@@ -63,7 +63,7 @@
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedIdProvidersRemoved });
                 StateHasChanged();
             });
-            SubscribeToAction<SelectRealmAction>((act) =>
+            SubscribeToAction<SelectRealmSuccessAction>((act) =>
             {
                 idProvidersGrid.Reload();
                 StateHasChanged();

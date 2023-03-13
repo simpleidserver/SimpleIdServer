@@ -50,7 +50,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
             if (handlerContext.User != null)
             {
                 jwsPayload.Claims.Add(JwtRegisteredClaimNames.Sub, handlerContext.User.Name);
-                var activeSession = handlerContext.User.ActiveSession;
+                var activeSession = handlerContext.User.GetActiveSession(handlerContext.Realm ?? Constants.DefaultRealm);
                 if (activeSession != null)
                     jwsPayload.Claims.Add(JwtRegisteredClaimNames.AuthTime, activeSession.AuthenticationDateTime.ConvertToUnixTimestamp());
             }
@@ -69,7 +69,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
 
         protected virtual SecurityTokenDescriptor BuildTokenDescriptor(IEnumerable<string> scopes, IEnumerable<string> audiences, HandlerContext handlerContext)
         {
-            var tokenDescriptor = _grantedTokenHelper.BuildAccessToken(handlerContext.Client.ClientId, audiences, scopes, handlerContext.Request.IssuerName, handlerContext.Client.TokenExpirationTimeInSeconds ?? _options.DefaultTokenExpirationTimeInSeconds);
+            var tokenDescriptor = _grantedTokenHelper.BuildAccessToken(handlerContext.Client.ClientId, audiences, scopes, handlerContext.GetIssuer(), handlerContext.Client.TokenExpirationTimeInSeconds ?? _options.DefaultTokenExpirationTimeInSeconds);
             if (handlerContext.Request.Certificate != null)
             {
                 var thumbprint = Hash(handlerContext.Request.Certificate.RawData);

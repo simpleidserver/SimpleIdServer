@@ -754,6 +754,10 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<DateTime>("CreateDateTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Realm")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ScopeId")
                         .HasColumnType("nvarchar(450)");
 
@@ -1324,6 +1328,10 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
                     b.Property<DateTime>("ExpirationDateTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Realm")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("State")
                         .HasColumnType("int");

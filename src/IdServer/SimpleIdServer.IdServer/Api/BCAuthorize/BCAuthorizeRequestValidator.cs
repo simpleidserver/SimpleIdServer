@@ -169,7 +169,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             if (audiences == null || !audiences.Any())
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_NO_AUDIENCE);
 
-            if (!audiences.Contains(context.Request.IssuerName))
+            if (!audiences.Contains(context.GetIssuer()))
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_BAD_AUDIENCE);
 
             if (string.IsNullOrWhiteSpace(issuer))
@@ -246,7 +246,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
                 if (extractionResult.Error != null)
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, extractionResult.Error);
                 var payload = extractionResult.Jwt;
-                if (!payload.Audiences.Contains(context.Request.IssuerName))
+                if (!payload.Audiences.Contains(context.GetIssuer()))
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_AUDIENCE_IDTOKENHINT);
 
                 return await CheckHint(context.Realm, payload, cancellationToken);

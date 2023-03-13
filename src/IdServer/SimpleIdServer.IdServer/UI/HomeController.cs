@@ -78,10 +78,11 @@ namespace SimpleIdServer.IdServer.UI
 
             async Task<List<ConsentViewModel>> GetConsents()
             {
-                var consents = new List<ConsentViewModel>(); 
-                var clientIds = user.Consents.Select(c => c.ClientId);
+                var consents = new List<ConsentViewModel>();
+                var filteredConsents = user.Consents.Where(c => c.Realm == prefix);
+                var clientIds = filteredConsents.Select(c => c.ClientId);
                 var oauthClients = await _clientRepository.Query().Include(c => c.Translations).Include(r => r.Realms).AsNoTracking().Where(c => clientIds.Contains(c.ClientId) && c.Realms.Any(r => r.Name == prefix)).ToListAsync(cancellationToken);
-                foreach (var consent in user.Consents)
+                foreach (var consent in filteredConsents)
                 {
                     var oauthClient = oauthClients.Single(c => c.ClientId == consent.ClientId);
                     consents.Add(new ConsentViewModel(
@@ -130,10 +131,11 @@ namespace SimpleIdServer.IdServer.UI
 
         [HttpGet]
         [Authorize(Constants.Policies.Authenticated)]
-        public async Task<IActionResult> RejectConsent(string consentId, CancellationToken cancellationToken)
+        public async Task<IActionResult> RejectConsent([FromRoute] string prefix, string consentId, CancellationToken cancellationToken)
         {
+            prefix = prefix ?? Constants.DefaultRealm;
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.Query().Include(u => u.Consents).FirstAsync(c => c.Name == nameIdentifier, cancellationToken);
+            var user = await _userRepository.Query().Include(u => u.Consents).Include(u => u.Realms).FirstAsync(c => c.Name == nameIdentifier && c.Realms.Any(r => r.Name == prefix), cancellationToken);
             if (!user.HasOpenIDConsent(consentId))
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request" });
 
@@ -334,7 +336,7 @@ namespace SimpleIdServer.IdServer.UI
         [HttpGet]
         public async Task<IActionResult> Disconnect()
         {
-            Response.Cookies.Delete(_options.SessionCookieName);
+            Response.Cookies.Delete(_options.GetSessionCookieName());
             await HttpContext.SignOutAsync();
             return RedirectToAction("Index");
         }

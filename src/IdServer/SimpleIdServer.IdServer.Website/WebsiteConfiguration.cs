@@ -12,7 +12,8 @@ namespace SimpleIdServer.IdServer.Website
 
         public static List<string> StandardClients = new List<string>
         {
-            "website"
+            "website",
+            "urn:website"
         };
 
         public static List<string> StandardScopes = new List<string>

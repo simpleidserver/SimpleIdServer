@@ -21,6 +21,27 @@ namespace SimpleIdServer.IdServer.Website.Stores.RealmStore
         {
             return state with
             {
+                ActiveRealm = null,
+                IsLoading = true
+            };
+        }
+
+        [ReducerMethod]
+        public static RealmsState ReduceGetActiveSuccessRealmAction(RealmsState state, GetActiveSuccessRealmAction act)
+        {
+            return state with
+            {
+                IsLoading = false,
+                ActiveRealm = act.Realm
+            };
+        }
+
+        [ReducerMethod]
+        public static RealmsState ReduceSelectRealmSuccessAction(RealmsState state, SelectRealmSuccessAction act)
+        {
+            return state with
+            {
+                IsLoading = false,
                 ActiveRealm = act.Realm
             };
         }

@@ -2,10 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer;
-using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.WsFederation;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 
 namespace Microsoft.Extensions.DependencyInjection
 {

@@ -125,7 +125,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                         {
                             { TokenRequestParameters.Ticket, permissionTicket.Id },
                             { "required_claims", rcs },
-                            { "redirect_uri", context.Request.IssuerName }
+                            { "redirect_uri", context.GetIssuer() }
                         }}
                     };
                     return new ContentResult

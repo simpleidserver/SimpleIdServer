@@ -42,7 +42,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseTypes
 
         public async Task Enrich(EnrichParameter parameter, HandlerContext context, CancellationToken cancellationToken)
         {
-            var activeSession = context.User.ActiveSession;
+            var activeSession = context.User.GetActiveSession(context.Realm ?? Constants.DefaultRealm);
             var dic = new JsonObject
             {
                 [JwtRegisteredClaimNames.Sub] = context.User.Name

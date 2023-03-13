@@ -113,7 +113,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
                 if (oauthClient == null)
                     throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));
 
-                if (!oauthClient.IsConsentDisabled && user.GetConsent(oauthClient.ClientId, scopes, claims, AuthorizationClaimTypes.UserInfo) == null)
+                if (!oauthClient.IsConsentDisabled && user.GetConsent(prefix, oauthClient.ClientId, scopes, claims, AuthorizationClaimTypes.UserInfo) == null)
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.NO_CONSENT);
 
                 var token = await _tokenRepository.Query().AsNoTracking().FirstOrDefaultAsync(t => t.Id == accessToken);

@@ -93,7 +93,7 @@ else
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
                 StateHasChanged();
             });
-            SubscribeToAction<SelectRealmAction>((act) =>
+            SubscribeToAction<SelectRealmSuccessAction>((act) =>
             {
                 navigationManager.NavigateTo("/scopes");
             });

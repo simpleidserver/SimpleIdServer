@@ -7,6 +7,7 @@ using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.ClaimTokenFormats;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Middlewares;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
 using System.Collections.Generic;
 using System.Text.Json;
@@ -180,6 +181,14 @@ namespace SimpleIdServer.IdServer.Options
         public IEnumerable<string> GetStringArrayParameter(string name) => Parameters[name].Split(',');
 
         public IEnumerable<T> GetObjectArrayParameter<T>(string name) => JsonSerializer.Deserialize<IEnumerable<T>>(Parameters[name]);
+
+        public string GetSessionCookieName()
+        {
+            var realm = RealmContext.Instance().Realm;
+            if (!string.IsNullOrWhiteSpace(realm))
+                return $"{SessionCookieName}.{realm}";
+            return SessionCookieName;
+        }
     }
 
     public class UICulture

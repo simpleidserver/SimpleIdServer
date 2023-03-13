@@ -666,6 +666,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     ClientId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Realm = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Scopes = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Claims = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ScopeId = table.Column<string>(type: "nvarchar(450)", nullable: true)
@@ -804,6 +805,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     AuthenticationDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ExpirationDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     State = table.Column<int>(type: "int", nullable: false),
+                    Realm = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>

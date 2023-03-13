@@ -12,7 +12,7 @@ namespace SimpleIdServer.IdServer.Auth
     {
         public void PostConfigure(string name, OpenIdConnectOptions options)
         {
-            options.ConfigurationManager = new IdServerConfigurationManager(options.Authority, new OpenIdConnectConfigurationRetriever(),
+            options.ConfigurationManager = new IdServerOpenIdConfigurationManager(options.Authority, new OpenIdConnectConfigurationRetriever(),
                 new HttpDocumentRetriever(options.Backchannel) { RequireHttps = options.RequireHttpsMetadata })
             {
                 RefreshInterval = options.RefreshInterval,

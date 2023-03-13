@@ -54,12 +54,9 @@ namespace SimpleIdServer.IdServer.Domains
                 return properties;
             }
         }
-        public UserSession? ActiveSession
+        public UserSession? GetActiveSession(string realm)
         {
-            get
-            {
-                return Sessions.FirstOrDefault(s => s.State == UserSessionStates.Active && DateTime.UtcNow < s.ExpirationDateTime);
-            }
+            return Sessions.FirstOrDefault(s => s.State == UserSessionStates.Active && DateTime.UtcNow < s.ExpirationDateTime && s.Realm == realm);
         }
         public UserCredential? ActiveOTP
         {
@@ -106,12 +103,12 @@ namespace SimpleIdServer.IdServer.Domains
             Consents.Remove(consent);
         }
 
-        public bool AddSession(DateTime expirationDateTime)
+        public bool AddSession(string realm, DateTime expirationDateTime)
         {
-            foreach (var session in Sessions)
+            foreach (var session in Sessions.Where(s => s.Realm == realm))
                 session.State = UserSessionStates.Rejected;
 
-            Sessions.Add(new UserSession { SessionId = Guid.NewGuid().ToString(), AuthenticationDateTime = DateTime.UtcNow, ExpirationDateTime = expirationDateTime, State = UserSessionStates.Active });
+            Sessions.Add(new UserSession { SessionId = Guid.NewGuid().ToString(), AuthenticationDateTime = DateTime.UtcNow, ExpirationDateTime = expirationDateTime, State = UserSessionStates.Active, Realm = realm });
             return true;
         }
 

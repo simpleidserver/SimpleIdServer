@@ -58,7 +58,7 @@ else
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.IdProviderMapperUpdated });
                 StateHasChanged();
             });
-            SubscribeToAction<SelectRealmAction>((act) =>
+            SubscribeToAction<SelectRealmSuccessAction>((act) =>
             {
                 navigationManager.NavigateTo("/idproviders");
             });

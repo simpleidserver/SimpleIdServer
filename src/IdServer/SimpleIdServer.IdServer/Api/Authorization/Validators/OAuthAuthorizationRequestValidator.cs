@@ -61,7 +61,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                 throw new OAuthLoginRequiredException(await GetFirstAmr(context.Realm, acrValues, claims, openidClient, cancellationToken));
             }
 
-            var activeSession = context.User.ActiveSession;
+            var activeSession = context.User.GetActiveSession(context.Realm ?? Constants.DefaultRealm);
             if (activeSession == null)
                 throw new OAuthLoginRequiredException(await GetFirstAmr(context.Realm, acrValues, claims, openidClient, cancellationToken), true);
 
@@ -92,7 +92,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                 if (context.User.Name != payload.Subject)
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_SUBJECT_IDTOKENHINT);
 
-                if (!payload.Audiences.Contains(context.Request.IssuerName))
+                if (!payload.Audiences.Contains(context.GetIssuer()))
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_AUDIENCE_IDTOKENHINT);
             }
 
@@ -111,7 +111,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                     throw new OAuthSelectAccountRequiredException();
             }
 
-            if (!context.User.HasOpenIDConsent(clientId, request, claims))
+            if (!context.User.HasOpenIDConsent(context.Realm, clientId, request, claims))
             {
                 RedirectToConsentView(context);
             }

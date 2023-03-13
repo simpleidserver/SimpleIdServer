@@ -1,11 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Website.Resources;
-using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 using System.Linq.Dynamic.Core;
 
 namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
@@ -14,21 +14,21 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
     {
         private readonly IAuthenticationSchemeProviderRepository _repository;
         private readonly IAuthenticationSchemeProviderDefinitionRepository _repositoryDef;
-        private readonly IRealmRepository _realmRepository;
-        private readonly IState<RealmsState> _realmsState;
+        private readonly DbContextOptions<StoreDbContext> _options;
+        private readonly ProtectedSessionStorage _sessionStorage;
 
-        public IdProviderEffects(IAuthenticationSchemeProviderRepository repository, IAuthenticationSchemeProviderDefinitionRepository repositoryDef, IRealmRepository realmRepository, IState<RealmsState> realmsState)
+        public IdProviderEffects(IAuthenticationSchemeProviderRepository repository, IAuthenticationSchemeProviderDefinitionRepository repositoryDef, DbContextOptions<StoreDbContext> options, ProtectedSessionStorage sessionStorage)
         {
             _repository = repository;
             _repositoryDef = repositoryDef;
-            _realmRepository = realmRepository;
-            _realmsState = realmsState;
+            _options = options;
+            _sessionStorage = sessionStorage;
         }
 
         [EffectMethod]
         public async Task Handle(SearchIdProvidersAction action, IDispatcher dispatcher)
         {
-            var realm = _realmsState.Value.ActiveRealm;
+            var realm = await GetRealm();
             IQueryable<AuthenticationSchemeProvider> query = _repository.Query().Include(p => p.Realms).Where(p => p.Realms.Any(r => r.Name == realm)).AsNoTracking();
             if (!string.IsNullOrWhiteSpace(action.Filter))
                 query = query.Where(SanitizeExpression(action.Filter));
@@ -45,7 +45,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         [EffectMethod]
         public async Task Handle(RemoveSelectedIdProvidersAction action, IDispatcher dispatcher)
         {
-            var realm = _realmsState.Value.ActiveRealm;
+            var realm = await GetRealm();
             var idProviders = await _repository.Query().Include(r => r.Realms).Include(p => p.Properties).Where(p => action.Ids.Contains(p.Name) && p.Realms.Any(r => r.Name == realm)).ToListAsync();
             _repository.RemoveRange(idProviders);
             await _repository.SaveChanges(CancellationToken.None);
@@ -55,7 +55,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         [EffectMethod]
         public async Task Handle(GetIdProviderAction action, IDispatcher dispatcher)
         {
-            var realm = _realmsState.Value.ActiveRealm;
+            var realm = await GetRealm();
             var idProvider = await _repository.Query().Include(i => i.Properties)
                 .Include(i => i.Mappers)
                 .Include(i => i.Realms)
@@ -87,37 +87,40 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
                 return;
             }
 
-            if (await _repository.Query().AsNoTracking().AnyAsync(r => r.Name == action.Name))
+            var realm = await GetRealm();
+            if (await _repository.Query().Include(r => r.Realms).AsNoTracking().AnyAsync(r => r.Name == action.Name && r.Realms.Any(rl => rl.Name == realm)))
             {
                 dispatcher.Dispatch(new AddIdProviderFailureAction { ErrorMessage = string.Format(Global.IdProviderExists, action.Name) });
                 return;
             }
 
-            var idProviderDef = await _repositoryDef.Query().SingleAsync(d => d.Name == action.IdProviderTypeName);
-            var realm = _realmsState.Value.ActiveRealm;
-            var activeRealm = await _realmRepository.Query().FirstAsync(r => r.Name == realm);
-            var idProvider = new AuthenticationSchemeProvider
+            using (var dbContext = new StoreDbContext(_options))
             {
-                Id = Guid.NewGuid().ToString(),
-                Name = action.Name,
-                Description = action.Description,
-                DisplayName = action.DisplayName,
-                CreateDateTime = DateTime.UtcNow,
-                UpdateDateTime = DateTime.UtcNow,
-                Properties = action.Properties.ToList(),
-                AuthSchemeProviderDefinition = idProviderDef,
-                Mappers = Constants.GetDefaultIdProviderMappers()
-            };
-            idProvider.Realms.Add(activeRealm);
-            _repository.Add(idProvider);
-            await _repository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new AddIdProviderSuccessAction { Name = action.Name, Description = action.Description, Properties = action.Properties, DisplayName = action.DisplayName });
+                var idProviderDef = await dbContext.AuthenticationSchemeProviderDefinitions.SingleAsync(d => d.Name == action.IdProviderTypeName);
+                var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
+                var idProvider = new AuthenticationSchemeProvider
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = action.Name,
+                    Description = action.Description,
+                    DisplayName = action.DisplayName,
+                    CreateDateTime = DateTime.UtcNow,
+                    UpdateDateTime = DateTime.UtcNow,
+                    Properties = action.Properties.ToList(),
+                    AuthSchemeProviderDefinition = idProviderDef,
+                    Mappers = Constants.GetDefaultIdProviderMappers()
+                };
+                idProvider.Realms.Add(activeRealm);
+                dbContext.Add(idProvider);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new AddIdProviderSuccessAction { Name = action.Name, Description = action.Description, Properties = action.Properties, DisplayName = action.DisplayName });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(UpdateIdProviderDetailsAction action, IDispatcher dispatcher)
         {
-            var realm = _realmsState.Value.ActiveRealm;
+            var realm = await GetRealm();
             var idProvider = await _repository.Query().Include(r => r.Realms).SingleAsync(a => a.Name == action.Name && a.Realms.Any(r => r.Name == realm));
             idProvider.Description = action.Description;
             idProvider.DisplayName = action.DisplayName;
@@ -129,7 +132,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         [EffectMethod]
         public async Task Handle(UpdateAuthenticationSchemeProviderPropertiesAction action, IDispatcher dispatcher)
         {
-            var realm = _realmsState.Value.ActiveRealm;
+            var realm = await GetRealm();
             var idProvider = await _repository.Query().Include(r => r.Realms).Include(p => p.Properties).SingleAsync(a => a.Name == action.Name && a.Realms.Any(r => r.Name == realm));
             idProvider.Properties.Clear();
             foreach (var property in action.Properties)
@@ -146,7 +149,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         [EffectMethod]
         public async Task Handle(AddAuthenticationSchemeProviderMapperAction action, IDispatcher dispatcher)
         {
-            var realm = _realmsState.Value.ActiveRealm;
+            var realm = await GetRealm();
             var idProvider = await _repository.Query().Include(r => r.Realms).Include(p => p.Mappers).SingleAsync(a => a.Name == action.IdProviderName && a.Realms.Any(r => r.Name == realm));
             var id = Guid.NewGuid().ToString();
             idProvider.Mappers.Add(new AuthenticationSchemeProviderMapper
@@ -174,7 +177,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         [EffectMethod]
         public async Task Handle(RemoveSelectedAuthenticationSchemeProviderMappersAction action, IDispatcher dispatcher)
         {
-            var realm = _realmsState.Value.ActiveRealm;
+            var realm = await GetRealm();
             var idProvider = await _repository.Query().Include(p => p.Realms).Include(p => p.Mappers).SingleAsync(a => a.Name == action.Name && a.Realms.Any(r => r.Name == realm));
             idProvider.Mappers = idProvider.Mappers.Where(m => !action.MapperIds.Contains(m.Id)).ToList();
             await _repository.SaveChanges(CancellationToken.None);
@@ -188,7 +191,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         [EffectMethod]
         public async Task Handle(UpdateAuthenticationSchemeProviderMapperAction action, IDispatcher dispatcher)
         {
-            var realm = _realmsState.Value.ActiveRealm;
+            var realm = await GetRealm();
             var idProvider = await _repository.Query().Include(p => p.Realms).Include(p => p.Mappers).SingleAsync(a => a.Name == action.IdProviderName && a.Realms.Any(r => r.Name == realm));
             var mapper = idProvider.Mappers.First(m => m.Id == action.Id);
             mapper.Name = action.Name;
@@ -205,6 +208,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
                 TargetUserAttribute = action.TargetUserAttribute,
                 TargetUserProperty = action.TargetUserProperty
             });
+        }
+
+        private async Task<string> GetRealm()
+        {
+            var realm = await _sessionStorage.GetAsync<string>("realm");
+            var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+            return realmStr;
         }
     }
 

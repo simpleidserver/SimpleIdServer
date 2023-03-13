@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Auth;
 using SimpleIdServer.IdServer.Options;
 using System;
 using System.Collections.Generic;
@@ -40,7 +41,7 @@ namespace SimpleIdServer.IdServer.UI.Infrastructures
 
         public IEnumerable<AuthenticationTicket> FetchTickets(HttpContext context)
         {
-            var filteredCookies = context.Request.Cookies.Where(c => c.Key.StartsWith($"{COOKIE_NAME}-"));
+            var filteredCookies = context.Request.Cookies.Where(c => c.Key.StartsWith($"{IdServerCookieAuthenticationHandler.GetCookieName(COOKIE_NAME)}-"));
             var result = new List<AuthenticationTicket>();
             foreach (var filterCookie in filteredCookies)
             {

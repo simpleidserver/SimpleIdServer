@@ -93,7 +93,7 @@
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedScopesRemoved });
                 StateHasChanged();
             });
-            SubscribeToAction<SelectRealmAction>((act) =>
+            SubscribeToAction<SelectRealmSuccessAction>((act) =>
             {
                 scopesGrid.Reload();
                 StateHasChanged();

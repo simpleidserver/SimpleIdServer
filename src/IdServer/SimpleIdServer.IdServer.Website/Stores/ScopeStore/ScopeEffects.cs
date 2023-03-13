@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
@@ -13,27 +14,29 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
     public class ScopeEffects
     {
         private readonly IScopeRepository _scopeRepository;
-        private readonly IRealmRepository _realmRepository;
-        private readonly IState<RealmsState> _realmsState;
+        private readonly ProtectedSessionStorage _sessionStorage;
+        private readonly DbContextOptions<StoreDbContext> _options;
 
-        public ScopeEffects(IScopeRepository scopeRepository, IRealmRepository realmRepository, IState<RealmsState> realmsState)
+        public ScopeEffects(IScopeRepository scopeRepository, ProtectedSessionStorage sessionStorage, DbContextOptions<StoreDbContext> options)
         {
             _scopeRepository = scopeRepository;
-            _realmRepository = realmRepository;
-            _realmsState = realmsState;
+            _sessionStorage = sessionStorage;
+            _options = options;
         }
 
 
         [EffectMethod]
         public async Task Handle(SearchScopesAction action, IDispatcher dispatcher)
         {
-            var realm = _realmsState.Value.ActiveRealm;
+            var realm = await GetRealm();
             IQueryable<Scope> query = _scopeRepository.Query().Include(s => s.Realms).Where(s => s.Realms.Any(r => r.Name == realm)).AsNoTracking();
             if (!string.IsNullOrWhiteSpace(action.Filter))
                 query = query.Where(SanitizeExpression(action.Filter));
 
             if (!string.IsNullOrWhiteSpace(action.OrderBy))
                 query = query.OrderBy(SanitizeExpression(action.OrderBy));
+            else
+                query = query.OrderBy(a => a.Name);
 
             if (!string.IsNullOrWhiteSpace(action.ClientType))
             {
@@ -52,7 +55,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
         [EffectMethod]
         public async Task Handle(RemoveSelectedScopesAction action, IDispatcher dispatcher)
         {
-            var realm = _realmsState.Value.ActiveRealm;
+            var realm = await GetRealm();
             var scopes = await _scopeRepository.Query().Include(s => s.Realms).Where(c => action.ScopeNames.Contains(c.Name) && c.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
             _scopeRepository.DeleteRange(scopes);
             await _scopeRepository.SaveChanges(CancellationToken.None);
@@ -62,63 +65,69 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
         [EffectMethod]
         public async Task Handle(AddIdentityScopeAction action, IDispatcher dispatcher)
         {
-            var realm = _realmsState.Value.ActiveRealm;
+            var realm = await GetRealm();
             if (await _scopeRepository.Query().Include(s => s.Realms).AsNoTracking().AnyAsync(s => s.Name == action.Name && s.Realms.Any(r => r.Name == realm), CancellationToken.None))
             {
                 dispatcher.Dispatch(new AddScopeFailureAction { Name = action.Name, ErrorMessage = string.Format(Global.ScopeAlreadyExists, action.Name) });
                 return;
             }
 
-            var activeRealm = await _realmRepository.Query().FirstAsync(r => r.Name == realm);
-            var newScope = new Scope
+            using (var dbContext = new StoreDbContext(_options))
             {
-                Id = Guid.NewGuid().ToString(),
-                Name = action.Name,
-                Description = action.Description,
-                Type = ScopeTypes.IDENTITY,
-                IsExposedInConfigurationEdp = action.IsExposedInConfigurationEdp,
-                Protocol = action.Protocol,
-                CreateDateTime = DateTime.UtcNow,
-                UpdateDateTime = DateTime.UtcNow
-            };
-            newScope.Realms.Add(activeRealm);
-            _scopeRepository.Add(newScope);
-            await _scopeRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new AddScopeSuccessAction { Name = action.Name, Description = action.Description, IsExposedInConfigurationEdp = action.IsExposedInConfigurationEdp, Protocol = action.Protocol, Type = ScopeTypes.IDENTITY });
+                var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
+                var newScope = new Scope
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = action.Name,
+                    Description = action.Description,
+                    Type = ScopeTypes.IDENTITY,
+                    IsExposedInConfigurationEdp = action.IsExposedInConfigurationEdp,
+                    Protocol = action.Protocol,
+                    CreateDateTime = DateTime.UtcNow,
+                    UpdateDateTime = DateTime.UtcNow
+                };
+                newScope.Realms.Add(activeRealm);
+                dbContext.Scopes.Add(newScope);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new AddScopeSuccessAction { Name = action.Name, Description = action.Description, IsExposedInConfigurationEdp = action.IsExposedInConfigurationEdp, Protocol = action.Protocol, Type = ScopeTypes.IDENTITY });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(AddApiScopeAction action, IDispatcher dispatcher)
         {
-            var realm = _realmsState.Value.ActiveRealm;
+            var realm = await GetRealm();
             if (await _scopeRepository.Query().Include(s => s.Realms).AsNoTracking().AnyAsync(s => s.Name == action.Name && s.Realms.Any(r => r.Name == realm), CancellationToken.None))
             {
                 dispatcher.Dispatch(new AddScopeFailureAction { Name = action.Name, ErrorMessage = string.Format(Global.ScopeAlreadyExists, action.Name) });
                 return;
             }
 
-            var activeRealm = await _realmRepository.Query().FirstAsync(r => r.Name == realm);
-            var newScope = new Scope
+            using (var dbContext = new StoreDbContext(_options))
             {
-                Id = Guid.NewGuid().ToString(),
-                Name = action.Name,
-                Description = action.Description,
-                Type = ScopeTypes.APIRESOURCE,
-                IsExposedInConfigurationEdp = action.IsExposedInConfigurationEdp,
-                Protocol = ScopeProtocols.OAUTH,
-                CreateDateTime = DateTime.UtcNow,
-                UpdateDateTime = DateTime.UtcNow
-            };
-            newScope.Realms.Add(activeRealm);
-            _scopeRepository.Add(newScope);
-            await _scopeRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new AddScopeSuccessAction { Name = action.Name, Description = action.Description, IsExposedInConfigurationEdp = action.IsExposedInConfigurationEdp, Protocol = ScopeProtocols.OAUTH, Type = ScopeTypes.APIRESOURCE });
+                var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
+                var newScope = new Scope
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = action.Name,
+                    Description = action.Description,
+                    Type = ScopeTypes.APIRESOURCE,
+                    IsExposedInConfigurationEdp = action.IsExposedInConfigurationEdp,
+                    Protocol = ScopeProtocols.OAUTH,
+                    CreateDateTime = DateTime.UtcNow,
+                    UpdateDateTime = DateTime.UtcNow
+                };
+                newScope.Realms.Add(activeRealm);
+                dbContext.Scopes.Add(newScope);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new AddScopeSuccessAction { Name = action.Name, Description = action.Description, IsExposedInConfigurationEdp = action.IsExposedInConfigurationEdp, Protocol = ScopeProtocols.OAUTH, Type = ScopeTypes.APIRESOURCE });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(GetScopeAction action, IDispatcher dispatcher)
         {
-            var realm = _realmsState.Value.ActiveRealm;
+            var realm = await GetRealm();
             var scope = await _scopeRepository.Query().Include(s => s.Realms).Include(s => s.ClaimMappers).AsNoTracking().SingleOrDefaultAsync(s => s.Name == action.ScopeName && s.Realms.Any(r => r.Name == realm), CancellationToken.None);
             if (scope == null)
             {
@@ -132,7 +141,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
         [EffectMethod]
         public async Task Handle(UpdateScopeAction action, IDispatcher dispatcher)
         {
-            var realm = _realmsState.Value.ActiveRealm;
+            var realm = await GetRealm();
             var scope = await _scopeRepository.Query().Include(s => s.Realms).SingleAsync(s => s.Name == action.ScopeName && s.Realms.Any(r => r.Name == realm), CancellationToken.None);
             scope.Description = action.Description;
             scope.IsExposedInConfigurationEdp = action.IsExposedInConfigurationEdp;
@@ -143,7 +152,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
         [EffectMethod]
         public async Task Handle(RemoveSelectedScopeMappersAction action, IDispatcher dispatcher)
         {
-            var realm = _realmsState.Value.ActiveRealm;
+            var realm = await GetRealm();
             var scope = await _scopeRepository.Query().Include(s => s.Realms).Include(s => s.ClaimMappers).SingleAsync(s => s.Name == action.ScopeName && s.Realms.Any(r => r.Name == realm), CancellationToken.None);
             scope.ClaimMappers = scope.ClaimMappers.Where(m => !action.ScopeMapperIds.Contains(m.Id)).ToList();
             await _scopeRepository.SaveChanges(CancellationToken.None);
@@ -153,7 +162,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
         [EffectMethod]
         public async Task Handle(AddScopeClaimMapperAction action, IDispatcher dispatcher)
         {
-            var realm = _realmsState.Value.ActiveRealm;
+            var realm = await GetRealm();
             var scope = await _scopeRepository.Query().Include(s => s.Realms).Include(s => s.ClaimMappers).SingleAsync(s => s.Name == action.ScopeName && s.Realms.Any(r => r.Name == realm), CancellationToken.None);
             if (scope.ClaimMappers.Any(m => m.Name == action.ClaimMapper.Name))
             {
@@ -181,7 +190,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
         [EffectMethod]
         public async Task Handle(UpdateScopeClaimMapperAction action, IDispatcher dispatcher)
         {
-            var realm = _realmsState.Value.ActiveRealm;
+            var realm = await GetRealm();
             var scope = await _scopeRepository.Query().Include(s => s.Realms).Include(s => s.ClaimMappers).SingleAsync(s => s.Name == action.ScopeName && s.Realms.Any(r => r.Name == realm), CancellationToken.None);
             if (!string.IsNullOrWhiteSpace(action.ClaimMapper.TokenClaimName) && scope.ClaimMappers.Any(m => m.TokenClaimName == action.ClaimMapper.TokenClaimName && m.Name != action.ClaimMapper.Name))
             {
@@ -210,6 +219,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
             mapper.IsMultiValued = action.ClaimMapper.IsMultiValued;
             await _scopeRepository.SaveChanges(CancellationToken.None);
             dispatcher.Dispatch(new UpdateScopeClaimMapperSuccessAction { ClaimMapper = action.ClaimMapper, ScopeName = action.ScopeName });
+        }
+
+        private async Task<string> GetRealm()
+        {
+            var realm = await _sessionStorage.GetAsync<string>("realm");
+            var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+            return realmStr;
         }
     }
 

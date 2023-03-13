@@ -89,7 +89,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             catch (OAuthLoginRequiredException ex)
             {
                 context.Request.RequestData.Remove(AuthorizationRequestParameters.Prompt);
-                return new RedirectActionAuthorizationResponse("Index", "Authenticate", context.Request.OriginalRequestData, ex.Area, true, new List<string> { _options.SessionCookieName });
+                return new RedirectActionAuthorizationResponse("Index", "Authenticate", context.Request.OriginalRequestData, ex.Area, true, new List<string> { _options.GetSessionCookieName() });
             }
             catch (OAuthSelectAccountRequiredException)
             {
@@ -225,7 +225,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
 
         private string BuildSessionState(HandlerContext handlerContext)
         {
-            var session = handlerContext.User.ActiveSession;
+            var session = handlerContext.User.GetActiveSession(handlerContext.Realm ?? Constants.DefaultRealm);
             if (session == null)
                 return null;
 

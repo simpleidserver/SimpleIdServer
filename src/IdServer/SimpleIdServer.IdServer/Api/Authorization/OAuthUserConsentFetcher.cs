@@ -9,13 +9,13 @@ namespace SimpleIdServer.IdServer.Api.Authorization
 {
     public interface IUserConsentFetcher
     {
-        Consent FetchFromAuthorizationRequest(User oauthUser, JsonObject queryParameters);
-        Consent BuildFromAuthorizationRequest(JsonObject queryParameters);
+        Consent FetchFromAuthorizationRequest(string realm, User oauthUser, JsonObject queryParameters);
+        Consent BuildFromAuthorizationRequest(string realm, JsonObject queryParameters);
     }
 
     public class OAuthUserConsentFetcher : IUserConsentFetcher
     {
-        public virtual Consent BuildFromAuthorizationRequest(JsonObject queryParameters)
+        public virtual Consent BuildFromAuthorizationRequest(string realm, JsonObject queryParameters)
         {
             var clientId = queryParameters.GetClientIdFromAuthorizationRequest();
             var scopes = queryParameters.GetScopesFromAuthorizationRequest();
@@ -26,16 +26,17 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                 ClientId = clientId,
                 Scopes = scopes.ToList(),
                 Claims = claims.Select(c => c.Name),
-                CreateDateTime = DateTime.UtcNow
+                CreateDateTime = DateTime.UtcNow,
+                Realm = realm
             };
         }
 
-        public virtual Consent FetchFromAuthorizationRequest(User oauthUser, JsonObject queryParameters)
+        public virtual Consent FetchFromAuthorizationRequest(string realm, User oauthUser, JsonObject queryParameters)
         {
             var clientId = queryParameters.GetClientIdFromAuthorizationRequest();
             var scopes = queryParameters.GetScopesFromAuthorizationRequest();
             var claims = queryParameters.GetClaimsFromAuthorizationRequest();
-            return oauthUser.GetConsent(clientId, scopes, claims, AuthorizationClaimTypes.IdToken);
+            return oauthUser.GetConsent(realm, clientId, scopes, claims, AuthorizationClaimTypes.IdToken);
         }
     }
 }

@@ -31,11 +31,16 @@ namespace SimpleIdServer.IdServer.Api.Configuration
         {
             var subUrl = string.Empty;
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
+            var issuerStr = issuer;
             if (!string.IsNullOrWhiteSpace(prefix))
+            {
+                issuerStr = $"{issuer}/{prefix}";
                 subUrl = $"{prefix}/";
+            }
+
             var jObj = new JsonObject
             {
-                [OAuthConfigurationNames.Issuer] = issuer,
+                [OAuthConfigurationNames.Issuer] = issuerStr,
                 [OAuthConfigurationNames.AuthorizationEndpoint] = $"{issuer}/{subUrl}{Constants.EndPoints.Authorization}",
                 [OAuthConfigurationNames.RegistrationEndpoint] = $"{issuer}/{subUrl}{Constants.EndPoints.Registration}",
                 [OAuthConfigurationNames.TokenEndpoint] = $"{issuer}/{subUrl}{Constants.EndPoints.Token}",

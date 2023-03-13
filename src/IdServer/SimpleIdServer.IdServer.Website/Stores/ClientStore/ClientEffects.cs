@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Radzen;
@@ -10,7 +11,6 @@ using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Website.Resources;
-using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 using SimpleIdServer.IdServer.WsFederation;
 using System.Linq.Dynamic.Core;
 
@@ -19,22 +19,20 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
     public class ClientEffects
     {
         private readonly IClientRepository _clientRepository;
-        private readonly IScopeRepository _scopeRepository;
-        private readonly IRealmRepository _realmRepository;
-        private readonly IState<RealmsState> _realmsState;
+        private readonly ProtectedSessionStorage _sessionStorage;
+        private readonly DbContextOptions<StoreDbContext> _options;
 
-        public ClientEffects(IClientRepository clientRepository, IScopeRepository scopeRepository, IRealmRepository realmRepository, IState<RealmsState> realmsState)
+        public ClientEffects(IClientRepository clientRepository, ProtectedSessionStorage sessionStorage, DbContextOptions<StoreDbContext> options)
         {
             _clientRepository = clientRepository;
-            _scopeRepository = scopeRepository;
-            _realmRepository = realmRepository;
-            _realmsState = realmsState;
+            _sessionStorage = sessionStorage;
+            _options = options;
         }
 
         [EffectMethod]
         public async Task Handle(SearchClientsAction action, IDispatcher dispatcher)
         {
-            var realm = _realmsState.Value.ActiveRealm;
+            var realm = await GetRealm();
             IQueryable<Client> query = _clientRepository.Query().Include(c => c.Translations).Include(c => c.Realms).Include(c => c.Scopes).Where(c => c.Realms.Any(r => r.Name == realm)).AsNoTracking();
             if (!string.IsNullOrWhiteSpace(action.Filter))
                 query = query.Where(SanitizeExpression(action.Filter));
@@ -52,107 +50,125 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public async Task Handle(AddSpaClientAction action, IDispatcher dispatcher)
         {
             if (!await ValidateAddClient(action.ClientId, action.RedirectionUrls, dispatcher)) return;
-            var realm = _realmsState.Value.ActiveRealm;
-            var activeRealm = await _realmRepository.Query().FirstAsync(r => r.Name == realm);
-            var scopes = await _scopeRepository.Query().Include(s => s.Realms).Where(s => (s.Name == Constants.StandardScopes.OpenIdScope.Name || s.Name == Constants.StandardScopes.Profile.Name) && s.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
-            var newClientBuilder = ClientBuilder.BuildUserAgentClient(action.ClientId, Guid.NewGuid().ToString(), activeRealm, action.RedirectionUrls.ToArray())
-                .AddScope(scopes.ToArray());
-            if (!string.IsNullOrWhiteSpace(action.ClientName))
-                newClientBuilder.SetClientName(action.ClientName);
-            var newClient = newClientBuilder.Build();
-            _clientRepository.Add(newClient);
-            await _clientRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.SPA });
+            using (var dbContext = new StoreDbContext(_options))
+            {
+                var realm = await GetRealm();
+                var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
+                var scopes = await dbContext.Scopes.Include(s => s.Realms).Where(s => (s.Name == Constants.StandardScopes.OpenIdScope.Name || s.Name == Constants.StandardScopes.Profile.Name) && s.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
+                var newClientBuilder = ClientBuilder.BuildUserAgentClient(action.ClientId, Guid.NewGuid().ToString(), activeRealm, action.RedirectionUrls.ToArray())
+                    .AddScope(scopes.ToArray());
+                if (!string.IsNullOrWhiteSpace(action.ClientName))
+                    newClientBuilder.SetClientName(action.ClientName);
+                var newClient = newClientBuilder.Build();
+                dbContext.Clients.Add(newClient);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.SPA });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(AddMachineClientApplicationAction action, IDispatcher dispatcher)
         {
             if (!await ValidateAddClient(action.ClientId, new List<string>(), dispatcher)) return;
-            var realm = _realmsState.Value.ActiveRealm;
-            var activeRealm = await _realmRepository.Query().FirstAsync(r => r.Name == realm);
-            var newClientBuilder = ClientBuilder.BuildApiClient(action.ClientId, action.ClientSecret, activeRealm);
-            if (!string.IsNullOrWhiteSpace(action.ClientName))
-                newClientBuilder.SetClientName(action.ClientName);
-            var newClient = newClientBuilder.Build();
-            _clientRepository.Add(newClient);
-            await _clientRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.MACHINE });
+            using (var dbContext = new StoreDbContext(_options))
+            {
+                var realm = await GetRealm();
+                var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
+                var newClientBuilder = ClientBuilder.BuildApiClient(action.ClientId, action.ClientSecret, activeRealm);
+                if (!string.IsNullOrWhiteSpace(action.ClientName))
+                    newClientBuilder.SetClientName(action.ClientName);
+                var newClient = newClientBuilder.Build();
+                dbContext.Clients.Add(newClient);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.MACHINE });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(AddWebsiteApplicationAction action, IDispatcher dispatcher)
         {
             if (!await ValidateAddClient(action.ClientId, new List<string>(), dispatcher)) return;
-            var realm = _realmsState.Value.ActiveRealm;
-            var activeRealm = await _realmRepository.Query().FirstAsync(r => r.Name == realm);
-            var scopes = await _scopeRepository.Query().Include(s => s.Realms).Where(s => (s.Name == Constants.StandardScopes.OpenIdScope.Name || s.Name == Constants.StandardScopes.Profile.Name) && s.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
-            var newClientBuilder = ClientBuilder.BuildTraditionalWebsiteClient(action.ClientId, action.ClientSecret, activeRealm, action.RedirectionUrls.ToArray())
-                .AddScope(scopes.ToArray());
-            if (!string.IsNullOrWhiteSpace(action.ClientName))
-                newClientBuilder.SetClientName(action.ClientName);
-            var newClient = newClientBuilder.Build();
-            _clientRepository.Add(newClient);
-            await _clientRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.WEBSITE });
+            using (var dbContext = new StoreDbContext(_options))
+            {
+                var realm = await GetRealm();
+                var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
+                var scopes = await dbContext.Scopes.Include(s => s.Realms).Where(s => (s.Name == Constants.StandardScopes.OpenIdScope.Name || s.Name == Constants.StandardScopes.Profile.Name) && s.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
+                var newClientBuilder = ClientBuilder.BuildTraditionalWebsiteClient(action.ClientId, action.ClientSecret, activeRealm, action.RedirectionUrls.ToArray())
+                    .AddScope(scopes.ToArray());
+                if (!string.IsNullOrWhiteSpace(action.ClientName))
+                    newClientBuilder.SetClientName(action.ClientName);
+                var newClient = newClientBuilder.Build();
+                dbContext.Clients.Add(newClient);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.WEBSITE });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(AddMobileApplicationAction action, IDispatcher dispatcher)
         {
             if (!await ValidateAddClient(action.ClientId, new List<string>(), dispatcher)) return;
-            var realm = _realmsState.Value.ActiveRealm;
-            var activeRealm = await _realmRepository.Query().FirstAsync(r => r.Name == realm);
-            var scopes = await _scopeRepository.Query().Include(s => s.Realms).Where(s => (s.Name == Constants.StandardScopes.OpenIdScope.Name || s.Name == Constants.StandardScopes.Profile.Name) && s.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
-            var newClientBuilder = ClientBuilder.BuildMobileApplication(action.ClientId, Guid.NewGuid().ToString(), activeRealm, action.RedirectionUrls.ToArray())
-                .AddScope(scopes.ToArray());
-            if (!string.IsNullOrWhiteSpace(action.ClientName))
-                newClientBuilder.SetClientName(action.ClientName);
-            var newClient = newClientBuilder.Build();
-            _clientRepository.Add(newClient);
-            await _clientRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.MOBILE });
+            using (var dbContext = new StoreDbContext(_options))
+            {
+                var realm = await GetRealm();
+                var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
+                var scopes = await dbContext.Scopes.Include(s => s.Realms).Where(s => (s.Name == Constants.StandardScopes.OpenIdScope.Name || s.Name == Constants.StandardScopes.Profile.Name) && s.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
+                var newClientBuilder = ClientBuilder.BuildMobileApplication(action.ClientId, Guid.NewGuid().ToString(), activeRealm, action.RedirectionUrls.ToArray())
+                    .AddScope(scopes.ToArray());
+                if (!string.IsNullOrWhiteSpace(action.ClientName))
+                    newClientBuilder.SetClientName(action.ClientName);
+                var newClient = newClientBuilder.Build();
+                dbContext.Clients.Add(newClient);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.MOBILE });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(AddDeviceApplicationAction action, IDispatcher dispatcher)
         {
             if (!await ValidateAddClient(action.ClientId, new List<string>(), dispatcher)) return;
-            var realm = _realmsState.Value.ActiveRealm;
-            var activeRealm = await _realmRepository.Query().FirstAsync(r => r.Name == realm);
-            var scopes = await _scopeRepository.Query().Include(s => s.Realms).Where(s => (s.Name == Constants.StandardScopes.OpenIdScope.Name || s.Name == Constants.StandardScopes.Profile.Name) && s.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
-            var newClientBuilder = ClientBuilder.BuildExternalAuthDeviceClient(action.ClientId, Guid.NewGuid().ToString(), activeRealm, action.RedirectionUrls.ToArray())
-                .AddScope(scopes.ToArray());
-            if (!string.IsNullOrWhiteSpace(action.ClientName))
-                newClientBuilder.SetClientName(action.ClientName);
-            var newClient = newClientBuilder.Build();
-            _clientRepository.Add(newClient);
-            await _clientRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.EXTERNAL });
+            using (var dbContext = new StoreDbContext(_options))
+            {
+                var realm = await GetRealm();
+                var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
+                var scopes = await dbContext.Scopes.Include(s => s.Realms).Where(s => (s.Name == Constants.StandardScopes.OpenIdScope.Name || s.Name == Constants.StandardScopes.Profile.Name) && s.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
+                var newClientBuilder = ClientBuilder.BuildExternalAuthDeviceClient(action.ClientId, Guid.NewGuid().ToString(), activeRealm, action.RedirectionUrls.ToArray())
+                    .AddScope(scopes.ToArray());
+                if (!string.IsNullOrWhiteSpace(action.ClientName))
+                    newClientBuilder.SetClientName(action.ClientName);
+                var newClient = newClientBuilder.Build();
+                dbContext.Clients.Add(newClient);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.EXTERNAL });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(AddWsFederationApplicationAction action, IDispatcher dispatcher)
         {
             if (!await ValidateAddClient(action.ClientId, new List<string>(), dispatcher)) return;
-            var realm = _realmsState.Value.ActiveRealm;
-            var activeRealm = await _realmRepository.Query().FirstAsync(r => r.Name == realm);
-            var newClientBuilder = WsClientBuilder.BuildWsFederationClient(action.ClientId, activeRealm);
-            if (!string.IsNullOrWhiteSpace(action.ClientName))
-                newClientBuilder.SetClientName(action.ClientName);
-            var newClient = newClientBuilder.Build();
-            var scopeNames = newClient.Scopes.Select(s => s.Name);
-            var scopes = await _scopeRepository.Query().Where(s => scopeNames.Contains(s.Name)).ToListAsync(CancellationToken.None);
-            newClient.Scopes = scopes;
-            _clientRepository.Add(newClient);
-            await _clientRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = WsFederationConstants.CLIENT_TYPE });
+            using (var dbContext = new StoreDbContext(_options))
+            {
+                var realm = await GetRealm();
+                var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
+                var newClientBuilder = WsClientBuilder.BuildWsFederationClient(action.ClientId, activeRealm);
+                if (!string.IsNullOrWhiteSpace(action.ClientName))
+                    newClientBuilder.SetClientName(action.ClientName);
+                var newClient = newClientBuilder.Build();
+                var scopeNames = newClient.Scopes.Select(s => s.Name);
+                var scopes = await dbContext.Scopes.Where(s => scopeNames.Contains(s.Name)).ToListAsync(CancellationToken.None);
+                newClient.Scopes = scopes;
+                dbContext.Clients.Add(newClient);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = WsFederationConstants.CLIENT_TYPE });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(RemoveSelectedClientsAction action, IDispatcher dispatcher)
         {
-            var realm = _realmsState.Value.ActiveRealm;
+            var realm = await GetRealm();
             var clients = await _clientRepository.Query().Include(c => c.Realms).Where(c => action.ClientIds.Contains(c.ClientId) && c.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
             _clientRepository.DeleteRange(clients);
             await _clientRepository.SaveChanges(CancellationToken.None);
@@ -162,7 +178,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         [EffectMethod]
         public async Task Handle(GetClientAction action, IDispatcher dispatcher)
         {
-            var realm = _realmsState.Value.ActiveRealm;
+            var realm = await GetRealm();
             var client = await _clientRepository.Query().Include(c => c.Realms).Include(c => c.Translations).Include(c => c.Scopes).Include(c => c.SerializedJsonWebKeys).AsNoTracking().SingleOrDefaultAsync(c => c.ClientId == action.ClientId && c.Realms.Any(r => r.Name == realm), CancellationToken.None);
             if(client == null)
             {
@@ -176,7 +192,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         [EffectMethod]
         public async Task Handle(UpdateClientDetailsAction act, IDispatcher dispatcher)
         {
-            var realm = _realmsState.Value.ActiveRealm;
+            var realm = await GetRealm();
             var client = await _clientRepository.Query().Include(c => c.Realms).Include(c => c.Translations).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm), CancellationToken.None);
             client.RedirectionUrls = act.RedirectionUrls.Split(';');
             client.UpdateClientName(act.ClientName);
@@ -224,7 +240,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         [EffectMethod]
         public async Task Handle(RemoveSelectedClientScopesAction act, IDispatcher dispatcher)
         {
-            var realm = _realmsState.Value.ActiveRealm;
+            var realm = await GetRealm();
             var client = await _clientRepository.Query().Include(c => c.Realms).Include(c => c.Scopes).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm), CancellationToken.None);
             client.Scopes = client.Scopes.Where(s => !act.ScopeNames.Contains(s.Name)).ToList();
             await _clientRepository.SaveChanges(CancellationToken.None);
@@ -238,23 +254,26 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         [EffectMethod]
         public async Task Handle(AddClientScopesAction act, IDispatcher dispatcher)
         {
-            var realm = _realmsState.Value.ActiveRealm;
-            var client = await _clientRepository.Query().Include(c => c.Realms).Include(c => c.Scopes).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm), CancellationToken.None);
-            var newScopes = await _scopeRepository.Query().Where(s => act.ScopeNames.Contains(s.Name)).ToListAsync();
-            foreach (var newScope in newScopes)
-                client.Scopes.Add(newScope);
-            await _clientRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new AddClientScopesSuccessAction
+            var realm = await GetRealm();
+            using (var dbContext = new StoreDbContext(_options))
             {
-                ClientId = act.ClientId,
-                Scopes = newScopes
-            });
+                var client = await dbContext.Clients.Include(c => c.Realms).Include(c => c.Scopes).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm), CancellationToken.None);
+                var newScopes = await dbContext.Scopes.Where(s => act.ScopeNames.Contains(s.Name)).ToListAsync();
+                foreach (var newScope in newScopes)
+                    client.Scopes.Add(newScope);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new AddClientScopesSuccessAction
+                {
+                    ClientId = act.ClientId,
+                    Scopes = newScopes
+                });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(GenerateSigKeyAction act, IDispatcher dispatcher)
         {
-            var realm = _realmsState.Value.ActiveRealm;
+            var realm = await GetRealm();
             var client = await _clientRepository.Query().Include(c => c.Realms).AsNoTracking().Include(c => c.SerializedJsonWebKeys).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm));
             if(client.JsonWebKeys.Any(j => j.KeyId == act.KeyId))
             {
@@ -283,7 +302,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         [EffectMethod]
         public async Task Handle(GenerateEncKeyAction act, IDispatcher dispatcher)
         {
-            var realm = _realmsState.Value.ActiveRealm;
+            var realm = await GetRealm();
             var client = await _clientRepository.Query().Include(c => c.Realms).AsNoTracking().Include(c => c.SerializedJsonWebKeys).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm));
             if (client.JsonWebKeys.Any(j => j.KeyId == act.KeyId))
             {
@@ -309,7 +328,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         [EffectMethod]
         public async Task Handle(AddSigKeyAction act, IDispatcher dispatcher)
         {
-            var realm = _realmsState.Value.ActiveRealm;
+            var realm = await GetRealm();
             var client = await _clientRepository.Query().Include(c => c.Realms).Include(c => c.SerializedJsonWebKeys).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm));
             var jsonWebKey = act.Credentials.SerializePublicJWK();
             client.Add(act.KeyId, jsonWebKey, Constants.JWKUsages.Sig, act.KeyType);
@@ -321,7 +340,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         [EffectMethod]
         public async Task Handle(AddEncKeyAction act, IDispatcher dispatcher)
         {
-            var realm = _realmsState.Value.ActiveRealm;
+            var realm = await GetRealm();
             var client = await _clientRepository.Query().Include(c => c.Realms).Include(c => c.SerializedJsonWebKeys).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm));
             var jsonWebKey = act.Credentials.SerializePublicJWK();
             client.Add(act.KeyId, jsonWebKey, Constants.JWKUsages.Enc, act.KeyType);
@@ -332,7 +351,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         [EffectMethod]
         public async Task Handle(RemoveSelectedClientKeysAction act, IDispatcher dispatcher)
         {
-            var realm = _realmsState.Value.ActiveRealm;
+            var realm = await GetRealm();
             var client = await _clientRepository.Query().Include(c => c.Realms).Include(c => c.SerializedJsonWebKeys).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm));
             client.SerializedJsonWebKeys = client.SerializedJsonWebKeys.Where(j => !act.KeyIds.Contains(j.Kid)).ToList();
             await _clientRepository.SaveChanges(CancellationToken.None);
@@ -342,7 +361,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         [EffectMethod]
         public async Task Handle(UpdateJWKSUrlAction act, IDispatcher dispatcher)
         {
-            var realm = _realmsState.Value.ActiveRealm;
+            var realm = await GetRealm();
             var client = await _clientRepository.Query().Include(c => c.Realms).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm));
             client.JwksUri = act.JWKSUrl;
             await _clientRepository.SaveChanges(CancellationToken.None);
@@ -352,7 +371,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         [EffectMethod]
         public async Task Handle(UpdateClientCredentialsAction act, IDispatcher dispatcher)
         {
-            var realm = _realmsState.Value.ActiveRealm;
+            var realm = await GetRealm();
             var client = await _clientRepository.Query().Include(c => c.Realms).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm));
             client.TokenEndPointAuthMethod = act.AuthMethod;
             if (client.TokenEndPointAuthMethod == OAuthClientSecretPostAuthenticationHandler.AUTH_METHOD || client.TokenEndPointAuthMethod == OAuthClientSecretBasicAuthenticationHandler.AUTH_METHOD)
@@ -381,7 +400,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
 
         private async Task<bool> ValidateAddClient(string clientId, IEnumerable<string> redirectionUrls, IDispatcher dispatcher)
         {
-            var realm = _realmsState.Value.ActiveRealm;
+            var realm = await GetRealm();
             var errors = new List<string>();
             foreach (var redirectionUrl in redirectionUrls)
                 if (!ValidateRedirectionUrl(redirectionUrl, out string errorMessage))
@@ -417,6 +436,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 errorMessage = string.Format(Global.RedirectUriContainsFragment, redirectionUrl);
 
             return errorMessage == null;
+        }
+
+        private async Task<string> GetRealm()
+        {
+            var realm = await _sessionStorage.GetAsync<string>("realm");
+            var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+            return realmStr;
         }
     }
 

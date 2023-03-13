@@ -50,7 +50,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
         {
             try
             {
-                Client oauthClient = await _clientAuthenticationHelper.AuthenticateClient(context.Realm, context.Request.HttpHeader, context.Request.RequestData, context.Request.Certificate, context.Request.IssuerName, cancellationToken, ErrorCodes.INVALID_REQUEST);
+                Client oauthClient = await _clientAuthenticationHelper.AuthenticateClient(context.Realm, context.Request.HttpHeader, context.Request.RequestData, context.Request.Certificate, context.GetIssuer(), cancellationToken, ErrorCodes.INVALID_REQUEST);
                 context.SetClient(oauthClient);
                 var user = await _bcAuthorizeRequestValidator.ValidateCreate(context, cancellationToken);
                 context.SetUser(user);

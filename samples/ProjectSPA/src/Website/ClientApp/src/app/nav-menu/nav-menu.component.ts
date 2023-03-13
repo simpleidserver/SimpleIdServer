@@ -26,7 +26,7 @@ export class NavMenuComponent {
 
   login(evt: any) {
     evt.preventDefault();
-    this.oauthService.initImplicitFlow();
+    this.oauthService.initCodeFlow();
   }
 
   collapse() {

@@ -57,6 +57,12 @@
         }
     }
 
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        dispatcher.Dispatch(new GetActiveRealmAction());
+    }
+
     async void ShowRealms(MenuItemEventArgs args)
     {
         if (state.Value.IsLoading || args.Text != "Active Realm : " + state.Value.ActiveRealm) return;

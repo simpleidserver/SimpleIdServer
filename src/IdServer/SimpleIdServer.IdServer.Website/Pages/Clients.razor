@@ -70,7 +70,7 @@
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedClientsRemoved });
                 StateHasChanged();
             });
-            SubscribeToAction<SelectRealmAction>((act) =>
+            SubscribeToAction<SelectRealmSuccessAction>((act) =>
             {
                 clientsGrid.Reload();
                 StateHasChanged();

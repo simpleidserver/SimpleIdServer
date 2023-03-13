@@ -36,7 +36,7 @@ namespace SimpleIdServer.IdServer.Api.TokenIntrospection
         {
             var token = context.Request.RequestData.GetToken();
             if(string.IsNullOrWhiteSpace(token)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, IntrospectionRequestParameters.Token));
-            var client = await _clientAuthenticationHelper.AuthenticateClient(context.Realm, context.Request.HttpHeader, context.Request.RequestData, context.Request.Certificate, context.Request.IssuerName, cancellationToken);
+            var client = await _clientAuthenticationHelper.AuthenticateClient(context.Realm, context.Request.HttpHeader, context.Request.RequestData, context.Request.Certificate, context.GetIssuer(), cancellationToken);
             var accessToken = await _grantedTokenHelper.GetAccessToken(token, cancellationToken);
             var accessTokenClientId = string.Empty;
             if (accessToken != null && accessToken.TryGetClaim(OpenIdConnectParameterNames.ClientId, out Claim value)) accessTokenClientId = value.Value;

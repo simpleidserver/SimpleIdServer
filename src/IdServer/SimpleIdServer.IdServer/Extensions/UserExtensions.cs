@@ -9,9 +9,9 @@ namespace SimpleIdServer.IdServer.Domains
 {
     public static class UserExtensions
     {
-        public static bool HasOpenIDConsent(this User user, string clientId, GrantRequest request, IEnumerable<AuthorizedClaim> claims, AuthorizationClaimTypes claimType = AuthorizationClaimTypes.IdToken)
+        public static bool HasOpenIDConsent(this User user, string prefix, string clientId, GrantRequest request, IEnumerable<AuthorizedClaim> claims, AuthorizationClaimTypes claimType = AuthorizationClaimTypes.IdToken)
         {
-            return user.GetConsent(clientId, request, claims, claimType) != null;
+            return user.GetConsent(prefix, clientId, request, claims, claimType) != null;
         }
 
         public static bool HasOpenIDConsent(this User user, string consentId)
@@ -19,12 +19,12 @@ namespace SimpleIdServer.IdServer.Domains
             return user.Consents.SingleOrDefault(c => c.Id == consentId) != null;
         }
 
-        public static Consent GetConsent(this User user, string clientId, GrantRequest request, IEnumerable<AuthorizedClaim> claims, AuthorizationClaimTypes claimType = AuthorizationClaimTypes.IdToken)
-            => GetConsent(user, clientId, request.Scopes, claims, claimType);
+        public static Consent GetConsent(this User user, string prefix, string clientId, GrantRequest request, IEnumerable<AuthorizedClaim> claims, AuthorizationClaimTypes claimType = AuthorizationClaimTypes.IdToken)
+            => GetConsent(user, prefix, clientId, request.Scopes, claims, claimType);
 
-        public static Consent GetConsent(this User user, string clientId, IEnumerable<string> scopes, IEnumerable<AuthorizedClaim> claims, AuthorizationClaimTypes claimType = AuthorizationClaimTypes.IdToken)
+        public static Consent GetConsent(this User user, string prefix, string clientId, IEnumerable<string> scopes, IEnumerable<AuthorizedClaim> claims, AuthorizationClaimTypes claimType = AuthorizationClaimTypes.IdToken)
         {
-            return user.Consents.FirstOrDefault(c => c.ClientId == clientId &&
+            return user.Consents.FirstOrDefault(c => c.ClientId == clientId && c.Realm == prefix &&
                 (scopes == null || (scopes.Where(s => s != Constants.StandardScopes.OpenIdScope.Name).All(s => c.Scopes.Contains(s)))) &&
                 (claims == null || (claims.Where(cl => cl.Type == claimType && cl.IsEssential && Constants.AllUserClaims.Contains(cl.Name)).All(cl => c.Claims.Any(scl => scl == cl.Name))))
             );

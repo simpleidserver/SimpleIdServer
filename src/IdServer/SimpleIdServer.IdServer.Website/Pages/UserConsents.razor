@@ -1,8 +1,10 @@
 ﻿@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @using SimpleIdServer.IdServer.Website.Stores.UserStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject IDispatcher dispatcher
 @inject IState<UserState> userState
+@inject IState<RealmsState> realmsState
 @inject IState<UpdateUserState> updateUserState
 @inject ContextMenuService contextMenuService
 @inject NotificationService notificationService

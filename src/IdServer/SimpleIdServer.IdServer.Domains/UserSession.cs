@@ -9,6 +9,7 @@ namespace SimpleIdServer.IdServer.Domains
         public DateTime AuthenticationDateTime { get; set; }
         public DateTime ExpirationDateTime { get; set; }
         public UserSessionStates State { get; set; }
+        public string Realm { get; set; }
         public User User { get; set; }
 
         public object Clone()

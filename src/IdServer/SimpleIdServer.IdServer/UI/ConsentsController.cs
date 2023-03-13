@@ -118,10 +118,10 @@ namespace SimpleIdServer.IdServer.UI
                 var query = unprotectedUrl.GetQueries().ToJsonObject();
                 var nameIdentifier = GetNameIdentifier();
                 var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.Consents).FirstAsync(c => c.Name == nameIdentifier && c.Realms.Any(r => r.Name == prefix), cancellationToken);
-                var consent = _userConsentFetcher.FetchFromAuthorizationRequest(user, query);
+                var consent = _userConsentFetcher.FetchFromAuthorizationRequest(prefix, user, query);
                 if (consent == null)
                 {
-                    consent = _userConsentFetcher.BuildFromAuthorizationRequest(query);
+                    consent = _userConsentFetcher.BuildFromAuthorizationRequest(prefix, query);
                     user.Consents.Add(consent);
                     await _userRepository.SaveChanges(cancellationToken);
                 }

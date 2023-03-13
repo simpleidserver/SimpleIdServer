@@ -54,7 +54,7 @@ else
         base.OnAfterRender(firstRender);
         if(firstRender)
         {
-            SubscribeToAction<SelectRealmAction>((act) =>
+            SubscribeToAction<SelectRealmSuccessAction>((act) =>
             {
                 navigationManager.NavigateTo("/idproviders");
             });

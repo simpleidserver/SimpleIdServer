@@ -33,7 +33,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
 
         protected async Task<Client> AuthenticateClient(HandlerContext context, CancellationToken cancellationToken)
         {
-            var oauthClient = await _clientAuthenticationHelper.AuthenticateClient(context.Realm, context.Request.HttpHeader, context.Request.RequestData, context.Request.Certificate, context.Request.IssuerName, cancellationToken);
+            var oauthClient = await _clientAuthenticationHelper.AuthenticateClient(context.Realm, context.Request.HttpHeader, context.Request.RequestData, context.Request.Certificate, context.GetIssuer(), cancellationToken);
             if (oauthClient.GrantTypes == null || !oauthClient.GrantTypes.Contains(GrantType)) throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(ErrorMessages.BAD_CLIENT_GRANT_TYPE, GrantType));
             return oauthClient;
         }

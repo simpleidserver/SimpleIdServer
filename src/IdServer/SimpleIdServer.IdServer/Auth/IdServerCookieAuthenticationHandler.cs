@@ -490,7 +490,7 @@ namespace SimpleIdServer.IdServer.Auth
             var loginPath = Options.LoginPath;
             var realm = RealmContext.Instance().Realm;
             if (!string.IsNullOrWhiteSpace(realm))
-                loginPath = $"/{realm}/{loginPath}";
+                loginPath = $"/{realm}{loginPath}";
             var loginUri = loginPath + QueryString.Create(Options.ReturnUrlParameter, redirectUri);
             var redirectContext = new RedirectContext<CookieAuthenticationOptions>(Context, Scheme, Options, properties, BuildRedirectUri(loginUri));
             await Events.RedirectToLogin(redirectContext);

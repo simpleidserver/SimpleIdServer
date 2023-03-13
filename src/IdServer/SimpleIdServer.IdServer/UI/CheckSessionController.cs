@@ -55,9 +55,9 @@ namespace SimpleIdServer.IdServer.UI
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public IActionResult Index([FromRoute] string prefix)
         {
-            var newHtml = Html.Replace("{cookieName}", _options.SessionCookieName);
+            var newHtml = Html.Replace("{cookieName}", _options.GetSessionCookieName());
             return new ContentResult
             {
                 ContentType = "text/html",
@@ -78,7 +78,7 @@ namespace SimpleIdServer.IdServer.UI
             {
                 if (string.IsNullOrWhiteSpace(postLogoutRedirectUri))
                 {
-                    Response.Cookies.Delete(_options.SessionCookieName);
+                    Response.Cookies.Delete(_options.GetSessionCookieName());
                     await HttpContext.SignOutAsync();
                     return new ContentResult
                     {
@@ -125,7 +125,7 @@ namespace SimpleIdServer.IdServer.UI
                 var sessionId = await GetSessionId(prefix, cancellationToken);
                 var validationResult = await Validate(prefix, postLogoutRedirectUri, idTokenHint, cancellationToken);
                 await SendLogoutToken(validationResult.Client, prefix, sessionId, cancellationToken);
-                Response.Cookies.Delete(_options.SessionCookieName);
+                Response.Cookies.Delete(_options.GetSessionCookieName());
                 await HttpContext.SignOutAsync();
                 if (!string.IsNullOrWhiteSpace(state))
                 {
@@ -189,7 +189,7 @@ namespace SimpleIdServer.IdServer.UI
         {
             var userId = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
             var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.OAuthUserClaims).FirstOrDefaultAsync(u => u.Name == userId && u.Realms.Any(r => r.Name == realm), cancellationToken);
-            return user.ActiveSession?.SessionId;
+            return user.GetActiveSession(realm)?.SessionId;
         }
 
         protected string BuildFrontChannelLogoutUrl(Client client, string sessionId)

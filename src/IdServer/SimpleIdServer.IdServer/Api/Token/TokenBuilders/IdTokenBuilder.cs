@@ -64,7 +64,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
             var openidClient = currentContext.Client;
             var claims = new Dictionary<string, object>
             {
-                { System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Aud,  new[] { openidClient.ClientId, currentContext.Request.IssuerName } },
+                { System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Aud,  new[] { openidClient.ClientId, currentContext.GetIssuer() } },
                 { JwtRegisteredClaimNames.Azp, openidClient.ClientId }
             };
 
@@ -78,7 +78,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
             if (currentContext.Response.TryGet(AuthorizationResponseParameters.Code, out code))
                 claims.Add(JwtRegisteredClaimNames.CHash, ComputeHash(code));
 
-            var activeSession = currentContext.User.ActiveSession;
+            var activeSession = currentContext.User.GetActiveSession(currentContext.Realm ?? Constants.DefaultRealm);
             if (maxAge != null && activeSession != null)
                 claims.Add(JwtRegisteredClaimNames.AuthTime, activeSession.AuthenticationDateTime.ConvertToUnixTimestamp());
 
@@ -114,7 +114,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
 
             var result = new SecurityTokenDescriptor
             {
-                Issuer = currentContext.Request.IssuerName,
+                Issuer = currentContext.GetIssuer(),
                 IssuedAt = DateTime.UtcNow,
                 Expires = DateTime.UtcNow.AddSeconds(openidClient.TokenExpirationTimeInSeconds ?? _options.DefaultTokenExpirationTimeInSeconds),
                 Claims = claims

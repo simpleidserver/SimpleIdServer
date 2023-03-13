@@ -94,23 +94,23 @@ namespace SimpleIdServer.IdServer.Builders
 
         #region Consents
 
-        public UserBuilder AddConsent(string clientId, params string[] scopes)
+        public UserBuilder AddConsent(string realm, string clientId, params string[] scopes)
         {
-            _user.Consents.Add(new Consent { Id = Guid.NewGuid().ToString(), ClientId = clientId, Scopes = scopes, CreateDateTime = DateTime.UtcNow });
+            _user.Consents.Add(new Consent { Id = Guid.NewGuid().ToString(), ClientId = clientId, Scopes = scopes, CreateDateTime = DateTime.UtcNow, Realm = realm });
             return this;
         }
 
-        public UserBuilder AddConsent(string clientId, IEnumerable<string> scopes, IEnumerable<string> claims)
+        public UserBuilder AddConsent(string realm, string clientId, IEnumerable<string> scopes, IEnumerable<string> claims)
         {
-            _user.Consents.Add(new Consent { Id = Guid.NewGuid().ToString(), Scopes = scopes, ClientId = clientId, Claims = claims, CreateDateTime = DateTime.UtcNow });
+            _user.Consents.Add(new Consent { Id = Guid.NewGuid().ToString(), Scopes = scopes, ClientId = clientId, Claims = claims, CreateDateTime = DateTime.UtcNow, Realm = realm });
             return this;
         }
 
         #endregion
 
-        public UserBuilder AddSession(string id, DateTime expirationTime)
+        public UserBuilder AddSession(string id, string realm, DateTime expirationTime)
         {
-            _user.Sessions.Add(new UserSession { SessionId = id, AuthenticationDateTime = DateTime.UtcNow, ExpirationDateTime = expirationTime, State = UserSessionStates.Active });
+            _user.Sessions.Add(new UserSession { SessionId = id, AuthenticationDateTime = DateTime.UtcNow, ExpirationDateTime = expirationTime, State = UserSessionStates.Active, Realm = realm });
             return this;
         }
 

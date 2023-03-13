@@ -174,7 +174,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             {
                 var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
                 var user = userRepository.Query().Include(u => u.Sessions).First(u => u.Name == "user");
-                user.ActiveSession.AuthenticationDateTime = DateTime.UtcNow.AddSeconds(seconds);
+                user.GetActiveSession(Constants.DefaultRealm).AuthenticationDateTime = DateTime.UtcNow.AddSeconds(seconds);
                 await userRepository.SaveChanges(CancellationToken.None);
             }
         }

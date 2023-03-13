@@ -10,7 +10,6 @@ using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.Middlewares
@@ -39,25 +38,19 @@ namespace SimpleIdServer.IdServer.Middlewares
                 {
                     var realmRepository = scope.ServiceProvider.GetRequiredService<IRealmRepository>();
                     var routeValues = context.Request.RouteValues;
-                    if(!routeValues.ContainsKey(Constants.Prefix))
+                    string realm = string.Empty;
+                    var realmCookie = context.Request.Cookies.FirstOrDefault(c => c.Key == Constants.DefaultRealmCookieName);
+                    if (routeValues.ContainsKey(Constants.Prefix))
                     {
-                        context.Response.Redirect($"/{Constants.DefaultRealm}");
-                        return;
+                        var prefix = routeValues.First(v => v.Key == Constants.Prefix).Value?.ToString();
+                        if (routeValues.Any(v => v.Key == Constants.Prefix) && (await realmRepository.Query().AnyAsync(r => r.Name == prefix)))
+                            realm = prefix;
                     }
 
-                    var prefix = routeValues.First(v => v.Key == Constants.Prefix).Value?.ToString();
-                    if (routeValues.Any(v => v.Key == Constants.Prefix) && (await realmRepository.Query().AnyAsync(r => r.Name == prefix)))
-                    {
-                        RealmContext.Instance().Realm = prefix;
-                    }
-                    else
-                    {
-                        var realmCookie = context.Request.Cookies.FirstOrDefault(c => c.Key == Constants.DefaultRealmCookieName);
-                        if(!realmCookie.Equals(default(KeyValuePair<string, string>)) && !string.IsNullOrWhiteSpace(realmCookie.Value))
-                        {
-                            RealmContext.Instance().Realm = realmCookie.Value;
-                        }
-                    }
+                    if (string.IsNullOrWhiteSpace(realm) && !realmCookie.Equals(default(KeyValuePair<string, string>)) && !string.IsNullOrWhiteSpace(realmCookie.Value))
+                        realm = realmCookie.Value;
+
+                    RealmContext.Instance().Realm = realm;
                 }
             }
 

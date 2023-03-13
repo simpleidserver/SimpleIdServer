@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Middlewares;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -165,6 +166,21 @@ namespace SimpleIdServer.IdServer.Api
         public JsonObject OriginalRequest { get; private set; }
         public HandlerContextResponse Response { get; private set; }
         public IUrlHelper UrlHelper { get; private set; }
+
+        public string GetIssuer()
+        {
+            var result = Request.IssuerName;
+            var realm = RealmContext.Instance().Realm;
+            if (!string.IsNullOrWhiteSpace(realm))
+            {
+                if (!result.EndsWith("/"))
+                    result += "/";
+
+                result += realm;
+            }
+
+            return result;
+        }
 
         public void SetClient(Client client) => Client = client;
 

@@ -104,7 +104,7 @@ namespace SimpleIdServer.IdServer.UI
                     returnUrl = Unprotect(returnUrl);
             }
 
-            return await Sign(returnUrl, "externalAuth", user, cancellationToken, true);
+            return await Sign(prefix, returnUrl, "externalAuth", user, cancellationToken, true);
         }
 
         private async Task<User> JustInTimeProvision(string realm, AuthenticateResult authResult, CancellationToken cancellationToken)

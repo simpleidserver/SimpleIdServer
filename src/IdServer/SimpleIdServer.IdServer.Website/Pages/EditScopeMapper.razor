@@ -84,7 +84,7 @@ else
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.ScopeClaimMapperUpdated });
                 StateHasChanged();
             });
-            SubscribeToAction<SelectRealmAction>((act) =>
+            SubscribeToAction<SelectRealmSuccessAction>((act) =>
             {
                 navigationManager.NavigateTo("/scopes");
             });
