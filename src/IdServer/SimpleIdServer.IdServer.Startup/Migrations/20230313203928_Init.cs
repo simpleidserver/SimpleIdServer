@@ -210,6 +210,27 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SerializedFileKeys",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    KeyId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Usage = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Alg = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Enc = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PublicKeyPem = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PrivateKeyPem = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsSymmetric = table.Column<bool>(type: "bit", nullable: false),
+                    Key = table.Column<byte[]>(type: "varbinary(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SerializedFileKeys", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Tokens",
                 columns: table => new
                 {
@@ -587,6 +608,30 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         name: "FK_ScopeClaimMapper_Scopes_ScopeId",
                         column: x => x.ScopeId,
                         principalTable: "Scopes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RealmSerializedFileKey",
+                columns: table => new
+                {
+                    RealmsName = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    SerializedFileKeysId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RealmSerializedFileKey", x => new { x.RealmsName, x.SerializedFileKeysId });
+                    table.ForeignKey(
+                        name: "FK_RealmSerializedFileKey_Realms_RealmsName",
+                        column: x => x.RealmsName,
+                        principalTable: "Realms",
+                        principalColumn: "Name",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_RealmSerializedFileKey_SerializedFileKeys_SerializedFileKeysId",
+                        column: x => x.SerializedFileKeysId,
+                        principalTable: "SerializedFileKeys",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -1015,6 +1060,11 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 column: "ScopesId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_RealmSerializedFileKey_SerializedFileKeysId",
+                table: "RealmSerializedFileKey",
+                column: "SerializedFileKeysId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RealmUser_UsersId",
                 table: "RealmUser",
                 column: "UsersId");
@@ -1129,6 +1179,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 name: "RealmScope");
 
             migrationBuilder.DropTable(
+                name: "RealmSerializedFileKey");
+
+            migrationBuilder.DropTable(
                 name: "RealmUser");
 
             migrationBuilder.DropTable(
@@ -1178,6 +1231,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
             migrationBuilder.DropTable(
                 name: "BCAuthorizeLst");
+
+            migrationBuilder.DropTable(
+                name: "SerializedFileKeys");
 
             migrationBuilder.DropTable(
                 name: "Realms");

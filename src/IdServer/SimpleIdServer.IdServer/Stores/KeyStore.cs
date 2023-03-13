@@ -1,9 +1,13 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Collections.Concurrent;
+using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Store;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace SimpleIdServer.IdServer.Stores
 {
@@ -11,49 +15,138 @@ namespace SimpleIdServer.IdServer.Stores
     {
         IEnumerable<SigningCredentials> GetAllSigningKeys(string realm);
         IEnumerable<EncryptingCredentials> GetAllEncryptingKeys(string realm);
-        void Add(string realm, SigningCredentials signingCredentials);
-        void Add(string realm, EncryptingCredentials encryptingCredentials);
+        void Add(Realm realm, SigningCredentials signingCredentials);
+        void Add(Realm realm, EncryptingCredentials encryptingCredentials);
     }
 
     public class InMemoryKeyStore : IKeyStore
     {
-        private ConcurrentDictionary<string, ICollection<SigningCredentials>> _signingCredentials = new ConcurrentDictionary<string, ICollection<SigningCredentials>>();
-        private ConcurrentDictionary<string, ICollection<EncryptingCredentials>> _encryptedCredentials = new ConcurrentDictionary<string, ICollection<EncryptingCredentials>>();
+        private readonly IFileSerializedKeyStore _fileSerializedKeyStore;
 
-        public InMemoryKeyStore() { }
+        public InMemoryKeyStore(IFileSerializedKeyStore fileSerializedKeyStore) 
+        {
+            _fileSerializedKeyStore = fileSerializedKeyStore;
+        }
 
         public IEnumerable<SigningCredentials> GetAllSigningKeys(string realm)
         {
-            if(!_signingCredentials.ContainsKey(realm))
-                return new List<SigningCredentials>();
-            return _signingCredentials.First(c => c.Key == realm).Value.ToList();
+            var result = new List<SigningCredentials>();
+            var serializedKeys = _fileSerializedKeyStore.Query().Include(s => s.Realms).Where(s => s.Usage == Constants.JWKUsages.Sig && s.Realms.Any(r => r.Name == realm)).ToList();
+            foreach(var serializedKey in serializedKeys)
+            {
+                SecurityKey securityKey;
+                if(serializedKey.IsSymmetric)
+                    securityKey = new SymmetricSecurityKey(serializedKey.Key);
+                else
+                {
+                    var pem = new PemResult(serializedKey.PublicKeyPem, serializedKey.PrivateKeyPem);
+                    securityKey = PemImporter.Import(pem, serializedKey.KeyId);
+                }
+
+                securityKey.KeyId = serializedKey.KeyId;
+                result.Add(new SigningCredentials(securityKey, serializedKey.Alg));
+            }
+
+            return result;
         }
 
         public IEnumerable<EncryptingCredentials> GetAllEncryptingKeys(string realm)
         {
-            if (!_encryptedCredentials.ContainsKey(realm))
-                return new List<EncryptingCredentials>();
-            return _encryptedCredentials.First(c => c.Key == realm).Value.ToList();
+            var result = new List<EncryptingCredentials>();
+            var serializedKeys = _fileSerializedKeyStore.Query().Include(s => s.Realms).Where(s => s.Usage == Constants.JWKUsages.Enc && s.Realms.Any(r => r.Name == realm)).ToList();
+            foreach(var serializedKey in serializedKeys)
+            {
+                SecurityKey securityKey;
+                if (serializedKey.IsSymmetric)
+                    securityKey = new SymmetricSecurityKey(serializedKey.Key);
+                else
+                {
+                    var pemResult = new PemResult(serializedKey.PublicKeyPem, serializedKey.PrivateKeyPem);
+                    securityKey = PemImporter.Import(pemResult, serializedKey.KeyId);
+                }
+
+                securityKey.KeyId = serializedKey.KeyId;
+                result.Add(new EncryptingCredentials(securityKey, serializedKey.Alg, serializedKey.Enc));
+            }
+
+            return result;
         }
 
-        public void Add(string realm, SigningCredentials signingCredentials)
+        public async void Add(Realm realm, SigningCredentials signingCredentials)
         {
-            if(!_signingCredentials.ContainsKey(realm))
-                _signingCredentials.AddOrUpdate(realm, new List<SigningCredentials>(), (a,b) => new List<SigningCredentials>());
-
-            _signingCredentials[realm].Add(signingCredentials);
+            var result = Convert(signingCredentials, realm);
+            _fileSerializedKeyStore.Add(result);
+            await _fileSerializedKeyStore.SaveChanges(CancellationToken.None);
         }
 
-        public void Add(string realm, EncryptingCredentials encryptingCredentials)
+        public async void Add(Realm realm, EncryptingCredentials encryptingCredentials)
         {
-            if (!_signingCredentials.ContainsKey(realm))
-                _encryptedCredentials.AddOrUpdate(realm, new List<EncryptingCredentials>(), (a, b) => new List<EncryptingCredentials>());
-
-            _encryptedCredentials[realm].Add(encryptingCredentials);
+            var result = Convert(encryptingCredentials, realm);
+            _fileSerializedKeyStore.Add(result);
+            await _fileSerializedKeyStore.SaveChanges(CancellationToken.None);
         }
 
-        internal void SetSigningCredentials(string realm, IEnumerable<SigningCredentials> signingCredentials) => _signingCredentials.AddOrUpdate(realm, signingCredentials.ToList(), (a, b) => signingCredentials.ToList());
+        internal async void SetSigningCredentials(Realm realm, IEnumerable<SigningCredentials> signingCredentials)
+        {
+            foreach(var signingCredential in signingCredentials)
+            {
+                var record = Convert(signingCredential, realm);
+                _fileSerializedKeyStore.Add(record);
+            }
 
-        internal void SetEncryptedCredentials(string realm, IEnumerable<EncryptingCredentials> encryptedCredentials) => _encryptedCredentials.AddOrUpdate(realm, encryptedCredentials.ToList(), (a, b) => encryptedCredentials.ToList());
+            await _fileSerializedKeyStore.SaveChanges(CancellationToken.None);
+        }
+
+        internal async void SetEncryptedCredentials(Realm realm, IEnumerable<EncryptingCredentials> encryptedCredentials)
+        {
+            foreach (var encryptedCredential in encryptedCredentials)
+            {
+                var record = Convert(encryptedCredential, realm);
+                _fileSerializedKeyStore.Add(record);
+            }
+
+            await _fileSerializedKeyStore.SaveChanges(CancellationToken.None);
+        }
+
+        public static SerializedFileKey Convert(SigningCredentials credentials, Realm realm)
+        {
+            var pem = PemConverter.ConvertFromSecurityKey(credentials.Key);
+            var result = new SerializedFileKey
+            {
+                Id = Guid.NewGuid().ToString(),
+                KeyId = credentials.Key.KeyId,
+                PrivateKeyPem = pem.PrivateKey,
+                PublicKeyPem = pem.PublicKey,
+                Usage = Constants.JWKUsages.Sig,
+                Alg = credentials.Algorithm,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow,
+                IsSymmetric = pem.IsSymmetric,
+                Key = pem.Key
+            };
+            result.Realms.Add(realm);
+            return result;
+        }
+
+        public static SerializedFileKey Convert(EncryptingCredentials credentials, Realm realm)
+        {
+            var pem = PemConverter.ConvertFromSecurityKey(credentials.Key);
+            var result = new SerializedFileKey
+            {
+                Id = Guid.NewGuid().ToString(),
+                KeyId = credentials.Key.KeyId,
+                PrivateKeyPem = pem.PrivateKey,
+                PublicKeyPem = pem.PublicKey,
+                Usage = Constants.JWKUsages.Enc,
+                Alg = credentials.Alg,
+                Enc = credentials.Enc,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow,
+                IsSymmetric = pem.IsSymmetric,
+                Key = pem.Key
+            };
+            result.Realms.Add(realm);
+            return result;
+        }
     }
 }

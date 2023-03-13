@@ -127,6 +127,21 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.ToTable("RealmScope");
                 });
 
+            modelBuilder.Entity("RealmSerializedFileKey", b =>
+                {
+                    b.Property<string>("RealmsName")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("SerializedFileKeysId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("RealmsName", "SerializedFileKeysId");
+
+                    b.HasIndex("SerializedFileKeysId");
+
+                    b.ToTable("RealmSerializedFileKey");
+                });
+
             modelBuilder.Entity("RealmUser", b =>
                 {
                     b.Property<string>("RealmsName")
@@ -916,6 +931,49 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.ToTable("ScopeClaimMapper");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.SerializedFileKey", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Alg")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Enc")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsSymmetric")
+                        .HasColumnType("bit");
+
+                    b.Property<byte[]>("Key")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("KeyId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PrivateKeyPem")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PublicKeyPem")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Usage")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SerializedFileKeys");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Token", b =>
                 {
                     b.Property<int>("PkID")
@@ -1463,6 +1521,21 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.HasOne("SimpleIdServer.IdServer.Domains.Scope", null)
                         .WithMany()
                         .HasForeignKey("ScopesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("RealmSerializedFileKey", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Realm", null)
+                        .WithMany()
+                        .HasForeignKey("RealmsName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SimpleIdServer.IdServer.Domains.SerializedFileKey", null)
+                        .WithMany()
+                        .HasForeignKey("SerializedFileKeysId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

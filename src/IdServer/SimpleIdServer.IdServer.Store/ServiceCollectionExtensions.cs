@@ -24,6 +24,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IUmaResourceRepository, UmaResourceRepository>();
             services.AddTransient<IUmaPendingRequestRepository, UmaPendingRequestRepository>();
             services.AddTransient<IRealmRepository, RealmRepository>();
+            services.AddTransient<IFileSerializedKeyStore, SerializedFileKeyStore>();
             if (action != null) services.AddDbContext<StoreDbContext>(action, lifetime);
             else services.AddDbContext<StoreDbContext>(o => o.UseInMemoryDatabase("identityServer"), lifetime);
             return services;

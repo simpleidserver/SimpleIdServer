@@ -20,6 +20,9 @@ namespace SimpleIdServer.IdServer
             if (key is ECDsaSecurityKey ecdsaKey)
                 return ConvertFromECDsaSecurityKey(ecdsaKey);
 
+            if (key is SymmetricSecurityKey symmetricSecurity)
+                return ConvertFromSymmetricSecurityKey(symmetricSecurity);
+
             throw new NotImplementedException();
         }
 
@@ -53,16 +56,27 @@ namespace SimpleIdServer.IdServer
             var privatePem = key.ECDsa.ExportECPrivateKeyPem();
             return new PemResult(publicPem, privatePem);
         }
+
+        public static PemResult ConvertFromSymmetricSecurityKey(SymmetricSecurityKey key) => new PemResult(key.Key);
     }
 
     public class PemResult
     {
+        public PemResult(byte[] key)
+        {
+            IsSymmetric = true;
+            Key = key;
+        }
+
         public PemResult(string publicKey, string privateKey)
         {
+            IsSymmetric = false;
             PublicKey = publicKey;
             PrivateKey = privateKey;
         }
 
+        public bool IsSymmetric { get; set; }
+        public byte[] Key { get; set; }
         public string PublicKey { get; private set; }
         public string PrivateKey { get; private set; }
     }

@@ -10,6 +10,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Startup;
 using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.WsFederation;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -43,9 +44,6 @@ void RunSqlServerIdServer(IServiceCollection services)
                 o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
             });
         })
-        .AddDeveloperSigningCredentials()
-        .AddDeveloperSigningCredentials("test")
-        .AddWsFederationSigningCredentials()
         .AddBackChannelAuthentication()
         .AddEmailAuthentication()
         .AddSmsAuthentication()
@@ -110,6 +108,12 @@ void SeedData(WebApplication application)
 
             if (!dbContext.AuthenticationSchemeProviders.Any())
                 dbContext.AuthenticationSchemeProviders.AddRange(IdServerConfiguration.Providers);
+
+            if(!dbContext.SerializedFileKeys.Any())
+            {
+                dbContext.SerializedFileKeys.Add(KeyGenerator.GenerateSigningCredentials(SimpleIdServer.IdServer.Constants.StandardRealms.Master));
+                dbContext.SerializedFileKeys.Add(WsFederationKeyGenerator.GenerateWsFederationSigningCredentials(SimpleIdServer.IdServer.Constants.StandardRealms.Master));
+            }
 
             if (!dbContext.Acrs.Any())
             {

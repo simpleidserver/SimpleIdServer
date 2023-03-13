@@ -3,21 +3,16 @@
 using Hangfire;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.AuthProviders;
 using System;
-using System.Collections.Generic;
-using System.Security.Cryptography;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     public class IdServerBuilder
     {
-        private readonly InMemoryKeyStore _keyStore = new InMemoryKeyStore();
         private readonly IServiceCollection _serviceCollection;
         private readonly AuthenticationBuilder _authBuilder;
 
@@ -25,62 +20,9 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             _serviceCollection = serviceCollection;
             _authBuilder = authBuilder;
-            _serviceCollection.AddSingleton<IKeyStore>(_keyStore);
         }
 
         public IServiceCollection Services => _serviceCollection;
-        public InMemoryKeyStore KeyStore => _keyStore;
-
-        public IdServerBuilder SetSigningKeys(string realm, params SigningCredentials[] signingCredentials)
-        {
-            return SetSigningKeys(realm ?? Constants.DefaultRealm, (IEnumerable<SigningCredentials>)signingCredentials);
-        }
-
-        public IdServerBuilder SetSigningKeys(string realm, IEnumerable<SigningCredentials> signingCredentials)
-        {
-            _keyStore.SetSigningCredentials(realm ?? Constants.DefaultRealm, signingCredentials);
-            return this;
-        }
-
-        public IdServerBuilder SetSigningKey(string realm, RsaSecurityKey rsa, string signingAlg = SecurityAlgorithms.RsaSha256)
-        {
-            var signingCredentials = new SigningCredentials(rsa, signingAlg);
-            return SetSigningKeys(realm ?? Constants.DefaultRealm, new[] { signingCredentials });
-        }
-
-        #region Encryption and signing Keys
-
-        public IdServerBuilder SetSigningKey(string realm, ECDsaSecurityKey ecdsa, string signingAlg = SecurityAlgorithms.EcdsaSha256)
-        {
-            var signingCredentials = new SigningCredentials(ecdsa, signingAlg);
-            return SetSigningKeys(realm ?? Constants.DefaultRealm, new[] { signingCredentials });
-        }
-
-        public IdServerBuilder SetEncryptedKeys(string realm = Constants.DefaultRealm, params EncryptingCredentials[] encryptedCredentials)
-        {
-            SetEncryptedKeys(realm, (IEnumerable<EncryptingCredentials>)encryptedCredentials);
-            return this;
-        }
-
-        public IdServerBuilder SetEncryptedKeys(string realm, IEnumerable<EncryptingCredentials> encryptedCredentials)
-        {
-            _keyStore.SetEncryptedCredentials(realm ?? Constants.DefaultRealm, encryptedCredentials);
-            return this;
-        }
-
-        public IdServerBuilder AddDeveloperSigningCredentials(string realm = Constants.DefaultRealm)
-        {
-            var rsa = RSA.Create();
-            var key = new RsaSecurityKey(rsa)
-            {
-                KeyId = "keyid"
-            };
-            var signingCredentials = new SigningCredentials(key, SecurityAlgorithms.RsaSha256);
-            SetSigningKeys(realm, new[] { signingCredentials });
-            return this;
-        }
-
-        #endregion
 
         #region Authentication & Authorization
 

@@ -4,12 +4,13 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace SimpleIdServer.IdServer
 {
@@ -139,6 +140,19 @@ namespace SimpleIdServer.IdServer
             if(!storeDbContext.UmaResources.Any())
             {
                 storeDbContext.UmaResources.AddRange(umaResources);
+                storeDbContext.SaveChanges();
+            }
+
+            return this;
+        }
+
+        public IdServerInMemoryStoreBuilder AddInMemoryKeys(Realm realm, ICollection<SigningCredentials> signingCredentials, ICollection<EncryptingCredentials> encryptingCredentials)
+        {
+            var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
+            if (!storeDbContext.SerializedFileKeys.Any())
+            {
+                storeDbContext.SerializedFileKeys.AddRange(signingCredentials.Select(c => InMemoryKeyStore.Convert(c, realm)).ToList());
+                storeDbContext.SerializedFileKeys.AddRange(encryptingCredentials.Select(c => InMemoryKeyStore.Convert(c, realm)).ToList());
                 storeDbContext.SaveChanges();
             }
 

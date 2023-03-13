@@ -9,6 +9,20 @@ namespace SimpleIdServer.IdServer
 {
     public static class PemImporter
     {
+        public static SecurityKey Import(PemResult content, string keyId)
+        {
+            if (content.PublicKey.Contains("BEGIN CERTIFICATE"))
+                return Import<X509SecurityKey>(content, keyId);
+
+            if(content.PublicKey.Contains("BEGIN RSA"))
+                return Import<RsaSecurityKey>(content, keyId);
+
+            if(content.PublicKey.Contains("BEGIN EC") || content.PrivateKey.Contains("BEGIN EC"))
+                return Import<ECDsaSecurityKey>(content, keyId);
+
+            throw new NotImplementedException();
+        }
+
         public static SecurityKey Import<T>(PemResult content, string keyId) where T : SecurityKey
         {
             if (typeof(T) == typeof(RsaSecurityKey))

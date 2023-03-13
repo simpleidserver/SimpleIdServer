@@ -169,7 +169,7 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddOAuthJwksApi(this IServiceCollection services)
         {
             services.AddTransient<IJwksRequestHandler, JwksRequestHandler>();
-            services.AddSingleton<IKeyStore, InMemoryKeyStore>();
+            services.AddTransient<IKeyStore, InMemoryKeyStore>();
             return services;
         }
 
@@ -226,6 +226,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IMapperClaimsExtractor, UserPropertyClaimsExtractor>();
             services.AddTransient<IMapperClaimsExtractor, UserAddressClaimsExtractor>();
             services.AddTransient<IMapperClaimsExtractor, UserSubClaimsExtractor>();
+            services.AddTransient<IKeyStore, InMemoryKeyStore>();
             return services;
         }
 
