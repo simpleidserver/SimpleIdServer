@@ -24,7 +24,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             {
                 IsLoading = false,
                 Clients = act.Clients.Select(c => new SelectableClient(c)),
-                Count = act.Clients.Count()
+                Count = act.Count
             };
         }
 

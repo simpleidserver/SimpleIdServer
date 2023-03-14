@@ -23,7 +23,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
             {
                 IsLoading = false,
                 ApiResources = apiResources,
-                Count = act.ApiResources.Count()
+                Count = act.Count
             };
         }
 

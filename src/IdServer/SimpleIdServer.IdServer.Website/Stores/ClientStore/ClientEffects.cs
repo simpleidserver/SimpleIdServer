@@ -40,8 +40,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             if (!string.IsNullOrWhiteSpace(action.OrderBy))
                 query = query.OrderBy(SanitizeExpression(action.OrderBy));
 
+            var nb = query.Count();
             var clients = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
-            dispatcher.Dispatch(new SearchClientsSuccessAction { Clients = clients });
+            dispatcher.Dispatch(new SearchClientsSuccessAction { Clients = clients, Count = nb });
 
             string SanitizeExpression(string expression) => expression.Replace("Value.", "");
         }
@@ -457,6 +458,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
     public class SearchClientsSuccessAction
     {
         public IEnumerable<Client> Clients { get; set; } = new List<Client>();
+        public int Count { get; set; }
     }
 
     public class AddSpaClientAction

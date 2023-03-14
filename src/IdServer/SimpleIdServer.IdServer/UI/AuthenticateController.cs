@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
@@ -26,7 +27,7 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
         private readonly IPasswordAuthService _passwordAuthService;
 
-        public AuthenticateController(IAuthenticationSchemeProvider authenticationSchemeProvider, IPasswordAuthService passwordAuthService, IOptions<IdServerHostOptions> options, IDataProtectionProvider dataProtectionProvider, IClientRepository clientRepository, IAmrHelper amrHelper, IUserRepository userRepository, IUserTransformer userTransformer) : base(options, dataProtectionProvider, clientRepository, amrHelper, userRepository, userTransformer)
+        public AuthenticateController(IAuthenticationSchemeProvider authenticationSchemeProvider, IPasswordAuthService passwordAuthService, IOptions<IdServerHostOptions> options, IDataProtectionProvider dataProtectionProvider, IClientRepository clientRepository, IAmrHelper amrHelper, IUserRepository userRepository, IUserTransformer userTransformer, IBusControl busControl) : base(options, dataProtectionProvider, clientRepository, amrHelper, userRepository, userTransformer, busControl)
         {
             _authenticationSchemeProvider = authenticationSchemeProvider;
             _passwordAuthService = passwordAuthService;
@@ -93,6 +94,7 @@ namespace SimpleIdServer.IdServer.UI
 
             try
             {
+                prefix = prefix ?? Constants.DefaultRealm;
                 var user = await _passwordAuthService.Authenticate(prefix, viewModel.Login, viewModel.Password, token);
                 return await Authenticate(prefix, viewModel.ReturnUrl, Constants.Areas.Password, user, token, viewModel.RememberLogin);
             }

@@ -1,9 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Hangfire;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using SimpleIdServer.IdServer;
+using SimpleIdServer.IdServer.Consumers;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.UI.AuthProviders;
@@ -89,6 +91,37 @@ namespace Microsoft.Extensions.DependencyInjection
             _serviceCollection.Configure<IdServerHostOptions>(o =>
             {
                 o.UseRealm = true;
+            });
+            return this;
+        }
+
+        /// <summary>
+        /// Use in memory implementation of mass transit.
+        /// </summary>
+        /// <returns></returns>
+        public IdServerBuilder UseInMemoryMassTransit()
+        {
+            _serviceCollection.AddMassTransit((o) =>
+            {
+                o.AddConsumer<IdServerEventsConsumer>();
+                o.UsingInMemory((ctx, cfg) =>
+                {
+                    cfg.ConfigureEndpoints(ctx);
+                });
+            });
+            return this;
+        }
+
+        /// <summary>
+        /// Configure and use mass transit.
+        /// </summary>
+        /// <param name="massTransitOptions"></param>
+        /// <returns></returns>
+        public IdServerBuilder UseMassTransit(Action<IBusRegistrationConfigurator> massTransitOptions)
+        {
+            _serviceCollection.AddMassTransit(massTransitOptions != null ? massTransitOptions : (o) =>
+            {
+                o.UsingInMemory();
             });
             return this;
         }

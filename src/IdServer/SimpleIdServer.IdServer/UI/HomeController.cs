@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
+using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.AuthProviders;
@@ -33,11 +35,12 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IUmaPendingRequestRepository _pendingRequestRepository;
         private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
         private readonly IOTPQRCodeGenerator _otpQRCodeGenerator;
+        private readonly IBusControl _busControl;
         private readonly ILogger<HomeController> _logger;
 
         public HomeController(IOptions<IdServerHostOptions> options, IUserRepository userRepository, IClientRepository clientRepository, 
             IUmaPendingRequestRepository pendingRequestRepository, IAuthenticationSchemeProvider authenticationSchemeProvider,
-            IOTPQRCodeGenerator otpQRCodeGenerator, ILogger<HomeController> logger)
+            IOTPQRCodeGenerator otpQRCodeGenerator, IBusControl busControl, ILogger<HomeController> logger)
         {
             _options = options.Value;
             _userRepository = userRepository;
@@ -45,6 +48,7 @@ namespace SimpleIdServer.IdServer.UI
             _pendingRequestRepository = pendingRequestRepository;
             _authenticationSchemeProvider = authenticationSchemeProvider;
             _otpQRCodeGenerator = otpQRCodeGenerator;
+            _busControl = busControl;
             _logger = logger;
         }
 
@@ -334,10 +338,18 @@ namespace SimpleIdServer.IdServer.UI
         }
 
         [HttpGet]
-        public async Task<IActionResult> Disconnect()
+        public async Task<IActionResult> Disconnect([FromRoute] string prefix)
         {
+            prefix = prefix ?? Constants.DefaultRealm;
+            if (User.Identity == null || !User.Identity.IsAuthenticated) return RedirectToAction("Index");
+            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
             Response.Cookies.Delete(_options.GetSessionCookieName());
             await HttpContext.SignOutAsync();
+            await _busControl.Publish(new UserLogoutSuccessEvent
+            {
+                UserName = nameIdentifier,
+                Realm = prefix
+            });
             return RedirectToAction("Index");
         }
 

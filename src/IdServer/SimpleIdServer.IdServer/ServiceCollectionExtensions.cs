@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -64,6 +65,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 opt.ConstraintMap.Add("realmPrefix", typeof(RealmRoutePrefixConstraint));
             });
+            Tracing.Init();
             services.AddControllersWithViews();
             services.AddDataProtection();
             services.AddDistributedMemoryCache();
@@ -149,7 +151,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         private static IServiceCollection AddOAuthClientAuthentication(this IServiceCollection services)
         {
-            services.AddTransient<IAuthenticateClient>(s => new AuthenticateClient(s.GetService<IClientRepository>(), s.GetServices<IOAuthClientAuthenticationHandler>(), s.GetServices<IClientAssertionParser>(), s.GetService<IOptions<IdServerHostOptions>>() ));
+            services.AddTransient<IAuthenticateClient>(s => new AuthenticateClient(s.GetService<IClientRepository>(), s.GetServices<IOAuthClientAuthenticationHandler>(), s.GetServices<IClientAssertionParser>(), s.GetService<IBusControl>(), s.GetService<IOptions<IdServerHostOptions>>() ));
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientPrivateKeyJwtAuthenticationHandler>();
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSecretBasicAuthenticationHandler>();
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSecretJwtAuthenticationHandler>();

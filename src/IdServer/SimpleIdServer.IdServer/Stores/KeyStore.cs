@@ -110,41 +110,80 @@ namespace SimpleIdServer.IdServer.Stores
 
         public static SerializedFileKey Convert(SigningCredentials credentials, Realm realm)
         {
-            var pem = PemConverter.ConvertFromSecurityKey(credentials.Key);
-            var result = new SerializedFileKey
+            var symmetric = credentials.Key as SymmetricSecurityKey;
+            SerializedFileKey result = null;
+            if (symmetric != null)
             {
-                Id = Guid.NewGuid().ToString(),
-                KeyId = credentials.Key.KeyId,
-                PrivateKeyPem = pem.PrivateKey,
-                PublicKeyPem = pem.PublicKey,
-                Usage = Constants.JWKUsages.Sig,
-                Alg = credentials.Algorithm,
-                CreateDateTime = DateTime.UtcNow,
-                UpdateDateTime = DateTime.UtcNow,
-                IsSymmetric = pem.IsSymmetric,
-                Key = pem.Key
-            };
+                result = new SerializedFileKey
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    KeyId = credentials.Key.KeyId,
+                    Usage = Constants.JWKUsages.Sig,
+                    Alg = credentials.Algorithm,
+                    CreateDateTime = DateTime.UtcNow,
+                    UpdateDateTime = DateTime.UtcNow,
+                    IsSymmetric = true,
+                    Key = symmetric.Key
+                };
+            }
+            else
+            {
+                var pem = PemConverter.ConvertFromSecurityKey(credentials.Key);
+                result = new SerializedFileKey
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    KeyId = credentials.Key.KeyId,
+                    PrivateKeyPem = pem.PrivateKey,
+                    PublicKeyPem = pem.PublicKey,
+                    Usage = Constants.JWKUsages.Sig,
+                    Alg = credentials.Algorithm,
+                    CreateDateTime = DateTime.UtcNow,
+                    UpdateDateTime = DateTime.UtcNow,
+                    IsSymmetric = false
+                };
+            }
+
             result.Realms.Add(realm);
             return result;
         }
 
         public static SerializedFileKey Convert(EncryptingCredentials credentials, Realm realm)
         {
-            var pem = PemConverter.ConvertFromSecurityKey(credentials.Key);
-            var result = new SerializedFileKey
+            var symmetric = credentials.Key as SymmetricSecurityKey;
+            SerializedFileKey result = null;
+            if (symmetric != null)
             {
-                Id = Guid.NewGuid().ToString(),
-                KeyId = credentials.Key.KeyId,
-                PrivateKeyPem = pem.PrivateKey,
-                PublicKeyPem = pem.PublicKey,
-                Usage = Constants.JWKUsages.Enc,
-                Alg = credentials.Alg,
-                Enc = credentials.Enc,
-                CreateDateTime = DateTime.UtcNow,
-                UpdateDateTime = DateTime.UtcNow,
-                IsSymmetric = pem.IsSymmetric,
-                Key = pem.Key
-            };
+                result = new SerializedFileKey
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    KeyId = credentials.Key.KeyId,
+                    Usage = Constants.JWKUsages.Sig,
+                    Alg = credentials.Alg,
+                    Enc = credentials.Enc,
+                    CreateDateTime = DateTime.UtcNow,
+                    UpdateDateTime = DateTime.UtcNow,
+                    IsSymmetric = true,
+                    Key = symmetric.Key
+                };
+            }
+            else
+            {
+                var pem = PemConverter.ConvertFromSecurityKey(credentials.Key);
+                result = new SerializedFileKey
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    KeyId = credentials.Key.KeyId,
+                    PrivateKeyPem = pem.PrivateKey,
+                    PublicKeyPem = pem.PublicKey,
+                    Usage = Constants.JWKUsages.Enc,
+                    Alg = credentials.Alg,
+                    Enc = credentials.Enc,
+                    CreateDateTime = DateTime.UtcNow,
+                    UpdateDateTime = DateTime.UtcNow,
+                    IsSymmetric = false
+                };
+            }
+
             result.Realms.Add(realm);
             return result;
         }

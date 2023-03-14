@@ -36,8 +36,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
             if (!string.IsNullOrWhiteSpace(action.OrderBy))
                 query = query.OrderBy(SanitizeExpression(action.OrderBy));
 
+            var nb = query.Count();
             var idProviders = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
-            dispatcher.Dispatch(new SearchIdProvidersSuccessAction { IdProviders = idProviders });
+            dispatcher.Dispatch(new SearchIdProvidersSuccessAction { IdProviders = idProviders, Count = nb });
 
             string SanitizeExpression(string expression) => expression.Replace("Value.", "");
         }
@@ -230,6 +231,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
     public class SearchIdProvidersSuccessAction
     {
         public ICollection<AuthenticationSchemeProvider> IdProviders { get; set; }
+        public int Count { get; set; }
     }
 
     public class RemoveSelectedIdProvidersAction

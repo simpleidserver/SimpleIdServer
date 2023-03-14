@@ -46,8 +46,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
                     query = query.Where(q => q.Protocol == ScopeProtocols.OAUTH || q.Protocol == ScopeProtocols.OPENID);
             }
 
+            var nb = query.Count();
             var scopes = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
-            dispatcher.Dispatch(new SearchScopesSuccessAction { Scopes = scopes });
+            dispatcher.Dispatch(new SearchScopesSuccessAction { Scopes = scopes, Count = nb });
 
             string SanitizeExpression(string expression) => expression.Replace("Value.", "");
         }
@@ -241,6 +242,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
     public class SearchScopesSuccessAction
     {
         public IEnumerable<Scope> Scopes { get; set; } = new List<Scope>();
+        public int Count { get; set; }
     }
 
     public class ToggleScopeSelectionAction

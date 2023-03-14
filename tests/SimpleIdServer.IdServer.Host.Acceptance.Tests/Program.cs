@@ -33,6 +33,7 @@ builder.Services.AddSIDIdentityServer()
             new EncryptingCredentials(BuildRsaSecurityKey("keyid4"), SecurityAlgorithms.RsaPKCS1, SecurityAlgorithms.Aes128CbcHmacSha256)
         });
     })
+    .UseInMemoryMassTransit()
     .AddBackChannelAuthentication()
     .AddAuthentication(o =>
     {

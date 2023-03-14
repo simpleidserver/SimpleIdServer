@@ -33,8 +33,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             if (!string.IsNullOrWhiteSpace(action.OrderBy))
                 query = query.OrderBy(SanitizeExpression(action.OrderBy));
 
+            var count = query.Count();
             var users = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
-            dispatcher.Dispatch(new SearchUsersSuccessAction { Users = users });
+            dispatcher.Dispatch(new SearchUsersSuccessAction { Users = users, Count = count });
 
             string SanitizeExpression(string expression) => expression.Replace("Value.", "");
         }
@@ -186,6 +187,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
     public class SearchUsersSuccessAction
     {
         public IEnumerable<User> Users { get; set; } = new List<User>();
+        public int Count { get; set; }
     }
 
     public class ToggleUserSelectionAction

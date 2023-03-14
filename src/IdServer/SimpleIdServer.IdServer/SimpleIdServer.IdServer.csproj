@@ -10,6 +10,7 @@
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.Certificate" Version="7.0.1" />
 		<PackageReference Include="Hangfire.AspNetCore" Version="1.7.32" />
 		<PackageReference Include="Hangfire.InMemory" Version="0.3.5" />
+		<PackageReference Include="MassTransit" Version="8.0.*" />
 	</ItemGroup>
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />

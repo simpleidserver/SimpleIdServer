@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
@@ -9,8 +10,10 @@ using SimpleIdServer.IdServer.Api.Authorization.ResponseModes;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Extensions;
+using SimpleIdServer.IdServer.ExternalEvents;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
@@ -27,87 +30,117 @@ namespace SimpleIdServer.IdServer.Api.Authorization
         private readonly IAuthorizationRequestHandler _authorizationRequestHandler;
         private readonly IResponseModeHandler _responseModeHandler;
         private readonly IDataProtector _dataProtector;
+        private readonly IBusControl _busControl;
 
-        public AuthorizationController(IAuthorizationRequestHandler authorizationRequestHandler, IResponseModeHandler responseModeHandler, IDataProtectionProvider dataProtectionProvider)
+        public AuthorizationController(IAuthorizationRequestHandler authorizationRequestHandler, IResponseModeHandler responseModeHandler, IDataProtectionProvider dataProtectionProvider, IBusControl busControl)
         {
             _authorizationRequestHandler = authorizationRequestHandler;
             _responseModeHandler = responseModeHandler;
             _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
+            _busControl = busControl;
         }
 
         public async Task Get([FromRoute] string prefix, CancellationToken token)
         {
-            var jObjBody = Request.Query.ToJObject();
-            var claimName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-            var userSubject = claimName == null ? string.Empty : claimName.Value;
-            var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, jObjBody, null, Request.Cookies), prefix ?? Constants.DefaultRealm, new HandlerContextResponse(Response.Cookies));
-            try
+            using (var activity = Tracing.IdServerActivitySource.StartActivity("Get Authorization"))
             {
-                var authorizationResponse = await _authorizationRequestHandler.Handle(context, token);
-                if (authorizationResponse.Type == AuthorizationResponseTypes.RedirectUrl)
+                var jObjBody = Request.Query.ToJObject();
+                var claimName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+                var userSubject = claimName == null ? string.Empty : claimName.Value;
+                var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, jObjBody, null, Request.Cookies), prefix ?? Constants.DefaultRealm, new HandlerContextResponse(Response.Cookies));
+                activity?.SetTag("realm", context.Realm);
+                try
                 {
-                    var redirectUrlAuthorizationResponse = authorizationResponse as RedirectURLAuthorizationResponse;
-                    _responseModeHandler.Handle(context.Request.RequestData, redirectUrlAuthorizationResponse, HttpContext);
-                    return;
-                }
-
-                var redirectActionAuthorizationResponse = authorizationResponse as RedirectActionAuthorizationResponse;
-                if (redirectActionAuthorizationResponse.Disconnect)
-                {
-                    if (redirectActionAuthorizationResponse.CookiesToRemove != null)
+                    var authorizationResponse = await _authorizationRequestHandler.Handle(context, token);
+                    if (authorizationResponse.Type == AuthorizationResponseTypes.RedirectUrl)
                     {
-                        foreach(var cookieName in redirectActionAuthorizationResponse.CookiesToRemove)
+                        var redirectUrlAuthorizationResponse = authorizationResponse as RedirectURLAuthorizationResponse;
+                        _responseModeHandler.Handle(context.Request.RequestData, redirectUrlAuthorizationResponse, HttpContext);
+                        return;
+                    }
+
+                    var redirectActionAuthorizationResponse = authorizationResponse as RedirectActionAuthorizationResponse;
+                    if (redirectActionAuthorizationResponse.Disconnect)
+                    {
+                        if (redirectActionAuthorizationResponse.CookiesToRemove != null)
                         {
-                            Response.Cookies.Delete(cookieName);
+                            foreach (var cookieName in redirectActionAuthorizationResponse.CookiesToRemove)
+                            {
+                                Response.Cookies.Delete(cookieName);
+                            }
+                        }
+
+                        try
+                        {
+                            await HttpContext.SignOutAsync();
+                        }
+                        catch { }
+                    }
+
+                    var parameters = new List<KeyValuePair<string, string>>();
+                    foreach (var record in redirectActionAuthorizationResponse.QueryParameters)
+                    {
+                        if (record.Value is JsonArray)
+                        {
+                            var jArr = record.Value.AsArray();
+                            foreach (var rec in jArr)
+                            {
+                                parameters.Add(new KeyValuePair<string, string>(record.Key, rec.ToString()));
+                            }
+                        }
+                        else
+                        {
+                            parameters.Add(new KeyValuePair<string, string>(record.Key, record.Value.ToString()));
                         }
                     }
 
-                    try
+                    FormatRedirectUrl(parameters);
+                    var queryCollection = new QueryBuilder(parameters);
+                    var issuer = Request.GetAbsoluteUriWithVirtualPath();
+                    if (!string.IsNullOrWhiteSpace(prefix))
+                        issuer = $"{issuer}/{prefix}";
+                    var returnUrl = $"{issuer}/{Constants.EndPoints.Authorization}{queryCollection.ToQueryString()}";
+                    var uiLocales = context.Request.RequestData.GetUILocalesFromAuthorizationRequest();
+                    var url = Url.Action(redirectActionAuthorizationResponse.Action, redirectActionAuthorizationResponse.ControllerName, new
                     {
-                        await HttpContext.SignOutAsync();
-                    }
-                    catch { }
+                        ReturnUrl = _dataProtector.Protect(returnUrl),
+                        area = redirectActionAuthorizationResponse.Area,
+                        ui_locales = string.Join(" ", uiLocales)
+                    });
+                    activity?.SetStatus(ActivityStatusCode.Ok, "Authorization is granted");
+                    await _busControl.Publish(new AuthorizationSuccessEvent
+                    {
+                        ClientId = context.Client.ClientId,
+                        Realm = context.Realm,
+                        RequestJSON = jObjBody.ToString(),
+                        RedirectUrl = url
+                    });
+                    HttpContext.Response.Redirect(url);
                 }
-
-                var parameters = new List<KeyValuePair<string, string>>();
-                foreach(var record in redirectActionAuthorizationResponse.QueryParameters)
+                catch (OAuthExceptionBadRequestURIException ex)
                 {
-                    if (record.Value is JsonArray)
+                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+                    await _busControl.Publish(new AuthorizationFailureEvent
                     {
-                        var jArr = record.Value.AsArray();
-                        foreach(var rec in jArr)
-                        {
-                            parameters.Add(new KeyValuePair<string, string>(record.Key, rec.ToString()));
-                        }
-                    }
-                    else
-                    {
-                        parameters.Add(new KeyValuePair<string, string>(record.Key, record.Value.ToString()));
-                    }
+                        ClientId = context.Client.ClientId,
+                        Realm = context.Realm,
+                        RequestJSON = jObjBody.ToString(),
+                        ErrorMessage = ex.Message
+                    });
+                    await BuildErrorResponse(context, ex, true);
                 }
-
-                FormatRedirectUrl(parameters);
-                var queryCollection = new QueryBuilder(parameters);
-                var issuer = Request.GetAbsoluteUriWithVirtualPath();
-                if (!string.IsNullOrWhiteSpace(prefix))
-                    issuer = $"{issuer}/{prefix}";
-                var returnUrl = $"{issuer}/{Constants.EndPoints.Authorization}{queryCollection.ToQueryString()}";
-                var uiLocales = context.Request.RequestData.GetUILocalesFromAuthorizationRequest();
-                var url = Url.Action(redirectActionAuthorizationResponse.Action, redirectActionAuthorizationResponse.ControllerName, new
+                catch (OAuthException ex)
                 {
-                    ReturnUrl = _dataProtector.Protect(returnUrl),
-                    area = redirectActionAuthorizationResponse.Area,
-                    ui_locales = string.Join(" ", uiLocales)
-                });
-                HttpContext.Response.Redirect(url);
-            }
-            catch(OAuthExceptionBadRequestURIException ex)
-            {
-                await BuildErrorResponse(context, ex, true);
-            }
-            catch(OAuthException ex)
-            {
-                await BuildErrorResponse(context, ex);
+                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+                    await _busControl.Publish(new AuthorizationFailureEvent
+                    {
+                        ClientId = context.Client.ClientId,
+                        Realm = context.Realm,
+                        RequestJSON = jObjBody.ToString(),
+                        ErrorMessage = ex.Message
+                    });
+                    await BuildErrorResponse(context, ex);
+                }
             }
         }
 

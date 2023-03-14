@@ -12,6 +12,7 @@ using SimpleIdServer.IdServer.Startup;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.WsFederation;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
@@ -24,13 +25,29 @@ builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAn
 builder.Services.AddRazorPages()
     .AddRazorRuntimeCompilation();
 RunSqlServerIdServer(builder.Services);
-
+ListenActivity();
 var app = builder.Build();
 SeedData(app);
 app.UseCors("AllowAll");
 app.UseSID()
     .UseWsFederation();
 app.Run();
+
+void ListenActivity()
+{
+    var activityListener = new ActivityListener();
+    activityListener.ShouldListenTo = (activitySource) => activitySource.Name == Tracing.ActivitySourceName;
+    activityListener.Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData;
+    activityListener.ActivityStarted += (e) =>
+    {
+
+    };
+    activityListener.ActivityStopped += (e) =>
+    {
+
+    };
+    ActivitySource.AddActivityListener(activityListener);
+}
 
 void RunSqlServerIdServer(IServiceCollection services)
 {
@@ -44,6 +61,7 @@ void RunSqlServerIdServer(IServiceCollection services)
                 o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
             });
         })
+        .UseInMemoryMassTransit()
         .AddBackChannelAuthentication()
         .AddEmailAuthentication()
         .AddSmsAuthentication()

@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -10,11 +11,13 @@ using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
 using SimpleIdServer.IdServer.Api.Token.Validators;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net;
@@ -32,6 +35,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
         private readonly IUserRepository _userRepository;
         private readonly IGrantHelper _audienceHelper;
+        private readonly IBusControl _busControl;
         private readonly ILogger<RefreshTokenHandler> _logger;
 
         public RefreshTokenHandler(
@@ -42,6 +46,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IUserRepository userRepository,
             IClientAuthenticationHelper clientAuthenticationHelper,
             IGrantHelper audienceHelper,
+            IBusControl busControl,
             IOptions<IdServerHostOptions> options,
             ILogger<RefreshTokenHandler> logger) : base(clientAuthenticationHelper, options)
         {
@@ -50,6 +55,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             _tokenProfiles = tokenProfiles;
             _tokenBuilders = tokenBuilders;
             _userRepository = userRepository;
+            _busControl = busControl;
             _audienceHelper = audienceHelper;
             _logger = logger;
         }
@@ -59,90 +65,125 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
 
         public override async Task<IActionResult> Handle(HandlerContext context, CancellationToken cancellationToken)
         {
-            try
+            IEnumerable<string> scopeLst = new string[0];
+            using (var activity = Tracing.IdServerActivitySource.StartActivity("Get Token"))
             {
-                _refreshTokenGrantTypeValidator.Validate(context);
-                var oauthClient = await AuthenticateClient(context, cancellationToken);
-                context.SetClient(oauthClient);
-                var refreshToken = context.Request.RequestData.GetRefreshToken();
-                var tokenResult = await _grantedTokenHelper.GetRefreshToken(refreshToken, cancellationToken);
-                if (tokenResult == null)
+                try
                 {
-                    _logger.LogError($"refresh token '{refreshToken}' is invalid");
-                    return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.BAD_REFRESH_TOKEN);
-                }
+                    activity?.SetTag("grant_type", GRANT_TYPE);
+                    activity?.SetTag("realm", context.Realm);
+                    _refreshTokenGrantTypeValidator.Validate(context);
+                    var oauthClient = await AuthenticateClient(context, cancellationToken);
+                    context.SetClient(oauthClient);
+                    activity?.SetTag("client_id", oauthClient.ClientId);
+                    var refreshToken = context.Request.RequestData.GetRefreshToken();
+                    var tokenResult = await _grantedTokenHelper.GetRefreshToken(refreshToken, cancellationToken);
+                    if (tokenResult == null)
+                    {
+                        _logger.LogError($"refresh token '{refreshToken}' is invalid");
+                        return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.BAD_REFRESH_TOKEN);
+                    }
 
-                if (tokenResult.ExpirationTime != null && DateTime.UtcNow > tokenResult.ExpirationTime.Value)
-                {
-                    _logger.LogError($"refresh token '{refreshToken}' is expired");
+                    if (tokenResult.ExpirationTime != null && DateTime.UtcNow > tokenResult.ExpirationTime.Value)
+                    {
+                        _logger.LogError($"refresh token '{refreshToken}' is expired");
+                        await _grantedTokenHelper.RemoveRefreshToken(refreshToken, cancellationToken);
+                        return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.REFRESH_TOKEN_IS_EXPIRED);
+                    }
+
+                    var jwsPayload = JsonObject.Parse(tokenResult.Data).AsObject();
+                    var originalJwsPayload = tokenResult.OriginalData == null ? null : JsonObject.Parse(tokenResult.OriginalData).AsObject();
+                    var clientId = jwsPayload.GetClientIdFromAuthorizationRequest();
+                    if (string.IsNullOrWhiteSpace(clientId))
+                    {
+                        var clientAssertion = jwsPayload.GetClientAssertion();
+                        if (string.IsNullOrWhiteSpace(clientAssertion))
+                        {
+                            _logger.LogError("client identifier cannot be extracted from the initial request");
+                            return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.CLIENT_ID_CANNOT_BE_EXTRACTED);
+                        }
+
+                        var jwsHandler = new JwtSecurityTokenHandler();
+                        var isJwsToken = jwsHandler.CanReadToken(clientAssertion);
+                        if (!isJwsToken)
+                        {
+                            _logger.LogError("client_assertion doesn't have a correct JWS format");
+                            throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.BAD_CLIENT_ASSERTION_FORMAT);
+                        }
+
+                        var extractedJws = jwsHandler.ReadJwtToken(clientAssertion);
+                        if (extractedJws == null)
+                        {
+                            _logger.LogError("payload cannot be extracted from client_assertion");
+                            throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.BAD_CLIENT_ASSERTION_FORMAT);
+                        }
+
+                        clientId = extractedJws.Issuer;
+                    }
+
+                    if (!clientId.Equals(oauthClient.ClientId, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        _logger.LogError("refresh token is not issued by the client");
+                        return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.REFRESH_TOKEN_NOT_ISSUED_BY_CLIENT);
+                    }
+
                     await _grantedTokenHelper.RemoveRefreshToken(refreshToken, cancellationToken);
-                    return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.REFRESH_TOKEN_IS_EXPIRED);
-                }
+                    var scopes = GetScopes(originalJwsPayload, jwsPayload);
+                    var resources = GetResources(originalJwsPayload, jwsPayload);
+                    var claims = GetClaims(originalJwsPayload, jwsPayload);
+                    var extractionResult = await _audienceHelper.Extract(context.Realm ?? Constants.DefaultRealm, scopes, resources, cancellationToken);
+                    scopeLst = extractionResult.Scopes;
+                    activity?.SetTag("scopes", string.Join(",", extractionResult.Scopes));
+                    var result = BuildResult(context, extractionResult.Scopes);
+                    await Authenticate(jwsPayload, context, cancellationToken);
+                    foreach (var tokenBuilder in _tokenBuilders)
+                        await tokenBuilder.Build(new BuildTokenParameter { Scopes = extractionResult.Scopes, Audiences = extractionResult.Audiences, Claims = claims, GrantId = tokenResult.GrantId }, context, cancellationToken);
 
-                var jwsPayload = JsonObject.Parse(tokenResult.Data).AsObject();
-                var originalJwsPayload = tokenResult.OriginalData == null ? null : JsonObject.Parse(tokenResult.OriginalData).AsObject();
-                var clientId = jwsPayload.GetClientIdFromAuthorizationRequest();
-                if (string.IsNullOrWhiteSpace(clientId))
-                {
-                    var clientAssertion = jwsPayload.GetClientAssertion();
-                    if (string.IsNullOrWhiteSpace(clientAssertion))
+                    _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? Options.DefaultTokenProfile)).Enrich(context);
+                    foreach (var kvp in context.Response.Parameters)
                     {
-                        _logger.LogError("client identifier cannot be extracted from the initial request");
-                        return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.CLIENT_ID_CANNOT_BE_EXTRACTED);
+                        result.Add(kvp.Key, kvp.Value);
                     }
 
-                    var jwsHandler = new JwtSecurityTokenHandler();
-                    var isJwsToken = jwsHandler.CanReadToken(clientAssertion);
-                    if (!isJwsToken)
+                    if (!string.IsNullOrWhiteSpace(tokenResult.GrantId))
+                        result.Add(TokenResponseParameters.GrantId, tokenResult.GrantId);
+
+                    await _busControl.Publish(new TokenIssuedSuccessEvent
                     {
-                        _logger.LogError("client_assertion doesn't have a correct JWS format");
-                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.BAD_CLIENT_ASSERTION_FORMAT);
-                    }
-
-                    var extractedJws = jwsHandler.ReadJwtToken(clientAssertion);
-                    if (extractedJws == null)
+                        GrantType = GRANT_TYPE,
+                        ClientId = context.Client.Id,
+                        Scopes = extractionResult.Scopes,
+                        Realm = context.Realm
+                    });
+                    activity?.SetStatus(ActivityStatusCode.Ok, "Token has been issued");
+                    return new OkObjectResult(result);
+                }
+                catch (OAuthUnauthorizedException ex)
+                {
+                    await _busControl.Publish(new TokenIssuedFailureEvent
                     {
-                        _logger.LogError("payload cannot be extracted from client_assertion");
-                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.BAD_CLIENT_ASSERTION_FORMAT);
-                    }
-
-                    clientId = extractedJws.Issuer;
+                        GrantType = GRANT_TYPE,
+                        ClientId = context.Client?.Id,
+                        Scopes = scopeLst,
+                        Realm = context.Realm,
+                        ErrorMessage = ex.Message
+                    });
+                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+                    return BuildError(HttpStatusCode.Unauthorized, ex.Code, ex.Message);
                 }
-
-                if (!clientId.Equals(oauthClient.ClientId, StringComparison.InvariantCultureIgnoreCase))
+                catch (OAuthException ex)
                 {
-                    _logger.LogError("refresh token is not issued by the client");
-                    return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.REFRESH_TOKEN_NOT_ISSUED_BY_CLIENT);
+                    await _busControl.Publish(new TokenIssuedFailureEvent
+                    {
+                        GrantType = GRANT_TYPE,
+                        ClientId = context.Client?.Id,
+                        Scopes = scopeLst,
+                        Realm = context.Realm,
+                        ErrorMessage = ex.Message
+                    });
+                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+                    return BuildError(HttpStatusCode.BadRequest, ex.Code, ex.Message);
                 }
-
-                await _grantedTokenHelper.RemoveRefreshToken(refreshToken, cancellationToken);
-                var scopes = GetScopes(originalJwsPayload, jwsPayload);
-                var resources = GetResources(originalJwsPayload, jwsPayload);
-                var claims = GetClaims(originalJwsPayload, jwsPayload);
-                var extractionResult = await _audienceHelper.Extract(context.Realm ?? Constants.DefaultRealm, scopes, resources, cancellationToken);
-                var result = BuildResult(context, extractionResult.Scopes);
-                await Authenticate(jwsPayload, context, cancellationToken);
-                foreach (var tokenBuilder in _tokenBuilders)
-                    await tokenBuilder.Build(new BuildTokenParameter { Scopes = extractionResult.Scopes, Audiences = extractionResult.Audiences, Claims = claims, GrantId = tokenResult.GrantId }, context, cancellationToken);
-                
-                _tokenProfiles.First(t => t.Profile == ( context.Client.PreferredTokenProfile ?? Options.DefaultTokenProfile)).Enrich(context);
-                foreach (var kvp in context.Response.Parameters)
-                {
-                    result.Add(kvp.Key, kvp.Value);
-                }
-
-                if (!string.IsNullOrWhiteSpace(tokenResult.GrantId))
-                    result.Add(TokenResponseParameters.GrantId, tokenResult.GrantId);
-
-                return new OkObjectResult(result);
-            }
-            catch (OAuthUnauthorizedException ex)
-            {
-                return BuildError(HttpStatusCode.Unauthorized, ex.Code, ex.Message);
-            }
-            catch (OAuthException ex)
-            {
-                return BuildError(HttpStatusCode.BadRequest, ex.Code, ex.Message);
             }
         }
 

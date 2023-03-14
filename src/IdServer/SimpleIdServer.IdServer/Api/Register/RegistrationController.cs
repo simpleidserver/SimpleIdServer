@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,12 +10,14 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Extensions;
+using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,42 +34,60 @@ namespace SimpleIdServer.IdServer.Api.Register
         private readonly IScopeRepository _scopeRepository;
         private readonly IRegisterClientRequestValidator _validator;
         private readonly IRealmRepository _realmRepository;
+        private readonly IBusControl _busControl;
         private readonly IdServerHostOptions _options;
 
-        public RegistrationController(IClientRepository clientRepository, IScopeRepository scopeRepository, IRegisterClientRequestValidator validator, IRealmRepository realmRepository, IOptions<IdServerHostOptions> options)
+        public RegistrationController(IClientRepository clientRepository, IScopeRepository scopeRepository, IRegisterClientRequestValidator validator, IRealmRepository realmRepository, IBusControl busControl, IOptions<IdServerHostOptions> options)
         {
             _clientRepository = clientRepository;
             _scopeRepository = scopeRepository;
             _validator = validator;
             _realmRepository = realmRepository;
+            _busControl = busControl;
             _options = options.Value;
         }
 
         [HttpPost]
         public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] RegisterClientRequest request, CancellationToken cancellationToken)
         {
-            try
+            prefix = prefix ?? Constants.DefaultRealm;
+            using (var activity = Tracing.IdServerActivitySource.StartActivity("Register Client"))
             {
-                prefix = prefix ?? Constants.DefaultRealm;
-                var client = await Build(request, cancellationToken);
-                await _validator.Validate(prefix, client, cancellationToken);
-                _clientRepository.Add(client);
-                await _clientRepository.SaveChanges(cancellationToken);
-                return new ContentResult
+                try
                 {
-                    StatusCode = (int)HttpStatusCode.Created,
-                    Content = client.Serialize(Request.GetAbsoluteUriWithVirtualPath()).ToJsonString(),
-                    ContentType = "application/json"
-                };
-            }
-            catch (OAuthException ex)
-            {
-                var jObj = new JsonObject
+                    var client = await Build(request, cancellationToken);
+                    await _validator.Validate(prefix, client, cancellationToken);
+                    _clientRepository.Add(client);
+                    await _clientRepository.SaveChanges(cancellationToken);
+                    activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Ok, "Client is registered");
+                    await _busControl.Publish(new ClientRegisteredSuccessEvent
+                    {
+                        Realm = prefix,
+                        RequestJSON = JsonSerializer.Serialize(request)
+                    });
+                    return new ContentResult
+                    {
+                        StatusCode = (int)HttpStatusCode.Created,
+                        Content = client.Serialize(Request.GetAbsoluteUriWithVirtualPath()).ToJsonString(),
+                        ContentType = "application/json"
+                    };
+                }
+                catch (OAuthException ex)
                 {
-                    [ErrorResponseParameters.Error] = ex.Code,
-                    [ErrorResponseParameters.ErrorDescription] = ex.Message
-                };
-                return new BadRequestObjectResult(jObj);
+                    await _busControl.Publish(new ClientRegisteredFailureEvent
+                    {
+                        Realm = prefix,
+                        ErrorMessage = ex.Message,
+                        RequestJSON = JsonSerializer.Serialize(request)
+                    });
+                    activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Error, ex.Message);
+                    var jObj = new JsonObject
+                    {
+                        [ErrorResponseParameters.Error] = ex.Code,
+                        [ErrorResponseParameters.ErrorDescription] = ex.Message
+                    };
+                    return new BadRequestObjectResult(jObj);
+                }
             }
 
             async Task<Client> Build(RegisterClientRequest request, CancellationToken cancellationToken)

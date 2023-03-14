@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
@@ -47,7 +48,8 @@ namespace SimpleIdServer.IdServer.UI
             IUserTransformer userTransformer,
             IAuthenticationSchemeProviderRepository authenticationSchemeProviderRepository,
             IAuthenticationHelper authenticationHelper,
-            IRealmRepository realmRepository) : base(options, dataProtectionProvider, clientRepository, amrHelper, userRepository, userTransformer)
+            IRealmRepository realmRepository,
+            IBusControl busControl) : base(options, dataProtectionProvider, clientRepository, amrHelper, userRepository, userTransformer, busControl)
         {
             _logger = logger;
             _authenticationSchemeProvider = authenticationSchemeProvider;

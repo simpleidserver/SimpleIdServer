@@ -26,6 +26,7 @@ namespace SimpleIdServer.IdServer.Store
         public DbSet<UMAPendingRequest> UmaPendingRequest { get; set; }
         public DbSet<Realm> Realms { get; set; }
         public DbSet<SerializedFileKey> SerializedFileKeys { get; set; }
+        public DbSet<AuditEvent> AuditEvents { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -63,6 +64,7 @@ namespace SimpleIdServer.IdServer.Store
             builder.ApplyConfiguration(new UMAResourcePermissionConfiguration());
             builder.ApplyConfiguration(new RealmConfiguration());
             builder.ApplyConfiguration(new SerializedFileKeyConfiguration());
+            builder.ApplyConfiguration(new AuditEventConfiguration());
         }
     }
 }

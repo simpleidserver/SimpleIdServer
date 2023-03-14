@@ -36,6 +36,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
             if (!string.IsNullOrWhiteSpace(action.OrderBy))
                 query = query.OrderBy(SanitizeExpression(action.OrderBy));
 
+            var nb = query.Count();
             var apiResources = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
             var selectedResources = new List<string>();
             if(!string.IsNullOrWhiteSpace(action.ScopeName))
@@ -44,7 +45,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
                 selectedResources = scope.ApiResources.Select(r => r.Name).ToList();
             }
 
-            dispatcher.Dispatch(new SearchApiResourcesSuccessAction { ApiResources = apiResources, SelectedApiResources = selectedResources });
+            dispatcher.Dispatch(new SearchApiResourcesSuccessAction { ApiResources = apiResources, SelectedApiResources = selectedResources, Count = nb });
 
             string SanitizeExpression(string expression) => expression.Replace("Value.", "");
         }
@@ -114,6 +115,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
     {
         public IEnumerable<ApiResource> ApiResources { get; set; } = new List<ApiResource>();
         public IEnumerable<string> SelectedApiResources { get; set; } = new List<string>();
+        public int Count { get; set; }
     }
 
     public class AddApiResourceAction

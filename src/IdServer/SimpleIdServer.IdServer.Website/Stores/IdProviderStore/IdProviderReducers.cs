@@ -16,7 +16,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         [ReducerMethod]
         public static SearchIdProvidersState ReduceSearchIdProvidersSuccessAction(SearchIdProvidersState state, SearchIdProvidersSuccessAction act) => new(idProviders: act.IdProviders, false)
         {
-            Count = act.IdProviders.Count
+            Count = act.Count
         };
 
         [ReducerMethod]

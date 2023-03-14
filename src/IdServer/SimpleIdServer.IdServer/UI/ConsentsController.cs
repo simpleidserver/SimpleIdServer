@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
@@ -9,6 +10,7 @@ using SimpleIdServer.IdServer.Api.Authorization;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseModes;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Extensions;
+using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.ViewModels;
@@ -31,6 +33,7 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IDataProtector _dataProtector;
         private readonly IResponseModeHandler _responseModeHandler;
         private readonly IExtractRequestHelper _extractRequestHelper;
+        private readonly IBusControl _busControl;
 
         public ConsentsController(
             IUserRepository userRepository,
@@ -38,7 +41,8 @@ namespace SimpleIdServer.IdServer.UI
             IUserConsentFetcher userConsentFetcher,
             IDataProtectionProvider dataProtectionProvider,
             IResponseModeHandler responseModeHandler,
-            IExtractRequestHelper extractRequestHelper)
+            IExtractRequestHelper extractRequestHelper,
+            IBusControl busControl)
         {
             _userRepository = userRepository;
             _clientRepository = clientRepository;
@@ -46,6 +50,7 @@ namespace SimpleIdServer.IdServer.UI
             _responseModeHandler = responseModeHandler;
             _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
             _extractRequestHelper = extractRequestHelper;
+            _busControl = busControl;
         }
 
         public async Task<IActionResult> Index([FromRoute] string prefix, string returnUrl, bool isProtected = true, CancellationToken cancellationToken = default(CancellationToken))
@@ -84,11 +89,13 @@ namespace SimpleIdServer.IdServer.UI
         [ValidateAntiForgeryToken]
         public async Task Reject([FromRoute] string prefix, RejectConsentViewModel viewModel, CancellationToken cancellationToken)
         {
+            prefix = prefix ?? Constants.DefaultRealm;
+            var nameIdentifier = GetNameIdentifier();
             var unprotectedUrl = _dataProtector.Unprotect(viewModel.ReturnUrl);
             var query = unprotectedUrl.GetQueries().ToJsonObject();
             var clientId = query.GetClientIdFromAuthorizationRequest();
             var oauthClient = await _clientRepository.Query().Include(c => c.Realms).AsNoTracking().FirstAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == prefix), cancellationToken);
-            query = await _extractRequestHelper.Extract(prefix ?? Constants.DefaultRealm, Request.GetAbsoluteUriWithVirtualPath(), query, oauthClient);
+            query = await _extractRequestHelper.Extract(prefix, Request.GetAbsoluteUriWithVirtualPath(), query, oauthClient);
             var redirectUri = query.GetRedirectUriFromAuthorizationRequest();
             var state = query.GetStateFromAuthorizationRequest();
             var jObj = new JsonObject
@@ -102,10 +109,17 @@ namespace SimpleIdServer.IdServer.UI
             }
 
             var dic = jObj.ToEnumerable().ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            await _busControl.Publish(new ConsentRevokedEvent
+            {
+                UserName = nameIdentifier,
+                ClientId = clientId,
+                Realm = prefix,
+                Scopes = query.GetScopesFromAuthorizationRequest(),
+                Claims = query.GetClaimsFromAuthorizationRequest().Select(c => c.Name)
+            });
             var redirectUrlAuthorizationResponse = new RedirectURLAuthorizationResponse(redirectUri, dic);
             _responseModeHandler.Handle(query, redirectUrlAuthorizationResponse, HttpContext);
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -123,6 +137,14 @@ namespace SimpleIdServer.IdServer.UI
                 {
                     consent = _userConsentFetcher.BuildFromAuthorizationRequest(prefix, query);
                     user.Consents.Add(consent);
+                    await _busControl.Publish(new ConsentGrantedEvent
+                    {
+                        UserName = nameIdentifier,
+                        ClientId = consent.ClientId,
+                        Scopes = consent.Scopes,
+                        Claims = consent.Claims,
+                        Realm = prefix
+                    });
                     await _userRepository.SaveChanges(cancellationToken);
                 }
 

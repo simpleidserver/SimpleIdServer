@@ -19,7 +19,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
             {
                 IsLoading = false,
                 Scopes = act.Scopes.Select(c => new SelectableScope(c)),
-                Count = act.Scopes.Count()
+                Count = act.Count
             };
         }
 

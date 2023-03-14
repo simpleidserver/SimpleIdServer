@@ -40,6 +40,29 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AuditEvents",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Realm = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsError = table.Column<bool>(type: "bit", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ErrorMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ClientId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RequestJSON = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RedirectUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AuthMethod = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Scopes = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Claims = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AuditEvents", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AuthenticationSchemeProviderDefinitions",
                 columns: table => new
                 {
@@ -1138,6 +1161,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
             migrationBuilder.DropTable(
                 name: "ApiResourceScope");
+
+            migrationBuilder.DropTable(
+                name: "AuditEvents");
 
             migrationBuilder.DropTable(
                 name: "AuthenticationContextClassReferenceRealm");

@@ -22,7 +22,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             {
                 IsLoading = false,
                 Users = act.Users.Select(c => new SelectableUser(c)),
-                Count = act.Users.Count()
+                Count = act.Count
             };
         }
 

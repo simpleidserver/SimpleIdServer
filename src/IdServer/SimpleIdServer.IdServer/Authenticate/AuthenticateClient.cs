@@ -1,10 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Authenticate.AssertionParsers;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using System;
@@ -25,13 +27,15 @@ namespace SimpleIdServer.IdServer.Authenticate
         private readonly IClientRepository _clientRepository;
         private readonly IEnumerable<IOAuthClientAuthenticationHandler> _handlers;
         private readonly IEnumerable<IClientAssertionParser> _clientAssertionParsers;
+        private readonly IBusControl _busControl;
         private readonly IdServerHostOptions _options;
 
-        public AuthenticateClient(IClientRepository clientRepository, IEnumerable<IOAuthClientAuthenticationHandler> handlers, IEnumerable<IClientAssertionParser> clientAssertionParsers, IOptions<IdServerHostOptions> options)
+        public AuthenticateClient(IClientRepository clientRepository, IEnumerable<IOAuthClientAuthenticationHandler> handlers, IEnumerable<IClientAssertionParser> clientAssertionParsers, IBusControl busControl, IOptions<IdServerHostOptions> options)
         {
             _clientRepository = clientRepository;
             _handlers = handlers;
             _clientAssertionParsers = clientAssertionParsers;
+            _busControl = busControl;
             _options = options.Value;
         }
 
@@ -55,8 +59,23 @@ namespace SimpleIdServer.IdServer.Authenticate
             var handler = _handlers.FirstOrDefault(h => h.AuthMethod == tokenEndPointAuthMethod);
             if (handler == null) throw new OAuthException(errorCode, string.Format(ErrorMessages.UNKNOWN_AUTH_METHOD, tokenEndPointAuthMethod));
 
-            if (!await handler.Handle(authenticateInstruction, client, issuerName, cancellationToken, errorCode)) throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_CREDENTIAL);
+            if (!await handler.Handle(authenticateInstruction, client, issuerName, cancellationToken, errorCode))
+            {
+                await _busControl.Publish(new ClientAuthenticationFailureEvent
+                {
+                    ClientId = client.ClientId,
+                    AuthMethod = tokenEndPointAuthMethod,
+                    Realm = authenticateInstruction.Realm
+                });
+                throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_CREDENTIAL);
+            }
 
+            await _busControl.Publish(new ClientAuthenticationSuccessEvent
+            {
+                ClientId = client.ClientId,
+                AuthMethod = tokenEndPointAuthMethod,
+                Realm = authenticateInstruction.Realm
+            });
             return client;
         }
 
