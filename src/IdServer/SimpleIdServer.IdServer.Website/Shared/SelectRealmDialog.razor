@@ -18,6 +18,9 @@
 <RadzenButton class="mt-1 w-100" Click=@((args) => AddRealm()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="Add Realm" />
 
 @code {
+    [Parameter]
+    public string activeRealm { get; set; }
+
     record RealmForm
     {
         public string Name { get; set; }
@@ -25,10 +28,10 @@
 
     RealmForm realmForm = new RealmForm();
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnParametersSet()
     {
-        await base.OnInitializedAsync();
-        realmForm.Name = realmsState.Value.ActiveRealm;
+        base.OnParametersSet();
+        realmForm.Name = activeRealm;
     }
 
     void SubmitSelectRealm(RealmForm realm)

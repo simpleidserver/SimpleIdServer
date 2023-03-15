@@ -11,10 +11,11 @@ using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Startup;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.WsFederation;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("appsettings.json")
@@ -24,35 +25,20 @@ builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAn
     .AllowAnyHeader()));
 builder.Services.AddRazorPages()
     .AddRazorRuntimeCompilation();
+OtherFeatures.CreateClientJWK();
 RunSqlServerIdServer(builder.Services);
-ListenActivity();
 var app = builder.Build();
-SeedData(app);
+// SeedData(app);
 app.UseCors("AllowAll");
 app.UseSID()
     .UseWsFederation();
 app.Run();
 
-void ListenActivity()
-{
-    var activityListener = new ActivityListener();
-    activityListener.ShouldListenTo = (activitySource) => activitySource.Name == Tracing.ActivitySourceName;
-    activityListener.Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData;
-    activityListener.ActivityStarted += (e) =>
-    {
-
-    };
-    activityListener.ActivityStopped += (e) =>
-    {
-
-    };
-    ActivitySource.AddActivityListener(activityListener);
-}
-
 void RunSqlServerIdServer(IServiceCollection services)
 {
     var name = Assembly.GetExecutingAssembly().GetName().Name;
     services.AddSIDIdentityServer()
+        /*
         .UseEFStore(o =>
         {
             o.UseSqlServer(builder.Configuration.GetConnectionString("IdServer"), o =>
@@ -60,6 +46,24 @@ void RunSqlServerIdServer(IServiceCollection services)
                 o.MigrationsAssembly(name);
                 o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
             });
+        })
+        */
+        .UseInMemoryStore(o =>
+        {
+            o.AddInMemoryRealms(IdServerConfiguration.Realms);
+            o.AddInMemoryScopes(IdServerConfiguration.Scopes);
+            o.AddInMemoryClients(IdServerConfiguration.Clients);
+            o.AddInMemoryUsers(IdServerConfiguration.Users);
+            o.AddInMemoryUMAResources(IdServerConfiguration.Resources);
+            o.AddInMemoryUMAPendingRequests(IdServerConfiguration.PendingRequests);
+            o.AddInMemoryAuthenticationSchemeProviderDefinitions(IdServerConfiguration.ProviderDefinitions);
+            o.AddInMemoryAuthenticationSchemeProviders(IdServerConfiguration.Providers);
+            o.AddInMemoryKeys(SimpleIdServer.IdServer.Constants.StandardRealms.Master, new List<SigningCredentials>
+            {
+                new SigningCredentials(BuildRsaSecurityKey("rsaSig"), SecurityAlgorithms.RsaSha256),
+                new SigningCredentials(BuildECDSaSecurityKey(ECCurve.NamedCurves.nistP256), SecurityAlgorithms.EcdsaSha256)
+            }, new List<EncryptingCredentials>());
+
         })
         .UseInMemoryMassTransit()
         .AddBackChannelAuthentication()
@@ -172,3 +176,13 @@ void SeedData(WebApplication application)
         }
     }
 }
+
+static RsaSecurityKey BuildRsaSecurityKey(string keyid) => new RsaSecurityKey(RSA.Create())
+{
+    KeyId = keyid
+};
+
+static ECDsaSecurityKey BuildECDSaSecurityKey(ECCurve curve) => new ECDsaSecurityKey(ECDsa.Create(curve))
+{
+    KeyId = Guid.NewGuid().ToString()
+};

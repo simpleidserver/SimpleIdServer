@@ -111,7 +111,10 @@ namespace SimpleIdServer.IdServer.Api.Register
             CheckSignature(client.TokenSignedResponseAlg, ErrorMessages.UNSUPPORTED_TOKEN_SIGNED_RESPONSE_ALG);
             CheckEncryption(client.TokenEncryptedResponseAlg, client.TokenEncryptedResponseEnc, ErrorMessages.UNSUPPORTED_TOKEN_ENCRYPTED_RESPONSE_ALG, ErrorMessages.UNSUPPORTED_TOKEN_ENCRYPTED_RESPONSE_ENC, OAuthClientParameters.TokenEncryptedResponseAlg);  
             
-            CheckSignature(client.IdTokenSignedResponseAlg, ErrorMessages.UNSUPPORTED_IDTOKEN_SIGNED_RESPONSE_ALG); CheckEncryption(client.IdTokenEncryptedResponseAlg, client.IdTokenEncryptedResponseEnc, ErrorMessages.UNSUPPORTED_IDTOKEN_ENCRYPTED_RESPONSE_ALG, ErrorMessages.UNSUPPORTED_IDTOKEN_ENCRYPTED_RESPONSE_ENC, OAuthClientParameters.IdTokenEncryptedResponseAlg);
+            CheckSignature(client.IdTokenSignedResponseAlg, ErrorMessages.UNSUPPORTED_IDTOKEN_SIGNED_RESPONSE_ALG); 
+            CheckEncryption(client.IdTokenEncryptedResponseAlg, client.IdTokenEncryptedResponseEnc, ErrorMessages.UNSUPPORTED_IDTOKEN_ENCRYPTED_RESPONSE_ALG, ErrorMessages.UNSUPPORTED_IDTOKEN_ENCRYPTED_RESPONSE_ENC, OAuthClientParameters.IdTokenEncryptedResponseAlg);
+            CheckSignature(client.AuthorizationSignedResponseAlg, ErrorMessages.UNSUPPORTED_AUTHORIZATION_SIGNED_RESPONSE_ALG);
+            CheckEncryption(client.AuthorizationEncryptedResponseAlg, client.AuthorizationEncryptedResponseEnc, ErrorMessages.UNSUPPORTED_AUTHORIZATION_ENCRYPTED_RESPONSE_ALG, ErrorMessages.UNSUPPORTED_AUTHORIZATION_ENCRYPTED_RESPONSE_ENC, client.AuthorizationEncryptedResponseAlg);
             CheckSignature(client.UserInfoSignedResponseAlg, ErrorMessages.UNSUPPORTED_USERINFO_SIGNED_RESPONSE_ALG);
             CheckEncryption(client.UserInfoEncryptedResponseAlg, client.UserInfoEncryptedResponseEnc, ErrorMessages.UNSUPPORTED_USERINFO_ENCRYPTED_RESPONSE_ALG, ErrorMessages.UNSUPPORTED_USERINFO_ENCRYPTED_RESPONSE_ENC, OAuthClientParameters.UserInfoEncryptedResponseAlg);
             CheckSignature(client.RequestObjectSigningAlg, ErrorMessages.UNSUPPORTED_REQUEST_OBJECT_SIGNING_ALG);

@@ -17,8 +17,9 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseModes
             _oauthResponseModeHandlers = oauthResponseModeHandlers;
         }
 
-        public void Handle(JsonObject queryParams, RedirectURLAuthorizationResponse authorizationResponse, HttpContext httpContext)
+        public void Handle(HandlerContext context, RedirectURLAuthorizationResponse authorizationResponse, HttpContext httpContext)
         {
+            var queryParams = context.Request.RequestData;
             var responseTypes = queryParams.GetResponseTypesFromAuthorizationRequest();
             var responseMode = queryParams.GetResponseModeFromAuthorizationRequest();
             IOAuthResponseModeHandler oauthResponseModeHandler = null;
@@ -42,7 +43,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseModes
                 oauthResponseModeHandler = _oauthResponseModeHandlers.First(o => o.ResponseMode == QueryResponseModeHandler.NAME);
             }
 
-            oauthResponseModeHandler.Handle(authorizationResponse, httpContext);
+            oauthResponseModeHandler.Handle(context, authorizationResponse, httpContext);
         }
 
         protected virtual string GetDefaultResponseMode(IEnumerable<string> responseTypes)
@@ -50,13 +51,9 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseModes
             var responseMode = string.Empty;
             // https://openid.net/specs/openid-connect-core-1_0.html#rfc.section.3.1.2.6
             if (!responseTypes.Any() || (responseTypes.Count() == 1 && responseTypes.Contains(AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE)))
-            {
                 responseMode = QueryResponseModeHandler.NAME;
-            }
             else
-            {
                 responseMode = FragmentResponseModeHandler.NAME;
-            }
 
             return responseMode;
         }

@@ -122,6 +122,18 @@ namespace SimpleIdServer.IdServer
             return this;
         }
 
+        public IdServerInMemoryStoreBuilder AddInMemoryAuthenticationSchemeProviderDefinitions(ICollection<Domains.AuthenticationSchemeProviderDefinition> definitions)
+        {
+            var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
+            if (!storeDbContext.AuthenticationSchemeProviderDefinitions.Any())
+            {
+                storeDbContext.AuthenticationSchemeProviderDefinitions.AddRange(definitions);
+                storeDbContext.SaveChanges();
+            }
+
+            return this;
+        }
+
         public IdServerInMemoryStoreBuilder AddInMemoryAuthenticationSchemeProviders(ICollection<Domains.AuthenticationSchemeProvider> providers)
         {
             var storeDbContext = _serviceProvider.GetService<StoreDbContext>();

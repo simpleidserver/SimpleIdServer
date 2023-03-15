@@ -124,7 +124,7 @@ Scenario: lifetime of the request must not exceed 300 seconds (request)
 
 Scenario: request parameter must contains jti (request)
 	Given authenticate a user
-	And build expiration time and add '2' seconds
+	And build expiration time and add '30' seconds
 	And build JWS request object for client 'fortyTwoClient' and sign with the key 'keyId'
 	| Key | Value                  |
 	| aud | https://localhost:8080 |

@@ -195,6 +195,10 @@ namespace System.Text.Json.Nodes
                 return new AuthorizedClaim[0];
 
             var claimsJObj = jObj[AuthorizationRequestParameters.Claims] as JsonObject;
+            var claimsValue = jObj[AuthorizationRequestParameters.Claims] as JsonValue;
+            if (claimsJObj == null && claimsValue != null)
+                claimsJObj = JsonObject.Parse(claimsValue.GetValue<string>()).AsObject();
+
             return claimsJObj.GetOpenIdClaims();
         }
 

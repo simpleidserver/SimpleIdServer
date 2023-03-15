@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Api.Authorization;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseModes;
 using SimpleIdServer.IdServer.DTOs;
@@ -64,7 +65,7 @@ namespace SimpleIdServer.IdServer.UI
                 var unprotectedUrl = _dataProtector.Unprotect(returnUrl);
                 var query = unprotectedUrl.GetQueries().ToJsonObject();
                 var clientId = query.GetClientIdFromAuthorizationRequest();
-                var oauthClient = await _clientRepository.Query().Include(c => c.Translations).Include(c => c.Realms).Include(c => c.Scopes).AsNoTracking().FirstAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == prefix), cancellationToken);
+                var oauthClient = await _clientRepository.Query().Include(c => c.Translations).Include(c => c.Realms).Include(c => c.Scopes).Include(c => c.SerializedJsonWebKeys).AsNoTracking().FirstAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == prefix), cancellationToken);
                 query = await _extractRequestHelper.Extract(prefix, Request.GetAbsoluteUriWithVirtualPath(), query, oauthClient);
                 var scopes = query.GetScopesFromAuthorizationRequest();
                 var claims = query.GetClaimsFromAuthorizationRequest();
@@ -118,7 +119,8 @@ namespace SimpleIdServer.IdServer.UI
                 Claims = query.GetClaimsFromAuthorizationRequest().Select(c => c.Name)
             });
             var redirectUrlAuthorizationResponse = new RedirectURLAuthorizationResponse(redirectUri, dic);
-            _responseModeHandler.Handle(query, redirectUrlAuthorizationResponse, HttpContext);
+            var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), null, query), prefix);
+            _responseModeHandler.Handle(context, redirectUrlAuthorizationResponse, HttpContext);
         }
 
         [HttpPost]

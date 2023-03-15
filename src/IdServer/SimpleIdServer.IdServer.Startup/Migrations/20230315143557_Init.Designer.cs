@@ -12,7 +12,7 @@ using SimpleIdServer.IdServer.Store;
 namespace SimpleIdServer.IdServer.Startup.Migrations
 {
     [DbContext(typeof(StoreDbContext))]
-    [Migration("20230314160022_Init")]
+    [Migration("20230315143557_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -536,6 +536,18 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
                     b.Property<int>("AuthReqIdExpirationTimeInSeconds")
                         .HasColumnType("int");
+
+                    b.Property<string>("AuthorizationEncryptedResponseAlg")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "authorization_encrypted_response_alg");
+
+                    b.Property<string>("AuthorizationEncryptedResponseEnc")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "authorization_encrypted_response_enc");
+
+                    b.Property<string>("AuthorizationSignedResponseAlg")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "authorization_signed_response_alg");
 
                     b.Property<string>("BCAuthenticationRequestSigningAlg")
                         .HasColumnType("nvarchar(max)")

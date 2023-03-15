@@ -54,7 +54,7 @@ namespace SimpleIdServer.IdServer
 
             var curve = ECCurve.NamedCurves.nistP256;
             if(alg == SecurityAlgorithms.EcdsaSha384) curve = ECCurve.NamedCurves.nistP384;
-            else curve = ECCurve.NamedCurves.nistP521;
+            else if(alg == SecurityAlgorithms.EcdsaSha512) curve = ECCurve.NamedCurves.nistP521;
 
             var ecdsaSecurityKey = new ECDsaSecurityKey(ECDsa.Create(curve)) { KeyId = keyId };
             return new SigningCredentials(ecdsaSecurityKey, alg);

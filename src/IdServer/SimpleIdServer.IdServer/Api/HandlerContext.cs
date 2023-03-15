@@ -10,6 +10,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Web;
+using static MassTransit.ValidationResultExtensions;
 
 namespace SimpleIdServer.IdServer.Api
 {
@@ -170,6 +171,11 @@ namespace SimpleIdServer.IdServer.Api
         public string GetIssuer()
         {
             var result = Request.IssuerName;
+            return GetIssuer(result);
+        }
+
+        public static string GetIssuer(string result)
+        {
             var realm = RealmContext.Instance().Realm;
             if (!string.IsNullOrWhiteSpace(realm))
             {

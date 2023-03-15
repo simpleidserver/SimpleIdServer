@@ -154,7 +154,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
                         {
                             Claims = payload
                         };
-                        securityTokenDescriptor.Issuer = Request.GetAbsoluteUriWithVirtualPath();
+                        securityTokenDescriptor.Issuer = context.GetIssuer();
                         securityTokenDescriptor.Audience = token.ClientId;
                         result = await _jwtBuilder.BuildClientToken(prefix, oauthClient, securityTokenDescriptor, oauthClient.UserInfoSignedResponseAlg, oauthClient.UserInfoEncryptedResponseAlg, oauthClient.UserInfoEncryptedResponseEnc, cancellationToken);
                         contentType = "application/jwt";

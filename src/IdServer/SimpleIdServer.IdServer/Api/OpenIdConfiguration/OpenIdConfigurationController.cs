@@ -78,6 +78,9 @@ namespace SimpleIdServer.IdServer.Api.OpenIdConfiguration
             result.Add(OpenIDConfigurationNames.GrantManagementActionRequired, _options.GrantManagementActionRequired);
             result.Add(OpenIDConfigurationNames.GrantManagementEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.Grants}");
             result.Add(OpenIDConfigurationNames.GrantManagementActionsSupported, JsonSerializer.SerializeToNode(Constants.AllStandardGrantManagementActions));
+            result.Add(OpenIDConfigurationNames.AuthorizationSigningAlgValuesSupported, JsonSerializer.SerializeToNode(Constants.AllSigningAlgs));
+            result.Add(OpenIDConfigurationNames.AuthorizationEncryptionAlgValuesSupported, JsonSerializer.SerializeToNode(Constants.AllEncAlgs));
+            result.Add(OpenIDConfigurationNames.AuthorizationEncryptionEncValuesSupported, JsonSerializer.SerializeToNode(Constants.AllEncryptions));
             return new OkObjectResult(result);
         }
     }

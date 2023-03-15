@@ -22,7 +22,7 @@
     </RadzenHeader>
     <RadzenSidebar @bind-Expanded="@sidebarExpanded">
         <RadzenPanelMenu Click="@(args => ShowRealms(args))">
-            <RadzenPanelMenuItem Text=@("Active Realm : " + state.Value.ActiveRealm) />
+            <RadzenPanelMenuItem Text=@("Active Realm : " + activeRealm) />
             <RadzenPanelMenuItem Text="Manage" />
             <RadzenPanelMenuItem Text="Clients" Icon="apps" Path="/clients" />
             <RadzenPanelMenuItem Text="Scopes" Icon="visibility" Path="/scopes" />
@@ -44,6 +44,7 @@
 
 @code {
     bool sidebarExpanded = true;
+    string activeRealm;
 
     protected override void OnAfterRender(bool firstRender)
     {
@@ -52,6 +53,16 @@
         {
             var act = new GetAllRealmAction();
             dispatcher.Dispatch(act);
+            SubscribeToAction<GetActiveSuccessRealmAction>((act) =>
+            {
+                activeRealm = act.Realm;
+                StateHasChanged();
+            });
+            SubscribeToAction<SelectRealmSuccessAction>((act) =>
+            {
+                activeRealm = act.Realm;
+                StateHasChanged();
+            });
         }
     }
 
@@ -63,8 +74,11 @@
 
     async void ShowRealms(MenuItemEventArgs args)
     {
-        if (state.Value.IsLoading || args.Text != "Active Realm : " + state.Value.ActiveRealm) return;
-        await dialogService.OpenAsync<SelectRealmDialog>("Select Realm", new Dictionary<string, object>(), new DialogOptions
+        if (state.Value.IsLoading || args.Text != "Active Realm : " + activeRealm) return;
+        await dialogService.OpenAsync<SelectRealmDialog>("Select Realm", new Dictionary<string, object>
+        {
+            { "activeRealm", activeRealm }
+        }, new DialogOptions
         {
             Width = "700px",
             Height = "512px",

@@ -10,7 +10,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseModes
         public static string NAME = "fragment";
         public string ResponseMode => NAME;
 
-        public void Handle(RedirectURLAuthorizationResponse authorizationResponse, HttpContext httpContext)
+        public void Handle(HandlerContext context, RedirectURLAuthorizationResponse authorizationResponse, HttpContext httpContext)
         {
             var queryBuilder = new QueryBuilder(authorizationResponse.QueryParameters);
             var redirectUrl = $"{authorizationResponse.RedirectUrl}#{queryBuilder.ToQueryString().ToString().TrimStart('?')}";

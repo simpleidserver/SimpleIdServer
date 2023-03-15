@@ -55,7 +55,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                     if (authorizationResponse.Type == AuthorizationResponseTypes.RedirectUrl)
                     {
                         var redirectUrlAuthorizationResponse = authorizationResponse as RedirectURLAuthorizationResponse;
-                        _responseModeHandler.Handle(context.Request.RequestData, redirectUrlAuthorizationResponse, HttpContext);
+                        _responseModeHandler.Handle(context, redirectUrlAuthorizationResponse, HttpContext);
                         return;
                     }
 
@@ -167,7 +167,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
 
             var dic = jObj.ToEnumerable().ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             var redirectUrlAuthorizationResponse = new RedirectURLAuthorizationResponse(redirectUri, dic);
-            _responseModeHandler.Handle(context.Request.RequestData, redirectUrlAuthorizationResponse, HttpContext);
+            _responseModeHandler.Handle(context, redirectUrlAuthorizationResponse, HttpContext);
         }
 
         private static void FormatRedirectUrl(List<KeyValuePair<string, string>> parameters)

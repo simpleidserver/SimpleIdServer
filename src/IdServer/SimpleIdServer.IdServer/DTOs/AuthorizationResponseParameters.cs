@@ -9,5 +9,7 @@ namespace SimpleIdServer.IdServer.DTOs
         public const string RefreshToken = "refresh_token";
         public const string AccessToken = "access_token";
         public const string IdToken = "id_token";
+        public const string Response = "response";
+        public const string RedirectUrl = "redirect_url";
     }
 }

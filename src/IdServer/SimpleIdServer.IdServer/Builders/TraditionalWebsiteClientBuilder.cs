@@ -309,6 +309,34 @@ namespace SimpleIdServer.IdServer.Builders
 
         #endregion
 
+        #region Response Mode
+
+        /// <summary>
+        /// Set authorization_signed_response_alg.
+        /// </summary>
+        /// <param name="sigAlg"></param>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder SetSigAuthorizationResponse(string sigAlg = SecurityAlgorithms.RsaSha256)
+        {
+            _client.AuthorizationSignedResponseAlg = sigAlg;
+            return this;
+        }
+
+        /// <summary>
+        /// Set authorization_encrypted_response_alg and authorization_encrypted_response_enc.
+        /// </summary>
+        /// <param name="alg"></param>
+        /// <param name="enc"></param>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder SetEncAuthorizationResponse(string alg, string enc)
+        {
+            _client.AuthorizationEncryptedResponseAlg = alg;
+            _client.AuthorizationEncryptedResponseEnc = enc;
+            return this;
+        }
+
+        #endregion
+
         #region Client authentication
 
         /// <summary>

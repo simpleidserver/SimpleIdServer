@@ -144,6 +144,9 @@ namespace SimpleIdServer.IdServer
         public const string UNSUPPORTED_GRANT_TYPE = "grant type {0} is not supported";
         public const string UNSUPPORTED_GRANT_TYPES = "grant types {0} are not supported";
         public const string UNSUPPORTED_IDTOKEN_SIGNED_RESPONSE_ALG = "id_token_signed_response_alg is not supported";
+        public const string UNSUPPORTED_AUTHORIZATION_SIGNED_RESPONSE_ALG = "authorization_signed_response_alg is not supported";
+        public const string UNSUPPORTED_AUTHORIZATION_ENCRYPTED_RESPONSE_ALG = "authorization_encrypted_response_alg is not supported";
+        public const string UNSUPPORTED_AUTHORIZATION_ENCRYPTED_RESPONSE_ENC = "authorization_encrypted_response_enc is not supported";
         public const string REFRESH_TOKEN_NOT_ISSUED_BY_CLIENT = "refresh token has not been issued by the client";
         public const string NO_REGISTERED_REDIRECTURI = "no redirect uri has been registered";
         public const string NO_ESSENTIAL_ACR_IS_SUPPORTED = "no essential acr is supported";

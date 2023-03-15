@@ -141,7 +141,7 @@ namespace SimpleIdServer.IdServer.Options
         /// </summary>
         public int CookieAuthExpirationTimeInSeconds { get; set; } = 5 * 60;
         /// <summary>
-        /// Name of the cookie used to store the session id.
+        /// NAME of the cookie used to store the session id.
         /// </summary>
         public string SessionCookieName { get; set; } = CookieAuthenticationDefaults.CookiePrefix + "Session";
         /// <summary>

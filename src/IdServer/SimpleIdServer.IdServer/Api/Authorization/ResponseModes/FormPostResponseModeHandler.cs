@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
-using SimpleIdServer.IdServer.Extensions;
 
 namespace SimpleIdServer.IdServer.Api.Authorization.ResponseModes
 {
@@ -14,13 +13,13 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseModes
         public const string NAME = "form_post";
         public string ResponseMode => NAME;
 
-        public void Handle(RedirectURLAuthorizationResponse authorizationResponse, HttpContext httpContext)
+        public void Handle(HandlerContext context, RedirectURLAuthorizationResponse authorizationResponse, HttpContext httpContext)
         {
             var queryBuilder = new QueryBuilder(authorizationResponse.QueryParameters)
             {
                 { "redirect_url", authorizationResponse.RedirectUrl }
             };
-            var issuer = httpContext.Request.GetAbsoluteUriWithVirtualPath();
+            var issuer = context.GetIssuer();
             var redirectUrl = $"{issuer}/{Constants.EndPoints.Form}{queryBuilder.ToQueryString()}";
             httpContext.Response.Redirect(redirectUrl);            
         }

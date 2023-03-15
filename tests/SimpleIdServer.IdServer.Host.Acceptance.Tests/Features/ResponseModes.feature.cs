@@ -19,7 +19,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class RevokeTokenFeature : object, Xunit.IClassFixture<RevokeTokenFeature.FixtureData>, System.IDisposable
+    public partial class ResponseModesFeature : object, Xunit.IClassFixture<ResponseModesFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
@@ -28,10 +28,10 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
-#line 1 "RevokeToken.feature"
+#line 1 "ResponseModes.feature"
 #line hidden
         
-        public RevokeTokenFeature(RevokeTokenFeature.FixtureData fixtureData, SimpleIdServer_IdServer_Host_Acceptance_Tests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
+        public ResponseModesFeature(ResponseModesFeature.FixtureData fixtureData, SimpleIdServer_IdServer_Host_Acceptance_Tests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
             this.TestInitialize();
@@ -40,7 +40,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "RevokeToken", "\tRevoke access token or refresh token", ProgrammingLanguage.CSharp, featureTags);
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "ResponseModes", "\tCheck response modes", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -80,14 +80,14 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Revoke access_token")]
-        [Xunit.TraitAttribute("FeatureTitle", "RevokeToken")]
-        [Xunit.TraitAttribute("Description", "Revoke access_token")]
-        public void RevokeAccess_Token()
+        [Xunit.SkippableFactAttribute(DisplayName="JWT response is returned as a fragment parameter")]
+        [Xunit.TraitAttribute("FeatureTitle", "ResponseModes")]
+        [Xunit.TraitAttribute("Description", "JWT response is returned as a fragment parameter")]
+        public void JWTResponseIsReturnedAsAFragmentParameter()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Revoke access_token", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("JWT response is returned as a fragment parameter", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 4
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -98,50 +98,53 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table318 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table318.AddRow(new string[] {
-                            "client_id",
-                            "firstClient"});
-                table318.AddRow(new string[] {
-                            "client_secret",
-                            "password"});
-                table318.AddRow(new string[] {
-                            "scope",
-                            "firstScope"});
-                table318.AddRow(new string[] {
-                            "grant_type",
-                            "client_credentials"});
 #line 5
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table318, "When ");
+ testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 12
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 13
- testRunner.And("extract parameter \'$.access_token\' from JSON body into \'accessToken\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-                TechTalk.SpecFlow.Table table319 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table317 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table319.AddRow(new string[] {
+                table317.AddRow(new string[] {
+                            "response_type",
+                            "token"});
+                table317.AddRow(new string[] {
                             "client_id",
-                            "firstClient"});
-                table319.AddRow(new string[] {
-                            "client_secret",
-                            "password"});
-                table319.AddRow(new string[] {
-                            "token",
-                            "$accessToken$"});
-                table319.AddRow(new string[] {
-                            "token_type_hint",
-                            "access_token"});
-#line 15
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token/revoke\'", ((string)(null)), table319, "When ");
+                            "fiftyFourClient"});
+                table317.AddRow(new string[] {
+                            "state",
+                            "state"});
+                table317.AddRow(new string[] {
+                            "response_mode",
+                            "fragment.jwt"});
+                table317.AddRow(new string[] {
+                            "redirect_uri",
+                            "http://localhost:8080"});
+                table317.AddRow(new string[] {
+                            "nonce",
+                            "nonce"});
+                table317.AddRow(new string[] {
+                            "scope",
+                            "openid profile"});
+#line 7
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table317, "When ");
+#line hidden
+#line 17
+ testRunner.And("extract parameter \'response\' from redirect url fragment", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 18
+ testRunner.And("extract payload from JWT \'$response$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 20
+ testRunner.Then("JWT has \'state\'=\'state\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 21
+ testRunner.Then("JWT contains \'access_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 22
- testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JWT contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 23
+ testRunner.Then("JWT contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -154,12 +157,12 @@ this.ScenarioInitialize(scenarioInfo);
             
             public FixtureData()
             {
-                RevokeTokenFeature.FeatureSetup();
+                ResponseModesFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                RevokeTokenFeature.FeatureTearDown();
+                ResponseModesFeature.FeatureTearDown();
             }
         }
     }

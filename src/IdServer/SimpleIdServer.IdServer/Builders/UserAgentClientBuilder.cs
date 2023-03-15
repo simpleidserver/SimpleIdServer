@@ -2,9 +2,11 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.IdServer.Api.Authorization.ResponseModes;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
 using SimpleIdServer.IdServer.Domains;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 namespace SimpleIdServer.IdServer.Builders
@@ -89,6 +91,34 @@ namespace SimpleIdServer.IdServer.Builders
         }
 
         public UserAgentClientBuilder AddRSAEncryptedKey(RsaSecurityKey rsa, string alg, string enc, SecurityKeyTypes keyType) => AddEncryptedKey(new EncryptingCredentials(rsa, alg, enc), SecurityKeyTypes.RSA);
+
+        #endregion
+
+        #region Response Mode
+
+        /// <summary>
+        /// Set authorization_signed_response_alg.
+        /// </summary>
+        /// <param name="sigAlg"></param>
+        /// <returns></returns>
+        public UserAgentClientBuilder SetSigAuthorizationResponse(string sigAlg = SecurityAlgorithms.RsaSha256)
+        {
+            _client.AuthorizationSignedResponseAlg = sigAlg;
+            return this;
+        }
+
+        /// <summary>
+        /// Set authorization_encrypted_response_alg and authorization_encrypted_response_enc.
+        /// </summary>
+        /// <param name="alg"></param>
+        /// <param name="enc"></param>
+        /// <returns></returns>
+        public UserAgentClientBuilder SetEncAuthorizationResponse(string alg, string enc)
+        {
+            _client.AuthorizationEncryptedResponseAlg = alg;
+            _client.AuthorizationEncryptedResponseEnc = enc;
+            return this;
+        }
 
         #endregion
 

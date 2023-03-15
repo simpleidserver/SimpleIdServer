@@ -10,7 +10,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseModes
         public static string NAME = "query";
         public string ResponseMode => NAME;
 
-        public void Handle(RedirectURLAuthorizationResponse authorizationResponse, HttpContext httpContext)
+        public void Handle(HandlerContext context, RedirectURLAuthorizationResponse authorizationResponse, HttpContext httpContext)
         {
             var url = QueryHelpers.AddQueryString(authorizationResponse.RedirectUrl, authorizationResponse.QueryParameters);
             httpContext.Response.Redirect(url);

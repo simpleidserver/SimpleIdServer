@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
@@ -161,9 +162,10 @@ namespace SimpleIdServer.IdServer.UI
                 jwsPayload.Add(JwtRegisteredClaimNames.Sid, sessionId);
             }
 
+            var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath());
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Issuer = Request.GetAbsoluteUriWithVirtualPath(),
+                Issuer = issuer,
                 Audience = openIdClient.ClientId,
                 IssuedAt = currentDateTime,
                 Claims = jwsPayload
@@ -200,7 +202,7 @@ namespace SimpleIdServer.IdServer.UI
             var url = client.FrontChannelLogoutUri;
             if (client.FrontChannelLogoutSessionRequired)
             {
-                var issuer = Request.GetAbsoluteUriWithVirtualPath();
+                var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath());
                 url = QueryHelpers.AddQueryString(url, new Dictionary<string, string>
                 {
                     { JwtRegisteredClaimNames.Iss, issuer },

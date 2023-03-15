@@ -534,6 +534,18 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<int>("AuthReqIdExpirationTimeInSeconds")
                         .HasColumnType("int");
 
+                    b.Property<string>("AuthorizationEncryptedResponseAlg")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "authorization_encrypted_response_alg");
+
+                    b.Property<string>("AuthorizationEncryptedResponseEnc")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "authorization_encrypted_response_enc");
+
+                    b.Property<string>("AuthorizationSignedResponseAlg")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "authorization_signed_response_alg");
+
                     b.Property<string>("BCAuthenticationRequestSigningAlg")
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "backchannel_authentication_request_signing_alg");

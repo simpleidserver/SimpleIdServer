@@ -121,6 +121,15 @@ namespace SimpleIdServer.IdServer.Api.Register
         [BindProperty(Name = OAuthClientParameters.RequireAuthTime)]
         [JsonPropertyName(OAuthClientParameters.RequireAuthTime)]
         public bool RequireAuthTime { get; set; } = false;
+        [JsonPropertyName(OAuthClientParameters.AuthorizationSignedResponseAlg)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? AuthorizationSignedResponseAlg { get; set; } = null;
+        [JsonPropertyName(OAuthClientParameters.AuthorizationEncryptedResponseAlg)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? AuthorizationEncryptedResponseAlg { get; set; } = null;
+        [JsonPropertyName(OAuthClientParameters.AuthorizationEncryptedResponseEnc)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? AuthorizationEncryptedResponseEnc { get; set; } = null;
         [JsonIgnore]
         public ICollection<TranslationRequest> Translations { get; set; } = new List<TranslationRequest>();
 
@@ -189,6 +198,11 @@ namespace SimpleIdServer.IdServer.Api.Register
             client.BackChannelLogoutSessionRequired = BackChannelLogoutSessionRequired;
 
             client.InitiateLoginUri = InitiateLoginUri;
+
+            if (string.IsNullOrWhiteSpace(AuthorizationSignedResponseAlg)) client.AuthorizationSignedResponseAlg = SecurityAlgorithms.RsaSha256;
+            else client.AuthorizationSignedResponseAlg = AuthorizationSignedResponseAlg;
+            client.AuthorizationEncryptedResponseAlg = AuthorizationEncryptedResponseAlg;
+            client.AuthorizationEncryptedResponseEnc = AuthorizationEncryptedResponseEnc;
         }
     }
 }

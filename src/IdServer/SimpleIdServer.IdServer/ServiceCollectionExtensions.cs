@@ -142,9 +142,17 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IOAuthResponseMode, QueryResponseModeHandler>();
             services.AddTransient<IOAuthResponseMode, FragmentResponseModeHandler>();
             services.AddTransient<IOAuthResponseMode, FormPostResponseModeHandler>();
+            services.AddTransient<IOAuthResponseMode, FormPostJwtResponseModeHandler>();
+            services.AddTransient<IOAuthResponseMode, QueryJwtResponseModeHandler>();
+            services.AddTransient<IOAuthResponseMode, FragmentJwtResponseModeHandler>();
+            services.AddTransient<IOAuthResponseMode, JwtResponseModeHandler>();
             services.AddTransient<IOAuthResponseModeHandler, QueryResponseModeHandler>();
             services.AddTransient<IOAuthResponseModeHandler, FragmentResponseModeHandler>();
             services.AddTransient<IOAuthResponseModeHandler, FormPostResponseModeHandler>();
+            services.AddTransient<IOAuthResponseModeHandler, FormPostJwtResponseModeHandler>();
+            services.AddTransient<IOAuthResponseModeHandler, QueryJwtResponseModeHandler>();
+            services.AddTransient<IOAuthResponseModeHandler, FragmentJwtResponseModeHandler>();
+            services.AddTransient<IOAuthResponseModeHandler, JwtResponseModeHandler>();
             services.AddTransient<IResponseModeHandler, ResponseModeHandler>();
             return services;
         }

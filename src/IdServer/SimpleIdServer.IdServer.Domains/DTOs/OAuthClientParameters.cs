@@ -66,5 +66,8 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
         public const string DefaultMaxAge = "default_max_age";
         public const string DefaultAcrValues = "default_acr_values";
         public const string RequireAuthTime = "require_auth_time";
+        public const string AuthorizationSignedResponseAlg = "authorization_signed_response_alg";
+        public const string AuthorizationEncryptedResponseAlg = "authorization_encrypted_response_alg";
+        public const string AuthorizationEncryptedResponseEnc = "authorization_encrypted_response_enc";
     }
 }

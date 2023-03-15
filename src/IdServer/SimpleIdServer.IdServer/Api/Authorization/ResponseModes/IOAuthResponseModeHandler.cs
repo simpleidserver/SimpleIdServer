@@ -6,6 +6,6 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseModes
 {
     public interface IOAuthResponseModeHandler : IOAuthResponseMode
     {
-        void Handle(RedirectURLAuthorizationResponse authorizationResponse, HttpContext httpContext);
+        void Handle(HandlerContext handlerContext, RedirectURLAuthorizationResponse authorizationResponse, HttpContext httpContext);
     }
 }

@@ -111,7 +111,6 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
 
             _claimsJwsPayloadEnricher.EnrichWithClaimsParameter(claims, requestedClaims, currentContext.User, activeSession?.AuthenticationDateTime);
             await _claimsEnricher.Enrich(currentContext.User, claims, openidClient, cancellationToken);
-
             var result = new SecurityTokenDescriptor
             {
                 Issuer = currentContext.GetIssuer(),

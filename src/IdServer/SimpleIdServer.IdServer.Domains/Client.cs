@@ -396,6 +396,24 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public bool RequireAuthTime { get; set; } = false;
         /// <summary>
+        /// The JWS [RFC7515] alg algorithm REQUIRED for signing authorization responses.
+        /// </summary>
+        [JsonPropertyName(OAuthClientParameters.AuthorizationSignedResponseAlg)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? AuthorizationSignedResponseAlg { get; set; } = null;
+        /// <summary>
+        /// The JWE [RFC7516] alg algorithm REQUIRED for encrypting authorization responses
+        /// </summary>
+        [JsonPropertyName(OAuthClientParameters.AuthorizationEncryptedResponseAlg)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? AuthorizationEncryptedResponseAlg { get; set; } = null;
+        /// <summary>
+        /// he JWE [RFC7516] enc algorithm REQUIRED for encrypting authorization responses.
+        /// </summary>
+        [JsonPropertyName(OAuthClientParameters.AuthorizationEncryptedResponseEnc)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? AuthorizationEncryptedResponseEnc { get; set; } = null;
+        /// <summary>
         /// Enable or disble the consent screen.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.IsConsentDisabled)]

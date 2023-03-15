@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authentication.Facebook;
+using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Startup.Converters;
@@ -31,8 +32,9 @@ namespace SimpleIdServer.IdServer.Startup
         {
             ClientBuilder.BuildTraditionalWebsiteClient("website", "password", null, "http://localhost:5001/signin-oidc").SetClientName("Website").SetClientLogoUri("https://cdn.logo.com/hotlink-ok/logo-social.png").AddScope(Constants.StandardScopes.OpenIdScope, Constants.StandardScopes.Profile).Build(),
             ClientBuilder.BuildExternalAuthDeviceClient("bankWebsite", "password", null, "http://localhost:5001/signin-oidc").SetClientName("Bank Website").AddScope(Constants.StandardScopes.OpenIdScope, Constants.StandardScopes.Profile).Build(),
-            WsClientBuilder.BuildWsFederationClient("urn:website").SetClientName("Name").Build(),
-            ClientBuilder.BuildUserAgentClient("oauth", "password", null, "https://oauth.tools/callback/code").AddScope(Constants.StandardScopes.OpenIdScope, Constants.StandardScopes.Profile).Build()
+            WsClientBuilder.BuildWsFederationClient("urn:website").SetClientName("NAME").Build(),
+            ClientBuilder.BuildUserAgentClient("oauth", "password", null, "https://oauth.tools/callback/code").AddScope(Constants.StandardScopes.OpenIdScope, Constants.StandardScopes.Profile).Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("fapi", "password", null, "https://localhost:8443/test/mnUbr3vVQO5Lewt/callback").SetRequestObjectSigning(SecurityAlgorithms.EcdsaSha256).SetSigAuthorizationResponse(SecurityAlgorithms.EcdsaSha256).AddScope(Constants.StandardScopes.OpenIdScope, Constants.StandardScopes.Profile).UseClientTlsAuthentication("cn=selfSigned").AddSigningKey(new SigningCredentials(PemImporter.Import(new PemResult("-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEK21CoKCA2Vk5zPM+7+vqtnrq4pIe\nsCLiWObLDFKKf3gJl0hll/ZTI5ww/oRrKIXO/uRe9AkckkKwqrqqXGnvsQ==\n-----END PUBLIC KEY-----", "-----BEGIN EC PRIVATE KEY-----\nMHcCAQEEIDHtu+N0u38ZN7DF/TpycDfaUs8WfPGUB3UusR0uv3TVoAoGCCqGSM49\nAwEHoUQDQgAEK21CoKCA2Vk5zPM+7+vqtnrq4pIesCLiWObLDFKKf3gJl0hll/ZT\nI5ww/oRrKIXO/uRe9AkckkKwqrqqXGnvsQ==\n-----END EC PRIVATE KEY-----"), "keyId"), SecurityAlgorithms.EcdsaSha256), SecurityAlgorithms.EcdsaSha256, SecurityKeyTypes.ECDSA).Build()
         };
 
         public static ICollection<UMAResource> Resources = new List<UMAResource>

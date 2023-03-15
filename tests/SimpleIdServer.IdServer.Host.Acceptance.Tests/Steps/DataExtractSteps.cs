@@ -3,6 +3,7 @@
 using BlushingPenguin.JsonPath;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.IdentityModel.JsonWebTokens;
+using System;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -48,6 +49,15 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
         {
             var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
             var queries = QueryHelpers.ParseQuery(httpResponseMessage.RequestMessage.RequestUri.Query);
+            var queryValue = queries[parameter][0];
+            _scenarioContext.Set(queryValue, parameter);
+        }
+
+        [When("extract parameter '(.*)' from redirect url fragment")]
+        public void WhenExtractRedirectUrlFragmentParameter(string parameter)
+        {
+            var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
+            var queries = QueryHelpers.ParseQuery(httpResponseMessage.RequestMessage.RequestUri.Fragment.TrimStart('#'));
             var queryValue = queries[parameter][0];
             _scenarioContext.Set(queryValue, parameter);
         }

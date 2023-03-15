@@ -33,5 +33,8 @@ namespace SimpleIdServer.IdServer.DTOs
         public const string GrantManagementActionRequired = "grant_management_action_required";
         public const string GrantManagementEndpoint = "grant_management_endpoint";
         public const string GrantManagementActionsSupported = "grant_management_actions_supported";
+        public const string AuthorizationSigningAlgValuesSupported = "authorization_signing_alg_values_supported";
+        public const string AuthorizationEncryptionAlgValuesSupported = "authorization_encryption_alg_values_supported";
+        public const string AuthorizationEncryptionEncValuesSupported = "authorization_encryption_enc_values_supported";
     }
 }
