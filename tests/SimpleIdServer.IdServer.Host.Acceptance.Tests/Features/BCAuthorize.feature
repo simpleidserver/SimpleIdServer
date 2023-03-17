@@ -17,7 +17,7 @@ Scenario: Authentication response is returned with interval because PING is used
 
 	When execute HTTP POST request 'https://localhost:8080/mtls/bc-authorize'
 	| Key                       | Value          |
-	| X-Testing-ClientCert      | mtlsClient.crt |
+	| X-Testing-ClientCert      | sidClient.crt |
 	| client_id                 | fortyTwoClient |
 	| request                   | $request$      |	
 
@@ -43,7 +43,7 @@ Scenario: Authentication response is returned without interval because PUSH is u
 
 	When execute HTTP POST request 'https://localhost:8080/mtls/bc-authorize'
 	| Key                       | Value            |
-	| X-Testing-ClientCert      | mtlsClient.crt   |
+	| X-Testing-ClientCert      | sidClient.crt   |
 	| client_id                 | fortyThreeClient |
 	| request                   | $request$        |	
 

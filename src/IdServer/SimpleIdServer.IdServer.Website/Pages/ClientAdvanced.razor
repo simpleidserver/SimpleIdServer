@@ -1,0 +1,91 @@
+﻿@using SimpleIdServer.IdServer.Api.Token.Handlers;
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.ClientStore;
+@using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
+@using SimpleIdServer.IdServer.Website.Stores.UserStore;
+@using SimpleIdServer.IdServer.WsFederation
+@using SimpleIdServer.IdServer.WsFederation.Extensions;
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject IDispatcher dispatcher
+@inject IState<UpdateClientState> updateClientState
+@inject TooltipService tooltipService
+@inject NotificationService notificationService
+
+<RadzenTemplateForm Submit=@SubmitUpdateClient TItem="UpdateAdvancedClient" Data=@updateAdvancedClient>
+    <RadzenAccordion Multiple=true>    
+        <Items>
+            <RadzenAccordionItem Text="OpenID configuration" Selected=true>
+                <!-- IdTokenSignedResponseAlg -->
+                <div class="row">
+                    <div class="col-md-2">
+                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, "JWA algorithm used for signing ID tokens"))" />
+                        <RadzenLabel Text="ID token signature algorithm" Style="padding: 0px;" />
+                    </div>
+                    <div class="col">
+                        <RadzenDropDown Name="IdTokenSignedResponseAlg" Class="w-100"
+                                        Data=@SimpleIdServer.IdServer.Constants.AllSigningAlgs
+                                        TValue="string"
+                                        @bind-Value=@updateAdvancedClient.IdTokenSignedResponseAlg />
+                    </div>
+                </div>
+                <!-- AuthorizationSignedResponseAlg -->
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, "JWA algorithm used for signing authorization response tokens when the response mode is jwt."))" />                        
+                        <RadzenLabel Text="Authorization response signature algorithm" Style="padding: 0px;" />
+                    </div>
+                    <div class="col">
+                        <RadzenDropDown Name="AuthorizationSignedResponseAlg" Class="w-100"
+                                        Data=@SimpleIdServer.IdServer.Constants.AllSigningAlgs
+                                        TValue="string"
+                                        @bind-Value=@updateAdvancedClient.AuthorizationSignedResponseAlg />
+                    </div>
+                </div>
+            </RadzenAccordionItem>
+        </Items>
+    </RadzenAccordion>
+
+    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateClientState.Value.IsUpdating ? "Updating..." : "Update")" Disabled=@updateClientState.Value.IsUpdating />
+</RadzenTemplateForm>
+
+
+@code {
+    [Parameter]
+    public SimpleIdServer.IdServer.Domains.Client Client { get; set; }
+
+    record UpdateAdvancedClient
+    {
+        public string? IdTokenSignedResponseAlg { get; set; } = null;
+        public string? AuthorizationSignedResponseAlg { get; set; } = null;
+    }
+
+    UpdateAdvancedClient updateAdvancedClient = new UpdateAdvancedClient();
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (this.Client == null) return;
+        updateAdvancedClient = new UpdateAdvancedClient
+        {
+            IdTokenSignedResponseAlg = Client.IdTokenEncryptedResponseAlg,
+            AuthorizationSignedResponseAlg = Client.AuthorizationSignedResponseAlg
+        };
+    }
+
+    void SubmitUpdateClient(UpdateAdvancedClient client)
+    {
+    }
+
+    void ShowTooltip(ElementReference eltRef, string msg)
+    {
+        tooltipService.Open(eltRef, msg, null);
+    }
+}

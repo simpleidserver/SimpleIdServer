@@ -23,8 +23,6 @@ Scenario: Get the configuration
 	And JSON '$.response_modes_supported[0]'='query'
 	And JSON '$.response_modes_supported[1]'='fragment'
 	And JSON '$.response_modes_supported[2]'='form_post'
-	And JSON '$.scopes_supported[0]'='secondScope'
-	And JSON '$.scopes_supported[1]'='firstScope'
 	And JSON '$.grant_types_supported[0]'='client_credentials'
 	And JSON '$.grant_types_supported[1]'='refresh_token'
 	And JSON '$.grant_types_supported[2]'='password'

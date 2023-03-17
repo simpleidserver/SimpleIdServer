@@ -106,7 +106,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "Value"});
                 table39.AddRow(new string[] {
                             "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
+                            "sidClient.crt"});
                 table39.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
@@ -162,7 +162,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "Value"});
                 table41.AddRow(new string[] {
                             "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
+                            "sidClient.crt"});
                 table41.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
@@ -221,7 +221,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "Value"});
                 table43.AddRow(new string[] {
                             "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
+                            "sidClient.crt"});
                 table43.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
@@ -280,7 +280,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "Value"});
                 table45.AddRow(new string[] {
                             "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
+                            "sidClient.crt"});
                 table45.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
@@ -342,7 +342,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "Value"});
                 table47.AddRow(new string[] {
                             "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
+                            "sidClient.crt"});
                 table47.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
@@ -407,7 +407,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "Value"});
                 table49.AddRow(new string[] {
                             "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
+                            "sidClient.crt"});
                 table49.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
@@ -475,7 +475,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "Value"});
                 table51.AddRow(new string[] {
                             "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
+                            "sidClient.crt"});
                 table51.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
@@ -543,7 +543,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "Value"});
                 table53.AddRow(new string[] {
                             "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
+                            "sidClient.crt"});
                 table53.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
@@ -614,7 +614,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "Value"});
                 table55.AddRow(new string[] {
                             "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
+                            "sidClient.crt"});
                 table55.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
@@ -688,7 +688,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "Value"});
                 table57.AddRow(new string[] {
                             "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
+                            "sidClient.crt"});
                 table57.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
@@ -765,7 +765,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "Value"});
                 table59.AddRow(new string[] {
                             "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
+                            "sidClient.crt"});
                 table59.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
@@ -845,7 +845,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "Value"});
                 table61.AddRow(new string[] {
                             "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
+                            "sidClient.crt"});
                 table61.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
@@ -925,7 +925,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "Value"});
                 table63.AddRow(new string[] {
                             "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
+                            "sidClient.crt"});
                 table63.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
@@ -1008,7 +1008,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "Value"});
                 table65.AddRow(new string[] {
                             "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
+                            "sidClient.crt"});
                 table65.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
@@ -1092,7 +1092,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "Value"});
                 table67.AddRow(new string[] {
                             "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
+                            "sidClient.crt"});
                 table67.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});

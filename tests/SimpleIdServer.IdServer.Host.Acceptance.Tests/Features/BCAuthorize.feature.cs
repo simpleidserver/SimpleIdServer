@@ -140,7 +140,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "Value"});
                 table36.AddRow(new string[] {
                             "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
+                            "sidClient.crt"});
                 table36.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
@@ -226,7 +226,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "Value"});
                 table38.AddRow(new string[] {
                             "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
+                            "sidClient.crt"});
                 table38.AddRow(new string[] {
                             "client_id",
                             "fortyThreeClient"});

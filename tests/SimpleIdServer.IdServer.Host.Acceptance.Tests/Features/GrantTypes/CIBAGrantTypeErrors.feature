@@ -6,7 +6,7 @@ Scenario: Only PING or POLL modes are supported to get a token
 	| Key                  | Value                             |
 	| grant_type           | urn:openid:params:grant-type:ciba |
 	| client_id            | fortyThreeClient                  |
-	| X-Testing-ClientCert | mtlsClient.crt                    |
+	| X-Testing-ClientCert | sidClient.crt                    |
 
 	And extract JSON from body
 	Then HTTP status code equals to '400'
@@ -18,7 +18,7 @@ Scenario: parameter auth_req_id is required
 	| Key                  | Value                             |
 	| grant_type           | urn:openid:params:grant-type:ciba |
 	| client_id            | fortyTwoClient                    |
-	| X-Testing-ClientCert | mtlsClient.crt                    |
+	| X-Testing-ClientCert | sidClient.crt                    |
 
 	And extract JSON from body
 	Then HTTP status code equals to '400'
@@ -30,7 +30,7 @@ Scenario: authorization request must exists
 	| Key                  | Value                             |
 	| grant_type           | urn:openid:params:grant-type:ciba |
 	| client_id            | fortyTwoClient                    |
-	| X-Testing-ClientCert | mtlsClient.crt                    |
+	| X-Testing-ClientCert | sidClient.crt                    |
 	| auth_req_id          | id                                |
 
 	And extract JSON from body

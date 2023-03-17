@@ -1,0 +1,174 @@
+﻿@using SimpleIdServer.IdServer.Domains;
+@using SimpleIdServer.IdServer.ConformanceSuite.Startup.Resources
+@using System.Security.Claims;
+@model SimpleIdServer.IdServer.UI.ViewModels.ProfileViewModel
+
+@{
+    ViewBag.Title = ProfileResource.title;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    Func<string, string> getClaim = (str) =>
+    {
+        var cl = User.Claims.FirstOrDefault(c => c.Type == str);
+        if (cl == null) return "-";
+        return cl.Value;
+    };
+}
+
+<div class="row profile gy-4">
+    <!-- User Information -->
+    <div class="col-md-3">
+        <div class="card shadow-sm">
+            <div class="card-body info">
+                <div class="picture">
+                    @Html.UserPicture(User)
+                </div>
+                <ul>
+                    <!-- Name identifier -->
+                    <li>
+                        <h6>@ProfileResource.subject</h6>
+                        <span class="text-muted">@getClaim(ClaimTypes.NameIdentifier)</span>
+                    </li>
+                    <!-- Name -->
+                    <li>
+                        <h6>@ProfileResource.name</h6>
+                        <span class="text-muted">@User.Identity.Name</span>
+                    </li>
+                    <!-- OTP Key -->
+                    <li>
+                        <h6>@ProfileResource.qrcode_otp</h6>
+                        @if (!Model.HasOtpKey)
+                        {
+                            <div class="alert alert-warning">@ProfileResource.no_otp</div>
+                        }
+                        else
+                        {
+                            <div>
+                                <img src="@Url.Action("GetOTP", "Home")" width="200px" />
+                            </div>
+                        }
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="row gy-4">
+            <!-- OPENID Consents -->
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5>@ProfileResource.approved_apps_title</h5>
+                        <p>@ProfileResource.approved_apps_description</p>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>@ProfileResource.client</th>
+                                    <th>@ProfileResource.scopes</th>
+                                    <th>@ProfileResource.claims</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var consent in Model.Consents.OrderBy(c => c.ClientName))
+                                {
+                                    <tr>
+                                        <td>@Html.ClientPicture(consent.ClientUri)</td>
+                                        <td class="align-middle">@(string.IsNullOrWhiteSpace(consent.ClientName) ? '-' : consent.ClientName)</td>
+                                        <td class="align-middle">@string.Join(",", consent.ScopeNames)</td>
+                                        <td class="align-middle">@string.Join(",", consent.ClaimNames)</td>
+                                        <td class="align-middle">
+                                            <a href="@Url.Action("RejectConsent", "Home", new { consentId = consent.ConsentId })" class="btn btn-danger">@ProfileResource.revoke_access</a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- Pending requests -->
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5>@ProfileResource.pending_request_title</h5>
+                        <p>@ProfileResource.pending_request_description</p>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>@ProfileResource.resource</th>
+                                    <th>@ProfileResource.description</th>
+                                    <th>@ProfileResource.scopes</th>
+                                    <th>@ProfileResource.requester</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var consent in Model.PendingRequests.Where(p => p.Owner == getClaim(ClaimTypes.NameIdentifier) && p.Status == UMAPendingRequestStatus.TOBECONFIRMED).OrderByDescending(u => u.CreateDateTime))
+                                {
+                                    <tr>
+                                        <td>@(string.IsNullOrWhiteSpace(consent.ResourceName) ? '-' : consent.ResourceName)</td>
+                                        <td>@(string.IsNullOrWhiteSpace(consent.ResourceDescription) ? '-' : consent.ResourceDescription)</td>
+                                        <td>@string.Join(",", consent.Scopes)</td>
+                                        <td>@consent.Requester</td>
+                                        <td>
+                                            <a href="@Url.Action("RejectUmaPendingRequest", "Home", new { ticketId = consent.TicketId})" class="btn btn-danger">@ProfileResource.revoke_access</a>
+                                            <a href="@Url.Action("ConfirmUmaPendingRequest", "Home", new { ticketId = consent.TicketId})" class="btn btn-success">@ProfileResource.accept_access</a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- External accounts -->
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5>@ProfileResource.external_accounts_title</h5>
+                        <p>@ProfileResource.external_accounts_description</p>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>@ProfileResource.account_name</th>
+                                    <th>@ProfileResource.account_login</th>
+                                    <th>@ProfileResource.created_at</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach(var externalAccount in Model.Profiles)
+                                {
+                                    <tr>
+                                        <td>@externalAccount.Scheme</td>
+                                        <td>@externalAccount.Subject</td>
+                                        <td>@externalAccount.CreateDateTime.ToString("dd/M/yyyy HH:mm:ss")</td>
+                                        <td>
+
+                                            @using (Html.BeginForm("Unlink", "Home", FormMethod.Post))
+                                            {
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" value="@externalAccount.Subject" name="Subject" />
+                                                <input type="hidden" value="@externalAccount.Scheme" name="Scheme" />
+                                                <button type="submit" class="btn btn-danger">@ProfileResource.unlink</button>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <div>
+                            @foreach(var extProvider in Model.ExternalIdProviders)
+                            {
+                                <a class="btn btn-secondary me-1" href="@Url.Action("Link", "Home", new { scheme = extProvider.AuthenticationScheme })">
+                                    @extProvider.DisplayName
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -132,6 +132,16 @@ namespace SimpleIdServer.IdServer.Builders
 
         #endregion
 
+        #region Identity Token
+
+        public TraditionalWebsiteClientBuilder SetIdTokenSignedResponseAlg(string alg = SecurityAlgorithms.RsaSha256)
+        {
+            _client.IdTokenSignedResponseAlg = alg;
+            return this;
+        }
+
+        #endregion
+
         #region Signing Key
 
         /// <summary>

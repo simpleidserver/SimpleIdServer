@@ -1,0 +1,14 @@
+﻿@using SimpleIdServer.IdServer.ConformanceSuite.Startup.Resources
+@model SimpleIdServer.IdServer.UI.ViewModels.RevokeSessionViewModel
+
+@{
+    ViewBag.Title = CheckSessionResource.revoke_session_title;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (!string.IsNullOrWhiteSpace(Model.FrontChannelLogout))
+{
+    <iframe src="@Model.FrontChannelLogout" style="display: none"></iframe>
+}
+
+<a href="@Model.RevokeSessionCallbackUrl" class="btn btn-danger">@CheckSessionResource.revoke_session_title</a>

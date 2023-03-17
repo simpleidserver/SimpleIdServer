@@ -2,7 +2,9 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using SimpleIdServer.IdServer;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Cryptography;
+using System.Text.Json.Nodes;
 
 namespace Microsoft.IdentityModel.Tokens
 {
@@ -22,6 +24,18 @@ namespace Microsoft.IdentityModel.Tokens
                 credentials = new EncryptingCredentials(new ECDsaSecurityKey(ECDsa.Create(parameters)) { KeyId = credentials.Key.KeyId }, credentials.Alg, credentials.Enc);
             }
 
+            var result = SerializeJWK(credentials);
+            return result;
+        }
+
+        public static string SerializeJWKStr(this EncryptingCredentials credentials)
+        {
+            var jsonWebKey = SerializeJWK(credentials);
+            return JsonNode.Parse(JsonExtensions.SerializeToJson(jsonWebKey)).AsObject().ToJsonString();
+        }
+
+        public static JsonWebKey SerializeJWK(this EncryptingCredentials credentials)
+        {
             var result = JsonWebKeyConverter.ConvertFromSecurityKey(credentials.Key);
             result.Use = Constants.JWKUsages.Enc;
             result.Alg = credentials.Alg;

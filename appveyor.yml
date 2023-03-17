@@ -6,7 +6,7 @@ branches:
   - master
 image: Visual Studio 2022
 install:
-- ps: "Import-Certificate -FilePath \"C:\\projects\\simpleidserver\\certificates\\simpleIdServerClient.crt\" -CertStoreLocation cert:\\LocalMachine\\Root\nImport-Certificate -FilePath \"C:\\projects\\simpleidserver\\certificates\\simpleIdServerClient.crt\" -CertStoreLocation cert:\\CurrentUser\\Root \n Install-Module VSSetup -Scope CurrentUser"
+- ps: "Import-Certificate -FilePath \"C:\\projects\\simpleidserver\\certificates\\simpleIdServer.crt\" -CertStoreLocation cert:\\LocalMachine\\Root\nImport-Certificate -FilePath \"C:\\projects\\simpleidserver\\certificates\\simpleIdServer.crt\" -CertStoreLocation cert:\\CurrentUser\\Root \n Install-Module VSSetup -Scope CurrentUser"
 nuget:
   disable_publish_on_pr: true
 build_script:

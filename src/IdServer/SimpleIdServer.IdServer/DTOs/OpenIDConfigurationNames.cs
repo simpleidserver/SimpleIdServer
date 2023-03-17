@@ -36,5 +36,6 @@ namespace SimpleIdServer.IdServer.DTOs
         public const string AuthorizationSigningAlgValuesSupported = "authorization_signing_alg_values_supported";
         public const string AuthorizationEncryptionAlgValuesSupported = "authorization_encryption_alg_values_supported";
         public const string AuthorizationEncryptionEncValuesSupported = "authorization_encryption_enc_values_supported";
+        public const string MtlsEndpointAliases = "mtls_endpoint_aliases";
     }
 }

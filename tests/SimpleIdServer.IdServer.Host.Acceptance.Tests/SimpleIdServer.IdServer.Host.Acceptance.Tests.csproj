@@ -39,8 +39,8 @@
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\UserInfoErrors - Copier.feature.cs" />
 	</ItemGroup>
 	<ItemGroup>
-	  <None Include="..\..\certificates\mtlsClient.crt" Link="mtlsClient.crt">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  <None Include="..\..\certificates\sidClient.crt" Link="sidClient.crt">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>
 	<ItemGroup>

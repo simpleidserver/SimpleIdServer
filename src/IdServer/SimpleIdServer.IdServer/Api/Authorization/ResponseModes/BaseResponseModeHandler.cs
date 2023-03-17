@@ -22,6 +22,8 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseModes
             var claims = response.QueryParameters.ToDictionary(q => q.Key, q => (object)q.Value);
             var descriptor = new SecurityTokenDescriptor
             {
+                Issuer = context.GetIssuer(),
+                Audience = context.Client.ClientId,
                 Claims = claims
             };
             var jwt = _jwtBuilder.BuildClientToken(context.Realm, context.Client, descriptor, context.Client.AuthorizationSignedResponseAlg ?? SecurityAlgorithms.RsaSha256, context.Client.AuthorizationEncryptedResponseAlg, context.Client.AuthorizationEncryptedResponseEnc, CancellationToken.None).Result;

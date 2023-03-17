@@ -297,7 +297,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             }
 
             var pemResult = PemConverter.ConvertFromSecurityKey(sigCredentials.Key);
-            dispatcher.Dispatch(new GenerateSigKeySuccessAction { Alg = act.Alg, KeyId = act.KeyId, Credentials = sigCredentials, Pem = pemResult, KeyType = act.KeyType });
+            dispatcher.Dispatch(new GenerateSigKeySuccessAction { Alg = act.Alg, KeyId = act.KeyId, Credentials = sigCredentials, Pem = pemResult, KeyType = act.KeyType, JsonWebKey = sigCredentials.SerializeJWKStr() });
         }
 
         [EffectMethod]
@@ -323,7 +323,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             }
 
             var pemResult = PemConverter.ConvertFromSecurityKey(encCredentials.Key);
-            dispatcher.Dispatch(new GenerateEncKeySuccessAction { Alg = act.Alg, KeyId = act.KeyId, Credentials = encCredentials, Pem = pemResult, KeyType = act.KeyType, Enc = act.Enc });
+            dispatcher.Dispatch(new GenerateEncKeySuccessAction { Alg = act.Alg, KeyId = act.KeyId, Credentials = encCredentials, Pem = pemResult, KeyType = act.KeyType, Enc = act.Enc, JsonWebKey = encCredentials.SerializeJWKStr() });
         }
 
         [EffectMethod]
@@ -653,6 +653,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public SigningCredentials Credentials { get; set; } = null!;
         public SecurityKeyTypes KeyType { get; set; }
         public PemResult Pem { get; set; } = null!;
+        public string JsonWebKey { get; set; } = null!;
     }
 
     public class GenerateEncKeySuccessAction
@@ -663,6 +664,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public EncryptingCredentials Credentials { get; set; } = null!;
         public SecurityKeyTypes KeyType { get; set; }
         public PemResult Pem { get; set; } = null!;
+        public string JsonWebKey { get; set; } = null!;
     }
 
     public class GenerateEncKeyAction

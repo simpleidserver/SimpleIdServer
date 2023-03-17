@@ -45,6 +45,7 @@ namespace SimpleIdServer.IdServer.Middlewares
 
         private async Task<AuthenticateResult> Authenticate(HttpContext context)
         {
+            var cert = await context.Connection.GetClientCertificateAsync();
             var x509AuthResult = await context.AuthenticateAsync(Constants.DefaultCertificateAuthenticationScheme);
             if (!x509AuthResult.Succeeded)
             {

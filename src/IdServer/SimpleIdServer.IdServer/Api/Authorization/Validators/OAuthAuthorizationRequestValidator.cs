@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -156,7 +157,11 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
             var responseMode = context.Request.RequestData.GetResponseModeFromAuthorizationRequest();
             var unsupportedResponseTypes = responseTypes.Where(t => !client.ResponseTypes.Contains(t));
             var redirectionUrls = await _clientHelper.GetRedirectionUrls(client, cancellationToken);
-            if (!string.IsNullOrWhiteSpace(redirectUri) && !redirectionUrls.Contains(redirectUri)) throw new OAuthExceptionBadRequestURIException(redirectUri);
+            if (!string.IsNullOrWhiteSpace(redirectUri) && !redirectionUrls.Any(r =>
+            {
+                var regex = new Regex(r);
+                return regex.Match(redirectUri).Success;
+            })) throw new OAuthExceptionBadRequestURIException(redirectUri);
 
             if (!string.IsNullOrWhiteSpace(responseMode) && !_oauthResponseModes.Any(o => o.ResponseMode == responseMode)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.BAD_RESPONSE_MODE, responseMode));
 

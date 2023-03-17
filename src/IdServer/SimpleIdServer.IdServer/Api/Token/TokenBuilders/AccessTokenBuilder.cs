@@ -73,7 +73,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
             if (handlerContext.Request.Certificate != null)
             {
                 var thumbprint = Hash(handlerContext.Request.Certificate.RawData);
-                tokenDescriptor.Claims.Add(ConfirmationClaimTypes.Cnf, new JsonObject
+                tokenDescriptor.Claims.Add(ConfirmationClaimTypes.Cnf, new Dictionary<string, object>
                 {
                     { JsonWebKeyParameterNames.X5tS256, thumbprint }
                 });

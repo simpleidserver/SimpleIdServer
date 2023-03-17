@@ -1,6 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.AspNetCore.Server.Kestrel.Https;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +21,14 @@ using System.Reflection;
 using System.Security.Cryptography;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.Configure<KestrelServerOptions>(options =>
+{
+    options.ConfigureHttpsDefaults(o =>
+    {
+        o.SslProtocols = System.Security.Authentication.SslProtocols.Tls12;
+        o.ClientCertificateMode = ClientCertificateMode.AllowCertificate;
+    });
+});
 builder.Configuration.AddJsonFile("appsettings.json")
     .AddEnvironmentVariables();
 builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
@@ -25,10 +36,9 @@ builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAn
     .AllowAnyHeader()));
 builder.Services.AddRazorPages()
     .AddRazorRuntimeCompilation();
-OtherFeatures.CreateClientJWK();
 RunSqlServerIdServer(builder.Services);
 var app = builder.Build();
-// SeedData(app);
+SeedData(app);
 app.UseCors("AllowAll");
 app.UseSID()
     .UseWsFederation();
@@ -38,7 +48,6 @@ void RunSqlServerIdServer(IServiceCollection services)
 {
     var name = Assembly.GetExecutingAssembly().GetName().Name;
     services.AddSIDIdentityServer()
-        /*
         .UseEFStore(o =>
         {
             o.UseSqlServer(builder.Configuration.GetConnectionString("IdServer"), o =>
@@ -46,24 +55,6 @@ void RunSqlServerIdServer(IServiceCollection services)
                 o.MigrationsAssembly(name);
                 o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
             });
-        })
-        */
-        .UseInMemoryStore(o =>
-        {
-            o.AddInMemoryRealms(IdServerConfiguration.Realms);
-            o.AddInMemoryScopes(IdServerConfiguration.Scopes);
-            o.AddInMemoryClients(IdServerConfiguration.Clients);
-            o.AddInMemoryUsers(IdServerConfiguration.Users);
-            o.AddInMemoryUMAResources(IdServerConfiguration.Resources);
-            o.AddInMemoryUMAPendingRequests(IdServerConfiguration.PendingRequests);
-            o.AddInMemoryAuthenticationSchemeProviderDefinitions(IdServerConfiguration.ProviderDefinitions);
-            o.AddInMemoryAuthenticationSchemeProviders(IdServerConfiguration.Providers);
-            o.AddInMemoryKeys(SimpleIdServer.IdServer.Constants.StandardRealms.Master, new List<SigningCredentials>
-            {
-                new SigningCredentials(BuildRsaSecurityKey("rsaSig"), SecurityAlgorithms.RsaSha256),
-                new SigningCredentials(BuildECDSaSecurityKey(ECCurve.NamedCurves.nistP256), SecurityAlgorithms.EcdsaSha256)
-            }, new List<EncryptingCredentials>());
-
         })
         .UseInMemoryMassTransit()
         .AddBackChannelAuthentication()
@@ -81,9 +72,14 @@ void RunSqlServerIdServer(IServiceCollection services)
                 o.RequireHttpsMetadata = false;
             });
             */
+            a.AddMutualAuthentication(m =>
+            {
+                m.AllowedCertificateTypes = CertificateTypes.All;
+                m.RevocationMode = System.Security.Cryptography.X509Certificates.X509RevocationMode.NoCheck;
+            });
             a.AddOIDCAuthentication(opts =>
             {
-                opts.Authority = "http://localhost:5001";
+                opts.Authority = "https://localhost.com:5001";
                 opts.ClientId = "website";
                 opts.ClientSecret = "password";
                 opts.ResponseType = "code";
@@ -140,6 +136,7 @@ void SeedData(WebApplication application)
             if (!dbContext.Acrs.Any())
             {
                 dbContext.Acrs.Add(SimpleIdServer.IdServer.Constants.StandardAcrs.FirstLevelAssurance);
+                dbContext.Acrs.Add(SimpleIdServer.IdServer.Constants.StandardAcrs.IapSilver);
                 dbContext.Acrs.Add(new SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference
                 {
                     Name = "email",

@@ -69,13 +69,6 @@ namespace SimpleIdServer.IdServer.Api.Configuration
             jObj.Add(OAuthConfigurationNames.GrantTypesSupported, JsonSerializer.SerializeToNode(GetGrantTypes()));
             jObj.Add(OAuthConfigurationNames.TokenEndpointAuthMethodsSupported, JsonSerializer.SerializeToNode(_oauthClientAuthenticationHandlers.Select(r => r.AuthMethod)));
             jObj.Add(OAuthConfigurationNames.TokenEndpointAuthSigningAlgValuesSupported, JsonSerializer.SerializeToNode(Constants.AllSigningAlgs));
-            if (_options.MtlsEnabled)
-            {
-                jObj.Add(OAuthConfigurationNames.MtlsEndpointAliases, new JsonObject
-                {
-                    [OAuthConfigurationNames.TokenEndpoint] = $"{issuer}/{Constants.EndPoints.MtlsToken}"
-                });
-            }
         }
 
         protected List<string> GetGrantTypes()

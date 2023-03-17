@@ -12,6 +12,7 @@ using SimpleIdServer.IdServer.SubjectTypeBuilders;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -52,7 +53,7 @@ namespace SimpleIdServer.IdServer.Api.OpenIdConfiguration
             result.Add(OpenIDConfigurationNames.UserInfoEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.UserInfo}");
             result.Add(OpenIDConfigurationNames.CheckSessionIframe, $"{issuer}/{prefix}{Constants.EndPoints.CheckSession}");
             result.Add(OpenIDConfigurationNames.EndSessionEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.EndSession}");
-            result.Add(OpenIDConfigurationNames.BackchannelAuthenticationEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.MtlsBCAuthorize}");
+            result.Add(OpenIDConfigurationNames.BackchannelAuthenticationEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.BCAuthorize}");
             result.Add(OpenIDConfigurationNames.RequestParameterSupported, true);
             result.Add(OpenIDConfigurationNames.RequestUriParameterSupported, true);
             result.Add(OpenIDConfigurationNames.RequestObjectSigningAlgValuesSupported, JsonSerializer.SerializeToNode(Constants.AllSigningAlgs));
@@ -81,6 +82,15 @@ namespace SimpleIdServer.IdServer.Api.OpenIdConfiguration
             result.Add(OpenIDConfigurationNames.AuthorizationSigningAlgValuesSupported, JsonSerializer.SerializeToNode(Constants.AllSigningAlgs));
             result.Add(OpenIDConfigurationNames.AuthorizationEncryptionAlgValuesSupported, JsonSerializer.SerializeToNode(Constants.AllEncAlgs));
             result.Add(OpenIDConfigurationNames.AuthorizationEncryptionEncValuesSupported, JsonSerializer.SerializeToNode(Constants.AllEncryptions));
+            if(_options.MtlsEnabled)
+            {
+                result.Add(OpenIDConfigurationNames.MtlsEndpointAliases, JsonSerializer.SerializeToNode(new JsonObject
+                {
+                    { OAuthConfigurationNames.TokenEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.MtlsToken}" },
+                    { OpenIDConfigurationNames.BackchannelAuthenticationEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.MtlsBCAuthorize}" }
+                }));
+            }
+
             return new OkObjectResult(result);
         }
     }

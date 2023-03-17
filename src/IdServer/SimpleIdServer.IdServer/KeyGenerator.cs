@@ -67,6 +67,8 @@ namespace SimpleIdServer.IdServer
             var certRequest = new CertificateRequest($"CN={subjectName}", rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
             certRequest.CertificateExtensions.Add(new X509KeyUsageExtension(X509KeyUsageFlags.DigitalSignature, true));
             var generatedCert = certRequest.CreateSelfSigned(DateTimeOffset.Now.AddDays(-1), DateTimeOffset.Now.AddYears(10));
+            var pub = Convert.ToBase64String(generatedCert.GetRawCertData());
+            var pr = Convert.ToBase64String(generatedCert.GetRSAPrivateKey().ExportPkcs8PrivateKey());
             return generatedCert;
         }
     }

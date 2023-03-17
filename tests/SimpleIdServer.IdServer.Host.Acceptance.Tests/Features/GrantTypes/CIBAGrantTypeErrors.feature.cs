@@ -109,7 +109,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "fortyThreeClient"});
                 table169.AddRow(new string[] {
                             "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
+                            "sidClient.crt"});
 #line 5
  testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/token\'", ((string)(null)), table169, "When ");
 #line hidden
@@ -158,7 +158,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "fortyTwoClient"});
                 table170.AddRow(new string[] {
                             "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
+                            "sidClient.crt"});
 #line 17
  testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/token\'", ((string)(null)), table170, "When ");
 #line hidden
@@ -207,7 +207,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "fortyTwoClient"});
                 table171.AddRow(new string[] {
                             "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
+                            "sidClient.crt"});
                 table171.AddRow(new string[] {
                             "auth_req_id",
                             "id"});

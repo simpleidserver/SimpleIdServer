@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using Moq;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Stores;
+using SimpleIdServer.OAuth.Host.Acceptance.Tests;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -46,7 +47,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
                 _scenarioContext.Set(_factory, "Factory");
                 var mock = new Mock<Infrastructures.IHttpClientFactory>();
                 mock.Setup(m => m.GetHttpClient()).Returns(client);
-                _scenarioContext.Set(new X509Certificate2(Path.Combine(Directory.GetCurrentDirectory(), "mtlsClient.crt")), "mtlsClient.crt");
+                _scenarioContext.Set(new X509Certificate2(Path.Combine(Directory.GetCurrentDirectory(), "sidClient.crt")), "sidClient.crt");
             }
         }
 
@@ -56,10 +57,8 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
         {
             using (var scope = _factory.Services.CreateScope())
             {
-                var clientRepository = scope.ServiceProvider.GetRequiredService<IClientRepository>();
-                var client = clientRepository.Query().Include(c => c.SerializedJsonWebKeys).First(c => c.ClientId == clientId);
-                var jsonWebKey = client.JsonWebKeys.First(j => j.KeyId == keyId);
                 var handler = new JsonWebTokenHandler();
+                var signingCredentials = IdServerConfiguration.ClientSigningCredentials[clientId];
                 var claims = new Dictionary<string, object>();
                 foreach (var row in table.Rows)
                     claims.Add(row["Key"].ToString(), ParseValue(_scenarioContext, row["Value"].ToString()));
@@ -67,7 +66,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
                 var descritor = new SecurityTokenDescriptor
                 {
                     Claims = claims,
-                    SigningCredentials = new SigningCredentials(jsonWebKey, jsonWebKey.Alg)
+                    SigningCredentials = signingCredentials
                 };
                 var request = handler.CreateToken(descritor);
                 _scenarioContext.Set(request, "request");
@@ -79,20 +78,18 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
         {
             using (var scope = _factory.Services.CreateScope())
             {
-                var clientRepository = scope.ServiceProvider.GetRequiredService<IClientRepository>();
                 var keyStore = scope.ServiceProvider.GetRequiredService<IKeyStore>();
                 var encryptedKey = keyStore.GetAllEncryptingKeys("master").First(k => k.Key.KeyId == encKeyId);
-                var client = clientRepository.Query().Include(c => c.SerializedJsonWebKeys).First(c => c.ClientId == clientId);
-                var jsonWebKey = client.JsonWebKeys.First(j => j.KeyId == sigKeyId);
                 var handler = new JsonWebTokenHandler();
                 var claims = new Dictionary<string, object>();
                 foreach (var row in table.Rows)
                     claims.Add(row["Key"].ToString(), row["Value"].ToString());
 
+                var signingCredentials = IdServerConfiguration.ClientSigningCredentials[clientId];
                 var descritor = new SecurityTokenDescriptor
                 {
                     Claims = claims,
-                    SigningCredentials = new SigningCredentials(jsonWebKey, jsonWebKey.Alg)
+                    SigningCredentials = signingCredentials
                 };
                 var request = handler.CreateToken(descritor);
                 request = handler.EncryptToken(request, encryptedKey);
@@ -332,13 +329,11 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
         {
             using (var scope = _factory.Services.CreateScope())
             {
-                var clientRepository = scope.ServiceProvider.GetRequiredService<IClientRepository>();
-                var client = clientRepository.Query().Include(c => c.SerializedJsonWebKeys).Single(c => c.ClientId == clientId);
-                var jwk = client.JsonWebKeys.Single(j => j.KeyId == keyid);
+                var signingCredentials = IdServerConfiguration.ClientSigningCredentials[clientId];
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
                     Claims = new Dictionary<string, object>(),
-                    SigningCredentials = new SigningCredentials(jwk, jwk.Alg)
+                    SigningCredentials = signingCredentials
                 };
                 if (isExpired) tokenDescriptor.Expires = DateTime.UtcNow.AddMinutes(-2);
                 foreach (var row in table.Rows)

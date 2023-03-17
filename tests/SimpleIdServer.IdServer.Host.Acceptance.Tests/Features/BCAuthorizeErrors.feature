@@ -6,7 +6,7 @@ Scenario: at least one token hint must be passed
 
 	When execute HTTP POST request 'https://localhost:8080/mtls/bc-authorize'
 	| Key                  | Value          |
-	| X-Testing-ClientCert | mtlsClient.crt |
+	| X-Testing-ClientCert | sidClient.crt |
 	| client_id            | fortyTwoClient |
 
 	And extract JSON from body
@@ -22,7 +22,7 @@ Scenario: request parameter must contains audience (request)
 
 	When execute HTTP POST request 'https://localhost:8080/mtls/bc-authorize'
 	| Key                  | Value          |
-	| X-Testing-ClientCert | mtlsClient.crt |
+	| X-Testing-ClientCert | sidClient.crt |
 	| client_id            | fortyTwoClient |
 	| request              | $request$      |
 
@@ -39,7 +39,7 @@ Scenario: request parameter must contains valid audience (request)
 
 	When execute HTTP POST request 'https://localhost:8080/mtls/bc-authorize'
 	| Key                  | Value          |
-	| X-Testing-ClientCert | mtlsClient.crt |
+	| X-Testing-ClientCert | sidClient.crt |
 	| client_id            | fortyTwoClient |
 	| request              | $request$      |
 
@@ -56,7 +56,7 @@ Scenario: request parameter must contains issuer (request)
 
 	When execute HTTP POST request 'https://localhost:8080/mtls/bc-authorize'
 	| Key                  | Value          |
-	| X-Testing-ClientCert | mtlsClient.crt |
+	| X-Testing-ClientCert | sidClient.crt |
 	| client_id            | fortyTwoClient |
 	| request              | $request$      |
 
@@ -74,7 +74,7 @@ Scenario: request parameter must contains valid issuer (request)
 
 	When execute HTTP POST request 'https://localhost:8080/mtls/bc-authorize'
 	| Key                  | Value          |
-	| X-Testing-ClientCert | mtlsClient.crt |
+	| X-Testing-ClientCert | sidClient.crt |
 	| client_id            | fortyTwoClient |
 	| request              | $request$      |
 
@@ -93,7 +93,7 @@ Scenario: request parameter must not be expired (request)
 
 	When execute HTTP POST request 'https://localhost:8080/mtls/bc-authorize'
 	| Key                  | Value          |
-	| X-Testing-ClientCert | mtlsClient.crt |
+	| X-Testing-ClientCert | sidClient.crt |
 	| client_id            | fortyTwoClient |
 	| request              | $request$      |
 
@@ -113,7 +113,7 @@ Scenario: lifetime of the request must not exceed 300 seconds (request)
 
 	When execute HTTP POST request 'https://localhost:8080/mtls/bc-authorize'
 	| Key                  | Value          |
-	| X-Testing-ClientCert | mtlsClient.crt |
+	| X-Testing-ClientCert | sidClient.crt |
 	| client_id            | fortyTwoClient |
 	| request              | $request$      |
 
@@ -133,7 +133,7 @@ Scenario: request parameter must contains jti (request)
 
 	When execute HTTP POST request 'https://localhost:8080/mtls/bc-authorize'
 	| Key                  | Value          |
-	| X-Testing-ClientCert | mtlsClient.crt |
+	| X-Testing-ClientCert | sidClient.crt |
 	| client_id            | fortyTwoClient |
 	| request              | $request$      |
 
@@ -154,7 +154,7 @@ Scenario: at least one token hint must be passed (request)
 
 	When execute HTTP POST request 'https://localhost:8080/mtls/bc-authorize'
 	| Key                  | Value          |
-	| X-Testing-ClientCert | mtlsClient.crt |
+	| X-Testing-ClientCert | sidClient.crt |
 	| client_id            | fortyTwoClient |
 	| request              | $request$      |
 
@@ -176,7 +176,7 @@ Scenario: user_code is required when backchannel_user_code_parameter is true (re
 
 	When execute HTTP POST request 'https://localhost:8080/mtls/bc-authorize'
 	| Key                  | Value          |
-	| X-Testing-ClientCert | mtlsClient.crt |
+	| X-Testing-ClientCert | sidClient.crt |
 	| client_id            | fortyTwoClient |
 	| request              | $request$      |
 
@@ -199,7 +199,7 @@ Scenario: scope parameter is required (request)
 
 	When execute HTTP POST request 'https://localhost:8080/mtls/bc-authorize'
 	| Key                  | Value          |
-	| X-Testing-ClientCert | mtlsClient.crt |
+	| X-Testing-ClientCert | sidClient.crt |
 	| client_id            | fortyTwoClient |
 	| request              | $request$      |
 
@@ -223,7 +223,7 @@ Scenario: scope must be valid (request)
 
 	When execute HTTP POST request 'https://localhost:8080/mtls/bc-authorize'
 	| Key                  | Value          |
-	| X-Testing-ClientCert | mtlsClient.crt |
+	| X-Testing-ClientCert | sidClient.crt |
 	| client_id            | fortyTwoClient |
 	| request              | $request$      |
 
@@ -247,7 +247,7 @@ Scenario: client_notification_token parameter is required (request)
 
 	When execute HTTP POST request 'https://localhost:8080/mtls/bc-authorize'
 	| Key                  | Value          |
-	| X-Testing-ClientCert | mtlsClient.crt |
+	| X-Testing-ClientCert | sidClient.crt |
 	| client_id            | fortyTwoClient |
 	| request              | $request$      |	
 
@@ -272,7 +272,7 @@ Scenario: client_notification_token size must be greater than 128 bits (request)
 
 	When execute HTTP POST request 'https://localhost:8080/mtls/bc-authorize'
 	| Key                       | Value          |
-	| X-Testing-ClientCert      | mtlsClient.crt |
+	| X-Testing-ClientCert      | sidClient.crt |
 	| client_id                 | fortyTwoClient |
 	| request                   | $request$      |	
 
@@ -297,7 +297,7 @@ Scenario: id_token_hint must be valid (request)
 
 	When execute HTTP POST request 'https://localhost:8080/mtls/bc-authorize'
 	| Key                       | Value          |
-	| X-Testing-ClientCert      | mtlsClient.crt |
+	| X-Testing-ClientCert      | sidClient.crt |
 	| client_id                 | fortyTwoClient |
 	| request                   | $request$      |	
 

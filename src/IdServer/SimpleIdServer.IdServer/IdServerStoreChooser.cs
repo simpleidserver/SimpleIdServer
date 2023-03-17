@@ -47,7 +47,7 @@ namespace SimpleIdServer.IdServer
         public IdServerInMemoryStoreBuilder(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
-            AddInMemoryAcr(new List<AuthenticationContextClassReference> { Constants.StandardAcrs.FirstLevelAssurance });
+            AddInMemoryAcr(new List<AuthenticationContextClassReference> { Constants.StandardAcrs.FirstLevelAssurance, Constants.StandardAcrs.IapSilver });
         }
 
         public IdServerInMemoryStoreBuilder AddInMemoryRealms(ICollection<Domains.Realm> realms)

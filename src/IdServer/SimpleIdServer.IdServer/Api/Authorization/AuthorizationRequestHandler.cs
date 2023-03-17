@@ -131,9 +131,6 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                 context.Response.Add(AuthorizationResponseParameters.State, state);
 
             _authorizationRequestEnricher.Enrich(context);
-            if (!context.Client.RedirectionUrls.Contains(redirectUri))
-                redirectUri = context.Client.RedirectionUrls.First();
-
             var grant = await ExecuteGrantManagementAction(grantRequest, context, cancellationToken);
             foreach (var responseTypeHandler in responseTypeHandlers)
                 await responseTypeHandler.Enrich(new EnrichParameter { Scopes = grantRequest.Scopes, Audiences = grantRequest.Audiences, GrantId = grant?.Id, Claims = context.Request.RequestData.GetClaimsFromAuthorizationRequest() }, context, cancellationToken);

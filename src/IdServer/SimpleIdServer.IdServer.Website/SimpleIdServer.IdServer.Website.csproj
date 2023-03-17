@@ -25,6 +25,11 @@
 		</Compile>
 	</ItemGroup>
 	<ItemGroup>
+	  <Content Update="Pages\ClientAdvanced.razor">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	  </Content>
+	</ItemGroup>
+	<ItemGroup>
 		<EmbeddedResource Update="Resources\Global.resx">
 			<Generator>PublicResXFileCodeGenerator</Generator>
 			<LastGenOutput>Global.Designer.cs</LastGenOutput>

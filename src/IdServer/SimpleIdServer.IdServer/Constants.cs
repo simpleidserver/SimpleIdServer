@@ -458,6 +458,16 @@ namespace SimpleIdServer.IdServer
                     StandardRealms.Master
                 }
             };
+            public static AuthenticationContextClassReference IapSilver = new AuthenticationContextClassReference
+            {
+                AuthenticationMethodReferences = new[] { Areas.Password },
+                Name = "urn:mace:incommon:iap:silver",
+                DisplayName = "Silver",
+                Realms = new List<Realm>
+                {
+                    StandardRealms.Master
+                }
+            };            
         }
 
         public static class StandardRealms
