@@ -120,6 +120,9 @@
   <data name="ApiResourceAlreadyExists" xml:space="preserve">
     <value>API Resource with the name '{0}' already exists</value>
   </data>
+  <data name="CertificateAuthoritySaved" xml:space="preserve">
+    <value>Certificate Authority has been saved</value>
+  </data>
   <data name="ClientAdded" xml:space="preserve">
     <value>The client '{0}' has successfully been added</value>
   </data>

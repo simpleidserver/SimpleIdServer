@@ -1,0 +1,150 @@
+﻿@using Fluxor.Blazor.Web.Components;
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore;
+@inherits FluxorComponent
+@inject IState<UpdateCertificateAuthorityState> updateCertificateAuthorityState
+@inject IDispatcher dispatcher
+@inject DialogService dialogService
+@inject NotificationService notificationService;
+
+<RadzenSteps>
+    <Steps>
+        <RadzenStepsItem Text="Certificate Authority Type">
+            <div class="row gy-4">
+                @foreach (var certificateAuthorityType in CertificateAuthorityTypes)
+                {
+                    <div class="col-md-6">
+                        <RadzenCard @onclick="() => SelectCertificateAuthorityType(certificateAuthorityType)" class="@(SelectedCertificateAuthorityType != null && SelectedCertificateAuthorityType.Name == certificateAuthorityType.Name ? "selected selectable" : "selectable")">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    @if (string.IsNullOrWhiteSpace(certificateAuthorityType.PictureUrl))
+                                    {
+                                        <RadzenImage Path="_content/SimpleIdServer.IdServer.Website/images/IdProvider.png" Style="width: 60px" />
+                                    }
+                                    else
+                                    {
+                                        <RadzenImage Path="@certificateAuthorityType.PictureUrl" Style="width: 60px" />
+                                    }
+                                </div>
+                                <div class="col">
+                                    <h5>@certificateAuthorityType.Name</h5>
+                                    <p class="text-muted">@certificateAuthorityType.ShortDescription</p>
+                                </div>
+                            </div>
+                        </RadzenCard>
+                    </div>
+                }
+            </div>
+
+            <hr />
+
+            @if (SelectedCertificateAuthorityType != null)
+            {
+                <h5><RadzenIcon Icon="info" /> @SelectedCertificateAuthorityType.Name</h5>
+                <p class="text-muted">@(new MarkupString(SelectedCertificateAuthorityType.Description))</p>
+            }
+        </RadzenStepsItem>
+        <RadzenStepsItem Text="Generate" Disabled="@(SelectedCertificateAuthorityType == null)">
+            @if(SelectedCertificateAuthorityType != null)
+            {
+                @switch(SelectedCertificateAuthorityType.Source)
+                {
+                    case CertificateAuthoritySources.DB:
+                        <RadzenTemplateForm Submit=@GenerateCertificateAuthority TItem="AddCertificateAuthorityDB" Data=@addCertificateAuthorityDB>
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Subject Name</RadzenText>
+                                <RadzenTextBox Name="SubjectName" @bind-Value="@addCertificateAuthorityDB.SubjectName" Class="w-100"></RadzenTextBox>
+                                <p class="text-muted">Contains identifying information about the entity to which the certificate is issued. <br /> It must starts with <b>CN=</b></p>
+                                <RadzenRequiredValidator Component="SubjectName" Text="Subject Name is required"></RadzenRequiredValidator>
+                            </div>
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Number of days</RadzenText>
+                                <RadzenNumeric Name="NumberOfDays" @bind-Value="@addCertificateAuthorityDB.NumberOfDays" Class="w-100"></RadzenNumeric>
+                                <p class="text-muted">Number of days the certificate will be valid</p>
+                            </div>
+                            @if(updateCertificateAuthorityState.Value.CertificateAuthority != null)
+                            {
+                                <div>
+                                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Public Pem</RadzenText>
+                                    <RadzenTextArea Rows=10 Name="ClientName" Disabled=true @bind-Value="@updateCertificateAuthorityState.Value.CertificateAuthority.PublicKey" Class="w-100"></RadzenTextArea>
+                                </div>
+                                <div>
+                                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Private Pem</RadzenText>
+                                    <RadzenTextArea Rows=10 Name="ClientName" Disabled=true @bind-Value="@updateCertificateAuthorityState.Value.CertificateAuthority.PrivateKey" Class="w-100"></RadzenTextArea>
+                                </div>
+                            }
+
+                            <div>
+                                <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Primary" Text="Generate" Disabled="@(updateCertificateAuthorityState.Value.IsUpdating)" />
+                                <RadzenButton Click=@((args) => SaveCertificateAuthority()) class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Save" Disabled="@(updateCertificateAuthorityState.Value.IsUpdating || updateCertificateAuthorityState.Value.CertificateAuthority == null)" />
+                            </div>                            
+                        </RadzenTemplateForm>
+                        break;
+                }                
+            }
+        </RadzenStepsItem>
+    </Steps>
+</RadzenSteps>
+
+@code {
+    public record CertificateAuthorityType
+    {
+        public string Name { get; set; } = null!;
+        public string ShortDescription { get; set; } = null!;
+        public string Description { get; set; } = null!;
+        public CertificateAuthoritySources Source { get; set; }
+        public string PictureUrl { get; set; } = null!;
+    }
+
+    public record AddCertificateAuthorityDB
+    {
+        public string SubjectName { get; set; } = null!;
+        public int NumberOfDays { get; set; } = 365;
+    }
+
+    public record AddCertificateAuthorityStore
+    {
+        public string SubjectName { get; set; } = null!;
+    }
+
+    AddCertificateAuthorityDB addCertificateAuthorityDB { get; set; } = new AddCertificateAuthorityDB();
+
+    CertificateAuthorityType SelectedCertificateAuthorityType { get; set; } = null;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+        {
+            SubscribeToAction<SaveCertificateAuthoritySuccessAction>((act) =>
+            {
+                dialogService.Close();
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.CertificateAuthoritySaved });
+                StateHasChanged();
+            }); 
+        }
+    }
+
+    public ICollection<CertificateAuthorityType> CertificateAuthorityTypes = new List<CertificateAuthorityType>
+    {
+        new CertificateAuthorityType { Name = "Generate", ShortDescription = "Generate one Certificate Authority", Description = "Generate one Certificate Authority and store into the database", Source = CertificateAuthoritySources.DB, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/db.png" },
+        new CertificateAuthorityType { Name = "Certificate Store", ShortDescription = "Use Certificate Store", Description = "Use Certificate Authority from the Certificate Store", Source = CertificateAuthoritySources.CERTIFICATESTORE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/certificatestore.png" }
+    };
+
+    void SelectCertificateAuthorityType(CertificateAuthorityType type)
+    {
+        SelectedCertificateAuthorityType = type;
+    }
+
+    void GenerateCertificateAuthority(AddCertificateAuthorityDB certificateAuthority)
+    {
+        var act = new GenerateCertificateAuthorityAction { SubjectName = certificateAuthority.SubjectName, NumberOfDays = certificateAuthority.NumberOfDays };
+        dispatcher.Dispatch(act);
+    }
+
+    void SaveCertificateAuthority()
+    {
+        var act = new SaveCertificateAuthorityAction { CertificateAuthority = updateCertificateAuthorityState.Value.CertificateAuthority };
+        dispatcher.Dispatch(act);        
+    }
+}

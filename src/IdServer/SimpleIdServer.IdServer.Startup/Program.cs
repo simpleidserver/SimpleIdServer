@@ -133,6 +133,9 @@ void SeedData(WebApplication application)
                 dbContext.SerializedFileKeys.Add(WsFederationKeyGenerator.GenerateWsFederationSigningCredentials(SimpleIdServer.IdServer.Constants.StandardRealms.Master));
             }
 
+            if(!dbContext.CertificateAuthorities.Any())
+                dbContext.CertificateAuthorities.AddRange(IdServerConfiguration.CertificateAuthorities);
+
             if (!dbContext.Acrs.Any())
             {
                 dbContext.Acrs.Add(SimpleIdServer.IdServer.Constants.StandardAcrs.FirstLevelAssurance);

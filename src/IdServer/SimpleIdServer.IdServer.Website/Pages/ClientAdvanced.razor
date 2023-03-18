@@ -75,7 +75,7 @@
         if (this.Client == null) return;
         updateAdvancedClient = new UpdateAdvancedClient
         {
-            IdTokenSignedResponseAlg = Client.IdTokenEncryptedResponseAlg,
+            IdTokenSignedResponseAlg = Client.IdTokenSignedResponseAlg,
             AuthorizationSignedResponseAlg = Client.AuthorizationSignedResponseAlg
         };
     }

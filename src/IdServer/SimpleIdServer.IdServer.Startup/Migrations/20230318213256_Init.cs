@@ -102,6 +102,29 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CertificateAuthorities",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    SubjectName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Source = table.Column<int>(type: "int", nullable: false),
+                    StoreLocation = table.Column<int>(type: "int", nullable: true),
+                    StoreName = table.Column<int>(type: "int", nullable: true),
+                    FindType = table.Column<int>(type: "int", nullable: true),
+                    FindValue = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PublicKey = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PrivateKey = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StartDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CertificateAuthorities", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ClaimProviders",
                 columns: table => new
                 {
@@ -396,6 +419,26 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ClientCertificate",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PublicKey = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PrivateKey = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CertificateAuthorityId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ClientCertificate", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ClientCertificate_CertificateAuthorities_CertificateAuthorityId",
+                        column: x => x.CertificateAuthorityId,
+                        principalTable: "CertificateAuthorities",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ClientJsonWebKey",
                 columns: table => new
                 {
@@ -504,6 +547,30 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_AuthenticationContextClassReferenceRealm_Realms_RealmsName",
+                        column: x => x.RealmsName,
+                        principalTable: "Realms",
+                        principalColumn: "Name",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CertificateAuthorityRealm",
+                columns: table => new
+                {
+                    CertificateAuthoritiesId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RealmsName = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CertificateAuthorityRealm", x => new { x.CertificateAuthoritiesId, x.RealmsName });
+                    table.ForeignKey(
+                        name: "FK_CertificateAuthorityRealm_CertificateAuthorities_CertificateAuthoritiesId",
+                        column: x => x.CertificateAuthoritiesId,
+                        principalTable: "CertificateAuthorities",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CertificateAuthorityRealm_Realms_RealmsName",
                         column: x => x.RealmsName,
                         principalTable: "Realms",
                         principalColumn: "Name",
@@ -1056,6 +1123,16 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 column: "BCAuthorizeId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CertificateAuthorityRealm_RealmsName",
+                table: "CertificateAuthorityRealm",
+                column: "RealmsName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ClientCertificate_CertificateAuthorityId",
+                table: "ClientCertificate",
+                column: "CertificateAuthorityId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ClientJsonWebKey_ClientId",
                 table: "ClientJsonWebKey",
                 column: "ClientId");
@@ -1190,7 +1267,13 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 name: "BCAuthorizeHistory");
 
             migrationBuilder.DropTable(
+                name: "CertificateAuthorityRealm");
+
+            migrationBuilder.DropTable(
                 name: "ClaimProviders");
+
+            migrationBuilder.DropTable(
+                name: "ClientCertificate");
 
             migrationBuilder.DropTable(
                 name: "ClientJsonWebKey");
@@ -1260,6 +1343,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
             migrationBuilder.DropTable(
                 name: "BCAuthorizeLst");
+
+            migrationBuilder.DropTable(
+                name: "CertificateAuthorities");
 
             migrationBuilder.DropTable(
                 name: "SerializedFileKeys");

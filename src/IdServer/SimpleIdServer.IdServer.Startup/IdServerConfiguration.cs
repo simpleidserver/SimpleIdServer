@@ -65,5 +65,10 @@ namespace SimpleIdServer.IdServer.Startup
         {
             Constants.StandardRealms.Master
         };
+
+        public static ICollection<CertificateAuthority> CertificateAuthorities = new List<CertificateAuthority>
+        {
+            CertificateAuthorityBuilder.Create("CN=simpleIdServerCA", Constants.StandardRealms.Master).Build()
+        };
     }
 }

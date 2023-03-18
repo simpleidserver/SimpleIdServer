@@ -15,6 +15,7 @@ namespace SimpleIdServer.IdServer.Domains
         public ICollection<AuthenticationContextClassReference> AuthenticationContextClassReferences { get; set; } = new List<AuthenticationContextClassReference>();
         public ICollection<AuthenticationSchemeProvider> AuthenticationSchemeProviders { get; set; } = new List<AuthenticationSchemeProvider>();
         public ICollection<ApiResource> ApiResources { get; set; } = new List<ApiResource>();
-        public ICollection<SerializedFileKey> SerializedFileKeys { get; set; }
+        public ICollection<SerializedFileKey> SerializedFileKeys { get; set; } = new List<SerializedFileKey>();
+        public ICollection<CertificateAuthority> CertificateAuthorities { get; set; } = new List<CertificateAuthority>();
     }
 }

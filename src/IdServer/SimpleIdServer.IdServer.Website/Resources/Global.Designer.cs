@@ -70,6 +70,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Certificate Authority has been saved.
+        /// </summary>
+        public static string CertificateAuthoritySaved {
+            get {
+                return ResourceManager.GetString("CertificateAuthoritySaved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à The client &apos;{0}&apos; has successfully been added.
         /// </summary>
         public static string ClientAdded {
@@ -205,7 +214,7 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à NAME is required.
+        ///   Recherche une chaîne localisée semblable à Name is required.
         /// </summary>
         public static string NameIsRequired {
             get {
@@ -268,7 +277,7 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à NAME must be unique.
+        ///   Recherche une chaîne localisée semblable à Name must be unique.
         /// </summary>
         public static string ScopeClaimMapperNameMustBeUnique {
             get {
@@ -277,7 +286,7 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à SAML Attribute NAME must be unique.
+        ///   Recherche une chaîne localisée semblable à SAML Attribute Name must be unique.
         /// </summary>
         public static string ScopeClaimMapperSAMLAttributeNameMustBeUnique {
             get {
@@ -286,7 +295,7 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Token Claim NAME must be unique.
+        ///   Recherche une chaîne localisée semblable à Token Claim Name must be unique.
         /// </summary>
         public static string ScopeClaimMapperTokenClaimNameMustBeUnique {
             get {

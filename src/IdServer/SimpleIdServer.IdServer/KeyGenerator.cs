@@ -5,6 +5,7 @@ using SimpleIdServer.IdServer.Domains;
 using System;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 
 namespace SimpleIdServer.IdServer
 {
@@ -34,32 +35,6 @@ namespace SimpleIdServer.IdServer
             return result;
         }
 
-        public static X509Certificate2 GenerateRootAuthority(string subjectName = "simpleIdServer")
-        {
-            var rsa = RSA.Create();
-            var parentReq = new CertificateRequest(
-                $"CN={subjectName}",
-                rsa,
-                HashAlgorithmName.SHA256,
-                RSASignaturePadding.Pkcs1);
-            parentReq.CertificateExtensions.Add(new X509BasicConstraintsExtension(true, false, 0, true));
-            parentReq.CertificateExtensions.Add(new X509SubjectKeyIdentifierExtension(parentReq.PublicKey, false));
-            return parentReq.CreateSelfSigned(DateTimeOffset.UtcNow.AddDays(-45), DateTimeOffset.UtcNow.AddDays(365));
-        }
-
-        public static X509Certificate2 GenerateSelfSignedCertificate(X509Certificate2 parentCertificate, string subjectName)
-        {
-            var rsa = RSA.Create();
-            var certRequest = new CertificateRequest($"CN={subjectName}", rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);            
-            certRequest.CertificateExtensions.Add(new X509BasicConstraintsExtension(false, false, 0, false));
-            certRequest.CertificateExtensions.Add(new X509KeyUsageExtension(X509KeyUsageFlags.DigitalSignature | X509KeyUsageFlags.NonRepudiation,false));
-            certRequest.CertificateExtensions.Add(new X509EnhancedKeyUsageExtension(new OidCollection { new Oid("1.3.6.1.5.5.7.3.8") }, true));
-            certRequest.CertificateExtensions.Add(new X509SubjectKeyIdentifierExtension(certRequest.PublicKey, false));
-            var generatedCert = certRequest.Create(parentCertificate, DateTimeOffset.Now, DateTimeOffset.Now.AddDays(10), new byte[] { 1, 2, 3, 4 });
-            generatedCert = RSACertificateExtensions.CopyWithPrivateKey(generatedCert, rsa);
-            return generatedCert;        
-        }
-
         public static X509Certificate2 GenerateSelfSignedCertificate()
         {
             var subjectName = "Self-Signed-Cert-Example";
@@ -67,9 +42,63 @@ namespace SimpleIdServer.IdServer
             var certRequest = new CertificateRequest($"CN={subjectName}", rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
             certRequest.CertificateExtensions.Add(new X509KeyUsageExtension(X509KeyUsageFlags.DigitalSignature, true));
             var generatedCert = certRequest.CreateSelfSigned(DateTimeOffset.Now.AddDays(-1), DateTimeOffset.Now.AddYears(10));
-            var pub = Convert.ToBase64String(generatedCert.GetRawCertData());
-            var pr = Convert.ToBase64String(generatedCert.GetRSAPrivateKey().ExportPkcs8PrivateKey());
             return generatedCert;
+        }
+
+        public static X509Certificate2 GenerateCertificateAuthority(string subjectName, string password, int nbValidDays = 365)
+        {
+            using (RSA parent = RSA.Create(2048))
+            {
+                CertificateRequest parentReq = new CertificateRequest(
+                    subjectName,
+                    parent,
+                    HashAlgorithmName.SHA256,
+                    RSASignaturePadding.Pkcs1);
+                parentReq.CertificateExtensions.Add(
+                    new X509BasicConstraintsExtension(true, false, 0, true));
+
+                parentReq.CertificateExtensions.Add(
+                    new X509SubjectKeyIdentifierExtension(parentReq.PublicKey, false));
+                using (X509Certificate2 parentCert = parentReq.CreateSelfSigned(
+                    DateTimeOffset.UtcNow.AddDays(-1),
+                    DateTimeOffset.UtcNow.AddDays(nbValidDays)))
+                {
+                    return new X509Certificate2(parentCert.Export(X509ContentType.Pfx, password), password, X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable);
+                }
+            }
+        }
+
+        public static PemResult GenerateClientCertificate(X509Certificate2 ca, string subjectName, int nbValidDays, CancellationToken cancellationToken)
+        {
+            using (var rsa = RSA.Create(2048))
+            {
+                CertificateRequest req = new CertificateRequest(
+                    subjectName,
+                    rsa,
+                    HashAlgorithmName.SHA256,
+                    RSASignaturePadding.Pkcs1);
+
+                req.CertificateExtensions.Add(
+                    new X509BasicConstraintsExtension(false, false, 0, false));
+
+                req.CertificateExtensions.Add(
+                    new X509KeyUsageExtension(
+                        X509KeyUsageFlags.DigitalSignature | X509KeyUsageFlags.NonRepudiation | X509KeyUsageFlags.KeyEncipherment | X509KeyUsageFlags.DataEncipherment,
+                        false));
+
+                req.CertificateExtensions.Add(
+                    new X509SubjectKeyIdentifierExtension(req.PublicKey, false));
+
+                using (X509Certificate2 cert = req.Create(
+                    ca,
+                    DateTimeOffset.UtcNow.AddDays(-1),
+                    DateTimeOffset.UtcNow.AddDays(nbValidDays),
+                    new byte[] { 1, 2, 3, 4 }))
+                {
+                    var privatePem = new string(PemEncoding.Write("PRIVATE KEY", rsa.ExportPkcs8PrivateKey()));
+                    return new PemResult(cert.ExportCertificatePem(), privatePem);
+                }
+            }
         }
     }
 }

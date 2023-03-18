@@ -82,6 +82,21 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.ToTable("AuthenticationSchemeProviderRealm");
                 });
 
+            modelBuilder.Entity("CertificateAuthorityRealm", b =>
+                {
+                    b.Property<string>("CertificateAuthoritiesId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RealmsName")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("CertificateAuthoritiesId", "RealmsName");
+
+                    b.HasIndex("RealmsName");
+
+                    b.ToTable("CertificateAuthorityRealm");
+                });
+
             modelBuilder.Entity("ClientRealm", b =>
                 {
                     b.Property<string>("ClientsId")
@@ -501,6 +516,53 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.ToTable("BCAuthorizeHistory");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.CertificateAuthority", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("EndDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("FindType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FindValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PrivateKey")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PublicKey")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Source")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("StartDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("StoreLocation")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("StoreName")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SubjectName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CertificateAuthorities");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ClaimProvider", b =>
                 {
                     b.Property<string>("Id")
@@ -776,6 +838,30 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Clients");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ClientCertificate", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CertificateAuthorityId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("PrivateKey")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PublicKey")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CertificateAuthorityId");
+
+                    b.ToTable("ClientCertificate");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ClientJsonWebKey", b =>
@@ -1542,6 +1628,21 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("CertificateAuthorityRealm", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.CertificateAuthority", null)
+                        .WithMany()
+                        .HasForeignKey("CertificateAuthoritiesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Realm", null)
+                        .WithMany()
+                        .HasForeignKey("RealmsName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("ClientRealm", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.Client", null)
@@ -1675,6 +1776,17 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .WithMany("Histories")
                         .HasForeignKey("BCAuthorizeId")
                         .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ClientCertificate", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.CertificateAuthority", "CertificateAuthority")
+                        .WithMany("ClientCertificates")
+                        .HasForeignKey("CertificateAuthorityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CertificateAuthority");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ClientJsonWebKey", b =>
@@ -1841,6 +1953,11 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.BCAuthorize", b =>
                 {
                     b.Navigation("Histories");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.CertificateAuthority", b =>
+                {
+                    b.Navigation("ClientCertificates");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Client", b =>

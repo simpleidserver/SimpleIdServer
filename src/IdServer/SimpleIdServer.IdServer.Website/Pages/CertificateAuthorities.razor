@@ -1,0 +1,135 @@
+﻿@page "/certificateauthorities"
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@using SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore;
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
+@inject ContextMenuService contextMenuService
+@inject DialogService dialogService
+@inject IDispatcher dispatcher
+@inject IState<SearchCertificateAuthoritiesState> searchCertificateAuthoritiesState
+
+<RadzenButton class="mb-1" Click="@(args => AddCertificateAuthority())" Icon="add" Text="Add Certificate Authority" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+
+<RadzenDataGrid @ref="caGrid"
+                AllowFiltering="true"
+                AllowColumnResize="true"
+                AllowAlternatingRows="false"
+                AllowSorting="true"
+                PageSize="30"
+                AllowPaging="true"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="true"
+                IsLoading="@searchCertificateAuthoritiesState.Value.IsLoading"
+                Count="@searchCertificateAuthoritiesState.Value.Count"
+                Data="@searchCertificateAuthoritiesState.Value.CertificateAuthorities"
+                LoadData="@LoadData"
+                RowRender="@RowRender"
+                TItem="SelectableCertificateAuthority"
+                ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <HeaderTemplate>
+                <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
+            </HeaderTemplate>
+            <Template Context="data">
+                <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Filterable="false" Sortable="false" Title="Identifier" Width="80px">
+            <Template Context="data">
+                <RadzenLink Text="@data.Value.SubjectName" Path="@($"/certificateauthorities/{data.Value.Id}/settings")" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Filterable="false" Sortable="false" Title="Source" Width="80px">
+            <Template Context="data">
+                <RadzenBadge Text="@(Enum.GetName(typeof(CertificateAuthoritySources), data.Value.Source))" IsPill="true" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Property="Value.StartDateTime" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Title="Start Datetime" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Property="Value.EndDateTime" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Title="End Datetime" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Update datetime" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
+            <Template Context="data">
+                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    bool selectAll = false;
+    RadzenDataGrid<SelectableCertificateAuthority> caGrid;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            SubscribeToAction<SelectRealmSuccessAction>((act) =>
+            {
+                caGrid.Reload();
+                StateHasChanged();
+            });
+            if (!searchCertificateAuthoritiesState.Value.IsLoading)
+                caGrid.Reload();
+        }
+    }
+
+    void LoadData(LoadDataArgs args)
+    {
+        var act = new SearchCertificateAuthoritiesAction { Filter = args.Filter, OrderBy = args.OrderBy, Skip = args.Skip, Take = args.Top };
+        dispatcher.Dispatch(act);
+    }
+
+
+    void ShowMoreContextMenu(SelectableCertificateAuthority certificateAuthority, MouseEventArgs args)
+    {
+        contextMenuService.Open(args, new List<ContextMenuItem>
+        {
+            new ContextMenuItem { Text = "Delete", Value = 1 }
+        }, (a) =>
+    {
+    if (a.Value.Equals(1))
+    {
+        var caIds = searchCertificateAuthoritiesState.Value.CertificateAuthorities?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
+        if (!caIds.Contains(certificateAuthority.Value.Id)) caIds.Add(certificateAuthority.Value.Id);
+        var act = new RemoveSelectedCertificateAuthoritiesAction { Ids = caIds };
+        dispatcher.Dispatch(act);
+        contextMenuService.Close();
+    }
+    });
+    }
+
+    void ToggleChanged(bool isSelected, SelectableCertificateAuthority certificateAuthority)
+    {
+        var act = new ToggleCertificateAuthoritySelectionAction { IsSelected = isSelected, Id = certificateAuthority.Value.Id };
+        dispatcher.Dispatch(act);
+    }
+
+    void ToggleAll(bool isSelected)
+    {
+        var act = new ToggleAllCertificateAuthoritySelectionAction { IsSelected = isSelected };
+        dispatcher.Dispatch(act);
+    }
+
+    void RowRender(RowRenderEventArgs<SelectableCertificateAuthority> row)
+    {
+        const string className = "class";
+        if (row.Data.IsNew)
+            row.Attributes.Add(className, "new");
+        else if (row.Data.IsSelected)
+            row.Attributes.Add(className, "active");
+        else if (row.Attributes.ContainsKey(className))
+            row.Attributes.Remove(className);
+    }
+
+    async void AddCertificateAuthority()
+    {
+        await dialogService.OpenAsync<AddCertificateAuthorityDialog>("Add Certificate Authority", new Dictionary<string, object>(), new DialogOptions
+        {
+            Width = "700px",
+            Height = "512px",
+            Resizable = true,
+            Draggable = true
+        });
+    }
+}

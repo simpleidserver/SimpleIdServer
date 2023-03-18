@@ -27,6 +27,7 @@ namespace SimpleIdServer.IdServer.Store
         public DbSet<Realm> Realms { get; set; }
         public DbSet<SerializedFileKey> SerializedFileKeys { get; set; }
         public DbSet<AuditEvent> AuditEvents { get; set; }
+        public DbSet<CertificateAuthority> CertificateAuthorities { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -65,6 +66,8 @@ namespace SimpleIdServer.IdServer.Store
             builder.ApplyConfiguration(new RealmConfiguration());
             builder.ApplyConfiguration(new SerializedFileKeyConfiguration());
             builder.ApplyConfiguration(new AuditEventConfiguration());
+            builder.ApplyConfiguration(new CertificateAuthorityConfiguration());
+            builder.ApplyConfiguration(new ClientCertificateConfiguration());
         }
     }
 }

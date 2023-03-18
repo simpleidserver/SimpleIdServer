@@ -180,6 +180,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddTransient<IJwksRequestHandler, JwksRequestHandler>();
             services.AddTransient<IKeyStore, InMemoryKeyStore>();
+            services.AddTransient<ICertificateAuthorityStore, CertificateAuthorityStore>();
             return services;
         }
 

@@ -59,11 +59,13 @@ namespace SimpleIdServer.IdServer
     {
         public PemResult(string publicKey, string privateKey)
         {
-            PublicKey = publicKey;
-            PrivateKey = privateKey;
+            PublicKey = SanitizePem(publicKey);
+            PrivateKey = SanitizePem(privateKey);
         }
 
         public string PublicKey { get; private set; }
         public string PrivateKey { get; private set; }
+
+        private string SanitizePem(string pem) => pem.Replace("\n", "\r\n");
     }
 }

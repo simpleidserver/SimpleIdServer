@@ -50,6 +50,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.RealmStore
                 var scopes = await dbContext.Scopes.Include(s => s.Realms).Where(s => WebsiteConfiguration.StandardScopes.Contains(s.Name)).ToListAsync();
                 var keys = await dbContext.SerializedFileKeys.Include(s => s.Realms).Where(s => s.Realms.Any(r => r.Name == Constants.DefaultRealm)).ToListAsync();
                 var acrs = await dbContext.Acrs.Include(a => a.Realms).ToListAsync();
+                var certificateAuthorities = await dbContext.CertificateAuthorities.Include(s => s.Realms).Where(s => s.Realms.Any(r => r.Name == Constants.DefaultRealm)).ToListAsync();
                 foreach (var user in users)
                     user.Realms.Add(realm);
 
@@ -64,6 +65,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.RealmStore
 
                 foreach(var key in keys)
                     key.Realms.Add(realm);
+
+                foreach(var certificateAuthority in certificateAuthorities)
+                    certificateAuthority.Realms.Add(realm);
 
                 await dbContext.SaveChangesAsync();
             }
