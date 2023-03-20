@@ -124,6 +124,20 @@
                                 </p>
                                 <RadzenRequiredValidator Component="RedirectionUris" Text="At leat one redirection URL must be specified"></RadzenRequiredValidator>
                             </div>
+                            <div class="mb-1">
+                                <RadzenCheckBox @bind-Value=@websiteApplication.IsFAPICompliant TValue="bool" />
+                                <RadzenLabel Text="Compliant with FAPI1.0" Style="margin-left: 8px; vertical-align: middle;" />
+                            </div>
+                            @if (websiteApplication.IsFAPICompliant)
+                            {
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Subject Name</RadzenText>
+                                <RadzenTextBox Name="SubjectName" @bind-Value="@websiteApplication.SubjectName" Class="w-100"></RadzenTextBox>
+                                <p class="text-muted">
+                                    MTLS authentication is configured by default. <br/>
+                                    Subject Name is used to check the validity of the Client Certificate.
+                                </p>
+                            }
+
                             <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addClientState.Value.IsAdding)" />
                         </RadzenTemplateForm>
                         break;
@@ -231,6 +245,8 @@
         public string ClientIdentifier { get; set; } = null!;
         public string ClientSecret { get; set; } = null!;
         public string RedirectionUris { get; set; } = null!;
+        public string SubjectName { get; set; } = null!;
+        public bool IsFAPICompliant { get; set; } = false;
     }
 
     record MachineApplication
@@ -307,7 +323,7 @@
 
     void AddWebsiteApplication(WebsiteApplication websiteApplication)
     {
-        dispatcher.Dispatch(new AddWebsiteApplicationAction { ClientId = websiteApplication.ClientIdentifier, ClientName = websiteApplication.ClientName, RedirectionUrls = websiteApplication.RedirectionUris.Split(';'), ClientSecret = websiteApplication.ClientSecret });
+        dispatcher.Dispatch(new AddWebsiteApplicationAction { SubjectName = websiteApplication.SubjectName, IsFAPICompliant = websiteApplication.IsFAPICompliant, ClientId = websiteApplication.ClientIdentifier, ClientName = websiteApplication.ClientName, RedirectionUrls = websiteApplication.RedirectionUris.Split(';'), ClientSecret = websiteApplication.ClientSecret });
     }
 
     void AddMobileApplication(MobileApplication mobileApplication)

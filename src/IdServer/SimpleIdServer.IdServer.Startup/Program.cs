@@ -17,9 +17,11 @@ using SimpleIdServer.IdServer.WsFederation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Security.Cryptography;
 
+ServicePointManager.ServerCertificateValidationCallback += (o, c, ch, er) => true;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<KestrelServerOptions>(options =>
 {
@@ -129,7 +131,8 @@ void SeedData(WebApplication application)
 
             if(!dbContext.SerializedFileKeys.Any())
             {
-                dbContext.SerializedFileKeys.Add(KeyGenerator.GenerateSigningCredentials(SimpleIdServer.IdServer.Constants.StandardRealms.Master));
+                dbContext.SerializedFileKeys.Add(KeyGenerator.GenerateRSASigningCredentials(SimpleIdServer.IdServer.Constants.StandardRealms.Master, "rsa-1"));
+                dbContext.SerializedFileKeys.Add(KeyGenerator.GenerateECDSASigningCredentials(SimpleIdServer.IdServer.Constants.StandardRealms.Master, "ecdsa-1"));
                 dbContext.SerializedFileKeys.Add(WsFederationKeyGenerator.GenerateWsFederationSigningCredentials(SimpleIdServer.IdServer.Constants.StandardRealms.Master));
             }
 

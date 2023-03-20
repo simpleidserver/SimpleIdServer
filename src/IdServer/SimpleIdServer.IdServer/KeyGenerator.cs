@@ -5,27 +5,42 @@ using SimpleIdServer.IdServer.Domains;
 using System;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
-using System.Threading;
 
 namespace SimpleIdServer.IdServer
 {
     public static class KeyGenerator
     {
-        public static SerializedFileKey GenerateSigningCredentials(Realm realm)
+        public static SerializedFileKey GenerateRSASigningCredentials(Realm realm, string keyid = "keyId", string alg = SecurityAlgorithms.RsaSha256)
         {
-            var rsa = RSA.Create();
-            var key = new RsaSecurityKey(rsa)
-            {
-                KeyId = "keyid"
-            };
-            var pem = PemConverter.ConvertFromSecurityKey(key);
+            var sig = ClientKeyGenerator.GenerateRSASignatureKey(keyid, alg);
+            var pem = PemConverter.ConvertFromSecurityKey(sig.Key);
             var result = new SerializedFileKey
             {
                 Id = Guid.NewGuid().ToString(),
-                Alg = SecurityAlgorithms.RsaSha256,
+                Alg = alg,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow,
-                KeyId = key.KeyId,
+                KeyId = sig.Kid,
+                PrivateKeyPem = pem.PrivateKey,
+                PublicKeyPem = pem.PublicKey,
+                Usage = Constants.JWKUsages.Sig,
+                IsSymmetric = false
+            };
+            result.Realms.Add(realm);
+            return result;
+        }
+
+        public static SerializedFileKey GenerateECDSASigningCredentials(Realm realm, string keyid = "keyId", string alg = SecurityAlgorithms.EcdsaSha256)
+        {
+            var sig = ClientKeyGenerator.GenerateECDsaSignatureKey(keyid, alg);
+            var pem = PemConverter.ConvertFromSecurityKey(sig.Key);
+            var result = new SerializedFileKey
+            {
+                Id = Guid.NewGuid().ToString(),
+                Alg = alg,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow,
+                KeyId = sig.Kid,
                 PrivateKeyPem = pem.PrivateKey,
                 PublicKeyPem = pem.PublicKey,
                 Usage = Constants.JWKUsages.Sig,
@@ -68,7 +83,7 @@ namespace SimpleIdServer.IdServer
             }
         }
 
-        public static PemResult GenerateClientCertificate(X509Certificate2 ca, string subjectName, int nbValidDays, CancellationToken cancellationToken)
+        public static PemResult GenerateClientCertificate(X509Certificate2 ca, string subjectName, int nbValidDays)
         {
             using (var rsa = RSA.Create(2048))
             {

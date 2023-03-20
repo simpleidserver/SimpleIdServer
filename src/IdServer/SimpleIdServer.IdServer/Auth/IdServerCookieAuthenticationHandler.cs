@@ -284,6 +284,7 @@ namespace SimpleIdServer.IdServer.Auth
                     GetCookieName()!,
                     cookieValue,
                     cookieOptions);
+
                 await ApplyHeaders(shouldRedirect: false, shouldHonorReturnUrlParameter: false, properties: properties);
             }
         }
@@ -361,16 +362,6 @@ namespace SimpleIdServer.IdServer.Auth
                 GetCookieName()!,
                 cookieValue,
                 signInContext.CookieOptions);
-
-            var realm = RealmContext.Instance().Realm;
-            if (!string.IsNullOrWhiteSpace(realm))
-            {
-                Options.CookieManager.AppendResponseCookie(
-                    Context,
-                    Constants.DefaultRealmCookieName,
-                    realm,
-                    cookieOptions);
-            }
 
             var signedInContext = new CookieSignedInContext(
                 Context,

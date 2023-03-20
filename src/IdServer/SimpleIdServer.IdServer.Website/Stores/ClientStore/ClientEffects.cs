@@ -98,6 +98,14 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                     .AddScope(scopes.ToArray());
                 if (!string.IsNullOrWhiteSpace(action.ClientName))
                     newClientBuilder.SetClientName(action.ClientName);
+                if(action.IsFAPICompliant)
+                {
+                    newClientBuilder.UseClientTlsAuthentication(action.SubjectName);
+                    newClientBuilder.SetSigAuthorizationResponse(SecurityAlgorithms.EcdsaSha256);
+                    newClientBuilder.SetIdTokenSignedResponseAlg(SecurityAlgorithms.EcdsaSha256);
+                    newClientBuilder.SetRequestObjectSigning(SecurityAlgorithms.EcdsaSha256);
+                }
+
                 var newClient = newClientBuilder.Build();
                 dbContext.Clients.Add(newClient);
                 await dbContext.SaveChangesAsync(CancellationToken.None);
@@ -474,6 +482,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public string ClientId { get; set; } = null!;
         public string ClientSecret { get; set; } = null!;
         public string? ClientName { get; set; } = null;
+        public bool IsFAPICompliant { get; set; } = false;
+        public string? SubjectName { get; set; } = null;
     }
 
     public class AddMobileApplicationAction

@@ -1,0 +1,19 @@
+﻿@using Fluxor.Blazor.Web.Components;
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore;
+
+<!-- Public Key -->
+<div>
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Public Key</RadzenText>
+    <RadzenTextArea Rows=10 Name="PublicKey" @bind-Value="@ClientCertificate.PublicKey" Class="w-100"></RadzenTextArea>
+</div>
+<!-- Private Key -->
+<div>
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Private Key</RadzenText>
+    <RadzenTextArea Rows=10 Name="PrivateKey" @bind-Value="@ClientCertificate.PrivateKey" Class="w-100"></RadzenTextArea>
+</div>
+
+@code {
+    [Parameter]
+    public ClientCertificate ClientCertificate { get; set; }
+}

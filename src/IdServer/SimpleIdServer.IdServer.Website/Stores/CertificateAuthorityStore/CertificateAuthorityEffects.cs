@@ -140,7 +140,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
         {
             var ca = await _certificateAuthorityRepository.Query().Include(c => c.ClientCertificates).FirstAsync(c => c.Id == action.CertificateAuthorityId);
             var certificate = _certificateAuthorityStore.Get(ca);
-            var pem = KeyGenerator.GenerateClientCertificate(certificate, action.SubjectName, action.NbDays, CancellationToken.None);
+            var pem = KeyGenerator.GenerateClientCertificate(certificate, action.SubjectName, action.NbDays);
             var record = new ClientCertificate
             {
                 Id = Guid.NewGuid().ToString(),

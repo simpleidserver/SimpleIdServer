@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using System.Net.Http;
 
 namespace SimpleIdServer.IdServer.Auth
 {
@@ -12,6 +13,12 @@ namespace SimpleIdServer.IdServer.Auth
     {
         public void PostConfigure(string name, OpenIdConnectOptions options)
         {
+            var handler = new HttpClientHandler();
+            handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => {
+                return true; 
+            };
+            var httpClient = new HttpClient(handler);
+            options.Backchannel = httpClient;
             options.ConfigurationManager = new IdServerOpenIdConfigurationManager(options.Authority, new OpenIdConnectConfigurationRetriever(),
                 new HttpDocumentRetriever(options.Backchannel) { RequireHttps = options.RequireHttpsMetadata })
             {

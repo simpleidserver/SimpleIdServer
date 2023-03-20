@@ -43,7 +43,20 @@ namespace SimpleIdServer.IdServer.Middlewares
                     if (routeValues.ContainsKey(Constants.Prefix))
                     {
                         var prefix = routeValues.First(v => v.Key == Constants.Prefix).Value?.ToString();
-                        if (routeValues.Any(v => v.Key == Constants.Prefix) && (await realmRepository.Query().AnyAsync(r => r.Name == prefix)))
+                        if (realmCookie.Value != prefix)
+                        {
+                            if (await realmRepository.Query().AnyAsync(r => r.Name == prefix))
+                            {
+                                realm = prefix;
+                                if (!string.IsNullOrWhiteSpace(realm))
+                                {
+                                    context.Response.Cookies.Append(
+                                        Constants.DefaultRealmCookieName,
+                                        realm);
+                                }
+                            }
+                        }
+                        else
                             realm = prefix;
                     }
 
