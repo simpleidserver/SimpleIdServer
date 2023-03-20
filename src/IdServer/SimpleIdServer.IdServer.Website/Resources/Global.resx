@@ -120,14 +120,26 @@
   <data name="ApiResourceAlreadyExists" xml:space="preserve">
     <value>API Resource with the name '{0}' already exists</value>
   </data>
+  <data name="CannotReadCertificateStore" xml:space="preserve">
+    <value>You don't have the permission to read the certificate store</value>
+  </data>
   <data name="CertificateAuthoritySaved" xml:space="preserve">
     <value>Certificate Authority has been saved</value>
+  </data>
+  <data name="CertificateDoesntExist" xml:space="preserve">
+    <value>The certificate doesn't exist</value>
+  </data>
+  <data name="CertificateDoesntHavePrivateKey" xml:space="preserve">
+    <value>The certificate doesn't contain private key</value>
   </data>
   <data name="ClientAdded" xml:space="preserve">
     <value>The client '{0}' has successfully been added</value>
   </data>
   <data name="ClientAlreadyExists" xml:space="preserve">
     <value>Client cannot be added because an another client exists with the same name</value>
+  </data>
+  <data name="ClientCertificateAdded" xml:space="preserve">
+    <value>Client Certificate has been added</value>
   </data>
   <data name="ClientCredentialsUpdated" xml:space="preserve">
     <value>Client credentials are updated</value>
@@ -209,6 +221,12 @@
   </data>
   <data name="ScopeResourcesUpdated" xml:space="preserve">
     <value>Scope Resources have been updated</value>
+  </data>
+  <data name="SelectedCertificateAuthoritiesRemoved" xml:space="preserve">
+    <value>Selected Certificate Authorities has been removed</value>
+  </data>
+  <data name="SelectedClientCertificatesRemoved" xml:space="preserve">
+    <value>Selected Client Certificates have been removed</value>
   </data>
   <data name="SelectedClientKeysRemoved" xml:space="preserve">
     <value>Selected client keys have been removed</value>

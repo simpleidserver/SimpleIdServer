@@ -18,5 +18,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
 
         public bool IsUpdating { get; set; }
         public CertificateAuthority CertificateAuthority { get; set; }
+        public string ErrorMessage { get; set; }
     }
 }

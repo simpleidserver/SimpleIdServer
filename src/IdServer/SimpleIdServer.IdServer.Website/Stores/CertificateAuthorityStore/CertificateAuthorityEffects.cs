@@ -6,19 +6,24 @@ using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System.Linq.Dynamic.Core;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
 
 namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
 {
     public class CertificateAuthorityEffects
     {
         private readonly ICertificateAuthorityRepository _certificateAuthorityRepository;
+        private readonly ICertificateAuthorityStore _certificateAuthorityStore;
         private readonly ProtectedSessionStorage _sessionStorage;
         private readonly DbContextOptions<StoreDbContext> _options;
 
-        public CertificateAuthorityEffects(ICertificateAuthorityRepository certificateAuthorityRepository, ProtectedSessionStorage sessionStorage, DbContextOptions<StoreDbContext> options)
+        public CertificateAuthorityEffects(ICertificateAuthorityRepository certificateAuthorityRepository, ICertificateAuthorityStore certificateAuthorityStore, ProtectedSessionStorage sessionStorage, DbContextOptions<StoreDbContext> options)
         {
             _certificateAuthorityRepository = certificateAuthorityRepository;
+            _certificateAuthorityStore = certificateAuthorityStore;
             _sessionStorage = sessionStorage;
             _options = options;
         }
@@ -50,6 +55,47 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
         }
 
         [EffectMethod]
+        public Task Handle(ImportCertificateAuthorityAction action, IDispatcher dispatcher)
+        {
+            var store = new X509Store(action.StoreName, action.StoreLocation);
+            try
+            {
+                store.Open(OpenFlags.ReadOnly);
+            }
+            catch
+            {
+                dispatcher.Dispatch(new GenerateCertificateAuthorityFailureAction { ErrorMessage = Resources.Global.CannotReadCertificateStore });
+                return Task.CompletedTask;
+            }
+
+            var certificate = store.Certificates.Find(action.FindType, action.FindValue, true).FirstOrDefault();
+            if(certificate == null)
+            {
+                dispatcher.Dispatch(new GenerateCertificateAuthorityFailureAction { ErrorMessage = Resources.Global.CertificateDoesntExist });
+                return Task.CompletedTask;
+            }
+
+            try
+            {
+                if (!certificate.HasPrivateKey || certificate.PrivateKey == null)
+                {
+                    dispatcher.Dispatch(new GenerateCertificateAuthorityFailureAction { ErrorMessage = Resources.Global.CertificateDoesntHavePrivateKey });
+                    return Task.CompletedTask;
+                }
+            }
+            catch
+            {
+                dispatcher.Dispatch(new GenerateCertificateAuthorityFailureAction { ErrorMessage = Resources.Global.CertificateDoesntHavePrivateKey });
+                return Task.CompletedTask;
+            }
+
+
+            var certificateAuthority = CertificateAuthorityBuilder.Import(certificate, action.StoreLocation, action.StoreName, action.FindType, action.FindValue).Build();
+            dispatcher.Dispatch(new GenerateCertificateAuthoritySuccessAction { CertificateAuthority = certificateAuthority });
+            return Task.CompletedTask;
+        }
+
+        [EffectMethod]
         public async Task Handle(SaveCertificateAuthorityAction action, IDispatcher dispatcher)
         {
             using (var dbContext = new StoreDbContext(_options))
@@ -62,6 +108,51 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
             }
 
             dispatcher.Dispatch(new SaveCertificateAuthoritySuccessAction { CertificateAuthority = action.CertificateAuthority });
+        }
+
+        [EffectMethod]
+        public async Task Handle(RemoveSelectedCertificateAuthoritiesAction action, IDispatcher dispatcher)
+        {
+            var cas = await _certificateAuthorityRepository.Query().Where(c => action.Ids.Contains(c.Id)).ToListAsync();
+            _certificateAuthorityRepository.Delete(cas);
+            await _certificateAuthorityRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new RemoveSelectedCertificateAuthoritiesSuccessAction { Ids = action.Ids });
+        }
+
+        [EffectMethod]
+        public async Task Handle(GetCertificateAuthorityAction action, IDispatcher dispatcher)
+        {
+            var kvp = await _certificateAuthorityStore.Get(action.Id, CancellationToken.None);
+            dispatcher.Dispatch(new GetCertificateAuthoritySuccessAction { CertificateAuthority = kvp.Value.Item1, Certificate = kvp.Value.Item2 });
+        }
+
+        [EffectMethod]
+        public async Task Handle(RemoveSelectedClientCertificatesAction action, IDispatcher dispatcher)
+        {
+            var ca = await _certificateAuthorityRepository.Query().Include(c => c.ClientCertificates).FirstAsync(c => c.Id == action.CertificateAuthorityId);
+            ca.ClientCertificates = ca.ClientCertificates.Where(c => !action.CertificateClientIds.Contains(c.Id)).ToList();
+            await _certificateAuthorityRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new RemoveSelectedClientCertificatesSuccessAction { CertificateAuthorityId = action.CertificateAuthorityId, CertificateClientIds = action.CertificateClientIds });
+        }
+
+        [EffectMethod]
+        public async Task Handle(AddClientCertificateAction action, IDispatcher dispatcher)
+        {
+            var ca = await _certificateAuthorityRepository.Query().Include(c => c.ClientCertificates).FirstAsync(c => c.Id == action.CertificateAuthorityId);
+            var certificate = _certificateAuthorityStore.Get(ca);
+            var pem = KeyGenerator.GenerateClientCertificate(certificate, action.SubjectName, action.NbDays, CancellationToken.None);
+            var record = new ClientCertificate
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = action.SubjectName,
+                PublicKey = pem.PublicKey,
+                PrivateKey = pem.PrivateKey,
+                StartDateTime = DateTime.UtcNow,
+                EndDateTime = DateTime.UtcNow.AddDays(action.NbDays)
+            };
+            ca.ClientCertificates.Add(record);
+            await _certificateAuthorityRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new AddClientCertificateSuccessAction { CertificateAuthorityId = action.CertificateAuthorityId, ClientCertificate = record });
         }
 
         private async Task<string> GetRealm()
@@ -102,15 +193,33 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
         public IEnumerable<string> Ids { get; set; }
     }
 
+    public class RemoveSelectedCertificateAuthoritiesSuccessAction
+    {
+        public IEnumerable<string> Ids { get; set; }
+    }
+
     public class GenerateCertificateAuthorityAction
     {
         public string SubjectName { get; set; }
         public int NumberOfDays { get; set; }
     }
 
+    public class ImportCertificateAuthorityAction
+    {
+        public StoreLocation StoreLocation { get; set; }
+        public StoreName StoreName { get; set; }
+        public X509FindType FindType { get; set; }
+        public string FindValue { get; set; }
+    }
+
     public class GenerateCertificateAuthoritySuccessAction
     {
         public CertificateAuthority CertificateAuthority { get; set; }
+    }
+
+    public class GenerateCertificateAuthorityFailureAction
+    {
+        public string ErrorMessage { get; set; }
     }
 
     public class SaveCertificateAuthorityAction
@@ -121,5 +230,57 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
     public class SaveCertificateAuthoritySuccessAction
     {
         public CertificateAuthority CertificateAuthority { get; set; }
+    }
+
+    public class SelectCertificateAuthoritySourceAction
+    {
+        public CertificateAuthoritySources Source { get; set; }
+    }
+
+    public class GetCertificateAuthorityAction
+    {
+        public string Id { get; set; }
+    }
+
+    public class GetCertificateAuthoritySuccessAction
+    {
+        public CertificateAuthority CertificateAuthority { get; set; }
+        public X509Certificate2 Certificate { get; set; }
+    }
+
+    public class ToggleClientCertificateSelectionAction
+    {
+        public string Id { get; set; }
+        public bool IsSelected { get; set; }
+    }
+
+    public class ToggleAllClientCertificatesSelectionAction
+    {
+        public bool IsSelected { get; set; }
+    }
+
+    public class RemoveSelectedClientCertificatesAction
+    {
+        public string CertificateAuthorityId { get; set; }
+        public IEnumerable<string> CertificateClientIds { get; set; }
+    }
+
+    public class RemoveSelectedClientCertificatesSuccessAction
+    {
+        public string CertificateAuthorityId { get; set; }
+        public IEnumerable<string> CertificateClientIds { get; set; }
+    }
+
+    public class AddClientCertificateAction
+    {
+        public string CertificateAuthorityId { get; set; }
+        public string SubjectName { get; set; }
+        public int NbDays { get; set; }
+    }
+
+    public class AddClientCertificateSuccessAction
+    {
+        public string CertificateAuthorityId { get; set; }
+        public ClientCertificate ClientCertificate { get; set; }
     }
 }

@@ -70,11 +70,38 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à You don&apos;t have the permission to read the certificate store.
+        /// </summary>
+        public static string CannotReadCertificateStore {
+            get {
+                return ResourceManager.GetString("CannotReadCertificateStore", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Certificate Authority has been saved.
         /// </summary>
         public static string CertificateAuthoritySaved {
             get {
                 return ResourceManager.GetString("CertificateAuthoritySaved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The certificate doesn&apos;t exist.
+        /// </summary>
+        public static string CertificateDoesntExist {
+            get {
+                return ResourceManager.GetString("CertificateDoesntExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The certificate doesn&apos;t contain private key.
+        /// </summary>
+        public static string CertificateDoesntHavePrivateKey {
+            get {
+                return ResourceManager.GetString("CertificateDoesntHavePrivateKey", resourceCulture);
             }
         }
         
@@ -93,6 +120,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string ClientAlreadyExists {
             get {
                 return ResourceManager.GetString("ClientAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Client Certificate has been added.
+        /// </summary>
+        public static string ClientCertificateAdded {
+            get {
+                return ResourceManager.GetString("ClientCertificateAdded", resourceCulture);
             }
         }
         
@@ -336,6 +372,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string ScopeResourcesUpdated {
             get {
                 return ResourceManager.GetString("ScopeResourcesUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Selected Certificate Authorities has been removed.
+        /// </summary>
+        public static string SelectedCertificateAuthoritiesRemoved {
+            get {
+                return ResourceManager.GetString("SelectedCertificateAuthoritiesRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Selected Client Certificates have been removed.
+        /// </summary>
+        public static string SelectedClientCertificatesRemoved {
+            get {
+                return ResourceManager.GetString("SelectedClientCertificatesRemoved", resourceCulture);
             }
         }
         

@@ -1,0 +1,53 @@
+﻿@using Fluxor.Blazor.Web.Components;
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore;
+@inherits FluxorComponent
+@inject IDispatcher dispatcher
+@inject Radzen.DialogService dialogService
+@inject IState<UpdateCertificateAuthorityState> updateCertificateAuthorityState
+@inject NotificationService notificationService
+
+<RadzenTemplateForm Submit=@SubmitAddClientCertificate TItem="ClientCertificateForm" Data=@clientCertificate>
+    <!-- Key -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Subject Name</RadzenText>
+        <RadzenTextBox Name="SubjectName" @bind-Value="@clientCertificate.SubjectName" Class="w-100"></RadzenTextBox>
+        <RadzenRequiredValidator Component="SubjectName" Text="Subject Name is required"></RadzenRequiredValidator>
+    </div>
+    <!-- Number of days -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Number of Days</RadzenText>
+        <RadzenNumeric Name="NbDays" @bind-Value="@clientCertificate.NbDays" Class="w-100"></RadzenNumeric>
+        <RadzenRequiredValidator Component="NbDays" Text="Number of days is required"></RadzenRequiredValidator>
+    </div>
+    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateCertificateAuthorityState.Value.IsUpdating ? "Adding..." : "Add")" Disabled=updateCertificateAuthorityState.Value.IsUpdating />
+</RadzenTemplateForm>
+
+@code{
+    [Parameter]
+    public string CertificateAuthorityId { get; set; }
+
+    record ClientCertificateForm
+    {
+        public string SubjectName { get; set; }
+        public int NbDays { get; set; } = 30;
+    }
+
+    ClientCertificateForm clientCertificate = new ClientCertificateForm();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        SubscribeToAction<AddClientCertificateSuccessAction>((act) =>
+        {
+            dialogService.Close();
+            notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.ClientCertificateAdded });
+            StateHasChanged();
+        });
+    }
+
+    void SubmitAddClientCertificate(ClientCertificateForm f)
+    {
+        dispatcher.Dispatch(new AddClientCertificateAction { CertificateAuthorityId = CertificateAuthorityId, SubjectName = f.SubjectName, NbDays = f.NbDays });
+    }
+}

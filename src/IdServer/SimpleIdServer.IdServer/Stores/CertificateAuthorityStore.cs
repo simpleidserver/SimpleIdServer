@@ -14,7 +14,8 @@ namespace SimpleIdServer.IdServer.Stores
 {
     public interface ICertificateAuthorityStore
     {
-        Task<X509Certificate2> Get(string id, CancellationToken cancellationToken);
+        Task<(CertificateAuthority, X509Certificate2)?> Get(string id, CancellationToken cancellationToken);
+        X509Certificate2 Get(CertificateAuthority certificateAuthority);
     }
 
     public class CertificateAuthorityStore : ICertificateAuthorityStore
@@ -31,12 +32,14 @@ namespace SimpleIdServer.IdServer.Stores
             _repository = repository;
         }
 
-        public async Task<X509Certificate2> Get(string id, CancellationToken cancellationToken)
+        public async Task<(CertificateAuthority, X509Certificate2)?> Get(string id, CancellationToken cancellationToken)
         {
-            var ca = await _repository.Query().AsNoTracking().FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
+            var ca = await _repository.Query().Include(r => r.ClientCertificates).AsNoTracking().FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
             if (ca == null) return null;
-            return _mappingTypeToBuiler[ca.Source](ca);
+            return (ca, _mappingTypeToBuiler[ca.Source](ca));
         }
+
+        public X509Certificate2 Get(CertificateAuthority certificateAuthority) => _mappingTypeToBuiler[certificateAuthority.Source](certificateAuthority);
 
         protected static X509Certificate2 ExtractFromDB(CertificateAuthority ca) => X509Certificate2.CreateFromPem(ca.PublicKey, ca.PrivateKey);
 

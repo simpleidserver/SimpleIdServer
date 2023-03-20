@@ -1,6 +1,7 @@
 ﻿@using Fluxor.Blazor.Web.Components;
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore;
+@using System.Security.Cryptography.X509Certificates;
 @inherits FluxorComponent
 @inject IState<UpdateCertificateAuthorityState> updateCertificateAuthorityState
 @inject IDispatcher dispatcher
@@ -80,6 +81,63 @@
                             </div>                            
                         </RadzenTemplateForm>
                         break;
+                    case CertificateAuthoritySources.CERTIFICATESTORE:
+                        <RadzenTemplateForm Submit=@ImportCertificateAuthority TItem="ImportCertificateAuthorityForm" Data=@importCertificateAuthorityForm>
+                            @if (!updateCertificateAuthorityState.Value.IsUpdating && !string.IsNullOrWhiteSpace(updateCertificateAuthorityState.Value.ErrorMessage))
+                            {
+                                <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@updateCertificateAuthorityState.Value.ErrorMessage</RadzenAlert>
+                            }
+
+                            <!-- Store location -->
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Store Location</RadzenText>
+                                <RadzenDropDown Name="StoreLocation" Class="w-100"
+                                    Data=@Enum.GetValues(typeof(StoreLocation))
+                                    TValue="StoreLocation"
+                                    @bind-Value=@importCertificateAuthorityForm.StoreLocation />
+                            </div>
+                            <!-- Store name -->
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Store Name</RadzenText>
+                                <RadzenDropDown Name="StoreName" Class="w-100"
+                                    Data=@Enum.GetValues(typeof(StoreName))
+                                    TValue="StoreName"
+                                    @bind-Value=@importCertificateAuthorityForm.StoreName />
+                            </div>
+                            <!-- Store name -->
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Find Type</RadzenText>
+                                <RadzenDropDown Name="FindType" Class="w-100"
+                                    Data=@Enum.GetValues(typeof(X509FindType))
+                                    TValue="X509FindType"
+                                    @bind-Value=@importCertificateAuthorityForm.FindType />
+                            </div>
+                            <!-- Find Value -->
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Find Value</RadzenText>
+                                <RadzenTextBox Name="FindValue" @bind-Value="@importCertificateAuthorityForm.FindValue" Class="w-100"></RadzenTextBox>
+                            </div>
+                            @if(updateCertificateAuthorityState.Value.CertificateAuthority != null)
+                            {
+                                <div>
+                                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Subject Name</RadzenText>
+                                    <RadzenTextBox Name="SubjectName" Disabled=true @bind-Value="@updateCertificateAuthorityState.Value.CertificateAuthority.SubjectName" Class="w-100"></RadzenTextBox>
+                                </div>
+                                <div>
+                                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Valid From</RadzenText>
+                                    <RadzenDatePicker Name="ValidFrom" DateFormat="d" Disabled=true @bind-Value="@updateCertificateAuthorityState.Value.CertificateAuthority.StartDateTime" Class="w-100"></RadzenDatePicker>
+                                </div>
+                                <div>
+                                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Valid To</RadzenText>
+                                    <RadzenDatePicker Name="ValidTo" DateFormat="d" Disabled=true @bind-Value="@updateCertificateAuthorityState.Value.CertificateAuthority.EndDateTime" Class="w-100"></RadzenDatePicker>
+                                </div>
+                            }
+                            <div>
+                                <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Primary" Text="Import" Disabled="@(updateCertificateAuthorityState.Value.IsUpdating)" />
+                                <RadzenButton Click=@((args) => SaveCertificateAuthority()) class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Save" Disabled="@(updateCertificateAuthorityState.Value.IsUpdating || updateCertificateAuthorityState.Value.CertificateAuthority == null)" />
+                            </div>
+                        </RadzenTemplateForm>
+                        break;
                 }                
             }
         </RadzenStepsItem>
@@ -102,12 +160,21 @@
         public int NumberOfDays { get; set; } = 365;
     }
 
+    public record ImportCertificateAuthorityForm
+    {
+        public StoreLocation StoreLocation { get; set; } = StoreLocation.LocalMachine;
+        public StoreName StoreName { get; set; } = StoreName.Root;
+        public X509FindType FindType { get; set; } = X509FindType.FindBySubjectName;
+        public string FindValue { get; set; }
+    }
+
     public record AddCertificateAuthorityStore
     {
         public string SubjectName { get; set; } = null!;
     }
 
     AddCertificateAuthorityDB addCertificateAuthorityDB { get; set; } = new AddCertificateAuthorityDB();
+    ImportCertificateAuthorityForm importCertificateAuthorityForm { get; set; } = new ImportCertificateAuthorityForm();
 
     CertificateAuthorityType SelectedCertificateAuthorityType { get; set; } = null;
 
@@ -128,7 +195,7 @@
     public ICollection<CertificateAuthorityType> CertificateAuthorityTypes = new List<CertificateAuthorityType>
     {
         new CertificateAuthorityType { Name = "Generate", ShortDescription = "Generate one Certificate Authority", Description = "Generate one Certificate Authority and store into the database", Source = CertificateAuthoritySources.DB, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/db.png" },
-        new CertificateAuthorityType { Name = "Certificate Store", ShortDescription = "Use Certificate Store", Description = "Use Certificate Authority from the Certificate Store", Source = CertificateAuthoritySources.CERTIFICATESTORE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/certificatestore.png" }
+        new CertificateAuthorityType { Name = "Certificate Store", ShortDescription = "Use Certificate Store", Description = "Use Certificate Authority from your local Certificate Store. <br/> The Certificate must contains a <b>Private Key</b>, it will be used to generate Client Certificate.", Source = CertificateAuthoritySources.CERTIFICATESTORE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/certificatestore.png" }
     };
 
     void SelectCertificateAuthorityType(CertificateAuthorityType type)
@@ -139,6 +206,12 @@
     void GenerateCertificateAuthority(AddCertificateAuthorityDB certificateAuthority)
     {
         var act = new GenerateCertificateAuthorityAction { SubjectName = certificateAuthority.SubjectName, NumberOfDays = certificateAuthority.NumberOfDays };
+        dispatcher.Dispatch(act);
+    }
+
+    void ImportCertificateAuthority(ImportCertificateAuthorityForm certificateAuthority)
+    {
+        var act = new ImportCertificateAuthorityAction { FindType = certificateAuthority.FindType, FindValue = certificateAuthority.FindValue, StoreLocation = certificateAuthority.StoreLocation, StoreName = certificateAuthority.StoreName };
         dispatcher.Dispatch(act);
     }
 

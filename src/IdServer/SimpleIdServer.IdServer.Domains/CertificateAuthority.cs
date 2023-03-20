@@ -13,7 +13,6 @@ namespace SimpleIdServer.IdServer.Domains
         public StoreName? StoreName { get; set; } = null;
         public X509FindType? FindType { get; set; } = null;
         public string? FindValue { get; set; } = null;
-        public string? Password { get; set; } = null;
         public string? PublicKey { get; set; } = null;
         public string? PrivateKey { get; set; } = null;
         public DateTime StartDateTime { get; set; }

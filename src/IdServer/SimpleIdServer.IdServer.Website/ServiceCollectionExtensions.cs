@@ -3,6 +3,7 @@
 using Fluxor;
 using Microsoft.EntityFrameworkCore;
 using Radzen;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -25,6 +26,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddScoped<NotificationService>();
             services.AddScoped<ContextMenuService>();
             services.AddScoped<TooltipService>();
+            services.AddTransient<ICertificateAuthorityStore, CertificateAuthorityStore>();
             return services;
         }
     }

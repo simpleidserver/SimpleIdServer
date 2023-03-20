@@ -1,0 +1,83 @@
+﻿@using Fluxor.Blazor.Web.Components;
+@using SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore;
+@using System.Security.Cryptography.X509Certificates;
+@inherits FluxorComponent
+@inject IState<CertificateAuthorityState> certificateAuthorityState
+@inject IJSRuntime JS
+
+<!-- Name -->
+<div>
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+    <RadzenTextBox Name="Id" @bind-Value="@certificateAuthorityState.Value.CertificateAuthority.SubjectName" Class="w-100" Disabled=true></RadzenTextBox>
+</div>
+<!-- Valid From -->
+<div>
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Valid From</RadzenText>
+    <RadzenDatePicker @bind-Value=@certificateAuthorityState.Value.CertificateAuthority.StartDateTime DateFormat="d" Class="w-100" Disabled=true />
+</div>
+<!-- Valid To -->
+<div>
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Valid To</RadzenText>
+    <RadzenDatePicker @bind-Value=@certificateAuthorityState.Value.CertificateAuthority.EndDateTime DateFormat="d" Class="w-100" Disabled=true />
+</div>
+@switch(certificateAuthorityState.Value.CertificateAuthority.Source)
+{
+    case CertificateAuthoritySources.DB:
+        <!-- Public key-->
+        <div>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Public Key</RadzenText>
+            <RadzenTextArea Rows="10" @bind-Value=@certificateAuthorityState.Value.CertificateAuthority.PublicKey Class="w-100" Disabled=true />
+        </div>
+        <!-- Private key-->
+        <div>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Private Key</RadzenText>
+            <RadzenTextArea Rows="10" @bind-Value=@certificateAuthorityState.Value.CertificateAuthority.PrivateKey Class="w-100" Disabled=true />
+        </div>
+        break;
+    case CertificateAuthoritySources.CERTIFICATESTORE:
+        <!-- Store location -->
+        <div>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Store Location</RadzenText>
+            <RadzenDropDown Name="StoreLocation" Class="w-100"
+                    Data=@Enum.GetValues(typeof(StoreLocation))
+                    TValue="StoreLocation?"
+                    Disabled=true
+                    @bind-Value=@certificateAuthorityState.Value.CertificateAuthority.StoreLocation />
+        </div>
+        <!-- Store name -->
+        <div>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Store Name</RadzenText>
+            <RadzenDropDown Name="StoreName" Class="w-100"
+                    Data=@Enum.GetValues(typeof(StoreName))
+                    TValue="StoreName?"
+                    Disabled=true
+                    @bind-Value=@certificateAuthorityState.Value.CertificateAuthority.StoreName />
+        </div>
+        <!-- Store name -->
+        <div>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Find Type</RadzenText>
+            <RadzenDropDown Name="FindType" Class="w-100"
+                    Data=@Enum.GetValues(typeof(X509FindType))
+                    TValue="X509FindType?"
+                    Disabled=true
+                    @bind-Value=@certificateAuthorityState.Value.CertificateAuthority.FindType />
+        </div>
+        <!-- Find Value -->
+        <div>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Find Value</RadzenText>
+            <RadzenTextBox Name="FindValue" Disabled=true @bind-Value="@certificateAuthorityState.Value.CertificateAuthority.FindValue" Class="w-100"></RadzenTextBox>
+        </div>
+        break;
+}
+
+<RadzenButton class="mt-1" Click=@(a => Download()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="Download" />
+
+@code {
+    async void Download()
+    {
+        var memoryStream = new MemoryStream(certificateAuthorityState.Value.Certificate.Export(X509ContentType.Pkcs12));
+        var fileName = $"{certificateAuthorityState.Value.CertificateAuthority.SubjectName}.pfx";
+        using var streamRef = new DotNetStreamReference(stream: memoryStream);
+        await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+    }
+}

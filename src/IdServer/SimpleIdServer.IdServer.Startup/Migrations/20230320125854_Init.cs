@@ -112,7 +112,6 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     StoreName = table.Column<int>(type: "int", nullable: true),
                     FindType = table.Column<int>(type: "int", nullable: true),
                     FindValue = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PublicKey = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PrivateKey = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     StartDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -423,6 +422,10 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StartDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     PublicKey = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PrivateKey = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CertificateAuthorityId = table.Column<string>(type: "nvarchar(450)", nullable: false)
