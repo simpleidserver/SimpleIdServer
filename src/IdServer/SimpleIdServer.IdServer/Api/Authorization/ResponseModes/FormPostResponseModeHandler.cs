@@ -19,7 +19,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseModes
             {
                 { "redirect_url", authorizationResponse.RedirectUrl }
             };
-            var issuer = context.GetIssuer();
+            var issuer = context.Request.IssuerName;
             var redirectUrl = $"{issuer}/{Constants.EndPoints.Form}{queryBuilder.ToQueryString()}";
             httpContext.Response.Redirect(redirectUrl);            
         }

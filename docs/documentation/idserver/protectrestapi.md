@@ -74,7 +74,7 @@ builder.Services.AddAuthentication(options =>
 })
     .AddJwtBearer(options =>
     {
-        options.Authority = "http://localhost:5001";
+        options.Authority = "https://localhost:5001/master";
         options.RequireHttpsMetadata = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -84,7 +84,7 @@ builder.Services.AddAuthentication(options =>
             },
             ValidIssuers = new List<string>
             {
-                "http://localhost:5001"
+                "https://localhost:5001/master"
             }
         };
     });

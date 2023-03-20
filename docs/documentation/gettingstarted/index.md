@@ -49,16 +49,16 @@ cd ..
 dotnet sln add ./src/IdServer/IdServer.csproj
 ```
 
-Run the `IdServer` project, it must listens on the url `http://localhost:5001`.
+Run the `IdServer` project, it must listens on the url `https://localhost:5001`.
 
 ```
 cd src/IdServer
-dotnet run --urls=http://localhost:5001
+dotnet run --urls=https://localhost:5001
 ```
 
 The IdentityServer is now ready to be used. 
 
-By default, there is one administrator account configured. It is possible to access to his profile by navigating to the url `http://localhost:5001` and authenticate with the following credentials :
+By default, there is one administrator account configured. It is possible to access to his profile by navigating to the url `https://localhost:5001/master` and authenticate with the following credentials :
 * Login : administrator
 * Password : password
 

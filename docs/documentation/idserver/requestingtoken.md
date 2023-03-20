@@ -70,7 +70,7 @@ using (var httpClient = new HttpClient())
         { "client_secret", "password" },
         { "scope", "read" }
     };
-    var tokenResponse = httpClient.PostAsync("http://localhost:5001/token", new FormUrlEncodedContent(form)).Result;
+    var tokenResponse = httpClient.PostAsync("https://localhost:5001/master/token", new FormUrlEncodedContent(form)).Result;
     var json = tokenResponse.Content.ReadAsStringAsync().Result;
     System.Console.WriteLine(json);
 }

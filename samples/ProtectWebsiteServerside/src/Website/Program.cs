@@ -15,7 +15,7 @@ builder.Services.AddAuthentication(options =>
     {
         options.SignInScheme = "Cookies";
         options.ResponseType = "code";
-        options.Authority = "http://localhost:5001/master";
+        options.Authority = "https://localhost:5001/master";
         options.RequireHttpsMetadata = false;
         options.ClientId = "protectedServersideApp";
         options.ClientSecret = "password";
