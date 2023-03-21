@@ -48,7 +48,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
         {
             var before = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"The Back Channel redirection URL is : {BuildUrl(handlerContext.UrlHelper, handlerContext.GetIssuer(), message)}");
+            Console.WriteLine($"The Back Channel redirection URL is : {BuildUrl(handlerContext.UrlHelper, handlerContext.Request.IssuerName, message)}");
             Console.ForegroundColor = before;
             return Task.CompletedTask;
         }

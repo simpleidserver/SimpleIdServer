@@ -183,7 +183,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_IS_EXPIRED);
 
             var diffSeconds = (exp - nbf).TotalSeconds;
-            if (diffSeconds >= _options.MaxRequestLifetime)
+            if (diffSeconds > _options.MaxRequestLifetime)
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.AUTH_REQUEST_MAXIMUM_LIFETIME, _options.MaxRequestLifetime));
 
             if (currentDateTime < nbf)

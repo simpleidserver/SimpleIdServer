@@ -1,12 +1,14 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.Domains;
 using System;
 using System.Collections.Generic;
+using static SimpleIdServer.IdServer.Constants;
 
 namespace SimpleIdServer.IdServer.Builders
 {
@@ -69,30 +71,28 @@ namespace SimpleIdServer.IdServer.Builders
         /// Build external authentication device client.
         /// CIBA is enabled.
         /// </summary>
-        /// <param name="clientId"></param>
-        /// <param name="clietnSecret"></param>
-        /// <param name="redirectUrls"></param>
         /// <returns></returns>
-        public static TraditionalWebsiteClientBuilder BuildExternalAuthDeviceClient(string clientId, string clientSecret, Realm realm = null, params string[] redirectUrls)
+        public static DeviceClientBuilder BuildExternalAuthDeviceClient(string clientId, string subjectName, Realm realm = null)
         {
             var client = new Client
             {
                 Id = Guid.NewGuid().ToString(),
                 ClientId = clientId,
-                ClientSecret = clientSecret,
+                ClientSecret = Guid.NewGuid().ToString(),
                 ClientType = ClientTypes.EXTERNAL,
-                RedirectionUrls = redirectUrls,
+                TlsClientAuthSubjectDN = subjectName,
+                TokenEndPointAuthMethod = OAuthClientTlsClientAuthenticationHandler.AUTH_METHOD,
+                BCTokenDeliveryMode = StandardNotificationModes.Poll,
+                BCAuthenticationRequestSigningAlg = SecurityAlgorithms.EcdsaSha256,
+                IdTokenSignedResponseAlg = SecurityAlgorithms.EcdsaSha256,
+                BCUserCodeParameter = false,
                 CreateDateTime = DateTime.UtcNow,
-                UpdateDateTime = DateTime.UtcNow,
-                ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE }
+                UpdateDateTime = DateTime.UtcNow
             };
             if (realm == null) client.Realms.Add(Constants.StandardRealms.Master);
             else client.Realms.Add(realm);
-            client.GrantTypes.Add(AuthorizationCodeHandler.GRANT_TYPE);
-            client.TokenEndPointAuthMethod = OAuthClientSecretPostAuthenticationHandler.AUTH_METHOD;
-            var result = new TraditionalWebsiteClientBuilder(client);
-            result.EnableCIBAGrantType();
-            return result;
+            client.GrantTypes.Add(CIBAHandler.GRANT_TYPE);
+            return new DeviceClientBuilder(client);
         }
 
         /// <summary>

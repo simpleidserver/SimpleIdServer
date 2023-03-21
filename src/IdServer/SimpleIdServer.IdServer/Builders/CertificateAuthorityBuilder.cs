@@ -3,6 +3,7 @@
 
 using SimpleIdServer.IdServer.Domains;
 using System;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
 namespace SimpleIdServer.IdServer.Builders
@@ -18,16 +19,17 @@ namespace SimpleIdServer.IdServer.Builders
 
         public static CertificateAuthorityBuilder Create(string subjectName, Realm realm = null, int numberOfDays = 365)
         {
-            var ca = KeyGenerator.GenerateCertificateAuthority(subjectName, "password", numberOfDays);
-            var pem = new PemResult(ca.ExportCertificatePem(), ca.GetRSAPrivateKey().ExportRSAPrivateKeyPem());
+            var caResult = KeyGenerator.GenerateCertificateAuthority(subjectName, numberOfDays); 
+            var privateKey = new string(PemEncoding.Write("PRIVATE KEY", caResult.Item2.ExportPkcs8PrivateKey()));
+            var pem = new PemResult(caResult.Item1.ExportCertificatePem(), privateKey);
             var result = new CertificateAuthority
             {
                 Id = Guid.NewGuid().ToString(),
                 PrivateKey = pem.PrivateKey,
                 PublicKey = pem.PublicKey,
                 UpdateDateTime = DateTime.UtcNow,
-                StartDateTime = ca.NotBefore,
-                EndDateTime = ca.NotAfter,
+                StartDateTime = caResult.Item1.NotBefore,
+                EndDateTime = caResult.Item1.NotAfter,
                 Source = CertificateAuthoritySources.DB,
                 SubjectName = subjectName,
             };

@@ -60,27 +60,22 @@ namespace SimpleIdServer.IdServer
             return generatedCert;
         }
 
-        public static X509Certificate2 GenerateCertificateAuthority(string subjectName, string password, int nbValidDays = 365)
+        public static (X509Certificate2, RSA) GenerateCertificateAuthority(string subjectName, int nbValidDays = 365)
         {
-            using (RSA parent = RSA.Create(2048))
-            {
-                CertificateRequest parentReq = new CertificateRequest(
-                    subjectName,
-                    parent,
-                    HashAlgorithmName.SHA256,
-                    RSASignaturePadding.Pkcs1);
-                parentReq.CertificateExtensions.Add(
-                    new X509BasicConstraintsExtension(true, false, 0, true));
+            var parent = RSA.Create(2048);
+            CertificateRequest parentReq = new CertificateRequest(
+                subjectName,
+                parent,
+                HashAlgorithmName.SHA256,
+                RSASignaturePadding.Pkcs1);
+            parentReq.CertificateExtensions.Add(
+                new X509BasicConstraintsExtension(true, false, 0, true));
 
-                parentReq.CertificateExtensions.Add(
-                    new X509SubjectKeyIdentifierExtension(parentReq.PublicKey, false));
-                using (X509Certificate2 parentCert = parentReq.CreateSelfSigned(
+            parentReq.CertificateExtensions.Add(
+                new X509SubjectKeyIdentifierExtension(parentReq.PublicKey, false));
+            return (parentReq.CreateSelfSigned(
                     DateTimeOffset.UtcNow.AddDays(-1),
-                    DateTimeOffset.UtcNow.AddDays(nbValidDays)))
-                {
-                    return new X509Certificate2(parentCert.Export(X509ContentType.Pfx, password), password, X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable);
-                }
-            }
+                    DateTimeOffset.UtcNow.AddDays(nbValidDays)), parent);
         }
 
         public static PemResult GenerateClientCertificate(X509Certificate2 ca, string subjectName, int nbValidDays)

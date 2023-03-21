@@ -142,7 +142,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 var realm = await GetRealm();
                 var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
                 var scopes = await dbContext.Scopes.Include(s => s.Realms).Where(s => (s.Name == Constants.StandardScopes.OpenIdScope.Name || s.Name == Constants.StandardScopes.Profile.Name) && s.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
-                var newClientBuilder = ClientBuilder.BuildExternalAuthDeviceClient(action.ClientId, Guid.NewGuid().ToString(), activeRealm, action.RedirectionUrls.ToArray())
+                var newClientBuilder = ClientBuilder.BuildExternalAuthDeviceClient(action.ClientId, action.SubjectName, activeRealm)
                     .AddScope(scopes.ToArray());
                 if (!string.IsNullOrWhiteSpace(action.ClientName))
                     newClientBuilder.SetClientName(action.ClientName);
@@ -495,9 +495,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
 
     public class AddDeviceApplicationAction
     {
-        public IEnumerable<string> RedirectionUrls { get; set; } = new List<string>();
         public string ClientId { get; set; } = null!;
         public string? ClientName { get; set; } = null;
+        public string SubjectName { get; set; } = null!;
     }
 
     public class AddWsFederationApplicationAction

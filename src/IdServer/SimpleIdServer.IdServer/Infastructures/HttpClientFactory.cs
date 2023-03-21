@@ -12,7 +12,14 @@ namespace SimpleIdServer.IdServer.Infrastructures
 
     public class HttpClientFactory : IHttpClientFactory
     {
-        public HttpClient GetHttpClient() => new HttpClient();
+        public HttpClient GetHttpClient()
+        {
+            var handler = new HttpClientHandler();
+            handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => {
+                return true;
+            };
+            return new HttpClient(handler);
+        }
 
         public HttpClient GetHttpClient(HttpClientHandler handler) => new HttpClient(handler);
     }

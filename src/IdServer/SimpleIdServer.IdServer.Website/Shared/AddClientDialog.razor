@@ -205,13 +205,13 @@
                                 <RadzenTextBox Name="ClientName" @bind-Value="@deviceApplication.ClientName" Class="w-100"></RadzenTextBox>
                             </div>
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Redirection URLs</RadzenText>
-                                <RadzenTextBox Name="RedirectionUris" @bind-Value="@deviceApplication.RedirectionUris" Class="w-100"></RadzenTextBox>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Subject Name</RadzenText>
+                                <RadzenTextBox Name="SubjectName" @bind-Value="@deviceApplication.SubjectName" Class="w-100"></RadzenTextBox>
                                 <p class="text-muted">
-                                    Redirection URLs must be passed as a list of URL separated by <b>;</b>. <br />
-                                    URL must be valid and must not contain fragment for example (http://localhost#fragment)
+                                    By default the client is configured to use MTLS authentication. <br/>
+                                    Subject Name of the client certificate must be specified.
                                 </p>
-                                <RadzenRequiredValidator Component="RedirectionUris" Text="At leat one redirection URL must be specified"></RadzenRequiredValidator>
+                                <RadzenRequiredValidator Component="SubjectName" Text="Subject Name is required"></RadzenRequiredValidator>
                             </div>
                             <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addClientState.Value.IsAdding)" />
                         </RadzenTemplateForm>
@@ -267,7 +267,7 @@
     {
         public string ClientName { get; set; } = null!;
         public string ClientIdentifier { get; set; } = null!;
-        public string RedirectionUris { get; set; } = null!;
+        public string SubjectName { get; set; } = null!;
     }
 
     record WsFederationApplication
@@ -338,6 +338,6 @@
 
     void AddDeviceApplication(DeviceApplication deviceApplication)
     {
-        dispatcher.Dispatch(new AddDeviceApplicationAction { ClientId = deviceApplication.ClientIdentifier, ClientName = deviceApplication.ClientName, RedirectionUrls = deviceApplication.RedirectionUris.Split(';') });
+        dispatcher.Dispatch(new AddDeviceApplicationAction { ClientId = deviceApplication.ClientIdentifier, ClientName = deviceApplication.ClientName, SubjectName = deviceApplication.SubjectName });
     }
 }
