@@ -14,11 +14,15 @@ services:
     image: simpleidserver/idserver:${TAG}
     environment:
       ASPNETCORE_URLS : "https://*:5001"
+      ASPNETCORE_Kestrel__Certificates__Default__Password: "password"
+      ASPNETCORE_Kestrel__Certificates__Default__Path: "/certificates/localhost.pfx"
       ConnectionStrings__IdServer: "Data Source=db;Initial Catalog=IdServer;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"
     ports:
       - "5001:5001"
     depends_on:
       - db
+    volumes:
+      - ./certificates:/certificates
   website:
     build:
       context: .

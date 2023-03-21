@@ -17,9 +17,9 @@ namespace SimpleIdServer.IdServer.Startup
 
         public static ICollection<Scope> Scopes => new List<Scope>
         {
-            Constants.StandardScopes.OpenIdScope,
-            Constants.StandardScopes.Profile,
-            Constants.StandardScopes.SAMLProfile
+            SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope,
+            SimpleIdServer.IdServer.Constants.StandardScopes.Profile,
+            SimpleIdServer.IdServer.Constants.StandardScopes.SAMLProfile
         };
 
         public static ICollection<User> Users => new List<User>
@@ -30,10 +30,10 @@ namespace SimpleIdServer.IdServer.Startup
 
         public static ICollection<Client> Clients => new List<Client>
         {
-            ClientBuilder.BuildTraditionalWebsiteClient("website", "password", null, "https://localhost:5001/signin-oidc", "https://localhost.com:5001/signin-oidc").SetClientName("Website").SetClientLogoUri("https://cdn.logo.com/hotlink-ok/logo-social.png").AddScope(Constants.StandardScopes.OpenIdScope, Constants.StandardScopes.Profile).Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("website", "password", null, "https://localhost:5001/signin-oidc", "https://localhost.com:5001/signin-oidc").SetClientName("Website").SetClientLogoUri("https://cdn.logo.com/hotlink-ok/logo-social.png").AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope, SimpleIdServer.IdServer.Constants.StandardScopes.Profile).Build(),
             WsClientBuilder.BuildWsFederationClient("urn:website").SetClientName("NAME").Build(),
-            ClientBuilder.BuildUserAgentClient("oauth", "password", null, "https://oauth.tools/callback/code").AddScope(Constants.StandardScopes.OpenIdScope, Constants.StandardScopes.Profile).Build(),
-            ClientBuilder.BuildTraditionalWebsiteClient("fapi", "password", null, "https://localhost:8443/test/(.*)").SetIdTokenSignedResponseAlg(SecurityAlgorithms.EcdsaSha256).SetRequestObjectSigning(SecurityAlgorithms.EcdsaSha256).SetSigAuthorizationResponse(SecurityAlgorithms.EcdsaSha256).AddScope(Constants.StandardScopes.OpenIdScope, Constants.StandardScopes.Profile).UseClientTlsAuthentication("CN=sidClient, O=Internet Widgits Pty Ltd, S=BE, C=BE").AddSigningKey(new SigningCredentials(PemImporter.Import(new PemResult("-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEK21CoKCA2Vk5zPM+7+vqtnrq4pIe\nsCLiWObLDFKKf3gJl0hll/ZTI5ww/oRrKIXO/uRe9AkckkKwqrqqXGnvsQ==\n-----END PUBLIC KEY-----", "-----BEGIN EC PRIVATE KEY-----\nMHcCAQEEIDHtu+N0u38ZN7DF/TpycDfaUs8WfPGUB3UusR0uv3TVoAoGCCqGSM49\nAwEHoUQDQgAEK21CoKCA2Vk5zPM+7+vqtnrq4pIesCLiWObLDFKKf3gJl0hll/ZT\nI5ww/oRrKIXO/uRe9AkckkKwqrqqXGnvsQ==\n-----END EC PRIVATE KEY-----"), "keyId"), SecurityAlgorithms.EcdsaSha256), SecurityAlgorithms.EcdsaSha256, SecurityKeyTypes.ECDSA).Build()
+            ClientBuilder.BuildUserAgentClient("oauth", "password", null, "https://oauth.tools/callback/code").AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope, SimpleIdServer.IdServer.Constants.StandardScopes.Profile).Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("fapi", "password", null, "https://localhost:8443/test/(.*)").SetIdTokenSignedResponseAlg(SecurityAlgorithms.EcdsaSha256).SetRequestObjectSigning(SecurityAlgorithms.EcdsaSha256).SetSigAuthorizationResponse(SecurityAlgorithms.EcdsaSha256).AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope, SimpleIdServer.IdServer.Constants.StandardScopes.Profile).UseClientTlsAuthentication("CN=sidClient, O=Internet Widgits Pty Ltd, S=BE, C=BE").AddSigningKey(new SigningCredentials(SimpleIdServer.IdServer.PemImporter.Import(new SimpleIdServer.IdServer.PemResult("-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEK21CoKCA2Vk5zPM+7+vqtnrq4pIe\nsCLiWObLDFKKf3gJl0hll/ZTI5ww/oRrKIXO/uRe9AkckkKwqrqqXGnvsQ==\n-----END PUBLIC KEY-----", "-----BEGIN EC PRIVATE KEY-----\nMHcCAQEEIDHtu+N0u38ZN7DF/TpycDfaUs8WfPGUB3UusR0uv3TVoAoGCCqGSM49\nAwEHoUQDQgAEK21CoKCA2Vk5zPM+7+vqtnrq4pIesCLiWObLDFKKf3gJl0hll/ZT\nI5ww/oRrKIXO/uRe9AkckkKwqrqqXGnvsQ==\n-----END EC PRIVATE KEY-----"), "keyId"), SecurityAlgorithms.EcdsaSha256), SecurityAlgorithms.EcdsaSha256, SecurityKeyTypes.ECDSA).Build()
         };
 
         public static ICollection<UMAResource> Resources = new List<UMAResource>
@@ -62,12 +62,12 @@ namespace SimpleIdServer.IdServer.Startup
 
         public static ICollection<Realm> Realms = new List<Realm>
         {
-            Constants.StandardRealms.Master
+            SimpleIdServer.IdServer.Constants.StandardRealms.Master
         };
 
         public static ICollection<CertificateAuthority> CertificateAuthorities = new List<CertificateAuthority>
         {
-            CertificateAuthorityBuilder.Create("CN=simpleIdServerCA", Constants.StandardRealms.Master).Build()
+            CertificateAuthorityBuilder.Create("CN=simpleIdServerCA", SimpleIdServer.IdServer.Constants.StandardRealms.Master).Build()
         };
     }
 }
