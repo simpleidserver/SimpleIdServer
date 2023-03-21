@@ -27,7 +27,8 @@
                            asp-area=""
                            asp-action="Login"
                            asp-route-scheme="@extProvider.AuthenticationScheme"
-                           asp-route-returnUrl="@Model.ReturnUrl">@extProvider.DisplayName</a>
+                           asp-route-returnUrl="@Model.ReturnUrl"
+                           asp-route-prefix="@Model.Realm">@extProvider.DisplayName</a>
                         </li>
                     }
                 </ul>

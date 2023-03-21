@@ -22,10 +22,18 @@
         href: idserver/protectserversideappfapicompliant.md
       - name: Confidential client use Back Channel Authentication (CIBA)
         href: idserver/confidentialclientciba.md
-- name: Certificate Authorities
+- name: External Identity Providers
+  items:
+   - name: Add Identity Provider
+     href: identityproviders/add.md
+- name: MTLS
   items:
    - name: Generate Certificate Authority
      href: certificateauthorities/generate.md
+   - name: Import Certificate Authority
+     href: certificateauthorities/import.md
+   - name: Generate Client Certificate
+     href: certificateauthorities/clientcertificate.md
 - name: Audit
   items:
    - name: Monitoring

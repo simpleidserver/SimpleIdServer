@@ -1,6 +1,10 @@
 # Protect server-side application compliant with FAPI using ASP.NET CORE
 
-In the SimpleIdServer Administration UI, a Server Side Application compliant with FAPI, for example an ASP.NET CORE website, can easily be created.
+> [!WARNING]
+> A full working example will be described in the next SimpleIdServer release. 
+> At the moment, we describe how to create a confidential client compliant with the FAPI specification.
+
+In the Administration UI, a Server Side Application compliant with FAPI, for example an ASP.NET CORE website, can easily be created.
 
 * Open the IdentityServer website [http://localhost:5002](http://localhost:5002).
 * In the Clients screen, click on `Add client` button.

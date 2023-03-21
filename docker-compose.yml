@@ -13,7 +13,7 @@ services:
       dockerfile: ./IdServer
     image: simpleidserver/idserver:${TAG}
     environment:
-      ASPNETCORE_URLS : "http://*:5001"
+      ASPNETCORE_URLS : "https://*:5001"
       ConnectionStrings__IdServer: "Data Source=db;Initial Catalog=IdServer;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"
     ports:
       - "5001:5001"

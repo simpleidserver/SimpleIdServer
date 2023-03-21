@@ -12,17 +12,18 @@ using SimpleIdServer.Scim.Persistence.EF;
 namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
 {
     [DbContext(typeof(SCIMDbContext))]
-    [Migration("20221210085350_AddIndirectReferences")]
-    partial class AddIndirectReferences
+    [Migration("20230302153749_Init")]
+    partial class Init
     {
+        /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.7")
+                .HasAnnotation("ProductVersion", "7.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("SCIMRepresentationSCIMSchema", b =>
                 {
@@ -64,7 +65,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -106,7 +107,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("IsArray")
                         .HasColumnType("bit");
@@ -249,33 +250,6 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                     b.HasIndex("SchemaAttributeId");
 
                     b.ToTable("SCIMRepresentationAttributeLst");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.Scim.Domains.SCIMRepresentationIndirectReference", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("NbReferences")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SCIMRepresentationId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("TargetAttributeId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TargetReferenceId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SCIMRepresentationId");
-
-                    b.ToTable("SCIMRepresentationIndirectReference");
                 });
 
             modelBuilder.Entity("SimpleIdServer.Scim.Domains.SCIMSchema", b =>
@@ -439,14 +413,6 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                     b.Navigation("SchemaAttribute");
                 });
 
-            modelBuilder.Entity("SimpleIdServer.Scim.Domains.SCIMRepresentationIndirectReference", b =>
-                {
-                    b.HasOne("SimpleIdServer.Scim.Domains.SCIMRepresentation", null)
-                        .WithMany("IndirectReferences")
-                        .HasForeignKey("SCIMRepresentationId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
             modelBuilder.Entity("SimpleIdServer.Scim.Domains.SCIMSchemaAttribute", b =>
                 {
                     b.HasOne("SimpleIdServer.Scim.Domains.SCIMSchema", null)
@@ -478,8 +444,6 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
             modelBuilder.Entity("SimpleIdServer.Scim.Domains.SCIMRepresentation", b =>
                 {
                     b.Navigation("FlatAttributes");
-
-                    b.Navigation("IndirectReferences");
                 });
 
             modelBuilder.Entity("SimpleIdServer.Scim.Domains.SCIMRepresentationAttribute", b =>

@@ -79,7 +79,7 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Name.
+        ///   Recherche une chaîne localisée semblable à NAME.
         /// </summary>
         public static string account_name {
             get {
@@ -169,7 +169,7 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Name.
+        ///   Recherche une chaîne localisée semblable à NAME.
         /// </summary>
         public static string name {
             get {

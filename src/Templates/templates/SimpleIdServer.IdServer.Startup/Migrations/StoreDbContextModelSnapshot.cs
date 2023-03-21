@@ -17,44 +17,164 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.3")
+                .HasAnnotation("ProductVersion", "7.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("ApiResourceRealm", b =>
+                {
+                    b.Property<string>("ApiResourcesId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RealmsName")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("ApiResourcesId", "RealmsName");
+
+                    b.HasIndex("RealmsName");
+
+                    b.ToTable("ApiResourceRealm");
+                });
+
             modelBuilder.Entity("ApiResourceScope", b =>
                 {
-                    b.Property<string>("ApiResourcesName")
+                    b.Property<string>("ApiResourcesId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("ScopesName")
+                    b.Property<string>("ScopesId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("ApiResourcesName", "ScopesName");
+                    b.HasKey("ApiResourcesId", "ScopesId");
 
-                    b.HasIndex("ScopesName");
+                    b.HasIndex("ScopesId");
 
                     b.ToTable("ApiResourceScope");
                 });
 
+            modelBuilder.Entity("AuthenticationContextClassReferenceRealm", b =>
+                {
+                    b.Property<string>("AuthenticationContextClassReferencesName")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RealmsName")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("AuthenticationContextClassReferencesName", "RealmsName");
+
+                    b.HasIndex("RealmsName");
+
+                    b.ToTable("AuthenticationContextClassReferenceRealm");
+                });
+
+            modelBuilder.Entity("AuthenticationSchemeProviderRealm", b =>
+                {
+                    b.Property<string>("AuthenticationSchemeProvidersId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RealmsName")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("AuthenticationSchemeProvidersId", "RealmsName");
+
+                    b.HasIndex("RealmsName");
+
+                    b.ToTable("AuthenticationSchemeProviderRealm");
+                });
+
+            modelBuilder.Entity("CertificateAuthorityRealm", b =>
+                {
+                    b.Property<string>("CertificateAuthoritiesId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RealmsName")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("CertificateAuthoritiesId", "RealmsName");
+
+                    b.HasIndex("RealmsName");
+
+                    b.ToTable("CertificateAuthorityRealm");
+                });
+
+            modelBuilder.Entity("ClientRealm", b =>
+                {
+                    b.Property<string>("ClientsId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RealmsName")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("ClientsId", "RealmsName");
+
+                    b.HasIndex("RealmsName");
+
+                    b.ToTable("ClientRealm");
+                });
+
             modelBuilder.Entity("ClientScope", b =>
                 {
-                    b.Property<string>("ClientsClientId")
+                    b.Property<string>("ClientsId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("ScopesName")
+                    b.Property<string>("ScopesId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("ClientsClientId", "ScopesName");
+                    b.HasKey("ClientsId", "ScopesId");
 
-                    b.HasIndex("ScopesName");
+                    b.HasIndex("ScopesId");
 
                     b.ToTable("ClientScope");
                 });
 
+            modelBuilder.Entity("RealmScope", b =>
+                {
+                    b.Property<string>("RealmsName")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ScopesId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("RealmsName", "ScopesId");
+
+                    b.HasIndex("ScopesId");
+
+                    b.ToTable("RealmScope");
+                });
+
+            modelBuilder.Entity("RealmSerializedFileKey", b =>
+                {
+                    b.Property<string>("RealmsName")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("SerializedFileKeysId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("RealmsName", "SerializedFileKeysId");
+
+                    b.HasIndex("SerializedFileKeysId");
+
+                    b.ToTable("RealmSerializedFileKey");
+                });
+
+            modelBuilder.Entity("RealmUser", b =>
+                {
+                    b.Property<string>("RealmsName")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UsersId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("RealmsName", "UsersId");
+
+                    b.HasIndex("UsersId");
+
+                    b.ToTable("RealmUser");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ApiResource", b =>
                 {
-                    b.Property<string>("Name")
+                    b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("CreateDateTime")
@@ -63,12 +183,66 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("UpdateDateTime")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("Name");
+                    b.HasKey("Id");
 
                     b.ToTable("ApiResources");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuditEvent", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("AuthMethod")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Claims")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClientId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsError")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Realm")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RedirectUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RequestJSON")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Scopes")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AuditEvents");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference", b =>
@@ -94,25 +268,21 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("AuthSchemeProviderDefinitionName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<DateTime>("CreateDateTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DisplayName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("HandlerFullQualifiedName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsEnabled")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OptionsFullQualifiedName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SerializedOptions")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdateDateTime")
@@ -120,7 +290,119 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AuthSchemeProviderDefinitionName");
+
                     b.ToTable("AuthenticationSchemeProviders");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderDefinition", b =>
+                {
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HandlerFullQualifiedName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OptionsFullQualifiedName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Name");
+
+                    b.ToTable("AuthenticationSchemeProviderDefinitions");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderDefinitionProperty", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PropertyName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SchemeProviderDefName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SchemeProviderDefName");
+
+                    b.ToTable("AuthenticationSchemeProviderDefinitionProperty");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderMapper", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("IdProviderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("MapperType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SourceClaimName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TargetUserAttribute")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TargetUserProperty")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdProviderId");
+
+                    b.ToTable("AuthenticationSchemeProviderMapper");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderProperty", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("PropertyName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SchemeProviderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SchemeProviderId");
+
+                    b.ToTable("AuthenticationSchemeProviderProperty");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthorizedScope", b =>
@@ -182,6 +464,10 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<string>("NotificationToken")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Realm")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("RejectionSentDateTime")
                         .HasColumnType("datetime2");
 
@@ -230,6 +516,50 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.ToTable("BCAuthorizeHistory");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.CertificateAuthority", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("EndDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("FindType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FindValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PrivateKey")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PublicKey")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Source")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("StartDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("StoreLocation")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("StoreName")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SubjectName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CertificateAuthorities");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ClaimProvider", b =>
                 {
                     b.Property<string>("Id")
@@ -253,9 +583,8 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Client", b =>
                 {
-                    b.Property<string>("ClientId")
-                        .HasColumnType("nvarchar(450)")
-                        .HasAnnotation("Relational:JsonPropertyName", "client_id");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ApplicationType")
                         .HasColumnType("nvarchar(max)")
@@ -263,6 +592,18 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
                     b.Property<int>("AuthReqIdExpirationTimeInSeconds")
                         .HasColumnType("int");
+
+                    b.Property<string>("AuthorizationEncryptedResponseAlg")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "authorization_encrypted_response_alg");
+
+                    b.Property<string>("AuthorizationEncryptedResponseEnc")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "authorization_encrypted_response_enc");
+
+                    b.Property<string>("AuthorizationSignedResponseAlg")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "authorization_signed_response_alg");
 
                     b.Property<string>("BCAuthenticationRequestSigningAlg")
                         .HasColumnType("nvarchar(max)")
@@ -290,6 +631,11 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<string>("BackChannelLogoutUri")
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "backchannel_logout_uri");
+
+                    b.Property<string>("ClientId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "client_id");
 
                     b.Property<string>("ClientSecret")
                         .IsRequired()
@@ -486,9 +832,46 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "userinfo_signed_response_alg");
 
-                    b.HasKey("ClientId");
+                    b.HasKey("Id");
 
                     b.ToTable("Clients");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ClientCertificate", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CertificateAuthorityId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("EndDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PrivateKey")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PublicKey")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("StartDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CertificateAuthorityId");
+
+                    b.ToTable("ClientCertificate");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ClientJsonWebKey", b =>
@@ -544,7 +927,11 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<DateTime>("CreateDateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ScopeName")
+                    b.Property<string>("Realm")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ScopeId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Scopes")
@@ -557,7 +944,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ScopeName");
+                    b.HasIndex("ScopeId");
 
                     b.HasIndex("UserId");
 
@@ -592,9 +979,28 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.ToTable("Grants");
                 });
 
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Scope", b =>
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Realm", b =>
                 {
                     b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Name");
+
+                    b.ToTable("Realms");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Scope", b =>
+                {
+                    b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("CreateDateTime")
@@ -606,6 +1012,10 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<bool>("IsExposedInConfigurationEdp")
                         .HasColumnType("bit");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Protocol")
                         .HasColumnType("int");
 
@@ -615,10 +1025,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<DateTime>("UpdateDateTime")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("Name");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
+                    b.HasKey("Id");
 
                     b.ToTable("Scopes");
                 });
@@ -641,7 +1048,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<string>("SAMLAttributeName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ScopeName")
+                    b.Property<string>("ScopeId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
@@ -677,9 +1084,52 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ScopeName");
+                    b.HasIndex("ScopeId");
 
                     b.ToTable("ScopeClaimMapper");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.SerializedFileKey", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Alg")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Enc")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsSymmetric")
+                        .HasColumnType("bit");
+
+                    b.Property<byte[]>("Key")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("KeyId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PrivateKeyPem")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PublicKeyPem")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Usage")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SerializedFileKeys");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Token", b =>
@@ -769,6 +1219,10 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<string>("Owner")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Realm")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Requester")
                         .HasColumnType("nvarchar(max)");
 
@@ -843,6 +1297,10 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<string>("IconUri")
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "icon_uri");
+
+                    b.Property<string>("Realm")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Scopes")
                         .IsRequired()
@@ -1087,6 +1545,10 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<DateTime>("ExpirationDateTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Realm")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("State")
                         .HasColumnType("int");
 
@@ -1116,17 +1578,92 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.ToTable("TranslationUMAResource");
                 });
 
+            modelBuilder.Entity("ApiResourceRealm", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.ApiResource", null)
+                        .WithMany()
+                        .HasForeignKey("ApiResourcesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Realm", null)
+                        .WithMany()
+                        .HasForeignKey("RealmsName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("ApiResourceScope", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.ApiResource", null)
                         .WithMany()
-                        .HasForeignKey("ApiResourcesName")
+                        .HasForeignKey("ApiResourcesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SimpleIdServer.IdServer.Domains.Scope", null)
                         .WithMany()
-                        .HasForeignKey("ScopesName")
+                        .HasForeignKey("ScopesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("AuthenticationContextClassReferenceRealm", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference", null)
+                        .WithMany()
+                        .HasForeignKey("AuthenticationContextClassReferencesName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Realm", null)
+                        .WithMany()
+                        .HasForeignKey("RealmsName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("AuthenticationSchemeProviderRealm", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProvider", null)
+                        .WithMany()
+                        .HasForeignKey("AuthenticationSchemeProvidersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Realm", null)
+                        .WithMany()
+                        .HasForeignKey("RealmsName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("CertificateAuthorityRealm", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.CertificateAuthority", null)
+                        .WithMany()
+                        .HasForeignKey("CertificateAuthoritiesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Realm", null)
+                        .WithMany()
+                        .HasForeignKey("RealmsName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ClientRealm", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Client", null)
+                        .WithMany()
+                        .HasForeignKey("ClientsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Realm", null)
+                        .WithMany()
+                        .HasForeignKey("RealmsName")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -1135,15 +1672,104 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.Client", null)
                         .WithMany()
-                        .HasForeignKey("ClientsClientId")
+                        .HasForeignKey("ClientsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SimpleIdServer.IdServer.Domains.Scope", null)
                         .WithMany()
-                        .HasForeignKey("ScopesName")
+                        .HasForeignKey("ScopesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("RealmScope", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Realm", null)
+                        .WithMany()
+                        .HasForeignKey("RealmsName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Scope", null)
+                        .WithMany()
+                        .HasForeignKey("ScopesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("RealmSerializedFileKey", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Realm", null)
+                        .WithMany()
+                        .HasForeignKey("RealmsName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SimpleIdServer.IdServer.Domains.SerializedFileKey", null)
+                        .WithMany()
+                        .HasForeignKey("SerializedFileKeysId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("RealmUser", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Realm", null)
+                        .WithMany()
+                        .HasForeignKey("RealmsName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SimpleIdServer.IdServer.Domains.User", null)
+                        .WithMany()
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProvider", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderDefinition", "AuthSchemeProviderDefinition")
+                        .WithMany("AuthSchemeProviders")
+                        .HasForeignKey("AuthSchemeProviderDefinitionName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AuthSchemeProviderDefinition");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderDefinitionProperty", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderDefinition", "SchemeProviderDef")
+                        .WithMany("Properties")
+                        .HasForeignKey("SchemeProviderDefName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SchemeProviderDef");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderMapper", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProvider", "IdProvider")
+                        .WithMany("Mappers")
+                        .HasForeignKey("IdProviderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("IdProvider");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderProperty", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProvider", "SchemeProvider")
+                        .WithMany("Properties")
+                        .HasForeignKey("SchemeProviderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SchemeProvider");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthorizedScope", b =>
@@ -1162,6 +1788,17 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ClientCertificate", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.CertificateAuthority", "CertificateAuthority")
+                        .WithMany("ClientCertificates")
+                        .HasForeignKey("CertificateAuthorityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CertificateAuthority");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ClientJsonWebKey", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.Client", null)
@@ -1174,7 +1811,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.Scope", null)
                         .WithMany("Consents")
-                        .HasForeignKey("ScopeName");
+                        .HasForeignKey("ScopeId");
 
                     b.HasOne("SimpleIdServer.IdServer.Domains.User", "User")
                         .WithMany("Consents")
@@ -1189,7 +1826,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.Scope", "Scope")
                         .WithMany("ClaimMappers")
-                        .HasForeignKey("ScopeName")
+                        .HasForeignKey("ScopeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1309,9 +1946,28 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProvider", b =>
+                {
+                    b.Navigation("Mappers");
+
+                    b.Navigation("Properties");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderDefinition", b =>
+                {
+                    b.Navigation("AuthSchemeProviders");
+
+                    b.Navigation("Properties");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.BCAuthorize", b =>
                 {
                     b.Navigation("Histories");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.CertificateAuthority", b =>
+                {
+                    b.Navigation("ClientCertificates");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Client", b =>
