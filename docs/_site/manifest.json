@@ -5,6 +5,153 @@
   "files": [
     {
       "type": "Conceptual",
+      "source_relative_path": "documentation/auditing/adminui.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/auditing/adminui.html",
+          "hash": "CHw8kT7PFVe+matFMTymDpUNEpOQaK8qUnI1ArctxkQ="
+        }
+      },
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/auditing/images/monitoring-1.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/auditing/images/monitoring-1.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/certificateauthorities/clientcertificate.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/certificateauthorities/clientcertificate.html",
+          "hash": "P+by2UKnEhYIXf9tW+QShnNP465NZ3gGLYX63R00+2g="
+        }
+      },
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/certificateauthorities/generate.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/certificateauthorities/generate.html",
+          "hash": "b4x4PLb7RoPKa9ocwJBRHKjWXL/SV9B0rALcJFk5j+Q="
+        }
+      },
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/certificateauthorities/images/clientcert-1.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/certificateauthorities/images/clientcert-1.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/certificateauthorities/images/clientcert-2.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/certificateauthorities/images/clientcert-2.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/certificateauthorities/images/clientcert-3.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/certificateauthorities/images/clientcert-3.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/certificateauthorities/images/generate-1.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/certificateauthorities/images/generate-1.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/certificateauthorities/images/generate-2.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/certificateauthorities/images/generate-2.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/certificateauthorities/images/generate-3.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/certificateauthorities/images/generate-3.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/certificateauthorities/images/import-1.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/certificateauthorities/images/import-1.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/certificateauthorities/images/import-2.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/certificateauthorities/images/import-2.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/certificateauthorities/import.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/certificateauthorities/import.html",
+          "hash": "vNNP4BUZ9pPB18PxQ0UgsxaGuEd6zBySfAJY0i7pIYs="
+        }
+      },
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "documentation/certifications/index.md",
       "output": {
         ".html": {
@@ -12,7 +159,7 @@
           "hash": "Ra9PZVcLqFM/6jOLMH0JOlmIF6WypTxnxjJ+lIKGHwM="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -43,7 +190,63 @@
       "output": {
         ".html": {
           "relative_path": "documentation/gettingstarted/index.html",
-          "hash": "gkH3A/f/CWfNLAlcrGsCo2poaTtlIOpH1kizVBmctp4="
+          "hash": "JYkxMkT5nFVKYctZu3iFcgEBPEkMSvvTlh6E5zjyWIE="
+        }
+      },
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/identityproviders/add.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/identityproviders/add.html",
+          "hash": "RmJmOSrH5XKERyl2EPhYitIwUZ75fKQ+kbWf6wd1LPY="
+        }
+      },
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/identityproviders/images/add-1.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/identityproviders/images/add-1.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/identityproviders/images/add-2.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/identityproviders/images/add-2.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/identityproviders/images/add-3.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/identityproviders/images/add-3.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/identityproviders/images/add-4.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/identityproviders/images/add-4.png"
         }
       },
       "is_incremental": false,
@@ -56,6 +259,106 @@
         ".html": {
           "relative_path": "documentation/idserver/authentication.html",
           "hash": "ON4Go2yXv8G3Zqyf1XimVPHpWbEFmTpvBsm8wKRG/LM="
+        }
+      },
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/idserver/confidentialclientciba.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/idserver/confidentialclientciba.html",
+          "hash": "KGyDx/fMKdLBL7NAZJn7hYc2Cx4l9Dyp3DJxYZYsd88="
+        }
+      },
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/idserver/images/ciba-1.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/idserver/images/ciba-1.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/idserver/images/ciba-2.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/idserver/images/ciba-2.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/idserver/images/ciba-3.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/idserver/images/ciba-3.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/idserver/images/ciba-4.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/idserver/images/ciba-4.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/idserver/images/ciba-5.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/idserver/images/ciba-5.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/idserver/images/ciba-6.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/idserver/images/ciba-6.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/idserver/images/fapi-1.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/idserver/images/fapi-1.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/idserver/images/fapi-2.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/idserver/images/fapi-2.png"
         }
       },
       "is_incremental": false,
@@ -173,6 +476,28 @@
     },
     {
       "type": "Resource",
+      "source_relative_path": "documentation/idserver/images/realm-1.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/idserver/images/realm-1.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/idserver/images/realm-2.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/idserver/images/realm-2.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
       "source_relative_path": "documentation/idserver/images/spa-1.png",
       "output": {
         "resource": {
@@ -224,7 +549,7 @@
           "hash": "XWsqYom3vAbatOy0iHwLtZLRmZAxvtaFChB3NiQzwzg="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -233,10 +558,10 @@
       "output": {
         ".html": {
           "relative_path": "documentation/idserver/protectrestapi.html",
-          "hash": "qaLy5Xbjygc/ZiXQoIwoh5lE5YF9dmB6Q3a1/qjhPGw="
+          "hash": "JHngYZGvWk3sMt+KgPKB129lKVEAMSvtfUQutRE3Rig="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -245,10 +570,22 @@
       "output": {
         ".html": {
           "relative_path": "documentation/idserver/protectserversideapp.html",
-          "hash": "xWDk8vYd0QW9EVoGUufSwOr1Y/mi5xfQjqH2twC2jsg="
+          "hash": "WhDiM+0kYZL2Zd2CgctTKT070Pp7XghGcDVftGeu1Ks="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/idserver/protectserversideappfapicompliant.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/idserver/protectserversideappfapicompliant.html",
+          "hash": "Hbngl76lH/bj8EPhbCIDNBF2vGIOeJOlLSP0qhxeKns="
+        }
+      },
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -257,10 +594,22 @@
       "output": {
         ".html": {
           "relative_path": "documentation/idserver/protectspa.html",
-          "hash": "XJBXm3AZyRymQ9n0R4R69jrHM7waX4GnDoiQCTTQlOc="
+          "hash": "tXi2Y72F1ijGXETexIfW4vm2zsTXT1IFF8znV5f1SPk="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/idserver/realm.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/idserver/realm.html",
+          "hash": "zgFkp0X4iHuSiZ1NdoLx49B2nCzGpLdxZA0rYUdwevI="
+        }
+      },
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -269,10 +618,10 @@
       "output": {
         ".html": {
           "relative_path": "documentation/idserver/requestingtoken.html",
-          "hash": "HP3Gn4sJAa0s1FqQlpJq2eif+wr0YreYah0lW6O1Ylg="
+          "hash": "xqYO1Woxisrp5KhWr11rHtX3otn6DWh7NlsXmA/EnlE="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -281,7 +630,7 @@
       "output": {
         ".html": {
           "relative_path": "documentation/toc.html",
-          "hash": "6/4xDBG3KhMGrcwGmDyyiiwhdMGAqaqj2RlJiIHUcVM="
+          "hash": "Qdm8Pz2Ue85FmcsSZvC2eRCzPcv1Ldsv4FdoGmjtFNk="
         }
       },
       "is_incremental": false,
@@ -296,7 +645,7 @@
           "hash": "XbubQEyojxQdYI1tmzH/WSfRV76uoAEayCB6iBeoczI="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -326,19 +675,17 @@
   "incremental_info": [
     {
       "status": {
-        "can_incremental": false,
-        "details": "Cannot build incrementally because last build info is missing.",
+        "can_incremental": true,
         "incrementalPhase": "build",
         "total_file_count": 0,
-        "skipped_file_count": 0,
-        "full_build_reason_code": "NoAvailableBuildCache"
+        "skipped_file_count": 0
       },
       "processors": {
         "ConceptualDocumentProcessor": {
-          "can_incremental": false,
+          "can_incremental": true,
           "incrementalPhase": "build",
-          "total_file_count": 9,
-          "skipped_file_count": 0
+          "total_file_count": 17,
+          "skipped_file_count": 17
         },
         "ResourceDocumentProcessor": {
           "can_incremental": false,
@@ -358,8 +705,8 @@
     },
     {
       "status": {
-        "can_incremental": false,
-        "details": "Cannot support incremental post processing, the reason is: last post processor info is null.",
+        "can_incremental": true,
+        "details": "Can support incremental post processing.",
         "incrementalPhase": "postProcessing",
         "total_file_count": 0,
         "skipped_file_count": 0

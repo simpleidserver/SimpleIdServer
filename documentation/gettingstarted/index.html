@@ -122,12 +122,12 @@ dotnet new idserver -n IdServer --connectionString &quot;Data Source=.;Initial C
 <pre><code>cd ..
 dotnet sln add ./src/IdServer/IdServer.csproj
 </code></pre>
-<p>Run the <code>IdServer</code> project, it must listens on the url <code>http://localhost:5001</code>.</p>
+<p>Run the <code>IdServer</code> project, it must listens on the url <code>https://localhost:5001</code>.</p>
 <pre><code>cd src/IdServer
-dotnet run --urls=http://localhost:5001
+dotnet run --urls=https://localhost:5001
 </code></pre>
 <p>The IdentityServer is now ready to be used.</p>
-<p>By default, there is one administrator account configured. It is possible to access to his profile by navigating to the url <code>http://localhost:5001</code> and authenticate with the following credentials :</p>
+<p>By default, there is one administrator account configured. It is possible to access to his profile by navigating to the url <code>https://localhost:5001/master</code> and authenticate with the following credentials :</p>
 <ul>
 <li>Login : administrator</li>
 <li>Password : password</li>
@@ -190,7 +190,7 @@ psake dockerUp
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/master/docs/documentation/gettingstarted/index.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/release/v3.0.2/docs/documentation/gettingstarted/index.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>

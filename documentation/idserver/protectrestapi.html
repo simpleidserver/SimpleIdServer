@@ -132,7 +132,7 @@ dotnet sln add ./src/ShopApi/ShopApi.csproj
 })
     .AddJwtBearer(options =&gt;
     {
-        options.Authority = &quot;http://localhost:5001&quot;;
+        options.Authority = &quot;https://localhost:5001/master&quot;;
         options.RequireHttpsMetadata = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -142,7 +142,7 @@ dotnet sln add ./src/ShopApi/ShopApi.csproj
             },
             ValidIssuers = new List&lt;string&gt;
             {
-                &quot;http://localhost:5001&quot;
+                &quot;https://localhost:5001/master&quot;
             }
         };
     });
@@ -161,7 +161,7 @@ builder.Services.AddAuthorization(b =&gt;
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/master/docs/documentation/idserver/protectrestapi.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/release/v3.0.2/docs/documentation/idserver/protectrestapi.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>
