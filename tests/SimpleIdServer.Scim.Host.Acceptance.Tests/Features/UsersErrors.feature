@@ -627,6 +627,7 @@ Scenario: Error is returned when endpoint is unknown
 	Then HTTP status code equals to '404'
 	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
 	Then JSON 'detail'='Endpoint not found'
+	Then JSON 'scimType'='unknown'
 
 Scenario: Error is returned when name is empty (HTTP PATCH)
 	When execute HTTP POST JSON request 'http://localhost/Users'
