@@ -403,6 +403,15 @@ namespace SimpleIdServer.Scim.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Readonly Attributes {0} cannot be removed.
+        /// </summary>
+        public static string ReadOnlyAttributesCannotBeRemoved {
+            get {
+                return ResourceManager.GetString("ReadOnlyAttributesCannotBeRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à references {0} don&apos;t exist.
         /// </summary>
         public static string ReferencesDontExist {
@@ -426,6 +435,15 @@ namespace SimpleIdServer.Scim.Resources {
         public static string RequiredAttributesAreMissing {
             get {
                 return ResourceManager.GetString("RequiredAttributesAreMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Required Attributes {0} cannot be removed.
+        /// </summary>
+        public static string RequiredAttributesCannotBeRemoved {
+            get {
+                return ResourceManager.GetString("RequiredAttributesCannotBeRemoved", resourceCulture);
             }
         }
         

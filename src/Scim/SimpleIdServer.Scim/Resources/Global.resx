@@ -231,6 +231,9 @@
   <data name="PropertyCannotContainsArray" xml:space="preserve">
     <value>Property {0} cannot contains an array</value>
   </data>
+  <data name="ReadOnlyAttributesCannotBeRemoved" xml:space="preserve">
+    <value>Readonly Attributes {0} cannot be removed</value>
+  </data>
   <data name="ReferencesDontExist" xml:space="preserve">
     <value>references {0} don't exist</value>
   </data>
@@ -239,6 +242,9 @@
   </data>
   <data name="RequiredAttributesAreMissing" xml:space="preserve">
     <value>required attributes {0} are missing</value>
+  </data>
+  <data name="RequiredAttributesCannotBeRemoved" xml:space="preserve">
+    <value>Required Attributes {0} cannot be removed</value>
   </data>
   <data name="RequiredSchemasAreMissing" xml:space="preserve">
     <value>the required schemas {0} are missing</value>

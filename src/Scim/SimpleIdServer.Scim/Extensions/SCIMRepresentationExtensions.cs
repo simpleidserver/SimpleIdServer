@@ -299,6 +299,14 @@ namespace SimpleIdServer.Scim.Domain
                                 attributes = attributes.Where(a => excludedAttributes.Any(ea => ea.IsSimilar(a, true))).ToList();
                             }
 
+                            var removedRequiredAttributes = attributes.Where(a => a.SchemaAttribute.Required);
+                            if(removedRequiredAttributes.Any())
+                                throw new SCIMImmutableAttributeException(string.Format(string.Format(Global.RequiredAttributesCannotBeRemoved, string.Join(",", removedRequiredAttributes.Select(r => r.FullPath)))));
+
+                            var removedReadOnlyAttributes = attributes.Where(a => a.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.READONLY);
+                            if (removedReadOnlyAttributes.Any())
+                                throw new SCIMImmutableAttributeException(string.Format(string.Format(Global.ReadOnlyAttributesCannotBeRemoved, string.Join(",", removedReadOnlyAttributes.Select(r => r.FullPath)))));
+
                             removeCallback(attributes);
                         }
                         break;

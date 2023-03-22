@@ -641,6 +641,11 @@ namespace SimpleIdServer.Scim.Api
             {
                 return this.BuildError(HttpStatusCode.NotFound, ex.Message, SCIMConstants.ErrorSCIMTypes.Unknown);
             }
+            catch (SCIMImmutableAttributeException ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return this.BuildError(HttpStatusCode.BadRequest, ex.Message, SCIMConstants.ErrorSCIMTypes.Mutability);
+            }
             catch (SCIMSchemaNotFoundException ex)
             {
                 _logger.LogError(ex, ex.Message);
