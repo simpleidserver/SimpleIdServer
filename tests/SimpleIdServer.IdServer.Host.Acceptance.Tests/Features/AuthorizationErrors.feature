@@ -1,5 +1,43 @@
 ﻿Feature: AuthorizationErrors
-	Check errors returned by the authorization endpoint
+	Check errors returned by the authorization endpoint	
+	
+Scenario: Request Uri must be valid
+	Given authenticate a user
+	When execute HTTP GET request 'http://localhost/authorization'
+	| Key         | Value                                       |
+	| client_id   | fortyClient                                 |
+	| request_uri | urn:ietf:params:oauth:request_uri:invalid   |
+	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '400'
+	Then JSON 'error'='invalid_request'
+	Then JSON 'error_description'='the request_uri is invalid'
+	
+Scenario: Response Type is required
+	Given authenticate a user
+	When execute HTTP GET request 'http://localhost/authorization'
+	| Key         | Value       |
+	| client_id   | fortyClient |
+	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '400'
+	Then JSON 'error'='invalid_request'
+	Then JSON 'error_description'='missing parameter response_type'
+	
+Scenario: Response Type must be supported
+	Given authenticate a user
+	When execute HTTP GET request 'http://localhost/authorization'
+	| Key           | Value       |
+	| client_id     | fortyClient |
+	| response_type | invalid     |
+	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '400'
+	Then JSON 'error'='unsupported_response_type'
+	Then JSON 'error_description'='missing response types invalid'
 
 Scenario: Check redirect_uri is valid
 	Given authenticate a user

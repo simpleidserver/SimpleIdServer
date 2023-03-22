@@ -1,7 +1,7 @@
-﻿
-// Copyright (c) SimpleIdServer. All rights reserved.
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
 using SimpleIdServer.IdServer.Api.Authorization.Validators;
@@ -14,7 +14,6 @@ using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -31,40 +30,31 @@ namespace SimpleIdServer.IdServer.Api.Authorization
 
     public class AuthorizationRequestHandler : IAuthorizationRequestHandler
     {
-        private readonly IEnumerable<IResponseTypeHandler> _responseTypeHandlers;
-        private readonly IEnumerable<IAuthorizationRequestValidator> _authorizationRequestValidators;
+        private readonly IAuthorizationRequestValidator _validator;
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IAuthorizationRequestEnricher _authorizationRequestEnricher;
-        private readonly IClientRepository _clientRepository;
         private readonly IUserRepository _userRepository;
-        private readonly IGrantHelper _grantHelper;
         private readonly IGrantRepository _grantRepository;
         private readonly ITokenRepository _tokenRepository;
-        private readonly IAuthenticationHelper _userHelper;
+        private readonly IDistributedCache _distributedCache;
         private readonly IdServerHostOptions _options;
 
-        public AuthorizationRequestHandler(IEnumerable<IResponseTypeHandler> responseTypeHandlers,
-            IEnumerable<IAuthorizationRequestValidator> authorizationRequestValidators,
+        public AuthorizationRequestHandler(IAuthorizationRequestValidator validator,
             IEnumerable<ITokenProfile> tokenProfiles, 
             IAuthorizationRequestEnricher authorizationRequestEnricher,
-            IClientRepository clientRepository,
             IUserRepository userRepository,
-            IGrantHelper grantHelper,
             IGrantRepository grantRepository,
             ITokenRepository tokenRepository,
-            IAuthenticationHelper userHelper,
+            IDistributedCache distributedCache,
             IOptions<IdServerHostOptions> options)
         {
-            _responseTypeHandlers = responseTypeHandlers;
-            _authorizationRequestValidators = authorizationRequestValidators;
+            _validator = validator;
             _tokenProfiles = tokenProfiles;
             _authorizationRequestEnricher = authorizationRequestEnricher;
-            _clientRepository = clientRepository;
             _userRepository = userRepository;
-            _grantHelper = grantHelper;
             _grantRepository = grantRepository;
             _tokenRepository = tokenRepository;
-            _userHelper = userHelper;
+            _distributedCache = distributedCache;
             _options = options.Value;
         }
 
@@ -100,16 +90,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
 
         protected async Task<AuthorizationResponse> BuildResponse(HandlerContext context, CancellationToken cancellationToken)
         {
-            var requestedResponseTypes = context.Request.RequestData.GetResponseTypesFromAuthorizationRequest();
-            if (!requestedResponseTypes.Any())
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.ResponseType));
-
-            var responseTypeHandlers = _responseTypeHandlers.Where(r => requestedResponseTypes.Contains(r.ResponseType));
-            var unsupportedResponseType = requestedResponseTypes.Where(r => !_responseTypeHandlers.Any(rh => rh.ResponseType == r));
-            if (unsupportedResponseType.Any())
-                throw new OAuthException(ErrorCodes.UNSUPPORTED_RESPONSE_TYPE, string.Format(ErrorMessages.MISSING_RESPONSE_TYPES, string.Join(" ", unsupportedResponseType)));
-
-            context.SetClient(await AuthenticateClient(context.Realm, context.Request.RequestData, cancellationToken));
+            var validationResult = await _validator.ValidateAuthorizationRequest(context, cancellationToken);
             var user = await _userRepository.Query()
                 .Include(u => u.Consents)
                 .Include(u => u.Sessions)
@@ -118,13 +99,9 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                 .AsNoTracking()
                 .SingleOrDefaultAsync(u => u.Name == context.Request.UserSubject && u.Realms.Any(r => r.Name == context.Realm), cancellationToken);
             context.SetUser(user);
-            var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
-            var resources = context.Request.RequestData.GetResourcesFromAuthorizationRequest();
-            var grantRequest = await _grantHelper.Extract(context.Realm ?? Constants.DefaultRealm, scopes, resources, cancellationToken);
-
-            foreach (var validator in _authorizationRequestValidators)
-                await validator.Validate(grantRequest, context, cancellationToken);
-
+            var grantRequest = validationResult.GrantRequest;
+            var responseTypeHandlers = validationResult.ResponseTypes;
+            await _validator.ValidateAuthorizationRequestWhenUserIsAuthenticated(grantRequest, context, cancellationToken);
             var state = context.Request.RequestData.GetStateFromAuthorizationRequest();
             var redirectUri = context.Request.RequestData.GetRedirectUriFromAuthorizationRequest();
             if (!string.IsNullOrWhiteSpace(state))
@@ -197,27 +174,6 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                     _tokenRepository.Remove(t);
                 await _tokenRepository.SaveChanges(cancellationToken);
             }
-        }
-
-        private async Task<Client> AuthenticateClient(string realm, JsonObject jObj, CancellationToken cancellationToken)
-        {
-            var clientId = jObj.GetClientIdFromAuthorizationRequest();
-            if (string.IsNullOrWhiteSpace(clientId))
-            {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.ClientId));
-            }
-
-            var client = await _clientRepository.Query().Include(c => c.Scopes).ThenInclude(s => s.ClaimMappers)
-                .Include(c => c.SerializedJsonWebKeys)
-                .Include(c => c.Realms)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == realm), cancellationToken);
-            if (client == null)
-            {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));
-            }
-
-            return client;
         }
 
         private string BuildSessionState(HandlerContext handlerContext)

@@ -20,6 +20,8 @@ namespace SimpleIdServer.IdServer.Authenticate
     public interface IAuthenticateClient
     {
         Task<Client> Authenticate(AuthenticateInstruction authenticateIsnstruction, string issuerName, CancellationToken cancellationToken, bool isAuthorizationCodeGrantType = false, string errorCode = ErrorCodes.INVALID_CLIENT);
+        bool TryGetClientId(AuthenticateInstruction instruction, out string clientId);
+
     }
 
     public class AuthenticateClient : IAuthenticateClient
@@ -79,19 +81,6 @@ namespace SimpleIdServer.IdServer.Authenticate
             return client;
         }
 
-        private bool TryGetClientId(AuthenticateInstruction instruction, out string clientId)
-        {
-            clientId = null;
-            if (TryExtractClientIdFromClientAssertion(instruction, out clientId)) return true;
-
-            clientId = instruction.ClientIdFromAuthorizationHeader;
-            if (!string.IsNullOrWhiteSpace(clientId)) return true;
-            
-            clientId = instruction.ClientIdFromHttpRequestBody;
-            if (!string.IsNullOrWhiteSpace(clientId)) return true;
-            return false;
-        }
-
         public bool TryExtractClientIdFromClientAssertion(AuthenticateInstruction instruction, out string clientId)
         {
             clientId = null;
@@ -104,6 +93,19 @@ namespace SimpleIdServer.IdServer.Authenticate
             if (!parser.TryExtractClientId(clientAssertion, out clientId)) return false;
             if (string.IsNullOrWhiteSpace(clientId)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.CLIENT_ID_CANNOT_BE_EXTRACTED_FROM_CLIENT_ASSERTION);
             return true;
+        }
+
+        public bool TryGetClientId(AuthenticateInstruction instruction, out string clientId)
+        {
+            clientId = null;
+            if (TryExtractClientIdFromClientAssertion(instruction, out clientId)) return true;
+
+            clientId = instruction.ClientIdFromAuthorizationHeader;
+            if (!string.IsNullOrWhiteSpace(clientId)) return true;
+            
+            clientId = instruction.ClientIdFromHttpRequestBody;
+            if (!string.IsNullOrWhiteSpace(clientId)) return true;
+            return false;
         }
     }
 }

@@ -45,12 +45,10 @@ namespace SimpleIdServer.IdServer.Helpers
     public class GrantHelper : IGrantHelper
     {
         private readonly IApiResourceRepository _apiResourceRepository;
-        private readonly IClientRepository _clientRepository;
 
-        public GrantHelper(IApiResourceRepository apiResourceRepository, IClientRepository clientRepository)
+        public GrantHelper(IApiResourceRepository apiResourceRepository)
         {
             _apiResourceRepository = apiResourceRepository;
-            _clientRepository = clientRepository;
         }
 
         public async Task<GrantRequest> Extract(string realm, IEnumerable<string> scopes, IEnumerable<string> resources, CancellationToken cancellationToken)

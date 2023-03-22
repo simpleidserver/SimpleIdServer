@@ -1,13 +1,16 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
+using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +23,9 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
 {
     public class OAuthAuthorizationRequestValidator : IAuthorizationRequestValidator
     {
+        private readonly IEnumerable<IResponseTypeHandler> _responseTypeHandlers;
+        private readonly IClientRepository _clientRepository;
+        private readonly IGrantHelper _grantHelper;
         private readonly IAmrHelper _amrHelper;
         private readonly IExtractRequestHelper _extractRequestHelper;
         private readonly IEnumerable<IOAuthResponseMode> _oauthResponseModes;
@@ -27,9 +33,11 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
         private readonly IJwtBuilder _jwtBuilder;
         private readonly IdServerHostOptions _options;
 
-        public OAuthAuthorizationRequestValidator(IAmrHelper amrHelper, 
-            IExtractRequestHelper extractRequestHelper, IEnumerable<IOAuthResponseMode> oauthResponseModes, IClientHelper clientHelper, IJwtBuilder jwtBuilder, IOptions<IdServerHostOptions> options)
+        public OAuthAuthorizationRequestValidator(IEnumerable<IResponseTypeHandler> responseTypeHandlers, IClientRepository clientRepository, IGrantHelper grantHelper, IAmrHelper amrHelper, IExtractRequestHelper extractRequestHelper, IEnumerable<IOAuthResponseMode> oauthResponseModes, IClientHelper clientHelper, IJwtBuilder jwtBuilder, IOptions<IdServerHostOptions> options)
         {
+            _responseTypeHandlers = responseTypeHandlers;
+            _clientRepository = clientRepository;
+            _grantHelper = grantHelper;
             _amrHelper = amrHelper;
             _extractRequestHelper = extractRequestHelper;
             _oauthResponseModes = oauthResponseModes;
@@ -38,7 +46,106 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
             _options = options.Value;
         }
 
-        public virtual async Task Validate(GrantRequest request, HandlerContext context, CancellationToken cancellationToken)
+        public virtual Task<AuthorizationRequestValidationResult> ValidateAuthorizationRequest(HandlerContext context, CancellationToken cancellationToken)
+        {
+            var clientId = context.Request.RequestData.GetClientIdFromAuthorizationRequest();
+            return ValidateAuthorizationRequest(context, clientId, cancellationToken);
+        }
+
+        public virtual async Task<AuthorizationRequestValidationResult> ValidateAuthorizationRequest(HandlerContext context, string clientId, CancellationToken cancellationToken)
+        {
+            context.SetClient(await AuthenticateClient(context.Realm, clientId, cancellationToken));
+            await _extractRequestHelper.Extract(context);
+            var requestedResponseTypes = context.Request.RequestData.GetResponseTypesFromAuthorizationRequest();
+            if (!requestedResponseTypes.Any())
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.ResponseType));
+
+            var responseTypeHandlers = _responseTypeHandlers.Where(r => requestedResponseTypes.Contains(r.ResponseType));
+            var unsupportedResponseType = requestedResponseTypes.Where(r => !_responseTypeHandlers.Any(rh => rh.ResponseType == r));
+            if (unsupportedResponseType.Any())
+                throw new OAuthException(ErrorCodes.UNSUPPORTED_RESPONSE_TYPE, string.Format(ErrorMessages.MISSING_RESPONSE_TYPES, string.Join(" ", unsupportedResponseType)));
+
+            var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
+            var resources = context.Request.RequestData.GetResourcesFromAuthorizationRequest();
+            var grantRequest = await _grantHelper.Extract(context.Realm ?? Constants.DefaultRealm, scopes, resources, cancellationToken);
+
+            if (!grantRequest.Scopes.Any() && !grantRequest.Audiences.Any())
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETERS, $"{AuthorizationRequestParameters.Scope},{AuthorizationRequestParameters.Resource}"));
+
+            var unsupportedScopes = grantRequest.Scopes.Where(s => s != Constants.StandardScopes.OpenIdScope.Name && !context.Client.Scopes.Any(sc => sc.Name == s));
+            if (unsupportedScopes.Any())
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_SCOPES, string.Join(",", unsupportedScopes)));
+
+            await CommonValidate(context, cancellationToken);
+            var nonce = context.Request.RequestData.GetNonceFromAuthorizationRequest();
+            var redirectUri = context.Request.RequestData.GetRedirectUriFromAuthorizationRequest();
+            var responseTypes = context.Request.RequestData.GetResponseTypesFromAuthorizationRequest();
+            if (string.IsNullOrWhiteSpace(redirectUri))
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.RedirectUri));
+
+            if (responseTypes.Contains(TokenResponseParameters.IdToken) && string.IsNullOrWhiteSpace(nonce))
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.Nonce));
+
+            if (context.Client.IsResourceParameterRequired && !resources.Any())
+                throw new OAuthException(ErrorCodes.INVALID_TARGET, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.Resource));
+
+            CheckGrantIdAndAction(context);
+            return new AuthorizationRequestValidationResult(grantRequest, responseTypeHandlers);
+
+            async Task CommonValidate(HandlerContext context, CancellationToken cancellationToken)
+            {
+                var client = context.Client;
+                var redirectUri = context.Request.RequestData.GetRedirectUriFromAuthorizationRequest();
+                var responseTypes = context.Request.RequestData.GetResponseTypesFromAuthorizationRequest();
+                var responseMode = context.Request.RequestData.GetResponseModeFromAuthorizationRequest();
+                var unsupportedResponseTypes = responseTypes.Where(t => !client.ResponseTypes.Contains(t));
+                var redirectionUrls = await _clientHelper.GetRedirectionUrls(client, cancellationToken);
+                if (!string.IsNullOrWhiteSpace(redirectUri) && !redirectionUrls.Any(r =>
+                {
+                    var regex = new Regex(r);
+                    return regex.Match(redirectUri).Success;
+                })) throw new OAuthExceptionBadRequestURIException(redirectUri);
+
+                if (!string.IsNullOrWhiteSpace(responseMode) && !_oauthResponseModes.Any(o => o.ResponseMode == responseMode)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.BAD_RESPONSE_MODE, responseMode));
+
+                if (unsupportedResponseTypes.Any()) throw new OAuthException(ErrorCodes.UNSUPPORTED_RESPONSE_TYPE, string.Format(ErrorMessages.BAD_RESPONSE_TYPES_CLIENT, string.Join(",", unsupportedResponseTypes)));
+            }
+
+            async Task<Client> AuthenticateClient(string realm, string clientId, CancellationToken cancellationToken)
+            {
+                if (string.IsNullOrWhiteSpace(clientId))
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.ClientId));
+
+                var client = await _clientRepository.Query().Include(c => c.Scopes).ThenInclude(s => s.ClaimMappers)
+                    .Include(c => c.SerializedJsonWebKeys)
+                    .Include(c => c.Realms)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == realm), cancellationToken);
+                if (client == null)
+                    throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));
+
+                return client;
+            }
+
+            void CheckGrantIdAndAction(HandlerContext context)
+            {
+                var grantId = context.Request.RequestData.GetGrantIdFromAuthorizationRequest();
+                var grantManagementAction = context.Request.RequestData.GetGrantManagementActionFromAuthorizationRequest();
+                if (_options.GrantManagementActionRequired && string.IsNullOrWhiteSpace(grantManagementAction))
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.GrantManagementAction));
+
+                if (!string.IsNullOrWhiteSpace(grantManagementAction) && !Constants.AllStandardGrantManagementActions.Contains(grantManagementAction))
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.INVALID_GRANT_MANAGEMENT_ACTION, grantManagementAction));
+
+                if (!string.IsNullOrWhiteSpace(grantId) && grantManagementAction == Constants.StandardGrantManagementActions.Create)
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.GRANT_ID_CANNOT_BE_SPECIFIED);
+
+                if (!string.IsNullOrWhiteSpace(grantId) && string.IsNullOrWhiteSpace(grantManagementAction))
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.GrantManagementAction));
+            }
+        }
+
+        public virtual async Task ValidateAuthorizationRequestWhenUserIsAuthenticated(GrantRequest request, HandlerContext context, CancellationToken cancellationToken)
         {
             var openidClient = context.Client;
             var clientId = context.Request.RequestData.GetClientIdFromAuthorizationRequest();
@@ -46,14 +153,6 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
             var acrValues = context.Request.RequestData.GetAcrValuesFromAuthorizationRequest();
             var prompt = context.Request.RequestData.GetPromptFromAuthorizationRequest();
             var claims = context.Request.RequestData.GetClaimsFromAuthorizationRequest();
-            var resources = context.Request.RequestData.GetResourcesFromAuthorizationRequest();
-            if (!request.Scopes.Any() && !request.Audiences.Any())
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETERS, $"{AuthorizationRequestParameters.Scope},{AuthorizationRequestParameters.Resource}"));
-
-            var unsupportedScopes = scopes.Where(s => s != Constants.StandardScopes.OpenIdScope.Name && !context.Client.Scopes.Any(sc => sc.Name == s));
-            if (unsupportedScopes.Any())
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_SCOPES, string.Join(",", unsupportedScopes)));
-
             if (context.User == null)
             {
                 if (prompt == PromptParameters.None)
@@ -66,19 +165,8 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
             if (activeSession == null)
                 throw new OAuthLoginRequiredException(await GetFirstAmr(context.Realm, acrValues, claims, openidClient, cancellationToken), true);
 
-            await _extractRequestHelper.Extract(context);
-            await CommonValidate(context, cancellationToken);
-            var responseTypes = context.Request.RequestData.GetResponseTypesFromAuthorizationRequest();
-            var nonce = context.Request.RequestData.GetNonceFromAuthorizationRequest();
-            var redirectUri = context.Request.RequestData.GetRedirectUriFromAuthorizationRequest();
             var maxAge = context.Request.RequestData.GetMaxAgeFromAuthorizationRequest();
             var idTokenHint = context.Request.RequestData.GetIdTokenHintFromAuthorizationRequest();
-            if (string.IsNullOrWhiteSpace(redirectUri))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.RedirectUri));
-
-            if (responseTypes.Contains(TokenResponseParameters.IdToken) && string.IsNullOrWhiteSpace(nonce))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.Nonce));
-
             if (maxAge != null)
             {
                 if (DateTime.UtcNow > activeSession.AuthenticationDateTime.AddSeconds(maxAge.Value))
@@ -96,10 +184,6 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                 if (!payload.Audiences.Contains(context.GetIssuer()))
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_AUDIENCE_IDTOKENHINT);
             }
-
-            if (context.Client.IsResourceParameterRequired && !resources.Any())
-                throw new OAuthException(ErrorCodes.INVALID_TARGET, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.Resource));
-            CheckGrantIdAndAction(context);
 
             switch (prompt)
             {
@@ -126,46 +210,10 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
             }
         }
 
-        protected void CheckGrantIdAndAction(HandlerContext context)
-        {
-            var grantId = context.Request.RequestData.GetGrantIdFromAuthorizationRequest();
-            var grantManagementAction = context.Request.RequestData.GetGrantManagementActionFromAuthorizationRequest();
-            if (_options.GrantManagementActionRequired && string.IsNullOrWhiteSpace(grantManagementAction))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.GrantManagementAction));
-
-            if (!string.IsNullOrWhiteSpace(grantManagementAction) && !Constants.AllStandardGrantManagementActions.Contains(grantManagementAction))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.INVALID_GRANT_MANAGEMENT_ACTION, grantManagementAction));
-
-            if (!string.IsNullOrWhiteSpace(grantId) && grantManagementAction == Constants.StandardGrantManagementActions.Create)
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.GRANT_ID_CANNOT_BE_SPECIFIED);
-
-            if (!string.IsNullOrWhiteSpace(grantId) && string.IsNullOrWhiteSpace(grantManagementAction))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.GrantManagementAction));
-        }
-
         protected virtual void RedirectToConsentView(HandlerContext context)
         {
             if (context.Client.IsConsentDisabled) return;
             throw new OAuthUserConsentRequiredException();
-        }
-
-        protected async Task CommonValidate(HandlerContext context, CancellationToken cancellationToken)
-        {
-            var client = context.Client;
-            var redirectUri = context.Request.RequestData.GetRedirectUriFromAuthorizationRequest();
-            var responseTypes = context.Request.RequestData.GetResponseTypesFromAuthorizationRequest();
-            var responseMode = context.Request.RequestData.GetResponseModeFromAuthorizationRequest();
-            var unsupportedResponseTypes = responseTypes.Where(t => !client.ResponseTypes.Contains(t));
-            var redirectionUrls = await _clientHelper.GetRedirectionUrls(client, cancellationToken);
-            if (!string.IsNullOrWhiteSpace(redirectUri) && !redirectionUrls.Any(r =>
-            {
-                var regex = new Regex(r);
-                return regex.Match(redirectUri).Success;
-            })) throw new OAuthExceptionBadRequestURIException(redirectUri);
-
-            if (!string.IsNullOrWhiteSpace(responseMode) && !_oauthResponseModes.Any(o => o.ResponseMode == responseMode)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.BAD_RESPONSE_MODE, responseMode));
-
-            if (unsupportedResponseTypes.Any()) throw new OAuthException(ErrorCodes.UNSUPPORTED_RESPONSE_TYPE, string.Format(ErrorMessages.BAD_RESPONSE_TYPES_CLIENT, string.Join(",", unsupportedResponseTypes)));
         }
 
         protected async Task<string> GetFirstAmr(string realm, IEnumerable<string> acrValues, IEnumerable<AuthorizedClaim> claims, Client client, CancellationToken cancellationToken)

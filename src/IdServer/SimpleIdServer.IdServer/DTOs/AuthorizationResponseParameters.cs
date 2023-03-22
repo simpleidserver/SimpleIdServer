@@ -11,5 +11,6 @@ namespace SimpleIdServer.IdServer.DTOs
         public const string IdToken = "id_token";
         public const string Response = "response";
         public const string RedirectUrl = "redirect_url";
+        public const string ExpiresIn = "expires_in";
     }
 }

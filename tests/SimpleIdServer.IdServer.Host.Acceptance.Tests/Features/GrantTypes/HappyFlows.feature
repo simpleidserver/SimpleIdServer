@@ -73,6 +73,44 @@ Scenario: Use 'authorization_code' grant type to get an access token
 	And JSON '$.expires_in'='1800'
 	And parameter 'state'='state'
 
+Scenario: Use 'authorization_code' grant type to get an access token and use PAR
+	Given authenticate a user
+	When execute HTTP POST request 'https://localhost:8080/par'
+	| Key           | Value                 |
+	| response_type | code                  |
+	| client_id     | thirdClient           |
+	| state         | state                 |
+	| redirect_uri  | http://localhost:8080 |
+	| response_mode | query                 |
+	| scope         | secondScope			|
+
+	And extract JSON from body
+	And extract parameter 'request_uri' from JSON body
+
+	And execute HTTP GET request 'https://localhost:8080/authorization'
+	| Key           | Value          |
+	| client_id     | thirdClient    |
+	| request_uri   | $request_uri$  |
+
+	And extract parameter 'code' from redirect url
+	And extract parameter 'state' from redirect url
+	
+	And execute HTTP POST request 'https://localhost:8080/token'
+	| Key           | Value        			|
+	| client_id     | thirdClient			|
+	| client_secret | password     			|
+	| grant_type    | authorization_code	|
+	| code			| $code$				|	
+	| redirect_uri  | http://localhost:8080	|	
+
+	And extract JSON from body
+
+	Then HTTP status code equals to '200'
+	And JSON '$.scope'='secondScope'
+	And JSON '$.token_type'='Bearer'
+	And JSON '$.expires_in'='1800'
+	And parameter 'state'='state'
+
 Scenario: Use 'refresh_token' grant type to get an access token
 	When execute HTTP POST request 'https://localhost:8080/token'
 	| Key           | Value              |

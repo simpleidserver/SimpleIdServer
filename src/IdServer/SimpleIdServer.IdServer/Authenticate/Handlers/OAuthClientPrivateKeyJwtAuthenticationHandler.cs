@@ -1,8 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.IdentityModel.JsonWebTokens;
-using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Authenticate.AssertionParsers;
+using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
 using System;
@@ -64,7 +64,6 @@ namespace SimpleIdServer.IdServer.Authenticate.Handlers
 
         private bool ValidateJwsPayLoad(JsonWebToken jsonWebToken, string expectedIssuer, string errorCode)
         {
-            var tokenEdp = $"{expectedIssuer}/{Constants.EndPoints.Token}";
             var jwsIssuer = jsonWebToken.Issuer;
             var jwsSubject = jsonWebToken.Subject;
             var jwsAudiences = jsonWebToken.Audiences;
@@ -72,7 +71,7 @@ namespace SimpleIdServer.IdServer.Authenticate.Handlers
             // 1. Check the client is correct.
             if (jwsSubject != jwsIssuer) throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_ISSUER);
             // 2. Check if the audience is correct
-            if (jwsAudiences == null || !jwsAudiences.Any() || !jwsAudiences.Any(j => j.Contains(tokenEdp))) throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_AUDIENCES);
+            if (jwsAudiences == null || !jwsAudiences.Any() || !jwsAudiences.Any(j => j.Contains(expectedIssuer))) throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_AUDIENCES);
             // 3. Check the expiration time
             if (DateTime.UtcNow > expirationDateTime) throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_EXPIRED);
             return true;

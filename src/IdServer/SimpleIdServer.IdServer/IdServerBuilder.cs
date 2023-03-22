@@ -96,6 +96,19 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
+        /// Authorization server accepts authorization request data only via PAR.
+        /// </summary>
+        /// <returns></returns>
+        public IdServerBuilder PARIsRequired()
+        {
+            _serviceCollection.Configure<IdServerHostOptions>(o =>
+            {
+                o.RequiredPushedAuthorizationRequest = true;
+            });
+            return this;
+        }
+
+        /// <summary>
         /// Use in memory implementation of mass transit.
         /// </summary>
         /// <returns></returns>

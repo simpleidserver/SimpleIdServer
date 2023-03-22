@@ -7,10 +7,8 @@ using SimpleIdServer.IdServer.Middlewares;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Web;
-using static MassTransit.ValidationResultExtensions;
 
 namespace SimpleIdServer.IdServer.Api
 {

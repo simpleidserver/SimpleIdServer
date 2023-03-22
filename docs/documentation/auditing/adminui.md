@@ -24,3 +24,5 @@ Following events are present :
 * UserInfoSuccessEvent
 * UserLoginSuccessEvent
 * UserLogoutSuccessEvent
+* PushedAuthorizationRequestSuccessEvent
+* PushedAuthorizationRequestFailureEvent

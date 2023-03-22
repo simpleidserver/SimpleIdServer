@@ -11,19 +11,8 @@ using SimpleIdServer.IdServer.ConformanceSuite.Startup;
 using SimpleIdServer.IdServer.Sms;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
-
-OtherFeatures.CreateCertificateAuthority("");
-
-var store = new X509Store(StoreName.Root, StoreLocation.LocalMachine);
-store.Open(OpenFlags.ReadOnly);
-var cc = store.Certificates.ToList();
-var tt = store.Certificates.Find(X509FindType.FindBySubjectName, "sidCA", true).First();
-var pp = tt.Export(X509ContentType.Pfx, "password");
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<KestrelServerOptions>(options =>

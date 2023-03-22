@@ -50,6 +50,10 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.TokenRevoke,
                 defaults: new { controller = "Token", action = "Revoke" });
 
+            webApplication.MapControllerRoute("publishedAuthorization",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.PushedAuthorizationRequest,
+                defaults: new { controller = "PushedAuthorization", action = "Post" });
+
             webApplication.MapControllerRoute("tokenInfo",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.TokenInfo,
                 defaults: new { controller = "TokenIntrospection", action = "Introspect" });

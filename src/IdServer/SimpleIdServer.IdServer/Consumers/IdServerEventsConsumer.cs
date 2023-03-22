@@ -21,7 +21,8 @@ namespace SimpleIdServer.IdServer.Consumers
         IConsumer<TokenIssuedFailureEvent>, IConsumer<TokenIssuedSuccessEvent>,
         IConsumer<TokenRevokedFailureEvent>, IConsumer<TokenRevokedSuccessEvent>,
         IConsumer<UserInfoFailureEvent>, IConsumer<UserInfoSuccessEvent>,
-        IConsumer<UserLoginSuccessEvent>, IConsumer<UserLogoutSuccessEvent>
+        IConsumer<UserLoginSuccessEvent>, IConsumer<UserLogoutSuccessEvent>,
+        IConsumer<PushedAuthorizationRequestSuccessEvent>, IConsumer<PushedAuthorizationRequestFailureEvent>
     {
         private readonly IServiceProvider _serviceProvider;
 
@@ -385,6 +386,48 @@ namespace SimpleIdServer.IdServer.Consumers
                     Description = "UserInfo Logout",
                     UserName = context.Message.UserName,
                     CreateDateTime = DateTime.UtcNow,
+                    Realm = context.Message.Realm,
+                    IsError = false
+                };
+                auditEventRepository.Add(auditEvt);
+                await auditEventRepository.SaveChanges(CancellationToken.None);
+            }
+        }
+
+        public async Task Consume(ConsumeContext<PushedAuthorizationRequestFailureEvent> context)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var auditEventRepository = scope.ServiceProvider.GetRequiredService<IAuditEventRepository>();
+                var auditEvt = new AuditEvent
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Description = "Pushed Authorization Failed",
+                    CreateDateTime = DateTime.UtcNow,
+                    Realm = context.Message.Realm,
+                    IsError = true,
+                    ClientId = context.Message.ClientId,
+                    RequestJSON = context.Message.RequestJSON,
+                    ErrorMessage = context.Message.ErrorMessage
+                };
+                auditEventRepository.Add(auditEvt);
+                await auditEventRepository.SaveChanges(CancellationToken.None);
+            }
+        }
+
+        public async Task Consume(ConsumeContext<PushedAuthorizationRequestSuccessEvent> context)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var auditEventRepository = scope.ServiceProvider.GetRequiredService<IAuditEventRepository>();
+                var auditEvt = new AuditEvent
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Description = "Pushed Authorization Success",
+                    CreateDateTime = DateTime.UtcNow,
+                    ClientId = context.Message.ClientId,
+                    RequestJSON = context.Message.RequestJSON,
+                    RedirectUrl = context.Message.RedirectUrl,
                     Realm = context.Message.Realm,
                     IsError = false
                 };

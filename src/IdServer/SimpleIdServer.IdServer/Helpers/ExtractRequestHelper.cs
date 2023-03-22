@@ -1,15 +1,19 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Options;
 using System;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
+using System.Text;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,10 +29,14 @@ namespace SimpleIdServer.IdServer.Helpers
     public class ExtractRequestHelper : IExtractRequestHelper
     {
         private readonly IJwtBuilder _jwtBuilder;
+        private readonly IDistributedCache _distributedCache;
+        private readonly IdServerHostOptions _options;
 
-        public ExtractRequestHelper(IJwtBuilder jwtBuilder)
+        public ExtractRequestHelper(IJwtBuilder jwtBuilder, IDistributedCache distributedCache, IOptions<IdServerHostOptions> options)
         {
             _jwtBuilder = jwtBuilder;
+            _distributedCache = distributedCache;
+            _options = options.Value;
         }
 
         public async Task<JsonObject> Extract(string realm, string issuerName, JsonObject jsonObject, Client oauthClient)
@@ -62,6 +70,16 @@ namespace SimpleIdServer.IdServer.Helpers
             if (string.IsNullOrWhiteSpace(requestUri))
                 return false;
 
+            string json = null;
+            if (requestUri.StartsWith(Constants.ParFormatKey) || _options.RequiredPushedAuthorizationRequest)
+            {
+                var payload = await _distributedCache.GetAsync(requestUri);
+                if (payload == null)
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.REQUEST_URI_IS_INVALID);
+                context.Request.SetRequestData(JsonObject.Parse(Encoding.UTF8.GetString(payload)).AsObject());
+                return true;
+            }
+
             Uri uri;
             if (!Uri.TryCreate(requestUri, UriKind.Absolute, out uri))
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_REQUEST_URI_PARAMETER);
@@ -70,7 +88,7 @@ namespace SimpleIdServer.IdServer.Helpers
             using (var httpClient = new HttpClient())
             {
                 var httpResult = await httpClient.GetAsync(cleanedUrl);
-                var json = await httpResult.Content.ReadAsStringAsync();
+                json = await httpResult.Content.ReadAsStringAsync();
                 return await CheckRequest(context, json);
             }
         }
@@ -98,7 +116,8 @@ namespace SimpleIdServer.IdServer.Helpers
             if (!jwt.TryGetClaim(AuthorizationRequestParameters.ClientId, out Claim cl))
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, ErrorMessages.MISSING_CLIENT_ID_CLAIM);
 
-            if (!jwt.GetClaim(AuthorizationRequestParameters.ResponseType).Value.Split(' ').OrderBy(s => s).SequenceEqual(context.Request.RequestData.GetResponseTypesFromAuthorizationRequest().OrderBy(s => s)))
+            var responseTypes = context.Request.RequestData.GetResponseTypesFromAuthorizationRequest();
+            if (responseTypes.Any() && !jwt.GetClaim(AuthorizationRequestParameters.ResponseType).Value.Split(' ').OrderBy(s => s).SequenceEqual(responseTypes.OrderBy(s => s)))
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, ErrorMessages.INVALID_RESPONSE_TYPE_CLAIM);
 
             if (jwt.GetClaim(AuthorizationRequestParameters.ClientId).Value != context.Client.ClientId)

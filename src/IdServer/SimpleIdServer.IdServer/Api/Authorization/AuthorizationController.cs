@@ -134,7 +134,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                     activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
                     await _busControl.Publish(new AuthorizationFailureEvent
                     {
-                        ClientId = context.Client.ClientId,
+                        ClientId = context.Client?.ClientId,
                         Realm = context.Realm,
                         RequestJSON = jObjBody.ToString(),
                         ErrorMessage = ex.Message

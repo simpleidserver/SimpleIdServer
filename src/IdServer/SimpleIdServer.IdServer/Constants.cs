@@ -44,6 +44,7 @@ namespace SimpleIdServer.IdServer
             public const string Grants = "grants";
             public const string UMAPermissions = "perm";
             public const string UMAResources = "rreguri";
+            public const string PushedAuthorizationRequest = "par";
         }
 
         public static List<string> AllStandardNotificationModes = new List<string>
@@ -506,5 +507,6 @@ namespace SimpleIdServer.IdServer
         public const string AlgDir = "dir";
         public const string DefaultRealm = "master";
         public const string DefaultRealmCookieName = "CurrentRealm";
+        public const string ParFormatKey = "urn:ietf:params:oauth:request_uri";
     }
 }

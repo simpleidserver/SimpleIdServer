@@ -8,3 +8,5 @@ Scenario: Get the configuration
 
 	Then HTTP status code equals to '200'
 	And JSON 'userinfo_endpoint'='https://localhost:8080/userinfo'
+	And JSON 'pushed_authorization_request_endpoint '='https://localhost:8080/par'
+	And JSON 'require_pushed_authorization_requests'='false'

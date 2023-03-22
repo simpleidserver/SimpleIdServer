@@ -173,6 +173,14 @@ namespace SimpleIdServer.IdServer.Options
         /// Use the email during the authentication.
         /// </summary>
         public bool IsEmailUsedDuringAuthentication { get; set; } = false;
+        /// <summary>
+        /// Indicating whether the authorization server accepts authorization request data only via PAR.
+        /// </summary>
+        public bool RequiredPushedAuthorizationRequest { get; set; } = false;
+        /// <summary>
+        /// Expiration time of a PAR.
+        /// </summary>
+        public double PARExpirationTimeInSeconds { get; set; } = 600;
 
         public int GetIntParameter(string name) => int.Parse(Parameters[name]);
 

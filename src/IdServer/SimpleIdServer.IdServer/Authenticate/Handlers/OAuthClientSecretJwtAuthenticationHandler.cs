@@ -1,13 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
-using SimpleIdServer.IdServer.Options;
 using System;
 using System.Linq;
 using System.Text;
@@ -21,15 +19,13 @@ namespace SimpleIdServer.IdServer.Authenticate.Handlers
     /// </summary>
     public class OAuthClientSecretJwtAuthenticationHandler : IOAuthClientAuthenticationHandler
     {
-        private readonly IdServerHostOptions _options;
         private readonly IClientHelper _clientHelper;
         private readonly ILogger<OAuthClientSecretJwtAuthenticationHandler> _logger;
         public string AuthMethod => AUTH_METHOD;
         public const string AUTH_METHOD = "client_secret_jwt";
 
-        public OAuthClientSecretJwtAuthenticationHandler(IOptions<IdServerHostOptions> options, IClientHelper clientHelper, ILogger<OAuthClientSecretJwtAuthenticationHandler> logger)
+        public OAuthClientSecretJwtAuthenticationHandler(IClientHelper clientHelper, ILogger<OAuthClientSecretJwtAuthenticationHandler> logger)
         {
-            _options = options.Value;
             _clientHelper = clientHelper;
             _logger = logger;
         }

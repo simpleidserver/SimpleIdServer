@@ -98,11 +98,11 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table68 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table71 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
 #line 5
- testRunner.When("execute HTTP POST JSON request \'http://localhost/bc-callback\'", ((string)(null)), table68, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/bc-callback\'", ((string)(null)), table71, "When ");
 #line hidden
 #line 8
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -135,24 +135,24 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table69 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table72 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table69.AddRow(new string[] {
+                table72.AddRow(new string[] {
                             "user",
                             "user"});
 #line 14
  testRunner.Given("build JWS by signing with a random RS256 algorithm and store the result into \'acc" +
-                        "essToken\'", ((string)(null)), table69, "Given ");
+                        "essToken\'", ((string)(null)), table72, "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table70 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table73 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table70.AddRow(new string[] {
+                table73.AddRow(new string[] {
                             "Authorization",
                             "Bearer $accessToken$"});
 #line 18
- testRunner.When("execute HTTP POST JSON request \'http://localhost/bc-callback\'", ((string)(null)), table70, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/bc-callback\'", ((string)(null)), table73, "When ");
 #line hidden
 #line 22
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -185,26 +185,26 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table71 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table74 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table71.AddRow(new string[] {
+                table74.AddRow(new string[] {
                             "sub",
                             "user"});
 #line 28
- testRunner.Given("build access_token and sign with the key \'keyid\'", ((string)(null)), table71, "Given ");
+ testRunner.Given("build access_token and sign with the key \'keyid\'", ((string)(null)), table74, "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table72 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table75 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table72.AddRow(new string[] {
+                table75.AddRow(new string[] {
                             "Authorization",
                             "Bearer $access_token$"});
-                table72.AddRow(new string[] {
+                table75.AddRow(new string[] {
                             "auth_req_id",
                             "invalid"});
 #line 32
- testRunner.When("execute HTTP POST JSON request \'http://localhost/bc-callback\'", ((string)(null)), table72, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/bc-callback\'", ((string)(null)), table75, "When ");
 #line hidden
 #line 37
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

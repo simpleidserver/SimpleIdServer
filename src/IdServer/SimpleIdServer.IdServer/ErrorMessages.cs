@@ -215,5 +215,8 @@ namespace SimpleIdServer.IdServer
         public const string GRANT_IS_REVOKED = "grant is revoked";
         public const string GRANT_IS_ALREADY_REVOKED = "grant is already revoked";
         public const string BC_AUTHORIZE_NOT_PENDING = "the back channel authorization is not in pending";
+        public const string UNEXPECTED_REQUEST_URI_PARAMETER = "the request cannot contains request_uri";
+        public const string REQUEST_URI_IS_REQUIRED = "the request_uri is required";
+        public const string REQUEST_URI_IS_INVALID = "the request_uri is invalid";
     }
 }
