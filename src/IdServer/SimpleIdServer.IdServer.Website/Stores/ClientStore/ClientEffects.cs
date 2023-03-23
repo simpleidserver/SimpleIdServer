@@ -13,6 +13,7 @@ using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Website.Resources;
 using SimpleIdServer.IdServer.WsFederation;
 using System.Linq.Dynamic.Core;
+using System.Net;
 
 namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
 {
@@ -98,18 +99,22 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                     .AddScope(scopes.ToArray());
                 if (!string.IsNullOrWhiteSpace(action.ClientName))
                     newClientBuilder.SetClientName(action.ClientName);
+                string jsonWebKeyStr = null;
                 if(action.IsFAPICompliant)
                 {
                     newClientBuilder.UseClientTlsAuthentication(action.SubjectName);
                     newClientBuilder.SetSigAuthorizationResponse(SecurityAlgorithms.EcdsaSha256);
                     newClientBuilder.SetIdTokenSignedResponseAlg(SecurityAlgorithms.EcdsaSha256);
                     newClientBuilder.SetRequestObjectSigning(SecurityAlgorithms.EcdsaSha256);
+                    var ecdsaSig = ClientKeyGenerator.GenerateECDsaSignatureKey("keyId", SecurityAlgorithms.EcdsaSha256);
+                    jsonWebKeyStr = ecdsaSig.SerializeJWKStr();
+                    newClientBuilder.AddSigningKey(ecdsaSig, SecurityAlgorithms.EcdsaSha256, SecurityKeyTypes.ECDSA);
                 }
 
                 var newClient = newClientBuilder.Build();
                 dbContext.Clients.Add(newClient);
                 await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.WEBSITE });
+                dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.WEBSITE, JsonWebKeyStr = jsonWebKeyStr });
             }
         }
 
@@ -525,6 +530,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public string? ClientName { get; set; } = null;
         public string? Language { get; set; } = null;
         public string ClientType { get; set; }
+        public string? JsonWebKeyStr { get; set; } = null;
     }
 
     public class RemoveSelectedClientsAction 

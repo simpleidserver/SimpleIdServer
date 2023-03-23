@@ -75,6 +75,9 @@
                 clientsGrid.Reload();
                 StateHasChanged();
             });
+            SubscribeToAction<AddClientSuccessAction>(async (act) =>
+            {
+            });
             if (!clientState.Value.IsLoading)
                 clientsGrid.Reload();
         }

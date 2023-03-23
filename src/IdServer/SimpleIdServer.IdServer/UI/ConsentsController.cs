@@ -132,6 +132,9 @@ namespace SimpleIdServer.IdServer.UI
                 prefix = prefix ?? Constants.DefaultRealm;
                 var unprotectedUrl = _dataProtector.Unprotect(confirmConsentsViewModel.ReturnUrl);
                 var query = unprotectedUrl.GetQueries().ToJsonObject();
+                var clientId = query.GetClientIdFromAuthorizationRequest();
+                var oauthClient = await _clientRepository.Query().Include(c => c.Translations).Include(c => c.Realms).Include(c => c.Scopes).Include(c => c.SerializedJsonWebKeys).AsNoTracking().FirstAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == prefix), cancellationToken);
+                query = await _extractRequestHelper.Extract(prefix, Request.GetAbsoluteUriWithVirtualPath(), query, oauthClient);
                 var nameIdentifier = GetNameIdentifier();
                 var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.Consents).FirstAsync(c => c.Name == nameIdentifier && c.Realms.Any(r => r.Name == prefix), cancellationToken);
                 var consent = _userConsentFetcher.FetchFromAuthorizationRequest(prefix, user, query);

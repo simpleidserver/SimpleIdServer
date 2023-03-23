@@ -23,7 +23,6 @@ The first step consists to configure the OPENID client.
 
 ![Confirm](images/protectserversideapp-2.png)
 
-
 ### Create ASP.NET CORE application
 
 The last step consists to create and configure an ASP.NET CORE project.

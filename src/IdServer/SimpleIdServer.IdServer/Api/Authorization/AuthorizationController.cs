@@ -56,6 +56,13 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                     {
                         var redirectUrlAuthorizationResponse = authorizationResponse as RedirectURLAuthorizationResponse;
                         _responseModeHandler.Handle(context, redirectUrlAuthorizationResponse, HttpContext);
+                        activity?.SetStatus(ActivityStatusCode.Ok, "Authorization Success");
+                        await _busControl.Publish(new AuthorizationSuccessEvent
+                        {
+                            ClientId = context.Client.ClientId,
+                            Realm = context.Realm,
+                            RequestJSON = jObjBody.ToString()
+                        });
                         return;
                     }
 
@@ -107,13 +114,13 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                         area = redirectActionAuthorizationResponse.Area,
                         ui_locales = string.Join(" ", uiLocales)
                     });
-                    activity?.SetStatus(ActivityStatusCode.Ok, "Authorization is granted");
-                    await _busControl.Publish(new AuthorizationSuccessEvent
+                    activity?.SetStatus(ActivityStatusCode.Error, $"User agent will be redirect to '{url}'");
+                    await _busControl.Publish(new AuthorizationFailureEvent
                     {
                         ClientId = context.Client.ClientId,
                         Realm = context.Realm,
                         RequestJSON = jObjBody.ToString(),
-                        RedirectUrl = url
+                        ErrorMessage = $"User agent will be redirect to '{url}'"
                     });
                     HttpContext.Response.Redirect(url);
                 }

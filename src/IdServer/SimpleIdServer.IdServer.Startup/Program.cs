@@ -81,7 +81,7 @@ void RunSqlServerIdServer(IServiceCollection services)
             });
             a.AddOIDCAuthentication(opts =>
             {
-                opts.Authority = "https://localhost.com:5001";
+                opts.Authority = "https://localhost:5001";
                 opts.ClientId = "website";
                 opts.ClientSecret = "password";
                 opts.ResponseType = "code";
