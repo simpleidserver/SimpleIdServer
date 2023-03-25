@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
-namespace SimpleIdServer.OpenId
+namespace SimpleIdServer.OpenIdConnect
 {
     public class CustomOpenIdConnectConfigureOptions : IConfigureNamedOptions<CustomOpenIdConnectOptions>
     {

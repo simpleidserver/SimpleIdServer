@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography.X509Certificates;
 
-namespace SimpleIdServer.OpenId
+namespace SimpleIdServer.OpenIdConnect
 {
     public class CustomOpenIdConnectOptions : OpenIdConnectOptions
     {

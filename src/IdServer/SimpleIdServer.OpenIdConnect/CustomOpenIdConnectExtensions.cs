@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using SimpleIdServer.OpenId;
+using SimpleIdServer.OpenIdConnect;
 using System;
 
 namespace Microsoft.Extensions.DependencyInjection

@@ -28,7 +28,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.OpenId
+namespace SimpleIdServer.OpenIdConnect
 {
     public class CustomOpenIdConnectHandler : RemoteAuthenticationHandler<CustomOpenIdConnectOptions>, IAuthenticationSignOutHandler
     {
@@ -36,15 +36,29 @@ namespace SimpleIdServer.OpenId
         private const string HeaderValueEpocDate = "Thu, 01 Jan 1970 00:00:00 GMT";
         private const string PushedAuthorizationRequestEndpoint = "pushed_authorization_request_endpoint";
         private const string RequirePushedAuthorizationRequests = "require_pushed_authorization_requests";
+        private const string MtlsEndpointAliasesName = "mtls_endpoint_aliases";
         private const string RequestParameterName = "request";
         private const string ClientIdParameterName = "client_id";
         private const string RequestUriParameterName = "request_uri";
+        private const string ResponseParameterName = "response";
+        private const string TokenEndpointParameterName = "token_endpoint";
+        private static IEnumerable<string> jwtResponseModes = new List<string>
+        {
+            "jwt", "query.jwt", "fragment.jwt", "form_post.jwt"
+        };
         private OpenIdConnectConfiguration? _configuration;
         protected HttpClient Backchannel => Options.Backchannel; 
         protected new OpenIdConnectEvents Events
         {
             get { return (OpenIdConnectEvents)base.Events; }
             set { base.Events = value; }
+        }
+
+        protected record AuthorizationExtractionResult
+        {
+            public bool IsValid { get; set; }
+            public HandleRequestResult ErrorResult { get; set; }
+            public OpenIdConnectMessage OpenIdConnectMessage { get; set; }
         }
 
         public CustomOpenIdConnectHandler(IOptionsMonitor<CustomOpenIdConnectOptions> options, ILoggerFactory logger, HtmlEncoder htmlEncoder, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
@@ -154,14 +168,16 @@ namespace SimpleIdServer.OpenId
         protected async override Task<HandleRequestResult> HandleRemoteAuthenticateAsync()
         {
             Logger.EnteringOpenIdAuthenticationHandlerHandleRemoteAuthenticateAsync(GetType().FullName!);
-
             OpenIdConnectMessage? authorizationResponse = null;
 
             if (HttpMethods.IsGet(Request.Method))
             {
+                var authResponse = await ExtractAuthorizationResponse(Request.Query.Select(pair => new KeyValuePair<string, string[]>(pair.Key, pair.Value.ToArray())));
+                if (!authResponse.IsValid)
+                    return authResponse.ErrorResult;
                 // ToArray handles the StringValues.IsNullOrEmpty case. We assume non-empty Value does not contain null elements.
 #pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
-                authorizationResponse = new OpenIdConnectMessage(Request.Query.Select(pair => new KeyValuePair<string, string[]>(pair.Key, pair.Value.ToArray())));
+                authorizationResponse = authResponse.OpenIdConnectMessage;
 #pragma warning restore CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
 
                 // response_mode=query (explicit or not) and a response_type containing id_token
@@ -185,10 +201,12 @@ namespace SimpleIdServer.OpenId
               && Request.Body.CanRead)
             {
                 var form = await Request.ReadFormAsync(Context.RequestAborted);
-
+                var authResponse = await ExtractAuthorizationResponse(form.Select(pair => new KeyValuePair<string, string[]>(pair.Key, pair.Value.ToArray())));
+                if (!authResponse.IsValid)
+                    return authResponse.ErrorResult;
                 // ToArray handles the StringValues.IsNullOrEmpty case. We assume non-empty Value does not contain null elements.
 #pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
-                authorizationResponse = new OpenIdConnectMessage(form.Select(pair => new KeyValuePair<string, string[]>(pair.Key, pair.Value.ToArray())));
+                authorizationResponse = authResponse.OpenIdConnectMessage;
 #pragma warning restore CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
             }
 
@@ -446,6 +464,36 @@ namespace SimpleIdServer.OpenId
 
                 return HandleRequestResult.Fail(exception, properties);
             }
+        }
+
+        protected async Task<AuthorizationExtractionResult> ExtractAuthorizationResponse(IEnumerable<KeyValuePair<string, string[]>> dic)
+        {
+            if (jwtResponseModes.Contains(Options.ResponseMode))
+            {
+                if (!dic.Any(kvp => kvp.Key == ResponseParameterName))
+                    return new AuthorizationExtractionResult { IsValid = false, ErrorResult = CustomHandlerRequestResults.NoResponse };
+                var response = dic.First(kvp => kvp.Key == ResponseParameterName).Value[0];
+                var handler = new JsonWebTokenHandler();
+                var payload = handler.ReadJsonWebToken(response);
+                if (_configuration == null && Options.ConfigurationManager != null)
+                    _configuration = await Options.ConfigurationManager.GetConfigurationAsync(Context.RequestAborted);
+
+                var jsonWebKey = _configuration.JsonWebKeySet.Keys.FirstOrDefault(k => k.KeyId == payload.Kid);
+                if (jsonWebKey == null)
+                    return new AuthorizationExtractionResult { IsValid = false, ErrorResult = CustomHandlerRequestResults.UnknownJWK };
+                var validationResult = new JsonWebTokenHandler().ValidateToken(response, new TokenValidationParameters
+                {
+                    ValidateAudience = false,
+                    ValidateIssuer = false,
+                    ValidateLifetime = false,
+                    IssuerSigningKey = jsonWebKey
+                });
+                if(!validationResult.IsValid)
+                    return new AuthorizationExtractionResult { IsValid = false, ErrorResult = CustomHandlerRequestResults.ResponseSignatureIsInvalid };
+                return new AuthorizationExtractionResult { IsValid = true, OpenIdConnectMessage = new OpenIdConnectMessage(validationResult.Claims.Select(c => new KeyValuePair<string, string[]>(c.Key, new string[] { c.Value.ToString() }))) };
+            }
+
+            return new AuthorizationExtractionResult { IsValid = true, OpenIdConnectMessage = new OpenIdConnectMessage(dic) };
         }
 
         /// <summary>
@@ -839,7 +887,7 @@ namespace SimpleIdServer.OpenId
                 properties.Items.Remove(OAuthConstants.CodeVerifierKey);
             }
 
-            var backChannelProperty = typeof(AuthorizationCodeReceivedContext).GetProperty("Backchannel", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            var backChannelProperty = typeof(AuthorizationCodeReceivedContext).GetProperty("Backchannel");
             var context = new AuthorizationCodeReceivedContext(Context, Scheme, Options, properties)
             {
                 ProtocolMessage = authorizationResponse,
@@ -1128,11 +1176,18 @@ namespace SimpleIdServer.OpenId
                     responseMessage = await Backchannel.SendAsync(requestMessage, Context.RequestAborted);
                     break;
                 case ClientAuthenticationTypes.TLS_CLIENT_AUTH:
-                    var handler = new HttpClientHandler();
-                    handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
-                    handler.CheckCertificateRevocationList = false;
-                    handler.ClientCertificateOptions = ClientCertificateOption.Manual;
-                    handler.SslProtocols = SslProtocols.Tls12;
+                    var mtlsEndpointAliases = _configuration.AdditionalData[MtlsEndpointAliasesName];
+                    var type = mtlsEndpointAliases.GetType();
+                    var getValueMethod = type.GetMethods(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public).First(m => m.Name == "GetValue" && m.GetParameters().Length == 1);
+                    var val = getValueMethod.Invoke(mtlsEndpointAliases, new object[] { TokenEndpointParameterName });
+                    var tokenEdp = val.ToString();
+                    var handler = new HttpClientHandler
+                    {
+                        ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; },
+                        CheckCertificateRevocationList = false,
+                        ClientCertificateOptions = ClientCertificateOption.Manual,
+                        SslProtocols = SslProtocols.Tls12
+                    };
                     handler.ClientCertificates.Add(Options.MTLSCertificate);
                     using (var httpClient = new HttpClient(handler))
                     {

@@ -24,7 +24,7 @@ namespace SimpleIdServer.IdServer.Builders
                 Name = name,
                 Description = description,
                 HandlerFullQualifiedName = handlerType.AssemblyQualifiedName,
-                OptionsFullQualifiedName = optionsType.AssemblyQualifiedName,
+                OptionsFullQualifiedName = optionsType.FullName,
                 Properties = properties.ToList()
             });
         }

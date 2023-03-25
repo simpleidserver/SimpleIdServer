@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -119,7 +120,7 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
             var handlerType = Type.GetType(provider.AuthSchemeProviderDefinition.HandlerFullQualifiedName);
             var authenticationHandlerType = GetGenericType(handlerType, typeof(AuthenticationHandler<>));
             if (authenticationHandlerType == null) return null;
-            var liteOptionType = Type.GetType(provider.AuthSchemeProviderDefinition.OptionsFullQualifiedName);
+            var liteOptionType = Assembly.GetEntryAssembly().GetType(provider.AuthSchemeProviderDefinition.OptionsFullQualifiedName);
             if (liteOptionType == null) return null;
 
             var optionType = authenticationHandlerType.GetGenericArguments().First();

@@ -4,12 +4,12 @@ using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
 
-const string JWK = "{\"alg\":\"ES256\",\"crv\":\"P-256\",\"d\":\"mf1MvmivRY_TdH-J7gAt7ak4DYGnyLIqIZ3dgHL5NHk\",\"kid\":\"keyId\",\"kty\":\"EC\",\"use\":\"sig\",\"x\":\"MdwuTbn0TCQYgsER0-NeE3vtSx3H4HD9sSD7Zfkxt8k\",\"y\":\"ec27GOT5l3Mu8pzZsj6doPBNbCIp_5afjoP66qPfu4o\"}";
-var jsonWebKey = JsonExtensions.DeserializeFromJson<JsonWebKey>(JWK);
-var certificate = new X509Certificate2(Path.Combine(Directory.GetCurrentDirectory(), "CN=websiteFAPI.pfx"));
-
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+const string JWK = "{\"alg\":\"ES256\",\"crv\":\"P-256\",\"d\":\"-U73QZxHx-pGMJhC9SG7Do4H0N4q6nvY4Fs2GGDVyFM\",\"kid\":\"keyId\",\"kty\":\"EC\",\"use\":\"sig\",\"x\":\"ikA6jQpF1OUjUw2wxXodnej6-LB7zVJZO7mlcIj9h0g\",\"y\":\"wED_dsFzH4YeJqrZqo_V-9B3gCAcwKg3N62oKenLkr8\"}";
+var jsonWebKey = JsonExtensions.DeserializeFromJson<JsonWebKey>(JWK);
+var certificate = new X509Certificate2(Path.Combine(Directory.GetCurrentDirectory(), "CN=websiteFAPI.pfx"));
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = "Cookies";
@@ -27,8 +27,8 @@ builder.Services.AddAuthentication(options =>
         options.GetClaimsFromUserInfoEndpoint = true;
         options.SaveTokens = true;
         options.MTLSCertificate = null;
-        options.ClientAuthenticationType = SimpleIdServer.OpenId.ClientAuthenticationTypes.TLS_CLIENT_AUTH;
-        options.RequestType = SimpleIdServer.OpenId.RequestTypes.PAR;
+        options.ClientAuthenticationType = SimpleIdServer.OpenIdConnect.ClientAuthenticationTypes.TLS_CLIENT_AUTH;
+        options.RequestType = SimpleIdServer.OpenIdConnect.RequestTypes.PAR;
         options.MTLSCertificate = certificate;
         options.SigningCredentials = new SigningCredentials(jsonWebKey, jsonWebKey.Alg);
     });
