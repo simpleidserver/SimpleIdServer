@@ -541,3 +541,52 @@ Scenario: only the same client can perform operations on the grant
 	
 	Then redirection url contains the parameter value 'error'='access_denied'
 	Then redirection url contains the parameter value 'error_description'='the client fortyEightClient is not authorized to access to perform operations on the grant'
+
+Scenario: authorization details type is required
+	Given authenticate a user
+	
+	When execute HTTP GET request 'http://localhost/authorization'
+	| Key                     | Value                                                   |
+	| response_type           | code token                                              |
+	| client_id               | fiftyFiveClient                                         |
+	| state                   | state                                                   |
+	| response_mode           | query                                                   |
+	| redirect_uri            | http://localhost:8080                                   |
+	| nonce                   | nonce                                                   |
+	| authorization_details   |  { "actions": [ "write" ] }                             |
+	
+	Then redirection url contains the parameter value 'error'='invalid_authorization_details'
+	Then redirection url contains the parameter value 'error_description'='the authorization_details type is required'	
+	
+Scenario: authorization details types must be supported
+	Given authenticate a user
+	
+	When execute HTTP GET request 'http://localhost/authorization'
+	| Key                     | Value                                                                                 |
+	| response_type           | code                                                                                  |
+	| client_id               | fortySevenClient                                                                      |
+	| state                   | state                                                                                 |
+	| response_mode           | query                                                                                 |
+	| redirect_uri            | http://localhost:8080                                                                 |
+	| nonce                   | nonce                                                                                 |
+	| claims                  | { "id_token": { "acr": { "essential" : true, "value": "urn:openbanking:psd2:ca" } } } | 
+	| resource                | https://cal.example.com                                                               |
+	| authorization_details   |  { "type" : "firstDetails", "test": "test", "creditorAccount": { "iban": "DE" } }     |
+	
+	Then redirection url contains the parameter value 'error'='invalid_authorization_details'
+	Then redirection url contains the parameter value 'error_description'='authorization details types firstDetails are not supported'	
+
+Scenario: redirect to the consent page when no consent has been given to the specified authorization_details
+	Given authenticate a user
+	
+	When execute HTTP GET request 'http://localhost/authorization'
+	| Key                     | Value                                                   |
+	| response_type           | code token                                              |
+	| client_id               | fiftyFiveClient                                         |
+	| state                   | state                                                   |
+	| response_mode           | query                                                   |
+	| redirect_uri            | http://localhost:8080                                   |
+	| nonce                   | nonce                                                   |
+	| authorization_details   |  { "type" : "firstDetails", "actions": [ "write" ] }    |
+
+	Then redirection url contains 'http://localhost/Consents'	

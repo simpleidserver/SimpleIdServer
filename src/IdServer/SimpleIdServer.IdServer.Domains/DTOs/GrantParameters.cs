@@ -8,5 +8,6 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
         public const string Claims = "claims";
         public const string Scope = "scope";
         public const string Resources = "resources";
+        public const string AuthorizationDetails = "authorization_details";
     }
 }

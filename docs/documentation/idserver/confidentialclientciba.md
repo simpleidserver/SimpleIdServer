@@ -1,9 +1,18 @@
 # Confidential Client uses CIBA
 
+> [!WARNING]
+> Before you start, Make sure you have an [up and running IdentityServer and IdentityServer website](/documentation/gettingstarted/index.html).
+
 According to the [specification](https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html), Public Client cannot use Client-Initiated Backchannel Authentication(CIBA).
 Only Confidential Client can use it, For example a Console Application, Website or a REST.API.
 
 In this tutorial, we are going to explain how to create a Console Application. It will initiate a CIBA Authentication Request and will get an Access Token by polling the `Token` endpoint.
+
+The client will have the following configuration :
+
+| Configuration                            | Value           |
+| ---------------------------------------- | --------------- |
+| Client Authentication Method             | tls_client_auth |
 
 ## Source Code
 

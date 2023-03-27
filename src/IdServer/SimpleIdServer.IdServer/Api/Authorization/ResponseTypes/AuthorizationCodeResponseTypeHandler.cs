@@ -63,7 +63,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseTypes
             context.Response.Add(AuthorizationResponseParameters.Code, authCode);
             var isScopeContainsOfflineAccess = parameter.Scopes.Contains(Constants.StandardScopes.OfflineAccessScope.Name);
             if (isScopeContainsOfflineAccess)
-                await _tokenBuilders.First(t => t.Name == TokenResponseParameters.RefreshToken).Build(new BuildTokenParameter { Scopes = parameter.Scopes, Audiences = parameter.Audiences, Claims = parameter.Claims, GrantId = parameter.GrantId }, context, cancellationToken);
+                await _tokenBuilders.First(t => t.Name == TokenResponseParameters.RefreshToken).Build(new BuildTokenParameter { Scopes = parameter.Scopes, AuthorizationDetails = parameter.AuthorizationDetails?.ToList(), Audiences = parameter.Audiences, Claims = parameter.Claims, GrantId = parameter.GrantId }, context, cancellationToken);
         }
 
         protected virtual void CheckPKCEParameters(HandlerContext handlerContext)

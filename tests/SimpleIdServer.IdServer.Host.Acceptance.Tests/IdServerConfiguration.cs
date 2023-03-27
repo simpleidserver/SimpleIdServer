@@ -113,7 +113,9 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildTraditionalWebsiteClient("fiftyOneClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().AddScope(AdminScope, CalendarScope).EnableCIBAGrantType(StandardNotificationModes.Push, "http://localhost/notificationedp").Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("fiftyTwoClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().AddScope(AdminScope, CalendarScope).EnableCIBAGrantType(StandardNotificationModes.Ping, "http://localhost/notificationedp", 0).Build(),
             ClientBuilder.BuildApiClient("fiftyThreeClient", "password").EnableUMAGrantType().ActAsUMAResourceServer().Build(),
-            ClientBuilder.BuildUserAgentClient("fiftyFourClient", "password", null, "http://localhost:8080").UseImplicitFlow().AddScope(StandardScopes.OpenIdScope, StandardScopes.Profile, StandardScopes.Email).SetSigAuthorizationResponse(SecurityAlgorithms.RsaSha256).Build()
+            ClientBuilder.BuildUserAgentClient("fiftyFourClient", "password", null, "http://localhost:8080").UseImplicitFlow().AddScope(StandardScopes.OpenIdScope, StandardScopes.Profile, StandardScopes.Email).SetSigAuthorizationResponse(SecurityAlgorithms.RsaSha256).Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("fiftyFiveClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().EnableTokenInResponseType().EnableRefreshTokenGrantType().AddScope(AdminScope, CalendarScope).AddAuthDataTypes("firstDetails", "secondDetails").Build(),
+
         };
 
         public static List<User> Users = new List<User>
@@ -162,6 +164,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                 .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fiftyOneClient", "admin", "calendar")
                 .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fiftyTwoClient", "admin", "calendar")
                 .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fiftyFourClient", "openid", "profile", "email")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fiftyFiveClient", new AuthorizationData { Type = "firstDetails", Actions = new List<string> { "read" } }, new AuthorizationData { Type = "secondDetails", Locations = new List<string> { "https://cal.example.com" }, Actions = new List<string> { "read" } })
                 .AddSession("sessionId", SimpleIdServer.IdServer.Constants.DefaultRealm, DateTime.UtcNow.AddDays(2)).Build()
         };
 

@@ -65,6 +65,7 @@ namespace SimpleIdServer.IdServer.UI
                 var unprotectedUrl = _dataProtector.Unprotect(returnUrl);
                 var query = unprotectedUrl.GetQueries().ToJsonObject();
                 var clientId = query.GetClientIdFromAuthorizationRequest();
+                var authDetails = query.GetAuthorizationDetailsFromAuthorizationRequest();
                 var oauthClient = await _clientRepository.Query().Include(c => c.Translations).Include(c => c.Realms).Include(c => c.Scopes).Include(c => c.SerializedJsonWebKeys).AsNoTracking().FirstAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == prefix), cancellationToken);
                 query = await _extractRequestHelper.Extract(prefix, Request.GetAbsoluteUriWithVirtualPath(), query, oauthClient);
                 var scopes = query.GetScopesFromAuthorizationRequest();
@@ -78,7 +79,8 @@ namespace SimpleIdServer.IdServer.UI
                     returnUrl,
                     oauthClient.LogoUri,
                     oauthClient.Scopes.Where(c => scopes.Contains(c.Name)).Select(s => s.Name),
-                    claimDescriptions));
+                    claimDescriptions,
+                    authDetails));
             }
             catch (CryptographicException)
             {

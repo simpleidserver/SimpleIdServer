@@ -71,3 +71,22 @@ Scenario: scopes 'admin' and 'calendar' and valid audiences are returned in the 
 	Then JWT has 'aud'='https://contacts.example.com'
 	Then JWT has 'scope'='admin'
 	Then JWT has 'scope'='calendar'
+
+Scenario: authorization details are returned in the access token
+	Given authenticate a user
+	
+	When execute HTTP GET request 'http://localhost/authorization'
+	| Key                     | Value                                                   |
+	| response_type           | code token                                              |
+	| client_id               | fiftyFiveClient                                         |
+	| state                   | state                                                   |
+	| response_mode           | query                                                   |
+	| redirect_uri            | http://localhost:8080                                   |
+	| nonce                   | nonce                                                   |
+	| authorization_details   |  { "type" : "firstDetails", "actions": [ "read" ] }     |
+	
+	And extract parameter 'access_token' from redirect url
+	And extract payload from JWT '$access_token$'
+
+	Then JWT has authorization_details type 'firstDetails'
+	Then JWT has authorization_details action 'read'

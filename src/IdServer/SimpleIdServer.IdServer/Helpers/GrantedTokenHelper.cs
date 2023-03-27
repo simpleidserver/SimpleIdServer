@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
@@ -16,6 +17,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -26,8 +28,8 @@ namespace SimpleIdServer.IdServer.Helpers
         Task<IEnumerable<Token>> GetTokensByAuthorizationCode(string code, CancellationToken cancellationToken);
         Task<bool> RemoveToken(string token, CancellationToken cancellationToken);
         Task<bool> RemoveTokens(IEnumerable<Token> tokens, CancellationToken cancellationToken);
-        SecurityTokenDescriptor BuildAccessToken(string clientId,IEnumerable<string> audiences, IEnumerable<string> scopes, string issuerName);
-        SecurityTokenDescriptor BuildAccessToken(string clientId,IEnumerable<string> audiences, IEnumerable<string> scopes, string issuerName, double validityPeriodsInSeconds);
+        SecurityTokenDescriptor BuildAccessToken(string clientId,IEnumerable<string> audiences, IEnumerable<string> scopes, ICollection<AuthorizationData> authorizationDetails, string issuerName);
+        SecurityTokenDescriptor BuildAccessToken(string clientId,IEnumerable<string> audiences, IEnumerable<string> scopes, ICollection<AuthorizationData> authorizationDetails, string issuerName, double validityPeriodsInSeconds);
         Task<bool> AddAccessToken(string token, string clientId, string authorizationCode, string grantId, CancellationToken cancellationToken);
         Task<JsonWebToken> GetAccessToken(string accessToken, CancellationToken cancellationToken);
         Task<bool> TryRemoveAccessToken(string accessToken, string clientId, CancellationToken cancellationToken);
@@ -92,7 +94,7 @@ namespace SimpleIdServer.IdServer.Helpers
 
         #region Access token
 
-        public SecurityTokenDescriptor BuildAccessToken(string clientId, IEnumerable<string> audiences, IEnumerable<string> scopes, string issuerName)
+        public SecurityTokenDescriptor BuildAccessToken(string clientId, IEnumerable<string> audiences, IEnumerable<string> scopes, ICollection<AuthorizationData> authorizationDetails, string issuerName)
         {
             var claims = new Dictionary<string, object>
             {
@@ -100,6 +102,9 @@ namespace SimpleIdServer.IdServer.Helpers
                 { OpenIdConnectParameterNames.ClientId, clientId },
                 { OpenIdConnectParameterNames.Scope, BuildScopeClaim(scopes) }
             };
+            if(authorizationDetails != null && authorizationDetails.Any())
+                claims.Add(AuthorizationRequestParameters.AuthorizationDetails, authorizationDetails.Select(d => d.Serialize()));
+
             return new SecurityTokenDescriptor
             {
                 Issuer = issuerName,
@@ -107,9 +112,9 @@ namespace SimpleIdServer.IdServer.Helpers
             };
         }
 
-        public SecurityTokenDescriptor BuildAccessToken(string clientId, IEnumerable<string> audiences, IEnumerable<string> scopes, string issuerName, double validityPeriodsInSeconds)
+        public SecurityTokenDescriptor BuildAccessToken(string clientId, IEnumerable<string> audiences, IEnumerable<string> scopes, ICollection<AuthorizationData> authorizationDetails, string issuerName, double validityPeriodsInSeconds)
         {
-            var descriptor = BuildAccessToken(clientId, audiences, scopes, issuerName);
+            var descriptor = BuildAccessToken(clientId, audiences, scopes, authorizationDetails, issuerName);
             AddExpirationAndIssueTime(descriptor, validityPeriodsInSeconds);
             return descriptor;
         }

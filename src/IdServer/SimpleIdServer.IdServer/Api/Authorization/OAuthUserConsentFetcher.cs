@@ -36,7 +36,8 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             var clientId = queryParameters.GetClientIdFromAuthorizationRequest();
             var scopes = queryParameters.GetScopesFromAuthorizationRequest();
             var claims = queryParameters.GetClaimsFromAuthorizationRequest();
-            return oauthUser.GetConsent(realm, clientId, scopes, claims, AuthorizationClaimTypes.IdToken);
+            var authDetails = queryParameters.GetAuthorizationDetailsFromAuthorizationRequest();
+            return oauthUser.GetConsent(realm, clientId, scopes, claims, authDetails, AuthorizationClaimTypes.IdToken);
         }
     }
 }

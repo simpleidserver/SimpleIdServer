@@ -3,21 +3,24 @@
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Encodings.Web;
 
 namespace SimpleIdServer.IdServer.Api.BCAuthorize
 {
     public class BaseNotificationService
     {
         private readonly IDataProtector _dataProtector;
+        private readonly UrlEncoder _urlEncoder;
 
-        public BaseNotificationService(IDataProtectionProvider dataProtectionProvider)
+        public BaseNotificationService(IDataProtectionProvider dataProtectionProvider, UrlEncoder urlEncoder)
         {
             _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
+            _urlEncoder = urlEncoder;
         }
 
         protected string BuildUrl(IUrlHelper urlHelper, string issuer, BCNotificationMessage message)
         {
-            var queries = message.Serialize();
+            var queries = message.Serialize(_urlEncoder);
             var queryCollection = new QueryBuilder(queries);
             var returnUrl = $"{HandlerContext.GetIssuer(issuer)}/{Constants.EndPoints.BCCallback}{queryCollection.ToQueryString()}";
             return $"{issuer}{urlHelper.Action("Index", "BackChannelConsents", new

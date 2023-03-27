@@ -130,6 +130,8 @@ namespace SimpleIdServer.IdServer.Api.Register
         [JsonPropertyName(OAuthClientParameters.AuthorizationEncryptedResponseEnc)]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? AuthorizationEncryptedResponseEnc { get; set; } = null;
+        [JsonPropertyName(OAuthClientParameters.AuthorizationDataTypes)]
+        public ICollection<string> AuthorizationDataTypes { get; set; } = new List<string>();
         [JsonIgnore]
         public ICollection<TranslationRequest> Translations { get; set; } = new List<TranslationRequest>();
 
@@ -203,6 +205,9 @@ namespace SimpleIdServer.IdServer.Api.Register
             else client.AuthorizationSignedResponseAlg = AuthorizationSignedResponseAlg;
             client.AuthorizationEncryptedResponseAlg = AuthorizationEncryptedResponseAlg;
             client.AuthorizationEncryptedResponseEnc = AuthorizationEncryptedResponseEnc;
+
+            if (AuthorizationDataTypes != null && AuthorizationDataTypes.Any())
+                client.AuthorizationDataTypes = AuthorizationDataTypes;
         }
     }
 }

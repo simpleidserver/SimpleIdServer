@@ -21,6 +21,7 @@ namespace SimpleIdServer.IdServer
         public const string UNKNOWN_AUTH_SCHEME_PROVIDER_PROPERTIES = "the authentication scheme provider cannot be updated because the following properties are unknown : {0}";
         public const string UNAUTHORIZED_CLIENT = "unauthorized client";
         public const string UNAUTHORIZED_ACCESSTOKEN = "the access token is not authorized to access to the operation";
+        public const string UNAUTHORIZED_USER_ACCESS_GRANT = "the user {0} is not authorized to access to performance operations on the grant";
         public const string UNAUTHORIZED_CLIENT_ACCESS_GRANT = "the client {0} is not authorized to access to perform operations on the grant";
         public const string UNAUTHORIZED_ACCESS_PERMISSION_API = "you're not authorized to access to the permissions endpoint";
         public const string UKNOWN_RESOURCE = "following resources {0} doesn't exist";
@@ -143,6 +144,7 @@ namespace SimpleIdServer.IdServer
         public const string UNSUPPORTED_SCOPES = "scopes {0} are not supported";
         public const string UNSUPPORTED_GRANT_TYPE = "grant type {0} is not supported";
         public const string UNSUPPORTED_GRANT_TYPES = "grant types {0} are not supported";
+        public const string UNSUPPORTED_AUTHORIZATION_DETAILS_TYPES = "authorization details types {0} are not supported";
         public const string UNSUPPORTED_IDTOKEN_SIGNED_RESPONSE_ALG = "id_token_signed_response_alg is not supported";
         public const string UNSUPPORTED_AUTHORIZATION_SIGNED_RESPONSE_ALG = "authorization_signed_response_alg is not supported";
         public const string UNSUPPORTED_AUTHORIZATION_ENCRYPTED_RESPONSE_ALG = "authorization_encrypted_response_alg is not supported";
@@ -218,5 +220,6 @@ namespace SimpleIdServer.IdServer
         public const string UNEXPECTED_REQUEST_URI_PARAMETER = "the request cannot contains request_uri";
         public const string REQUEST_URI_IS_REQUIRED = "the request_uri is required";
         public const string REQUEST_URI_IS_INVALID = "the request_uri is invalid";
+        public const string AUTHORIZATION_DETAILS_TYPE_REQUIRED = "the authorization_details type is required";
     }
 }

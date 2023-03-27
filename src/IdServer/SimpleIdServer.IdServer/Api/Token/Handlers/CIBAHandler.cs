@@ -72,7 +72,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).Include(u => u.Realms).FirstOrDefaultAsync(u => u.Id == authRequest.UserId && u.Realms.Any(r => r.Name == context.Realm), cancellationToken);
                     context.SetUser(user);
                     foreach (var tokenBuilder in _tokenBuilders)
-                        await tokenBuilder.Build(new BuildTokenParameter { Scopes = authRequest.Scopes }, context, cancellationToken);
+                        await tokenBuilder.Build(new BuildTokenParameter { Scopes = authRequest.Scopes, AuthorizationDetails = authRequest.AuthorizationDetails }, context, cancellationToken);
 
                     _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? Options.DefaultTokenProfile)).Enrich(context);
                     var result = BuildResult(context, authRequest.Scopes);

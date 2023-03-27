@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.IdServer.Domains.DTOs;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.IdServer.Domains
@@ -18,6 +19,8 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonIgnore]
         public string ClientId { get; set; } = null!;
         [JsonIgnore]
+        public string UserId { get; set; } = null!;
+        [JsonIgnore]
         public DateTime CreateDateTime { get; set; }
         [JsonIgnore]
         public DateTime UpdateDateTime { get; set; }
@@ -33,11 +36,30 @@ namespace SimpleIdServer.IdServer.Domains
         ///  JSON array where every entry contains a scope field and may contain one or more resource fields.
         /// </summary>
         public ICollection<AuthorizedScope> Scopes { get; set; } = new List<AuthorizedScope>();
+        /// <summary>
+        /// JSON Object as defined in [I-D.ietf-oauth-rar] containing all authorization details as requested and consented in one or more authorization requests associated with the respective grant.
+        /// </summary>
+        [JsonPropertyName(GrantParameters.AuthorizationDetails)]
+        public ICollection<AuthorizationData> AuthorizationDetails
+        {
+            get
+            {
+                if (SerializedAuthorizationDetails == null) return new List<AuthorizationData>();
+                return JsonSerializerExtensions.DeserializeAuthorizationDetails(SerializedAuthorizationDetails);
+            }
+            set
+            {
+                SerializedAuthorizationDetails = JsonSerializer.Serialize(value);
+            }
+        }
+        [JsonIgnore]
+        public string? SerializedAuthorizationDetails { get; set; } = null;
 
-        public void Merge(ICollection<string> claims, ICollection<AuthorizedScope> scopes)
+        public void Merge(ICollection<string> claims, ICollection<AuthorizedScope> scopes, IEnumerable<AuthorizationData> authorizationDetails)
         {
             MergeScopes();
             MergeClaims();
+            MergeAuthorizationDetails();
 
             void MergeScopes()
             {
@@ -67,6 +89,29 @@ namespace SimpleIdServer.IdServer.Domains
 
                 Claims = cls;
             }
+
+            void MergeAuthorizationDetails()
+            {
+                var unknownAuthDataLst = authorizationDetails.Where(s => !AuthorizationDetails.Any(sc => sc.Type == s.Type));
+                foreach (var unknownAuthData in unknownAuthDataLst)
+                    AuthorizationDetails.Add(unknownAuthData);
+                foreach (var existingAuthData in AuthorizationDetails)
+                {
+                    var newAuthData = authorizationDetails.FirstOrDefault(s => s.Type == existingAuthData.Type);
+                    if (newAuthData == null) continue;
+                    var unknownLocations = newAuthData.Locations.Where(l => !existingAuthData.Locations.Contains(l));
+                    foreach (var unknownLocation in unknownLocations)
+                        existingAuthData.Locations.Add(unknownLocation);
+                    var unknownActions = newAuthData.Actions.Where(a => !existingAuthData.Actions.Contains(a));
+                    foreach (var unknownAction in unknownActions)
+                        existingAuthData.Actions.Add(unknownAction);
+                    var unknownDataTypes = newAuthData.DataTypes.Where(a => !existingAuthData.DataTypes.Contains(a));
+                    foreach (var unknownDataType in unknownDataTypes)
+                        existingAuthData.DataTypes.Add(unknownDataType);
+                }
+
+                AuthorizationDetails = AuthorizationDetails;
+            }
         }
 
         public void Revoke()
@@ -75,7 +120,7 @@ namespace SimpleIdServer.IdServer.Domains
             Status = GrantTypeStatus.REVOKED;
         }
 
-        public static Grant Create(string clientId, ICollection<string> claims, ICollection<AuthorizedScope> scopes)
+        public static Grant Create(string clientId, string userId, ICollection<string> claims, ICollection<AuthorizedScope> scopes, ICollection<AuthorizationData> authorizationDataLst)
         {
             return new Grant
             {
@@ -85,7 +130,9 @@ namespace SimpleIdServer.IdServer.Domains
                 Claims = claims,
                 Scopes = scopes,
                 Status = GrantTypeStatus.ACTIVE,
-                ClientId = clientId
+                ClientId = clientId,
+                UserId = userId,
+                AuthorizationDetails = authorizationDataLst
             };
         }
     }

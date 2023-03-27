@@ -13,14 +13,15 @@ namespace SimpleIdServer.IdServer.Helpers
 {
     public interface IGrantHelper
     {
-        Task<GrantRequest> Extract(string realm, IEnumerable<string> scopes, IEnumerable<string> resources, CancellationToken cancellationToken);
+        Task<GrantRequest> Extract(string realm, IEnumerable<string> scopes, IEnumerable<string> resources, ICollection<AuthorizationData> authorizationDetails, CancellationToken cancellationToken);
     }
 
     public class GrantRequest
     {
-        public GrantRequest(ICollection<AuthorizedScope> authorizations)
+        public GrantRequest(ICollection<AuthorizedScope> authorizations, ICollection<AuthorizationData> authorizationDetails)
         {
             Authorizations = authorizations;
+            AuthorizationDetails = authorizationDetails;
         }
 
         public IEnumerable<string> Scopes
@@ -40,6 +41,7 @@ namespace SimpleIdServer.IdServer.Helpers
         }
 
         public ICollection<AuthorizedScope> Authorizations { get; private set; }
+        public ICollection<AuthorizationData> AuthorizationDetails { get; private set; }
     }
 
     public class GrantHelper : IGrantHelper
@@ -51,7 +53,7 @@ namespace SimpleIdServer.IdServer.Helpers
             _apiResourceRepository = apiResourceRepository;
         }
 
-        public async Task<GrantRequest> Extract(string realm, IEnumerable<string> scopes, IEnumerable<string> resources, CancellationToken cancellationToken)
+        public async Task<GrantRequest> Extract(string realm, IEnumerable<string> scopes, IEnumerable<string> resources, ICollection<AuthorizationData> authorizationDetails, CancellationToken cancellationToken)
         {
             var authResults = new List<AuthorizedScope>();
             if (resources.Any())
@@ -59,7 +61,11 @@ namespace SimpleIdServer.IdServer.Helpers
 
             var unknownScopes = scopes.Where(s => !authResults.Any(a => a.Scope == s));
             authResults.AddRange(await ProcessScopeParameter(scopes, cancellationToken));
-            return new GrantRequest(authResults);
+            var audiences = authResults.SelectMany(a => a.Resources).Distinct();
+            if(audiences.Any())
+                authorizationDetails = authorizationDetails.Where(d => d.Locations.Any(l => audiences.Contains(l))).ToList();
+
+            return new GrantRequest(authResults, authorizationDetails);
 
             async Task<List<AuthorizedScope>> ProcessResourceParameter(IEnumerable<string> resources, IEnumerable<string> scopes, CancellationToken cancellationToken)
             {

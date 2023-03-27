@@ -43,10 +43,22 @@
 
                 <h5>@string.Format(ConsentsResource.consent_client_access, Model.ClientName)</h5>
                 <ul class="list-group">
-                    <li class="list-group-item"><b>@ConsentsResource.scopes</b> : @string.Join(",", Model.ScopeNames)</li>
+                    @if(Model.ScopeNames != null && Model.ScopeNames.Any())
+                    {
+                        <li class="list-group-item"><b>@ConsentsResource.scopes</b> : @string.Join(",", Model.ScopeNames)</li>
+                    }
+
                     @if(Model.ClaimNames != null && Model.ClaimNames.Any())
                     {
                         <li class="list-group-item"><b>@ConsentsResource.claims</b> : @string.Join(",", Model.ClaimNames)</li>
+                    }
+
+                    @if(Model.AuthorizationDetails != null && Model.AuthorizationDetails.Any())
+                    {
+                        foreach(var authDetail in Model.AuthorizationDetails)
+                        {
+                            <li class="list-group-item"><b>@authDetail.Type</b> : @string.Join(",", authDetail.Actions)</li>
+                        }
                     }
                 </ul>
 

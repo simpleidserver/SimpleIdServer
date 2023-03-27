@@ -1,5 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.IdServer.Domains.DTOs;
+using System.Text.Json;
+
 namespace SimpleIdServer.IdServer.Domains
 {
     public class Consent
@@ -23,5 +26,18 @@ namespace SimpleIdServer.IdServer.Domains
         public string Realm { get; set; }
         public IEnumerable<string> Scopes { get; set; } = new List<string>();
         public IEnumerable<string> Claims { get; set; } = new List<string>();
+        public ICollection<AuthorizationData> AuthorizationDetails
+        {
+            get
+            {
+                if (SerializedAuthorizationDetails == null) return new List<AuthorizationData>();
+                return JsonSerializerExtensions.DeserializeAuthorizationDetails(SerializedAuthorizationDetails);
+            }
+            set
+            {
+                SerializedAuthorizationDetails = JsonSerializer.Serialize(value);
+            }
+        }
+        public string? SerializedAuthorizationDetails { get; set; } = null;
     }
 }

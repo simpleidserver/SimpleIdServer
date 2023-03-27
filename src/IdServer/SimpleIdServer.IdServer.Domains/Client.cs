@@ -408,6 +408,11 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? AuthorizationEncryptedResponseAlg { get; set; } = null;
         /// <summary>
+        /// List of supported authorization details types.
+        /// </summary>
+        [JsonPropertyName(OAuthClientParameters.AuthorizationDataTypes)]
+        public ICollection<string> AuthorizationDataTypes { get; set; } = new List<string>();
+        /// <summary>
         /// he JWE [RFC7516] enc algorithm REQUIRED for encrypting authorization responses.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.AuthorizationEncryptedResponseEnc)]

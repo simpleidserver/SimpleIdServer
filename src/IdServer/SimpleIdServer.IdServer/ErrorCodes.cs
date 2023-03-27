@@ -32,5 +32,6 @@ namespace SimpleIdServer.IdServer
         public const string INVALID_GRANT_ID = "invalid_grant_id";
         public const string INVALID_RESOURCE_ID = "invalid_resource_id";
         public const string NOT_FOUND = "not_found";
+        public const string INVALID_AUTHORIZATION_DETAILS = "invalid_authorization_details";
     }
 }

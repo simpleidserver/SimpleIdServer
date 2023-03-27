@@ -65,6 +65,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
                     openidClient.BCClientNotificationEndpoint,
                     openidClient.BCTokenDeliveryMode,
                     context.Request.RequestData.GetScopesFromAuthorizationRequest(),
+                    context.Request.RequestData.GetAuthorizationDetailsFromAuthorizationRequest(),
                     context.User.Id,
                     context.Request.RequestData.GetClientNotificationToken(),
                     context.Realm);
@@ -83,7 +84,8 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
                     BindingMessage = bindingMessage, 
                     Scopes = bcAuthorize.Scopes,
                     AcrLst = acrLst,
-                    Amr = amr
+                    Amr = amr,
+                    AuthorizationDetails = bcAuthorize.AuthorizationDetails
                 }, cancellationToken);
 
                 var res = new JsonObject

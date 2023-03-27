@@ -14,6 +14,7 @@ namespace SimpleIdServer.IdServer.Store.Configurations
             builder.Property(a => a.Claims).HasConversion(
                 v => string.Join(',', v),
                 v => v.Split(',', StringSplitOptions.None).ToList());
+            builder.Ignore(g => g.AuthorizationDetails);
             builder.HasMany(g => g.Scopes).WithOne().OnDelete(DeleteBehavior.Cascade);
         }
     }

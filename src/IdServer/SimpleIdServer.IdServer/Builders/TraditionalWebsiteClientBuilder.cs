@@ -132,6 +132,21 @@ namespace SimpleIdServer.IdServer.Builders
 
         #endregion
 
+        #region Authorization Data Types
+
+        /// <summary>
+        /// Add scope.
+        /// </summary>
+        /// <param name="scopes"></param>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder AddAuthDataTypes(params string[] authDataTypes)
+        {
+            foreach (var authDetailType in authDataTypes) _client.AuthorizationDataTypes.Add(authDetailType);
+            return this;
+        }
+
+        #endregion
+
         #region Identity Token
 
         public TraditionalWebsiteClientBuilder SetIdTokenSignedResponseAlg(string alg = SecurityAlgorithms.RsaSha256)

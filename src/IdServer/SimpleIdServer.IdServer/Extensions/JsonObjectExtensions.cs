@@ -121,6 +121,12 @@ namespace System.Text.Json.Nodes
             return scope.Split(' ');
         }
 
+        public static ICollection<AuthorizationData> GetAuthorizationDetailsFromAuthorizationRequest(this JsonObject jObj)
+        {
+            var authDetails = jObj.GetToken(AuthorizationRequestParameters.AuthorizationDetails);
+            return JsonSerializerExtensions.DeserializeAuthorizationDetails(authDetails);
+        }
+
         public static IEnumerable<string> GetResponseTypesFromAuthorizationRequest(this JsonObject jObj)
         {
             var responseType = jObj.GetStr(AuthorizationRequestParameters.ResponseType);
@@ -131,6 +137,8 @@ namespace System.Text.Json.Nodes
 
             return responseType.Split(' ');
         }
+
+
 
         public static IEnumerable<string> GetUILocalesFromAuthorizationRequest(this JsonObject jObj)
         {

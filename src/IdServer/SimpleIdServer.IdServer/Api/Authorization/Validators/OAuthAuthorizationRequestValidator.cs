@@ -66,15 +66,23 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                 throw new OAuthException(ErrorCodes.UNSUPPORTED_RESPONSE_TYPE, string.Format(ErrorMessages.MISSING_RESPONSE_TYPES, string.Join(" ", unsupportedResponseType)));
 
             var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
+            var authDetails = context.Request.RequestData.GetAuthorizationDetailsFromAuthorizationRequest();
             var resources = context.Request.RequestData.GetResourcesFromAuthorizationRequest();
-            var grantRequest = await _grantHelper.Extract(context.Realm ?? Constants.DefaultRealm, scopes, resources, cancellationToken);
+            var grantRequest = await _grantHelper.Extract(context.Realm ?? Constants.DefaultRealm, scopes, resources, authDetails, cancellationToken);
 
-            if (!grantRequest.Scopes.Any() && !grantRequest.Audiences.Any())
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETERS, $"{AuthorizationRequestParameters.Scope},{AuthorizationRequestParameters.Resource}"));
+            if (!grantRequest.Scopes.Any() && !grantRequest.Audiences.Any() && !grantRequest.AuthorizationDetails.Any())
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETERS, $"{AuthorizationRequestParameters.Scope},{AuthorizationRequestParameters.Resource},{AuthorizationRequestParameters.AuthorizationDetails}"));
 
             var unsupportedScopes = grantRequest.Scopes.Where(s => s != Constants.StandardScopes.OpenIdScope.Name && !context.Client.Scopes.Any(sc => sc.Name == s));
             if (unsupportedScopes.Any())
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_SCOPES, string.Join(",", unsupportedScopes)));
+
+            if(grantRequest.AuthorizationDetails != null && grantRequest.AuthorizationDetails.Any(d => string.IsNullOrWhiteSpace(d.Type)))
+                throw new OAuthException(ErrorCodes.INVALID_AUTHORIZATION_DETAILS, ErrorMessages.AUTHORIZATION_DETAILS_TYPE_REQUIRED);
+
+            var unsupportedAuthorizationDetailsTypes = grantRequest.AuthorizationDetails.Where(d => !context.Client.AuthorizationDataTypes.Contains(d.Type));
+            if (unsupportedAuthorizationDetailsTypes.Any())
+                throw new OAuthException(ErrorCodes.INVALID_AUTHORIZATION_DETAILS, string.Format(ErrorMessages.UNSUPPORTED_AUTHORIZATION_DETAILS_TYPES, string.Join(",", unsupportedAuthorizationDetailsTypes.Select(t => t.Type))));
 
             await CommonValidate(context, cancellationToken);
             var nonce = context.Request.RequestData.GetNonceFromAuthorizationRequest();
@@ -148,8 +156,9 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
         public virtual async Task ValidateAuthorizationRequestWhenUserIsAuthenticated(GrantRequest request, HandlerContext context, CancellationToken cancellationToken)
         {
             var openidClient = context.Client;
-            var clientId = context.Request.RequestData.GetClientIdFromAuthorizationRequest();
+            var authDetails = request.AuthorizationDetails;
             var scopes = request.Scopes;
+            var clientId = context.Request.RequestData.GetClientIdFromAuthorizationRequest();
             var acrValues = context.Request.RequestData.GetAcrValuesFromAuthorizationRequest();
             var prompt = context.Request.RequestData.GetPromptFromAuthorizationRequest();
             var claims = context.Request.RequestData.GetClaimsFromAuthorizationRequest();
@@ -196,7 +205,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                     throw new OAuthSelectAccountRequiredException();
             }
 
-            if (!context.User.HasOpenIDConsent(context.Realm, clientId, request, claims))
+            if (!context.User.HasOpenIDConsent(context.Realm, clientId, request, claims, authDetails))
             {
                 RedirectToConsentView(context);
             }

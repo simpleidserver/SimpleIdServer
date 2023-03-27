@@ -1,8 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using SimpleIdServer.IdServer.Domains.DTOs;
 using System.Data;
 using System.Text;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace SimpleIdServer.IdServer.Domains
 {
@@ -38,6 +41,19 @@ namespace SimpleIdServer.IdServer.Domains
         public DateTime? RejectionSentDateTime { get; set; }
         public DateTime? NextFetchTime { get; set; }
         public string Realm { get; set; } = null!;
+        public ICollection<AuthorizationData> AuthorizationDetails
+        {
+            get
+            {
+                if (SerializedAuthorizationDetails == null) return new List<AuthorizationData>();
+                return JsonSerializerExtensions.DeserializeAuthorizationDetails(SerializedAuthorizationDetails);
+            }
+            set
+            {
+                SerializedAuthorizationDetails = JsonSerializer.Serialize(value);
+            }
+        }
+        public string? SerializedAuthorizationDetails { get; set; } = null;
         public IEnumerable<string> Scopes { get; set; } = new List<string>();
         public ICollection<BCAuthorizeHistory> Histories { get; set; } = new List<BCAuthorizeHistory>();
 
@@ -72,6 +88,7 @@ namespace SimpleIdServer.IdServer.Domains
             string notificationEdp,
             string notificationMode,
             IEnumerable<string> scopes,
+            ICollection<AuthorizationData> authorizationDetails,
             string userId,
             string notificationToken,
             string realm)
@@ -87,7 +104,8 @@ namespace SimpleIdServer.IdServer.Domains
                 Scopes = scopes,
                 UserId = userId,
                 NotificationToken = notificationToken,
-                Realm = realm
+                Realm = realm,
+                AuthorizationDetails = authorizationDetails
             };
             result.UpdateStatus(BCAuthorizeStatus.Pending);
             return result;

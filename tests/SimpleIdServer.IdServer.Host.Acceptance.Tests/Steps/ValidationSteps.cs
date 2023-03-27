@@ -157,6 +157,12 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
         [Then("JWT has formatted address '(.*)'")]
         public void ThenJWTHasFormattedAddress(string value) => Assert.True(GetJWT().Claims.Any(c => c.Type == "address" && JsonObject.Parse(c.Value)["formatted"].GetValue<string>() == value) == true);
 
+        [Then("JWT has authorization_details type '(.*)'")]
+        public void ThenJWTHasAuthorizationDetailsType(string value) => Assert.True(GetJWT().Claims.Any(c => c.Type == "authorization_details" && JsonObject.Parse(c.Value)["type"].GetValue<string>() == value) == true);
+
+        [Then("JWT has authorization_details action '(.*)'")]
+        public void ThenAccessTokenHasAuthorizationDetailsHasAction(string value) =>  Assert.True(GetJWT().Claims.Any(c => c.Type == "authorization_details" && JsonObject.Parse(c.Value)["actions"].AsArray().Select(a => a.GetValue<string>()).Contains(value)));
+
         [Then("JWT is encrypted")]
         public void ThenJWTIsEncrypted() => Assert.True(GetJWT().IsEncrypted);
 

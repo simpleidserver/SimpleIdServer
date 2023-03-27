@@ -124,7 +124,7 @@ namespace SimpleIdServer.IdServer.Jobs
                 context.SetUser(parameter.Users.First(u => u.Id == bcAuthorize.UserId));
                 context.SetClient(parameter.Clients.First(c => c.ClientId == bcAuthorize.ClientId && c.Realms.Any(r => r.Name == bcAuthorize.Realm)));
                 foreach (var tokenBuilder in _tokenBuilders)
-                    await tokenBuilder.Build(new BuildTokenParameter { Scopes = bcAuthorize.Scopes }, context, CancellationToken.None);
+                    await tokenBuilder.Build(new BuildTokenParameter { Scopes = bcAuthorize.Scopes, AuthorizationDetails = bcAuthorize.AuthorizationDetails }, context, CancellationToken.None);
                 return context.Response.Parameters;
             }
         }

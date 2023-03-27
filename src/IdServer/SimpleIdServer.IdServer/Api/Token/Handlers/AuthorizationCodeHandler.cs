@@ -105,7 +105,8 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
 
                     var scopes = GetScopes(previousRequest, context);
                     var resources = GetResources(previousRequest, context);
-                    var extractionResult = await _audienceHelper.Extract(context.Realm ?? Constants.DefaultRealm, scopes, resources, cancellationToken);
+                    var authDetails = previousRequest.GetAuthorizationDetailsFromAuthorizationRequest();
+                    var extractionResult = await _audienceHelper.Extract(context.Realm ?? Constants.DefaultRealm, scopes, resources, authDetails, cancellationToken);
                     scopeLst = extractionResult.Scopes;
                     activity?.SetTag("scopes", string.Join(",", extractionResult.Scopes)); 
                     var result = BuildResult(context, extractionResult.Scopes);
@@ -113,7 +114,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     context.SetOriginalRequest(previousRequest);
 
                     foreach (var tokenBuilder in _tokenBuilders)
-                        await tokenBuilder.Build(new BuildTokenParameter { Scopes = extractionResult.Scopes, Audiences = extractionResult.Audiences, Claims = claims, GrantId = authCode.GrantId }, context, cancellationToken, true);
+                        await tokenBuilder.Build(new BuildTokenParameter { AuthorizationDetails = extractionResult.AuthorizationDetails, Scopes = extractionResult.Scopes, Audiences = extractionResult.Audiences, Claims = claims, GrantId = authCode.GrantId }, context, cancellationToken, true);
 
                     _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? _options.DefaultTokenProfile)).Enrich(context);
                     foreach (var kvp in context.Response.Parameters)

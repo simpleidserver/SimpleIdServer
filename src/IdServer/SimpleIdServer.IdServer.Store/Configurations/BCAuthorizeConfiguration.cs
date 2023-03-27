@@ -17,6 +17,7 @@ namespace SimpleIdServer.IdServer.Store.Configurations
                 v => string.Join(',', v),
                 v => v.Split(',', StringSplitOptions.None).ToList());
             builder.HasMany(a => a.Histories).WithOne().OnDelete(DeleteBehavior.Cascade);
+            builder.Ignore(bc => bc.AuthorizationDetails);
         }
     }
 }

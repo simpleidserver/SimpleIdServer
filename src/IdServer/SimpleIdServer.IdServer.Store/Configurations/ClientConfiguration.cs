@@ -29,6 +29,9 @@ namespace SimpleIdServer.IdServer.Store.Configurations
             builder.Property(a => a.DefaultAcrValues).HasConversion(
                 v => string.Join(',', v),
                 v => v.Split(',', StringSplitOptions.None).ToList());
+            builder.Property(a => a.AuthorizationDataTypes).HasConversion(
+                v => string.Join(',', v),
+                v => v.Split(',', StringSplitOptions.None).ToList());
             builder.HasMany(c => c.Translations).WithOne().OnDelete(DeleteBehavior.Cascade);
             builder.HasMany(c => c.SerializedJsonWebKeys).WithOne().OnDelete(DeleteBehavior.Cascade);
             builder.HasMany(c => c.Scopes).WithMany(s => s.Clients);

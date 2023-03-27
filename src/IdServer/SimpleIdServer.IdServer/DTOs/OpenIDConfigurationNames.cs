@@ -39,5 +39,6 @@ namespace SimpleIdServer.IdServer.DTOs
         public const string MtlsEndpointAliases = "mtls_endpoint_aliases";
         public const string PushedAuthorizationRequestEndpoint = "pushed_authorization_request_endpoint";
         public const string RequirePushedAuthorizationRequests = "require_pushed_authorization_requests";
+        public const string AuthorizationDetailsSupported = "authorization_details_supported";
     }
 }

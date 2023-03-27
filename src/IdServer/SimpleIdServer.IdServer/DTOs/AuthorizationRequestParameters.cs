@@ -28,5 +28,6 @@ namespace SimpleIdServer.IdServer.DTOs
         public const string Resource = "resource";
         public const string GrantId = "grant_id";
         public const string GrantManagementAction = "grant_management_action";
+        public const string AuthorizationDetails = "authorization_details";
     }
 }

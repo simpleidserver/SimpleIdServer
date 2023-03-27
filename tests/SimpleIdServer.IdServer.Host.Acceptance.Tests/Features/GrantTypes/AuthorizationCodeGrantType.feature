@@ -96,3 +96,64 @@ Scenario: scopes 'admin', 'calendar' are returned thanks to the original request
 	And access_token audience contains 'https://cal.example.com'
 	And access_token contains the claim 'scope'='admin'
 	And access_token contains the claim 'scope'='calendar'
+
+Scenario: authorization_details are returned
+	Given authenticate a user
+	
+	When execute HTTP GET request 'http://localhost/authorization'
+	| Key                     | Value                                                   |
+	| response_type           | code token                                              |
+	| client_id               | fiftyFiveClient                                         |
+	| state                   | state                                                   |
+	| response_mode           | query                                                   |
+	| redirect_uri            | http://localhost:8080                                   |
+	| nonce                   | nonce                                                   |
+	| authorization_details   |  { "type" : "firstDetails", "actions": [ "read" ] }     |
+	
+	And extract parameter 'code' from redirect url
+	
+	And execute HTTP POST request 'https://localhost:8080/token'
+	| Key           | Value        			       |
+	| client_id     | fiftyFiveClient              |
+	| client_secret | password     			       |
+	| grant_type    | authorization_code	       |
+	| code			| $code$				       |	
+	| redirect_uri  | http://localhost:8080	       |
+
+	And extract JSON from body
+	And extract parameter 'access_token' from JSON body
+	And extract payload from JWT '$access_token$'
+
+	Then JWT has authorization_details type 'firstDetails'
+	And JWT has authorization_details action 'read'
+
+Scenario: only one authorization_details is returned because there is one resource parameter
+	Given authenticate a user
+	
+	When execute HTTP GET request 'http://localhost/authorization'
+	| Key                     | Value                                                                                                |
+	| response_type           | code token                                                                                           |
+	| client_id               | fiftyFiveClient                                                                                      |
+	| state                   | state                                                                                                |
+	| response_mode           | query                                                                                                |
+	| redirect_uri            | http://localhost:8080                                                                                |
+	| nonce                   | nonce                                                                                                |
+	| authorization_details   |  { "type" : "secondDetails", "locations": [ "https://cal.example.com" ], "actions": [ "read" ] }     |
+	
+	And extract parameter 'code' from redirect url
+	
+	And execute HTTP POST request 'https://localhost:8080/token'
+	| Key           | Value        			       |
+	| client_id     | fiftyFiveClient              |
+	| client_secret | password     			       |
+	| grant_type    | authorization_code	       |
+	| code			| $code$				       |	
+	| resource      | https://cal.example.com      |
+	| redirect_uri  | http://localhost:8080	       |
+
+	And extract JSON from body
+	And extract parameter 'access_token' from JSON body
+	And extract payload from JWT '$access_token$'
+
+	Then JWT has authorization_details type 'secondDetails'
+	And JWT has authorization_details action 'read'

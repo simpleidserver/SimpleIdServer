@@ -109,7 +109,45 @@ Scenario: Use 'authorization_code' grant type to get an access token and use PAR
 	And JSON '$.scope'='secondScope'
 	And JSON '$.token_type'='Bearer'
 	And JSON '$.expires_in'='1800'
-	And parameter 'state'='state'
+	And parameter 'state'='state'	
+
+Scenario: Use 'authorization_code' grant type to get an access token and use PAR and RAR
+	Given authenticate a user
+	When execute HTTP POST request 'https://localhost:8080/par'
+	| Key                     | Value                                                                                                |
+	| response_type           | code token                                                                                           |
+	| client_id               | fiftyFiveClient                                                                                      |
+	| state                   | state                                                                                                |
+	| response_mode           | query                                                                                                |
+	| redirect_uri            | http://localhost:8080                                                                                |
+	| nonce                   | nonce                                                                                                |
+	| authorization_details   |  { "type" : "secondDetails", "locations": [ "https://cal.example.com" ], "actions": [ "read" ] }     |
+
+	And extract JSON from body
+	And extract parameter 'request_uri' from JSON body
+
+	And execute HTTP GET request 'https://localhost:8080/authorization'
+	| Key           | Value              |
+	| client_id     | fiftyFiveClient    |
+	| request_uri   | $request_uri$      |
+
+	And extract parameter 'code' from redirect url
+	And extract parameter 'state' from redirect url
+	
+	And execute HTTP POST request 'https://localhost:8080/token'
+	| Key           | Value        			|
+	| client_id     | fiftyFiveClient       |
+	| client_secret | password     			|
+	| grant_type    | authorization_code	|
+	| code			| $code$				|	
+	| redirect_uri  | http://localhost:8080	|	
+
+	And extract JSON from body	
+	And extract parameter 'access_token' from JSON body
+	And extract payload from JWT '$access_token$'
+
+	Then JWT has authorization_details type 'secondDetails'
+	And JWT has authorization_details action 'read'
 
 Scenario: Use 'refresh_token' grant type to get an access token
 	When execute HTTP POST request 'https://localhost:8080/token'

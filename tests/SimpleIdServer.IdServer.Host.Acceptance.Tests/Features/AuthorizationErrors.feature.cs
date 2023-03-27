@@ -2044,6 +2044,191 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
+        [Xunit.SkippableFactAttribute(DisplayName="authorization details type is required")]
+        [Xunit.TraitAttribute("FeatureTitle", "AuthorizationErrors")]
+        [Xunit.TraitAttribute("Description", "authorization details type is required")]
+        public void AuthorizationDetailsTypeIsRequired()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("authorization details type is required", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 545
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 546
+ testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table38 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table38.AddRow(new string[] {
+                            "response_type",
+                            "code token"});
+                table38.AddRow(new string[] {
+                            "client_id",
+                            "fiftyFiveClient"});
+                table38.AddRow(new string[] {
+                            "state",
+                            "state"});
+                table38.AddRow(new string[] {
+                            "response_mode",
+                            "query"});
+                table38.AddRow(new string[] {
+                            "redirect_uri",
+                            "http://localhost:8080"});
+                table38.AddRow(new string[] {
+                            "nonce",
+                            "nonce"});
+                table38.AddRow(new string[] {
+                            "authorization_details",
+                            "{ \"actions\": [ \"write\" ] }"});
+#line 548
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table38, "When ");
+#line hidden
+#line 558
+ testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_authorization_detai" +
+                        "ls\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 559
+ testRunner.Then("redirection url contains the parameter value \'error_description\'=\'the authorizati" +
+                        "on_details type is required\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="authorization details types must be supported")]
+        [Xunit.TraitAttribute("FeatureTitle", "AuthorizationErrors")]
+        [Xunit.TraitAttribute("Description", "authorization details types must be supported")]
+        public void AuthorizationDetailsTypesMustBeSupported()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("authorization details types must be supported", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 561
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 562
+ testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table39 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table39.AddRow(new string[] {
+                            "response_type",
+                            "code"});
+                table39.AddRow(new string[] {
+                            "client_id",
+                            "fortySevenClient"});
+                table39.AddRow(new string[] {
+                            "state",
+                            "state"});
+                table39.AddRow(new string[] {
+                            "response_mode",
+                            "query"});
+                table39.AddRow(new string[] {
+                            "redirect_uri",
+                            "http://localhost:8080"});
+                table39.AddRow(new string[] {
+                            "nonce",
+                            "nonce"});
+                table39.AddRow(new string[] {
+                            "claims",
+                            "{ \"id_token\": { \"acr\": { \"essential\" : true, \"value\": \"urn:openbanking:psd2:ca\" }" +
+                                " } }"});
+                table39.AddRow(new string[] {
+                            "resource",
+                            "https://cal.example.com"});
+                table39.AddRow(new string[] {
+                            "authorization_details",
+                            "{ \"type\" : \"firstDetails\", \"test\": \"test\", \"creditorAccount\": { \"iban\": \"DE\" } }"});
+#line 564
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table39, "When ");
+#line hidden
+#line 576
+ testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_authorization_detai" +
+                        "ls\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 577
+ testRunner.Then("redirection url contains the parameter value \'error_description\'=\'authorization d" +
+                        "etails types firstDetails are not supported\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="redirect to the consent page when no consent has been given to the specified auth" +
+            "orization_details")]
+        [Xunit.TraitAttribute("FeatureTitle", "AuthorizationErrors")]
+        [Xunit.TraitAttribute("Description", "redirect to the consent page when no consent has been given to the specified auth" +
+            "orization_details")]
+        public void RedirectToTheConsentPageWhenNoConsentHasBeenGivenToTheSpecifiedAuthorization_Details()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("redirect to the consent page when no consent has been given to the specified auth" +
+                    "orization_details", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 579
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 580
+ testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table40 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table40.AddRow(new string[] {
+                            "response_type",
+                            "code token"});
+                table40.AddRow(new string[] {
+                            "client_id",
+                            "fiftyFiveClient"});
+                table40.AddRow(new string[] {
+                            "state",
+                            "state"});
+                table40.AddRow(new string[] {
+                            "response_mode",
+                            "query"});
+                table40.AddRow(new string[] {
+                            "redirect_uri",
+                            "http://localhost:8080"});
+                table40.AddRow(new string[] {
+                            "nonce",
+                            "nonce"});
+                table40.AddRow(new string[] {
+                            "authorization_details",
+                            "{ \"type\" : \"firstDetails\", \"actions\": [ \"write\" ] }"});
+#line 582
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table40, "When ");
+#line hidden
+#line 592
+ testRunner.Then("redirection url contains \'http://localhost/Consents\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
         [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
         [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
         public class FixtureData : System.IDisposable

@@ -106,6 +106,12 @@ namespace SimpleIdServer.IdServer.Builders
             return this;
         }
 
+        public UserBuilder AddConsent(string realm, string clientId, params AuthorizationData[] authData)
+        {
+            _user.Consents.Add(new Consent { Id = Guid.NewGuid().ToString(), ClientId = clientId, AuthorizationDetails = authData, CreateDateTime = DateTime.UtcNow, Realm = realm });
+            return this;
+        }
+
         #endregion
 
         public UserBuilder AddSession(string id, string realm, DateTime expirationTime)

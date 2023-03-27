@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
 using SimpleIdServer.IdServer.Api.Authorization.Validators;
@@ -36,7 +35,6 @@ namespace SimpleIdServer.IdServer.Api.Authorization
         private readonly IUserRepository _userRepository;
         private readonly IGrantRepository _grantRepository;
         private readonly ITokenRepository _tokenRepository;
-        private readonly IDistributedCache _distributedCache;
         private readonly IdServerHostOptions _options;
 
         public AuthorizationRequestHandler(IAuthorizationRequestValidator validator,
@@ -45,7 +43,6 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             IUserRepository userRepository,
             IGrantRepository grantRepository,
             ITokenRepository tokenRepository,
-            IDistributedCache distributedCache,
             IOptions<IdServerHostOptions> options)
         {
             _validator = validator;
@@ -54,7 +51,6 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             _userRepository = userRepository;
             _grantRepository = grantRepository;
             _tokenRepository = tokenRepository;
-            _distributedCache = distributedCache;
             _options = options.Value;
         }
 
@@ -110,7 +106,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             _authorizationRequestEnricher.Enrich(context);
             var grant = await ExecuteGrantManagementAction(grantRequest, context, cancellationToken);
             foreach (var responseTypeHandler in responseTypeHandlers)
-                await responseTypeHandler.Enrich(new EnrichParameter { Scopes = grantRequest.Scopes, Audiences = grantRequest.Audiences, GrantId = grant?.Id, Claims = context.Request.RequestData.GetClaimsFromAuthorizationRequest() }, context, cancellationToken);
+                await responseTypeHandler.Enrich(new EnrichParameter { AuthorizationDetails = grantRequest.AuthorizationDetails, Scopes = grantRequest.Scopes, Audiences = grantRequest.Audiences, GrantId = grant?.Id, Claims = context.Request.RequestData.GetClaimsFromAuthorizationRequest() }, context, cancellationToken);
 
             _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? _options.DefaultTokenProfile)).Enrich(context);
             return new RedirectURLAuthorizationResponse(redirectUri, context.Response.Parameters);
@@ -122,6 +118,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             var grantManagementAction = context.Request.RequestData.GetGrantManagementActionFromAuthorizationRequest();
             if(string.IsNullOrWhiteSpace(grantManagementAction)) return null;
             var claims = context.Request.RequestData.GetClaimsFromAuthorizationRequest();
+            var authDetails = extractionResult.AuthorizationDetails;
             var allClaims = claims.Select(c => c.Name).Distinct().ToList();
             Grant grant = null;
             switch (grantManagementAction)
@@ -129,7 +126,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                 // create a fresh grant.
                 case Constants.StandardGrantManagementActions.Create:
                     {
-                        grant = Grant.Create(context.Client.ClientId, allClaims, extractionResult.Authorizations);
+                        grant = Grant.Create(context.Client.ClientId, context.User.Id, allClaims, extractionResult.Authorizations, authDetails.ToList());
                         _grantRepository.Add(grant);
                         await _grantRepository.SaveChanges(cancellationToken);
                     }
@@ -142,10 +139,13 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                             throw new OAuthException(ErrorCodes.INVALID_GRANT, string.Format(ErrorMessages.UNKNOWN_GRANT, grantId));
                         if (grant.ClientId != context.Client.ClientId)
                             throw new OAuthException(ErrorCodes.ACCESS_DENIED, string.Format(ErrorMessages.UNAUTHORIZED_CLIENT_ACCESS_GRANT, context.Client.ClientId));
+                        if(context.User.Id != grant.UserId)
+                            throw new OAuthException(ErrorCodes.ACCESS_DENIED, string.Format(ErrorMessages.UNAUTHORIZED_USER_ACCESS_GRANT, context.User.Id));
 
                         await RevokeTokens(grant.Id, cancellationToken);
                         grant.Claims = allClaims;
                         grant.Scopes = extractionResult.Authorizations;
+                        grant.AuthorizationDetails = authDetails.ToList();
                         await _grantRepository.SaveChanges(cancellationToken);
                     }
                     break;
@@ -157,8 +157,10 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                             throw new OAuthException(ErrorCodes.INVALID_GRANT, string.Format(ErrorMessages.UNKNOWN_GRANT, grantId));
                         if (grant.ClientId != context.Client.ClientId)
                             throw new OAuthException(ErrorCodes.ACCESS_DENIED, string.Format(ErrorMessages.UNAUTHORIZED_CLIENT_ACCESS_GRANT, context.Client.ClientId));
+                        if (context.User.Id != grant.UserId)
+                            throw new OAuthException(ErrorCodes.ACCESS_DENIED, string.Format(ErrorMessages.UNAUTHORIZED_USER_ACCESS_GRANT, context.User.Id));
 
-                        grant.Merge(allClaims, extractionResult.Authorizations);
+                        grant.Merge(allClaims, extractionResult.Authorizations, authDetails.ToList());
                         _grantRepository.Update(grant);
                         await _grantRepository.SaveChanges(cancellationToken);
                     }

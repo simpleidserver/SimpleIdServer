@@ -20,6 +20,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseTypes
     {
         public IEnumerable<string> Scopes { get; set; }
         public IEnumerable<string> Audiences { get; set; }
+        public IEnumerable<AuthorizationData> AuthorizationDetails { get; set; }
         public IEnumerable<AuthorizedClaim> Claims { get; set; }
         public string GrantId { get; set; }
     }

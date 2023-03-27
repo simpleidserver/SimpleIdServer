@@ -26,7 +26,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseTypes
 
         public Task Enrich(EnrichParameter parameter, HandlerContext context, CancellationToken cancellationToken)
         {
-            return _tokenBuilders.First(t => t.Name == AuthorizationResponseParameters.AccessToken).Build(new BuildTokenParameter { Scopes = parameter.Scopes, Audiences = parameter.Audiences, Claims = parameter.Claims, GrantId = parameter.GrantId }, context, cancellationToken);
+            return _tokenBuilders.First(t => t.Name == AuthorizationResponseParameters.AccessToken).Build(new BuildTokenParameter { AuthorizationDetails = parameter.AuthorizationDetails?.ToList(), Scopes = parameter.Scopes, Audiences = parameter.Audiences, Claims = parameter.Claims, GrantId = parameter.GrantId }, context, cancellationToken);
         }
     }
 }

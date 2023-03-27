@@ -36,7 +36,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
 
         public async virtual Task Build(BuildTokenParameter parameter, HandlerContext handlerContext, CancellationToken cancellationToken, bool useOriginalRequest = false)
         {
-            var tokenDescriptor = BuildOpenIdPayload(parameter.Scopes, parameter.Audiences, parameter.Claims, handlerContext);
+            var tokenDescriptor = BuildOpenIdPayload(parameter.Scopes, parameter.Audiences, parameter.Claims, parameter.AuthorizationDetails, handlerContext);
             if(parameter.AdditionalClaims != null)
                 foreach(var claim in parameter.AdditionalClaims)
                     tokenDescriptor.Claims.Add(claim.Key, claim.Value);
@@ -44,9 +44,9 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
             await SetResponse(handlerContext.Realm, parameter.GrantId, handlerContext, tokenDescriptor, cancellationToken);
         }
         
-        protected virtual SecurityTokenDescriptor BuildOpenIdPayload(IEnumerable<string> scopes, IEnumerable<string> resources, IEnumerable<AuthorizedClaim> claims, HandlerContext handlerContext)
+        protected virtual SecurityTokenDescriptor BuildOpenIdPayload(IEnumerable<string> scopes, IEnumerable<string> resources, IEnumerable<AuthorizedClaim> claims, ICollection<AuthorizationData> authorizationDetails, HandlerContext handlerContext)
         {
-            var jwsPayload = BuildTokenDescriptor(scopes, resources, handlerContext);
+            var jwsPayload = BuildTokenDescriptor(scopes, authorizationDetails, resources, handlerContext);
             if (handlerContext.User != null)
             {
                 jwsPayload.Claims.Add(JwtRegisteredClaimNames.Sub, handlerContext.User.Name);
@@ -67,9 +67,9 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
             return jwsPayload;
         }
 
-        protected virtual SecurityTokenDescriptor BuildTokenDescriptor(IEnumerable<string> scopes, IEnumerable<string> audiences, HandlerContext handlerContext)
+        protected virtual SecurityTokenDescriptor BuildTokenDescriptor(IEnumerable<string> scopes, ICollection<AuthorizationData> authorizationDetails, IEnumerable<string> audiences, HandlerContext handlerContext)
         {
-            var tokenDescriptor = _grantedTokenHelper.BuildAccessToken(handlerContext.Client.ClientId, audiences, scopes, handlerContext.GetIssuer(), handlerContext.Client.TokenExpirationTimeInSeconds ?? _options.DefaultTokenExpirationTimeInSeconds);
+            var tokenDescriptor = _grantedTokenHelper.BuildAccessToken(handlerContext.Client.ClientId, audiences, scopes, authorizationDetails, handlerContext.GetIssuer(), handlerContext.Client.TokenExpirationTimeInSeconds ?? _options.DefaultTokenExpirationTimeInSeconds);
             if (handlerContext.Request.Certificate != null)
             {
                 var thumbprint = Hash(handlerContext.Request.Certificate.RawData);

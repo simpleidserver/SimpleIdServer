@@ -149,6 +149,7 @@ namespace SimpleIdServer.IdServer.UI
                 AuthReqId = queries.GetAuthReqId(),
                 ClientId = queries.GetClientId(),
                 BindingMessage = queries.GetBindingMessage(),
+                AuthorizationDetails = queries.GetAuthorizationDetailsFromAuthorizationRequest(),
                 Scopes = queries.GetScopes(),
                 ReturnUrl = returnUrl
             };
