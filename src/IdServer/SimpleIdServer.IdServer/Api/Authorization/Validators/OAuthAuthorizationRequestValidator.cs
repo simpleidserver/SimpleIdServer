@@ -70,17 +70,17 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
             var resources = context.Request.RequestData.GetResourcesFromAuthorizationRequest();
             var grantRequest = await _grantHelper.Extract(context.Realm ?? Constants.DefaultRealm, scopes, resources, authDetails, cancellationToken);
 
-            if (!grantRequest.Scopes.Any() && !grantRequest.Audiences.Any() && !grantRequest.AuthorizationDetails.Any())
+            if (!grantRequest.Scopes.Any() && !grantRequest.Audiences.Any() && !authDetails.Any())
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETERS, $"{AuthorizationRequestParameters.Scope},{AuthorizationRequestParameters.Resource},{AuthorizationRequestParameters.AuthorizationDetails}"));
 
             var unsupportedScopes = grantRequest.Scopes.Where(s => s != Constants.StandardScopes.OpenIdScope.Name && !context.Client.Scopes.Any(sc => sc.Name == s));
             if (unsupportedScopes.Any())
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_SCOPES, string.Join(",", unsupportedScopes)));
 
-            if(grantRequest.AuthorizationDetails != null && grantRequest.AuthorizationDetails.Any(d => string.IsNullOrWhiteSpace(d.Type)))
+            if(authDetails != null && authDetails.Any(d => string.IsNullOrWhiteSpace(d.Type)))
                 throw new OAuthException(ErrorCodes.INVALID_AUTHORIZATION_DETAILS, ErrorMessages.AUTHORIZATION_DETAILS_TYPE_REQUIRED);
 
-            var unsupportedAuthorizationDetailsTypes = grantRequest.AuthorizationDetails.Where(d => !context.Client.AuthorizationDataTypes.Contains(d.Type));
+            var unsupportedAuthorizationDetailsTypes = authDetails.Where(d => !context.Client.AuthorizationDataTypes.Contains(d.Type));
             if (unsupportedAuthorizationDetailsTypes.Any())
                 throw new OAuthException(ErrorCodes.INVALID_AUTHORIZATION_DETAILS, string.Format(ErrorMessages.UNSUPPORTED_AUTHORIZATION_DETAILS_TYPES, string.Join(",", unsupportedAuthorizationDetailsTypes.Select(t => t.Type))));
 

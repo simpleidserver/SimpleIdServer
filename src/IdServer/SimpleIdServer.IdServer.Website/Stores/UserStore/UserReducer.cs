@@ -103,7 +103,10 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         {
             var consent = state.User.Consents.Single(c => c.Id == act.ConsentId);
             state.User.Consents.Remove(consent);
-            return state;
+            return state with
+            {
+                User = state.User
+            };
         }
 
         [ReducerMethod]

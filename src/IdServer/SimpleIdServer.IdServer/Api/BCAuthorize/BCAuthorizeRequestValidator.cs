@@ -204,10 +204,19 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
         private void CheckScopes(HandlerContext context)
         {
             var requestedScopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
-            if (!requestedScopes.Any())
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.Scope));
+            var authDetails = context.Request.RequestData.GetAuthorizationDetailsFromAuthorizationRequest();
+            if (!requestedScopes.Any() && !authDetails.Any())
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETERS, $"{AuthorizationRequestParameters.Scope},{AuthorizationRequestParameters.AuthorizationDetails}"));
 
-            ScopeHelper.Validate(requestedScopes, context.Client.Scopes.Select(s => s.Name));
+            if(requestedScopes.Any()) ScopeHelper.Validate(requestedScopes, context.Client.Scopes.Select(s => s.Name));
+            if(authDetails.Any())
+            {
+                if (authDetails != null && authDetails.Any(d => string.IsNullOrWhiteSpace(d.Type)))
+                    throw new OAuthException(ErrorCodes.INVALID_AUTHORIZATION_DETAILS, ErrorMessages.AUTHORIZATION_DETAILS_TYPE_REQUIRED);
+                var unsupportedAuthorizationDetailsTypes = authDetails.Where(d => !context.Client.AuthorizationDataTypes.Contains(d.Type));
+                if (unsupportedAuthorizationDetailsTypes.Any())
+                    throw new OAuthException(ErrorCodes.INVALID_AUTHORIZATION_DETAILS, string.Format(ErrorMessages.UNSUPPORTED_AUTHORIZATION_DETAILS_TYPES, string.Join(",", unsupportedAuthorizationDetailsTypes.Select(t => t.Type))));
+            }
         }
 
         private void CheckClientNotificationToken(HandlerContext context)

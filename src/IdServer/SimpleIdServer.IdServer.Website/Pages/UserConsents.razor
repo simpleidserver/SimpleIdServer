@@ -28,9 +28,17 @@
         <RadzenDataGridColumn TItem="Consent" Property="ClientId" Title="Client" Filterable="false" Sortable="false" Width="80px" />
         <RadzenDataGridColumn TItem="Consent" Title="Scopes" Filterable="false" Sortable="false" Width="80px">
             <Template Context="data">
-                @foreach(var scope in data.Scopes)
+                @foreach(var scope in data.Scopes.Where(s => !string.IsNullOrWhiteSpace(s)))
                 {
                     <RadzenBadge Text="@scope" IsPill="true" />
+                }
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Consent" Title="Authorization Details" Filterable="false" Sortable="false" Width="80px">
+            <Template Context="data">
+                @foreach (var authData in data.AuthorizationDetails)
+                {
+                    <RadzenBadge Text="@(authData.Type + ": " + ( (authData.Actions == null || !authData.Actions.Any()) ? string.Empty : string.Join(";", authData.Actions)))" IsPill="true" />
                 }
             </Template>
         </RadzenDataGridColumn>

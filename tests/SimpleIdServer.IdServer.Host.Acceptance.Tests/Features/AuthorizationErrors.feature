@@ -59,7 +59,7 @@ Scenario: Check redirect_uri is valid
 	Then JSON 'error_description'='redirect_uri http://localhost:8081 is not correct'
 	Then JSON 'state'='state'
 
-Scenario: Scope or resource parameter are required
+Scenario: Scope, resource or authorization_details parameter are required
 	Given authenticate a user
 	When execute HTTP GET request 'http://localhost/authorization'
 	| Key           | Value                 |
@@ -72,7 +72,7 @@ Scenario: Scope or resource parameter are required
 	| display       | popup                 |	
 	
 	Then redirection url contains the parameter value 'error'='invalid_request'
-	Then redirection url contains the parameter value 'error_description'='missing parameters scope,resource'
+	Then redirection url contains the parameter value 'error_description'='missing parameters scope,resource,authorization_details'
 
 Scenario: Scope must be supported
 	Given authenticate a user

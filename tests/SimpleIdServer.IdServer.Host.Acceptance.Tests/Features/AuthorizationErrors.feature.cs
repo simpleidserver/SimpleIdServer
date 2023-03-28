@@ -294,14 +294,14 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Scope or resource parameter are required")]
+        [Xunit.SkippableFactAttribute(DisplayName="Scope, resource or authorization_details parameter are required")]
         [Xunit.TraitAttribute("FeatureTitle", "AuthorizationErrors")]
-        [Xunit.TraitAttribute("Description", "Scope or resource parameter are required")]
-        public void ScopeOrResourceParameterAreRequired()
+        [Xunit.TraitAttribute("Description", "Scope, resource or authorization_details parameter are required")]
+        public void ScopeResourceOrAuthorization_DetailsParameterAreRequired()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Scope or resource parameter are required", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Scope, resource or authorization_details parameter are required", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 62
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -347,7 +347,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line hidden
 #line 75
  testRunner.Then("redirection url contains the parameter value \'error_description\'=\'missing paramet" +
-                        "ers scope,resource\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+                        "ers scope,resource,authorization_details\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

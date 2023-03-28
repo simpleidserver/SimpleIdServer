@@ -98,12 +98,12 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table300 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table308 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
 #line 5
  testRunner.When("execute HTTP GET request \'https://localhost:8080/.well-known/openid-configuration" +
-                        "\'", ((string)(null)), table300, "When ");
+                        "\'", ((string)(null)), table308, "When ");
 #line hidden
 #line 7
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

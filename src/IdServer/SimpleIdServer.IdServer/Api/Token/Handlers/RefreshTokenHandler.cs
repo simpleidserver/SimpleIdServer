@@ -131,7 +131,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     var scopes = GetScopes(originalJwsPayload, jwsPayload);
                     var resources = GetResources(originalJwsPayload, jwsPayload);
                     var claims = GetClaims(originalJwsPayload, jwsPayload);
-                    var authDetails = originalJwsPayload.GetAuthorizationDetailsFromAuthorizationRequest();
+                    var authDetails = GetAuthorizationDetails(originalJwsPayload, jwsPayload);
                     var extractionResult = await _audienceHelper.Extract(context.Realm ?? Constants.DefaultRealm, scopes, resources, authDetails, cancellationToken);
                     scopeLst = extractionResult.Scopes;
                     activity?.SetTag("scopes", string.Join(",", extractionResult.Scopes));

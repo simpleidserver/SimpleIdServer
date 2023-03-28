@@ -69,6 +69,14 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             return result;
         }
 
+        protected ICollection<AuthorizationData> GetAuthorizationDetails(JsonObject previousRequest, JsonObject newRequest)
+        {
+            var result = newRequest.GetAuthorizationDetailsFromAuthorizationRequest();
+            if ((result == null || !result.Any()) && previousRequest != null)
+                result = previousRequest.GetAuthorizationDetailsFromAuthorizationRequest();
+            return result;
+        }
+
         protected JsonObject BuildResult(HandlerContext context, IEnumerable<string> scopes)
         {
             return new JsonObject

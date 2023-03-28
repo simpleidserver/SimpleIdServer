@@ -185,7 +185,7 @@ Scenario: user_code is required when backchannel_user_code_parameter is true (re
 	Then JSON 'error'='invalid_request'
 	And JSON 'error_description'='the parameter user_code is missing'
 
-Scenario: scope parameter is required (request)
+Scenario: scope or authorization_details parameter is required (request)
 	Given authenticate a user
 	And build expiration time and add '10' seconds
 	And build JWS request object for client 'fortyTwoClient' and sign with the key 'keyId'
@@ -206,7 +206,55 @@ Scenario: scope parameter is required (request)
 	And extract JSON from body
 
 	Then JSON 'error'='invalid_request'
-	And JSON 'error_description'='missing parameter scope'
+	And JSON 'error_description'='missing parameters scope,authorization_details'
+
+Scenario: authorization_details type is required (request)
+	Given authenticate a user
+	And build expiration time and add '10' seconds
+	And build JWS request object for client 'fortyTwoClient' and sign with the key 'keyId'
+	| Key                   | Value                      |
+	| aud                   | https://localhost:8080     |
+	| iss                   | fortyTwoClient             |
+	| exp                   | $exp$                      |
+	| jti                   | jti                        |
+	| id_token_hint         | idtokenhint                |
+	| user_code             | code                       |
+	| authorization_details | { "locations": [] }        |
+
+	When execute HTTP POST request 'https://localhost:8080/mtls/bc-authorize'
+	| Key                  | Value          |
+	| X-Testing-ClientCert | sidClient.crt  |
+	| client_id            | fortyTwoClient |
+	| request              | $request$      |
+
+	And extract JSON from body
+
+	Then JSON 'error'='invalid_authorization_details'
+	And JSON 'error_description'='the authorization_details type is required'
+
+Scenario: authorization_details type must be valid (request)
+	Given authenticate a user
+	And build expiration time and add '10' seconds
+	And build JWS request object for client 'fortyTwoClient' and sign with the key 'keyId'
+	| Key                   | Value                      |
+	| aud                   | https://localhost:8080     |
+	| iss                   | fortyTwoClient             |
+	| exp                   | $exp$                      |
+	| jti                   | jti                        |
+	| id_token_hint         | idtokenhint                |
+	| user_code             | code                       |
+	| authorization_details | { "type": "invalid" }      |
+
+	When execute HTTP POST request 'https://localhost:8080/mtls/bc-authorize'
+	| Key                  | Value          |
+	| X-Testing-ClientCert | sidClient.crt  |
+	| client_id            | fortyTwoClient |
+	| request              | $request$      |
+
+	And extract JSON from body
+
+	Then JSON 'error'='invalid_authorization_details'
+	And JSON 'error_description'='authorization details types invalid are not supported'
 
 Scenario: scope must be valid (request)
 	Given authenticate a user

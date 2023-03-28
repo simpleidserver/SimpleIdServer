@@ -35,7 +35,7 @@ Scenario: Response Type must be supported
 	Then JSON 'error'='unsupported_response_type'
 	Then JSON 'error_description'='missing response types invalid'
 
-Scenario: Scope or resource parameter are required
+Scenario: Scope, resource or authorization_details parameter are required
 	When execute HTTP POST request 'https://localhost:8080/par'
 	| Key           | Value                 |
 	| response_type | code                  |
@@ -50,7 +50,7 @@ Scenario: Scope or resource parameter are required
 	
 	Then HTTP status code equals to '400'	
 	Then JSON 'error'='invalid_request'
-	Then JSON 'error_description'='missing parameters scope,resource'
+	Then JSON 'error_description'='missing parameters scope,resource,authorization_details'
 
 Scenario: Scope must be supported
 	When execute HTTP POST request 'https://localhost:8080/par'

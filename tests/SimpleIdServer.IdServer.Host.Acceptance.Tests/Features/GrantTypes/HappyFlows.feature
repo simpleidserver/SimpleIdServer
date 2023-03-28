@@ -364,3 +364,50 @@ Scenario: Use 'urn:ietf:params:oauth:grant-type:uma-ticket' grant type to get an
 	And access_token has permission to access to the resource id '$_id$'
 	And access_token has permission to access to the scope 'scope1'
 	And access_token has permission to access to the scope 'scope2'
+
+Scenario: Use 'urn:openid:params:grant-type:ciba' grant type to get an identity token (POLL mode) with authorization_details
+	Given authenticate a user
+
+	When execute HTTP GET request 'http://localhost/authorization'
+	| Key           | Value                 |
+	| response_type | id_token              |
+	| client_id     | fourteenClient        |
+	| state         | state                 |
+	| response_mode | query                 |
+	| scope         | openid email role     |
+	| redirect_uri  | http://localhost:8080 |
+	| nonce         | nonce                 |
+	
+	And extract parameter 'id_token' from redirect url
+
+	And execute HTTP POST request 'https://localhost:8080/bc-authorize'
+	| Key                       | Value                                                                                                |
+	| client_id                 | fortyNineClient                                                                                      |
+	| client_secret             | password                                                                                             |
+	| login_hint                | user                                                                                                 |
+	| user_code                 | password                                                                                             |
+	| authorization_details     |  { "type" : "secondDetails", "locations": [ "https://cal.example.com" ], "actions": [ "read" ] }     |
+
+	And extract JSON from body
+	And extract parameter 'auth_req_id' from JSON body
+
+	And execute HTTP POST JSON request 'http://localhost/bc-callback'
+	| Key           | Value                  |
+	| Authorization | Bearer $id_token$      |
+	| auth_req_id   | $auth_req_id$          |
+	| action        | 0                      |
+
+	And execute HTTP POST request 'https://localhost:8080/token'
+	| Key                  | Value                             |
+	| grant_type           | urn:openid:params:grant-type:ciba |
+	| client_id            | fortyNineClient                   |
+	| client_secret        | password                          |
+	| auth_req_id          | $auth_req_id$                     |
+	
+	And extract JSON from body
+	And extract parameter 'access_token' from JSON body
+	And extract payload from JWT '$access_token$'
+
+	Then HTTP status code equals to '200'
+	And JWT has authorization_details type 'secondDetails'
+	And JWT has authorization_details action 'read'

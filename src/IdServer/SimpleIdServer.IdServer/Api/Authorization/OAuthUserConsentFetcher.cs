@@ -20,6 +20,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             var clientId = queryParameters.GetClientIdFromAuthorizationRequest();
             var scopes = queryParameters.GetScopesFromAuthorizationRequest();
             var claims = queryParameters.GetClaimsFromAuthorizationRequest();
+            var authDetails = queryParameters.GetAuthorizationDetailsFromAuthorizationRequest();
             return new Consent
             {
                 Id = Guid.NewGuid().ToString(),
@@ -27,6 +28,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                 Scopes = scopes.ToList(),
                 Claims = claims.Select(c => c.Name),
                 CreateDateTime = DateTime.UtcNow,
+                AuthorizationDetails = authDetails,
                 Realm = realm
             };
         }
