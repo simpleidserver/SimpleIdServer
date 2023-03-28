@@ -62,7 +62,7 @@ namespace SimpleIdServer.IdServer.UI
             prefix = prefix ?? Constants.DefaultRealm;
             var schemes = await _authenticationSchemeProvider.GetAllSchemesAsync();
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.Query().Include(u => u.Consents).Include(u => u.ExternalAuthProviders).Include(u => u.Credentials).FirstOrDefaultAsync(u => u.Name == nameIdentifier, cancellationToken);
+            var user = await _userRepository.Query().Include(u => u.Consents).ThenInclude(c => c.Scopes).Include(u => u.ExternalAuthProviders).Include(u => u.Credentials).FirstOrDefaultAsync(u => u.Name == nameIdentifier, cancellationToken);
             var consents = await GetConsents();
             var pendingRequests = await GetPendingRequest();
             var externalIdProviders = ExternalProviderHelper.GetExternalAuthenticationSchemes(schemes);
@@ -93,8 +93,9 @@ namespace SimpleIdServer.IdServer.UI
                         consent.Id,
                         oauthClient.ClientName,
                         oauthClient.ClientUri,
-                        consent.Scopes,
-                        consent.Claims));
+                        consent.Scopes.Select(s => s.Scope),
+                        consent.Claims,
+                        consent.AuthorizationDetails.Select(s => s.Type)));
                 }
 
                 return consents;

@@ -214,12 +214,11 @@ namespace SimpleIdServer.IdServer
         public const string POLLING_DEVICE_ALREADY_REGISTERED = "only one polling device can be registrered";
         public const string POLLING_DEVICE_NOT_REGISTERED = "polling device is not registered";
         public const string GRANT_ID_CANNOT_BE_SPECIFIED = "grant_id cannot be specified because the grant_management_action is equals to create";
-        public const string GRANT_IS_REVOKED = "grant is revoked";
-        public const string GRANT_IS_ALREADY_REVOKED = "grant is already revoked";
         public const string BC_AUTHORIZE_NOT_PENDING = "the back channel authorization is not in pending";
         public const string UNEXPECTED_REQUEST_URI_PARAMETER = "the request cannot contains request_uri";
         public const string REQUEST_URI_IS_REQUIRED = "the request_uri is required";
         public const string REQUEST_URI_IS_INVALID = "the request_uri is invalid";
         public const string AUTHORIZATION_DETAILS_TYPE_REQUIRED = "the authorization_details type is required";
+        public const string GRANT_IS_NOT_ACCEPTED = "grant is not accepted";
     }
 }

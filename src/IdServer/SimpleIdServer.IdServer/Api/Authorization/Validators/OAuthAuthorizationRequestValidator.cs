@@ -145,9 +145,6 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                 if (!string.IsNullOrWhiteSpace(grantManagementAction) && !Constants.AllStandardGrantManagementActions.Contains(grantManagementAction))
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.INVALID_GRANT_MANAGEMENT_ACTION, grantManagementAction));
 
-                if (!string.IsNullOrWhiteSpace(grantId) && grantManagementAction == Constants.StandardGrantManagementActions.Create)
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.GRANT_ID_CANNOT_BE_SPECIFIED);
-
                 if (!string.IsNullOrWhiteSpace(grantId) && string.IsNullOrWhiteSpace(grantManagementAction))
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.GrantManagementAction));
             }
@@ -205,7 +202,8 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                     throw new OAuthSelectAccountRequiredException();
             }
 
-            if (!context.User.HasOpenIDConsent(context.Realm, clientId, request, claims, authDetails))
+            var grantManagementAction = context.Request.RequestData.GetGrantManagementActionFromAuthorizationRequest();
+            if (string.IsNullOrWhiteSpace(grantManagementAction) && !context.User.HasOpenIDConsent(context.Realm, clientId, request, claims, authDetails))
             {
                 RedirectToConsentView(context);
             }

@@ -66,6 +66,7 @@
                                     <th>@ProfileResource.client</th>
                                     <th>@ProfileResource.scopes</th>
                                     <th>@ProfileResource.claims</th>
+                                    <th>@ProfileResource.auth_details</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -77,6 +78,7 @@
                                         <td class="align-middle">@(string.IsNullOrWhiteSpace(consent.ClientName) ? '-' : consent.ClientName)</td>
                                         <td class="align-middle">@string.Join(",", consent.ScopeNames)</td>
                                         <td class="align-middle">@string.Join(",", consent.ClaimNames)</td>
+                                        <td class="align-middle">@string.Join(",", consent.AuthDataTypes)</td>
                                         <td class="align-middle">
                                             <a href="@Url.Action("RejectConsent", "Home", new { consentId = consent.ConsentId })" class="btn btn-danger">@ProfileResource.revoke_access</a>
                                         </td>

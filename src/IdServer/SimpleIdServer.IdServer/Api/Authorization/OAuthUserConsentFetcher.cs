@@ -25,9 +25,14 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             {
                 Id = Guid.NewGuid().ToString(),
                 ClientId = clientId,
-                Scopes = scopes.ToList(),
-                Claims = claims.Select(c => c.Name),
+                Scopes = scopes.Select(s => new AuthorizedScope
+                {
+                    Scope = s
+                }).ToList(),
+                Status = ConsentStatus.ACCEPTED,
+                Claims = claims.Select(c => c.Name).ToList(),
                 CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow,
                 AuthorizationDetails = authDetails,
                 Realm = realm
             };

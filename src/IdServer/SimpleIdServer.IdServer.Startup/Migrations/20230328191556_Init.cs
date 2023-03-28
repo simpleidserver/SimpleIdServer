@@ -212,24 +212,6 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Grants",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ClientId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    Claims = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SerializedAuthorizationDetails = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Grants", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Realms",
                 columns: table => new
                 {
@@ -487,27 +469,6 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         name: "FK_Translations_Clients_ClientId",
                         column: x => x.ClientId,
                         principalTable: "Clients",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "AuthorizedScope",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Scope = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Resources = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    GrantId = table.Column<string>(type: "nvarchar(450)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AuthorizedScope", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AuthorizedScope_Grants_GrantId",
-                        column: x => x.GrantId,
-                        principalTable: "Grants",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -804,29 +765,30 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Consent",
+                name: "Grants",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ClientId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Realm = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Scopes = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Claims = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     SerializedAuthorizationDetails = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ScopeId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Consent", x => x.Id);
+                    table.PrimaryKey("PK_Grants", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Consent_Scopes_ScopeId",
+                        name: "FK_Grants_Scopes_ScopeId",
                         column: x => x.ScopeId,
                         principalTable: "Scopes",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Consent_Users_UserId",
+                        name: "FK_Grants_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -1080,6 +1042,27 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "AuthorizedScope",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Scope = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Resources = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ConsentId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AuthorizedScope", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AuthorizedScope_Grants_ConsentId",
+                        column: x => x.ConsentId,
+                        principalTable: "Grants",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_ApiResourceRealm_RealmsName",
                 table: "ApiResourceRealm",
@@ -1121,9 +1104,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 column: "AuthSchemeProviderDefinitionName");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AuthorizedScope_GrantId",
+                name: "IX_AuthorizedScope_ConsentId",
                 table: "AuthorizedScope",
-                column: "GrantId");
+                column: "ConsentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BCAuthorizeHistory_BCAuthorizeId",
@@ -1156,13 +1139,13 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 column: "ScopesId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Consent_ScopeId",
-                table: "Consent",
+                name: "IX_Grants_ScopeId",
+                table: "Grants",
                 column: "ScopeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Consent_UserId",
-                table: "Consent",
+                name: "IX_Grants_UserId",
+                table: "Grants",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -1293,9 +1276,6 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 name: "ClientScope");
 
             migrationBuilder.DropTable(
-                name: "Consent");
-
-            migrationBuilder.DropTable(
                 name: "RealmScope");
 
             migrationBuilder.DropTable(
@@ -1362,9 +1342,6 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 name: "Realms");
 
             migrationBuilder.DropTable(
-                name: "Scopes");
-
-            migrationBuilder.DropTable(
                 name: "Translations");
 
             migrationBuilder.DropTable(
@@ -1374,10 +1351,13 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 name: "UMAResourcePermission");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "AuthenticationSchemeProviderDefinitions");
 
             migrationBuilder.DropTable(
-                name: "AuthenticationSchemeProviderDefinitions");
+                name: "Scopes");
+
+            migrationBuilder.DropTable(
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "Clients");

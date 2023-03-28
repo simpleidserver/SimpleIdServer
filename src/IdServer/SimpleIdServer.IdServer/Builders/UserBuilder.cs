@@ -5,6 +5,7 @@ using SimpleIdServer.IdServer.Domains.DTOs;
 using SimpleIdServer.IdServer.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using static SimpleIdServer.IdServer.Constants;
 
 namespace SimpleIdServer.IdServer.Builders
@@ -96,19 +97,26 @@ namespace SimpleIdServer.IdServer.Builders
 
         public UserBuilder AddConsent(string realm, string clientId, params string[] scopes)
         {
-            _user.Consents.Add(new Consent { Id = Guid.NewGuid().ToString(), ClientId = clientId, Scopes = scopes, CreateDateTime = DateTime.UtcNow, Realm = realm });
+            _user.Consents.Add(new Consent { Id = Guid.NewGuid().ToString(), ClientId = clientId, Scopes = scopes.Select(s => new AuthorizedScope { Scope = s }).ToList(), UpdateDateTime = DateTime.UtcNow, CreateDateTime = DateTime.UtcNow, Realm = realm, Status = ConsentStatus.ACCEPTED });
             return this;
         }
 
-        public UserBuilder AddConsent(string realm, string clientId, IEnumerable<string> scopes, IEnumerable<string> claims)
+        public UserBuilder AddConsent(string realm, string clientId, ICollection<string> scopes, ICollection<AuthorizationData> authorizationDetails, string consentId = null)
         {
-            _user.Consents.Add(new Consent { Id = Guid.NewGuid().ToString(), Scopes = scopes, ClientId = clientId, Claims = claims, CreateDateTime = DateTime.UtcNow, Realm = realm });
+            _user.Consents.Add(new Consent { Id = consentId ?? Guid.NewGuid().ToString(), ClientId = clientId, Scopes = scopes.Select(s => new AuthorizedScope { Scope = s }).ToList(), UpdateDateTime = DateTime.UtcNow, CreateDateTime = DateTime.UtcNow, Realm = realm, AuthorizationDetails = authorizationDetails.ToList(), Status = ConsentStatus.ACCEPTED });
+            return this;
+        }
+
+
+        public UserBuilder AddConsent(string realm, string clientId, ICollection<string> scopes, ICollection<string> claims)
+        {
+            _user.Consents.Add(new Consent { Id = Guid.NewGuid().ToString(), Scopes = scopes.Select(s => new AuthorizedScope { Scope = s }).ToList(), ClientId = clientId, UpdateDateTime = DateTime.UtcNow, Claims = claims, CreateDateTime = DateTime.UtcNow, Realm = realm, Status = ConsentStatus.ACCEPTED });
             return this;
         }
 
         public UserBuilder AddConsent(string realm, string clientId, params AuthorizationData[] authData)
         {
-            _user.Consents.Add(new Consent { Id = Guid.NewGuid().ToString(), ClientId = clientId, AuthorizationDetails = authData, CreateDateTime = DateTime.UtcNow, Realm = realm });
+            _user.Consents.Add(new Consent { Id = Guid.NewGuid().ToString(), ClientId = clientId, AuthorizationDetails = authData, UpdateDateTime = DateTime.UtcNow, CreateDateTime = DateTime.UtcNow, Realm = realm, Status = ConsentStatus.ACCEPTED });
             return this;
         }
 

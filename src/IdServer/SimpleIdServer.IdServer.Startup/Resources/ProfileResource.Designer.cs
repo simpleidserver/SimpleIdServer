@@ -79,7 +79,7 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à NAME.
+        ///   Recherche une chaîne localisée semblable à Name.
         /// </summary>
         public static string account_name {
             get {
@@ -102,6 +102,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static string approved_apps_title {
             get {
                 return ResourceManager.GetString("approved_apps_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Authorization Details.
+        /// </summary>
+        public static string auth_details {
+            get {
+                return ResourceManager.GetString("auth_details", resourceCulture);
             }
         }
         
@@ -169,7 +178,7 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à NAME.
+        ///   Recherche une chaîne localisée semblable à Name.
         /// </summary>
         public static string name {
             get {

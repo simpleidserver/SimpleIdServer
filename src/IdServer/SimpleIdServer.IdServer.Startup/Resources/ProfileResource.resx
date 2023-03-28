@@ -132,6 +132,9 @@
   <data name="approved_apps_title" xml:space="preserve">
     <value>Approved applications</value>
   </data>
+  <data name="auth_details" xml:space="preserve">
+    <value>Authorization Details</value>
+  </data>
   <data name="claims" xml:space="preserve">
     <value>Claims</value>
   </data>

@@ -440,25 +440,6 @@ Scenario: grant_management_action parameter must be valid
 	Then redirection url contains the parameter value 'error'='invalid_request'
 	Then redirection url contains the parameter value 'error_description'='the grant_management_action invalid is not valid'
 
-Scenario: grant_id cannot be specified when grant_management_action is equals to create
-	Given authenticate a user
-	
-	When execute HTTP GET request 'http://localhost/authorization'
-	| Key                     | Value                                                                                 |
-	| response_type           | code token                                                                            |
-	| client_id               | fortySixClient                                                                        |
-	| state                   | state                                                                                 |
-	| response_mode           | query                                                                                 |
-	| redirect_uri            | http://localhost:8080                                                                 |
-	| nonce                   | nonce                                                                                 |
-	| claims                  | { "id_token": { "acr": { "essential" : true, "value": "urn:openbanking:psd2:ca" } } } | 
-	| resource                | https://cal.example.com                                                               |
-	| grant_management_action | create                                                                                |
-	| grant_id                | id                                                                                    |
-	
-	Then redirection url contains the parameter value 'error'='invalid_request'
-	Then redirection url contains the parameter value 'error_description'='grant_id cannot be specified because the grant_management_action is equals to create'
-
 Scenario: grant_management_action must be specified when grant_id is present
 	Given authenticate a user
 	
@@ -502,32 +483,6 @@ Scenario: only the same client can perform operations on the grant
 	When execute HTTP GET request 'http://localhost/authorization'
 	| Key                     | Value                                                                                 |
 	| response_type           | code                                                                                  |
-	| client_id               | fortySevenClient                                                                      |
-	| state                   | state                                                                                 |
-	| response_mode           | query                                                                                 |
-	| redirect_uri            | http://localhost:8080                                                                 |
-	| nonce                   | nonce                                                                                 |
-	| claims                  | { "id_token": { "acr": { "essential" : true, "value": "urn:openbanking:psd2:ca" } } } | 
-	| resource                | https://cal.example.com                                                               |
-	| grant_management_action | create                                                                                |
-	| scope                   | grant_management_revoke                                                               |
-
-	And extract parameter 'code' from redirect url
-	
-	And execute HTTP POST request 'https://localhost:8080/token'
-	| Key           | Value        			|
-	| client_id     | fortySevenClient      |
-	| client_secret | password     			|
-	| grant_type    | authorization_code	|
-	| code			| $code$				|	
-	| redirect_uri  | http://localhost:8080	|
-	
-	And extract JSON from body
-	And extract parameter '$.grant_id' from JSON body into 'grantId'
-	
-	And execute HTTP GET request 'http://localhost/authorization'
-	| Key                     | Value                                                                                 |
-	| response_type           | code                                                                                  |
 	| client_id               | fortyEightClient                                                                      |
 	| state                   | state                                                                                 |
 	| response_mode           | query                                                                                 |
@@ -537,7 +492,7 @@ Scenario: only the same client can perform operations on the grant
 	| resource                | https://cal.example.com                                                               |
 	| grant_management_action | replace                                                                               |
 	| scope                   | grant_management_query                                                                |	
-	| grant_id                | $grantId$                                                                             |
+	| grant_id                | consentId                                                                             |
 	
 	Then redirection url contains the parameter value 'error'='access_denied'
 	Then redirection url contains the parameter value 'error_description'='the client fortyEightClient is not authorized to access to perform operations on the grant'

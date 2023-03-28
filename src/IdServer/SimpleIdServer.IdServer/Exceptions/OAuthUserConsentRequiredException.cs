@@ -4,19 +4,13 @@ namespace SimpleIdServer.IdServer.Exceptions
 {
     public class OAuthUserConsentRequiredException : OAuthException
     {
-        public OAuthUserConsentRequiredException() : base(string.Empty, string.Empty) { }
-
-        public OAuthUserConsentRequiredException(string controllerName) : this()
+        public OAuthUserConsentRequiredException(string grantId = null) : base(string.Empty, string.Empty) 
         {
-            ControllerName = controllerName;
-        }
-
-        public OAuthUserConsentRequiredException(string controllerName, string actionName) : this(controllerName) 
-        {
-            ActionName = actionName;
+            GrantId = grantId;
         }
 
         public string ControllerName { get; set; } = "Consents";
         public string ActionName { get; set; } = "Index";
+        public string? GrantId { get; set; } = null;
     }
 }

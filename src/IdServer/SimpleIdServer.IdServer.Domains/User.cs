@@ -97,6 +97,24 @@ namespace SimpleIdServer.IdServer.Domains
 
         #endregion
 
+        public Consent AddConsent(string realm, string clientId, ICollection<string> claims, ICollection<AuthorizedScope> scopes, ICollection<AuthorizationData> authorizationDetails)
+        {
+            var result = new Consent
+            {
+                Id = Guid.NewGuid().ToString(),
+                Realm = realm,
+                ClientId = clientId,
+                Scopes = scopes,
+                Claims = claims,
+                AuthorizationDetails = authorizationDetails,
+                Status = ConsentStatus.PENDING,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
+            };
+            Consents.Add(result);
+            return result;
+        }
+
         public void RejectConsent(string consentId)
         {
             var consent = Consents.Single(c => c.Id == consentId);

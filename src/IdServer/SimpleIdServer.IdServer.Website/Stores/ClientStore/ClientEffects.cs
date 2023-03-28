@@ -13,7 +13,6 @@ using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Website.Resources;
 using SimpleIdServer.IdServer.WsFederation;
 using System.Linq.Dynamic.Core;
-using System.Net;
 
 namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
 {

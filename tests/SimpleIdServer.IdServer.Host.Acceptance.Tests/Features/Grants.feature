@@ -5,17 +5,18 @@ Scenario: grant is returned when valid access token is passed
 	Given authenticate a user
 	
 	When execute HTTP GET request 'http://localhost/authorization'
-	| Key                     | Value                                                                                 |
-	| response_type           | code                                                                                  |
-	| client_id               | fortySevenClient                                                                      |
-	| state                   | state                                                                                 |
-	| response_mode           | query                                                                                 |
-	| redirect_uri            | http://localhost:8080                                                                 |
-	| nonce                   | nonce                                                                                 |
-	| claims                  | { "id_token": { "acr": { "essential" : true, "value": "urn:openbanking:psd2:ca" } } } | 
-	| resource                | https://cal.example.com                                                               |
-	| grant_management_action | create                                                                                |
-	| scope                   | grant_management_query                                                                |
+	| Key                     | Value                                                                                                |
+	| response_type           | code                                                                                                 |
+	| client_id               | fortySevenClient                                                                                     |
+	| state                   | state                                                                                                |
+	| response_mode           | query                                                                                                |
+	| redirect_uri            | http://localhost:8080                                                                                |
+	| nonce                   | nonce                                                                                                |
+	| claims                  | { "id_token": { "acr": { "essential" : true, "value": "urn:openbanking:psd2:ca" } } }                | 
+	| resource                | https://cal.example.com                                                                              |
+	| grant_management_action | create                                                                                               |
+	| scope                   | grant_management_query                                                                               |
+	| authorization_details   |  { "type" : "secondDetails", "locations": [ "https://cal.example.com" ], "actions": [ "read" ] }     |
 
 	And extract parameter 'code' from redirect url
 	
@@ -40,6 +41,10 @@ Scenario: grant is returned when valid access token is passed
 	Then JSON '$.claims[0]'='acr'
 	And JSON '$.scopes[0].scope'='admin'
 	And JSON '$.scopes[1].scope'='calendar'
+	And JSON '$.scopes[2].scope'='grant_management_query'
+	And JSON '$.authorization_details[0].type'='secondDetails'
+	And JSON '$.authorization_details[0].locations[0]'='https://cal.example.com'
+	And JSON '$.authorization_details[0].actions[0]'='read'
 
 Scenario: grant is returned when a valid refreshed access token is passed
 	Given authenticate a user

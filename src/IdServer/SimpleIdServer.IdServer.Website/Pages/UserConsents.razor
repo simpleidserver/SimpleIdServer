@@ -26,11 +26,31 @@
         ColumnWidth="300px">
     <Columns>
         <RadzenDataGridColumn TItem="Consent" Property="ClientId" Title="Client" Filterable="false" Sortable="false" Width="80px" />
+        <RadzenDataGridColumn TItem="Consent" Title="Status" Filterable="false" Sortable="false" Width="80px">
+            <Template Context="data">
+                @if(data.Status == ConsentStatus.PENDING)
+                {                    
+                    <RadzenBadge Text="Pending" IsPill="true" BadgeStyle="BadgeStyle.Danger"></RadzenBadge>
+                }
+                else
+                {
+                    <RadzenBadge Text="Confirmed" IsPill="true" BadgeStyle="BadgeStyle.Success"></RadzenBadge>
+                }
+            </Template>
+        </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="Consent" Title="Scopes" Filterable="false" Sortable="false" Width="80px">
             <Template Context="data">
-                @foreach(var scope in data.Scopes.Where(s => !string.IsNullOrWhiteSpace(s)))
+                @foreach(var scope in data.Scopes)
                 {
-                    <RadzenBadge Text="@scope" IsPill="true" />
+                    <RadzenBadge Text="@scope.Scope" IsPill="true" />
+                }
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Consent" Title="Claims" Filterable="false" Sortable="false" Width="80px">
+            <Template Context="data">
+                @foreach (var claim in data.Claims.Where(c => !string.IsNullOrWhiteSpace(c)))
+                {
+                    <RadzenBadge Text="@claim" IsPill="true" />
                 }
             </Template>
         </RadzenDataGridColumn>
@@ -42,7 +62,7 @@
                 }
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Consent" Property="CreateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Created at" Width="80px" />
+        <RadzenDataGridColumn TItem="Consent" Property="UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Created at" Width="80px" />
         <RadzenDataGridColumn TItem="Consent" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
                 <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />

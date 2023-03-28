@@ -237,6 +237,9 @@
   <data name="SelectedClientsRemoved" xml:space="preserve">
     <value>Selected clients have been removed</value>
   </data>
+  <data name="SelectedGrantsRemoved" xml:space="preserve">
+    <value>Selected grants have been rejected</value>
+  </data>
   <data name="SelectedIdProviderMappersRemoved" xml:space="preserve">
     <value>Selected mappers have been removed</value>
   </data>

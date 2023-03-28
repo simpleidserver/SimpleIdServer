@@ -23,34 +23,8 @@ Scenario: grant must exists
 	
 Scenario: access token must be valid
 	Given authenticate a user
-	
-	When execute HTTP GET request 'http://localhost/authorization'
-	| Key                     | Value                                                                                 |
-	| response_type           | code                                                                                  |
-	| client_id               | fortySevenClient                                                                      |
-	| state                   | state                                                                                 |
-	| response_mode           | query                                                                                 |
-	| redirect_uri            | http://localhost:8080                                                                 |
-	| nonce                   | nonce                                                                                 |
-	| claims                  | { "id_token": { "acr": { "essential" : true, "value": "urn:openbanking:psd2:ca" } } } | 
-	| resource                | https://cal.example.com                                                               |
-	| grant_management_action | create                                                                                |
-	| scope                   | grant_management_query                                                                |
 
-	And extract parameter 'code' from redirect url
-	
-	And execute HTTP POST request 'https://localhost:8080/token'
-	| Key           | Value        			|
-	| client_id     | fortySevenClient      |
-	| client_secret | password     			|
-	| grant_type    | authorization_code	|
-	| code			| $code$				|	
-	| redirect_uri  | http://localhost:8080	|
-	
-	And extract JSON from body
-	And extract parameter '$.grant_id' from JSON body into 'grantId'
-
-	And execute HTTP GET request 'http://localhost/grants/$grantId$'
+	When execute HTTP GET request 'http://localhost/grants/consentId'
 	| Key           | Value           |
 	| Authorization | Bearer INVALID  |
 
@@ -66,32 +40,6 @@ Scenario: only the same client can query the grant
 	When execute HTTP GET request 'http://localhost/authorization'
 	| Key                     | Value                                                                                 |
 	| response_type           | code                                                                                  |
-	| client_id               | fortySevenClient                                                                      |
-	| state                   | state                                                                                 |
-	| response_mode           | query                                                                                 |
-	| redirect_uri            | http://localhost:8080                                                                 |
-	| nonce                   | nonce                                                                                 |
-	| claims                  | { "id_token": { "acr": { "essential" : true, "value": "urn:openbanking:psd2:ca" } } } | 
-	| resource                | https://cal.example.com                                                               |
-	| grant_management_action | create                                                                                |
-	| scope                   | grant_management_revoke                                                               |
-
-	And extract parameter 'code' from redirect url
-	
-	And execute HTTP POST request 'https://localhost:8080/token'
-	| Key           | Value        			|
-	| client_id     | fortySevenClient      |
-	| client_secret | password     			|
-	| grant_type    | authorization_code	|
-	| code			| $code$				|	
-	| redirect_uri  | http://localhost:8080	|
-	
-	And extract JSON from body
-	And extract parameter '$.grant_id' from JSON body into 'grantId'
-	
-	And execute HTTP GET request 'http://localhost/authorization'
-	| Key                     | Value                                                                                 |
-	| response_type           | code                                                                                  |
 	| client_id               | fortyEightClient                                                                      |
 	| state                   | state                                                                                 |
 	| response_mode           | query                                                                                 |
@@ -99,7 +47,6 @@ Scenario: only the same client can query the grant
 	| nonce                   | nonce                                                                                 |
 	| claims                  | { "id_token": { "acr": { "essential" : true, "value": "urn:openbanking:psd2:ca" } } } | 
 	| resource                | https://cal.example.com                                                               |
-	| grant_management_action | create                                                                                |
 	| scope                   | grant_management_query                                                                |
 
 	And extract parameter 'code' from redirect url
@@ -115,7 +62,7 @@ Scenario: only the same client can query the grant
 	And extract JSON from body
 	And extract parameter '$.access_token' from JSON body into 'accessToken'
 
-	And execute HTTP GET request 'http://localhost/grants/$grantId$'
+	And execute HTTP GET request 'http://localhost/grants/consentId'
 	| Key           | Value                |
 	| Authorization | Bearer $accessToken$ |
 

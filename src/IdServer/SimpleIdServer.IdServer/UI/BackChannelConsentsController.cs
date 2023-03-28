@@ -33,7 +33,6 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IClientRepository _clientRepository;
         private readonly IdServer.Infrastructures.IHttpClientFactory _httpClientFactory;
         private readonly IJwtBuilder _jwtBuilder;
-        private readonly IAmrHelper _amrHelper;
         private readonly ILogger<BackChannelConsentsController> _logger;
 
         public BackChannelConsentsController(
@@ -45,7 +44,6 @@ namespace SimpleIdServer.IdServer.UI
             _clientRepository = clientRepository;
             _httpClientFactory = httpClientFactory;
             _jwtBuilder = jwtBuilder;
-            _amrHelper = amrHelper;
             _logger = logger;
         }
 

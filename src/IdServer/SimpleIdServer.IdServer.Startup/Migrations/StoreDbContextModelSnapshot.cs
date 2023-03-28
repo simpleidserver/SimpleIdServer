@@ -413,7 +413,8 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("GrantId")
+                    b.Property<string>("ConsentId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Resources")
@@ -428,11 +429,11 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GrantId");
+                    b.HasIndex("ConsentId");
 
                     b.ToTable("AuthorizedScope");
 
-                    b.HasAnnotation("Relational:JsonPropertyName", "scopes");
+                    b.HasAnnotation("Relational:JsonPropertyName", "scope");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.BCAuthorize", b =>
@@ -926,7 +927,8 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
                     b.Property<string>("Claims")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "claims");
 
                     b.Property<string>("ClientId")
                         .IsRequired()
@@ -942,43 +944,6 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<string>("ScopeId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Scopes")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SerializedAuthorizationDetails")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ScopeId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Consent");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Grant", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Claims")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "claims");
-
-                    b.Property<string>("ClientId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("SerializedAuthorizationDetails")
                         .HasColumnType("nvarchar(max)");
 
@@ -990,9 +955,13 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ScopeId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Grants");
                 });
@@ -1792,10 +1761,13 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthorizedScope", b =>
                 {
-                    b.HasOne("SimpleIdServer.IdServer.Domains.Grant", null)
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Consent", "Consent")
                         .WithMany("Scopes")
-                        .HasForeignKey("GrantId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("ConsentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Consent");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.BCAuthorizeHistory", b =>
@@ -1995,7 +1967,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Navigation("Translations");
                 });
 
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Grant", b =>
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Consent", b =>
                 {
                     b.Navigation("Scopes");
                 });

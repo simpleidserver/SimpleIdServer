@@ -7,13 +7,14 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
 {
     public class ConsentViewModel
     {
-        public ConsentViewModel(string consentId, string clientName, string clientUri, IEnumerable<string> scopeNames, IEnumerable<string> claimNames)
+        public ConsentViewModel(string consentId, string clientName, string clientUri, IEnumerable<string> scopeNames, IEnumerable<string> claimNames, IEnumerable<string> authDataTypes)
         {
             ConsentId = consentId;
             ClientName = clientName;
             ClientUri = clientUri;
             ScopeNames = scopeNames;
             ClaimNames = claimNames;
+            AuthDataTypes = authDataTypes;
         }
 
         public string ConsentId { get; set; }
@@ -21,5 +22,6 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
         public string ClientUri { get; set; }
         public IEnumerable<string> ScopeNames { get; set; }
         public IEnumerable<string> ClaimNames { get; set; }
+        public IEnumerable<string> AuthDataTypes { get; set; }
     }
 }

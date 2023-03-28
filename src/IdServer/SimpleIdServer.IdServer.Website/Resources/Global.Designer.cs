@@ -421,6 +421,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Selected grants have been rejected.
+        /// </summary>
+        public static string SelectedGrantsRemoved {
+            get {
+                return ResourceManager.GetString("SelectedGrantsRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Selected mappers have been removed.
         /// </summary>
         public static string SelectedIdProviderMappersRemoved {

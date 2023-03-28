@@ -101,11 +101,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         [ReducerMethod]
         public static UserState ReduceRevokeUserConsentSuccessAction(UserState state, RevokeUserConsentSuccessAction act)
         {
-            var consent = state.User.Consents.Single(c => c.Id == act.ConsentId);
-            state.User.Consents.Remove(consent);
+            var user = state.User;
+            var consent = user.Consents.Single(c => c.Id == act.ConsentId);
+            user.Consents.Remove(consent);
             return state with
             {
-                User = state.User
+                User = user
             };
         }
 

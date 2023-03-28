@@ -479,6 +479,16 @@ namespace SimpleIdServer.IdServer.Builders
             return this;
         }
 
+        /// <summary>
+        /// Disable OPENID consent.
+        /// </summary>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder DisableConsent()
+        {
+            _client.IsConsentDisabled = true;
+            return this;
+        }
+
         #endregion
 
         public Client Build() => _client;

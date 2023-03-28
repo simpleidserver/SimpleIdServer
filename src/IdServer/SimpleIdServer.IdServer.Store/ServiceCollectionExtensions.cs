@@ -20,13 +20,13 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IClaimProviderRepository, ClaimProviderRepository>();
             services.AddTransient<IBCAuthorizeRepository, BCAuthorizeRepository>();
             services.AddTransient<IApiResourceRepository, ApiResourceRepository>();
-            services.AddTransient<IGrantRepository, GrantRepository>();
             services.AddTransient<IUmaResourceRepository, UmaResourceRepository>();
             services.AddTransient<IUmaPendingRequestRepository, UmaPendingRequestRepository>();
             services.AddTransient<IRealmRepository, RealmRepository>();
             services.AddTransient<IFileSerializedKeyStore, SerializedFileKeyStore>();
             services.AddTransient<IAuditEventRepository, AuditEventRepository>();
             services.AddTransient<ICertificateAuthorityRepository, CertificateAuthorityRepository>();
+            services.AddTransient<IGrantRepository, GrantRepository>();
             if (action != null) services.AddDbContext<StoreDbContext>(action, lifetime);
             else services.AddDbContext<StoreDbContext>(o => o.UseInMemoryDatabase("identityServer"), lifetime);
             return services;

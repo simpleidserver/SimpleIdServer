@@ -21,13 +21,13 @@ namespace SimpleIdServer.IdServer.Store
         public DbSet<ClaimProvider> ClaimProviders { get; set; }
         public DbSet<BCAuthorize> BCAuthorizeLst { get; set; }
         public DbSet<ApiResource> ApiResources { get; set; }
-        public DbSet<Grant> Grants { get; set; }
         public DbSet<UMAResource> UmaResources { get; set; }
         public DbSet<UMAPendingRequest> UmaPendingRequest { get; set; }
         public DbSet<Realm> Realms { get; set; }
         public DbSet<SerializedFileKey> SerializedFileKeys { get; set; }
         public DbSet<AuditEvent> AuditEvents { get; set; }
         public DbSet<CertificateAuthority> CertificateAuthorities { get; set; }
+        public DbSet<Consent> Grants { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -55,7 +55,6 @@ namespace SimpleIdServer.IdServer.Store
             builder.ApplyConfiguration(new BCAuthorizeHistoryConfiguration());
             builder.ApplyConfiguration(new UserDeviceConfiguration());
             builder.ApplyConfiguration(new ApiResourceConfiguration());
-            builder.ApplyConfiguration(new GrantConfiguration());
             builder.ApplyConfiguration(new AuthorizedScopeConfiguration());
             builder.ApplyConfiguration(new UMAPendingRequestConfiguration());
             builder.ApplyConfiguration(new UMAPermissionTicketConfiguration());
