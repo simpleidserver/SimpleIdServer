@@ -83,9 +83,10 @@ namespace SimpleIdServer.IdServer.Api
             HttpHeader = httpHeader;
         }
 
-        public HandlerContextRequest(string issuerName, string userSubject, JsonObject data, JsonObject httpHeader, IRequestCookieCollection cookies): this(issuerName, userSubject, data, httpHeader)
+        public HandlerContextRequest(string issuerName, string userSubject, JsonObject data, JsonObject httpHeader, IRequestCookieCollection cookies, string referer = null): this(issuerName, userSubject, data, httpHeader)
         {
             Cookies = cookies;
+            Referer = referer;
         }
 
         public HandlerContextRequest(string issuerName, string userSubject, JsonObject data, JsonObject httpHeader, IRequestCookieCollection cookies, X509Certificate2 certificate) : this(issuerName, userSubject, data, httpHeader, cookies)
@@ -100,6 +101,7 @@ namespace SimpleIdServer.IdServer.Api
         public JsonObject HttpHeader { get; private set; }
         public IRequestCookieCollection Cookies { get; set; }
         public X509Certificate2 Certificate { get; set; }
+        public string Referer { get; set; }
 
         public void SetRequestData(JsonObject data)
         {
@@ -170,6 +172,12 @@ namespace SimpleIdServer.IdServer.Api
         {
             var result = Request.IssuerName;
             return GetIssuer(result);
+        }
+
+        public bool IsComingFromConsentScreen()
+        {
+            var consentsUrl = $"{GetIssuer()}/Consents";
+            return Request.Referer == null ? false : Request.Referer.StartsWith(consentsUrl);
         }
 
         public static string GetIssuer(string result)

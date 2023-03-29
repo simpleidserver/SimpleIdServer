@@ -32,7 +32,7 @@ namespace SimpleIdServer.IdServer.Api.Grants
             try
             {
                 var bearerToken = ExtractBearerToken();
-                var grant = await _grantRepository.Query().Include(g => g.Scopes).FirstOrDefaultAsync(q => q.Id == id, cancellationToken);
+                var grant = await _grantRepository.Query().Include(g => g.Scopes).Include(g => g.User).FirstOrDefaultAsync(q => q.Id == id, cancellationToken);
                 if (grant == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_TARGET, string.Format(ErrorMessages.UNKNOWN_GRANT, id));
                 if (grant.Status == Domains.ConsentStatus.PENDING) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_TARGET, ErrorMessages.GRANT_IS_NOT_ACCEPTED);
                 var token = await _grantedTokenHelper.GetAccessToken(bearerToken, cancellationToken);
@@ -41,7 +41,6 @@ namespace SimpleIdServer.IdServer.Api.Grants
                 if(!scopes.Contains(Constants.StandardScopes.GrantManagementQuery.Name)) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, ErrorMessages.INVALID_ACCESS_TOKEN_SCOPE);
                 var clientId = token.Claims.FirstOrDefault(c => c.Type == OpenIdConnectParameterNames.ClientId)?.Value;
                 if(grant.ClientId != clientId) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, string.Format(ErrorMessages.UNAUTHORIZED_CLIENT_ACCESS_GRANT, clientId));
-
                 return new OkObjectResult(grant);
             }
             catch (OAuthException ex)

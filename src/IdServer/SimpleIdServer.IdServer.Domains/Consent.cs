@@ -69,10 +69,15 @@ namespace SimpleIdServer.IdServer.Domains
 
             void MergeScopes()
             {
-                var unknownScopes = scopes.Where(s => !Scopes.Any(sc => sc.Scope == s.Scope));
+                var newScopes = Scopes.Select(s => new AuthorizedScope
+                {
+                    Resources = s.Resources,
+                    Scope = s.Scope
+                }).ToList();
+                var unknownScopes = scopes.Where(s => !newScopes.Any(sc => sc.Scope == s.Scope));
                 foreach (var unknownScope in unknownScopes)
-                    Scopes.Add(unknownScope);
-                foreach (var existingScope in Scopes)
+                    newScopes.Add(unknownScope);
+                foreach (var existingScope in newScopes)
                 {
                     var newScope = scopes.FirstOrDefault(s => s.Scope == existingScope.Scope);
                     if (newScope == null) continue;
@@ -82,11 +87,13 @@ namespace SimpleIdServer.IdServer.Domains
                         resources.Add(unknownResource);
                     existingScope.Resources = resources;
                 }
+
+                Scopes = newScopes;
             }
 
             void MergeClaims()
             {
-                var cls = Claims;
+                var cls = Claims.ToList();
                 foreach (var cl in claims)
                 {
                     if (cls.Contains(cl)) continue;
@@ -98,10 +105,11 @@ namespace SimpleIdServer.IdServer.Domains
 
             void MergeAuthorizationDetails()
             {
-                var unknownAuthDataLst = authorizationDetails.Where(s => !AuthorizationDetails.Any(sc => sc.Type == s.Type));
+                var newAuthorizationDetails = AuthorizationDetails.ToList();
+                var unknownAuthDataLst = authorizationDetails.Where(s => !newAuthorizationDetails.Any(sc => sc.Type == s.Type));
                 foreach (var unknownAuthData in unknownAuthDataLst)
-                    AuthorizationDetails.Add(unknownAuthData);
-                foreach (var existingAuthData in AuthorizationDetails)
+                    newAuthorizationDetails.Add(unknownAuthData);
+                foreach (var existingAuthData in newAuthorizationDetails)
                 {
                     var newAuthData = authorizationDetails.FirstOrDefault(s => s.Type == existingAuthData.Type);
                     if (newAuthData == null) continue;
@@ -116,7 +124,7 @@ namespace SimpleIdServer.IdServer.Domains
                         existingAuthData.DataTypes.Add(unknownDataType);
                 }
 
-                AuthorizationDetails = AuthorizationDetails;
+                AuthorizationDetails = newAuthorizationDetails;
             }
         }
 

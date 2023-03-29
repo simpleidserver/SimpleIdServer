@@ -107,6 +107,6 @@ Scenario: when using offline_scope the client can access to the userinfo even if
 
 	Then HTTP status code equals to '200'
 	Then JSON 'sub'='user'
-	Then JSON '$.role[0]'='role2'
-	Then JSON '$.role[1]'='role1'
+	Then JSON '$.role[0]'='role1'
+	Then JSON '$.role[1]'='role2'
 	Then JSON 'email'='email@outlook.fr'

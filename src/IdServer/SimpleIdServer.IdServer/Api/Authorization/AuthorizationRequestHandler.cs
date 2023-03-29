@@ -114,7 +114,12 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             var authDetails = extractionResult.AuthorizationDetails;
             var allClaims = claims.Select(c => c.Name).Distinct().ToList();
             var grant = context.User.Consents.FirstOrDefault(g => g.Id == grantId);
-            // if (grant?.Status == ConsentStatus.ACCEPTED) return grant;
+            if (grant?.Status == ConsentStatus.ACCEPTED && context.IsComingFromConsentScreen())
+            {
+                await _userRepository.SaveChanges(cancellationToken);
+                return grant;
+            }
+
             switch (grantManagementAction)
             {
                 // create a fresh grant.
@@ -132,7 +137,6 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                         if (grant.ClientId != context.Client.ClientId)
                             throw new OAuthException(ErrorCodes.ACCESS_DENIED, string.Format(ErrorMessages.UNAUTHORIZED_CLIENT_ACCESS_GRANT, context.Client.ClientId));
 
-                        // await RevokeTokens(grant.Id, cancellationToken);
                         grant.Claims = allClaims;
                         grant.Scopes = extractionResult.Authorizations;
                         grant.AuthorizationDetails = authDetails.ToList();
@@ -154,7 +158,6 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             }
 
             if(context.Client.IsConsentDisabled) grant.Accept();
-            _userRepository.Update(context.User);
             await _userRepository.SaveChanges(cancellationToken);
             if(!context.Client.IsConsentDisabled) throw new OAuthUserConsentRequiredException(grant.Id);
             return grant;

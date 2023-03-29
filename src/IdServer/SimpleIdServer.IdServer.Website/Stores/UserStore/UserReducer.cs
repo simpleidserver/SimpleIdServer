@@ -102,8 +102,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         public static UserState ReduceRevokeUserConsentSuccessAction(UserState state, RevokeUserConsentSuccessAction act)
         {
             var user = state.User;
-            var consent = user.Consents.Single(c => c.Id == act.ConsentId);
-            user.Consents.Remove(consent);
+            var consents = user.Consents.ToList();
+            consents.Remove(consents.Single(c => c.Id == act.ConsentId));
+            user.Consents = consents;
             return state with
             {
                 User = user

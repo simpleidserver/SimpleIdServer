@@ -19,7 +19,9 @@ namespace SimpleIdServer.IdServer.Startup
         {
             SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope,
             SimpleIdServer.IdServer.Constants.StandardScopes.Profile,
-            SimpleIdServer.IdServer.Constants.StandardScopes.SAMLProfile
+            SimpleIdServer.IdServer.Constants.StandardScopes.SAMLProfile,
+            SimpleIdServer.IdServer.Constants.StandardScopes.GrantManagementQuery,
+            SimpleIdServer.IdServer.Constants.StandardScopes.GrantManagementRevoke
         };
 
         public static ICollection<User> Users => new List<User>

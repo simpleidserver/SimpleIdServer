@@ -125,6 +125,21 @@
                                 <RadzenRequiredValidator Component="RedirectionUris" Text="At leat one redirection URL must be specified"></RadzenRequiredValidator>
                             </div>
                             <div class="mb-1">
+                                <RadzenCheckBox @bind-Value=@websiteApplication.HasAccessToGrant TValue="bool" />
+                                <RadzenLabel Text="Has access to grant API" Style="margin-left: 8px; vertical-align: middle;" />
+                            </div>
+                            @if(websiteApplication.HasAccessToGrant)
+                            {
+                                <div>                                    
+                                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Authorization Data Types</RadzenText>
+                                    <RadzenTextBox Name="AuthDataTypes" @bind-Value="@websiteApplication.AuthDataTypes" Class="w-100"></RadzenTextBox>
+                                    <p class="text-muted">
+                                        List of Authorization Data Types separated by <b>;</b>
+                                    </p>
+                                </div>
+                            }
+
+                            <div class="mb-1">
                                 <RadzenCheckBox @bind-Value=@websiteApplication.IsFAPICompliant TValue="bool" />
                                 <RadzenLabel Text="Compliant with FAPI1.0" Style="margin-left: 8px; vertical-align: middle;" />
                             </div>
@@ -254,6 +269,8 @@
         public string RedirectionUris { get; set; } = null!;
         public string SubjectName { get; set; } = null!;
         public bool IsFAPICompliant { get; set; } = false;
+        public bool HasAccessToGrant { get; set; } = false;
+        public string? AuthDataTypes { get; set; } = null;
     }
 
     record MachineApplication
@@ -344,7 +361,7 @@
 
     void AddWebsiteApplication(WebsiteApplication websiteApplication)
     {
-        dispatcher.Dispatch(new AddWebsiteApplicationAction { SubjectName = websiteApplication.SubjectName, IsFAPICompliant = websiteApplication.IsFAPICompliant, ClientId = websiteApplication.ClientIdentifier, ClientName = websiteApplication.ClientName, RedirectionUrls = websiteApplication.RedirectionUris.Split(';'), ClientSecret = websiteApplication.ClientSecret });
+        dispatcher.Dispatch(new AddWebsiteApplicationAction { AuthDataTypes = websiteApplication.AuthDataTypes, HasAccessToGrant = websiteApplication.HasAccessToGrant, SubjectName = websiteApplication.SubjectName, IsFAPICompliant = websiteApplication.IsFAPICompliant, ClientId = websiteApplication.ClientIdentifier, ClientName = websiteApplication.ClientName, RedirectionUrls = websiteApplication.RedirectionUris.Split(';'), ClientSecret = websiteApplication.ClientSecret });
     }
 
     void AddMobileApplication(MobileApplication mobileApplication)

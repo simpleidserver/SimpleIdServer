@@ -36,8 +36,8 @@ Scenario: Claims are returned in JSON format (HTTP GET)
 	Then HTTP status code equals to '200'
 	Then HTTP header has 'Content-Type'='application/json'
 	Then JSON 'sub'='user'
-	Then JSON '$.role[0]'='role2'
-	Then JSON '$.role[1]'='role1'
+	Then JSON '$.role[0]'='role1'
+	Then JSON '$.role[1]'='role2'
 	Then JSON 'email'='email@outlook.fr'
 
 Scenario: Claims are returned in JSON format (HTTP POST)
@@ -75,8 +75,8 @@ Scenario: Claims are returned in JSON format (HTTP POST)
 	Then HTTP status code equals to '200'
 	Then HTTP header has 'Content-Type'='application/json'
 	Then JSON 'sub'='user'
-	Then JSON '$.role[0]'='role2'
-	Then JSON '$.role[1]'='role1'
+	Then JSON '$.role[0]'='role1'
+	Then JSON '$.role[1]'='role2'
 	Then JSON 'email'='email@outlook.fr'
 
 Scenario: Claims are returned in JWS token

@@ -22,6 +22,8 @@
         href: idserver/protectserversideappfapicompliant.md
       - name: Confidential client use Back Channel Authentication (CIBA)
         href: idserver/confidentialclientciba.md
+      - name: FAPI Grant Management
+        href: idserver/fapigrantmanagement.md
 - name: External Identity Providers
   items:
    - name: Add Identity Provider

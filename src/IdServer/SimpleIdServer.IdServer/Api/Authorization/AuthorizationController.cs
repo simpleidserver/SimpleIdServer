@@ -47,7 +47,9 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                 var jObjBody = Request.Query.ToJObject();
                 var claimName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
                 var userSubject = claimName == null ? string.Empty : claimName.Value;
-                var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, jObjBody, null, Request.Cookies), prefix ?? Constants.DefaultRealm, new HandlerContextResponse(Response.Cookies));
+                var referer = string.Empty;
+                if (Request.Headers.Referer.Any()) referer = Request.Headers.Referer.First();
+                var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, jObjBody, null, Request.Cookies, referer), prefix ?? Constants.DefaultRealm, new HandlerContextResponse(Response.Cookies));
                 activity?.SetTag("realm", context.Realm);
                 try
                 {

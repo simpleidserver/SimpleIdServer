@@ -21,6 +21,7 @@ using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.WsFederation.Extensions;
 using System.Net;
 using System.Security.Claims;
+using System.Security.Cryptography.X509Certificates;
 
 namespace SimpleIdServer.IdServer.WsFederation.Api
 {
@@ -114,7 +115,7 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
 
             async Task<ClaimsIdentity> BuildSubject(string realm)
             {
-                var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, null, null, null, null), realm ?? Constants.DefaultRealm);
+                var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, null, null, null, (X509Certificate2)null), realm ?? Constants.DefaultRealm);
                 context.SetUser(user);
                 var claims = (await _claimsExtractor.ExtractClaims(new ClaimsExtractionParameter
                 {

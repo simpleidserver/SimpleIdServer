@@ -110,6 +110,15 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                     newClientBuilder.AddSigningKey(ecdsaSig, SecurityAlgorithms.EcdsaSha256, SecurityKeyTypes.ECDSA);
                 }
 
+                if(action.HasAccessToGrant)
+                {
+                    scopes = await dbContext.Scopes.Include(s => s.Realms).Where(s => (s.Name == Constants.StandardScopes.GrantManagementQuery.Name || s.Name == Constants.StandardScopes.GrantManagementRevoke.Name) && s.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
+                    newClientBuilder.AddScope(scopes.ToArray());
+                    var authDataTypes = string.IsNullOrWhiteSpace(action.AuthDataTypes) || action.AuthDataTypes == null ? null : action.AuthDataTypes.Split(';');
+                    if(authDataTypes != null)
+                        newClientBuilder.AddAuthDataTypes(authDataTypes);
+                }
+
                 var newClient = newClientBuilder.Build();
                 dbContext.Clients.Add(newClient);
                 await dbContext.SaveChangesAsync(CancellationToken.None);
@@ -488,6 +497,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public string? ClientName { get; set; } = null;
         public bool IsFAPICompliant { get; set; } = false;
         public string? SubjectName { get; set; } = null;
+        public bool HasAccessToGrant { get; set; } = false;
+        public string? AuthDataTypes { get; set; } = null;
     }
 
     public class AddMobileApplicationAction
