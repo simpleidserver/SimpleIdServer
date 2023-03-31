@@ -19,7 +19,7 @@ namespace SimpleIdServer.IdServer.Builders
 
         public static AuthenticationSchemeProviderBuilder Create<TOpts>(AuthenticationSchemeProviderDefinition definition, string name, string displayName, string description, IDynamicAuthenticationOptions<TOpts> options) where TOpts : Microsoft.AspNetCore.Authentication.AuthenticationSchemeOptions, new()
         {
-            var properties = AuthenticationSchemeSerializer.SerializeProperties(options);
+            var properties = IdServer.Serializer.PropertiesSerializer.SerializeProperties<AuthenticationSchemeProviderProperty>(options);
             return new AuthenticationSchemeProviderBuilder(new AuthenticationSchemeProvider
             {
                 Id = Guid.NewGuid().ToString(),

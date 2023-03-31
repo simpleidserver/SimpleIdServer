@@ -171,6 +171,30 @@ namespace SimpleIdServer.IdServer
             return this;
         }
 
+        public IdServerInMemoryStoreBuilder AddInMemoryIdentityProvisioning(ICollection<IdentityProvisioning> identityProvisioningLst)
+        {
+            var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
+            if (!storeDbContext.IdentityProvisioningLst.Any())
+            {
+                storeDbContext.IdentityProvisioningLst.AddRange(identityProvisioningLst);
+                storeDbContext.SaveChanges();
+            }
+
+            return this;
+        }
+
+        public IdServerInMemoryStoreBuilder AddInMemoryIdentityProvisioningDefinitions(ICollection<IdentityProvisioningDefinition> identityProvisioningDefinitions)
+        {
+            var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
+            if (!storeDbContext.IdentityProvisioningDefinitions.Any())
+            {
+                storeDbContext.IdentityProvisioningDefinitions.AddRange(identityProvisioningDefinitions);
+                storeDbContext.SaveChanges();
+            }
+
+            return this;
+        }
+
         public IdServerInMemoryStoreBuilder AddInMemoryUMAPendingRequests(ICollection<UMAPendingRequest> umaPendingRequests)
         {
             var storeDbContext = _serviceProvider.GetService<StoreDbContext>();

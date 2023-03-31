@@ -7,55 +7,55 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 
-namespace SimpleIdServer.IdServer.UI.AuthProviders
+namespace SimpleIdServer.IdServer.Serializer
 {
-    public class AuthenticationSchemeSerializer
+    public static class PropertiesSerializer
     {
-        public static IEnumerable<AuthenticationSchemeProviderDefinitionProperty> SerializePropertyDefinitions(Type optionsType)
+        public static IEnumerable<T> SerializePropertyDefinitions<T>(Type optionsType) where T : IPropertyDefinition
         {
             return optionsType.GetProperties(BindingFlags.Instance | BindingFlags.Public).Where(p =>
             {
-                var attr = p.GetCustomAttribute<VisibleAuthSchemeAttribute>();
+                var attr = p.GetCustomAttribute<VisiblePropertyAttribute>();
                 return attr != null;
             }).Select(p =>
             {
-                var attr = p.GetCustomAttribute<VisibleAuthSchemeAttribute>();
-                return new AuthenticationSchemeProviderDefinitionProperty
-                {
-                    PropertyName = p.Name,
-                    Description = attr.Description,
-                    DisplayName = attr.DisplayName
-                };
+                var attr = p.GetCustomAttribute<VisiblePropertyAttribute>();
+                var result = (IPropertyDefinition)Activator.CreateInstance<T>();
+                result.PropertyName = p.Name;
+                result.Description = attr.Description;
+                result.DisplayName = attr.DisplayName;
+                return (T)result;
             });
         }
 
-        public static IEnumerable<AuthenticationSchemeProviderProperty> SerializeProperties(object options)
+        public static IEnumerable<T> SerializeProperties<T>(object options) where T : IPropertyInstance
         {
             return options.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public).Where(p =>
             {
-                var attr = p.GetCustomAttribute<VisibleAuthSchemeAttribute>();
+                var attr = p.GetCustomAttribute<VisiblePropertyAttribute>();
                 var val = p.GetValue(options)?.ToString();
                 return attr != null;
             }).Select(p =>
             {
-                var attr = p.GetCustomAttribute<VisibleAuthSchemeAttribute>();
-                return new AuthenticationSchemeProviderProperty
-                {
-                    PropertyName = p.Name,
-                    Value = p.GetValue(options)?.ToString()
-                };
+                var attr = p.GetCustomAttribute<VisiblePropertyAttribute>();
+                var result = (IPropertyInstance)Activator.CreateInstance<T>();
+                result.PropertyName = p.Name;
+                result.Value = p.GetValue(options)?.ToString();
+                return (T)result;
             });
         }
 
-        public static object DeserializeOptions(Type type, IEnumerable<AuthenticationSchemeProviderProperty> properties)
+        public static TOpts DeserializeOptions<TOpts, T>(IEnumerable<T> properties) where T : IPropertyInstance => (TOpts)DeserializeOptions(typeof(TOpts), properties);
+
+        public static object DeserializeOptions<T>(Type type, IEnumerable<T> properties) where T : IPropertyInstance
         {
             var visibleProperties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public).Where(p =>
             {
-                var attr = p.GetCustomAttribute<VisibleAuthSchemeAttribute>();
+                var attr = p.GetCustomAttribute<VisiblePropertyAttribute>();
                 return attr != null && properties.Any(pr => pr.PropertyName == p.Name);
             });
             var result = Activator.CreateInstance(type);
-            foreach(var visibleProperty in visibleProperties)
+            foreach (var visibleProperty in visibleProperties)
             {
                 var prop = properties.Single(p => p.PropertyName == visibleProperty.Name);
                 if (string.IsNullOrWhiteSpace(prop.Value)) continue;

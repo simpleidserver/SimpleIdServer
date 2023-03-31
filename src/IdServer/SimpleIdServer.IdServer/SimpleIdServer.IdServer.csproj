@@ -16,6 +16,7 @@
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 	<ItemGroup>
+	  <ProjectReference Include="..\..\Scim\SimpleIdServer.Scim.Client\SimpleIdServer.Scim.Client.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Store\SimpleIdServer.IdServer.Store.csproj" />
 	</ItemGroup>
 </Project>

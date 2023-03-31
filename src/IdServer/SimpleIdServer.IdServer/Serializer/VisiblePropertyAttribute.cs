@@ -3,12 +3,12 @@
 
 using System;
 
-namespace SimpleIdServer.IdServer.UI.AuthProviders
+namespace SimpleIdServer.IdServer.Serializer
 {
     [AttributeUsage(AttributeTargets.Property)]
-    public class VisibleAuthSchemeAttribute : Attribute
+    public class VisiblePropertyAttribute : Attribute
     {
-        public VisibleAuthSchemeAttribute(string displayName, string? description = null)
+        public VisiblePropertyAttribute(string displayName, string description = null)
         {
             DisplayName = displayName;
             Description = description;

@@ -38,13 +38,13 @@ namespace SimpleIdServer.IdServer.UI.Services
             {
                 switch(mapper.MapperType)
                 {
-                    case AuthenticationSchemeProviderMapperTypes.SUBJECT:
+                    case MappingRuleTypes.SUBJECT:
                         ExractSubject();
                         break;
-                    case AuthenticationSchemeProviderMapperTypes.USERATTRIBUTE:
+                    case MappingRuleTypes.USERATTRIBUTE:
                         ExtractAttribute(mapper);
                         break;
-                    case AuthenticationSchemeProviderMapperTypes.USERPROPERTY:
+                    case MappingRuleTypes.USERPROPERTY:
                         ExtractProperty(mapper);
                         break;
                 }

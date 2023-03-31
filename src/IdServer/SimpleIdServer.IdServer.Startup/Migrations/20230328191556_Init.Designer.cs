@@ -1848,7 +1848,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UMAPermissionTicketRecord", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.UMAPermissionTicket", null)
-                        .WithMany("Records")
+                        .WithMany("Properties")
                         .HasForeignKey("UMAPermissionTicketId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
@@ -1984,7 +1984,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UMAPermissionTicket", b =>
                 {
-                    b.Navigation("Records");
+                    b.Navigation("Properties");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UMAResource", b =>

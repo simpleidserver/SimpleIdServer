@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Hangfire;
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
@@ -35,6 +36,7 @@ var app = builder.Build();
 app.UseCors("AllowAll");
 app.UseSID()
     .UseWsFederation();
+app.UseHangfireDashboard("/hangfire");
 app.Run();
 
 void RunSqlServerIdServer(IServiceCollection services)
@@ -51,6 +53,8 @@ void RunSqlServerIdServer(IServiceCollection services)
             o.AddInMemoryUMAPendingRequests(IdServerConfiguration.PendingRequests);
             o.AddInMemoryAuthenticationSchemeProviderDefinitions(IdServerConfiguration.ProviderDefinitions);
             o.AddInMemoryAuthenticationSchemeProviders(IdServerConfiguration.Providers);
+            o.AddInMemoryIdentityProvisioning(IdServerConfiguration.IdentityProvisiongLst);
+            o.AddInMemoryIdentityProvisioningDefinitions(IdServerConfiguration.IdProvisioningDefinitions);
             o.AddInMemoryKeys(SimpleIdServer.IdServer.Constants.StandardRealms.Master, new List<SigningCredentials>
             {
                 new SigningCredentials(BuildRsaSecurityKey("rsaSig"), SecurityAlgorithms.RsaSha256),

@@ -126,7 +126,7 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
             var optionType = authenticationHandlerType.GetGenericArguments().First();
             var liteOptionInterface = typeof(IDynamicAuthenticationOptions<>).MakeGenericType(optionType);
             var convert = liteOptionInterface.GetMethod("Convert");
-            var liteOptions = AuthenticationSchemeSerializer.DeserializeOptions(liteOptionType, provider.Properties);
+            var liteOptions = Serializer.PropertiesSerializer.DeserializeOptions(liteOptionType, provider.Properties);
             var options = convert.Invoke(liteOptions, new object[] { });
             PostConfigureOptions(optionType, handlerType, options);
             var optionsMonitorType = typeof(ConcreteOptionsMonitor<>).MakeGenericType(optionType);

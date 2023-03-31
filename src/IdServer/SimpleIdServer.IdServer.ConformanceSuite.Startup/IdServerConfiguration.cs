@@ -3,8 +3,9 @@
 using Microsoft.AspNetCore.Authentication.Facebook;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Builders;
-using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.ConformanceSuite.Startup.Converters;
+using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Jobs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,8 @@ namespace SimpleIdServer.IdServer.ConformanceSuite.Startup
     public class IdServerConfiguration
     {
         private static AuthenticationSchemeProviderDefinition Facebook = AuthenticationSchemeProviderDefinitionBuilder.Create("facebook", "Facebook", typeof(FacebookHandler), typeof(FacebookOptionsLite)).Build();
+
+        private static IdentityProvisioningDefinition Scim = IdentityProvisioningDefinitionBuilder.Create<SyncSCIMRepresentationsOptions>(SyncSCIMRepresentationsJob.NAME, "SCIM").Build();
 
         public static ICollection<Scope> Scopes => new List<Scope>
         {
@@ -50,6 +53,11 @@ namespace SimpleIdServer.IdServer.ConformanceSuite.Startup
             Facebook
         };
 
+        public static ICollection<IdentityProvisioningDefinition> IdProvisioningDefinitions = new List<IdentityProvisioningDefinition>
+        {
+            Scim
+        };
+
         public static ICollection<AuthenticationSchemeProvider> Providers => new List<AuthenticationSchemeProvider>
         {
            AuthenticationSchemeProviderBuilder.Create(Facebook, "Facebook", "Facebook", "Faceoobk", new FacebookOptionsLite
@@ -62,6 +70,15 @@ namespace SimpleIdServer.IdServer.ConformanceSuite.Startup
         public static ICollection<Realm> Realms = new List<Realm>
         {
             Constants.StandardRealms.Master
+        };
+
+        public static ICollection<IdentityProvisioning> IdentityProvisiongLst => new List<IdentityProvisioning>
+        {
+            IdentityProvisioningBuilder.Create(Scim, "SCIM", "SCIM", new SyncSCIMRepresentationsOptions
+            {
+                Count = 1,
+                SCIMEdp = "http://localhost:5002"
+            }).Build()
         };
     }
 }

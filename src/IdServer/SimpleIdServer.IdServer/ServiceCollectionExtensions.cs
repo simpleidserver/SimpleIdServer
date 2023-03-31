@@ -33,6 +33,7 @@ using SimpleIdServer.IdServer.ClaimsEnricher;
 using SimpleIdServer.IdServer.ClaimTokenFormats;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Infrastructures;
+using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
@@ -83,7 +84,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddClaimsEnricher()
                 .AddOAuthIntrospectionTokenApi()
                 .AddRegisterApi()
-                .AddBCAuthorizeApi();
+                .AddBCAuthorizeApi()
+                .AddIdentityProvisioning();
             services.AddAuthorization();
             services.Configure<AuthorizationOptions>(o =>
             {
@@ -264,6 +266,12 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IBCAuthorizeHandler, BCAuthorizeHandler>();
             services.AddTransient<IBCAuthorizeRequestValidator, BCAuthorizeRequestValidator>();
             services.AddTransient<IBCNotificationService, BCConsoleNotificationService>();
+            return services;
+        }
+
+        private static IServiceCollection AddIdentityProvisioning(this IServiceCollection services)
+        {
+            services.AddTransient<IIdentityProvisioningJob, SyncSCIMRepresentationsJob>();
             return services;
         }
 

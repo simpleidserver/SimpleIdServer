@@ -28,6 +28,8 @@ namespace SimpleIdServer.IdServer.Store
         public DbSet<AuditEvent> AuditEvents { get; set; }
         public DbSet<CertificateAuthority> CertificateAuthorities { get; set; }
         public DbSet<Consent> Grants { get; set; }
+        public DbSet<IdentityProvisioning> IdentityProvisioningLst { get; set; }
+        public DbSet<IdentityProvisioningDefinition> IdentityProvisioningDefinitions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -67,6 +69,11 @@ namespace SimpleIdServer.IdServer.Store
             builder.ApplyConfiguration(new AuditEventConfiguration());
             builder.ApplyConfiguration(new CertificateAuthorityConfiguration());
             builder.ApplyConfiguration(new ClientCertificateConfiguration());
+            builder.ApplyConfiguration(new IdentityProvisioningConfiguration());
+            builder.ApplyConfiguration(new IdentityProvisioningPropertyConfiguration());
+            builder.ApplyConfiguration(new IdentityProvisioningDefinitionConfiguration());
+            builder.ApplyConfiguration(new IdentityProvisioningDefinitionPropertyConfiguration());
+            builder.ApplyConfiguration(new IdentityProvisioningMappingRuleConfiguration());
         }
     }
 }

@@ -44,6 +44,7 @@ namespace SimpleIdServer.IdServer
             public const string Grants = "grants";
             public const string UMAPermissions = "perm";
             public const string UMAResources = "rreguri";
+            public const string IdentityProvisioning = "provisioning";
             public const string PushedAuthorizationRequest = "par";
         }
 
@@ -185,14 +186,14 @@ namespace SimpleIdServer.IdServer
             new AuthenticationSchemeProviderMapper
             {
                 Id = Guid.NewGuid().ToString(),
-                MapperType = AuthenticationSchemeProviderMapperTypes.SUBJECT,
+                MapperType = MappingRuleTypes.SUBJECT,
                 Name = "Subject",
                 SourceClaimName = ClaimTypes.NameIdentifier
             },
             new AuthenticationSchemeProviderMapper
             {
                 Id = Guid.NewGuid().ToString(),
-                MapperType = AuthenticationSchemeProviderMapperTypes.USERPROPERTY,
+                MapperType = MappingRuleTypes.USERPROPERTY,
                 Name = "Firstname",
                 SourceClaimName = ClaimTypes.Name,
                 TargetUserProperty = nameof(User.Firstname)
@@ -200,7 +201,7 @@ namespace SimpleIdServer.IdServer
             new AuthenticationSchemeProviderMapper
             {
                 Id = Guid.NewGuid().ToString(),
-                MapperType = AuthenticationSchemeProviderMapperTypes.USERPROPERTY,
+                MapperType = MappingRuleTypes.USERPROPERTY,
                 Name = "Lastname",
                 SourceClaimName = ClaimTypes.GivenName,
                 TargetUserProperty = nameof(User.Lastname)
@@ -208,7 +209,7 @@ namespace SimpleIdServer.IdServer
             new AuthenticationSchemeProviderMapper
             {
                 Id = Guid.NewGuid().ToString(),
-                MapperType = AuthenticationSchemeProviderMapperTypes.USERPROPERTY,
+                MapperType = MappingRuleTypes.USERPROPERTY,
                 Name = "Email",
                 SourceClaimName = ClaimTypes.Email,
                 TargetUserProperty = nameof(User.Email)
@@ -216,7 +217,7 @@ namespace SimpleIdServer.IdServer
             new AuthenticationSchemeProviderMapper
             {
                 Id = Guid.NewGuid().ToString(),
-                MapperType = AuthenticationSchemeProviderMapperTypes.USERATTRIBUTE,
+                MapperType = MappingRuleTypes.USERATTRIBUTE,
                 Name = "Gender",
                 SourceClaimName = ClaimTypes.Gender,
                 TargetUserAttribute = JwtRegisteredClaimNames.Gender
@@ -224,7 +225,7 @@ namespace SimpleIdServer.IdServer
             new AuthenticationSchemeProviderMapper
             {
                 Id = Guid.NewGuid().ToString(),
-                MapperType = AuthenticationSchemeProviderMapperTypes.USERATTRIBUTE,
+                MapperType = MappingRuleTypes.USERATTRIBUTE,
                 Name = "DateOfBirth",
                 SourceClaimName = ClaimTypes.DateOfBirth,
                 TargetUserAttribute = JwtRegisteredClaimNames.Birthdate
