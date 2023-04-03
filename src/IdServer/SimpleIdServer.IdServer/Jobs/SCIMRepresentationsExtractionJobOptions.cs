@@ -5,7 +5,7 @@ using SimpleIdServer.IdServer.Serializer;
 
 namespace SimpleIdServer.IdServer.Jobs
 {
-    public class SyncSCIMRepresentationsOptions
+    public class SCIMRepresentationsExtractionJobOptions
     {
         [VisibleProperty("SCIMEdp", "SCIM Endpoint")]
         public string SCIMEdp { get; set; }

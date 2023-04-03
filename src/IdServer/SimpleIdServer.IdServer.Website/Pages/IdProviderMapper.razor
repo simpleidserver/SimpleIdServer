@@ -25,10 +25,10 @@ else
     
     @switch (mapper.MapperType)
     {
-        case AuthenticationSchemeProviderMapperTypes.USERATTRIBUTE:
+        case MappingRuleTypes.USERATTRIBUTE:
             <UserAttributeIdProviderMapper Mapper=mapper AuthProviderMapperUpdated=@UpdateAuthProviderMapper></UserAttributeIdProviderMapper>
             break;
-        case AuthenticationSchemeProviderMapperTypes.USERPROPERTY:
+        case MappingRuleTypes.USERPROPERTY:
             <UserPropertyIdProviderMapper Mapper=mapper AuthProviderMapperUpdated=@UpdateAuthProviderMapper></UserPropertyIdProviderMapper>
             break;
     }

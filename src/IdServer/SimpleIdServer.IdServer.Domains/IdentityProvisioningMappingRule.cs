@@ -5,6 +5,7 @@ namespace SimpleIdServer.IdServer.Domains
 {
     public class IdentityProvisioningMappingRule : IMappingRule
     {
+        public string Id { get; set; } = null!;
         public string From { get; set; } = null!;
         public MappingRuleTypes MapperType { get; set; }
         public string? TargetUserAttribute { get; set; } = null;

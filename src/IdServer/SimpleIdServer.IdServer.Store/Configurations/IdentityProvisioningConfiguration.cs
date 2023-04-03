@@ -12,6 +12,8 @@ namespace SimpleIdServer.IdServer.Store.Configurations
         {
             builder.HasKey(i => i.Id);
             builder.HasMany(g => g.Properties).WithOne(g => g.IdentityProvisioning).OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(i => i.Histories).WithOne(g => g.IdentityProvisioning).OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(i => i.Realms).WithMany(g => g.IdentityProvisioningLst);
         }
     }
 }

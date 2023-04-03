@@ -1,6 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.EntityFrameworkCore;
+using EFCore.BulkExtensions;
 using SimpleIdServer.IdServer.Domains;
 
 namespace SimpleIdServer.IdServer.Store
@@ -10,6 +10,8 @@ namespace SimpleIdServer.IdServer.Store
         IQueryable<User> Query();
         void Update(User user);
         void Add(User user);
+        Task BulkUpdate(List<UserClaim> userClaims);
+        Task BulkUpdate(List<User> users);
         Task<int> SaveChanges(CancellationToken cancellationToken);
     }
 
@@ -27,6 +29,24 @@ namespace SimpleIdServer.IdServer.Store
         public void Update(User user) => _dbContext.Users.Update(user);
 
         public void Add(User user) => _dbContext.Users.Add(user);
+
+        public Task BulkUpdate(List<UserClaim> userClaims)
+        {
+            var bulkConfig = new BulkConfig
+            {
+                PropertiesToIncludeOnCompare = new List<string> { nameof(UserClaim.UserId), nameof(UserClaim.Name) }
+            };
+            return _dbContext.BulkInsertOrUpdateAsync(userClaims, bulkConfig);
+        }
+
+        public Task BulkUpdate(List<User> users)
+        {
+            var bulkConfig = new BulkConfig
+            {
+                PropertiesToIncludeOnCompare = new List<string> { nameof(User.Id) }
+            };
+            return _dbContext.BulkInsertOrUpdateAsync(users, bulkConfig);
+        }
 
         public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
     }

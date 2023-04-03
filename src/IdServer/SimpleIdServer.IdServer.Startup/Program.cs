@@ -1,9 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Hangfire;
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.Server.Kestrel.Https;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -44,6 +46,7 @@ SeedData(app);
 app.UseCors("AllowAll");
 app.UseSID()
     .UseWsFederation();
+app.UseHangfireDashboard("/hangfire");
 app.Run();
 
 void RunSqlServerIdServer(IServiceCollection services)
@@ -129,7 +132,13 @@ void SeedData(WebApplication application)
             if (!dbContext.AuthenticationSchemeProviders.Any())
                 dbContext.AuthenticationSchemeProviders.AddRange(IdServerConfiguration.Providers);
 
-            if(!dbContext.SerializedFileKeys.Any())
+            if (!dbContext.IdentityProvisioningDefinitions.Any())
+                dbContext.IdentityProvisioningDefinitions.AddRange(IdServerConfiguration.IdentityProvisioningDefLst);
+
+            if (!dbContext.IdentityProvisioningLst.Any())
+                dbContext.IdentityProvisioningLst.AddRange(IdServerConfiguration.IdentityProvisiongLst);
+
+            if (!dbContext.SerializedFileKeys.Any())
             {
                 dbContext.SerializedFileKeys.Add(KeyGenerator.GenerateRSASigningCredentials(SimpleIdServer.IdServer.Constants.StandardRealms.Master, "rsa-1"));
                 dbContext.SerializedFileKeys.Add(KeyGenerator.GenerateECDSASigningCredentials(SimpleIdServer.IdServer.Constants.StandardRealms.Master, "ecdsa-1"));
@@ -173,6 +182,15 @@ void SeedData(WebApplication application)
                         SimpleIdServer.IdServer.Constants.StandardRealms.Master
                     }
                 });
+            }
+
+            var dbConnection = dbContext.Database.GetDbConnection() as SqlConnection;
+            if(dbConnection != null)
+            {
+                if (dbConnection.State != System.Data.ConnectionState.Open) dbConnection.Open();
+                var cmd = dbConnection.CreateCommand();
+                cmd.CommandText = "ALTER DATABASE IdServer SET ALLOW_SNAPSHOT_ISOLATION ON";
+                cmd.ExecuteNonQuery();
             }
 
             dbContext.SaveChanges();

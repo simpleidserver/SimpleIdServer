@@ -1,9 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authentication.Facebook;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Startup.Converters;
 using System;
 using System.Collections.Generic;
@@ -15,6 +17,10 @@ namespace SimpleIdServer.IdServer.Startup
     {
         private static AuthenticationSchemeProviderDefinition Facebook = AuthenticationSchemeProviderDefinitionBuilder.Create("facebook", "Facebook", typeof(FacebookHandler), typeof(FacebookOptionsLite)).Build();
 
+        private static IdentityProvisioningDefinition Scim = IdentityProvisioningDefinitionBuilder.Create<SCIMRepresentationsExtractionJobOptions>(SimpleIdServer.IdServer.Jobs.SCIMRepresentationsExtractionJob.NAME, "SCIM")
+            .AddUserSubjectMappingRule("$.userName")
+            .AddUserPropertyMappingRule("$.name.familyName", nameof(User.Lastname))
+            .AddUserAttributeMappingRule("$.name.givenName", JwtRegisteredClaimNames.GivenName).Build();
         public static ICollection<Scope> Scopes => new List<Scope>
         {
             SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope,
@@ -70,6 +76,20 @@ namespace SimpleIdServer.IdServer.Startup
         public static ICollection<CertificateAuthority> CertificateAuthorities = new List<CertificateAuthority>
         {
             CertificateAuthorityBuilder.Create("CN=simpleIdServerCA", SimpleIdServer.IdServer.Constants.StandardRealms.Master).Build()
+        };
+
+        public static ICollection<IdentityProvisioningDefinition> IdentityProvisioningDefLst = new List<IdentityProvisioningDefinition>
+        {
+            Scim
+        };
+
+        public static ICollection<IdentityProvisioning> IdentityProvisiongLst => new List<IdentityProvisioning>
+        {
+            IdentityProvisioningBuilder.Create(Scim, "SCIM", "SCIM", new SCIMRepresentationsExtractionJobOptions
+            {
+                Count = 1,
+                SCIMEdp = "http://localhost:5002"
+            }).Build()
         };
     }
 }

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authentication.Facebook;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.ConformanceSuite.Startup.Converters;
@@ -16,7 +17,10 @@ namespace SimpleIdServer.IdServer.ConformanceSuite.Startup
     {
         private static AuthenticationSchemeProviderDefinition Facebook = AuthenticationSchemeProviderDefinitionBuilder.Create("facebook", "Facebook", typeof(FacebookHandler), typeof(FacebookOptionsLite)).Build();
 
-        private static IdentityProvisioningDefinition Scim = IdentityProvisioningDefinitionBuilder.Create<SyncSCIMRepresentationsOptions>(SyncSCIMRepresentationsJob.NAME, "SCIM").Build();
+        private static IdentityProvisioningDefinition Scim = IdentityProvisioningDefinitionBuilder.Create<SCIMRepresentationsExtractionJobOptions>(SCIMRepresentationsExtractionJob.NAME, "SCIM")
+            .AddUserSubjectMappingRule("$.userName")
+            .AddUserPropertyMappingRule("$.name.familyName", nameof(User.Lastname))
+            .AddUserAttributeMappingRule("$.name.givenName", JwtRegisteredClaimNames.GivenName).Build();
 
         public static ICollection<Scope> Scopes => new List<Scope>
         {
@@ -74,7 +78,7 @@ namespace SimpleIdServer.IdServer.ConformanceSuite.Startup
 
         public static ICollection<IdentityProvisioning> IdentityProvisiongLst => new List<IdentityProvisioning>
         {
-            IdentityProvisioningBuilder.Create(Scim, "SCIM", "SCIM", new SyncSCIMRepresentationsOptions
+            IdentityProvisioningBuilder.Create(Scim, "SCIM", "SCIM", new SCIMRepresentationsExtractionJobOptions
             {
                 Count = 1,
                 SCIMEdp = "http://localhost:5002"

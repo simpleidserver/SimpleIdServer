@@ -46,7 +46,6 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.0" />
-		<PackageReference Include="BlushingPenguin.JsonPath" Version="1.0.6" />
 		<PackageReference Include="SpecFlow" Version="3.9.74" />
 		<PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.9.74" />
 		<PackageReference Include="SpecFlow.xUnit" Version="3.9.74" />

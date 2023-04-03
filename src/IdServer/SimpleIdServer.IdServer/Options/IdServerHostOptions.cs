@@ -10,6 +10,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Middlewares;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text.Json;
 
 namespace SimpleIdServer.IdServer.Options
@@ -181,6 +182,10 @@ namespace SimpleIdServer.IdServer.Options
         /// Expiration time of a PAR.
         /// </summary>
         public double PARExpirationTimeInSeconds { get; set; } = 600;
+        /// <summary>
+        /// Destination folder where representations will be extracted.
+        /// </summary>
+        public string ExtractRepresentationsFolder { get; set; } = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Extraction");
 
         public int GetIntParameter(string name) => int.Parse(Parameters[name]);
 

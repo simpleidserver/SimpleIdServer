@@ -30,10 +30,10 @@
         <RadzenStepsItem Text="Create" Disabled=@(SelectedMapperType == null)>
             @switch(SelectedMapperType.Type)
             {
-                case AuthenticationSchemeProviderMapperTypes.USERATTRIBUTE:
+                case MappingRuleTypes.USERATTRIBUTE:
                     <UserAttributeIdProviderMapper AuthProviderMapperUpdated=@UpdateAuthProviderMapper></UserAttributeIdProviderMapper>
                     break;
-                case AuthenticationSchemeProviderMapperTypes.USERPROPERTY:
+                case MappingRuleTypes.USERPROPERTY:
                     <UserPropertyIdProviderMapper AuthProviderMapperUpdated=@UpdateAuthProviderMapper></UserPropertyIdProviderMapper>
                     break;
             }
@@ -50,14 +50,14 @@
         public string Name { get; set; } = null!;
         public string ShortDescription { get; set; } = null!;
         public string Description { get; set; } = null!;
-        public AuthenticationSchemeProviderMapperTypes Type { get; set; }
+        public MappingRuleTypes Type { get; set; }
         public string PictureUrl { get; set; } = null!;
     }
 
     ICollection<MapperType> MapperTypes { get; set; } = new List<MapperType>
     {
-        new MapperType { Name = "Attribute", ShortDescription = "User attribute", Description = "Map one claim to a user attribute", Type = AuthenticationSchemeProviderMapperTypes.USERATTRIBUTE,  PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserAttribute.png" },
-        new MapperType { Name = "Property", ShortDescription = "User property", Description = "Map one claim to a user property", Type = AuthenticationSchemeProviderMapperTypes.USERPROPERTY, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserProperty.png" }
+        new MapperType { Name = "Attribute", ShortDescription = "User attribute", Description = "Map one claim to a user attribute", Type = MappingRuleTypes.USERATTRIBUTE,  PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserAttribute.png" },
+        new MapperType { Name = "Property", ShortDescription = "User property", Description = "Map one claim to a user property", Type = MappingRuleTypes.USERPROPERTY, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserProperty.png" }
     };
 
     MapperType? SelectedMapperType { get; set; } = null;

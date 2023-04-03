@@ -355,7 +355,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
     {
         public string IdProviderName { get; set; } = null!;
         public string Name { get; set; } = null!;
-        public AuthenticationSchemeProviderMapperTypes MapperType { get; set; }
+        public MappingRuleTypes MapperType { get; set; }
         public string? SourceClaimName { get; set; } = null;
         public string? TargetUserAttribute { get; set; } = null;
         public string? TargetUserProperty { get; set; } = null;
@@ -366,7 +366,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         public string IdProviderName { get; set; } = null!;
         public string Id { get; set; } = null!;
         public string Name { get; set; } = null!;
-        public AuthenticationSchemeProviderMapperTypes MapperType { get; set; }
+        public MappingRuleTypes MapperType { get; set; }
         public string? SourceClaimName { get; set; } = null;
         public string? TargetUserAttribute { get; set; } = null;
         public string? TargetUserProperty { get; set; } = null;

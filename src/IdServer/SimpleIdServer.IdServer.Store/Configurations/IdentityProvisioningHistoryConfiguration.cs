@@ -1,16 +1,18 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SimpleIdServer.IdServer.Domains;
 
 namespace SimpleIdServer.IdServer.Store.Configurations
 {
-    public class IdentityProvisioningMappingRuleConfiguration : IEntityTypeConfiguration<IdentityProvisioningMappingRule>
+    public class IdentityProvisioningHistoryConfiguration : IEntityTypeConfiguration<IdentityProvisioningHistory>
     {
-        public void Configure(EntityTypeBuilder<IdentityProvisioningMappingRule> builder)
+        public void Configure(EntityTypeBuilder<IdentityProvisioningHistory> builder)
         {
-            builder.HasKey(m => m.Id);
+            builder.Property<int>("Id").ValueGeneratedOnAdd();
+            builder.HasKey("Id");
         }
     }
 }

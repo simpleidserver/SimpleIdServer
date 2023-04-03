@@ -16,10 +16,10 @@ namespace SimpleIdServer.IdServer.Builders
             _identityProvisioning = identityProvisioning;
         }
 
-        public static IdentityProvisioningBuilder Create<TOpts>(IdentityProvisioningDefinition definition, string name, string description, TOpts options)
+        public static IdentityProvisioningBuilder Create<TOpts>(IdentityProvisioningDefinition definition, string name, string description, TOpts options, Realm realm = null)
         {
             var properties = Serializer.PropertiesSerializer.SerializeProperties<IdentityProvisioningProperty>(options);
-            return new IdentityProvisioningBuilder(new IdentityProvisioning
+            var result = new IdentityProvisioning
             {
                 Id = Guid.NewGuid().ToString(),
                 Name = name,
@@ -28,7 +28,10 @@ namespace SimpleIdServer.IdServer.Builders
                 UpdateDateTime = DateTime.UtcNow,
                 Properties = properties.ToList(),
                 Definition = definition
-            });
+            };
+            if (realm == null) result.Realms.Add(Constants.StandardRealms.Master);
+            else result.Realms.Add(realm);
+            return new IdentityProvisioningBuilder(result);
         }
 
         public IdentityProvisioning Build() => _identityProvisioning;

@@ -39,6 +39,7 @@ namespace SimpleIdServer.IdServer.Domains
         public UserStatus Status { get; set; }
         public DateTime CreateDateTime { get; set; }
         public DateTime UpdateDateTime { get; set; }
+        public string? Source { get; set; } = null;
         public ICollection<Claim> Claims
         {
             get

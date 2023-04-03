@@ -12,5 +12,28 @@ namespace SimpleIdServer.IdServer.Domains
         public DateTime UpdateDateTime { get; set; }
         public IdentityProvisioningDefinition Definition { get; set; } = null!;
         public ICollection<IdentityProvisioningProperty> Properties { get; set; } = new List<IdentityProvisioningProperty>();
+        public ICollection<IdentityProvisioningHistory> Histories { get; set; } = new List<IdentityProvisioningHistory>();
+        public ICollection<Realm> Realms { get; set; } = new List<Realm>();
+
+        public void Import(DateTime startDateTime, DateTime endDateTime, string folderName, int nbRepresentations)
+        {
+            Histories.Add(new IdentityProvisioningHistory
+            {
+                StartDateTime = startDateTime,
+                EndDateTime = endDateTime,
+                FolderName = folderName,
+                NbRepresentations = nbRepresentations
+            });
+        }
+
+        public void FailToImport(DateTime startDateTime, DateTime endDateTime, string errorMessage)
+        {
+            Histories.Add(new IdentityProvisioningHistory
+            {
+                StartDateTime = startDateTime,
+                EndDateTime = endDateTime,
+                ErrorMessage = errorMessage
+            });
+        }
     }
 }

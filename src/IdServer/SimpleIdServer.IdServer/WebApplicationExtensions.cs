@@ -166,9 +166,12 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.EndSessionCallback,
                 defaults: new { controller = "CheckSession", action = "EndSessionCallback" });
 
-            webApplication.MapControllerRoute("enqueueIdentityProvisioning",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}/enqueue",
+            webApplication.MapControllerRoute("extractRepresentations",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{name}/{id}/enqueue",
                 defaults: new { controller = "IdentityProvisioning", action = "Enqueue" });
+            webApplication.MapControllerRoute("importRepresentations",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/import",
+                defaults: new { controller = "IdentityProvisioning", action = "Import" });
 
             webApplication.MapControllerRoute(
                 name: "defaultWithArea",

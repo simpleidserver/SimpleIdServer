@@ -39,7 +39,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableAuthenticationSchemeProviderMapper" Filterable="false" Sortable="false" Title="Type" Width="80px">
             <Template Context="data">
-                <RadzenBadge Text=@(Enum.GetName(typeof(AuthenticationSchemeProviderMapperTypes), data.Value.MapperType)) IsPill="true" />
+                <RadzenBadge Text=@(Enum.GetName(typeof(MappingRuleTypes), data.Value.MapperType)) IsPill="true" />
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableAuthenticationSchemeProviderMapper" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">

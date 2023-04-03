@@ -6,11 +6,11 @@ using SimpleIdServer.IdServer.Domains;
 
 namespace SimpleIdServer.IdServer.Store.Configurations
 {
-    public class IdentityProvisioningMappingRuleConfiguration : IEntityTypeConfiguration<IdentityProvisioningMappingRule>
+    public class ExtractedRepresentationConfiguration : IEntityTypeConfiguration<ExtractedRepresentation>
     {
-        public void Configure(EntityTypeBuilder<IdentityProvisioningMappingRule> builder)
+        public void Configure(EntityTypeBuilder<ExtractedRepresentation> builder)
         {
-            builder.HasKey(m => m.Id);
+            builder.HasKey(b => b.ExternalId);
         }
     }
 }

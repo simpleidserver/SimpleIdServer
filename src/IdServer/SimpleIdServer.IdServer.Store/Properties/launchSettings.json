@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "SimpleIdServer.IdServer.Store": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:50865;http://localhost:50866"
+    }
+  }
+}

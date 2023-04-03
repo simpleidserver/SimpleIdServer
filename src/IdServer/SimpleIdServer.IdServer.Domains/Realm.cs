@@ -17,5 +17,6 @@ namespace SimpleIdServer.IdServer.Domains
         public ICollection<ApiResource> ApiResources { get; set; } = new List<ApiResource>();
         public ICollection<SerializedFileKey> SerializedFileKeys { get; set; } = new List<SerializedFileKey>();
         public ICollection<CertificateAuthority> CertificateAuthorities { get; set; } = new List<CertificateAuthority>();
+        public ICollection<IdentityProvisioning> IdentityProvisioningLst { get; set; } = new List<IdentityProvisioning>();
     }
 }

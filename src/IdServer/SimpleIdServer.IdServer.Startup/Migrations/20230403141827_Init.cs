@@ -212,6 +212,32 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ExtractedRepresentations",
+                columns: table => new
+                {
+                    ExternalId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Version = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExtractedRepresentations", x => x.ExternalId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "IdentityProvisioningDefinitions",
+                columns: table => new
+                {
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_IdentityProvisioningDefinitions", x => x.Name);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Realms",
                 columns: table => new
                 {
@@ -328,7 +354,8 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     DeviceRegistrationToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
                     CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Source = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -470,6 +497,73 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         column: x => x.ClientId,
                         principalTable: "Clients",
                         principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "IdentityProvisioningDefinitionProperty",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PropertyName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DisplayName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IdentityProvisioningDefinitionName = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_IdentityProvisioningDefinitionProperty", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_IdentityProvisioningDefinitionProperty_IdentityProvisioningDefinitions_IdentityProvisioningDefinitionName",
+                        column: x => x.IdentityProvisioningDefinitionName,
+                        principalTable: "IdentityProvisioningDefinitions",
+                        principalColumn: "Name",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "IdentityProvisioningLst",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DefinitionName = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_IdentityProvisioningLst", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_IdentityProvisioningLst_IdentityProvisioningDefinitions_DefinitionName",
+                        column: x => x.DefinitionName,
+                        principalTable: "IdentityProvisioningDefinitions",
+                        principalColumn: "Name",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "IdentityProvisioningMappingRule",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    From = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MapperType = table.Column<int>(type: "int", nullable: false),
+                    TargetUserAttribute = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TargetUserProperty = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IdentityProvisioningDefinitionName = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_IdentityProvisioningMappingRule", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_IdentityProvisioningMappingRule_IdentityProvisioningDefinitions_IdentityProvisioningDefinitionName",
+                        column: x => x.IdentityProvisioningDefinitionName,
+                        principalTable: "IdentityProvisioningDefinitions",
+                        principalColumn: "Name",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -820,7 +914,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserClaim",
+                name: "UserClaims",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -831,9 +925,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserClaim", x => x.Id);
+                    table.PrimaryKey("PK_UserClaims", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserClaim_Users_UserId",
+                        name: "FK_UserClaims_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -933,8 +1027,8 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MapperType = table.Column<int>(type: "int", nullable: false),
                     SourceClaimName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MapperType = table.Column<int>(type: "int", nullable: false),
                     TargetUserAttribute = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TargetUserProperty = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IdProviderId = table.Column<string>(type: "nvarchar(450)", nullable: false)
@@ -1016,6 +1110,78 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         column: x => x.UMAResourceId,
                         principalTable: "UmaResources",
                         principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "IdentityProvisioningHistory",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StartDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    FolderName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NbRepresentations = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    ErrorMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsImported = table.Column<bool>(type: "bit", nullable: false),
+                    ImportDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IdentityProvisioningId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_IdentityProvisioningHistory", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_IdentityProvisioningHistory_IdentityProvisioningLst_IdentityProvisioningId",
+                        column: x => x.IdentityProvisioningId,
+                        principalTable: "IdentityProvisioningLst",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "IdentityProvisioningProperty",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PropertyName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IdentityProvisioningId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_IdentityProvisioningProperty", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_IdentityProvisioningProperty_IdentityProvisioningLst_IdentityProvisioningId",
+                        column: x => x.IdentityProvisioningId,
+                        principalTable: "IdentityProvisioningLst",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "IdentityProvisioningRealm",
+                columns: table => new
+                {
+                    IdentityProvisioningLstId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RealmsName = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_IdentityProvisioningRealm", x => new { x.IdentityProvisioningLstId, x.RealmsName });
+                    table.ForeignKey(
+                        name: "FK_IdentityProvisioningRealm_IdentityProvisioningLst_IdentityProvisioningLstId",
+                        column: x => x.IdentityProvisioningLstId,
+                        principalTable: "IdentityProvisioningLst",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_IdentityProvisioningRealm_Realms_RealmsName",
+                        column: x => x.RealmsName,
+                        principalTable: "Realms",
+                        principalColumn: "Name",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -1149,6 +1315,36 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_IdentityProvisioningDefinitionProperty_IdentityProvisioningDefinitionName",
+                table: "IdentityProvisioningDefinitionProperty",
+                column: "IdentityProvisioningDefinitionName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_IdentityProvisioningHistory_IdentityProvisioningId",
+                table: "IdentityProvisioningHistory",
+                column: "IdentityProvisioningId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_IdentityProvisioningLst_DefinitionName",
+                table: "IdentityProvisioningLst",
+                column: "DefinitionName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_IdentityProvisioningMappingRule_IdentityProvisioningDefinitionName",
+                table: "IdentityProvisioningMappingRule",
+                column: "IdentityProvisioningDefinitionName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_IdentityProvisioningProperty_IdentityProvisioningId",
+                table: "IdentityProvisioningProperty",
+                column: "IdentityProvisioningId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_IdentityProvisioningRealm_RealmsName",
+                table: "IdentityProvisioningRealm",
+                column: "RealmsName");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RealmScope_ScopesId",
                 table: "RealmScope",
                 column: "ScopesId");
@@ -1199,8 +1395,8 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 column: "UMAResourcePermissionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserClaim_UserId",
-                table: "UserClaim",
+                name: "IX_UserClaims_UserId",
+                table: "UserClaims",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -1276,6 +1472,24 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 name: "ClientScope");
 
             migrationBuilder.DropTable(
+                name: "ExtractedRepresentations");
+
+            migrationBuilder.DropTable(
+                name: "IdentityProvisioningDefinitionProperty");
+
+            migrationBuilder.DropTable(
+                name: "IdentityProvisioningHistory");
+
+            migrationBuilder.DropTable(
+                name: "IdentityProvisioningMappingRule");
+
+            migrationBuilder.DropTable(
+                name: "IdentityProvisioningProperty");
+
+            migrationBuilder.DropTable(
+                name: "IdentityProvisioningRealm");
+
+            migrationBuilder.DropTable(
                 name: "RealmScope");
 
             migrationBuilder.DropTable(
@@ -1303,7 +1517,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 name: "UMAResourcePermissionClaim");
 
             migrationBuilder.DropTable(
-                name: "UserClaim");
+                name: "UserClaims");
 
             migrationBuilder.DropTable(
                 name: "UserCredential");
@@ -1336,6 +1550,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 name: "CertificateAuthorities");
 
             migrationBuilder.DropTable(
+                name: "IdentityProvisioningLst");
+
+            migrationBuilder.DropTable(
                 name: "SerializedFileKeys");
 
             migrationBuilder.DropTable(
@@ -1358,6 +1575,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "IdentityProvisioningDefinitions");
 
             migrationBuilder.DropTable(
                 name: "Clients");
