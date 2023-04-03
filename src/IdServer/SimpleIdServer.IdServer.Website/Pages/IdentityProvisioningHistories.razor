@@ -1,0 +1,63 @@
+﻿@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
+@using SimpleIdServer.IdServer.Website.Stores.UserStore;
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject IDispatcher dispatcher
+@inject IState<UserState> userState
+@inject IState<RealmsState> realmsState
+@inject IState<UpdateUserState> updateUserState
+@inject ContextMenuService contextMenuService
+@inject NotificationService notificationService
+
+<p class="text-muted">Execution history.</p>
+
+<RadzenDataGrid AllowFiltering="true" 
+        AllowColumnResize="true"
+        AllowAlternatingRows="false" 
+        AllowSorting="true" 
+        PageSize="30" 
+        AllowPaging="true" 
+        PagerHorizontalAlign="HorizontalAlign.Left" 
+        ShowPagingSummary="true"
+        IsLoading="@updateUserState.Value.IsUpdating"
+        Count="@IdentityProvisioning.Histories.Count"
+        Data="@IdentityProvisioning.Histories"
+        TItem="IdentityProvisioningHistory" 
+        ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn TItem="IdentityProvisioningHistory" Property="StartDateTime" Title="Start" Filterable="false" Sortable="true" SortOrder="SortOrder.Descending" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" />
+        <RadzenDataGridColumn TItem="IdentityProvisioningHistory" Property="EndDateTime" Title="End" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" />
+        <RadzenDataGridColumn TItem="IdentityProvisioningHistory" Property="ImportDateTime" Title="Import DateTime" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" />
+        <RadzenDataGridColumn TItem="IdentityProvisioningHistory" Property="IsImported" Title="Is Imported" Filterable="false" Sortable="false" Width="80px">
+            <Template Context="data">
+                @if(data.IsImported)
+                {
+                    <RadzenBadge Text="Imported" IsPill="true" BadgeStyle="BadgeStyle.Success"></RadzenBadge>
+                }
+                else
+                {
+                    <RadzenBadge Text="Not Imported" IsPill="true" BadgeStyle="BadgeStyle.Warning"></RadzenBadge>
+                }
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="IdentityProvisioningHistory" Property="NbRepresentations" Title="Number of extracted representations" Filterable="false" Sortable="false" Width="80px" />
+        <RadzenDataGridColumn TItem="IdentityProvisioningHistory" Title="Status" Filterable="false" Sortable="false" Width="80px">
+            <Template Context="data">
+                @if (data.Status == IdentityProvisioningHistoryStatus.SUCCESS)
+                {                    
+                    <RadzenBadge Text="Success" IsPill="true" BadgeStyle="BadgeStyle.Success"></RadzenBadge>
+                }
+                else
+                {
+                    <RadzenBadge Text="Failure" IsPill="true" BadgeStyle="BadgeStyle.Danger"></RadzenBadge>
+                }
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="IdentityProvisioningHistory" Property="ErrorMessage" Title="Error Message" Filterable="false" Sortable="false" Width="80px" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    [Parameter]
+    public SimpleIdServer.IdServer.Domains.IdentityProvisioning IdentityProvisioning { get; set; }
+}

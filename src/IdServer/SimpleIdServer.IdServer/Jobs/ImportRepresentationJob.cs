@@ -114,6 +114,7 @@ namespace SimpleIdServer.IdServer.Jobs
 
         private ExtractionResult ExtractUsersAndClaims(IdentityProvisioningDefinition idProvisioningDef, IEnumerable<string> columns, IEnumerable<string> values)
         {
+            var updatedProperties = new List<string>();
             var visibleAttributes = typeof(User).GetProperties(BindingFlags.Instance | BindingFlags.Public)
                 .Where(p =>
                 {
@@ -125,9 +126,10 @@ namespace SimpleIdServer.IdServer.Jobs
             var user = new User
             {
                 Id = externalRepresentationId,
-                Source = idProvisioningDef.Name
+                Source = idProvisioningDef.Name,
+                UpdateDateTime = DateTime.UtcNow
             };
-            int index = 0;
+            int index = 2;
             foreach(var column in columns.Skip(2))
             {
                 var mappingRule = idProvisioningDef.MappingRules.Single(r => r.Id == column);
@@ -137,7 +139,7 @@ namespace SimpleIdServer.IdServer.Jobs
                     case MappingRuleTypes.USERATTRIBUTE:
                         userClaims.Add(new UserClaim
                         {
-                            Id = Guid.NewGuid().ToString(),
+                            Id = $"{externalRepresentationId}_{mappingRule.TargetUserAttribute}",
                             UserId = externalRepresentationId,
                             Value = value,
                             Name = mappingRule.TargetUserAttribute

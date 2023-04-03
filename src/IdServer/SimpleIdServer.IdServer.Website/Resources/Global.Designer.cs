@@ -430,6 +430,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Selected Identity Provisioning has been removed.
+        /// </summary>
+        public static string SelectedIdentityProvisioningRemoved {
+            get {
+                return ResourceManager.GetString("SelectedIdentityProvisioningRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Selected mappers have been removed.
         /// </summary>
         public static string SelectedIdProviderMappersRemoved {
@@ -489,6 +498,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string UnknownClient {
             get {
                 return ResourceManager.GetString("UnknownClient", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The identity provisioning doesn&apos;t exist.
+        /// </summary>
+        public static string UnknownIdentityProvisioning {
+            get {
+                return ResourceManager.GetString("UnknownIdentityProvisioning", resourceCulture);
             }
         }
         

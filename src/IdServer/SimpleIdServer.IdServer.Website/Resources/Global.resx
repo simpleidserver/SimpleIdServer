@@ -240,6 +240,9 @@
   <data name="SelectedGrantsRemoved" xml:space="preserve">
     <value>Selected grants have been rejected</value>
   </data>
+  <data name="SelectedIdentityProvisioningRemoved" xml:space="preserve">
+    <value>Selected Identity Provisioning has been removed</value>
+  </data>
   <data name="SelectedIdProviderMappersRemoved" xml:space="preserve">
     <value>Selected mappers have been removed</value>
   </data>
@@ -260,6 +263,9 @@
   </data>
   <data name="UnknownClient" xml:space="preserve">
     <value>The client '{0}' doesn't exist</value>
+  </data>
+  <data name="UnknownIdentityProvisioning" xml:space="preserve">
+    <value>The identity provisioning doesn't exist</value>
   </data>
   <data name="UnknownIdProvider" xml:space="preserve">
     <value>Identity provider '{0}' doesn't exist</value>

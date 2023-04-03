@@ -1,0 +1,77 @@
+﻿@page "/identityprovisioning/{id}/{action}"
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
+@using SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore;
+@inherits Fluxor.Blazor.Web.Components.FluxorLayout
+@inject NotificationService notificationService
+@inject NavigationManager navigationManager
+@layout MainLayout
+@inject IState<IdentityProvisioningState> identityProvisioningState
+@inject IDispatcher dispatcher
+
+@if (identityProvisioningState.Value.IsLoading)
+{    
+    <RadzenText class="mt-3 mb-3" Text="Wait..." TextStyle="TextStyle.DisplayH6" />
+}
+else
+{
+    <RadzenBreadCrumb>
+        <RadzenBreadCrumbItem Path="/users" Text="Identity Provisioning" />
+        <RadzenBreadCrumbItem Text="Identity Provisioning details" />
+    </RadzenBreadCrumb>
+
+    <RadzenText class="mt-3 mb-3" Text="@identityProvisioningState.Value.IdentityProvisioning?.Name" TextStyle="TextStyle.DisplayH6" />
+
+    <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
+        <Tabs>
+            <RadzenTabsItem Text="Histories" >
+                <IdentityProvisioningHistories IdentityProvisioning="@identityProvisioningState.Value.IdentityProvisioning"></IdentityProvisioningHistories>
+            </RadzenTabsItem>
+        </Tabs>
+    </RadzenTabs>
+}
+
+@code {
+    Dictionary<string, int> mappingActionNameToIndex = new Dictionary<string, int>
+    {
+        { "histories", 0 }
+    };
+    [Parameter]
+    public string id { get; set; } = null!;
+
+    [Parameter]
+    public string? action { get; set; } = null;
+
+    int selectedIndex = 0;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+        {
+            SubscribeToAction<GetIdentityProvisioningFailureAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
+                StateHasChanged();
+            });
+            SubscribeToAction<SelectRealmSuccessAction>((act) =>
+            {
+                navigationManager.NavigateTo("/identityprovisioning");
+            });
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (string.IsNullOrWhiteSpace(id)) return;
+        if (!string.IsNullOrWhiteSpace(action) && mappingActionNameToIndex.ContainsKey(action))
+            selectedIndex = mappingActionNameToIndex[action];
+        dispatcher.Dispatch(new GetIdentityProvisioningAction { Id = id });
+    }
+
+    void OnChange(int index)
+    {
+        var rec = mappingActionNameToIndex.Single(kvp => kvp.Value == index);
+        navigationManager.NavigateTo($"/identityprovisioning/{id}/{rec.Key}");
+    }
+}

@@ -1,0 +1,136 @@
+﻿@page "/identityprovisioning"
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject IState<SearchIdentityProvisioningState> searchIdentityProvisioningState
+@inject IDispatcher dispatcher
+@inject NotificationService notificationService
+@inject DialogService dialogService
+@inject ContextMenuService contextMenuService
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore;
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
+
+<RadzenDataGrid @ref="identityProvisioningGrid"
+                AllowFiltering="true"
+                AllowColumnResize="true"
+                AllowAlternatingRows="false"
+                FilterMode="FilterMode.Simple"
+                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                AllowSorting="true"
+                PageSize="15"
+                AllowPaging="true"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="true"
+                IsLoading="@searchIdentityProvisioningState.Value.IsLoading"
+                Count="@searchIdentityProvisioningState.Value.Count"
+                Data="@searchIdentityProvisioningState.Value.Values"
+                LoadData="@LoadData"
+                RowRender="@RowRender"
+                TItem="SelectableIdentityProvisioning"
+                ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn TItem="SelectableIdentityProvisioning" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <HeaderTemplate>
+                <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
+            </HeaderTemplate>
+            <Template Context="data">
+                <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableIdentityProvisioning" Filterable="false" Sortable="false" Title="Name" Width="80px">
+            <Template Context="data">                
+                <RadzenLink Text="@data.Value.Name" Path="@($"/identityprovisioning/{data.Value.Id}/histories")" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableIdentityProvisioning" Property="Value.Description" Filterable="false" Sortable="false" Title="Description" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableIdentityProvisioning" Filterable="false" Sortable="false" Title="Active" Width="80px">
+            <Template Context="data">
+                @if(data.Value.IsEnabled)
+                {
+                    <RadzenBadge Text="Active" IsPill="true" BadgeStyle="BadgeStyle.Success"></RadzenBadge>
+                }
+                else
+                {
+                    <RadzenBadge Text="Disable" IsPill="true" BadgeStyle="BadgeStyle.Danger"></RadzenBadge>
+                }
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableIdentityProvisioning" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Update datetime" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableIdentityProvisioning" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <Template Context="data">
+                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    RadzenDataGrid<SelectableIdentityProvisioning> identityProvisioningGrid;
+    bool selectAll;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+        {
+            SubscribeToAction<SelectRealmSuccessAction>((act) =>
+            {
+                identityProvisioningGrid.Reload();
+                StateHasChanged();
+            });
+            SubscribeToAction<RemoveSelectedIdentityProvisioningSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedIdentityProvisioningRemoved });
+                StateHasChanged();
+            });
+            if (!searchIdentityProvisioningState.Value.IsLoading)
+                identityProvisioningGrid.Reload();
+        }
+    }
+
+    void ToggleAll(bool isSelected)
+    {
+        var act = new ToggleAllIdentityProvisioningAction { IsSelected = isSelected };
+        dispatcher.Dispatch(act);
+    }
+
+    void ToggleChanged(bool isSelected, SelectableIdentityProvisioning identityProvisioning)
+    {
+        var act = new ToggleIdentityProvisioningSelectionAction { IsSelected = isSelected, IdentityProvisioningId = identityProvisioning.Value.Id };
+        dispatcher.Dispatch(act);
+    }
+
+    void RowRender(RowRenderEventArgs<SelectableIdentityProvisioning> row)
+    {
+        const string className = "class";
+        if (row.Data.IsNew)
+            row.Attributes.Add(className, "new");
+        else if (row.Data.IsSelected)
+            row.Attributes.Add(className, "active");
+        else if (row.Attributes.ContainsKey(className))
+            row.Attributes.Remove(className);
+    }
+
+    void ShowMoreContextMenu(SelectableIdentityProvisioning identityProvisioning, MouseEventArgs args)
+    {
+        contextMenuService.Open(args, new List<ContextMenuItem>
+        {
+            new ContextMenuItem { Text = "Delete", Value = 1 }
+        }, (a) =>
+    {
+        if (a.Value.Equals(1))
+        {
+            var ids = searchIdentityProvisioningState.Value.Values?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
+            if (!ids.Contains(identityProvisioning.Value.Id)) ids.Add(identityProvisioning.Value.Id);
+            var act = new RemoveSelectedIdentityProvisioningAction { Ids = ids};
+            dispatcher.Dispatch(act);
+            contextMenuService.Close();
+        }
+    });
+    }
+
+    void LoadData(LoadDataArgs args)
+    {
+        var act = new SearchIdentityProvisioningAction { Filter = args.Filter, OrderBy = args.OrderBy, Skip = args.Skip, Take = args.Top };
+        dispatcher.Dispatch(act);
+    }
+}

@@ -34,7 +34,7 @@ namespace SimpleIdServer.IdServer.Store
         {
             var bulkConfig = new BulkConfig
             {
-                PropertiesToIncludeOnCompare = new List<string> { nameof(UserClaim.UserId), nameof(UserClaim.Name) }
+                PropertiesToIncludeOnCompare = new List<string> { nameof(UserClaim.Id), nameof(UserClaim.UserId), nameof(UserClaim.Name), nameof(UserClaim.Value) }
             };
             return _dbContext.BulkInsertOrUpdateAsync(userClaims, bulkConfig);
         }
@@ -43,7 +43,7 @@ namespace SimpleIdServer.IdServer.Store
         {
             var bulkConfig = new BulkConfig
             {
-                PropertiesToIncludeOnCompare = new List<string> { nameof(User.Id) }
+                PropertiesToIncludeOnCompare = new List<string> { nameof(User.Id), nameof(User.Name), nameof(User.Firstname), nameof(User.Lastname), nameof(User.Email), nameof(User.EmailVerified) }
             };
             return _dbContext.BulkInsertOrUpdateAsync(users, bulkConfig);
         }
