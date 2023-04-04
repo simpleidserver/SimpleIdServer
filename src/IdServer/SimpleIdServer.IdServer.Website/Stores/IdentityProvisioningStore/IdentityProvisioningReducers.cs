@@ -61,9 +61,48 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             };
         }
 
+        [ReducerMethod]
+        public static SearchIdentityProvisioningState ReduceUpdateIdProvisioningDetailSuccessAction(SearchIdentityProvisioningState state, UpdateIdProvisioningDetailsSuccessAction act)
+        {
+            var idProvisioningLst = state.Values.ToList();
+            var idProvisioning = idProvisioningLst.SingleOrDefault(i => i.Value.Id == act.Id);
+            if(idProvisioning != null)
+            {
+                idProvisioning.Value.Description = act.Description;
+                idProvisioning.Value.UpdateDateTime = DateTime.UtcNow;
+            }
+
+            return state with
+            {
+                Values = idProvisioningLst,
+                IsLoading = false
+            };
+        }
+
         #endregion
 
         #region IdentityProvisioningState
+
+        [ReducerMethod]
+        public static IdentityProvisioningState ReduceUpdateIdProvisioningPropertiesAction(IdentityProvisioningState state, UpdateIdProvisioningPropertiesAction act)
+        {
+            return state with
+            {
+                IsLoading = true
+            };
+        }
+
+        [ReducerMethod]
+        public static IdentityProvisioningState ReduceUpdateIdProvisioningPropertiesSuccessAction(IdentityProvisioningState state, UpdateIdProvisioningPropertiesSuccessAction act)
+        {
+            var idProvisioning = state.IdentityProvisioning;
+            idProvisioning.Properties = act.Properties.ToList();
+            return state with
+            {
+                IsLoading = false,
+                IdentityProvisioning = idProvisioning
+            };
+        }
 
         [ReducerMethod]
         public static IdentityProvisioningState ReduceGetIdentityProvisioningAction(IdentityProvisioningState state, GetIdentityProvisioningAction act) => new(true, null);
@@ -102,6 +141,27 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             };
         }
 
+        [ReducerMethod]
+        public static IdentityProvisioningState ReduceUpdateIdProvisioningDetailsAction(IdentityProvisioningState state, UpdateIdProvisioningDetailsAction act)
+        {
+            return state with
+            {
+                IsLoading = true
+            };
+        }
+
+        [ReducerMethod]
+        public static IdentityProvisioningState ReduceUpdateIdProvisioningDetailSuccessAction(IdentityProvisioningState state, UpdateIdProvisioningDetailsSuccessAction act)
+        {
+            var idProvisioning = state.IdentityProvisioning;
+            idProvisioning.Description = act.Description;
+            idProvisioning.UpdateDateTime = DateTime.UtcNow;
+            return state with
+            {
+                IsLoading = false,
+                IdentityProvisioning = idProvisioning
+            };
+        }
 
         #endregion
     }

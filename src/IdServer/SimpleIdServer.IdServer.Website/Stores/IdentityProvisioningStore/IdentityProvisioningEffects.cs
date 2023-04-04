@@ -8,7 +8,6 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Website.Resources;
 using System.Linq.Dynamic.Core;
-using System.Runtime.InteropServices;
 
 namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
 {
@@ -75,7 +74,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         public async Task Handle(LaunchIdentityProvisioningAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            using (var httpClient = new HttpClient())
+            var handler = new HttpClientHandler();
+            handler.ServerCertificateCustomValidationCallback =
+                (httpRequestMessage, cert, cetChain, policyErrors) =>
+                {
+                    return true;
+                };
+            using (var httpClient = new HttpClient(handler))
             {
                 var requestMessage = new HttpRequestMessage
                 {
@@ -92,11 +97,20 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         {
             var result = await _identityProvisioningStore.Query().Include(p => p.Properties).SingleAsync(i => i.Id == action.Id);
             result.Properties.Clear();
-            foreach(var property in result.Properties)
+            foreach(var property in action.Properties)
                 result.Properties.Add(property);
 
             await _identityProvisioningStore.SaveChanges(CancellationToken.None);
             dispatcher.Dispatch(new UpdateIdProvisioningPropertiesSuccessAction { Id = action.Id, Properties = action.Properties });
+        }
+
+        [EffectMethod]
+        public async Task Handle(UpdateIdProvisioningDetailsAction action, IDispatcher dispatcher)
+        {
+            var result = await _identityProvisioningStore.Query().SingleAsync(i => i.Id == action.Id);
+            result.Description = action.Description;
+            await _identityProvisioningStore.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new UpdateIdProvisioningDetailsSuccessAction { Description = action.Description, Id = action.Id });
         }
 
         private async Task<string> GetRealm()
@@ -179,5 +193,17 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
     {
         public string Id { get; set; }
         public IEnumerable<IdentityProvisioningProperty> Properties { get; set; }
+    }
+
+    public class UpdateIdProvisioningDetailsAction
+    {
+        public string Id { get; set; }
+        public string Description { get; set; }
+    }
+
+    public class UpdateIdProvisioningDetailsSuccessAction
+    {
+        public string Id { get; set; }
+        public string Description { get; set; }
     }
 }

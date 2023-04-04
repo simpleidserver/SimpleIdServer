@@ -9,6 +9,9 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSIDWebsite(o =>
 {
+    o.IdServerBaseUrl = builder.Configuration["IdServerBaseUrl"];
+}, o =>
+{
     o.UseSqlServer(builder.Configuration.GetConnectionString("IdServer"),  o =>
     {
         o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);

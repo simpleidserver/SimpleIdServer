@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Hangfire;
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
@@ -42,11 +41,10 @@ builder.Services.AddRazorPages()
     .AddRazorRuntimeCompilation();
 RunSqlServerIdServer(builder.Services);
 var app = builder.Build();
-SeedData(app);
+SeedData(app, builder.Configuration["SCIMBaseUrl"]);
 app.UseCors("AllowAll");
 app.UseSID()
     .UseWsFederation();
-app.UseHangfireDashboard("/hangfire");
 app.Run();
 
 void RunSqlServerIdServer(IServiceCollection services)
@@ -101,7 +99,7 @@ void RunSqlServerIdServer(IServiceCollection services)
         });
 }
 
-void SeedData(WebApplication application)
+void SeedData(WebApplication application, string scimBaseUrl)
 {
     using (var scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
     {
@@ -136,7 +134,7 @@ void SeedData(WebApplication application)
                 dbContext.IdentityProvisioningDefinitions.AddRange(IdServerConfiguration.IdentityProvisioningDefLst);
 
             if (!dbContext.IdentityProvisioningLst.Any())
-                dbContext.IdentityProvisioningLst.AddRange(IdServerConfiguration.IdentityProvisiongLst);
+                dbContext.IdentityProvisioningLst.AddRange(IdServerConfiguration.GetIdentityProvisiongLst(scimBaseUrl));
 
             if (!dbContext.SerializedFileKeys.Any())
             {

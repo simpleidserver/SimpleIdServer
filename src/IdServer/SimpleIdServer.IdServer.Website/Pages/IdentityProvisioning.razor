@@ -26,6 +26,9 @@ else
 
     <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
         <Tabs>
+            <RadzenTabsItem Text="Details">
+                <IdentityProvisioningDetails IdProvisioning="@identityProvisioningState.Value.IdentityProvisioning"></IdentityProvisioningDetails>
+            </RadzenTabsItem>
             <RadzenTabsItem Text="Properties">
                 <IdentityProvisioningProperties IdProvisioning="@identityProvisioningState.Value.IdentityProvisioning"></IdentityProvisioningProperties>
             </RadzenTabsItem>
@@ -39,8 +42,9 @@ else
 @code {
     Dictionary<string, int> mappingActionNameToIndex = new Dictionary<string, int>
     {
-        { "properties", 0 },
-        { "histories", 1 }
+        { "details", 0 },
+        { "properties", 1 },
+        { "histories", 2 }
     };
     [Parameter]
     public string id { get; set; } = null!;
@@ -63,6 +67,16 @@ else
             SubscribeToAction<LaunchIdentityProvisioningSuccessAction>((act) =>
             {
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.IdentityProvisioningLaunched });
+                StateHasChanged();
+            });
+            SubscribeToAction<UpdateIdProvisioningDetailsSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.IdProvisioningDetailsUpdated });
+                StateHasChanged();
+            });
+            SubscribeToAction<UpdateIdProvisioningPropertiesSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.IdProvisioningPropertiesUpdated });
                 StateHasChanged();
             });
             SubscribeToAction<SelectRealmSuccessAction>((act) =>

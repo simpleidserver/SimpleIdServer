@@ -7,6 +7,18 @@ services:
     environment:
       ACCEPT_EULA: Y
       MSSQL_SA_PASSWORD : "D54DE7hHpkG9"
+  scim:
+    build:
+      context: .
+      dockerfile: ./ScimDockerFile
+    image: simpleidserver/scim:${TAG}
+    environment:
+      ASPNETCORE_URLS : "http://*:5003"
+      ASPNETCORE_ENVIRONMENT: "Docker"
+    ports:
+      - "5003:5003"
+    depends_on:
+      - db
   idserver:
     build:
       context: .
@@ -17,10 +29,12 @@ services:
       ASPNETCORE_Kestrel__Certificates__Default__Password: "password"
       ASPNETCORE_Kestrel__Certificates__Default__Path: "/certificates/localhost.pfx"
       ConnectionStrings__IdServer: "Data Source=db;Initial Catalog=IdServer;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"
+      SCIMBaseUrl: "http://scim:5003"
     ports:
       - "5001:5001"
     depends_on:
       - db
+      - scim
     volumes:
       - ./certificates:/certificates
   website:
@@ -30,10 +44,12 @@ services:
     image: simpleidserver/website:${TAG}
     environment:
       ASPNETCORE_URLS : "http://*:5002"
+      IdServerBaseUrl: "https://idserver:5001"
       ConnectionStrings__IdServer: "Data Source=db;Initial Catalog=IdServer;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"
     ports:
       - "5002:5002"
     depends_on:
       - db
+      - idserver
 volumes:
   mssqldata:

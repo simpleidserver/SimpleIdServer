@@ -42,7 +42,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableIdentityProvisioning" Filterable="false" Sortable="false" Title="Name" Width="80px">
             <Template Context="data">                
-                <RadzenLink Text="@data.Value.Name" Path="@($"/identityprovisioning/{data.Value.Id}/properties")" />
+                <RadzenLink Text="@data.Value.Name" Path="@($"/identityprovisioning/{data.Value.Id}/details")" />
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableIdentityProvisioning" Property="Value.Description" Filterable="false" Sortable="false" Title="Description" Width="80px" />

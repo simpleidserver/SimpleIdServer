@@ -177,6 +177,9 @@
   <data name="IdProviderPropertiesUpdated" xml:space="preserve">
     <value>Identity Provider Properties have been updated</value>
   </data>
+  <data name="IdProvisioningDetailsUpdated" xml:space="preserve">
+    <value>Details have been updated</value>
+  </data>
   <data name="IdProvisioningPropertiesUpdated" xml:space="preserve">
     <value>Properties have been updated</value>
   </data>

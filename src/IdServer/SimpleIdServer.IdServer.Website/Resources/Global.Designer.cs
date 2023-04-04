@@ -241,6 +241,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Details have been updated.
+        /// </summary>
+        public static string IdProvisioningDetailsUpdated {
+            get {
+                return ResourceManager.GetString("IdProvisioningDetailsUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Properties have been updated.
         /// </summary>
         public static string IdProvisioningPropertiesUpdated {

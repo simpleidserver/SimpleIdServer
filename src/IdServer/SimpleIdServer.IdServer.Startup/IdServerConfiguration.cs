@@ -83,12 +83,12 @@ namespace SimpleIdServer.IdServer.Startup
             Scim
         };
 
-        public static ICollection<IdentityProvisioning> IdentityProvisiongLst => new List<IdentityProvisioning>
+        public static ICollection<IdentityProvisioning> GetIdentityProvisiongLst(string scimEdp) => new List<IdentityProvisioning>
         {
             IdentityProvisioningBuilder.Create(Scim, "SCIM", "SCIM", new SCIMRepresentationsExtractionJobOptions
             {
                 Count = 1,
-                SCIMEdp = "http://localhost:5003"
+                SCIMEdp = scimEdp
             }).Build()
         };
     }

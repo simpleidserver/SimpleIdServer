@@ -1,0 +1,50 @@
+﻿@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore;
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject DialogService dialogService
+@inject NotificationService notificationService
+@inject IDispatcher dispatcher
+
+<RadzenTemplateForm Submit=@SubmitUpdateIdProvisioningDetails TItem="UpdateIdentityProvisioningDetails" Data=@updateIdentityProvisioning>
+    <!-- Name -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+        <RadzenTextBox Name="Name" @bind-Value="@updateIdentityProvisioning.Name" Class="w-100" Disabled=true></RadzenTextBox>
+    </div>
+    <!-- Description -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Description</RadzenText>
+        <RadzenTextArea Name="Description" @bind-Value="@updateIdentityProvisioning.Description" Class="w-100"></RadzenTextArea>
+        <RadzenRequiredValidator Component="Description" Text="Description is required"></RadzenRequiredValidator>
+    </div>
+    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Update" />
+</RadzenTemplateForm>
+
+@code {
+    record UpdateIdentityProvisioningDetails
+    {
+        public string Id { get; set; } = null!;
+        public string Name { get; set; } = null!;
+        public string Description { get; set; } = null!;
+    }
+
+    UpdateIdentityProvisioningDetails updateIdentityProvisioning = new UpdateIdentityProvisioningDetails();
+
+    [Parameter]
+    public SimpleIdServer.IdServer.Domains.IdentityProvisioning IdProvisioning { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (IdProvisioning == null) return;
+        updateIdentityProvisioning.Id = IdProvisioning.Id;
+        updateIdentityProvisioning.Name = IdProvisioning.Name;
+        updateIdentityProvisioning.Description = IdProvisioning.Description;
+    }
+
+    void SubmitUpdateIdProvisioningDetails(UpdateIdentityProvisioningDetails idProvisioningDetails)
+    {
+        var act = new UpdateIdProvisioningDetailsAction { Id = idProvisioningDetails.Id,  Description = idProvisioningDetails.Description };
+        dispatcher.Dispatch(act);
+    }
+}

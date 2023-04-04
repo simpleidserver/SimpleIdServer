@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Hangfire;
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
@@ -36,7 +35,6 @@ var app = builder.Build();
 app.UseCors("AllowAll");
 app.UseSID()
     .UseWsFederation();
-app.UseHangfireDashboard("/hangfire");
 app.Run();
 
 void RunSqlServerIdServer(IServiceCollection services)
