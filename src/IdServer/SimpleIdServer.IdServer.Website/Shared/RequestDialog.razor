@@ -1,9 +1,9 @@
 ﻿<div>
-    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Request</RadzenText>
-    <RadzenTextArea Rows="20" @bind-Value="@AuditEvent.RequestJSON" Class="w-100"></RadzenTextArea>
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Content</RadzenText>
+    <RadzenTextArea Rows="20" @bind-Value="@Content" Class="w-100"></RadzenTextArea>
 </div>
 
 @code {
     [Parameter]
-    public AuditEvent AuditEvent { get; set; }
+    public string Content { get; set; }
 }

@@ -43,6 +43,14 @@
         <RadzenDataGridColumn TItem="SelectableUser" Property="Value.Email" Filterable="false" Sortable="false" Title="Email" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableUser" Property="Value.Firstname" Filterable="false" Sortable="false" Title="First name" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableUser" Property="Value.Lastname" Filterable="false" Sortable="false" Title="Last name" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableUser" Filterable="false" Sortable="false" Title="Source" Width="80px">
+            <Template Context="data">
+                @if(!string.IsNullOrWhiteSpace(data.Value.Source))
+                {
+                    <RadzenBadge Text="@data.Value.Source" IsPill="true" BadgeStyle="BadgeStyle.Info"></RadzenBadge>
+                }
+            </Template>
+        </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableUser" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Update datetime" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableUser" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">                

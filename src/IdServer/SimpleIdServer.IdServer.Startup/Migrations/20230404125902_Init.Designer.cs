@@ -12,7 +12,7 @@ using SimpleIdServer.IdServer.Store;
 namespace SimpleIdServer.IdServer.Startup.Migrations
 {
     [DbContext(typeof(StoreDbContext))]
-    [Migration("20230403141827_Init")]
+    [Migration("20230404125902_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -173,21 +173,6 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.HasIndex("SerializedFileKeysId");
 
                     b.ToTable("RealmSerializedFileKey");
-                });
-
-            modelBuilder.Entity("RealmUser", b =>
-                {
-                    b.Property<string>("RealmsName")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("UsersId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("RealmsName", "UsersId");
-
-                    b.HasIndex("UsersId");
-
-                    b.ToTable("RealmUser");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ApiResource", b =>
@@ -1086,7 +1071,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("EndDateTime")
+                    b.Property<DateTime?>("EndDateTime")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("ErrorMessage")
@@ -1098,12 +1083,6 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<string>("IdentityProvisioningId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime?>("ImportDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsImported")
-                        .HasColumnType("bit");
 
                     b.Property<int>("NbRepresentations")
                         .HasColumnType("int");
@@ -1176,6 +1155,37 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.ToTable("IdentityProvisioningProperty");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ImportSummary", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("EndDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("NbRepresentations")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RealmName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("StartDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RealmName");
+
+                    b.ToTable("ImportSummaries");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Realm", b =>
                 {
                     b.Property<string>("Name")
@@ -1193,6 +1203,21 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.HasKey("Name");
 
                     b.ToTable("Realms");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.RealmUser", b =>
+                {
+                    b.Property<string>("UsersId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RealmsName")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("UsersId", "RealmsName");
+
+                    b.HasIndex("RealmsName");
+
+                    b.ToTable("RealmUser");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Scope", b =>
@@ -1928,21 +1953,6 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RealmUser", b =>
-                {
-                    b.HasOne("SimpleIdServer.IdServer.Domains.Realm", null)
-                        .WithMany()
-                        .HasForeignKey("RealmsName")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SimpleIdServer.IdServer.Domains.User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProvider", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderDefinition", "AuthSchemeProviderDefinition")
@@ -2093,6 +2103,36 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .IsRequired();
 
                     b.Navigation("IdentityProvisioning");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ImportSummary", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Realm", "Realm")
+                        .WithMany("ImportSummaries")
+                        .HasForeignKey("RealmName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Realm");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.RealmUser", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Realm", "Realm")
+                        .WithMany("Users")
+                        .HasForeignKey("RealmsName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SimpleIdServer.IdServer.Domains.User", "User")
+                        .WithMany("Realms")
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Realm");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ScopeClaimMapper", b =>
@@ -2271,6 +2311,13 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Navigation("Properties");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Realm", b =>
+                {
+                    b.Navigation("ImportSummaries");
+
+                    b.Navigation("Users");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Scope", b =>
                 {
                     b.Navigation("ClaimMappers");
@@ -2304,6 +2351,8 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Navigation("ExternalAuthProviders");
 
                     b.Navigation("OAuthUserClaims");
+
+                    b.Navigation("Realms");
 
                     b.Navigation("Sessions");
                 });

@@ -33,7 +33,10 @@ namespace SimpleIdServer.IdServer.UI.Services
                 UpdateDateTime = DateTime.UtcNow,
                 CreateDateTime = DateTime.UtcNow
             };
-            user.Realms.Add(realm);
+            user.Realms.Add(new RealmUser
+            {
+                RealmsName = realm.Name
+            });
             foreach(var mapper in idProvider.Mappers)
             {
                 switch(mapper.MapperType)

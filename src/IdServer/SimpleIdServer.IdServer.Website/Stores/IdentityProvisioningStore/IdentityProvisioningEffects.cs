@@ -3,21 +3,25 @@
 using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Website.Resources;
 using System.Linq.Dynamic.Core;
+using System.Runtime.InteropServices;
 
 namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
 {
     public class IdentityProvisioningEffects
     {
         private readonly IIdentityProvisioningStore _identityProvisioningStore;
+        private readonly IdServerWebsiteOptions _options;
         private readonly ProtectedSessionStorage _sessionStorage;
 
-        public IdentityProvisioningEffects(IIdentityProvisioningStore identityProvisioningStore, ProtectedSessionStorage sessionStorage)
+        public IdentityProvisioningEffects(IIdentityProvisioningStore identityProvisioningStore, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
         {
             _identityProvisioningStore = identityProvisioningStore;
+            _options = options.Value;
             _sessionStorage = sessionStorage;
         }
 
@@ -53,7 +57,11 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         public async Task Handle(GetIdentityProvisioningAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var result = await _identityProvisioningStore.Query().Include(c => c.Realms).Include(c => c.Histories).SingleOrDefaultAsync(c => c.Realms.Any(r => r.Name == realm) && action.Id == c.Id);
+            var result = await _identityProvisioningStore.Query().Include(c => c.Realms)
+                .Include(c => c.Properties)
+                .Include(c => c.Definition).ThenInclude(d => d.Properties)
+                .Include(c => c.Histories)
+                .SingleOrDefaultAsync(c => c.Realms.Any(r => r.Name == realm) && action.Id == c.Id);
             if(result == null)
             {
                 dispatcher.Dispatch(new GetIdentityProvisioningFailureAction { ErrorMessage = Global.UnknownIdentityProvisioning });
@@ -61,6 +69,34 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             }
 
             dispatcher.Dispatch(new GetIdentityProvisioningSuccessAction { IdentityProvisioning = result });
+        }
+
+        [EffectMethod]
+        public async Task Handle(LaunchIdentityProvisioningAction action, IDispatcher dispatcher)
+        {
+            var realm = await GetRealm();
+            using (var httpClient = new HttpClient())
+            {
+                var requestMessage = new HttpRequestMessage
+                {
+                    RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/provisioning/{action.Name}/{action.Id}/enqueue")
+                };
+                await httpClient.SendAsync(requestMessage);
+            }
+
+            dispatcher.Dispatch(new LaunchIdentityProvisioningSuccessAction { Id = action.Id, Name = action.Name });
+        }
+
+        [EffectMethod]
+        public async Task Handle(UpdateIdProvisioningPropertiesAction action, IDispatcher dispatcher)
+        {
+            var result = await _identityProvisioningStore.Query().Include(p => p.Properties).SingleAsync(i => i.Id == action.Id);
+            result.Properties.Clear();
+            foreach(var property in result.Properties)
+                result.Properties.Add(property);
+
+            await _identityProvisioningStore.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new UpdateIdProvisioningPropertiesSuccessAction { Id = action.Id, Properties = action.Properties });
         }
 
         private async Task<string> GetRealm()
@@ -119,5 +155,29 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
     public class RemoveSelectedIdentityProvisioningSuccessAction
     {
         public IEnumerable<string> Ids { get; set; }
+    }
+
+    public class LaunchIdentityProvisioningAction
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class LaunchIdentityProvisioningSuccessAction
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class UpdateIdProvisioningPropertiesAction
+    {
+        public string Id { get; set; }
+        public IEnumerable<IdentityProvisioningProperty> Properties { get; set; }
+    }
+
+    public class UpdateIdProvisioningPropertiesSuccessAction
+    {
+        public string Id { get; set; }
+        public IEnumerable<IdentityProvisioningProperty> Properties { get; set; }
     }
 }

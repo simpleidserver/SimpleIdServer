@@ -1,0 +1,36 @@
+﻿@using Fluxor.Blazor.Web.Components;
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore;
+@inherits FluxorComponent
+@inject IDispatcher dispatcher
+@inject DialogService dialogService
+@inject NotificationService notificationService
+
+<EditIdentityProvisioning IdProvisioningSaved=@SaveIdProvisioning IdProvisioning=@IdProvisioning IdProvisioningDef=@IdProvisioning.Definition IsAddForm=false />
+
+@code {
+    [Parameter]
+    public SimpleIdServer.IdServer.Domains.IdentityProvisioning IdProvisioning { get; set; }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            SubscribeToAction<UpdateIdProvisioningPropertiesSuccessAction>((act) =>
+            {
+                dialogService.Close();
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.IdProvisioningPropertiesUpdated });
+                StateHasChanged();
+            });
+        }
+
+        return Task.CompletedTask;
+    }
+
+    void SaveIdProvisioning(IEnumerable<IdentityProvisioningProperty> properties)
+    {
+        var act = new UpdateIdProvisioningPropertiesAction { Id = IdProvisioning.Id, Properties = properties };
+        dispatcher.Dispatch(act);
+    }
+}

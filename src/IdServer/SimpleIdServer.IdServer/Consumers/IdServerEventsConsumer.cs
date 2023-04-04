@@ -22,7 +22,9 @@ namespace SimpleIdServer.IdServer.Consumers
         IConsumer<TokenRevokedFailureEvent>, IConsumer<TokenRevokedSuccessEvent>,
         IConsumer<UserInfoFailureEvent>, IConsumer<UserInfoSuccessEvent>,
         IConsumer<UserLoginSuccessEvent>, IConsumer<UserLogoutSuccessEvent>,
-        IConsumer<PushedAuthorizationRequestSuccessEvent>, IConsumer<PushedAuthorizationRequestFailureEvent>
+        IConsumer<PushedAuthorizationRequestSuccessEvent>, IConsumer<PushedAuthorizationRequestFailureEvent>,
+        IConsumer<ImportUsersSuccessEvent>, IConsumer<ExtractRepresentationsFailureEvent>,
+        IConsumer<ExtractRepresentationsSuccessEvent>
     {
         private readonly IServiceProvider _serviceProvider;
 
@@ -430,6 +432,61 @@ namespace SimpleIdServer.IdServer.Consumers
                     RedirectUrl = context.Message.RedirectUrl,
                     Realm = context.Message.Realm,
                     IsError = false
+                };
+                auditEventRepository.Add(auditEvt);
+                await auditEventRepository.SaveChanges(CancellationToken.None);
+            }
+        }
+
+        public async Task Consume(ConsumeContext<ImportUsersSuccessEvent> context)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var auditEventRepository = scope.ServiceProvider.GetRequiredService<IAuditEventRepository>();
+                var auditEvt = new AuditEvent
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Description = $"{context.Message.NbUsers} users have been imported",
+                    CreateDateTime = DateTime.UtcNow,
+                    Realm = context.Message.Realm,
+                    IsError = false
+                };
+                auditEventRepository.Add(auditEvt);
+                await auditEventRepository.SaveChanges(CancellationToken.None);
+            }
+        }
+
+        public async Task Consume(ConsumeContext<ExtractRepresentationsSuccessEvent> context)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var auditEventRepository = scope.ServiceProvider.GetRequiredService<IAuditEventRepository>();
+                var auditEvt = new AuditEvent
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Description = $"Extract {context.Message.NbRepresentations} users from {context.Message.IdentityProvisioningName}",
+                    CreateDateTime = DateTime.UtcNow,
+                    Realm = context.Message.Realm,
+                    IsError = false
+                };
+                auditEventRepository.Add(auditEvt);
+                await auditEventRepository.SaveChanges(CancellationToken.None);
+            }
+        }
+
+        public async Task Consume(ConsumeContext<ExtractRepresentationsFailureEvent> context)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var auditEventRepository = scope.ServiceProvider.GetRequiredService<IAuditEventRepository>();
+                var auditEvt = new AuditEvent
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Description = $"Fail to extract users from {context.Message.IdentityProvisioningName}",
+                    CreateDateTime = DateTime.UtcNow,
+                    Realm = context.Message.Realm,
+                    ErrorMessage = context.Message.ErrorMessage,
+                    IsError = true
                 };
                 auditEventRepository.Add(auditEvt);
                 await auditEventRepository.SaveChanges(CancellationToken.None);

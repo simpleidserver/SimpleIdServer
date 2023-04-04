@@ -7,5 +7,6 @@ namespace SimpleIdServer.IdServer.ExternalEvents
     {
         public string IdentityProvisioningName { get; set; }
         public string ErrorMessage { get; set; }
+        public string Realm { get; set; }
     }
 }

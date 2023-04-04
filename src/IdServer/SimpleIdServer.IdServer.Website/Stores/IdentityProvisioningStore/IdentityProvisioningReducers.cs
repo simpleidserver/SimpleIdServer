@@ -74,6 +74,34 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         [ReducerMethod]
         public static IdentityProvisioningState ReduceGetIdentityProvisioningSuccessAction(IdentityProvisioningState state, GetIdentityProvisioningSuccessAction act) => new(false, act.IdentityProvisioning);
 
+        [ReducerMethod]
+        public static IdentityProvisioningState ReduceLaunchIdentityProvisioningAction(IdentityProvisioningState state, LaunchIdentityProvisioningAction act)
+        {
+            return state with
+            {
+                IsLoading = true
+            };
+        }
+
+        [ReducerMethod]
+        public static IdentityProvisioningState ReduceLaunchIdentityProvisioningSuccessAction(IdentityProvisioningState state, LaunchIdentityProvisioningSuccessAction act)
+        {
+            var idProvisioning = state.IdentityProvisioning;
+            var histories = state.IdentityProvisioning.Histories.ToList();
+            histories.Add(new IdentityProvisioningHistory
+            {
+                StartDateTime = DateTime.UtcNow,
+                NbRepresentations = 0,
+                Status = IdentityProvisioningHistoryStatus.START
+            });
+            idProvisioning.Histories = histories;
+            return state with
+            {
+                IsLoading = false,
+                IdentityProvisioning = idProvisioning
+            };
+        }
+
 
         #endregion
     }

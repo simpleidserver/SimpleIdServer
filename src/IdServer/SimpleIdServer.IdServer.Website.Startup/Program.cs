@@ -7,7 +7,7 @@ builder.Configuration.AddJsonFile("appsettings.json")
     .AddEnvironmentVariables();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSIDWebsite(o =>
+builder.Services.AddSIDWebsite(action: o =>
 {
     o.UseSqlServer(builder.Configuration.GetConnectionString("IdServer"),  o =>
     {

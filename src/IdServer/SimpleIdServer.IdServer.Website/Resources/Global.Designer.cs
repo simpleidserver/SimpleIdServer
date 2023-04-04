@@ -178,6 +178,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Identity Provisioning is launched.
+        /// </summary>
+        public static string IdentityProvisioningLaunched {
+            get {
+                return ResourceManager.GetString("IdentityProvisioningLaunched", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Identity Provider has been added.
         /// </summary>
         public static string IdProviderAdded {
@@ -228,6 +237,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string IdProviderPropertiesUpdated {
             get {
                 return ResourceManager.GetString("IdProviderPropertiesUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Properties have been updated.
+        /// </summary>
+        public static string IdProvisioningPropertiesUpdated {
+            get {
+                return ResourceManager.GetString("IdProvisioningPropertiesUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Import is launched.
+        /// </summary>
+        public static string ImportLaunched {
+            get {
+                return ResourceManager.GetString("ImportLaunched", resourceCulture);
             }
         }
         

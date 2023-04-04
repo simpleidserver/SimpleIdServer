@@ -190,7 +190,7 @@ namespace SimpleIdServer.IdServer.UI
         protected async Task<string> GetSessionId(string realm, CancellationToken cancellationToken)
         {
             var userId = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.OAuthUserClaims).FirstOrDefaultAsync(u => u.Name == userId && u.Realms.Any(r => r.Name == realm), cancellationToken);
+            var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.OAuthUserClaims).FirstOrDefaultAsync(u => u.Name == userId && u.Realms.Any(r => r.RealmsName == realm), cancellationToken);
             return user.GetActiveSession(realm)?.SessionId;
         }
 

@@ -7,6 +7,6 @@ namespace SimpleIdServer.IdServer.Domains
         public string PropertyName { get; set; } = null!;
         public string DisplayName { get; set; } = null!;
         public string? Description { get; set; } = null;
-        public IdentityProvisioningDefinition IdentityProvisioningDefinition { get; set; }
+        public IdentityProvisioningDefinition IdentityProvisioningDefinition { get; set; } = null!;
     }
 }

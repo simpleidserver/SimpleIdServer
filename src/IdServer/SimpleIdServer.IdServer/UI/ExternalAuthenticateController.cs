@@ -125,7 +125,7 @@ namespace SimpleIdServer.IdServer.UI
                 .Include(u => u.Sessions)
                 .Include(u => u.OAuthUserClaims)
                 .Include(u => u.Realms)
-                .FirstOrDefaultAsync(u => u.ExternalAuthProviders.Any(e => e.Scheme == scheme && e.Subject == sub) && u.Realms.Any(r => r.Name == realm), cancellationToken);
+                .FirstOrDefaultAsync(u => u.ExternalAuthProviders.Any(e => e.Scheme == scheme && e.Subject == sub) && u.Realms.Any(r => r.RealmsName == realm), cancellationToken);
             if (user == null)
             {
                 _logger.LogInformation($"Start to provision the user '{sub}'");

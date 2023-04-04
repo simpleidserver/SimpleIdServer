@@ -31,8 +31,8 @@ namespace SimpleIdServer.IdServer.Builders
                 IsActive = true,
                 Value = PasswordHelper.ComputeHash(password)
             });
-            if (realm == null) result._user.Realms.Add(Constants.StandardRealms.Master);
-            else result._user.Realms.Add(realm);
+            if (realm == null) result._user.Realms.Add(new RealmUser { RealmsName = Constants.StandardRealms.Master.Name });
+            else result._user.Realms.Add(new RealmUser { RealmsName = realm.Name });
             result._user.CreateDateTime = DateTime.UtcNow;
             result._user.UpdateDateTime = DateTime.UtcNow;
             return result;

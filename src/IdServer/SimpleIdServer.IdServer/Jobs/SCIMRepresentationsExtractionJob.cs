@@ -121,11 +121,12 @@ namespace SimpleIdServer.IdServer.Jobs
                         _logger.LogInformation($"{nbUsers} users has been exported into {destinationFolder}");
                         activity?.SetStatus(ActivityStatusCode.Ok, $"{nbUsers} users has been exported into {destinationFolder}");
                         var endDateTime = DateTime.UtcNow;
-                        metadata.Import(startDateTime, endDateTime, folderName, nbUsers);
+                        metadata.Export(startDateTime, endDateTime, folderName, nbUsers);
                         await _busControl.Publish(new ExtractRepresentationsSuccessEvent
                         {
                             IdentityProvisioningName = NAME,
-                            NbRepresentations = nbUsers
+                            NbRepresentations = nbUsers,
+                            Realm = prefix
                         });
                         transactionScope.Complete();
                     }
@@ -139,7 +140,8 @@ namespace SimpleIdServer.IdServer.Jobs
                     await _busControl.Publish(new ExtractRepresentationsFailureEvent
                     {
                         IdentityProvisioningName = NAME,
-                        ErrorMessage = ex.ToString()
+                        ErrorMessage = ex.ToString(),
+                        Realm = prefix
                     });
                 }
                 finally

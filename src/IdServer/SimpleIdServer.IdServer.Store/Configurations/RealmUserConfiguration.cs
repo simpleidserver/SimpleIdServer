@@ -6,13 +6,11 @@ using SimpleIdServer.IdServer.Domains;
 
 namespace SimpleIdServer.IdServer.Store.Configurations
 {
-    public class RealmConfiguration : IEntityTypeConfiguration<Realm>
+    public class RealmUserConfiguration : IEntityTypeConfiguration<RealmUser>
     {
-        public void Configure(EntityTypeBuilder<Realm> builder)
+        public void Configure(EntityTypeBuilder<RealmUser> builder)
         {
-            builder.HasKey(r => r.Name);
-            builder.HasMany(u => u.Users).WithOne(u => u.Realm).HasForeignKey(u => u.RealmsName);
-            builder.HasMany(u => u.ImportSummaries).WithOne(u => u.Realm).HasForeignKey(u => u.RealmName);
+            builder.HasKey(b => new { b.UsersId, b.RealmsName });
         }
     }
 }

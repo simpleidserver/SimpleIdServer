@@ -156,6 +156,9 @@
   <data name="ExternalAuthProviderUnlinked" xml:space="preserve">
     <value>External authentication provider has been unlinked</value>
   </data>
+  <data name="IdentityProvisioningLaunched" xml:space="preserve">
+    <value>Identity Provisioning is launched</value>
+  </data>
   <data name="IdProviderAdded" xml:space="preserve">
     <value>Identity Provider has been added</value>
   </data>
@@ -173,6 +176,12 @@
   </data>
   <data name="IdProviderPropertiesUpdated" xml:space="preserve">
     <value>Identity Provider Properties have been updated</value>
+  </data>
+  <data name="IdProvisioningPropertiesUpdated" xml:space="preserve">
+    <value>Properties have been updated</value>
+  </data>
+  <data name="ImportLaunched" xml:space="preserve">
+    <value>Import is launched</value>
   </data>
   <data name="InvalidRedirectUrl" xml:space="preserve">
     <value>Redirection url '{0}' is not valid</value>

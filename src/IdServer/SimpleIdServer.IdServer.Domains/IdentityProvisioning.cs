@@ -15,14 +15,15 @@ namespace SimpleIdServer.IdServer.Domains
         public ICollection<IdentityProvisioningHistory> Histories { get; set; } = new List<IdentityProvisioningHistory>();
         public ICollection<Realm> Realms { get; set; } = new List<Realm>();
 
-        public void Import(DateTime startDateTime, DateTime endDateTime, string folderName, int nbRepresentations)
+        public void Export(DateTime startDateTime, DateTime endDateTime, string folderName, int nbRepresentations)
         {
             Histories.Add(new IdentityProvisioningHistory
             {
                 StartDateTime = startDateTime,
                 EndDateTime = endDateTime,
                 FolderName = folderName,
-                NbRepresentations = nbRepresentations
+                NbRepresentations = nbRepresentations,
+                Status = IdentityProvisioningHistoryStatus.EXPORT
             });
         }
 
@@ -32,7 +33,8 @@ namespace SimpleIdServer.IdServer.Domains
             {
                 StartDateTime = startDateTime,
                 EndDateTime = endDateTime,
-                ErrorMessage = errorMessage
+                ErrorMessage = errorMessage,
+                Status = IdentityProvisioningHistoryStatus.ERROR
             });
         }
     }

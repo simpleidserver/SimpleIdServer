@@ -12,6 +12,7 @@ namespace SimpleIdServer.IdServer.Store
         void Add(User user);
         Task BulkUpdate(List<UserClaim> userClaims);
         Task BulkUpdate(List<User> users);
+        Task BulkUpdate(List<RealmUser> userRealms);
         Task<int> SaveChanges(CancellationToken cancellationToken);
     }
 
@@ -46,6 +47,15 @@ namespace SimpleIdServer.IdServer.Store
                 PropertiesToIncludeOnCompare = new List<string> { nameof(User.Id), nameof(User.Name), nameof(User.Firstname), nameof(User.Lastname), nameof(User.Email), nameof(User.EmailVerified) }
             };
             return _dbContext.BulkInsertOrUpdateAsync(users, bulkConfig);
+        }
+
+        public Task BulkUpdate(List<RealmUser> userRealms)
+        {
+            var bulkConfig = new BulkConfig
+            {
+                PropertiesToIncludeOnCompare = new List<string> { nameof(RealmUser.RealmsName), nameof(RealmUser.UsersId) }
+            };
+            return _dbContext.BulkInsertOrUpdateAsync(userRealms, bulkConfig);
         }
 
         public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);

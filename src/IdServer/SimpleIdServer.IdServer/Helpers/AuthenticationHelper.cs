@@ -28,14 +28,14 @@ namespace SimpleIdServer.IdServer.Helpers
 
         public Task<User> GetUserByLogin(IQueryable<User> users, string login, string realm, CancellationToken cancellationToken = default)
         {
-            if (_options.IsEmailUsedDuringAuthentication) return users.SingleOrDefaultAsync(u => u.Email == login && u.Realms.Any(r => r.Name == realm), cancellationToken);
+            if (_options.IsEmailUsedDuringAuthentication) return users.SingleOrDefaultAsync(u => u.Email == login && u.Realms.Any(r => r.RealmsName == realm), cancellationToken);
             return users.SingleOrDefaultAsync(u => u.Name == login, cancellationToken);
         }
 
         public IQueryable<User> FilterUsersByLogin(IQueryable<User> users, string login, string realm)
         {
-            if (_options.IsEmailUsedDuringAuthentication) return users.Where(u => u.Email == login && u.Realms.Any(r => r.Name == realm));
-            return users.Where(u => u.Name == login && u.Realms.Any(r => r.Name == realm));
+            if (_options.IsEmailUsedDuringAuthentication) return users.Where(u => u.Email == login && u.Realms.Any(r => r.RealmsName == realm));
+            return users.Where(u => u.Name == login && u.Realms.Any(r => r.RealmsName == realm));
         }
 
         public string GetLogin(User user) => _options.IsEmailUsedDuringAuthentication ? user.Email : user.Name;

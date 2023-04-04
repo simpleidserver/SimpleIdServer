@@ -140,7 +140,7 @@ namespace SimpleIdServer.IdServer.UI
         {
             prefix = prefix ?? Constants.DefaultRealm;
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.Query().Include(u => u.Consents).Include(u => u.Realms).FirstAsync(c => c.Name == nameIdentifier && c.Realms.Any(r => r.Name == prefix), cancellationToken);
+            var user = await _userRepository.Query().Include(u => u.Consents).Include(u => u.Realms).FirstAsync(c => c.Name == nameIdentifier && c.Realms.Any(r => r.RealmsName == prefix), cancellationToken);
             if (!user.HasOpenIDConsent(consentId))
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request" });
 

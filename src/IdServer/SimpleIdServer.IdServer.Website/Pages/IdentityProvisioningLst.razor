@@ -1,6 +1,7 @@
 ﻿@page "/identityprovisioning"
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject IState<SearchIdentityProvisioningState> searchIdentityProvisioningState
+@inject IState<SearchImportSummariesState> searchImportSummariesState
 @inject IDispatcher dispatcher
 @inject NotificationService notificationService
 @inject DialogService dialogService
@@ -8,6 +9,9 @@
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
+@using SimpleIdServer.IdServer.Website.Stores.ImportSummaryStore;
+
+<RadzenText class="mb-3" Text="Extract" TextStyle="TextStyle.DisplayH6" />
 
 <RadzenDataGrid @ref="identityProvisioningGrid"
                 AllowFiltering="true"
@@ -23,7 +27,7 @@
                 IsLoading="@searchIdentityProvisioningState.Value.IsLoading"
                 Count="@searchIdentityProvisioningState.Value.Count"
                 Data="@searchIdentityProvisioningState.Value.Values"
-                LoadData="@LoadData"
+                LoadData="@LoadIdentityProvisioningLst"
                 RowRender="@RowRender"
                 TItem="SelectableIdentityProvisioning"
                 ColumnWidth="300px">
@@ -38,7 +42,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableIdentityProvisioning" Filterable="false" Sortable="false" Title="Name" Width="80px">
             <Template Context="data">                
-                <RadzenLink Text="@data.Value.Name" Path="@($"/identityprovisioning/{data.Value.Id}/histories")" />
+                <RadzenLink Text="@data.Value.Name" Path="@($"/identityprovisioning/{data.Value.Id}/properties")" />
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableIdentityProvisioning" Property="Value.Description" Filterable="false" Sortable="false" Title="Description" Width="80px" />
@@ -63,8 +67,53 @@
     </Columns>
 </RadzenDataGrid>
 
+<RadzenText class="mt-3 mb-3" Text="Import" TextStyle="TextStyle.DisplayH6" />
+
+<RadzenButton class="mb-1" Click="@(args => LaunchImport())" Icon="launch" Text="Import" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+
+<RadzenDataGrid @ref="importSummaryGrid"
+                AllowFiltering="true"
+                AllowColumnResize="true"
+                AllowAlternatingRows="false"
+                FilterMode="FilterMode.Simple"
+                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                AllowSorting="true"
+                PageSize="15"
+                AllowPaging="true"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="true"
+                IsLoading="@searchIdentityProvisioningState.Value.IsLoading"
+                Count="@searchImportSummariesState.Value.Count"
+                Data="@searchImportSummariesState.Value.ImportSummaries"
+                LoadData="@LoadImportSummaries"
+                TItem="ImportSummary"
+                ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn TItem="ImportSummary" Property="StartDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Start" Width="80px" />
+        <RadzenDataGridColumn TItem="ImportSummary" Property="EndDateTime" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Title="End" Width="80px" />
+        <RadzenDataGridColumn TItem="ImportSummary" Property="NbRepresentations" Filterable="false" Sortable="false" Title="Nb Imported" Width="80px" />
+        <RadzenDataGridColumn TItem="ImportSummary" Title="Status" Filterable="false" Sortable="false" Width="80px">
+            <Template Context="data">
+                @if (data.Status == ImportStatus.START)
+                {                    
+                    <RadzenBadge Text="Started" IsPill="true" BadgeStyle="BadgeStyle.Info"></RadzenBadge>
+                }
+                else if (data.Status == ImportStatus.ERROR)
+                {
+                    <RadzenBadge Text="Failed" IsPill="true" BadgeStyle="BadgeStyle.Danger"></RadzenBadge>
+                }
+                else if (data.Status == ImportStatus.SUCCESS)
+                {
+                    <RadzenBadge Text="Success" IsPill="true" BadgeStyle="BadgeStyle.Success"></RadzenBadge>
+                }
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
 @code {
     RadzenDataGrid<SelectableIdentityProvisioning> identityProvisioningGrid;
+    RadzenDataGrid<ImportSummary> importSummaryGrid;
     bool selectAll;
 
     protected override void OnAfterRender(bool firstRender)
@@ -80,6 +129,11 @@
             SubscribeToAction<RemoveSelectedIdentityProvisioningSuccessAction>((act) =>
             {
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedIdentityProvisioningRemoved });
+                StateHasChanged();
+            });
+            SubscribeToAction<LaunchImportSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.ImportLaunched });
                 StateHasChanged();
             });
             if (!searchIdentityProvisioningState.Value.IsLoading)
@@ -117,20 +171,32 @@
             new ContextMenuItem { Text = "Delete", Value = 1 }
         }, (a) =>
     {
-        if (a.Value.Equals(1))
-        {
-            var ids = searchIdentityProvisioningState.Value.Values?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
-            if (!ids.Contains(identityProvisioning.Value.Id)) ids.Add(identityProvisioning.Value.Id);
-            var act = new RemoveSelectedIdentityProvisioningAction { Ids = ids};
-            dispatcher.Dispatch(act);
-            contextMenuService.Close();
-        }
+    if (a.Value.Equals(1))
+    {
+        var ids = searchIdentityProvisioningState.Value.Values?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
+        if (!ids.Contains(identityProvisioning.Value.Id)) ids.Add(identityProvisioning.Value.Id);
+        var act = new RemoveSelectedIdentityProvisioningAction { Ids = ids};
+        dispatcher.Dispatch(act);
+        contextMenuService.Close();
+    }
     });
     }
 
-    void LoadData(LoadDataArgs args)
+    void LoadIdentityProvisioningLst(LoadDataArgs args)
     {
         var act = new SearchIdentityProvisioningAction { Filter = args.Filter, OrderBy = args.OrderBy, Skip = args.Skip, Take = args.Top };
+        dispatcher.Dispatch(act);
+    }
+
+    void LoadImportSummaries(LoadDataArgs args)
+    {
+        var act = new SearchImportSummariesAction { Filter = args.Filter, OrderBy = args.OrderBy, Skip = args.Skip, Take = args.Top };
+        dispatcher.Dispatch(act);
+    }
+
+    void LaunchImport()
+    {
+        var act = new LaunchImportAction();
         dispatcher.Dispatch(act);
     }
 }

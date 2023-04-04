@@ -86,7 +86,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                 .Include(u => u.Sessions)
                 .Include(u => u.Realms)
                 .Include(u => u.OAuthUserClaims)
-                .SingleOrDefaultAsync(u => u.Name == context.Request.UserSubject && u.Realms.Any(r => r.Name == context.Realm), cancellationToken);
+                .SingleOrDefaultAsync(u => u.Name == context.Request.UserSubject && u.Realms.Any(r => r.RealmsName == context.Realm), cancellationToken);
             context.SetUser(user);
             var grantRequest = validationResult.GrantRequest;
             var responseTypeHandlers = validationResult.ResponseTypes;

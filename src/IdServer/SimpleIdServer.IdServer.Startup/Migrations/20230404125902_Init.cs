@@ -664,6 +664,29 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ImportSummaries",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    StartDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    NbRepresentations = table.Column<int>(type: "int", nullable: false),
+                    ErrorMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    RealmName = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ImportSummaries", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ImportSummaries_Realms_RealmName",
+                        column: x => x.RealmName,
+                        principalTable: "Realms",
+                        principalColumn: "Name",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ApiResourceScope",
                 columns: table => new
                 {
@@ -898,7 +921,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RealmUser", x => new { x.RealmsName, x.UsersId });
+                    table.PrimaryKey("PK_RealmUser", x => new { x.UsersId, x.RealmsName });
                     table.ForeignKey(
                         name: "FK_RealmUser_Realms_RealmsName",
                         column: x => x.RealmsName,
@@ -1120,13 +1143,11 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     StartDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
                     FolderName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     NbRepresentations = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     ErrorMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsImported = table.Column<bool>(type: "bit", nullable: false),
-                    ImportDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IdentityProvisioningId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
@@ -1345,6 +1366,11 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 column: "RealmsName");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ImportSummaries_RealmName",
+                table: "ImportSummaries",
+                column: "RealmName");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RealmScope_ScopesId",
                 table: "RealmScope",
                 column: "ScopesId");
@@ -1355,9 +1381,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 column: "SerializedFileKeysId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RealmUser_UsersId",
+                name: "IX_RealmUser_RealmsName",
                 table: "RealmUser",
-                column: "UsersId");
+                column: "RealmsName");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ScopeClaimMapper_ScopeId",
@@ -1488,6 +1514,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
             migrationBuilder.DropTable(
                 name: "IdentityProvisioningRealm");
+
+            migrationBuilder.DropTable(
+                name: "ImportSummaries");
 
             migrationBuilder.DropTable(
                 name: "RealmScope");

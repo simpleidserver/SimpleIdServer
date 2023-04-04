@@ -32,6 +32,7 @@ namespace SimpleIdServer.IdServer.Store
         public DbSet<IdentityProvisioningDefinition> IdentityProvisioningDefinitions { get; set; }
         public DbSet<UserClaim> UserClaims { get; set; }
         public DbSet<ExtractedRepresentation> ExtractedRepresentations { get; set; }
+        public DbSet<ImportSummary> ImportSummaries { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -78,6 +79,8 @@ namespace SimpleIdServer.IdServer.Store
             builder.ApplyConfiguration(new IdentityProvisioningMappingRuleConfiguration());
             builder.ApplyConfiguration(new IdentityProvisioningHistoryConfiguration());
             builder.ApplyConfiguration(new ExtractedRepresentationConfiguration());
+            builder.ApplyConfiguration(new RealmUserConfiguration());
+            builder.ApplyConfiguration(new ImportSummaryConfiguration());
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using MassTransit;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -21,47 +23,63 @@ namespace SimpleIdServer.IdServer.Jobs
 {
     public interface IImportRepresentationJob
     {
-        Task Execute(string realm);
+        Task Execute(string realm, string id);
     }
 
     public class ImportRepresentationJob : IImportRepresentationJob
     {
         private readonly IIdentityProvisioningStore _identityProvisioningStore;
+        private readonly IImportSummaryStore _importSummaryStore;
         private readonly IUserRepository _userRepository;
         private readonly IBusControl _busControl;
         private readonly IdServerHostOptions _options;
         private readonly ILogger<ImportRepresentationJob> _logger;
 
-        public ImportRepresentationJob(IIdentityProvisioningStore identityProvisioningStore, IUserRepository userRepository, IBusControl busControl, IOptions<IdServerHostOptions> options, ILogger<ImportRepresentationJob> logger)
+        public ImportRepresentationJob(IIdentityProvisioningStore identityProvisioningStore, IImportSummaryStore importSummaryStore, IUserRepository userRepository, IBusControl busControl, IOptions<IdServerHostOptions> options, ILogger<ImportRepresentationJob> logger)
         {
             _identityProvisioningStore = identityProvisioningStore;
+            _importSummaryStore = importSummaryStore;
             _userRepository = userRepository;
             _busControl = busControl;
             _options = options.Value;
             _logger = logger;
         }
 
-        public async Task Execute(string realm)
+        public async Task Execute(string realm, string id)
         {
             using (var activity = Tracing.IdServerActivitySource.StartActivity("Start to import SCIM users"))
             {
+                var importSummary = ImportSummary.Create(id, realm);
+                _importSummaryStore.Add(importSummary);
+                await _importSummaryStore.SaveChanges(CancellationToken.None);
                 var destinationFolder = _options.ExtractRepresentationsFolder;
                 int nbImport = 0;
-                using (var transactionScope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = System.Transactions.IsolationLevel.Snapshot }, TransactionScopeAsyncFlowOption.Enabled))
+                try
                 {
-                    foreach (var subDirectory in Directory.EnumerateDirectories(destinationFolder))
-                        nbImport += await Import(new DirectoryInfo(subDirectory).Name, realm);
+                    using (var transactionScope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = System.Transactions.IsolationLevel.Snapshot }, TransactionScopeAsyncFlowOption.Enabled))
+                    {
+                        foreach (var subDirectory in Directory.EnumerateDirectories(destinationFolder))
+                            nbImport += await Import(new DirectoryInfo(subDirectory).Name, realm);
 
-                    await _identityProvisioningStore.SaveChanges(CancellationToken.None);
-                    transactionScope.Complete();
+                        await _identityProvisioningStore.SaveChanges(CancellationToken.None);
+                        transactionScope.Complete();
+                    }
+
+                    await _busControl.Publish(new ImportUsersSuccessEvent
+                    {
+                        NbUsers = nbImport,
+                        Realm = realm
+                    });
+                    activity?.SetStatus(ActivityStatusCode.Ok, $"{nbImport} users has been imported");
+                    importSummary.Success(nbImport);
+                    await _importSummaryStore.SaveChanges(CancellationToken.None);
                 }
-
-                await _busControl.Publish(new ImportUsersSuccessEvent
+                catch(Exception ex)
                 {
-                    NbUsers = nbImport,
-                    Realm = realm
-                });
-                activity?.SetStatus(ActivityStatusCode.Ok, $"{nbImport} users has been imported");
+                    _logger.LogError(ex.ToString());
+                    importSummary.Fail(ex.ToString());
+                    await _importSummaryStore.SaveChanges(CancellationToken.None);
+                }
             }
         }
 
@@ -77,12 +95,13 @@ namespace SimpleIdServer.IdServer.Jobs
                 .ToListAsync();
             foreach (var identityProvisioning in identityProvisioningLst)
             {
-                foreach (var history in identityProvisioning.Histories.Where(h => !h.IsImported && h.Status == IdentityProvisioningHistoryStatus.SUCCESS).OrderBy(h => h.StartDateTime))
+                foreach (var history in identityProvisioning.Histories.Where(h => h.Status == IdentityProvisioningHistoryStatus.EXPORT).OrderBy(h => h.StartDateTime))
                 {
                     var path = Path.Combine(_options.ExtractRepresentationsFolder, name, history.FolderName);
                     foreach (var filePath in Directory.GetFiles(path))
-                        result += await Export(filePath, identityProvisioning.Definition);
+                         await Export(filePath, identityProvisioning.Definition, realm);
                     history.Import();
+                    result += history.NbRepresentations;
                 }
             }
 
@@ -90,7 +109,7 @@ namespace SimpleIdServer.IdServer.Jobs
             return result;
         }
 
-        private async Task<int> Export(string filePath, IdentityProvisioningDefinition idProvisioningDef)
+        private async Task Export(string filePath, IdentityProvisioningDefinition idProvisioningDef, string realm)
         {
             var userClaims = new List<UserClaim>();
             var users = new List<User>();
@@ -109,7 +128,11 @@ namespace SimpleIdServer.IdServer.Jobs
 
             await _userRepository.BulkUpdate(users);
             await _userRepository.BulkUpdate(userClaims);
-            return users.Count();
+            await _userRepository.BulkUpdate(users.Select(u => new RealmUser
+            {
+                UsersId = u.Id,
+                RealmsName = realm
+            }).ToList());
         }
 
         private ExtractionResult ExtractUsersAndClaims(IdentityProvisioningDefinition idProvisioningDef, IEnumerable<string> columns, IEnumerable<string> values)

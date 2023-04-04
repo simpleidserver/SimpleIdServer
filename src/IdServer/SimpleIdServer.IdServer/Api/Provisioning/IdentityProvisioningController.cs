@@ -7,6 +7,8 @@ using SimpleIdServer.IdServer.Jobs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Text.Json;
 
 namespace SimpleIdServer.IdServer.Api.Provisioning
 {
@@ -31,8 +33,14 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
         public IActionResult Import([FromRoute] string prefix)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            BackgroundJob.Enqueue<IImportRepresentationJob>((j) => j.Execute(prefix));
-            return new NoContentResult();
+            string id = Guid.NewGuid().ToString();
+            BackgroundJob.Enqueue<IImportRepresentationJob>((j) => j.Execute(prefix, id));
+            return new ContentResult
+            {
+                StatusCode = (int)HttpStatusCode.Created,
+                Content = JsonSerializer.Serialize(new { id = id }),
+                ContentType = "application/json"
+            };
         }
     }
 }

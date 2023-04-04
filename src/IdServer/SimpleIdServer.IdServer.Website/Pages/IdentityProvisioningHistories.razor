@@ -6,6 +6,7 @@
 @inject IState<UserState> userState
 @inject IState<RealmsState> realmsState
 @inject IState<UpdateUserState> updateUserState
+@inject DialogService dialogService
 @inject ContextMenuService contextMenuService
 @inject NotificationService notificationService
 
@@ -27,37 +28,54 @@
     <Columns>
         <RadzenDataGridColumn TItem="IdentityProvisioningHistory" Property="StartDateTime" Title="Start" Filterable="false" Sortable="true" SortOrder="SortOrder.Descending" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" />
         <RadzenDataGridColumn TItem="IdentityProvisioningHistory" Property="EndDateTime" Title="End" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" />
-        <RadzenDataGridColumn TItem="IdentityProvisioningHistory" Property="ImportDateTime" Title="Import DateTime" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" />
-        <RadzenDataGridColumn TItem="IdentityProvisioningHistory" Property="IsImported" Title="Is Imported" Filterable="false" Sortable="false" Width="80px">
-            <Template Context="data">
-                @if(data.IsImported)
-                {
-                    <RadzenBadge Text="Imported" IsPill="true" BadgeStyle="BadgeStyle.Success"></RadzenBadge>
-                }
-                else
-                {
-                    <RadzenBadge Text="Not Imported" IsPill="true" BadgeStyle="BadgeStyle.Warning"></RadzenBadge>
-                }
-            </Template>
-        </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="IdentityProvisioningHistory" Property="NbRepresentations" Title="Number of extracted representations" Filterable="false" Sortable="false" Width="80px" />
         <RadzenDataGridColumn TItem="IdentityProvisioningHistory" Title="Status" Filterable="false" Sortable="false" Width="80px">
             <Template Context="data">
-                @if (data.Status == IdentityProvisioningHistoryStatus.SUCCESS)
+                @if (data.Status == IdentityProvisioningHistoryStatus.IMPORT)
                 {                    
-                    <RadzenBadge Text="Success" IsPill="true" BadgeStyle="BadgeStyle.Success"></RadzenBadge>
+                    <RadzenBadge Text="Imported" IsPill="true" BadgeStyle="BadgeStyle.Success"></RadzenBadge>
                 }
-                else
+                else if (data.Status == IdentityProvisioningHistoryStatus.START)
                 {
-                    <RadzenBadge Text="Failure" IsPill="true" BadgeStyle="BadgeStyle.Danger"></RadzenBadge>
+                    <RadzenBadge Text="Started" IsPill="true" BadgeStyle="BadgeStyle.Info"></RadzenBadge>
+                }
+                else if (data.Status == IdentityProvisioningHistoryStatus.EXPORT)
+                {
+                    <RadzenBadge Text="Exported" IsPill="true" BadgeStyle="BadgeStyle.Info"></RadzenBadge>
+                }
+                else if(data.Status == IdentityProvisioningHistoryStatus.ERROR)
+                {
+                    <RadzenBadge Text="Failed to extract" IsPill="true" BadgeStyle="BadgeStyle.Danger"></RadzenBadge>
                 }
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="IdentityProvisioningHistory" Property="ErrorMessage" Title="Error Message" Filterable="false" Sortable="false" Width="80px" />
+        <RadzenDataGridColumn TItem="IdentityProvisioningHistory" Title="Error Message" Filterable="false" Sortable="false" Width="80px">
+            <Template Context="data">
+                @if (!string.IsNullOrWhiteSpace(data.ErrorMessage))
+                {
+                    <RadzenButton Icon="search" Click="@(args => ShowAudit(data))" />
+                }
+            </Template>
+        </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
 
 @code {
     [Parameter]
     public SimpleIdServer.IdServer.Domains.IdentityProvisioning IdentityProvisioning { get; set; }
+
+
+    async void ShowAudit(SimpleIdServer.IdServer.Domains.IdentityProvisioningHistory history)
+    {
+        await dialogService.OpenAsync<RequestDialog>("Error", new Dictionary<string, object>
+        {
+            { "Content", history.ErrorMessage }
+        }, new DialogOptions
+        {
+            Width = "700px",
+            Height = "512px",
+            Resizable = true,
+            Draggable = true
+        });
+    }
 }

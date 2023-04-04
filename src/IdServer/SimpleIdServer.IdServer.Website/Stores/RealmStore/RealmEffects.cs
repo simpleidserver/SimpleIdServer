@@ -52,7 +52,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.RealmStore
                 var acrs = await dbContext.Acrs.Include(a => a.Realms).ToListAsync();
                 var certificateAuthorities = await dbContext.CertificateAuthorities.Include(s => s.Realms).Where(s => s.Realms.Any(r => r.Name == Constants.DefaultRealm)).ToListAsync();
                 foreach (var user in users)
-                    user.Realms.Add(realm);
+                    user.Realms.Add(new RealmUser { RealmsName = action.Name });
 
                 foreach (var client in clients)
                     client.Realms.Add(realm);

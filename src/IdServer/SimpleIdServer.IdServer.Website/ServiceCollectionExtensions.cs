@@ -5,12 +5,13 @@ using Microsoft.EntityFrameworkCore;
 using Radzen;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI;
+using SimpleIdServer.IdServer.Website;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddSIDWebsite(this IServiceCollection services, Action<DbContextOptionsBuilder>? action = null)
+        public static IServiceCollection AddSIDWebsite(this IServiceCollection services, Action<IdServerWebsiteOptions>? callbackOptions = null, Action<DbContextOptionsBuilder>? action = null)
         {
             services.AddFluxor(o =>
             {
@@ -27,6 +28,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddScoped<ContextMenuService>();
             services.AddScoped<TooltipService>();
             services.AddTransient<ICertificateAuthorityStore, CertificateAuthorityStore>();
+            if (callbackOptions == null) services.Configure<IdServerWebsiteOptions>((o) => { });
+            else services.Configure(callbackOptions);
             return services;
         }
     }

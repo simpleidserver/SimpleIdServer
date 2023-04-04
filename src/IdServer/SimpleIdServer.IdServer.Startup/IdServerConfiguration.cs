@@ -88,7 +88,7 @@ namespace SimpleIdServer.IdServer.Startup
             IdentityProvisioningBuilder.Create(Scim, "SCIM", "SCIM", new SCIMRepresentationsExtractionJobOptions
             {
                 Count = 1,
-                SCIMEdp = "http://localhost:5002"
+                SCIMEdp = "http://localhost:5003"
             }).Build()
         };
     }

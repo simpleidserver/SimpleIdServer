@@ -30,6 +30,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IIdentityProvisioningStore, IdentityProvisioningStore>();
             services.AddTransient<IIdentityProvisioningDefinitionStore, IdentityProvisioningDefinitionStore>();
             services.AddTransient<IExtractedRepresentationRepository, ExtractedRepresentationRepository>();
+            services.AddTransient<IImportSummaryStore, ImportSummaryStore>();
             if (action != null) services.AddDbContext<StoreDbContext>(action, lifetime);
             else services.AddDbContext<StoreDbContext>(o => o.UseInMemoryDatabase("identityServer"), lifetime);
             return services;
