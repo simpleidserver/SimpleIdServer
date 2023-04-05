@@ -272,6 +272,7 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddIdentityProvisioning(this IServiceCollection services)
         {
             services.AddTransient<IRepresentationExtractionJob, SCIMRepresentationsExtractionJob>();
+            services.AddTransient<IRepresentationExtractionJob, LDAPRepresentationsExtractionJob>();
             services.AddTransient<IImportRepresentationJob, ImportRepresentationJob>();
             return services;
         }

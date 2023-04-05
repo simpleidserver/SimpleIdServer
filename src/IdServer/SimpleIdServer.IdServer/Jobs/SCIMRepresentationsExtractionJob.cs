@@ -1,152 +1,67 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using BlushingPenguin.JsonPath;
-using MassTransit;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.Scim.Client;
 using SimpleIdServer.Scim.Client.DTOs;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Transactions;
 
 namespace SimpleIdServer.IdServer.Jobs
 {
-    public class SCIMRepresentationsExtractionJob : RepresentationExtractionJob
+    public class SCIMRepresentationsExtractionJob : RepresentationExtractionJob<SCIMRepresentationsExtractionJobOptions>
     {
-        private readonly IIdentityProvisioningStore _identityProvisioningStore;
-        private readonly IBusControl _busControl;
-        private readonly IExtractedRepresentationRepository _extractedRepresentationRepository;
-        private readonly IdServerHostOptions _options;
-        private readonly ILogger<SCIMRepresentationsExtractionJob> _logger;
+        public const string NAME = "SCIM";
 
-        public SCIMRepresentationsExtractionJob(IIdentityProvisioningStore identityProvisioningStore, IBusControl busControl, IExtractedRepresentationRepository extractedRepresentationRepository, IOptions<IdServerHostOptions> options, ILogger<SCIMRepresentationsExtractionJob> logger)
+        public SCIMRepresentationsExtractionJob(ILogger<RepresentationExtractionJob<SCIMRepresentationsExtractionJobOptions>> logger, IIdentityProvisioningStore identityProvisioningStore, IExtractedRepresentationRepository extractedRepresentationRepository, IOptions<IdServerHostOptions> options) : base(logger, identityProvisioningStore, extractedRepresentationRepository, options)
         {
-            _identityProvisioningStore = identityProvisioningStore;
-            _busControl = busControl;
-            _extractedRepresentationRepository = extractedRepresentationRepository;
-            _options = options.Value;
-            _logger = logger;
         }
 
-        public const string NAME = "SCIM";
         public override string Name => NAME;
 
-        public async override Task Execute(string instanceId, string prefix)
+        protected override async IAsyncEnumerable<List<ExtractedRepresentation>> FetchUsers(SCIMRepresentationsExtractionJobOptions options, string destinationFolder, IdentityProvisioning identityProvisioning)
         {
-            using (var activity = Tracing.IdServerActivitySource.StartActivity("Start to export SCIM users"))
+            using (var scimClient = new SCIMClient(options.SCIMEdp))
             {
-                _logger.LogInformation("Start to export SCIM users");
-                var lck = new object();
-                var metadata = await _identityProvisioningStore.Query()
-                    .Include(d => d.Properties)
-                    .Include(d => d.Realms)
-                    .Include(d => d.Histories)
-                    .Include(d => d.Definition).ThenInclude(d => d.MappingRules)
-                    .FirstOrDefaultAsync(i => i.Id == instanceId && i.Realms.Any(r => r.Name == prefix));
-                if (!metadata.IsEnabled)
+                var searchUsers = await scimClient.SearchUsers(new SearchRequest
                 {
-                    _logger.LogInformation($"The job {instanceId} is disabled");
-                    return;
-                }
-
-                var startDateTime = DateTime.UtcNow;
-                try
+                    Count = options.Count,
+                    StartIndex = 1
+                }, null, CancellationToken.None);
+                var filterUsers = await FilterUsers(searchUsers.Item1);
+                ExtractUsers(filterUsers, 1, destinationFolder, identityProvisioning.Definition);
+                yield return filterUsers.Select(r => new ExtractedRepresentation
                 {
-                    var optionsType = typeof(SCIMRepresentationsExtractionJobOptions);
-                    var destinationFolder = Path.Combine(_options.ExtractRepresentationsFolder, Name);
-                    if (!Directory.Exists(destinationFolder)) Directory.CreateDirectory(destinationFolder);
-                    var folderName = DateTime.Now.ToString("MMddyyyyHHmm");
-                    destinationFolder = Path.Combine(destinationFolder, folderName);
-                    Directory.CreateDirectory(destinationFolder);
-                    var options = Serializer.PropertiesSerializer.DeserializeOptions<SCIMRepresentationsExtractionJobOptions, IdentityProvisioningProperty>(metadata.Properties);
-                    int nbUsers = 0;
-
-                    using (var transactionScope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = System.Transactions.IsolationLevel.Snapshot }, TransactionScopeAsyncFlowOption.Enabled))
+                    ExternalId = r.Id,
+                    Version = r.Meta.Version.ToString()
+                }).ToList();
+                var totalResults = searchUsers.Item1.TotalResults;
+                var count = searchUsers.Item1.ItemsPerPage;
+                var nbPages = ((int)Math.Ceiling((double)totalResults / count));
+                var allPages = Enumerable.Range(2, nbPages - 1);
+                foreach(var currentPage in allPages)
+                {
+                    var newSearchUsers = await scimClient.SearchUsers(new SearchRequest
                     {
-                        using (var scimClient = new SCIMClient(options.SCIMEdp))
-                        {
-                            var searchUsers = await scimClient.SearchUsers(new SearchRequest
-                            {
-                                Count = options.Count,
-                                StartIndex = 1
-                            }, null, CancellationToken.None);
-                            var filterUsers = await FilterUsers(searchUsers.Item1);
-                            ExtractUsers(filterUsers, 1, destinationFolder, metadata.Definition);
-                            await _extractedRepresentationRepository.BulkUpdate(filterUsers.Select(r => new ExtractedRepresentation
-                            {
-                                ExternalId = r.Id,
-                                Version = r.Meta.Version.ToString()
-                            }).ToList());
-                            var totalResults = searchUsers.Item1.TotalResults;
-                            var count = searchUsers.Item1.ItemsPerPage;
-                            nbUsers += filterUsers.Count();
-                            var nbPages = ((int)Math.Ceiling((double)totalResults / count));
-                            var allPages = Enumerable.Range(2, nbPages - 1);
-                            await Parallel.ForEachAsync(allPages, new ParallelOptions
-                            {
-                                MaxDegreeOfParallelism = 5
-                            }, async (currentPage, e) =>
-                            {
-                                var newSearchUsers = await scimClient.SearchUsers(new SearchRequest
-                                {
-                                    Count = count,
-                                    StartIndex = currentPage * count
-                                }, null, CancellationToken.None);
-                                lock (lck)
-                                {
-                                    var newFilterUsers = FilterUsers(newSearchUsers.Item1).Result;
-                                    ExtractUsers(newFilterUsers, currentPage, destinationFolder, metadata.Definition);
-                                    nbUsers += newFilterUsers.Count();
-                                    _extractedRepresentationRepository.BulkUpdate(newFilterUsers.Select(r => new ExtractedRepresentation
-                                    {
-                                        ExternalId = r.Id,
-                                        Version = r.Meta.Version.ToString()
-                                    }).ToList()).Wait();
-                                }
-                            });
-                        }
-
-                        _logger.LogInformation($"{nbUsers} users has been exported into {destinationFolder}");
-                        activity?.SetStatus(ActivityStatusCode.Ok, $"{nbUsers} users has been exported into {destinationFolder}");
-                        var endDateTime = DateTime.UtcNow;
-                        metadata.Export(startDateTime, endDateTime, folderName, nbUsers);
-                        await _busControl.Publish(new ExtractRepresentationsSuccessEvent
-                        {
-                            IdentityProvisioningName = NAME,
-                            NbRepresentations = nbUsers,
-                            Realm = prefix
-                        });
-                        transactionScope.Complete();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    activity?.SetStatus(ActivityStatusCode.Error, ex.ToString());
-                    _logger.LogError(ex.ToString());
-                    var endDateTime = DateTime.UtcNow;
-                    metadata.FailToImport(startDateTime, endDateTime, ex.ToString());
-                    await _busControl.Publish(new ExtractRepresentationsFailureEvent
+                        Count = count,
+                        StartIndex = currentPage * count
+                    }, null, CancellationToken.None);
+                    var newFilterUsers = FilterUsers(newSearchUsers.Item1).Result;
+                    ExtractUsers(newFilterUsers, currentPage, destinationFolder, identityProvisioning.Definition);
+                    yield return newFilterUsers.Select(r => new ExtractedRepresentation
                     {
-                        IdentityProvisioningName = NAME,
-                        ErrorMessage = ex.ToString(),
-                        Realm = prefix
-                    });
-                }
-                finally
-                {
-                    await _identityProvisioningStore.SaveChanges(CancellationToken.None);
+                        ExternalId = r.Id,
+                        Version = r.Meta.Version.ToString()
+                    }).ToList();
                 }
             }
         }
@@ -154,7 +69,7 @@ namespace SimpleIdServer.IdServer.Jobs
         private async Task<IEnumerable<RepresentationResult>> FilterUsers(SearchResult<RepresentationResult> searchResult)
         {
             var ids = searchResult.Resources.Select(r => r.Id);
-            var extractedRepresentations = await _extractedRepresentationRepository.BulkRead(ids);
+            var extractedRepresentations = await ExtractedRepresentationRepository.BulkRead(ids);
             return searchResult.Resources.Where((r) =>
             {
                 var er = extractedRepresentations.SingleOrDefault(er => er.ExternalId == r.Id);
@@ -169,7 +84,7 @@ namespace SimpleIdServer.IdServer.Jobs
             {
                 fs.WriteLine(BuildFileColumns(definition));
                 foreach (var resource in resources)
-                    fs.WriteLine($"{resource.Id}{SEPARATOR}{resource.Meta.Version}{SEPARATOR}{Extract(resource, definition)}");
+                    fs.WriteLine($"{resource.Id}{Constants.SEPARATOR}{resource.Meta.Version}{Constants.SEPARATOR}{Extract(resource, definition)}");
             }
         }
 
@@ -189,7 +104,7 @@ namespace SimpleIdServer.IdServer.Jobs
                 values.Add(token.Value.GetString());
             }
 
-            return string.Join(SEPARATOR, values);
+            return string.Join(Constants.SEPARATOR, values);
         }
     }
 }

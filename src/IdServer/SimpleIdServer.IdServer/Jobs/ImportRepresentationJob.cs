@@ -115,11 +115,11 @@ namespace SimpleIdServer.IdServer.Jobs
             var users = new List<User>();
             using(var fs = File.OpenText(filePath))
             {
-                var columns = fs.ReadLine().Split(RepresentationExtractionJob.SEPARATOR);
+                var columns = fs.ReadLine().Split(Constants.SEPARATOR);
                 var line = string.Empty;
                 while((line = fs.ReadLine()) != null)
                 {
-                    var values = line.Split(RepresentationExtractionJob.SEPARATOR);
+                    var values = line.Split(Constants.SEPARATOR);
                     var extractionResult = ExtractUsersAndClaims(idProvisioningDef, columns, values);
                     userClaims.AddRange(extractionResult.UserClaims);
                     users.Add(extractionResult.User);
