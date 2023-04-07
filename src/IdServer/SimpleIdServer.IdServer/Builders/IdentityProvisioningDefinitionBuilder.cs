@@ -51,6 +51,8 @@ namespace SimpleIdServer.IdServer.Builders
             return this;
         }
 
+        public IdentityProvisioningDefinitionBuilder AddLDAPDistinguishedName() => AddUserAttributeMappingRule("distinguishedName", Constants.LDAPDistinguishedName);
+
         public IdentityProvisioningDefinitionBuilder AddUserSubjectMappingRule(string from)
         {
             _idProvisioningDef.MappingRules.Add(new IdentityProvisioningMappingRule

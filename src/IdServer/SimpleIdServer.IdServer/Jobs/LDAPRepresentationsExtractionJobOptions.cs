@@ -20,6 +20,8 @@ namespace SimpleIdServer.IdServer.Jobs
         public string UserObjectClasses { get; set; } = "person,organizationalPerson";
         [VisibleProperty("UUID LDAP Attribute", "Name of the LDAP attribute, which is used as a unique object identifier (UUID) for objects in LDAP.")]
         public string UUIDLDAPAttribute { get; set; } = "entryUUID";
+        [VisibleProperty("Modification Date Attribute", "Name of the LDAP Attribute, which is used as the modification date for objects in LDAP")]
+        public string ModificationDateAttribute { get; set; } = "modificationDate";
         [VisibleProperty("Batch size", "Number of records")]
         public int BatchSize { get; set; } = 1;
     }

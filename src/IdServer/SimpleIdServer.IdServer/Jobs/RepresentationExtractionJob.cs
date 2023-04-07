@@ -27,9 +27,10 @@ namespace SimpleIdServer.IdServer.Jobs
 
     public abstract class RepresentationExtractionJob<T> : IRepresentationExtractionJob where T : class
     {
-        public RepresentationExtractionJob(ILogger<RepresentationExtractionJob<T>> logger, IIdentityProvisioningStore identityProvisioningStore, IExtractedRepresentationRepository  extractedRepresentationRepository, IOptions<IdServerHostOptions> options)
+        public RepresentationExtractionJob(ILogger<RepresentationExtractionJob<T>> logger, IBusControl busControl, IIdentityProvisioningStore identityProvisioningStore, IExtractedRepresentationRepository  extractedRepresentationRepository, IOptions<IdServerHostOptions> options)
         {
             Logger = logger;
+            BusControl = busControl;
             IdentityProvisioningStore = identityProvisioningStore;
             ExtractedRepresentationRepository = extractedRepresentationRepository;
             Options = options.Value;
@@ -46,7 +47,7 @@ namespace SimpleIdServer.IdServer.Jobs
         {
             using (var activity = Tracing.IdServerActivitySource.StartActivity($"Start to export {Name} users"))
             {
-                Logger.LogInformation("Start to export SCIM users");
+                Logger.LogInformation($"Start to export {Name} users");
                 var metadata = await IdentityProvisioningStore.Query()
                     .Include(d => d.Properties)
                     .Include(d => d.Realms)

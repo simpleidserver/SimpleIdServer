@@ -14,6 +14,7 @@ namespace SimpleIdServer.IdServer.Domains
         public ICollection<IdentityProvisioningProperty> Properties { get; set; } = new List<IdentityProvisioningProperty>();
         public ICollection<IdentityProvisioningHistory> Histories { get; set; } = new List<IdentityProvisioningHistory>();
         public ICollection<Realm> Realms { get; set; } = new List<Realm>();
+        public ICollection<User> Users { get; set; } = new List<User>();
 
         public void Export(DateTime startDateTime, DateTime endDateTime, string folderName, int nbRepresentations)
         {

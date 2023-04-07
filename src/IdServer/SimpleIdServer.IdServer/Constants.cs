@@ -509,6 +509,7 @@ namespace SimpleIdServer.IdServer
         public const string DefaultRealm = "master";
         public const string DefaultRealmCookieName = "CurrentRealm";
         public const string ParFormatKey = "urn:ietf:params:oauth:request_uri";
-        public const string SEPARATOR = ";";
+        public const string IdProviderSeparator = ";";
+        public const string LDAPDistinguishedName = "LDAP_DISTINGUISHEDNAME";
     }
 }

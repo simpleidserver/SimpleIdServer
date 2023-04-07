@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using BlushingPenguin.JsonPath;
+using MassTransit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
@@ -22,7 +23,7 @@ namespace SimpleIdServer.IdServer.Jobs
     {
         public const string NAME = "SCIM";
 
-        public SCIMRepresentationsExtractionJob(ILogger<RepresentationExtractionJob<SCIMRepresentationsExtractionJobOptions>> logger, IIdentityProvisioningStore identityProvisioningStore, IExtractedRepresentationRepository extractedRepresentationRepository, IOptions<IdServerHostOptions> options) : base(logger, identityProvisioningStore, extractedRepresentationRepository, options)
+        public SCIMRepresentationsExtractionJob(ILogger<RepresentationExtractionJob<SCIMRepresentationsExtractionJobOptions>> logger, IBusControl busControl, IIdentityProvisioningStore identityProvisioningStore, IExtractedRepresentationRepository extractedRepresentationRepository, IOptions<IdServerHostOptions> options) : base(logger, busControl, identityProvisioningStore, extractedRepresentationRepository, options)
         {
         }
 
@@ -84,7 +85,7 @@ namespace SimpleIdServer.IdServer.Jobs
             {
                 fs.WriteLine(BuildFileColumns(definition));
                 foreach (var resource in resources)
-                    fs.WriteLine($"{resource.Id}{Constants.SEPARATOR}{resource.Meta.Version}{Constants.SEPARATOR}{Extract(resource, definition)}");
+                    fs.WriteLine($"{resource.Id}{Constants.IdProviderSeparator}{resource.Meta.Version}{Constants.IdProviderSeparator}{Extract(resource, definition)}");
             }
         }
 
@@ -104,7 +105,7 @@ namespace SimpleIdServer.IdServer.Jobs
                 values.Add(token.Value.GetString());
             }
 
-            return string.Join(Constants.SEPARATOR, values);
+            return string.Join(Constants.IdProviderSeparator, values);
         }
     }
 }

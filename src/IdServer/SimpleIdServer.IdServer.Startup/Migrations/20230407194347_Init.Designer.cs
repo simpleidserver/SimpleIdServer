@@ -12,7 +12,7 @@ using SimpleIdServer.IdServer.Store;
 namespace SimpleIdServer.IdServer.Startup.Migrations
 {
     [DbContext(typeof(StoreDbContext))]
-    [Migration("20230404125902_Init")]
+    [Migration("20230407194347_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -1625,6 +1625,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<string>("Firstname")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("IdentityProvisioningId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("Lastname")
                         .HasColumnType("nvarchar(max)");
 
@@ -1642,6 +1645,8 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("IdentityProvisioningId");
 
                     b.ToTable("Users");
                 });
@@ -2189,6 +2194,15 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.User", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.IdentityProvisioning", "IdentityProvisioning")
+                        .WithMany("Users")
+                        .HasForeignKey("IdentityProvisioningId");
+
+                    b.Navigation("IdentityProvisioning");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UserClaim", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.User", "User")
@@ -2300,6 +2314,8 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Navigation("Histories");
 
                     b.Navigation("Properties");
+
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.IdentityProvisioningDefinition", b =>

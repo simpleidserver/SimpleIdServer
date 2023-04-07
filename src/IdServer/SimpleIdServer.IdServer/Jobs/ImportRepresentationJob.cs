@@ -99,7 +99,7 @@ namespace SimpleIdServer.IdServer.Jobs
                 {
                     var path = Path.Combine(_options.ExtractRepresentationsFolder, name, history.FolderName);
                     foreach (var filePath in Directory.GetFiles(path))
-                         await Export(filePath, identityProvisioning.Definition, realm);
+                         await Export(filePath, identityProvisioning, realm);
                     history.Import();
                     result += history.NbRepresentations;
                 }
@@ -109,18 +109,18 @@ namespace SimpleIdServer.IdServer.Jobs
             return result;
         }
 
-        private async Task Export(string filePath, IdentityProvisioningDefinition idProvisioningDef, string realm)
+        private async Task Export(string filePath, IdentityProvisioning idProvisioning, string realm)
         {
             var userClaims = new List<UserClaim>();
             var users = new List<User>();
             using(var fs = File.OpenText(filePath))
             {
-                var columns = fs.ReadLine().Split(Constants.SEPARATOR);
+                var columns = fs.ReadLine().Split(Constants.IdProviderSeparator);
                 var line = string.Empty;
                 while((line = fs.ReadLine()) != null)
                 {
-                    var values = line.Split(Constants.SEPARATOR);
-                    var extractionResult = ExtractUsersAndClaims(idProvisioningDef, columns, values);
+                    var values = line.Split(Constants.IdProviderSeparator);
+                    var extractionResult = ExtractUsersAndClaims(idProvisioning, columns, values);
                     userClaims.AddRange(extractionResult.UserClaims);
                     users.Add(extractionResult.User);
                 }
@@ -135,7 +135,7 @@ namespace SimpleIdServer.IdServer.Jobs
             }).ToList());
         }
 
-        private ExtractionResult ExtractUsersAndClaims(IdentityProvisioningDefinition idProvisioningDef, IEnumerable<string> columns, IEnumerable<string> values)
+        private ExtractionResult ExtractUsersAndClaims(IdentityProvisioning idProvisioning, IEnumerable<string> columns, IEnumerable<string> values)
         {
             var updatedProperties = new List<string>();
             var visibleAttributes = typeof(User).GetProperties(BindingFlags.Instance | BindingFlags.Public)
@@ -149,13 +149,14 @@ namespace SimpleIdServer.IdServer.Jobs
             var user = new User
             {
                 Id = externalRepresentationId,
-                Source = idProvisioningDef.Name,
+                Source = idProvisioning.Definition.Name,
+                IdentityProvisioningId = idProvisioning.Id,
                 UpdateDateTime = DateTime.UtcNow
             };
             int index = 2;
             foreach(var column in columns.Skip(2))
             {
-                var mappingRule = idProvisioningDef.MappingRules.Single(r => r.Id == column);
+                var mappingRule = idProvisioning.Definition.MappingRules.Single(r => r.Id == column);
                 var value = values.ElementAt(index);
                 switch(mappingRule.MapperType)
                 {

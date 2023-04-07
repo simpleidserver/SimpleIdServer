@@ -40,6 +40,7 @@ namespace SimpleIdServer.IdServer.Domains
         public DateTime CreateDateTime { get; set; }
         public DateTime UpdateDateTime { get; set; }
         public string? Source { get; set; } = null;
+        public string? IdentityProvisioningId { get; set; } = null;
         public ICollection<Claim> Claims
         {
             get
@@ -80,6 +81,7 @@ namespace SimpleIdServer.IdServer.Domains
         public ICollection<UserExternalAuthProvider> ExternalAuthProviders { get; set; } = new List<UserExternalAuthProvider>();
         public ICollection<Consent> Consents { get; set; } = new List<Consent>();
         public ICollection<UserDevice> Devices { get; set; } = new List<UserDevice>();
+        public IdentityProvisioning? IdentityProvisioning { get; set; } = null;
 
         #region User claims
 
