@@ -250,6 +250,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Mapping rule has been added.
+        /// </summary>
+        public static string IdProvisioningMappingRuleAdded {
+            get {
+                return ResourceManager.GetString("IdProvisioningMappingRuleAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Properties have been updated.
         /// </summary>
         public static string IdProvisioningPropertiesUpdated {
@@ -462,6 +471,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string SelectedGrantsRemoved {
             get {
                 return ResourceManager.GetString("SelectedGrantsRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Mapping rules have been removed.
+        /// </summary>
+        public static string SelectedIdentityProvisioningMappingRulesRemoved {
+            get {
+                return ResourceManager.GetString("SelectedIdentityProvisioningMappingRulesRemoved", resourceCulture);
             }
         }
         

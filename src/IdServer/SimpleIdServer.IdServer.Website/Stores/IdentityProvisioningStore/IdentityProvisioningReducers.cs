@@ -164,5 +164,99 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         }
 
         #endregion
+
+        #region SearchIdentityProvisioningMappingRuleState
+
+        [ReducerMethod]
+        public static SearchIdentityProvisioningMappingRuleState ReduceGetIdentityProvisioningAction(SearchIdentityProvisioningMappingRuleState state, GetIdentityProvisioningAction act)
+        {
+            return state with
+            {
+                IsLoading = true
+            };
+        }
+
+        [ReducerMethod]
+        public static SearchIdentityProvisioningMappingRuleState ReduceGetIdentityProvisioningSuccessAction(SearchIdentityProvisioningMappingRuleState state, GetIdentityProvisioningSuccessAction act) => new(false, act.IdentityProvisioning.Definition.MappingRules, act.IdentityProvisioning.Definition.MappingRules.Count());
+
+        [ReducerMethod]
+        public static SearchIdentityProvisioningMappingRuleState ReduceSelectIdentityProvisioningMappingRuleAction(SearchIdentityProvisioningMappingRuleState state, SelectIdentityProvisioningMappingRuleAction act)
+        {
+            var mappingRules = state.MappingRules.ToList();
+            var mappingRule = mappingRules.Single(r => r.Value.Id == act.Id);
+            mappingRule.IsSelected = act.IsSelected;
+            return state with
+            {
+                MappingRules = mappingRules
+            };
+        }
+
+        [ReducerMethod]
+        public static SearchIdentityProvisioningMappingRuleState ReduceSelectAllIdentityProvisioningMappingRulesAction(SearchIdentityProvisioningMappingRuleState state, SelectAllIdentityProvisioningMappingRulesAction act)
+        {
+            var mappingRules = state.MappingRules.ToList();
+            foreach (var mappingRule in mappingRules)
+                mappingRule.IsSelected = act.IsSelected;
+            return state with
+            {
+                MappingRules = mappingRules
+            };
+        }
+
+        [ReducerMethod]
+        public static SearchIdentityProvisioningMappingRuleState ReduceRemoveSelectedIdentityProvisioningMappingRulesAction(SearchIdentityProvisioningMappingRuleState state, RemoveSelectedIdentityProvisioningMappingRulesAction act)
+        {
+            return state with
+            {
+                IsLoading = true
+            };
+        }
+
+        [ReducerMethod]
+        public static SearchIdentityProvisioningMappingRuleState ReduceRemoveSelectedIdentityProvisioningMappingRulesSuccessAction(SearchIdentityProvisioningMappingRuleState state, RemoveSelectedIdentityProvisioningMappingRulesSuccessAction act)
+        {
+            var mappingRules = state.MappingRules;
+            mappingRules = mappingRules.Where(r => !act.MappingRuleIds.Contains(r.Value.Id)).ToList();
+            return state with
+            {
+                IsLoading = false,
+                MappingRules = mappingRules,
+                Count = mappingRules.Count()
+            };
+        }
+
+        [ReducerMethod]
+        public static SearchIdentityProvisioningMappingRuleState ReduceAddIdentityProvisioningMappingRuleSuccessAction(SearchIdentityProvisioningMappingRuleState state, AddIdentityProvisioningMappingRuleSuccessAction act)
+        {
+            var mappingRules = state.MappingRules.ToList();
+            mappingRules.Add(new SelectableIdentityProvisioningMappingRule(new IdentityProvisioningMappingRule
+            {
+                Id = act.NewId,
+                From = act.From,
+                MapperType = act.MappingRule,
+                TargetUserAttribute = act.TargetUserAttribute,
+                TargetUserProperty = act.TargetUserProperty
+            })
+            {
+                IsNew = true
+            });
+            return state with
+            {
+                MappingRules = mappingRules,
+                Count= mappingRules.Count()
+            };
+        }
+
+        #endregion
+
+        #region UpdateIdentityProvisioningState
+
+        [ReducerMethod]
+        public static UpdateIdentityProvisioningState ReduceAddIdentityProvisioningMappingRuleAction(UpdateIdentityProvisioningState state, AddIdentityProvisioningMappingRuleAction act) => new(true, null);
+
+        [ReducerMethod]
+        public static UpdateIdentityProvisioningState ReduceAddIdentityProvisioningMappingRuleSuccessAction(UpdateIdentityProvisioningState state, AddIdentityProvisioningMappingRuleSuccessAction act) => new(false, null);
+
+        #endregion
     }
 }

@@ -180,6 +180,9 @@
   <data name="IdProvisioningDetailsUpdated" xml:space="preserve">
     <value>Details have been updated</value>
   </data>
+  <data name="IdProvisioningMappingRuleAdded" xml:space="preserve">
+    <value>Mapping rule has been added</value>
+  </data>
   <data name="IdProvisioningPropertiesUpdated" xml:space="preserve">
     <value>Properties have been updated</value>
   </data>
@@ -251,6 +254,9 @@
   </data>
   <data name="SelectedGrantsRemoved" xml:space="preserve">
     <value>Selected grants have been rejected</value>
+  </data>
+  <data name="SelectedIdentityProvisioningMappingRulesRemoved" xml:space="preserve">
+    <value>Mapping rules have been removed</value>
   </data>
   <data name="SelectedIdentityProvisioningRemoved" xml:space="preserve">
     <value>Selected Identity Provisioning has been removed</value>

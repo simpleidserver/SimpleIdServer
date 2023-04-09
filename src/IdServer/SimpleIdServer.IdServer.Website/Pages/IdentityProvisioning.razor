@@ -32,6 +32,9 @@ else
             <RadzenTabsItem Text="Properties">
                 <IdentityProvisioningProperties IdProvisioning="@identityProvisioningState.Value.IdentityProvisioning"></IdentityProvisioningProperties>
             </RadzenTabsItem>
+            <RadzenTabsItem Text="Mapping rules">
+                <IdentityProvisioningMappingRules IdProvisioning="@identityProvisioningState.Value.IdentityProvisioning"></IdentityProvisioningMappingRules>
+            </RadzenTabsItem>
             <RadzenTabsItem Text="Histories" >
                 <IdentityProvisioningHistories IdentityProvisioning="@identityProvisioningState.Value.IdentityProvisioning"></IdentityProvisioningHistories>
             </RadzenTabsItem>
@@ -44,7 +47,8 @@ else
     {
         { "details", 0 },
         { "properties", 1 },
-        { "histories", 2 }
+        { "mappingrules", 2 },
+        { "histories", 3 }
     };
     [Parameter]
     public string id { get; set; } = null!;
@@ -77,6 +81,11 @@ else
             SubscribeToAction<UpdateIdProvisioningPropertiesSuccessAction>((act) =>
             {
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.IdProvisioningPropertiesUpdated });
+                StateHasChanged();
+            });
+            SubscribeToAction<RemoveSelectedIdentityProvisioningMappingRulesSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedIdentityProvisioningMappingRulesRemoved });
                 StateHasChanged();
             });
             SubscribeToAction<SelectRealmSuccessAction>((act) =>

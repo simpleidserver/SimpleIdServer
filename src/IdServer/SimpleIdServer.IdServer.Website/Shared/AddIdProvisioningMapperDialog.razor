@@ -1,0 +1,171 @@
+﻿@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore;
+@using System.Reflection;
+@inject DialogService dialogService
+@inject IState<UpdateIdentityProvisioningState> addIdProvisioningState
+@inject NotificationService notificationService
+@inject IDispatcher dispatcher
+
+<RadzenSteps>
+    <Steps>
+        <RadzenStepsItem Text="Mapper Type">
+            <div class="row gy-4">
+                @foreach (var mappingRule in IdProvisioningMappingRules)
+                {
+                    <div class="col-md-6">
+                        <RadzenCard @onclick="() => SelectMappingRule(mappingRule)" class="@(SelectedMappingRule != null && SelectedMappingRule.Name == mappingRule.Name ? "selected selectable" : "selectable")">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <RadzenImage Path="@mappingRule.PictureUrl" Style="width: 60px" />
+                                </div>
+                                <div class="col">
+                                    <h5>@mappingRule.Name</h5>
+                                    <p class="text-muted">@(new MarkupString(mappingRule.ShortDescription))</p>
+                                </div>
+                            </div>
+                        </RadzenCard>
+                    </div>
+                }
+            </div>
+        </RadzenStepsItem>
+        <RadzenStepsItem Text="Create" Disabled=@(SelectedMappingRule == null)>
+            @switch(SelectedMappingRule.Type)
+            {
+                case MappingRuleTypes.USERATTRIBUTE:
+                    <RadzenTemplateForm Submit=@SubmitUpdateUserAttributeIdProvisioning TItem="UserAttributeIdProvisioningMappingRuleForm" Data=@userAttributeIdProvisioningMappingRuleForm>
+                        <!-- Token Claim Name -->
+                        <div>
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Source</RadzenText>
+                            <RadzenTextBox Name="From" @bind-Value="@userAttributeIdProvisioningMappingRuleForm.From" Class="w-100"></RadzenTextBox>
+                            <RadzenRequiredValidator Component="From" Text="According to the type of identity provisioning, you must specify an LDAP property or a JSON path if you are using SCIM."></RadzenRequiredValidator>
+                        </div>
+                        <!-- User attribute -->
+                        <div>
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">User Attribute</RadzenText>
+                            <RadzenTextBox Name="TargetUserAttribute" @bind-Value="@userAttributeIdProvisioningMappingRuleForm.TargetUserAttribute" Class="w-100"></RadzenTextBox>
+                            <RadzenRequiredValidator Component="TargetUserAttribute" Text="User attribute is required"></RadzenRequiredValidator>
+                        </div>
+                        <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addIdProvisioningState.Value.IsUpdating ? "Saving..." : "Save")" Disabled="@(addIdProvisioningState.Value.IsUpdating)" />
+                    </RadzenTemplateForm>
+                    break;
+                case MappingRuleTypes.USERPROPERTY:
+                    <RadzenTemplateForm Submit=@SubmitUpdateUserPropertyIdProvisioning TItem="UserPropertyIdProvisioningMappingRuleForm" Data=@userPropertyIdProvisioningMappingRuleForm>
+                        <!-- Token Claim Name -->
+                        <div>
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Source</RadzenText>
+                            <RadzenTextBox Name="From" @bind-Value="@userPropertyIdProvisioningMappingRuleForm.From" Class="w-100"></RadzenTextBox>
+                            <RadzenRequiredValidator Component="From" Text="According to the type of identity provisioning, you must specify an LDAP property or a JSON path if you are using SCIM."></RadzenRequiredValidator>
+                        </div>
+                        <!-- Property -->
+                        <div>
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">User property</RadzenText>
+                            <RadzenDropDown Name="UserPropertyName" Class="w-100"
+                                    Data=@userProperties
+                                    TValue="String"
+                                    @bind-Value=@userPropertyIdProvisioningMappingRuleForm.TargetUserProperty />
+                            <p class="text-muted">Name of the property</p>
+                            <RadzenRequiredValidator Component="UserPropertyName" Text="Property is required"></RadzenRequiredValidator>
+                        </div>
+                        <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addIdProvisioningState.Value.IsUpdating ? "Saving..." : "Save")" Disabled="@(addIdProvisioningState.Value.IsUpdating)" />
+                    </RadzenTemplateForm>
+                    break;
+            }
+        </RadzenStepsItem>
+    </Steps>
+</RadzenSteps>
+
+@code {
+    [Parameter]
+    public string IdProvisioningId { get; set; }
+    IEnumerable<string> userProperties = new List<string>();
+
+    record IdProvisioningMappingRule
+    {
+        public string Name { get; set; } = null!;
+        public string ShortDescription { get; set; } = null!;
+        public string Description { get; set; } = null!;
+        public MappingRuleTypes Type { get; set; }
+        public string PictureUrl { get; set; } = null!;
+    }
+
+    record UserAttributeIdProvisioningMappingRuleForm
+    {
+        public string From { get; set; } = null!;
+        public string TargetUserAttribute { get; set; } = null!;
+    }
+
+    record UserPropertyIdProvisioningMappingRuleForm
+    {
+        public string From { get; set; } = null!;
+        public string TargetUserProperty { get; set; } = null!;
+    }
+
+    UserAttributeIdProvisioningMappingRuleForm userAttributeIdProvisioningMappingRuleForm = new UserAttributeIdProvisioningMappingRuleForm();
+    UserPropertyIdProvisioningMappingRuleForm userPropertyIdProvisioningMappingRuleForm = new UserPropertyIdProvisioningMappingRuleForm();
+
+    ICollection<IdProvisioningMappingRule> IdProvisioningMappingRules { get; set; } = new List<IdProvisioningMappingRule>
+    {
+        new IdProvisioningMappingRule { Name = "Attribute", ShortDescription = "User attribute", Description = "Map one claim to a user attribute", Type = MappingRuleTypes.USERATTRIBUTE,  PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserAttribute.png" },
+        new IdProvisioningMappingRule { Name = "Property", ShortDescription = "User property", Description = "Map one claim to a user property", Type = MappingRuleTypes.USERPROPERTY, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserProperty.png" }
+    };
+
+    IdProvisioningMappingRule? SelectedMappingRule { get; set; } = null;
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        base.OnAfterRenderAsync(firstRender);
+        if(firstRender)
+        {
+            SubscribeToAction<AddIdentityProvisioningMappingRuleSuccessAction>((act) =>
+            {
+                dialogService.Close();
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.IdProvisioningMappingRuleAdded });
+                StateHasChanged();
+            });
+        }
+
+        return Task.CompletedTask;
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if(string.IsNullOrWhiteSpace(IdProvisioningId)) return;
+        userProperties = typeof(User).GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                .Where(p =>
+                {
+                    var attr = p.GetCustomAttribute<UserPropertyAttribute>();
+                    return attr == null ? false : attr.IsVisible;
+                })
+                .Select(p => p.Name);
+    }
+
+    void SelectMappingRule(IdProvisioningMappingRule mappingRule)
+    {
+        SelectedMappingRule = mappingRule;
+    }
+
+    void SubmitUpdateUserAttributeIdProvisioning(UserAttributeIdProvisioningMappingRuleForm form)
+    {
+        dispatcher.Dispatch(new AddIdentityProvisioningMappingRuleAction
+        {
+            Id = IdProvisioningId,
+            MappingRule = MappingRuleTypes.USERATTRIBUTE,
+            From = form.From,
+            TargetUserAttribute = form.TargetUserAttribute
+        });
+    }
+
+    void SubmitUpdateUserPropertyIdProvisioning(UserPropertyIdProvisioningMappingRuleForm form)
+    {
+        dispatcher.Dispatch(new AddIdentityProvisioningMappingRuleAction
+        {
+            Id = IdProvisioningId,
+            MappingRule = MappingRuleTypes.USERPROPERTY,
+            From = form.From,
+            TargetUserProperty = form.TargetUserProperty
+        });        
+    }
+}

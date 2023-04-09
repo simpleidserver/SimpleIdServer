@@ -108,6 +108,14 @@
                 }
             </Template>
         </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="ImportSummary" Title="Error" Filterable="false" Sortable="false" Width="80px">
+            <Template Context="data">
+                @if(!string.IsNullOrWhiteSpace(data.ErrorMessage))
+                {
+                    <RadzenButton Icon="search" Click="@(args => ShowAudit(data))" />
+                }
+            </Template>
+        </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
 
@@ -198,5 +206,19 @@
     {
         var act = new LaunchImportAction();
         dispatcher.Dispatch(act);
+    }
+
+    async void ShowAudit(ImportSummary importSummary)
+    {
+        await dialogService.OpenAsync<RequestDialog>("Error", new Dictionary<string, object>
+        {
+            { "Content", importSummary.ErrorMessage }
+        }, new DialogOptions
+        {
+            Width = "700px",
+            Height = "512px",
+            Resizable = true,
+            Draggable = true
+        });
     }
 }

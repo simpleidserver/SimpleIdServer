@@ -2,7 +2,7 @@
 @using Fluxor.Blazor.Web.Components;
 @using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
 @using SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore;
-@inject IState<AddIdProvisioningState> addIdProvisioningState
+@inject IState<UpdateIdentityProvisioningState> addIdProvisioningState
 
 @if (!addIdProvisioningState.Value.IsUpdating && !string.IsNullOrWhiteSpace(addIdProvisioningState.Value.ErrorMessage))
 {

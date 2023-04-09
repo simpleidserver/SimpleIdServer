@@ -5,14 +5,14 @@ using Fluxor;
 namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
 {
     [FeatureState]
-    public record AddIdProvisioningState
+    public record UpdateIdentityProvisioningState
     {
-        public AddIdProvisioningState()
+        public UpdateIdentityProvisioningState()
         {
 
         }
 
-        public AddIdProvisioningState(bool isUpdating, string errorMesasge)
+        public UpdateIdentityProvisioningState(bool isUpdating, string errorMesasge)
         {
             IsUpdating = isUpdating;
             ErrorMessage = errorMesasge;

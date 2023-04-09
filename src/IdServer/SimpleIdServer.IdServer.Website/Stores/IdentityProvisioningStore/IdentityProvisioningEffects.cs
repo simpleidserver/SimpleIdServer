@@ -59,6 +59,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             var result = await _identityProvisioningStore.Query().Include(c => c.Realms)
                 .Include(c => c.Properties)
                 .Include(c => c.Definition).ThenInclude(d => d.Properties)
+                .Include(c => c.Definition).ThenInclude(d => d.MappingRules)
                 .Include(c => c.Histories)
                 .SingleOrDefaultAsync(c => c.Realms.Any(r => r.Name == realm) && action.Id == c.Id);
             if(result == null)
@@ -111,6 +112,34 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             result.Description = action.Description;
             await _identityProvisioningStore.SaveChanges(CancellationToken.None);
             dispatcher.Dispatch(new UpdateIdProvisioningDetailsSuccessAction { Description = action.Description, Id = action.Id });
+        }
+
+        [EffectMethod]
+        public async Task Handle(RemoveSelectedIdentityProvisioningMappingRulesAction action, IDispatcher dispatcher)
+        {
+            var result = await _identityProvisioningStore.Query().Include(i => i.Definition).ThenInclude(d => d.MappingRules).SingleAsync(i => i.Id == action.Id);
+            var mappingRules = result.Definition.MappingRules;
+            result.Definition.MappingRules = result.Definition.MappingRules.Where(r => !action.MappingRuleIds.Contains(r.Id)).ToList();
+            await _identityProvisioningStore.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new RemoveSelectedIdentityProvisioningMappingRulesSuccessAction { Id = action.Id, MappingRuleIds = action.MappingRuleIds });
+        }
+
+        [EffectMethod]
+        public async Task Handle(AddIdentityProvisioningMappingRuleAction action, IDispatcher dispatcher)
+        {
+            var result = await _identityProvisioningStore.Query().Include(i => i.Definition).ThenInclude(d => d.MappingRules).SingleAsync(i => i.Id == action.Id);
+            var mappingRules = result.Definition.MappingRules;
+            var newId = Guid.NewGuid().ToString();
+            mappingRules.Add(new IdentityProvisioningMappingRule
+            {
+                From= action.From,
+                Id = newId,
+                MapperType = action.MappingRule,
+                TargetUserAttribute = action.TargetUserAttribute,
+                TargetUserProperty = action.TargetUserProperty
+            });
+            await _identityProvisioningStore.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new AddIdentityProvisioningMappingRuleSuccessAction { NewId = newId, Id = action.Id, MappingRule = action.MappingRule, From = action.From, TargetUserAttribute = action.TargetUserAttribute, TargetUserProperty = action.TargetUserProperty });
         }
 
         private async Task<string> GetRealm()
@@ -205,5 +234,47 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
     {
         public string Id { get; set; }
         public string Description { get; set; }
+    }
+
+    public class SelectIdentityProvisioningMappingRuleAction
+    {
+        public bool IsSelected { get; set; }
+        public string Id { get; set; }
+    }
+
+    public class SelectAllIdentityProvisioningMappingRulesAction
+    {
+        public bool IsSelected { get; set; }
+    }
+
+    public class RemoveSelectedIdentityProvisioningMappingRulesAction
+    {
+        public IEnumerable<string> MappingRuleIds { get; set; }
+        public string Id { get; set; }
+    }
+
+    public class RemoveSelectedIdentityProvisioningMappingRulesSuccessAction
+    {
+        public IEnumerable<string> MappingRuleIds { get; set; }
+        public string Id { get; set; }
+    }
+
+    public class AddIdentityProvisioningMappingRuleAction
+    {
+        public string Id { get; set; }
+        public MappingRuleTypes MappingRule { get; set; }
+        public string From { get; set; } = null!;
+        public string? TargetUserAttribute { get; set; } = null;
+        public string? TargetUserProperty { get; set; } = null;
+    }
+
+    public class AddIdentityProvisioningMappingRuleSuccessAction
+    {
+        public string Id { get; set; }
+        public string NewId { get; set; }
+        public MappingRuleTypes MappingRule { get; set; }
+        public string From { get; set; } = null!;
+        public string? TargetUserAttribute { get; set; } = null;
+        public string? TargetUserProperty { get; set; } = null;
     }
 }
