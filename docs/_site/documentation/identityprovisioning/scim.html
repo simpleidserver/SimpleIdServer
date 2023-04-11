@@ -1,0 +1,230 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>SCIM </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="SCIM ">
+    <meta name="generator" content="docfx 2.59.2.0">
+    
+    <link rel="shortcut icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="../toc.html">
+    
+    
+    
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="scim">SCIM</h1>
+
+<p>Users stored in SCIM can be imported into the Identity Server.</p>
+<div class="WARNING">
+<h5>Warning</h5>
+<p>Before you start, Make sure you have an <a href="/documentation/gettingstarted/index.html">up and running IdentityServer, IdentityServer website and SCIM</a>.</p>
+</div>
+<p>In this tutorial, we are going to explain how to import users from SCIM to Identity Server.</p>
+<h2 id="create-some-users">Create some users</h2>
+<p>Open POSTMAN and execute the following requests to create two users</p>
+<p>First request</p>
+<pre><code>HTTP POST
+Target http://localhost:5003/Users
+Authorization Bearer ba521b3b-02f7-4a37-b03c-58f713bf88e7
+
+Content
+{
+  &quot;schemas&quot;: [
+    &quot;urn:ietf:params:scim:schemas:core:2.0:User&quot;,
+    &quot;urn:ietf:params:scim:schemas:extension:enterprise:2.0:User&quot;
+  ],
+  &quot;userName&quot;: &quot;firstUser&quot;,
+  &quot;active&quot;: true,
+  &quot;displayName&quot;: &quot;lennay&quot;,
+  &quot;externalId&quot;: &quot;e1f4c134-2dec-4754-bb50-9e786e4ecae9&quot;,
+  &quot;department&quot;: &quot;Department&quot;,
+  &quot;name&quot;: {
+    &quot;formatted&quot;: &quot;Andrew Ryan&quot;,
+    &quot;familyName&quot;: &quot;Ryan&quot;,
+    &quot;givenName&quot;: &quot;Andrew&quot;
+  },
+  &quot;emails&quot;: [
+    {
+      &quot;primary&quot;: true,
+      &quot;type&quot;: &quot;work&quot;,
+      &quot;value&quot;: &quot;andrew@gmail.com&quot;
+    },
+    {
+      &quot;primary&quot;: false,
+      &quot;type&quot;: &quot;home&quot;,
+      &quot;value&quot;: &quot;andrewhome@gmail.com&quot;
+    }
+  ]
+}
+</code></pre>
+<p>Second request</p>
+<pre><code>HTTP POST
+Target http://localhost:5003/Users
+Authorization Bearer ba521b3b-02f7-4a37-b03c-58f713bf88e7
+
+Content
+{
+  &quot;schemas&quot;: [
+    &quot;urn:ietf:params:scim:schemas:core:2.0:User&quot;,
+    &quot;urn:ietf:params:scim:schemas:extension:enterprise:2.0:User&quot;
+  ],
+  &quot;userName&quot;: &quot;secondUser&quot;,
+  &quot;active&quot;: true,
+  &quot;displayName&quot;: &quot;lennay&quot;,
+  &quot;externalId&quot;: &quot;e1f4c134-2dec-4754-bb50-9e786e4ecae9&quot;,
+  &quot;department&quot;: &quot;Department&quot;,
+  &quot;name&quot;: {
+    &quot;formatted&quot;: &quot;Andrew Ryan&quot;,
+    &quot;familyName&quot;: &quot;Ryan&quot;,
+    &quot;givenName&quot;: &quot;Andrew&quot;
+  },
+  &quot;emails&quot;: [
+    {
+      &quot;primary&quot;: true,
+      &quot;type&quot;: &quot;work&quot;,
+      &quot;value&quot;: &quot;andrew@gmail.com&quot;
+    },
+    {
+      &quot;primary&quot;: false,
+      &quot;type&quot;: &quot;home&quot;,
+      &quot;value&quot;: &quot;andrewhome@gmail.com&quot;
+    }
+  ]
+}
+</code></pre>
+<h2 id="extract">Extract</h2>
+<p>Browse the <a href="http://localhost:5002">administration UI</a>, navigate to the <code>Identity Provisioning</code> screen and click on <code>SCIM</code>.</p>
+<p>In the <code>Properties</code> tab, you can update the attributes of the extraction job</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Authentication Type</td>
+<td>Specify how to retrieve the access token. By default the value is APIKEY</td>
+</tr>
+<tr>
+<td>API Key</td>
+<td>When authentication type is equals to APIKEY then the APIKEY must be specified</td>
+</tr>
+<tr>
+<td>ClientId</td>
+<td>When authentication type is equals to CLIENT_SECRET_POST then the ClientId must be specified</td>
+</tr>
+<tr>
+<td>ClientSecret</td>
+<td>When authentication type is equals to CLIENT_SECRET_POST then the ClientSecret must be specified</td>
+</tr>
+</tbody>
+</table>
+<p>In the scope of this tutorial, default values are correct and should not be updated.</p>
+<p>The <code>Mapping Rules</code> tab contains the rules used by IdServer to map properties from SCIM to user attributes / properties.</p>
+<p><img src="images/scim-1.png" alt="Mapping rules"></p>
+<p>Before launching the extraction, make sure the Identity Server and the Administration UI are launched.</p>
+<p>Click on the <code>Histories</code> tab and click on the <code>Launch</code> button.</p>
+<p>Wait some seconds and refresh the page. A new line must be displayed in the table, you can read that 2 records have been extracted from LDAP.</p>
+<h2 id="import">Import</h2>
+<p>Navigate to the <code>Identity Provisioning</code> screen and click on the <code>Import</code> button.</p>
+<p>Wait some seconds and refresh the page. A new line must be displayed in the table, you can read that 2 records have been imported into the Identity Server.</p>
+<p>Both users are visible in the Users screen.</p>
+<h1 id="users"><img src="images/scim-2.png" alt="Users"></h1>
+<p>Because SCIM API doesn't store password, it is not possible to authenticate with a new imported SCIM user, except if at least one credential has been defined.</p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/release/v3.0.3/docs/documentation/identityprovisioning/scim.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

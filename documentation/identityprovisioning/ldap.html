@@ -1,0 +1,261 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>LDAP </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="LDAP ">
+    <meta name="generator" content="docfx 2.59.2.0">
+    
+    <link rel="shortcut icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="../toc.html">
+    
+    
+    
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="ldap">LDAP</h1>
+
+<p>Users stored in LDAP repository can be imported into the Identity Server.</p>
+<div class="WARNING">
+<h5>Warning</h5>
+<p>Only <a href="https://www.openldap.org/">OPENLDAP</a> is supported.
+No Integration tests have been executed against Active Directory.</p>
+<p>Before you start, Make sure you have an <a href="/documentation/gettingstarted/index.html">up and running IdentityServer and IdentityServer website</a>.</p>
+</div>
+<p>In this tutorial, we are going to explain how to import users from <a href="https://www.openldap.org/">OPENLDAP</a> to the Identity Server.</p>
+<h2 id="install-openldap">Install OPENLDAP</h2>
+<p>Before going further, make sure there is Docker installed on your machine.</p>
+<p>Open a command prompt, launch an OPENLDAP instance by executing this command line :</p>
+<pre><code>docker run -p 389:389 -p 636:636 --name ldap-service -h ldap-service -e LDAP_ORGANISATION=&quot;XL&quot; -e LDAP_DOMAIN=&quot;xl.com&quot; -e LDAP_ADMIN_PASSWORD=&quot;password&quot; -d osixia/openldap:latest
+</code></pre>
+<p>This exposes LDAP over port 389 and LDAPS over port 636.</p>
+<h2 id="create-some-users">Create some users</h2>
+<p>Download and install <a href="https://directory.apache.org/studio/downloads.html">Apache Directory Studio</a>.</p>
+<p>Authenticate as admin with the right login DN :</p>
+<pre><code>Login Credentials:
+ID : cn=admin,dc=xl,dc=com
+Password: password
+</code></pre>
+<p>Under <code>dc=xl,dc=com</code>, create one entry with the object class <code>Organizational Unit (organizationalUnit)</code>. Its <code>ou</code> attribute must be equals to <code>people</code>.
+This entry will contain the users, who are going to be migrated to the Identity Server.</p>
+<p><img src="images/ldap-1.png" alt="Create Organization Unit"></p>
+<p>Under <code>ou=people</code>, add two entries. Both will contain two object classes <code>Organizational Person (organizationalPerson)</code> and <code>person</code>.</p>
+<p>First user must have the following attributes and a password equals to password.</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>objectClass</td>
+<td>organizationalPerson</td>
+</tr>
+<tr>
+<td>objectClass</td>
+<td>person</td>
+</tr>
+<tr>
+<td>cn</td>
+<td>firstUser</td>
+</tr>
+<tr>
+<td>sn</td>
+<td>firstUser</td>
+</tr>
+<tr>
+<td>userPassword</td>
+<td>password</td>
+</tr>
+</tbody>
+</table>
+<p><img src="images/ldap-2.png" alt="Create first user"></p>
+<p>Second user must have the following attributes</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>objectClass</td>
+<td>organizationalPerson</td>
+</tr>
+<tr>
+<td>objectClass</td>
+<td>person</td>
+</tr>
+<tr>
+<td>cn</td>
+<td>secondUser</td>
+</tr>
+<tr>
+<td>sn</td>
+<td>secondUser</td>
+</tr>
+</tbody>
+</table>
+<p><img src="images/ldap-3.png" alt="Create second user"></p>
+<p>Now there is an up and running OPENLDAP server with two users, you can use the administration website to import both users.</p>
+<h2 id="extract">Extract</h2>
+<p>Browse the <a href="http://localhost:5002">administration UI</a>, navigate to the <code>Identity Provisioning</code> screen and click on <code>LDAP</code>.</p>
+<p>In the <code>Properties</code> tab, you can update the attributes of the extraction job</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bind DN</td>
+<td>DN of the LDAP admin, which will be used by IdServer to access LDAP Server</td>
+</tr>
+<tr>
+<td>Bind Credentials</td>
+<td>Password of LDAP admin</td>
+</tr>
+<tr>
+<td>Users DN</td>
+<td>Full DN of LDAP tree where users are</td>
+</tr>
+<tr>
+<td>User object classes</td>
+<td>All values of LDAP objectClass attribute for users in LDAP, divided by commas</td>
+</tr>
+<tr>
+<td>UUID LDAP Attribute</td>
+<td>Name of the LDAP attribute, which is used as a unique object identifier (UUID) for objects in LDAP.</td>
+</tr>
+<tr>
+<td>Modification Date Attribute</td>
+<td>Name of the LDAP Attribute, which is used as the modification date for objects in LDAP</td>
+</tr>
+<tr>
+<td>Batch Size</td>
+<td>Number of records</td>
+</tr>
+</tbody>
+</table>
+<div class="WARNING">
+<h5>Warning</h5>
+<p>If the <strong>UUID LDAP Attribute</strong> doesn't exist then the FULL DN is used as a unique identifier.</p>
+<p>If the <strong>Modification Date Attribute</strong> doesn't exist then extracted users cannot be versioned. Therefore, even if no modifications have been made on the users since the last extraction, all the users will be extracted in the next execution.</p>
+</div>
+<p>In the scope of this tutorial, default values are correct and should not be updated.</p>
+<p>The <code>Mapping Rules</code> tab contains the rules used by IdServer to map properties from OPENLDAP to user attributes / properties.</p>
+<p><img src="images/ldap-4.png" alt="Mapping rules"></p>
+<p>Before launching the extraction, make sure the Identity Server and the Administration UI are launched.</p>
+<p>Click on the <code>Histories</code> tab and click on the <code>Launch</code> button.</p>
+<p>Wait some seconds and refresh the page. A new line must be displayed in the table, you can read that 2 records have been extracted from LDAP.</p>
+<p><img src="images/ldap-5.png" alt="Exported users"></p>
+<h2 id="import">Import</h2>
+<p>Navigate to the <code>Identity Provisioning</code> screen and click on the <code>Import</code> button.</p>
+<p>Wait some seconds and refresh the page. A new line must be displayed in the table, you can read that 2 records have been imported into the Identity Server.</p>
+<p>Both users are visible in the Users screen.</p>
+<p><img src="images/ldap-6.png" alt="Users"></p>
+<h2 id="authenticate">Authenticate</h2>
+<p>Browse the <a href="https://localhost:5001/master">Identity Server</a> and click on the Authenticate button.</p>
+<p>Authenticate with the following credentials. You're now authenticated with a user coming from OPENLDAP.</p>
+<pre><code>Login : firstUser
+Password : password
+</code></pre>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/release/v3.0.3/docs/documentation/identityprovisioning/ldap.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

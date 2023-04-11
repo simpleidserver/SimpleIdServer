@@ -149,6 +149,27 @@ dotnet run --urls=http://localhost:5002
 <h2 id="identity-server-website-ui-preview">Identity Server website UI preview</h2>
 <p>The IdentityServer website UI uses Radzen.</p>
 <p><img src="images/IdentityServerWebsite-2.png" alt="IdentityServerWebsite"></p>
+<h2 id="scim-security">SCIM Security</h2>
+<p>By default SCIM is configured to use API KEY authentication.
+Any clients who want to execute one operation must pass one of those keys into <code>HTTP HEADER Authorization Bearer</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Owner</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IdServer</td>
+<td>ba521b3b-02f7-4a37-b03c-58f713bf88e7</td>
+</tr>
+<tr>
+<td>AzureAd</td>
+<td>1595a72a-2804-495d-8a8a-2c861e7a736a</td>
+</tr>
+</tbody>
+</table>
 <h2 id="create-scim-project-with-ef-support">Create SCIM project with EF support</h2>
 <p>Create a web project named <code>ScimEF</code> with the <code>SimpleIdServer.Scim.Persistence.EF</code> package installed and Entity Framework (EF) configured to use SQLServer.</p>
 <pre><code>cd src
@@ -162,7 +183,7 @@ dotnet sln add ./src/ScimEF/ScimEF.csproj
 <pre><code>cd src/SCIMEF
 dotnet run --urls=http://localhost:5003
 </code></pre>
-<p>Now the SCIM server is running, you can check its Schemas endpoint on [http://localhost:5003/Schemas][http://localhost:5003/Schemas].</p>
+<p>Now the SCIM server is running, you can check its Schemas endpoint on <a href="http://localhost:5003/Schemas">http://localhost:5003/Schemas</a>.</p>
 <h2 id="create-scim-project-with-mongodb-support">Create SCIM project with MongoDB support</h2>
 <p>Create a web project named <code>ScimMongoDB</code> with the <code>SimpleIdServer.Scim.Persistence.MongoDB</code> package installed and with MongoDB support.</p>
 <pre><code>cd src
@@ -176,7 +197,7 @@ dotnet sln add ./src/ScimMongoDB/ScimMongoDB.csproj
 <pre><code>cd src/ScimMongoDB
 dotnet run --urls=http://localhost:5003
 </code></pre>
-<p>Now the SCIM server is running, you can check its Schemas endpoint on [http://localhost:5003/Schemas][http://localhost:5003/Schemas].</p>
+<p>Now the SCIM server is running, you can check its Schemas endpoint on <a href="http://localhost:5003/Schemas">http://localhost:5003/Schemas</a>.</p>
 <h1 id="running-with-docker">Running with docker</h1>
 <p>To execute all the projects in Docker, execute the following commands :</p>
 <pre><code>psake dockerBuild
@@ -190,7 +211,7 @@ psake dockerUp
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/release/v3.0.2/docs/documentation/gettingstarted/index.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/release/v3.0.3/docs/documentation/gettingstarted/index.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>

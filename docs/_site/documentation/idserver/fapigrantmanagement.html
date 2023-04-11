@@ -1,0 +1,452 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>FAPI Grant Management </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="FAPI Grant Management ">
+    <meta name="generator" content="docfx 2.59.2.0">
+    
+    <link rel="shortcut icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="../toc.html">
+    
+    
+    
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="fapi-grant-management">FAPI Grant Management</h1>
+
+<div class="WARNING">
+<h5>Warning</h5>
+<p>Before you start, Make sure you have an <a href="/documentation/gettingstarted/index.html">up and running IdentityServer and IdentityServer website</a>.
+The goal of this tutorial is to give an overview of the OAUTH2.0 grant management. The sample project is basic and doesn't embrace all the concepts.</p>
+</div>
+<p>Grant Management has been introduced by FAPI 2.0. This standard aims to replace the variety of consent management APIs that have been created in open banking markets.</p>
+<p>These capabilities include</p>
+<ul>
+<li>Granting access and returning a <code>grant_id</code>.</li>
+<li>Querying the details of a grant throught a <code>GET</code>.</li>
+<li>Update of a grant.</li>
+<li>Deletion of a grant.</li>
+</ul>
+<p>The standard also uses Rich Authorization Request (RAR). It allows clients to specify their fine-granted authorization requirements using the expressiveness of JSON data structure, for example</p>
+<pre><code>{
+   &quot;type&quot;:&quot;account_information&quot;,
+   &quot;actions&quot;:[
+      &quot;list_accounts&quot;,
+      &quot;read_balances&quot;,
+      &quot;read_transactions&quot;
+   ],
+   &quot;locations&quot;:[
+      &quot;https://example.com/accounts&quot;
+   ]
+}
+</code></pre>
+<p>For more information please refer to the <a href="https://openid.net/specs/fapi-grant-management-01.html">official documentation</a>.</p>
+<p>In this tutorial, we are going to explain how to create a <code>Third Party Website (Server Site Web App)</code> which will fetch all the Bank Accounts of the authenticated user from a <code>REST.API service</code>.</p>
+<ul>
+<li>The Authorization Policy implemented by the REST.API is basic. It checks if the Access Token contains at least one Authorization Data Type equals to <code>list_accounts</code>.</li>
+<li>The Third Party Website needs the User's consent to access to the <code>list_accounts</code> Authorization Data and to the <code>openid</code> and <code>profile</code> scopes. When the consent is accepted, the <code>grant_id</code> returned by the Identity Server is stored by the Website into an In-Memory store.</li>
+</ul>
+<p>The <code>grant_id</code> can be used by the website to manage the lifecycle of a grant :</p>
+<ul>
+<li>Querying the grant.</li>
+<li>Revoke the grant.</li>
+</ul>
+<p>The Third Party website will have the following configuration</p>
+<table>
+<thead>
+<tr>
+<th>Configuration</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Client Authentication Method</td>
+<td>Client Secret Post</td>
+</tr>
+<tr>
+<td>Authorization Data Types</td>
+<td>account_information</td>
+</tr>
+<tr>
+<td>Scopes</td>
+<td>grant_management_query grant_management_revoke openid profile</td>
+</tr>
+</tbody>
+</table>
+<h2 id="source-code">Source code</h2>
+<p>The source code of this project can be found <a href="https://github.com/simpleidserver/SimpleIdServer/tree/master/samples/FapiGrantManagement">here</a>.</p>
+<h2 id="add-client">Add client</h2>
+<p>The first step consists to configure the OPENID client</p>
+<ul>
+<li>Open the IdentityServer website <a href="http://localhost:5002">http://localhost:5002</a>.</li>
+<li>In the Clients screen, click on <code>Add client</code> button.</li>
+<li>Select <code>web application</code> and click on next.</li>
+</ul>
+<p><img src="images/fapigrant-1.png" alt="Choose client"></p>
+<ul>
+<li>Fill-in the form like this and click on the <code>Save</code> button to confirm the creation. The secret must be equals to <code>password</code>.</li>
+</ul>
+<p><img src="images/fapigrant-2.png" alt="Confirm"></p>
+<h2 id="create-restapi">Create REST.API</h2>
+<p>The second step consists to create and configure a REST.API project.</p>
+<ul>
+<li>Open a command prompt, run the following commands to create the directory structure for the solution.</li>
+</ul>
+<pre><code>mkdir FapiGrantManagement
+cd FapiGrantManagement
+mkdir src
+dotnet new sln -n FapiGrantManagement
+</code></pre>
+<ul>
+<li>Create a REST.API project and install the <code>Microsoft.AspNetCore.Authentication.JwtBearer</code> Nuget Package</li>
+</ul>
+<pre><code>cd src
+dotnet new webapi -n AccountInfoApi
+cd AccountInfoApi
+dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer
+</code></pre>
+<ul>
+<li>Add the <code>AccountInfoApi</code> project into your Visual Studio solution.</li>
+</ul>
+<pre><code>cd ..\..
+dotnet sln add ./src/AccountInfoApi/AccountInfoApi.csproj
+</code></pre>
+<ul>
+<li>Edit the file <code>AccountInfoApi\Program.cs</code>, configure the JWT authentication and add an Authorization policy named <code>account_information</code>, it checks if the Authorization Details are correct.</li>
+</ul>
+<pre><code>builder.Services.AddAuthentication(options =&gt;
+{
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+    .AddJwtBearer(options =&gt;
+    {
+        options.Authority = &quot;https://localhost:5001/master&quot;;
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateAudience = false,
+            ValidIssuers = new List&lt;string&gt;
+            {
+                &quot;https://localhost:5001/master&quot;
+            }
+        };
+    });
+builder.Services.AddAuthorization(b =&gt;
+{
+    b.AddPolicy(&quot;account_information&quot;, p =&gt; p.RequireAssertion(c =&gt;
+    {
+        var cl = c.User.Claims.First(c =&gt; c.Type == &quot;authorization_details&quot;);
+        return JsonObject.Parse(cl.Value)[&quot;type&quot;].GetValue&lt;string&gt;() == &quot;account_information&quot;;
+    }));
+});
+</code></pre>
+<ul>
+<li>Add a new controller <code>AccountInfoController</code>. It will return the list of Bank Accounts.</li>
+</ul>
+<pre><code>[ApiController]
+[Route(&quot;[controller]&quot;)]
+[Authorize(&quot;account_information&quot;)]
+public class AccountInfoController : ControllerBase
+{
+    [HttpGet(Name = &quot;Accounts&quot;)]
+    public IEnumerable&lt;string&gt; Get()
+    {
+        return new List&lt;string&gt; { &quot;account&quot; };
+    }
+}
+</code></pre>
+<p>Now your REST.API is configured, you can launch it on the port 7001</p>
+<pre><code>dotnet run --urls=http://localhost:7001
+</code></pre>
+<h2 id="create-third-party-website">Create Third Party website</h2>
+<p>Create and configure the Third Party Website</p>
+<ul>
+<li>Create a web project named <code>Website</code>.</li>
+</ul>
+<pre><code>cd src
+dotnet new mvc -n Website
+</code></pre>
+<ul>
+<li>Add the <code>Website</code> project into your Visual Studio solution.</li>
+</ul>
+<pre><code>cd ..
+dotnet sln add ./src/Website/Website.csproj
+</code></pre>
+<ul>
+<li>Add a <code>User</code> class into the <code>Models</code> directory.</li>
+</ul>
+<pre><code>namespace Website.Models
+{
+    public class User
+    {
+        public string Id { get; set; }
+        public ICollection&lt;UserGrant&gt; Grants { get; set; } = new List&lt;UserGrant&gt;();
+
+        public UserGrant GetGrant(string bankAccount) =&gt; Grants.FirstOrDefault(g =&gt; g.BankAccount == bankAccount);
+    }
+
+    public class UserGrant
+    {
+        public string GrantId { get; set; }
+        public string BankAccount { get; set; }
+    }
+}
+</code></pre>
+<ul>
+<li>Add a <code>CallbackViewModel</code> into the <code>Models</code> directory.</li>
+</ul>
+<pre><code>namespace Website.Models
+{
+    public class CallbackViewModel
+    {
+        public string GrantId { get; set; }
+        public IEnumerable&lt;string&gt; Accounts { get; set; }
+    }
+}
+</code></pre>
+<ul>
+<li>Add a <code>UserStore</code> class. It is used to store the <code>grant_id</code> of the user.</li>
+</ul>
+<pre><code>using Website.Models;
+
+namespace Website.Stores
+{
+    public interface IUserStore
+    {
+        User Get(string id);
+    }
+
+    public class UserStore : IUserStore
+    {
+        private readonly ICollection&lt;User&gt; _users;
+
+        public UserStore(ICollection&lt;User&gt; users)
+        {
+            _users = users;
+        }
+
+        public User Get(string id) =&gt; _users.First(u =&gt; u.Id == id);
+    }
+}
+</code></pre>
+<ul>
+<li>Edit the <code>Program.cs</code> class and register the <code>UserStore</code> as a Singleton.</li>
+</ul>
+<pre><code>builder.Services.AddSingleton&lt;IUserStore&gt;(new UserStore(new List&lt;User&gt;
+{
+    new User { Id = &quot;userId&quot; }
+}));
+</code></pre>
+<ul>
+<li>Edit the <code>HomeController.cs</code> class and add an action named <code>AuthenticateBank</code>. When this action is called, then the user-agent is redirected to the Identity Server of your Bank.</li>
+</ul>
+<pre><code>public IActionResult AuthenticateBank()
+{
+    const string bankAccountName = &quot;bank&quot;;
+    const string userId = &quot;userId&quot;;
+    const string clientId = &quot;fapiGrant&quot;;
+    const string callbackUrl = &quot;http://localhost:7000/callback&quot;;
+    const string authorizationDetails = &quot;{ \&quot;type\&quot; : \&quot;account_information\&quot;, \&quot;actions\&quot; : [\&quot;read\&quot;] }&quot;;
+    var userGrant = _userStore.Get(userId).GetGrant(bankAccountName);
+    var url = $&quot;https://localhost:5001/master/authorization?client_id={clientId}&amp;redirect_uri={callbackUrl}&amp;response_type=code&amp;scope=openid profile&amp;authorization_details={authorizationDetails}&quot;;
+    if (userGrant == null)
+        url += &quot;&amp;code&amp;grant_management_action=create&quot;;
+    return Redirect(url);
+}
+</code></pre>
+<ul>
+<li>Add an action named <code>Callback</code>. This action is called by the Identity Server after the Authorization is granted. It fetches the <code>access_token</code> and <code>grant_id</code>, calls the <code>AccountInfoApi</code> and displays a view.</li>
+</ul>
+<pre><code>[Route(&quot;callback&quot;)]
+public async Task&lt;IActionResult&gt; Callback()
+{
+    const string bankAccountName = &quot;bank&quot;;
+    const string userId = &quot;userId&quot;;
+    var user = _userStore.Get(userId);
+    var accessToken = await GetAccessToken();
+    var accounts = await GetAccounts();
+    return View(new CallbackViewModel
+    {
+        GrantId = user.GetGrant(bankAccountName).GrantId,
+        Accounts = accounts
+    });
+
+    async Task&lt;string&gt; GetAccessToken()
+    {
+        var authorizationCode = Request.Query[&quot;code&quot;].First();
+        using (var httpClient = new HttpClient())
+        {
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(&quot;https://localhost:5001/master/token&quot;),
+                Content = new FormUrlEncodedContent(new Dictionary&lt;string, string&gt;
+            {
+                { &quot;client_id&quot;, &quot;fapiGrant&quot; },
+                { &quot;client_secret&quot;, &quot;password&quot; },
+                { &quot;grant_type&quot;, &quot;authorization_code&quot; },
+                { &quot;code&quot;, authorizationCode },
+                { &quot;redirect_uri&quot;, &quot;http://localhost:7000/callback&quot; }
+            })
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var jsonObj = JsonObject.Parse(json).AsObject();
+            if (jsonObj.ContainsKey(&quot;grant_id&quot;))
+            {
+                var grantId = jsonObj[&quot;grant_id&quot;].GetValue&lt;string&gt;();
+                user.Grants.Add(new UserGrant
+                {
+                    BankAccount = bankAccountName,
+                    GrantId = grantId
+                });
+            }
+            return jsonObj[&quot;access_token&quot;].GetValue&lt;string&gt;();
+        }
+    }
+
+    async Task&lt;IEnumerable&lt;string&gt;&gt; GetAccounts()
+    {
+        using(var httpClient = new HttpClient())
+        {
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(&quot;http://localhost:7001/AccountInfo&quot;)
+            };
+            requestMessage.Headers.Add(&quot;Authorization&quot;, $&quot;Bearer {accessToken}&quot;);
+            var httpResponse = await httpClient.SendAsync(requestMessage);
+            var json = await httpResponse.Content.ReadAsStringAsync();
+            return JsonArray.Parse(json).AsArray().Select(x =&gt; x.GetValue&lt;string&gt;());
+        }
+    }
+}
+</code></pre>
+<ul>
+<li>Add a view <code>Callback.cshtml</code> into the Directory <code>Views\Home</code>. It displays the <code>grant_id</code> and also the list of bank accounts.</li>
+</ul>
+<pre><code>@model Website.Models.CallbackViewModel
+
+&lt;div&gt;The grant identifier is : @Model.GrantId&lt;/div&gt;
+
+&lt;h5&gt;List of bank accounts&lt;/h5&gt;
+&lt;ul&gt;
+    @foreach(var bankAccount in Model.Accounts)
+    {
+        &lt;li&gt;@bankAccount&lt;/li&gt;
+    }
+&lt;/ul&gt;
+</code></pre>
+<ul>
+<li>Edit the view <code>Views\Home\Index.cshtml</code> and replace the context with the following code</li>
+</ul>
+<pre><code>@{
+    ViewData[&quot;Title&quot;] = &quot;Home Page&quot;;
+}
+
+&lt;div&gt;
+    &lt;a href=&quot;@Url.Action(&quot;AuthenticateBank&quot;, &quot;Home&quot;)&quot;&gt;Bank Account information&lt;/a&gt;
+&lt;/div&gt;
+</code></pre>
+<p>Now your REST.API is configured, you can launch it on the port 7000</p>
+<pre><code>dotnet run --urls=http://localhost:7000
+</code></pre>
+<p>Browse the website <a href="http://localhost:7000">http://localhost:7000</a>, click on <code>Bank Account Information</code>.
+You'll be redirected to the Identity Server, authenticate with the <code>administrator</code> credentials and confirm the consent.
+At the end you'll see the <code>grant_id</code> and the list of Bank Accounts.</p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/release/v3.0.3/docs/documentation/idserver/fapigrantmanagement.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

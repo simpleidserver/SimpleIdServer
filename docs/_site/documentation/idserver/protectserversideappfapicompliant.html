@@ -71,25 +71,233 @@
 
 <div class="WARNING">
 <h5>Warning</h5>
-<p>A full working example will be described in the next SimpleIdServer release.
-At the moment, we describe how to create a confidential client compliant with the FAPI specification.</p>
+<p>Before you start, Make sure you have an <a href="/documentation/gettingstarted/index.html">up and running IdentityServer and IdentityServer website</a>.</p>
 </div>
-<p>In the Administration UI, a Server Side Application compliant with FAPI, for example an ASP.NET CORE website, can easily be created.</p>
+<p>In this tutorial, we are going to explain how to create a highly secured ASP.NET CORE application, which respects all the security recommendations from FAPI <a href="https://openid.net/specs/openid-financial-api-part-2-1_0.html#confidential-client">https://openid.net/specs/openid-financial-api-part-2-1_0.html#confidential-client</a> :</p>
+<ul>
+<li>The client shall support MTLS as mechanism for sender-constrained access tokens.</li>
+<li>The client shall include <code>request</code> or <code>request_uri</code> parameter as defined in Section 6 of <a href="https://openid.net/specs/openid-connect-core-1_0.html">OIDC</a> in the authentication request.</li>
+<li>If the Authorization Request is too large for example a <a href="https://datatracker.ietf.org/doc/html/draft-ietf-oauth-rar-23">Rich Authorization Request</a>, then it is recommended to use <a href="https://datatracker.ietf.org/doc/html/rfc9126">Pushed Authorization Request (PAR)</a>.</li>
+<li><a href="https://openid.net/specs/openid-financial-api-jarm.html">JWT-Secured OAUTH2.0 authorisation response</a> (JARM) is used to sign and / or encrypt the authorisation response, it protects against replay, credential leaks and mix-up attacks.</li>
+<li>The PS256 or ES256 algorithms must be used.</li>
+</ul>
+<p>The website will have the following configuration :</p>
+<table>
+<thead>
+<tr>
+<th>Configuration</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Client Authentication Method</td>
+<td>tls_client_auth</td>
+</tr>
+<tr>
+<td>Authorization Signed Response Algorithm</td>
+<td>ES256</td>
+</tr>
+<tr>
+<td>Identity Token Signed Response Algorithm</td>
+<td>ES256</td>
+</tr>
+<tr>
+<td>Request Object Signed Response Algorithm</td>
+<td>ES256</td>
+</tr>
+<tr>
+<td>Pushed Authorization Request</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Response Mode</td>
+<td>jwt</td>
+</tr>
+</tbody>
+</table>
+<h2 id="source-code">Source Code</h2>
+<p>The source code of this project can be found <a href="https://github.com/simpleidserver/SimpleIdServer/tree/master/samples/HighlySecuredServersideWebsite">here</a>.</p>
+<h2 id="add-a-client">Add a client</h2>
 <ul>
 <li>Open the IdentityServer website <a href="http://localhost:5002">http://localhost:5002</a>.</li>
-<li>In the Clients screen, click on <code>Add client</code> button.</li>
-<li>Select <code>Web application</code> and click on next.</li>
+<li>In the Certificate Authorities screen, select one Certificate Authority. Don't forget, the Certificate Authority must be trusted by your machine. You can download it and import into the correct Certificate Store.</li>
+<li>Click on the <code>Client Certificates</code> tabulation, and click on the <code>Add Client Certificate</code> button.</li>
+<li>Set the Subject Name value to <code>CN=websiteFAPI</code> and click on <code>Add</code>.</li>
 </ul>
-<p><img src="images/fapi-1.png" alt="Choose client"></p>
+<p><img src="images/fapi-1.png" alt="Add Client Certificate"></p>
 <ul>
-<li>Check the checkbox named <code>Compliant with FAPI1.0</code>, enter Subject Name of the Client Certificate, for example : <code>CN=firstClient</code>.</li>
+<li>Click on the <code>Download</code> button next to the certificate.</li>
+<li>Navigate to the Clients screen and click on the <code>Add client</code> button.</li>
+<li>Select <code>Web application</code> and click on Next.</li>
 </ul>
-<p><img src="images/fapi-2.png" alt="Compliant with FAPI"></p>
+<p><img src="images/fapi-3.png" alt="Select client type"></p>
 <ul>
-<li>Click on the <code>Save</code> button.</li>
+<li>Fill-in the form like this. You can specify any password, it will not be used because we are using <code>tls_client_auth</code>. Click on <code>Save</code> button.</li>
 </ul>
-<p>A new client is created, it is configured to use the <code>tls_client_auth</code> authentication method.</p>
-<p>A client certificate can easily be generated in the <code>Certificate Authorities</code> Web Page.</p>
+<p><img src="images/fapi-4.png" alt="Fill-in client form"></p>
+<ul>
+<li>The generated JSON Web Key will be displayed, copy the value into a text file.</li>
+</ul>
+<p><img src="images/fapi-5.png" alt="Generated Website"></p>
+<p>Now your client is ready to be used, you can develop the ASP.NET CORE website.</p>
+<h2 id="create-aspnet-core-application">Create ASP.NET CORE application</h2>
+<p>The last step consists to create and configure an ASP.NET CORE project.</p>
+<ul>
+<li>Open a command prompt, run the following commands to create the directory structure for the solution.</li>
+</ul>
+<pre><code>mkdir HighlySecuredServersideWebsite
+cd HighlySecuredServersideWebsite
+mkdir src
+dotnet new sln -n HighlySecuredServersideWebsite
+</code></pre>
+<ul>
+<li>Create a web project named <code>Website</code> and install the <code>SimpleIdServer.OpenIdConnect</code> nuget package.</li>
+</ul>
+<div class="WARNING">
+<h5>Warning</h5>
+<p>This Nuget Package supports all the features coming from the official <code>Microsoft.AspNetCore.Authentication.OpenIdConnect</code> Nuget Package.
+It also supports new features like <code>tls_client_auth</code> Client Authentication Method, new authorization responses like :jwt, query.jwt, fragment.jwt, form_post.jwt, fragment.jwt, and Pushed Authorization Request.</p>
+</div>
+<pre><code>cd src
+dotnet new mvc -n Website
+cd Website
+dotnet add package SimpleIdServer.OpenIdConnect
+</code></pre>
+<ul>
+<li>Add the <code>Website</code> project into your Visual Studio solution.</li>
+</ul>
+<pre><code>cd ..\..
+dotnet sln add ./src/Website/Website.csproj
+</code></pre>
+<ul>
+<li>Edit the <code>Program.cs</code> file and configure the OPENID authentication with the following configuration. The <code>JWK</code> variable MUST be replaced by the content of the file you've previously copied, and the certificate <code>CN=websiteFAPI.pfx</code> MUST be replaced by the one you've previously downloaded.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Configuration</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Client Authentication Method</td>
+<td>tls_client_auth</td>
+</tr>
+<tr>
+<td>Authorization Signed Response Algorithm</td>
+<td>ES256</td>
+</tr>
+<tr>
+<td>Identity Token Signed Response Algorithm</td>
+<td>ES256</td>
+</tr>
+<tr>
+<td>Request Object Signed Response Algorithm</td>
+<td>ES256</td>
+</tr>
+<tr>
+<td>Pushed Authorization Request</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Response Mode</td>
+<td>jwt</td>
+</tr>
+</tbody>
+</table>
+<pre><code>using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Cryptography.X509Certificates;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.AddControllersWithViews();
+
+const string JWK = &quot;{\&quot;alg\&quot;:\&quot;ES256\&quot;,\&quot;crv\&quot;:\&quot;P-256\&quot;,\&quot;d\&quot;:\&quot;mf1MvmivRY_TdH-J7gAt7ak4DYGnyLIqIZ3dgHL5NHk\&quot;,\&quot;kid\&quot;:\&quot;keyId\&quot;,\&quot;kty\&quot;:\&quot;EC\&quot;,\&quot;use\&quot;:\&quot;sig\&quot;,\&quot;x\&quot;:\&quot;MdwuTbn0TCQYgsER0-NeE3vtSx3H4HD9sSD7Zfkxt8k\&quot;,\&quot;y\&quot;:\&quot;ec27GOT5l3Mu8pzZsj6doPBNbCIp_5afjoP66qPfu4o\&quot;}&quot;;
+var jsonWebKey = JsonExtensions.DeserializeFromJson&lt;JsonWebKey&gt;(JWK);
+var certificate = new X509Certificate2(Path.Combine(Directory.GetCurrentDirectory(), &quot;CN=websiteFAPI.pfx&quot;));
+builder.Services.AddAuthentication(options =&gt;
+{
+    options.DefaultScheme = &quot;Cookies&quot;;
+    options.DefaultChallengeScheme = &quot;sid&quot;;
+})
+    .AddCookie(&quot;Cookies&quot;)
+    .AddCustomOpenIdConnect(&quot;sid&quot;, options =&gt;
+    {
+        options.SignInScheme = &quot;Cookies&quot;;
+        options.ResponseType = &quot;code&quot;;
+        options.ResponseMode = &quot;jwt&quot;;
+        options.Authority = &quot;https://localhost:5001/master&quot;;
+        options.RequireHttpsMetadata = false;
+        options.ClientId = &quot;websiteFAPI&quot;;
+        options.GetClaimsFromUserInfoEndpoint = true;
+        options.SaveTokens = true;
+        options.MTLSCertificate = null;
+        options.ClientAuthenticationType = SimpleIdServer.OpenIdConnect.ClientAuthenticationTypes.TLS_CLIENT_AUTH;
+        options.RequestType = SimpleIdServer.OpenIdConnect.RequestTypes.PAR;
+        options.MTLSCertificate = certificate;
+        options.SigningCredentials = new SigningCredentials(jsonWebKey, jsonWebKey.Alg);
+    });
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler(&quot;/Home/Error&quot;);
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
+}
+
+app.UseCookiePolicy(new CookiePolicyOptions
+{
+    Secure = CookieSecurePolicy.Always
+});
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
+app.UseAuthorization();
+app.MapControllerRoute(
+    name: &quot;default&quot;,
+    pattern: &quot;{controller=Home}/{action=Index}/{id?}&quot;);
+
+app.Run();
+</code></pre>
+<ul>
+<li>Add a <code>ClaimsController</code> controller with one protected operation.</li>
+</ul>
+<pre><code>public class ClaimsController : Controller
+{
+    [Authorize]
+    public IActionResult Index()
+    {
+        return View();
+    }
+}
+</code></pre>
+<ul>
+<li>Create a view <code>Views\Claims\Index.cshtml</code> with the following content. It will display all the claims of the authenticated user.</li>
+</ul>
+<pre><code>&lt;ul&gt;
+    @foreach (var claim in User.Claims)
+    {
+        &lt;li&gt;@claim.Type : @claim.Value&lt;/li&gt;
+    }
+&lt;/ul&gt;
+</code></pre>
+<ul>
+<li>In a command prompt, navigate to the directory <code>src\Website</code> and launch the application.</li>
+</ul>
+<pre><code>dotnet run --urls=http://localhost:5003
+</code></pre>
+<ul>
+<li>Browse this URL <a href="http://localhost:5003/claims">http://localhost:5003/claims</a>, the User-Agent is automatically redirected to the OPENID server.
+Submit the credentials - login : <code>administrator</code>, password : <code>password</code> and confirm the consent. You'll be redirected to the following screen where your claims will be displayed.</li>
+</ul>
+<p><img src="images/fapi-6.png" alt="Claims"></p>
 </article>
           </div>
           
@@ -98,7 +306,7 @@ At the moment, we describe how to create a confidential client compliant with th
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/release/v3.0.2/docs/documentation/idserver/protectserversideappfapicompliant.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/release/v3.0.3/docs/documentation/idserver/protectserversideappfapicompliant.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>

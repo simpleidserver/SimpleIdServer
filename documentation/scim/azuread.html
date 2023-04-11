@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Auditing Screen </title>
+    <title>Set up SCIM provisioning in Azure AD </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Auditing Screen ">
+    <meta name="title" content="Set up SCIM provisioning in Azure AD ">
     <meta name="generator" content="docfx 2.59.2.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
@@ -67,34 +67,36 @@
         <div class="article row grid-right">
           <div class="col-md-10">
             <article class="content wrap" id="_content" data-uid="">
-<h1 id="auditing-screen">Auditing Screen</h1>
+<h1 id="set-up-scim-provisioning-in-azure-ad">Set up SCIM provisioning in Azure AD</h1>
 
-<p>In the Administration UI, there is one Auditing Screen.
-It can be used to monitor the events.</p>
-<p><img src="images/monitoring-1.png" alt="Monitoring"></p>
-<p>Following events are present :</p>
-<ul>
-<li>AuthorizationFailureEvent</li>
-<li>AuthenticationSuccessEvent</li>
-<li>ClientAuthenticationFailureEvent</li>
-<li>ClientAuthenticationSuccessEvent</li>
-<li>ClientRegisteredFailureEvent</li>
-<li>ClientRegisteredSuccessEvent</li>
-<li>ConsentGrantedEvent</li>
-<li>ConsentRevokedEvent</li>
-<li>TokenIntrospectionFailureEvent</li>
-<li>TokenIntrospectionSuccessEvent</li>
-<li>TokenIssuedFailureEvent</li>
-<li>TokenIssuedSuccessEvent</li>
-<li>TokenRevokedFailureEvent</li>
-<li>TokenRevokedSuccessEvent</li>
-<li>UserInfoFailureEvent</li>
-<li>UserInfoSuccessEvent</li>
-<li>UserLoginSuccessEvent</li>
-<li>UserLogoutSuccessEvent</li>
-<li>PushedAuthorizationRequestSuccessEvent</li>
-<li>PushedAuthorizationRequestFailureEvent</li>
-</ul>
+<div class="NOTE">
+<h5>Note</h5>
+<p>By default, SCIM is configured to use <strong>API KEY authentication</strong>. Any clients who have those keys can execute SCIM operations.</p>
+</div>
+<p>To Integrate the SCIM endpoint with the Azure AD Provisioning Service you can follow this tutorial <a href="https://learn.microsoft.com/en-us/azure/active-directory/app-provisioning/use-scim-to-provision-users-and-groups#integrate-your-scim-endpoint-with-the-azure-ad-provisioning-service">https://learn.microsoft.com/en-us/azure/active-directory/app-provisioning/use-scim-to-provision-users-and-groups#integrate-your-scim-endpoint-with-the-azure-ad-provisioning-service</a>.</p>
+<p>When the provisioning mode must be selected, the <code>Tenant URL</code> and <code>Secret Token</code> must be specified.</p>
+<p><img src="images/azuread-1.png" alt="Create Organization Unit"></p>
+<p>Tenant URL must be the URL of your SCIM endpoint for example <code>http://localhost:5003</code>.</p>
+<p>The Secret Token must be one of the token defined in the <code>appsettings.json</code> file of the SCIM project.</p>
+<p>By default, there are two tokens :</p>
+<table>
+<thead>
+<tr>
+<th>Owner</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IdServer</td>
+<td>ba521b3b-02f7-4a37-b03c-58f713bf88e7</td>
+</tr>
+<tr>
+<td>AzureAd</td>
+<td>1595a72a-2804-495d-8a8a-2c861e7a736a</td>
+</tr>
+</tbody>
+</table>
 </article>
           </div>
           
@@ -103,7 +105,7 @@ It can be used to monitor the events.</p>
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/release/v3.0.3/docs/documentation/auditing/adminui.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/release/v3.0.3/docs/documentation/scim/azuread.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>

@@ -69,9 +69,28 @@
             <article class="content wrap" id="_content" data-uid="">
 <h1 id="confidential-client-uses-ciba">Confidential Client uses CIBA</h1>
 
+<div class="WARNING">
+<h5>Warning</h5>
+<p>Before you start, Make sure you have an <a href="/documentation/gettingstarted/index.html">up and running IdentityServer and IdentityServer website</a>.</p>
+</div>
 <p>According to the <a href="https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html">specification</a>, Public Client cannot use Client-Initiated Backchannel Authentication(CIBA).
 Only Confidential Client can use it, For example a Console Application, Website or a REST.API.</p>
 <p>In this tutorial, we are going to explain how to create a Console Application. It will initiate a CIBA Authentication Request and will get an Access Token by polling the <code>Token</code> endpoint.</p>
+<p>The client will have the following configuration :</p>
+<table>
+<thead>
+<tr>
+<th>Configuration</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Client Authentication Method</td>
+<td>tls_client_auth</td>
+</tr>
+</tbody>
+</table>
 <h2 id="source-code">Source Code</h2>
 <p>The source code of this project can be found <a href="https://github.com/simpleidserver/SimpleIdServer/tree/master/samples/DeviceUseCIBA">here</a>.</p>
 <h2 id="add-a-client">Add a client</h2>
@@ -182,7 +201,7 @@ Copy the URL in the browser and authenticate with the credentials login : <code>
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/release/v3.0.2/docs/documentation/idserver/confidentialclientciba.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/release/v3.0.3/docs/documentation/idserver/confidentialclientciba.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>
