@@ -9,7 +9,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddScimStoreEF(this IServiceCollection services, Action<DbContextOptionsBuilder> optionsAction = null)
+        public static IServiceCollection AddScimStoreEF(this IServiceCollection services, Action<DbContextOptionsBuilder> dbContextOptsCallback = null, Action<SCIMEFOptions> optionsCallback = null)
         {
             services.AddTransient<ISCIMRepresentationCommandRepository, EFSCIMRepresentationCommandRepository>();
             services.AddTransient<ISCIMRepresentationQueryRepository, EFSCIMRepresentationQueryRepository>();
@@ -17,7 +17,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<ISCIMSchemaCommandRepository, EFSCIMSchemaCommandRepository>();
             services.AddTransient<ISCIMAttributeMappingQueryRepository, EFSCIMAttributeMappingQueryRepository>();
             services.AddTransient<IProvisioningConfigurationRepository, EFProvisioningConfigurationRepository>();
-            services.AddDbContext<SCIMDbContext>(optionsAction);
+            services.AddDbContext<SCIMDbContext>(dbContextOptsCallback);
+            if (optionsCallback == null) services.Configure<SCIMEFOptions>(o => { });
+            else services.Configure(optionsCallback);
             return services;
         }
     }

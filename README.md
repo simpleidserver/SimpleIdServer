@@ -91,7 +91,7 @@ By default, there is one administrator account configured. It is possible to acc
 
 The IdentityServer UI uses Bootstrap 5.
 
-![IdentityServer](docs/documentation/gettingstarted/images/IdentityServer-1.png)
+![IdentityServer](images/docs/documentation/gettingstarted/images/IdentityServer-1.png)
 
 ## Create IdentityServer website project
 
@@ -117,7 +117,17 @@ Using the website, you can perform configurations of users and clients.
 
 The IdentityServer website UI uses Radzen.
 
-![IdentityServerWebsite](docs/documentation/gettingstarted/images/IdentityServerWebsite-2.png)
+![IdentityServerWebsite](images/docs/documentation/gettingstarted/images/IdentityServerWebsite-2.png)
+
+## SCIM Security
+
+By default SCIM is configured to use API KEY authentication.
+Any clients who want to execute one operation must pass one of those keys into `HTTP HEADER Authorization Bearer`.
+
+| Owner    | Value                                |
+| -------- | ------------------------------------ |
+| IdServer | ba521b3b-02f7-4a37-b03c-58f713bf88e7 |
+| AzureAd  | 1595a72a-2804-495d-8a8a-2c861e7a736a |
 
 ## Create SCIM project with EF support
 
@@ -142,7 +152,7 @@ cd src/SCIMEF
 dotnet run --urls=http://localhost:5003
 ```
 
-Now the SCIM server is running, you can check its Schemas endpoint on [http://localhost:5003/Schemas][http://localhost:5003/Schemas].
+Now the SCIM server is running, you can check its Schemas endpoint on [http://localhost:5003/Schemas](http://localhost:5003/Schemas).
 
 ## Create SCIM project with MongoDB support
 
@@ -167,7 +177,7 @@ cd src/ScimMongoDB
 dotnet run --urls=http://localhost:5003
 ```
 
-Now the SCIM server is running, you can check its Schemas endpoint on [http://localhost:5003/Schemas][http://localhost:5003/Schemas].
+Now the SCIM server is running, you can check its Schemas endpoint on [http://localhost:5003/Schemas](http://localhost:5003/Schemas).
 
 # Running with docker
 

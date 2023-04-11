@@ -86,6 +86,9 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                     o.MigrationsAssembly(migrationsAssembly);
                     o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
                 });
+            }, options =>
+            {
+                options.DefaultSchema = "scim";
             });
         }
 

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Persistence.EF.Configurations;
 
@@ -8,8 +9,11 @@ namespace SimpleIdServer.Scim.Persistence.EF
 {
     public class SCIMDbContext : DbContext
     {
-        public SCIMDbContext(DbContextOptions<SCIMDbContext> dbContextOptions) : base(dbContextOptions)
+        private readonly SCIMEFOptions _options;
+
+        public SCIMDbContext(DbContextOptions<SCIMDbContext> dbContextOptions, IOptions<SCIMEFOptions> options) : base(dbContextOptions)
         {
+            _options = options.Value;
         }
 
         public DbSet<SCIMAttributeMapping> SCIMAttributeMappingLst { get; set; }
@@ -22,6 +26,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            if (!string.IsNullOrWhiteSpace(_options.DefaultSchema)) modelBuilder.HasDefaultSchema(_options.DefaultSchema);
             modelBuilder.ApplyConfiguration(new ProvisioningConfConfiguration());
             modelBuilder.ApplyConfiguration(new ProvisioningConfigurationHistoryConfiguration());
             modelBuilder.ApplyConfiguration(new ProvisioningConfigurationRecordConfiguration());

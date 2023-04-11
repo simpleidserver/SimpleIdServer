@@ -21,6 +21,12 @@ namespace SimpleIdServer.IdServer.Startup
             .AddUserSubjectMappingRule("$.userName")
             .AddUserPropertyMappingRule("$.name.familyName", nameof(User.Lastname))
             .AddUserAttributeMappingRule("$.name.givenName", JwtRegisteredClaimNames.GivenName).Build();
+
+        private static IdentityProvisioningDefinition Ldap = IdentityProvisioningDefinitionBuilder.Create<LDAPRepresentationsExtractionJobOptions>(SimpleIdServer.IdServer.Jobs.LDAPRepresentationsExtractionJob.NAME, "LDAP")
+            .AddUserSubjectMappingRule("cn")
+            .AddLDAPDistinguishedName()
+            .Build();
+
         public static ICollection<Scope> Scopes => new List<Scope>
         {
             SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope,
@@ -88,7 +94,19 @@ namespace SimpleIdServer.IdServer.Startup
             IdentityProvisioningBuilder.Create(Scim, "SCIM", "SCIM", new SCIMRepresentationsExtractionJobOptions
             {
                 Count = 1,
-                SCIMEdp = scimEdp
+                SCIMEdp = scimEdp,
+                AuthenticationType = ClientAuthenticationTypes.APIKEY,
+                ApiKey = "ba521b3b-02f7-4a37-b03c-58f713bf88e7"
+            }).Build(),
+            IdentityProvisioningBuilder.Create(Ldap, "LDAP", "LDAP", new LDAPRepresentationsExtractionJobOptions
+            {
+                BatchSize = 1,
+                BindCredentials = "password",
+                BindDN = "cn=admin,dc=xl,dc=com",
+                Server = "localhost",
+                Port = 389,
+                UserObjectClasses = "organizationalPerson,person",
+                UsersDN = "ou=people,dc=xl,dc=com"
             }).Build()
         };
     }

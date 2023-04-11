@@ -12,5 +12,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.3" />
     <PackageReference Include="SimpleIdServer.Scim" Version="3.0.*-*" />
     <PackageReference Include="SimpleIdServer.Scim.Persistence.MongoDB" Version="3.0.*-*" />
+	<PackageReference Include="AspNetCore.Authentication.ApiKey" Version="7.0.0" />
   </ItemGroup>
 </Project>

@@ -8,9 +8,9 @@ namespace SimpleIdServer.IdServer.Startup.Converters
 {
     public class OpenIdConnectLiteOptions : IDynamicAuthenticationOptions<OpenIdConnectOptions>
     {
-        [VisibleProperty("ClientId")]
+        [SimpleIdServer.IdServer.Serializer.VisibleProperty("ClientId")]
         public string ClientId { get; set; }
-        [VisibleProperty("ClientSecret")]
+        [SimpleIdServer.IdServer.Serializer.VisibleProperty("ClientSecret")]
         public string ClientSecret { get; set; }
 
         public OpenIdConnectOptions Convert()

@@ -11,8 +11,12 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.EnsureSchema(
+                name: "scim");
+
             migrationBuilder.CreateTable(
                 name: "ProvisioningConfigurations",
+                schema: "scim",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -27,6 +31,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
 
             migrationBuilder.CreateTable(
                 name: "SCIMAttributeMappingLst",
+                schema: "scim",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -44,6 +49,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
 
             migrationBuilder.CreateTable(
                 name: "SCIMRepresentationLst",
+                schema: "scim",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -61,6 +67,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
 
             migrationBuilder.CreateTable(
                 name: "SCIMSchemaLst",
+                schema: "scim",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -76,6 +83,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
 
             migrationBuilder.CreateTable(
                 name: "ProvisioningConfigurationHistory",
+                schema: "scim",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -96,6 +104,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                     table.ForeignKey(
                         name: "FK_ProvisioningConfigurationHistory_ProvisioningConfigurations_ProvisioningConfigurationId",
                         column: x => x.ProvisioningConfigurationId,
+                        principalSchema: "scim",
                         principalTable: "ProvisioningConfigurations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -103,6 +112,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
 
             migrationBuilder.CreateTable(
                 name: "ProvisioningConfigurationRecord",
+                schema: "scim",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -120,11 +130,13 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                     table.ForeignKey(
                         name: "FK_ProvisioningConfigurationRecord_ProvisioningConfigurationRecord_ProvisioningConfigurationRecordId",
                         column: x => x.ProvisioningConfigurationRecordId,
+                        principalSchema: "scim",
                         principalTable: "ProvisioningConfigurationRecord",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ProvisioningConfigurationRecord_ProvisioningConfigurations_ProvisioningConfigurationId",
                         column: x => x.ProvisioningConfigurationId,
+                        principalSchema: "scim",
                         principalTable: "ProvisioningConfigurations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -132,6 +144,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
 
             migrationBuilder.CreateTable(
                 name: "SCIMRepresentationSCIMSchema",
+                schema: "scim",
                 columns: table => new
                 {
                     RepresentationsId = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -143,12 +156,14 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                     table.ForeignKey(
                         name: "FK_SCIMRepresentationSCIMSchema_SCIMRepresentationLst_RepresentationsId",
                         column: x => x.RepresentationsId,
+                        principalSchema: "scim",
                         principalTable: "SCIMRepresentationLst",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_SCIMRepresentationSCIMSchema_SCIMSchemaLst_SchemasId",
                         column: x => x.SchemasId,
+                        principalSchema: "scim",
                         principalTable: "SCIMSchemaLst",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -156,6 +171,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
 
             migrationBuilder.CreateTable(
                 name: "SCIMSchemaAttribute",
+                schema: "scim",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -182,6 +198,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                     table.ForeignKey(
                         name: "FK_SCIMSchemaAttribute_SCIMSchemaLst_SchemaId",
                         column: x => x.SchemaId,
+                        principalSchema: "scim",
                         principalTable: "SCIMSchemaLst",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -189,6 +206,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
 
             migrationBuilder.CreateTable(
                 name: "SCIMSchemaExtension",
+                schema: "scim",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -202,6 +220,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                     table.ForeignKey(
                         name: "FK_SCIMSchemaExtension_SCIMSchemaLst_SCIMSchemaId",
                         column: x => x.SCIMSchemaId,
+                        principalSchema: "scim",
                         principalTable: "SCIMSchemaLst",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -209,6 +228,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
 
             migrationBuilder.CreateTable(
                 name: "SCIMRepresentationAttributeLst",
+                schema: "scim",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -233,17 +253,20 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                     table.ForeignKey(
                         name: "FK_SCIMRepresentationAttributeLst_SCIMRepresentationAttributeLst_ParentAttributeId",
                         column: x => x.ParentAttributeId,
+                        principalSchema: "scim",
                         principalTable: "SCIMRepresentationAttributeLst",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_SCIMRepresentationAttributeLst_SCIMRepresentationLst_RepresentationId",
                         column: x => x.RepresentationId,
+                        principalSchema: "scim",
                         principalTable: "SCIMRepresentationLst",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_SCIMRepresentationAttributeLst_SCIMSchemaAttribute_SchemaAttributeId",
                         column: x => x.SchemaAttributeId,
+                        principalSchema: "scim",
                         principalTable: "SCIMSchemaAttribute",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -251,46 +274,55 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProvisioningConfigurationHistory_ProvisioningConfigurationId",
+                schema: "scim",
                 table: "ProvisioningConfigurationHistory",
                 column: "ProvisioningConfigurationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProvisioningConfigurationRecord_ProvisioningConfigurationId",
+                schema: "scim",
                 table: "ProvisioningConfigurationRecord",
                 column: "ProvisioningConfigurationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProvisioningConfigurationRecord_ProvisioningConfigurationRecordId",
+                schema: "scim",
                 table: "ProvisioningConfigurationRecord",
                 column: "ProvisioningConfigurationRecordId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SCIMRepresentationAttributeLst_ParentAttributeId",
+                schema: "scim",
                 table: "SCIMRepresentationAttributeLst",
                 column: "ParentAttributeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SCIMRepresentationAttributeLst_RepresentationId",
+                schema: "scim",
                 table: "SCIMRepresentationAttributeLst",
                 column: "RepresentationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SCIMRepresentationAttributeLst_SchemaAttributeId",
+                schema: "scim",
                 table: "SCIMRepresentationAttributeLst",
                 column: "SchemaAttributeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SCIMRepresentationSCIMSchema_SchemasId",
+                schema: "scim",
                 table: "SCIMRepresentationSCIMSchema",
                 column: "SchemasId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SCIMSchemaAttribute_SchemaId",
+                schema: "scim",
                 table: "SCIMSchemaAttribute",
                 column: "SchemaId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SCIMSchemaExtension_SCIMSchemaId",
+                schema: "scim",
                 table: "SCIMSchemaExtension",
                 column: "SCIMSchemaId");
         }
@@ -299,34 +331,44 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ProvisioningConfigurationHistory");
+                name: "ProvisioningConfigurationHistory",
+                schema: "scim");
 
             migrationBuilder.DropTable(
-                name: "ProvisioningConfigurationRecord");
+                name: "ProvisioningConfigurationRecord",
+                schema: "scim");
 
             migrationBuilder.DropTable(
-                name: "SCIMAttributeMappingLst");
+                name: "SCIMAttributeMappingLst",
+                schema: "scim");
 
             migrationBuilder.DropTable(
-                name: "SCIMRepresentationAttributeLst");
+                name: "SCIMRepresentationAttributeLst",
+                schema: "scim");
 
             migrationBuilder.DropTable(
-                name: "SCIMRepresentationSCIMSchema");
+                name: "SCIMRepresentationSCIMSchema",
+                schema: "scim");
 
             migrationBuilder.DropTable(
-                name: "SCIMSchemaExtension");
+                name: "SCIMSchemaExtension",
+                schema: "scim");
 
             migrationBuilder.DropTable(
-                name: "ProvisioningConfigurations");
+                name: "ProvisioningConfigurations",
+                schema: "scim");
 
             migrationBuilder.DropTable(
-                name: "SCIMSchemaAttribute");
+                name: "SCIMSchemaAttribute",
+                schema: "scim");
 
             migrationBuilder.DropTable(
-                name: "SCIMRepresentationLst");
+                name: "SCIMRepresentationLst",
+                schema: "scim");
 
             migrationBuilder.DropTable(
-                name: "SCIMSchemaLst");
+                name: "SCIMSchemaLst",
+                schema: "scim");
         }
     }
 }

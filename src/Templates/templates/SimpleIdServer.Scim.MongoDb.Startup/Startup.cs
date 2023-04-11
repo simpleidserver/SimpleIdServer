@@ -1,11 +1,13 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using AspNetCore.Authentication.ApiKey;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleIdServer.Scim.Domains;
+using SimpleIdServer.Scim.MongoDb.Startup.Services.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -38,17 +40,13 @@ namespace SimpleIdServer.Scim.MongoDb.Startup
                 o.AddSCIMValueProviders();
             }).AddNewtonsoftJson(o => { });
             services.AddLogging();
-            // services.AddAuthorization(opts => opts.AddDefaultSCIMAuthorizationPolicy());
-            services.AddAuthorization(opts =>
-            {
-                opts.AddPolicy("QueryScimResource", p => p.RequireAssertion(_ => true));
-                opts.AddPolicy("AddScimResource", p => p.RequireAssertion(_ => true));
-                opts.AddPolicy("DeleteScimResource", p => p.RequireAssertion(_ => true));
-                opts.AddPolicy("UpdateScimResource", p => p.RequireAssertion(_ => true));
-                opts.AddPolicy("BulkScimResource", p => p.RequireAssertion(_ => true));
-                opts.AddPolicy("UserAuthenticated", p => p.RequireAssertion(_ => true));
-                opts.AddPolicy("Provison", p => p.RequireAssertion(_ => true));
-            });
+            services.AddAuthentication(ApiKeyDefaults.AuthenticationScheme)
+                .AddApiKeyInHeaderOrQueryParams<ApiKeyProvider>(options =>
+                {
+                    options.Realm = "Sample Web API";
+                    options.KeyName = "Authorization";
+                });
+            services.AddAuthorization(opts => opts.AddDefaultSCIMAuthorizationPolicy());
             services.AddSIDScim(_ =>
             {
                 _.IgnoreUnsupportedCanonicalValues = false;

@@ -8,13 +8,14 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.3" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.7" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.0 " />
 	<PackageReference Include="SimpleIdServer.Scim" Version="3.0.*-*" />
 	<PackageReference Include="SimpleIdServer.Scim.Persistence.EF" Version="3.0.*-*" />
 	<PackageReference Include="SimpleIdServer.Scim.SwashbuckleV6" Version="3.0.*-*" />
+	<PackageReference Include="AspNetCore.Authentication.ApiKey" Version="7.0.0" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Migrations\" />

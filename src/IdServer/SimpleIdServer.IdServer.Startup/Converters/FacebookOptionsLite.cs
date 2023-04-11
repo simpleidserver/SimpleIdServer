@@ -8,9 +8,9 @@ namespace SimpleIdServer.IdServer.Startup.Converters
 {
     public class FacebookOptionsLite : IDynamicAuthenticationOptions<FacebookOptions>
     {
-        [VisibleProperty("AppId")]
+        [SimpleIdServer.IdServer.Serializer.VisibleProperty("AppId")]
         public string AppId { get; set; }
-        [VisibleProperty("AppSecret")]
+        [SimpleIdServer.IdServer.Serializer.VisibleProperty("AppSecret")]
         public string AppSecret { get; set; }
 
         public FacebookOptions Convert() => new FacebookOptions

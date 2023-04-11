@@ -94,6 +94,16 @@ The IdentityServer website UI uses Radzen.
 
 ![IdentityServerWebsite](images/IdentityServerWebsite-2.png)
 
+## SCIM Security
+
+By default SCIM is configured to use API KEY authentication.
+Any clients who want to execute one operation must pass one of those keys into `HTTP HEADER Authorization Bearer`.
+
+| Owner    | Value                                |
+| -------- | ------------------------------------ |
+| IdServer | ba521b3b-02f7-4a37-b03c-58f713bf88e7 |
+| AzureAd  | 1595a72a-2804-495d-8a8a-2c861e7a736a |
+
 ## Create SCIM project with EF support
 
 Create a web project named `ScimEF` with the `SimpleIdServer.Scim.Persistence.EF` package installed and Entity Framework (EF) configured to use SQLServer.
