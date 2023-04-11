@@ -91,7 +91,7 @@ By default, there is one administrator account configured. It is possible to acc
 
 The IdentityServer UI uses Bootstrap 5.
 
-![IdentityServer](images/docs/documentation/gettingstarted/images/IdentityServer-1.png)
+![IdentityServer](docs/documentation/gettingstarted/images/IdentityServer-1.png)
 
 ## Create IdentityServer website project
 
@@ -117,7 +117,7 @@ Using the website, you can perform configurations of users and clients.
 
 The IdentityServer website UI uses Radzen.
 
-![IdentityServerWebsite](images/docs/documentation/gettingstarted/images/IdentityServerWebsite-2.png)
+![IdentityServerWebsite](docs/documentation/gettingstarted/images/IdentityServerWebsite-2.png)
 
 ## SCIM Security
 
