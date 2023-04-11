@@ -117,7 +117,7 @@ cd src/SCIMEF
 dotnet run --urls=http://localhost:5003
 ```
 
-Now the SCIM server is running, you can check its Schemas endpoint on [http://localhost:5003/Schemas][http://localhost:5003/Schemas].
+Now the SCIM server is running, you can check its Schemas endpoint on [http://localhost:5003/Schemas](http://localhost:5003/Schemas).
 
 ## Create SCIM project with MongoDB support
 
@@ -142,7 +142,7 @@ cd src/ScimMongoDB
 dotnet run --urls=http://localhost:5003
 ```
 
-Now the SCIM server is running, you can check its Schemas endpoint on [http://localhost:5003/Schemas][http://localhost:5003/Schemas].
+Now the SCIM server is running, you can check its Schemas endpoint on [http://localhost:5003/Schemas](http://localhost:5003/Schemas).
 
 # Running with docker
 

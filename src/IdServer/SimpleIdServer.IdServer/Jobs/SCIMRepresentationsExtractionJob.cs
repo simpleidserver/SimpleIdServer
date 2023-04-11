@@ -33,11 +33,13 @@ namespace SimpleIdServer.IdServer.Jobs
         {
             using (var scimClient = new SCIMClient(options.SCIMEdp))
             {
+
+                var accessToken = await GetAccessToken(options);
                 var searchUsers = await scimClient.SearchUsers(new SearchRequest
                 {
                     Count = options.Count,
                     StartIndex = 1
-                }, null, CancellationToken.None);
+                }, accessToken, CancellationToken.None);
                 var filterUsers = await FilterUsers(searchUsers.Item1);
                 ExtractUsers(filterUsers, 1, destinationFolder, identityProvisioning.Definition);
                 yield return filterUsers.Select(r => new ExtractedRepresentation
@@ -55,7 +57,7 @@ namespace SimpleIdServer.IdServer.Jobs
                     {
                         Count = count,
                         StartIndex = currentPage * count
-                    }, null, CancellationToken.None);
+                    }, accessToken, CancellationToken.None);
                     var newFilterUsers = FilterUsers(newSearchUsers.Item1).Result;
                     ExtractUsers(newFilterUsers, currentPage, destinationFolder, identityProvisioning.Definition);
                     yield return newFilterUsers.Select(r => new ExtractedRepresentation
@@ -76,6 +78,17 @@ namespace SimpleIdServer.IdServer.Jobs
                 var er = extractedRepresentations.SingleOrDefault(er => er.ExternalId == r.Id);
                 return er == null || er.Version != r.Meta.Version.ToString();
             }).ToList();
+        }
+
+        private Task<string> GetAccessToken(SCIMRepresentationsExtractionJobOptions options)
+        {
+            switch(options.AuthenticationType)
+            {
+                case ClientAuthenticationTypes.APIKEY:
+                    return Task.FromResult(options.ApiKey);
+                default:
+                    throw new NotImplementedException($"Authentication {options.AuthenticationType} is not supported");
+            }
         }
 
         private void ExtractUsers(IEnumerable<RepresentationResult> resources, int currentPage, string destinationFolder, IdentityProvisioningDefinition definition)

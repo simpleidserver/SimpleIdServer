@@ -9,11 +9,21 @@ namespace SimpleIdServer.IdServer.Jobs
     {
         [VisibleProperty("SCIMEdp", "SCIM Endpoint")]
         public string SCIMEdp { get; set; }
+        [VisibleProperty("Authentication Type", "Select the type of authentication")]
+        public ClientAuthenticationTypes AuthenticationType { get; set; }
+        [VisibleProperty("API Key", "Value is present in the appsettings.json file")]
+        public string ApiKey { get; set; }
         [VisibleProperty("ClientId", "Client Identifier")]
         public string ClientId { get; set; }
         [VisibleProperty("ClientSecret", "Client Secret")]
         public string ClientSecret { get; set; }
         [VisibleProperty("Count", "Maximum number of records returned by the SCIM endpoint")]
         public int Count { get; set; }
+    }
+
+    public enum ClientAuthenticationTypes
+    {
+        APIKEY = 0,
+        CLIENT_SECRET_POST = 1
     }
 }

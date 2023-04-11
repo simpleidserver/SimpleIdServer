@@ -94,7 +94,9 @@ namespace SimpleIdServer.IdServer.Startup
             IdentityProvisioningBuilder.Create(Scim, "SCIM", "SCIM", new SCIMRepresentationsExtractionJobOptions
             {
                 Count = 1,
-                SCIMEdp = scimEdp
+                SCIMEdp = scimEdp,
+                AuthenticationType = ClientAuthenticationTypes.APIKEY,
+                ApiKey = "ba521b3b-02f7-4a37-b03c-58f713bf88e7"
             }).Build(),
             IdentityProvisioningBuilder.Create(Ldap, "LDAP", "LDAP", new LDAPRepresentationsExtractionJobOptions
             {

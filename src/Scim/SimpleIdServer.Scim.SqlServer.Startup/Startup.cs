@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using AspNetCore.Authentication.ApiKey;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Persistence.EF;
 using SimpleIdServer.Scim.SqlServer.Startup.Consumers;
+using SimpleIdServer.Scim.SqlServer.Startup.Services;
 using SimpleIdServer.Scim.SwashbuckleV6;
 using System;
 using System.IO;
@@ -34,26 +36,24 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
         public void ConfigureServices(IServiceCollection services)
         {
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
+            var apiKeys = Configuration.GetSection(nameof(ApiKeysConfiguration)).Get<ApiKeysConfiguration>();
             services.AddMvc(o =>
             {
                 o.EnableEndpointRouting = false;
                 o.AddSCIMValueProviders();
             }).AddNewtonsoftJson(o => { });
+            services.AddSingleton(apiKeys);
             services.AddLogging(o =>
             {
                 o.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
             });
-            // services.AddAuthorization(opts => opts.AddDefaultSCIMAuthorizationPolicy());
-            services.AddAuthorization(opts =>
-            {
-                opts.AddPolicy("QueryScimResource", p => p.RequireAssertion(_ => true));
-                opts.AddPolicy("AddScimResource", p => p.RequireAssertion(_ => true));
-                opts.AddPolicy("DeleteScimResource", p => p.RequireAssertion(_ => true));
-                opts.AddPolicy("UpdateScimResource", p => p.RequireAssertion(_ => true));
-                opts.AddPolicy("BulkScimResource", p => p.RequireAssertion(_ => true));
-                opts.AddPolicy("UserAuthenticated", p => p.RequireAssertion(_ => true));
-                opts.AddPolicy("Provison", p => p.RequireAssertion(_ => true));
-            });
+            services.AddAuthentication(ApiKeyDefaults.AuthenticationScheme)
+                .AddApiKeyInHeaderOrQueryParams<ApiKeyProvider>(options =>
+                {
+                    options.Realm = "Sample Web API";
+                    options.KeyName = "Authorization";
+                });
+            services.AddAuthorization(opts => opts.AddDefaultSCIMAuthorizationPolicy());
             services.AddSwaggerGen(c =>
             {
                 c.SchemaFilter<EnumDocumentFilter>();

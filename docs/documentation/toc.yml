@@ -24,10 +24,22 @@
         href: idserver/confidentialclientciba.md
       - name: FAPI Grant Management
         href: idserver/fapigrantmanagement.md
+- name: SCIM
+  items:
+   - name: Configure Azure AD Provisioning 
+     href: scim/azuread.md
 - name: External Identity Providers
   items:
    - name: Add Identity Provider
      href: identityproviders/add.md
+- name: Identity Provisioning
+  items:
+   - name: Introduction
+     href: identityprovisioning/index.md
+   - name: LDAP
+     href: identityprovisioning/ldap.md
+   - name: SCIM
+     href: identityprovisioning/scim.md
 - name: MTLS
   items:
    - name: Generate Certificate Authority
