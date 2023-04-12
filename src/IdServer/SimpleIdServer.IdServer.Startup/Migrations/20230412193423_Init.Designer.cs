@@ -12,7 +12,7 @@ using SimpleIdServer.IdServer.Store;
 namespace SimpleIdServer.IdServer.Startup.Migrations
 {
     [DbContext(typeof(StoreDbContext))]
-    [Migration("20230407194347_Init")]
+    [Migration("20230412193423_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.4")
+                .HasAnnotation("ProductVersion", "7.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -128,6 +128,51 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.HasIndex("ScopesId");
 
                     b.ToTable("ClientScope");
+                });
+
+            modelBuilder.Entity("GroupRealm", b =>
+                {
+                    b.Property<string>("GroupsId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RealmsName")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("GroupsId", "RealmsName");
+
+                    b.HasIndex("RealmsName");
+
+                    b.ToTable("GroupRealm");
+                });
+
+            modelBuilder.Entity("GroupScope", b =>
+                {
+                    b.Property<string>("GroupsId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RolesId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("GroupsId", "RolesId");
+
+                    b.HasIndex("RolesId");
+
+                    b.ToTable("GroupScope");
+                });
+
+            modelBuilder.Entity("GroupUser", b =>
+                {
+                    b.Property<string>("GroupsId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UsersId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("GroupsId", "UsersId");
+
+                    b.HasIndex("UsersId");
+
+                    b.ToTable("GroupUser");
                 });
 
             modelBuilder.Entity("IdentityProvisioningRealm", b =>
@@ -981,6 +1026,38 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.HasKey("ExternalId");
 
                     b.ToTable("ExtractedRepresentations");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Group", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FullPath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ParentGroupId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("UpdateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParentGroupId");
+
+                    b.ToTable("Groups");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.IdentityProvisioning", b =>
@@ -1913,6 +1990,51 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("GroupRealm", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Group", null)
+                        .WithMany()
+                        .HasForeignKey("GroupsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Realm", null)
+                        .WithMany()
+                        .HasForeignKey("RealmsName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GroupScope", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Group", null)
+                        .WithMany()
+                        .HasForeignKey("GroupsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Scope", null)
+                        .WithMany()
+                        .HasForeignKey("RolesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GroupUser", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Group", null)
+                        .WithMany()
+                        .HasForeignKey("GroupsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SimpleIdServer.IdServer.Domains.User", null)
+                        .WithMany()
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("IdentityProvisioningRealm", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.IdentityProvisioning", null)
@@ -2053,6 +2175,15 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Group", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Group", "ParentGroup")
+                        .WithMany("Children")
+                        .HasForeignKey("ParentGroupId");
+
+                    b.Navigation("ParentGroup");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.IdentityProvisioning", b =>
@@ -2307,6 +2438,11 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Consent", b =>
                 {
                     b.Navigation("Scopes");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Group", b =>
+                {
+                    b.Navigation("Children");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.IdentityProvisioning", b =>

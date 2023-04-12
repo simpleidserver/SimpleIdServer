@@ -156,6 +156,18 @@
   <data name="ExternalAuthProviderUnlinked" xml:space="preserve">
     <value>External authentication provider has been unlinked</value>
   </data>
+  <data name="GroupAdded" xml:space="preserve">
+    <value>Group has been added</value>
+  </data>
+  <data name="GroupAlreadyExists" xml:space="preserve">
+    <value>Group with the name {0} already exists</value>
+  </data>
+  <data name="GroupMemberAdded" xml:space="preserve">
+    <value>Member has been added</value>
+  </data>
+  <data name="GroupMembersRemoved" xml:space="preserve">
+    <value>Selected members have been removed</value>
+  </data>
   <data name="IdentityProvisioningLaunched" xml:space="preserve">
     <value>Identity Provisioning is launched</value>
   </data>
@@ -255,6 +267,9 @@
   <data name="SelectedGrantsRemoved" xml:space="preserve">
     <value>Selected grants have been rejected</value>
   </data>
+  <data name="SelectedGroupsRemoved" xml:space="preserve">
+    <value>Selected groups have been removed</value>
+  </data>
   <data name="SelectedIdentityProvisioningMappingRulesRemoved" xml:space="preserve">
     <value>Mapping rules have been removed</value>
   </data>
@@ -281,6 +296,9 @@
   </data>
   <data name="UnknownClient" xml:space="preserve">
     <value>The client '{0}' doesn't exist</value>
+  </data>
+  <data name="UnknownGroup" xml:space="preserve">
+    <value>Group doesn't exist</value>
   </data>
   <data name="UnknownIdentityProvisioning" xml:space="preserve">
     <value>The identity provisioning doesn't exist</value>

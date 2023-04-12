@@ -224,6 +224,28 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Groups",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FullPath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ParentGroupId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Groups", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Groups_Groups_ParentGroupId",
+                        column: x => x.ParentGroupId,
+                        principalTable: "Groups",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "IdentityProvisioningDefinitions",
                 columns: table => new
                 {
@@ -643,6 +665,30 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "GroupRealm",
+                columns: table => new
+                {
+                    GroupsId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RealmsName = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GroupRealm", x => new { x.GroupsId, x.RealmsName });
+                    table.ForeignKey(
+                        name: "FK_GroupRealm_Groups_GroupsId",
+                        column: x => x.GroupsId,
+                        principalTable: "Groups",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_GroupRealm_Realms_RealmsName",
+                        column: x => x.RealmsName,
+                        principalTable: "Realms",
+                        principalColumn: "Name",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ImportSummaries",
                 columns: table => new
                 {
@@ -708,6 +754,30 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     table.ForeignKey(
                         name: "FK_ClientScope_Scopes_ScopesId",
                         column: x => x.ScopesId,
+                        principalTable: "Scopes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GroupScope",
+                columns: table => new
+                {
+                    GroupsId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RolesId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GroupScope", x => new { x.GroupsId, x.RolesId });
+                    table.ForeignKey(
+                        name: "FK_GroupScope_Groups_GroupsId",
+                        column: x => x.GroupsId,
+                        principalTable: "Groups",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_GroupScope_Scopes_RolesId",
+                        column: x => x.RolesId,
                         principalTable: "Scopes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -1104,6 +1174,30 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "GroupUser",
+                columns: table => new
+                {
+                    GroupsId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UsersId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GroupUser", x => new { x.GroupsId, x.UsersId });
+                    table.ForeignKey(
+                        name: "FK_GroupUser_Groups_GroupsId",
+                        column: x => x.GroupsId,
+                        principalTable: "Groups",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_GroupUser_Users_UsersId",
+                        column: x => x.UsersId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RealmUser",
                 columns: table => new
                 {
@@ -1342,6 +1436,26 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_GroupRealm_RealmsName",
+                table: "GroupRealm",
+                column: "RealmsName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Groups_ParentGroupId",
+                table: "Groups",
+                column: "ParentGroupId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GroupScope_RolesId",
+                table: "GroupScope",
+                column: "RolesId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GroupUser_UsersId",
+                table: "GroupUser",
+                column: "UsersId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_IdentityProvisioningDefinitionProperty_IdentityProvisioningDefinitionName",
                 table: "IdentityProvisioningDefinitionProperty",
                 column: "IdentityProvisioningDefinitionName");
@@ -1512,6 +1626,15 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 name: "ExtractedRepresentations");
 
             migrationBuilder.DropTable(
+                name: "GroupRealm");
+
+            migrationBuilder.DropTable(
+                name: "GroupScope");
+
+            migrationBuilder.DropTable(
+                name: "GroupUser");
+
+            migrationBuilder.DropTable(
                 name: "IdentityProvisioningDefinitionProperty");
 
             migrationBuilder.DropTable(
@@ -1588,6 +1711,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
             migrationBuilder.DropTable(
                 name: "CertificateAuthorities");
+
+            migrationBuilder.DropTable(
+                name: "Groups");
 
             migrationBuilder.DropTable(
                 name: "SerializedFileKeys");

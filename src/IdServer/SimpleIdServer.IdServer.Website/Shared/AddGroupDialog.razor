@@ -1,0 +1,42 @@
+﻿@using SimpleIdServer.IdServer.Website.Stores.GroupStore;
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject IDispatcher dispatcher
+@inject IState<UpdateGroupState> updateGroupState
+
+<RadzenTemplateForm Submit=@AddGroup TItem="AddGroupForm" Data=@addGroup>
+    @if(!updateGroupState.Value.IsUpdating && !string.IsNullOrWhiteSpace(updateGroupState.Value.ErrorMessage))
+    {
+        <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@updateGroupState.Value.ErrorMessage</RadzenAlert>
+    }
+
+    <!-- Name -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+        <RadzenTextBox Name="Name" @bind-Value="@addGroup.Name" Class="w-100"></RadzenTextBox>
+        <RadzenRequiredValidator Component="Name" Text="Name is required"></RadzenRequiredValidator>
+    </div>
+    <!-- Description -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Description</RadzenText>
+        <RadzenTextArea Name="Description" @bind-Value="@addGroup.Description" class="w-100"></RadzenTextArea>
+    </div>
+    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateGroupState.Value.IsUpdating ? "Adding..." : "Add")" Disabled=updateGroupState.Value.IsUpdating />
+</RadzenTemplateForm>
+
+@code {
+    [Parameter]
+    public string ParentId { get; set; }
+
+    record AddGroupForm
+    {
+        public string Name { get; set; }
+        public string Description { get; set; }
+    }
+
+    AddGroupForm addGroup = new AddGroupForm();
+
+    void AddGroup(AddGroupForm grp)
+    {
+        dispatcher.Dispatch(new AddGroupAction { Description = grp.Description, Name = grp.Name, ParentId = ParentId });
+    }
+}

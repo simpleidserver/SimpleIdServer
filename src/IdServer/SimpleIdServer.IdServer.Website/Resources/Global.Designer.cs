@@ -178,6 +178,42 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Group has been added.
+        /// </summary>
+        public static string GroupAdded {
+            get {
+                return ResourceManager.GetString("GroupAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Group with the name {0} already exists.
+        /// </summary>
+        public static string GroupAlreadyExists {
+            get {
+                return ResourceManager.GetString("GroupAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Member has been added.
+        /// </summary>
+        public static string GroupMemberAdded {
+            get {
+                return ResourceManager.GetString("GroupMemberAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Selected members have been removed.
+        /// </summary>
+        public static string GroupMembersRemoved {
+            get {
+                return ResourceManager.GetString("GroupMembersRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Identity Provisioning is launched.
         /// </summary>
         public static string IdentityProvisioningLaunched {
@@ -475,6 +511,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Selected groups have been removed.
+        /// </summary>
+        public static string SelectedGroupsRemoved {
+            get {
+                return ResourceManager.GetString("SelectedGroupsRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Mapping rules have been removed.
         /// </summary>
         public static string SelectedIdentityProvisioningMappingRulesRemoved {
@@ -552,6 +597,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string UnknownClient {
             get {
                 return ResourceManager.GetString("UnknownClient", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Group doesn&apos;t exist.
+        /// </summary>
+        public static string UnknownGroup {
+            get {
+                return ResourceManager.GetString("UnknownGroup", resourceCulture);
             }
         }
         

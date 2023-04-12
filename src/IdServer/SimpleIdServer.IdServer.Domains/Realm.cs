@@ -19,5 +19,6 @@ namespace SimpleIdServer.IdServer.Domains
         public ICollection<CertificateAuthority> CertificateAuthorities { get; set; } = new List<CertificateAuthority>();
         public ICollection<IdentityProvisioning> IdentityProvisioningLst { get; set; } = new List<IdentityProvisioning>();
         public ICollection<ImportSummary> ImportSummaries { get; set; } = new List<ImportSummary>();
+        public ICollection<Group> Groups { get; set; } = new List<Group>();
     }
 }

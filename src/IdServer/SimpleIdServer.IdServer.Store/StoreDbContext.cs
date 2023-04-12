@@ -33,6 +33,7 @@ namespace SimpleIdServer.IdServer.Store
         public DbSet<UserClaim> UserClaims { get; set; }
         public DbSet<ExtractedRepresentation> ExtractedRepresentations { get; set; }
         public DbSet<ImportSummary> ImportSummaries { get; set; }
+        public DbSet<Group> Groups { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -81,6 +82,7 @@ namespace SimpleIdServer.IdServer.Store
             builder.ApplyConfiguration(new ExtractedRepresentationConfiguration());
             builder.ApplyConfiguration(new RealmUserConfiguration());
             builder.ApplyConfiguration(new ImportSummaryConfiguration());
+            builder.ApplyConfiguration(new GroupConfiguration());
         }
     }
 }

@@ -30,7 +30,8 @@ namespace SimpleIdServer.IdServer.Domains
         public ICollection<ApiResource> ApiResources { get; set; } = new List<ApiResource>();
         public ICollection<Consent> Consents { get; set; } = new List<Consent>();
         public ICollection<Client> Clients { get; set; } = new List<Client>();
-        public ICollection<Realm> Realms { get; set; } = new List<Realm>(); 
+        public ICollection<Realm> Realms { get; set; } = new List<Realm>();
+        public ICollection<Group> Groups { get; set; } = new List<Group>();
 
         public static Scope Create(string scopeName)
         {

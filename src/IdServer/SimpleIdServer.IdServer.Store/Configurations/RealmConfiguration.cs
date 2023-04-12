@@ -13,6 +13,7 @@ namespace SimpleIdServer.IdServer.Store.Configurations
             builder.HasKey(r => r.Name);
             builder.HasMany(u => u.Users).WithOne(u => u.Realm).HasForeignKey(u => u.RealmsName);
             builder.HasMany(u => u.ImportSummaries).WithOne(u => u.Realm).HasForeignKey(u => u.RealmName);
+            builder.HasMany(u => u.Groups).WithMany(u => u.Realms);
         }
     }
 }

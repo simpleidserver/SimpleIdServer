@@ -1,0 +1,89 @@
+﻿@page "/groups/{id}/{action}"
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.GroupStore;
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
+@inject IDispatcher dispatcher
+@inject DialogService dialogService
+@inject NavigationManager navigationManager
+@inject NotificationService notificationService
+@inject IState<GroupState> groupState
+
+@if(groupState.Value.IsLoading)
+{
+    <RadzenText class="mt-3 mb-3" Text="Wait..." TextStyle="TextStyle.DisplayH6" />
+}
+else
+{
+    <RadzenBreadCrumb>
+        <RadzenBreadCrumbItem Path="/groups" Text="Groups" />
+        <RadzenBreadCrumbItem Text="Group details" />
+    </RadzenBreadCrumb>
+
+    <RadzenText class="mt-3 mb-3" Text="@groupState.Value.Group.Name" TextStyle="TextStyle.DisplayH6" />
+
+
+    <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
+        <Tabs>
+            <RadzenTabsItem Text="Children">
+                <GroupChildren Group="@groupState.Value.Group"></GroupChildren>
+            </RadzenTabsItem>
+        </Tabs>
+    </RadzenTabs>
+}
+
+@code {
+    Dictionary<string, int> mappingActionNameToIndex = new Dictionary<string, int>
+    {
+        { "children", 0 }
+    };
+
+    [Parameter]
+    public string id { get; set; } = null!;
+
+    [Parameter]
+    public string? action { get; set; } = null;
+
+    int selectedIndex = 0;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+        {
+            SubscribeToAction<SelectRealmSuccessAction>((act) =>
+            {
+                navigationManager.NavigateTo("/groups");
+            });
+            SubscribeToAction<AddGroupSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.GroupMemberAdded });
+                dialogService.Close();
+            });
+            SubscribeToAction<RemoveSelectedGroupsSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.GroupMembersRemoved });
+            });
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (string.IsNullOrWhiteSpace(id)) return;
+        if (!string.IsNullOrWhiteSpace(action) && mappingActionNameToIndex.ContainsKey(action))
+            selectedIndex = mappingActionNameToIndex[action];
+        SubscribeToAction<GetGroupFailureAction>((act) =>
+        {
+            notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
+            StateHasChanged();
+        });
+        dispatcher.Dispatch(new GetGroupAction { Id = id });
+    }
+
+    void OnChange(int index)
+    {
+        var rec = mappingActionNameToIndex.Single(kvp => kvp.Value == index);
+        navigationManager.NavigateTo($"/groups/{id}/{rec.Key}");
+    }
+}
