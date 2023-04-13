@@ -1,9 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
-using NetTopologySuite.Index.Bintree;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Website.Stores.ClientStore;
 using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
 
 namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
@@ -132,13 +130,45 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
         #region GroupState
 
         [ReducerMethod]
-        public static GroupState ReduceGetGroupAction(GroupState state, GetGroupAction act) => new(true, null);
+        public static GroupState ReduceGetGroupAction(GroupState state, GetGroupAction act) => new(true, null, null);
 
         [ReducerMethod]
-        public static GroupState ReduceGetGroupSuccessAction(GroupState state, GetGroupSuccessAction act) => new(false, act.Group);
+        public static GroupState ReduceGetGroupSuccessAction(GroupState state, GetGroupSuccessAction act) => new(false, act.Group, act.RootGroup);
 
         [ReducerMethod]
-        public static GroupState ReduceGetGroupFailureAction(GroupState state, GetGroupFailureAction act) => new(false, null);
+        public static GroupState ReduceGetGroupFailureAction(GroupState state, GetGroupFailureAction act) => new(false, null, null);
+
+        [ReducerMethod]
+        public static GroupState ReduceAddGroupSuccessAction(GroupState state, AddGroupSuccessAction act)
+        {
+            if (string.IsNullOrWhiteSpace(act.ParentGroupId) || state.Group.Id != act.ParentGroupId) return state;
+            var children = state.Group.Children.ToList();
+            children.Add(new Group
+            {
+                Id = act.Id,
+                Name = act.Name,
+                Description= act.Description
+            });
+            var group = state.Group;
+            group.Children = children;
+            return state with
+            {
+                Group = group
+            };
+        }
+
+        [ReducerMethod]
+        public static GroupState ReduceRemoveSelectedGroupsSuccessAction(GroupState state, RemoveSelectedGroupsSuccessAction act)
+        {
+            var group = state.Group;
+            var children = group.Children.ToList();
+            children = children.Where(c => !act.FullPathLst.Contains(c.FullPath)).ToList();
+            group.Children = children;
+            return state with
+            {
+                Group = group
+            };
+        }
 
         #endregion
 
@@ -214,6 +244,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
             return state with
             {
                 Members = members,
+                Count = members.Count,
                 IsLoading = false
             };
         }

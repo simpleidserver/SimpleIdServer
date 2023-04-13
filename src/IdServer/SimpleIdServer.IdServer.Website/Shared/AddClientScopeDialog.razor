@@ -27,9 +27,6 @@
                 ColumnWidth="300px">
     <Columns>
         <RadzenDataGridColumn TItem="EditableClientScope" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
-            <HeaderTemplate>
-                <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
-            </HeaderTemplate>
             <Template Context="data">
                 @if(!data.IsPresent)
                 {
@@ -62,7 +59,6 @@
 
 @code {
     RadzenDataGrid<EditableClientScope> grid;
-    bool selectAll = false;
     [Parameter]
     public Client Client { get; set; } = null!;
     [Parameter]
@@ -97,12 +93,6 @@
     void ToggleChanged(bool isSelected, EditableClientScope scope)
     {
         var act = new ToggleScopeSelectionAction { IsSelected = isSelected, ScopeName = scope.Value.Name };
-        dispatcher.Dispatch(act);
-    }
-
-    void ToggleAll(bool isSelected)
-    {
-        var act = new ToggleAllScopeSelectionAction { IsSelected = isSelected };
         dispatcher.Dispatch(act);
     }
 

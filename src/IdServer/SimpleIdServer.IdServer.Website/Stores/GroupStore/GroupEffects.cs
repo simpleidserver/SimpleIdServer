@@ -100,14 +100,19 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
         [EffectMethod]
         public async Task Handle(GetGroupAction action, IDispatcher dispatcher)
         {
-            var grp = await _groupRepository.Query().Include(m => m.Children).Include(m => m.Roles).SingleOrDefaultAsync(g => g.Id== action.Id, CancellationToken.None);
+            var grp = await _groupRepository.Query().Include(m => m.Children).Include(m => m.Roles).AsNoTracking().SingleOrDefaultAsync(g => g.Id== action.Id, CancellationToken.None);
             if(grp == null)
             {
                 dispatcher.Dispatch(new GetGroupFailureAction { ErrorMessage =  Resources.Global.UnknownGroup });
                 return;
             }
 
-            dispatcher.Dispatch(new GetGroupSuccessAction { Group = grp });
+            var rootGroup = grp;
+            var fullPath = grp.FullPath;
+            var splittedFullPath = fullPath.Split('.');
+            if(splittedFullPath.Count() > 1)
+                rootGroup = await _groupRepository.Query().Include(m => m.Children).AsNoTracking().SingleAsync(g => g.FullPath == splittedFullPath[0], CancellationToken.None);
+            dispatcher.Dispatch(new GetGroupSuccessAction { Group = grp, RootGroup = rootGroup });
         }
 
         [EffectMethod]
@@ -209,6 +214,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
     public class GetGroupSuccessAction
     {
         public Group Group { get; set; }
+        public Group RootGroup { get; set; }
     }
 
     public class GetGroupFailureAction

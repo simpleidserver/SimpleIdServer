@@ -10,14 +10,16 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
     {
         public GroupState() { }
 
-        public GroupState(bool isLoading, Group? group)
+        public GroupState(bool isLoading, Group? group, Group? rootGroup)
         {
             IsLoading = isLoading;
             Group = group;
+            RootGroup = rootGroup;
         }
 
 
         public bool IsLoading { get; set; } = true;
         public Group? Group { get; set; } = null;
+        public Group? RootGroup { get; set; } = null;
     }
 }

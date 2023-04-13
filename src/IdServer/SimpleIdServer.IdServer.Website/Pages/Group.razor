@@ -1,5 +1,7 @@
 ﻿@page "/groups/{id}/{action}"
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@using Microsoft.EntityFrameworkCore;
+@using SimpleIdServer.IdServer.Store;
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.GroupStore;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
@@ -7,6 +9,7 @@
 @inject DialogService dialogService
 @inject NavigationManager navigationManager
 @inject NotificationService notificationService
+@inject IGroupRepository groupRepository
 @inject IState<GroupState> groupState
 
 @if(groupState.Value.IsLoading)
@@ -22,19 +25,38 @@ else
 
     <RadzenText class="mt-3 mb-3" Text="@groupState.Value.Group.Name" TextStyle="TextStyle.DisplayH6" />
 
-    <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
-        <Tabs>
-            <RadzenTabsItem Text="Children">
-                <GroupChildren Group="@groupState.Value.Group"></GroupChildren>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="Roles">
-                <GroupRoles Group="@groupState.Value.Group"></GroupRoles>
-            </RadzenTabsItem>
-        </Tabs>
-    </RadzenTabs>
+    <RadzenSplitter>
+        <RadzenSplitterPane Size="10%">
+            <RadzenTree Expand="@OnExpand" Data=@groups>
+                <RadzenTreeLevel TextProperty="Name" Template="@treeTemplate" />
+            </RadzenTree>
+        </RadzenSplitterPane>
+        <RadzenSplitterPane>
+            <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
+                <Tabs>
+                    <RadzenTabsItem Text="Children">
+                        <GroupChildren Group="@groupState.Value.Group"></GroupChildren>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="Roles">
+                        <GroupRoles Group="@groupState.Value.Group"></GroupRoles>
+                    </RadzenTabsItem>
+                </Tabs>
+            </RadzenTabs>
+        </RadzenSplitterPane>
+    </RadzenSplitter>
 }
 
 @code {
+    ICollection<SimpleIdServer.IdServer.Domains.Group> groups;
+    RenderFragment<RadzenTreeItem> treeTemplate = (context) => builder =>
+    {
+        var grp = context.Value as SimpleIdServer.IdServer.Domains.Group;
+        builder.OpenComponent<RadzenLink>(0);
+        builder.AddAttribute(1, "Text", grp.Name);
+        builder.AddAttribute(2, "Path", $"/groups/{grp.Id}/children");
+        builder.CloseComponent();
+    };
+
     Dictionary<string, int> mappingActionNameToIndex = new Dictionary<string, int>
     {
         { "children", 0 },
@@ -58,14 +80,20 @@ else
             {
                 navigationManager.NavigateTo("/groups");
             });
+            SubscribeToAction<GetGroupSuccessAction>((act) =>
+            {
+                groups.Add(act.RootGroup);
+            });
             SubscribeToAction<AddGroupSuccessAction>((act) =>
             {
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.GroupMemberAdded });
                 dialogService.Close();
+                StateHasChanged();
             });
             SubscribeToAction<RemoveSelectedGroupsSuccessAction>((act) =>
             {
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.GroupMembersRemoved });
+                StateHasChanged();
             });
             SubscribeToAction<RemoveSelectedGroupRolesSuccessAction>((act) =>
             {
@@ -86,6 +114,22 @@ else
             StateHasChanged();
         });
         dispatcher.Dispatch(new GetGroupAction { Id = id });
+        groups = new List<SimpleIdServer.IdServer.Domains.Group>();
+    }
+
+    void OnExpand(TreeExpandEventArgs args)
+    {
+        var group = args.Value as SimpleIdServer.IdServer.Domains.Group;
+        var children = group.Children;
+        if (group.Children == null || !group.Children.Any())
+        {
+            children = groupRepository.Query().Where(g => g.ParentGroupId == group.Id).AsNoTracking().ToList();
+        }
+
+        args.Children.Template = treeTemplate;
+        args.Children.Data = children;
+        args.Children.TextProperty = "Name";
+        args.Children.HasChildren = (g) => true;
     }
 
     void OnChange(int index)
