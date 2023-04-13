@@ -73,7 +73,8 @@ namespace SimpleIdServer.IdServer.Domains
     public enum ScopeTypes
     {
         IDENTITY = 0,
-        APIRESOURCE = 1
+        APIRESOURCE = 1,
+        ROLE = 2
     }
 
     public enum ScopeProtocols

@@ -1,0 +1,43 @@
+﻿@using Fluxor.Blazor.Web.Components;
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.ClientStore;
+@using SimpleIdServer.IdServer.Website.Stores.UserStore;
+@inherits FluxorComponent
+@inject Radzen.DialogService dialogService
+@inject NotificationService notificationService
+@inject IState<UpdateClientState> updateClientState
+@inject IDispatcher dispatcher
+
+<RadzenTemplateForm Submit=@SubmitAddClientRole TItem="AddClientRole" Data=@addClientRole>
+    <!-- Name -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+        <RadzenTextBox Name="Name" @bind-Value="@addClientRole.Name" Class="w-100"></RadzenTextBox>
+        <RadzenRequiredValidator Component="Name" Text="Name is required"></RadzenRequiredValidator>
+    </div>
+    <!-- Description -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Description</RadzenText>
+        <RadzenTextArea Name="Description" @bind-Value="@addClientRole.Description" Class="w-100"></RadzenTextArea>
+    </div>
+    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateClientState.Value.IsUpdating ? "Adding..." : "Add")" Disabled=@updateClientState.Value.IsUpdating />
+</RadzenTemplateForm>
+
+@code {
+    [Parameter]
+    public string ClientId { get; set; }
+
+    AddClientRole addClientRole = new AddClientRole();
+
+    record AddClientRole
+    {
+        public string Name { get; set; } = null!;
+        public string Description { get; set; } = null!;
+    }
+
+    void SubmitAddClientRole(AddClientRole addClientRole)
+    {
+        dispatcher.Dispatch(new AddClientRoleAction { Name = addClientRole.Name, Description = addClientRole.Description, ClientId = ClientId });
+        dialogService.Close();
+    }
+}

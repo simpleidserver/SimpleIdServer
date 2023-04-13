@@ -142,6 +142,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Client role has been added.
+        /// </summary>
+        public static string ClientRoleAdded {
+            get {
+                return ResourceManager.GetString("ClientRoleAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Client scopes have been added.
         /// </summary>
         public static string ClientScopesAdded {
@@ -210,6 +219,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string GroupMembersRemoved {
             get {
                 return ResourceManager.GetString("GroupMembersRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Roles have been added.
+        /// </summary>
+        public static string GroupRolesAdded {
+            get {
+                return ResourceManager.GetString("GroupRolesAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Selected group roles have been removed.
+        /// </summary>
+        public static string GroupRolesRemoved {
+            get {
+                return ResourceManager.GetString("GroupRolesRemoved", resourceCulture);
             }
         }
         
@@ -480,6 +507,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string SelectedClientKeysRemoved {
             get {
                 return ResourceManager.GetString("SelectedClientKeysRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Selected client roles have been removed.
+        /// </summary>
+        public static string SelectedClientRolesRemoved {
+            get {
+                return ResourceManager.GetString("SelectedClientRolesRemoved", resourceCulture);
             }
         }
         

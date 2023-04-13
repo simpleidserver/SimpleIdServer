@@ -51,6 +51,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
         [ReducerMethod]
         public static SearchScopesState ReduceRemoveSelectedScopesAction(SearchScopesState state, RemoveSelectedScopesAction act)
         {
+            if (act.IsRole) return state;
             return state with
             {
                 IsLoading = true
@@ -60,6 +61,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
         [ReducerMethod]
         public static SearchScopesState ReduceRemoveSelectedScopesSuccessAction(SearchScopesState state, RemoveSelectedScopesSuccessAction act)
         {
+            if (act.IsRole) return state;
             var scopes = state.Scopes?.ToList();
             if (scopes == null) return state;
             scopes = scopes.Where(s => !act.ScopeNames.Contains(s.Value.Name)).ToList();

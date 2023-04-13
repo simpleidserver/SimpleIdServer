@@ -1,7 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
+using NetTopologySuite.Index.Bintree;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Website.Stores.ClientStore;
+using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
 
 namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
 {
@@ -118,6 +121,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
         [ReducerMethod]
         public static UpdateGroupState ReduceAddGroupFailureAction(UpdateGroupState state, AddGroupFailureAction act) => new UpdateGroupState { ErrorMessage = act.ErrorMessage, IsUpdating = false };
 
+        [ReducerMethod]
+        public static UpdateGroupState ReduceAddGroupRolesAction(UpdateGroupState state, AddGroupRolesAction act) => new UpdateGroupState { ErrorMessage = null, IsUpdating = true };
+
+        [ReducerMethod]
+        public static UpdateGroupState ReduceAddGroupRolesSuccessAction(UpdateGroupState state, AddGroupRolesSuccessAction act) => new UpdateGroupState { ErrorMessage = null, IsUpdating = false };
+
         #endregion
 
         #region GroupState
@@ -228,6 +237,110 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
                 IsLoading = false,
                 Count = members.Count(),
                 Members = members
+            };
+        }
+
+        #endregion
+
+        #region GroupRolesState
+
+        [ReducerMethod]
+        public static GroupRolesState ReduceGetGroupAction(GroupRolesState state, GetGroupAction act) => new(new List<Scope>(), true);
+
+        [ReducerMethod]
+        public static GroupRolesState ReduceGetGroupSuccessAction(GroupRolesState state, GetGroupSuccessAction act) => new(act.Group.Roles, false);
+
+        [ReducerMethod]
+        public static GroupRolesState ReduceRemoveSelectedGroupRolesAction(GroupRolesState state, RemoveSelectedGroupRolesAction act)
+        {
+            return state with
+            {
+                IsLoading = true
+            };
+        }
+
+        [ReducerMethod]
+        public static GroupRolesState ReduceRemoveSelectedGroupRolesSuccessAction(GroupRolesState state, RemoveSelectedGroupRolesSuccessAction act)
+        {
+            var roles = state.GroupRoles;
+            roles = roles.Where(r => !act.RoleIds.Contains(r.Value.Id)).ToList();
+            return state with
+            {
+                GroupRoles = roles,
+                Count = roles.Count(),
+                IsLoading = false
+            };
+        }
+
+        [ReducerMethod]
+        public static GroupRolesState ReduceToggleAllGroupRolesAction(GroupRolesState state, ToggleAllGroupRolesAction act)
+        {
+            var roles = state.GroupRoles;
+            foreach (var role in roles)
+                role.IsSelected = act.IsSelected;
+
+            return state with
+            {
+                GroupRoles = roles
+            };
+        }
+
+        [ReducerMethod]
+        public static GroupRolesState ReduceToggleGroupRoleAction(GroupRolesState state, ToggleGroupRoleAction act)
+        {
+            var roles = state.GroupRoles;
+            var role = roles.Single(r => r.Value.Id == act.Id);
+            role.IsSelected = act.IsSelected;
+            return state with
+            {
+                GroupRoles = roles
+            };
+        }
+
+        [ReducerMethod]
+        public static GroupRolesState ReduceSearchScopesAction(GroupRolesState state, SearchScopesAction act) => state with
+        {
+            IsEditableRolesLoading = true
+        };
+
+        [ReducerMethod]
+        public static GroupRolesState ReduceSearchScopesSuccessAction(GroupRolesState state, SearchScopesSuccessAction act)
+        {
+            if (state.GroupRoles == null) return state;
+            var result = act.Scopes.OrderBy(s => s.Name).Select(s => new EditableGroupScope(s)
+            {
+                IsPresent = state.GroupRoles.Any(sc => sc.Value.Name == s.Name)
+            }).ToList();
+            return state with
+            {
+                EditableGroupRoles = result,
+                EditableGroupCount = result.Count,
+                IsEditableRolesLoading = false
+            };
+        }
+
+        [ReducerMethod]
+        public static GroupRolesState ReduceAddGroupRolesAction(GroupRolesState state, AddGroupRolesAction act) 
+        {
+            return state with
+            {
+                IsLoading = false
+            };
+        }
+
+        [ReducerMethod]
+        public static GroupRolesState ReduceAddGroupRolesSuccessAction(GroupRolesState state, AddGroupRolesSuccessAction act)
+        {
+            var roles = state.GroupRoles.ToList();
+            roles.AddRange(act.Roles.Select(r => new SelectableGroupRole(r)
+            {
+                IsNew = true
+            }).ToList());
+            return state with
+            {
+                Count = roles.Count,
+                GroupRoles = roles,
+                IsLoading = false
             };
         }
 

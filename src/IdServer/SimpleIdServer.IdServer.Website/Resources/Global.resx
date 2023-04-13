@@ -144,6 +144,9 @@
   <data name="ClientCredentialsUpdated" xml:space="preserve">
     <value>Client credentials are updated</value>
   </data>
+  <data name="ClientRoleAdded" xml:space="preserve">
+    <value>Client role has been added</value>
+  </data>
   <data name="ClientScopesAdded" xml:space="preserve">
     <value>Client scopes have been added</value>
   </data>
@@ -167,6 +170,12 @@
   </data>
   <data name="GroupMembersRemoved" xml:space="preserve">
     <value>Selected members have been removed</value>
+  </data>
+  <data name="GroupRolesAdded" xml:space="preserve">
+    <value>Roles have been added</value>
+  </data>
+  <data name="GroupRolesRemoved" xml:space="preserve">
+    <value>Selected group roles have been removed</value>
   </data>
   <data name="IdentityProvisioningLaunched" xml:space="preserve">
     <value>Identity Provisioning is launched</value>
@@ -257,6 +266,9 @@
   </data>
   <data name="SelectedClientKeysRemoved" xml:space="preserve">
     <value>Selected client keys have been removed</value>
+  </data>
+  <data name="SelectedClientRolesRemoved" xml:space="preserve">
+    <value>Selected client roles have been removed</value>
   </data>
   <data name="SelectedClientScopesRemoved" xml:space="preserve">
     <value>Selected client scopes have been removed</value>

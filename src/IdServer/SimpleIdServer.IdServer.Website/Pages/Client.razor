@@ -40,6 +40,9 @@ else
             <RadzenTabsItem Text="Credentials">
                 <ClientCredentials Client="@clientState.Value.Client"></ClientCredentials>
             </RadzenTabsItem>
+            <RadzenTabsItem Text="Roles">
+                <ClientRoles Client="@clientState.Value.Client"></ClientRoles>
+            </RadzenTabsItem>
             <RadzenTabsItem Text="Advanced">
                 <ClientAdvanced Client="@clientState.Value.Client"></ClientAdvanced>
             </RadzenTabsItem>
@@ -54,7 +57,8 @@ else
         { "scopes", 1 },
         { "keys", 2 },
         { "credentials", 3 },
-        { "advanced", 4 }
+        { "roles", 4 },
+        { "advanced", 5 }
     };
 
     [Parameter]

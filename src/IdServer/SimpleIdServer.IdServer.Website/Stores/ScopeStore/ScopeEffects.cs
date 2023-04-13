@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Website.Resources;
-using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 using System.Linq.Dynamic.Core;
 
 namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
@@ -29,7 +28,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
         public async Task Handle(SearchScopesAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            IQueryable<Scope> query = _scopeRepository.Query().Include(s => s.Realms).Where(s => s.Realms.Any(r => r.Name == realm)).AsNoTracking();
+            IQueryable<Scope> query = _scopeRepository.Query().Include(s => s.Realms).Where(s => s.Realms.Any(r => r.Name == realm) && ((action.IsRole && s.Type == ScopeTypes.ROLE) || (!action.IsRole && (s.Type == ScopeTypes.IDENTITY || s.Type == ScopeTypes.APIRESOURCE)))).AsNoTracking();
             if (!string.IsNullOrWhiteSpace(action.Filter))
                 query = query.Where(SanitizeExpression(action.Filter));
 
@@ -60,7 +59,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
             var scopes = await _scopeRepository.Query().Include(s => s.Realms).Where(c => action.ScopeNames.Contains(c.Name) && c.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
             _scopeRepository.DeleteRange(scopes);
             await _scopeRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new RemoveSelectedScopesSuccessAction { ScopeNames = action.ScopeNames });
+            dispatcher.Dispatch(new RemoveSelectedScopesSuccessAction { ScopeNames = action.ScopeNames, IsRole = action.IsRole });
         }
 
         [EffectMethod]
@@ -237,6 +236,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
         public int? Skip { get; set; } = null;
         public int? Take { get; set; } = null;
         public string? ClientType { get; set; } = null;
+        public bool IsRole { get; set; }
     }
 
     public class SearchScopesSuccessAction
@@ -259,11 +259,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
     public class RemoveSelectedScopesAction
     {
         public ICollection<string> ScopeNames { get; set; } = new List<string>();
+        public bool IsRole { get; set; }
     }
 
     public class RemoveSelectedScopesSuccessAction
     {
         public ICollection<string> ScopeNames { get; set; } = new List<string>();
+        public bool IsRole { get; set; }
     }
 
     public class AddIdentityScopeAction

@@ -1,0 +1,126 @@
+﻿@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.ClientStore;
+@using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
+@inject IDispatcher dispatcher
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject ContextMenuService contextMenuService
+@inject NotificationService notificationService
+@inject DialogService dialogService
+@inject IState<ClientRolesState> clientRolesState
+
+<RadzenButton class="mb-1" Click="@(args => AddScope())" Icon="add" Text="Add role" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+
+<RadzenDataGrid AllowFiltering="true"
+                AllowColumnResize="true"
+                AllowAlternatingRows="false"
+                AllowSorting="true"
+                PageSize="30"
+                AllowPaging="true"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="true"
+                IsLoading="@clientRolesState.Value.IsLoading"
+                Count="@clientRolesState.Value.Nb"
+                Data="@clientRolesState.Value.Roles"
+                RowRender="@RowRender"
+                TItem="SelectableClientRole"
+                ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn TItem="SelectableClientRole" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <HeaderTemplate>
+                <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
+            </HeaderTemplate>
+            <Template Context="data">
+                <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableClientRole" Property="Value.Name" Filterable="false" Sortable="false" SortOrder=SortOrder.Ascending Title="Name" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableClientRole" Property="Value.Description" Filterable="false" Sortable="false" Title="Description" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableClientRole" Property="Value.UpdateDateTime" Filterable="false" Sortable="false" SortOrder=SortOrder.Descending Title="Update Datetime" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableClientRole" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <Template Context="data">
+                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    bool selectAll = false;
+    [Parameter]
+    public SimpleIdServer.IdServer.Domains.Client Client { get; set; }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            SubscribeToAction<AddClientRoleSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.ClientRoleAdded });
+                StateHasChanged();
+            });
+            SubscribeToAction<RemoveSelectedScopesSuccessAction>((act) =>
+            {
+                if (!act.IsRole) return;
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedClientRolesRemoved });
+                StateHasChanged();
+            });
+        }
+    }
+
+
+    void ShowMoreContextMenu(SelectableClientRole role, MouseEventArgs args)
+    {
+        contextMenuService.Open(args, new List<ContextMenuItem>
+        {
+            new ContextMenuItem { Text = "Delete", Value = 1 }
+        }, (a) =>
+    {
+    if (a.Value.Equals(1))
+    {
+        var scopeNames = clientRolesState.Value.Roles.Where(s => s.IsSelected).Select(s => s.Value.Name).ToList();
+        if (!scopeNames.Contains(role.Value.Name)) scopeNames.Add(role.Value.Name);
+        var act = new RemoveSelectedScopesAction { ScopeNames = scopeNames, IsRole = true };
+        dispatcher.Dispatch(act);
+        contextMenuService.Close();
+    }
+    });
+    }
+
+    void ToggleAll(bool isSelected)
+    {
+        var act = new ToggleAllClientRolesAction { IsSelected = isSelected };
+        dispatcher.Dispatch(act);
+    }
+
+    void ToggleChanged(bool isSelected, SelectableClientRole role)
+    {
+        var act = new ToggleClientRoleAction { IsSelected = isSelected, RoleId = role.Value.Id };
+        dispatcher.Dispatch(act);
+    }
+
+    void RowRender(RowRenderEventArgs<SelectableClientRole> row)
+    {
+        const string className = "class";
+        if (row.Data.IsNew)
+            row.Attributes.Add(className, "new");
+        else if (row.Data.IsSelected)
+            row.Attributes.Add(className, "active");
+        else if (row.Attributes.ContainsKey(className))
+            row.Attributes.Remove(className);
+    }
+
+    async void AddScope()
+    {
+        await dialogService.OpenAsync<AddClientRoleDialog>("Add client role", new Dictionary<string, object>
+        {
+            { "ClientId", Client.ClientId }
+        }, new DialogOptions
+            {
+                Width = "700px",
+                Height = "512px",
+                Resizable = true,
+                Draggable = true
+            });
+    }
+}

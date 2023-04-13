@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
+using MassTransit;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
@@ -170,7 +171,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         #region ClientState
 
         [ReducerMethod]
-        public static ClientState ReduceGetScopeAction(ClientState state, GetClientAction act) => state with
+        public static ClientState ReduceGetClientAction(ClientState state, GetClientAction act) => state with
         {
             IsLoading = true
         };
@@ -258,12 +259,16 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         };
 
         [ReducerMethod]
-        public static ClientScopesState ReduceGetClientSuccessAction(ClientScopesState state, GetClientSuccessAction act) => state with
+        public static ClientScopesState ReduceGetClientSuccessAction(ClientScopesState state, GetClientSuccessAction act)
         {
-            IsLoading = false,
-            Count = act.Client.Scopes.Count(),
-            Scopes = act.Client.Scopes.Select(s => new SelectableClientScope(s)).ToList()
-        };
+            var scopes = act.Client.Scopes.Where(s => s.Type == ScopeTypes.IDENTITY || s.Type == ScopeTypes.APIRESOURCE).ToList();
+            return state with
+            {
+                IsLoading = false,
+                Count = scopes.Count(),
+                Scopes = scopes.Select(s => new SelectableClientScope(s)).ToList()
+            };
+        }
 
         [ReducerMethod]
         public static ClientScopesState ReduceToggleAllClientScopeSelectionAction(ClientScopesState state, ToggleAllClientScopeSelectionAction act)
@@ -463,6 +468,89 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 Keys = keys,
                 Count = keys.Count,
                 IsLoading = false
+            };
+        }
+
+        #endregion
+
+        #region ClientRolesState
+
+        [ReducerMethod]
+        public static ClientRolesState ReduceGetClientAction(ClientRolesState state, GetClientAction act) => new(new List<Scope>(), true);
+
+        [ReducerMethod]
+        public static ClientRolesState ReduceGetClientSuccessAction(ClientRolesState state, GetClientSuccessAction act) => new(act.Client.Scopes.Where(s => s.Type == ScopeTypes.ROLE), false);
+
+        [ReducerMethod]
+        public static ClientRolesState ReduceAddClientRoleAction(ClientRolesState state, AddClientRoleAction act)
+        {
+            return state with
+            {
+                IsLoading = true
+            };
+        }
+
+        [ReducerMethod]
+        public static ClientRolesState ReduceAddClientRoleSuccessAction(ClientRolesState state, AddClientRoleSuccessAction act)
+        {
+            var roles = state.Roles.ToList();
+            roles.Add(new SelectableClientRole(act.Scope)
+            {
+                IsNew = true
+            });
+            return state with
+            {
+                IsLoading = false,
+                Roles = roles,
+                Nb = roles.Count()
+            };
+        }
+
+        [ReducerMethod]
+        public static ClientRolesState ReduceRemoveSelectedScopesAction(ClientRolesState state, RemoveSelectedScopesAction act)
+        {
+            if (!act.IsRole) return state;
+            return state with
+            {
+                IsLoading = true
+            };
+        }
+
+        [ReducerMethod]
+        public static ClientRolesState ReduceRemoveSelectedScopesSuccessAction(ClientRolesState state, RemoveSelectedScopesSuccessAction act)
+        {
+            if (!act.IsRole) return state;
+            var roles = state.Roles.ToList();
+            roles = roles.Where(r => !act.ScopeNames.Contains(r.Value.Name)).ToList();
+            return state with
+            {
+                IsLoading = false,
+                Roles = roles,
+                Nb = roles.Count()
+            };
+        }
+
+        [ReducerMethod]
+        public static ClientRolesState ReduceToggleAllClientRolesAction(ClientRolesState state, ToggleAllClientRolesAction act)
+        {
+            var roles = state.Roles.ToList();
+            foreach(var role in roles)
+                role.IsSelected = act.IsSelected;
+            return state with
+            {
+                Roles = roles
+            };
+        }
+
+        [ReducerMethod]
+        public static ClientRolesState ReduceToggleClientRoleAction(ClientRolesState state, ToggleClientRoleAction act)
+        {
+            var roles = state.Roles.ToList();
+            var role = roles.Single(r => r.Value.Id == act.RoleId);
+            role.IsSelected = act.IsSelected;
+            return state with
+            {
+                Roles = roles
             };
         }
 

@@ -65,6 +65,8 @@
     bool selectAll = false;
     [Parameter]
     public Client Client { get; set; } = null!;
+    [Parameter]
+    public bool IsRole { get; set; } = false;
 
     protected override async Task OnInitializedAsync()
     {

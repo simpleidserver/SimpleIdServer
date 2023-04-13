@@ -22,9 +22,31 @@ namespace SimpleIdServer.IdServer.Builders
                 Id = Guid.NewGuid().ToString(),
                 Name = name, 
                 IsExposedInConfigurationEdp = isExposed,
-                Realms =new List<Realm>
+                Realms = new List<Realm>
                 {
                     Constants.StandardRealms.Master
+                }
+            });
+        }
+
+        public static ScopeBuilder CreateRoleScope(Client client, string name, string description, Realm realm = null)
+        {
+            return new ScopeBuilder(new Scope
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = $"{client.ClientId}/{name}",
+                Type = ScopeTypes.ROLE,
+                Protocol = ScopeProtocols.OAUTH,
+                Description = description,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow,
+                Realms = new List<Realm>
+                {
+                    realm ?? Constants.StandardRealms.Master
+                },
+                Clients = new List<Client>
+                { 
+                    client
                 }
             });
         }

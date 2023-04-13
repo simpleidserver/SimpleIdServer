@@ -100,7 +100,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
         [EffectMethod]
         public async Task Handle(GetGroupAction action, IDispatcher dispatcher)
         {
-            var grp = await _groupRepository.Query().Include(m => m.Children).SingleOrDefaultAsync(g => g.Id== action.Id, CancellationToken.None);
+            var grp = await _groupRepository.Query().Include(m => m.Children).Include(m => m.Roles).SingleOrDefaultAsync(g => g.Id== action.Id, CancellationToken.None);
             if(grp == null)
             {
                 dispatcher.Dispatch(new GetGroupFailureAction { ErrorMessage =  Resources.Global.UnknownGroup });
@@ -108,6 +108,34 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
             }
 
             dispatcher.Dispatch(new GetGroupSuccessAction { Group = grp });
+        }
+
+        [EffectMethod]
+        public async Task Handle(AddGroupRolesAction action, IDispatcher dispatcher)
+        {
+            using (var dbContext = new StoreDbContext(_options))
+            {
+                var grp = await dbContext.Groups.Include(g => g.Roles).SingleAsync(g => g.Id == action.GroupId);
+                var roles = await dbContext.Scopes.Where(s => action.ScopeNames.Contains(s.Name)).ToListAsync();
+                foreach (var role in roles)
+                    grp.Roles.Add(role);
+
+                await dbContext.SaveChangesAsync();
+                dispatcher.Dispatch(new AddGroupRolesSuccessAction { Roles = roles });
+            }
+        }
+
+        [EffectMethod]
+        public async Task Handle(RemoveSelectedGroupRolesAction action, IDispatcher dispatcher)
+        {
+            var grp = await _groupRepository.Query().Include(m => m.Roles).SingleAsync(g => g.Id == action.Id, CancellationToken.None);
+            grp.Roles = grp.Roles.Where(r => !action.RoleIds.Contains(r.Id)).ToList();
+            await _groupRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new RemoveSelectedGroupRolesSuccessAction
+            {
+                Id = action.Id,
+                RoleIds = action.RoleIds
+            });
         }
 
         private async Task<string> GetRealm()
@@ -197,5 +225,39 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
     {
         public string MemberId { get; set; }
         public bool IsSelected { get; set; }
+    }
+    
+    public class ToggleAllGroupRolesAction
+    {
+        public bool IsSelected { get; set; }
+    }
+
+    public class ToggleGroupRoleAction
+    {
+        public bool IsSelected { get; set; }
+        public string Id { get; set; }
+    }
+
+    public class RemoveSelectedGroupRolesAction
+    {
+        public string Id { get; set; }
+        public IEnumerable<string> RoleIds { get; set; }
+    }
+
+    public class RemoveSelectedGroupRolesSuccessAction
+    {
+        public string Id { get; set; }
+        public IEnumerable<string> RoleIds { get; set; }
+    }
+
+    public class AddGroupRolesAction
+    {
+        public string GroupId { get; set; } = null!;
+        public IEnumerable<string> ScopeNames { get; set; } = new List<string>();
+    }
+
+    public class AddGroupRolesSuccessAction
+    {
+        public IEnumerable<Scope> Roles { get; set; }
     }
 }

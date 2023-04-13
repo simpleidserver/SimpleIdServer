@@ -420,6 +420,24 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             });
         }
 
+        [EffectMethod]
+        public async Task Handle(AddClientRoleAction act, IDispatcher dispatcher)
+        {
+            var realm = await GetRealm();
+            using (var dbContext = new StoreDbContext(_options))
+            {
+                var r = await dbContext.Realms.SingleAsync(r => r.Name == realm);
+                var client = await dbContext.Clients.SingleAsync(c => c.ClientId == act.ClientId);
+                var scope = ScopeBuilder.CreateRoleScope(client, act.Name, act.Description, r).Build();
+                dbContext.Scopes.Add(scope);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new AddClientRoleSuccessAction
+                {
+                    Scope = scope
+                });
+            }
+        }
+
         private async Task<bool> ValidateAddClient(string clientId, IEnumerable<string> redirectionUrls, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
@@ -800,5 +818,28 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public string? TlsClientAuthSanDNS { get; set; } = null;
         public string? TlsClientAuthSanEmail { get; set; } = null;
         public string? TlsClientAuthSanIP { get; set; } = null;
+    }
+
+    public class AddClientRoleAction
+    {
+        public string ClientId { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+    }
+
+    public class AddClientRoleSuccessAction
+    {
+        public Scope Scope { get; set; }
+    }
+
+    public class ToggleClientRoleAction
+    {
+        public string RoleId { get; set; }
+        public bool IsSelected { get; set; }
+    }
+
+    public class ToggleAllClientRolesAction
+    {
+        public bool IsSelected { get; set; }
     }
 }
