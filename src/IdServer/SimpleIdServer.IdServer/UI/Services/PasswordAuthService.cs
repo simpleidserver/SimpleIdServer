@@ -32,7 +32,7 @@ namespace SimpleIdServer.IdServer.UI.Services
 
         public virtual async Task<User> Authenticate(string realm, string login, string password, CancellationToken cancellationToken)
         {
-            var user = await _userHelper.GetUserByLogin(_userRepository.Query().Include(u => u.IdentityProvisioning).ThenInclude(i => i.Properties).Include(u => u.Credentials).Include(u => u.Realms).Include(u => u.OAuthUserClaims), login, realm, cancellationToken);
+            var user = await _userHelper.GetUserByLogin(_userRepository.Query().Include(u => u.IdentityProvisioning).ThenInclude(i => i.Properties).Include(u => u.Credentials).Include(u => u.Realms).Include(u => u.Groups).Include(u => u.OAuthUserClaims), login, realm, cancellationToken);
             if (user == null)
                 throw new BaseUIException(ErrorCodes.UNKNOWN_USER);
 

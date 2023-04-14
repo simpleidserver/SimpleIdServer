@@ -83,6 +83,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     var password = context.Request.RequestData.GetStr(TokenRequestParameters.Password);
                     var user = await _userHelper.FilterUsersByLogin(_userRepository.Query()
                         .Include(u => u.Credentials)
+                        .Include(u => u.Groups)
                         .Include(u => u.OAuthUserClaims)
                         .Include(u => u.Realms)
                         .AsNoTracking(), userName, context.Realm).FirstOrDefaultAsync(u => u.Credentials.Any(c => c.CredentialType == UserCredential.PWD && c.Value == PasswordHelper.ComputeHash(password) && c.IsActive), cancellationToken);

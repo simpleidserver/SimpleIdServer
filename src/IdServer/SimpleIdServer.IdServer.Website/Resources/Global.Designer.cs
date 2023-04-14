@@ -736,6 +736,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à User groups have been assigned.
+        /// </summary>
+        public static string UserGroupsAssigned {
+            get {
+                return ResourceManager.GetString("UserGroupsAssigned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à User roles have been unassigned.
+        /// </summary>
+        public static string UserRolesUnassigned {
+            get {
+                return ResourceManager.GetString("UserRolesUnassigned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à User session has been rejected.
         /// </summary>
         public static string UserSessionRejected {

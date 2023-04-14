@@ -17,6 +17,7 @@ builder.Services.AddSIDIdentityServer()
         o.AddInMemoryUsers(IdServerConfiguration.Users);
         o.AddInMemoryApiResources(IdServerConfiguration.ApiResources);
         o.AddInMemoryUMAResources(IdServerConfiguration.UmaResources);
+        o.AddInMemoryGroups(IdServerConfiguration.Groups);
         o.AddInMemoryKeys(SimpleIdServer.IdServer.Constants.StandardRealms.Master, new List<SigningCredentials>
         {
             new SigningCredentials(BuildRsaSecurityKey("keyid"), SecurityAlgorithms.RsaSha256),

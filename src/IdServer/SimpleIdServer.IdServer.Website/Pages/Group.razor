@@ -25,6 +25,13 @@ else
 
     <RadzenText class="mt-3 mb-3" Text="@groupState.Value.Group.Name" TextStyle="TextStyle.DisplayH6" />
 
+    <RadzenBreadCrumb>
+        @foreach (var groupName in groupNames)
+        {
+            <RadzenBreadCrumbItem Text="@groupName" />
+        }
+    </RadzenBreadCrumb>
+
     <RadzenSplitter>
         <RadzenSplitterPane Size="10%">
             <RadzenTree Expand="@OnExpand" Data=@groups>
@@ -32,16 +39,18 @@ else
             </RadzenTree>
         </RadzenSplitterPane>
         <RadzenSplitterPane>
-            <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
-                <Tabs>
-                    <RadzenTabsItem Text="Children">
-                        <GroupChildren Group="@groupState.Value.Group"></GroupChildren>
-                    </RadzenTabsItem>
-                    <RadzenTabsItem Text="Roles">
-                        <GroupRoles Group="@groupState.Value.Group"></GroupRoles>
-                    </RadzenTabsItem>
-                </Tabs>
-            </RadzenTabs>
+            <div class="ml-3">
+                <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
+                    <Tabs>
+                        <RadzenTabsItem Text="Children">
+                            <GroupChildren Group="@groupState.Value.Group"></GroupChildren>
+                        </RadzenTabsItem>
+                        <RadzenTabsItem Text="Roles">
+                            <GroupRoles Group="@groupState.Value.Group"></GroupRoles>
+                        </RadzenTabsItem>
+                    </Tabs>
+                </RadzenTabs>
+            </div>
         </RadzenSplitterPane>
     </RadzenSplitter>
 }
@@ -69,6 +78,8 @@ else
     [Parameter]
     public string? action { get; set; } = null;
 
+    public List<string> groupNames = new List<string>();
+
     int selectedIndex = 0;
 
     protected override void OnAfterRender(bool firstRender)
@@ -83,6 +94,7 @@ else
             SubscribeToAction<GetGroupSuccessAction>((act) =>
             {
                 groups.Add(act.RootGroup);
+                groupNames = act.Group.FullPath.Split('.').ToList();
             });
             SubscribeToAction<AddGroupSuccessAction>((act) =>
             {

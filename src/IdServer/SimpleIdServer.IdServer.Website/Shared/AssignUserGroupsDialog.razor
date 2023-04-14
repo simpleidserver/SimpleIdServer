@@ -1,0 +1,96 @@
+﻿@using Fluxor.Blazor.Web.Components;
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.GroupStore;
+@using SimpleIdServer.IdServer.Website.Stores.UserStore;
+@inherits FluxorComponent
+@inject IDispatcher dispatcher
+@inject NotificationService notificationService
+@inject DialogService dialogService
+@inject IState<UpdateUserState> updateUserState
+@inject IState<UserGroupsState> userGroupsState
+
+<RadzenDataGrid @ref="grid"
+                AllowFiltering="true"
+                AllowColumnResize="true"
+                AllowAlternatingRows="false"
+                AllowSorting="true"
+                PageSize="30"
+                AllowPaging="true"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="true"
+                IsLoading="@userGroupsState.Value.IsEditableGroupsLoading"
+                Count="@userGroupsState.Value.EditableGroupsCount"
+                Data="@userGroupsState.Value.EditableGroups"
+                LoadData="@LoadData"
+                RowRender="@RowRender"
+                TItem="EditableUserGroup"
+                ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn TItem="EditableUserGroup" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <Template Context="data">
+                @if (!data.IsPresent)
+                {
+                    <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
+                }
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="EditableUserGroup" Filterable="false" Sortable="false" Title="Path" Width="80px">
+            <Template Context="data">
+                <RadzenLink Text="@data.Value.FullPath" Path="@($"/groups/{data.Value.Id}/children")" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="EditableUserGroup" Property="Value.Description" Filterable="false" Sortable="false" Title="Description" Width="80px" />
+        <RadzenDataGridColumn TItem="EditableUserGroup" Property="Value.UpdateDateTime" Filterable="false" Sortable="false" Title="Updated at" Width="80px" FormatString="{0:dd/M/yyyy HH:mm:ss}" />
+    </Columns>
+</RadzenDataGrid>
+
+<RadzenButton Click="@(args => AssignUserGroups())" class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateUserState.Value.IsUpdating ? "Saving..." : "Save")" Disabled="@(updateUserState.Value.IsUpdating)" />
+
+@code {
+    RadzenDataGrid<EditableUserGroup> grid;
+    [Parameter]
+    public SimpleIdServer.IdServer.Domains.User User { get; set; }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+        {
+            SubscribeToAction<AssignUserGroupsSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.UserGroupsAssigned });
+                dialogService.Close();
+                StateHasChanged();
+            });
+            grid.Reload();
+        }
+    }
+
+    void LoadData(LoadDataArgs args)
+    {
+        var act = new SearchGroupsAction { Filter = args.Filter, OrderBy = args.OrderBy, Skip = args.Skip, Take = args.Top, OnlyRoot = false };
+        dispatcher.Dispatch(act);
+    }
+
+    void ToggleChanged(bool isSelected, EditableUserGroup group)
+    {
+        dispatcher.Dispatch(new ToggleGroupSelectionAction { GroupId = group.Value.Id, IsSelected = isSelected });
+    }
+
+    void RowRender(RowRenderEventArgs<EditableUserGroup> row)
+    {
+        const string className = "class";
+        if (row.Data.IsSelected)
+            row.Attributes.Add(className, "active");
+        else if (row.Data.IsPresent)
+            row.Attributes.Add(className, "disabled");
+        else if (row.Attributes.ContainsKey(className))
+            row.Attributes.Remove(className);
+    }
+
+    void AssignUserGroups()
+    {
+        var act = new AssignUserGroupsAction { UserId = User.Id, GroupIds = userGroupsState.Value.EditableGroups.Where(s => !s.IsPresent && s.IsSelected).Select(s => s.Value.Id) };
+        dispatcher.Dispatch(act);
+    }
+}

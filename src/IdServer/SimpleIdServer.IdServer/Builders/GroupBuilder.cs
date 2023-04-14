@@ -16,10 +16,16 @@ namespace SimpleIdServer.IdServer.Builders
 
         public static GroupBuilder Create(string name, string description)
         {
-            var record = new Group { Id = Guid.NewGuid().ToString(), Name = name, Description = description };
+            var record = new Group { Id = Guid.NewGuid().ToString(), Name = name, Description = description, FullPath = name };
             return new GroupBuilder(record);
         }
 
-        public Group Builder() => _group;
+        public GroupBuilder AddRole(Scope scope)
+        {
+            _group.Roles.Add(scope);
+            return this;
+        }
+
+        public Group Build() => _group;
     }
 }

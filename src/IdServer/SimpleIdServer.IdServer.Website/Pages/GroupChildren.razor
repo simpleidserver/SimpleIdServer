@@ -5,7 +5,7 @@
 @inject ContextMenuService contextMenuService
 @inject DialogService dialogService
 
-<RadzenButton class="mb-1" Click="@(args => AddMember())" Icon="add" Text="Add group" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+<RadzenButton class="mb-1" Click="@(args => AddMember())" Icon="add" Text="Add member" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
 
 <RadzenDataGrid AllowFiltering="true"
                 AllowColumnResize="true"
@@ -100,7 +100,7 @@
         }, new DialogOptions
         {
             Width = "700px",
-            Height ="512px",
+            Height = "512px",
             Resizable = true,
             Draggable = true
         });

@@ -77,7 +77,7 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
 
             var tokenType = GetTokenType(client);
             var nameIdentifier = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).AsNoTracking().SingleOrDefaultAsync(u => u.Name == nameIdentifier, cancellationToken);
+            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).Include(u => u.Groups).AsNoTracking().SingleOrDefaultAsync(u => u.Name == nameIdentifier, cancellationToken);
             var subject = await BuildSubject(realm);
             return BuildResponse(realm);
 

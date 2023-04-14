@@ -18,6 +18,7 @@ namespace SimpleIdServer.IdServer
         public const string UNKNOWN_GRANT = "the grant {0} doesn't exist";
         public const string UNKNOWN_ACCESS_TOKEN = "either the access token has been revoked or is invalid";
         public const string UNKNOWN_UMA_RESOURCE = "the UMA resource doesn't exist";
+        public const string UNKNOWN_GROUP_IDS = "the group {0} don't exist";
         public const string UNKNOWN_AUTH_SCHEME_PROVIDER_PROPERTIES = "the authentication scheme provider cannot be updated because the following properties are unknown : {0}";
         public const string UNAUTHORIZED_CLIENT = "unauthorized client";
         public const string UNAUTHORIZED_ACCESSTOKEN = "the access token is not authorized to access to the operation";

@@ -320,7 +320,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             return state with
             {
                 EditableScopes = result,
-                EditableScopesCount = result.Count,
+                EditableScopesCount = act.Count,
                 IsEditableScopesLoading = false
             };
         }

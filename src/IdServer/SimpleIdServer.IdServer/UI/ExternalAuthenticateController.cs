@@ -121,6 +121,7 @@ namespace SimpleIdServer.IdServer.UI
             }
 
             var user = await UserRepository.Query()
+                .Include(u => u.Groups)
                 .Include(u => u.ExternalAuthProviders)
                 .Include(u => u.Sessions)
                 .Include(u => u.OAuthUserClaims)
@@ -133,6 +134,7 @@ namespace SimpleIdServer.IdServer.UI
                     .Include(u => u.ExternalAuthProviders)
                     .Include(u => u.Sessions)
                     .Include(u => u.Realms)
+                    .Include(u => u.Groups)
                     .Include(u => u.OAuthUserClaims), sub, realm, cancellationToken);
                 if(existingUser != null)
                 {

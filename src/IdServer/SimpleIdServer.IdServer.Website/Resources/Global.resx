@@ -342,6 +342,12 @@
   <data name="UserDetailsUpdated" xml:space="preserve">
     <value>User details have been updated</value>
   </data>
+  <data name="UserGroupsAssigned" xml:space="preserve">
+    <value>User groups have been assigned</value>
+  </data>
+  <data name="UserRolesUnassigned" xml:space="preserve">
+    <value>User roles have been unassigned</value>
+  </data>
   <data name="UserSessionRejected" xml:space="preserve">
     <value>User session has been rejected</value>
   </data>

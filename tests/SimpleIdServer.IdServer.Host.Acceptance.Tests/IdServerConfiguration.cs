@@ -32,10 +32,20 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             { "twentyEightClient", new EncryptingCredentials(new RsaSecurityKey(RSA.Create()) { KeyId = "keyId" }, SecurityAlgorithms.RsaOAEP, SecurityAlgorithms.Aes128CbcHmacSha256) },
             { "twentyNineClient", new EncryptingCredentials(new RsaSecurityKey(RSA.Create()) { KeyId = "keyId" }, SecurityAlgorithms.RsaOAEP, SecurityAlgorithms.Aes192CbcHmacSha384) }
         };
+
+        private static Client FiftySixClient = ClientBuilder.BuildUserAgentClient("fiftySixClient", "password", null, "http://localhost:8080").UseImplicitFlow().AddScope(StandardScopes.OpenIdScope, StandardScopes.Role).Build();
+
+        private static Scope FiftySixClientAdminRole = ScopeBuilder.CreateRoleScope(FiftySixClient, "admin", "admin").Build();
         private static Scope FirstScope = ScopeBuilder.CreateApiScope("firstScope", true).Build();
         private static Scope SecondScope = ScopeBuilder.CreateApiScope("secondScope", true).Build();
         private static Scope AdminScope = ScopeBuilder.CreateApiScope("admin", true).Build();
         private static Scope CalendarScope = ScopeBuilder.CreateApiScope("calendar", true).Build();
+        private static Group AdminGroup = GroupBuilder.Create("admin", "admin").AddRole(FiftySixClientAdminRole).Build();
+
+        public static List<Group> Groups => new List<Group>
+        {
+            AdminGroup
+        };
 
         public static List<Scope> Scopes => new List<Scope>
         {
@@ -115,7 +125,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildApiClient("fiftyThreeClient", "password").EnableUMAGrantType().ActAsUMAResourceServer().Build(),
             ClientBuilder.BuildUserAgentClient("fiftyFourClient", "password", null, "http://localhost:8080").UseImplicitFlow().AddScope(StandardScopes.OpenIdScope, StandardScopes.Profile, StandardScopes.Email).SetSigAuthorizationResponse(SecurityAlgorithms.RsaSha256).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("fiftyFiveClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().EnableTokenInResponseType().EnableRefreshTokenGrantType().AddScope(AdminScope, CalendarScope).AddAuthDataTypes("firstDetails", "secondDetails").Build(),
-
+            FiftySixClient
         };
 
         public static List<User> Users = new List<User>
@@ -124,6 +134,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                 .SetEmail("email@outlook.fr")
                 .AddRole("role1")
                 .AddRole("role2")
+                .AddGroup(AdminGroup)
                 .SetAddress("street", "locality", "region", "postalcode", "country", "formatted")
                 .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "thirdClient", "secondScope")
                 .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "nineClient", "secondScope")
@@ -166,6 +177,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                 .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fiftyTwoClient", "admin", "calendar")
                 .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fiftyFourClient", "openid", "profile", "email")
                 .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fiftyFiveClient", new AuthorizationData { Type = "firstDetails", Actions = new List<string> { "read" } }, new AuthorizationData { Type = "secondDetails", Locations = new List<string> { "https://cal.example.com" }, Actions = new List<string> { "read" } })
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fiftySixClient", "openid", "role")
                 .AddSession("sessionId", SimpleIdServer.IdServer.Constants.DefaultRealm, DateTime.UtcNow.AddDays(2)).Build()
         };
 

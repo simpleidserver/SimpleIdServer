@@ -14,12 +14,16 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
     public class UserEffects
     {
         private readonly IUserRepository _userRepository;
+        private readonly IGroupRepository _groupRepository;
         private readonly ProtectedSessionStorage _sessionStorage;
+        private readonly DbContextOptions<StoreDbContext> _options;
 
-        public UserEffects(IUserRepository userRepository, ProtectedSessionStorage sessionStorage)
+        public UserEffects(IUserRepository userRepository, IGroupRepository groupRepository, ProtectedSessionStorage sessionStorage, DbContextOptions<StoreDbContext> options)
         {
             _userRepository = userRepository;
+            _groupRepository = groupRepository;
             _sessionStorage = sessionStorage;
+            _options = options;
         }
 
         [EffectMethod]
@@ -44,7 +48,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         public async Task Handle(GetUserAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.OAuthUserClaims).Include(u => u.Consents).ThenInclude(c => c.Scopes).Include(u => u.Sessions).Include(u => u.Credentials).Include(u => u.ExternalAuthProviders).AsNoTracking().SingleOrDefaultAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
+            var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.OAuthUserClaims).Include(u => u.Groups).Include(u => u.Consents).ThenInclude(c => c.Scopes).Include(u => u.Sessions).Include(u => u.Credentials).Include(u => u.ExternalAuthProviders).AsNoTracking().SingleOrDefaultAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
             if (user == null) {
                 dispatcher.Dispatch(new GetUserFailureAction { ErrorMessage = string.Format(Global.UnknownUser, action.UserId) });
                 return;
@@ -166,6 +170,42 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             credential.IsActive = true;
             await _userRepository.SaveChanges(CancellationToken.None);
             dispatcher.Dispatch(new DefaultUserCredentialSuccessAction { CredentialId = action.CredentialId, UserId = action.UserId });
+        }
+
+        [EffectMethod]
+        public async Task Handle(RemoveSelectedUserGroupAction action, IDispatcher dispatcher)
+        {
+            var user = await _userRepository.Query().Include(u => u.Groups).SingleAsync(u => u.Id == action.UserId);
+            user.Groups = user.Groups.Where(g => !action.GroupIds.Contains(g.Id)).ToList();
+            await _userRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new RemoveSelectedUserGroupSuccessAction { GroupIds = action.GroupIds, UserId = action.UserId });
+        }
+
+        [EffectMethod]
+        public async Task Handle(AssignUserGroupsAction action, IDispatcher dispatcher)
+        {
+            using (var dbContext = new StoreDbContext(_options))
+            {
+                var realm = await GetRealm();
+                var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
+                var groups = await dbContext.Groups.Include(s => s.Realms).Where(s => action.GroupIds.Contains(s.Id) && s.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
+                var user = await dbContext.Users.Include(u => u.Groups).SingleAsync(u => u.Id == action.UserId);
+                foreach (var grp in groups)
+                    user.Groups.Add(grp);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new AssignUserGroupsSuccessAction { Groups = groups, UserId = action.UserId });
+            }
+        }
+
+        [EffectMethod]
+        public async Task Handle(ResolveUserRolesAction action, IDispatcher dispatcher)
+        {
+            if (!action.IsSelected) return;
+            var user = await _userRepository.Query().Include(u => u.Groups).AsNoTracking().SingleAsync(u => u.Id == action.UserId);
+            var grpPathLst = user.Groups.SelectMany(g => g.ResolveAllPath()).Distinct();
+            var allGroups = await _groupRepository.Query().Include(g => g.Roles).AsNoTracking().Where(g => grpPathLst.Contains(g.FullPath)).ToListAsync();
+            var roles = allGroups.SelectMany(g => g.Roles).Select(r => r.Name).Distinct();
+            dispatcher.Dispatch(new ResolveUserRolesSuccessAction { Roles = roles, UserId = user.Id });
         }
 
         private async Task<string> GetRealm()
@@ -339,5 +379,52 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
     {
         public string UserId { get; set; } = null!;
         public string CredentialId { get; set; } = null!;
+    }
+
+    public class ToggleAllUserGroupsAction
+    {
+        public bool IsSelected { get; set; }
+    }
+
+    public class ToggleUserGroupAction
+    {
+        public string GroupId { get; set; }
+        public bool IsSelected { get; set; }
+    }
+
+    public class RemoveSelectedUserGroupAction
+    {
+        public IEnumerable<string> GroupIds { get; set; }
+        public string UserId { get; set; }
+    }
+
+    public class RemoveSelectedUserGroupSuccessAction
+    {
+        public string UserId { get; set; }
+        public IEnumerable<string> GroupIds { get; set; }
+    }
+
+    public class AssignUserGroupsAction
+    {
+        public string UserId { get; set; }
+        public IEnumerable<string> GroupIds { get; set; }
+    }
+
+    public class AssignUserGroupsSuccessAction
+    {
+        public string UserId { get; set; }
+        public IEnumerable<SimpleIdServer.IdServer.Domains.Group> Groups { get; set; }
+    }
+
+    public class ResolveUserRolesAction
+    {
+        public string UserId { get; set; }
+        public bool IsSelected { get; set; }
+    }
+
+    public class ResolveUserRolesSuccessAction
+    {
+        public string UserId { get; set; }
+        public IEnumerable<string> Roles { get; set; }
     }
 }

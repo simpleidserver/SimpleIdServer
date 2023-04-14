@@ -13,6 +13,11 @@
 
 <RadzenButton class="mb-1" Click="@(args => AddClaim())" Icon="add" Text="Add claim" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
 
+<div class="mb-1">
+    <RadzenCheckBox @bind-Value=@resolveRoles Change=@ResolveRoles TValue="bool" />
+    <RadzenLabel Text="Resolve roles" Style="margin-left: 8px; vertical-align: middle;" />
+</div>
+
 <RadzenDataGrid AllowFiltering="true" 
         AllowColumnResize="true"
         AllowAlternatingRows="false" 
@@ -32,7 +37,10 @@
         <RadzenDataGridColumn TItem="SelectableUserClaim" Property="Value.Value" Title="Value" Filterable="false" Sortable="false" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableUserClaim" Filterable="false" Sortable="false" Width="80px">
             <Template Context="data">
-                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                @if(!data.IsRole)
+                {
+                    <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                }
             </Template>
         </RadzenDataGridColumn>
     </Columns>
@@ -43,6 +51,8 @@
 @code {
     [Parameter]
     public string UserId { get; set; }
+
+    bool resolveRoles = false;
 
     protected override void OnAfterRender(bool firstRender)
     {
@@ -71,12 +81,17 @@
                 contextMenuService.Close();
             }
         });
-
     }
 
     void SaveClaims()
     {
         var act = new UpdateUserClaimsAction { UserId = UserId, Claims = claimsState.Value.UserClaims.Select(c => c.Value).ToList() };
+        dispatcher.Dispatch(act);
+    }
+
+    void ResolveRoles(bool isSelected)
+    {
+        var act = new ResolveUserRolesAction { IsSelected = isSelected, UserId = UserId };
         dispatcher.Dispatch(act);
     }
 

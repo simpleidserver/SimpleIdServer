@@ -158,6 +158,18 @@ namespace SimpleIdServer.IdServer
             return this;
         }
 
+        public IdServerInMemoryStoreBuilder AddInMemoryGroups(ICollection<Group> groups)
+        {
+            var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
+            if (!storeDbContext.Groups.Any())
+            {
+                storeDbContext.Groups.AddRange(groups);
+                storeDbContext.SaveChanges();
+            }
+
+            return this;
+        }
+
         public IdServerInMemoryStoreBuilder AddInMemoryKeys(Realm realm, ICollection<SigningCredentials> signingCredentials, ICollection<EncryptingCredentials> encryptingCredentials)
         {
             var storeDbContext = _serviceProvider.GetService<StoreDbContext>();

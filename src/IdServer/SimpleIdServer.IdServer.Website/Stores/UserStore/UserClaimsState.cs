@@ -39,5 +39,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         public bool IsSelected { get; set; } = false;
         public bool IsNew { get; set; } = false;
         public UserClaim Value { get; set; }
+        public bool IsRole { get; set; } = false;
     }
 }

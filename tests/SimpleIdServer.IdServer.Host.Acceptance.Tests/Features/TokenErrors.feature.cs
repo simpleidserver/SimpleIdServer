@@ -98,11 +98,11 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table354 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table355 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
 #line 5
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table354, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table355, "When ");
 #line hidden
 #line 8
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -141,56 +141,35 @@ this.ScenarioInitialize(scenarioInfo);
 #line 15
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table355 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table356 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table355.AddRow(new string[] {
+                table356.AddRow(new string[] {
                             "response_type",
                             "code"});
-                table355.AddRow(new string[] {
+                table356.AddRow(new string[] {
                             "client_id",
                             "thirdClient"});
-                table355.AddRow(new string[] {
+                table356.AddRow(new string[] {
                             "state",
                             "state"});
-                table355.AddRow(new string[] {
+                table356.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table355.AddRow(new string[] {
+                table356.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table355.AddRow(new string[] {
+                table356.AddRow(new string[] {
                             "scope",
                             "secondScope"});
 #line 16
- testRunner.When("execute HTTP GET request \'https://localhost:8080/authorization\'", ((string)(null)), table355, "When ");
+ testRunner.When("execute HTTP GET request \'https://localhost:8080/authorization\'", ((string)(null)), table356, "When ");
 #line hidden
 #line 25
  testRunner.And("extract parameter \'code\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 26
  testRunner.And("extract parameter \'state\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-                TechTalk.SpecFlow.Table table356 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table356.AddRow(new string[] {
-                            "client_id",
-                            "thirdClient"});
-                table356.AddRow(new string[] {
-                            "client_secret",
-                            "password"});
-                table356.AddRow(new string[] {
-                            "grant_type",
-                            "authorization_code"});
-                table356.AddRow(new string[] {
-                            "code",
-                            "$code$"});
-                table356.AddRow(new string[] {
-                            "redirect_uri",
-                            "http://localhost:8080"});
-#line 28
- testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table356, "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table357 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
@@ -210,8 +189,29 @@ this.ScenarioInitialize(scenarioInfo);
                 table357.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-#line 36
+#line 28
  testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table357, "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table358 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table358.AddRow(new string[] {
+                            "client_id",
+                            "thirdClient"});
+                table358.AddRow(new string[] {
+                            "client_secret",
+                            "password"});
+                table358.AddRow(new string[] {
+                            "grant_type",
+                            "authorization_code"});
+                table358.AddRow(new string[] {
+                            "code",
+                            "$code$"});
+                table358.AddRow(new string[] {
+                            "redirect_uri",
+                            "http://localhost:8080"});
+#line 36
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table358, "And ");
 #line hidden
 #line 44
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

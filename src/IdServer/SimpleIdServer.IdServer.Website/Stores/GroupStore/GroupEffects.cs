@@ -26,18 +26,20 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
         public async Task Handle(SearchGroupsAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            IQueryable<Group> query = _groupRepository.Query().Include(c => c.Realms).Where(c => c.Realms.Any(r => r.Name == realm) && c.Name == c.FullPath).AsNoTracking();
+            IQueryable<Group> query = _groupRepository.Query().Include(c => c.Realms).Where(c => c.Realms.Any(r => r.Name == realm) && (!action.OnlyRoot || action.OnlyRoot && c.Name == c.FullPath)).AsNoTracking();
             if (!string.IsNullOrWhiteSpace(action.Filter))
                 query = query.Where(SanitizeExpression(action.Filter));
 
             if (!string.IsNullOrWhiteSpace(action.OrderBy))
                 query = query.OrderBy(SanitizeExpression(action.OrderBy));
+            else
+                query = query.OrderBy(q => q.FullPath);
 
             var nb = query.Count();
             var groups = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
             dispatcher.Dispatch(new SearchGroupsSuccessAction { Groups = groups, Count = nb });
 
-            string SanitizeExpression(string expression) => expression.Replace("Group.", "");
+            string SanitizeExpression(string expression) => expression.Replace("Group.", "").Replace("Value", "");
         }
 
         [EffectMethod]
@@ -157,6 +159,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
         public string? OrderBy { get; set; } = null;
         public int? Skip { get; set; } = null;
         public int? Take { get; set; } = null;
+        public bool OnlyRoot { get; set; } = true;
     }
 
     public class SearchGroupsSuccessAction

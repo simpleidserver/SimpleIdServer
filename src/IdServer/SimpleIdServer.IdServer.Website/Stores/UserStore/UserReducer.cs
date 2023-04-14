@@ -3,7 +3,8 @@
 using Fluxor;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using SimpleIdServer.IdServer.Domains;
-using System;
+using SimpleIdServer.IdServer.Website.Stores.GroupStore;
+using System.Data;
 using User = SimpleIdServer.IdServer.Domains.User;
 
 namespace SimpleIdServer.IdServer.Website.Stores.UserStore
@@ -216,6 +217,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         [ReducerMethod]
         public static UpdateUserState ReduceDefaultUserCredentialSuccessAction(UpdateUserState state, DefaultUserCredentialSuccessAction act) => new(false);
 
+        [ReducerMethod]
+        public static UpdateUserState ReduceAssignUserGroupsAction(UpdateUserState state, AssignUserGroupsAction act) => new(true);
+
+        [ReducerMethod]
+        public static UpdateUserState ReduceAssignUserGroupsSuccessAction(UpdateUserState state, AssignUserGroupsSuccessAction act) => new(false);
+
         #endregion
 
         #region UserClaims
@@ -262,6 +269,42 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             return state with
             {
                 UserClaims = claims,
+                Count = claims.Count()
+            };
+        }
+
+        [ReducerMethod]
+        public static UserClaimsState ReduceResolveUserRolesAction(UserClaimsState state, ResolveUserRolesAction action)
+        {
+            if(!action.IsSelected)
+            {
+                var claims = state.UserClaims.ToList();
+                claims = claims.Where(c => !c.IsRole).ToList();
+                return state with
+                {
+                    UserClaims = claims
+                };
+            }
+
+            return state with
+            {
+                IsLoading = true
+            };
+        }
+
+        [ReducerMethod]
+        public static UserClaimsState ReduceResolveUserRolesSuccessAction(UserClaimsState state, ResolveUserRolesSuccessAction action)
+        {
+            var claims = state.UserClaims.ToList();
+            claims.AddRange(action.Roles.Select(r => new SelectableUserClaim(new UserClaim(Guid.NewGuid().ToString(), "role", r))
+            {
+                IsNew = true,
+                IsRole = true
+            }).ToList());
+            return state with
+            {
+                UserClaims = claims,
+                IsLoading = false,
                 Count = claims.Count()
             };
         }
@@ -351,6 +394,107 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             return state with
             {
                 UserCredentials = credentials,
+            };
+        }
+
+        #endregion
+
+        #region UserGroupsState
+
+        [ReducerMethod]
+        public static UserGroupsState ReduceGetUserAction(UserGroupsState state, GetUserAction act) => new(new List<Group>(), true);
+
+        [ReducerMethod]
+        public static UserGroupsState ReduceGetUserSuccessAction(UserGroupsState state, GetUserSuccessAction act) => new(act.User.Groups, false);
+
+        [ReducerMethod]
+        public static UserGroupsState ReduceToggleAllUserGroupsAction(UserGroupsState state, ToggleAllUserGroupsAction act)
+        {
+            var groups = state.Groups.ToList();
+            foreach (var group in groups)
+                group.IsSelected = act.IsSelected;
+            return state with
+            {
+                Groups = groups
+            };
+        }
+
+        [ReducerMethod]
+        public static UserGroupsState ReduceToggleUserGroupAction(UserGroupsState state, ToggleUserGroupAction act)
+        {
+            var groups = state.Groups.ToList();
+            var group = state.Groups.Single(g => g.Value.Id == act.GroupId);
+            group.IsSelected = act.IsSelected;
+            return state with
+            {
+                Groups = groups
+            };
+        }
+
+        [ReducerMethod]
+        public static UserGroupsState ReduceRemoveSelectedUserGroupAction(UserGroupsState state, RemoveSelectedUserGroupAction act)
+        {
+            return state with
+            {
+                IsLoading = true
+            };
+        }
+
+        [ReducerMethod]
+        public static UserGroupsState ReduceRemoveSelectedUserGroupSuccessAction(UserGroupsState state, RemoveSelectedUserGroupSuccessAction act)
+        {
+            var groups = state.Groups.ToList();
+            groups = groups.Where(g => !act.GroupIds.Contains(g.Value.Id)).ToList();
+            return state with
+            {
+                IsLoading = false,
+                Groups = groups,
+                Count = groups.Count()
+            };
+        }
+
+        [ReducerMethod]
+        public static UserGroupsState ReduceAssignUserGroupsAction(UserGroupsState state, AssignUserGroupsAction act)
+        {
+            return state with
+            {
+                IsLoading = true
+            };
+        }
+
+        [ReducerMethod]
+        public static UserGroupsState ReduceAssignUserGroupsSuccessAction(UserGroupsState state, AssignUserGroupsSuccessAction act)
+        {
+            var groups = state.Groups.ToList();
+            groups.AddRange(act.Groups.Select(g => new SelectableUserGroup(g) { IsNew = true }).ToList());
+            return state with
+            {
+                IsLoading = false,
+                Groups = groups,
+            };
+        }
+
+        [ReducerMethod]
+        public static UserGroupsState ReduceSearchGroupsAction(UserGroupsState state, SearchGroupsAction act)
+        {
+            return state with
+            {
+                IsEditableGroupsLoading = true
+            };
+        }
+
+        [ReducerMethod]
+        public static UserGroupsState ReduceSearchGroupsSuccessAction(UserGroupsState state, SearchGroupsSuccessAction act)
+        {
+            var result = act.Groups.OrderBy(s => s.Name).Select(s => new EditableUserGroup(s)
+            {
+                IsPresent = state.Groups.Any(sc => sc.Value.Id == s.Id)
+            }).ToList();
+            return state with
+            {
+                IsEditableGroupsLoading = false,
+                EditableGroups = result,
+                EditableGroupsCount = act.Count
             };
         }
 

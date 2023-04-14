@@ -80,6 +80,12 @@ namespace SimpleIdServer.IdServer.Builders
             return this;
         }
 
+        public UserBuilder AddGroup(Group group)
+        {
+            _user.Groups.Add(group);
+            return this; 
+        }
+
         public UserBuilder SetAddress(string street, string locality, string region, string postalCode, string country, string formatted)
         {
             _user.UpdateClaim(AddressClaimNames.Street, street);

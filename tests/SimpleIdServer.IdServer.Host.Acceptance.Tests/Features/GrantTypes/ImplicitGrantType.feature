@@ -90,3 +90,29 @@ Scenario: authorization details are returned in the access token
 
 	Then JWT has authorization_details type 'firstDetails'
 	Then JWT has authorization_details action 'read'
+
+Scenario: Roles coming from group are returned
+	Given authenticate a user
+	When execute HTTP GET request 'http://localhost/authorization'
+	| Key           | Value                      |
+	| response_type | id_token                   |
+	| client_id     | fiftySixClient             |
+	| state         | state                      |
+	| response_mode | query                      |
+	| scope         | openid role                |
+	| redirect_uri  | http://localhost:8080      |
+	| nonce         | nonce                      |
+	
+	And extract parameter 'id_token' from redirect url
+	And extract payload from JWT '$id_token$'
+	
+	Then redirection url doesn't contain the parameter 'access_token'
+	Then JWT contains 'iss'
+	Then JWT contains 'iat'
+	Then JWT contains 'exp'
+	Then JWT contains 'azp'
+	Then JWT contains 'aud'
+	Then JWT has 'sub'='user'
+	Then JWT has 'role'='role1'
+	Then JWT has 'role'='role2'
+	Then JWT has 'role'='fiftySixClient/admin'

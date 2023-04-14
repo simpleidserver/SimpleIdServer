@@ -1,0 +1,120 @@
+﻿@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.UserStore;
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject IState<UserGroupsState> userGroupsState
+@inject IDispatcher dispatcher
+@inject ContextMenuService contextMenuService
+@inject DialogService dialogService
+@inject NotificationService notificationService
+
+<p class="text-muted">List of groups assigned to the user.</p>
+
+<RadzenButton class="mb-1" Click="@(args => AssignGroups())" Icon="add" Text="Assign groups" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+
+<RadzenDataGrid AllowFiltering="true"
+                AllowColumnResize="true"
+                AllowAlternatingRows="false"
+                AllowSorting="true"
+                PageSize="30"
+                AllowPaging="true"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="true"
+                IsLoading="@userGroupsState.Value.IsLoading"
+                Count="@userGroupsState.Value.Count"
+                Data="@userGroupsState.Value.Groups"
+                TItem="SelectableUserGroup"
+                RowRender="@RowRender"
+                ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn TItem="SelectableUserGroup" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <HeaderTemplate>
+                <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
+            </HeaderTemplate>
+            <Template Context="data">
+                <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableUserGroup" Property="Value.FullPath" Title="Path" Filterable="false" Sortable="false" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableUserGroup" Property="Value.UpdateDateTime" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Updated at" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableUserGroup" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <Template Context="data">
+                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    [Parameter]
+    public SimpleIdServer.IdServer.Domains.User User { get; set; }
+
+    bool selectAll = false;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            SubscribeToAction<RemoveSelectedUserGroupSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.UserRolesUnassigned});
+                StateHasChanged();
+            });
+        }
+    }
+
+    void ShowMoreContextMenu(SelectableUserGroup group, MouseEventArgs args)
+    {
+        contextMenuService.Open(args, new List<ContextMenuItem>
+        {
+            new ContextMenuItem { Text = "Unassign", Value = 1 }
+        }, (a) =>
+    {
+        if (a.Value.Equals(1))
+        {
+            var groupIds = userGroupsState.Value.Groups?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
+            if (!groupIds.Contains(group.Value.FullPath)) groupIds.Add(group.Value.Id);
+            var act = new RemoveSelectedUserGroupAction { GroupIds = groupIds, UserId = User.Id };
+            dispatcher.Dispatch(act);
+            contextMenuService.Close();
+        }
+    });
+    }
+
+    void ToggleChanged(bool isSelected, SelectableUserGroup group)
+    {
+        var act = new ToggleUserGroupAction { IsSelected = isSelected, GroupId = group.Value.Id };
+        dispatcher.Dispatch(act);
+    }
+
+    void ToggleAll(bool isSelected)
+    {
+        var act = new ToggleAllUserGroupsAction { IsSelected = isSelected };
+        dispatcher.Dispatch(act);
+    }
+
+    void RowRender(RowRenderEventArgs<SelectableUserGroup> row)
+    {
+        const string className = "class";
+        if (row.Data.IsNew)
+            row.Attributes.Add(className, "new");
+        else if (row.Data.IsSelected)
+            row.Attributes.Add(className, "active");
+        else if (row.Attributes.ContainsKey(className))
+            row.Attributes.Remove(className);
+    }
+
+    async void AssignGroups()
+    {
+        await dialogService.OpenAsync<AssignUserGroupsDialog>("Assign groups", new Dictionary<string, object>
+        {
+            { "User", User }
+        }, new DialogOptions
+        {
+            Width = "700px",
+            Height = "512px",
+            Resizable = true,
+            Draggable = true
+        });
+    }
+}

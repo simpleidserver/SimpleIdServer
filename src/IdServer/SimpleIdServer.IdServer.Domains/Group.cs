@@ -16,5 +16,14 @@ namespace SimpleIdServer.IdServer.Domains
         public ICollection<Scope> Roles { get; set; } = new List<Scope>();
         public ICollection<User> Users { get; set; } = new List<User>();
         public ICollection<Realm> Realms { get; set; } = new List<Realm>();
+
+        public List<string> ResolveAllPath()
+        {
+            var result = new List<string> { FullPath };
+            var splitted = FullPath.Split('.');
+            if (splitted.Length == 1) return result;
+            for (var i = 1; i < splitted.Length; i++) result.Add(string.Join('.', splitted.Take(i)));
+            return result;
+        }
     }
 }

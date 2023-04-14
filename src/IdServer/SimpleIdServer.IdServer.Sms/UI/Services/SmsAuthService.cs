@@ -37,7 +37,7 @@ namespace SimpleIdServer.IdServer.Sms.UI.Services
 
         public async Task<User> Authenticate(string phoneNumber, long otpCode, CancellationToken cancellationToken)
         {
-            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).Include(u => u.Credentials).FirstOrDefaultAsync(u => u.OAuthUserClaims.Any(c => c.Name == JwtRegisteredClaimNames.PhoneNumber && c.Value == phoneNumber), cancellationToken);
+            var user = await _userRepository.Query().Include(u => u.Groups).Include(u => u.OAuthUserClaims).Include(u => u.Credentials).FirstOrDefaultAsync(u => u.OAuthUserClaims.Any(c => c.Name == JwtRegisteredClaimNames.PhoneNumber && c.Value == phoneNumber), cancellationToken);
             if (user == null)
                 throw new BaseUIException("unknown_phonenumber");
 
@@ -53,7 +53,7 @@ namespace SimpleIdServer.IdServer.Sms.UI.Services
 
         public async Task<long> SendCode(string phoneNumber, CancellationToken cancellationToken)
         {
-            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).Include(u => u.Credentials).FirstOrDefaultAsync(u => u.OAuthUserClaims.Any(c => c.Name == JwtRegisteredClaimNames.PhoneNumber && c.Value == phoneNumber), cancellationToken);
+            var user = await _userRepository.Query().Include(u => u.Groups).Include(u => u.OAuthUserClaims).Include(u => u.Credentials).FirstOrDefaultAsync(u => u.OAuthUserClaims.Any(c => c.Name == JwtRegisteredClaimNames.PhoneNumber && c.Value == phoneNumber), cancellationToken);
             if (user == null)
                 throw new BaseUIException("unknown_phonenumber");
 
