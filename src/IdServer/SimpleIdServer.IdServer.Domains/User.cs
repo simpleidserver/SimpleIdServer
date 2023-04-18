@@ -82,6 +82,7 @@ namespace SimpleIdServer.IdServer.Domains
         public ICollection<Consent> Consents { get; set; } = new List<Consent>();
         public ICollection<UserDevice> Devices { get; set; } = new List<UserDevice>();
         public ICollection<Group> Groups { get; set; } = new List<Group>();
+        public ICollection<UserWalletCredential> WalletCredentials { get; set; } = new List<UserWalletCredential>();
         public IdentityProvisioning? IdentityProvisioning { get; set; } = null;
 
         #region User claims

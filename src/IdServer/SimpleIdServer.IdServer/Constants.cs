@@ -46,6 +46,7 @@ namespace SimpleIdServer.IdServer
             public const string UMAResources = "rreguri";
             public const string IdentityProvisioning = "provisioning";
             public const string PushedAuthorizationRequest = "par";
+            public const string CredentialOffer = "credential_offer";
         }
 
         public static List<string> AllStandardNotificationModes = new List<string>

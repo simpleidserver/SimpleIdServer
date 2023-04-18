@@ -40,5 +40,6 @@ namespace SimpleIdServer.IdServer.DTOs
         public const string PushedAuthorizationRequestEndpoint = "pushed_authorization_request_endpoint";
         public const string RequirePushedAuthorizationRequests = "require_pushed_authorization_requests";
         public const string AuthorizationDetailsSupported = "authorization_details_supported";
+        public const string CredentialOfferEndpoint = "credential_offer_endpoint";
     }
 }

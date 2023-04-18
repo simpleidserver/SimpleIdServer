@@ -1,0 +1,13 @@
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+namespace SimpleIdServer.Did
+{
+    public static class VerificationMethodTypes
+    {
+        public const string EcdsaSecp256k1VerificationKey2019 = "EcdsaSecp256k1VerificationKey2019";
+        public const string EcdsaSecp256k1RecoveryMethod2020 = "EcdsaSecp256k1RecoveryMethod2020";
+        public const string Ed25519VerificationKey2018 = "Ed25519VerificationKey2018";
+        public const string RSAVerificationKey2018 = "RSAVerificationKey2018";
+        public const string X25519KeyAgreementKey2019 = "X25519KeyAgreementKey2019";
+    }
+}

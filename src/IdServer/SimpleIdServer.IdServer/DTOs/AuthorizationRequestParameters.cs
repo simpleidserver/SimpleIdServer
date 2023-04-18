@@ -30,5 +30,15 @@ namespace SimpleIdServer.IdServer.DTOs
         public const string GrantVersion = "grant_version";
         public const string GrantManagementAction = "grant_management_action";
         public const string AuthorizationDetails = "authorization_details";
+        public const string PresentationDefinition = "presentation_definition";
+        public const string PresentationDefinitionUri = "presentation_definition_uri";
+        public const string ClientMetadata = "client_metadata";
+        public const string ClientMetadataUri = "client_metadata_uri";
+        public const string ClientIdScheme = "client_id_scheme";
+        public const string WalletIssuer = "wallet_issuer";
+        public const string UserHint = "user_hint";
+        public const string IssuerState = "issuer_state";
+        public const string PreAuthorizedCode = "pre-authorized_code";
+        public const string UserPin = "user_pin";
     }
 }
