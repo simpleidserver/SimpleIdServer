@@ -10,6 +10,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -101,6 +103,7 @@ namespace SimpleIdServer.Did
             {
                 var origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
                 var diff = DateTime.UtcNow - origin;
+                var controllerKey = di.Address;
                 var now = new BigInteger(Math.Floor(diff.TotalSeconds));
                 var result = new IdentityDocument
                 {
@@ -110,7 +113,9 @@ namespace SimpleIdServer.Did
                 int delegateCount = 0;
                 int serviceCount = 0;
                 var pks = new Dictionary<string, IdentityDocumentVerificationMethod>();
+                var service = new Dictionary<string, IdentityDocumentService>();
                 var auth = new Dictionary<string, string>();
+                var authentication = new List<string> { $"{id}#controller" };
                 var keyAgreementRefs = new Dictionary<string, string>();
                 var regex = new Regex(@"^did\/(pub|svc)\/(\w+)(\/(\w+))?(\/(\w+))?$");
                 foreach (var evt in evts)
@@ -121,11 +126,11 @@ namespace SimpleIdServer.Did
                         if (regex.IsMatch(evt.Identity))
                         {
                             var splitted = evt.Identity.Split('/');
-                            var section = splitted[1];
-                            var algorithm = splitted[2];
-                            var type = splitted[3];
-                            if (legacyAttrTypes.ContainsKey(type)) type = legacyAttrTypes[type];
-                            var encoding = splitted[4];
+                            var section = splitted.ElementAtOrDefault(1);
+                            var algorithm = splitted.ElementAtOrDefault(2);
+                            var type = splitted.ElementAtOrDefault(3);
+                            if (type != null && legacyAttrTypes.ContainsKey(type)) type = legacyAttrTypes[type];
+                            var encoding = splitted.ElementAtOrDefault(4);
                             switch(section)
                             {
                                 case "pub":
@@ -156,17 +161,51 @@ namespace SimpleIdServer.Did
                                     else if (splitted[3] == "enc") keyAgreementRefs.Add(eventIndex, pk.Id);
                                     break;
                                 case "svc":
-
+                                    serviceCount++;
+                                    var endpoint = System.Text.Encoding.UTF8.GetString(Strip0X(evt.Value).HexToByteArray());
+                                    service.Add(eventIndex, new IdentityDocumentService
+                                    {
+                                        Id = $"{id}#service-{serviceCount}",
+                                        Type = algorithm,
+                                        ServiceEndpoint = endpoint
+                                    });
+                                    break;
                             }
-
-                            string ss = "";
                         }
                     }
                 }
+
+                var publicKeys = new List<IdentityDocumentVerificationMethod>
+                {
+                    new IdentityDocumentVerificationMethod
+                    {
+                        Id = $"{id}#controller",
+                        Type = VerificationMethodTypes.EcdsaSecp256k1RecoveryMethod2020,
+                        Controller = id,
+                        BlockChainAccountId = $"eip155:TODO:{controllerKey}"
+                    }
+                };
+                if(controllerKey == di.Address)
+                {
+                    publicKeys.Add(new IdentityDocumentVerificationMethod
+                    {
+                        Id = $"{id}#controllerKey",
+                        Type = VerificationMethodTypes.EcdsaSecp256k1VerificationKey2019,
+                        Controller = id,
+                        PublicKeyHex = Strip0X(controllerKey)
+                    });
+                    authentication.Add($"{id}#controllerKey");
+                }
+
+                publicKeys.AddRange(pks.Select(k => k.Value));
+                result.VertificationMethods = publicKeys;
+                if (authentication.Any()) result.Authentication = authentication;
+                if (service.Any()) result.Service = service.Select(s => s.Value).ToList();
+                result.AssertionMethod = result.VertificationMethods.Select(s => s.Id).ToList();
                 return result;
             }
 
-            string Strip0X(string str) => str.StartsWith("0x") ? str.Skip(2).ToList() : str;
+            string Strip0X(string str) => str.StartsWith("0x") ? new string(str.Skip(2).ToArray()) : str;
         }
     }
 }

@@ -10,9 +10,14 @@ namespace SimpleIdServer.Did
         public string Id { get; set; }
         [JsonPropertyName("type")]
         public string Type { get; set; }
+        /// <summary>
+        /// Entity that is authorized to make changes to a DID document.
+        /// The process of authorizing a DID controller is defined by the DID method.
+        /// </summary>
         [JsonPropertyName("controller")]
         public string Controller { get; set; }
         [JsonPropertyName("blockchainAccountId")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string BlockChainAccountId { get; set; }
         [JsonPropertyName("publicKeyHex")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

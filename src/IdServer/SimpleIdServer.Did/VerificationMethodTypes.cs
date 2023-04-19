@@ -9,5 +9,8 @@ namespace SimpleIdServer.Did
         public const string Ed25519VerificationKey2018 = "Ed25519VerificationKey2018";
         public const string RSAVerificationKey2018 = "RSAVerificationKey2018";
         public const string X25519KeyAgreementKey2019 = "X25519KeyAgreementKey2019";
+        public const string Secp256k1VerificationKey2018 = "Secp256k1VerificationKey2018";
+        public const string Secp256k1SignatureVerificationKey2018 = "Secp256k1SignatureVerificationKey2018";
+        public const string EcdsaPublicKeySecp256k1 = "EcdsaPublicKeySecp256k1";
     }
 }

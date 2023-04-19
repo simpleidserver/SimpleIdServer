@@ -45,6 +45,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Did", "src\I
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Did.Startup", "src\IdServer\SimpleIdServer.Did.Startup\SimpleIdServer.Did.Startup.csproj", "{DB2F6F2C-7ED0-4811-BB6E-03E7F3D82490}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Did.Jwt", "src\IdServer\SimpleIdServer.Did.Jwt\SimpleIdServer.Did.Jwt.csproj", "{0930D2C5-864C-42D7-84E3-D707A44906B5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -119,6 +121,10 @@ Global
 		{DB2F6F2C-7ED0-4811-BB6E-03E7F3D82490}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB2F6F2C-7ED0-4811-BB6E-03E7F3D82490}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DB2F6F2C-7ED0-4811-BB6E-03E7F3D82490}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0930D2C5-864C-42D7-84E3-D707A44906B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0930D2C5-864C-42D7-84E3-D707A44906B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0930D2C5-864C-42D7-84E3-D707A44906B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0930D2C5-864C-42D7-84E3-D707A44906B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -142,6 +148,7 @@ Global
 		{8E4A021B-6525-4326-B290-CFA57FFEFFEA} = {4796A22B-91A9-42AF-87CA-F69392696B0A}
 		{5A2478E6-8225-4839-985E-56FD4000BD46} = {4796A22B-91A9-42AF-87CA-F69392696B0A}
 		{DB2F6F2C-7ED0-4811-BB6E-03E7F3D82490} = {68306EFF-55D9-497B-9482-FEB81C485914}
+		{0930D2C5-864C-42D7-84E3-D707A44906B5} = {4796A22B-91A9-42AF-87CA-F69392696B0A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FE1E2C8-475E-4592-8609-D331B1D01730}
