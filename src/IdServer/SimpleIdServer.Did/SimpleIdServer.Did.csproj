@@ -3,9 +3,4 @@
 		<TargetFramework>net7.0</TargetFramework>
 		<Description>Library used to manimulate Distributed Identity Document.</Description>
 	</PropertyGroup>
-	<ItemGroup>	
-		<PackageReference Include="Nethereum.Web3" Version="4.14.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.*" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.*" />
-	</ItemGroup>
 </Project>

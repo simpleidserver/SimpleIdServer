@@ -2,14 +2,19 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.Signer;
+using SimpleIdServer.Did.Models;
 using System;
 using System.Linq;
 
-namespace SimpleIdServer.Did
+namespace SimpleIdServer.Did.Ethr
 {
-    public class IdentityDocumentIdentifierParser
+    public class IdentityDocumentIdentifierParser : IIdentityDocumentIdentifierParser
     {
-        public static IdentityDocumentIdentifier Parse(string id)
+        public string Type => Constants.Type;
+
+        public IdentityDocumentIdentifier Parse(string id) => InternalParse(id);
+
+        internal static IdentityDocumentIdentifier InternalParse(string id)
         {
             const string start = "did:ethr";
             if (string.IsNullOrWhiteSpace(id)) throw new ArgumentNullException(nameof(id));
@@ -18,11 +23,10 @@ namespace SimpleIdServer.Did
             if (splitted.Count() != 3 && splitted.Count() != 4) throw new ArgumentException($"the DID Identifier must have the following format {start}:<identifier> or {start}:<source>:<identifier>");
             var result = new IdentityDocumentIdentifier(splitted.Last(), splitted.Count() == 4 ? splitted[2] : null);
             var payload = result.Identifier.HexToByteArray();
-            if(result.Identifier.Count() > 42)
+            if (result.Identifier.Count() > 42)
             {
                 var publicKey = new EthECKey(payload, false);
                 result.Address = publicKey.GetPublicAddress();
-                result.PublicKey = publicKey;
             }
             else result.Address = result.Identifier;
             return result;

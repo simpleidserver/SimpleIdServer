@@ -1,8 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Nethereum.Signer;
 
-namespace SimpleIdServer.Did
+namespace SimpleIdServer.Did.Models
 {
     public record IdentityDocumentIdentifier
     {
@@ -17,8 +16,7 @@ namespace SimpleIdServer.Did
         }
 
         public string Identifier { get; set; } = null!;
-        public string? Source { get; set; } = null;
+        public string Source { get; set; } = null;
         public string Address { get; set; } = null!;
-        public EthECKey PublicKey { get; set; } = null;
     }
 }

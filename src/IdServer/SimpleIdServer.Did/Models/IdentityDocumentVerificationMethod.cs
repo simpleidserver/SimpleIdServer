@@ -1,8 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
-namespace SimpleIdServer.Did
+namespace SimpleIdServer.Did.Models
 {
     public class IdentityDocumentVerificationMethod
     {
@@ -21,18 +22,21 @@ namespace SimpleIdServer.Did
         public string BlockChainAccountId { get; set; }
         [JsonPropertyName("publicKeyHex")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string? PublicKeyHex { get; set; } = null;
+        public string PublicKeyHex { get; set; } = null;
         [JsonPropertyName("publicKeyBase64")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string? PublicKeyBase64 { get; set; } = null;
+        public string PublicKeyBase64 { get; set; } = null;
         [JsonPropertyName("publicKeyBase58")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string? PublicKeyBase58 { get; set; } = null;
+        public string PublicKeyBase58 { get; set; } = null;
         [JsonPropertyName("publicKeyPem")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string? PublicKeyPem { get; set; } = null;
+        public string PublicKeyPem { get; set; } = null;
+        [JsonPropertyName("publicKeyJwk")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public JsonObject PublicKeyJwk { get; set; } = null;
         [JsonPropertyName("value")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string? Value { get; set; } = null;
+        public string Value { get; set; } = null;
     }
 }

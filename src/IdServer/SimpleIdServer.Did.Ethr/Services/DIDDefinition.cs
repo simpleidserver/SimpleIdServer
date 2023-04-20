@@ -2,7 +2,7 @@ using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.Contracts;
 using System.Numerics;
 
-namespace SimpleIdServer.Did.Services
+namespace SimpleIdServer.Did.Ethr.Services
 {
     public partial class DIDDeployment : DIDDeploymentBase
     {

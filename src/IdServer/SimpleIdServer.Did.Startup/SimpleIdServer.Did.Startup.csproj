@@ -4,14 +4,6 @@
 		<OutputType>Exe</OutputType>
 	</PropertyGroup>
 	<ItemGroup>
-	  <None Remove="EthereumDID.abi" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Content Include="EthereumDID.abi">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
-	</ItemGroup>
-	<ItemGroup>
-	  <ProjectReference Include="..\SimpleIdServer.Did\SimpleIdServer.Did.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.Did.Jwt\SimpleIdServer.Did.Jwt.csproj" />
 	</ItemGroup>
 </Project>

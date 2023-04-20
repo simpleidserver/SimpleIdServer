@@ -3,7 +3,7 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace SimpleIdServer.Did
+namespace SimpleIdServer.Did.Models
 {
     public class IdentityDocument
     {
@@ -15,8 +15,8 @@ namespace SimpleIdServer.Did
         /// Expression verification methods, such as cryptographic public keys, which can be used to authenticate or authorize interactions with the DID subject of associated parties.
         /// Public Key can be used as a verification method with respect to a digital signature, it verifies that the signer could use the associated cryptographic private key.
         /// </summary>
-        [JsonPropertyName("vertificationMethod")]
-        public ICollection<IdentityDocumentVerificationMethod> VertificationMethods { get; set; } = new List<IdentityDocumentVerificationMethod>();
+        [JsonPropertyName("verificationMethod")]
+        public ICollection<IdentityDocumentVerificationMethod> VerificationMethod { get; set; } = new List<IdentityDocumentVerificationMethod>();
         /// <summary>
         /// Used to specify how the DID subject is expected to be authenticated.
         /// Each verification method MAY be embedded or referenced.

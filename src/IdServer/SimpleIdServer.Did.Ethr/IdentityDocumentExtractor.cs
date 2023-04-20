@@ -5,20 +5,19 @@ using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using Nethereum.Web3;
-using SimpleIdServer.Did.Services;
+using SimpleIdServer.Did.Ethr.Services;
+using SimpleIdServer.Did.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.Did
+namespace SimpleIdServer.Did.Ethr
 {
-    public class IdentityDocumentExtractor
+    public class IdentityDocumentExtractor : IIdentityDocumentExtractor
     {
         private static Dictionary<string, string> legacyAttrTypes = new Dictionary<string, string>
         {
@@ -42,9 +41,11 @@ namespace SimpleIdServer.Did
             _store = store;
         }
 
+        public string Type => Constants.Type;
+
         public async Task<IdentityDocument> Extract(string id, CancellationToken cancellationToken)
         {
-            var di = IdentityDocumentIdentifierParser.Parse(id);
+            var di = IdentityDocumentIdentifierParser.InternalParse(id);
             var networkConf = _store.Query().SingleOrDefault(n => n.Name == di.Source);
             if (networkConf == null) throw new InvalidOperationException($"the source {di.Source} is not supported");
             var service = new DIDService(new Web3(networkConf.RpcUrl), networkConf.ContractAdr);
@@ -198,10 +199,10 @@ namespace SimpleIdServer.Did
                 }
 
                 publicKeys.AddRange(pks.Select(k => k.Value));
-                result.VertificationMethods = publicKeys;
+                result.VerificationMethod = publicKeys;
                 if (authentication.Any()) result.Authentication = authentication;
                 if (service.Any()) result.Service = service.Select(s => s.Value).ToList();
-                result.AssertionMethod = result.VertificationMethods.Select(s => s.Id).ToList();
+                result.AssertionMethod = result.VerificationMethod.Select(s => s.Id).ToList();
                 return result;
             }
 

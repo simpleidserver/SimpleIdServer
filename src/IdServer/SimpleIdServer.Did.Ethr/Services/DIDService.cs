@@ -4,7 +4,7 @@ using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.Did.Services
+namespace SimpleIdServer.Did.Ethr.Services
 {
     public partial class DIDService
     {
