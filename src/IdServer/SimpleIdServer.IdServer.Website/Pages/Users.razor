@@ -9,6 +9,8 @@
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @using SimpleIdServer.IdServer.Website.Stores.UserStore;
 
+<RadzenButton class="mb-1" Click="@(args => AddUser())" Icon="add" Text="Add user" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+
 <RadzenDataGrid @ref=gridUsers
         AllowFiltering="true"
         AllowColumnResize="true"
@@ -34,7 +36,7 @@
                 <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableUser" Filterable="false" Sortable="true" Title="Login" Width="80px">
+        <RadzenDataGridColumn TItem="SelectableUser" Filterable="false" Sortable="true" Title="Id" Width="80px">
             <Template Context="data">
                 <RadzenLink Text="@data.Value.Id" Path="@($"/users/{data.Value.Id}/settings")" />
             </Template>
@@ -78,6 +80,11 @@
             {
                 gridUsers.Reload();
                 StateHasChanged();
+            });
+            SubscribeToAction<AddUserSuccessAction>(async (act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.UserAdded });
+                dialogService.Close();
             });
             if (!userState.Value.IsLoading)
                 gridUsers.Reload();
@@ -125,5 +132,16 @@
             row.Attributes.Add(className, "active");
         else if (row.Attributes.ContainsKey(className))
             row.Attributes.Remove(className);
+    }
+
+    async void AddUser()
+    {
+        await dialogService.OpenAsync<AddUserDialog>("Add user", new Dictionary<string, object>(), new DialogOptions
+        {
+            Width = "700px",
+            Height ="512px",
+            Resizable = true,
+            Draggable = true
+        });
     }
 }

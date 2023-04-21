@@ -15,5 +15,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         }
 
         public bool IsUpdating { get; set; } = false;
+        public string ErrorMessage { get; set; } = null;
     }
 }
