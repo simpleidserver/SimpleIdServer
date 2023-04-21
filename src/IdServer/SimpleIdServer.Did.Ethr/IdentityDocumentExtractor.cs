@@ -19,6 +19,8 @@ namespace SimpleIdServer.Did.Ethr
 {
     public class IdentityDocumentExtractor : IIdentityDocumentExtractor
     {
+        private readonly DidEthrOptions _options;
+
         private static Dictionary<string, string> legacyAttrTypes = new Dictionary<string, string>
         {
             { "sigAuth", "SignatureAuthentication2018" },
@@ -36,9 +38,10 @@ namespace SimpleIdServer.Did.Ethr
         };
         private readonly IIdentityDocumentConfigurationStore _store;
 
-        public IdentityDocumentExtractor(IIdentityDocumentConfigurationStore store)
+        public IdentityDocumentExtractor(IIdentityDocumentConfigurationStore store, DidEthrOptions options = null)
         {
             _store = store;
+            _options = options ?? new DidEthrOptions();
         }
 
         public string Type => Constants.Type;
@@ -48,7 +51,8 @@ namespace SimpleIdServer.Did.Ethr
             var di = IdentityDocumentIdentifierParser.InternalParse(id);
             var networkConf = _store.Query().SingleOrDefault(n => n.Name == di.Source);
             if (networkConf == null) throw new InvalidOperationException($"the source {di.Source} is not supported");
-            var service = new DIDService(new Web3(networkConf.RpcUrl), networkConf.ContractAdr);
+            var rpcUrl = string.Format(networkConf.RpcUrl, _options.InfuraProjectId);
+            var service = new EthereumDIDRegistryService(new Web3(networkConf.RpcUrl), networkConf.ContractAdr);
             var attributeChangedDTO = service.ContractHandler.GetEvent<DIDAttributeChangedEventDTO>();
             var evts = await ExtractEvents();
             return Build();
@@ -89,7 +93,6 @@ namespace SimpleIdServer.Did.Ethr
                 var attributeChanged = attributeChangedDTO.DecodeAllEventsForEvent(logs).First();
                 var evt = attributeChanged.Event;
                 var tt = evt.ValidTo.ToHexBigInteger();
-
                 var stringBytesDecoder = new StringBytes32Decoder();
                 return new ERC1056Event
                 {
@@ -199,10 +202,10 @@ namespace SimpleIdServer.Did.Ethr
                 }
 
                 publicKeys.AddRange(pks.Select(k => k.Value));
-                result.VerificationMethod = publicKeys;
-                if (authentication.Any()) result.Authentication = authentication;
-                if (service.Any()) result.Service = service.Select(s => s.Value).ToList();
-                result.AssertionMethod = result.VerificationMethod.Select(s => s.Id).ToList();
+                foreach (var publicKey in publicKeys) result.AddVerificationMethod(publicKey);
+                if (authentication.Any()) foreach (var a in authentication) result.AddAuthentication(a);
+                if (service.Any()) foreach(var s in service.Select(s => s.Value).ToList()) result.AddService(s);
+                foreach (var verif in result.VerificationMethod.Select(s => s.Id).ToList()) result.AddAuthentication(verif);
                 return result;
             }
 

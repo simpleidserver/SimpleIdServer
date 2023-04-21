@@ -10,10 +10,16 @@
 
   <ItemGroup>
     <None Remove="didDoc.json" />
+    <None Remove="files\did-ethr-0xb9c5714089478a327f09197987f16f9e5d936e8a.json" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="didDoc.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="files\did-ethr-0xb9c5714089478a327f09197987f16f9e5d936e8a.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
@@ -28,6 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.Did.Ethr\SimpleIdServer.Did.Ethr.csproj" />
     <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.Did.Jwt\SimpleIdServer.Did.Jwt.csproj" />
   </ItemGroup>
 </Project>

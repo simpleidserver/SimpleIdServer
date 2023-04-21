@@ -4,6 +4,7 @@
 		<OutputType>Exe</OutputType>
 	</PropertyGroup>
 	<ItemGroup>
+	  <ProjectReference Include="..\SimpleIdServer.Did.Ethr\SimpleIdServer.Did.Ethr.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.Did.Jwt\SimpleIdServer.Did.Jwt.csproj" />
 	</ItemGroup>
 </Project>
