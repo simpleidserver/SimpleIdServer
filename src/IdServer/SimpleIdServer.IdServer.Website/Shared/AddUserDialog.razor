@@ -1,0 +1,56 @@
+@using SimpleIdServer.IdServer.Website.Stores.UserStore;
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject IDispatcher dispatcher
+@inject IState<UpdateUserState> updateUserState
+
+<RadzenTemplateForm Submit=@AddUser TItem="AddUserForm" Data=@addUser>
+    @if(!updateUserState.Value.IsUpdating && !string.IsNullOrWhiteSpace(updateUserState.Value.ErrorMessage))
+    {
+        <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@updateUserState.Value.ErrorMessage</RadzenAlert>
+    }
+
+    <!-- Name -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+        <RadzenTextBox Name="Name" @bind-Value="@addUser.Name" Class="w-100"></RadzenTextBox>
+        <RadzenRequiredValidator Component="Name" Text="Name is required"></RadzenRequiredValidator>
+    </div>
+    <!-- FirstName -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">First name</RadzenText>
+        <RadzenTextBox Name="FirstName" @bind-Value="@addUser.FirstName" class="w-100"></RadzenTextBox>
+    </div>
+    <!-- LastName -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Last name</RadzenText>
+        <RadzenTextBox Name="LastName" @bind-Value="@addUser.LastName" class="w-100"></RadzenTextBox>
+    </div>
+    <!-- Email -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Email</RadzenText>
+        <RadzenTextBox Name="Email" @bind-Value="@addUser.Email" class="w-100"></RadzenTextBox>
+        <RadzenEmailValidator Component="Email" Text="Provide a valid email address" />
+    </div>
+    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateUserState.Value.IsUpdating ? "Adding..." : "Add")" Disabled=updateUserState.Value.IsUpdating />
+</RadzenTemplateForm>
+
+@code {
+    record AddUserForm
+    {
+        public string Name { get; set; }
+        public string? FirstName { get; set; } = null;
+        public string? LastName { get; set; } = null;
+        public string? Email { get; set; } = null;
+    }
+    AddUserForm addUser = new AddUserForm();
+    void AddUser(AddUserForm user)
+    {
+        dispatcher.Dispatch(new AddUserAction
+        {
+            Email = user.Email,
+            Firstname = user.FirstName,
+            Lastname = user.LastName,
+            Name = user.Name
+        });
+    }
+}
