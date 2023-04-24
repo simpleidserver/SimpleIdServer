@@ -12,15 +12,15 @@ namespace SimpleIdServer.Did.Crypto
     {
         public static ISignatureKey Build(IdentityDocumentVerificationMethod validationMethod, string alg)
         {
-            if (alg != SupportedSignatureKeyAlgs.ES256K && alg != SupportedSignatureKeyAlgs.Ed25519 && alg != SupportedSignatureKeyAlgs.ES256) throw new NotImplementedException("Only ES256K is supported");
+            if (alg != Constants.SupportedSignatureKeyAlgs.ES256K && alg != Constants.SupportedSignatureKeyAlgs.Ed25519 && alg != Constants.SupportedSignatureKeyAlgs.ES256) throw new NotImplementedException("Only ES256K is supported");
             var publicKey = ExtractPublicKey(validationMethod);
             switch(alg)
             {
-                case SupportedSignatureKeyAlgs.ES256K:
+                case Constants.SupportedSignatureKeyAlgs.ES256K:
                     return new ES256KSignatureKey(publicKey);
-                case SupportedSignatureKeyAlgs.Ed25519:
+                case Constants.SupportedSignatureKeyAlgs.Ed25519:
                     return new Ed25519SignatureKey(publicKey, null);
-                case SupportedSignatureKeyAlgs.ES256:
+                case Constants.SupportedSignatureKeyAlgs.ES256:
                     return new ES256SignatureKey(publicKey, null);
                 default:
                     throw new NotImplementedException($"{alg} is notsupported");

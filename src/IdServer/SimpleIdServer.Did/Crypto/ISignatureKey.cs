@@ -6,6 +6,7 @@ namespace SimpleIdServer.Did.Crypto
 {
     public interface ISignatureKey
     {
+        string Name { get; }
         bool Check(string content, string signature);
         string Sign(string content);
         IdentityDocumentVerificationMethod ExtractVerificationMethodWithPublicKey();

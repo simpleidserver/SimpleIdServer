@@ -22,7 +22,7 @@ namespace SimpleIdServer.Did
                 identityDocument.AddVerificationMethod(new IdentityDocumentVerificationMethod
                 {
                     Id = newId,
-                    Type = VerificationMethodTypes.EcdsaSecp256k1VerificationKey2019,
+                    Type = Constants.VerificationMethodTypes.EcdsaSecp256k1VerificationKey2019,
                     Controller = did,
                     PublicKeyHex = parsed.PublicKey
                 });

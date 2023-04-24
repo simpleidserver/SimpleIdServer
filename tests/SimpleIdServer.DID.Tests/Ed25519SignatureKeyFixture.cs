@@ -11,7 +11,6 @@ namespace SimpleIdServer.DID.Tests
         [Test]
         public void When_BuildSignature_Then_SignatureIsCorrect()
         {
-            // https://github.com/decentralized-identity/did-jwt/blob/986ff37840d730216163357dad8f4307270f5c32/src/__tests__/SignerAlgorithm.test.ts
             var privateKey = "nlXR4aofRVuLqtn9+XVQNlX4s1nVQvp+TOhBBtYls1IG+sHyIkDP/WN+rWZHGIQp+v2pyct+rkM4asF/YRFQdQ==";
             var plaintext = "hello";
             var key = new Ed25519SignatureKey(null, Base64UrlEncoder.DecodeBytes(privateKey));

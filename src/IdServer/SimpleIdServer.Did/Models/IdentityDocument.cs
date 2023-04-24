@@ -1,7 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Did.Events;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -43,10 +45,21 @@ namespace SimpleIdServer.Did.Models
         [JsonIgnore]
         public ICollection<IEvent> Events { get; set; } = new List<IEvent>();
 
-        public void AddVerificationMethod(IdentityDocumentVerificationMethod verificationMethod)
+        public KeyPurposes GetKeyPurpose(IdentityDocumentVerificationMethod verificationMethod)
+        {
+            if (Authentication != null && Authentication.Any(a => verificationMethod.Id == a)) return KeyPurposes.SigAuthentication;
+            if (AssertionMethod != null && AssertionMethod.Any(m => verificationMethod.Id == m)) return KeyPurposes.VerificationKey;
+            throw new InvalidOperationException("enc is not supported");
+        }
+
+        public void AddVerificationMethod(IdentityDocumentVerificationMethod verificationMethod, bool isStandard = true)
         {
             if (VerificationMethod == null) VerificationMethod = new List<IdentityDocumentVerificationMethod>();
             VerificationMethod.Add(verificationMethod);
+            if (!isStandard) Events.Add(new VerificationMethodAdded
+            {
+                VerificationMethod = verificationMethod
+            });
         }
 
         public void AddAuthentication(string authentication)

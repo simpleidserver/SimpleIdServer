@@ -32,6 +32,8 @@ namespace SimpleIdServer.Did.Crypto
             }
         }
 
+        public string Name => Constants.SupportedSignatureKeyAlgs.Ed25519;
+
         public bool Check(string content, string signature)
         {
             if (_publicKey == null) throw new InvalidOperationException("There is no public key");

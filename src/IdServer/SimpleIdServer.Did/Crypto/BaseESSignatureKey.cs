@@ -22,7 +22,7 @@ namespace SimpleIdServer.Did.Crypto
         private readonly ECDomainParameters _domainParameters;
         private readonly X9ECParameters _secp256k1;
 
-        public BaseESSignatureKey(byte[] publicKey)
+        public BaseESSignatureKey(byte[] publicKey, byte[] privateKey = null)
         {
             _secp256k1 = SecNamedCurves.GetByName(CurveName);
             _domainParameters = new ECDomainParameters(_secp256k1.Curve, _secp256k1.G, _secp256k1.N, _secp256k1.H);
@@ -31,13 +31,11 @@ namespace SimpleIdServer.Did.Crypto
                 var q = _secp256k1.Curve.DecodePoint(publicKey);
                 _publicKeyParameters = new ECPublicKeyParameters("EC", q, _domainParameters);
             }
+
+            if (privateKey != null) _privateKeyParameters = new ECPrivateKeyParameters(new Org.BouncyCastle.Math.BigInteger(1, privateKey), _domainParameters);
         }
 
-        public BaseESSignatureKey(byte[] publicKey, byte[] privateKey) : this(publicKey)
-        {
-            if(privateKey != null) _privateKeyParameters = new ECPrivateKeyParameters(new Org.BouncyCastle.Math.BigInteger(1, privateKey), _domainParameters);
-        }
-
+        public abstract string Name { get; }
         public abstract string CurveName { get; }
 
         public ECPublicKeyParameters PublicKey

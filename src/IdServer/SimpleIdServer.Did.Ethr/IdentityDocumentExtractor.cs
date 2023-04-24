@@ -20,22 +20,6 @@ namespace SimpleIdServer.Did.Ethr
     public class IdentityDocumentExtractor : IIdentityDocumentExtractor
     {
         private readonly DidEthrOptions _options;
-
-        private static Dictionary<string, string> legacyAttrTypes = new Dictionary<string, string>
-        {
-            { "sigAuth", "SignatureAuthentication2018" },
-            { "veriKey", "VerificationKey2018" },
-            { "enc", "KeyAgreementKey2019" }
-        };
-        private static Dictionary<string, string> legacyAlgo = new Dictionary<string, string>
-        {
-            { "Secp256k1VerificationKey2018", VerificationMethodTypes.EcdsaSecp256k1VerificationKey2019 },
-            { "Ed25519SignatureAuthentication2018", VerificationMethodTypes.Ed25519VerificationKey2018 },
-            { "Secp256k1SignatureAuthentication2018", VerificationMethodTypes.EcdsaSecp256k1VerificationKey2019 },
-            { "RSAVerificationKey2018", VerificationMethodTypes.RSAVerificationKey2018 },
-            { "Ed25519VerificationKey2018", VerificationMethodTypes.Ed25519VerificationKey2018 },
-            { "X25519KeyAgreementKey2019", VerificationMethodTypes.X25519KeyAgreementKey2019 }
-        };
         private readonly IIdentityDocumentConfigurationStore _store;
 
         public IdentityDocumentExtractor(IIdentityDocumentConfigurationStore store, DidEthrOptions options = null)
@@ -119,6 +103,7 @@ namespace SimpleIdServer.Did.Ethr
                 var pks = new Dictionary<string, IdentityDocumentVerificationMethod>();
                 var service = new Dictionary<string, IdentityDocumentService>();
                 var auth = new Dictionary<string, string>();
+                var assertion = new Dictionary<string, string>();
                 var authentication = new List<string> { $"{id}#controller" };
                 var keyAgreementRefs = new Dictionary<string, string>();
                 var regex = new Regex(@"^did\/(pub|svc)\/(\w+)(\/(\w+))?(\/(\w+))?$");
@@ -133,7 +118,7 @@ namespace SimpleIdServer.Did.Ethr
                             var section = splitted.ElementAtOrDefault(1);
                             var algorithm = splitted.ElementAtOrDefault(2);
                             var type = splitted.ElementAtOrDefault(3);
-                            if (type != null && legacyAttrTypes.ContainsKey(type)) type = legacyAttrTypes[type];
+                            if (type != null && Constants.LegacyAttrTypes.ContainsKey(type)) type = Constants.LegacyAttrTypes[type];
                             var encoding = splitted.ElementAtOrDefault(4);
                             switch(section)
                             {
@@ -145,7 +130,7 @@ namespace SimpleIdServer.Did.Ethr
                                         Type = $"{algorithm}{type}",
                                         Controller = id
                                     };
-                                    if (legacyAlgo.ContainsKey(pk.Type)) pk.Type = legacyAlgo[pk.Type];
+                                    if (Constants.LegacyAlgos.ContainsKey(pk.Type)) pk.Type = Constants.LegacyAlgos[pk.Type];
                                     else pk.Type = algorithm;
                                     switch(encoding)
                                     {
@@ -162,6 +147,7 @@ namespace SimpleIdServer.Did.Ethr
 
                                     pks.Add(eventIndex, pk);
                                     if (splitted[3] == "sigAuth") auth.Add(eventIndex, pk.Id);
+                                    else if (splitted[3] == "veriKey") assertion.Add(eventIndex, pk.Id);
                                     else if (splitted[3] == "enc") keyAgreementRefs.Add(eventIndex, pk.Id);
                                     break;
                                 case "svc":
@@ -184,9 +170,9 @@ namespace SimpleIdServer.Did.Ethr
                     new IdentityDocumentVerificationMethod
                     {
                         Id = $"{id}#controller",
-                        Type = VerificationMethodTypes.EcdsaSecp256k1RecoveryMethod2020,
+                        Type = Did.Constants.VerificationMethodTypes.EcdsaSecp256k1RecoveryMethod2020,
                         Controller = id,
-                        BlockChainAccountId = $"eip155:TODO:{controllerKey}"
+                        BlockChainAccountId = $"eip155:1:{controllerKey}"
                     }
                 };
                 if(controllerKey == di.Address)
@@ -194,7 +180,7 @@ namespace SimpleIdServer.Did.Ethr
                     publicKeys.Add(new IdentityDocumentVerificationMethod
                     {
                         Id = $"{id}#controllerKey",
-                        Type = VerificationMethodTypes.EcdsaSecp256k1VerificationKey2019,
+                        Type = Did.Constants.VerificationMethodTypes.EcdsaSecp256k1VerificationKey2019,
                         Controller = id,
                         PublicKeyHex = Strip0X(controllerKey)
                     });
@@ -205,7 +191,7 @@ namespace SimpleIdServer.Did.Ethr
                 foreach (var publicKey in publicKeys) result.AddVerificationMethod(publicKey);
                 if (authentication.Any()) foreach (var a in authentication) result.AddAuthentication(a);
                 if (service.Any()) foreach(var s in service.Select(s => s.Value).ToList()) result.AddService(s);
-                foreach (var verif in result.VerificationMethod.Select(s => s.Id).ToList()) result.AddAuthentication(verif);
+                if (assertion.Any()) foreach(var method in assertion.Select(kvp => kvp.Value)) result.AddAssertionMethod(method);
                 return result;
             }
 

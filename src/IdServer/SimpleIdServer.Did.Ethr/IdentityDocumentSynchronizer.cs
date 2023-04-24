@@ -2,10 +2,10 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Nethereum.ABI.Encoders;
 using Nethereum.Hex.HexConvertors.Extensions;
+using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Ethr.Services;
 using SimpleIdServer.Did.Events;
 using SimpleIdServer.Did.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -37,6 +37,7 @@ namespace SimpleIdServer.Did.Ethr
         {
             var result = new List<SetAttributeFunction>();
             var serviceAddedLst = document.Events.Where(e => e.Name == ServiceAdded.DEFAULT_NAME).Cast<ServiceAdded>();
+            var verificationMethodAddedLst = document.Events.Where(e => e.Name == VerificationMethodAdded.DEFAULT_NAME).Cast<VerificationMethodAdded>().Select(v => v.VerificationMethod);
             var encoder = new Bytes32TypeEncoder();
             foreach (var serviceAdded in serviceAddedLst)
             {
@@ -50,7 +51,29 @@ namespace SimpleIdServer.Did.Ethr
                 });
             }
 
+            foreach(var verificationMethod in verificationMethodAddedLst)
+            {
+                var type = document.GetKeyPurpose(verificationMethod);
+                var alg = verificationMethod.Type;
+                var publicKey = SignatureKeyFactory.ExtractPublicKey(verificationMethod);
+                var hex = $"0x{publicKey.ToHex()}";
+                var value = hex.HexToByteArray();
+                var name = $"did/pub/{IdentityDocumentVerificationMethod.GetAlg(GetLegacyType(verificationMethod))}/{Constants.KeyPurposeNames[type]}/hex";
+                result.Add(new SetAttributeFunction
+                {
+                    Identity = address,
+                    Name = encoder.Encode(name),
+                    Value = value
+                });
+            }
+
             return result;
+
+            string GetLegacyType(IdentityDocumentVerificationMethod verificationMethod)
+            {
+                if (!Constants.LegacyAlgos.Values.Contains(verificationMethod.Type)) return verificationMethod.Type;
+                return Constants.LegacyAlgos.First(kvp => kvp.Value == verificationMethod.Type).Key;
+            }
         }
     }
 }

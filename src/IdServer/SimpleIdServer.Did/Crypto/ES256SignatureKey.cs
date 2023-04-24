@@ -14,5 +14,6 @@ namespace SimpleIdServer.Did.Crypto
         }
 
         public override string CurveName => "secp256r1";
+        public override string Name => Constants.SupportedSignatureKeyAlgs.ES256;
     }
 }

@@ -11,18 +11,18 @@ namespace SimpleIdServer.Did.Jwt
     // Implement : https://github.com/decentralized-identity/did-jwt/blob/87cbfd0f719fc2fdb0ac83ed9ca964b3c1b1b1a9/src/JWT.ts
     public class JwtValidator
     {
-        public bool Validate(string json, IdentityDocument document, ProofTypes proofType = ProofTypes.Authentication)
+        public bool Validate(string json, IdentityDocument document, KeyPurposes keyPurpose = KeyPurposes.SigAuthentication)
         {
             var handler = new JsonWebTokenHandler();
             var jwt = handler.ReadJsonWebToken(json);
             if (string.IsNullOrWhiteSpace(jwt.Issuer)) throw new InvalidOperationException("JWT iss is required");
             var did = jwt.Issuer;
             var alg = jwt.Alg;
-            if (!SupportedPublicKeyTypes.Values.ContainsKey(alg)) throw new InvalidOperationException($"Alg {alg} is not supported");
-            var keyTypes = SupportedPublicKeyTypes.Values[alg];
+            if (!Constants.SupportedPublicKeyTypes.ContainsKey(alg)) throw new InvalidOperationException($"Alg {alg} is not supported");
+            var keyTypes = Constants.SupportedPublicKeyTypes[alg];
             var ids = document.Authentication;
-            if (proofType == ProofTypes.Assertion) ids = document.AssertionMethod;
-            if (!ids.Any()) throw new InvalidOperationException($"There is no key to used for the proof type {proofType}");
+            if (keyPurpose == KeyPurposes.VerificationKey) ids = document.AssertionMethod;
+            if (!ids.Any()) throw new InvalidOperationException($"There is no key to used for the proof type {keyPurpose}");
             var authenticators = document.VerificationMethod.Where(m => keyTypes.Contains(m.Type));
             if (!authenticators.Any()) throw new InvalidOperationException($"DID Document does not have public keyh for {alg}");
             foreach (var authenticator in authenticators)

@@ -3,6 +3,7 @@
 
 using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -33,15 +34,28 @@ namespace SimpleIdServer.Did
             return this;
         }
 
-        public IdentityDocumentBuilder AddVerificationMethod(ISignatureKey signatureKey, string type)
+        public IdentityDocumentBuilder AddVerificationMethod(ISignatureKey signatureKey, string type, KeyPurposes purpose = KeyPurposes.VerificationKey)
         {
+            var types = Constants.SupportedPublicKeyTypes[signatureKey.Name];
+            if (!types.Contains(type)) throw new InvalidOperationException($"the type {type} is not supported for the algorithm {signatureKey}");
             var verificationMethod = signatureKey.ExtractVerificationMethodWithPublicKey();
             var id = $"{_identityDocument.Id}#delegate-{(_identityDocument.VerificationMethod.Where(m => m.Id.Contains("#delegate")).Count() + 1)}";
             verificationMethod.Controller = _identityDocument.Id;
-            verificationMethod.Id = _identityDocument.Id;
+            verificationMethod.Id = id;
             verificationMethod.Type = type;
-            _identityDocument.AddVerificationMethod(verificationMethod);
-            _identityDocument.AddAssertionMethod(id);
+            _identityDocument.AddVerificationMethod(verificationMethod, false);
+            switch (purpose)
+            {
+                case KeyPurposes.VerificationKey:
+                    _identityDocument.AddAssertionMethod(id);
+                    break;
+                case KeyPurposes.SigAuthentication:
+                    _identityDocument.AddAuthentication(id);
+                    break;
+                default:
+                    throw new InvalidOperationException("enc is not supported");
+            }
+
             return this;
         }
 
@@ -60,7 +74,7 @@ namespace SimpleIdServer.Did
             result.AddVerificationMethod(new IdentityDocumentVerificationMethod
             {
                 Id = $"{did}#controller",
-                Type = VerificationMethodTypes.EcdsaSecp256k1RecoveryMethod2020,
+                Type = Constants.VerificationMethodTypes.EcdsaSecp256k1RecoveryMethod2020,
                 Controller = did,
                 BlockChainAccountId = $"eip155:1:{publicAdr}"
             });

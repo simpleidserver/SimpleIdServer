@@ -1,10 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-namespace SimpleIdServer.Did.Jwt
+namespace SimpleIdServer.Did.Models
 {
-    public enum ProofTypes
+    public enum KeyPurposes
     {
-        Authentication = 0,
-        Assertion = 1
+        SigAuthentication = 0,
+        VerificationKey = 1,
+        Encryption = 2
     }
 }

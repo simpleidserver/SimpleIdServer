@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using System.Numerics;
 
-namespace SimpleIdServer.Did.Models
+namespace SimpleIdServer.Did.Ethr
 {
     public record ERC1056Event
     {

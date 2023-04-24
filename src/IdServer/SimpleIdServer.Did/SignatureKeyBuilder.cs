@@ -28,6 +28,18 @@ namespace SimpleIdServer.Did
             return new ES256KSignatureKey(null, privateBytes);
         }
 
+        public static ISignatureKey NewES256()
+        {
+            var secureRandom = new SecureRandom();
+            var gen = new ECKeyPairGenerator("EC");
+            var keyGenParam = new KeyGenerationParameters(secureRandom, 256);
+            gen.Init(keyGenParam);
+            var keyPair = gen.GenerateKeyPair();
+            var privateBytes = ((ECPrivateKeyParameters)keyPair.Private).D.ToByteArrayUnsigned();
+            if (privateBytes.Length != 32) return NewES256();
+            return new ES256SignatureKey(null, privateBytes);
+        }
+
         public static ISignatureKey NewED25519()
         {
             var gen = new Ed25519KeyPairGenerator();
