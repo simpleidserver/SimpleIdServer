@@ -22,11 +22,14 @@ namespace SimpleIdServer.Did.Models
         public ICollection<IdentityDocumentVerificationMethod> VerificationMethod { get; set; } = null;
         /// <summary>
         /// Used to specify how the DID subject is expected to be authenticated.
-        /// Each verification method MAY be embedded or referenced.
+        /// Each verification method MAY be embedded or referenced, for purposes sur as logging into a website.
         /// </summary>
         [JsonPropertyName("authentication")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ICollection<string> Authentication { get; set; } = null;
+        /// <summary>
+        /// Used to specify how the DID subject is excepted to express claims, such as the purposes of issuing a verifiable credential.
+        /// </summary>
         [JsonPropertyName("assertionMethod")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ICollection<string> AssertionMethod { get; set; } = null;

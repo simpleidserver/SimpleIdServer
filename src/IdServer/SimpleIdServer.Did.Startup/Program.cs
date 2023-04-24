@@ -1,11 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Did;
+using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Ethr;
 using SimpleIdServer.Did.Ethr.Services;
 using SimpleIdServer.Did.Extensions;
 using SimpleIdServer.Did.Jwt;
-using SimpleIdServer.Did.Jwt.Crypto;
 using SimpleIdServer.Did.Models;
 using System;
 using System.IO;
@@ -80,11 +80,20 @@ async void SyncIdentityDocument()
     // This controller address must be represented in the DID Document as a verificationMethod entry with the id set as the DID besing resolved and with the fragment #controller appênded to it.
     // ERTC1056 contract publishes three types of events for each identifier.
 }
+
 async void ExtractDID()
+{
+    var extractor = new IdentityDocumentExtractor(new IdentityDocumentConfigurationStore());
+    var etherDidDocument = await extractor.Extract($"did:ethr:{network}:{publicKey}", CancellationToken.None);
+}
+
+async void ExtractDIDAndAddPublicKey()
 {
     var extractor = new IdentityDocumentExtractor(new IdentityDocumentConfigurationStore());
     // var auroraDidDocument = await extractor.Extract("did:ethr:aurora:0x036d148205e34a8591dcdcea34fb7fed760f5f1eca66d254830833f755ff359ef0", CancellationToken.None);
     var etherDidDocument = await extractor.Extract($"did:ethr:{network}:{publicKey}", CancellationToken.None);
+    // IdentityDocumentBuilder.New(etherDidDocument).AddServiceEndpoint();
+    // etherDidDocument.AddAuthentication();
 }
 
 void DisplayDidDocument(IdentityDocument document)

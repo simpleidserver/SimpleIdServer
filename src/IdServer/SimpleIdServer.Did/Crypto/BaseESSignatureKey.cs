@@ -6,41 +6,45 @@ using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Crypto.Signers;
 using Org.BouncyCastle.Math;
+using SimpleIdServer.Did.Extensions;
+using SimpleIdServer.Did.Models;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace SimpleIdServer.Did.Jwt.Crypto
+namespace SimpleIdServer.Did.Crypto
 {
-    public class ES256KSignatureKey : ISignatureKey
+    public abstract class BaseESSignatureKey : ISignatureKey
     {
         private ECPublicKeyParameters _publicKeyParameters;
         private readonly ECPrivateKeyParameters _privateKeyParameters;
         private readonly ECDomainParameters _domainParameters;
         private readonly X9ECParameters _secp256k1;
 
-        public ES256KSignatureKey(byte[] publicKey)
+        public BaseESSignatureKey(byte[] publicKey)
         {
-            _secp256k1 = SecNamedCurves.GetByName("secp256k1");
+            _secp256k1 = SecNamedCurves.GetByName(CurveName);
             _domainParameters = new ECDomainParameters(_secp256k1.Curve, _secp256k1.G, _secp256k1.N, _secp256k1.H);
-            if(publicKey != null)
+            if (publicKey != null)
             {
                 var q = _secp256k1.Curve.DecodePoint(publicKey);
                 _publicKeyParameters = new ECPublicKeyParameters("EC", q, _domainParameters);
             }
         }
 
-        public ES256KSignatureKey(byte[] publicKey, byte[] privateKey) : this(publicKey)
+        public BaseESSignatureKey(byte[] publicKey, byte[] privateKey) : this(publicKey)
         {
-            _privateKeyParameters = new ECPrivateKeyParameters(new Org.BouncyCastle.Math.BigInteger(1, privateKey), _domainParameters);
+            if(privateKey != null) _privateKeyParameters = new ECPrivateKeyParameters(new Org.BouncyCastle.Math.BigInteger(1, privateKey), _domainParameters);
         }
+
+        public abstract string CurveName { get; }
 
         public ECPublicKeyParameters PublicKey
         {
             get
             {
-                if(_publicKeyParameters == null)
+                if (_publicKeyParameters == null)
                 {
                     var q = _secp256k1.G.Multiply(_privateKeyParameters.D);
                     _publicKeyParameters = new ECPublicKeyParameters("EC", q, _domainParameters);
@@ -48,6 +52,14 @@ namespace SimpleIdServer.Did.Jwt.Crypto
 
                 return _publicKeyParameters;
             }
+        }
+
+        public byte[] GetPubKey()
+        {
+            var q = PublicKey.Q;
+            q = q.Normalize();
+            var publicKey = _secp256k1.Curve.CreatePoint(q.XCoord.ToBigInteger(), q.YCoord.ToBigInteger()).GetEncoded(false);
+            return publicKey;
         }
 
         public bool Check(string content, string signature)
@@ -86,7 +98,7 @@ namespace SimpleIdServer.Did.Jwt.Crypto
         {
             var payload = Base64UrlEncoder.DecodeBytes(signature);
             byte? v = null;
-            if(payload.Length > 64)
+            if (payload.Length > 64)
             {
                 v = payload[64];
                 if (v == 0 || v == 1)
@@ -100,6 +112,14 @@ namespace SimpleIdServer.Did.Jwt.Crypto
             var result = new ECDSASignature(new BigInteger(1, r), new BigInteger(1, s));
             if (v != null) result.V = new byte[] { v.Value };
             return result;
+        }
+
+        public IdentityDocumentVerificationMethod ExtractVerificationMethodWithPublicKey()
+        {
+            return new IdentityDocumentVerificationMethod
+            {
+                PublicKeyHex = GetPubKey().ToHex()
+            };
         }
     }
 }

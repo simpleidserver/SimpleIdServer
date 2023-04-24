@@ -19,5 +19,15 @@ namespace SimpleIdServer.DID.Tests
             var json = didDocument.Serialize();
             Assert.That(json, Is.EqualTo(expectedJson));
         }
+
+        [Test]
+        public void When_IdentifierContainsPublicKey_Then_JSONContainsPublicKey()
+        {
+            var identityDocument = JsonSerializer.Deserialize<IdentityDocument>(File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "files", "did-ethr-rsk-0x03fdd57adec3d438ea237fe46b33ee1e016eda6b585c3e27ea66686c2ea5358479.json")));
+            var expectedJson = identityDocument.Serialize();
+            var didDocument = EthrIdentityDocumentBuilder.NewEthr("did:ethr:rsk:0x03fdd57adec3d438ea237fe46b33ee1e016eda6b585c3e27ea66686c2ea5358479").Build();
+            var json = didDocument.Serialize();
+            Assert.That(json, Is.EqualTo(expectedJson));
+        }
     }
 }

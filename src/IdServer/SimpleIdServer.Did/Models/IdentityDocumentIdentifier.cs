@@ -18,6 +18,6 @@ namespace SimpleIdServer.Did.Models
         public string Identifier { get; set; } = null!;
         public string Source { get; set; } = null;
         public string Address { get; set; } = null!;
-        public byte[] PublicKey { get; set; } = null;
+        public string PublicKey { get; set; } = null;
     }
 }

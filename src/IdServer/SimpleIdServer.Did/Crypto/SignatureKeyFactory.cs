@@ -6,15 +6,25 @@ using SimpleIdServer.Did.Extensions;
 using SimpleIdServer.Did.Models;
 using System;
 
-namespace SimpleIdServer.Did.Jwt.Crypto
+namespace SimpleIdServer.Did.Crypto
 {
     public class SignatureKeyFactory
     {
         public static ISignatureKey Build(IdentityDocumentVerificationMethod validationMethod, string alg)
         {
-            if (alg != SupportedJwtAlgs.ES256K) throw new NotImplementedException("Only ES256K is supported");
+            if (alg != SupportedSignatureKeyAlgs.ES256K && alg != SupportedSignatureKeyAlgs.Ed25519 && alg != SupportedSignatureKeyAlgs.ES256) throw new NotImplementedException("Only ES256K is supported");
             var publicKey = ExtractPublicKey(validationMethod);
-            return new ES256KSignatureKey(publicKey);
+            switch(alg)
+            {
+                case SupportedSignatureKeyAlgs.ES256K:
+                    return new ES256KSignatureKey(publicKey);
+                case SupportedSignatureKeyAlgs.Ed25519:
+                    return new Ed25519SignatureKey(publicKey, null);
+                case SupportedSignatureKeyAlgs.ES256:
+                    return new ES256SignatureKey(publicKey, null);
+                default:
+                    throw new NotImplementedException($"{alg} is notsupported");
+            }
         }
 
         public static byte[] ExtractPublicKey(IdentityDocumentVerificationMethod validationMethod)

@@ -7,7 +7,7 @@ using Org.BouncyCastle.Crypto.Signers;
 using System;
 using System.Linq;
 
-namespace SimpleIdServer.Did.Jwt.Crypto
+namespace SimpleIdServer.Did.Crypto
 {
     public class DeterministicECDSA : ECDsaSigner
     {

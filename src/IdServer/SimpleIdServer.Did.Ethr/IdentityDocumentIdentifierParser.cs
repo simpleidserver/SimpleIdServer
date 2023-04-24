@@ -27,7 +27,7 @@ namespace SimpleIdServer.Did.Ethr
             {
                 var publicKey = new EthECKey(payload, false);
                 result.Address = publicKey.GetPublicAddress();
-                result.PublicKey = publicKey.GetPubKey();
+                result.PublicKey = result.Identifier.Replace("0x", string.Empty);
             }
             else result.Address = result.Identifier;
             return result;

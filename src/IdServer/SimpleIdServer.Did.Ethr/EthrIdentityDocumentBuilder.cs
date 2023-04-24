@@ -24,7 +24,7 @@ namespace SimpleIdServer.Did
                     Id = newId,
                     Type = VerificationMethodTypes.EcdsaSecp256k1VerificationKey2019,
                     Controller = did,
-                    PublicKeyHex = parsed.PublicKey.ToHex()
+                    PublicKeyHex = parsed.PublicKey
                 });
                 identityDocument.AddAuthentication(newId);
                 identityDocument.AddAssertionMethod(newId);

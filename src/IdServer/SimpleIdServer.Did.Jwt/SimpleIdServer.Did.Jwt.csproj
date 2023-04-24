@@ -6,8 +6,4 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\SimpleIdServer.Did\SimpleIdServer.Did.csproj" />
 	</ItemGroup>
-	<ItemGroup>
-		<PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="6.29.0" />
-		<PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
-	</ItemGroup>
 </Project>

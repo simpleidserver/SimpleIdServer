@@ -1,12 +1,19 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using System;
+using System.Linq;
 
 namespace SimpleIdServer.Did.Extensions
 {
     public static class HexByteConvertorExtensions
     {
         private static readonly byte[] Empty = new byte[0];
+
+        public static string ToHex(this byte[] value, bool prefix = false)
+        {
+            var strPrex = prefix ? "0x" : "";
+            return strPrex + string.Concat(value.Select(b => b.ToString("x2")).ToArray());
+        }
 
         public static byte[] HexToByteArray(this string value)
         {

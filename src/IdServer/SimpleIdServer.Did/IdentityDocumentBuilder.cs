@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Models;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,8 @@ namespace SimpleIdServer.Did
 
         public static IdentityDocumentBuilder New(string did, string publicAdr) => new IdentityDocumentBuilder(BuildDefaultDocument(did, publicAdr));
 
+        public static IdentityDocumentBuilder New(IdentityDocument identityDocument) => new IdentityDocumentBuilder(identityDocument);
+
         public IdentityDocumentBuilder AddServiceEndpoint(string type, string serviceEndpoint)
         {
             var id = $"{_identityDocument.Id}#service-{(_identityDocument.Service.Count() + 1)}";
@@ -27,6 +30,18 @@ namespace SimpleIdServer.Did
                 Type = type,
                 ServiceEndpoint = serviceEndpoint
             }, false);
+            return this;
+        }
+
+        public IdentityDocumentBuilder AddVerificationMethod(ISignatureKey signatureKey, string type)
+        {
+            var verificationMethod = signatureKey.ExtractVerificationMethodWithPublicKey();
+            var id = $"{_identityDocument.Id}#delegate-{(_identityDocument.VerificationMethod.Where(m => m.Id.Contains("#delegate")).Count() + 1)}";
+            verificationMethod.Controller = _identityDocument.Id;
+            verificationMethod.Id = _identityDocument.Id;
+            verificationMethod.Type = type;
+            _identityDocument.AddVerificationMethod(verificationMethod);
+            _identityDocument.AddAssertionMethod(id);
             return this;
         }
 

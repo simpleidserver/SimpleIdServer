@@ -1,11 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-
 using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Math;
 using System.IO;
 
-namespace SimpleIdServer.Did.Jwt.Crypto
+namespace SimpleIdServer.Did.Crypto
 {
     public class ECDSASignature
     {
