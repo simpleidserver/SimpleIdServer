@@ -10,18 +10,19 @@ namespace SimpleIdServer.Did.Crypto
 {
     public class SignatureKeyFactory
     {
-        public static ISignatureKey Build(IdentityDocumentVerificationMethod validationMethod, string alg)
+        public static ISignatureKey Build(IdentityDocumentVerificationMethod validationMethod, string alg, byte[] privateKey = null)
         {
             if (alg != Constants.SupportedSignatureKeyAlgs.ES256K && alg != Constants.SupportedSignatureKeyAlgs.Ed25519 && alg != Constants.SupportedSignatureKeyAlgs.ES256) throw new NotImplementedException("Only ES256K is supported");
             var publicKey = ExtractPublicKey(validationMethod);
+            if (publicKey == null) return null;
             switch(alg)
             {
                 case Constants.SupportedSignatureKeyAlgs.ES256K:
-                    return new ES256KSignatureKey(publicKey);
+                    return new ES256KSignatureKey(publicKey, privateKey);
                 case Constants.SupportedSignatureKeyAlgs.Ed25519:
-                    return new Ed25519SignatureKey(publicKey, null);
+                    return new Ed25519SignatureKey(publicKey, privateKey);
                 case Constants.SupportedSignatureKeyAlgs.ES256:
-                    return new ES256SignatureKey(publicKey, null);
+                    return new ES256SignatureKey(publicKey, privateKey);
                 default:
                     throw new NotImplementedException($"{alg} is notsupported");
             }
@@ -43,7 +44,7 @@ namespace SimpleIdServer.Did.Crypto
                 return namedCurve.Curve.CreatePoint(x, y).GetEncoded();
             }
 
-            throw new NotImplementedException("Public key cannot be extracted");
+            return null;
         }
     }
 }

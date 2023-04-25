@@ -8,7 +8,10 @@ namespace SimpleIdServer.Did.Crypto
     {
         string Name { get; }
         bool Check(string content, string signature);
+        bool Check(byte[] content, byte[] signature);
         string Sign(string content);
+        string Sign(byte[] content);
+        byte[] PrivateKey { get; }
         IdentityDocumentVerificationMethod ExtractVerificationMethodWithPublicKey();
     }
 }

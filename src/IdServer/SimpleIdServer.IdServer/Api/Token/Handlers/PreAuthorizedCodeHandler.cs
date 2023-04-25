@@ -32,7 +32,8 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                 _validator.Validate(context);
                 var preAuthorizedCode = context.Request.RequestData.GetPreAuthorizedCode();
                 var userPin = context.Request.RequestData.GetUserPin();
-
+                // Credential issuer is waiting for the end-user integration to complete (must give his consent to access to the claims).
+                // the access token represents the approval of the end-user.
             }
 
             return null;

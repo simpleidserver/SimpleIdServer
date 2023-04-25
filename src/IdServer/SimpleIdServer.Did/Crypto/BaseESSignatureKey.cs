@@ -38,6 +38,15 @@ namespace SimpleIdServer.Did.Crypto
         public abstract string Name { get; }
         public abstract string CurveName { get; }
 
+        public byte[] PrivateKey
+        {
+            get
+            {
+                if (_privateKeyParameters == null) return null;
+                return _privateKeyParameters.D.ToByteArrayUnsigned();
+            }
+        }
+
         public ECPublicKeyParameters PublicKey
         {
             get
@@ -60,7 +69,9 @@ namespace SimpleIdServer.Did.Crypto
             return publicKey;
         }
 
-        public bool Check(string content, string signature)
+        public bool Check(string content, string signature) => Check(Encoding.UTF8.GetBytes(content), Base64UrlEncoder.DecodeBytes(signature));
+
+        public bool Check(byte[] content, byte[] signature)
         {
             var sig = ExtractSignature(signature);
             var signer = new ECDsaSigner();
@@ -70,6 +81,12 @@ namespace SimpleIdServer.Did.Crypto
         }
 
         public string Sign(string content)
+        {
+            var payload = Encoding.UTF8.GetBytes(content);
+            return Sign(payload);
+        }
+
+        public string Sign(byte[] content)
         {
             if (_privateKeyParameters == null) throw new InvalidOperationException("There is no private key");
             var hash = Hash(content);
@@ -82,10 +99,11 @@ namespace SimpleIdServer.Did.Crypto
             return Base64UrlEncoder.Encode(lst.ToArray());
         }
 
-        private static byte[] Hash(string content)
+        private static byte[] Hash(string content) => Hash(Encoding.UTF8.GetBytes(content));
+
+        private static byte[] Hash(byte[] payload)
         {
             byte[] result = null;
-            var payload = Encoding.UTF8.GetBytes(content);
             using (var sha256 = SHA256.Create())
                 result = sha256.ComputeHash(payload);
 
@@ -95,6 +113,11 @@ namespace SimpleIdServer.Did.Crypto
         private static ECDSASignature ExtractSignature(string signature)
         {
             var payload = Base64UrlEncoder.DecodeBytes(signature);
+            return ExtractSignature(payload);
+        }
+
+        private static ECDSASignature ExtractSignature(byte[] payload)
+        {
             byte? v = null;
             if (payload.Length > 64)
             {

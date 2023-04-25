@@ -15,7 +15,14 @@ namespace SimpleIdServer.IdServer.Api.Credential
 
         public async Task<IActionResult> Post([FromBody] CredentialRequest request, CancellationToken cancellationToken)
         {
-            // generate a DID from block chain...
+            // 1. Stocker la demande d'accès au VC d'un utilisateur connecté.
+            // 2. retourner les credentials du "credential offer". chaque credential possède son propre DID.
+
+            // communication MUST utilize TLS.
+            // access token represents te approval.
+            // Issued Credential SHOULD be cryptographically bound to the identifier of the End-User who posses the Credential.
+            // Claims in the Credential are usually about the End-User who possesses it.
+            // Publish the DID to the blockchain in order to issue to a wallet.
             return null;
         }
     }

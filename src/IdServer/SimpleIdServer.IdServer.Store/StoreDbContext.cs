@@ -34,6 +34,7 @@ namespace SimpleIdServer.IdServer.Store
         public DbSet<ExtractedRepresentation> ExtractedRepresentations { get; set; }
         public DbSet<ImportSummary> ImportSummaries { get; set; }
         public DbSet<Group> Groups { get; set; }
+        public DbSet<VerifiableCredentialContext> VerifiableCredentialContexts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -84,6 +85,7 @@ namespace SimpleIdServer.IdServer.Store
             builder.ApplyConfiguration(new ImportSummaryConfiguration());
             builder.ApplyConfiguration(new GroupConfiguration());
             builder.ApplyConfiguration(new UserWalletCredentialConfiguration());
+            builder.ApplyConfiguration(new VerifiableCredentialContextsConfiguration());
         }
     }
 }

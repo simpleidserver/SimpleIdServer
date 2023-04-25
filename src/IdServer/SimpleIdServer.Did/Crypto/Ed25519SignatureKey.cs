@@ -34,21 +34,31 @@ namespace SimpleIdServer.Did.Crypto
 
         public string Name => Constants.SupportedSignatureKeyAlgs.Ed25519;
 
-        public bool Check(string content, string signature)
+        public byte[] PrivateKey
+        {
+            get
+            {
+                if (_privateKey == null) return null;
+                return _privateKey.GetEncoded();
+            }
+        }
+
+        public bool Check(string content, string signature) => Check(Encoding.UTF8.GetBytes(content), Base64UrlEncoder.DecodeBytes(signature));
+
+        public bool Check(byte[] payload, byte[] signaturePayload)
         {
             if (_publicKey == null) throw new InvalidOperationException("There is no public key");
-            var payload = Encoding.UTF8.GetBytes(content);
             var verifier = new Ed25519Signer();
             verifier.Init(false, _publicKey);
             verifier.BlockUpdate(payload, 0, payload.Length);
-            var signaturePayload = Base64UrlEncoder.DecodeBytes(signature);
             return verifier.VerifySignature(signaturePayload);
         }
 
-        public string Sign(string content)
+        public string Sign(string content) => Sign(Encoding.UTF8.GetBytes(content));
+
+        public string Sign(byte[] payload)
         {
             if (_privateKey == null) throw new InvalidOperationException("There is no private key");
-            var payload = Encoding.UTF8.GetBytes(content);
             var signer = new Ed25519Signer();
             signer.Init(true, _privateKey);
             signer.BlockUpdate(payload, 0, payload.Length);

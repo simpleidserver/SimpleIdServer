@@ -23,8 +23,7 @@ namespace SimpleIdServer.Did
                 {
                     VerificationMethodTypes.ED25519SignatureVerification,
                     VerificationMethodTypes.Ed25519VerificationKey2018,
-                    VerificationMethodTypes.Ed25519VerificationKey2020,
-                    VerificationMethodTypes.JsonWebKey2020
+                    VerificationMethodTypes.Ed25519VerificationKey2020
                 }
             },
             {

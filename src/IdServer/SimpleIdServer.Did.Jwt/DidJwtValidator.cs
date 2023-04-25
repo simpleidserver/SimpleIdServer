@@ -8,15 +8,12 @@ using System.Linq;
 
 namespace SimpleIdServer.Did.Jwt
 {
-    // Implement : https://github.com/decentralized-identity/did-jwt/blob/87cbfd0f719fc2fdb0ac83ed9ca964b3c1b1b1a9/src/JWT.ts
-    public class JwtValidator
+    public static class DidJwtValidator
     {
-        public bool Validate(string json, IdentityDocument document, KeyPurposes keyPurpose = KeyPurposes.SigAuthentication)
+        public static bool Validate(string json, IdentityDocument document, KeyPurposes keyPurpose = KeyPurposes.SigAuthentication)
         {
             var handler = new JsonWebTokenHandler();
             var jwt = handler.ReadJsonWebToken(json);
-            if (string.IsNullOrWhiteSpace(jwt.Issuer)) throw new InvalidOperationException("JWT iss is required");
-            var did = jwt.Issuer;
             var alg = jwt.Alg;
             if (!Constants.SupportedPublicKeyTypes.ContainsKey(alg)) throw new InvalidOperationException($"Alg {alg} is not supported");
             var keyTypes = Constants.SupportedPublicKeyTypes[alg];
@@ -35,6 +32,7 @@ namespace SimpleIdServer.Did.Jwt
             var content = $"{jwt.EncodedHeader}.{jwt.EncodedPayload}";
             var signature = jwt.EncodedSignature;
             var sigKey = SignatureKeyFactory.Build(method, alg);
+            if (sigKey == null) return false;
             var result = sigKey.Check(content, signature);
             return result;
         }
