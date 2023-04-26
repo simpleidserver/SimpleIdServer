@@ -12,7 +12,7 @@ namespace SimpleIdServer.Did.Models
     public class IdentityDocument
     {
         [JsonPropertyName("@context")]
-        public IEnumerable<string> Context { get; set; }
+        public ICollection<string> Context { get; set; } = new List<string>();
         [JsonPropertyName("id")]
         public string Id { get; set; }
         /// <summary>
@@ -21,7 +21,7 @@ namespace SimpleIdServer.Did.Models
         /// </summary>
         [JsonPropertyName("verificationMethod")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public ICollection<IdentityDocumentVerificationMethod> VerificationMethod { get; set; } = null;
+        public ICollection<IdentityDocumentVerificationMethod> VerificationMethod { get; set; } = new List<IdentityDocumentVerificationMethod>();
         /// <summary>
         /// Used to specify how the DID subject is expected to be authenticated.
         /// Each verification method MAY be embedded or referenced, for purposes sur as logging into a website.
@@ -50,6 +50,11 @@ namespace SimpleIdServer.Did.Models
             if (Authentication != null && Authentication.Any(a => verificationMethod.Id == a)) return KeyPurposes.SigAuthentication;
             if (AssertionMethod != null && AssertionMethod.Any(m => verificationMethod.Id == m)) return KeyPurposes.VerificationKey;
             throw new InvalidOperationException("enc is not supported");
+        }
+
+        public void AddContext(string context)
+        {
+            Context.Add(context);
         }
 
         public void AddVerificationMethod(IdentityDocumentVerificationMethod verificationMethod, bool isStandard = true)

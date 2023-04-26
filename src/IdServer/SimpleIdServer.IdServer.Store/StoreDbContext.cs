@@ -85,6 +85,7 @@ namespace SimpleIdServer.IdServer.Store
             builder.ApplyConfiguration(new ImportSummaryConfiguration());
             builder.ApplyConfiguration(new GroupConfiguration());
             builder.ApplyConfiguration(new UserWalletCredentialConfiguration());
+            builder.ApplyConfiguration(new UserWalletCredentialClaimConfiguration());
             builder.ApplyConfiguration(new VerifiableCredentialContextsConfiguration());
         }
     }

@@ -12,14 +12,6 @@ namespace SimpleIdServer.IdServer.Domains
         /// </summary>
         public ICollection<string> CredentialTypes { get; set; } = new List<string>();
         /// <summary>
-        /// The entity that issued the credential.
-        /// </summary>
-        public string? Issuer { get; set; } = null;
-        /// <summary>
-        /// When the credential was issued.
-        /// </summary>
-        public DateTime IssuanceDate { get; set; }
-        /// <summary>
         /// Claims about the subjects of the credential.
         /// </summary>
         public ICollection<UserWalletCredentialClaim> Claims { get; set; } = new List<UserWalletCredentialClaim>();

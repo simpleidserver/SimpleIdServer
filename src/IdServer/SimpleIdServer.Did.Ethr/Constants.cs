@@ -23,6 +23,8 @@ namespace SimpleIdServer.Did.Ethr
             new NetworkConfiguration { Name = "sepolia", RpcUrl = "https://rpc.sepolia.org", ContractAdr = DefaultContractAdr }
         };
 
+        public const string StandardSepc256K1RecoveryContext = "https://w3id.org/security/suites/secp256k1recovery-2020/v2";
+
         public static Dictionary<string, string> LegacyAttrTypes = new Dictionary<string, string>
         {
             { "sigAuth", Did.Constants.LegacyAttributeTypes.SignatureAuthentication2018 },

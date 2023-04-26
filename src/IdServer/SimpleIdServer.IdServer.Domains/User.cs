@@ -41,6 +41,9 @@ namespace SimpleIdServer.IdServer.Domains
         public DateTime UpdateDateTime { get; set; }
         public string? Source { get; set; } = null;
         public string? IdentityProvisioningId { get; set; } = null;
+        public string? Did { get; set; } = null;
+        public string? DidPublicHex { get; set; } = null;
+        public string? DidPrivateHex { get; set; } = null;
         public ICollection<Claim> Claims
         {
             get

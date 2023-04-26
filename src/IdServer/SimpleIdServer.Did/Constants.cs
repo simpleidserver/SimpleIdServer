@@ -65,5 +65,7 @@ namespace SimpleIdServer.Did
             public const string ES256 = "ES256";
             public const string Ed25519 = "Ed25519";
         }
+
+        public const string DefaultIdentityDocumentContext = "https://www.w3.org/ns/did/v1";
     }
 }

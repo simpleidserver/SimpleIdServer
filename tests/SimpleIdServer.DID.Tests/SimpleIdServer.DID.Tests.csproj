@@ -54,5 +54,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.Did.Ethr\SimpleIdServer.Did.Ethr.csproj" />
     <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.Did.Jwt\SimpleIdServer.Did.Jwt.csproj" />
+    <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj" />
   </ItemGroup>
 </Project>

@@ -43,7 +43,7 @@ namespace SimpleIdServer.Did.Crypto
             }
         }
 
-        public bool Check(string content, string signature) => Check(Encoding.UTF8.GetBytes(content), Base64UrlEncoder.DecodeBytes(signature));
+        public bool Check(string content, string signature) => Check(System.Text.Encoding.UTF8.GetBytes(content), Base64UrlEncoder.DecodeBytes(signature));
 
         public bool Check(byte[] payload, byte[] signaturePayload)
         {
@@ -54,7 +54,7 @@ namespace SimpleIdServer.Did.Crypto
             return verifier.VerifySignature(signaturePayload);
         }
 
-        public string Sign(string content) => Sign(Encoding.UTF8.GetBytes(content));
+        public string Sign(string content) => Sign(System.Text.Encoding.UTF8.GetBytes(content));
 
         public string Sign(byte[] payload)
         {

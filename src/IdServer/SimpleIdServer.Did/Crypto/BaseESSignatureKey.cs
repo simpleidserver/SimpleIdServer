@@ -69,7 +69,7 @@ namespace SimpleIdServer.Did.Crypto
             return publicKey;
         }
 
-        public bool Check(string content, string signature) => Check(Encoding.UTF8.GetBytes(content), Base64UrlEncoder.DecodeBytes(signature));
+        public bool Check(string content, string signature) => Check(System.Text.Encoding.UTF8.GetBytes(content), Base64UrlEncoder.DecodeBytes(signature));
 
         public bool Check(byte[] content, byte[] signature)
         {
@@ -82,7 +82,7 @@ namespace SimpleIdServer.Did.Crypto
 
         public string Sign(string content)
         {
-            var payload = Encoding.UTF8.GetBytes(content);
+            var payload = System.Text.Encoding.UTF8.GetBytes(content);
             return Sign(payload);
         }
 
@@ -99,7 +99,7 @@ namespace SimpleIdServer.Did.Crypto
             return Base64UrlEncoder.Encode(lst.ToArray());
         }
 
-        private static byte[] Hash(string content) => Hash(Encoding.UTF8.GetBytes(content));
+        private static byte[] Hash(string content) => Hash(System.Text.Encoding.UTF8.GetBytes(content));
 
         private static byte[] Hash(byte[] payload)
         {

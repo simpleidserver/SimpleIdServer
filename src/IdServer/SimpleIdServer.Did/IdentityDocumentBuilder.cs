@@ -18,9 +18,15 @@ namespace SimpleIdServer.Did
             _identityDocument = identityDocument;
         }
 
-        public static IdentityDocumentBuilder New(string did, string publicAdr) => new IdentityDocumentBuilder(BuildDefaultDocument(did, publicAdr));
+        public static IdentityDocumentBuilder New(string did, string publicAdr) => new IdentityDocumentBuilder(BuildDefaultDocument(did));
 
         public static IdentityDocumentBuilder New(IdentityDocument identityDocument) => new IdentityDocumentBuilder(identityDocument);
+
+        public IdentityDocumentBuilder AddContext(string context)
+        {
+            _identityDocument.Context.Add(context);
+            return this;
+        }
 
         public IdentityDocumentBuilder AddServiceEndpoint(string type, string serviceEndpoint)
         {
@@ -34,15 +40,14 @@ namespace SimpleIdServer.Did
             return this;
         }
 
-        public IdentityDocumentBuilder AddVerificationMethod(ISignatureKey signatureKey, string type, KeyPurposes purpose = KeyPurposes.VerificationKey)
+        public IdentityDocumentBuilder AddVerificationMethod(ISignatureKey signatureKey, string publicKeyFormat, KeyPurposes purpose = KeyPurposes.VerificationKey)
         {
             var types = Constants.SupportedPublicKeyTypes[signatureKey.Name];
-            if (!types.Contains(type)) throw new InvalidOperationException($"the type {type} is not supported for the algorithm {signatureKey}");
             var verificationMethod = signatureKey.ExtractVerificationMethodWithPublicKey();
             var id = $"{_identityDocument.Id}#delegate-{(_identityDocument.VerificationMethod.Where(m => m.Id.Contains("#delegate")).Count() + 1)}";
             verificationMethod.Controller = _identityDocument.Id;
             verificationMethod.Id = id;
-            verificationMethod.Type = type;
+            verificationMethod.Type = publicKeyFormat;
             _identityDocument.AddVerificationMethod(verificationMethod, false);
             switch (purpose)
             {
@@ -61,25 +66,16 @@ namespace SimpleIdServer.Did
 
         public IdentityDocument Build() => _identityDocument;
 
-        protected static IdentityDocument BuildDefaultDocument(string did, string publicAdr)
+        protected static IdentityDocument BuildDefaultDocument(string did)
         {
             var result = new IdentityDocument
             {
                 Id = did,
                 Context = new List<string>
                 {
-                    "https://www.w3.org/ns/did/v1", "https://w3id.org/security/suites/secp256k1recovery-2020/v2"
+                    Constants.DefaultIdentityDocumentContext
                 }
             };
-            result.AddVerificationMethod(new IdentityDocumentVerificationMethod
-            {
-                Id = $"{did}#controller",
-                Type = Constants.VerificationMethodTypes.EcdsaSecp256k1RecoveryMethod2020,
-                Controller = did,
-                BlockChainAccountId = $"eip155:1:{publicAdr}"
-            });
-            result.AddAuthentication($"{did}#controller");
-            result.AddAssertionMethod($"{did}#controller");
             return result;
         }
     }

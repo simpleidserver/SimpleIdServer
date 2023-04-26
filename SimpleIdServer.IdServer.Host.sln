@@ -59,6 +59,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03. VC", "03. VC", "{75C1BB
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Vc.Jwt", "src\IdServer\SimpleIdServer.Vc.Jwt\SimpleIdServer.Vc.Jwt.csproj", "{7CDBA88D-F67D-424C-8204-AE088160A3F4}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Did.Key", "src\IdServer\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj", "{88C356D3-6BBB-474C-954F-62757953DCB6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -153,6 +155,10 @@ Global
 		{7CDBA88D-F67D-424C-8204-AE088160A3F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7CDBA88D-F67D-424C-8204-AE088160A3F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7CDBA88D-F67D-424C-8204-AE088160A3F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88C356D3-6BBB-474C-954F-62757953DCB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88C356D3-6BBB-474C-954F-62757953DCB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88C356D3-6BBB-474C-954F-62757953DCB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88C356D3-6BBB-474C-954F-62757953DCB6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -183,6 +189,7 @@ Global
 		{BDD6E799-0E84-4DA7-A6C3-C7819E309EEB} = {033E4EF3-2FB5-450A-9B35-616D9B0D6EAA}
 		{75C1BBDE-2853-4DF6-90EF-41CD4BE9C0D5} = {4796A22B-91A9-42AF-87CA-F69392696B0A}
 		{7CDBA88D-F67D-424C-8204-AE088160A3F4} = {75C1BBDE-2853-4DF6-90EF-41CD4BE9C0D5}
+		{88C356D3-6BBB-474C-954F-62757953DCB6} = {DD879F07-27A6-4E02-A57E-6BEB9CD7B2CE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FE1E2C8-475E-4592-8609-D331B1D01730}

@@ -41,7 +41,7 @@ namespace SimpleIdServer.Did.Ethr
             var encoder = new Bytes32TypeEncoder();
             foreach (var serviceAdded in serviceAddedLst)
             {
-                var hex = $"0x{Encoding.UTF8.GetBytes(serviceAdded.ServiceEndpoint).ToHex()}";
+                var hex = $"0x{System.Text.Encoding.UTF8.GetBytes(serviceAdded.ServiceEndpoint).ToHex()}";
                 var value = hex.HexToByteArray();
                 result.Add(new SetAttributeFunction
                 {
