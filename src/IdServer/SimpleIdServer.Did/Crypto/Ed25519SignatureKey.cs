@@ -7,7 +7,7 @@ using SimpleIdServer.Did.Extensions;
 using SimpleIdServer.Did.Models;
 using System;
 using System.Linq;
-using System.Text;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.Did.Crypto
 {
@@ -41,6 +41,22 @@ namespace SimpleIdServer.Did.Crypto
                 if (_privateKey == null) return null;
                 return _privateKey.GetEncoded();
             }
+        }
+
+        public byte[] GetPublicKey(bool compressed = false)
+        {
+            if (_publicKey == null) return null;
+            return _publicKey.GetEncoded();
+        }
+
+        public JsonObject GetPublicKeyJwk()
+        {
+            return new JsonObject
+            {
+                { "kty", "OKP" },
+                { "crv", "Ed25519" },
+                { "x", Base64UrlEncoder.Encode(_publicKey.GetEncoded()) }
+            };
         }
 
         public bool Check(string content, string signature) => Check(System.Text.Encoding.UTF8.GetBytes(content), Base64UrlEncoder.DecodeBytes(signature));

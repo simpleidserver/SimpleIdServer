@@ -56,4 +56,13 @@
     <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.Did.Jwt\SimpleIdServer.Did.Jwt.csproj" />
     <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="files\did-key-z6MkemXVAYXaxbZoJhn1iRuhjQNLJQQYjuxEpc4eN9oQBhEa.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="files\did-key-zQ3shcFhrFGtxgnmPZKBPJfPRpJtVUz6ZLs8iLBqAmtv6zyxB.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

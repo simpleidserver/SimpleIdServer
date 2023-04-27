@@ -42,20 +42,24 @@ namespace SimpleIdServer.Did
 
         public IdentityDocumentBuilder AddVerificationMethod(ISignatureKey signatureKey, string publicKeyFormat, KeyPurposes purpose = KeyPurposes.VerificationKey)
         {
-            var types = Constants.SupportedPublicKeyTypes[signatureKey.Name];
             var verificationMethod = signatureKey.ExtractVerificationMethodWithPublicKey();
             var id = $"{_identityDocument.Id}#delegate-{(_identityDocument.VerificationMethod.Where(m => m.Id.Contains("#delegate")).Count() + 1)}";
             verificationMethod.Controller = _identityDocument.Id;
             verificationMethod.Id = id;
             verificationMethod.Type = publicKeyFormat;
+            return AddVerificationMethod(verificationMethod, publicKeyFormat, purpose);
+        }
+
+        public IdentityDocumentBuilder AddVerificationMethod(IdentityDocumentVerificationMethod verificationMethod, string publicKeyFormat, KeyPurposes purpose = KeyPurposes.VerificationKey)
+        {
             _identityDocument.AddVerificationMethod(verificationMethod, false);
             switch (purpose)
             {
                 case KeyPurposes.VerificationKey:
-                    _identityDocument.AddAssertionMethod(id);
+                    _identityDocument.AddAssertionMethod(verificationMethod.Id);
                     break;
                 case KeyPurposes.SigAuthentication:
-                    _identityDocument.AddAuthentication(id);
+                    _identityDocument.AddAuthentication(verificationMethod.Id);
                     break;
                 default:
                     throw new InvalidOperationException("enc is not supported");

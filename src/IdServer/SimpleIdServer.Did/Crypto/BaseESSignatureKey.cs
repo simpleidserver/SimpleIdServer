@@ -11,7 +11,7 @@ using SimpleIdServer.Did.Models;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
-using System.Text;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.Did.Crypto
 {
@@ -38,16 +38,7 @@ namespace SimpleIdServer.Did.Crypto
         public abstract string Name { get; }
         public abstract string CurveName { get; }
 
-        public byte[] PrivateKey
-        {
-            get
-            {
-                if (_privateKeyParameters == null) return null;
-                return _privateKeyParameters.D.ToByteArrayUnsigned();
-            }
-        }
-
-        public ECPublicKeyParameters PublicKey
+        public ECPublicKeyParameters PublicKeyParameters
         {
             get
             {
@@ -61,12 +52,34 @@ namespace SimpleIdServer.Did.Crypto
             }
         }
 
-        public byte[] GetPubKey()
+        public byte[] PrivateKey
         {
-            var q = PublicKey.Q;
+            get
+            {
+                if (_privateKeyParameters == null) return null;
+                return _privateKeyParameters.D.ToByteArrayUnsigned();
+            }
+        }
+
+        public byte[] GetPublicKey(bool compressed = false)
+        {
+            var q = PublicKeyParameters.Q;
             q = q.Normalize();
-            var publicKey = _secp256k1.Curve.CreatePoint(q.XCoord.ToBigInteger(), q.YCoord.ToBigInteger()).GetEncoded(false);
+            var publicKey = _secp256k1.Curve.CreatePoint(q.XCoord.ToBigInteger(), q.YCoord.ToBigInteger()).GetEncoded(compressed);
             return publicKey;
+        }
+
+        public JsonObject GetPublicKeyJwk()
+        {
+            var q = PublicKeyParameters.Q;
+            q = q.Normalize();
+            return new JsonObject
+            {
+                { "kty", "EC" },
+                { "crv", CurveName },
+                { "x", Base64UrlEncoder.Encode(q.XCoord.GetEncoded()) },
+                { "y", Base64UrlEncoder.Encode(q.YCoord.GetEncoded()) }
+            };
         }
 
         public bool Check(string content, string signature) => Check(System.Text.Encoding.UTF8.GetBytes(content), Base64UrlEncoder.DecodeBytes(signature));
@@ -76,7 +89,7 @@ namespace SimpleIdServer.Did.Crypto
             var sig = ExtractSignature(signature);
             var signer = new ECDsaSigner();
             var hash = Hash(content);
-            signer.Init(false, PublicKey);
+            signer.Init(false, PublicKeyParameters);
             return signer.VerifySignature(hash, sig.R, sig.S);
         }
 
@@ -99,8 +112,6 @@ namespace SimpleIdServer.Did.Crypto
             return Base64UrlEncoder.Encode(lst.ToArray());
         }
 
-        private static byte[] Hash(string content) => Hash(System.Text.Encoding.UTF8.GetBytes(content));
-
         private static byte[] Hash(byte[] payload)
         {
             byte[] result = null;
@@ -108,12 +119,6 @@ namespace SimpleIdServer.Did.Crypto
                 result = sha256.ComputeHash(payload);
 
             return result;
-        }
-
-        private static ECDSASignature ExtractSignature(string signature)
-        {
-            var payload = Base64UrlEncoder.DecodeBytes(signature);
-            return ExtractSignature(payload);
         }
 
         private static ECDSASignature ExtractSignature(byte[] payload)
@@ -139,7 +144,7 @@ namespace SimpleIdServer.Did.Crypto
         {
             return new IdentityDocumentVerificationMethod
             {
-                PublicKeyHex = GetPubKey().ToHex()
+                PublicKeyHex = GetPublicKey().ToHex()
             };
         }
     }

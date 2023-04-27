@@ -1,11 +1,13 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using System.Collections.Generic;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using static SimpleIdServer.Did.Constants;
 
 namespace SimpleIdServer.Did.Models
 {
+    [JsonConverter(typeof(IdentityDocumentVerificationMethodConverter))]
     public class IdentityDocumentVerificationMethod
     {
         [JsonPropertyName("id")]
@@ -39,6 +41,7 @@ namespace SimpleIdServer.Did.Models
         [JsonPropertyName("value")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Value { get; set; } = null;
+        public Dictionary<string, string> AdditionalParameters = new Dictionary<string, string>();
 
         public string GetAlg() => GetAlg(Type);
 
