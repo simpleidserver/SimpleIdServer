@@ -372,7 +372,17 @@ namespace SimpleIdServer.Scim.Parser.Expressions
                     {
                         case SCIMSchemaAttributeTypes.STRING:
                             var startWith = typeof(string).GetMethod("StartsWith", new Type[] { typeof(string) });
-                            comparison = Expression.Call(propertyValueString, startWith, Expression.Constant(comparisonExpression.Value));
+                            if (!schemaAttr.CaseExact)
+                            {
+                                comparison = Expression.Call(
+                                    Expression.Call(propertyValueString, typeof(string).GetMethod("ToLower", System.Type.EmptyTypes)),
+                                    startWith,
+                                    Expression.Call(Expression.Constant(comparisonExpression.Value), typeof(string).GetMethod("ToLower", System.Type.EmptyTypes)));
+                            }
+                            else
+                            {
+                                comparison = Expression.Call(propertyValueString, startWith, Expression.Constant(comparisonExpression.Value));
+                            }
                             break;
                     }
                     break;
@@ -381,7 +391,17 @@ namespace SimpleIdServer.Scim.Parser.Expressions
                     {
                         case SCIMSchemaAttributeTypes.STRING:
                             var endWith = typeof(string).GetMethod("EndsWith", new Type[] { typeof(string) });
-                            comparison = Expression.Call(propertyValueString, endWith, Expression.Constant(comparisonExpression.Value));
+                            if(!schemaAttr.CaseExact)
+                            {
+                                comparison = Expression.Call(
+                                    Expression.Call(propertyValueString, typeof(string).GetMethod("ToLower", System.Type.EmptyTypes)),
+                                    endWith,
+                                    Expression.Call(Expression.Constant(comparisonExpression.Value), typeof(string).GetMethod("ToLower", System.Type.EmptyTypes)));
+                            }
+                            else
+                            {
+                                comparison = Expression.Call(propertyValueString, endWith, Expression.Constant(comparisonExpression.Value));
+                            }
                             break;
                     }
                     break;
@@ -389,7 +409,17 @@ namespace SimpleIdServer.Scim.Parser.Expressions
                     if (schemaAttr.Type == SCIMSchemaAttributeTypes.STRING)
                     {
                         var contains = typeof(string).GetMethod("Contains", new[] { typeof(string) });
-                        comparison = Expression.Call(propertyValueString, contains, Expression.Constant(comparisonExpression.Value));
+                        if(!schemaAttr.CaseExact)
+                        {
+                            comparison = Expression.Call(
+                                Expression.Call(propertyValueString, typeof(string).GetMethod("ToLower", System.Type.EmptyTypes)),
+                                contains,
+                                Expression.Call(Expression.Constant(comparisonExpression.Value), typeof(string).GetMethod("ToLower", System.Type.EmptyTypes)));
+                        }
+                        else
+                        {
+                            comparison = Expression.Call(propertyValueString, contains, Expression.Constant(comparisonExpression.Value));
+                        }
                     }
                     break;
             }
