@@ -86,6 +86,11 @@
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.UserAdded });
                 dialogService.Close();
             });
+            SubscribeToAction<RemoveSelectedUsersSuccessAction>(async (act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedUsersRemoved });
+                dialogService.Close();
+            });
             if (!userState.Value.IsLoading)
                 gridUsers.Reload();
         }
@@ -103,7 +108,12 @@
         {
             new ContextMenuItem { Text = "Delete", Value = 1 }
         }, (a) => {
-            if(a.Value.Equals(1)) {
+            if(a.Value.Equals(1)) 
+            {
+                var userIds = userState.Value.Users?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
+                if (!userIds.Contains(user.Value.Id)) userIds.Add(user.Value.Id);
+                var act = new RemoveSelectedUsersAction { UserIds = userIds };
+                dispatcher.Dispatch(act);
                 contextMenuService.Close();
             }
         });

@@ -14,6 +14,28 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         #region SearchUsersState
 
         [ReducerMethod]
+        public static SearchUsersState ReduceRemoveSelectedUsersAction(SearchUsersState state, RemoveSelectedUsersAction action)
+        {
+            return state with
+            {
+                IsLoading = true
+            };
+        }
+
+        [ReducerMethod]
+        public static SearchUsersState ReduceRemoveSelectedUsersSuccessAction(SearchUsersState state, RemoveSelectedUsersSuccessAction action)
+        {
+            var users = state.Users.ToList();
+            users = users.Where(u => !action.UserIds.Contains(u.Value.Id)).ToList();
+            return state with
+            {
+                IsLoading = false,
+                Users = users,
+                Count = users.Count()
+            };
+        }
+
+        [ReducerMethod]
         public static SearchUsersState ReduceSearchUsersAction(SearchUsersState state, SearchUsersAction act) => new(isLoading: true, users: new List<User>());
 
         [ReducerMethod]

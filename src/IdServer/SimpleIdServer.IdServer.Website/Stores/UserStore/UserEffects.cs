@@ -219,6 +219,15 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         }
 
         [EffectMethod]
+        public async Task Handle(RemoveSelectedUsersAction action, IDispatcher dispatcher)
+        {
+            var users = await _userRepository.Query().Where(u => action.UserIds.Contains(u.Id)).ToListAsync();
+            _userRepository.Remove(users);
+            await _userRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new RemoveSelectedUsersSuccessAction { UserIds = action.UserIds });
+        }
+
+        [EffectMethod]
         public async Task Handle(AddUserAction action, IDispatcher dispatcher)
         {
             ILogger logger = _loggerFactory.CreateLogger("Effect for AddUserAction");
@@ -555,5 +564,15 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
     public class AddUserFailureAction : FailureAction
     {
 
+    }
+
+    public class RemoveSelectedUsersAction
+    {
+        public IEnumerable<string> UserIds { get; set; }
+    }
+
+    public class RemoveSelectedUsersSuccessAction
+    {
+        public IEnumerable<string> UserIds { get; set; }
     }
 }
