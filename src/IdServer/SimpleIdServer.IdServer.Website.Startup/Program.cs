@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using SimpleIdServer.IdServer.Website.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,11 +13,12 @@ builder.Services.AddSIDWebsite(o =>
     o.IdServerBaseUrl = builder.Configuration["IdServerBaseUrl"];
 }, o =>
 {
-    o.UseSqlServer(builder.Configuration.GetConnectionString("IdServer"),  o =>
+    o.UseSqlServer(builder.Configuration.GetConnectionString("IdServer"), o =>
     {
         o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
     });
 });
+builder.Services.AddDefaultSecurity(builder.Configuration);
 
 var app = builder.Build();
 
@@ -30,7 +32,10 @@ if (!app.Environment.IsDevelopment())
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseCookiePolicy();
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseMiddleware<SignOutMiddleware>();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 

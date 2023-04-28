@@ -4,6 +4,7 @@
 @inject ContextMenuService contextMenuService
 @inject IDispatcher dispatcher
 @inject DialogService dialogService
+@inject NavigationManager Navigation
 
 <PageTitle>SimpleIdServer Administration UI</PageTitle>
 
@@ -33,6 +34,7 @@
             <RadzenPanelMenuItem Text="Identity Providers" Icon="people" Path="/idproviders" />
             <RadzenPanelMenuItem Text="Auditing" Icon="source" Path="/auditing" />
             <RadzenPanelMenuItem Text="Certificate Authorities" Icon="shield" Path="/certificateauthorities" />
+            <RadzenPanelMenuItem Text="Sign out" Icon="logout" Path="/SignOut" />
         </RadzenPanelMenu>
         <div class="p-2">
             Sidebar
@@ -88,5 +90,9 @@
             Resizable = true,
             Draggable = true
         });
+    }
+
+    void SignOut() {
+        Navigation.ToBaseRelativePath("/Logout");
     }
 }
