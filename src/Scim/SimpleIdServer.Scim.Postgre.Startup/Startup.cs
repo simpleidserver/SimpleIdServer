@@ -89,6 +89,10 @@ namespace SimpleIdServer.Scim.Postgre.Startup
             }, o =>
             {
                 o.DefaultSchema = "public";
+                o.SetInsertBulkOperation((b) =>
+                {
+
+                });
             });
         }
 
