@@ -14,7 +14,7 @@ public class SignOutMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        if (context.Request.Path.Equals("/Logout", System.StringComparison.OrdinalIgnoreCase))
+        if (context.Request.Path.Equals("/SignOut", System.StringComparison.OrdinalIgnoreCase))
         {
             await context.SignOutAsync("oidc");
         }
