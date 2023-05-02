@@ -375,7 +375,7 @@ namespace SimpleIdServer.Scim.Parser.Expressions
                             if (!schemaAttr.CaseExact)
                             {
                                 comparison = Expression.Call(
-                                    Expression.Call(propertyValueString, typeof(string).GetMethod("ToLower", System.Type.EmptyTypes)),
+                                    Expression.Call(Expression.Coalesce(propertyValueString, Expression.Constant(string.Empty)), typeof(string).GetMethod("ToLower", System.Type.EmptyTypes)),
                                     startWith,
                                     Expression.Call(Expression.Constant(comparisonExpression.Value), typeof(string).GetMethod("ToLower", System.Type.EmptyTypes)));
                             }
@@ -394,7 +394,7 @@ namespace SimpleIdServer.Scim.Parser.Expressions
                             if(!schemaAttr.CaseExact)
                             {
                                 comparison = Expression.Call(
-                                    Expression.Call(propertyValueString, typeof(string).GetMethod("ToLower", System.Type.EmptyTypes)),
+                                    Expression.Call(Expression.Coalesce(propertyValueString, Expression.Constant(string.Empty)), typeof(string).GetMethod("ToLower", System.Type.EmptyTypes)),
                                     endWith,
                                     Expression.Call(Expression.Constant(comparisonExpression.Value), typeof(string).GetMethod("ToLower", System.Type.EmptyTypes)));
                             }
@@ -412,7 +412,7 @@ namespace SimpleIdServer.Scim.Parser.Expressions
                         if(!schemaAttr.CaseExact)
                         {
                             comparison = Expression.Call(
-                                Expression.Call(propertyValueString, typeof(string).GetMethod("ToLower", System.Type.EmptyTypes)),
+                                Expression.Call(Expression.Coalesce(propertyValueString, Expression.Constant(string.Empty)), typeof(string).GetMethod("ToLower", System.Type.EmptyTypes)),
                                 contains,
                                 Expression.Call(Expression.Constant(comparisonExpression.Value), typeof(string).GetMethod("ToLower", System.Type.EmptyTypes)));
                         }
@@ -468,6 +468,7 @@ namespace SimpleIdServer.Scim.Parser.Expressions
 
             if(!caseSensitive)
             {
+                e1 = Expression.Coalesce(e1, Expression.Constant(string.Empty));
                 e1 = Expression.Call(e1, typeof(string).GetMethod("ToLower", System.Type.EmptyTypes));
                 e2 = Expression.Call(e2, typeof(string).GetMethod("ToLower", System.Type.EmptyTypes));
             }
@@ -488,6 +489,7 @@ namespace SimpleIdServer.Scim.Parser.Expressions
 
             if (!caseSensitive)
             {
+                e1 = Expression.Coalesce(e1, Expression.Constant(string.Empty));
                 e1 = Expression.Call(e1, typeof(string).GetMethod("ToLower", System.Type.EmptyTypes));
                 e2 = Expression.Call(e2, typeof(string).GetMethod("ToLower", System.Type.EmptyTypes));
             }

@@ -4082,14 +4082,17 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Check properties are updated when the path parameter is omitted")]
+        [Xunit.SkippableFactAttribute(DisplayName="Check properties are updated when the path parameter is omitted (HTTP PATCH REPLA" +
+            "CE)")]
         [Xunit.TraitAttribute("FeatureTitle", "Users")]
-        [Xunit.TraitAttribute("Description", "Check properties are updated when the path parameter is omitted")]
-        public virtual void CheckPropertiesAreUpdatedWhenThePathParameterIsOmitted()
+        [Xunit.TraitAttribute("Description", "Check properties are updated when the path parameter is omitted (HTTP PATCH REPLA" +
+            "CE)")]
+        public virtual void CheckPropertiesAreUpdatedWhenThePathParameterIsOmittedHTTPPATCHREPLACE()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Check properties are updated when the path parameter is omitted", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Check properties are updated when the path parameter is omitted (HTTP PATCH REPLA" +
+                    "CE)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
 #line 1076
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -4168,6 +4171,98 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("JSON \'name.familyName\'=\'familyName\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 1099
+ testRunner.Then("JSON \'employeeNumber\'=\'Number\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Check properties are updated when the path parameter is omitted (HTTP PATCH ADD)")]
+        [Xunit.TraitAttribute("FeatureTitle", "Users")]
+        [Xunit.TraitAttribute("Description", "Check properties are updated when the path parameter is omitted (HTTP PATCH ADD)")]
+        public virtual void CheckPropertiesAreUpdatedWhenThePathParameterIsOmittedHTTPPATCHADD()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Check properties are updated when the path parameter is omitted (HTTP PATCH ADD)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 1102
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table190 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table190.AddRow(new string[] {
+                            "schemas",
+                            "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
+                                "ension:enterprise:2.0:User\" ]"});
+                table190.AddRow(new string[] {
+                            "userName",
+                            "bjen"});
+                table190.AddRow(new string[] {
+                            "externalId",
+                            "externalid"});
+                table190.AddRow(new string[] {
+                            "name",
+                            "{ \"formatted\" : \"formatted\", \"familyName\": \"familyName\", \"givenName\": \"givenName\"" +
+                                " }"});
+                table190.AddRow(new string[] {
+                            "employeeNumber",
+                            "\"number\""});
+#line 1103
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table190, "When ");
+#line hidden
+#line 1111
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 1112
+ testRunner.And("extract \'id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table191 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table191.AddRow(new string[] {
+                            "schemas",
+                            "[ \"urn:ietf:params:scim:api:messages:2.0:PatchOp\" ]"});
+                table191.AddRow(new string[] {
+                            "Operations",
+                            "[ { \"op\": \"add\", \"value\" : { \"name.formatted\" : \"newformatted\", \"name.familyName\"" +
+                                ": \"familyName\", \"employeeNumber\": \"Number\" } } ]"});
+#line 1114
+ testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table191, "And ");
+#line hidden
+#line 1119
+ testRunner.And("execute HTTP GET request \'http://localhost/Users/$id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 1120
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 1122
+ testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 1123
+ testRunner.Then("JSON \'name.formatted\'=\'newformatted\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 1124
+ testRunner.Then("JSON \'name.familyName\'=\'familyName\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 1125
  testRunner.Then("JSON \'employeeNumber\'=\'Number\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
