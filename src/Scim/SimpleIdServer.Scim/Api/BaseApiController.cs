@@ -460,7 +460,9 @@ namespace SimpleIdServer.Scim.Api
                     return this.BuildError(HttpStatusCode.NotFound, string.Format(Global.ResourceNotFound, id), SCIMConstants.ErrorSCIMTypes.Unknown);
                 }
 
-                representation.ApplyEmptyArray();
+                if(!includedAttributes.Any() && !excludedAttributes.Any())   
+                    representation.ApplyEmptyArray();
+
                 await _attributeReferenceEnricher.Enrich(_resourceType, new List<SCIMRepresentation> { representation }, _uriProvider.GetAbsoluteUriWithVirtualPath());
                 return BuildHTTPResult(representation, HttpStatusCode.OK, true);
             }
