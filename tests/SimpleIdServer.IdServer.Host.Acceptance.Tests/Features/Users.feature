@@ -12,7 +12,7 @@ Scenario: create a user
 	And extract JSON from body
 	And extract parameter 'access_token' from JSON body	
 	
-	When execute HTTP POST JSON request 'https://localhost:8080/users'
+	And execute HTTP POST JSON request 'https://localhost:8080/users'
 	| Key             | Value                 |
 	| Authorization   | Bearer $access_token$ |	
 	| name            | newUser               |

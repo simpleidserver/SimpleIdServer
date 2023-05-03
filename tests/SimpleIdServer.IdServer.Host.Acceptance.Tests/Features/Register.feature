@@ -2,8 +2,19 @@
 	Check client can be registered
 
 Scenario: Register a complete client
-	When execute HTTP POST JSON request 'http://localhost/register'
+	When execute HTTP POST request 'http://localhost/token'
+	| Key           | Value              |
+	| client_id     | fiftySevenClient   |
+	| client_secret | password           |
+	| scope         | register           |
+	| grant_type    | client_credentials |	
+	
+	And extract JSON from body
+	And extract parameter 'access_token' from JSON body	
+	
+	And execute HTTP POST JSON request 'http://localhost/register'
 	| Key                             | Value                      |
+	| Authorization                   | Bearer $access_token$      |	
 	| redirect_uris                   | [https://web.com]          |
 	| response_types                  | [token]                    |
 	| grant_types                     | [implicit]                 |
@@ -60,8 +71,19 @@ Scenario: Register a complete client
 	Then JSON 'initiate_login_uri'='https://localhost/loginuri'	
 
 Scenario: Get a client
-	When execute HTTP POST JSON request 'http://localhost/register'
+	When execute HTTP POST request 'http://localhost/token'
+	| Key           | Value              |
+	| client_id     | fiftySevenClient   |
+	| client_secret | password           |
+	| scope         | register           |
+	| grant_type    | client_credentials |	
+	
+	And extract JSON from body
+	And extract parameter 'access_token' from JSON body	
+
+	And execute HTTP POST JSON request 'http://localhost/register'
 	| Key                             | Value                      |
+	| Authorization                   | Bearer $access_token$      |
 	| redirect_uris                   | [https://web.com]          |
 	| response_types                  | [token]                    |
 	| grant_types                     | [implicit]                 |

@@ -90,7 +90,6 @@ namespace SimpleIdServer.IdServer
 
         public class Policies
         {
-            public const string Register = "register";
             public const string Authenticated = "authenticated";
         }
 
@@ -433,6 +432,20 @@ namespace SimpleIdServer.IdServer
                 Id = Guid.NewGuid().ToString(),
                 Type = ScopeTypes.APIRESOURCE,
                 Name = "users",
+                Realms = new List<Realm>
+                {
+                    StandardRealms.Master
+                },
+                Protocol = ScopeProtocols.OAUTH,
+                IsExposedInConfigurationEdp = true,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
+            };
+            public static Scope Register = new Scope
+            {
+                Id = Guid.NewGuid().ToString(),
+                Type = ScopeTypes.APIRESOURCE,
+                Name = "register",
                 Realms = new List<Realm>
                 {
                     StandardRealms.Master

@@ -44,7 +44,7 @@ var app = builder.Build();
 SeedData(app, builder.Configuration["SCIMBaseUrl"]);
 app.UseCors("AllowAll");
 app.UseSID()
-    .UseWsFederation(); 
+    .UseWsFederation();
 app.Run();
 
 void RunSqlServerIdServer(IServiceCollection services)
