@@ -59,7 +59,8 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             Constants.StandardScopes.Email,
             Constants.StandardScopes.OfflineAccessScope,
             Constants.StandardScopes.GrantManagementQuery,
-            Constants.StandardScopes.GrantManagementRevoke
+            Constants.StandardScopes.GrantManagementRevoke,
+            Constants.StandardScopes.Users
         };
 
         public static List<ApiResource> ApiResources = new List<ApiResource>
@@ -125,7 +126,8 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildApiClient("fiftyThreeClient", "password").EnableUMAGrantType().ActAsUMAResourceServer().Build(),
             ClientBuilder.BuildUserAgentClient("fiftyFourClient", "password", null, "http://localhost:8080").UseImplicitFlow().AddScope(StandardScopes.OpenIdScope, StandardScopes.Profile, StandardScopes.Email).SetSigAuthorizationResponse(SecurityAlgorithms.RsaSha256).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("fiftyFiveClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().EnableTokenInResponseType().EnableRefreshTokenGrantType().AddScope(AdminScope, CalendarScope).AddAuthDataTypes("firstDetails", "secondDetails").Build(),
-            FiftySixClient
+            FiftySixClient,
+            ClientBuilder.BuildApiClient("fiftySevenClient", "password").AddScope(StandardScopes.Users).Build()
         };
 
         public static List<User> Users = new List<User>

@@ -1,10 +1,13 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.IdentityModel.JsonWebTokens;
+using SimpleIdServer.IdServer.Domains.DTOs;
 using System.Security.Claims;
+using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.IdServer.Domains
 {
+    [JsonConverter(typeof(UserJsonConverter))]
     public class User : IEquatable<User>
     {
         private static Dictionary<string, KeyValuePair<Action<User, string>, Func<User, object>>> _userClaims = new Dictionary<string, KeyValuePair<Action<User, string>, Func<User, object>>>
@@ -24,23 +27,39 @@ namespace SimpleIdServer.IdServer.Domains
             ExternalAuthProviders = new List<UserExternalAuthProvider>();
         }
 
+        [JsonPropertyName(UserNames.Id)]
         public string Id { get; set; } = null!;
+        [JsonPropertyName(UserNames.Name)]
         [UserProperty(true)]
         public string Name { get; set; } = null!;
+        [JsonPropertyName(UserNames.Firstname)]
         [UserProperty(true)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Firstname { get; set; } = null;
+        [JsonPropertyName(UserNames.Lastname)]
         [UserProperty(true)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Lastname { get; set; } = null;
+        [JsonPropertyName(UserNames.Email)]
         [UserProperty(true)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Email { get; set; } = null;
         [UserProperty(true)]
+        [JsonPropertyName(UserNames.EmailVerified)]
         public bool EmailVerified { get; set; } = false;
+        [JsonIgnore]
         public string? DeviceRegistrationToken { get; set; }
+        [JsonIgnore]
         public UserStatus Status { get; set; }
+        [JsonPropertyName(UserNames.CreateDateTime)]
         public DateTime CreateDateTime { get; set; }
+        [JsonPropertyName(UserNames.UpdateDateTime)]
         public DateTime UpdateDateTime { get; set; }
+        [JsonIgnore]
         public string? Source { get; set; } = null;
+        [JsonIgnore]
         public string? IdentityProvisioningId { get; set; } = null;
+        [JsonIgnore]
         public ICollection<Claim> Claims
         {
             get
@@ -60,6 +79,7 @@ namespace SimpleIdServer.IdServer.Domains
         {
             return Sessions.FirstOrDefault(s => s.State == UserSessionStates.Active && DateTime.UtcNow < s.ExpirationDateTime && s.Realm == realm);
         }
+        [JsonIgnore]
         public UserCredential? ActiveOTP
         {
             get
@@ -67,6 +87,7 @@ namespace SimpleIdServer.IdServer.Domains
                 return Credentials.FirstOrDefault(c => c.CredentialType == UserCredential.OTP && c.IsActive);
             }
         }
+        [JsonIgnore]
         public UserCredential? ActivePassword
         {
             get
@@ -74,14 +95,23 @@ namespace SimpleIdServer.IdServer.Domains
                 return Credentials.FirstOrDefault(c => c.CredentialType == UserCredential.PWD && c.IsActive);
             }
         }
+        [JsonIgnore]
         public ICollection<RealmUser> Realms { get; set; } = new List<RealmUser>();
+        [JsonIgnore]
         public ICollection<UserSession> Sessions { get; set; } = new List<UserSession>();
+        [JsonIgnore]
         public ICollection<UserClaim> OAuthUserClaims { get; set; } = new List<UserClaim>();
+        [JsonPropertyName(UserNames.Credentials)]
         public ICollection<UserCredential> Credentials { get; set; } = new List<UserCredential>();
+        [JsonIgnore]
         public ICollection<UserExternalAuthProvider> ExternalAuthProviders { get; set; } = new List<UserExternalAuthProvider>();
+        [JsonIgnore]
         public ICollection<Consent> Consents { get; set; } = new List<Consent>();
+        [JsonIgnore]
         public ICollection<UserDevice> Devices { get; set; } = new List<UserDevice>();
+        [JsonIgnore]
         public ICollection<Group> Groups { get; set; } = new List<Group>();
+        [JsonIgnore]
         public IdentityProvisioning? IdentityProvisioning { get; set; } = null;
 
         #region User claims

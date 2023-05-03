@@ -150,6 +150,7 @@ namespace SimpleIdServer.IdServer
         public const string UNSUPPORTED_AUTHORIZATION_SIGNED_RESPONSE_ALG = "authorization_signed_response_alg is not supported";
         public const string UNSUPPORTED_AUTHORIZATION_ENCRYPTED_RESPONSE_ALG = "authorization_encrypted_response_alg is not supported";
         public const string UNSUPPORTED_AUTHORIZATION_ENCRYPTED_RESPONSE_ENC = "authorization_encrypted_response_enc is not supported";
+        public const string UNSUPPORTED_CREDENTIAL_TYPE = "the credential type {0} is not supported";
         public const string REFRESH_TOKEN_NOT_ISSUED_BY_CLIENT = "refresh token has not been issued by the client";
         public const string NO_REGISTERED_REDIRECTURI = "no redirect uri has been registered";
         public const string NO_ESSENTIAL_ACR_IS_SUPPORTED = "no essential acr is supported";
@@ -221,5 +222,6 @@ namespace SimpleIdServer.IdServer
         public const string REQUEST_URI_IS_INVALID = "the request_uri is invalid";
         public const string AUTHORIZATION_DETAILS_TYPE_REQUIRED = "the authorization_details type is required";
         public const string GRANT_IS_NOT_ACCEPTED = "grant is not accepted";
+        public const string USER_EXISTS = "the user {0} already exists";
     }
 }

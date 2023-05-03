@@ -38,13 +38,15 @@ namespace SimpleIdServer.IdServer.Api
             return false;
         }
 
-        protected void CheckHasPAT(string realm, IJwtBuilder jwtBuilder)
+        protected void CheckHasPAT(string realm, IJwtBuilder jwtBuilder) => CheckAccessToken(realm, Constants.StandardScopes.UmaProtection.Name, jwtBuilder);
+
+        protected void CheckAccessToken(string realm, string scope, IJwtBuilder jwtBuilder)
         {
             var bearerToken = ExtractBearerToken();
             var extractionResult = jwtBuilder.ReadSelfIssuedJsonWebToken(realm, bearerToken);
             if (extractionResult.Error != null)
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, extractionResult.Error);
-            if (!extractionResult.Jwt.Claims.Any(c => c.Type == "scope" && c.Value == Constants.StandardScopes.UmaProtection.Name))
+            if (!extractionResult.Jwt.Claims.Any(c => c.Type == "scope" && c.Value == scope))
                 throw new OAuthException(ErrorCodes.REQUEST_DENIED, ErrorMessages.UNAUTHORIZED_ACCESS_PERMISSION_API);
         }
 

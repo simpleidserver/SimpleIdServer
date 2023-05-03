@@ -54,3 +54,9 @@
      href: auditing/adminui.md
 - name: Certifications
   href: certifications/index.md
+- name: REST API
+  items:
+   - name: Security
+     href: restapi/security.md
+   - name: Overview
+     href: restapi/overview.html
