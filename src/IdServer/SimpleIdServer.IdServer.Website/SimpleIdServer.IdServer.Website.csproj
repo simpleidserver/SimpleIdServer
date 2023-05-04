@@ -19,6 +19,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\SimpleIdServer.IdServer.WsFederation\SimpleIdServer.IdServer.WsFederation.csproj" />
 		<ProjectReference Include="..\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
+		<ProjectReference Include="..\SimpleIdServer.Vc\SimpleIdServer.Vc.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Compile Update="Resources\Global.Designer.cs">

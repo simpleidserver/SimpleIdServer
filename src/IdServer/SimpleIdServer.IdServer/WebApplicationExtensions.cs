@@ -35,6 +35,10 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.OpenIDConfiguration,
                 defaults: new { controller = "OpenIdConfiguration", action = "Get" });
 
+            webApplication.MapControllerRoute("credentialIssuer",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialIssuer,
+                defaults: new { controller = "CredentialIssuer", action = "Get" });
+
             webApplication.MapControllerRoute("jwks",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Jwks,
                 defaults: new { controller = "Jwks", action = "Get" });

@@ -19,7 +19,6 @@ namespace SimpleIdServer.IdServer.Store.Configurations
             builder.HasMany(u => u.Consents).WithOne(u => u.User).OnDelete(DeleteBehavior.Cascade);
             builder.HasMany(u => u.Devices).WithOne(u => u.User).OnDelete(DeleteBehavior.Cascade);
             builder.HasMany(u => u.Realms).WithOne(u => u.User).HasForeignKey(u => u.UsersId);
-            builder.HasMany(u => u.WalletCredentials).WithOne(u => u.User).HasForeignKey(u => u.UserId).OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

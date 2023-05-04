@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.IdServer.Api.CredentialIssuer;
 using SimpleIdServer.IdServer.Api.Token.PKCECodeChallengeMethods;
 using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
@@ -186,6 +187,10 @@ namespace SimpleIdServer.IdServer.Options
         /// Destination folder where representations will be extracted.
         /// </summary>
         public string ExtractRepresentationsFolder { get; set; } = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Extraction");
+        public ICollection<CredentialIssuerDisplayResult> CredentialIssuerDisplays { get; set; } = new List<CredentialIssuerDisplayResult>
+        {
+            new CredentialIssuerDisplayResult { Name = "SimpleIdServer" }
+        };
 
         public int GetIntParameter(string name) => int.Parse(Parameters[name]);
 

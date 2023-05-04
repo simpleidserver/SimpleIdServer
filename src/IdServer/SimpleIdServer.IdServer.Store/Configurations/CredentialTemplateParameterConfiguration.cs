@@ -6,11 +6,11 @@ using SimpleIdServer.IdServer.Domains;
 
 namespace SimpleIdServer.IdServer.Store.Configurations
 {
-    public class UserWalletCredentialClaimConfiguration : IEntityTypeConfiguration<UserWalletCredentialClaim>
+    public class CredentialTemplateParameterConfiguration : IEntityTypeConfiguration<CredentialTemplateParameter>
     {
-        public void Configure(EntityTypeBuilder<UserWalletCredentialClaim> builder)
+        public void Configure(EntityTypeBuilder<CredentialTemplateParameter> builder)
         {
-            builder.HasKey(u => u.Id);
+            builder.HasKey(c => c.Id);
         }
     }
 }

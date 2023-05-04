@@ -59,8 +59,11 @@ namespace SimpleIdServer.IdServer.Domains
         public string? Source { get; set; } = null;
         [JsonIgnore]
         public string? IdentityProvisioningId { get; set; } = null;
+        [JsonIgnore]
         public string? Did { get; set; } = null;
+        [JsonIgnore]
         public string? DidPublicHex { get; set; } = null;
+        [JsonIgnore]
         public string? DidPrivateHex { get; set; } = null;
         [JsonIgnore]
         public ICollection<Claim> Claims
@@ -114,8 +117,6 @@ namespace SimpleIdServer.IdServer.Domains
         public ICollection<UserDevice> Devices { get; set; } = new List<UserDevice>();
         [JsonIgnore]
         public ICollection<Group> Groups { get; set; } = new List<Group>();
-        [JsonIgnore]
-        public ICollection<UserWalletCredential> WalletCredentials { get; set; } = new List<UserWalletCredential>();
         [JsonIgnore]
         public IdentityProvisioning? IdentityProvisioning { get; set; } = null;
 

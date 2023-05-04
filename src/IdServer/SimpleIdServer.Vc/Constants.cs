@@ -7,5 +7,10 @@ namespace SimpleIdServer.Vc
         public const string DefaultVerifiableCredentialContext = "https://www.w3.org/2018/credentials/v1";
         public const string DefaultVerifiableCredentialType = "VerifiableCredential";
         public const string DefaultVerifiablePresentationType = "VerifiablePresentation";
+
+        public static class CredentialTemplateProfiles
+        {
+            public const string W3CVerifiableCredentials = "jwt_vc_json";
+        }
     }
 }

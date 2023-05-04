@@ -29,6 +29,7 @@ namespace SimpleIdServer.IdServer
             public const string OAuthConfiguration = ".well-known/oauth-authorization-server";
             public const string OpenIDConfiguration = ".well-known/openid-configuration";
             public const string UMAConfiguration = ".well-known/uma2-configuration";
+            public const string CredentialIssuer = ".well-known/openid-credential-issuer";
             public const string Form = "form";
             public const string AuthSchemeProviders = "authschemeproviders";
             public const string ClientManagement = "management/clients";
@@ -46,8 +47,8 @@ namespace SimpleIdServer.IdServer
             public const string UMAResources = "rreguri";
             public const string IdentityProvisioning = "provisioning";
             public const string PushedAuthorizationRequest = "par";
-            public const string CredentialOffer = "credential_offer";
             public const string Users = "users";
+            public const string Credential = "credential";
         }
 
         public static List<string> AllStandardNotificationModes = new List<string>

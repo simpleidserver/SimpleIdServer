@@ -6,11 +6,12 @@ using SimpleIdServer.IdServer.Domains;
 
 namespace SimpleIdServer.IdServer.Store.Configurations
 {
-    public class VerifiableCredentialContextsConfiguration : IEntityTypeConfiguration<VerifiableCredentialContext>
+    public class CredentialTemplateDisplayConfiguration : IEntityTypeConfiguration<CredentialTemplateDisplay>
     {
-        public void Configure(EntityTypeBuilder<VerifiableCredentialContext> builder)
+        public void Configure(EntityTypeBuilder<CredentialTemplateDisplay> builder)
         {
-            builder.HasKey(b => b.Id);
+            builder.HasKey(c => c.Id);
+            builder.Ignore(c => c.Logo);
         }
     }
 }

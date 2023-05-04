@@ -357,4 +357,7 @@
   <data name="SelectedUsersRemoved" xml:space="preserve">
     <value>Selected users are removed</value>
   </data>
+  <data name="SelectedCredentialTemplatesRemoved" xml:space="preserve">
+    <value>Selected credential templates are removed</value>
+  </data>
 </root>

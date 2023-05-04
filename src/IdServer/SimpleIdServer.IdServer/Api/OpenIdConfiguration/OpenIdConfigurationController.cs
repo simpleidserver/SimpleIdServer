@@ -55,7 +55,6 @@ namespace SimpleIdServer.IdServer.Api.OpenIdConfiguration
             result.Add(OpenIDConfigurationNames.EndSessionEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.EndSession}");
             result.Add(OpenIDConfigurationNames.BackchannelAuthenticationEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.BCAuthorize}");
             result.Add(OpenIDConfigurationNames.PushedAuthorizationRequestEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.PushedAuthorizationRequest}");
-            result.Add(OpenIDConfigurationNames.CredentialOfferEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.CredentialOffer}");
             result.Add(OpenIDConfigurationNames.RequestParameterSupported, true);
             result.Add(OpenIDConfigurationNames.RequestUriParameterSupported, true);
             result.Add(OpenIDConfigurationNames.RequestObjectSigningAlgValuesSupported, JsonSerializer.SerializeToNode(Constants.AllSigningAlgs));

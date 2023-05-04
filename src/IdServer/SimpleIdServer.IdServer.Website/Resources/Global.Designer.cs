@@ -538,6 +538,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Selected credential templates are removed.
+        /// </summary>
+        public static string SelectedCredentialTemplatesRemoved {
+            get {
+                return ResourceManager.GetString("SelectedCredentialTemplatesRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Selected grants have been rejected.
         /// </summary>
         public static string SelectedGrantsRemoved {
