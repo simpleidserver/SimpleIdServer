@@ -226,7 +226,7 @@ namespace SimpleIdServer.IdServer.UI
             if (claimName != extractionResult.Jwt.Subject)
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_SUBJECT_IDTOKENHINT);
 
-            if (!extractionResult.Jwt.Audiences.Contains(Request.GetAbsoluteUriWithVirtualPath()))
+            if (!extractionResult.Jwt.Audiences.Contains(GetIssuer()))
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_AUDIENCE_IDTOKENHINT);
 
             var clients = await _clientRepository.Query().Include(c => c.Realms).Where(c => extractionResult.Jwt.Audiences.Contains(c.ClientId) && c.Realms.Any(r => r.Name == realm)).ToListAsync(cancellationToken);
@@ -243,12 +243,18 @@ namespace SimpleIdServer.IdServer.UI
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_ENC_OR_ALG_USED_TO_ENCRYPT_IDTOKENHINT);
             }
 
-            if (openidClient.IdTokenSignedResponseAlg != extractionResult.Jwt.Alg)
+            if ((openidClient.IdTokenSignedResponseAlg ?? _options.DefaultTokenSignedResponseAlg) != extractionResult.Jwt.Alg)
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_ALG_USED_TO_SIGN_IDTOKENHINT);
             }
 
             return new ValidationResult(extractionResult.Jwt, openidClient);
+
+            string GetIssuer()
+            {
+                var request = Request.GetAbsoluteUriWithVirtualPath();
+                return HandlerContext.GetIssuer(request);
+            }
         }
 
         private ReadJsonWebTokenResult ExtractIdTokenHint(string realm, string idTokenHint)

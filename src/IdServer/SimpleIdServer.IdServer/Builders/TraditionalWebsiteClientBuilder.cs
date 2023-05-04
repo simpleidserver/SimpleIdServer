@@ -7,6 +7,7 @@ using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using static SimpleIdServer.IdServer.Constants;
@@ -401,6 +402,18 @@ namespace SimpleIdServer.IdServer.Builders
         public TraditionalWebsiteClientBuilder UseClientSecretPostAuthentication()
         {
             _client.TokenEndPointAuthMethod = OAuthClientSecretPostAuthenticationHandler.AUTH_METHOD;
+            return this;
+        }
+
+        #endregion
+
+        #region Logout profile
+
+        public TraditionalWebsiteClientBuilder AddPostLogoutUri(string logoutUri)
+        {
+            var postLogoutUris = _client.PostLogoutRedirectUris?.ToList() ?? new List<string>();
+            postLogoutUris.Add(logoutUri);
+            _client.PostLogoutRedirectUris = postLogoutUris;
             return this;
         }
 

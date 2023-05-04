@@ -86,6 +86,13 @@ namespace SimpleIdServer.Scim.Postgre.Startup
                     o.MigrationsAssembly(migrationsAssembly);
                     o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
                 });
+            }, o =>
+            {
+                o.DefaultSchema = "public";
+                o.SetInsertBulkOperation((b) =>
+                {
+
+                });
             });
         }
 

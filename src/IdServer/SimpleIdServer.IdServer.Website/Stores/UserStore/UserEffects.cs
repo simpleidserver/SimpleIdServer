@@ -3,23 +3,32 @@
 using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Radzen;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Website.Resources;
+using SimpleIdServer.IdServer.Website.Stores.Base;
 using System.Linq.Dynamic.Core;
 
 namespace SimpleIdServer.IdServer.Website.Stores.UserStore
 {
     public class UserEffects
     {
+        private readonly ILoggerFactory _loggerFactory;
         private readonly IUserRepository _userRepository;
         private readonly IGroupRepository _groupRepository;
         private readonly ProtectedSessionStorage _sessionStorage;
         private readonly DbContextOptions<StoreDbContext> _options;
 
-        public UserEffects(IUserRepository userRepository, IGroupRepository groupRepository, ProtectedSessionStorage sessionStorage, DbContextOptions<StoreDbContext> options)
+        public UserEffects(
+            ILoggerFactory loggerFactory,
+            IUserRepository userRepository,
+            IGroupRepository groupRepository,
+            ProtectedSessionStorage sessionStorage,
+            DbContextOptions<StoreDbContext> options)
         {
+            _loggerFactory = loggerFactory;
             _userRepository = userRepository;
             _groupRepository = groupRepository;
             _sessionStorage = sessionStorage;
@@ -49,7 +58,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         {
             var realm = await GetRealm();
             var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.OAuthUserClaims).Include(u => u.Groups).Include(u => u.Consents).ThenInclude(c => c.Scopes).Include(u => u.Sessions).Include(u => u.Credentials).Include(u => u.ExternalAuthProviders).AsNoTracking().SingleOrDefaultAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
-            if (user == null) {
+            if (user == null)
+            {
                 dispatcher.Dispatch(new GetUserFailureAction { ErrorMessage = string.Format(Global.UnknownUser, action.UserId) });
                 return;
             }
@@ -88,7 +98,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         {
             var realm = await GetRealm();
             var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.ExternalAuthProviders).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
-            var externalAuthProvider = user.ExternalAuthProviders.Single(c => c.Scheme == action.Scheme && c.Subject == action.Subject) ;
+            var externalAuthProvider = user.ExternalAuthProviders.Single(c => c.Scheme == action.Scheme && c.Subject == action.Subject);
             user.ExternalAuthProviders.Remove(externalAuthProvider);
             await _userRepository.SaveChanges(CancellationToken.None);
             dispatcher.Dispatch(new UnlinkExternalAuthProviderSuccessAction { Scheme = action.Scheme, Subject = action.Subject, UserId = action.UserId });
@@ -206,6 +216,69 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             var allGroups = await _groupRepository.Query().Include(g => g.Roles).AsNoTracking().Where(g => grpPathLst.Contains(g.FullPath)).ToListAsync();
             var roles = allGroups.SelectMany(g => g.Roles).Select(r => r.Name).Distinct();
             dispatcher.Dispatch(new ResolveUserRolesSuccessAction { Roles = roles, UserId = user.Id });
+        }
+
+        [EffectMethod]
+        public async Task Handle(RemoveSelectedUsersAction action, IDispatcher dispatcher)
+        {
+            var users = await _userRepository.Query().Where(u => action.UserIds.Contains(u.Id)).ToListAsync();
+            _userRepository.Remove(users);
+            await _userRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new RemoveSelectedUsersSuccessAction { UserIds = action.UserIds });
+        }
+
+        [EffectMethod]
+        public async Task Handle(AddUserAction action, IDispatcher dispatcher)
+        {
+            ILogger logger = _loggerFactory.CreateLogger("Effect for AddUserAction");
+            logger.LogDebug("Attempting to create an user.");
+
+            if (string.IsNullOrEmpty(action.Name))
+            {
+                dispatcher.Dispatch(new AddUserFailureAction() { ErrorMessage = $"The field 'Name' is required." });
+                return;
+            }
+
+            string nameLower = action.Name.ToLower();
+            bool userExists = _userRepository.Query().Any(u => u.Name.ToLower() == nameLower);
+
+            if (userExists)
+            {
+                string message = $"The user '{action.Name}' already exists.";
+                dispatcher.Dispatch(new AddUserFailureAction() { ErrorMessage = message });
+                logger.LogDebug(message);
+                return;
+            }
+
+            string id = Guid.NewGuid().ToString();
+            string realm = await GetRealm();
+
+            var newUser = new User()
+            {
+                Id = id,
+                Name = action.Name,
+                Firstname = action.Firstname,
+                Lastname = action.Lastname,
+                Email = action.Email,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
+            };
+
+            newUser.Realms.Add(new RealmUser() { RealmsName = realm, UsersId = id });
+            _userRepository.Add(newUser);
+
+            await _userRepository.SaveChanges(CancellationToken.None);
+
+            dispatcher.Dispatch(new AddUserSuccessAction()
+            {
+                Id = id,
+                Email = action.Email,
+                Firstname = action.Firstname,
+                Lastname = action.Lastname,
+                Name = action.Name
+            });
+
+            logger.LogInformation($"The user '{action.Name}' was added succesfully.");
         }
 
         private async Task<string> GetRealm()
@@ -426,5 +499,80 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
     {
         public string UserId { get; set; }
         public IEnumerable<string> Roles { get; set; }
+    }
+
+    /// <summary>
+    /// Represents the information needed to add an user.
+    /// </summary>
+    public class AddUserAction
+    {
+        /// <summary>
+        /// The username to use when login.
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// (Optional) The user's first name.
+        /// </summary>
+        public string? Firstname { get; set; } = null;
+
+        /// <summary>
+        /// (Optional) The user's last name.
+        /// </summary>
+        public string? Lastname { get; set; } = null;
+
+        /// <summary>
+        /// (Optional) The user's email.
+        /// </summary>
+        public string? Email { get; set; } = null;
+    }
+
+    /// <summary>
+    /// Information about the succesfull user addition.
+    /// </summary>
+    public class AddUserSuccessAction
+    {
+        /// <summary>
+        /// The generated user's Id.
+        /// </summary>
+        public string Id { get; set; }
+
+        /// <summary>
+        /// The username to use when login.
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// (Optional) The user's first name.
+        /// </summary>
+        public string? Firstname { get; set; } = null;
+
+        /// <summary>
+        /// (Optional) The user's last name.
+        /// </summary>
+        public string? Lastname { get; set; } = null;
+
+        /// <summary>
+        /// (Optional) The user's email.
+        /// </summary>
+        public string? Email { get; set; } = null;
+    }
+
+    /// <summary>
+    /// Information about the failed user addition.
+    /// </summary>
+    public class AddUserFailureAction : FailureAction
+    {
+
+    }
+
+    public class RemoveSelectedUsersAction
+    {
+        public IEnumerable<string> UserIds { get; set; }
+    }
+
+    public class RemoveSelectedUsersSuccessAction
+    {
+        public IEnumerable<string> UserIds { get; set; }
     }
 }

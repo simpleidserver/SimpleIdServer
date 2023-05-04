@@ -214,6 +214,8 @@ namespace SimpleIdServer.Scim.Domain
                                     var path = newAttribute.FullPath;
                                     var schemaAttr = newAttribute.SchemaAttribute;
                                     IEnumerable<SCIMRepresentationAttribute> parentAttributes = null;
+                                    if (newAttribute.GetLevel() > 1 && fullPath == null)
+                                        parentAttributes = representation.GetAttributesByPath(newAttribute.GetParentFullPath()).ToList();
                                     if (fullPath == path)
                                     {
                                         var attr = attributes.FirstOrDefault(a => a.FullPath == fullPath);
@@ -245,6 +247,7 @@ namespace SimpleIdServer.Scim.Domain
                                     {
                                         foreach (var parentAttribute in parentAttributes)
                                         {
+                                            representation.RefreshHierarchicalAttributesCache();
                                             var attr = parentAttribute.CachedChildren.FirstOrDefault(c => c.SchemaAttributeId == newAttribute.SchemaAttributeId);
                                             if (attr != null) representation.FlatAttributes.Remove(attr);
                                             representation.AddAttribute(parentAttribute, newAttribute);

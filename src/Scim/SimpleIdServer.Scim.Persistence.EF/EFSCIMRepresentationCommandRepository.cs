@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.Scim.Domains;
 using System;
 using System.Collections.Generic;
@@ -14,10 +15,12 @@ namespace SimpleIdServer.Scim.Persistence.EF
     public class EFSCIMRepresentationCommandRepository : ISCIMRepresentationCommandRepository
     {
         private readonly SCIMDbContext _scimDbContext;
+        private readonly SCIMEFOptions _options;
 
-        public EFSCIMRepresentationCommandRepository(SCIMDbContext scimDbContext)
+        public EFSCIMRepresentationCommandRepository(SCIMDbContext scimDbContext, IOptions<SCIMEFOptions> options)
         {
             _scimDbContext = scimDbContext;
+            _options = options.Value;
         }
 
         public async Task<SCIMRepresentation> Get(string id, CancellationToken token = default)
@@ -141,9 +144,17 @@ namespace SimpleIdServer.Scim.Persistence.EF
             return Task.FromResult(true);
         }
 
-        public Task BulkInsert(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes) => _scimDbContext.BulkInsertAsync(scimRepresentationAttributes.ToList());
+        public Task BulkInsert(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes)
+        {
+            var bulkConfig = GetBulkConfig(BulkOperations.INSERT);
+            return _scimDbContext.BulkInsertAsync(scimRepresentationAttributes.ToList(), bulkConfig);
+        }
 
-        public Task BulkDelete(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes) => _scimDbContext.BulkDeleteAsync(scimRepresentationAttributes.ToList());
+        public Task BulkDelete(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes)
+        {
+            var bulkConfig = GetBulkConfig(BulkOperations.DELETE);
+            return _scimDbContext.BulkDeleteAsync(scimRepresentationAttributes.ToList(), bulkConfig);
+        }
 
         public async Task BulkUpdate(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes)
         {
@@ -151,7 +162,18 @@ namespace SimpleIdServer.Scim.Persistence.EF
             {
                 PropertiesToInclude = new List<string> { nameof(SCIMRepresentationAttribute.ValueString) }
             };
+            bulkConfig = GetBulkConfig(BulkOperations.UPDATE, bulkConfig);
             await _scimDbContext.BulkUpdateAsync(scimRepresentationAttributes.ToList(), bulkConfig);
+        }
+
+        private BulkConfig GetBulkConfig(BulkOperations operation) => GetBulkConfig(operation, null);
+
+        private BulkConfig GetBulkConfig(BulkOperations operation, BulkConfig bulkConfig)
+        {
+            if (!_options.BulkOperations.ContainsKey(operation)) return bulkConfig;
+            if (bulkConfig == null) bulkConfig = new BulkConfig();
+            _options.BulkOperations[operation](bulkConfig);
+            return bulkConfig;
         }
     }
 }

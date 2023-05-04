@@ -610,6 +610,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Selected users are removed.
+        /// </summary>
+        public static string SelectedUsersRemoved {
+            get {
+                return ResourceManager.GetString("SelectedUsersRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Signature key has been added.
         /// </summary>
         public static string SigKeyAdded {
@@ -678,6 +687,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string UnknownUser {
             get {
                 return ResourceManager.GetString("UnknownUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à A new user has been added.
+        /// </summary>
+        public static string UserAdded {
+            get {
+                return ResourceManager.GetString("UserAdded", resourceCulture);
             }
         }
         

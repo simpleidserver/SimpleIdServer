@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -11,6 +10,7 @@ using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Extensions;
 using SimpleIdServer.IdServer.ExternalEvents;
+using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using System;
@@ -27,27 +27,37 @@ namespace SimpleIdServer.IdServer.Api.Register
     /// <summary>
     /// https://www.rfc-editor.org/rfc/rfc7591
     /// </summary>
-    [Authorize(Constants.Policies.Register)]
-    public class RegistrationController : Controller
+    public class RegistrationController : BaseController
     {
         private readonly IClientRepository _clientRepository;
         private readonly IScopeRepository _scopeRepository;
         private readonly IRegisterClientRequestValidator _validator;
         private readonly IRealmRepository _realmRepository;
         private readonly IBusControl _busControl;
+        private readonly IJwtBuilder _jwtBuilder;
         private readonly IdServerHostOptions _options;
 
-        public RegistrationController(IClientRepository clientRepository, IScopeRepository scopeRepository, IRegisterClientRequestValidator validator, IRealmRepository realmRepository, IBusControl busControl, IOptions<IdServerHostOptions> options)
+        public RegistrationController(IClientRepository clientRepository, IScopeRepository scopeRepository, IRegisterClientRequestValidator validator, IRealmRepository realmRepository, IBusControl busControl, IJwtBuilder jwtBuilder, IOptions<IdServerHostOptions> options)
         {
             _clientRepository = clientRepository;
             _scopeRepository = scopeRepository;
             _validator = validator;
             _realmRepository = realmRepository;
             _busControl = busControl;
+            _jwtBuilder = jwtBuilder;
             _options = options.Value;
         }
 
+        /// <summary>
+        /// Register a client.
+        /// </summary>
+        /// <param name="prefix">Realm</param>
+        /// <param name="request">Registration request</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [HttpPost]
+        [ProducesResponseType(201)]
+        [ProducesResponseType(400)]
         public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] RegisterClientRequest request, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
@@ -55,6 +65,7 @@ namespace SimpleIdServer.IdServer.Api.Register
             {
                 try
                 {
+                    CheckAccessToken(prefix, Constants.StandardScopes.Register.Name, _jwtBuilder);
                     var client = await Build(request, cancellationToken);
                     await _validator.Validate(prefix, client, cancellationToken);
                     _clientRepository.Add(client);
@@ -135,7 +146,16 @@ namespace SimpleIdServer.IdServer.Api.Register
             }
         }
 
+        /// <summary>
+        /// Get a client
+        /// </summary>
+        /// <param name="prefix">Realm</param>
+        /// <param name="id">Client's identifier.</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [HttpGet]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> Get([FromRoute] string prefix, string id, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
@@ -144,7 +164,16 @@ namespace SimpleIdServer.IdServer.Api.Register
             return new OkObjectResult(res.Client.Serialize(Request.GetAbsoluteUriWithVirtualPath()));
         }
 
+        /// <summary>
+        /// Delete a client.
+        /// </summary>
+        /// <param name="prefix">Realm</param>
+        /// <param name="id">Client's identifier</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [HttpDelete]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> Delete([FromRoute] string prefix, string id, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
@@ -156,7 +185,18 @@ namespace SimpleIdServer.IdServer.Api.Register
             return NoContent();
         }
 
+        /// <summary>
+        /// Update a client.
+        /// </summary>
+        /// <param name="prefix">Realm</param>
+        /// <param name="id">Client's identifier</param>
+        /// <param name="request">Update request</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [HttpPut]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> Update([FromRoute] string prefix, string id, RegisterClientRequest request, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;

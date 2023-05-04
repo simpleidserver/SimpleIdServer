@@ -8,6 +8,7 @@ using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -24,7 +25,7 @@ namespace SimpleIdServer.IdServer.Consumers
         IConsumer<UserLoginSuccessEvent>, IConsumer<UserLogoutSuccessEvent>,
         IConsumer<PushedAuthorizationRequestSuccessEvent>, IConsumer<PushedAuthorizationRequestFailureEvent>,
         IConsumer<ImportUsersSuccessEvent>, IConsumer<ExtractRepresentationsFailureEvent>,
-        IConsumer<ExtractRepresentationsSuccessEvent>
+        IConsumer<ExtractRepresentationsSuccessEvent>, IConsumer<AddUserSuccessEvent>, IConsumer<RemoveUserSuccessEvent>
     {
         private readonly IServiceProvider _serviceProvider;
 
@@ -487,6 +488,43 @@ namespace SimpleIdServer.IdServer.Consumers
                     Realm = context.Message.Realm,
                     ErrorMessage = context.Message.ErrorMessage,
                     IsError = true
+                };
+                auditEventRepository.Add(auditEvt);
+                await auditEventRepository.SaveChanges(CancellationToken.None);
+            }
+        }
+
+        public async Task Consume(ConsumeContext<AddUserSuccessEvent> context)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var auditEventRepository = scope.ServiceProvider.GetRequiredService<IAuditEventRepository>();
+                var auditEvt = new AuditEvent
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Description = $"User with the name '{context.Message.Name}' has been added",
+                    CreateDateTime = DateTime.UtcNow,
+                    Realm = context.Message.Realm,
+                    IsError = false,
+                    RequestJSON = JsonSerializer.Serialize(context.Message)
+                };
+                auditEventRepository.Add(auditEvt);
+                await auditEventRepository.SaveChanges(CancellationToken.None);
+            }
+        }
+
+        public async Task Consume(ConsumeContext<RemoveUserSuccessEvent> context)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var auditEventRepository = scope.ServiceProvider.GetRequiredService<IAuditEventRepository>();
+                var auditEvt = new AuditEvent
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Description = $"User with the name '{context.Message.Name}' has been removed",
+                    CreateDateTime = DateTime.UtcNow,
+                    Realm = context.Message.Realm,
+                    IsError = false
                 };
                 auditEventRepository.Add(auditEvt);
                 await auditEventRepository.SaveChanges(CancellationToken.None);

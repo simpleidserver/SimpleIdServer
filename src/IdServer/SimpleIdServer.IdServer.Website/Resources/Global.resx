@@ -351,4 +351,10 @@
   <data name="UserSessionRejected" xml:space="preserve">
     <value>User session has been rejected</value>
   </data>
+  <data name="UserAdded" xml:space="preserve">
+    <value>A new user has been added</value>
+  </data>
+  <data name="SelectedUsersRemoved" xml:space="preserve">
+    <value>Selected users are removed</value>
+  </data>
 </root>

@@ -166,6 +166,23 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.EndSessionCallback,
                 defaults: new { controller = "CheckSession", action = "EndSessionCallback" });
 
+            webApplication.MapControllerRoute("form",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Form,
+                defaults: new { controller = "Form", action = "Index" });
+
+            webApplication.MapControllerRoute("addUser",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users,
+                defaults: new { controller = "Users", action = "Add" });
+            webApplication.MapControllerRoute("getUser",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}",
+                defaults: new { controller = "Users", action = "Get" });
+            webApplication.MapControllerRoute("deleteUser",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}",
+                defaults: new { controller = "Users", action = "Delete" });
+            webApplication.MapControllerRoute("replaceCredential",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/credentials",
+                defaults: new { controller = "Users", action = "ReplaceCredential" });
+
             webApplication.MapControllerRoute("extractRepresentations",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{name}/{id}/enqueue",
                 defaults: new { controller = "IdentityProvisioning", action = "Enqueue" });

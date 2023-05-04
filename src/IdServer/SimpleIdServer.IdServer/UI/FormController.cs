@@ -9,7 +9,6 @@ using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.IdServer.UI
 {
-    [Route(Constants.EndPoints.Form)]
     public class FormController : Controller
     {
         public IActionResult Index()

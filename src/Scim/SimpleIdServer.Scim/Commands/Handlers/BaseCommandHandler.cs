@@ -20,7 +20,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
         {
             foreach(var removeAttr in result.RemovedRepresentationAttributes) await _busControl.Publish(new RepresentationRefAttributeRemovedEvent(removeAttr));
             foreach(var addAttr in result.AddedRepresentationAttributes) await _busControl.Publish(new RepresentationRefAttributeAddedEvent(addAttr));
-            foreach (var updateAttr in result.UpdatedRepresentationAttributes) await _busControl.Publish(new RepresentationRefAttributeRemovedEvent(updateAttr));
+            foreach (var updateAttr in result.UpdatedRepresentationAttributes) await _busControl.Publish(new RepresentationRefAttributeUpdatedEvent(updateAttr));
         }
     }
 }

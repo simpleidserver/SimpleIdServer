@@ -14,6 +14,28 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         #region SearchUsersState
 
         [ReducerMethod]
+        public static SearchUsersState ReduceRemoveSelectedUsersAction(SearchUsersState state, RemoveSelectedUsersAction action)
+        {
+            return state with
+            {
+                IsLoading = true
+            };
+        }
+
+        [ReducerMethod]
+        public static SearchUsersState ReduceRemoveSelectedUsersSuccessAction(SearchUsersState state, RemoveSelectedUsersSuccessAction action)
+        {
+            var users = state.Users.ToList();
+            users = users.Where(u => !action.UserIds.Contains(u.Value.Id)).ToList();
+            return state with
+            {
+                IsLoading = false,
+                Users = users,
+                Count = users.Count()
+            };
+        }
+
+        [ReducerMethod]
         public static SearchUsersState ReduceSearchUsersAction(SearchUsersState state, SearchUsersAction act) => new(isLoading: true, users: new List<User>());
 
         [ReducerMethod]
@@ -24,6 +46,37 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
                 IsLoading = false,
                 Users = act.Users.Select(c => new SelectableUser(c)),
                 Count = act.Count
+            };
+        }
+
+        [ReducerMethod]
+        public static SearchUsersState ReduceAddUserFailureAction(SearchUsersState state, AddUserFailureAction act)
+        {
+            return state with
+            {
+                IsLoading = false
+            };
+        }
+
+        [ReducerMethod]
+        public static SearchUsersState ReduceAddUserSuccessAction(SearchUsersState state, AddUserSuccessAction act)
+        {
+            List<SelectableUser> users = state.Users.ToList();
+            User newUser = new User()
+            {
+                Id = act.Id,
+                Name = act.Name,
+                Firstname = act.Firstname,
+                Lastname = act.Lastname,
+                Email = act.Email,
+                UpdateDateTime = DateTime.UtcNow
+            };
+            users.Add(new SelectableUser(newUser) { IsNew = true });
+            return state with
+            {
+                IsLoading = false,
+                Users = users,
+                Count = users.Count
             };
         }
 
@@ -145,7 +198,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         public static UserState ReduceAddUserCredentialSuccessAction(UserState state, AddUserCredentialSuccessAction act)
         {
             var user = state.User;
-            if(act.IsDefault)
+            if (act.IsDefault)
             {
                 foreach (var c in user.Credentials.Where(c => c.CredentialType == act.Credential.CredentialType))
                     c.IsActive = false;
@@ -223,6 +276,18 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         [ReducerMethod]
         public static UpdateUserState ReduceAssignUserGroupsSuccessAction(UpdateUserState state, AssignUserGroupsSuccessAction act) => new(false);
 
+        [ReducerMethod]
+        public static UpdateUserState ReduceAddUserAction(UpdateUserState state, AddUserAction act)
+            => new(true);
+
+        [ReducerMethod]
+        public static UpdateUserState ReduceAddUserSuccessAction(UpdateUserState state, AddUserSuccessAction act)
+            => new(false);
+
+        [ReducerMethod]
+        public static UpdateUserState ReduceAddUserFailureAction(UpdateUserState state, AddUserFailureAction act)
+            => new(false) { ErrorMessage = act.ErrorMessage };
+
         #endregion
 
         #region UserClaims
@@ -276,7 +341,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         [ReducerMethod]
         public static UserClaimsState ReduceResolveUserRolesAction(UserClaimsState state, ResolveUserRolesAction action)
         {
-            if(!action.IsSelected)
+            if (!action.IsSelected)
             {
                 var claims = state.UserClaims.ToList();
                 claims = claims.Where(c => !c.IsRole).ToList();
@@ -340,7 +405,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         public static UserCredentialsState ReduceAddUserCredentialSuccessAction(UserCredentialsState state, AddUserCredentialSuccessAction act)
         {
             var credentials = state.UserCredentials.ToList();
-            if(act.IsDefault)
+            if (act.IsDefault)
             {
                 if (act.Credential.IsActive)
                     foreach (var a in credentials.Where(c => c.CredentialType == act.Credential.CredentialType))

@@ -10,6 +10,7 @@ namespace SimpleIdServer.IdServer.Store
         IQueryable<User> Query();
         void Update(User user);
         void Add(User user);
+        void Remove(IEnumerable<User> users);
         Task BulkUpdate(List<UserClaim> userClaims);
         Task BulkUpdate(List<User> users);
         Task BulkUpdate(List<RealmUser> userRealms);
@@ -30,6 +31,8 @@ namespace SimpleIdServer.IdServer.Store
         public void Update(User user) => _dbContext.Users.Update(user);
 
         public void Add(User user) => _dbContext.Users.Add(user);
+
+        public void Remove(IEnumerable<User> users) => _dbContext.Users.RemoveRange(users);
 
         public Task BulkUpdate(List<UserClaim> userClaims)
         {

@@ -46,15 +46,6 @@ namespace Microsoft.Extensions.DependencyInjection
             return this;
         }
 
-        public IdServerBuilder SetDefaultRegistrationAuthorizationPolicy()
-        {
-            _serviceCollection.Configure<AuthorizationOptions>(o =>
-            {
-                o.AddPolicy(Constants.Policies.Register, o => o.RequireClaim("scope", Constants.ScopeNames.Register));
-            });
-            return this;
-        }
-
         #endregion
 
         #region CIBA

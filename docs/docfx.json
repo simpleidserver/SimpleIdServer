@@ -20,7 +20,7 @@
           "documentation/**.md",
           "documentation/**/toc.yml",
           "toc.yml",
-          "*.md"
+          "*.md",
         ]
       }
     ],
@@ -28,6 +28,7 @@
       {
         "files": [
           "documentation/**.png",
+          "documentation/restapi/overview.html",
 		  "logo.svg"
         ]
       }
