@@ -15,11 +15,10 @@ namespace SimpleIdServer.Did.Key
 
         internal static IdentityDocumentIdentifier InternalParse(string id)
         {
-            const string start = "did:key";
-            if (string.IsNullOrWhiteSpace(id)) throw new ArgumentNullException(nameof(start));
-            if (!id.StartsWith(start)) throw new ArgumentOutOfRangeException($"the DID Identifier must start by {start}");
+            if (string.IsNullOrWhiteSpace(id)) throw new ArgumentNullException(nameof(Constants.Namespace));
+            if (!id.StartsWith(Constants.Namespace)) throw new ArgumentOutOfRangeException($"the DID Identifier must start by {Constants.Namespace}");
             var splitted = id.Split(':');
-            if (splitted.Length != 3) throw new ArgumentException($"the DID Identifier must have the following format {start}:<mb-value>");
+            if (splitted.Length != 3) throw new ArgumentException($"the DID Identifier must have the following format {Constants.Namespace}:<mb-value>");
             var multibaseValue = splitted.Last();
             if (!multibaseValue.StartsWith("z")) throw new InvalidOperationException("The Multi Base Value must start with z");
             var result = new IdentityDocumentIdentifier(id, null);

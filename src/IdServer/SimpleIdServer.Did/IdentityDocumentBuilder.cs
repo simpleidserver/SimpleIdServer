@@ -18,6 +18,8 @@ namespace SimpleIdServer.Did
             _identityDocument = identityDocument;
         }
 
+        protected IdentityDocument IdentityDocument => _identityDocument;
+
         public static IdentityDocumentBuilder New(string did, string publicAdr) => new IdentityDocumentBuilder(BuildDefaultDocument(did));
 
         public static IdentityDocumentBuilder New(IdentityDocument identityDocument) => new IdentityDocumentBuilder(identityDocument);
@@ -47,12 +49,12 @@ namespace SimpleIdServer.Did
             verificationMethod.Controller = _identityDocument.Id;
             verificationMethod.Id = id;
             verificationMethod.Type = publicKeyFormat;
-            return AddVerificationMethod(verificationMethod, publicKeyFormat, purpose);
+            _identityDocument.AddVerificationMethod(verificationMethod, false);
+            return AddVerificationMethod(verificationMethod, purpose);
         }
 
-        public IdentityDocumentBuilder AddVerificationMethod(IdentityDocumentVerificationMethod verificationMethod, string publicKeyFormat, KeyPurposes purpose = KeyPurposes.VerificationKey)
+        public IdentityDocumentBuilder AddVerificationMethod(IdentityDocumentVerificationMethod verificationMethod, KeyPurposes purpose = KeyPurposes.VerificationKey)
         {
-            _identityDocument.AddVerificationMethod(verificationMethod, false);
             switch (purpose)
             {
                 case KeyPurposes.VerificationKey:

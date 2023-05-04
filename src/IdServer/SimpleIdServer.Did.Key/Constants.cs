@@ -7,6 +7,7 @@ namespace SimpleIdServer.Did.Key
     public static class Constants
     {
         public const string Type = "key";
+        public const string Namespace = "did:key";
 
         public static Dictionary<string, string> TypeToContextUrl = new Dictionary<string, string>
         {
