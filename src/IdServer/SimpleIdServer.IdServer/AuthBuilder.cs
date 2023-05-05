@@ -29,6 +29,10 @@ namespace SimpleIdServer.IdServer
             {
                 opts.Events = new OpenIdConnectEvents
                 {
+                    OnSignedOutCallbackRedirect = ctx =>
+                    {
+                        return Task.CompletedTask;
+                    },
                     OnRedirectToIdentityProvider = context =>
                     {
                         if (context.Properties.Items.TryGetValue("prompt", out string prompt))

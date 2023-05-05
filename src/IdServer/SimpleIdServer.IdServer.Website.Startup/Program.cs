@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using SimpleIdServer.IdServer.Website.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,13 +29,14 @@ if (!app.Environment.IsDevelopment())
 
 
 app.UseStaticFiles();
-
 app.UseRouting();
 app.UseCookiePolicy();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseMiddleware<SignOutMiddleware>();
-app.MapBlazorHub();
-app.MapFallbackToPage("/_Host");
-
+app.UseEndpoints(edps =>
+{
+    edps.MapBlazorHub();
+    edps.MapFallbackToPage("/_Host");
+    edps.MapControllers();
+});
 app.Run();

@@ -23,10 +23,11 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             var queries = message.Serialize(_urlEncoder);
             var queryCollection = new QueryBuilder(queries);
             var returnUrl = $"{HandlerContext.GetIssuer(issuer)}/{Constants.EndPoints.BCCallback}{queryCollection.ToQueryString()}";
-            return $"{issuer}{urlHelper.Action("Index", "BackChannelConsents", new
+            var url = urlHelper.Action("Index", "BackChannelConsents", new
             {
                 returnUrl = _dataProtector.Protect(returnUrl)
-            })}";
+            });
+            return $"{issuer}{url}";
         }
     }
 }

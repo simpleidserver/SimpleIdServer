@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -60,10 +61,11 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddAuthentication(options =>
             {
-                options.DefaultScheme = "Cookies";
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = "oidc";
             })
-            .AddCookie("Cookies", options =>
+            .AddCookie(options =>
             {
                 options.Cookie.SameSite = SameSiteMode.None;
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
@@ -73,7 +75,6 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 config.NonceCookie.SecurePolicy = CookieSecurePolicy.Always;
                 config.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
-
                 config.Authority = defaultSecurityOptions.Issuer;
                 config.ClientId = defaultSecurityOptions.ClientId;
                 config.ClientSecret = defaultSecurityOptions.ClientSecret;
@@ -89,16 +90,10 @@ namespace Microsoft.Extensions.DependencyInjection
                     RoleClaimType = "role"
                 };
                 config.Scope.Clear();
-
                 if (!string.IsNullOrEmpty(defaultSecurityOptions.Scope))
                 {
-                    string[] scopes = defaultSecurityOptions.Scope
-                        .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.RemoveEmptyEntries);
-
-                    foreach (string scope in scopes)
-                    {
-                        config.Scope.Add(scope);
-                    }
+                    string[] scopes = defaultSecurityOptions.Scope.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.RemoveEmptyEntries);
+                    foreach (string scope in scopes) config.Scope.Add(scope);
                 }
             });
 
