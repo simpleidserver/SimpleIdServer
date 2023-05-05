@@ -5,15 +5,13 @@
       // Use IntelliSense to find out which attributes exist for C# debugging
       // Use hover for the description of the existing attributes
       // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
-      "name": "Launch IdServer (Hot Reload)",
+      "name": "Launch IdServer",
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build-idserver",
       // If you have changed target frameworks, make sure to update the program path.
-      // "program": "${workspaceFolder}/src/IdServer/SimpleIdServer.IdServer.Startup/bin/Debug/net7.0/SimpleIdServer.IdServer.Startup.dll",
-      // "args": [],
-      "program": "dotnet",
-      "args": ["watch", "--project", ".", "--verbose"],
+      "program": "${workspaceFolder}/src/IdServer/SimpleIdServer.IdServer.Startup/bin/Debug/net7.0/SimpleIdServer.IdServer.Startup.dll",
+      "args": [],
       "cwd": "${workspaceFolder}/src/IdServer/SimpleIdServer.IdServer.Startup",
       "stopAtEntry": false,
       // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
@@ -33,15 +31,13 @@
       // Use IntelliSense to find out which attributes exist for C# debugging
       // Use hover for the description of the existing attributes
       // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
-      "name": "Lauch UI (Hot Reload)",
+      "name": "Lauch UI",
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build-ui",
       // If you have changed target frameworks, make sure to update the program path.
-      // "program": "${workspaceFolder}/src/IdServer/SimpleIdServer.IdServer.Website.Startup/bin/Debug/net7.0/SimpleIdServer.IdServer.Website.Startup.dll",
-      // "args": [],
-      "program": "dotnet",
-      "args": ["watch", "--project", ".", "--verbose"],
+      "program": "${workspaceFolder}/src/IdServer/SimpleIdServer.IdServer.Website.Startup/bin/Debug/net7.0/SimpleIdServer.IdServer.Website.Startup.dll",
+      "args": [],
       "cwd": "${workspaceFolder}/src/IdServer/SimpleIdServer.IdServer.Website.Startup",
       "stopAtEntry": false,
       // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser

@@ -12,11 +12,12 @@ builder.Services.AddSIDWebsite(o =>
     o.IdServerBaseUrl = builder.Configuration["IdServerBaseUrl"];
 }, o =>
 {
-    o.UseSqlServer(builder.Configuration.GetConnectionString("IdServer"),  o =>
+    o.UseSqlServer(builder.Configuration.GetConnectionString("IdServer"), o =>
     {
         o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
     });
 });
+builder.Services.AddDefaultSecurity(builder.Configuration);
 
 var app = builder.Build();
 
@@ -28,10 +29,14 @@ if (!app.Environment.IsDevelopment())
 
 
 app.UseStaticFiles();
-
 app.UseRouting();
-
-app.MapBlazorHub();
-app.MapFallbackToPage("/_Host");
-
+app.UseCookiePolicy();
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseEndpoints(edps =>
+{
+    edps.MapBlazorHub();
+    edps.MapFallbackToPage("/_Host");
+    edps.MapControllers();
+});
 app.Run();
