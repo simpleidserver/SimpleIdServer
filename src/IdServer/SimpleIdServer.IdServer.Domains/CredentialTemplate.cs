@@ -7,11 +7,14 @@ namespace SimpleIdServer.IdServer.Domains
 {
     public class CredentialTemplate
     {
+        [JsonIgnore]
+        public string TechnicalId { get; set; } = null!;
         /// <summary>
         /// Identifying the respective object.
         /// </summary>
         [JsonPropertyName(CredentialTemplateNames.Id)]
-        public string Id { get; set; } = null!;
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Id { get; set; } = null;
         /// <summary>
         /// Format of the credential, e.g. jwt_vc_json or ldp_vc.
         /// </summary>

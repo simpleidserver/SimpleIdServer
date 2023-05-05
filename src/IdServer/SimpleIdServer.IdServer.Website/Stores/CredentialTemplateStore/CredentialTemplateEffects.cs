@@ -3,8 +3,10 @@
 using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
+using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Website.Resources;
 using System.Linq.Dynamic.Core;
 
 namespace SimpleIdServer.IdServer.Website.Stores.CredentialTemplateStore
@@ -13,11 +15,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.CredentialTemplateStore
     {
         private readonly ICredentialTemplateRepository _credentialTemplateRepository;
         private readonly ProtectedSessionStorage _sessionStorage;
+        private readonly DbContextOptions<StoreDbContext> _options;
 
-        public CredentialTemplateEffects(ICredentialTemplateRepository credentialTemplateRepository, ProtectedSessionStorage sessionStorage)
+        public CredentialTemplateEffects(ICredentialTemplateRepository credentialTemplateRepository, ProtectedSessionStorage sessionStorage, DbContextOptions<StoreDbContext> options)
         {
             _credentialTemplateRepository = credentialTemplateRepository;
             _sessionStorage = sessionStorage;
+            _options = options;
         }
 
         [EffectMethod]
@@ -44,8 +48,29 @@ namespace SimpleIdServer.IdServer.Website.Stores.CredentialTemplateStore
             var records = await _credentialTemplateRepository.Query().Where(c => action.CredentialTemplateIds.Contains(c.Id)).ToListAsync();
             _credentialTemplateRepository.Delete(records);
             await _credentialTemplateRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new RemoveSelectedCredentialTemplatesSuccessAction { });
+            dispatcher.Dispatch(new RemoveSelectedCredentialTemplatesSuccessAction { CredentialTemplateIds = action.CredentialTemplateIds });
 
+        }
+
+        [EffectMethod]
+        public async Task Handle(AddW3CCredentialTemplateAction action, IDispatcher dispatcher)
+        {
+            var exists = await _credentialTemplateRepository.Query().Include(q => q.Parameters).AnyAsync(t => t.Format == Vc.Constants.CredentialTemplateProfiles.W3CVerifiableCredentials && t.Parameters.Any(p => p.Name == "type" && p.Value == action.Type));
+            if(exists)
+            {
+                dispatcher.Dispatch(new AddCredentialTemplateErrorAction { ErrorMessage = Global.CredentialTemplateExists });
+                return;
+            }
+
+            var realm = await GetRealm();
+            using (var dbContext = new StoreDbContext(_options))
+            {
+                var existingRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
+                var credentialTemplate = CredentialTemplateBuilder.NewW3CCredential(action.Name, action.LogoUrl, Vc.Constants.CredentialTemplateProfiles.W3CVerifiableCredentials, existingRealm).Build();
+                dbContext.CredentialTemplates.Add(credentialTemplate);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new AddCredentialTemplateSuccessAction { Credential = credentialTemplate });
+            }
         }
 
         private async Task<string> GetRealm()
@@ -89,5 +114,22 @@ namespace SimpleIdServer.IdServer.Website.Stores.CredentialTemplateStore
     public class RemoveSelectedCredentialTemplatesSuccessAction
     {
         public IEnumerable<string> CredentialTemplateIds { get; set; }
+    }
+
+    public class AddW3CCredentialTemplateAction
+    {
+        public string Name { get; set; }
+        public string LogoUrl { get; set; }
+        public string Type { get; set; }
+    }
+
+    public class AddCredentialTemplateSuccessAction
+    {
+        public CredentialTemplate Credential { get; set; }
+    }
+
+    public class AddCredentialTemplateErrorAction
+    {
+        public string ErrorMessage { get; set; }
     }
 }

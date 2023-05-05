@@ -169,6 +169,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Credential template is added.
+        /// </summary>
+        public static string CredentialTemplateAdded {
+            get {
+                return ResourceManager.GetString("CredentialTemplateAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The credential template with type &apos;{0}&apos; already exists.
+        /// </summary>
+        public static string CredentialTemplateExists {
+            get {
+                return ResourceManager.GetString("CredentialTemplateExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Encryption key has been added.
         /// </summary>
         public static string EncKeyAdded {

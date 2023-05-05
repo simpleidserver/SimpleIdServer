@@ -69,6 +69,34 @@ namespace SimpleIdServer.IdServer.Website.Stores.CredentialTemplateStore
             };
         }
 
+        [ReducerMethod]
+        public static SearchCredentialTemplatesState ReduceAddCredentialTemplateSuccessAction(SearchCredentialTemplatesState state, AddCredentialTemplateSuccessAction act)
+        {
+            var records = state.CredentialTemplates.ToList();
+            records.Add(new SelectableCredentialTemplate(act.Credential)
+            {
+                IsNew = true
+            });
+            return state with
+            {
+                CredentialTemplates = records,
+                Count = records.Count()
+            };
+        }
+
+        #endregion
+
+        #region UpdateCredentialTemplateState
+
+        [ReducerMethod]
+        public static UpdateCredentialTemplateState ReduceAddW3CCredentialTemplateAction(UpdateCredentialTemplateState state, AddW3CCredentialTemplateAction act) => new(true, null);
+
+        [ReducerMethod]
+        public static UpdateCredentialTemplateState ReduceAddCredentialTemplateSuccessAction(UpdateCredentialTemplateState state, AddCredentialTemplateSuccessAction act) => new(false, null);
+
+        [ReducerMethod]
+        public static UpdateCredentialTemplateState ReduceAddCredentialTemplateErrorAction(UpdateCredentialTemplateState state, AddCredentialTemplateErrorAction act) => new(false, act.ErrorMessage);
+
         #endregion
     }
 }

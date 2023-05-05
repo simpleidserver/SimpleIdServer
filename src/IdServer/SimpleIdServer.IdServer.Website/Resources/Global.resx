@@ -360,4 +360,10 @@
   <data name="SelectedCredentialTemplatesRemoved" xml:space="preserve">
     <value>Selected credential templates are removed</value>
   </data>
+  <data name="CredentialTemplateExists" xml:space="preserve">
+    <value>The credential template with type '{0}' already exists</value>
+  </data>
+  <data name="CredentialTemplateAdded" xml:space="preserve">
+    <value>Credential template is added</value>
+  </data>
 </root>

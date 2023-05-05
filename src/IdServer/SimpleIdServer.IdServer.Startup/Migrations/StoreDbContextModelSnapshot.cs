@@ -127,6 +127,21 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.ToTable("ClientScope");
                 });
 
+            modelBuilder.Entity("CredentialTemplateRealm", b =>
+                {
+                    b.Property<string>("CredentialTemplatesTechnicalId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RealmsName")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("CredentialTemplatesTechnicalId", "RealmsName");
+
+                    b.HasIndex("RealmsName");
+
+                    b.ToTable("CredentialTemplateRealm");
+                });
+
             modelBuilder.Entity("GroupRealm", b =>
                 {
                     b.Property<string>("GroupsId")
@@ -1013,9 +1028,8 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.CredentialTemplate", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)")
-                        .HasAnnotation("Relational:JsonPropertyName", "id");
+                    b.Property<string>("TechnicalId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("CreateDateTime")
                         .HasColumnType("datetime2");
@@ -1024,10 +1038,14 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "id");
+
                     b.Property<DateTime>("UpdateDateTime")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("Id");
+                    b.HasKey("TechnicalId");
 
                     b.ToTable("CredentialTemplates");
                 });
@@ -1362,9 +1380,6 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<DateTime>("CreateDateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CredentialTemplateId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -1372,8 +1387,6 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Name");
-
-                    b.HasIndex("CredentialTemplateId");
 
                     b.ToTable("Realms");
                 });
@@ -2107,6 +2120,21 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("CredentialTemplateRealm", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.CredentialTemplate", null)
+                        .WithMany()
+                        .HasForeignKey("CredentialTemplatesTechnicalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Realm", null)
+                        .WithMany()
+                        .HasForeignKey("RealmsName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("GroupRealm", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.Group", null)
@@ -2391,13 +2419,6 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Navigation("Realm");
                 });
 
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Realm", b =>
-                {
-                    b.HasOne("SimpleIdServer.IdServer.Domains.CredentialTemplate", null)
-                        .WithMany("Realms")
-                        .HasForeignKey("CredentialTemplateId");
-                });
-
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.RealmUser", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.Realm", "Realm")
@@ -2591,8 +2612,6 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Navigation("DisplayLst");
 
                     b.Navigation("Parameters");
-
-                    b.Navigation("Realms");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Group", b =>

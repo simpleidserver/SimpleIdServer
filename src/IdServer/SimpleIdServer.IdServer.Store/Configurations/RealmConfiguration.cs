@@ -14,6 +14,7 @@ namespace SimpleIdServer.IdServer.Store.Configurations
             builder.HasMany(u => u.Users).WithOne(u => u.Realm).HasForeignKey(u => u.RealmsName);
             builder.HasMany(u => u.ImportSummaries).WithOne(u => u.Realm).HasForeignKey(u => u.RealmName);
             builder.HasMany(u => u.Groups).WithMany(u => u.Realms);
+            builder.HasMany(u => u.CredentialTemplates).WithMany(u => u.Realms);
         }
     }
 }
