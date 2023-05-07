@@ -98,5 +98,15 @@ namespace SimpleIdServer.IdServer.Website.Stores.CredentialTemplateStore
         public static UpdateCredentialTemplateState ReduceAddCredentialTemplateErrorAction(UpdateCredentialTemplateState state, AddCredentialTemplateErrorAction act) => new(false, act.ErrorMessage);
 
         #endregion
+
+        #region CredentialTemplateState
+
+        [ReducerMethod]
+        public static CredentialTemplateState ReduceGetCredentialTemplateAction(CredentialTemplateState state, GetCredentialTemplateAction act) => new(true, null);
+
+        [ReducerMethod]
+        public static CredentialTemplateState ReduceGetCredentialTemplateSuccessAction(CredentialTemplateState state, GetCredentialTemplateSuccessAction act) => new(false, act.CredentialTemplate);
+
+        #endregion
     }
 }

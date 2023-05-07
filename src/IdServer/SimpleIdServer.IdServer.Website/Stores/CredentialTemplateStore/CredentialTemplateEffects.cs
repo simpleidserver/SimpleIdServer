@@ -73,6 +73,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.CredentialTemplateStore
             }
         }
 
+        [EffectMethod]
+        public async Task Handle(GetCredentialTemplateAction action, IDispatcher dispatcher)
+        {
+            var credentialTemplate = await _credentialTemplateRepository.Query().FirstAsync(c => c.TechnicalId == action.Id);
+            dispatcher.Dispatch(new GetCredentialTemplateSuccessAction { CredentialTemplate = credentialTemplate });
+        }
+
         private async Task<string> GetRealm()
         {
             var realm = await _sessionStorage.GetAsync<string>("realm");
@@ -131,5 +138,15 @@ namespace SimpleIdServer.IdServer.Website.Stores.CredentialTemplateStore
     public class AddCredentialTemplateErrorAction
     {
         public string ErrorMessage { get; set; }
+    }
+
+    public class GetCredentialTemplateAction
+    {
+        public string Id { get; set; }
+    }
+
+    public class GetCredentialTemplateSuccessAction
+    {
+        public CredentialTemplate CredentialTemplate { get; set; }
     }
 }
