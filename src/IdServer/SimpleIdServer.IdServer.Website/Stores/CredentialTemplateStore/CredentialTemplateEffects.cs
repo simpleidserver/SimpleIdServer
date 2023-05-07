@@ -7,6 +7,7 @@ using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Website.Resources;
+using System.Diagnostics.Contracts;
 using System.Linq.Dynamic.Core;
 
 namespace SimpleIdServer.IdServer.Website.Stores.CredentialTemplateStore
@@ -76,8 +77,37 @@ namespace SimpleIdServer.IdServer.Website.Stores.CredentialTemplateStore
         [EffectMethod]
         public async Task Handle(GetCredentialTemplateAction action, IDispatcher dispatcher)
         {
-            var credentialTemplate = await _credentialTemplateRepository.Query().FirstAsync(c => c.TechnicalId == action.Id);
+            var credentialTemplate = await _credentialTemplateRepository.Query().Include(c => c.DisplayLst).FirstAsync(c => c.TechnicalId == action.Id);
             dispatcher.Dispatch(new GetCredentialTemplateSuccessAction { CredentialTemplate = credentialTemplate });
+        }
+
+        [EffectMethod]
+        public async Task Handle(RemoveSelectedCredentialTemplateDisplayAction action, IDispatcher dispatcher)
+        {
+            var credentialTemplate = await _credentialTemplateRepository.Query().Include(c => c.DisplayLst).FirstAsync(c => c.TechnicalId == action.Id);
+            credentialTemplate.DisplayLst = credentialTemplate.DisplayLst.Where(d => !action.DisplayIds.Contains(d.Id)).ToList();
+            await _credentialTemplateRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new RemoveSelectedCredentialTemplateDisplaySuccessAction { Id = action.Id, DisplayIds = action.DisplayIds });
+        }
+
+        [EffectMethod]
+        public async Task Handle(AddCredentialTemplateDisplayAction action, IDispatcher dispatcher)
+        {
+            var credentialTemplate = await _credentialTemplateRepository.Query().Include(c => c.DisplayLst).FirstAsync(c => c.TechnicalId == action.CredentialTemplateId);
+            var display = new CredentialTemplateDisplay
+            {
+                BackgroundColor = action.BackgroundColor,
+                Description = action.Description,
+                Id = Guid.NewGuid().ToString(),
+                Locale = action.Locale,
+                LogoUrl = action.LogoUrl,
+                LogoAltText = action.LogoAltText,
+                Name = action.Name,
+                TextColor = action.TextColor
+            };
+            credentialTemplate.DisplayLst.Add(display);
+            await _credentialTemplateRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new AddCredentialTemplateDisplaySuccessAction { Display = display });
         }
 
         private async Task<string> GetRealm()
@@ -148,5 +178,46 @@ namespace SimpleIdServer.IdServer.Website.Stores.CredentialTemplateStore
     public class GetCredentialTemplateSuccessAction
     {
         public CredentialTemplate CredentialTemplate { get; set; }
+    }
+
+    public class ToggleAllCredentialTemplateDisplayAction
+    {
+        public bool IsSelected { get; set; }
+    }
+
+    public class ToggleCredentialTemplateDisplayAction
+    {
+        public string Id { get; set; }
+        public string DisplayId { get; set; }
+        public bool IsSelected { get; set; }
+    }
+
+    public class RemoveSelectedCredentialTemplateDisplayAction
+    {
+        public string Id { get; set; }
+        public IEnumerable<string> DisplayIds { get; set; } 
+    }
+
+    public class RemoveSelectedCredentialTemplateDisplaySuccessAction
+    {
+        public string Id { get; set; }
+        public IEnumerable<string> DisplayIds { get; set; }
+    }
+
+    public class AddCredentialTemplateDisplayAction
+    {
+        public string CredentialTemplateId { get; set; }
+        public string Name { get; set; } = null!;
+        public string Locale { get; set; } = null!;
+        public string? Description { get; set; } = null;
+        public string? LogoUrl { get; set; } = null;
+        public string? LogoAltText { get; set; } = null;
+        public string? BackgroundColor { get; set; } = null;
+        public string? TextColor { get; set; } = null;
+    }
+
+    public class AddCredentialTemplateDisplaySuccessAction
+    {
+        public CredentialTemplateDisplay Display { get; set; }
     }
 }

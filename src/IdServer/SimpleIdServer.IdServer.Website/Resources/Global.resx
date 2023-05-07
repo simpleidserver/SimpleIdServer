@@ -366,4 +366,10 @@
   <data name="CredentialTemplateAdded" xml:space="preserve">
     <value>Credential template is added</value>
   </data>
+  <data name="SelectedCredentialTemplateDisplaysRemoved" xml:space="preserve">
+    <value>Selected displays have been removed</value>
+  </data>
+  <data name="CredentialTemplateDisplayAdded" xml:space="preserve">
+    <value>Display has been added</value>
+  </data>
 </root>

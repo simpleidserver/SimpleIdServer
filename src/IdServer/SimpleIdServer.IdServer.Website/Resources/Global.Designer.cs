@@ -178,6 +178,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Display has been added.
+        /// </summary>
+        public static string CredentialTemplateDisplayAdded {
+            get {
+                return ResourceManager.GetString("CredentialTemplateDisplayAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à The credential template with type &apos;{0}&apos; already exists.
         /// </summary>
         public static string CredentialTemplateExists {
@@ -552,6 +561,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string SelectedClientsRemoved {
             get {
                 return ResourceManager.GetString("SelectedClientsRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Selected displays have been removed.
+        /// </summary>
+        public static string SelectedCredentialTemplateDisplaysRemoved {
+            get {
+                return ResourceManager.GetString("SelectedCredentialTemplateDisplaysRemoved", resourceCulture);
             }
         }
         
