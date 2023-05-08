@@ -1,9 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.IdServer.Domains.DTOs;
+using SimpleIdServer.Vc.DTOs;
 using System.Text.Json.Serialization;
 
-namespace SimpleIdServer.IdServer.Domains
+namespace SimpleIdServer.Vc.Models
 {
     public class CredentialTemplateDisplay
     {
@@ -67,7 +67,7 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonIgnore]
         public string CredentialTemplateId { get; set; } = null!;
         [JsonIgnore]
-        public CredentialTemplate CredentialTemplate { get; set; } = null!;
+        public BaseCredentialTemplate CredentialTemplate { get; set; } = null!;
     }
 
     public record CredentialTemplateDisplayLogo

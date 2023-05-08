@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using System.Text.Json.Serialization;
 
-namespace SimpleIdServer.IdServer.Domains
+namespace SimpleIdServer.Vc.Models
 {
     public class CredentialTemplateParameter
     {
@@ -13,10 +13,18 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonIgnore]
         public string Value { get; set; } = null!;
         [JsonIgnore]
-        public string JsonPath { get; set; } = null!;
-        [JsonIgnore]
         public string CredentialTemplateId { get; set; } = null!;
         [JsonIgnore]
-        public CredentialTemplate CredentialTemplate { get; set; } = null!;
+        public BaseCredentialTemplate CredentialTemplate { get; set; } = null!;
+        [JsonIgnore]
+        public CredentialTemplateParameterTypes ParameterType { get; set; } = CredentialTemplateParameterTypes.STRING;
+        [JsonIgnore]
+        public bool IsArray { get; set; } = false;
+    }
+
+    public enum CredentialTemplateParameterTypes
+    {
+        STRING = 0,
+        JSON = 1
     }
 }

@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using Fluxor;
+using SimpleIdServer.Vc.Models;
 using System.Data;
 
 namespace SimpleIdServer.IdServer.Website.Stores.CredentialTemplateStore
@@ -132,7 +133,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.CredentialTemplateStore
         [ReducerMethod]
         public static CredentialTemplateDisplayState ReduceGetCredentialTemplateSuccessAction(CredentialTemplateDisplayState state, GetCredentialTemplateSuccessAction act)
         {
-            var displays = act.CredentialTemplate.DisplayLst.Select(d => new SelectableCredentialTemplateDisplay(new Domains.CredentialTemplateDisplay
+            var displays = act.CredentialTemplate.DisplayLst.Select(d => new SelectableCredentialTemplateDisplay(new CredentialTemplateDisplay
             {
                 BackgroundColor = d.BackgroundColor,
                 Description = d.Description,

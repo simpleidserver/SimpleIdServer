@@ -12,5 +12,12 @@ namespace SimpleIdServer.Vc
         {
             public const string W3CVerifiableCredentials = "jwt_vc_json";
         }
+
+        public static class CredentialSubjectDisplayTypes
+        {
+            public const string String = "string";
+            public const string Number = "number";
+            public const string Jpeg = "image/jpeg";
+        }
     }
 }

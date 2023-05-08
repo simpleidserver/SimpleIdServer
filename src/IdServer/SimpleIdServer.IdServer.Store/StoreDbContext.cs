@@ -84,6 +84,7 @@ namespace SimpleIdServer.IdServer.Store
             builder.ApplyConfiguration(new RealmUserConfiguration());
             builder.ApplyConfiguration(new ImportSummaryConfiguration());
             builder.ApplyConfiguration(new GroupConfiguration());
+            builder.ApplyConfiguration(new BaseCredentialTemplateConfiguration());
             builder.ApplyConfiguration(new CredentialTemplateConfiguration());
             builder.ApplyConfiguration(new CredentialTemplateDisplayConfiguration());
             builder.ApplyConfiguration(new CredentialTemplateParameterConfiguration());

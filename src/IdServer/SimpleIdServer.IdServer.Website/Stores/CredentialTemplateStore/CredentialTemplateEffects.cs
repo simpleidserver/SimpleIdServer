@@ -3,11 +3,11 @@
 using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
-using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Website.Resources;
-using System.Diagnostics.Contracts;
+using SimpleIdServer.Vc.Builders;
+using SimpleIdServer.Vc.Models;
 using System.Linq.Dynamic.Core;
 
 namespace SimpleIdServer.IdServer.Website.Stores.CredentialTemplateStore
@@ -67,7 +67,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.CredentialTemplateStore
             using (var dbContext = new StoreDbContext(_options))
             {
                 var existingRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
-                var credentialTemplate = CredentialTemplateBuilder.NewW3CCredential(action.Name, action.LogoUrl, Vc.Constants.CredentialTemplateProfiles.W3CVerifiableCredentials, existingRealm).Build();
+                var w3CCredentialTemplate = W3CCredentialTemplateBuilder.New(action.Name, action.LogoUrl, action.Type).Build();
+                var credentialTemplate = new CredentialTemplate(w3CCredentialTemplate);
+                credentialTemplate.Realms.Add(existingRealm);
                 dbContext.CredentialTemplates.Add(credentialTemplate);
                 await dbContext.SaveChangesAsync(CancellationToken.None);
                 dispatcher.Dispatch(new AddCredentialTemplateSuccessAction { Credential = credentialTemplate });
@@ -77,7 +79,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.CredentialTemplateStore
         [EffectMethod]
         public async Task Handle(GetCredentialTemplateAction action, IDispatcher dispatcher)
         {
-            var credentialTemplate = await _credentialTemplateRepository.Query().Include(c => c.DisplayLst).FirstAsync(c => c.TechnicalId == action.Id);
+            var credentialTemplate = await _credentialTemplateRepository.Query().Include(c => c.DisplayLst).Include(c => c.Parameters).FirstAsync(c => c.TechnicalId == action.Id);
             dispatcher.Dispatch(new GetCredentialTemplateSuccessAction { CredentialTemplate = credentialTemplate });
         }
 
