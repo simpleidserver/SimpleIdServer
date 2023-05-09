@@ -1,5 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+
+using System.Collections.Generic;
+
 namespace SimpleIdServer.Vc
 {
     public static class Constants
@@ -19,5 +22,12 @@ namespace SimpleIdServer.Vc
             public const string Number = "number";
             public const string Jpeg = "image/jpeg";
         }
+
+        public static IEnumerable<string> AllCredentialSubjectDisplayTypes = new string[]
+        {
+            CredentialSubjectDisplayTypes.String,
+            CredentialSubjectDisplayTypes.Number,
+            CredentialSubjectDisplayTypes.Jpeg
+        };
     }
 }

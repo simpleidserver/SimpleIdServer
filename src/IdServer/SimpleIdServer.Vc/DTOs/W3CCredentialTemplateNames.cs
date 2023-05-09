@@ -4,7 +4,7 @@ namespace SimpleIdServer.Vc.DTOs
 {
     public static class W3CCredentialTemplateNames
     {
-        public const string Type = "type";
+        public const string Types = "types";
         public const string CredentialSubjet = "credentialSubject";
     }
 }

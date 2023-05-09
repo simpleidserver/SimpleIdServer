@@ -7,7 +7,7 @@ namespace SimpleIdServer.IdServer.Domains
     {
         public string Id { get; set; } = null!;
         /// <summary>
-        /// Type of provider.
+        /// Types of provider.
         /// Valid values : AD, API, DB etc...
         /// </summary>
         public string ProviderType { get; set; } = null!;

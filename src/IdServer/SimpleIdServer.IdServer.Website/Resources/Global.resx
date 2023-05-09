@@ -372,4 +372,13 @@
   <data name="CredentialTemplateDisplayAdded" xml:space="preserve">
     <value>Display has been added</value>
   </data>
+  <data name="SelectedCredentialSubjectsRemoved" xml:space="preserve">
+    <value>Selected credentials subjects are removed</value>
+  </data>
+  <data name="CredentialTypesAreUpdated" xml:space="preserve">
+    <value>Credential types are updated</value>
+  </data>
+  <data name="CredentialSubjectAdded" xml:space="preserve">
+    <value>Credential subject has been added</value>
+  </data>
 </root>

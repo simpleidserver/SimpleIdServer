@@ -533,7 +533,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
     public class AddUserSuccessAction
     {
         /// <summary>
-        /// The generated user's Id.
+        /// The generated user's TechnicalId.
         /// </summary>
         public string Id { get; set; }
 

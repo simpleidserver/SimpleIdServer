@@ -1330,7 +1330,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<int>("Protocol")
                         .HasColumnType("int");
 
-                    b.Property<int>("Type")
+                    b.Property<int>("Types")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdateDateTime")
@@ -1621,7 +1621,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<string>("Subject")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Type")
+                    b.Property<string>("Types")
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "type");
 
@@ -1766,7 +1766,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Type")
+                    b.Property<string>("Types")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
@@ -1829,7 +1829,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<string>("SerializedOptions")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Type")
+                    b.Property<string>("Types")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

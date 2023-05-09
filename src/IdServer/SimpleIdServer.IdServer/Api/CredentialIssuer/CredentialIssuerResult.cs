@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
+using SimpleIdServer.Vc.Models;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
@@ -17,7 +18,7 @@ namespace SimpleIdServer.IdServer.Api.CredentialIssuer
         /// List of JSON Objects, each of them representing metadata about a separate credential type that the credential issuer can issue.
         /// </summary>
         [JsonPropertyName(CredentialIssuerResultNames.CredentialsSupported)]
-        public ICollection<CredentialTemplate> CredentialsSupported { get; set; } = new List<CredentialTemplate>();
+        public ICollection<BaseCredentialTemplate> CredentialsSupported { get; set; } = new List<BaseCredentialTemplate>();
         /// <summary>
         /// Each object contains display properties of a Credential Issuer for a certain language.
         /// </summary>

@@ -23,6 +23,7 @@ namespace SimpleIdServer.Vc.Models
         /// <summary>
         ///  OPTIONAL. An array of objects, where each object contains display properties of a certain claim in the Credential for a certain language
         /// </summary>
+        [JsonPropertyName(W3CCredentialSubjectNames.Display)]
         public ICollection<W3CCredentialSubjectDisplay> Display { get; set; } = new List<W3CCredentialSubjectDisplay>();
     }
 

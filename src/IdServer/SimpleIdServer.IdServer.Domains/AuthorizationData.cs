@@ -10,7 +10,7 @@ namespace SimpleIdServer.IdServer.Domains
     public class AuthorizationData
     {
         /// <summary>
-        /// Type of authorization data.
+        /// Types of authorization data.
         /// </summary>
         [JsonPropertyName(AuthorizationDataParameters.Type)]
         public string Type { get; set; } = null!;

@@ -43,7 +43,7 @@ namespace SimpleIdServer.IdServer.ClaimsEnricher
 
                 var result = await httpClient.SendAsync(request);
                 var json = await result.Content.ReadAsStringAsync();
-                var kvp = result.Content.Headers.FirstOrDefault(k => k.Key == "Content-Type");
+                var kvp = result.Content.Headers.FirstOrDefault(k => k.Key == "Content-Types");
                 if (!kvp.Equals(default(KeyValuePair<string, IEnumerable<string>>)) && !string.IsNullOrWhiteSpace(kvp.Key) && result.IsSuccessStatusCode)
                 {
                     if (kvp.Value.Any(v => v.Contains("application/jwt")))
@@ -74,7 +74,7 @@ namespace SimpleIdServer.IdServer.ClaimsEnricher
 
                 var result = await httpClient.SendAsync(request);
                 var json = await result.Content.ReadAsStringAsync();
-                var kvp = result.Content.Headers.FirstOrDefault(k => k.Key == "Content-Type");
+                var kvp = result.Content.Headers.FirstOrDefault(k => k.Key == "Content-Types");
                 if (!kvp.Equals(default(KeyValuePair<string, IEnumerable<string>>)) && !string.IsNullOrWhiteSpace(kvp.Key) && result.IsSuccessStatusCode)
                 {
                     if (kvp.Value.Any(v => v.Contains("application/json")))

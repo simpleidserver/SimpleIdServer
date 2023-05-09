@@ -112,6 +112,37 @@ namespace SimpleIdServer.IdServer.Website.Stores.CredentialTemplateStore
             dispatcher.Dispatch(new AddCredentialTemplateDisplaySuccessAction { Display = display });
         }
 
+        [EffectMethod]
+        public async Task Handle(RemoveSelectedCredentialSubjectsAction action, IDispatcher dispatcher)
+        {
+            var credentialTemplate = await _credentialTemplateRepository.Query().Include(c => c.Parameters).FirstAsync(c => c.TechnicalId == action.TechnicalId);
+            credentialTemplate.Parameters = credentialTemplate.Parameters.Where(p => !action.ParameterIds.Contains(p.Id)).ToList();
+            await _credentialTemplateRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new RemoveSelectedCredentialSubjectsSuccessAction { ParameterIds = action.ParameterIds, TechnicalId = action.TechnicalId });
+        }
+
+        [EffectMethod]
+        public async Task Handle(UpdateW3CCredentialTemplateTypesAction action, IDispatcher dispatcher)
+        {
+            var credentialTemplate = await _credentialTemplateRepository.Query().Include(c => c.Parameters).FirstAsync(c => c.TechnicalId == action.TechnicalId);
+            var w3cCredentialTemplate = new W3CCredentialTemplate(credentialTemplate);
+            w3cCredentialTemplate.ReplaceTypes(action.ConcatenatedTypes.Split(';'));
+            credentialTemplate.Parameters = w3cCredentialTemplate.Parameters;
+            await _credentialTemplateRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new UpdateW3CCredentialTemplateTypesSuccessAction { ConcatenatedTypes = action.ConcatenatedTypes, TechnicalId = action.TechnicalId });
+        }
+
+        [EffectMethod]
+        public async Task Handle(AddW3CCredentialTemplateCredentialSubjectAction action, IDispatcher dispatcher)
+        {
+            var credentialTemplate = await _credentialTemplateRepository.Query().Include(c => c.Parameters).FirstAsync(c => c.TechnicalId == action.TechnicalId);
+            var w3cCredentialTemplate = new W3CCredentialTemplate(credentialTemplate);
+            var parameter = w3cCredentialTemplate.AddCredentialSubject(action.ClaimName, action.Subject);
+            credentialTemplate.Parameters = w3cCredentialTemplate.Parameters;
+            await _credentialTemplateRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new AddW3CCredentialTemplateCredentialSubjectSuccessAction { TechnicalId = action.TechnicalId, ClaimName = action.ClaimName, Subject = action.Subject, ParameterId = parameter.Id });
+        }
+
         private async Task<string> GetRealm()
         {
             var realm = await _sessionStorage.GetAsync<string>("realm");
@@ -221,5 +252,55 @@ namespace SimpleIdServer.IdServer.Website.Stores.CredentialTemplateStore
     public class AddCredentialTemplateDisplaySuccessAction
     {
         public CredentialTemplateDisplay Display { get; set; }
+    }
+
+    public class ToggleAllCredentialSubjectsAction
+    {
+        public bool IsSelected { get; set; }
+    }
+
+    public class ToggleCredentialSubjectAction
+    {
+        public string ClaimName { get; set; }
+        public bool IsSelected { get; set; }
+    }
+
+    public class RemoveSelectedCredentialSubjectsAction
+    {
+        public string TechnicalId { get; set; }
+        public IEnumerable<string> ParameterIds { get; set; }
+    }
+
+    public class RemoveSelectedCredentialSubjectsSuccessAction
+    {
+        public string TechnicalId { get; set; }
+        public IEnumerable<string> ParameterIds { get; set; }
+    }
+
+    public class UpdateW3CCredentialTemplateTypesAction
+    {
+        public string TechnicalId { get; set; }
+        public string ConcatenatedTypes { get; set; }
+    }
+
+    public class UpdateW3CCredentialTemplateTypesSuccessAction
+    {
+        public string TechnicalId { get; set; }
+        public string ConcatenatedTypes { get; set; }
+    }
+
+    public class AddW3CCredentialTemplateCredentialSubjectAction
+    {
+        public string TechnicalId { get; set; }
+        public string ClaimName { get; set; }
+        public W3CCredentialSubject Subject { get; set; }
+    }
+
+    public class AddW3CCredentialTemplateCredentialSubjectSuccessAction
+    {
+        public string TechnicalId { get; set; }
+        public string ParameterId { get; set; }
+        public string ClaimName { get; set; }
+        public W3CCredentialSubject Subject { get; set; }
     }
 }

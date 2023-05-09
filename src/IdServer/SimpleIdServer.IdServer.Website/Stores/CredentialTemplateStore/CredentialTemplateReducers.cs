@@ -105,6 +105,18 @@ namespace SimpleIdServer.IdServer.Website.Stores.CredentialTemplateStore
         [ReducerMethod]
         public static UpdateCredentialTemplateState ReduceAddCredentialTemplateDisplaySuccessAction(UpdateCredentialTemplateState state, AddCredentialTemplateDisplaySuccessAction act) => new(false, null);
 
+        [ReducerMethod]
+        public static UpdateCredentialTemplateState ReduceRemoveSelectedCredentialSubjectsAction(UpdateCredentialTemplateState state, RemoveSelectedCredentialSubjectsAction act) => new(true, null);
+
+        [ReducerMethod]
+        public static UpdateCredentialTemplateState ReduceRemoveSelectedCredentialSubjectsSuccessAction(UpdateCredentialTemplateState state, RemoveSelectedCredentialSubjectsSuccessAction act) => new(false, null);
+
+        [ReducerMethod]
+        public static UpdateCredentialTemplateState ReduceAddW3CCredentialTemplateCredentialSubjectAction(UpdateCredentialTemplateState state, AddW3CCredentialTemplateCredentialSubjectAction act) => new(true, null);
+
+        [ReducerMethod]
+        public static UpdateCredentialTemplateState ReduceAddW3CCredentialTemplateCredentialSubjectSuccessAction(UpdateCredentialTemplateState state, AddW3CCredentialTemplateCredentialSubjectAction act) => new(false, null);
+
         #endregion
 
         #region CredentialTemplateState
@@ -220,6 +232,132 @@ namespace SimpleIdServer.IdServer.Website.Stores.CredentialTemplateStore
                 IsLoading = false,
                 CredentialTemplateDisplays = displays,
                 Count = displays.Count
+            };
+        }
+
+        #endregion
+
+        #region W3CCredentialTemplateState
+
+
+        [ReducerMethod]
+        public static W3CCredentialTemplateState ReduceGetCredentialTemplateAction(W3CCredentialTemplateState state, GetCredentialTemplateAction act)
+        {
+            return state with
+            {
+                IsLoading = true,
+                CredentialSubjects = new List<SelectableW3CCredentialSubjectRecord>(),
+                Count = 0,
+                Types = new List<string>()
+            };
+        }
+
+        [ReducerMethod]
+        public static W3CCredentialTemplateState ReduceGetCredentialTemplateSuccessAction(W3CCredentialTemplateState state, GetCredentialTemplateSuccessAction act)
+        {
+            if (act.CredentialTemplate.Format != Vc.Constants.CredentialTemplateProfiles.W3CVerifiableCredentials) return state with
+            {
+                IsLoading = false
+            };
+
+            var w3cCredentialTemplate = new W3CCredentialTemplate(act.CredentialTemplate);
+            var credentialSubjects = w3cCredentialTemplate.GetSubjects().Select(r => new SelectableW3CCredentialSubjectRecord(r.ParameterId, r.ClaimName, r.Subject));
+            return state with
+            {
+                IsLoading = false,
+                TechnicalId = act.CredentialTemplate.TechnicalId,
+                CredentialSubjects = credentialSubjects.ToList(),
+                Count = credentialSubjects.Count(),
+                Types = w3cCredentialTemplate.GetTypes()
+            };
+        }
+
+        [ReducerMethod]
+        public static W3CCredentialTemplateState ReduceToggleAllCredentialSubjectsAction(W3CCredentialTemplateState state, ToggleAllCredentialSubjectsAction act)
+        {
+            var subjects = state.CredentialSubjects.ToList();
+            foreach (var subject in subjects) subject.IsSelected = true;
+            return state with
+            {
+                CredentialSubjects = subjects
+            };
+        }
+
+        [ReducerMethod]
+        public static W3CCredentialTemplateState ReduceToggleCredentialSubjectAction(W3CCredentialTemplateState state, ToggleCredentialSubjectAction act)
+        {
+            var subjects = state.CredentialSubjects.ToList();
+            var subject = subjects.Single(s => s.ClaimName == act.ClaimName);
+            subject.IsSelected = act.IsSelected;
+            return state with
+            {
+                CredentialSubjects = subjects
+            };
+        }
+
+        [ReducerMethod]
+        public static W3CCredentialTemplateState ReduceRemoveSelectedCredentialSubjectsAction(W3CCredentialTemplateState state, RemoveSelectedCredentialSubjectsAction act)
+        {
+            return state with
+            {
+                IsLoading = true
+            };
+        }
+
+        [ReducerMethod]
+        public static W3CCredentialTemplateState ReduceRemoveSelectedCredentialSubjectsSuccessAction(W3CCredentialTemplateState state, RemoveSelectedCredentialSubjectsSuccessAction act)
+        {
+            var subjects = state.CredentialSubjects.ToList();
+            subjects = subjects.Where(s => !act.ParameterIds.Contains(s.ParameterId)).ToList();
+            return state with
+            {
+                IsLoading = false,
+                Count = subjects.Count(),
+                CredentialSubjects = subjects
+            };
+        }
+
+        [ReducerMethod]
+        public static W3CCredentialTemplateState ReduceUpdateW3CCredentialTemplateTypesAction(W3CCredentialTemplateState state, UpdateW3CCredentialTemplateTypesAction act)
+        {
+            return state with
+            {
+                IsLoading = true
+            };
+        }
+
+        [ReducerMethod]
+        public static W3CCredentialTemplateState ReduceUpdateW3CCredentialTemplateTypesSuccessAction(W3CCredentialTemplateState state, UpdateW3CCredentialTemplateTypesSuccessAction act)
+        {
+            return state with
+            {
+                IsLoading = false,
+                Types = act.ConcatenatedTypes.Split(';')
+            };
+        }
+
+        [ReducerMethod]
+        public static W3CCredentialTemplateState ReduceAddW3CCredentialTemplateCredentialSubjectAction(W3CCredentialTemplateState state, AddW3CCredentialTemplateCredentialSubjectAction act)
+        {
+            return state with
+            {
+                IsLoading = true
+            };
+        }
+
+        [ReducerMethod]
+        public static W3CCredentialTemplateState ReduceAddW3CCredentialTemplateCredentialSubjectSuccessAction(W3CCredentialTemplateState state, AddW3CCredentialTemplateCredentialSubjectSuccessAction act)
+        {
+            var credentialSubjects = state.CredentialSubjects.ToList();
+            credentialSubjects.Add(new SelectableW3CCredentialSubjectRecord(act.ParameterId, act.ClaimName, act.Subject)
+            {
+                IsNew = true
+            });
+            return state with
+            {
+                IsLoading = false,
+                Count = credentialSubjects.Count,
+                CredentialSubjects = credentialSubjects
             };
         }
 

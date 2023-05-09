@@ -154,14 +154,14 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="content-Type cannot be equals to \'application/json\'")]
+        [Xunit.SkippableFactAttribute(DisplayName="content-Types cannot be equals to \'application/json\'")]
         [Xunit.TraitAttribute("FeatureTitle", "UserInfoErrors")]
-        [Xunit.TraitAttribute("Description", "content-Type cannot be equals to \'application/json\'")]
+        [Xunit.TraitAttribute("Description", "content-Types cannot be equals to \'application/json\'")]
         public void Content_TypeCannotBeEqualsToApplicationJson()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("content-Type cannot be equals to \'application/json\'", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("content-Types cannot be equals to \'application/json\'", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 22
 this.ScenarioInitialize(scenarioInfo);
 #line hidden

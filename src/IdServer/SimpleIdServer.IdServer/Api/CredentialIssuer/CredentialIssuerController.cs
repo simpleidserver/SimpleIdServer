@@ -6,7 +6,11 @@ using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Extensions;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.Vc.Models;
 using System.Linq;
+using System.Net;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -33,10 +37,15 @@ namespace SimpleIdServer.IdServer.Api.CredentialIssuer
             {
                 CredentialIssuer = issuer,
                 CredentialEndpoint = $"{issuer}/{Constants.EndPoints.Credential}",
-                CredentialsSupported = credentialTemplates,
+                CredentialsSupported = credentialTemplates.Cast<BaseCredentialTemplate>().ToList(),
                 Display = _options.CredentialIssuerDisplays
             };
-            return Ok(result);
+            return new ContentResult
+            {
+                Content = JsonSerializer.Serialize(result),
+                StatusCode = (int)HttpStatusCode.OK,
+                ContentType = "application/json"
+            };
         }
     }
 }

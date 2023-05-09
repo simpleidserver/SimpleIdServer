@@ -169,6 +169,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Credential subject has been added.
+        /// </summary>
+        public static string CredentialSubjectAdded {
+            get {
+                return ResourceManager.GetString("CredentialSubjectAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Credential template is added.
         /// </summary>
         public static string CredentialTemplateAdded {
@@ -192,6 +201,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string CredentialTemplateExists {
             get {
                 return ResourceManager.GetString("CredentialTemplateExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Credential types are updated.
+        /// </summary>
+        public static string CredentialTypesAreUpdated {
+            get {
+                return ResourceManager.GetString("CredentialTypesAreUpdated", resourceCulture);
             }
         }
         
@@ -561,6 +579,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string SelectedClientsRemoved {
             get {
                 return ResourceManager.GetString("SelectedClientsRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Selected credentials subjects are removed.
+        /// </summary>
+        public static string SelectedCredentialSubjectsRemoved {
+            get {
+                return ResourceManager.GetString("SelectedCredentialSubjectsRemoved", resourceCulture);
             }
         }
         
