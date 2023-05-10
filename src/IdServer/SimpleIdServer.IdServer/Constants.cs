@@ -18,6 +18,11 @@ namespace SimpleIdServer.IdServer
             public const string Sig = "sig";
         }
 
+        public static class StandardAuthorizationDetails
+        {
+            public const string OpenIdCredential = "openid_credential";
+        }
+
         public static class EndPoints
         {
             public const string Token = "token";

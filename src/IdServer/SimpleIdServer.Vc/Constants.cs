@@ -23,11 +23,16 @@ namespace SimpleIdServer.Vc
             public const string Jpeg = "image/jpeg";
         }
 
-        public static IEnumerable<string> AllCredentialSubjectDisplayTypes = new string[]
+        public static ICollection<string> AllCredentialSubjectDisplayTypes = new string[]
         {
             CredentialSubjectDisplayTypes.String,
             CredentialSubjectDisplayTypes.Number,
             CredentialSubjectDisplayTypes.Jpeg
+        };
+
+        public static IEnumerable<string> AllCredentialTemplateProfiles = new string[]
+        {
+            CredentialTemplateProfiles.W3CVerifiableCredentials
         };
     }
 }

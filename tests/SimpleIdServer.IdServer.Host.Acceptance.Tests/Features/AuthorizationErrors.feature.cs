@@ -129,14 +129,14 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Response Types is required")]
+        [Xunit.SkippableFactAttribute(DisplayName="Response Type is required")]
         [Xunit.TraitAttribute("FeatureTitle", "AuthorizationErrors")]
-        [Xunit.TraitAttribute("Description", "Response Types is required")]
+        [Xunit.TraitAttribute("Description", "Response Type is required")]
         public void ResponseTypeIsRequired()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Response Types is required", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Response Type is required", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 17
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -175,14 +175,14 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Response Types must be supported")]
+        [Xunit.SkippableFactAttribute(DisplayName="Response Type must be supported")]
         [Xunit.TraitAttribute("FeatureTitle", "AuthorizationErrors")]
-        [Xunit.TraitAttribute("Description", "Response Types must be supported")]
+        [Xunit.TraitAttribute("Description", "Response Type must be supported")]
         public void ResponseTypeMustBeSupported()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Response Types must be supported", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Response Type must be supported", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 29
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -2157,6 +2157,124 @@ this.ScenarioInitialize(scenarioInfo);
 #line hidden
 #line 567
  testRunner.Then("redirection url contains \'http://localhost/Consents\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="format is required when authorization_details contains openid_credential")]
+        [Xunit.TraitAttribute("FeatureTitle", "AuthorizationErrors")]
+        [Xunit.TraitAttribute("Description", "format is required when authorization_details contains openid_credential")]
+        public void FormatIsRequiredWhenAuthorization_DetailsContainsOpenid_Credential()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("format is required when authorization_details contains openid_credential", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 569
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 570
+ testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table39 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table39.AddRow(new string[] {
+                            "response_type",
+                            "code token"});
+                table39.AddRow(new string[] {
+                            "client_id",
+                            "fiftyEightClient"});
+                table39.AddRow(new string[] {
+                            "state",
+                            "state"});
+                table39.AddRow(new string[] {
+                            "response_mode",
+                            "query"});
+                table39.AddRow(new string[] {
+                            "redirect_uri",
+                            "http://localhost:8080"});
+                table39.AddRow(new string[] {
+                            "nonce",
+                            "nonce"});
+                table39.AddRow(new string[] {
+                            "authorization_details",
+                            "{ \"type\" : \"openid_credential\" }"});
+#line 572
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table39, "When ");
+#line hidden
+#line 582
+ testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 583
+ testRunner.Then("redirection url contains the parameter value \'error_description\'=\'the authorizati" +
+                        "on_details must contain a format\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="credential format must be supported")]
+        [Xunit.TraitAttribute("FeatureTitle", "AuthorizationErrors")]
+        [Xunit.TraitAttribute("Description", "credential format must be supported")]
+        public void CredentialFormatMustBeSupported()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("credential format must be supported", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 585
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 586
+ testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table40 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table40.AddRow(new string[] {
+                            "response_type",
+                            "code token"});
+                table40.AddRow(new string[] {
+                            "client_id",
+                            "fiftyEightClient"});
+                table40.AddRow(new string[] {
+                            "state",
+                            "state"});
+                table40.AddRow(new string[] {
+                            "response_mode",
+                            "query"});
+                table40.AddRow(new string[] {
+                            "redirect_uri",
+                            "http://localhost:8080"});
+                table40.AddRow(new string[] {
+                            "nonce",
+                            "nonce"});
+                table40.AddRow(new string[] {
+                            "authorization_details",
+                            "{ \"type\" : \"openid_credential\", \"format\": \"invalid_format\" }"});
+#line 588
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table40, "When ");
+#line hidden
+#line 598
+ testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 599
+ testRunner.Then("redirection url contains the parameter value \'error_description\'=\'credential form" +
+                        "ats invalid_format are not supported\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

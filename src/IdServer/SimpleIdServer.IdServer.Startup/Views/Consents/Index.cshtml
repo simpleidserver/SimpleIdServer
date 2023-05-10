@@ -57,7 +57,36 @@
                     {
                         foreach(var authDetail in Model.AuthorizationDetails)
                         {
-                            <li class="list-group-item"><b>@authDetail.Type</b> : @string.Join(",", authDetail.Actions)</li>
+                            if (authDetail.Type == SimpleIdServer.IdServer.Constants.StandardAuthorizationDetails.OpenIdCredential)
+                            {
+                                <li class="list-group-item">
+                                    <b>@authDetail.Type</b>
+                                    @if (authDetail.Types != null && authDetail.Types.Any())
+                                    {
+                                        <ul class="list-group">
+                                            @foreach (var type in authDetail.Types)
+                                            {
+                                                <li class="list-group-item">@type</li>
+                                            }
+                                        </ul>
+                                    }
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="list-group-item">
+                                    <b>@authDetail.Type</b> : @string.Join(",", authDetail.Actions)
+                                    @if(authDetail.Locations != null && authDetail.Locations.Any())
+                                    {
+                                        <ul class="list-group">
+                                            @foreach(var location in authDetail.Locations)
+                                            {
+                                                <li class="list-group-item">@location</li>
+                                            }
+                                        </ul>
+                                    }
+                                </li>                                
+                            }
                         }
                     }
                 </ul>

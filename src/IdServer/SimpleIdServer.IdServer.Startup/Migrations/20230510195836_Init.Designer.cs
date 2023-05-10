@@ -12,7 +12,7 @@ using SimpleIdServer.IdServer.Store;
 namespace SimpleIdServer.IdServer.Startup.Migrations
 {
     [DbContext(typeof(StoreDbContext))]
-    [Migration("20230508195608_Init")]
+    [Migration("20230510195836_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -1333,7 +1333,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<int>("Protocol")
                         .HasColumnType("int");
 
-                    b.Property<int>("Types")
+                    b.Property<int>("Type")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdateDateTime")
@@ -1624,7 +1624,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<string>("Subject")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Types")
+                    b.Property<string>("Type")
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "type");
 
@@ -1769,7 +1769,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Types")
+                    b.Property<string>("Type")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
@@ -1832,7 +1832,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<string>("SerializedOptions")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Types")
+                    b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

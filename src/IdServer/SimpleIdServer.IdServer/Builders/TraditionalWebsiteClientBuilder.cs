@@ -419,6 +419,20 @@ namespace SimpleIdServer.IdServer.Builders
 
         #endregion
 
+        #region Credential Issuance
+
+        /// <summary>
+        /// Add openid_credential into AuthorizationDataTypes.
+        /// </summary>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder TrustOpenIdCredential()
+        {
+            _client.AuthorizationDataTypes.Add(Constants.StandardAuthorizationDetails.OpenIdCredential);
+            return this;
+        }
+
+        #endregion
+
         #region Other parameters
 
         /// <summary>

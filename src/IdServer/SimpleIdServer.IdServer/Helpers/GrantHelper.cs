@@ -63,7 +63,7 @@ namespace SimpleIdServer.IdServer.Helpers
             authResults.AddRange(await ProcessScopeParameter(scopes, cancellationToken));
             var audiences = authResults.SelectMany(a => a.Resources).Distinct();
             if(audiences.Any())
-                authorizationDetails = authorizationDetails.Where(d => d.Locations.Any(l => audiences.Contains(l))).ToList();
+                authorizationDetails = authorizationDetails.Where(d => d.Locations != null && d.Locations.Any(l => audiences.Contains(l))).ToList();
 
             return new GrantRequest(authResults, authorizationDetails);
 

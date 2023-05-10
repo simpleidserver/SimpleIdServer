@@ -129,6 +129,7 @@ namespace SimpleIdServer.IdServer
         public const string MISSING_POST_LOGOUT_REDIRECT_URI = "the parameter post_logout_redirect_uri is missing";
         public const string MISSING_ID_TOKEN_HINT = "id_token_hint parameter is missing";
         public const string MISSING_RESPONSE_TYPE_CLAIM = "the response_type claim is missing";
+        public const string MISSING_OPENID_CREDENTIAL_FORMAT = "the authorization_details must contain a format";
         public const string MISSING_CLIENT_ID_CLAIM = "the client_id claim is missing";
         public const string UNSUPPORTED_USERINFO_SIGNED_RESPONSE_ALG = "userinfo_signed_response_alg is not supported";
         public const string UNSUPPORTED_TOKEN_ENCRYPTED_RESPONSE_ALG = "token_encrypted_response_alg is not supported";
@@ -142,6 +143,7 @@ namespace SimpleIdServer.IdServer
         public const string UNSUPPORTED_TOKEN_ENCRYPTED_RESPONSE_ENC = "token_encrypted_response_enc is not supported";
         public const string UNSUPPORTED_TOKEN_SIGNED_RESPONSE_ALG = "token_signed_response_alg is not supported";
         public const string UNSUPPORTED_BC_AUTHENTICATION_REQUEST_SIGNING_ALG = "bc_authentication_request_signing_alg is not supported";
+        public const string UNSUPPORTED_CREDENTIALS_FORMAT = "credential formats {0} are not supported";
         public const string UNSUPPORTED_SCOPES = "scopes {0} are not supported";
         public const string UNSUPPORTED_GRANT_TYPE = "grant type {0} is not supported";
         public const string UNSUPPORTED_GRANT_TYPES = "grant types {0} are not supported";

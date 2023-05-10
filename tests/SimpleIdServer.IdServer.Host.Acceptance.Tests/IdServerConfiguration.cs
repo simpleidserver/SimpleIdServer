@@ -128,7 +128,8 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildUserAgentClient("fiftyFourClient", "password", null, "http://localhost:8080").UseImplicitFlow().AddScope(StandardScopes.OpenIdScope, StandardScopes.Profile, StandardScopes.Email).SetSigAuthorizationResponse(SecurityAlgorithms.RsaSha256).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("fiftyFiveClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().EnableTokenInResponseType().EnableRefreshTokenGrantType().AddScope(AdminScope, CalendarScope).AddAuthDataTypes("firstDetails", "secondDetails").Build(),
             FiftySixClient,
-            ClientBuilder.BuildApiClient("fiftySevenClient", "password").AddScope(StandardScopes.Users).AddScope(StandardScopes.Register).Build()
+            ClientBuilder.BuildApiClient("fiftySevenClient", "password").AddScope(StandardScopes.Users).AddScope(StandardScopes.Register).Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("fiftyEightClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().EnableTokenInResponseType().TrustOpenIdCredential().Build()
         };
 
         public static List<User> Users = new List<User>
@@ -181,6 +182,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                 .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fiftyFourClient", "openid", "profile", "email")
                 .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fiftyFiveClient", new AuthorizationData { Type = "firstDetails", Actions = new List<string> { "read" } }, new AuthorizationData { Type = "secondDetails", Locations = new List<string> { "https://cal.example.com" }, Actions = new List<string> { "read" } })
                 .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fiftySixClient", "openid", "role")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fiftyEightClient", new AuthorizationData { Type = "openid_credential", Types = new List<string> { "VerifiableCredential", "UniversityDegreeCredential" } })
                 .AddSession("sessionId", SimpleIdServer.IdServer.Constants.DefaultRealm, DateTime.UtcNow.AddDays(2)).Build()
         };
 

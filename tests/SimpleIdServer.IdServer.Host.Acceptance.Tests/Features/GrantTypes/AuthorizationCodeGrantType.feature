@@ -157,3 +157,32 @@ Scenario: only one authorization_details is returned because there is one resour
 
 	Then JWT has authorization_details type 'secondDetails'
 	And JWT has authorization_details action 'read'
+
+Scenario: access token contains authorization_details with openid_credential
+	Given authenticate a user
+	
+	When execute HTTP GET request 'http://localhost/authorization'
+	| Key                     | Value                                                                                                                         |
+	| response_type           | code token                                                                                                                    |
+	| client_id               | fiftyEightClient                                                                                                              |
+	| state                   | state                                                                                                                         |
+	| response_mode           | query                                                                                                                         |
+	| redirect_uri            | http://localhost:8080                                                                                                         |
+	| nonce                   | nonce                                                                                                                         |
+	| authorization_details   |  { "type" : "openid_credential", "format": "jwt_vc_json", "types": [ "VerifiableCredential", "UniversityDegreeCredential" ] } |
+	
+	And extract parameter 'code' from redirect url
+	
+	And execute HTTP POST request 'https://localhost:8080/token'
+	| Key           | Value        			       |
+	| client_id     | fiftyEightClient             |
+	| client_secret | password     			       |
+	| grant_type    | authorization_code	       |
+	| code			| $code$				       |
+	| redirect_uri  | http://localhost:8080	       |
+
+	And extract JSON from body
+	And extract parameter 'access_token' from JSON body
+	And extract payload from JWT '$access_token$'
+
+	Then JWT has authorization_details type 'openid_credential'

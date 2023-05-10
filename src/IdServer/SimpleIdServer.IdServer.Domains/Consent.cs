@@ -122,6 +122,9 @@ namespace SimpleIdServer.IdServer.Domains
                     var unknownDataTypes = newAuthData.DataTypes.Where(a => !existingAuthData.DataTypes.Contains(a));
                     foreach (var unknownDataType in unknownDataTypes)
                         existingAuthData.DataTypes.Add(unknownDataType);
+                    var unknownTypes = newAuthData.Types.Where(t => !existingAuthData.Types.Contains(t));
+                    foreach (var unknownType in unknownTypes)
+                        existingAuthData.Types.Add(unknownType);
                 }
 
                 AuthorizationDetails = newAuthorizationDetails;

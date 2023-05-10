@@ -565,3 +565,35 @@ Scenario: redirect to the consent page when no consent has been given to the spe
 	| authorization_details   |  { "type" : "firstDetails", "actions": [ "write" ] }    |
 
 	Then redirection url contains 'http://localhost/Consents'	
+
+Scenario: format is required when authorization_details contains openid_credential
+	Given authenticate a user
+	
+	When execute HTTP GET request 'http://localhost/authorization'
+	| Key                     | Value                                |
+	| response_type           | code token                           |
+	| client_id               | fiftyEightClient                     |
+	| state                   | state                                |
+	| response_mode           | query                                |
+	| redirect_uri            | http://localhost:8080                |
+	| nonce                   | nonce                                |
+	| authorization_details   |  { "type" : "openid_credential" }    |
+	
+	Then redirection url contains the parameter value 'error'='invalid_request'
+	Then redirection url contains the parameter value 'error_description'='the authorization_details must contain a format'	
+
+Scenario: credential format must be supported
+	Given authenticate a user
+	
+	When execute HTTP GET request 'http://localhost/authorization'
+	| Key                     | Value															|
+	| response_type           | code token														|
+	| client_id               | fiftyEightClient												|
+	| state                   | state															|
+	| response_mode           | query															|
+	| redirect_uri            | http://localhost:8080											|
+	| nonce                   | nonce															|
+	| authorization_details   |  { "type" : "openid_credential", "format": "invalid_format" }   |
+	
+	Then redirection url contains the parameter value 'error'='invalid_request'
+	Then redirection url contains the parameter value 'error_description'='credential formats invalid_format are not supported'	
