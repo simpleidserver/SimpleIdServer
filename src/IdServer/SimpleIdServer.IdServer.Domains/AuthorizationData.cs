@@ -45,6 +45,30 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonIgnore]
         public Dictionary<string, string> AdditionalData { get; set; } = new Dictionary<string, string>();
 
+        public void AddLocation(string location)
+        {
+            if (Locations == null) Locations = new List<string>();
+            Locations.Add(location);
+        }
+
+        public void AddAction(string action)
+        {
+            if (Actions == null) Actions = new List<string>();
+            Actions.Add(action);
+        }
+
+        public void AddDataType(string type)
+        {
+            if (DataTypes == null) DataTypes = new List<string>();
+            DataTypes.Add(type);
+        }
+
+        public void AddType(string type)
+        {
+            if (type == null) Types = new List<string>();
+            Types.Add(type);
+        }
+
         public Dictionary<string, object> Serialize()
         {
             var result = new Dictionary<string, object>

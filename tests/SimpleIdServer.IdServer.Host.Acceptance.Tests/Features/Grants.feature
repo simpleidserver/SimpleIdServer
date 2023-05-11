@@ -203,6 +203,7 @@ Scenario: merge the authorization_details types and check the grant is updated
 
 	Then JSON '$.authorization_details[0].type'='openid_credential'
 	And JSON '$.authorization_details[0].format'='jwt_vc_json'
+	And JSON '$.authorization_details[0].locations[0]'='http://localhost'
 	And JSON '$.authorization_details[0].types[0]'='VerifiableCredential'
 	And JSON '$.authorization_details[0].types[1]'='UniversityDegreeCredential'
 

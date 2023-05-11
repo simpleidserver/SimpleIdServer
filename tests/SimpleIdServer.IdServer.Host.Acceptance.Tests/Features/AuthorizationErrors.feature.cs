@@ -2280,6 +2280,65 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
+        [Xunit.SkippableFactAttribute(DisplayName="credential location must be equals to the authorization server")]
+        [Xunit.TraitAttribute("FeatureTitle", "AuthorizationErrors")]
+        [Xunit.TraitAttribute("Description", "credential location must be equals to the authorization server")]
+        public void CredentialLocationMustBeEqualsToTheAuthorizationServer()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("credential location must be equals to the authorization server", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 601
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 602
+ testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table41 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table41.AddRow(new string[] {
+                            "response_type",
+                            "code token"});
+                table41.AddRow(new string[] {
+                            "client_id",
+                            "fiftyEightClient"});
+                table41.AddRow(new string[] {
+                            "state",
+                            "state"});
+                table41.AddRow(new string[] {
+                            "response_mode",
+                            "query"});
+                table41.AddRow(new string[] {
+                            "redirect_uri",
+                            "http://localhost:8080"});
+                table41.AddRow(new string[] {
+                            "nonce",
+                            "nonce"});
+                table41.AddRow(new string[] {
+                            "authorization_details",
+                            "{ \"type\" : \"openid_credential\", \"format\": \"jwt_vc_json\" }"});
+#line 604
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table41, "When ");
+#line hidden
+#line 614
+ testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 615
+ testRunner.Then("redirection url contains the parameter value \'error_description\'=\'the authorizati" +
+                        "on_details location must be equal to the authorization server http://localhost\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
         [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
         [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
         public class FixtureData : System.IDisposable

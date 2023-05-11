@@ -148,7 +148,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                 if (unexceptedFormats.Any()) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_CREDENTIALS_FORMAT, string.Join(",", unexceptedFormats)));
                 if (!string.IsNullOrWhiteSpace(_options.WalletAuthorizationServer))
                 {
-                    var invalidLocations = authDetails.Where(d => d.Locations == null || (d.Locations != null && d.Locations.Contains(_options.WalletAuthorizationServer)));
+                    var invalidLocations = authDetails.Where(d => d.Locations == null || (d.Locations != null && !d.Locations.Contains(_options.WalletAuthorizationServer)));
                     if (invalidLocations.Any()) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.INVALID_AUTH_DETAILS_LOCATION, _options.WalletAuthorizationServer));
                 }
             }
