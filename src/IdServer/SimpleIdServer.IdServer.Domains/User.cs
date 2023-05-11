@@ -119,6 +119,8 @@ namespace SimpleIdServer.IdServer.Domains
         public ICollection<Group> Groups { get; set; } = new List<Group>();
         [JsonIgnore]
         public IdentityProvisioning? IdentityProvisioning { get; set; } = null;
+        [JsonIgnore]
+        public ICollection<UserCredentialOffer> CredentialOffers { get; set; } = new List<UserCredentialOffer>();
 
         #region User claims
 

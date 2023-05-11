@@ -28,7 +28,7 @@ namespace SimpleIdServer.IdServer.Api.CredentialIssuer
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get([FromRoute] string prefix, CancellationToken cancellationToken)
+        public async Task<IActionResult> Get([FromRoute] string prefix, string credentialOffer, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
             var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath());
