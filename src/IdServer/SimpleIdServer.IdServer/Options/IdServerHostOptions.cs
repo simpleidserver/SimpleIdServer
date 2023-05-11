@@ -187,6 +187,11 @@ namespace SimpleIdServer.IdServer.Options
         /// Destination folder where representations will be extracted.
         /// </summary>
         public string ExtractRepresentationsFolder { get; set; } = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Extraction");
+        /// <summary>
+        /// Authorization server used by the wallet.
+        /// </summary>
+        public string? WalletAuthorizationServer { get; set; } = null;
+        
         public ICollection<CredentialIssuerDisplayResult> CredentialIssuerDisplays { get; set; } = new List<CredentialIssuerDisplayResult>
         {
             new CredentialIssuerDisplayResult { Name = "SimpleIdServer" }

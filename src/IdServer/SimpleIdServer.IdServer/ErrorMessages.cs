@@ -68,6 +68,7 @@ namespace SimpleIdServer.IdServer
         public const string INVALID_AUDIENCE_IDTOKENHINT = "audience contained in id_token_hint is invalid";
         public const string INVALID_APPLICATION_TYPE = "application type is invalid";
         public const string INVALID_GRANT_MANAGEMENT_ACTION = "the grant_management_action {0} is not valid";
+        public const string INVALID_AUTH_DETAILS_LOCATION = "the authorization_details location must be equal to the authorization server {0}";
         public const string INVALID_JWT = "JSON Web Token cannot be read";
         public const string BAD_CODE_VERIFIER = "code_verifier is invalid";
         public const string BAD_TOKEN_FORMAT = "token format {0} is invalid";

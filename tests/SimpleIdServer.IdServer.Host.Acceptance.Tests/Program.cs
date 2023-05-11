@@ -8,7 +8,10 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddSIDIdentityServer()
+builder.Services.AddSIDIdentityServer(o =>
+{
+    o.WalletAuthorizationServer = "http://localhost";
+})
     .UseInMemoryStore(o =>
     {
         o.AddInMemoryRealms(IdServerConfiguration.Realms);

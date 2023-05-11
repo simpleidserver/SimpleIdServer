@@ -40,6 +40,7 @@ namespace SimpleIdServer.IdServer.Api.CredentialIssuer
                 CredentialsSupported = credentialTemplates.Cast<BaseCredentialTemplate>().ToList(),
                 Display = _options.CredentialIssuerDisplays
             };
+            if(_options.WalletAuthorizationServer != null) result.AuthorizationServer= _options.WalletAuthorizationServer;
             return new ContentResult
             {
                 Content = JsonSerializer.Serialize(result),

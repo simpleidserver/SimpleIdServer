@@ -10,6 +10,13 @@ namespace SimpleIdServer.IdServer.Api.CredentialIssuer
 {
     public class CredentialIssuerResult
     {
+        /// <summary>
+        /// Identifier of the OAUTH2.0 Authorization server, the credential issuer relies on for the authorization.
+        /// If this element is omitted, the entity providing the credential issuer is also acting as the AS.
+        /// </summary>
+        [JsonPropertyName(CredentialIssuerResultNames.AuthorizationServer)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? AuthorizationServer { get; set; } = null;
         [JsonPropertyName(CredentialIssuerResultNames.CredentialIssuer)]
         public string CredentialIssuer { get; set; } = null!;
         [JsonPropertyName(CredentialIssuerResultNames.CredentialEndpoint)]

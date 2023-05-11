@@ -10,5 +10,6 @@ namespace SimpleIdServer.IdServer.DTOs
         public const string Display = "display";
         public const string Name = "name";
         public const string Locale = "locale";
+        public const string AuthorizationServer = "authorization_server";
     }
 }
