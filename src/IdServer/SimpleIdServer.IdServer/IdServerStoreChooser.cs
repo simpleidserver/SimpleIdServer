@@ -170,6 +170,17 @@ namespace SimpleIdServer.IdServer
             return this;
         }
 
+        public IdServerInMemoryStoreBuilder AddInMemoryCredentialOffers(ICollection<UserCredentialOffer> offers)
+        {
+            var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
+            if(!storeDbContext.CredentialOffers.Any())
+            {
+                storeDbContext.CredentialOffers.AddRange(offers);
+            }
+
+            return this;
+        }
+
         public IdServerInMemoryStoreBuilder AddInMemoryKeys(Realm realm, ICollection<SigningCredentials> signingCredentials, ICollection<EncryptingCredentials> encryptingCredentials)
         {
             var storeDbContext = _serviceProvider.GetService<StoreDbContext>();

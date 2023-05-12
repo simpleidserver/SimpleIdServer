@@ -19,7 +19,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class GrantErrorsFeature : object, Xunit.IClassFixture<GrantErrorsFeature.FixtureData>, System.IDisposable
+    public partial class CredentialOfferErrorsFeature : object, Xunit.IClassFixture<CredentialOfferErrorsFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
@@ -28,10 +28,10 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
-#line 1 "GrantErrors.feature"
+#line 1 "CredentialOfferErrors.feature"
 #line hidden
         
-        public GrantErrorsFeature(GrantErrorsFeature.FixtureData fixtureData, SimpleIdServer_IdServer_Host_Acceptance_Tests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
+        public CredentialOfferErrorsFeature(CredentialOfferErrorsFeature.FixtureData fixtureData, SimpleIdServer_IdServer_Host_Acceptance_Tests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
             this.TestInitialize();
@@ -40,7 +40,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "GrantErrors", "\tCheck errors returned by grants API", ProgrammingLanguage.CSharp, featureTags);
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "CredentialOfferErrors", "\tCheck errors returned by credential_offer API", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -81,7 +81,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
         }
         
         [Xunit.SkippableFactAttribute(DisplayName="access token is required")]
-        [Xunit.TraitAttribute("FeatureTitle", "GrantErrors")]
+        [Xunit.TraitAttribute("FeatureTitle", "CredentialOfferErrors")]
         [Xunit.TraitAttribute("Description", "access token is required")]
         public void AccessTokenIsRequired()
         {
@@ -98,11 +98,11 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table133 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table128 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
 #line 5
- testRunner.When("execute HTTP GET request \'http://localhost/grants/id\'", ((string)(null)), table133, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/credential_offer/id\'", ((string)(null)), table128, "When ");
 #line hidden
 #line 8
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -117,14 +117,14 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="grant must exists")]
-        [Xunit.TraitAttribute("FeatureTitle", "GrantErrors")]
-        [Xunit.TraitAttribute("Description", "grant must exists")]
-        public void GrantMustExists()
+        [Xunit.SkippableFactAttribute(DisplayName="accesss token is not valid")]
+        [Xunit.TraitAttribute("FeatureTitle", "CredentialOfferErrors")]
+        [Xunit.TraitAttribute("Description", "accesss token is not valid")]
+        public void AccesssTokenIsNotValid()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("grant must exists", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("accesss token is not valid", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 13
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -135,71 +135,22 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table134 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table129 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table134.AddRow(new string[] {
+                table129.AddRow(new string[] {
                             "Authorization",
                             "Bearer AT"});
 #line 14
- testRunner.When("execute HTTP GET request \'http://localhost/grants/id\'", ((string)(null)), table134, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/credential_offer/id\'", ((string)(null)), table129, "When ");
 #line hidden
 #line 18
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 20
- testRunner.Then("HTTP status code equals to \'404\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'error\'=\'invalid_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 21
- testRunner.And("JSON \'error\'=\'invalid_target\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 22
- testRunner.And("JSON \'error_description\'=\'the grant id doesn\'t exist\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="access token must be valid")]
-        [Xunit.TraitAttribute("FeatureTitle", "GrantErrors")]
-        [Xunit.TraitAttribute("Description", "access token must be valid")]
-        public void AccessTokenMustBeValid()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("access token must be valid", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 24
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-#line 25
- testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line hidden
-                TechTalk.SpecFlow.Table table135 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table135.AddRow(new string[] {
-                            "Authorization",
-                            "Bearer INVALID"});
-#line 27
- testRunner.When("execute HTTP GET request \'http://localhost/grants/consentId\'", ((string)(null)), table135, "When ");
-#line hidden
-#line 31
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 33
- testRunner.Then("HTTP status code equals to \'401\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 34
- testRunner.And("JSON \'error\'=\'invalid_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 35
  testRunner.And("JSON \'error_description\'=\'either the access token has been revoked or is invalid\'" +
                         "", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
@@ -207,15 +158,15 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="only the same client can query the grant")]
-        [Xunit.TraitAttribute("FeatureTitle", "GrantErrors")]
-        [Xunit.TraitAttribute("Description", "only the same client can query the grant")]
-        public void OnlyTheSameClientCanQueryTheGrant()
+        [Xunit.SkippableFactAttribute(DisplayName="cannot get an unknown credential offer")]
+        [Xunit.TraitAttribute("FeatureTitle", "CredentialOfferErrors")]
+        [Xunit.TraitAttribute("Description", "cannot get an unknown credential offer")]
+        public void CannotGetAnUnknownCredentialOffer()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("only the same client can query the grant", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 37
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("cannot get an unknown credential offer", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 23
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -225,94 +176,87 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 38
+#line 24
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table136 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table130 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table136.AddRow(new string[] {
+                table130.AddRow(new string[] {
                             "response_type",
                             "code"});
-                table136.AddRow(new string[] {
+                table130.AddRow(new string[] {
                             "client_id",
-                            "fortyEightClient"});
-                table136.AddRow(new string[] {
+                            "fiftyEightClient"});
+                table130.AddRow(new string[] {
                             "state",
                             "state"});
-                table136.AddRow(new string[] {
+                table130.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table136.AddRow(new string[] {
+                table130.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table136.AddRow(new string[] {
+                table130.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table136.AddRow(new string[] {
-                            "claims",
-                            "{ \"id_token\": { \"acr\": { \"essential\" : true, \"value\": \"urn:openbanking:psd2:ca\" }" +
-                                " } }"});
-                table136.AddRow(new string[] {
-                            "resource",
-                            "https://cal.example.com"});
-                table136.AddRow(new string[] {
+                table130.AddRow(new string[] {
                             "scope",
-                            "grant_management_query"});
-#line 40
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table136, "When ");
+                            "credential_offer"});
+#line 26
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table130, "When ");
 #line hidden
-#line 52
+#line 36
  testRunner.And("extract parameter \'code\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table137 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table131 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table137.AddRow(new string[] {
+                table131.AddRow(new string[] {
                             "client_id",
-                            "fortyEightClient"});
-                table137.AddRow(new string[] {
+                            "fiftyEightClient"});
+                table131.AddRow(new string[] {
                             "client_secret",
                             "password"});
-                table137.AddRow(new string[] {
+                table131.AddRow(new string[] {
                             "grant_type",
                             "authorization_code"});
-                table137.AddRow(new string[] {
+                table131.AddRow(new string[] {
                             "code",
                             "$code$"});
-                table137.AddRow(new string[] {
+                table131.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-#line 54
- testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table137, "And ");
+#line 38
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table131, "And ");
 #line hidden
-#line 62
+#line 46
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 63
+#line 47
  testRunner.And("extract parameter \'$.access_token\' from JSON body into \'accessToken\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table138 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table132 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table138.AddRow(new string[] {
+                table132.AddRow(new string[] {
                             "Authorization",
                             "Bearer $accessToken$"});
-#line 65
- testRunner.And("execute HTTP GET request \'http://localhost/grants/consentId\'", ((string)(null)), table138, "And ");
+#line 49
+ testRunner.And("execute HTTP GET request \'http://localhost/credential_offer/unknownCredentialOffe" +
+                        "r\'", ((string)(null)), table132, "And ");
 #line hidden
-#line 69
+#line 53
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 71
- testRunner.Then("HTTP status code equals to \'401\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 55
+ testRunner.Then("HTTP status code equals to \'404\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 72
- testRunner.And("JSON \'error\'=\'invalid_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 56
+ testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 73
- testRunner.And("JSON \'error_description\'=\'the client fortyEightClient is not authorized to access" +
-                        " to perform operations on the grant\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 57
+ testRunner.Then("JSON \'error_description\'=\'the credential offer doesn\'t exist\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -325,12 +269,12 @@ this.ScenarioInitialize(scenarioInfo);
             
             public FixtureData()
             {
-                GrantErrorsFeature.FeatureSetup();
+                CredentialOfferErrorsFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                GrantErrorsFeature.FeatureTearDown();
+                CredentialOfferErrorsFeature.FeatureTearDown();
             }
         }
     }

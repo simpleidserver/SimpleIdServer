@@ -6,6 +6,7 @@ using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using static SimpleIdServer.IdServer.Constants;
 
@@ -34,13 +35,62 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
         };
 
         private static Client FiftySixClient = ClientBuilder.BuildUserAgentClient("fiftySixClient", "password", null, "http://localhost:8080").UseImplicitFlow().AddScope(StandardScopes.OpenIdScope, StandardScopes.Role).Build();
-
         private static Scope FiftySixClientAdminRole = ScopeBuilder.CreateRoleScope(FiftySixClient, "admin", "admin").Build();
         private static Scope FirstScope = ScopeBuilder.CreateApiScope("firstScope", true).Build();
         private static Scope SecondScope = ScopeBuilder.CreateApiScope("secondScope", true).Build();
         private static Scope AdminScope = ScopeBuilder.CreateApiScope("admin", true).Build();
         private static Scope CalendarScope = ScopeBuilder.CreateApiScope("calendar", true).Build();
         private static Group AdminGroup = GroupBuilder.Create("admin", "admin").AddRole(FiftySixClientAdminRole).Build();
+        private static User User = UserBuilder.Create("user", "password")
+                .SetEmail("email@outlook.fr")
+                .AddRole("role1")
+                .AddRole("role2")
+                .AddGroup(AdminGroup)
+                .SetAddress("street", "locality", "region", "postalcode", "country", "formatted")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "thirdClient", "secondScope")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "nineClient", "secondScope")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fortyTwoClient", "secondScope")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fourteenClient", "openid", "profile", "role", "email", "address")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fifteenClient", "openid", "profile", "role", "email")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "sixteenClient", "openid", "profile", "role", "email")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "seventeenClient", "openid", "profile", "role", "email")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "eighteenClient", "openid", "profile", "role", "email")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "nineteenClient", "openid", "profile", "role", "email")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "twentyClient", "openid", "profile", "role", "email")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "twentyOneClient", "openid", "profile", "role", "email")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "twentyTwoClient", "openid", "profile", "role", "email")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "twentyThreeClient", "openid", "profile", "role", "email")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "twentyFourClient", "openid", "profile", "role", "email")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "twentyFiveClient", "openid", "profile", "role", "email")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "twentySixClient", "openid", "profile", "role", "email")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "twentySevenClient", "openid", "profile", "role", "email")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "twentyEightClient", "openid", "profile", "role", "email")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "twentyNineClient", "openid", "profile", "role", "email")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "thirtyClient", "openid", "profile", "role", "email")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "thirtyOneClient", new[] { "openid", "profile", "role", "email" }, new[] { "sub" })
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "thirtyTwoClient", "openid", "profile", "role", "email")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "thirtyThreeClient", "openid", "profile", "role", "email")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "thirtyFourClient", "openid", "profile", "role", "email")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "thirtyFiveClient", "openid", "profile", "role", "email")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "thirtySixClient", "openid", "profile", "role", "email", "offline_access")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "thirtySevenClient", "openid", "profile", "role", "email")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "thirtyEightClient", "openid", "profile", "role", "email")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "thirtyNineClient", "openid", "profile", "role", "email")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fortyClient", new string[] { "openid", "profile", "role", "email" }, new string[] { "name", "email" })
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fortyOneClient", "openid", "profile", "role", "email")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fortySixClient", "admin", "calendar")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fortySevenClient", new string[] { "admin", "calendar", "grant_management_query", "grant_management_revoke" }, new AuthorizationData[] { new AuthorizationData { Type = "firstDetails", Actions = new List<string> { "read" } }, new AuthorizationData { Type = "secondDetails", Locations = new List<string> { "https://cal.example.com" }, Actions = new List<string> { "read" } } }, "consentId")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fortyEightClient", "admin", "calendar", "grant_management_query", "grant_management_revoke")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fortyNineClient", "admin", "calendar")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fortyNineClient", new AuthorizationData { Type = "firstDetails", Actions = new List<string> { "read" } }, new AuthorizationData { Type = "secondDetails", Locations = new List<string> { "https://cal.example.com" }, Actions = new List<string> { "read" } })
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fiftyClient", "admin", "calendar")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fiftyOneClient", "admin", "calendar")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fiftyTwoClient", "admin", "calendar")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fiftyFourClient", "openid", "profile", "email")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fiftyFiveClient", new AuthorizationData { Type = "firstDetails", Actions = new List<string> { "read" } }, new AuthorizationData { Type = "secondDetails", Locations = new List<string> { "https://cal.example.com" }, Actions = new List<string> { "read" } })
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fiftySixClient", "openid", "role")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fiftyEightClient", new AuthorizationData { Type = "openid_credential", Types = new List<string> { "VerifiableCredential", "UniversityDegreeCredential" } })
+                .AddSession("sessionId", SimpleIdServer.IdServer.Constants.DefaultRealm, DateTime.UtcNow.AddDays(2)).Build();
 
         public static List<Group> Groups => new List<Group>
         {
@@ -61,7 +111,8 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             Constants.StandardScopes.GrantManagementQuery,
             Constants.StandardScopes.GrantManagementRevoke,
             Constants.StandardScopes.Users,
-            Constants.StandardScopes.Register
+            Constants.StandardScopes.Register,
+            Constants.StandardScopes.CredentialOffer
         };
 
         public static List<ApiResource> ApiResources = new List<ApiResource>
@@ -129,61 +180,17 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildTraditionalWebsiteClient("fiftyFiveClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().EnableTokenInResponseType().EnableRefreshTokenGrantType().AddScope(AdminScope, CalendarScope).AddAuthDataTypes("firstDetails", "secondDetails").Build(),
             FiftySixClient,
             ClientBuilder.BuildApiClient("fiftySevenClient", "password").AddScope(StandardScopes.Users).AddScope(StandardScopes.Register).Build(),
-            ClientBuilder.BuildTraditionalWebsiteClient("fiftyEightClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().EnableTokenInResponseType().TrustOpenIdCredential().DisableConsent().AddScope(StandardScopes.GrantManagementQuery, StandardScopes.GrantManagementRevoke).Build()
+            ClientBuilder.BuildTraditionalWebsiteClient("fiftyEightClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().EnableTokenInResponseType().TrustOpenIdCredential().DisableConsent().AddScope(StandardScopes.GrantManagementQuery, StandardScopes.GrantManagementRevoke, StandardScopes.CredentialOffer).Build()
         };
 
         public static List<User> Users = new List<User>
         {
-            UserBuilder.Create("user", "password")
-                .SetEmail("email@outlook.fr")
-                .AddRole("role1")
-                .AddRole("role2")
-                .AddGroup(AdminGroup)
-                .SetAddress("street", "locality", "region", "postalcode", "country", "formatted")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "thirdClient", "secondScope")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "nineClient", "secondScope")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fortyTwoClient", "secondScope")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fourteenClient", "openid", "profile", "role", "email", "address")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fifteenClient", "openid", "profile", "role", "email")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "sixteenClient", "openid", "profile", "role", "email")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "seventeenClient", "openid", "profile", "role", "email")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "eighteenClient", "openid", "profile", "role", "email")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "nineteenClient", "openid", "profile", "role", "email")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "twentyClient", "openid", "profile", "role", "email")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "twentyOneClient", "openid", "profile", "role", "email")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "twentyTwoClient", "openid", "profile", "role", "email")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "twentyThreeClient", "openid", "profile", "role", "email")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "twentyFourClient", "openid", "profile", "role", "email")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "twentyFiveClient", "openid", "profile", "role", "email")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "twentySixClient", "openid", "profile", "role", "email")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "twentySevenClient", "openid", "profile", "role", "email")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "twentyEightClient", "openid", "profile", "role", "email")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "twentyNineClient", "openid", "profile", "role", "email")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "thirtyClient", "openid", "profile", "role", "email")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "thirtyOneClient", new [] { "openid", "profile", "role", "email" }, new [] { "sub" })
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "thirtyTwoClient", "openid", "profile", "role", "email")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "thirtyThreeClient", "openid", "profile", "role", "email")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "thirtyFourClient", "openid", "profile", "role", "email")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "thirtyFiveClient", "openid", "profile", "role", "email")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "thirtySixClient", "openid", "profile", "role", "email", "offline_access")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "thirtySevenClient", "openid", "profile", "role", "email")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "thirtyEightClient", "openid", "profile", "role", "email")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "thirtyNineClient", "openid", "profile", "role", "email")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fortyClient", new string[] { "openid", "profile", "role", "email" }, new string[] { "name", "email" })
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fortyOneClient", "openid", "profile", "role", "email")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fortySixClient", "admin", "calendar")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fortySevenClient", new string[] { "admin", "calendar", "grant_management_query", "grant_management_revoke" }, new AuthorizationData[] { new AuthorizationData { Type = "firstDetails", Actions = new List<string> { "read" } }, new AuthorizationData { Type = "secondDetails", Locations = new List<string> { "https://cal.example.com" }, Actions = new List<string> { "read" } } }, "consentId")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fortyEightClient", "admin", "calendar", "grant_management_query", "grant_management_revoke")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fortyNineClient", "admin", "calendar")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fortyNineClient", new AuthorizationData { Type = "firstDetails", Actions = new List<string> { "read" } }, new AuthorizationData { Type = "secondDetails", Locations = new List<string> { "https://cal.example.com" }, Actions = new List<string> { "read" } })
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fiftyClient", "admin", "calendar")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fiftyOneClient", "admin", "calendar")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fiftyTwoClient", "admin", "calendar")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fiftyFourClient", "openid", "profile", "email")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fiftyFiveClient", new AuthorizationData { Type = "firstDetails", Actions = new List<string> { "read" } }, new AuthorizationData { Type = "secondDetails", Locations = new List<string> { "https://cal.example.com" }, Actions = new List<string> { "read" } })
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fiftySixClient", "openid", "role")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fiftyEightClient", new AuthorizationData { Type = "openid_credential", Types = new List<string> { "VerifiableCredential", "UniversityDegreeCredential" } })
-                .AddSession("sessionId", SimpleIdServer.IdServer.Constants.DefaultRealm, DateTime.UtcNow.AddDays(2)).Build()
+            User
+        };
+
+        public static List<UserCredentialOffer> CredentialOffers = new List<UserCredentialOffer>
+        {
+            CredentialOfferBuilder.New("credentialOfferId", new List<string> { "VerifiableCredential", "UniversityDegreeCredential" }, IdServerConfiguration.Users.First()).Build()
         };
 
         public static List<UMAResource> UmaResources = new List<UMAResource>

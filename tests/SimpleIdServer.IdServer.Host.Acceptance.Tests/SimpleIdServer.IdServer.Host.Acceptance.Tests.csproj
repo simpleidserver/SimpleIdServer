@@ -15,6 +15,8 @@
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\ClientAuths\ClientSecretJwtAuthenticationErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\ClientAuths\ClientSelfSignedTlsAuthenticationErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\ClientCredentialsGrantTypeErrors - Copier.feature.cs" />
+	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\CredentialOfferErrors - Copier.feature.cs" />
+	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\GrantErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\Grants - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\GrantTypes\AuthorizationCodeGrantTypeErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\GrantTypes\CIBAGrantTypeErrors - Copier.feature.cs" />
@@ -65,6 +67,12 @@
 	<ItemGroup>
 	  <Compile Update="Features\CredentialIssuer.feature.cs">
 	    <DependentUpon>CredentialIssuer.feature</DependentUpon>
+	  </Compile>
+	  <Compile Update="Features\CredentialOffer.feature.cs">
+	    <DependentUpon>CredentialOffer.feature</DependentUpon>
+	  </Compile>
+	  <Compile Update="Features\CredentialOfferErrors.feature.cs">
+	    <DependentUpon>CredentialOfferErrors.feature</DependentUpon>
 	  </Compile>
 	  <Compile Update="Features\Users.feature.cs">
 	    <DependentUpon>Users.feature</DependentUpon>
@@ -207,6 +215,14 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <SpecFlowFeatureFiles Update="Features\CredentialIssuer.feature">
+	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
+	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+	  </SpecFlowFeatureFiles>
+	  <SpecFlowFeatureFiles Update="Features\CredentialOffer.feature">
+	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
+	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+	  </SpecFlowFeatureFiles>
+	  <SpecFlowFeatureFiles Update="Features\CredentialOfferErrors.feature">
 	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
 	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
 	  </SpecFlowFeatureFiles>

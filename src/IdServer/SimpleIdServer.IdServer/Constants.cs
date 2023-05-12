@@ -54,6 +54,7 @@ namespace SimpleIdServer.IdServer
             public const string PushedAuthorizationRequest = "par";
             public const string Users = "users";
             public const string Credential = "credential";
+            public const string CredentialOffer = "credential_offer";
         }
 
         public static List<string> AllStandardNotificationModes = new List<string>
@@ -481,6 +482,20 @@ namespace SimpleIdServer.IdServer
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
+            public static Scope CredentialOffer = new Scope
+            {
+                Id = Guid.NewGuid().ToString(),
+                Type = ScopeTypes.APIRESOURCE,
+                Name = "credential_offer",
+                Realms = new List<Realm>
+                {
+                    StandardRealms.Master
+                },
+                Protocol = ScopeProtocols.OAUTH,
+                IsExposedInConfigurationEdp = true,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
+            };
         }
 
         public static class StandardAcrs
@@ -546,5 +561,6 @@ namespace SimpleIdServer.IdServer
         public const string ParFormatKey = "urn:ietf:params:oauth:request_uri";
         public const string IdProviderSeparator = ";";
         public const string LDAPDistinguishedName = "LDAP_DISTINGUISHEDNAME";
+        public const string DefaultNotificationMode = "console";
     }
 }

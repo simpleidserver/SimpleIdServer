@@ -351,6 +351,17 @@ namespace SimpleIdServer.IdServer.Domains
         /// RP URL that will cause the RP to log itself out when rendered in an iframe by the OP.
         /// </summary>
         public string? FrontChannelLogoutUri { get; set; } = null;
+        /// <summary>
+        /// URL of the issuance initation endpoint of a Wallet.
+        /// </summary>
+        [JsonPropertyName(OAuthClientParameters.CredentialOfferEndpoint)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? CredentialOfferEndpoint { get; set; } = null;
+        /// <summary>
+        /// If the wallet decided to use Pre-Authorized Code Flow, a PIN value must be sent in the user_pin pazrameter with the respective token request.
+        /// </summary>
+        [JsonIgnore]
+        public bool UserPinRequired { get; set; } = false;
         [JsonPropertyName(OAuthClientParameters.FrontChannelLogoutSessionRequired)]
         /// <summary>
         /// Boolean value specifying whether the RP requires that iss (issuer) and sid (session id) query parameters be included to identify the RP session

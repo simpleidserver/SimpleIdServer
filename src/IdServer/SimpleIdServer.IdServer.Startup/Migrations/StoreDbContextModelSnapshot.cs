@@ -727,6 +727,10 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .HasColumnType("datetime2")
                         .HasAnnotation("Relational:JsonPropertyName", "create_datetime");
 
+                    b.Property<string>("CredentialOfferEndpoint")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "credential_offer_endpoint");
+
                     b.Property<string>("DefaultAcrValues")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
@@ -900,6 +904,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<string>("UserInfoSignedResponseAlg")
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "userinfo_signed_response_alg");
+
+                    b.Property<bool>("UserPinRequired")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -1740,6 +1747,10 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "name");
 
+                    b.Property<string>("NotificationMode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Source")
                         .HasColumnType("nvarchar(max)");
 
@@ -1819,6 +1830,26 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.ToTable("UserCredential");
 
                     b.HasAnnotation("Relational:JsonPropertyName", "credentials");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UserCredentialOffer", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CredentialNames")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("CredentialOffers");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UserDevice", b =>
@@ -2513,6 +2544,17 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UserCredentialOffer", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.User", "User")
+                        .WithMany("CredentialOffers")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UserDevice", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.User", "User")
@@ -2672,6 +2714,8 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.User", b =>
                 {
                     b.Navigation("Consents");
+
+                    b.Navigation("CredentialOffers");
 
                     b.Navigation("Credentials");
 

@@ -17,7 +17,6 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -40,6 +39,8 @@ namespace SimpleIdServer.IdServer.Helpers
         Task<string> AddAuthorizationCode(JsonObject originalRequest, string grantId, double validityPeriodsInSeconds, CancellationToken cancellationToken);
         Task<AuthCode> GetAuthorizationCode(string code, CancellationToken cancellationToken);
         Task RemoveAuthorizationCode(string code, CancellationToken cancellationToken);
+        Task AddPreAuthorizationCode(string code, string pin, double validityPeriodsInSeconds, CancellationToken cancellationToken);
+        Task AddAuthorizationCodeIssuerState(string credentialOfferId, string issuerState, string clientId, double validityPeriodsInSeconds, CancellationToken cancellationToken);
     }
 
     public class AuthCode
@@ -234,6 +235,34 @@ namespace SimpleIdServer.IdServer.Helpers
         public Task RemoveAuthorizationCode(string code, CancellationToken cancellationToken)
         {
             return _distributedCache.RemoveAsync(code, cancellationToken);
+        }
+
+        #endregion
+
+        #region Pre Authorization Code
+
+        public async Task AddPreAuthorizationCode(string code, string pin, double validityPeriodsInSeconds, CancellationToken cancellationToken)
+        {
+            var preAuthCode = new PreAuthCode { Code = code, Pin = pin };
+            var serializedPreAuthCode = JsonSerializer.Serialize(preAuthCode);
+            await _distributedCache.SetAsync(code, Encoding.UTF8.GetBytes(serializedPreAuthCode), new DistributedCacheEntryOptions
+            {
+                SlidingExpiration = TimeSpan.FromSeconds(validityPeriodsInSeconds)
+            }, cancellationToken);
+        }
+
+        #endregion
+
+        #region Credential Offer
+
+        public async Task AddAuthorizationCodeIssuerState(string credentialOfferId, string issuerState, string clientId, double validityPeriodsInSeconds, CancellationToken cancellationToken)
+        {
+            var issuer = new CredentialOfferIssuer { CredentialOfferId = credentialOfferId, IssuerState = issuerState, ClientId = clientId };
+            var serializedIssuer = JsonSerializer.Serialize(issuer);
+            await _distributedCache.SetAsync(issuerState, Encoding.UTF8.GetBytes(serializedIssuer), new DistributedCacheEntryOptions
+            {
+                SlidingExpiration = TimeSpan.FromSeconds(validityPeriodsInSeconds)
+            }, cancellationToken);
         }
 
         #endregion

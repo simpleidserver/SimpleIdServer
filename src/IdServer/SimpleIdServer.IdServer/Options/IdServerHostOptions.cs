@@ -2,12 +2,12 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.IdentityModel.Tokens;
-using SimpleIdServer.IdServer.Api.CredentialIssuer;
 using SimpleIdServer.IdServer.Api.Token.PKCECodeChallengeMethods;
 using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.ClaimTokenFormats;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Middlewares;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
 using System.Collections.Generic;
@@ -30,6 +30,14 @@ namespace SimpleIdServer.IdServer.Options
         /// Authorization code expiration time in seconds.
         /// </summary>
         public int AuthorizationCodeExpirationInSeconds { get; set; } = 600;
+        /// <summary>
+        /// Pre Authorization code expiration time in seconds.
+        /// </summary>
+        public int PreAuthorizationCodeExpirationInSeconds { get; set; } = 600;
+        /// <summary>
+        /// Expiration time of the issuer state.
+        /// </summary>
+        public int AuthorizationCodeIssuerStateExpirationInSeconds { get; set; } = 600;
         /// <summary>
         /// Trusted parties used to validate the software statement.
         /// </summary>
@@ -191,6 +199,10 @@ namespace SimpleIdServer.IdServer.Options
         /// Authorization server used by the wallet.
         /// </summary>
         public string? WalletAuthorizationServer { get; set; } = null;
+        /// <summary>
+        /// Send credential offer by reference using credential_offer_uri parameter.
+        /// </summary>
+        public bool SendCredentialOfferByReference { get; set; } = false;
         
         public ICollection<CredentialIssuerDisplayResult> CredentialIssuerDisplays { get; set; } = new List<CredentialIssuerDisplayResult>
         {

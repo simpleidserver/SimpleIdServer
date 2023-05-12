@@ -264,7 +264,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddTransient<IBCAuthorizeHandler, BCAuthorizeHandler>();
             services.AddTransient<IBCAuthorizeRequestValidator, BCAuthorizeRequestValidator>();
-            services.AddTransient<IBCNotificationService, BCConsoleNotificationService>();
+            services.AddTransient<IBCNotificationService, BCNotificationService>();
             return services;
         }
 

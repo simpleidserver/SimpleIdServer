@@ -194,6 +194,13 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/import",
                 defaults: new { controller = "IdentityProvisioning", action = "Import" });
 
+            webApplication.MapControllerRoute("getCredentialOffer",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialOffer + "/{id}",
+                defaults: new { controller = "CredentialOffer", action = "Get" });
+            webApplication.MapControllerRoute("getCredentialOfferQRCode",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialOffer + "/{id}/qr",
+                defaults: new { controller = "CredentialOffer", action = "GetQRCode" });
+
             webApplication.MapControllerRoute(
                 name: "defaultWithArea",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + "{area:exists}/{controller=Home}/{action=Index}/{id?}");

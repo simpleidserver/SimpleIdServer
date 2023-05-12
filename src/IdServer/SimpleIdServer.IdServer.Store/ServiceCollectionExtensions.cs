@@ -33,6 +33,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IImportSummaryStore, ImportSummaryStore>();
             services.AddTransient<IGroupRepository, GroupRepository>();
             services.AddTransient<ICredentialTemplateRepository, CredentialTemplateRepository>();
+            services.AddTransient<ICredentialOfferRepository, CredentialOfferRepository>();
             if (action != null) services.AddDbContext<StoreDbContext>(action, lifetime);
             else services.AddDbContext<StoreDbContext>(o => o.UseInMemoryDatabase("identityServer"), lifetime);
             return services;

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Email;
 using SimpleIdServer.IdServer.Email.UI.Services;
 
@@ -19,6 +20,8 @@ namespace Microsoft.Extensions.DependencyInjection
             if (callback != null) idServerBuilder.Services.Configure(callback);
             else idServerBuilder.Services.Configure<IdServerEmailOptions>(o => { });
             idServerBuilder.Services.AddTransient<IEmailAuthService, EmailAuthService>();
+            idServerBuilder.Services.AddTransient<IUserNotificationService, EmailUserNotificationService>();
+            idServerBuilder.Services.AddTransient<IEmailUserNotificationService, EmailUserNotificationService>();
             return idServerBuilder;
         }
     }

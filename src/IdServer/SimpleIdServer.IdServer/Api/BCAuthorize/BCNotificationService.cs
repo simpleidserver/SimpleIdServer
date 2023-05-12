@@ -1,9 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Encodings.Web;
@@ -46,17 +47,35 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
         }
     }
 
-    public class BCConsoleNotificationService : BaseNotificationService, IBCNotificationService
+    public class BCNotificationService : IBCNotificationService
     {
-        public BCConsoleNotificationService(IDataProtectionProvider dataProtectionProvider, UrlEncoder encoder) : base(dataProtectionProvider, encoder) {  }
+        private readonly IDataProtector _dataProtector;
+        private readonly UrlEncoder _urlEncoder;
+        private readonly IEnumerable<IUserNotificationService> _notificationServices;
 
-        public Task Notify(HandlerContext handlerContext, BCNotificationMessage message, CancellationToken cancellationToken)
+        public BCNotificationService(IDataProtectionProvider dataProtectionProvider, UrlEncoder urlEncoder, IEnumerable<IUserNotificationService> notificationServices)
         {
-            var before = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"The Back Channel redirection URL is : {BuildUrl(handlerContext.UrlHelper, handlerContext.Request.IssuerName, message)}");
-            Console.ForegroundColor = before;
-            return Task.CompletedTask;
+            _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
+            _urlEncoder = urlEncoder;
+            _notificationServices = notificationServices;
+        }
+
+        public async Task Notify(HandlerContext handlerContext, BCNotificationMessage message, CancellationToken cancellationToken)
+        {
+            var notificationMode = handlerContext.User.NotificationMode ?? Constants.DefaultNotificationMode;
+            var notificationService = _notificationServices.First(n => n.Name == notificationMode);
+            await notificationService.Send($"The Back Channel redirection URL is : {BuildUrl(handlerContext.UrlHelper, handlerContext.Request.IssuerName, message)}", handlerContext.User);
+        }
+
+        protected string BuildUrl(IUrlHelper urlHelper, string issuer, BCNotificationMessage message)
+        {
+            var queries = message.Serialize(_urlEncoder);
+            var queryCollection = new QueryBuilder(queries);
+            var returnUrl = $"{HandlerContext.GetIssuer(issuer)}/{Constants.EndPoints.BCCallback}{queryCollection.ToQueryString()}";
+            return $"{issuer}{urlHelper.Action("Index", "BackChannelConsents", new
+            {
+                returnUrl = _dataProtector.Protect(returnUrl)
+            })}";
         }
     }
 }

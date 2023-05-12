@@ -202,6 +202,8 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     UserInfoEncryptedResponseEnc = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     BCUserCodeParameter = table.Column<bool>(type: "bit", nullable: false),
                     FrontChannelLogoutUri = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CredentialOfferEndpoint = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserPinRequired = table.Column<bool>(type: "bit", nullable: false),
                     FrontChannelLogoutSessionRequired = table.Column<bool>(type: "bit", nullable: false),
                     BackChannelLogoutSessionRequired = table.Column<bool>(type: "bit", nullable: false),
                     DefaultMaxAge = table.Column<double>(type: "float", nullable: true),
@@ -1197,7 +1199,8 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     IdentityProvisioningId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Did = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DidPublicHex = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DidPrivateHex = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    DidPrivateHex = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NotificationMode = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1228,6 +1231,25 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         name: "FK_UMAResourcePermissionClaim_UMAResourcePermission_UMAResourcePermissionId",
                         column: x => x.UMAResourcePermissionId,
                         principalTable: "UMAResourcePermission",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CredentialOffers",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CredentialNames = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CredentialOffers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CredentialOffers_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -1516,6 +1538,11 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 column: "ScopesId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CredentialOffers_UserId",
+                table: "CredentialOffers",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CredentialTemplateDisplay_CredentialTemplateId",
                 table: "CredentialTemplateDisplay",
                 column: "CredentialTemplateId");
@@ -1726,6 +1753,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
             migrationBuilder.DropTable(
                 name: "ClientScope");
+
+            migrationBuilder.DropTable(
+                name: "CredentialOffers");
 
             migrationBuilder.DropTable(
                 name: "CredentialTemplateDisplay");

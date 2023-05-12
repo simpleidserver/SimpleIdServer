@@ -9,5 +9,7 @@ namespace SimpleIdServer.IdServer.Domains
         public ICollection<string> CredentialNames { get; set; } = new List<string>();
         public string UserId { get; set; } = null!;
         public User User { get; set; } = null!;
+        public DateTime CreateDateTime { get; set; }
+        public DateTime UpdateDateTime { get; set; }
     }
 }
