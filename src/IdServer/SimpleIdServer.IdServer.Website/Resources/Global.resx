@@ -384,4 +384,7 @@
   <data name="CredentialOfferAdded" xml:space="preserve">
     <value>Credential offer has been added</value>
   </data>
+  <data name="SelectedCredentialOffersRemoved" xml:space="preserve">
+    <value>Selected credential offers have been removed</value>
+  </data>
 </root>

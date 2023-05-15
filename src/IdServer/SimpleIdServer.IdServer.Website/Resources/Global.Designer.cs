@@ -592,6 +592,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Selected credential offers have been removed.
+        /// </summary>
+        public static string SelectedCredentialOffersRemoved {
+            get {
+                return ResourceManager.GetString("SelectedCredentialOffersRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Selected credentials subjects are removed.
         /// </summary>
         public static string SelectedCredentialSubjectsRemoved {

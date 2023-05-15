@@ -31,4 +31,6 @@ Scenario: get a credential_offer url
 	| Key           | Value                 |
 	| Authorization | Bearer $accessToken$  |
 
-	Then HTTP status code equals to '200'
+	And extract query parameters into JSON
+
+	Then JSON exists 'credential_offer'

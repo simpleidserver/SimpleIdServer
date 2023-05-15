@@ -26,7 +26,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.IdServer.Api.CredentialIssuer
+namespace SimpleIdServer.IdServer.Api.CredentialOffer
 {
     public class CredentialOfferController : BaseController
     {
@@ -85,9 +85,9 @@ namespace SimpleIdServer.IdServer.Api.CredentialIssuer
             {
                 var result = await InternalGet(prefix, id, cancellationToken);
                 if (result.Code != HttpStatusCode.OK) return BuildError(result.Code, result.ErrorCode, result.ErrorMessage);
-                return Ok(result.Url);
+                return Redirect(result.Url);
             }
-            catch(OAuthException ex)
+            catch (OAuthException ex)
             {
                 return BuildError(HttpStatusCode.BadRequest, ex.Code, ex.Message);
             }
@@ -145,7 +145,7 @@ namespace SimpleIdServer.IdServer.Api.CredentialIssuer
             }
 
             var url = BuildUrl(result, client);
-            return CredentialOfferBuildResult.Ok(url);
+            return CredentialOfferBuildResult.Ok(url, credentialOffer);
         }
 
         private string BuildUrl(CredentialOfferResult result, Client client)
@@ -166,16 +166,18 @@ namespace SimpleIdServer.IdServer.Api.CredentialIssuer
             private CredentialOfferBuildResult() { }
 
             public string Url { get; private set; }
+            public UserCredentialOffer CredentialOffer { get; private set; }
             public HttpStatusCode Code { get; private set; }
             public string ErrorCode { get; private set; }
             public string ErrorMessage { get; private set; }
 
-            public static CredentialOfferBuildResult Ok(string url)
+            public static CredentialOfferBuildResult Ok(string url, UserCredentialOffer credentialOffer)
             {
                 return new CredentialOfferBuildResult
                 {
                     Code = HttpStatusCode.OK,
-                    Url = url
+                    Url = url,
+                    CredentialOffer = credentialOffer
                 };
             }
 

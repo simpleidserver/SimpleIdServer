@@ -577,7 +577,23 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         public static UserCredentialOffersState ReduceGetUserAction(UserCredentialOffersState state, GetUserAction act) => new(true, new List<UserCredentialOffer>());
 
         [ReducerMethod]
-        public static UserCredentialOffersState ReduceGetUserSuccessAction(UserCredentialOffersState state, GetUserSuccessAction act) => new(false, act.User.CredentialOffers);
+        public static UserCredentialOffersState ReduceGetUserSuccessAction(UserCredentialOffersState state, GetUserSuccessAction act)
+        {
+            var credOffers = act.User.CredentialOffers.Select(co => new SelectableUserCredentialOffer(new UserCredentialOffer
+            {
+                CreateDateTime = co.CreateDateTime,
+                UserId = co.UserId,
+                CredentialNames = co.CredentialNames,
+                UpdateDateTime = co.UpdateDateTime,
+                Id = co.Id
+            })).ToList();
+            return state with
+            {
+                Count = credOffers.Count,
+                CredentialOffers = credOffers,
+                IsLoading = false
+            };
+        }
 
         [ReducerMethod]
         public static UserCredentialOffersState ReduceAddCredentialOfferSuccessAction(UserCredentialOffersState state, AddCredentialOfferSuccessAction act)
@@ -636,6 +652,31 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             return state with
             {
                 CredentialOffers = credentialOffers
+            };
+        }
+
+        #endregion
+
+        #region UserCredentialOfferState
+
+        [ReducerMethod]
+        public static UserCredentialOfferState ReduceGetCredentialOfferQRCodeAction(UserCredentialOfferState state, GetCredentialOfferAction action)
+        {
+            return state with
+            {
+                IsLoading = true,
+                Picture = null                
+            };
+        }
+
+        [ReducerMethod]
+        public static UserCredentialOfferState ReduceGetCredentialOfferQRCodeSuccessAction(UserCredentialOfferState state, GetCredentialOfferSuccessAction action)
+        {
+            return state with
+            {
+                IsLoading = false,
+                Picture = action.Picture,
+                Url=  action.Url
             };
         }
 

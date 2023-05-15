@@ -4,12 +4,17 @@ using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using QRCoder;
 using Radzen;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Website.Resources;
 using SimpleIdServer.IdServer.Website.Stores.Base;
+using System.Drawing.Imaging;
 using System.Linq.Dynamic.Core;
+using System.Net.Http.Headers;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.IdServer.Website.Stores.UserStore
 {
@@ -20,19 +25,25 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         private readonly IGroupRepository _groupRepository;
         private readonly ProtectedSessionStorage _sessionStorage;
         private readonly DbContextOptions<StoreDbContext> _options;
+        private readonly IdServerWebsiteOptions _websiteOptions;
+        private readonly DefaultSecurityOptions _securityOptions;
 
         public UserEffects(
             ILoggerFactory loggerFactory,
             IUserRepository userRepository,
             IGroupRepository groupRepository,
             ProtectedSessionStorage sessionStorage,
-            DbContextOptions<StoreDbContext> options)
+            DbContextOptions<StoreDbContext> options,
+            IOptions<IdServerWebsiteOptions> websiteOptions,
+            DefaultSecurityOptions securityOptions)
         {
             _loggerFactory = loggerFactory;
             _userRepository = userRepository;
             _groupRepository = groupRepository;
             _sessionStorage = sessionStorage;
             _options = options;
+            _websiteOptions = websiteOptions.Value;
+            _securityOptions = securityOptions;
         }
 
         [EffectMethod]
@@ -281,7 +292,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             logger.LogInformation($"The user '{action.Name}' was added succesfully.");
         }
 
-        [ReducerMethod]
+        [EffectMethod]
         public async Task Handle(RemoveSelectedUserCredentialOffersAction action, IDispatcher dispatcher)
         {
             var user = await _userRepository.Query().Include(u => u.CredentialOffers).FirstOrDefaultAsync(u => u.Id == action.UserId);
@@ -304,6 +315,75 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             user.CredentialOffers.Add(credentialOffer);
             await _userRepository.SaveChanges(CancellationToken.None);
             dispatcher.Dispatch(new AddCredentialOfferSuccessAction { CredentialOffer = credentialOffer });
+        }
+
+        [EffectMethod]
+        public async Task Handle(GetCredentialOfferAction action, IDispatcher dispatcher)
+        {
+            var realm = await GetRealm();
+            var handler = new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = (httpRequestMessage, cert, cetChain, policyErrors) =>
+                {
+                    return true;
+                },
+                AllowAutoRedirect = false
+            };
+            using (var httpClient = new HttpClient(handler))
+            {
+                var accessToken = await GetAccessToken(httpClient);
+                var credentialOffer = await GetCredentialOffer(httpClient, accessToken);
+                var picture = GetQRCode(credentialOffer);
+                dispatcher.Dispatch(new GetCredentialOfferSuccessAction { Picture = picture, Url = credentialOffer });
+            }
+
+            async Task<string> GetAccessToken(HttpClient httpClient)
+            {
+                var dic = new List<KeyValuePair<string, string>>
+                {
+                    new KeyValuePair<string, string>("client_id", _securityOptions.ClientId),
+                    new KeyValuePair<string, string>("client_secret", _securityOptions.ClientSecret),
+                    new KeyValuePair<string, string>("grant_type", "client_credentials"),
+                    new KeyValuePair<string, string>("scope", "credential_offer")
+                };
+                var requestMessage = new HttpRequestMessage
+                {
+                    RequestUri = new Uri($"{_websiteOptions.IdServerBaseUrl}/{realm}/token"),
+                    Content = new FormUrlEncodedContent(dic),
+                    Method = HttpMethod.Post
+                };
+                var httpResult = await httpClient.SendAsync(requestMessage);
+                var json = await httpResult.Content.ReadAsStringAsync();
+                return JsonObject.Parse(json)["access_token"].GetValue<string>();
+            }
+
+            async Task<string> GetCredentialOffer(HttpClient httpClient, string accessToken)
+            {
+                var requestMessage = new HttpRequestMessage
+                {
+                    RequestUri = new Uri($"{_websiteOptions.IdServerBaseUrl}/{realm}/credential_offer/{action.CredentialOfferId}")
+                };
+                requestMessage.Headers.Add("Authorization", $"Bearer {accessToken}");
+                var httpResult = await httpClient.SendAsync(requestMessage);
+                var headers = httpResult.Headers;
+                return headers.Location.OriginalString;
+            }
+
+            string GetQRCode(string url)
+            {
+                var qrGenerator = new QRCodeGenerator();
+                var qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
+                var qrCode = new QRCode(qrCodeData);
+                var bitMap = qrCode.GetGraphic(20);
+                byte[] payload = null;
+                using (var stream = new MemoryStream())
+                {
+                    bitMap.Save(stream, ImageFormat.Png);
+                    payload = stream.ToArray();
+                }
+
+                return $"data:image/jpeg;base64,{Convert.ToBase64String(payload)}";
+            }
         }
 
         private async Task<string> GetRealm()
@@ -633,5 +713,16 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
     public class AddCredentialOfferSuccessAction
     {
         public UserCredentialOffer CredentialOffer { get; set; }
+    }
+
+    public class GetCredentialOfferAction
+    {
+        public string CredentialOfferId { get; set; }
+    }
+
+    public class GetCredentialOfferSuccessAction
+    {
+        public string Picture { get; set; }
+        public string Url { get; set; }
     }
 }

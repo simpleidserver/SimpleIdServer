@@ -4,7 +4,7 @@ using SimpleIdServer.IdServer.DTOs;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace SimpleIdServer.IdServer.Api.CredentialIssuer
+namespace SimpleIdServer.IdServer.Api.CredentialOffer
 {
     public class CredentialOfferResult
     {

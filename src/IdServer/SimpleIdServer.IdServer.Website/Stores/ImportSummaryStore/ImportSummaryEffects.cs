@@ -46,12 +46,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.ImportSummaryStore
         public async Task Handle(LaunchImportAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var handler = new HttpClientHandler();
-            handler.ServerCertificateCustomValidationCallback =
-                (httpRequestMessage, cert, cetChain, policyErrors) =>
+            var handler = new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = (httpRequestMessage, cert, cetChain, policyErrors) =>
                 {
                     return true;
-                };
+                }
+            };
             using (var httpClient = new HttpClient(handler))
             {
                 var requestMessage = new HttpRequestMessage
