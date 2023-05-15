@@ -69,7 +69,6 @@ namespace SimpleIdServer.IdServer.Api.CredentialIssuer
                 return BuildError(HttpStatusCode.BadRequest, ex.Code, ex.Message);
             }
 
-
             Bitmap GetQRCode(CredentialOfferBuildResult res)
             {
                 var qrGenerator = new QRCodeGenerator();

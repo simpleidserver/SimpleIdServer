@@ -169,6 +169,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Credential offer has been added.
+        /// </summary>
+        public static string CredentialOfferAdded {
+            get {
+                return ResourceManager.GetString("CredentialOfferAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Credential subject has been added.
         /// </summary>
         public static string CredentialSubjectAdded {

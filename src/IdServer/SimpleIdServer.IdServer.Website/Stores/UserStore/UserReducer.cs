@@ -288,6 +288,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         public static UpdateUserState ReduceAddUserFailureAction(UpdateUserState state, AddUserFailureAction act)
             => new(false) { ErrorMessage = act.ErrorMessage };
 
+        [ReducerMethod]
+        public static UpdateUserState ReduceAddCredentialOfferAction(UpdateUserState state, AddCredentialOfferAction act) => new(true) { };
+
+        [ReducerMethod]
+        public static UpdateUserState ReduceAddCredentialOfferSuccessAction(UpdateUserState state, AddCredentialOfferSuccessAction act) => new(false);
+
         #endregion
 
         #region UserClaims
@@ -560,6 +566,76 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
                 IsEditableGroupsLoading = false,
                 EditableGroups = result,
                 EditableGroupsCount = act.Count
+            };
+        }
+
+        #endregion
+
+        #region UserCredentialOffersState
+
+        [ReducerMethod]
+        public static UserCredentialOffersState ReduceGetUserAction(UserCredentialOffersState state, GetUserAction act) => new(true, new List<UserCredentialOffer>());
+
+        [ReducerMethod]
+        public static UserCredentialOffersState ReduceGetUserSuccessAction(UserCredentialOffersState state, GetUserSuccessAction act) => new(false, act.User.CredentialOffers);
+
+        [ReducerMethod]
+        public static UserCredentialOffersState ReduceAddCredentialOfferSuccessAction(UserCredentialOffersState state, AddCredentialOfferSuccessAction act)
+        {
+            var credOffers = state.CredentialOffers.ToList();
+            credOffers.Add(new SelectableUserCredentialOffer(act.CredentialOffer)
+            {
+                IsNew = true
+            });
+            return state with
+            {
+                CredentialOffers = credOffers,
+                Count = credOffers.Count()
+            };
+        }
+
+        [ReducerMethod]
+        public static UserCredentialOffersState ReduceRemoveSelectedUserCredentialOffersAction(UserCredentialOffersState state, RemoveSelectedUserCredentialOffersAction action)
+        {
+            return state with
+            {
+                IsLoading = true
+            };
+        }
+
+        [ReducerMethod]
+        public static UserCredentialOffersState ReduceRemoveSelectedUserCredentialOffersSuccessAction(UserCredentialOffersState state, RemoveSelectedUserCredentialOffersSuccessAction action)
+        {
+            var credentialOffers = state.CredentialOffers.ToList();
+            credentialOffers = credentialOffers.Where(o => !action.CredentialOffersId.Contains(o.Value.Id)).ToList();
+            return state with
+            {
+                IsLoading = false,
+                Count = credentialOffers.Count,
+                CredentialOffers = credentialOffers
+            };
+        }
+
+        [ReducerMethod]
+        public static UserCredentialOffersState ReduceToggleAllUserCredentialOffersAction(UserCredentialOffersState state, ToggleAllUserCredentialOffersAction action)
+        {
+            var credentialOffers = state.CredentialOffers.ToList();
+            foreach (var credOffer in credentialOffers) credOffer.IsSelected = action.IsSelected;
+            return state with
+            {
+                CredentialOffers = credentialOffers
+            };
+        }
+
+        [ReducerMethod]
+        public static UserCredentialOffersState ReduceToggleUserCredentialOfferAction(UserCredentialOffersState state, ToggleUserCredentialOfferAction action)
+        {
+            var credentialOffers = state.CredentialOffers.ToList();
+            var credOffer = credentialOffers.Single(o => o.Value.Id == action.CredentialOfferId);
+            credOffer.IsSelected = action.IsSelected;
+            return state with
+            {
+                CredentialOffers = credentialOffers
             };
         }
 

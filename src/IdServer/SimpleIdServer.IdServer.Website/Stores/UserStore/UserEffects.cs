@@ -57,7 +57,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         public async Task Handle(GetUserAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.OAuthUserClaims).Include(u => u.Groups).Include(u => u.Consents).ThenInclude(c => c.Scopes).Include(u => u.Sessions).Include(u => u.Credentials).Include(u => u.ExternalAuthProviders).AsNoTracking().SingleOrDefaultAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
+            var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.OAuthUserClaims).Include(u => u.CredentialOffers).Include(u => u.Groups).Include(u => u.Consents).ThenInclude(c => c.Scopes).Include(u => u.Sessions).Include(u => u.Credentials).Include(u => u.ExternalAuthProviders).Include(u => u.CredentialOffers).AsNoTracking().SingleOrDefaultAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
             if (user == null)
             {
                 dispatcher.Dispatch(new GetUserFailureAction { ErrorMessage = string.Format(Global.UnknownUser, action.UserId) });
@@ -279,6 +279,31 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             });
 
             logger.LogInformation($"The user '{action.Name}' was added succesfully.");
+        }
+
+        [ReducerMethod]
+        public async Task Handle(RemoveSelectedUserCredentialOffersAction action, IDispatcher dispatcher)
+        {
+            var user = await _userRepository.Query().Include(u => u.CredentialOffers).FirstOrDefaultAsync(u => u.Id == action.UserId);
+            user.CredentialOffers = user.CredentialOffers.Where(c => !action.CredentialOffersId.Contains(c.Id)).ToList();
+            await _userRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new RemoveSelectedUserCredentialOffersSuccessAction { CredentialOffersId = action.CredentialOffersId });
+        }
+
+        [EffectMethod]
+        public async Task Handle(AddCredentialOfferAction action, IDispatcher dispatcher)
+        {
+            var user = await _userRepository.Query().Include(u => u.CredentialOffers).FirstOrDefaultAsync(u => u.Id == action.UserId);
+            var credentialOffer = new UserCredentialOffer
+            {
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow,
+                CredentialNames = action.CredentialTypes,
+                Id = Guid.NewGuid().ToString()
+            };
+            user.CredentialOffers.Add(credentialOffer);
+            await _userRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new AddCredentialOfferSuccessAction { CredentialOffer = credentialOffer });
         }
 
         private async Task<string> GetRealm()
@@ -574,5 +599,39 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
     public class RemoveSelectedUsersSuccessAction
     {
         public IEnumerable<string> UserIds { get; set; }
+    }
+
+    public class ToggleAllUserCredentialOffersAction
+    {
+        public bool IsSelected { get; set; }
+    }
+
+    public class ToggleUserCredentialOfferAction
+    {
+        public bool IsSelected { get; set; }
+        public string CredentialOfferId { get; set; }
+        public string UserId { get; set; }
+    }
+
+    public class RemoveSelectedUserCredentialOffersAction
+    {
+        public ICollection<string> CredentialOffersId { get; set; }
+        public string UserId { get; set; }
+    }
+
+    public class RemoveSelectedUserCredentialOffersSuccessAction
+    {
+        public ICollection<string> CredentialOffersId { get; set; }
+    }
+
+    public class AddCredentialOfferAction
+    {
+        public string UserId { get; set; }
+        public ICollection<string> CredentialTypes { get; set; }
+    }
+
+    public class AddCredentialOfferSuccessAction
+    {
+        public UserCredentialOffer CredentialOffer { get; set; }
     }
 }

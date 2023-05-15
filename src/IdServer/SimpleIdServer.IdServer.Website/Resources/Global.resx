@@ -381,4 +381,7 @@
   <data name="CredentialSubjectAdded" xml:space="preserve">
     <value>Credential subject has been added</value>
   </data>
+  <data name="CredentialOfferAdded" xml:space="preserve">
+    <value>Credential offer has been added</value>
+  </data>
 </root>
