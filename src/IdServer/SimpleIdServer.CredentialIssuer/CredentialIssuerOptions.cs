@@ -8,8 +8,14 @@ namespace SimpleIdServer.CredentialIssuer
 {
     public class CredentialIssuerOptions
     {
-        public string AuthorizationServer { get; set; }
-        public bool UseRealm { get; set; } = true;
+        /// <summary>
+        /// If the credential issuer is different than the authorization server then set the URL.
+        /// </summary>
+        public string AuthorizationServer { get; set; } = null;
+        /// <summary>
+        /// Enable or disable realm.
+        /// </summary>
+        public bool UseRealm { get; set; } = false;
 
         public ICollection<CredentialIssuerDisplayResult> CredentialIssuerDisplays { get; set; } = new List<CredentialIssuerDisplayResult>
         {

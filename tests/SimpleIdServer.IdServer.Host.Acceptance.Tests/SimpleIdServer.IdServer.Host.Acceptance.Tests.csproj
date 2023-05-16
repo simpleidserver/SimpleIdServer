@@ -62,6 +62,7 @@
 		<PackageReference Include="Moq" Version="4.18.3" />
 	</ItemGroup>
 	<ItemGroup>
+	  <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.CredentialIssuer\SimpleIdServer.CredentialIssuer.csproj" />
 	  <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Tests\SimpleIdServer.IdServer.Tests.csproj" />
 	</ItemGroup>

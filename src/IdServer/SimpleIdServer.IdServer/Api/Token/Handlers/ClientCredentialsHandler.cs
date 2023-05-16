@@ -73,7 +73,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     activity?.SetTag("scopes", string.Join(",", extractionResult.Scopes));
                     var result = BuildResult(context, extractionResult.Scopes);
                     foreach (var tokenBuilder in _tokenBuilders)
-
+                        await tokenBuilder.Build(new BuildTokenParameter { Audiences = extractionResult.Audiences, Scopes = extractionResult.Scopes }, context, cancellationToken);
 
                     _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? _options.DefaultTokenProfile)).Enrich(context);
                     foreach (var kvp in context.Response.Parameters)

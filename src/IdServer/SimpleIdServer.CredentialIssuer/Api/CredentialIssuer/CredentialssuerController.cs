@@ -35,7 +35,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.CredentialIssuer
                 CredentialIssuer = issuer,
                 CredentialEndpoint = $"{issuer}/{Constants.EndPoints.Credential}",
                 CredentialsSupported = credentialTemplates.Cast<BaseCredentialTemplate>().ToList(),
-                // Display = _options.CredentialIssuerDisplays
+                Display = _options.CredentialIssuerDisplays
             };
             if (_options.AuthorizationServer != null) result.AuthorizationServer = _options.AuthorizationServer;
             return new ContentResult

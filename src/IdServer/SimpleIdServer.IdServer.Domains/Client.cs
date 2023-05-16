@@ -363,7 +363,7 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? CredentialOfferEndpoint { get; set; } = null;
         /// <summary>
-        /// If the wallet decided to use Pre-Authorized Code Flow, a PIN value must be sent in the user_pin pazrameter with the respective token request.
+        /// If the wallet decided to use Pre-Authorized Code Flow, a PIN value must be sent in the user_pin parameter with the respective token request.
         /// </summary>
         [JsonIgnore]
         public bool UserPinRequired { get; set; } = false;

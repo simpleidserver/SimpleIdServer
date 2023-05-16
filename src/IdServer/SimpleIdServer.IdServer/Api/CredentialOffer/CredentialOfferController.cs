@@ -11,7 +11,6 @@ using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
-using SimpleIdServer.IdServer.Extensions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
@@ -47,11 +46,6 @@ namespace SimpleIdServer.IdServer.Api.CredentialOffer
             _urlEncoder = urlEncoder;
             _options = options.Value;
         }
-
-        // 1. A user generates a credential offer via the website : do-you want to share the UniversityDegree ?
-        // 2. wallet is going to scan the QRCode. An SMS is automatically sent to the USER.
-        // 3. get the token.
-        // 4. Credential endpoint checks the access token.
 
         [HttpGet]
         public async Task<IActionResult> GetQRCode([FromRoute] string prefix, string id, CancellationToken cancellationToken)
@@ -134,7 +128,7 @@ namespace SimpleIdServer.IdServer.Api.CredentialOffer
                 result.Grants.Add(PreAuthorizedCodeHandler.GRANT_TYPE, new Dictionary<string, object>
                 {
                     { CredentialOfferResultNames.UserPinRequired, client.UserPinRequired },
-                    { CredentialOfferResultNames.PreAuthorizedCode, Guid.NewGuid().ToString() }
+                    { CredentialOfferResultNames.PreAuthorizedCode, preAuthorizedCode }
                 });
                 await _grantedTokenHelper.AddPreAuthCode(preAuthorizedCode, pin, clientId, _options.CredOfferExpirationInSeconds, cancellationToken);
             }

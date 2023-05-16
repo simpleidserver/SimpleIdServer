@@ -18,6 +18,7 @@ namespace SimpleIdServer.IdServer.Api.CredentialOffer
         /// <summary>
         /// A JSON object indicating to the Wallet the Grant Types the Credential Issuer's AS is prepared to process for this credential offer.
         /// </summary>
+        [JsonPropertyName(CredentialOfferResultNames.Grants)]
         public Dictionary<string, object> Grants { get; set; } = new Dictionary<string, object>();
     }
 }

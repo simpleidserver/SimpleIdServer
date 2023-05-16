@@ -597,19 +597,3 @@ Scenario: credential format must be supported
 	
 	Then redirection url contains the parameter value 'error'='invalid_request'
 	Then redirection url contains the parameter value 'error_description'='credential formats invalid_format are not supported'	
-
-Scenario: credential location must be equals to the authorization server
-	Given authenticate a user
-	
-	When execute HTTP GET request 'http://localhost/authorization'
-	| Key                     | Value															|
-	| response_type           | code token														|
-	| client_id               | fiftyEightClient												|
-	| state                   | state															|
-	| response_mode           | query															|
-	| redirect_uri            | http://localhost:8080											|
-	| nonce                   | nonce															|
-	| authorization_details   |  { "type" : "openid_credential", "format": "jwt_vc_json" }		|
-	
-	Then redirection url contains the parameter value 'error'='invalid_request'
-	Then redirection url contains the parameter value 'error_description'='the authorization_details location must be equal to the authorization server http://localhost'	

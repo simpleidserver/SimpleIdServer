@@ -181,7 +181,8 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             FiftySixClient,
             ClientBuilder.BuildApiClient("fiftySevenClient", "password").AddScope(StandardScopes.Users).AddScope(StandardScopes.Register).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("fiftyEightClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().EnableTokenInResponseType().TrustOpenIdCredential().DisableConsent().AddScope(StandardScopes.GrantManagementQuery, StandardScopes.GrantManagementRevoke, StandardScopes.CredentialOffer).Build(),
-            ClientBuilder.BuildWalletClient("fiftyNineClient", "password").Build()
+            ClientBuilder.BuildWalletClient("fiftyNineClient", "password").Build(),
+            ClientBuilder.BuildWalletClient("sixtyClient", "password").RequirePin().Build()
         };
 
         public static List<User> Users = new List<User>

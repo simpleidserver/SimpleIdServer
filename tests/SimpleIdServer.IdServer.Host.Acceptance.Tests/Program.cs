@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.CredentialIssuer;
 using SimpleIdServer.OAuth.Host.Acceptance.Tests;
 using System;
 using System.Collections.Generic;
@@ -49,7 +50,9 @@ builder.Services.AddSIDIdentityServer(o =>
         });
     });
 
-var app = builder.Build().UseSID();
+var app = builder.Build()
+    .UseCredentialIssuer()
+    .UseSID();
 app.Run();
 
 static RsaSecurityKey BuildRsaSecurityKey(string keyid) => new RsaSecurityKey(RSA.Create())
