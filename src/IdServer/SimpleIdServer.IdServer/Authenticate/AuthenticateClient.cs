@@ -21,7 +21,6 @@ namespace SimpleIdServer.IdServer.Authenticate
     {
         Task<Client> Authenticate(AuthenticateInstruction authenticateIsnstruction, string issuerName, CancellationToken cancellationToken, bool isAuthorizationCodeGrantType = false, string errorCode = ErrorCodes.INVALID_CLIENT);
         bool TryGetClientId(AuthenticateInstruction instruction, out string clientId);
-
     }
 
     public class AuthenticateClient : IAuthenticateClient

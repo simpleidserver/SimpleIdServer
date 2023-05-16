@@ -12,7 +12,7 @@ namespace SimpleIdServer.IdServer.UI.Services
 {
     public interface IUserTransformer
     {
-        User Transform(Realm realm, ClaimsPrincipal principal, AuthenticationSchemeProvider idProvider);
+        User Transform(Domains.Realm realm, ClaimsPrincipal principal, AuthenticationSchemeProvider idProvider);
         ICollection<Claim> Transform(User user);
     }
 
@@ -25,7 +25,7 @@ namespace SimpleIdServer.IdServer.UI.Services
             { ClaimTypes.Gender, JwtRegisteredClaimNames.Gender }
         };
 
-        public User Transform(Realm realm, ClaimsPrincipal principal, AuthenticationSchemeProvider idProvider)
+        public User Transform(Domains.Realm realm, ClaimsPrincipal principal, AuthenticationSchemeProvider idProvider)
         {
             var user = new User
             {

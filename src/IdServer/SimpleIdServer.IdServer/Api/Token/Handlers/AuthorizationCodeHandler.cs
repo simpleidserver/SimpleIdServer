@@ -30,7 +30,6 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
     public class AuthorizationCodeHandler : BaseCredentialsHandler
     {
         private readonly IAuthorizationCodeGrantTypeValidator _authorizationCodeGrantTypeValidator;
-        private readonly IGrantedTokenHelper _grantedTokenHelper;
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
         private readonly IUserRepository _userRepository;
@@ -41,7 +40,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
 
         public AuthorizationCodeHandler(
             IAuthorizationCodeGrantTypeValidator authorizationCodeGrantTypeValidator, 
-            IGrantedTokenHelper grantedTokenHelper, 
+            IGrantedTokenHelper grantedTokenHelper,
             IEnumerable<ITokenProfile> tokenProfiles,
             IEnumerable<ITokenBuilder> tokenBuilders,
             IUserRepository usrRepository,
@@ -49,10 +48,9 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IGrantHelper audienceHelper,
             IBusControl busControl,
             IOptions<IdServerHostOptions> options,
-            ILogger<AuthorizationCodeHandler> logger) : base(clientAuthenticationHelper, options)
+            ILogger<AuthorizationCodeHandler> logger) : base(clientAuthenticationHelper, grantedTokenHelper, options)
         {
             _authorizationCodeGrantTypeValidator = authorizationCodeGrantTypeValidator;
-            _grantedTokenHelper = grantedTokenHelper;
             _tokenProfiles = tokenProfiles;
             _tokenBuilders = tokenBuilders;
             _userRepository = usrRepository;
@@ -80,15 +78,15 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     activity?.SetTag("client_id", oauthClient.ClientId);
                     var code = context.Request.RequestData.GetAuthorizationCode();
                     var redirectUri = context.Request.RequestData.GetRedirectUri();
-                    var authCode = await _grantedTokenHelper.GetAuthorizationCode(code, cancellationToken);
+                    var authCode = await GrantedTokenHelper.GetAuthorizationCode(code, cancellationToken);
                     var previousRequest = authCode?.OriginalRequest;
                     if (previousRequest == null)
                     {
                         // https://tools.ietf.org/html/rfc6749#section-4.1.2
-                        var searchResult = await _grantedTokenHelper.GetTokensByAuthorizationCode(code, cancellationToken);
+                        var searchResult = await GrantedTokenHelper.GetTokensByAuthorizationCode(code, cancellationToken);
                         if (searchResult.Any())
                         {
-                            await _grantedTokenHelper.RemoveTokens(searchResult, cancellationToken);
+                            await GrantedTokenHelper.RemoveTokens(searchResult, cancellationToken);
                             _logger.LogError($"authorization code '{code}' has already been used, all tokens previously issued have been revoked");
                             return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.AUTHORIZATION_CODE_ALREADY_USED);
                         }
@@ -101,7 +99,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     var claims = previousRequest.GetClaimsFromAuthorizationRequest();
                     if (!previousClientId.Equals(oauthClient.ClientId, StringComparison.InvariantCultureIgnoreCase)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.AUTHORIZATION_CODE_NOT_ISSUED_BY_CLIENT);
                     if (!previousRedirectUrl.Equals(redirectUri, StringComparison.InvariantCultureIgnoreCase)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.NOT_SAME_REDIRECT_URI);
-                    await _grantedTokenHelper.RemoveAuthorizationCode(code, cancellationToken);
+                    await GrantedTokenHelper.RemoveAuthorizationCode(code, cancellationToken);
 
                     var scopes = GetScopes(previousRequest, context);
                     var resources = GetResources(previousRequest, context);
@@ -124,7 +122,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
 
                     if (!string.IsNullOrWhiteSpace(authCode.GrantId))
                         result.Add(TokenResponseParameters.GrantId, authCode.GrantId);
-
+                    await AddCredentialParameters(context, result, cancellationToken);
                     await _busControl.Publish(new TokenIssuedSuccessEvent
                     {
                         GrantType = GRANT_TYPE,

@@ -701,6 +701,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "backchannel_logout_uri");
 
+                    b.Property<double?>("CNonceExpirationTimeInSeconds")
+                        .HasColumnType("float");
+
                     b.Property<string>("ClientId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")

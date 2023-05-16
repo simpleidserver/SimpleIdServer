@@ -215,6 +215,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IGrantTypeHandler, AuthorizationCodeHandler>();
             services.AddTransient<IGrantTypeHandler, CIBAHandler>();
             services.AddTransient<IGrantTypeHandler, UmaTicketHandler>();
+            services.AddTransient<IGrantTypeHandler, PreAuthorizedCodeHandler>();
             services.AddTransient<ICIBAGrantTypeValidator, CIBAGrantTypeValidator>();
             services.AddTransient<IClientAuthenticationHelper, ClientAuthenticationHelper>();
             services.AddTransient<IRevokeTokenRequestHandler, RevokeTokenRequestHandler>();

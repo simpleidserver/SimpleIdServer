@@ -16,9 +16,6 @@ namespace Microsoft.AspNetCore.Builder
         {
             var opts = webApplication.Services.GetRequiredService<IOptions<IdServerHostOptions>>().Value;
             var usePrefix = opts.UseRealm;
-            if (usePrefix)
-                webApplication.UseMiddleware<RealmMiddleware>();
-
             webApplication.UseCookiePolicy(new CookiePolicyOptions
             {
                 Secure = Http.CookieSecurePolicy.Always
@@ -34,10 +31,6 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.MapControllerRoute("openidConfiguration",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.OpenIDConfiguration,
                 defaults: new { controller = "OpenIdConfiguration", action = "Get" });
-
-            webApplication.MapControllerRoute("credentialIssuer",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialIssuer,
-                defaults: new { controller = "CredentialIssuer", action = "Get" });
 
             webApplication.MapControllerRoute("jwks",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Jwks,

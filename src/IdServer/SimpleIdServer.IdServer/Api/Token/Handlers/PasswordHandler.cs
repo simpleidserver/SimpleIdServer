@@ -37,7 +37,8 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IdServerHostOptions _options;
 
         public PasswordHandler(
-            IPasswordGrantTypeValidator passwordGrantTypeValidator, 
+            IPasswordGrantTypeValidator passwordGrantTypeValidator,
+            IGrantedTokenHelper grantedTokenHelper,
             IUserRepository userRepository, 
             IEnumerable<ITokenProfile> tokenProfiles,
             IEnumerable<ITokenBuilder> tokenBuilders, 
@@ -45,7 +46,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IGrantHelper audienceHelper,
             IAuthenticationHelper userHelper,
             IBusControl busControl,
-            IOptions<IdServerHostOptions> options) : base(clientAuthenticationHelper, options)
+            IOptions<IdServerHostOptions> options) : base(clientAuthenticationHelper, grantedTokenHelper, options)
         {
             _passwordGrantTypeValidator = passwordGrantTypeValidator;
             _userRepository = userRepository;

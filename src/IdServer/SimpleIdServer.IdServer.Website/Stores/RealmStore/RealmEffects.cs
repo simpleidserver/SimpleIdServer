@@ -27,7 +27,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.RealmStore
         [EffectMethod]
         public async Task Handle(GetAllRealmAction action, IDispatcher dispatcher)
         {
-            IEnumerable<Realm> realms = await _realmRepository.Query().AsNoTracking().ToListAsync();
+            IEnumerable<Domains.Realm> realms = await _realmRepository.Query().AsNoTracking().ToListAsync();
             dispatcher.Dispatch(new GetAllRealmSuccessAction { Realms = realms});
         }
 
@@ -43,7 +43,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.RealmStore
 
             using(var dbContext = new StoreDbContext(_options))
             {
-                var realm = new Realm { Name = action.Name, Description = action.Description, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow };
+                var realm = new Domains.Realm { Name = action.Name, Description = action.Description, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow };
                 dbContext.Realms.Add(realm);
                 var users = await dbContext.Users.Include(u => u.Realms).Where(u => WebsiteConfiguration.StandardUsers.Contains(u.Name)).ToListAsync();
                 var clients = await dbContext.Clients.Include(c => c.Realms).Where(c => WebsiteConfiguration.StandardClients.Contains(c.ClientId)).ToListAsync();
@@ -111,12 +111,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.RealmStore
 
     public class GetAllRealmAction
     {
-        public IEnumerable<Realm> Realms { get; set; }
+        public IEnumerable<Domains.Realm> Realms { get; set; }
     }
 
     public class GetAllRealmSuccessAction
     {
-        public IEnumerable<Realm> Realms { get; set; }
+        public IEnumerable<Domains.Realm> Realms { get; set; }
     }
 
     public class SelectRealmAction

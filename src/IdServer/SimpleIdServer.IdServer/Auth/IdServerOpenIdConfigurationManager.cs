@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using SimpleIdServer.IdServer.Middlewares;
+using SimpleIdServer.Realm.Middlewares;
 
 namespace SimpleIdServer.IdServer.Auth
 {

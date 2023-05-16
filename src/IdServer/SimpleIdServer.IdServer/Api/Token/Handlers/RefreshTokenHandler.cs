@@ -48,7 +48,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IGrantHelper audienceHelper,
             IBusControl busControl,
             IOptions<IdServerHostOptions> options,
-            ILogger<RefreshTokenHandler> logger) : base(clientAuthenticationHelper, options)
+            ILogger<RefreshTokenHandler> logger) : base(clientAuthenticationHelper, grantedTokenHelper, options)
         {
             _refreshTokenGrantTypeValidator = refreshTokenGrantTypeValidator;
             _grantedTokenHelper = grantedTokenHelper;

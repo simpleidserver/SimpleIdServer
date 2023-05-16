@@ -86,7 +86,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                 throw new OAuthException(ErrorCodes.INVALID_AUTHORIZATION_DETAILS, string.Format(ErrorMessages.UNSUPPORTED_AUTHORIZATION_DETAILS_TYPES, string.Join(",", unsupportedAuthorizationDetailsTypes.Select(t => t.Type))));
 
             await CommonValidate(context, cancellationToken);
-            CheckOpenIdCredential();
+            CheckOpenIdCredential(authDetails);
             var nonce = context.Request.RequestData.GetNonceFromAuthorizationRequest();
             var redirectUri = context.Request.RequestData.GetRedirectUriFromAuthorizationRequest();
             var responseTypes = context.Request.RequestData.GetResponseTypesFromAuthorizationRequest();
@@ -135,22 +135,6 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                     throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));
 
                 return client;
-            }
-
-            void CheckOpenIdCredential()
-            {
-                var openidCredentials = authDetails.Where(t => t.Type == Constants.StandardAuthorizationDetails.OpenIdCredential);
-                if (!openidCredentials.Any()) return;
-                var missingFormat = openidCredentials.Any(t => !t.AdditionalData.Any(d => d.Key == AuthorizationDataParameters.Format));
-                if (missingFormat) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_OPENID_CREDENTIAL_FORMAT);
-                var allFormats = openidCredentials.SelectMany(t => t.AdditionalData).Where(d => d.Key == AuthorizationDataParameters.Format).Select(d => d.Value).Distinct();
-                var unexceptedFormats = allFormats.Where(f => !Vc.Constants.AllCredentialTemplateProfiles.Contains(f));
-                if (unexceptedFormats.Any()) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_CREDENTIALS_FORMAT, string.Join(",", unexceptedFormats)));
-                if (!string.IsNullOrWhiteSpace(_options.WalletAuthorizationServer))
-                {
-                    var invalidLocations = authDetails.Where(d => d.Locations == null || (d.Locations != null && !d.Locations.Contains(_options.WalletAuthorizationServer)));
-                    if (invalidLocations.Any()) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.INVALID_AUTH_DETAILS_LOCATION, _options.WalletAuthorizationServer));
-                }
             }
 
             void CheckGrantIdAndAction(HandlerContext context)
@@ -236,6 +220,18 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                 if (invalidClaims.Any())
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.INVALID_CLAIMS, string.Join(",", invalidClaims.Select(i => i.Name))));
             }
+        }
+
+        public static IEnumerable<AuthorizationData> CheckOpenIdCredential(ICollection<AuthorizationData> authDetails)
+        {
+            var openidCredentials = authDetails.Where(t => t.Type == Constants.StandardAuthorizationDetails.OpenIdCredential);
+            if (!openidCredentials.Any()) return null;
+            var missingFormat = openidCredentials.Any(t => !t.AdditionalData.Any(d => d.Key == AuthorizationDataParameters.Format));
+            if (missingFormat) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_OPENID_CREDENTIAL_FORMAT);
+            var allFormats = openidCredentials.SelectMany(t => t.AdditionalData).Where(d => d.Key == AuthorizationDataParameters.Format).Select(d => d.Value).Distinct();
+            var unexceptedFormats = allFormats.Where(f => !Vc.Constants.AllCredentialTemplateProfiles.Contains(f));
+            if (unexceptedFormats.Any()) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_CREDENTIALS_FORMAT, string.Join(",", unexceptedFormats)));
+            return openidCredentials;
         }
 
         protected virtual void RedirectToConsentView(HandlerContext context)

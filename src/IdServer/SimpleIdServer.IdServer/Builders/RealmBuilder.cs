@@ -7,16 +7,16 @@ namespace SimpleIdServer.IdServer.Builders
 {
     public class RealmBuilder
     {
-        private readonly Realm _realm;
+        private readonly Domains.Realm _realm;
 
-        internal RealmBuilder(Realm realm)
+        internal RealmBuilder(Domains.Realm realm)
         {
             _realm = realm;
         }
 
         public static RealmBuilder Create(string name, string description)
         {
-            return new RealmBuilder(new Realm
+            return new RealmBuilder(new Domains.Realm
             {
                 Name = name,
                 Description = description,
@@ -27,6 +27,6 @@ namespace SimpleIdServer.IdServer.Builders
 
         public static RealmBuilder CreateMaster() => Create(Constants.DefaultRealm, Constants.DefaultRealm);
 
-        public Realm Build() => _realm;
+        public Domains.Realm Build() => _realm;
     }
 }

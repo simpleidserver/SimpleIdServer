@@ -5,6 +5,7 @@ namespace SimpleIdServer.IdServer.Helpers
 {
     public class PreAuthCode
     {
+        public string ClientId { get; set; }
         public string Code {  get; set; }
         public string Pin { get; set; }
     }

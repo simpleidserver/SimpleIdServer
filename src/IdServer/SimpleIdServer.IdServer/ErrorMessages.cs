@@ -35,7 +35,9 @@ namespace SimpleIdServer.IdServer
         public const string DUPLICATE_SCOPES = "duplicate scopes : {0}";
         public const string UNAUTHORIZED_TO_SCOPES = "unauthorized to scopes : {0}";
         public const string INVALID_CLAIMS = "claims {0} are invalid";
+        public const string INVALID_PREAUTHORIZEDCODE = "either the pre-authorized code has expired or is invalid";
         public const string INVALID_IDTOKENHINT = "id_token_hint is invalid";
+        public const string INVALID_PIN = "the pin is invalid";
         public const string INVALID_UMA_PERMISSION_SCOPE = "At least one of the scopes included in the request does not match an available scope for any of the resources associated with requested permissions for the permission ticket provided by the client.";
         public const string INVALID_HTTPS_INITIATE_LOGIN_URI = "initiate_login_uri doesn't contain https scheme";
         public const string INVALID_AUDIENCE = "invalid audiences";
@@ -151,6 +153,7 @@ namespace SimpleIdServer.IdServer
         public const string UNSUPPORTED_GRANT_TYPES = "grant types {0} are not supported";
         public const string UNSUPPORTED_AUTHORIZATION_DETAILS_TYPES = "authorization details types {0} are not supported";
         public const string UNSUPPORTED_IDTOKEN_SIGNED_RESPONSE_ALG = "id_token_signed_response_alg is not supported";
+        public const string UNSUPPORTED_CREDENTIAL_TYPES = "the credential offer doesn't support those credential types {0}";
         public const string UNSUPPORTED_AUTHORIZATION_SIGNED_RESPONSE_ALG = "authorization_signed_response_alg is not supported";
         public const string UNSUPPORTED_AUTHORIZATION_ENCRYPTED_RESPONSE_ALG = "authorization_encrypted_response_alg is not supported";
         public const string UNSUPPORTED_AUTHORIZATION_ENCRYPTED_RESPONSE_ENC = "authorization_encrypted_response_enc is not supported";

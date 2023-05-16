@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Middlewares;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.Realm.Middlewares;
 using System;
 using System.Collections.Generic;
 using System.Linq;

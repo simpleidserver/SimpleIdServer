@@ -1,11 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.IdServer.DTOs;
+using SimpleIdServer.CredentialIssuer.DTOs;
 using SimpleIdServer.Vc.Models;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace SimpleIdServer.IdServer.Api.CredentialIssuer
+namespace SimpleIdServer.CredentialIssuer.Api.CredentialIssuer
 {
     public class CredentialIssuerResult
     {
@@ -15,7 +15,7 @@ namespace SimpleIdServer.IdServer.Api.CredentialIssuer
         /// </summary>
         [JsonPropertyName(CredentialIssuerResultNames.AuthorizationServer)]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string? AuthorizationServer { get; set; } = null;
+        public string AuthorizationServer { get; set; } = null;
         [JsonPropertyName(CredentialIssuerResultNames.CredentialIssuer)]
         public string CredentialIssuer { get; set; } = null!;
         [JsonPropertyName(CredentialIssuerResultNames.CredentialEndpoint)]

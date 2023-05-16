@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -46,6 +47,11 @@ namespace SimpleIdServer.IdServer.Api.CredentialOffer
             _urlEncoder = urlEncoder;
             _options = options.Value;
         }
+
+        // 1. A user generates a credential offer via the website : do-you want to share the UniversityDegree ?
+        // 2. wallet is going to scan the QRCode. An SMS is automatically sent to the USER.
+        // 3. get the token.
+        // 4. Credential endpoint checks the access token.
 
         [HttpGet]
         public async Task<IActionResult> GetQRCode([FromRoute] string prefix, string id, CancellationToken cancellationToken)
@@ -95,7 +101,6 @@ namespace SimpleIdServer.IdServer.Api.CredentialOffer
 
         private async Task<CredentialOfferBuildResult> InternalGet(string prefix, string id, CancellationToken cancellationToken)
         {
-            // https://openid.bitbucket.io/connect/openid-4-verifiable-credential-issuance-1_0.html#section-4.1.1
             prefix = prefix ?? Constants.DefaultRealm;
             var bearerToken = ExtractBearerToken();
             var token = await _grantedTokenHelper.GetAccessToken(bearerToken, cancellationToken);
@@ -126,21 +131,21 @@ namespace SimpleIdServer.IdServer.Api.CredentialOffer
                 }
 
                 var preAuthorizedCode = Guid.NewGuid().ToString();
-                await _grantedTokenHelper.AddPreAuthorizationCode(preAuthorizedCode, pin, _options.PreAuthorizationCodeExpirationInSeconds, cancellationToken);
                 result.Grants.Add(PreAuthorizedCodeHandler.GRANT_TYPE, new Dictionary<string, object>
                 {
                     { CredentialOfferResultNames.UserPinRequired, client.UserPinRequired },
                     { CredentialOfferResultNames.PreAuthorizedCode, Guid.NewGuid().ToString() }
                 });
+                await _grantedTokenHelper.AddPreAuthCode(preAuthorizedCode, pin, clientId, _options.CredOfferExpirationInSeconds, cancellationToken);
             }
 
             if (client.GrantTypes.Contains(AuthorizationCodeHandler.GRANT_TYPE))
             {
-                var issuerState = Guid.NewGuid().ToString();
-                await _grantedTokenHelper.AddAuthorizationCodeIssuerState(credentialOffer.Id, issuerState, clientId, _options.AuthorizationCodeIssuerStateExpirationInSeconds, cancellationToken);
+                var credIssuerState = Guid.NewGuid().ToString();
+                await _grantedTokenHelper.AddAuthCode(credIssuerState, clientId, _options.CredOfferExpirationInSeconds, cancellationToken);
                 result.Grants.Add(AuthorizationCodeHandler.GRANT_TYPE, new Dictionary<string, object>
                 {
-                    { CredentialOfferResultNames.IssuerState, issuerState }
+                    { CredentialOfferResultNames.IssuerState, credIssuerState }
                 });
             }
 

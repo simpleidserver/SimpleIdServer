@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.CredentialIssuer;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Sms;
@@ -44,7 +45,9 @@ var app = builder.Build();
 SeedData(app, builder.Configuration["SCIMBaseUrl"]);
 app.UseCors("AllowAll");
 app.UseSID()
-    .UseWsFederation();
+    .UseCredentialIssuer()
+    .UseWsFederation()
+    .UseRealm();
 app.Run();
 
 void RunSqlServerIdServer(IServiceCollection services)

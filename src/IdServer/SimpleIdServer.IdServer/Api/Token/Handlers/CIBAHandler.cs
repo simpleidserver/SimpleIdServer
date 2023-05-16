@@ -10,6 +10,7 @@ using SimpleIdServer.IdServer.Api.Token.TokenBuilders;
 using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using System.Collections.Generic;
@@ -33,6 +34,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
 
         public CIBAHandler(
             ILogger<CIBAHandler> logger,
+            IGrantedTokenHelper grantedTokenHelper,
             IUserRepository userRepository,
             ICIBAGrantTypeValidator cibaGrantTypeValidator,
             IEnumerable<ITokenBuilder> tokenBuilders,
@@ -40,7 +42,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IClientAuthenticationHelper clientAuthenticationHelper,
             IOptions<IdServerHostOptions> options,
             IBCAuthorizeRepository bcAuthorizeRepository,
-            IBusControl busControl) : base(clientAuthenticationHelper, options)
+            IBusControl busControl) : base(clientAuthenticationHelper, grantedTokenHelper, options)
         {
             _logger = logger;
             _userRepository = userRepository;

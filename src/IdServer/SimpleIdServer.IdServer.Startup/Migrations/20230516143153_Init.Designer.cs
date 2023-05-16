@@ -12,7 +12,7 @@ using SimpleIdServer.IdServer.Store;
 namespace SimpleIdServer.IdServer.Startup.Migrations
 {
     [DbContext(typeof(StoreDbContext))]
-    [Migration("20230515133915_Init")]
+    [Migration("20230516143153_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -703,6 +703,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<string>("BackChannelLogoutUri")
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "backchannel_logout_uri");
+
+                    b.Property<double?>("CNonceExpirationTimeInSeconds")
+                        .HasColumnType("float");
 
                     b.Property<string>("ClientId")
                         .IsRequired()

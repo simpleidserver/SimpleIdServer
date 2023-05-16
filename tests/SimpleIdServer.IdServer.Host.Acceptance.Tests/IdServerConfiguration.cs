@@ -180,7 +180,8 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildTraditionalWebsiteClient("fiftyFiveClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().EnableTokenInResponseType().EnableRefreshTokenGrantType().AddScope(AdminScope, CalendarScope).AddAuthDataTypes("firstDetails", "secondDetails").Build(),
             FiftySixClient,
             ClientBuilder.BuildApiClient("fiftySevenClient", "password").AddScope(StandardScopes.Users).AddScope(StandardScopes.Register).Build(),
-            ClientBuilder.BuildTraditionalWebsiteClient("fiftyEightClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().EnableTokenInResponseType().TrustOpenIdCredential().DisableConsent().AddScope(StandardScopes.GrantManagementQuery, StandardScopes.GrantManagementRevoke, StandardScopes.CredentialOffer).Build()
+            ClientBuilder.BuildTraditionalWebsiteClient("fiftyEightClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().EnableTokenInResponseType().TrustOpenIdCredential().DisableConsent().AddScope(StandardScopes.GrantManagementQuery, StandardScopes.GrantManagementRevoke, StandardScopes.CredentialOffer).Build(),
+            ClientBuilder.BuildWalletClient("fiftyNineClient", "password").Build()
         };
 
         public static List<User> Users = new List<User>
@@ -198,7 +199,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             UMAResourceBuilder.Create("id", "read", "write").Build()
         };
 
-        public static List<Realm> Realms = new List<Realm>
+        public static List<SimpleIdServer.IdServer.Domains.Realm> Realms = new List<SimpleIdServer.IdServer.Domains.Realm>
         {
             SimpleIdServer.IdServer.Constants.StandardRealms.Master
         };

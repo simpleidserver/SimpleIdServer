@@ -10,7 +10,7 @@ namespace SimpleIdServer.IdServer
 {
     public static class KeyGenerator
     {
-        public static SerializedFileKey GenerateRSASigningCredentials(Realm realm, string keyid = "keyId", string alg = SecurityAlgorithms.RsaSha256)
+        public static SerializedFileKey GenerateRSASigningCredentials(Domains.Realm realm, string keyid = "keyId", string alg = SecurityAlgorithms.RsaSha256)
         {
             var sig = ClientKeyGenerator.GenerateRSASignatureKey(keyid, alg);
             var pem = PemConverter.ConvertFromSecurityKey(sig.Key);
@@ -30,7 +30,7 @@ namespace SimpleIdServer.IdServer
             return result;
         }
 
-        public static SerializedFileKey GenerateECDSASigningCredentials(Realm realm, string keyid = "keyId", string alg = SecurityAlgorithms.EcdsaSha256)
+        public static SerializedFileKey GenerateECDSASigningCredentials(Domains.Realm realm, string keyid = "keyId", string alg = SecurityAlgorithms.EcdsaSha256)
         {
             var sig = ClientKeyGenerator.GenerateECDsaSignatureKey(keyid, alg);
             var pem = PemConverter.ConvertFromSecurityKey(sig.Key);

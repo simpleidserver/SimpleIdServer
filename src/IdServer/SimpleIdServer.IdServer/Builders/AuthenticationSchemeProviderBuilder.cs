@@ -31,7 +31,7 @@ namespace SimpleIdServer.IdServer.Builders
                 Properties = properties.ToList(),
                 Mappers = Constants.GetDefaultIdProviderMappers(),
                 AuthSchemeProviderDefinition = definition,
-                Realms = new List<Realm>
+                Realms = new List<Domains.Realm>
                 {
                     Constants.StandardRealms.Master
                 }

@@ -186,6 +186,11 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public double? TokenExpirationTimeInSeconds { get; set; }
         /// <summary>
+        /// Lifetime in seconds of the c_nonce.
+        /// </summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public double? CNonceExpirationTimeInSeconds { get; set; }
+        /// <summary>
         /// Refresh token expiration time in seconds.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.RefreshTokenExpirationTimeInSeconds)]
@@ -565,5 +570,6 @@ namespace SimpleIdServer.IdServer.Domains
         public const string WEBSITE = "WEBSITE";
         public const string MOBILE = "MOBILE";
         public const string EXTERNAL = "EXTERNALDEVICE";
+        public const string WALLET = "WALLET";
     }
 }

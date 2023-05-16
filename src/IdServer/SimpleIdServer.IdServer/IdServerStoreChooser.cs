@@ -181,7 +181,7 @@ namespace SimpleIdServer.IdServer
             return this;
         }
 
-        public IdServerInMemoryStoreBuilder AddInMemoryKeys(Realm realm, ICollection<SigningCredentials> signingCredentials, ICollection<EncryptingCredentials> encryptingCredentials)
+        public IdServerInMemoryStoreBuilder AddInMemoryKeys(Domains.Realm realm, ICollection<SigningCredentials> signingCredentials, ICollection<EncryptingCredentials> encryptingCredentials)
         {
             var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
             if (!storeDbContext.SerializedFileKeys.Any())

@@ -11,5 +11,7 @@ namespace SimpleIdServer.IdServer.DTOs
         public const string Scope = "scope";
         public const string IdToken = "id_token";
         public const string GrantId = "grant_id";
+        public const string CNonce = "c_nonce";
+        public const string CNonceExpiresIn = "c_nonce_expires_in";
     }
 }

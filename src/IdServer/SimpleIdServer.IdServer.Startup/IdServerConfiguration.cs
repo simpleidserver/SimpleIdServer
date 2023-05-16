@@ -80,7 +80,7 @@ namespace SimpleIdServer.IdServer.Startup
            }).Build()
         };
 
-        public static ICollection<Realm> Realms = new List<Realm>
+        public static ICollection<SimpleIdServer.IdServer.Domains.Realm> Realms = new List<SimpleIdServer.IdServer.Domains.Realm>
         {
             SimpleIdServer.IdServer.Constants.StandardRealms.Master
         };

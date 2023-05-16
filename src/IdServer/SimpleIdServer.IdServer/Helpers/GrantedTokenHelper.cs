@@ -39,8 +39,10 @@ namespace SimpleIdServer.IdServer.Helpers
         Task<string> AddAuthorizationCode(JsonObject originalRequest, string grantId, double validityPeriodsInSeconds, CancellationToken cancellationToken);
         Task<AuthCode> GetAuthorizationCode(string code, CancellationToken cancellationToken);
         Task RemoveAuthorizationCode(string code, CancellationToken cancellationToken);
-        Task AddPreAuthorizationCode(string code, string pin, double validityPeriodsInSeconds, CancellationToken cancellationToken);
-        Task AddAuthorizationCodeIssuerState(string credentialOfferId, string issuerState, string clientId, double validityPeriodsInSeconds, CancellationToken cancellationToken);
+        Task AddPreAuthCode(string preAuthorizationCode, string pin, string clientId, double validityPeriodsInSeconds, CancellationToken cancellationToken);
+        Task AddAuthCode(string credIssuerState, string clientId, double validityPeriodsInSeconds, CancellationToken cancellationToken);
+        Task<PreAuthCode> GetPreAuthCode(string preAuthorizationCode, CancellationToken cancellationToken);
+        Task AddCredentialNonce(string credentialNonce, double validityPeriodsInSeconds, CancellationToken cancellationToken);
     }
 
     public class AuthCode
@@ -239,27 +241,38 @@ namespace SimpleIdServer.IdServer.Helpers
 
         #endregion
 
-        #region Pre Authorization Code
+        #region Credential Offer
 
-        public async Task AddPreAuthorizationCode(string code, string pin, double validityPeriodsInSeconds, CancellationToken cancellationToken)
+        public async Task AddPreAuthCode(string preAuthorizationCode, string pin, string clientId, double validityPeriodsInSeconds, CancellationToken cancellationToken)
         {
-            var preAuthCode = new PreAuthCode { Code = code, Pin = pin };
-            var serializedPreAuthCode = JsonSerializer.Serialize(preAuthCode);
-            await _distributedCache.SetAsync(code, Encoding.UTF8.GetBytes(serializedPreAuthCode), new DistributedCacheEntryOptions
+            var credOffer = new PreAuthCode { ClientId = clientId, Pin = pin, Code = preAuthorizationCode };
+            var serializedCredOffer = JsonSerializer.Serialize(credOffer);
+            await _distributedCache.SetAsync(preAuthorizationCode, Encoding.UTF8.GetBytes(serializedCredOffer), new DistributedCacheEntryOptions
             {
                 SlidingExpiration = TimeSpan.FromSeconds(validityPeriodsInSeconds)
             }, cancellationToken);
         }
 
-        #endregion
-
-        #region Credential Offer
-
-        public async Task AddAuthorizationCodeIssuerState(string credentialOfferId, string issuerState, string clientId, double validityPeriodsInSeconds, CancellationToken cancellationToken)
+        public async Task AddAuthCode(string credIssuerState, string clientId, double validityPeriodsInSeconds, CancellationToken cancellationToken)
         {
-            var issuer = new CredentialOfferIssuer { CredentialOfferId = credentialOfferId, IssuerState = issuerState, ClientId = clientId };
-            var serializedIssuer = JsonSerializer.Serialize(issuer);
-            await _distributedCache.SetAsync(issuerState, Encoding.UTF8.GetBytes(serializedIssuer), new DistributedCacheEntryOptions
+            var credOffer = new CredIssuerState { IssuerState = credIssuerState, ClientId = clientId };
+            var serializedCredOffer = JsonSerializer.Serialize(credOffer);
+            await _distributedCache.SetAsync(credIssuerState, Encoding.UTF8.GetBytes(serializedCredOffer), new DistributedCacheEntryOptions
+            {
+                SlidingExpiration = TimeSpan.FromSeconds(validityPeriodsInSeconds)
+            }, cancellationToken);
+        }
+
+        public async Task<PreAuthCode> GetPreAuthCode(string preAuthorizationCode, CancellationToken cancellationToken)
+        {
+            var cachedToken = await _distributedCache.GetAsync(preAuthorizationCode, cancellationToken);
+            if (cachedToken == null) return null;
+            return JsonSerializer.Deserialize<PreAuthCode>(Encoding.UTF8.GetString(cachedToken));
+        }
+
+        public async Task AddCredentialNonce(string credentialNonce, double validityPeriodsInSeconds, CancellationToken cancellationToken)
+        {
+            await _distributedCache.SetAsync(credentialNonce, Encoding.UTF8.GetBytes(string.Empty), new DistributedCacheEntryOptions
             {
                 SlidingExpiration = TimeSpan.FromSeconds(validityPeriodsInSeconds)
             }, cancellationToken);

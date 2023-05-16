@@ -179,6 +179,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     TokenExpirationTimeInSeconds = table.Column<double>(type: "float", nullable: true),
+                    CNonceExpirationTimeInSeconds = table.Column<double>(type: "float", nullable: true),
                     RefreshTokenExpirationTimeInSeconds = table.Column<double>(type: "float", nullable: true),
                     TokenSignedResponseAlg = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TokenEncryptedResponseAlg = table.Column<string>(type: "nvarchar(max)", nullable: true),

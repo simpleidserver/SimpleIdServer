@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseModes;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
-using SimpleIdServer.IdServer.Extensions;
 using SimpleIdServer.IdServer.ExternalEvents;
 using System;
 using System.Collections.Generic;

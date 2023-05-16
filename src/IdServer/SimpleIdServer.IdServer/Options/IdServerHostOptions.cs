@@ -8,8 +8,8 @@ using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.ClaimTokenFormats;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
-using SimpleIdServer.IdServer.Middlewares;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
+using SimpleIdServer.Realm.Middlewares;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text.Json;
@@ -33,7 +33,7 @@ namespace SimpleIdServer.IdServer.Options
         /// <summary>
         /// Pre Authorization code expiration time in seconds.
         /// </summary>
-        public int PreAuthorizationCodeExpirationInSeconds { get; set; } = 600;
+        public int CredOfferExpirationInSeconds { get; set; } = 600;
         /// <summary>
         /// Expiration time of the issuer state.
         /// </summary>
@@ -196,18 +196,17 @@ namespace SimpleIdServer.IdServer.Options
         /// </summary>
         public string ExtractRepresentationsFolder { get; set; } = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Extraction");
         /// <summary>
-        /// Authorization server used by the wallet.
+        /// If the Credential Issuer is not the same than Authorization Server, then the authorization server must be specified.
         /// </summary>
         public string? WalletAuthorizationServer { get; set; } = null;
         /// <summary>
         /// Send credential offer by reference using credential_offer_uri parameter.
         /// </summary>
         public bool SendCredentialOfferByReference { get; set; } = false;
-        
-        public ICollection<CredentialIssuerDisplayResult> CredentialIssuerDisplays { get; set; } = new List<CredentialIssuerDisplayResult>
-        {
-            new CredentialIssuerDisplayResult { Name = "SimpleIdServer" }
-        };
+        /// <summary>
+        /// Default c_nonce expiration time in seconds.
+        /// </summary>
+        public double? DefaultCNonceExpirationTimeInSeconds { get; set; } = 600;
 
         public int GetIntParameter(string name) => int.Parse(Parameters[name]);
 
