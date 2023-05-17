@@ -16,6 +16,7 @@ namespace Microsoft.AspNetCore.Builder
         {
             var opts = webApplication.Services.GetRequiredService<IOptions<IdServerHostOptions>>().Value;
             var usePrefix = opts.UseRealm;
+            if(usePrefix) webApplication.UseMiddleware<RealmMiddleware>();
             webApplication.UseCookiePolicy(new CookiePolicyOptions
             {
                 Secure = Http.CookieSecurePolicy.Always
@@ -186,13 +187,6 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.MapControllerRoute("importRepresentations",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/import",
                 defaults: new { controller = "IdentityProvisioning", action = "Import" });
-
-            webApplication.MapControllerRoute("getCredentialOffer",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialOffer + "/{id}",
-                defaults: new { controller = "CredentialOffer", action = "Get" });
-            webApplication.MapControllerRoute("getCredentialOfferQRCode",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialOffer + "/{id}/qr",
-                defaults: new { controller = "CredentialOffer", action = "GetQRCode" });
 
             webApplication.MapControllerRoute(
                 name: "defaultWithArea",

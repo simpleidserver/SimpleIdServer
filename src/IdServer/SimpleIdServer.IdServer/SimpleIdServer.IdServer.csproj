@@ -23,7 +23,6 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\..\Scim\SimpleIdServer.Scim.Client\SimpleIdServer.Scim.Client.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Store\SimpleIdServer.IdServer.Store.csproj" />
-	  <ProjectReference Include="..\SimpleIdServer.Realm\SimpleIdServer.Realm.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.Vc\SimpleIdServer.Vc.csproj" />
 	</ItemGroup>
 	<ItemGroup>

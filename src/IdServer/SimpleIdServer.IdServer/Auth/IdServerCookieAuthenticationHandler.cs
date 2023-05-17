@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Middlewares;
-using SimpleIdServer.Realm.Middlewares;
 using System;
 using System.Diagnostics;
 using System.Linq;

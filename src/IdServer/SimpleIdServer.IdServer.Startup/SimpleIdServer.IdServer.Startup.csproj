@@ -4,7 +4,7 @@
 		<OutputType>Exe</OutputType>
 	</PropertyGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\SimpleIdServer.CredentialIssuer\SimpleIdServer.CredentialIssuer.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.IdServer.CredentialIssuer\SimpleIdServer.IdServer.CredentialIssuer.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Email\SimpleIdServer.IdServer.Email.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Sms\SimpleIdServer.IdServer.Sms.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.WsFederation\SimpleIdServer.IdServer.WsFederation.csproj" />

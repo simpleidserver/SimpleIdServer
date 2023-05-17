@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Reflection.Metadata;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
@@ -110,9 +111,11 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     var result = BuildResult(context, extractionResult.Scopes);
                     await Authenticate(previousRequest, context, cancellationToken);
                     context.SetOriginalRequest(previousRequest);
-
+                    var expiresIn = context.Client.CNonceExpirationTimeInSeconds ?? _options.DefaultCNonceExpirationTimeInSeconds.Value;
+                    var credentialNonce = Guid.NewGuid().ToString();
+                    var parameters = new BuildTokenParameter { AuthorizationDetails = extractionResult.AuthorizationDetails, Scopes = extractionResult.Scopes, Audiences = extractionResult.Audiences, Claims = claims, GrantId = authCode.GrantId };
                     foreach (var tokenBuilder in _tokenBuilders)
-                        await tokenBuilder.Build(new BuildTokenParameter { AuthorizationDetails = extractionResult.AuthorizationDetails, Scopes = extractionResult.Scopes, Audiences = extractionResult.Audiences, Claims = claims, GrantId = authCode.GrantId }, context, cancellationToken, true);
+                        await tokenBuilder.Build(parameters, context, cancellationToken, true);
 
                     _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? _options.DefaultTokenProfile)).Enrich(context);
                     foreach (var kvp in context.Response.Parameters)
@@ -122,6 +125,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
 
                     if (!string.IsNullOrWhiteSpace(authCode.GrantId))
                         result.Add(TokenResponseParameters.GrantId, authCode.GrantId);
+
                     await AddCredentialParameters(context, result, cancellationToken);
                     await _busControl.Publish(new TokenIssuedSuccessEvent
                     {

@@ -8,5 +8,6 @@ namespace SimpleIdServer.IdServer.Helpers
         public string ClientId { get; set; }
         public string Code {  get; set; }
         public string Pin { get; set; }
+        public string UserId { get; set; }
     }
 }

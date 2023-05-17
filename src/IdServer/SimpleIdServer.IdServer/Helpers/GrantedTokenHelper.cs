@@ -39,7 +39,7 @@ namespace SimpleIdServer.IdServer.Helpers
         Task<string> AddAuthorizationCode(JsonObject originalRequest, string grantId, double validityPeriodsInSeconds, CancellationToken cancellationToken);
         Task<AuthCode> GetAuthorizationCode(string code, CancellationToken cancellationToken);
         Task RemoveAuthorizationCode(string code, CancellationToken cancellationToken);
-        Task AddPreAuthCode(string preAuthorizationCode, string pin, string clientId, double validityPeriodsInSeconds, CancellationToken cancellationToken);
+        Task AddPreAuthCode(string preAuthorizationCode, string pin, string clientId, string userId, double validityPeriodsInSeconds, CancellationToken cancellationToken);
         Task AddAuthCode(string credIssuerState, string clientId, double validityPeriodsInSeconds, CancellationToken cancellationToken);
         Task<PreAuthCode> GetPreAuthCode(string preAuthorizationCode, CancellationToken cancellationToken);
         Task AddCredentialNonce(string credentialNonce, double validityPeriodsInSeconds, CancellationToken cancellationToken);
@@ -243,9 +243,9 @@ namespace SimpleIdServer.IdServer.Helpers
 
         #region Credential Offer
 
-        public async Task AddPreAuthCode(string preAuthorizationCode, string pin, string clientId, double validityPeriodsInSeconds, CancellationToken cancellationToken)
+        public async Task AddPreAuthCode(string preAuthorizationCode, string pin, string clientId, string userId, double validityPeriodsInSeconds, CancellationToken cancellationToken)
         {
-            var credOffer = new PreAuthCode { ClientId = clientId, Pin = pin, Code = preAuthorizationCode };
+            var credOffer = new PreAuthCode { ClientId = clientId, Pin = pin, Code = preAuthorizationCode, UserId = userId };
             var serializedCredOffer = JsonSerializer.Serialize(credOffer);
             await _distributedCache.SetAsync(preAuthorizationCode, Encoding.UTF8.GetBytes(serializedCredOffer), new DistributedCacheEntryOptions
             {

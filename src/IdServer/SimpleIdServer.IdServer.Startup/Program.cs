@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using SimpleIdServer.CredentialIssuer;
 using SimpleIdServer.IdServer;
+using SimpleIdServer.IdServer.CredentialIssuer;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Startup;
@@ -45,9 +45,8 @@ var app = builder.Build();
 SeedData(app, builder.Configuration["SCIMBaseUrl"]);
 app.UseCors("AllowAll");
 app.UseSID()
-    .UseCredentialIssuer()
     .UseWsFederation()
-    .UseRealm();
+    .UseCredentialIssuer();
 app.Run();
 
 void RunSqlServerIdServer(IServiceCollection services)
@@ -62,6 +61,7 @@ void RunSqlServerIdServer(IServiceCollection services)
                 o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
             });
         })
+        .AddCredentialIssuer()
         .UseInMemoryMassTransit()
         .AddBackChannelAuthentication()
         .AddEmailAuthentication()

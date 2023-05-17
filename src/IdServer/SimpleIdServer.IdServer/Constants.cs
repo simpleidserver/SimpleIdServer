@@ -52,7 +52,6 @@ namespace SimpleIdServer.IdServer
             public const string IdentityProvisioning = "provisioning";
             public const string PushedAuthorizationRequest = "par";
             public const string Users = "users";
-            public const string CredentialOffer = "credential_offer";
         }
 
         public static List<string> AllStandardNotificationModes = new List<string>
@@ -553,10 +552,12 @@ namespace SimpleIdServer.IdServer
         /// Direct use of a shared symmetric key as the CEK.
         /// </summary>
         public const string AlgDir = "dir";
-        public const string DefaultRealm = "master";
         public const string ParFormatKey = "urn:ietf:params:oauth:request_uri";
         public const string IdProviderSeparator = ";";
         public const string LDAPDistinguishedName = "LDAP_DISTINGUISHEDNAME";
         public const string DefaultNotificationMode = "console";
+        public const string DefaultRealm = "master";
+        public const string DefaultRealmCookieName = "CurrentRealm";
+        public const string Prefix = "prefix";
     }
 }

@@ -101,17 +101,17 @@ this.ScenarioInitialize(scenarioInfo);
 #line 5
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table46 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table45 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table46.AddRow(new string[] {
+                table45.AddRow(new string[] {
                             "X-Testing-ClientCert",
                             "sidClient.crt"});
-                table46.AddRow(new string[] {
+                table45.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
 #line 7
- testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table46, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table45, "When ");
 #line hidden
 #line 12
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -147,30 +147,30 @@ this.ScenarioInitialize(scenarioInfo);
 #line 18
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table47 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table46 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table47.AddRow(new string[] {
+                table46.AddRow(new string[] {
                             "iss",
                             "fortyTwoClient"});
 #line 19
  testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
-                        "\'", ((string)(null)), table47, "And ");
+                        "\'", ((string)(null)), table46, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table48 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table47 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table48.AddRow(new string[] {
+                table47.AddRow(new string[] {
                             "X-Testing-ClientCert",
                             "sidClient.crt"});
-                table48.AddRow(new string[] {
+                table47.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
-                table48.AddRow(new string[] {
+                table47.AddRow(new string[] {
                             "request",
                             "$request$"});
 #line 23
- testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table48, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table47, "When ");
 #line hidden
 #line 29
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -206,30 +206,30 @@ this.ScenarioInitialize(scenarioInfo);
 #line 35
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table49 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table48 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table49.AddRow(new string[] {
+                table48.AddRow(new string[] {
                             "aud",
                             "invalid"});
 #line 36
  testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
-                        "\'", ((string)(null)), table49, "And ");
+                        "\'", ((string)(null)), table48, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table50 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table49 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table50.AddRow(new string[] {
+                table49.AddRow(new string[] {
                             "X-Testing-ClientCert",
                             "sidClient.crt"});
-                table50.AddRow(new string[] {
+                table49.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
-                table50.AddRow(new string[] {
+                table49.AddRow(new string[] {
                             "request",
                             "$request$"});
 #line 40
- testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table50, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table49, "When ");
 #line hidden
 #line 46
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -265,30 +265,30 @@ this.ScenarioInitialize(scenarioInfo);
 #line 52
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table51 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table50 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table51.AddRow(new string[] {
+                table50.AddRow(new string[] {
                             "aud",
                             "https://localhost:8080"});
 #line 53
  testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
-                        "\'", ((string)(null)), table51, "And ");
+                        "\'", ((string)(null)), table50, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table52 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table51 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table52.AddRow(new string[] {
+                table51.AddRow(new string[] {
                             "X-Testing-ClientCert",
                             "sidClient.crt"});
-                table52.AddRow(new string[] {
+                table51.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
-                table52.AddRow(new string[] {
+                table51.AddRow(new string[] {
                             "request",
                             "$request$"});
 #line 57
- testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table52, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table51, "When ");
 #line hidden
 #line 63
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -324,33 +324,33 @@ this.ScenarioInitialize(scenarioInfo);
 #line 69
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table53 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table52 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table53.AddRow(new string[] {
+                table52.AddRow(new string[] {
                             "aud",
                             "https://localhost:8080"});
-                table53.AddRow(new string[] {
+                table52.AddRow(new string[] {
                             "iss",
                             "invalid"});
 #line 70
  testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
-                        "\'", ((string)(null)), table53, "And ");
+                        "\'", ((string)(null)), table52, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table54 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table53 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table54.AddRow(new string[] {
+                table53.AddRow(new string[] {
                             "X-Testing-ClientCert",
                             "sidClient.crt"});
-                table54.AddRow(new string[] {
+                table53.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
-                table54.AddRow(new string[] {
+                table53.AddRow(new string[] {
                             "request",
                             "$request$"});
 #line 75
- testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table54, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table53, "When ");
 #line hidden
 #line 81
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -386,36 +386,36 @@ this.ScenarioInitialize(scenarioInfo);
 #line 87
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table55 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table54 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table55.AddRow(new string[] {
+                table54.AddRow(new string[] {
                             "aud",
                             "https://localhost:8080"});
-                table55.AddRow(new string[] {
+                table54.AddRow(new string[] {
                             "iss",
                             "fortyTwoClient"});
-                table55.AddRow(new string[] {
+                table54.AddRow(new string[] {
                             "exp",
                             "1587492240"});
 #line 88
  testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
-                        "\'", ((string)(null)), table55, "And ");
+                        "\'", ((string)(null)), table54, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table56 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table55 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table56.AddRow(new string[] {
+                table55.AddRow(new string[] {
                             "X-Testing-ClientCert",
                             "sidClient.crt"});
-                table56.AddRow(new string[] {
+                table55.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
-                table56.AddRow(new string[] {
+                table55.AddRow(new string[] {
                             "request",
                             "$request$"});
 #line 94
- testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table56, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table55, "When ");
 #line hidden
 #line 100
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -451,39 +451,39 @@ this.ScenarioInitialize(scenarioInfo);
 #line 106
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table57 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table56 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table57.AddRow(new string[] {
+                table56.AddRow(new string[] {
                             "aud",
                             "https://localhost:8080"});
-                table57.AddRow(new string[] {
+                table56.AddRow(new string[] {
                             "iss",
                             "fortyTwoClient"});
-                table57.AddRow(new string[] {
+                table56.AddRow(new string[] {
                             "nbf",
                             "1587492240"});
-                table57.AddRow(new string[] {
+                table56.AddRow(new string[] {
                             "exp",
                             "7267687440"});
 #line 107
  testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
-                        "\'", ((string)(null)), table57, "And ");
+                        "\'", ((string)(null)), table56, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table58 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table57 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table58.AddRow(new string[] {
+                table57.AddRow(new string[] {
                             "X-Testing-ClientCert",
                             "sidClient.crt"});
-                table58.AddRow(new string[] {
+                table57.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
-                table58.AddRow(new string[] {
+                table57.AddRow(new string[] {
                             "request",
                             "$request$"});
 #line 114
- testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table58, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table57, "When ");
 #line hidden
 #line 120
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -522,36 +522,36 @@ this.ScenarioInitialize(scenarioInfo);
 #line 127
  testRunner.And("build expiration time and add \'30\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table59 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table58 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table59.AddRow(new string[] {
+                table58.AddRow(new string[] {
                             "aud",
                             "https://localhost:8080"});
-                table59.AddRow(new string[] {
+                table58.AddRow(new string[] {
                             "iss",
                             "fortyTwoClient"});
-                table59.AddRow(new string[] {
+                table58.AddRow(new string[] {
                             "exp",
                             "$exp$"});
 #line 128
  testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
-                        "\'", ((string)(null)), table59, "And ");
+                        "\'", ((string)(null)), table58, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table60 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table59 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table60.AddRow(new string[] {
+                table59.AddRow(new string[] {
                             "X-Testing-ClientCert",
                             "sidClient.crt"});
-                table60.AddRow(new string[] {
+                table59.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
-                table60.AddRow(new string[] {
+                table59.AddRow(new string[] {
                             "request",
                             "$request$"});
 #line 134
- testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table60, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table59, "When ");
 #line hidden
 #line 140
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -590,39 +590,39 @@ this.ScenarioInitialize(scenarioInfo);
 #line 147
  testRunner.And("build expiration time and add \'10\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table61 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table60 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table61.AddRow(new string[] {
+                table60.AddRow(new string[] {
                             "aud",
                             "https://localhost:8080"});
-                table61.AddRow(new string[] {
+                table60.AddRow(new string[] {
                             "iss",
                             "fortyTwoClient"});
-                table61.AddRow(new string[] {
+                table60.AddRow(new string[] {
                             "exp",
                             "$exp$"});
-                table61.AddRow(new string[] {
+                table60.AddRow(new string[] {
                             "jti",
                             "jti"});
 #line 148
  testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
-                        "\'", ((string)(null)), table61, "And ");
+                        "\'", ((string)(null)), table60, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table62 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table61 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table62.AddRow(new string[] {
+                table61.AddRow(new string[] {
                             "X-Testing-ClientCert",
                             "sidClient.crt"});
-                table62.AddRow(new string[] {
+                table61.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
-                table62.AddRow(new string[] {
+                table61.AddRow(new string[] {
                             "request",
                             "$request$"});
 #line 155
- testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table62, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table61, "When ");
 #line hidden
 #line 161
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -661,42 +661,42 @@ this.ScenarioInitialize(scenarioInfo);
 #line 168
  testRunner.And("build expiration time and add \'10\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table63 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table62 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table63.AddRow(new string[] {
+                table62.AddRow(new string[] {
                             "aud",
                             "https://localhost:8080"});
-                table63.AddRow(new string[] {
+                table62.AddRow(new string[] {
                             "iss",
                             "fortyTwoClient"});
-                table63.AddRow(new string[] {
+                table62.AddRow(new string[] {
                             "exp",
                             "$exp$"});
-                table63.AddRow(new string[] {
+                table62.AddRow(new string[] {
                             "jti",
                             "jti"});
-                table63.AddRow(new string[] {
+                table62.AddRow(new string[] {
                             "id_token_hint",
                             "idtokenhint"});
 #line 169
  testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
-                        "\'", ((string)(null)), table63, "And ");
+                        "\'", ((string)(null)), table62, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table64 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table63 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table64.AddRow(new string[] {
+                table63.AddRow(new string[] {
                             "X-Testing-ClientCert",
                             "sidClient.crt"});
-                table64.AddRow(new string[] {
+                table63.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
-                table64.AddRow(new string[] {
+                table63.AddRow(new string[] {
                             "request",
                             "$request$"});
 #line 177
- testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table64, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table63, "When ");
 #line hidden
 #line 183
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -735,45 +735,45 @@ this.ScenarioInitialize(scenarioInfo);
 #line 190
  testRunner.And("build expiration time and add \'10\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table65 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table64 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table65.AddRow(new string[] {
+                table64.AddRow(new string[] {
                             "aud",
                             "https://localhost:8080"});
-                table65.AddRow(new string[] {
+                table64.AddRow(new string[] {
                             "iss",
                             "fortyTwoClient"});
-                table65.AddRow(new string[] {
+                table64.AddRow(new string[] {
                             "exp",
                             "$exp$"});
-                table65.AddRow(new string[] {
+                table64.AddRow(new string[] {
                             "jti",
                             "jti"});
-                table65.AddRow(new string[] {
+                table64.AddRow(new string[] {
                             "id_token_hint",
                             "idtokenhint"});
-                table65.AddRow(new string[] {
+                table64.AddRow(new string[] {
                             "user_code",
                             "code"});
 #line 191
  testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
-                        "\'", ((string)(null)), table65, "And ");
+                        "\'", ((string)(null)), table64, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table66 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table65 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table66.AddRow(new string[] {
+                table65.AddRow(new string[] {
                             "X-Testing-ClientCert",
                             "sidClient.crt"});
-                table66.AddRow(new string[] {
+                table65.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
-                table66.AddRow(new string[] {
+                table65.AddRow(new string[] {
                             "request",
                             "$request$"});
 #line 200
- testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table66, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table65, "When ");
 #line hidden
 #line 206
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -812,48 +812,48 @@ this.ScenarioInitialize(scenarioInfo);
 #line 213
  testRunner.And("build expiration time and add \'10\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table67 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table66 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table67.AddRow(new string[] {
+                table66.AddRow(new string[] {
                             "aud",
                             "https://localhost:8080"});
-                table67.AddRow(new string[] {
+                table66.AddRow(new string[] {
                             "iss",
                             "fortyTwoClient"});
-                table67.AddRow(new string[] {
+                table66.AddRow(new string[] {
                             "exp",
                             "$exp$"});
-                table67.AddRow(new string[] {
+                table66.AddRow(new string[] {
                             "jti",
                             "jti"});
-                table67.AddRow(new string[] {
+                table66.AddRow(new string[] {
                             "id_token_hint",
                             "idtokenhint"});
-                table67.AddRow(new string[] {
+                table66.AddRow(new string[] {
                             "user_code",
                             "code"});
-                table67.AddRow(new string[] {
+                table66.AddRow(new string[] {
                             "authorization_details",
                             "{ \"locations\": [] }"});
 #line 214
  testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
-                        "\'", ((string)(null)), table67, "And ");
+                        "\'", ((string)(null)), table66, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table68 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table67 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table68.AddRow(new string[] {
+                table67.AddRow(new string[] {
                             "X-Testing-ClientCert",
                             "sidClient.crt"});
-                table68.AddRow(new string[] {
+                table67.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
-                table68.AddRow(new string[] {
+                table67.AddRow(new string[] {
                             "request",
                             "$request$"});
 #line 224
- testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table68, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table67, "When ");
 #line hidden
 #line 230
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -892,48 +892,48 @@ this.ScenarioInitialize(scenarioInfo);
 #line 237
  testRunner.And("build expiration time and add \'10\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table69 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table68 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table69.AddRow(new string[] {
+                table68.AddRow(new string[] {
                             "aud",
                             "https://localhost:8080"});
-                table69.AddRow(new string[] {
+                table68.AddRow(new string[] {
                             "iss",
                             "fortyTwoClient"});
-                table69.AddRow(new string[] {
+                table68.AddRow(new string[] {
                             "exp",
                             "$exp$"});
-                table69.AddRow(new string[] {
+                table68.AddRow(new string[] {
                             "jti",
                             "jti"});
-                table69.AddRow(new string[] {
+                table68.AddRow(new string[] {
                             "id_token_hint",
                             "idtokenhint"});
-                table69.AddRow(new string[] {
+                table68.AddRow(new string[] {
                             "user_code",
                             "code"});
-                table69.AddRow(new string[] {
+                table68.AddRow(new string[] {
                             "authorization_details",
                             "{ \"type\": \"invalid\" }"});
 #line 238
  testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
-                        "\'", ((string)(null)), table69, "And ");
+                        "\'", ((string)(null)), table68, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table70 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table69 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table70.AddRow(new string[] {
+                table69.AddRow(new string[] {
                             "X-Testing-ClientCert",
                             "sidClient.crt"});
-                table70.AddRow(new string[] {
+                table69.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
-                table70.AddRow(new string[] {
+                table69.AddRow(new string[] {
                             "request",
                             "$request$"});
 #line 248
- testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table70, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table69, "When ");
 #line hidden
 #line 254
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -972,48 +972,48 @@ this.ScenarioInitialize(scenarioInfo);
 #line 261
  testRunner.And("build expiration time and add \'10\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table71 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table70 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table71.AddRow(new string[] {
+                table70.AddRow(new string[] {
                             "aud",
                             "https://localhost:8080"});
-                table71.AddRow(new string[] {
+                table70.AddRow(new string[] {
                             "iss",
                             "fortyTwoClient"});
-                table71.AddRow(new string[] {
+                table70.AddRow(new string[] {
                             "exp",
                             "$exp$"});
-                table71.AddRow(new string[] {
+                table70.AddRow(new string[] {
                             "jti",
                             "jti"});
-                table71.AddRow(new string[] {
+                table70.AddRow(new string[] {
                             "id_token_hint",
                             "idtokenhint"});
-                table71.AddRow(new string[] {
+                table70.AddRow(new string[] {
                             "scope",
                             "invalid"});
-                table71.AddRow(new string[] {
+                table70.AddRow(new string[] {
                             "user_code",
                             "code"});
 #line 262
  testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
-                        "\'", ((string)(null)), table71, "And ");
+                        "\'", ((string)(null)), table70, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table72 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table71 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table72.AddRow(new string[] {
+                table71.AddRow(new string[] {
                             "X-Testing-ClientCert",
                             "sidClient.crt"});
-                table72.AddRow(new string[] {
+                table71.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
-                table72.AddRow(new string[] {
+                table71.AddRow(new string[] {
                             "request",
                             "$request$"});
 #line 272
- testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table72, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table71, "When ");
 #line hidden
 #line 278
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -1052,48 +1052,48 @@ this.ScenarioInitialize(scenarioInfo);
 #line 285
  testRunner.And("build expiration time and add \'10\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table73 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table72 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table73.AddRow(new string[] {
+                table72.AddRow(new string[] {
                             "aud",
                             "https://localhost:8080"});
-                table73.AddRow(new string[] {
+                table72.AddRow(new string[] {
                             "iss",
                             "fortyTwoClient"});
-                table73.AddRow(new string[] {
+                table72.AddRow(new string[] {
                             "exp",
                             "$exp$"});
-                table73.AddRow(new string[] {
+                table72.AddRow(new string[] {
                             "jti",
                             "jti"});
-                table73.AddRow(new string[] {
+                table72.AddRow(new string[] {
                             "id_token_hint",
                             "idtokenhint"});
-                table73.AddRow(new string[] {
+                table72.AddRow(new string[] {
                             "scope",
                             "secondScope"});
-                table73.AddRow(new string[] {
+                table72.AddRow(new string[] {
                             "user_code",
                             "code"});
 #line 286
  testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
-                        "\'", ((string)(null)), table73, "And ");
+                        "\'", ((string)(null)), table72, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table74 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table73 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table74.AddRow(new string[] {
+                table73.AddRow(new string[] {
                             "X-Testing-ClientCert",
                             "sidClient.crt"});
-                table74.AddRow(new string[] {
+                table73.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
-                table74.AddRow(new string[] {
+                table73.AddRow(new string[] {
                             "request",
                             "$request$"});
 #line 296
- testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table74, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table73, "When ");
 #line hidden
 #line 302
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -1132,51 +1132,51 @@ this.ScenarioInitialize(scenarioInfo);
 #line 309
  testRunner.And("build expiration time and add \'10\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table75 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table74 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table75.AddRow(new string[] {
+                table74.AddRow(new string[] {
                             "aud",
                             "https://localhost:8080"});
-                table75.AddRow(new string[] {
+                table74.AddRow(new string[] {
                             "iss",
                             "fortyTwoClient"});
-                table75.AddRow(new string[] {
+                table74.AddRow(new string[] {
                             "exp",
                             "$exp$"});
-                table75.AddRow(new string[] {
+                table74.AddRow(new string[] {
                             "jti",
                             "jti"});
-                table75.AddRow(new string[] {
+                table74.AddRow(new string[] {
                             "id_token_hint",
                             "idtokenhint"});
-                table75.AddRow(new string[] {
+                table74.AddRow(new string[] {
                             "scope",
                             "secondScope"});
-                table75.AddRow(new string[] {
+                table74.AddRow(new string[] {
                             "client_notification_token",
                             "1"});
-                table75.AddRow(new string[] {
+                table74.AddRow(new string[] {
                             "user_code",
                             "code"});
 #line 310
  testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
-                        "\'", ((string)(null)), table75, "And ");
+                        "\'", ((string)(null)), table74, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table76 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table75 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table76.AddRow(new string[] {
+                table75.AddRow(new string[] {
                             "X-Testing-ClientCert",
                             "sidClient.crt"});
-                table76.AddRow(new string[] {
+                table75.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
-                table76.AddRow(new string[] {
+                table75.AddRow(new string[] {
                             "request",
                             "$request$"});
 #line 321
- testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table76, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table75, "When ");
 #line hidden
 #line 327
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -1216,51 +1216,51 @@ this.ScenarioInitialize(scenarioInfo);
 #line 334
  testRunner.And("build expiration time and add \'10\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table77 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table76 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table77.AddRow(new string[] {
+                table76.AddRow(new string[] {
                             "aud",
                             "https://localhost:8080"});
-                table77.AddRow(new string[] {
+                table76.AddRow(new string[] {
                             "iss",
                             "fortyTwoClient"});
-                table77.AddRow(new string[] {
+                table76.AddRow(new string[] {
                             "exp",
                             "$exp$"});
-                table77.AddRow(new string[] {
+                table76.AddRow(new string[] {
                             "jti",
                             "jti"});
-                table77.AddRow(new string[] {
+                table76.AddRow(new string[] {
                             "id_token_hint",
                             "idtokenhint"});
-                table77.AddRow(new string[] {
+                table76.AddRow(new string[] {
                             "scope",
                             "secondScope"});
-                table77.AddRow(new string[] {
+                table76.AddRow(new string[] {
                             "client_notification_token",
                             "04bcf708-dfba-4719-a3d3-b213322e2c38"});
-                table77.AddRow(new string[] {
+                table76.AddRow(new string[] {
                             "user_code",
                             "code"});
 #line 335
  testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
-                        "\'", ((string)(null)), table77, "And ");
+                        "\'", ((string)(null)), table76, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table78 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table77 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table78.AddRow(new string[] {
+                table77.AddRow(new string[] {
                             "X-Testing-ClientCert",
                             "sidClient.crt"});
-                table78.AddRow(new string[] {
+                table77.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
-                table78.AddRow(new string[] {
+                table77.AddRow(new string[] {
                             "request",
                             "$request$"});
 #line 346
- testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table78, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table77, "When ");
 #line hidden
 #line 352
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

@@ -36,6 +36,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
         private readonly IGrantHelper _audienceHelper;
+        private readonly IUserRepository _userRepository;
         private readonly IdServerHostOptions _options;
 
         public PreAuthorizedCodeHandler(
@@ -46,6 +47,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IEnumerable<ITokenBuilder> tokenBuilders,
             IClientRepository clientRepository,
             IGrantHelper audienceHelper,
+            IUserRepository userRepository,
             IOptions<IdServerHostOptions> options) : base(clientAuthenticationHelper, grantedTokenHelper, options)
         {
             _busControl = busControl;
@@ -53,6 +55,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             _tokenProfiles = tokenProfiles;
             _tokenBuilders = tokenBuilders;
             _audienceHelper = audienceHelper;
+            _userRepository = userRepository;
             _options = options.Value;
         }
 
@@ -76,15 +79,17 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     scopeLst = extractionResult.Scopes;
                     activity?.SetTag("scopes", string.Join(",", extractionResult.Scopes));
                     var result = BuildResult(context, extractionResult.Scopes);
+                    var credentialNonce = Guid.NewGuid().ToString();
+                    var expiresIn = context.Client.CNonceExpirationTimeInSeconds ?? _options.DefaultCNonceExpirationTimeInSeconds.Value;
+                    var parameter = new BuildTokenParameter { AuthorizationDetails = extractionResult.AuthorizationDetails, Audiences = extractionResult.Audiences, Scopes = extractionResult.Scopes };
                     foreach (var tokenBuilder in _tokenBuilders)
-                        await tokenBuilder.Build(new BuildTokenParameter { AuthorizationDetails = extractionResult.AuthorizationDetails, Audiences = extractionResult.Audiences, Scopes = extractionResult.Scopes }, context, cancellationToken);
+                        await tokenBuilder.Build(parameter, context, cancellationToken);
 
                     _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? _options.DefaultTokenProfile)).Enrich(context);
                     var accessToken = context.Response.Parameters[TokenResponseParameters.AccessToken];
-                    var cNonce = Guid.NewGuid().ToString();
-                    var expiresIn = validationResult.Client.CNonceExpirationTimeInSeconds ?? _options.DefaultCNonceExpirationTimeInSeconds.Value;
                     foreach (var kvp in context.Response.Parameters)
                         result.Add(kvp.Key, kvp.Value);
+
                     await AddCredentialParameters(context, result, cancellationToken);
                     await _busControl.Publish(new TokenIssuedSuccessEvent
                     {
@@ -127,18 +132,22 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                 if (preAuth == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_PREAUTHORIZEDCODE);
                 var authDetails = context.Request.RequestData.GetAuthorizationDetailsFromAuthorizationRequest();
                 OAuthAuthorizationRequestValidator.CheckOpenIdCredential(authDetails);
-                return new ValidationResult(client);
+                var user = await _userRepository.Query().AsNoTracking().SingleAsync(u => u.Id == preAuth.UserId, cancellationToken);
+                context.SetUser(user);
+                return new ValidationResult(client, user);
             }
         }
 
         private record ValidationResult
         {
-            public ValidationResult(Client client)
+            public ValidationResult(Client client, User user)
             {
                 Client = client;
+                User = user;
             }
 
-            public Client Client { get; private set;}
+            public Client Client { get; private set; }
+            public User User { get; private set; }
         }
     }
 }

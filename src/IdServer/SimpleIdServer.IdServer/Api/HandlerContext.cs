@@ -180,7 +180,19 @@ namespace SimpleIdServer.IdServer.Api
             return Request.Referer == null ? false : Request.Referer.StartsWith(consentsUrl);
         }
 
-        public static string GetIssuer(string result) => SimpleIdServer.Realm.IssuerHelper.GetIssuer(result);
+        public static string GetIssuer(string result)
+        {
+            var realm = RealmContext.Instance().Realm;
+            if (!string.IsNullOrWhiteSpace(realm))
+            {
+                if (!result.EndsWith("/"))
+                    result += "/";
+
+                result += realm;
+            }
+
+            return result;
+        }
 
         public void SetClient(Client client) => Client = client;
 

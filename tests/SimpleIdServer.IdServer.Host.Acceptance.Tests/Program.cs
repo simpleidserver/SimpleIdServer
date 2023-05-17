@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using SimpleIdServer.CredentialIssuer;
+using SimpleIdServer.IdServer.CredentialIssuer;
 using SimpleIdServer.OAuth.Host.Acceptance.Tests;
 using System;
 using System.Collections.Generic;
@@ -40,6 +40,7 @@ builder.Services.AddSIDIdentityServer(o =>
         });
     })
     .UseInMemoryMassTransit()
+    .AddCredentialIssuer()
     .AddBackChannelAuthentication()
     .AddAuthentication(o =>
     {
@@ -49,7 +50,6 @@ builder.Services.AddSIDIdentityServer(o =>
             m.RevocationMode = System.Security.Cryptography.X509Certificates.X509RevocationMode.NoCheck;
         });
     });
-
 var app = builder.Build()
     .UseCredentialIssuer()
     .UseSID();
