@@ -202,10 +202,6 @@ namespace SimpleIdServer.IdServer.Options
         /// Send credential offer by reference using credential_offer_uri parameter.
         /// </summary>
         public bool SendCredentialOfferByReference { get; set; } = false;
-        /// <summary>
-        /// Default c_nonce expiration time in seconds.
-        /// </summary>
-        public double? DefaultCNonceExpirationTimeInSeconds { get; set; } = 600;
 
         public int GetIntParameter(string name) => int.Parse(Parameters[name]);
 

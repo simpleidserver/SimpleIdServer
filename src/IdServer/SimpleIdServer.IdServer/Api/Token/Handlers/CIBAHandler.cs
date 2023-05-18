@@ -34,7 +34,6 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
 
         public CIBAHandler(
             ILogger<CIBAHandler> logger,
-            IGrantedTokenHelper grantedTokenHelper,
             IUserRepository userRepository,
             ICIBAGrantTypeValidator cibaGrantTypeValidator,
             IEnumerable<ITokenBuilder> tokenBuilders,
@@ -42,7 +41,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IClientAuthenticationHelper clientAuthenticationHelper,
             IOptions<IdServerHostOptions> options,
             IBCAuthorizeRepository bcAuthorizeRepository,
-            IBusControl busControl) : base(clientAuthenticationHelper, grantedTokenHelper, options)
+            IBusControl busControl) : base(clientAuthenticationHelper, options)
         {
             _logger = logger;
             _userRepository = userRepository;

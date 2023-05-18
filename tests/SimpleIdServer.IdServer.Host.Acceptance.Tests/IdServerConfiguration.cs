@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Text.Json;
 using static SimpleIdServer.IdServer.Constants;
 
 namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
@@ -89,7 +90,14 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                 .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fiftyFourClient", "openid", "profile", "email")
                 .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fiftyFiveClient", new AuthorizationData { Type = "firstDetails", Actions = new List<string> { "read" } }, new AuthorizationData { Type = "secondDetails", Locations = new List<string> { "https://cal.example.com" }, Actions = new List<string> { "read" } })
                 .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fiftySixClient", "openid", "role")
-                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fiftyEightClient", new AuthorizationData { Type = "openid_credential", Types = new List<string> { "VerifiableCredential", "UniversityDegreeCredential" } })
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "fiftyEightClient", new AuthorizationData
+                {
+                    Type = "openid_credential",
+                    AdditionalData = new Dictionary<string, string>
+                    {
+                        { "types", JsonSerializer.Serialize(new List<string> { "VerifiableCredential", "UniversityDegreeCredential" }) }
+                    }
+                })
                 .AddSession("sessionId", SimpleIdServer.IdServer.Constants.DefaultRealm, DateTime.UtcNow.AddDays(2)).Build();
 
         public static List<Group> Groups => new List<Group>

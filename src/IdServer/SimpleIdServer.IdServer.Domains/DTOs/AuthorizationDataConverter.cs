@@ -42,14 +42,6 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
                 writer.WriteEndArray();
             }
 
-            if(value.Types != null && value.Types.Any())
-            {
-                writer.WriteStartArray(AuthorizationDataParameters.Types);
-                foreach (var t in value.Types)
-                    writer.WriteStringValue(t);
-                writer.WriteEndArray();
-            }
-
             if (value.AdditionalData != null)
             {
                 foreach (var kvp in value.AdditionalData)

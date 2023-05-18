@@ -8,6 +8,10 @@ namespace SimpleIdServer.IdServer.CredentialIssuer
 {
     public class CredentialIssuerOptions
     {
+        /// <summary>
+        /// Default c_nonce expiration time in seconds.
+        /// </summary>
+        public double? DefaultCNonceExpirationTimeInSeconds { get; set; } = 600;
         public ICollection<CredentialIssuerDisplayResult> CredentialIssuerDisplays { get; set; } = new List<CredentialIssuerDisplayResult>
         {
             new CredentialIssuerDisplayResult { Name = "SimpleIdServer" }

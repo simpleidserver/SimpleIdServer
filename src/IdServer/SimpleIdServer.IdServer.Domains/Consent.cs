@@ -134,11 +134,11 @@ namespace SimpleIdServer.IdServer.Domains
                             existingAuthData.AddDataType(unknownDataType);
                     }
 
-                    if(newAuthData.Types != null)
+                    if(newAuthData.AdditionalData != null)
                     {
-                        var unknownTypes = newAuthData.Types.Where(t => !existingAuthData.Types.Contains(t));
-                        foreach (var unknownType in unknownTypes)
-                            existingAuthData.AddType(unknownType);
+                        var unknownAddsData = newAuthData.AdditionalData.Where(t => !existingAuthData.AdditionalData.Contains(t));
+                        foreach (var unknownAddData in unknownAddsData)
+                            existingAuthData.AddAdditionalData(unknownAddData.Key, unknownAddData.Value);
                     }
                 }
 

@@ -10,5 +10,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer
         public const string UNKNOWN_ACCESS_TOKEN = "either the access token has been revoked or is invalid";
         public const string INVALID_ACCESS_TOKEN_SCOPE = "access token has an invalid scope";
         public const string UNKNOWN_CREDENTIAL_OFFER = "the credential offer doesn't exist";
+        public const string MISSING_OPENID_CREDENTIAL_FORMAT = "the authorization_details must contain a format";
+        public const string UNSUPPORTED_CREDENTIALS_FORMAT = "credential formats {0} are not supported";
     }
 }

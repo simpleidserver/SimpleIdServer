@@ -13,8 +13,8 @@ using SimpleIdServer.IdServer.ClaimsEnricher;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
-using SimpleIdServer.IdServer.Extensions;
 using SimpleIdServer.IdServer.ExternalEvents;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Store;
 using System;
@@ -34,6 +34,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
     public class UserInfoController : Controller
     {
         private readonly IJwtBuilder _jwtBuilder;
+        private readonly IUserHelper _userHelper;
         private readonly IScopeRepository _scopeRepository;
         private readonly IUserRepository _userRepository;
         private readonly IClientRepository _clientRepository;
@@ -46,6 +47,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
 
         public UserInfoController(
             IJwtBuilder jwtBuilder,
+            IUserHelper userHelper,
             IScopeRepository scopeRepository,
             IUserRepository userRepository,
             IClientRepository clientRepository,
@@ -57,6 +59,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
             IBusControl busControl)
         {
             _jwtBuilder = jwtBuilder;
+            _userHelper = userHelper;
             _scopeRepository = scopeRepository;
             _userRepository = userRepository;
             _clientRepository = clientRepository;
@@ -128,7 +131,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
                         throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));
 
                     activity?.SetTag("client_id", oauthClient.ClientId);
-                    if (!oauthClient.IsConsentDisabled && user.GetConsent(prefix, oauthClient.ClientId, scopes, claims, null, AuthorizationClaimTypes.UserInfo) == null)
+                    if (!oauthClient.IsConsentDisabled && _userHelper.GetConsent(user, prefix, oauthClient.ClientId, scopes, claims, null, AuthorizationClaimTypes.UserInfo) == null)
                         throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.NO_CONSENT);
 
                     var token = await _tokenRepository.Query().AsNoTracking().FirstOrDefaultAsync(t => t.Id == accessToken);

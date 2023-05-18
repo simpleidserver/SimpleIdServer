@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>net7.0</TargetFramework>
-		<Description>Identity server project with OPENID, OAUTH2.0, UMA2.0 and CIBA support.</Description>
+		<Description>Identity server project with OPENID, OAUTH2.0, UMA2.0, CIBA and FAPI support.</Description>
 	</PropertyGroup>
 	<ItemGroup>
 	  <None Remove="Jobs\ImportRepresentationJob.cs~RF59cf7d4.TMP" />

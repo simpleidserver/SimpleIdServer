@@ -13,6 +13,7 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.ExternalEvents;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.AuthProviders;
@@ -30,6 +31,7 @@ namespace SimpleIdServer.IdServer.UI
     public class HomeController : Controller
     {
         private readonly IdServerHostOptions _options;
+        private readonly IUserHelper _userHelper;
         private readonly IUserRepository _userRepository;
         private readonly IClientRepository _clientRepository;
         private readonly IUmaPendingRequestRepository _pendingRequestRepository;
@@ -38,11 +40,12 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IBusControl _busControl;
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(IOptions<IdServerHostOptions> options, IUserRepository userRepository, IClientRepository clientRepository, 
+        public HomeController(IOptions<IdServerHostOptions> options, IUserHelper userHelper, IUserRepository userRepository, IClientRepository clientRepository, 
             IUmaPendingRequestRepository pendingRequestRepository, IAuthenticationSchemeProvider authenticationSchemeProvider,
             IOTPQRCodeGenerator otpQRCodeGenerator, IBusControl busControl, ILogger<HomeController> logger)
         {
             _options = options.Value;
+            _userHelper = userHelper;
             _userRepository = userRepository;
             _clientRepository = clientRepository;
             _pendingRequestRepository = pendingRequestRepository;
@@ -141,7 +144,7 @@ namespace SimpleIdServer.IdServer.UI
             prefix = prefix ?? Constants.DefaultRealm;
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
             var user = await _userRepository.Query().Include(u => u.Consents).Include(u => u.Realms).FirstAsync(c => c.Name == nameIdentifier && c.Realms.Any(r => r.RealmsName == prefix), cancellationToken);
-            if (!user.HasOpenIDConsent(consentId))
+            if (!_userHelper.HasOpenIDConsent(user, consentId))
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request" });
 
             user.RejectConsent(consentId);

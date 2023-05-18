@@ -41,11 +41,11 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IBusControl _busControl;
 
-        public UmaTicketHandler(IUmaTicketGrantTypeValidator umaTicketGrantTypeValidator, IGrantedTokenHelper grantedTokenHelper, IUmaPermissionTicketHelper umaPermissionTicketHelper, 
+        public UmaTicketHandler(IUmaTicketGrantTypeValidator umaTicketGrantTypeValidator, IUmaPermissionTicketHelper umaPermissionTicketHelper, 
             IEnumerable<IClaimTokenFormat> claimTokenFormats, IUmaResourceRepository umaResourceRepository,
             IUmaPendingRequestRepository umaPendingRequestRepository, IEnumerable<ITokenBuilder> tokenBuilders,
             IEnumerable<ITokenProfile> tokenProfiles, IClientAuthenticationHelper clientAuthenticationHelper, 
-            IBusControl busControl, IOptions<IdServerHostOptions> options) : base(clientAuthenticationHelper, grantedTokenHelper, options)
+            IBusControl busControl, IOptions<IdServerHostOptions> options) : base(clientAuthenticationHelper, options)
         {
             _umaTicketGrantTypeValidator = umaTicketGrantTypeValidator;
             _umaPermissionTicketHelper = umaPermissionTicketHelper;

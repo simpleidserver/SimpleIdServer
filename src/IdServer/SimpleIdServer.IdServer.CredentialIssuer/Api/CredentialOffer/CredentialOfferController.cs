@@ -10,6 +10,7 @@ using QRCoder;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.CredentialIssuer.DTOs;
+using SimpleIdServer.IdServer.CredentialIssuer.Helpers;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
@@ -33,15 +34,17 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialOffer
     {
         private readonly ICredentialOfferRepository _credentialOfferRepository;
         private readonly IGrantedTokenHelper _grantedTokenHelper;
+        private readonly ICredIssuerTokenHelper _credIssuerTokenHelper;
         private readonly IClientRepository _clientRepository;
         private readonly IEnumerable<IUserNotificationService> _notificationServices;
         private readonly UrlEncoder _urlEncoder;
         private readonly IdServerHostOptions _options;
 
-        public CredentialOfferController(ICredentialOfferRepository credentialOfferRepository, IGrantedTokenHelper grantedTokenHelper, IClientRepository clientRepository, IEnumerable<IUserNotificationService> notificationServices, UrlEncoder urlEncoder, IOptions<IdServerHostOptions> options)
+        public CredentialOfferController(ICredentialOfferRepository credentialOfferRepository, IGrantedTokenHelper grantedTokenHelper, ICredIssuerTokenHelper credIssuerTokenHelper, IClientRepository clientRepository, IEnumerable<IUserNotificationService> notificationServices, UrlEncoder urlEncoder, IOptions<IdServerHostOptions> options)
         {
             _credentialOfferRepository = credentialOfferRepository;
             _grantedTokenHelper = grantedTokenHelper;
+            _credIssuerTokenHelper = credIssuerTokenHelper;
             _clientRepository = clientRepository;
             _notificationServices = notificationServices;
             _urlEncoder = urlEncoder;
@@ -137,7 +140,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialOffer
             if (client.GrantTypes.Contains(AuthorizationCodeHandler.GRANT_TYPE))
             {
                 var credIssuerState = Guid.NewGuid().ToString();
-                await _grantedTokenHelper.AddAuthCode(credIssuerState, clientId, _options.CredOfferExpirationInSeconds, cancellationToken);
+                await _credIssuerTokenHelper.AddAuthCode(credIssuerState, clientId, _options.CredOfferExpirationInSeconds, cancellationToken);
                 result.Grants.Add(AuthorizationCodeHandler.GRANT_TYPE, new Dictionary<string, object>
                 {
                     { CredentialOfferResultNames.IssuerState, credIssuerState }

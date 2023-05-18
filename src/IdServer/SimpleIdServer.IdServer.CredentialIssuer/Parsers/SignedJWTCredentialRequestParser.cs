@@ -1,8 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.IdServer.CredentialIssuer.Api.Credential;
 using SimpleIdServer.Vc.DTOs;
 
-namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential.Parsers
+namespace SimpleIdServer.IdServer.CredentialIssuer.Parsers
 {
     public class SignedJWTCredentialRequestParser : ICredentialRequestParser
     {

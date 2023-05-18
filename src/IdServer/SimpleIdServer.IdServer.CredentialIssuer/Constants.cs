@@ -11,5 +11,10 @@ namespace SimpleIdServer.IdServer.CredentialIssuer
             public const string Credential = "credential";
             public const string CredentialOffer = "credential_offer";
         }
+
+        public static class StandardAuthorizationDetails
+        {
+            public const string OpenIdCredential = "openid_credential";
+        }
     }
 }

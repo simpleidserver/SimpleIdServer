@@ -10,8 +10,5 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
         public const string Actions = "actions";
         public const string DataTypes = "datatypes";
         public const string Identifier = "identifier";
-        public const string Format = "format";
-        public const string CredentialDefinition = "credential_definition";
-        public const string Types = "types";
     }
 }

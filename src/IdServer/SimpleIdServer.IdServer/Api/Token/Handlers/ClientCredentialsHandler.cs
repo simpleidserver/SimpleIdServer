@@ -32,14 +32,13 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IdServerHostOptions _options;
 
         public ClientCredentialsHandler(
-            IClientCredentialsGrantTypeValidator clientCredentialsGrantTypeValidator, 
-            IGrantedTokenHelper grantedTokenHelper,
+            IClientCredentialsGrantTypeValidator clientCredentialsGrantTypeValidator,
+            IGrantHelper audienceHelper,
             IEnumerable<ITokenProfile> tokenProfiles,
             IEnumerable<ITokenBuilder> tokenBuilders, 
             IClientAuthenticationHelper clientAuthenticationHelper,
-            IGrantHelper audienceHelper,
             IBusControl busControl,
-            IOptions<IdServerHostOptions> options) : base(clientAuthenticationHelper, grantedTokenHelper, options)
+            IOptions<IdServerHostOptions> options) : base(clientAuthenticationHelper, options)
         {
             _clientCredentialsGrantTypeValidator = clientCredentialsGrantTypeValidator;
             _tokenProfiles = tokenProfiles;

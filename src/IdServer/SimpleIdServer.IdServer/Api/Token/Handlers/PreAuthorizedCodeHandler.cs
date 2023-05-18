@@ -2,13 +2,10 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using SimpleIdServer.IdServer.Api.Authorization.Validators;
 using SimpleIdServer.IdServer.Api.Token.Helpers;
 using SimpleIdServer.IdServer.Api.Token.TokenBuilders;
 using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
-using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
@@ -31,6 +28,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
     /// </summary>
     public class PreAuthorizedCodeHandler : BaseCredentialsHandler
     {
+        private readonly IPreAuthorizedCodeValidator _validator;
         private readonly IBusControl _busControl;
         private readonly IClientRepository _clientRepository;
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
@@ -40,6 +38,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IdServerHostOptions _options;
 
         public PreAuthorizedCodeHandler(
+            IPreAuthorizedCodeValidator validator,
             IBusControl busControl,
             IClientAuthenticationHelper clientAuthenticationHelper,
             IGrantedTokenHelper grantedTokenHelper,
@@ -48,8 +47,9 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IClientRepository clientRepository,
             IGrantHelper audienceHelper,
             IUserRepository userRepository,
-            IOptions<IdServerHostOptions> options) : base(clientAuthenticationHelper, grantedTokenHelper, options)
+            IOptions<IdServerHostOptions> options) : base(clientAuthenticationHelper, options)
         {
+            _validator = validator;
             _busControl = busControl;
             _clientRepository = clientRepository;
             _tokenProfiles = tokenProfiles;
@@ -71,7 +71,8 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                 {
                     activity?.SetTag("grant_type", GRANT_TYPE);
                     activity?.SetTag("realm", context.Realm);
-                    var validationResult = await Validate(activity);
+                    var validationResult = await _validator.Validate(context, cancellationToken);
+                    activity?.SetTag("client_id", validationResult.Client.Id);
                     var scopes = ScopeHelper.Validate(context.Request.RequestData.GetStr(TokenRequestParameters.Scope), validationResult.Client.Scopes.Select(s => s.Name));
                     var resources = context.Request.RequestData.GetResourcesFromAuthorizationRequest();
                     var authDetails = context.Request.RequestData.GetAuthorizationDetailsFromAuthorizationRequest();
@@ -80,7 +81,6 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     activity?.SetTag("scopes", string.Join(",", extractionResult.Scopes));
                     var result = BuildResult(context, extractionResult.Scopes);
                     var credentialNonce = Guid.NewGuid().ToString();
-                    var expiresIn = context.Client.CNonceExpirationTimeInSeconds ?? _options.DefaultCNonceExpirationTimeInSeconds.Value;
                     var parameter = new BuildTokenParameter { AuthorizationDetails = extractionResult.AuthorizationDetails, Audiences = extractionResult.Audiences, Scopes = extractionResult.Scopes };
                     foreach (var tokenBuilder in _tokenBuilders)
                         await tokenBuilder.Build(parameter, context, cancellationToken);
@@ -90,7 +90,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     foreach (var kvp in context.Response.Parameters)
                         result.Add(kvp.Key, kvp.Value);
 
-                    await AddCredentialParameters(context, result, cancellationToken);
+                    await Enrich(context, result, cancellationToken);
                     await _busControl.Publish(new TokenIssuedSuccessEvent
                     {
                         GrantType = GRANT_TYPE,
@@ -114,40 +114,11 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     return BuildError(HttpStatusCode.BadRequest, ex.Code, ex.Message);
                 }
             }
-
-            async Task<ValidationResult> Validate(Activity activity)
-            {
-                string clientId;
-                if (!TryGetClientId(context, out clientId)) throw new OAuthException(ErrorCodes.INVALID_CLIENT, ErrorMessages.MISSING_CLIENT_ID);
-                activity?.SetTag("client_id", clientId);
-                var client = await _clientRepository.Query().AsNoTracking().Include(c => c.Scopes).SingleOrDefaultAsync(c => c.ClientId == clientId, cancellationToken);
-                if (client == null) throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));
-                if (!client.GrantTypes.Contains(GRANT_TYPE)) throw new OAuthException(ErrorCodes.INVALID_GRANT, string.Format(ErrorMessages.UNSUPPORTED_GRANT_TYPE, GRANT_TYPE));
-                context.SetClient(client);
-                var preAuthorizedCode = context.Request.RequestData.GetPreAuthorizedCode();
-                var userPin = context.Request.RequestData.GetUserPin();
-                if (string.IsNullOrWhiteSpace(preAuthorizedCode)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.PreAuthorizedCode));
-                if (client.UserPinRequired && string.IsNullOrWhiteSpace(userPin)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.UserPin));
-                var preAuth = await GrantedTokenHelper.GetPreAuthCode(preAuthorizedCode, cancellationToken);
-                if (preAuth == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_PREAUTHORIZEDCODE);
-                var authDetails = context.Request.RequestData.GetAuthorizationDetailsFromAuthorizationRequest();
-                OAuthAuthorizationRequestValidator.CheckOpenIdCredential(authDetails);
-                var user = await _userRepository.Query().AsNoTracking().SingleAsync(u => u.Id == preAuth.UserId, cancellationToken);
-                context.SetUser(user);
-                return new ValidationResult(client, user);
-            }
         }
 
-        private record ValidationResult
+        protected virtual Task Enrich(HandlerContext handlerContext, JsonObject result, CancellationToken cancellationToken)
         {
-            public ValidationResult(Client client, User user)
-            {
-                Client = client;
-                User = user;
-            }
-
-            public Client Client { get; private set; }
-            public User User { get; private set; }
+            return Task.CompletedTask;
         }
     }
 }

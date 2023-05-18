@@ -40,7 +40,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
 
         public RefreshTokenHandler(
             IRefreshTokenGrantTypeValidator refreshTokenGrantTypeValidator, 
-            IGrantedTokenHelper grantedTokenHelper, 
+            IGrantedTokenHelper grantedTokenHelper,
             IEnumerable<ITokenProfile> tokenProfiles,
             IEnumerable<ITokenBuilder> tokenBuilders, 
             IUserRepository userRepository,
@@ -48,7 +48,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IGrantHelper audienceHelper,
             IBusControl busControl,
             IOptions<IdServerHostOptions> options,
-            ILogger<RefreshTokenHandler> logger) : base(clientAuthenticationHelper, grantedTokenHelper, options)
+            ILogger<RefreshTokenHandler> logger) : base(clientAuthenticationHelper, options)
         {
             _refreshTokenGrantTypeValidator = refreshTokenGrantTypeValidator;
             _grantedTokenHelper = grantedTokenHelper;

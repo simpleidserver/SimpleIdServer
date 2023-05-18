@@ -5,7 +5,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Domains.DTOs;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
@@ -25,6 +24,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
     public class OAuthAuthorizationRequestValidator : IAuthorizationRequestValidator
     {
         private readonly IEnumerable<IResponseTypeHandler> _responseTypeHandlers;
+        private readonly IUserHelper _userHelper;
         private readonly IClientRepository _clientRepository;
         private readonly IGrantHelper _grantHelper;
         private readonly IAmrHelper _amrHelper;
@@ -34,9 +34,10 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
         private readonly IJwtBuilder _jwtBuilder;
         private readonly IdServerHostOptions _options;
 
-        public OAuthAuthorizationRequestValidator(IEnumerable<IResponseTypeHandler> responseTypeHandlers, IClientRepository clientRepository, IGrantHelper grantHelper, IAmrHelper amrHelper, IExtractRequestHelper extractRequestHelper, IEnumerable<IOAuthResponseMode> oauthResponseModes, IClientHelper clientHelper, IJwtBuilder jwtBuilder, IOptions<IdServerHostOptions> options)
+        public OAuthAuthorizationRequestValidator(IEnumerable<IResponseTypeHandler> responseTypeHandlers, IUserHelper userHelper, IClientRepository clientRepository, IGrantHelper grantHelper, IAmrHelper amrHelper, IExtractRequestHelper extractRequestHelper, IEnumerable<IOAuthResponseMode> oauthResponseModes, IClientHelper clientHelper, IJwtBuilder jwtBuilder, IOptions<IdServerHostOptions> options)
         {
             _responseTypeHandlers = responseTypeHandlers;
+            _userHelper = userHelper;
             _clientRepository = clientRepository;
             _grantHelper = grantHelper;
             _amrHelper = amrHelper;
@@ -86,7 +87,6 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                 throw new OAuthException(ErrorCodes.INVALID_AUTHORIZATION_DETAILS, string.Format(ErrorMessages.UNSUPPORTED_AUTHORIZATION_DETAILS_TYPES, string.Join(",", unsupportedAuthorizationDetailsTypes.Select(t => t.Type))));
 
             await CommonValidate(context, cancellationToken);
-            CheckOpenIdCredential(authDetails);
             var nonce = context.Request.RequestData.GetNonceFromAuthorizationRequest();
             var redirectUri = context.Request.RequestData.GetRedirectUriFromAuthorizationRequest();
             var responseTypes = context.Request.RequestData.GetResponseTypesFromAuthorizationRequest();
@@ -208,7 +208,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
             }
 
             var grantManagementAction = context.Request.RequestData.GetGrantManagementActionFromAuthorizationRequest();
-            if (string.IsNullOrWhiteSpace(grantManagementAction) && !context.User.HasOpenIDConsent(context.Realm, clientId, request, claims, authDetails))
+            if (string.IsNullOrWhiteSpace(grantManagementAction) && !_userHelper.HasOpenIDConsent(context.User, context.Realm, clientId, request, claims, authDetails))
             {
                 RedirectToConsentView(context);
             }
@@ -220,18 +220,6 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                 if (invalidClaims.Any())
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.INVALID_CLAIMS, string.Join(",", invalidClaims.Select(i => i.Name))));
             }
-        }
-
-        public static IEnumerable<AuthorizationData> CheckOpenIdCredential(ICollection<AuthorizationData> authDetails)
-        {
-            var openidCredentials = authDetails.Where(t => t.Type == Constants.StandardAuthorizationDetails.OpenIdCredential);
-            if (!openidCredentials.Any()) return null;
-            var missingFormat = openidCredentials.Any(t => !t.AdditionalData.Any(d => d.Key == AuthorizationDataParameters.Format));
-            if (missingFormat) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_OPENID_CREDENTIAL_FORMAT);
-            var allFormats = openidCredentials.SelectMany(t => t.AdditionalData).Where(d => d.Key == AuthorizationDataParameters.Format).Select(d => d.Value).Distinct();
-            var unexceptedFormats = allFormats.Where(f => !Vc.Constants.AllCredentialTemplateProfiles.Contains(f));
-            if (unexceptedFormats.Any()) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_CREDENTIALS_FORMAT, string.Join(",", unexceptedFormats)));
-            return openidCredentials;
         }
 
         protected virtual void RedirectToConsentView(HandlerContext context)

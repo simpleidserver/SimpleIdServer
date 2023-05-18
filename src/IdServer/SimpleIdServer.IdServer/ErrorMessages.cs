@@ -133,7 +133,6 @@ namespace SimpleIdServer.IdServer
         public const string MISSING_POST_LOGOUT_REDIRECT_URI = "the parameter post_logout_redirect_uri is missing";
         public const string MISSING_ID_TOKEN_HINT = "id_token_hint parameter is missing";
         public const string MISSING_RESPONSE_TYPE_CLAIM = "the response_type claim is missing";
-        public const string MISSING_OPENID_CREDENTIAL_FORMAT = "the authorization_details must contain a format";
         public const string MISSING_CLIENT_ID_CLAIM = "the client_id claim is missing";
         public const string UNSUPPORTED_USERINFO_SIGNED_RESPONSE_ALG = "userinfo_signed_response_alg is not supported";
         public const string UNSUPPORTED_TOKEN_ENCRYPTED_RESPONSE_ALG = "token_encrypted_response_alg is not supported";

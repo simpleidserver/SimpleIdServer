@@ -40,8 +40,6 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonPropertyName(AuthorizationDataParameters.Identifier)]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Identifier { get; set; } = null;
-        [JsonPropertyName(AuthorizationDataParameters.Types)]
-        public ICollection<string> Types { get; set; } = new List<string>();
         [JsonIgnore]
         public Dictionary<string, string> AdditionalData { get; set; } = new Dictionary<string, string>();
 
@@ -63,10 +61,10 @@ namespace SimpleIdServer.IdServer.Domains
             DataTypes.Add(type);
         }
 
-        public void AddType(string type)
+        public void AddAdditionalData(string key, string value)
         {
-            if (type == null) Types = new List<string>();
-            Types.Add(type);
+            if (AdditionalData == null) AdditionalData = new Dictionary<string, string>();
+            AdditionalData.Add(key, value);
         }
 
         public Dictionary<string, object> Serialize()
@@ -83,9 +81,6 @@ namespace SimpleIdServer.IdServer.Domains
 
             if (DataTypes != null && DataTypes.Any())
                 result.Add(AuthorizationDataParameters.DataTypes, DataTypes);
-
-            if (Types != null && Types.Any())
-                result.Add(AuthorizationDataParameters.Types, Types);
 
             if (!string.IsNullOrWhiteSpace(Identifier))
                 result.Add(AuthorizationDataParameters.Identifier, Identifier);

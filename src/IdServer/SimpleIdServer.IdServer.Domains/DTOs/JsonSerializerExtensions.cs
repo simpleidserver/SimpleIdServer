@@ -53,9 +53,6 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
                         case AuthorizationDataParameters.DataTypes:
                             result.DataTypes = record.Value.AsArray().Select(v => v.GetValue<string>()).ToList();
                             break;
-                        case AuthorizationDataParameters.Types:
-                            result.Types = record.Value.AsArray().Select(v => v.GetValue<string>()).ToList();
-                            break;
                         default:
                             var val = record.Value as JsonValue;
                             if (val != null) result.AdditionalData.Add(record.Key, record.Value.GetValue<string>());

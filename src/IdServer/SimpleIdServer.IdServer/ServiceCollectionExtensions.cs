@@ -240,6 +240,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IMapperClaimsExtractor, UserPropertyClaimsExtractor>();
             services.AddTransient<IMapperClaimsExtractor, UserAddressClaimsExtractor>();
             services.AddTransient<IMapperClaimsExtractor, UserSubClaimsExtractor>();
+            services.AddTransient<IUserHelper, UserHelper>();
+            services.AddTransient<IPreAuthorizedCodeValidator, PreAuthorizedCodeValidator>();
             services.AddTransient<IKeyStore, InMemoryKeyStore>();
             return services;
         }
