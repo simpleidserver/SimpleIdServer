@@ -3,8 +3,10 @@
 using SimpleIdServer.Vc.DTOs;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading;
 
 namespace SimpleIdServer.Vc.Models
 {
@@ -35,6 +37,15 @@ namespace SimpleIdServer.Vc.Models
         public ICollection<CredentialTemplateDisplay> DisplayLst { get; set; } = new List<CredentialTemplateDisplay>();
         [JsonIgnore]
         public ICollection<CredentialTemplateParameter> Parameters { get; set; } = new List<CredentialTemplateParameter>();
+
+        public CredentialTemplateDisplay Display
+        {
+            get
+            {
+                var result = DisplayLst.FirstOrDefault(d => d.Locale == Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName);
+                return result ?? DisplayLst.FirstOrDefault();
+            }
+        }
 
         public string Serialize() => JsonSerializer.Serialize(this);
     }

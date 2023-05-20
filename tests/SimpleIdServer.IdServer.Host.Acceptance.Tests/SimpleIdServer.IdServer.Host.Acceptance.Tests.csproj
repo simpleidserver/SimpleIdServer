@@ -15,6 +15,7 @@
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\ClientAuths\ClientSecretJwtAuthenticationErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\ClientAuths\ClientSelfSignedTlsAuthenticationErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\ClientCredentialsGrantTypeErrors - Copier.feature.cs" />
+	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\Credential - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\CredentialOfferErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\GrantErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\Grants - Copier.feature.cs" />
@@ -67,6 +68,9 @@
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Tests\SimpleIdServer.IdServer.Tests.csproj" />
 	</ItemGroup>
 	<ItemGroup>
+	  <Compile Update="Features\CredentialErrors.feature.cs">
+	    <DependentUpon>CredentialErrors.feature</DependentUpon>
+	  </Compile>
 	  <Compile Update="Features\Credential.feature.cs">
 	    <DependentUpon>Credential.feature</DependentUpon>
 	  </Compile>
@@ -222,6 +226,10 @@
 	  </Compile>
 	</ItemGroup>
 	<ItemGroup>
+	  <SpecFlowFeatureFiles Update="Features\CredentialErrors.feature">
+	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
+	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+	  </SpecFlowFeatureFiles>
 	  <SpecFlowFeatureFiles Update="Features\Credential.feature">
 	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
 	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>

@@ -47,6 +47,11 @@
 	    <AutoGen>True</AutoGen>
 	    <DependentUpon>AuthenticatePasswordResource.resx</DependentUpon>
 	  </Compile>
+	  <Compile Update="Resources\CredentialsResource.Designer.cs">
+	    <DependentUpon>CredentialsResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
 	  <Compile Update="Resources\ScopesResource.Designer.cs">
 	    <DependentUpon>ScopesResource.resx</DependentUpon>
 	    <DesignTime>True</DesignTime>
@@ -103,6 +108,10 @@
 	  <EmbeddedResource Update="Resources\AuthenticatePasswordResource.resx">
 	    <Generator>PublicResXFileCodeGenerator</Generator>
 	    <LastGenOutput>AuthenticatePasswordResource.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Resources\CredentialsResource.resx">
+	    <LastGenOutput>CredentialsResource.Designer.cs</LastGenOutput>
+	    <Generator>PublicResXFileCodeGenerator</Generator>
 	  </EmbeddedResource>
 	  <EmbeddedResource Update="Resources\ScopesResource.resx">
 	    <LastGenOutput>ScopesResource.Designer.cs</LastGenOutput>

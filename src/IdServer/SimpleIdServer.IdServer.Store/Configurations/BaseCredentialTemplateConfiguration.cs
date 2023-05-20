@@ -11,6 +11,7 @@ namespace SimpleIdServer.IdServer.Store.Configurations
         public void Configure(EntityTypeBuilder<BaseCredentialTemplate> builder)
         {
             builder.HasKey(c => c.TechnicalId);
+            builder.Ignore(c => c.Display);
             builder.HasMany(c => c.DisplayLst).WithOne(c => c.CredentialTemplate).HasForeignKey(c => c.CredentialTemplateId).OnDelete(DeleteBehavior.Cascade);
             builder.HasMany(c => c.Parameters).WithOne(c => c.CredentialTemplate).HasForeignKey(c => c.CredentialTemplateId).OnDelete(DeleteBehavior.Cascade);
         }

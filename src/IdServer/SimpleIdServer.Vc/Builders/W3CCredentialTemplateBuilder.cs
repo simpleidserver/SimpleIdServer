@@ -24,7 +24,7 @@ namespace SimpleIdServer.Vc.Builders
                         Id = Guid.NewGuid().ToString(),
                         Name = name,
                         LogoUrl = logoUrl,
-                        Locale = "en-US"
+                        Locale = "en"
                     }
                 }
             };

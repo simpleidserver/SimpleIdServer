@@ -19,7 +19,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class RevokeTokenFeature : object, Xunit.IClassFixture<RevokeTokenFeature.FixtureData>, System.IDisposable
+    public partial class CredentialErrorsFeature : object, Xunit.IClassFixture<CredentialErrorsFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
@@ -28,10 +28,10 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
-#line 1 "RevokeToken.feature"
+#line 1 "CredentialErrors.feature"
 #line hidden
         
-        public RevokeTokenFeature(RevokeTokenFeature.FixtureData fixtureData, SimpleIdServer_IdServer_Host_Acceptance_Tests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
+        public CredentialErrorsFeature(CredentialErrorsFeature.FixtureData fixtureData, SimpleIdServer_IdServer_Host_Acceptance_Tests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
             this.TestInitialize();
@@ -40,7 +40,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "RevokeToken", "\tRevoke access token or refresh token", ProgrammingLanguage.CSharp, featureTags);
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "CredentialErrors", "\tCheck errors returned by the credential endpoint", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -80,14 +80,14 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Revoke access_token")]
-        [Xunit.TraitAttribute("FeatureTitle", "RevokeToken")]
-        [Xunit.TraitAttribute("Description", "Revoke access_token")]
-        public void RevokeAccess_Token()
+        [Xunit.SkippableFactAttribute(DisplayName="access token is required")]
+        [Xunit.TraitAttribute("FeatureTitle", "CredentialErrors")]
+        [Xunit.TraitAttribute("Description", "access token is required")]
+        public void AccessTokenIsRequired()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Revoke access_token", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("access token is required", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 4
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -98,50 +98,64 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table414 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table127 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table414.AddRow(new string[] {
-                            "client_id",
-                            "firstClient"});
-                table414.AddRow(new string[] {
-                            "client_secret",
-                            "password"});
-                table414.AddRow(new string[] {
-                            "scope",
-                            "firstScope"});
-                table414.AddRow(new string[] {
-                            "grant_type",
-                            "client_credentials"});
 #line 5
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table414, "When ");
+ testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/credential\'", ((string)(null)), table127, "When ");
 #line hidden
-#line 12
+#line 8
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 13
- testRunner.And("extract parameter \'$.access_token\' from JSON body into \'accessToken\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 10
+ testRunner.Then("JSON \'error\'=\'access_denied\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-                TechTalk.SpecFlow.Table table415 = new TechTalk.SpecFlow.Table(new string[] {
+#line 11
+ testRunner.And("JSON \'error_description\'=\'missing token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="access token must be valid")]
+        [Xunit.TraitAttribute("FeatureTitle", "CredentialErrors")]
+        [Xunit.TraitAttribute("Description", "access token must be valid")]
+        public void AccessTokenMustBeValid()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("access token must be valid", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 13
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table128 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table415.AddRow(new string[] {
-                            "client_id",
-                            "firstClient"});
-                table415.AddRow(new string[] {
-                            "client_secret",
-                            "password"});
-                table415.AddRow(new string[] {
-                            "token",
-                            "$accessToken$"});
-                table415.AddRow(new string[] {
-                            "token_type_hint",
-                            "access_token"});
-#line 15
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token/revoke\'", ((string)(null)), table415, "When ");
+                table128.AddRow(new string[] {
+                            "Authorization",
+                            "Bearer INVALID"});
+#line 14
+ testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/credential\'", ((string)(null)), table128, "When ");
+#line hidden
+#line 18
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 20
+ testRunner.Then("HTTP status code equals to \'401\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 21
+ testRunner.And("JSON \'error\'=\'invalid_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 22
- testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("JSON \'error_description\'=\'either the access token has been revoked or is invalid\'" +
+                        "", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -154,12 +168,12 @@ this.ScenarioInitialize(scenarioInfo);
             
             public FixtureData()
             {
-                RevokeTokenFeature.FeatureSetup();
+                CredentialErrorsFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                RevokeTokenFeature.FeatureTearDown();
+                CredentialErrorsFeature.FeatureTearDown();
             }
         }
     }

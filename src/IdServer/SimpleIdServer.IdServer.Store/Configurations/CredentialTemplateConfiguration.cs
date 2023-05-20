@@ -10,6 +10,7 @@ namespace SimpleIdServer.IdServer.Store.Configurations
     {
         public void Configure(EntityTypeBuilder<CredentialTemplate> builder)
         {
+
         }
     }
 }

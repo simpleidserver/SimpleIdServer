@@ -22,14 +22,14 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class LayoutResource {
+    public class CredentialsResource {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal LayoutResource() {
+        internal CredentialsResource() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.IdServer.Startup.Resources.LayoutResource", typeof(LayoutResource).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.IdServer.Startup.Resources.CredentialsResource", typeof(CredentialsResource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,83 +61,20 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Authenticate.
+        ///   Recherche une chaîne localisée semblable à Share.
         /// </summary>
-        public static string authenticate {
+        public static string share {
             get {
-                return ResourceManager.GetString("authenticate", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à Choose active session.
-        /// </summary>
-        public static string choose_session {
-            get {
-                return ResourceManager.GetString("choose_session", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à Consents.
-        /// </summary>
-        public static string consents {
-            get {
-                return ResourceManager.GetString("consents", resourceCulture);
+                return ResourceManager.GetString("share", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Recherche une chaîne localisée semblable à Credentials.
         /// </summary>
-        public static string credentials {
+        public static string title {
             get {
-                return ResourceManager.GetString("credentials", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à Disconnect.
-        /// </summary>
-        public static string disconnect {
-            get {
-                return ResourceManager.GetString("disconnect", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à English.
-        /// </summary>
-        public static string en {
-            get {
-                return ResourceManager.GetString("en", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à French.
-        /// </summary>
-        public static string fr {
-            get {
-                return ResourceManager.GetString("fr", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à Languages.
-        /// </summary>
-        public static string languages {
-            get {
-                return ResourceManager.GetString("languages", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à Language is {0}.
-        /// </summary>
-        public static string selected_language {
-            get {
-                return ResourceManager.GetString("selected_language", resourceCulture);
+                return ResourceManager.GetString("title", resourceCulture);
             }
         }
     }
