@@ -128,6 +128,13 @@ namespace SimpleIdServer.IdServer.Builders
 
         #endregion
 
+        public UserBuilder SetDID(string did, string privateKey)
+        {
+            _user.Did = did;
+            _user.DidPrivateHex = privateKey;
+            return this;
+        }
+
         public UserBuilder AddSession(string id, string realm, DateTime expirationTime)
         {
             _user.Sessions.Add(new UserSession { SessionId = id, AuthenticationDateTime = DateTime.UtcNow, ExpirationDateTime = expirationTime, State = UserSessionStates.Active, Realm = realm });

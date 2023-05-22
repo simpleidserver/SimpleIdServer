@@ -80,14 +80,14 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="get a credential_offer url")]
+        [Xunit.SkippableFactAttribute(DisplayName="user shares his credentials")]
         [Xunit.TraitAttribute("FeatureTitle", "CredentialOffer")]
-        [Xunit.TraitAttribute("Description", "get a credential_offer url")]
-        public void GetACredential_OfferUrl()
+        [Xunit.TraitAttribute("Description", "user shares his credentials")]
+        public void UserSharesHisCredentials()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("get a credential_offer url", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("user shares his credentials", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 4
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -101,77 +101,32 @@ this.ScenarioInitialize(scenarioInfo);
 #line 5
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table130 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table161 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table130.AddRow(new string[] {
-                            "response_type",
-                            "code"});
-                table130.AddRow(new string[] {
-                            "client_id",
-                            "fiftyEightClient"});
-                table130.AddRow(new string[] {
-                            "state",
-                            "state"});
-                table130.AddRow(new string[] {
-                            "response_mode",
-                            "query"});
-                table130.AddRow(new string[] {
-                            "redirect_uri",
-                            "http://localhost:8080"});
-                table130.AddRow(new string[] {
-                            "nonce",
-                            "nonce"});
-                table130.AddRow(new string[] {
-                            "scope",
-                            "credential_offer"});
+                table161.AddRow(new string[] {
+                            "wallet_client_id",
+                            "fiftyNineClient"});
+                table161.AddRow(new string[] {
+                            "credential_template_id",
+                            "credTemplate"});
 #line 7
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table130, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table161, "When ");
 #line hidden
-#line 17
- testRunner.And("extract parameter \'code\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-                TechTalk.SpecFlow.Table table131 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table131.AddRow(new string[] {
-                            "client_id",
-                            "fiftyEightClient"});
-                table131.AddRow(new string[] {
-                            "client_secret",
-                            "password"});
-                table131.AddRow(new string[] {
-                            "grant_type",
-                            "authorization_code"});
-                table131.AddRow(new string[] {
-                            "code",
-                            "$code$"});
-                table131.AddRow(new string[] {
-                            "redirect_uri",
-                            "http://localhost:8080"});
-#line 19
- testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table131, "And ");
-#line hidden
-#line 27
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 28
- testRunner.And("extract parameter \'$.access_token\' from JSON body into \'accessToken\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-                TechTalk.SpecFlow.Table table132 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table132.AddRow(new string[] {
-                            "Authorization",
-                            "Bearer $accessToken$"});
-#line 30
- testRunner.And("execute HTTP GET request \'http://localhost/credential_offer/credentialOfferId\'", ((string)(null)), table132, "And ");
-#line hidden
-#line 34
+#line 12
  testRunner.And("extract query parameters into JSON", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 36
- testRunner.Then("JSON exists \'credential_offer\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 13
+ testRunner.And("extract query parameter \'credential_offer\' into JSON", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 15
+ testRunner.Then("JSON exists \'credential_issuer\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 16
+ testRunner.And("JSON exists \'grants\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 17
+ testRunner.And("JSON exists \'credentials\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();

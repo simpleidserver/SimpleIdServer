@@ -19,9 +19,12 @@ namespace SimpleIdServer.Did.Jwt
             if (!string.IsNullOrEmpty(verificationMethodId)) verificationMethod = identityDocument.VerificationMethod.First(m => m.Id == verificationMethodId);
             var alg = Constants.SupportedPublicKeyTypes.First(kvp => kvp.Value.Contains(verificationMethod.Type)).Key;
             var signatureKey = SignatureKeyFactory.Build(verificationMethod, alg, privateKeyPayload);
-            securityTokenDescriptor.SigningCredentials = new SigningCredentials(new DidSecurityKey(signatureKey), alg);
-            var handler = new JsonWebTokenHandler();
-            return handler.CreateToken(securityTokenDescriptor);
+            using (var securityKey = new DidSecurityKey(signatureKey))
+            {
+                securityTokenDescriptor.SigningCredentials = new SigningCredentials(new DidSecurityKey(signatureKey), alg);
+                var handler = new JsonWebTokenHandler();
+                return handler.CreateToken(securityTokenDescriptor);
+            }
         }
     }
 }

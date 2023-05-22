@@ -2,10 +2,11 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.Did.Crypto;
+using System;
 
 namespace SimpleIdServer.Did.Jwt
 {
-    public class DidSecurityKey : AsymmetricSecurityKey
+    public class DidSecurityKey : AsymmetricSecurityKey, IDisposable
     {
         private readonly ISignatureKey _signatureKey;
 
@@ -20,5 +21,10 @@ namespace SimpleIdServer.Did.Jwt
         public override PrivateKeyStatus PrivateKeyStatus => throw new System.NotImplementedException();
 
         public override int KeySize => throw new System.NotImplementedException();
+
+        public void Dispose()
+        {
+            CryptoProviderFactory.CustomCryptoProvider = null;
+        }
     }
 }

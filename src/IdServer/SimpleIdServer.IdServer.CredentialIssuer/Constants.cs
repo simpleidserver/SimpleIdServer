@@ -16,5 +16,10 @@ namespace SimpleIdServer.IdServer.CredentialIssuer
         {
             public const string OpenIdCredential = "openid_credential";
         }
+
+        public static class StandardProofTypes
+        {
+            public const string Jwt = "jwt";
+        }
     }
 }

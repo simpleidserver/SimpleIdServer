@@ -5,6 +5,7 @@ using Org.BouncyCastle.Asn1.Sec;
 using SimpleIdServer.Did.Extensions;
 using SimpleIdServer.Did.Models;
 using System;
+using System.Linq;
 
 namespace SimpleIdServer.Did.Crypto
 {
@@ -32,6 +33,13 @@ namespace SimpleIdServer.Did.Crypto
         {
             if (!string.IsNullOrWhiteSpace(validationMethod.PublicKeyBase64)) return Convert.FromBase64String(validationMethod.PublicKeyBase64);
             if (!string.IsNullOrWhiteSpace(validationMethod.PublicKeyHex)) return validationMethod.PublicKeyHex.HexToByteArray();
+            if(validationMethod.AdditionalParameters.ContainsKey("publicKeyMultibase"))
+            {
+                var publicKeyMultiBase = validationMethod.AdditionalParameters["publicKeyMultibase"].TrimStart('z');
+                var decoded = Encoding.Base58Encoding.Decode(publicKeyMultiBase);
+                return decoded.Skip(3).ToArray();
+            }
+
             if (validationMethod.PublicKeyJwk != null && validationMethod.PublicKeyJwk.ContainsKey("crv") && validationMethod.PublicKeyJwk.ContainsKey("x") && validationMethod.PublicKeyJwk.ContainsKey("y"))
             {
                 var crv = validationMethod.PublicKeyJwk["crv"].GetValue<string>();

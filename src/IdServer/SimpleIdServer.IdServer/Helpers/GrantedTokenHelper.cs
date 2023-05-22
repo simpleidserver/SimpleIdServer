@@ -41,6 +41,7 @@ namespace SimpleIdServer.IdServer.Helpers
         Task RemoveAuthorizationCode(string code, CancellationToken cancellationToken);
         Task AddPreAuthCode(string preAuthorizationCode, string pin, string clientId, string userId, double validityPeriodsInSeconds, CancellationToken cancellationToken);
         Task<PreAuthCode> GetPreAuthCode(string preAuthorizationCode, CancellationToken cancellationToken);
+        Task RemovePreAuthCode(string preAuthorizationCode, CancellationToken cancellationToken);
     }
 
     public class AuthCode
@@ -250,6 +251,8 @@ namespace SimpleIdServer.IdServer.Helpers
                 SlidingExpiration = TimeSpan.FromSeconds(validityPeriodsInSeconds)
             }, cancellationToken);
         }
+
+        public Task RemovePreAuthCode(string preAuthorizationCode, CancellationToken cancellationToken) => _distributedCache.RemoveAsync(preAuthorizationCode, cancellationToken);
 
         public async Task<PreAuthCode> GetPreAuthCode(string preAuthorizationCode, CancellationToken cancellationToken)
         {

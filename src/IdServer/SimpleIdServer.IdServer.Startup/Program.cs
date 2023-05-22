@@ -100,6 +100,7 @@ void RunSqlServerIdServer(IServiceCollection services)
                 opts.Scope.Add("profile");
             });
         });
+    services.AddDIDKey();
 }
 
 void SeedData(WebApplication application, string scimBaseUrl)

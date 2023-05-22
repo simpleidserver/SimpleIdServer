@@ -80,14 +80,14 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="access token is required")]
+        [Xunit.SkippableFactAttribute(DisplayName="wallet_client_id parameter is required (share)")]
         [Xunit.TraitAttribute("FeatureTitle", "CredentialOfferErrors")]
-        [Xunit.TraitAttribute("Description", "access token is required")]
-        public void AccessTokenIsRequired()
+        [Xunit.TraitAttribute("Description", "wallet_client_id parameter is required (share)")]
+        public void Wallet_Client_IdParameterIsRequiredShare()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("access token is required", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("wallet_client_id parameter is required (share)", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 4
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -98,34 +98,40 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table133 = new TechTalk.SpecFlow.Table(new string[] {
+#line 5
+ testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table162 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-#line 5
- testRunner.When("execute HTTP GET request \'http://localhost/credential_offer/id\'", ((string)(null)), table133, "When ");
-#line hidden
-#line 8
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 7
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table162, "When ");
 #line hidden
 #line 10
- testRunner.Then("JSON \'error\'=\'access_denied\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 11
- testRunner.And("JSON \'error_description\'=\'missing token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 12
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 13
+ testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 14
+ testRunner.Then("JSON \'error_description\'=\'the parameter wallet_client_id is missing\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="accesss token is not valid")]
+        [Xunit.SkippableFactAttribute(DisplayName="credential_template_id parameter is required (share)")]
         [Xunit.TraitAttribute("FeatureTitle", "CredentialOfferErrors")]
-        [Xunit.TraitAttribute("Description", "accesss token is not valid")]
-        public void AccesssTokenIsNotValid()
+        [Xunit.TraitAttribute("Description", "credential_template_id parameter is required (share)")]
+        public void Credential_Template_IdParameterIsRequiredShare()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("accesss token is not valid", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 13
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("credential_template_id parameter is required (share)", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 16
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -135,22 +141,197 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table134 = new TechTalk.SpecFlow.Table(new string[] {
+#line 17
+ testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table163 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table134.AddRow(new string[] {
-                            "Authorization",
-                            "Bearer AT"});
-#line 14
- testRunner.When("execute HTTP GET request \'http://localhost/credential_offer/id\'", ((string)(null)), table134, "When ");
+#line 19
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table163, "When ");
 #line hidden
-#line 18
+#line 22
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 20
+#line 24
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 25
+ testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 26
+ testRunner.Then("JSON \'error_description\'=\'the parameter credential_template_id is missing\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="credential template must exists (share)")]
+        [Xunit.TraitAttribute("FeatureTitle", "CredentialOfferErrors")]
+        [Xunit.TraitAttribute("Description", "credential template must exists (share)")]
+        public void CredentialTemplateMustExistsShare()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("credential template must exists (share)", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 28
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 29
+ testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table164 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table164.AddRow(new string[] {
+                            "wallet_client_id",
+                            "unknown"});
+                table164.AddRow(new string[] {
+                            "credential_template_id",
+                            "unknown"});
+#line 31
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table164, "When ");
+#line hidden
+#line 36
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 38
+ testRunner.Then("HTTP status code equals to \'404\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 39
+ testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 40
+ testRunner.Then("JSON \'error_description\'=\'the credential template unknown doesn\'t exist\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="the wallet must exists (share)")]
+        [Xunit.TraitAttribute("FeatureTitle", "CredentialOfferErrors")]
+        [Xunit.TraitAttribute("Description", "the wallet must exists (share)")]
+        public void TheWalletMustExistsShare()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("the wallet must exists (share)", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 42
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 43
+ testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table165 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table165.AddRow(new string[] {
+                            "wallet_client_id",
+                            "unknown"});
+                table165.AddRow(new string[] {
+                            "credential_template_id",
+                            "credentialOfferId"});
+#line 45
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table165, "When ");
+#line hidden
+#line 50
+ testRunner.Then("HTTP status code equals to \'404\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 51
+ testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 52
+ testRunner.Then("JSON \'error_description\'=\'the wallet unknown doesn\'t exist\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="access token is required (get)")]
+        [Xunit.TraitAttribute("FeatureTitle", "CredentialOfferErrors")]
+        [Xunit.TraitAttribute("Description", "access token is required (get)")]
+        public void AccessTokenIsRequiredGet()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("access token is required (get)", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 54
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table166 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+#line 55
+ testRunner.When("execute HTTP GET request \'http://localhost/credential_offer/id\'", ((string)(null)), table166, "When ");
+#line hidden
+#line 58
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 60
+ testRunner.Then("JSON \'error\'=\'access_denied\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 61
+ testRunner.And("JSON \'error_description\'=\'missing token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="accesss token is not valid (get)")]
+        [Xunit.TraitAttribute("FeatureTitle", "CredentialOfferErrors")]
+        [Xunit.TraitAttribute("Description", "accesss token is not valid (get)")]
+        public void AccesssTokenIsNotValidGet()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("accesss token is not valid (get)", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 63
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table167 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table167.AddRow(new string[] {
+                            "Authorization",
+                            "Bearer AT"});
+#line 64
+ testRunner.When("execute HTTP GET request \'http://localhost/credential_offer/id\'", ((string)(null)), table167, "When ");
+#line hidden
+#line 68
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 70
  testRunner.Then("JSON \'error\'=\'invalid_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 21
+#line 71
  testRunner.And("JSON \'error_description\'=\'either the access token has been revoked or is invalid\'" +
                         "", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
@@ -158,15 +339,15 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="cannot get an unknown credential offer")]
+        [Xunit.SkippableFactAttribute(DisplayName="cannot get an unknown credential offer (get)")]
         [Xunit.TraitAttribute("FeatureTitle", "CredentialOfferErrors")]
-        [Xunit.TraitAttribute("Description", "cannot get an unknown credential offer")]
-        public void CannotGetAnUnknownCredentialOffer()
+        [Xunit.TraitAttribute("Description", "cannot get an unknown credential offer (get)")]
+        public void CannotGetAnUnknownCredentialOfferGet()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("cannot get an unknown credential offer", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 23
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("cannot get an unknown credential offer (get)", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 73
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -176,86 +357,86 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 24
+#line 74
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table135 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table168 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table135.AddRow(new string[] {
+                table168.AddRow(new string[] {
                             "response_type",
                             "code"});
-                table135.AddRow(new string[] {
+                table168.AddRow(new string[] {
                             "client_id",
                             "fiftyEightClient"});
-                table135.AddRow(new string[] {
+                table168.AddRow(new string[] {
                             "state",
                             "state"});
-                table135.AddRow(new string[] {
+                table168.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table135.AddRow(new string[] {
+                table168.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table135.AddRow(new string[] {
+                table168.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table135.AddRow(new string[] {
+                table168.AddRow(new string[] {
                             "scope",
                             "credential_offer"});
-#line 26
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table135, "When ");
+#line 76
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table168, "When ");
 #line hidden
-#line 36
+#line 86
  testRunner.And("extract parameter \'code\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table136 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table169 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table136.AddRow(new string[] {
+                table169.AddRow(new string[] {
                             "client_id",
                             "fiftyEightClient"});
-                table136.AddRow(new string[] {
+                table169.AddRow(new string[] {
                             "client_secret",
                             "password"});
-                table136.AddRow(new string[] {
+                table169.AddRow(new string[] {
                             "grant_type",
                             "authorization_code"});
-                table136.AddRow(new string[] {
+                table169.AddRow(new string[] {
                             "code",
                             "$code$"});
-                table136.AddRow(new string[] {
+                table169.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-#line 38
- testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table136, "And ");
+#line 88
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table169, "And ");
 #line hidden
-#line 46
+#line 96
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 47
+#line 97
  testRunner.And("extract parameter \'$.access_token\' from JSON body into \'accessToken\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table137 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table170 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table137.AddRow(new string[] {
+                table170.AddRow(new string[] {
                             "Authorization",
                             "Bearer $accessToken$"});
-#line 49
+#line 99
  testRunner.And("execute HTTP GET request \'http://localhost/credential_offer/unknownCredentialOffe" +
-                        "r\'", ((string)(null)), table137, "And ");
+                        "r\'", ((string)(null)), table170, "And ");
 #line hidden
-#line 53
+#line 103
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 55
+#line 105
  testRunner.Then("HTTP status code equals to \'404\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 56
+#line 106
  testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 57
+#line 107
  testRunner.Then("JSON \'error_description\'=\'the credential offer doesn\'t exist\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }

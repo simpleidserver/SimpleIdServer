@@ -22,7 +22,7 @@ builder.Services.AddSIDIdentityServer(o =>
         o.AddInMemoryApiResources(IdServerConfiguration.ApiResources);
         o.AddInMemoryUMAResources(IdServerConfiguration.UmaResources);
         o.AddInMemoryGroups(IdServerConfiguration.Groups);
-        o.AddInMemoryCredentialOffers(IdServerConfiguration.CredentialOffers);
+        o.AddInMemoryCredentialTemplates(IdServerConfiguration.CredTemplates);
         o.AddInMemoryKeys(SimpleIdServer.IdServer.Constants.StandardRealms.Master, new List<SigningCredentials>
         {
             new SigningCredentials(BuildRsaSecurityKey("keyid"), SecurityAlgorithms.RsaSha256),
@@ -50,6 +50,7 @@ builder.Services.AddSIDIdentityServer(o =>
             m.RevocationMode = System.Security.Cryptography.X509Certificates.X509RevocationMode.NoCheck;
         });
     });
+builder.Services.AddDIDKey();
 var app = builder.Build()
     .UseCredentialIssuer()
     .UseSID();

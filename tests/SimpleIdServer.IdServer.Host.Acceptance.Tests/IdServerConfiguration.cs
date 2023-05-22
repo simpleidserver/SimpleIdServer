@@ -1,12 +1,13 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using MassTransit.Monitoring;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.Vc.Builders;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text.Json;
 using static SimpleIdServer.IdServer.Constants;
@@ -15,6 +16,9 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
 {
     public class IdServerConfiguration
     {
+        public const string DidKey = "did:key:zQ3shRd8JuxBEFhLzUE6rasi4cxM3SWdKk5atZn77skrq6LYF";
+        public const string PrivateKey = "53bad9040c535a6ae7f2b6272034ae37d62459b8188d6b362c249d351f5d135d";
+
         public static Dictionary<string, SigningCredentials> ClientSigningCredentials = new Dictionary<string, SigningCredentials>
         {
             { "sevenClient", new SigningCredentials(new RsaSecurityKey(RSA.Create()) { KeyId = "keyId" }, SecurityAlgorithms.RsaSha256) },
@@ -98,6 +102,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                         { "types", JsonSerializer.Serialize(new List<string> { "VerifiableCredential", "UniversityDegreeCredential" }) }
                     }
                 })
+                .SetDID(DidKey, PrivateKey)
                 .AddSession("sessionId", SimpleIdServer.IdServer.Constants.DefaultRealm, DateTime.UtcNow.AddDays(2)).Build();
 
         public static List<Group> Groups => new List<Group>
@@ -198,11 +203,6 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             User
         };
 
-        public static List<UserCredentialOffer> CredentialOffers = new List<UserCredentialOffer>
-        {
-            CredentialOfferBuilder.New("credentialOfferId", new List<string> { "VerifiableCredential", "UniversityDegreeCredential" }, IdServerConfiguration.Users.First()).Build()
-        };
-
         public static List<UMAResource> UmaResources = new List<UMAResource>
         {
             UMAResourceBuilder.Create("id", "read", "write").Build()
@@ -211,6 +211,11 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
         public static List<SimpleIdServer.IdServer.Domains.Realm> Realms = new List<SimpleIdServer.IdServer.Domains.Realm>
         {
             SimpleIdServer.IdServer.Constants.StandardRealms.Master
+        };
+
+        public static List<CredentialTemplate> CredTemplates = new List<CredentialTemplate>
+        {
+            new CredentialTemplate(W3CCredentialTemplateBuilder.New("credTemplate", "UniversityDegree", "http://localhost", "UniversityDegree").Build())
         };
     }
 }

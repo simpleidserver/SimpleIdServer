@@ -6,7 +6,7 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
 {
     public class CredentialTemplateViewModel
     {
-        public string? Id { get; set; } = null;
+        public string Id { get; set; } = null!;
         public CredentialTemplateDisplay? Display {  get; set; } = null;
     }
 }

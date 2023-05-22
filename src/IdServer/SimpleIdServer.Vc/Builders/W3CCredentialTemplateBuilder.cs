@@ -8,11 +8,13 @@ namespace SimpleIdServer.Vc.Builders
     {
         protected W3CCredentialTemplateBuilder(W3CCredentialTemplate credentialTemplate) : base(credentialTemplate) { }
 
-        public static W3CCredentialTemplateBuilder New(string name, string logoUrl, string type)
+        public static W3CCredentialTemplateBuilder New(string name, string logoUrl, string type) => New(Guid.NewGuid().ToString(), name, logoUrl, type);
+
+        public static W3CCredentialTemplateBuilder New(string id, string name, string logoUrl, string type)
         {
             var result = new W3CCredentialTemplate
             {
-                TechnicalId = Guid.NewGuid().ToString(),
+                TechnicalId = id,
                 Id = $"{name}_JWT",
                 Format = Vc.Constants.CredentialTemplateProfiles.W3CVerifiableCredentials,
                 CreateDateTime = DateTime.UtcNow,

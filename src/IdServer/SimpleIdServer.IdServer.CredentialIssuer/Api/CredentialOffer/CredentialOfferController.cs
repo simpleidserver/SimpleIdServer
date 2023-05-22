@@ -37,10 +37,11 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialOffer
         private readonly IUserRepository _userRepository;
         private readonly IClientRepository _clientRepository;
         private readonly IEnumerable<IUserNotificationService> _notificationServices;
+        private readonly IGrantedTokenHelper _grantedTokenHelper;
         private readonly UrlEncoder _urlEncoder;
         private readonly IdServerHostOptions _options;
 
-        public CredentialOfferController(ICredentialTemplateRepository credentialTemplateRepository, ICredentialOfferRepository credentialOfferRepository, IAuthenticationHelper authenticationHelper, IUserRepository userRepository, IClientRepository clientRepository, IEnumerable<IUserNotificationService> notificationServices, UrlEncoder urlEncoder, IOptions<IdServerHostOptions> options)
+        public CredentialOfferController(ICredentialTemplateRepository credentialTemplateRepository, ICredentialOfferRepository credentialOfferRepository, IAuthenticationHelper authenticationHelper, IUserRepository userRepository, IClientRepository clientRepository, IEnumerable<IUserNotificationService> notificationServices, IGrantedTokenHelper grantedTokenHelper, UrlEncoder urlEncoder, IOptions<IdServerHostOptions> options)
         {
             _credentialTemplateRepository = credentialTemplateRepository;
             _credentialOfferRepository = credentialOfferRepository;
@@ -48,67 +49,27 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialOffer
             _userRepository = userRepository;
             _clientRepository = clientRepository;
             _notificationServices = notificationServices;
+            _grantedTokenHelper = grantedTokenHelper;
             _urlEncoder = urlEncoder;
             _options = options.Value;
         }
 
         [HttpPost]
         [Authorize(IdServer.Constants.Policies.Authenticated)]
+        public async Task<IActionResult> ShareQR([FromRoute] string prefix, [FromBody] ShareCredentialTemplateRequest request, CancellationToken cancellationToken)
+        {
+            var kvp = await InternalShare(prefix, request, cancellationToken);
+            if (kvp.Item1 != null) return kvp.Item1;
+            return GetQRCode(kvp.Item2);
+        }
+
+        [HttpPost]
+        [Authorize(IdServer.Constants.Policies.Authenticated)]
         public async Task<IActionResult> Share([FromRoute] string prefix, [FromBody] ShareCredentialTemplateRequest request, CancellationToken cancellationToken)
         {
-            prefix = prefix ?? SimpleIdServer.IdServer.Constants.DefaultRealm;
-            if (request == null) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.MALFROMED_INCOMING_REQUEST);
-            if (string.IsNullOrWhiteSpace(request.WalletClientId)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, nameof(ShareCredentialTemplateRequest.WalletClientId)));
-            if (string.IsNullOrWhiteSpace(request.CredentialTemplateId)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, nameof(ShareCredentialTemplateRequest.CredentialTemplateId)));
-            var credentialTemplate = await _credentialTemplateRepository.Query().AsNoTracking().SingleOrDefaultAsync(c => c.TechnicalId == request.CredentialTemplateId, cancellationToken);
-            if (credentialTemplate == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_CREDENTIAL_TEMPLATE, request.CredentialTemplateId));
-            var client = await _clientRepository.Query().AsNoTracking().SingleOrDefaultAsync(c => c.ClientId == request.WalletClientId && c.ApplicationType == ClientTypes.WALLET, cancellationToken);
-            if (client == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_WALLET_CLIENT_ID, request.WalletClientId));
-            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _authenticationHelper.GetUserByLogin(_userRepository.Query().AsNoTracking()
-                .Include(u => u.OAuthUserClaims), nameIdentifier, prefix, cancellationToken);
-            var cred = await _credentialOfferRepository.Query().AsNoTracking().FirstOrDefaultAsync(c => c.CredentialTemplateId == request.CredentialTemplateId && c.UserId == nameIdentifier && c.ClientId == request.WalletClientId);
-
-            if (cred == null || cred.Status == UserCredentialOfferStatus.INVALID || cred.ExpirationDateTime <= DateTime.UtcNow)
-            {
-                cred = new UserCredentialOffer
-                {
-                   Id = Guid.NewGuid().ToString(),
-                   UpdateDateTime = DateTime.UtcNow,
-                   CreateDateTime = DateTime.UtcNow,
-                   ExpirationDateTime = DateTime.UtcNow.AddSeconds(_options.CredOfferExpirationInSeconds),
-                   Status= UserCredentialOfferStatus.VALID,
-                   ClientId = request.WalletClientId,
-                   UserId = nameIdentifier,
-                   CredentialTemplateId = request.CredentialTemplateId
-                };
-                _credentialOfferRepository.Add(cred);
-                if (client.GrantTypes.Contains(PreAuthorizedCodeHandler.GRANT_TYPE))
-                {
-                    string pin = string.Empty;
-                    if (client.UserPinRequired)
-                    {
-                        pin = Guid.NewGuid().ToString();
-                        var notificationService = _notificationServices.First(n => (user.NotificationMode ?? IdServer.Constants.DefaultNotificationMode) == n.Name);
-                        await notificationService.Send(pin, user);
-                    }
-
-                    var preAuthorizedCode = Guid.NewGuid().ToString();
-                    cred.PreAuthorizedCode = preAuthorizedCode;
-                    cred.Pin = pin;
-                }
-
-                if (client.GrantTypes.Contains(AuthorizationCodeHandler.GRANT_TYPE))
-                {
-                    var credIssuerState = Guid.NewGuid().ToString();
-                    cred.CredIssuerState = credIssuerState;
-                }
-
-                await _credentialOfferRepository.SaveChanges(cancellationToken);
-            }
-
-            var result = InternalGet(prefix, cred, client);
-            return GetQRCode(result);
+            var kvp = await InternalShare(prefix, request, cancellationToken);
+            if (kvp.Item1 != null) return kvp.Item1;
+            return Redirect(kvp.Item2.Url);
         }
 
         [HttpGet]
@@ -144,6 +105,12 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialOffer
         private async Task<CredentialOfferBuildResult> InternalGet(string prefix, string id, CancellationToken cancellationToken)
         {
             prefix = prefix ?? SimpleIdServer.IdServer.Constants.DefaultRealm;
+            var bearerToken = ExtractBearerToken();
+            var token = await _grantedTokenHelper.GetAccessToken(bearerToken, cancellationToken);
+            if (token == null) return CredentialOfferBuildResult.Unauthorized(ErrorCodes.INVALID_TOKEN, ErrorMessages.UNKNOWN_ACCESS_TOKEN);
+            var scopes = token.Claims.Where(c => c.Type == "scope").Select(c => c.Value).ToList();
+            if (!scopes.Contains(SimpleIdServer.IdServer.Constants.StandardScopes.CredentialOffer.Name)) return CredentialOfferBuildResult.Unauthorized(ErrorCodes.INVALID_TOKEN, ErrorMessages.INVALID_ACCESS_TOKEN_SCOPE);
+
             var credentialOffer = await _credentialOfferRepository.Query().AsNoTracking().SingleOrDefaultAsync(c => c.Id == id, cancellationToken);
             if (credentialOffer == null) return CredentialOfferBuildResult.NotFound(ErrorCodes.INVALID_REQUEST,  ErrorMessages.UNKNOWN_CREDENTIAL_OFFER);
             if (credentialOffer.Status == UserCredentialOfferStatus.INVALID) return CredentialOfferBuildResult.Invalid(ErrorCodes.INVALID_CREDOFFER, ErrorMessages.CREDOFFER_IS_INVALID);
@@ -180,6 +147,64 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialOffer
 
             var url = BuildUrl(result, client);
             return CredentialOfferBuildResult.Ok(url, credentialOffer);
+        }
+
+        private async Task<(IActionResult, CredentialOfferBuildResult)> InternalShare(string prefix, ShareCredentialTemplateRequest request, CancellationToken cancellationToken)
+        {
+            prefix = prefix ?? IdServer.Constants.DefaultRealm;
+            if (request == null) return (BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.MALFROMED_INCOMING_REQUEST), null);
+            if (string.IsNullOrWhiteSpace(request.WalletClientId)) return (BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, ShareCredentialTemplateNames.WalletClientId)), null);
+            if (string.IsNullOrWhiteSpace(request.CredentialTemplateId)) return (BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, ShareCredentialTemplateNames.CredentialTemplateId)), null);
+            var credentialTemplate = await _credentialTemplateRepository.Query().AsNoTracking().SingleOrDefaultAsync(c => c.TechnicalId == request.CredentialTemplateId, cancellationToken);
+            if (credentialTemplate == null) return (BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_CREDENTIAL_TEMPLATE, request.CredentialTemplateId)), null);
+            var client = await _clientRepository.Query().AsNoTracking().SingleOrDefaultAsync(c => c.ClientId == request.WalletClientId && c.ClientType == ClientTypes.WALLET, cancellationToken);
+            if (client == null) return (BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_WALLET_CLIENT_ID, request.WalletClientId)), null);
+            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            var user = await _authenticationHelper.GetUserByLogin(_userRepository.Query().AsNoTracking()
+                .Include(u => u.OAuthUserClaims), nameIdentifier, prefix, cancellationToken);
+            var cred = await _credentialOfferRepository.Query().AsNoTracking().FirstOrDefaultAsync(c => c.CredentialTemplateId == request.CredentialTemplateId && c.UserId == user.Id && c.ClientId == request.WalletClientId);
+
+            if (cred == null || cred.Status != UserCredentialOfferStatus.VALID || cred.ExpirationDateTime <= DateTime.UtcNow)
+            {
+                cred = new UserCredentialOffer
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    UpdateDateTime = DateTime.UtcNow,
+                    CreateDateTime = DateTime.UtcNow,
+                    ExpirationDateTime = DateTime.UtcNow.AddSeconds(_options.CredOfferExpirationInSeconds),
+                    Status = UserCredentialOfferStatus.VALID,
+                    ClientId = request.WalletClientId,
+                    UserId = user.Id,
+                    CredentialTemplateId = request.CredentialTemplateId
+                };
+                _credentialOfferRepository.Add(cred);
+                if (client.GrantTypes.Contains(PreAuthorizedCodeHandler.GRANT_TYPE))
+                {
+                    string pin = string.Empty;
+                    if (client.UserPinRequired)
+                    {
+                        pin = Guid.NewGuid().ToString();
+                        var notificationService = _notificationServices.First(n => (user.NotificationMode ?? IdServer.Constants.DefaultNotificationMode) == n.Name);
+                        await notificationService.Send(pin, user);
+                    }
+
+                    var preAuthorizedCode = Guid.NewGuid().ToString();
+                    cred.PreAuthorizedCode = preAuthorizedCode;
+                    cred.Pin = pin;
+                }
+
+                if (client.GrantTypes.Contains(AuthorizationCodeHandler.GRANT_TYPE))
+                {
+                    var credIssuerState = Guid.NewGuid().ToString();
+                    cred.CredIssuerState = credIssuerState;
+                }
+
+                await _grantedTokenHelper.AddPreAuthCode(cred.PreAuthorizedCode, cred.Pin, cred.ClientId, cred.UserId, _options.CredOfferExpirationInSeconds, cancellationToken);
+                await _credentialOfferRepository.SaveChanges(cancellationToken);
+            }
+
+            var result = InternalGet(prefix, cred, client);
+            return (null, result);
         }
 
         private string BuildUrl(CredentialOfferResult result, Client client)

@@ -156,7 +156,7 @@ namespace SimpleIdServer.IdServer.UI
                 var credentialTemplates = await _credentialTemplateRepository.Query().Include(c => c.DisplayLst).Include(c => c.Realms).AsNoTracking().Where(c => c.Realms.All(r => r.Name == prefix)).ToListAsync(cancellationToken);
                 return credentialTemplates.Select(c => new CredentialTemplateViewModel
                 {
-                    Id = c.Id,
+                    Id = c.TechnicalId,
                     Display = c.Display
                 }).ToList();
             }

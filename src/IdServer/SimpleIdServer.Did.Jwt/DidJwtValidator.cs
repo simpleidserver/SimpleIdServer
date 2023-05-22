@@ -14,6 +14,11 @@ namespace SimpleIdServer.Did.Jwt
         {
             var handler = new JsonWebTokenHandler();
             var jwt = handler.ReadJsonWebToken(json);
+            return Validate(jwt, document, keyPurpose);
+        }
+
+        public static bool Validate(JsonWebToken jwt, IdentityDocument document, KeyPurposes keyPurpose = KeyPurposes.SigAuthentication)
+        {
             var alg = jwt.Alg;
             if (!Constants.SupportedPublicKeyTypes.ContainsKey(alg)) throw new InvalidOperationException($"Alg {alg} is not supported");
             var keyTypes = Constants.SupportedPublicKeyTypes[alg];

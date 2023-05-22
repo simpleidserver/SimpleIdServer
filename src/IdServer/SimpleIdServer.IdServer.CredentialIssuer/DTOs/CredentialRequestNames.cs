@@ -7,5 +7,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.DTOs
         public const string Format = "format";
         public const string Proof = "proof";
         public const string ProofType = "proof_type";
+        public const string Types = "types";
+        public const string Jwt = "jwt";
     }
 }

@@ -1241,14 +1241,27 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CredentialTemplateId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     CredentialNames = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ClientId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ExpirationDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    Pin = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PreAuthorizedCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CredIssuerState = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_CredentialOffers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CredentialOffers_BaseCredentialTemplate_CredentialTemplateId",
+                        column: x => x.CredentialTemplateId,
+                        principalTable: "BaseCredentialTemplate",
+                        principalColumn: "TechnicalId",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_CredentialOffers_Users_UserId",
                         column: x => x.UserId,
@@ -1539,6 +1552,11 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 name: "IX_ClientScope_ScopesId",
                 table: "ClientScope",
                 column: "ScopesId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CredentialOffers_CredentialTemplateId",
+                table: "CredentialOffers",
+                column: "CredentialTemplateId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CredentialOffers_UserId",

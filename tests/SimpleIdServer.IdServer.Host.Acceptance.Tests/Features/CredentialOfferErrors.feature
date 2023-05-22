@@ -1,7 +1,57 @@
 ﻿Feature: CredentialOfferErrors
 	Check errors returned by credential_offer API
 	
-Scenario: access token is required
+Scenario: wallet_client_id parameter is required (share)
+	Given authenticate a user
+	
+	When execute HTTP POST JSON request 'http://localhost/credential_offer/share'
+	| Key | Value |
+
+	And extract JSON from body
+	
+	Then HTTP status code equals to '400'
+	Then JSON 'error'='invalid_request'
+	Then JSON 'error_description'='the parameter wallet_client_id is missing'
+
+Scenario: credential_template_id parameter is required (share)
+	Given authenticate a user
+	
+	When execute HTTP POST JSON request 'http://localhost/credential_offer/share'
+	| Key | Value |
+
+	And extract JSON from body
+	
+	Then HTTP status code equals to '400'
+	Then JSON 'error'='invalid_request'
+	Then JSON 'error_description'='the parameter credential_template_id is missing'
+
+Scenario: credential template must exists (share)
+	Given authenticate a user
+	
+	When execute HTTP POST JSON request 'http://localhost/credential_offer/share'
+	| Key                    | Value    |
+	| wallet_client_id       | unknown  |
+	| credential_template_id | unknown  |
+
+	And extract JSON from body
+
+	Then HTTP status code equals to '404'
+	Then JSON 'error'='invalid_request'
+	Then JSON 'error_description'='the credential template unknown doesn't exist'
+
+Scenario: the wallet must exists (share)
+	Given authenticate a user
+	
+	When execute HTTP POST JSON request 'http://localhost/credential_offer/share'
+	| Key                    | Value              |
+	| wallet_client_id       | unknown            |
+	| credential_template_id | credentialOfferId  |
+
+	Then HTTP status code equals to '404'
+	Then JSON 'error'='invalid_request'
+	Then JSON 'error_description'='the wallet unknown doesn't exist'
+
+Scenario: access token is required (get)
 	When execute HTTP GET request 'http://localhost/credential_offer/id'
 	| Key           | Value                 |
 
@@ -10,7 +60,7 @@ Scenario: access token is required
 	Then JSON 'error'='access_denied'
 	And JSON 'error_description'='missing token'
 
-Scenario: accesss token is not valid
+Scenario: accesss token is not valid (get)
 	When execute HTTP GET request 'http://localhost/credential_offer/id'
 	| Key           | Value                 |
 	| Authorization | Bearer AT             |
@@ -20,7 +70,7 @@ Scenario: accesss token is not valid
 	Then JSON 'error'='invalid_token'
 	And JSON 'error_description'='either the access token has been revoked or is invalid'
 	
-Scenario: cannot get an unknown credential offer
+Scenario: cannot get an unknown credential offer (get)
 	Given authenticate a user
 	
 	When execute HTTP GET request 'http://localhost/authorization'

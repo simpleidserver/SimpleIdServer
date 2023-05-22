@@ -11,7 +11,6 @@ using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -30,32 +29,28 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
     {
         private readonly IPreAuthorizedCodeValidator _validator;
         private readonly IBusControl _busControl;
-        private readonly IClientRepository _clientRepository;
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
         private readonly IGrantHelper _audienceHelper;
-        private readonly IUserRepository _userRepository;
+        private readonly IGrantedTokenHelper _grantedTokenHelper;
         private readonly IdServerHostOptions _options;
 
         public PreAuthorizedCodeHandler(
             IPreAuthorizedCodeValidator validator,
             IBusControl busControl,
             IClientAuthenticationHelper clientAuthenticationHelper,
-            IGrantedTokenHelper grantedTokenHelper,
             IEnumerable<ITokenProfile> tokenProfiles,
             IEnumerable<ITokenBuilder> tokenBuilders,
-            IClientRepository clientRepository,
             IGrantHelper audienceHelper,
-            IUserRepository userRepository,
+            IGrantedTokenHelper grantedTokenHelper,
             IOptions<IdServerHostOptions> options) : base(clientAuthenticationHelper, options)
         {
             _validator = validator;
             _busControl = busControl;
-            _clientRepository = clientRepository;
             _tokenProfiles = tokenProfiles;
             _tokenBuilders = tokenBuilders;
             _audienceHelper = audienceHelper;
-            _userRepository = userRepository;
+            _grantedTokenHelper = grantedTokenHelper;
             _options = options.Value;
         }
 
@@ -76,6 +71,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     var scopes = ScopeHelper.Validate(context.Request.RequestData.GetStr(TokenRequestParameters.Scope), validationResult.Client.Scopes.Select(s => s.Name));
                     var resources = context.Request.RequestData.GetResourcesFromAuthorizationRequest();
                     var authDetails = context.Request.RequestData.GetAuthorizationDetailsFromAuthorizationRequest();
+                    var preAuthorizedCode = context.Request.RequestData.GetPreAuthorizedCode();
                     var extractionResult = await _audienceHelper.Extract(context.Realm ?? Constants.DefaultRealm, scopes, resources, authDetails, cancellationToken);
                     scopeLst = extractionResult.Scopes;
                     activity?.SetTag("scopes", string.Join(",", extractionResult.Scopes));
@@ -91,6 +87,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                         result.Add(kvp.Key, kvp.Value);
 
                     await Enrich(context, result, cancellationToken);
+                    await _grantedTokenHelper.RemovePreAuthCode(preAuthorizedCode, cancellationToken);
                     await _busControl.Publish(new TokenIssuedSuccessEvent
                     {
                         GrantType = GRANT_TYPE,

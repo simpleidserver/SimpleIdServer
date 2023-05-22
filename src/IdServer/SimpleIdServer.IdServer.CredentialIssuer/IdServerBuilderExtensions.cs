@@ -5,12 +5,14 @@ using SimpleIdServer.IdServer.Api.Authorization.Validators;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.CredentialIssuer;
 using SimpleIdServer.IdServer.CredentialIssuer.Api.Authorization;
+using SimpleIdServer.IdServer.CredentialIssuer.Api.Credential.Validators;
 using SimpleIdServer.IdServer.CredentialIssuer.Api.Token;
 using SimpleIdServer.IdServer.CredentialIssuer.Helpers;
 using SimpleIdServer.IdServer.CredentialIssuer.Parsers;
 using SimpleIdServer.IdServer.CredentialIssuer.Validators;
 using SimpleIdServer.IdServer.Helpers;
 using System;
+using System.Linq;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -30,6 +32,10 @@ namespace Microsoft.Extensions.DependencyInjection
             idServerBuilder.Services.AddTransient<IPreAuthorizedCodeValidator, CredIssuerPreAuthorizedCodeValidator>();
             idServerBuilder.Services.AddTransient<ICredIssuerTokenHelper, CredIssuerTokenHelper>();
             idServerBuilder.Services.AddTransient<IUserHelper, CredIssuerUserHelper>();
+            idServerBuilder.Services.AddTransient<IProofValidator, JwtProofValidator>();
+            var preAuthCodeHandler = idServerBuilder.Services.First(s => s.ImplementationType == typeof(PreAuthorizedCodeHandler));
+            idServerBuilder.Services.Remove(preAuthCodeHandler);
+            idServerBuilder.Services.AddTransient<IGrantTypeHandler, CredIssuerPreAuthorizedCodeHandler>();
             return idServerBuilder;
         }
     }

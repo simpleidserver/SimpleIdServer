@@ -6,6 +6,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer
     {
         public const string INVALID_REQUEST = "invalid_request";
         public const string INVALID_TOKEN = "invalid_token";
+        public const string INVALID_PROOF = "invalid_proof";
         public const string INVALID_CREDOFFER = "invalid_credoffer";
     }
 }

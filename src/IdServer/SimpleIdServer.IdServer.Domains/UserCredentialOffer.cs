@@ -24,6 +24,7 @@ namespace SimpleIdServer.IdServer.Domains
     public enum UserCredentialOfferStatus
     {
         VALID = 0,
-        INVALID = 1
+        ISSUED = 1,
+        INVALID = 2
     }
 }

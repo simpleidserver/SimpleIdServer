@@ -6,6 +6,7 @@ using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential
 {
+    [JsonConverter(typeof(CredentialRequestConverter))]
     public class CredentialRequest
     {
         /// <summary>
@@ -20,6 +21,6 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential
         [JsonPropertyName(CredentialRequestNames.Proof)]
         public CredentialProofRequest Proof { get; set; }
         [JsonIgnore]
-        public JsonObject OtherParameters { get; set; }
+        public JsonObject OtherParameters { get; set; } = new JsonObject();
     }
 }

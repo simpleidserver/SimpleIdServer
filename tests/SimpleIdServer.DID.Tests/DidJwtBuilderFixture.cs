@@ -18,6 +18,8 @@ namespace SimpleIdServer.DID.Tests
             var identityDocument = IdentityDocumentBuilder.New("did", "publicadr")
                 .AddVerificationMethod(generateKey, SimpleIdServer.Did.Constants.VerificationMethodTypes.EcdsaSecp256k1VerificationKey2019)
                 .Build();
+            var dd = identityDocument.Serialize();
+
             var securityTokenDescriptor = new SecurityTokenDescriptor
             {
                 Claims = new Dictionary<string, object>

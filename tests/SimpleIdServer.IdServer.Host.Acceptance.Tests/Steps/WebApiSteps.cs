@@ -368,24 +368,21 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             foreach(var record in table.Rows)
             {
                 var key = record["Key"];
-                object value = record["Value"];
+                object value = ParseValue(_scenarioContext, record["Value"]);
                 try
                 {
                     value = JsonNode.Parse(value.ToString());
                 }
-                catch
-                {
-                    value = ParseValue(_scenarioContext, record["Value"]);
-                }
+                catch { }
 
                 if (PARAMETERS_IN_HEADER.Contains(key))
                 {
                     continue;
                 }
 
-                if (value is JsonArray)
+                if (value is JsonNode)
                 {
-                    result.Add(key, value as JsonArray);
+                    result.Add(key, value as JsonNode);
                 }
                 else
                 {

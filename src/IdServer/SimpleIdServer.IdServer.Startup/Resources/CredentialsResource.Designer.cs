@@ -61,11 +61,47 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à There is no wallet.
+        /// </summary>
+        public static string noWallet {
+            get {
+                return ResourceManager.GetString("noWallet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Scan the QR code with your wallet.
+        /// </summary>
+        public static string scanQRCode {
+            get {
+                return ResourceManager.GetString("scanQRCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Select the wallet.
+        /// </summary>
+        public static string selectWallet {
+            get {
+                return ResourceManager.GetString("selectWallet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Share.
         /// </summary>
         public static string share {
             get {
                 return ResourceManager.GetString("share", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Share credential with one wallet.
+        /// </summary>
+        public static string shareOneWallet {
+            get {
+                return ResourceManager.GetString("shareOneWallet", resourceCulture);
             }
         }
         

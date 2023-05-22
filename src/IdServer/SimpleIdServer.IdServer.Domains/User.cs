@@ -62,8 +62,6 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonIgnore]
         public string? Did { get; set; } = null;
         [JsonIgnore]
-        public string? DidPublicHex { get; set; } = null;
-        [JsonIgnore]
         public string? DidPrivateHex { get; set; } = null;
         [JsonIgnore]
         public ICollection<Claim> Claims

@@ -1840,12 +1840,35 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("ClientId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreateDateTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("CredIssuerState")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CredentialNames")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CredentialTemplateId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("ExpirationDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Pin")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PreAuthorizedCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("UpdateDateTime")
                         .HasColumnType("datetime2");
@@ -1855,6 +1878,8 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CredentialTemplateId");
 
                     b.HasIndex("UserId");
 
@@ -2555,11 +2580,19 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UserCredentialOffer", b =>
                 {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.CredentialTemplate", "CredentialTemplate")
+                        .WithMany("CredentialOffers")
+                        .HasForeignKey("CredentialTemplateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("SimpleIdServer.IdServer.Domains.User", "User")
                         .WithMany("CredentialOffers")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("CredentialTemplate");
 
                     b.Navigation("User");
                 });
@@ -2744,6 +2777,11 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Navigation("DisplayLst");
 
                     b.Navigation("Parameters");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.CredentialTemplate", b =>
+                {
+                    b.Navigation("CredentialOffers");
                 });
 #pragma warning restore 612, 618
         }
