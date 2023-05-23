@@ -180,7 +180,7 @@ Scenario: types contained in the request must be similar to the one present in t
 	| Key           | Value                                                   |
 	| Authorization | Bearer $access_token$                                   |
 	| format        | jwt_vc_json                                             |
-	| types         | ["VerifiableCredential", "UniversityDegree"]            |
+	| types         | ["VerifiableCredential","UniversityDegree"]             |
 	
 	And extract JSON from body
 
@@ -327,18 +327,17 @@ Scenario: JWT parameter must be valid
 	Then JSON 'error'='invalid_proof'
 	And JSON 'error_description'='the proof is not a well formed JWT token'
 
-Scenario: Check JWT
+Scenario: JWT Type must be equals to openid4vci-proof+jwt
 	Given authenticate a user
-	
-	And build proof
-	| Key     | Value |
-	| c_nonce | test  |
-
 
 	When execute HTTP POST JSON request 'http://localhost/credential_offer/share'
 	| Key                    | Value              |
 	| wallet_client_id       | fiftyNineClient    |
 	| credential_template_id | credTemplate       |
+	
+	And build proof
+	| Key     | Value |
+	| c_nonce | test  |
 
 	And extract query parameters into JSON
 	And extract query parameter 'credential_offer' into JSON
@@ -365,4 +364,44 @@ Scenario: Check JWT
 	And extract JSON from body
 
 	Then JSON 'error'='invalid_proof'
-	And JSON 'error_description'='the proof is not a well formed JWT token'
+	And JSON 'error_description'='the proof typ must be equals to openid4vci-proof+jwt'
+
+Scenario: JWT must contains a valid NONCE
+	Given authenticate a user
+
+	When execute HTTP POST JSON request 'http://localhost/credential_offer/share'
+	| Key                    | Value                                                    |
+	| wallet_client_id       | fiftyNineClient                                          |
+	| credential_template_id | credTemplate                                             |
+	
+	And build proof
+	| Key     | Value                                                    |
+	| typ     | openid4vci-proof+jwt                                     |
+	| c_nonce | invalid                                                  |
+
+	And extract query parameters into JSON
+	And extract query parameter 'credential_offer' into JSON
+	And extract parameter '$.grants.urn:ietf:params:oauth:grant-type:pre-authorized_code.pre-authorized_code' from JSON body into 'preAuthorizedCode'
+
+	And execute HTTP POST request 'https://localhost:8080/token'
+	| Key                     | Value                                                                                                                        |
+	| grant_type              | urn:ietf:params:oauth:grant-type:pre-authorized_code                                                                         |
+	| client_id               | fiftyNineClient                                                                                                              |
+	| pre-authorized_code     | $preAuthorizedCode$                                                                                                          |
+	| authorization_details   |  { "type" : "openid_credential", "format": "jwt_vc_json", "types": [ "VerifiableCredential", "UniversityDegree"] }           |	
+	
+	And extract JSON from body
+	And extract parameter 'access_token' from JSON body
+	And extract payload from JWT '$access_token$'
+
+	And execute HTTP POST JSON request 'https://localhost:8080/credential'
+	| Key           | Value                                         |
+	| Authorization | Bearer $access_token$                         |
+	| format        | jwt_vc_json                                   |
+	| types         | [VerifiableCredential,UniversityDegree]       |
+	| proof         | { "proof_type": "jwt", "jwt": "$proof$" }     |
+	
+	And extract JSON from body
+
+	Then JSON 'error'='invalid_proof'
+	And JSON 'error_description'='the credential nonce (c_nonce) is not valid'

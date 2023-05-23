@@ -11,6 +11,8 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Helpers
     public interface ICredIssuerTokenHelper
     {
         Task AddCredentialNonce(string credentialNonce, double validityPeriodsInSeconds, CancellationToken cancellationToken);
+        Task<bool> HasCredentialNonce(string credentialNonce, CancellationToken cancellationToken);
+
     }
 
     public class CredIssuerTokenHelper : ICredIssuerTokenHelper
@@ -29,5 +31,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Helpers
                 SlidingExpiration = TimeSpan.FromSeconds(validityPeriodsInSeconds)
             }, cancellationToken);
         }
+
+        public async Task<bool> HasCredentialNonce(string credentialNonce, CancellationToken cancellationToken) => await _distributedCache.GetAsync(credentialNonce, cancellationToken) != null;
     }
 }

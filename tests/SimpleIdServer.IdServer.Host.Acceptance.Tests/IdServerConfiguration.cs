@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using MassTransit.Monitoring;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Builders;
@@ -16,8 +15,8 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
 {
     public class IdServerConfiguration
     {
-        public const string DidKey = "did:key:zQ3shRd8JuxBEFhLzUE6rasi4cxM3SWdKk5atZn77skrq6LYF";
-        public const string PrivateKey = "53bad9040c535a6ae7f2b6272034ae37d62459b8188d6b362c249d351f5d135d";
+        public const string DidKey = "did:key:z6Mknh2Rpuqp9gRZThCJtUMEUaA5oivMD5AFic3Fz3uftAhX";
+        public const string PrivateKey = "c1d5ca0e0c8c72825838b79b0fcd6cc7a035f852fe95f7c1b6db4feaf9806068";
 
         public static Dictionary<string, SigningCredentials> ClientSigningCredentials = new Dictionary<string, SigningCredentials>
         {
@@ -102,6 +101,8 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                         { "types", JsonSerializer.Serialize(new List<string> { "VerifiableCredential", "UniversityDegreeCredential" }) }
                     }
                 })
+                .AddClaim("degreeType", "BachelorDegree")
+                .AddClaim("degreeName", "Bachelor of Science and Arts")
                 .SetDID(DidKey, PrivateKey)
                 .AddSession("sessionId", SimpleIdServer.IdServer.Constants.DefaultRealm, DateTime.UtcNow.AddDays(2)).Build();
 
@@ -216,6 +217,17 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
         public static List<CredentialTemplate> CredTemplates = new List<CredentialTemplate>
         {
             new CredentialTemplate(W3CCredentialTemplateBuilder.New("credTemplate", "UniversityDegree", "http://localhost", "UniversityDegree").Build())
+            {
+                ClaimMappers = new List<CredentialTemplateClaimMapper>
+                {
+                    new CredentialTemplateClaimMapper
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        MapperType = CredentialTemplateClaimMapperTypes.USERATTRIBUTE,
+                        UserAttributeName = "degreeName"
+                    }
+                }
+            }
         };
     }
 }

@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.CredentialIssuer.Api.Credential.Validators;
 using SimpleIdServer.IdServer.CredentialIssuer.DTOs;
+using SimpleIdServer.IdServer.CredentialIssuer.Extractors;
 using SimpleIdServer.IdServer.CredentialIssuer.Parsers;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
@@ -28,15 +29,17 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential
         private readonly IGrantedTokenHelper _grantedTokenHelper;
         private readonly IUserRepository _userRepository;
         private readonly IAuthenticationHelper _authenticationHelper;
+        private readonly ICredentialTemplateClaimsExtractor _claimsExtractor;
         private readonly ILogger<CredentialController> _logger;
 
-        public CredentialController(IEnumerable<ICredentialRequestParser> parsers, IEnumerable<IProofValidator> proofValidators, IGrantedTokenHelper grantedTokenHelper, IUserRepository userRepository, IAuthenticationHelper authenticationHelper, ILogger<CredentialController> logger)
+        public CredentialController(IEnumerable<ICredentialRequestParser> parsers, IEnumerable<IProofValidator> proofValidators, IGrantedTokenHelper grantedTokenHelper, IUserRepository userRepository, IAuthenticationHelper authenticationHelper, ICredentialTemplateClaimsExtractor claimsExtractor, ILogger<CredentialController> logger)
         {
             _parsers = parsers;
             _proofValidators = proofValidators;
             _grantedTokenHelper = grantedTokenHelper;
             _userRepository = userRepository;
             _authenticationHelper = authenticationHelper;
+            _claimsExtractor = claimsExtractor;
             _logger = logger;
         }
 
@@ -46,12 +49,30 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential
             prefix = prefix ?? SimpleIdServer.IdServer.Constants.DefaultRealm;
             try
             {
+                var context = new HandlerContext(new HandlerContextRequest(null, null), prefix);
                 var accessToken = ExtractBearerToken();
                 var token = await _grantedTokenHelper.GetAccessToken(accessToken, cancellationToken);
                 if (token == null) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, ErrorMessages.UNKNOWN_ACCESS_TOKEN);
                 var extractionResult = await ValidateRequest(request, token, cancellationToken);
-                var user = await _authenticationHelper.GetUserByLogin(_userRepository.Query().AsNoTracking(), token.Subject, prefix, cancellationToken);
-                await CheckProof(request, user,cancellationToken);
+                var user = await _authenticationHelper.GetUserByLogin(_userRepository.Query().Include(u => u.OAuthUserClaims).AsNoTracking(), token.Subject, prefix, cancellationToken);
+                await CheckProof(request, user, cancellationToken);
+                context.SetClient(null);
+                context.SetUser(user);
+                var extractedClaims = await _claimsExtractor.ExtractClaims(context, extractionResult.CredentialTemplate);
+                // build VC
+                /*
+                const string credentialSubject = "{\"degree\": { \"type\": \"BachelorDegree\", \"name\": \"Baccalauréat en musiques numériques\" }}";
+                var generateKey = SignatureKeyBuilder.NewES256K();
+                var hex = generateKey.PrivateKey.ToHex();
+                var identityDocument = IdentityDocumentBuilder.New("did", "publicadr")
+                .AddVerificationMethod(generateKey, Did.Constants.VerificationMethodTypes.EcdsaSecp256k1VerificationKey2019)
+                .Build();
+                var verifiableCredential = VerifiableCredentialBuilder
+                .New()
+                .SetCredentialSubject(JsonObject.Parse(credentialSubject).AsObject()).Build();
+                */
+                // build JWT
+                // var jwt = VcJwtBuilder.GenerateToken(identityDocument, verifiableCredential, hex.HexToByteArray(), "did#delegate-1");
                 return null;
             }
             catch (OAuthUnauthorizedException ex)
@@ -66,7 +87,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential
             }
         }
 
-        protected async Task<ICredentialRequest> ValidateRequest(CredentialRequest request, JsonWebToken jsonWebToken, CancellationToken cancellationToken)
+        protected async Task<ExtractionResult> ValidateRequest(CredentialRequest request, JsonWebToken jsonWebToken, CancellationToken cancellationToken)
         {
             if (request == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.CREDENTIAL_REQUEST_INVALID);
             if (string.IsNullOrWhiteSpace(request.Format)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, CredentialRequestNames.Format));
@@ -77,11 +98,11 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential
             var serializedClaims = jsonWebToken.GetClaimJson();
             var authDetails = serializedClaims.GetAuthorizationDetailsFromAuthorizationRequest();
             IEnumerable<AuthorizationData> filteredAuthDefailts;
-            if (authDetails != null && (filteredAuthDefailts = authDetails.Where(a => a.Type == Constants.StandardAuthorizationDetails.OpenIdCredential)).Any()) 
+            if (authDetails != null && (filteredAuthDefailts = authDetails.Where(a => a.Type == Constants.StandardAuthorizationDetails.OpenIdCredential)).Any())
             {
                 var validationResult = extractionResult.Request.Validate(filteredAuthDefailts);
                 if (!string.IsNullOrWhiteSpace(validationResult.ErrorMessage)) throw new OAuthUnauthorizedException(ErrorCodes.INVALID_REQUEST, validationResult.ErrorMessage);
-                return extractionResult.Request;
+                return extractionResult;
             }
 
             throw new OAuthUnauthorizedException(ErrorCodes.INVALID_REQUEST, ErrorMessages.UNAUHTORIZED_TO_ACCESS_TO_CREDENTIAL);

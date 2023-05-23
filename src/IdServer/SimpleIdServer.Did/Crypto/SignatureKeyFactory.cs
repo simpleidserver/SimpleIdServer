@@ -37,7 +37,7 @@ namespace SimpleIdServer.Did.Crypto
             {
                 var publicKeyMultiBase = validationMethod.AdditionalParameters["publicKeyMultibase"].TrimStart('z');
                 var decoded = Encoding.Base58Encoding.Decode(publicKeyMultiBase);
-                return decoded.Skip(3).ToArray();
+                return decoded.Skip(2).ToArray();
             }
 
             if (validationMethod.PublicKeyJwk != null && validationMethod.PublicKeyJwk.ContainsKey("crv") && validationMethod.PublicKeyJwk.ContainsKey("x") && validationMethod.PublicKeyJwk.ContainsKey("y"))

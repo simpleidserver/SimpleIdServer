@@ -97,6 +97,12 @@ namespace SimpleIdServer.IdServer.Builders
             return this;
         }
 
+        public UserBuilder AddClaim(string name, string value)
+        {
+            _user.AddClaim(name, value);
+            return this;
+        }
+
         #endregion
 
         #region Consents

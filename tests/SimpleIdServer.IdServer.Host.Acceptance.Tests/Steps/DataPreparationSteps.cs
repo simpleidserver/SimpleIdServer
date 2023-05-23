@@ -11,7 +11,6 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using TechTalk.SpecFlow;
-using DidKeyIdentityDocumentExtractor = SimpleIdServer.Did.Key.IdentityDocumentExtractor;
 
 namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
 {
@@ -59,22 +58,6 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             var req = new CertificateRequest($"cn={Guid.NewGuid()}", ecdsa, HashAlgorithmName.SHA256);
             var cert = req.CreateSelfSigned(DateTimeOffset.Now, DateTimeOffset.Now.AddYears(2));
             _scenarioContext.Set(cert, key);
-        }
-
-        [Given("build proof")]
-        public async void GivenBuildJWTProof(Table table)
-        {
-            var extractor = new DidKeyIdentityDocumentExtractor(new Did.Key.DidKeyOptions());
-            var did = await extractor.Extract(IdServerConfiguration.DidKey, CancellationToken.None);
-            var securityTokenDescriptor = new SecurityTokenDescriptor
-            {
-                Claims = new Dictionary<string, object>()
-            };
-            foreach (var row in table.Rows)
-                securityTokenDescriptor.Claims.Add(row["Key"].ToString(), WebApiSteps.ParseValue(_scenarioContext, row["Value"].ToString()));
-
-            var proof = DidJwtBuilder.GenerateToken(securityTokenDescriptor, did, IdServerConfiguration.PrivateKey.HexToByteArray());
-            _scenarioContext.Set(proof, "proof");
         }
     }
 }

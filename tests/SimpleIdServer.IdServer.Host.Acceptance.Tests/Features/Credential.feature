@@ -2,20 +2,14 @@
 	Check credential endpoint
 	
 Scenario: get credential
-	When execute HTTP POST request 'https://localhost:8080/token'
-	| Key            | Value              |
-	| grant_type     | client_credentials |
-	| client_id      | fiftyNineClient    |
-	| client_secret  | password           |
-	| scope          | credential_offer   |
-	
-	And extract JSON from body	
-	And extract parameter 'access_token' from JSON body	
+	Given authenticate a user
 
-	And execute HTTP GET request 'http://localhost/credential_offer/credentialOfferId'
-	| Key           | Value                  |
-	| Authorization | Bearer $access_token$  |	
+	When execute HTTP POST JSON request 'http://localhost/credential_offer/share'
+	| Key                    | Value             |
+	| wallet_client_id       | fiftyNineClient   |
+	| credential_template_id | credTemplate      |
 
+	And extract query parameters into JSON
 	And extract query parameter 'credential_offer' into JSON
 	And extract parameter '$.grants.urn:ietf:params:oauth:grant-type:pre-authorized_code.pre-authorized_code' from JSON body into 'preAuthorizedCode'
 
@@ -24,14 +18,25 @@ Scenario: get credential
 	| grant_type              | urn:ietf:params:oauth:grant-type:pre-authorized_code                                                                         |
 	| client_id               | fiftyNineClient                                                                                                              |
 	| pre-authorized_code     | $preAuthorizedCode$                                                                                                          |
-	| authorization_details   |  { "type" : "openid_credential", "format": "jwt_vc_json", "types": [ "VerifiableCredential", "UniversityDegreeCredential"] } |
+	| authorization_details   |  { "type" : "openid_credential", "format": "jwt_vc_json", "types": [ "VerifiableCredential", "UniversityDegree"] }           |	
 	
 	And extract JSON from body
 	And extract parameter 'access_token' from JSON body
-	And extract payload from JWT '$access_token$'
+	And extract parameter 'c_nonce' from JSON body
+	And extract payload from JWT '$access_token$'	
+	And build proof
+	| Key     | Value                 |
+	| typ     | openid4vci-proof+jwt  |
+	| c_nonce | $c_nonce$             |
 
 	And execute HTTP POST JSON request 'https://localhost:8080/credential'
-	| Key           | Value                 |
-	| Authorization | Bearer $access_token$ |
+	| Key           | Value                                         |
+	| Authorization | Bearer $access_token$                         |
+	| format        | jwt_vc_json                                   |
+	| types         | [VerifiableCredential,UniversityDegree]       |
+	| proof         | { "proof_type": "jwt", "jwt": "$proof$" }     |
+	
+	And extract JSON from body
 
-	Then HTTP status code equals to '200'
+	Then JSON 'error'='invalid_proof'
+	And JSON 'error_description'='the credential nonce (c_nonce) is not valid'

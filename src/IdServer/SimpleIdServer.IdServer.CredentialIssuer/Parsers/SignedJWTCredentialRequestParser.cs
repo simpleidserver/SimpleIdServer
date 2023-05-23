@@ -29,7 +29,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Parsers
         {
             if (request.OtherParameters == null || !request.OtherParameters.ContainsKey(W3CCredentialTemplateNames.Types)) return ExtractionResult.Error(string.Format(ErrorMessages.MISSING_PARAMETER, W3CCredentialTemplateNames.Types));
             var credentialTypes = request.GetTypes();
-            var credentialTemplate = await _credentialTemplateRepository.Query().Include(c => c.Parameters).AsNoTracking().FirstOrDefaultAsync(c => c.Parameters.All(p => p.Name == CredentialRequestNames.Types && credentialTypes.Contains(p.Value)), cancellationToken);
+            var credentialTemplate = await _credentialTemplateRepository.Query().Include(c => c.Parameters).Include(c => c.ClaimMappers).AsNoTracking().FirstOrDefaultAsync(c => c.Parameters.All(p => p.Name == CredentialRequestNames.Types && credentialTypes.Contains(p.Value)), cancellationToken);
             if (credentialTemplate == null) return ExtractionResult.Error(ErrorMessages.NO_CREDENTIAL_FOUND);
             var result = new SignedJWTCredentialRequest
             {

@@ -43,13 +43,14 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential
                             else
                             {
                                 var val = reader.GetString();
-                                if (propertyName == "proof") prop.p.SetValue(result, JsonSerializer.Deserialize<CredentialProofRequest>(val));
-                                else prop.p.SetValue(result, val);
+                                prop.p.SetValue(result, val);
                             }
                         }
                         break;
                     case JsonTokenType.StartObject:
-                        result.OtherParameters.Add(propertyName, ExtractObject(reader));
+                        var obj = ExtractObject(reader);
+                        if (propertyName == "proof") result.Proof = JsonSerializer.Deserialize<CredentialProofRequest>(obj.ToJsonString());
+                        else result.OtherParameters.Add(propertyName, obj);
                         break;
                     case JsonTokenType.StartArray:
                         result.OtherParameters.Add(propertyName, ExtractArray(reader));

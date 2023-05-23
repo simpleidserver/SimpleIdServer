@@ -24,5 +24,7 @@ namespace SimpleIdServer.IdServer.Domains
         public ICollection<Realm> Realms { get; set; } = new List<Realm>();
         [JsonIgnore]
         public ICollection<UserCredentialOffer> CredentialOffers { get; set; } = new List<UserCredentialOffer>();
+        [JsonIgnore]
+        public ICollection<CredentialTemplateClaimMapper> ClaimMappers { get; set; } = new List<CredentialTemplateClaimMapper>();
     }
 }

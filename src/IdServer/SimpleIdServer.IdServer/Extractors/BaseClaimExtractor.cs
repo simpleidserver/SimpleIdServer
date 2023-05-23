@@ -1,18 +1,16 @@
-﻿// Copyright (c) SimpleIdServer. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.IdServer.Domains;
-using System;
+﻿using SimpleIdServer.IdServer.Domains;
 using System.Collections.Generic;
+using System;
 using System.Text.Json;
 
-namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
+namespace SimpleIdServer.IdServer.Extractors
 {
-    public class BaseAttributeClaimsExtractor
+    public class BaseClaimExtractor
     {
-        public object Convert(string value, ScopeClaimMapper mapper)
+        public object Convert(string value, IClaimMappingRule mapper)
         {
             if (mapper.TokenClaimJsonType == null) return null;
-            switch(mapper.TokenClaimJsonType)
+            switch (mapper.TokenClaimJsonType)
             {
                 case TokenClaimJsonTypes.BOOLEAN:
                     return bool.Parse(value);

@@ -19,7 +19,18 @@ namespace Microsoft.AspNetCore.Http
 
         private static JsonNode GetValue(StringValues strValues)
         {
-            if (strValues.Count() == 1) return JsonValue.Create(strValues.First());
+            if (strValues.Count() == 1)
+            {
+                try
+                {
+                    return JsonNode.Parse(strValues.First());
+                }
+                catch
+                {
+                    return JsonValue.Create(strValues.First());
+                }
+            }
+
             return JsonSerializer.SerializeToNode(strValues.Select(s => s));
         }
     }
