@@ -1,7 +1,7 @@
 ﻿Feature: Credential
 	Check credential endpoint
 	
-Scenario: get credential
+Scenario: use pre authorized code to get a credential
 	Given authenticate a user
 
 	When execute HTTP POST JSON request 'http://localhost/credential_offer/share'
@@ -38,5 +38,7 @@ Scenario: get credential
 	
 	And extract JSON from body
 
-	Then JSON 'error'='invalid_proof'
-	And JSON 'error_description'='the credential nonce (c_nonce) is not valid'
+	Then JSON exists 'credential'
+	And JSON exists 'c_nonce'
+	And JSON exists 'c_nonce_expires_in'
+	And JSON 'format'='ldp_vc'

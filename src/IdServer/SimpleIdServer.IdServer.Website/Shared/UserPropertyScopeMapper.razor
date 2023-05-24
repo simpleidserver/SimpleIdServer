@@ -23,9 +23,9 @@
         <RadzenDropDown Name="UserPropertyName" Class="w-100"
                         Data=@userProperties
                         TValue="String"
-                        @bind-Value=@scopeMapperFom.UserPropertyName />
+                        @bind-Value=@scopeMapperFom.SourceUserPropertyName />
         <p class="text-muted">Name of the property</p>
-        <RadzenRequiredValidator Component="UserPropertyName" Text="Property is required"></RadzenRequiredValidator>
+        <RadzenRequiredValidator Component="                                                                                                                                                                                                                                                                                                                                                                                                       " Text="Property is required"></RadzenRequiredValidator>
     </div>
     <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateScopeMapperState.Value.IsUpdating ? "Saving..." : "Save")" Disabled="@(updateScopeMapperState.Value.IsUpdating)" />
 </RadzenTemplateForm>
@@ -43,7 +43,7 @@
 
     record UserPropertyScopeMapperForm : BaseUserScopeMapperForm
     {
-        public string UserPropertyName { get; set; } = null!;
+        public string SourceUserPropertyName { get; set; } = null!;
     }
 
     UserPropertyScopeMapperForm scopeMapperFom = new UserPropertyScopeMapperForm();
@@ -60,14 +60,14 @@
                 .Select(p => p.Name);
         if (ClaimMapper == null) return;
         scopeMapperFom.Update(ClaimMapper);
-        scopeMapperFom.UserPropertyName = ClaimMapper.UserPropertyName;
+        scopeMapperFom.SourceUserPropertyName = ClaimMapper.SourceUserProperty;
     }
 
     async void SubmitScopeMapper()
     {
         var result = scopeMapperFom.Build();
-        result.MapperType = ScopeClaimMapperTypes.USERPROPERTY;
-        result.UserPropertyName = scopeMapperFom.UserPropertyName;
+        result.MapperType = MappingRuleTypes.USERPROPERTY;
+        result.SourceUserProperty = scopeMapperFom.SourceUserPropertyName;
         await ScopeMapperSaved.InvokeAsync(result);
     }
 }

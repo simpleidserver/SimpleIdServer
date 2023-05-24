@@ -12,7 +12,7 @@ namespace SimpleIdServer.IdServer.Website.Models
         public void Update(ScopeClaimMapper mapper)
         {
             Name = mapper.Name;
-            TokenClaimName = mapper.TokenClaimName;
+            TokenClaimName = mapper.TargetClaimPath;
             SAMLAttributeName = mapper.SAMLAttributeName;
             if(mapper.TokenClaimJsonType != null)
                 ClaimJsonType = mapper.TokenClaimJsonType.Value;
@@ -23,7 +23,7 @@ namespace SimpleIdServer.IdServer.Website.Models
             return new ScopeClaimMapper
             {
                 Name = Name,
-                TokenClaimName = TokenClaimName,
+                TargetClaimPath = TokenClaimName,
                 SAMLAttributeName = SAMLAttributeName,
                 TokenClaimJsonType = ClaimJsonType
             };

@@ -172,7 +172,7 @@ namespace SimpleIdServer.IdServer
             public static ScopeClaimMapper BirthDate = ScopeClaimMapper.CreateOpenIdAttributeClaim(JwtRegisteredClaimNames.Birthdate, JwtRegisteredClaimNames.Birthdate, JwtRegisteredClaimNames.Birthdate);
             public static ScopeClaimMapper ZoneInfo = ScopeClaimMapper.CreateOpenIdAttributeClaim(UserClaims.ZoneInfo, UserClaims.ZoneInfo, UserClaims.ZoneInfo); 
             public static ScopeClaimMapper Locale = ScopeClaimMapper.CreateOpenIdAttributeClaim(UserClaims.Locale, UserClaims.Locale, UserClaims.Locale);
-            public static ScopeClaimMapper Address = ScopeClaimMapper.CreateOpenIdAddressClaim(UserClaims.Address);
+            public static List<ScopeClaimMapper> Address = ScopeClaimMapper.CreateOpenIdAddressClaim();
             public static ScopeClaimMapper PhoneNumber = ScopeClaimMapper.CreateOpenIdAttributeClaim(JwtRegisteredClaimNames.PhoneNumber, JwtRegisteredClaimNames.PhoneNumber, JwtRegisteredClaimNames.PhoneNumber);
             public static ScopeClaimMapper PhoneNumberVerified = ScopeClaimMapper.CreateOpenIdAttributeClaim(JwtRegisteredClaimNames.PhoneNumberVerified, JwtRegisteredClaimNames.PhoneNumberVerified, JwtRegisteredClaimNames.PhoneNumberVerified, TokenClaimJsonTypes.BOOLEAN);
             public static ScopeClaimMapper Role = ScopeClaimMapper.CreateOpenIdAttributeClaimArray(UserClaims.Role, UserClaims.Role, UserClaims.Role);
@@ -289,10 +289,7 @@ namespace SimpleIdServer.IdServer
             {
                 Id = Guid.NewGuid().ToString(),
                 Name = "address",
-                ClaimMappers = new List<ScopeClaimMapper>
-                {
-                    StandardClaims.Address
-                },
+                ClaimMappers = StandardClaims.Address,
                 Realms = new List<Domains.Realm>
                 {
                     StandardRealms.Master

@@ -1036,6 +1036,41 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.ToTable("Grants");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.CredentialTemplateClaimMapper", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CredentialTemplateId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsMultiValued")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("MapperType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SourceUserAttribute")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SourceUserProperty")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TargetClaimPath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("TokenClaimJsonType")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CredentialTemplateId");
+
+                    b.ToTable("CredentialTemplateClaimMapper");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ExtractedRepresentation", b =>
                 {
                     b.Property<string>("ExternalId")
@@ -1373,35 +1408,17 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("SourceUserAttribute")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SourceUserProperty")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TargetClaimPath")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("TokenClaimJsonType")
                         .HasColumnType("int");
-
-                    b.Property<string>("TokenClaimName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserAttributeCountryName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserAttributeFormattedName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserAttributeLocalityName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserAttributeName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserAttributePostalCodeName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserAttributeRegionName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserAttributeStreetName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserPropertyName")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -1721,9 +1738,6 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DidPrivateHex")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DidPublicHex")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
@@ -2399,6 +2413,17 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.CredentialTemplateClaimMapper", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.CredentialTemplate", "CredentialTemplate")
+                        .WithMany("ClaimMappers")
+                        .HasForeignKey("CredentialTemplateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CredentialTemplate");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Group", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.Group", "ParentGroup")
@@ -2781,6 +2806,8 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.CredentialTemplate", b =>
                 {
+                    b.Navigation("ClaimMappers");
+
                     b.Navigation("CredentialOffers");
                 });
 #pragma warning restore 612, 618

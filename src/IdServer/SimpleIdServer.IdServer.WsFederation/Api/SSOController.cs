@@ -10,15 +10,13 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.IdentityModel.Tokens.Saml;
 using Microsoft.IdentityModel.Tokens.Saml2;
 using SimpleIdServer.IdServer.Api;
-using SimpleIdServer.IdServer.Api.Token.TokenBuilders;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
-using SimpleIdServer.IdServer.Extensions;
+using SimpleIdServer.IdServer.Extractors;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Stores;
-using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.WsFederation.Extensions;
 using System.Net;
 using System.Security.Claims;
@@ -30,23 +28,20 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
     {
         private readonly IClientRepository _clientRepository;
         private readonly IUserRepository _userRepository;
-        private readonly IUserTransformer _userTransformer;
         private readonly IDataProtector _dataProtector;
-        private readonly IClaimsExtractor _claimsExtractor;
+        private readonly IScopeClaimsExtractor _claimsExtractor;
         private readonly IdServerHostOptions _options;
 
         public SSOController(IClientRepository clientRepository, 
             IUserRepository userRepository,
-            IUserTransformer userTransformer,
-            IDataProtectionProvider dataProtectionProvider, 
-            IClaimsExtractor claimsExtractor,
+            IDataProtectionProvider dataProtectionProvider,
+            IScopeClaimsExtractor claimsExtractor,
             IOptions<IdServerHostOptions> opts, 
             IOptions<IdServerWsFederationOptions> options, 
             IKeyStore keyStore) : base(options, keyStore)
         {
             _clientRepository = clientRepository;
             _userRepository = userRepository;
-            _userTransformer = userTransformer;
             _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
             _claimsExtractor = claimsExtractor;
             _options = opts.Value;
@@ -118,12 +113,7 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
             {
                 var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, null, null, null, (X509Certificate2)null), realm ?? Constants.DefaultRealm);
                 context.SetUser(user);
-                var claims = (await _claimsExtractor.ExtractClaims(new ClaimsExtractionParameter
-                {
-                    Protocol = ScopeProtocols.SAML,
-                    Context = context,
-                    Scopes = client.Scopes
-                })).Select(c => new Claim(c.Key, c.Value.ToString())).ToList();
+                var claims = (await _claimsExtractor.ExtractClaims(context, client.Scopes, ScopeProtocols.SAML)).Select(c => new Claim(c.Key, c.Value.ToString())).ToList(); ;
                 if (claims.Count(t => t.Type == ClaimTypes.NameIdentifier) == 0)
                     throw new OAuthException(ErrorCodes.INVALID_RP, ErrorMessages.NO_CLAIM);
 

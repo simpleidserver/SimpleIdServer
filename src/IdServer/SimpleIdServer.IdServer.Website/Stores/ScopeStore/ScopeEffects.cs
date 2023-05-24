@@ -170,7 +170,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
                 return;
             }
 
-            if (!string.IsNullOrWhiteSpace(action.ClaimMapper.TokenClaimName) && scope.ClaimMappers.Any(m => m.TokenClaimName == action.ClaimMapper.TokenClaimName))
+            if (!string.IsNullOrWhiteSpace(action.ClaimMapper.TargetClaimPath) && scope.ClaimMappers.Any(m => m.TargetClaimPath == action.ClaimMapper.TargetClaimPath))
             {
                 dispatcher.Dispatch(new AddScopeClaimMapperFailureAction { ScopeName = action.ScopeName, ErrorMessage = Global.ScopeClaimMapperTokenClaimNameMustBeUnique });
                 return;
@@ -192,7 +192,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
         {
             var realm = await GetRealm();
             var scope = await _scopeRepository.Query().Include(s => s.Realms).Include(s => s.ClaimMappers).SingleAsync(s => s.Name == action.ScopeName && s.Realms.Any(r => r.Name == realm), CancellationToken.None);
-            if (!string.IsNullOrWhiteSpace(action.ClaimMapper.TokenClaimName) && scope.ClaimMappers.Any(m => m.TokenClaimName == action.ClaimMapper.TokenClaimName && m.Name != action.ClaimMapper.Name))
+            if (!string.IsNullOrWhiteSpace(action.ClaimMapper.TargetClaimPath) && scope.ClaimMappers.Any(m => m.TargetClaimPath == action.ClaimMapper.TargetClaimPath && m.Name != action.ClaimMapper.Name))
             {
                 dispatcher.Dispatch(new UpdateScopeClaimMapperFailureAction { ScopeName = action.ScopeName, ErrorMessage = Global.ScopeClaimMapperTokenClaimNameMustBeUnique });
                 return;
@@ -205,15 +205,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
             }
 
             var mapper = scope.ClaimMappers.Single(m => m.Name == action.ClaimMapper.Name);
-            mapper.UserAttributeName = action.ClaimMapper.UserAttributeName;
-            mapper.UserAttributeStreetName = action.ClaimMapper.UserAttributeStreetName;
-            mapper.UserAttributeLocalityName = action.ClaimMapper.UserAttributeLocalityName;
-            mapper.UserAttributeRegionName = action.ClaimMapper.UserAttributeRegionName;
-            mapper.UserAttributePostalCodeName = action.ClaimMapper.UserAttributePostalCodeName;
-            mapper.UserAttributeCountryName = action.ClaimMapper.UserAttributeCountryName;
-            mapper.UserAttributeFormattedName = action.ClaimMapper.UserAttributeFormattedName;
-            mapper.UserPropertyName = action.ClaimMapper.UserPropertyName;
-            mapper.TokenClaimName = action.ClaimMapper.TokenClaimName;
+            mapper.SourceUserAttribute = action.ClaimMapper.SourceUserAttribute;
+            mapper.SourceUserProperty = action.ClaimMapper.SourceUserProperty;
+            mapper.TargetClaimPath = action.ClaimMapper.TargetClaimPath;
             mapper.SAMLAttributeName = action.ClaimMapper.SAMLAttributeName;
             mapper.TokenClaimJsonType = action.ClaimMapper.TokenClaimJsonType;
             mapper.IsMultiValued = action.ClaimMapper.IsMultiValued;

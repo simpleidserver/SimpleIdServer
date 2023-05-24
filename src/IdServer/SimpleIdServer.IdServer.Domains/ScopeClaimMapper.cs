@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-
 using SimpleIdServer.IdServer.Domains.DTOs;
 using System.Security.Claims;
 
@@ -52,12 +51,17 @@ namespace SimpleIdServer.IdServer.Domains
 
         public static List<ScopeClaimMapper> CreateOpenIdAddressClaim()
         {
+            return CreateOpenIdAddressClaim(AddressClaimNames.Street, AddressClaimNames.Locality, AddressClaimNames.Region, AddressClaimNames.PostalCode, AddressClaimNames.Country, AddressClaimNames.Formatted);
+        }
+
+        public static List<ScopeClaimMapper> CreateOpenIdAddressClaim(string street, string locality, string region, string postalCode, string country, string formatted)
+        {
             return new List<ScopeClaimMapper>
             {
                 new ScopeClaimMapper
                 {
                     Id = Guid.NewGuid().ToString(),
-                    Name = $"address.{AddressClaimNames.Street}",
+                    Name = "Street",
                     MapperType = MappingRuleTypes.USERATTRIBUTE,
                     SourceUserAttribute = AddressClaimNames.Street,
                     TargetClaimPath = $"address.{AddressClaimNames.Street}",
@@ -66,7 +70,7 @@ namespace SimpleIdServer.IdServer.Domains
                 new ScopeClaimMapper
                 {
                     Id = Guid.NewGuid().ToString(),
-                    Name = $"address.{AddressClaimNames.Locality}",
+                    Name = "Locality",
                     MapperType = MappingRuleTypes.USERATTRIBUTE,
                     SourceUserAttribute = AddressClaimNames.Locality,
                     TargetClaimPath = $"address.{AddressClaimNames.Locality}",
@@ -75,7 +79,7 @@ namespace SimpleIdServer.IdServer.Domains
                 new ScopeClaimMapper
                 {
                     Id = Guid.NewGuid().ToString(),
-                    Name = $"address.{AddressClaimNames.Region}",
+                    Name = "Region",
                     MapperType = MappingRuleTypes.USERATTRIBUTE,
                     SourceUserAttribute = AddressClaimNames.Region,
                     TargetClaimPath = $"address.{AddressClaimNames.Region}",
@@ -84,7 +88,7 @@ namespace SimpleIdServer.IdServer.Domains
                 new ScopeClaimMapper
                 {
                     Id = Guid.NewGuid().ToString(),
-                    Name = $"address.{AddressClaimNames.PostalCode}",
+                    Name = "Postal code",
                     MapperType = MappingRuleTypes.USERATTRIBUTE,
                     SourceUserAttribute = AddressClaimNames.PostalCode,
                     TargetClaimPath = $"address.{AddressClaimNames.PostalCode}",
@@ -93,7 +97,7 @@ namespace SimpleIdServer.IdServer.Domains
                 new ScopeClaimMapper
                 {
                     Id = Guid.NewGuid().ToString(),
-                    Name = $"address.{AddressClaimNames.Country}",
+                    Name = "Country",
                     MapperType = MappingRuleTypes.USERATTRIBUTE,
                     SourceUserAttribute = AddressClaimNames.Country,
                     TargetClaimPath = $"address.{AddressClaimNames.Country}",
@@ -102,7 +106,7 @@ namespace SimpleIdServer.IdServer.Domains
                 new ScopeClaimMapper
                 {
                     Id = Guid.NewGuid().ToString(),
-                    Name = $"address.{AddressClaimNames.Formatted}",
+                    Name = "Formatted",
                     MapperType = MappingRuleTypes.USERATTRIBUTE,
                     SourceUserAttribute = AddressClaimNames.Formatted,
                     TargetClaimPath = $"address.{AddressClaimNames.Formatted}",

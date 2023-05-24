@@ -4,6 +4,7 @@
 		<Description>Identity server project with OPENID, OAUTH2.0, UMA2.0, CIBA and FAPI support.</Description>
 	</PropertyGroup>
 	<ItemGroup>
+	  <None Remove="Api\Token\TokenBuilders\IdTokenBuilder.cs~RFa873498.TMP" />
 	  <None Remove="Jobs\ImportRepresentationJob.cs~RF59cf7d4.TMP" />
 	</ItemGroup>
 	<ItemGroup>

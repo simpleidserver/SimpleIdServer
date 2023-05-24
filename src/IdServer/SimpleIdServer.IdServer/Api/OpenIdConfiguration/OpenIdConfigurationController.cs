@@ -68,7 +68,7 @@ namespace SimpleIdServer.IdServer.Api.OpenIdConfiguration
             result.Add(OpenIDConfigurationNames.UserInfoSigningAlgValuesSupported, JsonSerializer.SerializeToNode(Constants.AllSigningAlgs));
             result.Add(OpenIDConfigurationNames.UserInfoEncryptionAlgValuesSupported, JsonSerializer.SerializeToNode(Constants.AllEncAlgs));
             result.Add(OpenIDConfigurationNames.UserInfoEncryptionEncValuesSupported, JsonSerializer.SerializeToNode(Constants.AllEncryptions));
-            result.Add(OpenIDConfigurationNames.ClaimsSupported, JsonSerializer.SerializeToNode(claims.DistinctBy(c => c.TokenClaimName).Select(c => c.TokenClaimName)));
+            result.Add(OpenIDConfigurationNames.ClaimsSupported, JsonSerializer.SerializeToNode(claims.DistinctBy(c => c.TargetClaimPath).Select(c => c.TargetClaimPath)));
             result.Add(OpenIDConfigurationNames.ClaimsParameterSupported, true);
             result.Add(OpenIDConfigurationNames.BackchannelTokenDeliveryModesSupported, JsonSerializer.SerializeToNode(Constants.AllStandardNotificationModes));
             result.Add(OpenIDConfigurationNames.BackchannelAuthenticationRequestSigningAlgValues, JsonSerializer.SerializeToNode(Constants.AllSigningAlgs));

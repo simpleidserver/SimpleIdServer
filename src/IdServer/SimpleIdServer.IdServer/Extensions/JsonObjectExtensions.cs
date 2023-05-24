@@ -160,7 +160,7 @@ namespace System.Text.Json.Nodes
         public static ICollection<AuthorizationData> GetAuthorizationDetailsFromAuthorizationRequest(this JsonObject jObj)
         {
             var authDetails = jObj.GetToken(AuthorizationRequestParameters.AuthorizationDetails);
-            return authDetails == null ? null : JsonSerializerExtensions.DeserializeAuthorizationDetails(authDetails);
+            return authDetails == null ? new List<AuthorizationData>() : JsonSerializerExtensions.DeserializeAuthorizationDetails(authDetails);
         }
 
         public static string GetPreAuthorizedCode(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.PreAuthorizedCode);

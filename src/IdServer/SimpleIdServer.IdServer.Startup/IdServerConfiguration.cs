@@ -36,7 +36,8 @@ namespace SimpleIdServer.IdServer.Startup
             SimpleIdServer.IdServer.Constants.StandardScopes.GrantManagementRevoke,
             SimpleIdServer.IdServer.Constants.StandardScopes.Users,
             SimpleIdServer.IdServer.Constants.StandardScopes.Register,
-            SimpleIdServer.IdServer.Constants.StandardScopes.CredentialOffer
+            SimpleIdServer.IdServer.Constants.StandardScopes.CredentialOffer,
+            SimpleIdServer.IdServer.Constants.StandardScopes.Address
         };
 
         public static ICollection<User> Users => new List<User>

@@ -428,6 +428,30 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CredentialTemplateClaimMapper",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    MapperType = table.Column<int>(type: "int", nullable: false),
+                    SourceUserAttribute = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SourceUserProperty = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TargetClaimPath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsMultiValued = table.Column<bool>(type: "bit", nullable: false),
+                    TokenClaimJsonType = table.Column<int>(type: "int", nullable: true),
+                    CredentialTemplateId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CredentialTemplateClaimMapper", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CredentialTemplateClaimMapper_BaseCredentialTemplate_CredentialTemplateId",
+                        column: x => x.CredentialTemplateId,
+                        principalTable: "BaseCredentialTemplate",
+                        principalColumn: "TechnicalId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CredentialTemplateDisplay",
                 columns: table => new
                 {
@@ -904,15 +928,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     MapperType = table.Column<int>(type: "int", nullable: false),
-                    UserAttributeName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserAttributeStreetName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserAttributeLocalityName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserAttributeRegionName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserAttributePostalCodeName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserAttributeCountryName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserAttributeFormattedName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserPropertyName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TokenClaimName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SourceUserAttribute = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SourceUserProperty = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TargetClaimPath = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SAMLAttributeName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TokenClaimJsonType = table.Column<int>(type: "int", nullable: true),
                     IsMultiValued = table.Column<bool>(type: "bit", nullable: false),
@@ -1199,7 +1217,6 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     Source = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IdentityProvisioningId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Did = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DidPublicHex = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DidPrivateHex = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     NotificationMode = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
@@ -1564,6 +1581,11 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CredentialTemplateClaimMapper_CredentialTemplateId",
+                table: "CredentialTemplateClaimMapper",
+                column: "CredentialTemplateId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CredentialTemplateDisplay_CredentialTemplateId",
                 table: "CredentialTemplateDisplay",
                 column: "CredentialTemplateId");
@@ -1777,6 +1799,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
             migrationBuilder.DropTable(
                 name: "CredentialOffers");
+
+            migrationBuilder.DropTable(
+                name: "CredentialTemplateClaimMapper");
 
             migrationBuilder.DropTable(
                 name: "CredentialTemplateDisplay");

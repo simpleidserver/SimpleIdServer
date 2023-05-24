@@ -13,7 +13,7 @@ namespace SimpleIdServer.IdServer.Extractors
         Task<Dictionary<string, object>> ExtractClaims(HandlerContext context, IEnumerable<Scope> scopes, ScopeProtocols protocol);
     }
     
-    public class ScopeClaimsExtractor
+    public class ScopeClaimsExtractor : IScopeClaimsExtractor
     {
         private readonly IClaimsExtractor _claimsExtractor;
 

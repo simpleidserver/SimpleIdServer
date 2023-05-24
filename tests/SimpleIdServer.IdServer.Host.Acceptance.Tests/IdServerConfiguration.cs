@@ -223,8 +223,18 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                     new CredentialTemplateClaimMapper
                     {
                         Id = Guid.NewGuid().ToString(),
-                        MapperType = CredentialTemplateClaimMapperTypes.USERATTRIBUTE,
-                        UserAttributeName = "degreeName"
+                        MapperType = MappingRuleTypes.USERATTRIBUTE,
+                        SourceUserAttribute = "degreeName",
+                        TargetClaimPath = "degree.name",
+                        TokenClaimJsonType = TokenClaimJsonTypes.STRING
+                    },
+                    new CredentialTemplateClaimMapper
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        MapperType = MappingRuleTypes.USERATTRIBUTE,
+                        SourceUserAttribute = "degreeType",
+                        TargetClaimPath = "degree.type",
+                        TokenClaimJsonType = TokenClaimJsonTypes.STRING
                     }
                 }
             }

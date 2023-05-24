@@ -80,14 +80,14 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="get credential")]
+        [Xunit.SkippableFactAttribute(DisplayName="use pre authorized code to get a credential")]
         [Xunit.TraitAttribute("FeatureTitle", "Credential")]
-        [Xunit.TraitAttribute("Description", "get credential")]
-        public void GetCredential()
+        [Xunit.TraitAttribute("Description", "use pre authorized code to get a credential")]
+        public void UsePreAuthorizedCodeToGetACredential()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("get credential", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("use pre authorized code to get a credential", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 4
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -149,6 +149,9 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("extract parameter \'access_token\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 25
+ testRunner.And("extract parameter \'c_nonce\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 26
  testRunner.And("extract payload from JWT \'$access_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table125 = new TechTalk.SpecFlow.Table(new string[] {
@@ -159,8 +162,8 @@ this.ScenarioInitialize(scenarioInfo);
                             "openid4vci-proof+jwt"});
                 table125.AddRow(new string[] {
                             "c_nonce",
-                            "$cNonce$"});
-#line 26
+                            "$c_nonce$"});
+#line 27
  testRunner.And("build proof", ((string)(null)), table125, "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table126 = new TechTalk.SpecFlow.Table(new string[] {
@@ -178,17 +181,23 @@ this.ScenarioInitialize(scenarioInfo);
                 table126.AddRow(new string[] {
                             "proof",
                             "{ \"proof_type\": \"jwt\", \"jwt\": \"$proof$\" }"});
-#line 31
+#line 32
  testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/credential\'", ((string)(null)), table126, "And ");
 #line hidden
-#line 38
+#line 39
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 40
- testRunner.Then("JSON \'error\'=\'invalid_proof\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
 #line 41
- testRunner.And("JSON \'error_description\'=\'the credential nonce (c_nonce) is not valid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.Then("JSON exists \'credential\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 42
+ testRunner.And("JSON exists \'c_nonce\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 43
+ testRunner.And("JSON exists \'c_nonce_expires_in\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 44
+ testRunner.And("JSON \'format\'=\'ldp_vc\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();

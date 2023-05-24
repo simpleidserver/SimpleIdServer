@@ -14,6 +14,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
+using SimpleIdServer.IdServer.Extractors;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Store;
@@ -41,7 +42,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
         private readonly ITokenRepository _tokenRepository;
         private readonly IClaimsEnricher _claimsEnricher;
         private readonly IClaimsJwsPayloadEnricher _claimsJwsPayloadEnricher;
-        private readonly IClaimsExtractor _claimsExtractor;
+        private readonly IScopeClaimsExtractor _claimsExtractor;
         private readonly ILogger<UserInfoController> _logger;
         private readonly IBusControl _busControl;
 
@@ -54,7 +55,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
             ITokenRepository tokenRepository,
             IClaimsEnricher claimsEnricher,
             IClaimsJwsPayloadEnricher claimsJwsPayloadEnricher,
-            IClaimsExtractor claimsExtractor,
+            IScopeClaimsExtractor claimsExtractor,
             ILogger<UserInfoController> logger,
             IBusControl busControl)
         {
@@ -142,12 +143,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
                     var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, null, null, null, (X509Certificate2)null), prefix ?? Constants.DefaultRealm);
                     context.SetUser(user);
                     activity?.SetTag("scopes", string.Join(",", oauthScopes.Select(s => s.Name)));
-                    var payload = await _claimsExtractor.ExtractClaims(new ClaimsExtractionParameter
-                    {
-                        Protocol = ScopeProtocols.OPENID,
-                        Context = context,
-                        Scopes = oauthScopes
-                    });
+                    var payload = await _claimsExtractor.ExtractClaims(context, oauthScopes, ScopeProtocols.OPENID);
                     _claimsJwsPayloadEnricher.EnrichWithClaimsParameter(payload, claims, user, authTime, AuthorizationClaimTypes.UserInfo);
                     await _claimsEnricher.Enrich(user, payload, oauthClient, cancellationToken);
                     string contentType = "application/json";
