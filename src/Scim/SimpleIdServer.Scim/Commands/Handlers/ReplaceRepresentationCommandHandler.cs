@@ -75,6 +75,12 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             existingRepresentation.SetDisplayName(updatedRepresentation.DisplayName);
             existingRepresentation.SetExternalId(updatedRepresentation.ExternalId);
             existingRepresentation.SetUpdated(DateTime.UtcNow);
+            
+            var uniqueServerAttributeIds = existingRepresentation.FlatAttributes.Where(s => s.IsLeaf()).Where(a => a.SchemaAttribute.MultiValued == false && a.SchemaAttribute.Uniqueness == SCIMSchemaAttributeUniqueness.SERVER);
+            var uniqueGlobalAttributes = existingRepresentation.FlatAttributes.Where(s => s.IsLeaf()).Where(a => a.SchemaAttribute.MultiValued == false && a.SchemaAttribute.Uniqueness == SCIMSchemaAttributeUniqueness.GLOBAL);
+            await CheckSCIMRepresentationExistsForGivenUniqueAttributes(uniqueServerAttributeIds, existingRepresentation.Id, replaceRepresentationCommand.ResourceType);
+            await CheckSCIMRepresentationExistsForGivenUniqueAttributes(uniqueGlobalAttributes, existingRepresentation.Id);
+            
             var isReferenceProperty = await _representationReferenceSync.IsReferenceProperty(replaceRepresentationCommand.Representation.Attributes.GetKeys());
             var references = _representationReferenceSync.Sync(updateResult.AttributeMappingLst, replaceRepresentationCommand.ResourceType, oldRepresentation, existingRepresentation, replaceRepresentationCommand.Location, schema, !isReferenceProperty);
             using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
@@ -145,6 +151,32 @@ namespace SimpleIdServer.Scim.Commands.Handlers
         private class UpdateRepresentationResult
         {
             public IEnumerable<SCIMAttributeMapping> AttributeMappingLst { get; set; }
+        }
+    }
+    
+    private async Task CheckSCIMRepresentationExistsForGivenUniqueAttributes(IEnumerable<SCIMRepresentationAttribute> attributes, string currentId, string endpoint = null)
+    {
+        foreach (var attribute in attributes)
+        {
+            SCIMRepresentation record = null;
+            switch (attribute.SchemaAttribute.Type)
+            {
+                case SCIMSchemaAttributeTypes.STRING:
+                    record = await _scimRepresentationCommandRepository.FindSCIMRepresentationByAttribute(attribute.SchemaAttribute.Id, attribute.ValueString, endpoint);
+                    break;
+                case SCIMSchemaAttributeTypes.INTEGER:
+                    if (attribute.ValueInteger != null)
+                    {
+                        record = await _scimRepresentationCommandRepository.FindSCIMRepresentationByAttribute(attribute.SchemaAttribute.Id, attribute.ValueInteger.Value, endpoint);
+                    }
+
+                    break;
+            }
+
+            if (record != null && record.Id != currentId)
+            {
+                throw new SCIMUniquenessAttributeException(string.Format(Global.AttributeMustBeUnique, attribute.SchemaAttribute.Name));
+            }
         }
     }
 }
