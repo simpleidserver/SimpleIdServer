@@ -177,7 +177,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "jwt_vc_json"});
                 table126.AddRow(new string[] {
                             "types",
-                            "[VerifiableCredential,UniversityDegree]"});
+                            "[\"VerifiableCredential\",\"UniversityDegree\"]"});
                 table126.AddRow(new string[] {
                             "proof",
                             "{ \"proof_type\": \"jwt\", \"jwt\": \"$proof$\" }"});
@@ -197,8 +197,30 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("JSON exists \'c_nonce_expires_in\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 44
- testRunner.And("JSON \'format\'=\'ldp_vc\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'format\'=\'jwt_vc_json\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="use authorization code to get a credential")]
+        [Xunit.TraitAttribute("FeatureTitle", "Credential")]
+        [Xunit.TraitAttribute("Description", "use authorization code to get a credential")]
+        public void UseAuthorizationCodeToGetACredential()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("use authorization code to get a credential", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 46
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
             }
             this.ScenarioCleanup();
         }

@@ -12,7 +12,6 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Helpers
     {
         Task AddCredentialNonce(string credentialNonce, double validityPeriodsInSeconds, CancellationToken cancellationToken);
         Task<double?> GetCredentialNonce(string credentialNonce, CancellationToken cancellationToken);
-
     }
 
     public class CredIssuerTokenHelper : ICredIssuerTokenHelper

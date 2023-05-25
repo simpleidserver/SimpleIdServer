@@ -358,7 +358,7 @@ Scenario: JWT Type must be equals to openid4vci-proof+jwt
 	| Key           | Value                                         |
 	| Authorization | Bearer $access_token$                         |
 	| format        | jwt_vc_json                                   |
-	| types         | [VerifiableCredential,UniversityDegree]       |
+	| types         | ["VerifiableCredential","UniversityDegree"]   |
 	| proof         | { "proof_type": "jwt", "jwt": "$proof$" }     |
 	
 	And extract JSON from body
@@ -398,7 +398,7 @@ Scenario: JWT must contains a valid NONCE
 	| Key           | Value                                         |
 	| Authorization | Bearer $access_token$                         |
 	| format        | jwt_vc_json                                   |
-	| types         | [VerifiableCredential,UniversityDegree]       |
+	| types         | ["VerifiableCredential","UniversityDegree"]   |
 	| proof         | { "proof_type": "jwt", "jwt": "$proof$" }     |
 	
 	And extract JSON from body

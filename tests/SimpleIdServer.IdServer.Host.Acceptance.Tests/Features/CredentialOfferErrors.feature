@@ -17,7 +17,8 @@ Scenario: credential_template_id parameter is required (share)
 	Given authenticate a user
 	
 	When execute HTTP POST JSON request 'http://localhost/credential_offer/share'
-	| Key | Value |
+	| Key              | Value  |
+	| wallet_client_id | wallet |
 
 	And extract JSON from body
 	
@@ -47,9 +48,11 @@ Scenario: the wallet must exists (share)
 	| wallet_client_id       | unknown            |
 	| credential_template_id | credentialOfferId  |
 
+	And extract JSON from body
+
 	Then HTTP status code equals to '404'
 	Then JSON 'error'='invalid_request'
-	Then JSON 'error_description'='the wallet unknown doesn't exist'
+	Then JSON 'error_description'='the credential template credentialOfferId doesn't exist'
 
 Scenario: access token is required (get)
 	When execute HTTP GET request 'http://localhost/credential_offer/id'

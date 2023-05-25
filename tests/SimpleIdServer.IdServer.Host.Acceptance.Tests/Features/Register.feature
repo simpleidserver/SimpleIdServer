@@ -13,32 +13,32 @@ Scenario: Register a complete client
 	And extract parameter 'access_token' from JSON body	
 	
 	And execute HTTP POST JSON request 'http://localhost/register'
-	| Key                             | Value                      |
-	| Authorization                   | Bearer $access_token$      |	
-	| redirect_uris                   | [https://web.com]          |
-	| response_types                  | [token]                    |
-	| grant_types                     | [implicit]                 |
-	| client_name                     | name                       |
-	| client_name#fr                  | nom                        |
-	| client_name#en                  | name                       |
-	| application_type                | web                        |
-	| token_endpoint_auth_method      | client_secret_jwt          |
-	| sector_identifier_uri           | https://localhost/sector   |
-	| subject_type                    | public                     |
-	| id_token_signed_response_alg    | RS256                      |
-	| id_token_encrypted_response_alg | RSA-OAEP                   |
-	| id_token_encrypted_response_enc | A256CBC-HS512              |
-	| userinfo_signed_response_alg    | RS256                      |
-	| userinfo_encrypted_response_alg | RSA-OAEP                   |
-	| userinfo_encrypted_response_enc | A256CBC-HS512              |
-	| request_object_signing_alg      | RS256                      |
-	| request_object_encryption_alg   | RSA-OAEP                   |
-	| request_object_encryption_enc   | A256CBC-HS512              |
-	| default_max_age                 | 2                          |
-	| require_auth_time               | true                       |
-	| default_acr_values              | [a,b]                      |
-	| post_logout_redirect_uris       | [http://localhost/logout]  |
-	| initiate_login_uri              | https://localhost/loginuri |
+	| Key                             | Value                        |
+	| Authorization                   | Bearer $access_token$        |	
+	| redirect_uris                   | ["https://web.com"]          |
+	| response_types                  | ["token"]                    |
+	| grant_types                     | ["implicit"]                 |
+	| client_name                     | name                         |
+	| client_name#fr                  | nom                          |
+	| client_name#en                  | name                         |
+	| application_type                | web                          |
+	| token_endpoint_auth_method      | client_secret_jwt            |
+	| sector_identifier_uri           | https://localhost/sector     |
+	| subject_type                    | public                       |
+	| id_token_signed_response_alg    | RS256                        |
+	| id_token_encrypted_response_alg | RSA-OAEP                     |
+	| id_token_encrypted_response_enc | A256CBC-HS512                |
+	| userinfo_signed_response_alg    | RS256                        |
+	| userinfo_encrypted_response_alg | RSA-OAEP                     |
+	| userinfo_encrypted_response_enc | A256CBC-HS512                |
+	| request_object_signing_alg      | RS256                        |
+	| request_object_encryption_alg   | RSA-OAEP                     |
+	| request_object_encryption_enc   | A256CBC-HS512                |
+	| default_max_age                 | 2                            |
+	| require_auth_time               | true                         |
+	| default_acr_values              | ["a","b"]                    |
+	| post_logout_redirect_uris       | ["http://localhost/logout"]  |
+	| initiate_login_uri              | https://localhost/loginuri   |
 
 	And extract JSON from body
 	
@@ -82,32 +82,32 @@ Scenario: Get a client
 	And extract parameter 'access_token' from JSON body	
 
 	And execute HTTP POST JSON request 'http://localhost/register'
-	| Key                             | Value                      |
-	| Authorization                   | Bearer $access_token$      |
-	| redirect_uris                   | [https://web.com]          |
-	| response_types                  | [token]                    |
-	| grant_types                     | [implicit]                 |
-	| client_name                     | name                       |
-	| client_name#fr                  | nom                        |
-	| client_name#en                  | name                       |
-	| application_type                | web                        |
-	| token_endpoint_auth_method      | client_secret_jwt          |
-	| sector_identifier_uri           | https://localhost/sector   |
-	| subject_type                    | public                     |
-	| id_token_signed_response_alg    | RS256                      |
-	| id_token_encrypted_response_alg | RSA-OAEP                   |
-	| id_token_encrypted_response_enc | A256CBC-HS512              |
-	| userinfo_signed_response_alg    | RS256                      |
-	| userinfo_encrypted_response_alg | RSA-OAEP                   |
-	| userinfo_encrypted_response_enc | A256CBC-HS512              |
-	| request_object_signing_alg      | RS256                      |
-	| request_object_encryption_alg   | RSA-OAEP                   |
-	| request_object_encryption_enc   | A256CBC-HS512              |
-	| default_max_age                 | 2                          |
-	| require_auth_time               | true                       |
-	| default_acr_values              | [a,b]                      |
-	| post_logout_redirect_uris       | [http://localhost/logout]  |
-	| initiate_login_uri              | https://localhost/loginuri |
+	| Key                             | Value                        |
+	| Authorization                   | Bearer $access_token$        |
+	| redirect_uris                   | ["https://web.com"]          |
+	| response_types                  | ["token"]                    |
+	| grant_types                     | ["implicit"]                 |
+	| client_name                     | name                         |
+	| client_name#fr                  | nom                          |
+	| client_name#en                  | name                         |
+	| application_type                | web                          |
+	| token_endpoint_auth_method      | client_secret_jwt            |
+	| sector_identifier_uri           | https://localhost/sector     |
+	| subject_type                    | public                       |
+	| id_token_signed_response_alg    | RS256                        |
+	| id_token_encrypted_response_alg | RSA-OAEP                     |
+	| id_token_encrypted_response_enc | A256CBC-HS512                |
+	| userinfo_signed_response_alg    | RS256                        |
+	| userinfo_encrypted_response_alg | RSA-OAEP                     |
+	| userinfo_encrypted_response_enc | A256CBC-HS512                |
+	| request_object_signing_alg      | RS256                        |
+	| request_object_encryption_alg   | RSA-OAEP                     |
+	| request_object_encryption_enc   | A256CBC-HS512                |
+	| default_max_age                 | 2                            |
+	| require_auth_time               | true                         |
+	| default_acr_values              | ["a","b"]                    |
+	| post_logout_redirect_uris       | ["http://localhost/logout"]  |
+	| initiate_login_uri              | https://localhost/loginuri   |
 
 	And extract JSON from body
 	And extract parameter 'client_id' from JSON body

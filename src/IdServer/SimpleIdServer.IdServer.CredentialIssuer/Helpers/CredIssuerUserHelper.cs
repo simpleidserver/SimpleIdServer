@@ -16,6 +16,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Helpers
                 (claims == null || (claims.Where(cl => cl.Type == claimType && cl.IsEssential && SimpleIdServer.IdServer.Constants.AllUserClaims.Contains(cl.Name)).All(cl => c.Claims.Any(scl => scl == cl.Name)))) &&
                 ((authDetails == null || !authDetails.Any()) || (authDetails.All(d =>
                 {
+                    if (d.Type == SimpleIdServer.IdServer.CredentialIssuer.Constants.StandardAuthorizationDetails.OpenIdCredential) return c.AuthorizationDetails.Any(ad => ad.Type == d.Type && d.GetTypes() != null && d.GetTypes().All(t => ad.GetTypes().Contains(t)));
                     return c.AuthorizationDetails.Any(ad => ad.Type == d.Type && d.Actions != null && d.Actions.All(a => ad.Actions.Contains(a)) && d.Identifier == ad.Identifier);
                 })))
             );

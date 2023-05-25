@@ -136,7 +136,7 @@ namespace SimpleIdServer.IdServer.Domains
 
                     if(newAuthData.AdditionalData != null)
                     {
-                        var unknownAddsData = newAuthData.AdditionalData.Where(t => !existingAuthData.AdditionalData.Contains(t));
+                        var unknownAddsData = newAuthData.AdditionalData.Where(t => !existingAuthData.AdditionalData.Any(kvp => kvp.Key == t.Key && kvp.Value == t.Value));
                         foreach (var unknownAddData in unknownAddsData)
                             existingAuthData.AddAdditionalData(unknownAddData.Key, unknownAddData.Value);
                     }

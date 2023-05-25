@@ -15,13 +15,10 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Store;
-using SimpleIdServer.Vc;
-using SimpleIdServer.Vc.Models;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
@@ -76,7 +73,8 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential
                     return new OkObjectResult(result);
                 }
                 catch (OAuthUnauthorizedException ex)
-                {                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+                {                    
+                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
                     _logger.LogError(ex.ToString());
                     return BuildError(HttpStatusCode.Unauthorized, ex.Code, ex.Message);
                 }

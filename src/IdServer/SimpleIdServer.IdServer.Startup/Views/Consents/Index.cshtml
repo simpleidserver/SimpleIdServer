@@ -1,4 +1,5 @@
-﻿@using SimpleIdServer.IdServer.Startup.Resources
+﻿@using SimpleIdServer.IdServer.Domains;
+@using SimpleIdServer.IdServer.Startup.Resources
 @model SimpleIdServer.IdServer.UI.ViewModels.ConsentsIndexViewModel
 
 @{
@@ -51,6 +52,45 @@
                     @if(Model.ClaimNames != null && Model.ClaimNames.Any())
                     {
                         <li class="list-group-item"><b>@ConsentsResource.claims</b> : @string.Join(",", Model.ClaimNames)</li>
+                    }
+
+                    @if (Model.AuthorizationDetails != null && Model.AuthorizationDetails.Any())
+                    {
+                        foreach (var authDetail in Model.AuthorizationDetails)
+                        {
+                            if (authDetail.Type == SimpleIdServer.IdServer.CredentialIssuer.Constants.StandardAuthorizationDetails.OpenIdCredential)
+                            {
+                                var format = authDetail.GetFormat();
+                                switch(format)
+                                {
+                                    case SimpleIdServer.Vc.Constants.CredentialTemplateProfiles.W3CVerifiableCredentials:
+                                        var types = authDetail.GetTypes();
+                                        <b>@authDetail.Type</b>
+                                        <ul class="list-group">
+                                            @foreach(var type in types)
+                                            {
+                                                <li class="list-group-item">@type</li>
+                                            }
+                                        </ul>
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                <li class="list-group-item">
+                                    <b>@authDetail.Type</b> : @string.Join(",", authDetail.Actions)
+                                    @if (authDetail.Locations != null && authDetail.Locations.Any())
+                                    {
+                                        <ul class="list-group">
+                                            @foreach (var location in authDetail.Locations)
+                                            {
+                                                <li class="list-group-item">@location</li>
+                                            }
+                                        </ul>
+                                    }
+                                </li>
+                            }
+                        }
                     }
                 </ul>
 

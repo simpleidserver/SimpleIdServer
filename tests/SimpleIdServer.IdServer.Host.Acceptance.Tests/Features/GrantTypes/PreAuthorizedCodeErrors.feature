@@ -69,20 +69,14 @@ Scenario: pre-authorized must exists
 	And JSON '$.error_description'='either the pre-authorized code has expired or is invalid'
 
 Scenario: format is required in the authorization_details
-	When execute HTTP POST request 'https://localhost:8080/token'
-	| Key            | Value              |
-	| grant_type     | client_credentials |
-	| client_id      | fiftyNineClient    |
-	| client_secret  | password           |
-	| scope          | credential_offer   |
-	
-	And extract JSON from body	
-	And extract parameter 'access_token' from JSON body	
+	Given authenticate a user
 
-	And execute HTTP GET request 'http://localhost/credential_offer/credentialOfferId'
-	| Key           | Value                  |
-	| Authorization | Bearer $access_token$  |	
+	When execute HTTP POST JSON request 'http://localhost/credential_offer/share'
+	| Key                    | Value             |
+	| wallet_client_id       | fiftyNineClient   |
+	| credential_template_id | credTemplate      |
 
+	And extract query parameters into JSON
 	And extract query parameter 'credential_offer' into JSON
 	And extract parameter '$.grants.urn:ietf:params:oauth:grant-type:pre-authorized_code.pre-authorized_code' from JSON body into 'preAuthorizedCode'
 
@@ -99,20 +93,14 @@ Scenario: format is required in the authorization_details
 	And JSON '$.error_description'='the authorization_details must contain a format'
 
 Scenario: format must be supported in the authorization_details
-	When execute HTTP POST request 'https://localhost:8080/token'
-	| Key            | Value              |
-	| grant_type     | client_credentials |
-	| client_id      | fiftyNineClient    |
-	| client_secret  | password           |
-	| scope          | credential_offer   |
-	
-	And extract JSON from body	
-	And extract parameter 'access_token' from JSON body	
+	Given authenticate a user
 
-	And execute HTTP GET request 'http://localhost/credential_offer/credentialOfferId'
-	| Key           | Value                  |
-	| Authorization | Bearer $access_token$  |	
+	When execute HTTP POST JSON request 'http://localhost/credential_offer/share'
+	| Key                    | Value             |
+	| wallet_client_id       | fiftyNineClient   |
+	| credential_template_id | credTemplate      |
 
+	And extract query parameters into JSON
 	And extract query parameter 'credential_offer' into JSON
 	And extract parameter '$.grants.urn:ietf:params:oauth:grant-type:pre-authorized_code.pre-authorized_code' from JSON body into 'preAuthorizedCode'
 
@@ -121,7 +109,7 @@ Scenario: format must be supported in the authorization_details
 	| grant_type              | urn:ietf:params:oauth:grant-type:pre-authorized_code       |
 	| client_id               | fiftyNineClient                                            |
 	| pre-authorized_code     | $preAuthorizedCode$                                        |
-	| authorization_details   |  { "type" : "openid_credential", "format" : "invalid" }    |
+	| authorization_details   | { "type" : "openid_credential", "format" : "invalid" }     |
 	
 	And extract JSON from body
 	Then HTTP status code equals to '400'

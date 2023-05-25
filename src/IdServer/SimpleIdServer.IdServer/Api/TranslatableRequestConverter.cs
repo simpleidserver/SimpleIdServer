@@ -31,15 +31,18 @@ namespace SimpleIdServer.IdServer.Api
                         propertyName = reader.GetString();
                         break;
                     case JsonTokenType.String:
+                    case JsonTokenType.Number:
+                    case JsonTokenType.True:
+                    case JsonTokenType.False:
                         if (!isArray)
                         {
                             var prop = props.FirstOrDefault(p => p.Name == propertyName);
                             if (prop.p != null)
                             {
                                 if (prop.p.PropertyType == typeof(double?))
-                                    prop.p.SetValue(result, double.Parse(reader.GetString()));
+                                    prop.p.SetValue(result, reader.GetDouble());
                                 else if (prop.p.PropertyType == typeof(bool))
-                                    prop.p.SetValue(result, bool.Parse(reader.GetString()));
+                                    prop.p.SetValue(result, reader.GetBoolean());
                                 else
                                     prop.p.SetValue(result, reader.GetString());
                             }

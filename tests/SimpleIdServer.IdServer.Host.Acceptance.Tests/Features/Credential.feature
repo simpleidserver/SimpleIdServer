@@ -33,7 +33,7 @@ Scenario: use pre authorized code to get a credential
 	| Key           | Value                                         |
 	| Authorization | Bearer $access_token$                         |
 	| format        | jwt_vc_json                                   |
-	| types         | [VerifiableCredential,UniversityDegree]       |
+	| types         | ["VerifiableCredential","UniversityDegree"]   |
 	| proof         | { "proof_type": "jwt", "jwt": "$proof$" }     |
 	
 	And extract JSON from body
@@ -41,4 +41,6 @@ Scenario: use pre authorized code to get a credential
 	Then JSON exists 'credential'
 	And JSON exists 'c_nonce'
 	And JSON exists 'c_nonce_expires_in'
-	And JSON 'format'='ldp_vc'
+	And JSON 'format'='jwt_vc_json'
+
+Scenario: use authorization code to get a credential

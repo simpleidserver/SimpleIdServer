@@ -396,7 +396,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             foreach(var record in table.Rows)
             {
                 var key = record["Key"];
-                object value = ParseValue(_scenarioContext, record["Value"]);
+                object value = ParseValue(_scenarioContext, record["Value"], true);
                 try
                 {
                     value = JsonNode.Parse(value.ToString());
@@ -439,15 +439,15 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             return result;
         }
 
-        public static object ParseValue(ScenarioContext scenarioContext, string val)
+        public static object ParseValue(ScenarioContext scenarioContext, string val, bool ignoreArray = false)
         {
             if (val.StartsWith('$') && val.EndsWith('$'))
             {
                 val = val.TrimStart('$').TrimEnd('$');
                 return scenarioContext.Get<object>(val);
             }
-
-            if (val.StartsWith('[') && val.EndsWith(']'))
+            
+            if (!ignoreArray && val.StartsWith('[') && val.EndsWith(']'))
             {
                 val = val.TrimStart('[').TrimEnd(']');
                 var res = new JsonArray();

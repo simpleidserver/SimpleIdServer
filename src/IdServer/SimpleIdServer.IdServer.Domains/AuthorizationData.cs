@@ -64,7 +64,8 @@ namespace SimpleIdServer.IdServer.Domains
         public void AddAdditionalData(string key, string value)
         {
             if (AdditionalData == null) AdditionalData = new Dictionary<string, string>();
-            AdditionalData.Add(key, value);
+            if(AdditionalData.ContainsKey(key)) AdditionalData[key] = value;
+            else  AdditionalData.Add(key, value);
         }
 
         public Dictionary<string, object> Serialize()

@@ -22,7 +22,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential.Formats
                 { CredentialResultNames.CNonce, parameter.CNonce },
                 { CredentialResultNames.CNonceExpiresIn, parameter.CNonceExpiresIn },
                 { CredentialResultNames.Credential, jwt },
-                { CredentialResultNames.Format, "ldp_vc" }
+                { CredentialResultNames.Format, Format }
             };
         }
     }

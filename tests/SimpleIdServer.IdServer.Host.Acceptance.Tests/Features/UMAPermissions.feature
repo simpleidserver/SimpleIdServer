@@ -14,7 +14,7 @@ Scenario: get a permisson ticket
 
 	And execute HTTP POST JSON request 'http://localhost/rreguri'
 	| Key             | Value                 |
-	| resource_scopes | [scope1,scope2]       |
+	| resource_scopes | ["scope1","scope2"]   |
 	| subject         | user1                 |
 	| icon_uri        | icon                  |
 	| name#fr         | nom                   |
@@ -30,7 +30,7 @@ Scenario: get a permisson ticket
 	And execute HTTP POST JSON request 'http://localhost/perm'
 	| Key             | Value                 |
 	| resource_id     | $_id$                 |
-	| resource_scopes | [scope1,scope2]       |
+	| resource_scopes | ["scope1","scope2"]   |
 	| Authorization   | Bearer $access_token$ |
 
 	And extract JSON from body

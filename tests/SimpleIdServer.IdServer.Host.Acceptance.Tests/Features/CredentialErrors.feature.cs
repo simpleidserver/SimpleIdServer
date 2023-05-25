@@ -1146,7 +1146,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "jwt_vc_json"});
                 table159.AddRow(new string[] {
                             "types",
-                            "[VerifiableCredential,UniversityDegree]"});
+                            "[\"VerifiableCredential\",\"UniversityDegree\"]"});
                 table159.AddRow(new string[] {
                             "proof",
                             "{ \"proof_type\": \"jwt\", \"jwt\": \"$proof$\" }"});
@@ -1260,7 +1260,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "jwt_vc_json"});
                 table163.AddRow(new string[] {
                             "types",
-                            "[VerifiableCredential,UniversityDegree]"});
+                            "[\"VerifiableCredential\",\"UniversityDegree\"]"});
                 table163.AddRow(new string[] {
                             "proof",
                             "{ \"proof_type\": \"jwt\", \"jwt\": \"$proof$\" }"});
