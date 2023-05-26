@@ -333,13 +333,13 @@ namespace SimpleIdServer.Scim.Helpers
 
         private static ResolutionRowResult Resolve(KeyValuePair<string, JToken> kvp, ICollection<SCIMSchema> allSchemas)
         {
-            var schema = allSchemas.FirstOrDefault(s => s.Attributes.Any(at => at.FullPath == kvp.Key));
+            var schema = allSchemas.FirstOrDefault(s => s.Attributes.Any(at => at.FullPath.Equals(kvp.Key, StringComparison.InvariantCultureIgnoreCase)));
             if (schema == null)
             {
                 throw new SCIMSchemaViolatedException(string.Format(Global.AttributeIsNotRecognirzed, kvp.Key));
             }
 
-            return new ResolutionRowResult(schema, schema.Attributes.First(at => at.FullPath == kvp.Key), kvp.Value);
+            return new ResolutionRowResult(schema, schema.Attributes.First(at => at.FullPath.Equals(kvp.Key, StringComparison.InvariantCultureIgnoreCase)), kvp.Value);
         }
 
         private static ICollection<ResolutionRowResult> ResolveFullQualifiedName(KeyValuePair<string, JToken> kvp, ICollection<SCIMSchema> extensionSchemas)
@@ -368,7 +368,7 @@ namespace SimpleIdServer.Scim.Helpers
 
         private static ResolutionRowResult Resolve(KeyValuePair<string, JToken> kvp, SCIMSchema schema, ICollection<SCIMSchemaAttribute> schemaAttributes)
         {
-            var attrSchema = schemaAttributes.FirstOrDefault(a => a.Name == kvp.Key);
+            var attrSchema = schemaAttributes.FirstOrDefault(a => a.Name.Equals(kvp.Key, StringComparison.InvariantCultureIgnoreCase));
             if (attrSchema == null)
             {
                 throw new SCIMSchemaViolatedException(string.Format(Global.AttributeIsNotRecognirzed, kvp.Key));
