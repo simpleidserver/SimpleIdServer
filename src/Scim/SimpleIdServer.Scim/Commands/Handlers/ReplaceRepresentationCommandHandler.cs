@@ -148,35 +148,35 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             }
         }
 
+        private async Task CheckSCIMRepresentationExistsForGivenUniqueAttributes(IEnumerable<SCIMRepresentationAttribute> attributes, string currentId, string endpoint = null)
+        {
+            foreach (var attribute in attributes)
+            {
+                SCIMRepresentation record = null;
+                switch (attribute.SchemaAttribute.Type)
+                {
+                    case SCIMSchemaAttributeTypes.STRING:
+                        record = await _scimRepresentationCommandRepository.FindSCIMRepresentationByAttribute(attribute.SchemaAttribute.Id, attribute.ValueString, endpoint);
+                        break;
+                    case SCIMSchemaAttributeTypes.INTEGER:
+                        if (attribute.ValueInteger != null)
+                        {
+                            record = await _scimRepresentationCommandRepository.FindSCIMRepresentationByAttribute(attribute.SchemaAttribute.Id, attribute.ValueInteger.Value, endpoint);
+                        }
+
+                        break;
+                }
+
+                if (record != null && record.Id != currentId)
+                {
+                    throw new SCIMUniquenessAttributeException(string.Format(Global.AttributeMustBeUnique, attribute.SchemaAttribute.Name));
+                }
+            }
+        }
+
         private class UpdateRepresentationResult
         {
             public IEnumerable<SCIMAttributeMapping> AttributeMappingLst { get; set; }
-        }
-    }
-    
-    private async Task CheckSCIMRepresentationExistsForGivenUniqueAttributes(IEnumerable<SCIMRepresentationAttribute> attributes, string currentId, string endpoint = null)
-    {
-        foreach (var attribute in attributes)
-        {
-            SCIMRepresentation record = null;
-            switch (attribute.SchemaAttribute.Type)
-            {
-                case SCIMSchemaAttributeTypes.STRING:
-                    record = await _scimRepresentationCommandRepository.FindSCIMRepresentationByAttribute(attribute.SchemaAttribute.Id, attribute.ValueString, endpoint);
-                    break;
-                case SCIMSchemaAttributeTypes.INTEGER:
-                    if (attribute.ValueInteger != null)
-                    {
-                        record = await _scimRepresentationCommandRepository.FindSCIMRepresentationByAttribute(attribute.SchemaAttribute.Id, attribute.ValueInteger.Value, endpoint);
-                    }
-
-                    break;
-            }
-
-            if (record != null && record.Id != currentId)
-            {
-                throw new SCIMUniquenessAttributeException(string.Format(Global.AttributeMustBeUnique, attribute.SchemaAttribute.Name));
-            }
         }
     }
 }
