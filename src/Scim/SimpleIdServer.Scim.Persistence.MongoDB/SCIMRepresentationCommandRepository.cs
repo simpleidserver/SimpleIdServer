@@ -179,6 +179,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
         public async Task<bool> Add(SCIMRepresentation representation, CancellationToken token)
         {
             var record = new SCIMRepresentationModel(representation, _options.CollectionSchemas, _options.CollectionRepresentationAttributes);
+            foreach (var flatAttr in record.FlatAttributes) flatAttr.RepresentationId = representation.Id;
             if (_session != null)
             {
                 await _scimDbContext.SCIMRepresentationLst.InsertOneAsync(_session, record, null, token);
