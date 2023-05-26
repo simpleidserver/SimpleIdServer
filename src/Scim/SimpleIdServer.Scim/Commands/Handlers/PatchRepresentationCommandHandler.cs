@@ -39,7 +39,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             _options = options.Value;
         }
 
-        public async Task<PatchRepresentationResult> Handle(PatchRepresentationCommand patchRepresentationCommand)
+        public async virtual Task<PatchRepresentationResult> Handle(PatchRepresentationCommand patchRepresentationCommand)
         {
             var schema = await _scimSchemaCommandRepository.FindRootSCIMSchemaByResourceType(patchRepresentationCommand.ResourceType);
             if (schema == null) throw new SCIMSchemaNotFoundException();

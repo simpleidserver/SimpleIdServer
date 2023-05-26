@@ -38,7 +38,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             _representationReferenceSync = representationReferenceSync;
         }
 
-        public async Task<SCIMRepresentation> Handle(ReplaceRepresentationCommand replaceRepresentationCommand)
+        public async virtual Task<SCIMRepresentation> Handle(ReplaceRepresentationCommand replaceRepresentationCommand)
         {
             var requestedSchemas = replaceRepresentationCommand.Representation.Schemas;
             if (!requestedSchemas.Any())
