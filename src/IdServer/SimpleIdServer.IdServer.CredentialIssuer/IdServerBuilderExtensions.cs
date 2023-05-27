@@ -38,8 +38,11 @@ namespace Microsoft.Extensions.DependencyInjection
             idServerBuilder.Services.AddTransient<ICredentialTemplateClaimsExtractor, CredentialTemplateClaimsExtractor>();
             idServerBuilder.Services.AddTransient<ICredentialFormat, JwtVcCredentialFormat>();
             var preAuthCodeHandler = idServerBuilder.Services.First(s => s.ImplementationType == typeof(PreAuthorizedCodeHandler));
+            var authCodeHandler = idServerBuilder.Services.First(s => s.ImplementationType == typeof(AuthorizationCodeHandler));
             idServerBuilder.Services.Remove(preAuthCodeHandler);
+            idServerBuilder.Services.Remove(authCodeHandler);
             idServerBuilder.Services.AddTransient<IGrantTypeHandler, CredIssuerPreAuthorizedCodeHandler>();
+            idServerBuilder.Services.AddTransient<IGrantTypeHandler, CredIssuerAuthorizationCodeHandler>();
             return idServerBuilder;
         }
     }

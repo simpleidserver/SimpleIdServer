@@ -3,7 +3,6 @@
 using BlushingPenguin.JsonPath;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.IdentityModel.JsonWebTokens;
-using Newtonsoft.Json.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Nodes;

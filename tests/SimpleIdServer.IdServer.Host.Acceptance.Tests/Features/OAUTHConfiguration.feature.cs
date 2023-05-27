@@ -98,12 +98,12 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table375 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table379 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
 #line 5
  testRunner.When("execute HTTP GET request \'https://localhost:8080/.well-known/oauth-authorization-" +
-                        "server\'", ((string)(null)), table375, "When ");
+                        "server\'", ((string)(null)), table379, "When ");
 #line hidden
 #line 7
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -169,17 +169,17 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("JSON \'$.grant_types_supported[2]\'=\'password\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 29
- testRunner.And("JSON \'$.grant_types_supported[3]\'=\'authorization_code\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.grant_types_supported[3]\'=\'urn:openid:params:grant-type:ciba\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 30
- testRunner.And("JSON \'$.grant_types_supported[4]\'=\'urn:openid:params:grant-type:ciba\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.grant_types_supported[4]\'=\'urn:ietf:params:oauth:grant-type:uma-ticket\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 31
- testRunner.And("JSON \'$.grant_types_supported[5]\'=\'urn:ietf:params:oauth:grant-type:uma-ticket\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.grant_types_supported[5]\'=\'urn:ietf:params:oauth:grant-type:pre-authorize" +
+                        "d_code\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 32
- testRunner.And("JSON \'$.grant_types_supported[6]\'=\'urn:ietf:params:oauth:grant-type:pre-authorize" +
-                        "d_code\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.grant_types_supported[6]\'=\'authorization_code\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 33
  testRunner.And("JSON \'$.grant_types_supported[7]\'=\'implicit\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

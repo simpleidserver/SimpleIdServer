@@ -44,3 +44,47 @@ Scenario: use pre authorized code to get a credential
 	And JSON 'format'='jwt_vc_json'
 
 Scenario: use authorization code to get a credential
+	Given authenticate a user
+	
+	When execute HTTP GET request 'http://localhost/authorization'
+	| Key                     | Value                                                                                                               |
+	| response_type           | code token                                                                                                          |
+	| client_id               | fiftyEightClient                                                                                                    |
+	| state                   | state                                                                                                               |
+	| response_mode           | query                                                                                                               |
+	| redirect_uri            | http://localhost:8080                                                                                               |
+	| nonce                   | nonce                                                                                                               |
+	| authorization_details   |  { "type" : "openid_credential", "format": "jwt_vc_json", "types": [ "VerifiableCredential", "UniversityDegree"] }  |	
+	
+	And extract parameter 'code' from redirect url
+	
+	And execute HTTP POST request 'https://localhost:8080/token'
+	| Key           | Value        			|
+	| client_id     | fiftyEightClient      |
+	| client_secret | password     			|
+	| grant_type    | authorization_code	|
+	| code			| $code$				|	
+	| redirect_uri  | http://localhost:8080	|
+
+	And extract JSON from body
+	And extract parameter 'access_token' from JSON body
+	And extract parameter 'c_nonce' from JSON body
+	And extract payload from JWT '$access_token$'	
+	And build proof
+	| Key     | Value                 |
+	| typ     | openid4vci-proof+jwt  |
+	| c_nonce | $c_nonce$             |
+	
+	And execute HTTP POST JSON request 'https://localhost:8080/credential'
+	| Key           | Value                                         |
+	| Authorization | Bearer $access_token$                         |
+	| format        | jwt_vc_json                                   |
+	| types         | ["VerifiableCredential","UniversityDegree"]   |
+	| proof         | { "proof_type": "jwt", "jwt": "$proof$" }     |
+	
+	And extract JSON from body
+
+	Then JSON exists 'credential'
+	And JSON exists 'c_nonce'
+	And JSON exists 'c_nonce_expires_in'
+	And JSON 'format'='jwt_vc_json'
