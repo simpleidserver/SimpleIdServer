@@ -1123,3 +1123,25 @@ Scenario: Check properties are updated when the path parameter is omitted (HTTP 
 	Then JSON 'name.formatted'='newformatted'
 	Then JSON 'name.familyName'='familyName'
 	Then JSON 'employeeNumber'='Number'
+
+Scenario: Check property name are not case sensitive
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key                                                        | Value                                                                                                          |
+	| schemas                                                    | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| UserName                                                   | bjen                                                                                                           |
+	| ExternalId                                                 | externalid                                                                                                     |
+	| name                                                       | { "formatted" : "formatted", "FAMILYNAME": "familyName", "givenName": "givenName" }                            |
+	| urn:ietf:params:scim:schemas:extension:enterprise:2.0:User | { "employeeNumber" : "number" }                                                                                |
+	| eidCertificate                                             | aGVsbG8=                                                                                                       |
+	| immutable                                                  | immutable																									  |
+	
+	And extract JSON from body
+	And extract 'id' from JSON body
+	
+	And execute HTTP GET request 'http://localhost/Users/$id$'
+	And extract JSON from body
+
+	Then HTTP status code equals to '200'
+	Then JSON 'name.formatted'='formatted'
+	Then JSON 'name.familyName'='familyName'
+	Then JSON 'employeeNumber'='Number'
