@@ -6,6 +6,7 @@ using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Exceptions;
 using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.Helpers;
+using SimpleIdServer.Scim.Infrastructure;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Resources;
 using System;
@@ -38,7 +39,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             _representationReferenceSync = representationReferenceSync;
         }
 
-        public async virtual Task<SCIMRepresentation> Handle(ReplaceRepresentationCommand replaceRepresentationCommand)
+        public async virtual Task<GenericResult<SCIMRepresentation>> Handle(ReplaceRepresentationCommand replaceRepresentationCommand)
         {
             var requestedSchemas = replaceRepresentationCommand.Representation.Schemas;
             if (!requestedSchemas.Any())
@@ -96,7 +97,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 await _scimRepresentationCommandRepository.Update(existingRepresentation);
                 await transaction.Commit();
                 existingRepresentation.ApplyEmptyArray();
-                return existingRepresentation;
+                return GenericResult<SCIMRepresentation>.Ok(existingRepresentation);
             }
         }
 

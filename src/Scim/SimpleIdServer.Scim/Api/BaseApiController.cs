@@ -17,7 +17,6 @@ using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.ExternalEvents;
 using SimpleIdServer.Scim.Helpers;
 using SimpleIdServer.Scim.Parser.Exceptions;
-using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Queries;
 using SimpleIdServer.Scim.Resources;
 using System;
@@ -364,7 +363,9 @@ namespace SimpleIdServer.Scim.Api
             _logger.LogInformation(Global.StartGetResources);
             try
             {
-                var result = await _searchRepresentationsQueryHandler.Handle(searchRequest, _resourceType);
+                var searchResult = await _searchRepresentationsQueryHandler.Handle(searchRequest, _resourceType);
+                if (searchResult.HasError) return this.BuildError(searchResult);
+                var result = searchResult.Result;
                 var jObj = new JObject
                 {
                     { StandardSCIMRepresentationAttributes.Schemas, new JArray(new [] { StandardSchemas.ListResponseSchemas.Id } ) },
@@ -440,7 +441,9 @@ namespace SimpleIdServer.Scim.Api
             _logger.LogInformation(string.Format(Global.StartGetResource, id));
             try
             {
-                var representation = await _getRepresentationQueryHandler.Handle(id, parameter, _resourceType);
+                var getRepresentationResult = await _getRepresentationQueryHandler.Handle(id, parameter, _resourceType);
+                if (getRepresentationResult.HasError) return this.BuildError(getRepresentationResult);
+                var representation = getRepresentationResult.Result;
                 await _attributeReferenceEnricher.Enrich(_resourceType, new List<SCIMRepresentation> { representation }, _uriProvider.GetAbsoluteUriWithVirtualPath());
                 return BuildHTTPResult(representation, HttpStatusCode.OK, true);
             }
@@ -468,7 +471,9 @@ namespace SimpleIdServer.Scim.Api
             try
             {
                 var command = new AddRepresentationCommand(_resourceType, jobj, _uriProvider.GetAbsoluteUriWithVirtualPath());
-                var scimRepresentation = await _addRepresentationCommandHandler.Handle(command);
+                var addRepresentationResult = await _addRepresentationCommandHandler.Handle(command);
+                if (addRepresentationResult.HasError) return this.BuildError(addRepresentationResult);
+                var scimRepresentation = addRepresentationResult.Result;
                 var location = GetLocation(scimRepresentation);
                 var content = scimRepresentation.ToResponse(location, false, mergeExtensionAttributes: _options.MergeExtensionAttributes);
                 if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationAddedEvent(scimRepresentation.Id, scimRepresentation.Version, GetResourceType(scimRepresentation.ResourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
@@ -506,8 +511,10 @@ namespace SimpleIdServer.Scim.Api
             _logger.LogInformation(string.Format(Global.DeleteResource, id));
             try
             {
-                var representation = await _deleteRepresentationCommandHandler.Handle(new DeleteRepresentationCommand(id, _resourceType, _uriProvider.GetAbsoluteUriWithVirtualPath()));
-                if(IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationRemovedEvent(id, representation.Version, GetResourceType(_resourceType), _options.IncludeToken ? Request.GetToken() : string.Empty));
+                var getRepresentationResult = await _deleteRepresentationCommandHandler.Handle(new DeleteRepresentationCommand(id, _resourceType, _uriProvider.GetAbsoluteUriWithVirtualPath()));
+                if (getRepresentationResult.HasError) return this.BuildError(getRepresentationResult);
+                var representation = getRepresentationResult.Result;
+                if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationRemovedEvent(id, representation.Version, GetResourceType(_resourceType), _options.IncludeToken ? Request.GetToken() : string.Empty));
                 return new StatusCodeResult((int)HttpStatusCode.NoContent);
             }
             catch (SCIMSchemaViolatedException ex)
@@ -542,7 +549,9 @@ namespace SimpleIdServer.Scim.Api
             _logger.LogInformation(Global.UpdateResource, id);
             try
             {
-                var newRepresentation = await _replaceRepresentationCommandHandler.Handle(new ReplaceRepresentationCommand(id, _resourceType, representationParameter, _uriProvider.GetAbsoluteUriWithVirtualPath()));
+                var updateResult = await _replaceRepresentationCommandHandler.Handle(new ReplaceRepresentationCommand(id, _resourceType, representationParameter, _uriProvider.GetAbsoluteUriWithVirtualPath()));
+                if (updateResult.HasError) return this.BuildError(updateResult);
+                var newRepresentation = updateResult.Result;
                 var location = GetLocation(newRepresentation);
                 var content = newRepresentation.ToResponse(location, false, mergeExtensionAttributes: _options.MergeExtensionAttributes);
                 if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(newRepresentation.Id, newRepresentation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
@@ -595,7 +604,9 @@ namespace SimpleIdServer.Scim.Api
             _logger.LogInformation(string.Format(Global.PatchResource, id, patchRepresentation == null ? string.Empty : JsonConvert.SerializeObject(patchRepresentation)));
             try
             {
-                var patchResult = await _patchRepresentationCommandHandler.Handle(new PatchRepresentationCommand(id, ResourceType, patchRepresentation, _uriProvider.GetAbsoluteUriWithVirtualPath()));
+                var patchRes = await _patchRepresentationCommandHandler.Handle(new PatchRepresentationCommand(id, ResourceType, patchRepresentation, _uriProvider.GetAbsoluteUriWithVirtualPath()));
+                if (patchRes.HasError) return this.BuildError(patchRes);
+                var patchResult = patchRes.Result;
                 if (!patchResult.IsPatched) return NoContent();
                 var newRepresentation = patchResult.SCIMRepresentation;
                 var location = GetLocation(newRepresentation);

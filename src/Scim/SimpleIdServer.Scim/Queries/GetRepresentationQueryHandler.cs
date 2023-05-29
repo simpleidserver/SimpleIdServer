@@ -5,6 +5,7 @@ using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
+using SimpleIdServer.Scim.Infrastructure;
 using SimpleIdServer.Scim.Parser;
 using SimpleIdServer.Scim.Parser.Expressions;
 using SimpleIdServer.Scim.Persistence;
@@ -28,7 +29,7 @@ namespace SimpleIdServer.Scim.Queries
             _logger = logger;
         }
 
-        public async virtual Task<SCIMRepresentation> Handle(string id, GetSCIMResourceRequest parameter, string resourceType)
+        public async virtual Task<GenericResult<SCIMRepresentation>> Handle(string id, GetSCIMResourceRequest parameter, string resourceType)
         {
             var schema = await _scimSchemaQueryRepository.FindRootSCIMSchemaByResourceType(resourceType);
             if (schema == null) throw new SCIMNotFoundException();
@@ -51,7 +52,7 @@ namespace SimpleIdServer.Scim.Queries
 
             if (!includedAttributes.Any() && !excludedAttributes.Any())
                 representation.ApplyEmptyArray();
-            return representation;
+            return GenericResult<SCIMRepresentation>.Ok(representation);
         }
     }
 }

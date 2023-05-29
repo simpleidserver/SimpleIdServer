@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
+using SimpleIdServer.Scim.Infrastructure;
 using SimpleIdServer.Scim.Parser;
 using SimpleIdServer.Scim.Parser.Expressions;
 using SimpleIdServer.Scim.Persistence;
@@ -30,7 +31,7 @@ namespace SimpleIdServer.Scim.Queries
             _scimRepresentationQueryRepository = scimRepresentationQueryRepository;
         }
 
-        public virtual async Task<SearchSCIMRepresentationsResponse> Handle(SearchSCIMResourceParameter searchRequest, string resourceType)
+        public virtual async Task<GenericResult<SearchSCIMRepresentationsResponse>> Handle(SearchSCIMResourceParameter searchRequest, string resourceType)
         {
             if (searchRequest == null) throw new SCIMBadSyntaxException(Global.HttpPostNotWellFormatted);
             if (searchRequest.Count > _options.MaxResults || searchRequest.Count == null) searchRequest.Count = _options.MaxResults;
@@ -56,7 +57,7 @@ namespace SimpleIdServer.Scim.Queries
             var result = await _scimRepresentationQueryRepository.FindSCIMRepresentations(new SearchSCIMRepresentationsParameter(resourceType, searchRequest.StartIndex, searchRequest.Count.Value, sortByFilter, searchRequest.SortOrder, SCIMFilterParser.Parse(searchRequest.Filter, schemas), includedAttributes, excludedAttributes));
             var representations = result.Content.ToList();
             foreach (var representation in representations) representation.Schemas = schemas;
-            return result;
+            return GenericResult<SearchSCIMRepresentationsResponse>.Ok(result);
         }
     }
 }

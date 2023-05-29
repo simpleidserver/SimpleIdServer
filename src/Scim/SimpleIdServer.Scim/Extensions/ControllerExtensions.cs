@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Scim.DTOs;
+using SimpleIdServer.Scim.Infrastructure;
 using SimpleIdServer.Scim.Serialization;
 using System.Net;
 
@@ -18,6 +19,19 @@ namespace SimpleIdServer.Scim.Extensions
             {
                 StatusCode = (int)code,
                 Content = result.ToString(),
+                ContentType = "application/json"
+            };
+        }
+
+        public static IActionResult BuildError<T>(this Controller controller, GenericResult<T> result)
+        {
+            var serializer = new SCIMSerializer();
+            var code = result.StatusCode;
+            var res = serializer.Serialize(new SCIMErrorRepresentation(((int)code).ToString(), result.ErrorMessage, result.ScimType));
+            return new ContentResult
+            {
+                StatusCode = (int)code,
+                Content = res.ToString(),
                 ContentType = "application/json"
             };
         }

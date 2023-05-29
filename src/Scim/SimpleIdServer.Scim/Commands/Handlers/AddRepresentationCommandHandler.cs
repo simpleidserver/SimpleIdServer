@@ -5,6 +5,7 @@ using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Exceptions;
 using SimpleIdServer.Scim.Helpers;
+using SimpleIdServer.Scim.Infrastructure;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Resources;
 using System;
@@ -34,7 +35,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             _representationReferenceSync = representationReferenceSync;
         }
 
-        public async virtual Task<SCIMRepresentation> Handle(AddRepresentationCommand addRepresentationCommand)
+        public async virtual Task<GenericResult<SCIMRepresentation>> Handle(AddRepresentationCommand addRepresentationCommand)
         {
             var requestedSchemas = addRepresentationCommand.Representation.Schemas;
             if (!requestedSchemas.Any())
@@ -85,7 +86,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             }
 
             scimRepresentation.ApplyEmptyArray();
-            return scimRepresentation;
+            return GenericResult<SCIMRepresentation>.Ok(scimRepresentation);
         }
 
         private async Task CheckSCIMRepresentationExistsForGivenUniqueAttributes(IEnumerable<SCIMRepresentationAttribute> attributes, string endpoint = null)
