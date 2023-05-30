@@ -4,10 +4,6 @@
 		<Description>Identity server project with OPENID, OAUTH2.0, UMA2.0, CIBA and FAPI support.</Description>
 	</PropertyGroup>
 	<ItemGroup>
-	  <None Remove="Api\Token\TokenBuilders\IdTokenBuilder.cs~RFa873498.TMP" />
-	  <None Remove="Jobs\ImportRepresentationJob.cs~RF59cf7d4.TMP" />
-	</ItemGroup>
-	<ItemGroup>
 		<PackageReference Include="QRCoder" Version="1.4.1" />
 		<PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="6.25.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="7.0.1" />

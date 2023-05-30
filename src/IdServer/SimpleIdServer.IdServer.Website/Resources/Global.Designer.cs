@@ -232,6 +232,33 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Ethereum contract has been deployed.
+        /// </summary>
+        public static string EthrContractDeployed {
+            get {
+                return ResourceManager.GetString("EthrContractDeployed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Ethereum network has been added.
+        /// </summary>
+        public static string EthrNetworkAdded {
+            get {
+                return ResourceManager.GetString("EthrNetworkAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The ethereum network {0} already exists.
+        /// </summary>
+        public static string EthrNetworkExists {
+            get {
+                return ResourceManager.GetString("EthrNetworkExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à External authentication provider has been unlinked.
         /// </summary>
         public static string ExternalAuthProviderUnlinked {
@@ -624,6 +651,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string SelectedCredentialTemplatesRemoved {
             get {
                 return ResourceManager.GetString("SelectedCredentialTemplatesRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Selected ethereum networks have been removed.
+        /// </summary>
+        public static string SelectedEthrNetworksRemoved {
+            get {
+                return ResourceManager.GetString("SelectedEthrNetworksRemoved", resourceCulture);
             }
         }
         

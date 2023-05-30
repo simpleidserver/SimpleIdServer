@@ -1,0 +1,146 @@
+﻿@page "/ethrnetworks"
+@inject IState<SearchEthrNetworksState> searchNetworksState
+@inject IDispatcher dispatcher
+@inject ContextMenuService contextMenuService
+@inject DialogService dialogService
+@inject NotificationService notificationService
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.EthrNetworkStore;
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+
+<p class="text-muted">Manage the ethereum networks used to generate distributed identities (DID).</p>
+
+<RadzenButton class="mb-1" Click="@(args => AddNetwork())" Icon="add" Text="Add ethereum network" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+
+<RadzenDataGrid @ref="networksGrid"
+                AllowFiltering="true"
+                AllowColumnResize="true"
+                AllowAlternatingRows="false"
+                AllowSorting="true"
+                PageSize="30"
+                AllowPaging="true"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="true"
+                IsLoading="@searchNetworksState.Value.IsLoading"
+                Count="@searchNetworksState.Value.Count"
+                Data="@searchNetworksState.Value.Networks"
+                LoadData="@LoadData"
+                RowRender="@RowRender"
+                TItem="SelectableEthrNetwork"
+                ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn TItem="SelectableEthrNetwork" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <HeaderTemplate>
+                <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
+            </HeaderTemplate>
+            <Template Context="data">
+                <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableEthrNetwork" Property="Value.Name" Filterable="false" Sortable="true" Title="Name" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableEthrNetwork" Property="Value.ContractAdr" Filterable="false" Sortable="true" Title="Contract" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableEthrNetwork" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Update datetime" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableEthrNetwork" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
+            <Template Context="data">
+                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    RadzenDataGrid<SelectableEthrNetwork> networksGrid;
+    bool selectAll = false;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            SubscribeToAction<RemoveSelectedEthrContractSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedEthrNetworksRemoved });
+                StateHasChanged();
+            });
+            SubscribeToAction<DeployEthrContractSuccessAction>(async (act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.EthrContractDeployed });
+                StateHasChanged();
+            });
+            SubscribeToAction<DeployEthrContractFailureAction>(async (act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
+                StateHasChanged();
+            });
+            if (!searchNetworksState.Value.IsLoading)
+                networksGrid.Reload();
+        }
+    }
+
+    void LoadData(LoadDataArgs args)
+    {
+        var act = new SearchEthrNetworksAction { Filter = args.Filter, OrderBy = args.OrderBy, Skip = args.Skip, Take = args.Top };
+        dispatcher.Dispatch(act);
+    }
+
+    void ToggleChanged(bool isSelected, SelectableEthrNetwork network)
+    {
+        var act = new ToggleEthrContractAction { IsSelected = isSelected, Name = network.Value.Name };
+        dispatcher.Dispatch(act);
+    }
+
+    void ToggleAll(bool isSelected)
+    {
+        var act = new ToggleAllEthrContractAction { IsSelected = isSelected };
+        dispatcher.Dispatch(act);
+    }
+
+    void RowRender(RowRenderEventArgs<SelectableEthrNetwork> row)
+    {
+        const string className = "class";
+        if (row.Data.IsNew)
+            row.Attributes.Add(className, "new");
+        else if (row.Data.IsSelected)
+            row.Attributes.Add(className, "active");
+        else if (row.Attributes.ContainsKey(className))
+            row.Attributes.Remove(className);
+    }
+
+    void ShowMoreContextMenu(SelectableEthrNetwork network, MouseEventArgs args)
+    {
+        var menuItems = new List<ContextMenuItem>
+        {
+            new ContextMenuItem { Text = "Delete", Value = 1 }
+        };
+        if (string.IsNullOrWhiteSpace(network.Value.ContractAdr)) menuItems.Add(new ContextMenuItem { Text = "Deploy smart contract", Value = 2 });
+        contextMenuService.Open(args, menuItems, (a) =>
+        {
+            if (a.Value.Equals(1))
+            {
+                var names = searchNetworksState.Value.Networks?.Where(c => c.IsSelected).Select(c => c.Value.Name)?.ToList();
+                if (!names.Contains(network.Value.Name)) names.Add(network.Value.Name);
+                var act = new RemoveSelectedEthrContractAction { Names = names };
+                dispatcher.Dispatch(act);
+                contextMenuService.Close();
+            }
+
+            if(a.Value.Equals(2))
+            {
+                var act = new DeployEthrContractAction { Name = network.Value.Name };
+                dispatcher.Dispatch(act);
+                contextMenuService.Close();
+            }
+        });
+    }
+
+    async void AddNetwork()
+    {
+        await dialogService.OpenAsync<AddEthrNetworkDialog>("Add Ethereum Network", new Dictionary<string, object>(), new DialogOptions
+        {
+            Width = "700px",
+            Height = "512px",
+            Resizable = true,
+            Draggable = true
+        });
+    }
+}

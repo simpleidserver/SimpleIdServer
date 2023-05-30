@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.Options;
 using Nethereum.ABI.Decoders;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.Hex.HexTypes;
@@ -19,13 +20,13 @@ namespace SimpleIdServer.Did.Ethr
 {
     public class IdentityDocumentExtractor : IIdentityDocumentExtractor
     {
-        private readonly DidEthrOptions _options;
         private readonly IIdentityDocumentConfigurationStore _store;
+        private readonly DidEthrOptions _options;
 
-        public IdentityDocumentExtractor(IIdentityDocumentConfigurationStore store, DidEthrOptions options = null)
+        public IdentityDocumentExtractor(IIdentityDocumentConfigurationStore store, IOptions<DidEthrOptions> options)
         {
             _store = store;
-            _options = options ?? new DidEthrOptions();
+            _options = options.Value;
         }
 
         public string Type => Constants.Type;

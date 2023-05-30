@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.Options;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.Hex.HexTypes;
 using Nethereum.Web3;
@@ -18,10 +19,10 @@ namespace SimpleIdServer.Did.Ethr.Services
         private NetworkConfiguration _networkConfiguration;
         private Web3 _web3;
 
-        public SmartContractService(IIdentityDocumentConfigurationStore configurationStore, DidEthrOptions options)
+        public SmartContractService(IIdentityDocumentConfigurationStore configurationStore, IOptions<DidEthrOptions> options)
         {
             _configurationStore = configurationStore;
-            _options = options;
+            _options = options.Value;
         }
 
         public SmartContractService UseAccount(string privateKey)
@@ -40,12 +41,12 @@ namespace SimpleIdServer.Did.Ethr.Services
 
         public Task<HexBigInteger> GetCurrentBalance() => _web3.Eth.GetBalance.SendRequestAsync(_account.Address);
 
-        public async Task<EthereumDIDRegistryService> DeployContractAndGetService()
+        public Task<EthereumDIDRegistryService> DeployContractAndGetService()
         {
             var deployment = new EthereumDIDRegistryDeployment();
-            var receipt = await EthereumDIDRegistryService.DeployContractAndWaitForReceiptAsync(_web3, deployment);
+            var receipt = EthereumDIDRegistryService.DeployContractAndWaitForReceiptAsync(_web3, deployment).Result;
             var service = new EthereumDIDRegistryService(_web3, receipt.ContractAddress);
-            return service;
+            return Task.FromResult(service);
         }
     }
 }

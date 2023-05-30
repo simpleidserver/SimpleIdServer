@@ -17,6 +17,13 @@ builder.Services.AddSIDWebsite(o =>
         o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
     });
 });
+builder.Services.AddDIDEthrStore(o =>
+{
+    o.UseSqlServer(builder.Configuration.GetConnectionString("IdServer"), o =>
+    {
+        o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+    });
+});
 builder.Services.AddDefaultSecurity(builder.Configuration);
 
 var app = builder.Build();
@@ -26,7 +33,6 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
 }
-
 
 app.UseStaticFiles();
 app.UseRouting();

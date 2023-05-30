@@ -387,4 +387,16 @@
   <data name="SelectedCredentialOffersRemoved" xml:space="preserve">
     <value>Selected credential offers have been removed</value>
   </data>
+  <data name="EthrNetworkExists" xml:space="preserve">
+    <value>The ethereum network {0} already exists</value>
+  </data>
+  <data name="EthrContractDeployed" xml:space="preserve">
+    <value>Ethereum contract has been deployed</value>
+  </data>
+  <data name="EthrNetworkAdded" xml:space="preserve">
+    <value>Ethereum network has been added</value>
+  </data>
+  <data name="SelectedEthrNetworksRemoved" xml:space="preserve">
+    <value>Selected ethereum networks have been removed</value>
+  </data>
 </root>

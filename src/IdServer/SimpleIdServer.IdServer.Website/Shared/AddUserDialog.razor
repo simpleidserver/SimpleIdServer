@@ -42,7 +42,9 @@
         public string? LastName { get; set; } = null;
         public string? Email { get; set; } = null;
     }
+
     AddUserForm addUser = new AddUserForm();
+
     void AddUser(AddUserForm user)
     {
         dispatcher.Dispatch(new AddUserAction

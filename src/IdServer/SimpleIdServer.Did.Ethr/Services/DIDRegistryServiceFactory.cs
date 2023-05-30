@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.Options;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.Web3;
 using Nethereum.Web3.Accounts;
@@ -17,10 +18,10 @@ namespace SimpleIdServer.Did.Ethr.Services
         private readonly IIdentityDocumentConfigurationStore _configurationStore;
         private readonly DidEthrOptions _options;
 
-        public DIDRegistryServiceFactory(IIdentityDocumentConfigurationStore configurationStore, DidEthrOptions options)
+        public DIDRegistryServiceFactory(IIdentityDocumentConfigurationStore configurationStore, IOptions<DidEthrOptions> options)
         {
             _configurationStore = configurationStore;
-            _options = options;
+            _options = options.Value;
         }
 
         public EthereumDIDRegistryService Build(string privateKey, string contractAdr, string network = Constants.DefaultSource)

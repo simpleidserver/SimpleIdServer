@@ -3,17 +3,19 @@
 using SimpleIdServer.Did;
 using SimpleIdServer.Did.Ethr;
 using SimpleIdServer.Did.Ethr.Services;
+using System;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddDIDEthr(this IServiceCollection services, DidEthrOptions options)
+        public static IServiceCollection AddDIDEthr(this IServiceCollection services, Action<DidEthrOptions> callback = null)
         {
-            services.AddSingleton(options ?? new DidEthrOptions());
+            services.Configure<DidEthrOptions>(callback == null ? (o) => { } : callback);
             services.AddTransient<IIdentityDocumentIdentifierParser, IdentityDocumentIdentifierParser>();
             services.AddTransient<IIdentityDocumentExtractor, IdentityDocumentExtractor>();
             services.AddSingleton<IIdentityDocumentConfigurationStore, IdentityDocumentConfigurationStore>();
+            services.AddTransient<ISmartContractServiceFactory, SmartContractServiceFactory>();
             services.AddTransient<IDIDRegistryServiceFactory, DIDRegistryServiceFactory>();
             return services;
         }

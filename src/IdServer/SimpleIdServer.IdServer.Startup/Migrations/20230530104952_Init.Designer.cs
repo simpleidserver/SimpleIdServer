@@ -12,7 +12,7 @@ using SimpleIdServer.IdServer.Store;
 namespace SimpleIdServer.IdServer.Startup.Migrations
 {
     [DbContext(typeof(StoreDbContext))]
-    [Migration("20230524133914_Init")]
+    [Migration("20230530104952_Init")]
     partial class Init
     {
         /// <inheritdoc />
