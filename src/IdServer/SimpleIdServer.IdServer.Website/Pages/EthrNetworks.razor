@@ -8,7 +8,10 @@
 @using SimpleIdServer.IdServer.Website.Stores.EthrNetworkStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
-<p class="text-muted">Manage the ethereum networks used to generate distributed identities (DID).</p>
+<p class="text-muted">
+    Smart contracts used during the generation of Distributed Identity (DID) can be deployed here.
+    By default Ethereum is used.
+</p>
 
 <RadzenButton class="mb-1" Click="@(args => AddNetwork())" Icon="add" Text="Add ethereum network" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
 
