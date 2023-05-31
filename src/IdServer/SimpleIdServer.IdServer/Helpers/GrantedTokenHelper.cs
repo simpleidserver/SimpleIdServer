@@ -17,7 +17,6 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -96,6 +95,7 @@ namespace SimpleIdServer.IdServer.Helpers
 
         public SecurityTokenDescriptor BuildAccessToken(string clientId, IEnumerable<string> audiences, IEnumerable<string> scopes, ICollection<AuthorizationData> authorizationDetails, string issuerName)
         {
+            if (audiences == null || !audiences.Any()) audiences = new List<string> { clientId };
             var claims = new Dictionary<string, object>
             {
                 { System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Aud, audiences },
