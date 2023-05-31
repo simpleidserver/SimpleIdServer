@@ -32,7 +32,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.EthrNetworkStore
                 query = query.OrderBy(SanitizeExpression(action.OrderBy));
 
             var nb = query.Count();
-            var networks = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
+            var networks = await query.ToListAsync(CancellationToken.None);
             dispatcher.Dispatch(new SearchEthrNetworksSuccessAction { Networks = networks, Count = nb });
 
             string SanitizeExpression(string expression) => expression.Replace("Value.", "");
@@ -144,6 +144,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.EthrNetworkStore
     }
 
     public class ToggleEthrContractAction
+    {
+        public string Name { get; set; }
+        public bool IsSelected { get; set; }
+    }
+
+    public class SelectOneEthrContractAction
     {
         public string Name { get; set; }
         public bool IsSelected { get; set; }

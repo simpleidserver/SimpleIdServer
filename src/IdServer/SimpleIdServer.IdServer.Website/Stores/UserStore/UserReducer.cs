@@ -212,6 +212,19 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             };
         }
 
+        [ReducerMethod]
+        public static UserState ReduceGenerateDIDEthrSuccessAction(UserState state, GenerateDIDEthrSuccessAction act)
+        {
+            var user = state.User;
+            user.Did = act.Did;
+            user.DidPrivateHex = act.DidPrivateHex;
+            user.UpdateDateTime = DateTime.UtcNow;
+            return state with
+            {
+                User = user
+            };
+        }
+
         #endregion
 
         #region UpdateUserState
@@ -293,6 +306,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
 
         [ReducerMethod]
         public static UpdateUserState ReduceAddCredentialOfferSuccessAction(UpdateUserState state, AddCredentialOfferSuccessAction act) => new(false);
+
+        [ReducerMethod]
+        public static UpdateUserState ReduceGenerateDIDEthrAction(UpdateUserState state, GenerateDIDEthrAction act) => new(true) { };
+
+        [ReducerMethod]
+        public static UpdateUserState ReduceGenerateDIDEthrSuccessAction(UpdateUserState state, GenerateDIDEthrSuccessAction act) => new(false);
 
         #endregion
 

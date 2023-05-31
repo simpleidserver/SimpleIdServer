@@ -125,6 +125,22 @@ namespace SimpleIdServer.IdServer.Website.Stores.EthrNetworkStore
             };
         }
 
+        [ReducerMethod]
+        public static SearchEthrNetworksState ReduceSelectOneEthrContractAction(SearchEthrNetworksState state, SelectOneEthrContractAction act)
+        {
+            var results = state.Networks.ToList();
+            foreach(var result in results)
+            {
+                if (result.Value.Name == act.Name) result.IsSelected = true;
+                else result.IsSelected = false;
+            }
+
+            return state with
+            {
+                Networks = results
+            };
+        }
+
         #endregion
 
         #region UpdateEthrNetworkState

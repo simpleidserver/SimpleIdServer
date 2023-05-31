@@ -399,4 +399,7 @@
   <data name="SelectedEthrNetworksRemoved" xml:space="preserve">
     <value>Selected ethereum networks have been removed</value>
   </data>
+  <data name="DIDKeyCreated" xml:space="preserve">
+    <value>DID has been generated</value>
+  </data>
 </root>

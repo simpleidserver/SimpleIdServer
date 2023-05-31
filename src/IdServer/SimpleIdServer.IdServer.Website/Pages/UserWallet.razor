@@ -1,0 +1,40 @@
+﻿@inject DialogService dialogService
+
+<div>
+    <RadzenButton class="mb-1" Click="@(args => AddDID())" Icon="add" Text="Add DID" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+    @if(!string.IsNullOrWhiteSpace(User.Did))
+    {
+        <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">There is no Decentralized Identifier (DID).  please '</RadzenAlert>
+    }
+    else
+    {
+        <!-- Decentralized Identifier -->
+        <div>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Decentralized Identifier (DID)</RadzenText>
+            <RadzenTextBox @bind-Value="@User.Did" Class="w-100" Disabled=true></RadzenTextBox>
+            <p class="text-muted">Global unique identifier that enables an entity to be identified in a manner that is verifiable.</p>
+        </div>
+        <!-- Private Wallet Key -->
+        <div>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Private Key</RadzenText>
+            <RadzenPassword @bind-Value="@User.DidPrivateHex" Class="w-100" Disabled=true></RadzenPassword>
+            <p class="text-muted">Private Key of your wallet. Value is encoded in hexadecimal.</p>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public SimpleIdServer.IdServer.Domains.User User { get; set; }
+
+    async void AddDID()
+    {
+        await dialogService.OpenAsync<AddDIDDialog>("Add Decentralized Identifier", new Dictionary<string, object>(), new DialogOptions
+        {
+            Width = "700px",
+            Height = "512px",
+            Resizable = true,
+            Draggable = true
+        });
+    }
+}

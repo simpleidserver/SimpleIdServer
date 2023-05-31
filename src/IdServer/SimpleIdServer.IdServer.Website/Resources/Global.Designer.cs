@@ -223,6 +223,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à DID has been generated.
+        /// </summary>
+        public static string DIDKeyCreated {
+            get {
+                return ResourceManager.GetString("DIDKeyCreated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Encryption key has been added.
         /// </summary>
         public static string EncKeyAdded {

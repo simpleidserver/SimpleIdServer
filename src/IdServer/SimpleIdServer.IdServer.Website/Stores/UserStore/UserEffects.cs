@@ -7,13 +7,16 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using QRCoder;
 using Radzen;
+using SimpleIdServer.Did;
+using SimpleIdServer.Did.Ethr;
+using SimpleIdServer.Did.Ethr.Services;
+using SimpleIdServer.Did.Extensions;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Website.Resources;
 using SimpleIdServer.IdServer.Website.Stores.Base;
 using System.Drawing.Imaging;
 using System.Linq.Dynamic.Core;
-using System.Net.Http.Headers;
 using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.IdServer.Website.Stores.UserStore
@@ -23,6 +26,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         private readonly ILoggerFactory _loggerFactory;
         private readonly IUserRepository _userRepository;
         private readonly IGroupRepository _groupRepository;
+        private readonly IDIDRegistryServiceFactory _didRegistryServiceFactory;
+        private readonly IIdentityDocumentConfigurationStore _identityDocumentConfigurationStore;
         private readonly ProtectedSessionStorage _sessionStorage;
         private readonly DbContextOptions<StoreDbContext> _options;
         private readonly IdServerWebsiteOptions _websiteOptions;
@@ -32,6 +37,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             ILoggerFactory loggerFactory,
             IUserRepository userRepository,
             IGroupRepository groupRepository,
+            IDIDRegistryServiceFactory didRegistryServiceFactory,
+            IIdentityDocumentConfigurationStore identityDocumentConfigurationStore,
             ProtectedSessionStorage sessionStorage,
             DbContextOptions<StoreDbContext> options,
             IOptions<IdServerWebsiteOptions> websiteOptions,
@@ -40,6 +47,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             _loggerFactory = loggerFactory;
             _userRepository = userRepository;
             _groupRepository = groupRepository;
+            _didRegistryServiceFactory = didRegistryServiceFactory;
+            _identityDocumentConfigurationStore = identityDocumentConfigurationStore;
             _sessionStorage = sessionStorage;
             _options = options;
             _websiteOptions = websiteOptions.Value;
@@ -386,6 +395,26 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             }
         }
 
+        [EffectMethod]
+        public async Task Handle(GenerateDIDEthrAction action, IDispatcher dispatcher)
+        {
+            var realm = await GetRealm();
+            var user = await _userRepository.Query().Include(u => u.Realms).FirstOrDefaultAsync(u => u.Id == action.UserId && u.Realms.Any(r => r.RealmsName == realm));
+            var network = await _identityDocumentConfigurationStore.Query().FirstAsync(i => i.Name == action.NetworkName);
+            var key = SignatureKeyBuilder.NewES256K();
+            var did = $"did:ethr:{action.NetworkName}:{action.PublicKey}";
+            var identityDocument = IdentityDocumentBuilder.New(did, action.PublicKey)
+                .AddVerificationMethod(key, SimpleIdServer.Did.Constants.VerificationMethodTypes.Secp256k1VerificationKey2018)
+                .Build();
+            var sync = new IdentityDocumentSynchronizer(_didRegistryServiceFactory);
+            await sync.Sync(identityDocument, action.PublicKey, network.PrivateAccountKey, network.ContractAdr);
+            var hex = key.PrivateKey.ToHex();
+            user.Did = did;
+            user.DidPrivateHex = hex;
+            user.UpdateDateTime = DateTime.UtcNow;
+            dispatcher.Dispatch(new GenerateDIDEthrSuccessAction { Did = user.Did, DidPrivateHex = user.DidPrivateHex, UserId = action.UserId });
+        }
+
         private async Task<string> GetRealm()
         {
             var realm = await _sessionStorage.GetAsync<string>("realm");
@@ -724,5 +753,19 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
     {
         public string Picture { get; set; }
         public string Url { get; set; }
+    }
+
+    public class GenerateDIDEthrAction
+    {
+        public string UserId { get; set; }
+        public string PublicKey { get; set; }
+        public string NetworkName { get; set; }
+    }
+
+    public class GenerateDIDEthrSuccessAction
+    {
+        public string UserId { get; set; }
+        public string Did { get; set; }
+        public string DidPrivateHex { get; set; }
     }
 }

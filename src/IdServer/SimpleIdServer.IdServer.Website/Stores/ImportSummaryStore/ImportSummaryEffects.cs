@@ -59,8 +59,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ImportSummaryStore
                 {
                     RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/provisioning/import")
                 };
-                var httpResult = await httpClient.SendAsync(requestMessage);
-                var tt = "";
+                await httpClient.SendAsync(requestMessage);
             }
 
             dispatcher.Dispatch(new LaunchImportSuccessAction());
