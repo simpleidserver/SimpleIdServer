@@ -12,6 +12,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton(keyOptions ?? new DidKeyOptions());
             services.AddTransient<IIdentityDocumentIdentifierParser, IdentityDocumentIdentifierParser>();
             services.AddTransient<IIdentityDocumentExtractor, IdentityDocumentExtractor>();
+            services.AddTransient<IDIDGenerator, DIDKeyGenerator>();
             return services;
         }
     }

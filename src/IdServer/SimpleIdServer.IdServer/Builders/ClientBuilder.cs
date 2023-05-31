@@ -33,7 +33,6 @@ namespace SimpleIdServer.IdServer.Builders
             };
             if (realm == null) client.Realms.Add(Constants.StandardRealms.Master);
             else client.Realms.Add(realm);
-            client.Scopes.Add(Constants.StandardScopes.CredentialOffer);
             client.GrantTypes.Add(PreAuthorizedCodeHandler.GRANT_TYPE);
             client.GrantTypes.Add(ClientCredentialsHandler.GRANT_TYPE);
             return new WalletClientBuilder(client);

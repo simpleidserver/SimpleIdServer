@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using SimpleIdServer.Did.Ethr.Store;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.CredentialIssuer;
 using SimpleIdServer.IdServer.Domains;
@@ -102,14 +101,7 @@ void RunSqlServerIdServer(IServiceCollection services)
             });
         });
     services.AddDIDKey();
-    services.AddDIDEthrStore(db =>
-    {
-        db.UseSqlServer(builder.Configuration.GetConnectionString("IdServer"), o =>
-        {
-            o.MigrationsAssembly(name);
-            o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-        });
-    });
+    services.AddDIDEthr();
 }
 
 void SeedData(WebApplication application, string scimBaseUrl)
@@ -195,6 +187,17 @@ void SeedData(WebApplication application, string scimBaseUrl)
                 });
             }
 
+            if (!dbContext.Networks.Any())
+                dbContext.Networks.Add(new SimpleIdServer.IdServer.Domains.NetworkConfiguration
+                {
+                    Name = "sepolia",
+                    RpcUrl = "https://rpc.sepolia.org",
+                    ContractAdr = SimpleIdServer.Did.Ethr.Constants.DefaultContractAdr,
+                    PrivateAccountKey = "0fda34d0029c91481b1f54b0b68efea94c4572c80b2902cb3a2ab722b41fc1e1",
+                    UpdateDateTime = DateTime.UtcNow,
+                    CreateDateTime = DateTime.UtcNow
+                });
+
             var dbConnection = dbContext.Database.GetDbConnection() as SqlConnection;
             if(dbConnection != null)
             {
@@ -205,23 +208,6 @@ void SeedData(WebApplication application, string scimBaseUrl)
             }
 
             dbContext.SaveChanges();
-        }
-
-        using(var ethrDbContext = scope.ServiceProvider.GetService<EthrDbContext>())
-        {
-            ethrDbContext.Database.Migrate();
-            if (!ethrDbContext.Networks.Any())
-                ethrDbContext.Networks.Add(new SimpleIdServer.Did.Ethr.Models.NetworkConfiguration
-                {
-                    Name = "sepolia",
-                    RpcUrl = "https://rpc.sepolia.org",
-                    ContractAdr = SimpleIdServer.Did.Ethr.Constants.DefaultContractAdr,
-                    PrivateAccountKey = "0fda34d0029c91481b1f54b0b68efea94c4572c80b2902cb3a2ab722b41fc1e1",
-                    UpdateDateTime = DateTime.UtcNow,
-                    CreateDateTime = DateTime.UtcNow
-                });
-
-            ethrDbContext.SaveChanges();
         }
     }
 }

@@ -36,6 +36,7 @@ namespace SimpleIdServer.IdServer.Store
         public DbSet<Group> Groups { get; set; }
         public DbSet<CredentialTemplate> CredentialTemplates { get; set; }
         public DbSet<UserCredentialOffer> CredentialOffers { get; set; }
+        public DbSet<NetworkConfiguration> Networks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -90,6 +91,7 @@ namespace SimpleIdServer.IdServer.Store
             builder.ApplyConfiguration(new CredentialTemplateConfiguration());
             builder.ApplyConfiguration(new CredentialTemplateDisplayConfiguration());
             builder.ApplyConfiguration(new CredentialTemplateParameterConfiguration());
+            builder.ApplyConfiguration(new NetworkConfigurationConf());
         }
     }
 }

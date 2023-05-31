@@ -105,12 +105,6 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialOffer
         private async Task<CredentialOfferBuildResult> InternalGet(string prefix, string id, CancellationToken cancellationToken)
         {
             prefix = prefix ?? SimpleIdServer.IdServer.Constants.DefaultRealm;
-            var bearerToken = ExtractBearerToken();
-            var token = await _grantedTokenHelper.GetAccessToken(bearerToken, cancellationToken);
-            if (token == null) return CredentialOfferBuildResult.Unauthorized(ErrorCodes.INVALID_TOKEN, ErrorMessages.UNKNOWN_ACCESS_TOKEN);
-            var scopes = token.Claims.Where(c => c.Type == "scope").Select(c => c.Value).ToList();
-            if (!scopes.Contains(SimpleIdServer.IdServer.Constants.StandardScopes.CredentialOffer.Name)) return CredentialOfferBuildResult.Unauthorized(ErrorCodes.INVALID_TOKEN, ErrorMessages.INVALID_ACCESS_TOKEN_SCOPE);
-
             var credentialOffer = await _credentialOfferRepository.Query().AsNoTracking().SingleOrDefaultAsync(c => c.Id == id, cancellationToken);
             if (credentialOffer == null) return CredentialOfferBuildResult.NotFound(ErrorCodes.INVALID_REQUEST,  ErrorMessages.UNKNOWN_CREDENTIAL_OFFER);
             if (credentialOffer.Status == UserCredentialOfferStatus.INVALID) return CredentialOfferBuildResult.Invalid(ErrorCodes.INVALID_CREDOFFER, ErrorMessages.CREDOFFER_IS_INVALID);

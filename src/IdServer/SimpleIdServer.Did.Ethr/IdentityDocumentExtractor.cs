@@ -8,6 +8,7 @@ using Nethereum.RPC.Eth.DTOs;
 using Nethereum.Web3;
 using SimpleIdServer.Did.Ethr.Services;
 using SimpleIdServer.Did.Models;
+using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
 using System.Linq;

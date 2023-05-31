@@ -5,10 +5,9 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Nethereum.Web3" Version="4.14.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.*" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.*" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\SimpleIdServer.Did\SimpleIdServer.Did.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.IdServer.Store\SimpleIdServer.IdServer.Store.csproj" />
 	</ItemGroup>
 </Project>

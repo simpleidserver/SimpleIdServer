@@ -180,6 +180,9 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.MapControllerRoute("replaceCredential",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/credentials",
                 defaults: new { controller = "Users", action = "ReplaceCredential" });
+            webApplication.MapControllerRoute("generateDecentralizedIdentity",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/did",
+                defaults: new { controller = "Users", action = "GenerateDecentralizedIdentity" });
 
             webApplication.MapControllerRoute("extractRepresentations",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{name}/{id}/enqueue",

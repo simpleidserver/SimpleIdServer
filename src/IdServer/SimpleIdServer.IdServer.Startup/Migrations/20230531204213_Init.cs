@@ -279,6 +279,22 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Networks",
+                columns: table => new
+                {
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RpcUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PrivateAccountKey = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ContractAdr = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Networks", x => x.Name);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Realms",
                 columns: table => new
                 {
@@ -1841,6 +1857,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
             migrationBuilder.DropTable(
                 name: "ImportSummaries");
+
+            migrationBuilder.DropTable(
+                name: "Networks");
 
             migrationBuilder.DropTable(
                 name: "RealmScope");

@@ -14,9 +14,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.Configure<DidEthrOptions>(callback == null ? (o) => { } : callback);
             services.AddTransient<IIdentityDocumentIdentifierParser, IdentityDocumentIdentifierParser>();
             services.AddTransient<IIdentityDocumentExtractor, IdentityDocumentExtractor>();
-            services.AddSingleton<IIdentityDocumentConfigurationStore, IdentityDocumentConfigurationStore>();
             services.AddTransient<ISmartContractServiceFactory, SmartContractServiceFactory>();
             services.AddTransient<IDIDRegistryServiceFactory, DIDRegistryServiceFactory>();
+            services.AddTransient<IDIDGenerator, DIDEthrGenerator>();
             return services;
         }
     }

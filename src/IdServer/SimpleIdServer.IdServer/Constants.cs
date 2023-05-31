@@ -471,11 +471,11 @@ namespace SimpleIdServer.IdServer
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
-            public static Scope CredentialOffer = new Scope
+            public static Scope Provisioning = new Scope
             {
                 Id = Guid.NewGuid().ToString(),
                 Type = ScopeTypes.APIRESOURCE,
-                Name = "credential_offer",
+                Name = "provisioning",
                 Realms = new List<Domains.Realm>
                 {
                     StandardRealms.Master

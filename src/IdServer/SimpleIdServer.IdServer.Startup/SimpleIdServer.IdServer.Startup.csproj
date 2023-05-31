@@ -4,7 +4,7 @@
 		<OutputType>Exe</OutputType>
 	</PropertyGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\SimpleIdServer.Did.Ethr.Store\SimpleIdServer.Did.Ethr.Store.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.Did.Ethr\SimpleIdServer.Did.Ethr.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.CredentialIssuer\SimpleIdServer.IdServer.CredentialIssuer.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Email\SimpleIdServer.IdServer.Email.csproj" />
@@ -146,6 +146,5 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Migrations\" />
-	  <Folder Include="Migrations\EthrDb\" />
 	</ItemGroup>
 </Project>

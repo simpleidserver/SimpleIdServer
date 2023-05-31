@@ -57,6 +57,7 @@ namespace SimpleIdServer.IdServer
         public const string INVALID_ACCESS_TOKEN_SCOPE = "access token has an invalid scope";
         public const string INVALID_JWS_REQUEST_PARAMETER = "request parameter is not a valid JWS token";
         public const string INVALID_REQUEST_URI_PARAMETER = "request_uri parameter is invalid";
+        public const string INVALID_INCOMING_REQUEST = "incoming request is invalid";
         public const string INVALID_ENC_OR_ALG_USED_TO_ENCRYPT_IDTOKENHINT = "the alg / enc used to encrypt the id_token_hint is invalid";
         public const string INVALID_SECTOR_IDENTIFIER_URI = "sector_identifier_uri is not a valid URI";
         public const string INVALID_HTTPS_SECTOR_IDENTIFIER_URI = "sector_identifier_uri doesn't contain https scheme";
@@ -72,6 +73,7 @@ namespace SimpleIdServer.IdServer
         public const string INVALID_APPLICATION_TYPE = "application type is invalid";
         public const string INVALID_GRANT_MANAGEMENT_ACTION = "the grant_management_action {0} is not valid";
         public const string INVALID_AUTH_DETAILS_LOCATION = "the authorization_details location must be equal to the authorization server {0}";
+        public const string INVALID_DECENTRALIZED_IDENTITY_METHOD = "the decentralized identity method {0} doesn't exist";
         public const string INVALID_JWT = "JSON Web Token cannot be read";
         public const string BAD_CODE_VERIFIER = "code_verifier is invalid";
         public const string BAD_TOKEN_FORMAT = "token format {0} is invalid";

@@ -12,7 +12,7 @@ using SimpleIdServer.IdServer.Store;
 namespace SimpleIdServer.IdServer.Startup.Migrations
 {
     [DbContext(typeof(StoreDbContext))]
-    [Migration("20230530104952_Init")]
+    [Migration("20230531204213_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -1321,6 +1321,34 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.HasIndex("RealmName");
 
                     b.ToTable("ImportSummaries");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.NetworkConfiguration", b =>
+                {
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ContractAdr")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PrivateAccountKey")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RpcUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Name");
+
+                    b.ToTable("Networks");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Realm", b =>

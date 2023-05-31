@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.Web3;
 using Nethereum.Web3.Accounts;
+using SimpleIdServer.IdServer.Store;
 using System.Linq;
 
 namespace SimpleIdServer.Did.Ethr.Services

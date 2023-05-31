@@ -5,7 +5,8 @@ using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.Hex.HexTypes;
 using Nethereum.Web3;
 using Nethereum.Web3.Accounts;
-using SimpleIdServer.Did.Ethr.Models;
+using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Store;
 using System.Linq;
 using System.Threading.Tasks;
 

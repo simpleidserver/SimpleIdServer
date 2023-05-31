@@ -3,8 +3,10 @@
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SimpleIdServer.Did;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Domains.DTOs;
+using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
@@ -27,13 +29,15 @@ namespace SimpleIdServer.IdServer.Api.Users
         private readonly IRealmRepository _realmRepository;
         private readonly IBusControl _busControl;
         private readonly IJwtBuilder _jwtBuilder;
+        private readonly IEnumerable<IDIDGenerator> _generators;
 
-        public UsersController(IUserRepository userRepository, IRealmRepository realmRepository, IBusControl busControl, IJwtBuilder jwtBuilder)
+        public UsersController(IUserRepository userRepository, IRealmRepository realmRepository, IBusControl busControl, IJwtBuilder jwtBuilder, IEnumerable<IDIDGenerator> generators)
         {
             _userRepository = userRepository;
             _realmRepository = realmRepository;
             _busControl = busControl;
             _jwtBuilder = jwtBuilder;
+            _generators = generators;
         }
 
         /// <summary>
@@ -244,6 +248,61 @@ namespace SimpleIdServer.IdServer.Api.Users
                             break;
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Generate decentralized identity.
+        /// </summary>
+        /// <param name="prefix"></param>
+        /// <param name="id"></param>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        /// <exception cref="OAuthException"></exception>
+        [HttpPost]
+        [ProducesResponseType(201)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GenerateDecentralizedIdentity([FromRoute] string prefix, string id, [FromBody] GenerateDecentralizedIdentityRequest request, CancellationToken cancellationToken)
+        {
+            using (var activity = Tracing.IdServerActivitySource.StartActivity("Generate decentralized identity"))
+            {
+                try
+                {
+                    prefix = prefix ?? Constants.DefaultRealm;
+                    CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
+                    Validate();
+                    var user = await _userRepository.Query().Include(u => u.Realms).FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.RealmsName == prefix), cancellationToken);
+                    if (user == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_USER, id));
+                    var generator = _generators.FirstOrDefault(g => g.Method == request.Method);
+                    if (generator == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.INVALID_DECENTRALIZED_IDENTITY_METHOD, request.Method));
+                    var generationResult = await generator.Generate(request.Parameters, cancellationToken);
+                    if (!string.IsNullOrWhiteSpace(generationResult.ErrorMessage)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, generationResult.ErrorMessage);
+                    activity?.SetStatus(ActivityStatusCode.Ok, "Decentralized Identity is generated");
+                    return new ContentResult
+                    {
+                        Content = JsonSerializer.Serialize(new GenerateDecentralizedIdentifierResult
+                        {
+                            DID = generationResult.DID,
+                            PrivateKey = generationResult.PrivateKey
+                        }),
+                        ContentType = "application/json",
+                        StatusCode = (int)HttpStatusCode.Created
+                    };
+                }
+                catch (OAuthException ex)
+                {
+                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+                    return BuildError(ex);
+                }
+            }
+
+            void Validate()
+            {
+                if (request == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
+                if (string.IsNullOrWhiteSpace(request.Method)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, GenerateDecentralizedIdentityRequestNames.Method));
             }
         }
     }
