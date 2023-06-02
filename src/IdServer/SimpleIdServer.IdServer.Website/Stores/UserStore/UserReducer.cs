@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Website.Stores.GroupStore;
@@ -330,7 +331,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         [ReducerMethod]
         public static UserClaimsState ReduceUpdateUserClaimsSuccessAction(UserClaimsState state, UpdateUserClaimsSuccessAction action)
         {
-            var claims = action.Claims.Select(c => new SelectableUserClaim(c));
+            var claims = state.UserClaims.Where(c => c.IsRole).ToList();
+            foreach(var cl in action.Claims) claims.Add(new SelectableUserClaim(cl));
             return state with
             {
                 UserClaims = claims,
