@@ -38,13 +38,14 @@
                 <p class="text-muted">@(new MarkupString(SelectedDIDType.Description))</p>
             }
         </RadzenStepsItem>
-        <RadzenStepsItem>
+        <RadzenStepsItem Text="Create" Disabled="@(SelectedDIDType == null)">
             @if (SelectedDIDType != null)
             {
                 switch (SelectedDIDType.Type)
                 {
                     // did:ethr
                     case SimpleIdServer.Did.Ethr.Constants.Type:
+                        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Select ethereum network</RadzenText>
                         <RadzenTemplateForm Submit="@SubmitGenerateDIDEthr" TItem="GenerateEthrDIDForm" Data="@GenerateEthrDID">
                             <!-- Choose Network -->
                             <RadzenDataGrid AllowFiltering="false"

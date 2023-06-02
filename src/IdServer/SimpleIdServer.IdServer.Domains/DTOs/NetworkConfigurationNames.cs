@@ -6,7 +6,7 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
     {
         public const string Name = "name";
         public const string RpcUrl = "rpc_url";
-        public const string PrivateAccountKey = "private_accoutkey";
+        public const string PrivateAccountKey = "private_accountkey";
         public const string ContractAdr = "contract_adr";
         public const string CreateDateTime = "create_datetime";
         public const string UpdateDateTime = "update_datetime";

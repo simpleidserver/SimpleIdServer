@@ -28,6 +28,6 @@ namespace SimpleIdServer.IdServer.Store
 
         public void Remove(NetworkConfiguration networkConfiguration) => _dbContext.Networks.Remove(networkConfiguration);
 
-        public Task<int> SaveChanges(CancellationToken cancellationToken) => Task.FromResult(1);
+        public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
     }
 }

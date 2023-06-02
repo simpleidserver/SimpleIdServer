@@ -233,5 +233,7 @@ namespace SimpleIdServer.IdServer
         public const string AUTHORIZATION_DETAILS_TYPE_REQUIRED = "the authorization_details type is required";
         public const string GRANT_IS_NOT_ACCEPTED = "grant is not accepted";
         public const string USER_EXISTS = "the user {0} already exists";
+        public const string CONTRACT_ALREADY_DEPLOYED = "contract is already deployed";
+        public const string NO_CONTRACT = "there is no contract";
     }
 }

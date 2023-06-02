@@ -9,6 +9,7 @@ namespace SimpleIdServer.IdServer
         public const string INVALID_REDIRECT_URI = "invalid_redirect_uri";
         public const string INVALID_CLIENT_METADATA = "invalid_client_metadata";
         public const string INVALID_SOFTWARE_STATEMENT = "invalid_software_statement";
+        public const string INVALID_NETWORK = "invalid_network";
         public const string INVALID_GRANT = "invalid_grant";
         public const string INVALID_TOKEN = "invalid_token";
         public const string INVALID_SCOPE = "invalid_scope";
@@ -33,5 +34,6 @@ namespace SimpleIdServer.IdServer
         public const string INVALID_RESOURCE_ID = "invalid_resource_id";
         public const string NOT_FOUND = "not_found";
         public const string INVALID_AUTHORIZATION_DETAILS = "invalid_authorization_details";
+        public const string UNEXPECTED_ERROR = "unexpected_error";
     }
 }

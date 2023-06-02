@@ -35,7 +35,7 @@ namespace SimpleIdServer.IdServer.Website
         {
             var token = await GetAccessToken();
             _httpClient.DefaultRequestHeaders.Clear();
-            _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token.AccessToken);
             return _httpClient;   
         }
 
@@ -56,9 +56,9 @@ namespace SimpleIdServer.IdServer.Website
                 Content = new FormUrlEncodedContent(content)
             };
             var httpResult = await _httpClient.SendAsync(httpRequest);
-            var json = await httpRequest.Content.ReadAsStringAsync();
+            var json = await httpResult.Content.ReadAsStringAsync();
             var accessToken = JsonObject.Parse(json)["access_token"].GetValue<string>();
-            var jsonWebToken = _jsonWebTokenHandler.ReadJsonWebToken(json);
+            var jsonWebToken = _jsonWebTokenHandler.ReadJsonWebToken(accessToken);
             _accessToken = new GetAccessTokenResult(accessToken, jsonWebToken);
             return _accessToken;
         }

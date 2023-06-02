@@ -34,7 +34,13 @@ namespace SimpleIdServer.Did.Ethr.Services
 
         public SmartContractService UseNetwork(string network)
         {
-            _networkConfiguration = _configurationStore.Query().Single(c => c.Name == network);
+            var networkConfiguration = _configurationStore.Query().Single(c => c.Name == network);
+            return UseNetwork(networkConfiguration);
+        }
+
+        public SmartContractService UseNetwork(NetworkConfiguration networkConfiguration)
+        {
+            _networkConfiguration = networkConfiguration;
             var rpcUrl = string.Format(_networkConfiguration.RpcUrl, _options.InfuraProjectId);
             _web3 = new Web3(_account, rpcUrl);
             return this;

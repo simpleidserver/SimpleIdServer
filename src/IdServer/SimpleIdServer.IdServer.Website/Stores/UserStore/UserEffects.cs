@@ -2,22 +2,18 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using QRCoder;
 using Radzen;
-using SimpleIdServer.Did;
-using SimpleIdServer.Did.Ethr;
-using SimpleIdServer.Did.Ethr.Services;
-using SimpleIdServer.Did.Extensions;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Website.Resources;
 using SimpleIdServer.IdServer.Website.Stores.Base;
 using System.Drawing.Imaging;
 using System.Linq.Dynamic.Core;
+using System.Text;
 using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.IdServer.Website.Stores.UserStore
@@ -27,8 +23,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         private readonly ILoggerFactory _loggerFactory;
         private readonly IUserRepository _userRepository;
         private readonly IGroupRepository _groupRepository;
-        private readonly IDIDRegistryServiceFactory _didRegistryServiceFactory;
-        private readonly IIdentityDocumentConfigurationStore _identityDocumentConfigurationStore;
+        private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly ProtectedSessionStorage _sessionStorage;
         private readonly DbContextOptions<StoreDbContext> _options;
         private readonly IdServerWebsiteOptions _websiteOptions;
@@ -38,8 +33,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             ILoggerFactory loggerFactory,
             IUserRepository userRepository,
             IGroupRepository groupRepository,
-            IDIDRegistryServiceFactory didRegistryServiceFactory,
-            IIdentityDocumentConfigurationStore identityDocumentConfigurationStore,
+            IWebsiteHttpClientFactory websiteHttpClientFactory,
             ProtectedSessionStorage sessionStorage,
             DbContextOptions<StoreDbContext> options,
             IOptions<IdServerWebsiteOptions> websiteOptions,
@@ -48,8 +42,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             _loggerFactory = loggerFactory;
             _userRepository = userRepository;
             _groupRepository = groupRepository;
-            _didRegistryServiceFactory = didRegistryServiceFactory;
-            _identityDocumentConfigurationStore = identityDocumentConfigurationStore;
+            _websiteHttpClientFactory = websiteHttpClientFactory;
             _sessionStorage = sessionStorage;
             _options = options;
             _websiteOptions = websiteOptions.Value;
@@ -400,20 +393,32 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         public async Task Handle(GenerateDIDEthrAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var user = await _userRepository.Query().Include(u => u.Realms).FirstOrDefaultAsync(u => u.Id == action.UserId && u.Realms.Any(r => r.RealmsName == realm));
-            var network = await _identityDocumentConfigurationStore.Query().FirstAsync(i => i.Name == action.NetworkName);
-            var key = SignatureKeyBuilder.NewES256K();
-            var did = $"did:ethr:{action.NetworkName}:{action.PublicKey}";
-            var identityDocument = IdentityDocumentBuilder.New(did, action.PublicKey)
-                .AddVerificationMethod(key, SimpleIdServer.Did.Constants.VerificationMethodTypes.Secp256k1VerificationKey2018)
-                .Build();
-            var sync = new IdentityDocumentSynchronizer(_didRegistryServiceFactory);
-            await sync.Sync(identityDocument, action.PublicKey, network.PrivateAccountKey, network.ContractAdr);
-            var hex = key.PrivateKey.ToHex();
-            user.Did = did;
-            user.DidPrivateHex = hex;
-            user.UpdateDateTime = DateTime.UtcNow;
-            dispatcher.Dispatch(new GenerateDIDEthrSuccessAction { Did = user.Did, DidPrivateHex = user.DidPrivateHex, UserId = action.UserId });
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var request = new JsonObject
+            {
+                { "method", "ethr" },
+                { "publicKey", action.PublicKey },
+                { "network", action.NetworkName }
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{_websiteOptions.IdServerBaseUrl}/{realm}/users/{action.UserId}/did"),
+                Method = HttpMethod.Post,
+                Content = new StringContent(request.ToJsonString(), Encoding.UTF8, "application/json")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            try
+            {
+                httpResult.EnsureSuccessStatusCode();
+                var jObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new GenerateDIDEthrSuccessAction { UserId = action.UserId, Did = jObj["did"].GetValue<string>(), DidPrivateHex = jObj["private_key"].GetValue<string>() });
+            }
+            catch
+            {
+                // var jObj = JsonObject.Parse(json);
+                // dispatcher.Dispatch(new AddEthrNetworkFailureAction { ErrorMessage = jObj["error_description"].GetValue<string>() });
+            }
         }
 
         private async Task<string> GetRealm()

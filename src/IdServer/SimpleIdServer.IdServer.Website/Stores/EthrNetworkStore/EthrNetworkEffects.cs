@@ -1,39 +1,43 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
-using Microsoft.EntityFrameworkCore;
-using SimpleIdServer.Did.Ethr.Services;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Store;
-using SimpleIdServer.IdServer.Website.Resources;
 using System.Linq.Dynamic.Core;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.IdServer.Website.Stores.EthrNetworkStore
 {
     public class EthrNetworkEffects
     {
-        private readonly IIdentityDocumentConfigurationStore _identityDocumentConfigurationStore;
-        private readonly ISmartContractServiceFactory _smartContractServiceFactory;
+        private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
+        private readonly IdServerWebsiteOptions _options;
+        private readonly ProtectedSessionStorage _sessionsStorage;
 
-        public EthrNetworkEffects(IIdentityDocumentConfigurationStore identityDocumentConfigurationStore, ISmartContractServiceFactory smartContractServiceFactory)
+        public EthrNetworkEffects(IWebsiteHttpClientFactory websiteHttpClientFactory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionsStorage)
         {
-            _identityDocumentConfigurationStore = identityDocumentConfigurationStore;
-            _smartContractServiceFactory = smartContractServiceFactory;
+            _websiteHttpClientFactory = websiteHttpClientFactory;
+            _options = options.Value;
+            _sessionsStorage = sessionsStorage;
         }
 
         [EffectMethod]
         public async Task Handle(SearchEthrNetworksAction action, IDispatcher dispatcher)
         {
-
-            IQueryable<NetworkConfiguration> query = _identityDocumentConfigurationStore.Query();
-            if (!string.IsNullOrWhiteSpace(action.Filter))
-                query = query.Where(SanitizeExpression(action.Filter));
-
-            if (!string.IsNullOrWhiteSpace(action.OrderBy))
-                query = query.OrderBy(SanitizeExpression(action.OrderBy));
-
-            var nb = query.Count();
-            var networks = await query.ToListAsync(CancellationToken.None);
+            var realm = await GetRealm();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/networks"),
+                Method = HttpMethod.Get
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var networks = JsonSerializer.Deserialize<IEnumerable<SimpleIdServer.IdServer.Domains.NetworkConfiguration>>(json);
+            var nb = networks.Count();
             dispatcher.Dispatch(new SearchEthrNetworksSuccessAction { Networks = networks, Count = nb });
 
             string SanitizeExpression(string expression) => expression.Replace("Value.", "");
@@ -42,45 +46,81 @@ namespace SimpleIdServer.IdServer.Website.Stores.EthrNetworkStore
         [EffectMethod]
         public async Task Handle(AddEthrNetworkAction action, IDispatcher dispatcher)
         {
-            var exists = await _identityDocumentConfigurationStore.Query().AnyAsync(c => c.Name == action.Name);
-            if (exists)
+            var realm = await GetRealm();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var request = new JsonObject
             {
-                dispatcher.Dispatch(new AddEthrNetworkFailureAction { ErrorMessage = string.Format(Global.EthrNetworkExists, action.Name) });
-                return;
+                { "name", action.Name },
+                { "rpc_url", action.RpcUrl },
+                { "private_accountkey", action.PrivateAccountKey }
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/networks"),
+                Method = HttpMethod.Post,
+                Content = new StringContent(request.ToJsonString(), Encoding.UTF8, "application/json")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            try
+            {
+                httpResult.EnsureSuccessStatusCode();
+                dispatcher.Dispatch(new AddEthrNetworkSuccessAction { Name = action.Name, RpcUrl = action.RpcUrl, PrivateAccountKey = action.PrivateAccountKey });
             }
-
-            var network = new NetworkConfiguration { Name = action.Name, RpcUrl = action.RpcUrl, PrivateAccountKey = action.PrivateAccountKey, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow };
-            _identityDocumentConfigurationStore.Add(network);
-            await _identityDocumentConfigurationStore.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new AddEthrNetworkSuccessAction { Name = action.Name, RpcUrl = action.RpcUrl, PrivateAccountKey = action.PrivateAccountKey });
+            catch
+            {
+                var jObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new AddEthrNetworkFailureAction { ErrorMessage = jObj["error_description"].GetValue<string>() });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(RemoveSelectedEthrContractAction action, IDispatcher dispatcher)
         {
-            var ethrContracts = await _identityDocumentConfigurationStore.Query().Where(c => action.Names.Contains(c.Name)).ToListAsync();
-            foreach(var ethrContract in ethrContracts) _identityDocumentConfigurationStore.Remove(ethrContract);
-            await _identityDocumentConfigurationStore.SaveChanges(CancellationToken.None);
+            var realm = await GetRealm();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            foreach (var name in action.Names)
+            {
+                var requestMessage = new HttpRequestMessage
+                {
+                    RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/networks/{name}"),
+                    Method = HttpMethod.Delete
+                };
+                await httpClient.SendAsync(requestMessage);
+            }
+
             dispatcher.Dispatch(new RemoveSelectedEthrContractSuccessAction { Names = action.Names });
         }
 
         [EffectMethod]
         public async Task Handle(DeployEthrContractAction action, IDispatcher dispatcher)
         {
-            var accountService = _smartContractServiceFactory.Build();
+            var realm = await GetRealm();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/networks/{action.Name}/deploy"),
+                Method = HttpMethod.Get
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var jObj = JsonObject.Parse(json);
             try
             {
-                var networkConfiguration = await _identityDocumentConfigurationStore.Query().SingleAsync(c => c.Name == action.Name);
-                var result = await accountService.UseAccount(networkConfiguration.PrivateAccountKey).UseNetwork(action.Name).DeployContractAndGetService();
-                networkConfiguration.UpdateDateTime = DateTime.UtcNow;
-                networkConfiguration.ContractAdr = result.ContractHandler.ContractAddress;
-                await _identityDocumentConfigurationStore.SaveChanges(CancellationToken.None);
-                dispatcher.Dispatch(new DeployEthrContractSuccessAction { Name = networkConfiguration.Name, ContractAdr = networkConfiguration.ContractAdr });
+                httpResult.EnsureSuccessStatusCode();
+                dispatcher.Dispatch(new DeployEthrContractSuccessAction { Name = action.Name, ContractAdr = jObj["contract_adr"].GetValue<string>() });
             }
-            catch(Exception ex)
+            catch
             {
-                dispatcher.Dispatch(new DeployEthrContractFailureAction { ErrorMessage = ex.Message });
+                dispatcher.Dispatch(new DeployEthrContractFailureAction { ErrorMessage = jObj["error_description"].GetValue<string>() });
             }
+        }
+
+        private async Task<string> GetRealm()
+        {
+            var realm = await _sessionsStorage.GetAsync<string>("realm");
+            var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+            return realmStr;
         }
     }
 

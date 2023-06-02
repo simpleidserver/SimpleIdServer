@@ -4,9 +4,9 @@
 
 <div>
     <RadzenButton class="mb-1" Click="@(args => AddDID())" Icon="add" Text="Add DID" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
-    @if (!string.IsNullOrWhiteSpace(userState.Value.User.Did))
+    @if (string.IsNullOrWhiteSpace(userState.Value.User.Did))
     {
-        <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">There is no Decentralized Identifier (DID).  please '</RadzenAlert>
+        <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">There is no Decentralized Identifier (DID).</RadzenAlert>
     }
     else
     {

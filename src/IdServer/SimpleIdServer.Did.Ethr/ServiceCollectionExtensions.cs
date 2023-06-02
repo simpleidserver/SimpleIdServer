@@ -17,6 +17,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<ISmartContractServiceFactory, SmartContractServiceFactory>();
             services.AddTransient<IDIDRegistryServiceFactory, DIDRegistryServiceFactory>();
             services.AddTransient<IDIDGenerator, DIDEthrGenerator>();
+            services.AddTransient<IContractDeploy, EthrContractDeploy>();
             return services;
         }
     }

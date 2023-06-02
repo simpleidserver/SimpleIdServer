@@ -12,6 +12,6 @@ namespace SimpleIdServer.IdServer.Api.Users
         [JsonPropertyName(GenerateDecentralizedIdentityRequestNames.Method)]
         public string Method { get; set; }
         [JsonIgnore]
-        public Dictionary<string, string> Parameters { get; set; }
+        public Dictionary<string, string> Parameters { get; set; } = new Dictionary<string, string>();
     }
 }

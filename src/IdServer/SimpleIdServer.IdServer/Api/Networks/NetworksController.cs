@@ -2,12 +2,14 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SimpleIdServer.Did;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Domains.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Store;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -21,11 +23,13 @@ namespace SimpleIdServer.IdServer.Api.Networks
     {
         private readonly IJwtBuilder _jwtBuilder;
         private readonly IIdentityDocumentConfigurationStore _store;
+        private readonly IEnumerable<IContractDeploy> _contractDeploys;
 
-        public NetworksController(IJwtBuilder jwtBuilder, IIdentityDocumentConfigurationStore store)
+        public NetworksController(IJwtBuilder jwtBuilder, IIdentityDocumentConfigurationStore store, IEnumerable<IContractDeploy> contractDeploys)
         {
             _jwtBuilder = jwtBuilder;
             _store = store;
+            _contractDeploys = contractDeploys;
         }
 
         /// <summary>
@@ -132,6 +136,52 @@ namespace SimpleIdServer.IdServer.Api.Networks
                 if (string.IsNullOrWhiteSpace(request.Name)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, NetworkConfigurationNames.Name));
                 if (string.IsNullOrWhiteSpace(request.RpcUrl)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, NetworkConfigurationNames.RpcUrl));
                 if (string.IsNullOrWhiteSpace(request.PrivateAccountKey)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, NetworkConfigurationNames.PrivateAccountKey));
+            }
+        }
+
+        /// <summary>
+        /// Deploy a contract.
+        /// </summary>
+        /// <param name="prefix"></param>
+        /// <param name="name"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [ProducesResponseType(201)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> Deploy([FromRoute] string prefix, string name, CancellationToken cancellationToken)
+        {
+            using (var activity = Tracing.IdServerActivitySource.StartActivity("Deploy a contract"))
+            {
+                try
+                {
+                    prefix = prefix ?? Constants.DefaultRealm;
+                    CheckAccessToken(prefix, Constants.StandardScopes.Networks.Name, _jwtBuilder);
+                    var network = await _store.Query().FirstOrDefaultAsync(s => s.Name == name, cancellationToken);
+                    if (network == null) return this.BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_NETWORK, name));
+                    if (!string.IsNullOrWhiteSpace(network.ContractAdr)) return this.BuildError(HttpStatusCode.InternalServerError, ErrorCodes.INVALID_NETWORK, ErrorMessages.CONTRACT_ALREADY_DEPLOYED);
+                    var contractDeploy = _contractDeploys.SingleOrDefault();
+                    if (contractDeploy == null) return this.BuildError(HttpStatusCode.InternalServerError, ErrorCodes.UNEXPECTED_ERROR, ErrorMessages.NO_CONTRACT);
+                    var result = await contractDeploy.Deploy(network);
+                    network.ContractAdr = result;
+                    network.UpdateDateTime = DateTime.UtcNow;
+                    await _store.SaveChanges(cancellationToken);
+                    activity?.SetStatus(ActivityStatusCode.Ok, "Contract is deployed");
+                    return new ContentResult
+                    {
+                        Content = JsonSerializer.Serialize(new ContractDeployResult
+                        {
+                            ContractAdr = result
+                        }),
+                        ContentType = "application/json",
+                        StatusCode = (int)HttpStatusCode.Created
+                    };
+                }
+                catch (OAuthException ex)
+                {
+                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+                    return BuildError(ex);
+                }
             }
         }
     }

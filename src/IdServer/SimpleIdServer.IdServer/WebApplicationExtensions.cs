@@ -193,14 +193,17 @@ namespace Microsoft.AspNetCore.Builder
 
 
             webApplication.MapControllerRoute("getAllNetworks",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Networks + "/networks",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Networks,
                 defaults: new { controller = "Networks", action = "GetAll" });
             webApplication.MapControllerRoute("removeNetwork",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Networks + "/networks/{name}",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Networks + "/{name}",
                 defaults: new { controller = "Networks", action = "Remove" });
             webApplication.MapControllerRoute("addNetwork",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Networks + "/networks",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Networks,
                 defaults: new { controller = "Networks", action = "Add" });
+            webApplication.MapControllerRoute("deployContract",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Networks + "/{name}/deploy",
+                defaults: new { controller = "Networks", action = "Deploy" });
 
             webApplication.MapControllerRoute(
                 name: "defaultWithArea",
