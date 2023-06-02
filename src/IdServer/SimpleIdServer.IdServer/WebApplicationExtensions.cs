@@ -191,6 +191,17 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/import",
                 defaults: new { controller = "IdentityProvisioning", action = "Import" });
 
+
+            webApplication.MapControllerRoute("getAllNetworks",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Networks + "/networks",
+                defaults: new { controller = "Networks", action = "GetAll" });
+            webApplication.MapControllerRoute("removeNetwork",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Networks + "/networks/{name}",
+                defaults: new { controller = "Networks", action = "Remove" });
+            webApplication.MapControllerRoute("addNetwork",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Networks + "/networks",
+                defaults: new { controller = "Networks", action = "Add" });
+
             webApplication.MapControllerRoute(
                 name: "defaultWithArea",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + "{area:exists}/{controller=Home}/{action=Index}/{id?}");

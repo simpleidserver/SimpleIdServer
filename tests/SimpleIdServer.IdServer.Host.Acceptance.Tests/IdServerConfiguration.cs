@@ -126,7 +126,8 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             Constants.StandardScopes.GrantManagementRevoke,
             Constants.StandardScopes.Users,
             Constants.StandardScopes.Register,
-            Constants.StandardScopes.CredentialOffer
+            Constants.StandardScopes.Provisioning,
+            Constants.StandardScopes.Networks
         };
 
         public static List<ApiResource> ApiResources = new List<ApiResource>
@@ -194,7 +195,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildTraditionalWebsiteClient("fiftyFiveClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().EnableTokenInResponseType().EnableRefreshTokenGrantType().AddScope(AdminScope, CalendarScope).AddAuthDataTypes("firstDetails", "secondDetails").Build(),
             FiftySixClient,
             ClientBuilder.BuildApiClient("fiftySevenClient", "password").AddScope(StandardScopes.Users).AddScope(StandardScopes.Register).Build(),
-            ClientBuilder.BuildTraditionalWebsiteClient("fiftyEightClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().EnableTokenInResponseType().TrustOpenIdCredential().DisableConsent().AddScope(StandardScopes.GrantManagementQuery, StandardScopes.GrantManagementRevoke, StandardScopes.CredentialOffer).Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("fiftyEightClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().EnableTokenInResponseType().TrustOpenIdCredential().DisableConsent().AddScope(StandardScopes.GrantManagementQuery, StandardScopes.GrantManagementRevoke).Build(),
             ClientBuilder.BuildWalletClient("fiftyNineClient", "password").Build(),
             ClientBuilder.BuildWalletClient("sixtyClient", "password").RequirePin().Build()
         };

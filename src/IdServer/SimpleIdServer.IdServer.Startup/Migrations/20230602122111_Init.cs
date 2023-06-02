@@ -285,7 +285,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     RpcUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PrivateAccountKey = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ContractAdr = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ContractAdr = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },

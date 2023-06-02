@@ -32,6 +32,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddScoped<NotificationService>();
             services.AddScoped<ContextMenuService>();
             services.AddScoped<TooltipService>();
+            services.AddSingleton<IWebsiteHttpClientFactory, WebsiteHttpClientFactory>();
             services.AddDIDEthr();
             services.AddTransient<ICertificateAuthorityStore, CertificateAuthorityStore>();
             if (callbackOptions == null) services.Configure<IdServerWebsiteOptions>((o) => { });

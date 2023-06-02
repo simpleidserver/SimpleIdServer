@@ -47,6 +47,7 @@ namespace SimpleIdServer.IdServer
             public const string IdentityProvisioning = "provisioning";
             public const string PushedAuthorizationRequest = "par";
             public const string Users = "users";
+            public const string Networks = "networks";
         }
 
         public static List<string> AllStandardNotificationModes = new List<string>
@@ -476,6 +477,20 @@ namespace SimpleIdServer.IdServer
                 Id = Guid.NewGuid().ToString(),
                 Type = ScopeTypes.APIRESOURCE,
                 Name = "provisioning",
+                Realms = new List<Domains.Realm>
+                {
+                    StandardRealms.Master
+                },
+                Protocol = ScopeProtocols.OAUTH,
+                IsExposedInConfigurationEdp = true,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
+            };
+            public static Scope Networks = new Scope
+            {
+                Id = Guid.NewGuid().ToString(),
+                Type = ScopeTypes.APIRESOURCE,
+                Name = "networks",
                 Realms = new List<Domains.Realm>
                 {
                     StandardRealms.Master

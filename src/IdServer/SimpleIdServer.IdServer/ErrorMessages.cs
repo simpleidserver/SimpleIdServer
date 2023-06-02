@@ -20,6 +20,7 @@ namespace SimpleIdServer.IdServer
         public const string UNKNOWN_UMA_RESOURCE = "the UMA resource doesn't exist";
         public const string UNKNOWN_GROUP_IDS = "the group {0} don't exist";
         public const string UNKNOWN_CREDENTIAL_OFFER = "the credential offer doesn't exist";
+        public const string UNKNOWN_NETWORK = "the network {0} doesn't exist";
         public const string UNKNOWN_AUTH_SCHEME_PROVIDER_PROPERTIES = "the authentication scheme provider cannot be updated because the following properties are unknown : {0}";
         public const string UNAUTHORIZED_CLIENT = "unauthorized client";
         public const string UNAUTHORIZED_ACCESSTOKEN = "the access token is not authorized to access to the operation";
@@ -75,6 +76,7 @@ namespace SimpleIdServer.IdServer
         public const string INVALID_AUTH_DETAILS_LOCATION = "the authorization_details location must be equal to the authorization server {0}";
         public const string INVALID_DECENTRALIZED_IDENTITY_METHOD = "the decentralized identity method {0} doesn't exist";
         public const string INVALID_JWT = "JSON Web Token cannot be read";
+        public const string INVALID_NETWORK_NAME = "the network name already exists";
         public const string BAD_CODE_VERIFIER = "code_verifier is invalid";
         public const string BAD_TOKEN_FORMAT = "token format {0} is invalid";
         public const string BAD_CODE_CHALLENGE_METHOD = "transform algorithm {0} is not supported";

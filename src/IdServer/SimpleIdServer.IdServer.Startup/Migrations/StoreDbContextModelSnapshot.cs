@@ -1323,25 +1323,30 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.NetworkConfiguration", b =>
                 {
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(450)")
+                        .HasAnnotation("Relational:JsonPropertyName", "name");
 
                     b.Property<string>("ContractAdr")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "contract_adr");
 
                     b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime2")
+                        .HasAnnotation("Relational:JsonPropertyName", "create_datetime");
 
                     b.Property<string>("PrivateAccountKey")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "private_accoutkey");
 
                     b.Property<string>("RpcUrl")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "rpc_url");
 
                     b.Property<DateTime>("UpdateDateTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime2")
+                        .HasAnnotation("Relational:JsonPropertyName", "update_datetime");
 
                     b.HasKey("Name");
 

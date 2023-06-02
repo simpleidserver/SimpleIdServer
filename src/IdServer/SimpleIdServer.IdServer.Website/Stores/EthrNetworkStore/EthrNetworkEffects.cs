@@ -2,9 +2,9 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
 using Microsoft.EntityFrameworkCore;
-using SimpleIdServer.Did.Ethr;
-using SimpleIdServer.Did.Ethr.Models;
 using SimpleIdServer.Did.Ethr.Services;
+using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Website.Resources;
 using System.Linq.Dynamic.Core;
 
@@ -24,6 +24,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.EthrNetworkStore
         [EffectMethod]
         public async Task Handle(SearchEthrNetworksAction action, IDispatcher dispatcher)
         {
+
             IQueryable<NetworkConfiguration> query = _identityDocumentConfigurationStore.Query();
             if (!string.IsNullOrWhiteSpace(action.Filter))
                 query = query.Where(SanitizeExpression(action.Filter));
