@@ -48,6 +48,16 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         }
 
         [EffectMethod]
+        public async Task Handle(GetAllClientsAction action, IDispatcher dispatcher)
+        {
+            var realm = await GetRealm();
+            IQueryable<Client> query = _clientRepository.Query().Include(c => c.Translations).Include(c => c.Realms).Include(c => c.Scopes).Where(c => c.Realms.Any(r => r.Name == realm)).AsNoTracking();
+            var nb = query.Count();
+            var clients = await query.ToListAsync(CancellationToken.None);
+            dispatcher.Dispatch(new SearchClientsSuccessAction { Clients = clients, Count = nb });
+        }
+
+        [EffectMethod]
         public async Task Handle(AddSpaClientAction action, IDispatcher dispatcher)
         {
             if (!await ValidateAddClient(action.ClientId, action.RedirectionUrls, dispatcher)) return;
@@ -492,6 +502,10 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public string? OrderBy { get; set; } = null;
         public int? Skip { get; set; } = null;
         public int? Take { get; set; } = null;
+    }
+
+    public class GetAllClientsAction
+    {
     }
 
     public class SearchClientsSuccessAction

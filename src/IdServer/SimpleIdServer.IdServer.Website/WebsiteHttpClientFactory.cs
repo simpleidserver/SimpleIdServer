@@ -46,7 +46,7 @@ namespace SimpleIdServer.IdServer.Website
             {
                 new KeyValuePair<string, string>("client_id", _securityOptions.ClientId),
                 new KeyValuePair<string, string>("client_secret", _securityOptions.ClientSecret),
-                new KeyValuePair<string, string>("scope", "provisioning networks users"),
+                new KeyValuePair<string, string>("scope", "provisioning networks users credential_offer"),
                 new KeyValuePair<string, string>("grant_type", "client_credentials")
             };
             var httpRequest = new HttpRequestMessage

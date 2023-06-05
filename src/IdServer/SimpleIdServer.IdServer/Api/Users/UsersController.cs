@@ -280,6 +280,9 @@ namespace SimpleIdServer.IdServer.Api.Users
                     if (generator == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.INVALID_DECENTRALIZED_IDENTITY_METHOD, request.Method));
                     var generationResult = await generator.Generate(request.Parameters, cancellationToken);
                     if (!string.IsNullOrWhiteSpace(generationResult.ErrorMessage)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, generationResult.ErrorMessage);
+                    user.Did = generationResult.DID;
+                    user.DidPrivateHex = generationResult.PrivateKey;
+                    await _userRepository.SaveChanges(cancellationToken);
                     activity?.SetStatus(ActivityStatusCode.Ok, "Decentralized Identity is generated");
                     return new ContentResult
                     {

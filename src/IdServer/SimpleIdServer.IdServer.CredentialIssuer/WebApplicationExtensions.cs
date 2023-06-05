@@ -25,9 +25,15 @@ namespace SimpleIdServer.IdServer.CredentialIssuer
             webApplication.MapControllerRoute("shareCredentialOfferQR",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialOffer + "/shareqr",
                 defaults: new { controller = "CredentialOffer", action = "ShareQR" });
+            webApplication.MapControllerRoute("clientShareCredentialOfferQR",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialOffer + "/shareqr/{id}",
+                defaults: new { controller = "CredentialOffer", action = "ClientShareQR" });
             webApplication.MapControllerRoute("shareCredentialOffer",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialOffer + "/share",
                 defaults: new { controller = "CredentialOffer", action = "Share" });
+            webApplication.MapControllerRoute("clientShareCredentialOffer",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialOffer + "/share/{id}",
+                defaults: new { controller = "CredentialOffer", action = "ClientShare" });
             webApplication.MapControllerRoute("getCredentialOffer",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialOffer + "/{id}",
                 defaults: new { controller = "CredentialOffer", action = "Get" });

@@ -37,7 +37,7 @@ namespace SimpleIdServer.Did.Ethr
                 .AddVerificationMethod(key, Did.Constants.VerificationMethodTypes.Secp256k1VerificationKey2018)
                 .Build();
             var sync = new IdentityDocumentSynchronizer(_didRegistryServiceFactory);
-            await sync.Sync(identityDocument, publicKey, network.PrivateAccountKey, network.ContractAdr);
+            await sync.Sync(identityDocument, publicKey, network);
             var hex = key.PrivateKey.ToHex();
             return DIDGenerationResult.Ok(did, hex);
         }

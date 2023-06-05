@@ -43,10 +43,15 @@
             {
                 switch (SelectedDIDType.Type)
                 {
-                    // did:ethr
-                    case SimpleIdServer.Did.Ethr.Constants.Type:
+                    // ethr
+                    case "ethr":
+                        @if (!updateUserState.Value.IsUpdating && !string.IsNullOrWhiteSpace(updateUserState.Value.ErrorMessage))
+                        {
+                            <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@updateUserState.Value.ErrorMessage</RadzenAlert>
+                        }
+
                         <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Select ethereum network</RadzenText>
-                        <RadzenTemplateForm Submit="@SubmitGenerateDIDEthr" TItem="GenerateEthrDIDForm" Data="@GenerateEthrDID">
+                        <RadzenTemplateForm Submit="@SubmitGenerateDIDEthr" TItem="GenerateEthrDIDForm" Data="@generateEthrDID">
                             <!-- Choose Network -->
                             <RadzenDataGrid AllowFiltering="false"
                                 AllowColumnResize="true"
@@ -77,16 +82,16 @@
                             </RadzenDataGrid>
                             <!-- Public Key -->
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Public Key</RadzenText>
-                                <RadzenTextBox Name="PublicKey" bind-Value="@GenerateEthrDID.PublicKey" Class="w-100"></RadzenTextBox>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Public Key of your wallet</RadzenText>
+                                <RadzenTextBox Name="PublicKey" @bind-Value="@generateEthrDID.PublicKey" Class="w-100"></RadzenTextBox>
                                 <RadzenRequiredValidator Component="PublicKey" Text="Public Key is required"></RadzenRequiredValidator>
-                                <p class="text-muted">Public Key in hexadecimal format.</p>
+                                <p class="text-muted">Public Key must be in hexadecimal format.</p>
                             </div>
                             <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateUserState.Value.IsUpdating ? "Adding..." : "Add")" Disabled=updateUserState.Value.IsUpdating />
                         </RadzenTemplateForm>
                         break;
-                    // did:key
-                    case SimpleIdServer.Did.Key.Constants.Type:
+                    // key
+                    case "key":
 
                         break;
                 }
@@ -117,12 +122,12 @@
 
     ICollection<DIDType> DIDTypes = new List<DIDType>
     {
-        new DIDType { Name = "did:key", ShortDescription = "Doesn't require a DID Registry of any kind", Description = "Concatenation of the Multicodec identifier for the public key type and the raw bytes associated with the public key format. For more information please read the website <a href='https://w3c-ccg.github.io/did-method-key/'>https://w3c-ccg.github.io/did-method-key/</a>", Type = SimpleIdServer.Did.Key.Constants.Type, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/DIDKey.png" },
-        new DIDType { Name = "did:ethr", ShortDescription = "Decentralized Identitier Document is stored in ethereum", Description = "For more information please read the website <a href='https://github.com/decentralized-identity/ethr-did-resolver/blob/master/doc/did-method-spec.md'>https://github.com/decentralized-identity/ethr-did-resolver/blob/master/doc/did-method-spec.md</a>", Type = SimpleIdServer.Did.Ethr.Constants.Type, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/DIDEthr.png" },
+        new DIDType { Name = "did:key", ShortDescription = "Doesn't require a DID Registry of any kind", Description = "Concatenation of the Multicodec identifier for the public key type and the raw bytes associated with the public key format. For more information please read the website <a href='https://w3c-ccg.github.io/did-method-key/'>https://w3c-ccg.github.io/did-method-key/</a>", Type = "key", PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/DIDKey.png" },
+        new DIDType { Name = "did:ethr", ShortDescription = "Decentralized Identitier Document is stored in ethereum", Description = "For more information please read the website <a href='https://github.com/decentralized-identity/ethr-did-resolver/blob/master/doc/did-method-spec.md'>https://github.com/decentralized-identity/ethr-did-resolver/blob/master/doc/did-method-spec.md</a>", Type = "ethr", PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/DIDEthr.png" },
     };
 
     DIDType? SelectedDIDType { get; set; } = null;
-    GenerateEthrDIDForm GenerateEthrDID { get; set; } = new GenerateEthrDIDForm();
+    GenerateEthrDIDForm generateEthrDID { get; set; } = new GenerateEthrDIDForm();
 
     protected override async Task OnInitializedAsync()
     {

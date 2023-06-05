@@ -18,6 +18,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer
         public const string UNKNOWN_CREDENTIAL_TEMPLATE = "the credential template {0} doesn't exist";
         public const string UNKNOWN_WALLET_CLIENT_ID = "the wallet {0} doesn't exist";
         public const string UNKNOWN_PROOF_TYPE = "the proof type {0} is unknown";
+        public const string UNKNOWN_USER = "the user {0} doesn't exist";
         public const string UNSUPPORTED_CREDENTIALS_FORMAT = "credential formats {0} are not supported";
         public const string MALFROMED_INCOMING_REQUEST = "the incoming request is malformed";
         public const string CREDOFFER_IS_INVALID = "credential offer is invalid";

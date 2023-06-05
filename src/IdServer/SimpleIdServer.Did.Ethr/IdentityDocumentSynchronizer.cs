@@ -6,6 +6,7 @@ using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Ethr.Services;
 using SimpleIdServer.Did.Events;
 using SimpleIdServer.Did.Models;
+using SimpleIdServer.IdServer.Domains;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -27,6 +28,16 @@ namespace SimpleIdServer.Did.Ethr
             var service = _factory.Build(privateKey, contractAdr, parsedId.Source);
             var changedAttributes = ExtractChangedAttributes(document, address);
             foreach(var changedAttribute in changedAttributes)
+            {
+                await service.SetAttributeRequestAsync(changedAttribute);
+            }
+        }
+
+        public async Task Sync(IdentityDocument document, string address, NetworkConfiguration networkConfiguration)
+        {
+            var service = _factory.Build(networkConfiguration.PrivateAccountKey, networkConfiguration.ContractAdr, networkConfiguration);
+            var changedAttributes = ExtractChangedAttributes(document, address);
+            foreach (var changedAttribute in changedAttributes)
             {
                 await service.SetAttributeRequestAsync(changedAttribute);
             }

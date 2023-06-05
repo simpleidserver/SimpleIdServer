@@ -37,7 +37,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.CredentialTemplateStore
                 query = query.OrderBy(SanitizeExpression(action.OrderBy));
 
             var nb = query.Count();
-            var clients = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
+            var clients = await query.ToListAsync(CancellationToken.None);
             dispatcher.Dispatch(new SearchCredentialTemplatesSuccessAction { CredentialTemplates = clients, Count = nb });
 
             string SanitizeExpression(string expression) => expression.Replace("Value.", "");
@@ -155,8 +155,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.CredentialTemplateStore
     {
         public string? Filter { get; set; } = null;
         public string? OrderBy { get; set; } = null;
-        public int? Skip { get; set; } = null;
-        public int? Take { get; set; } = null;
     }
 
     public class SearchCredentialTemplatesSuccessAction

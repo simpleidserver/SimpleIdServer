@@ -305,72 +305,33 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         }
 
         [EffectMethod]
-        public async Task Handle(AddCredentialOfferAction action, IDispatcher dispatcher)
-        {
-            var user = await _userRepository.Query().Include(u => u.CredentialOffers).FirstOrDefaultAsync(u => u.Id == action.UserId);
-            var credentialOffer = new UserCredentialOffer
-            {
-                CreateDateTime = DateTime.UtcNow,
-                UpdateDateTime = DateTime.UtcNow,
-                CredentialNames = action.CredentialTypes,
-                Id = Guid.NewGuid().ToString()
-            };
-            user.CredentialOffers.Add(credentialOffer);
-            await _userRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new AddCredentialOfferSuccessAction { CredentialOffer = credentialOffer });
-        }
-
-        [EffectMethod]
-        public async Task Handle(GetCredentialOfferAction action, IDispatcher dispatcher)
+        public async Task Handle(ShareCredentialOfferAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var handler = new HttpClientHandler
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var request = new JsonObject
             {
-                ServerCertificateCustomValidationCallback = (httpRequestMessage, cert, cetChain, policyErrors) =>
-                {
-                    return true;
-                },
-                AllowAutoRedirect = false
+                { "credential_template_id", action.CredentialTemplateId },
+                { "wallet_client_id", action.ClientId }
             };
-            using (var httpClient = new HttpClient(handler))
+            var requestMessage = new HttpRequestMessage
             {
-                var accessToken = await GetAccessToken(httpClient);
-                var credentialOffer = await GetCredentialOffer(httpClient, accessToken);
+                RequestUri = new Uri($"{_websiteOptions.IdServerBaseUrl}/{realm}/credential_offer/share/{action.UserId}"),
+                Method = HttpMethod.Post,
+                Content = new StringContent(request.ToJsonString(), Encoding.UTF8, "application/json")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            if(httpResult.StatusCode == System.Net.HttpStatusCode.Redirect)
+            {
+                var credentialOffer = httpResult.Headers.Location.OriginalString;
                 var picture = GetQRCode(credentialOffer);
-                dispatcher.Dispatch(new GetCredentialOfferSuccessAction { Picture = picture, Url = credentialOffer });
+                dispatcher.Dispatch(new ShareCredentialOfferSuccessAction { Picture = picture, CredentialOffer = credentialOffer });
+                return;
             }
 
-            async Task<string> GetAccessToken(HttpClient httpClient)
-            {
-                var dic = new List<KeyValuePair<string, string>>
-                {
-                    new KeyValuePair<string, string>("client_id", _securityOptions.ClientId),
-                    new KeyValuePair<string, string>("client_secret", _securityOptions.ClientSecret),
-                    new KeyValuePair<string, string>("grant_type", "client_credentials"),
-                    new KeyValuePair<string, string>("scope", "credential_offer")
-                };
-                var requestMessage = new HttpRequestMessage
-                {
-                    RequestUri = new Uri($"{_websiteOptions.IdServerBaseUrl}/{realm}/token"),
-                    Content = new FormUrlEncodedContent(dic),
-                    Method = HttpMethod.Post
-                };
-                var httpResult = await httpClient.SendAsync(requestMessage);
-                var json = await httpResult.Content.ReadAsStringAsync();
-                return JsonObject.Parse(json)["access_token"].GetValue<string>();
-            }
-
-            async Task<string> GetCredentialOffer(HttpClient httpClient, string accessToken)
-            {
-                var requestMessage = new HttpRequestMessage
-                {
-                    RequestUri = new Uri($"{_websiteOptions.IdServerBaseUrl}/{realm}/credential_offer/{action.CredentialOfferId}")
-                };
-                requestMessage.Headers.Add("Authorization", $"Bearer {accessToken}");
-                var httpResult = await httpClient.SendAsync(requestMessage);
-                var headers = httpResult.Headers;
-                return headers.Location.OriginalString;
-            }
+            var jObj = JsonObject.Parse(json);
+            dispatcher.Dispatch(new ShareCredentialOfferFailureAction { ErrorMessage = jObj["error_description"].GetValue<string>() });
 
             string GetQRCode(string url)
             {
@@ -416,8 +377,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             }
             catch
             {
-                // var jObj = JsonObject.Parse(json);
-                // dispatcher.Dispatch(new AddEthrNetworkFailureAction { ErrorMessage = jObj["error_description"].GetValue<string>() });
+                var jObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new GenerateDIDEthrFailureAction { ErrorMessage = jObj["error_description"].GetValue<string>() });
             }
         }
 
@@ -739,26 +700,27 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         public ICollection<string> CredentialOffersId { get; set; }
     }
 
-    public class AddCredentialOfferAction
+    public class ShareCredentialOfferAction
     {
         public string UserId { get; set; }
-        public ICollection<string> CredentialTypes { get; set; }
+        public string CredentialTemplateId { get; set; }
+        public string ClientId { get; set; }
+    }
+
+    public class ShareCredentialOfferSuccessAction
+    {
+        public string Picture { get; set; }
+        public string CredentialOffer { get; set; }
+    }
+
+    public class ShareCredentialOfferFailureAction
+    {
+        public string ErrorMessage { get; set; }
     }
 
     public class AddCredentialOfferSuccessAction
     {
         public UserCredentialOffer CredentialOffer { get; set; }
-    }
-
-    public class GetCredentialOfferAction
-    {
-        public string CredentialOfferId { get; set; }
-    }
-
-    public class GetCredentialOfferSuccessAction
-    {
-        public string Picture { get; set; }
-        public string Url { get; set; }
     }
 
     public class GenerateDIDEthrAction
@@ -773,5 +735,10 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         public string UserId { get; set; }
         public string Did { get; set; }
         public string DidPrivateHex { get; set; }
+    }
+
+    public class GenerateDIDEthrFailureAction
+    {
+        public string ErrorMessage { get; set; }
     }
 }

@@ -8,7 +8,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
     [FeatureState]
     public record UserCredentialOfferState
     {
-        public bool IsLoading { get; set; } = true;
+        public bool IsLoading { get; set; } = false;
         public string Picture { get; set; }
         public string Url { get; set; }
     }

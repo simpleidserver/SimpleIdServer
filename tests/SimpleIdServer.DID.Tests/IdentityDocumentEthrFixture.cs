@@ -17,7 +17,7 @@ namespace SimpleIdServer.DID.Tests
 
         public async Task When_DeployContract_Then_NoException()
         {
-            var accountService = new SmartContractService(new IdentityDocumentConfigurationStore(), Options.Create(new DidEthrOptions()));
+            var accountService = new SmartContractService(new MockIdentityConfigurationStore(), Options.Create(new DidEthrOptions()));
             var balance = await accountService.UseAccount(privateKey).UseNetwork(network).DeployContractAndGetService();
         }
 
@@ -27,7 +27,7 @@ namespace SimpleIdServer.DID.Tests
                 .AddServiceEndpoint("github", "https://shorturl.at/eiDKO")
                 .AddVerificationMethod(SignatureKeyBuilder.NewES256K(), SimpleIdServer.Did.Constants.VerificationMethodTypes.Secp256k1VerificationKey2018)
                 .Build();
-            var sync = new IdentityDocumentSynchronizer(new DIDRegistryServiceFactory(new IdentityDocumentConfigurationStore(), Options.Create(new DidEthrOptions())));
+            var sync = new IdentityDocumentSynchronizer(new DIDRegistryServiceFactory(new MockIdentityConfigurationStore(), Options.Create(new DidEthrOptions())));
             await sync.Sync(identityDocument, publicKey, privateKey, contractAdr);
         }
 
@@ -35,7 +35,7 @@ namespace SimpleIdServer.DID.Tests
         public async Task When_ReadIdentityDocument_Then_MetadataAreCorrect()
         {
             const string id = $"did:ethr:{network}:{publicKey}";
-            var extractor = new IdentityDocumentExtractor(new IdentityDocumentConfigurationStore(), Options.Create(new DidEthrOptions()));
+            var extractor = new IdentityDocumentExtractor(new MockIdentityConfigurationStore(), Options.Create(new DidEthrOptions()));
             var etherDidDocument = await extractor.Extract(id, CancellationToken.None);
             Assert.NotNull(etherDidDocument);
             Assert.That(etherDidDocument.Id, Is.EqualTo(id));

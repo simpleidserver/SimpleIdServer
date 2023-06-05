@@ -302,7 +302,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             => new(false) { ErrorMessage = act.ErrorMessage };
 
         [ReducerMethod]
-        public static UpdateUserState ReduceAddCredentialOfferAction(UpdateUserState state, AddCredentialOfferAction act) => new(true) { };
+        public static UpdateUserState ReduceAddCredentialOfferAction(UpdateUserState state, ShareCredentialOfferAction act) => new(true) { };
 
         [ReducerMethod]
         public static UpdateUserState ReduceAddCredentialOfferSuccessAction(UpdateUserState state, AddCredentialOfferSuccessAction act) => new(false);
@@ -312,6 +312,27 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
 
         [ReducerMethod]
         public static UpdateUserState ReduceGenerateDIDEthrSuccessAction(UpdateUserState state, GenerateDIDEthrSuccessAction act) => new(false);
+
+        [ReducerMethod]
+        public static UpdateUserState ReduceGenerateDIDEthrFailureAction(UpdateUserState state, GenerateDIDEthrFailureAction act) => new(false)
+        {
+            ErrorMessage = act.ErrorMessage
+        };
+
+        [ReducerMethod]
+        public static UpdateUserState ReduceShareCredentialOfferAction(UpdateUserState state, ShareCredentialOfferAction act) => new(true);
+
+        [ReducerMethod]
+        public static UpdateUserState ReduceShareCredentialOfferSuccessAction(UpdateUserState state, ShareCredentialOfferFailureAction act) => new(false)
+        {
+            ErrorMessage = null
+        };
+
+        [ReducerMethod]
+        public static UpdateUserState ReduceShareCredentialOfferFailureAction(UpdateUserState state, ShareCredentialOfferFailureAction act) => new(false)
+        {
+            ErrorMessage = act.ErrorMessage
+        };
 
         #endregion
 
@@ -679,23 +700,33 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         #region UserCredentialOfferState
 
         [ReducerMethod]
-        public static UserCredentialOfferState ReduceGetCredentialOfferQRCodeAction(UserCredentialOfferState state, GetCredentialOfferAction action)
+        public static UserCredentialOfferState ReduceShareCredentialOfferAction(UserCredentialOfferState state, ShareCredentialOfferAction action)
         {
             return state with
             {
-                IsLoading = true,
-                Picture = null                
+                IsLoading = true
             };
         }
 
         [ReducerMethod]
-        public static UserCredentialOfferState ReduceGetCredentialOfferQRCodeSuccessAction(UserCredentialOfferState state, GetCredentialOfferSuccessAction action)
+        public static UserCredentialOfferState ReduceShareCredentialOfferSuccessAction(UserCredentialOfferState state, ShareCredentialOfferSuccessAction action)
         {
             return state with
             {
                 IsLoading = false,
                 Picture = action.Picture,
-                Url=  action.Url
+                Url = action.Picture
+            };
+        }
+
+        [ReducerMethod]
+        public static UserCredentialOfferState ReduceShareCredentialOfferFailureAction(UserCredentialOfferState state, ShareCredentialOfferFailureAction action)
+        {
+            return state with
+            {
+                IsLoading = false,
+                Picture = null,
+                Url = null
             };
         }
 
