@@ -196,21 +196,94 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
         {
             int total = representations.Count();
             var lastChild = attrExpression.GetLastChild();
+            Func<SCIMRepresentationAttribute, string> getResult = (attr) =>
+            {
+                switch(lastChild.SchemaAttribute.Type)
+                {
+                    case SCIMSchemaAttributeTypes.BOOLEAN:
+                        return attr.ValueBoolean.ToString();
+                    case SCIMSchemaAttributeTypes.INTEGER:
+                        return attr.ValueInteger.ToString();
+                    case SCIMSchemaAttributeTypes.DECIMAL:
+                        return attr.ValueDecimal.ToString();
+                    case SCIMSchemaAttributeTypes.DATETIME:
+                        return attr.ValueDateTime.ToString();
+                    case SCIMSchemaAttributeTypes.REFERENCE:
+                        return attr.ValueReference.ToString();
+                    case SCIMSchemaAttributeTypes.BINARY:
+                        return attr.ValueBinary;
+                    default:
+                        return attr.ValueString;
+                }
+            };
+            var lastSchemaAttributeId = lastChild.SchemaAttribute.Id;
             var result = from s in representations
-                    join attr in dbContext.SCIMRepresentationAttributeLst on s.Id equals attr.RepresentationId
+                    join attr in dbContext.SCIMRepresentationAttributeLst on new { id = s.Id, schemaAttrId = lastSchemaAttributeId } equals new { id = attr.RepresentationId, schemaAttrId = attr.SchemaAttributeId }
                     select new
                     {
                         Attr = attr,
                         Rep = s,
-                        orderedValue = (lastChild.SchemaAttribute.Id == attr.SchemaAttributeId) ? attr.ValueString : ""
+                        orderedValueStr = (lastChild.SchemaAttribute.Id == attr.SchemaAttributeId) ? attr.ValueString : "",
+                        orderedValueBoo = (lastChild.SchemaAttribute.Id == attr.SchemaAttributeId) ? attr.ValueBoolean: default(bool),
+                        orderedValueInt = (lastChild.SchemaAttribute.Id == attr.SchemaAttributeId) ? attr.ValueInteger : default(int),
+                        orderedValueDec = (lastChild.SchemaAttribute.Id == attr.SchemaAttributeId) ? attr.ValueDecimal : default(decimal),
+                        orderedValueDat = (lastChild.SchemaAttribute.Id == attr.SchemaAttributeId) ? attr.ValueDateTime : default(DateTime),
+                        orderedValueRef = (lastChild.SchemaAttribute.Id == attr.SchemaAttributeId) ? attr.ValueReference : "",
+                        orderedValueBin = (lastChild.SchemaAttribute.Id == attr.SchemaAttributeId) ? attr.ValueBinary : "",
                     };
             switch (order)
             {
                 case SearchSCIMRepresentationOrders.Ascending:
-                    result = result.OrderBy(q => q.orderedValue);
+                    switch(lastChild.SchemaAttribute.Type)
+                    {
+                        case SCIMSchemaAttributeTypes.INTEGER:
+                            result = result.OrderBy(q => q.orderedValueInt);
+                            break;
+                        case SCIMSchemaAttributeTypes.BOOLEAN:
+                            result = result.OrderBy(q => q.orderedValueBoo);
+                            break;
+                        case SCIMSchemaAttributeTypes.DECIMAL:
+                            result = result.OrderBy(q => q.orderedValueDec);
+                            break;
+                        case SCIMSchemaAttributeTypes.DATETIME:
+                            result = result.OrderBy(q => q.orderedValueDat);
+                            break;
+                        case SCIMSchemaAttributeTypes.REFERENCE:
+                            result = result.OrderBy(q => q.orderedValueRef);
+                            break;
+                        case SCIMSchemaAttributeTypes.BINARY:
+                            result = result.OrderBy(q => q.orderedValueBin);
+                            break;
+                        default:
+                            result = result.OrderBy(q => q.orderedValueStr);
+                            break;
+                    }
                     break;
                 case SearchSCIMRepresentationOrders.Descending:
-                    result = result.OrderByDescending(q => q.orderedValue);
+                    switch (lastChild.SchemaAttribute.Type)
+                    {
+                        case SCIMSchemaAttributeTypes.INTEGER:
+                            result = result.OrderByDescending(q => q.orderedValueInt);
+                            break;
+                        case SCIMSchemaAttributeTypes.BOOLEAN:
+                            result = result.OrderByDescending(q => q.orderedValueBoo);
+                            break;
+                        case SCIMSchemaAttributeTypes.DECIMAL:
+                            result = result.OrderByDescending(q => q.orderedValueDec);
+                            break;
+                        case SCIMSchemaAttributeTypes.DATETIME:
+                            result = result.OrderByDescending(q => q.orderedValueDat);
+                            break;
+                        case SCIMSchemaAttributeTypes.REFERENCE:
+                            result = result.OrderByDescending(q => q.orderedValueRef);
+                            break;
+                        case SCIMSchemaAttributeTypes.BINARY:
+                            result = result.OrderByDescending(q => q.orderedValueBin);
+                            break;
+                        default:
+                            result = result.OrderByDescending(q => q.orderedValueStr);
+                            break;
+                    }
                     break;
             }
 
