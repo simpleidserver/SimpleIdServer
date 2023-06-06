@@ -48,6 +48,7 @@ namespace SimpleIdServer.IdServer
             public const string PushedAuthorizationRequest = "par";
             public const string Users = "users";
             public const string Networks = "networks";
+            public const string DeviceAuthorization = "device_authorization";
         }
 
         public static List<string> AllStandardNotificationModes = new List<string>

@@ -489,6 +489,8 @@ namespace SimpleIdServer.IdServer.Domains
         public int BCIntervalSeconds { get; set; } = 5;
         [JsonIgnore]
         public ICollection<Realm> Realms { get; set; } = new List<Realm>();
+        [JsonIgnore]
+        public ICollection<DeviceAuthCode> DeviceAuthCodes { get; set; } = new List<DeviceAuthCode>();
 
         public double? GetDoubleParameter(string name)
         {

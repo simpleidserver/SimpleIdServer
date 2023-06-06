@@ -205,6 +205,10 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Networks + "/{name}/deploy",
                 defaults: new { controller = "Networks", action = "Deploy" });
 
+            webApplication.MapControllerRoute("deviceAuthorization",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.DeviceAuthorization,
+                defaults: new { controller = "DeviceAuthorization", action = "Post" });
+
             webApplication.MapControllerRoute(
                 name: "defaultWithArea",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + "{area:exists}/{controller=Home}/{action=Index}/{id?}");

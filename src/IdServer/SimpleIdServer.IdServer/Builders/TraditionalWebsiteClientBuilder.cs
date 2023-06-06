@@ -53,6 +53,15 @@ namespace SimpleIdServer.IdServer.Builders
         }
 
         /// <summary>
+        /// Enable device code grant-type
+        /// </summary>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder EnableDeviceCodeGrantType()
+        {
+            return this;
+        }
+
+        /// <summary>
         /// Allows the client to use UMA grant-type.
         /// </summary>
         /// <returns></returns>

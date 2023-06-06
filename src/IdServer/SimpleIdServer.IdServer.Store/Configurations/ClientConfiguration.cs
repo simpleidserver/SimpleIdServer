@@ -34,6 +34,7 @@ namespace SimpleIdServer.IdServer.Store.Configurations
                 v => v.Split(',', StringSplitOptions.None).ToList());
             builder.HasMany(c => c.Translations).WithOne().OnDelete(DeleteBehavior.Cascade);
             builder.HasMany(c => c.SerializedJsonWebKeys).WithOne().OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(c => c.DeviceAuthCodes).WithOne(a => a.Client).OnDelete(DeleteBehavior.Cascade);
             builder.HasMany(c => c.Scopes).WithMany(s => s.Clients);
             builder.HasMany(c => c.Realms).WithMany(s => s.Clients);
             builder.Ignore(c => c.JsonWebKeys);

@@ -51,6 +51,7 @@ namespace SimpleIdServer.IdServer.Api.OpenIdConfiguration
                 prefix = $"{prefix}/";
 
             result.Add(OpenIDConfigurationNames.UserInfoEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.UserInfo}");
+            result.Add(OpenIDConfigurationNames.DeviceAuthorizationEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.DeviceAuthorization}");
             result.Add(OpenIDConfigurationNames.CheckSessionIframe, $"{issuer}/{prefix}{Constants.EndPoints.CheckSession}");
             result.Add(OpenIDConfigurationNames.EndSessionEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.EndSession}");
             result.Add(OpenIDConfigurationNames.BackchannelAuthenticationEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.BCAuthorize}");

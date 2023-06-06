@@ -37,6 +37,7 @@ namespace SimpleIdServer.IdServer.Store
         public DbSet<CredentialTemplate> CredentialTemplates { get; set; }
         public DbSet<UserCredentialOffer> CredentialOffers { get; set; }
         public DbSet<NetworkConfiguration> Networks { get; set; }
+        public DbSet<DeviceAuthCode> DeviceAuthCodes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -92,6 +93,7 @@ namespace SimpleIdServer.IdServer.Store
             builder.ApplyConfiguration(new CredentialTemplateDisplayConfiguration());
             builder.ApplyConfiguration(new CredentialTemplateParameterConfiguration());
             builder.ApplyConfiguration(new NetworkConfigurationConf());
+            builder.ApplyConfiguration(new DeviceAuthCodeConfiguration());
         }
     }
 }

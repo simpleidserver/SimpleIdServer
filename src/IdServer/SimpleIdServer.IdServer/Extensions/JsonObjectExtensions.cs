@@ -320,6 +320,8 @@ namespace System.Text.Json.Nodes
 
         public static string GetRedirectUri(this JsonObject jObj) => jObj.GetStr(TokenRequestParameters.RedirectUri);
 
+        public static string GetDeviceCode(this JsonObject jObj) => jObj.GetStr(TokenRequestParameters.DeviceCode);
+
         public static ClientCredentials GetClientCredentials(this JsonObject jObj)
         {
             var authorization = jObj.GetToken(Constants.AuthorizationHeaderName);

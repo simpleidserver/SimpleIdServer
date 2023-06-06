@@ -22,5 +22,6 @@ namespace SimpleIdServer.IdServer.DTOs
         public const string ClaimTokenFormat = "claim_token_format";
         public const string Pct = "pct";
         public const string Rpt = "rpt";
+        public const string DeviceCode = "device_code";
     }
 }

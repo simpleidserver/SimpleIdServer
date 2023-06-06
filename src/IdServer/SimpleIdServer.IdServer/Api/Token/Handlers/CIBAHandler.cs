@@ -10,7 +10,6 @@ using SimpleIdServer.IdServer.Api.Token.TokenBuilders;
 using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
-using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using System.Collections.Generic;

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer;
@@ -16,6 +17,7 @@ using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
 using SimpleIdServer.IdServer.Api.Authorization.Validators;
 using SimpleIdServer.IdServer.Api.BCAuthorize;
 using SimpleIdServer.IdServer.Api.Configuration;
+using SimpleIdServer.IdServer.Api.DeviceAuthorization;
 using SimpleIdServer.IdServer.Api.Jwks;
 using SimpleIdServer.IdServer.Api.Register;
 using SimpleIdServer.IdServer.Api.Token;
@@ -69,6 +71,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 opt.ConstraintMap.Add("realmPrefix", typeof(RealmRoutePrefixConstraint));
             });
             Tracing.Init();
+            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddControllersWithViews();
             services.AddDataProtection();
             services.AddDistributedMemoryCache();
@@ -87,6 +90,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddOAuthIntrospectionTokenApi()
                 .AddRegisterApi()
                 .AddBCAuthorizeApi()
+                .AddDeviceAuthorizationApi()
                 .AddIdentityProvisioning();
             services.AddAuthorization();
             services.Configure<AuthorizationOptions>(o =>
@@ -187,6 +191,13 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
+        private static IServiceCollection AddDeviceAuthorizationApi(this IServiceCollection services)
+        {
+            services.AddTransient<IDeviceAuthorizationRequestHandler, DeviceAuthorizationRequestHandler>();
+            services.AddTransient<IDeviceAuthorizationRequestValidator, DeviceAuthorizationRequestValidator>();
+            return services;
+        }
+
         private static IServiceCollection AddSubjectTypeBuilder(this IServiceCollection services)
         {
             services.AddTransient<ISubjectTypeBuilder, PairWiseSubjectTypeBuidler>();
@@ -217,6 +228,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IGrantTypeHandler, CIBAHandler>();
             services.AddTransient<IGrantTypeHandler, UmaTicketHandler>();
             services.AddTransient<IGrantTypeHandler, PreAuthorizedCodeHandler>();
+            services.AddTransient<IGrantTypeHandler, DeviceCodeHandler>();
             services.AddTransient<ICIBAGrantTypeValidator, CIBAGrantTypeValidator>();
             services.AddTransient<IClientAuthenticationHelper, ClientAuthenticationHelper>();
             services.AddTransient<IRevokeTokenRequestHandler, RevokeTokenRequestHandler>();
@@ -244,6 +256,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IUserHelper, UserHelper>();
             services.AddTransient<IPreAuthorizedCodeValidator, PreAuthorizedCodeValidator>();
             services.AddTransient<IKeyStore, InMemoryKeyStore>();
+            services.AddTransient<IDeviceCodeGrantTypeValidator, DeviceCodeGrantTypeValidator>();
             return services;
         }
 

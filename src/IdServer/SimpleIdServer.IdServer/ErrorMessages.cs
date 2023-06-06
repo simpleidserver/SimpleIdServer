@@ -20,6 +20,7 @@ namespace SimpleIdServer.IdServer
         public const string UNKNOWN_UMA_RESOURCE = "the UMA resource doesn't exist";
         public const string UNKNOWN_GROUP_IDS = "the group {0} don't exist";
         public const string UNKNOWN_CREDENTIAL_OFFER = "the credential offer doesn't exist";
+        public const string UNKNOWN_DEVICE_CODE = "the device_code doesn't exist";
         public const string UNKNOWN_NETWORK = "the network {0} doesn't exist";
         public const string UNKNOWN_AUTH_SCHEME_PROVIDER_PROPERTIES = "the authentication scheme provider cannot be updated because the following properties are unknown : {0}";
         public const string UNAUTHORIZED_CLIENT = "unauthorized client";
@@ -38,6 +39,7 @@ namespace SimpleIdServer.IdServer
         public const string INVALID_CLAIMS = "claims {0} are invalid";
         public const string INVALID_PREAUTHORIZEDCODE = "either the pre-authorized code has expired or is invalid";
         public const string INVALID_IDTOKENHINT = "id_token_hint is invalid";
+        public const string INVALID_ISSUED_DEVICE_CODE = "the device code has already been used to get a token";
         public const string INVALID_PIN = "the pin is invalid";
         public const string INVALID_UMA_PERMISSION_SCOPE = "At least one of the scopes included in the request does not match an available scope for any of the resources associated with requested permissions for the permission ticket provided by the client.";
         public const string INVALID_HTTPS_INITIATE_LOGIN_URI = "initiate_login_uri doesn't contain https scheme";
@@ -49,6 +51,7 @@ namespace SimpleIdServer.IdServer
         public const string INVALID_SCOPE = "At least one of the scopes included in the request does not match an available scope for any of the resources associated with requested permissions for the permission ticket provided by the client.";
         public const string INVALID_SUBJECT_TYPE = "subject_type is invalid";
         public const string INVALID_BC_DELIVERY_MODE = "invalid back channel delivery mode";
+        public const string INVALID_EXPIRED_DEVICE_CODE = "the device code is expired";
         public const string INVALID_BC_CLIENT_NOTIFICATION_EDP = "invalid back channel client notification endpoint";
         public const string INVALID_HTTPS_BC_CLIENT_NOTIFICATION_EDP = "client notification endpoint doesn't contain https scheme";
         public const string INVALID_REQUEST_PARAMETER = "request parameter is invalid";
@@ -58,6 +61,7 @@ namespace SimpleIdServer.IdServer
         public const string INVALID_ACCESS_TOKEN_SCOPE = "access token has an invalid scope";
         public const string INVALID_JWS_REQUEST_PARAMETER = "request parameter is not a valid JWS token";
         public const string INVALID_REQUEST_URI_PARAMETER = "request_uri parameter is invalid";
+        public const string INVALID_PENDING_DEVICE_CODE = "authorization request is still pending as the end user hasn't yet completed the user-interation steps";
         public const string INVALID_INCOMING_REQUEST = "incoming request is invalid";
         public const string INVALID_ENC_OR_ALG_USED_TO_ENCRYPT_IDTOKENHINT = "the alg / enc used to encrypt the id_token_hint is invalid";
         public const string INVALID_SECTOR_IDENTIFIER_URI = "sector_identifier_uri is not a valid URI";
@@ -77,6 +81,7 @@ namespace SimpleIdServer.IdServer
         public const string INVALID_DECENTRALIZED_IDENTITY_METHOD = "the decentralized identity method {0} doesn't exist";
         public const string INVALID_JWT = "JSON Web Token cannot be read";
         public const string INVALID_NETWORK_NAME = "the network name already exists";
+        public const string INVALID_CLIENT_ID_DEVICE_CODE = "the device code has not been issued for the client";
         public const string BAD_CODE_VERIFIER = "code_verifier is invalid";
         public const string BAD_TOKEN_FORMAT = "token format {0} is invalid";
         public const string BAD_CODE_CHALLENGE_METHOD = "transform algorithm {0} is not supported";
