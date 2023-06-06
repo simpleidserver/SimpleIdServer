@@ -225,6 +225,19 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             };
         }
 
+        [ReducerMethod]
+        public static UserState ReduceGenerateDIDKeySuccessAction(UserState state, GenerateDIDKeySuccessAction act)
+        {
+            var user = state.User;
+            user.Did = act.Did;
+            user.DidPrivateHex = act.DidPrivateHex;
+            user.UpdateDateTime = DateTime.UtcNow;
+            return state with
+            {
+                User = user
+            };
+        }
+
         #endregion
 
         #region UpdateUserState
@@ -331,6 +344,18 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         [ReducerMethod]
         public static UpdateUserState ReduceShareCredentialOfferFailureAction(UpdateUserState state, ShareCredentialOfferFailureAction act) => new(false)
         {
+            ErrorMessage = act.ErrorMessage
+        };
+
+        [ReducerMethod]
+        public static UpdateUserState ReduceGenerateDIDKeyAction(UpdateUserState state, GenerateDIDKeyAction act) => new(true) { };
+
+        [ReducerMethod]
+        public static UpdateUserState ReduceGenerateDIDKeySuccessAction(UpdateUserState state, GenerateDIDKeySuccessAction act) => new(false) { };
+
+        [ReducerMethod]
+        public static UpdateUserState ReduceGenerateDIDKeyFailureAction(UpdateUserState state, GenerateDIDKeyFailureAction act) => new(false) 
+        { 
             ErrorMessage = act.ErrorMessage
         };
 
@@ -625,6 +650,10 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
                 UserId = co.UserId,
                 CredentialNames = co.CredentialNames,
                 UpdateDateTime = co.UpdateDateTime,
+                ExpirationDateTime = co.ExpirationDateTime,
+                ClientId = co.ClientId,
+                Status = co.Status,
+                CredentialTemplateId = co.CredentialTemplateId,
                 Id = co.Id
             })).ToList();
             return state with
@@ -692,6 +721,24 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             return state with
             {
                 CredentialOffers = credentialOffers
+            };
+        }
+
+        [ReducerMethod]
+        public static UserCredentialOffersState ReduceGenerateDIDKeySuccessAction(UserCredentialOffersState state, GenerateDIDKeySuccessAction act)
+        {
+            return state with
+            {
+                CredentialOffers = new List<SelectableUserCredentialOffer>()
+            };
+        }
+
+        [ReducerMethod]
+        public static UserCredentialOffersState ReduceGenerateDIDEthrSuccessAction(UserCredentialOffersState state, GenerateDIDEthrSuccessAction act)
+        {
+            return state with
+            {
+                CredentialOffers = new List<SelectableUserCredentialOffer>()
             };
         }
 

@@ -316,7 +316,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             };
             var requestMessage = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{_websiteOptions.IdServerBaseUrl}/{realm}/credential_offer/share/{action.UserId}"),
+                RequestUri = new Uri($"{_websiteOptions.IdServerBaseUrl}/{realm}/credential_offer/share/{action.UserName}"),
                 Method = HttpMethod.Post,
                 Content = new StringContent(request.ToJsonString(), Encoding.UTF8, "application/json")
             };
@@ -327,6 +327,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
                 var credentialOffer = httpResult.Headers.Location.OriginalString;
                 var picture = GetQRCode(credentialOffer);
                 dispatcher.Dispatch(new ShareCredentialOfferSuccessAction { Picture = picture, CredentialOffer = credentialOffer });
+                dispatcher.Dispatch(new GetUserAction { UserId = action.UserId });
                 return;
             }
 
@@ -379,6 +380,37 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             {
                 var jObj = JsonObject.Parse(json);
                 dispatcher.Dispatch(new GenerateDIDEthrFailureAction { ErrorMessage = jObj["error_description"].GetValue<string>() });
+            }
+        }
+
+
+        [EffectMethod]
+        public async Task Handle(GenerateDIDKeyAction action, IDispatcher dispatcher)
+        {
+            var realm = await GetRealm();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var request = new JsonObject
+            {
+                { "method", "key" }
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{_websiteOptions.IdServerBaseUrl}/{realm}/users/{action.UserId}/did"),
+                Method = HttpMethod.Post,
+                Content = new StringContent(request.ToJsonString(), Encoding.UTF8, "application/json")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            try
+            {
+                httpResult.EnsureSuccessStatusCode();
+                var jObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new GenerateDIDKeySuccessAction { UserId = action.UserId, Did = jObj["did"].GetValue<string>(), DidPrivateHex = jObj["private_key"].GetValue<string>() });
+            }
+            catch
+            {
+                var jObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new GenerateDIDKeyFailureAction { ErrorMessage = jObj["error_description"].GetValue<string>() });
             }
         }
 
@@ -703,6 +735,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
     public class ShareCredentialOfferAction
     {
         public string UserId { get; set; }
+        public string UserName { get; set; }
         public string CredentialTemplateId { get; set; }
         public string ClientId { get; set; }
     }
@@ -738,6 +771,23 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
     }
 
     public class GenerateDIDEthrFailureAction
+    {
+        public string ErrorMessage { get; set; }
+    }
+
+    public class GenerateDIDKeyAction
+    {
+        public string UserId { get; set; }
+    }
+
+    public class GenerateDIDKeySuccessAction
+    {
+        public string UserId { get; set; }
+        public string Did { get; set; }
+        public string DidPrivateHex { get; set; }
+    }
+
+    public class GenerateDIDKeyFailureAction
     {
         public string ErrorMessage { get; set; }
     }

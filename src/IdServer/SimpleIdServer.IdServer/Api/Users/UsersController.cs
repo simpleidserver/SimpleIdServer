@@ -274,7 +274,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                     prefix = prefix ?? Constants.DefaultRealm;
                     CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
                     Validate();
-                    var user = await _userRepository.Query().Include(u => u.Realms).FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.RealmsName == prefix), cancellationToken);
+                    var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.CredentialOffers).FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.RealmsName == prefix), cancellationToken);
                     if (user == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_USER, id));
                     var generator = _generators.FirstOrDefault(g => g.Method == request.Method);
                     if (generator == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.INVALID_DECENTRALIZED_IDENTITY_METHOD, request.Method));
@@ -282,6 +282,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                     if (!string.IsNullOrWhiteSpace(generationResult.ErrorMessage)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, generationResult.ErrorMessage);
                     user.Did = generationResult.DID;
                     user.DidPrivateHex = generationResult.PrivateKey;
+                    user.CredentialOffers.Clear();
                     await _userRepository.SaveChanges(cancellationToken);
                     activity?.SetStatus(ActivityStatusCode.Ok, "Decentralized Identity is generated");
                     return new ContentResult

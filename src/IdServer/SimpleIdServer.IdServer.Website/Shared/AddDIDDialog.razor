@@ -92,7 +92,7 @@
                         break;
                     // key
                     case "key":
-
+                        <RadzenButton class="mt-1" Click=@SubmitGenerateDIDKey Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateUserState.Value.IsUpdating ? "Adding..." : "Add")" Disabled=updateUserState.Value.IsUpdating />
                         break;
                 }
             }
@@ -138,6 +138,12 @@
             notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.DIDKeyCreated });
             StateHasChanged();
         });
+        SubscribeToAction<GenerateDIDKeySuccessAction>((act) =>
+        {
+            dialogService.Close();
+            notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.DIDKeyCreated });
+            StateHasChanged();
+        });
     }
 
     void SelectDIDType(DIDType didType)
@@ -178,6 +184,7 @@
 
     void SubmitGenerateDIDKey()
     {
-        
+        var act = new GenerateDIDKeyAction { UserId = UserId };
+        dispatcher.Dispatch(act);
     }
 }
