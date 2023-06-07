@@ -1304,6 +1304,39 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "DeviceAuthCodes",
+                columns: table => new
+                {
+                    DeviceCode = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ClientId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserLogin = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Scopes = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ExpirationDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    NextAccessDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    LastAccessTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DeviceAuthCodes", x => x.DeviceCode);
+                    table.ForeignKey(
+                        name: "FK_DeviceAuthCodes_Clients_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Clients",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_DeviceAuthCodes_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Grants",
                 columns: table => new
                 {
@@ -1617,6 +1650,16 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 column: "RealmsName");
 
             migrationBuilder.CreateIndex(
+                name: "IX_DeviceAuthCodes_ClientId",
+                table: "DeviceAuthCodes",
+                column: "ClientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DeviceAuthCodes_UserId",
+                table: "DeviceAuthCodes",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Grants_ScopeId",
                 table: "Grants",
                 column: "ScopeId");
@@ -1827,6 +1870,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
             migrationBuilder.DropTable(
                 name: "CredentialTemplateRealm");
+
+            migrationBuilder.DropTable(
+                name: "DeviceAuthCodes");
 
             migrationBuilder.DropTable(
                 name: "ExtractedRepresentations");

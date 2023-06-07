@@ -1071,6 +1071,56 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.ToTable("CredentialTemplateClaimMapper");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.DeviceAuthCode", b =>
+                {
+                    b.Property<string>("DeviceCode")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ClientId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpirationDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastAccessTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("NextAccessDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Scopes")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserLogin")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("DeviceCode");
+
+                    b.HasIndex("ClientId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("DeviceAuthCodes");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ExtractedRepresentation", b =>
                 {
                     b.Property<string>("ExternalId")
@@ -1337,7 +1387,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<string>("PrivateAccountKey")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "private_accoutkey");
+                        .HasAnnotation("Relational:JsonPropertyName", "private_accountkey");
 
                     b.Property<string>("RpcUrl")
                         .IsRequired()
@@ -2457,6 +2507,23 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Navigation("CredentialTemplate");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.DeviceAuthCode", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Client", "Client")
+                        .WithMany("DeviceAuthCodes")
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SimpleIdServer.IdServer.Domains.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Client");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Group", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.Group", "ParentGroup")
@@ -2749,6 +2816,8 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Client", b =>
                 {
+                    b.Navigation("DeviceAuthCodes");
+
                     b.Navigation("SerializedJsonWebKeys");
 
                     b.Navigation("Translations");

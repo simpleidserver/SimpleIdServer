@@ -3,14 +3,15 @@
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.Token.Helpers;
 using SimpleIdServer.IdServer.Api.Token.TokenBuilders;
 using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
 using SimpleIdServer.IdServer.Api.Token.Validators;
+using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using System.Collections.Generic;
@@ -29,8 +30,8 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IUserRepository _userRepository;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
+        private readonly IAuthenticationHelper _authenticationHelper;
         private readonly IBusControl _busControl;
-        private readonly ILogger<DeviceCodeHandler> _logger;
 
         public DeviceCodeHandler(
             IClientAuthenticationHelper clientAuthenticationHelper,
@@ -40,8 +41,8 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IEnumerable<ITokenProfile> tokenProfiles,
             IOptions<IdServerHostOptions> options,
             IDeviceCodeGrantTypeValidator validator,
-            IBusControl busControl,
-            ILogger<DeviceCodeHandler> logger) : base(clientAuthenticationHelper, options)
+            IAuthenticationHelper authenticationHelper,
+            IBusControl busControl) : base(clientAuthenticationHelper, options)
         {
             _validator = validator;
             _busControl = busControl;
@@ -49,7 +50,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             _userRepository = userRepository;
             _tokenBuilders = tokenBuilders;
             _tokenProfiles = tokenProfiles;
-            _logger = logger;
+            _authenticationHelper = authenticationHelper;
         }
 
         public override string GrantType => GRANT_TYPE;
@@ -70,7 +71,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     var deviceAuthCode = await _validator.Validate(context, cancellationToken);
                     scopeLst = deviceAuthCode.Scopes;
                     activity?.SetTag("scopes", string.Join(",", deviceAuthCode.Scopes));
-                    var user = await _userRepository.Query().Include(u => u.Groups).Include(u => u.OAuthUserClaims).Include(u => u.Realms).AsNoTracking().FirstOrDefaultAsync(u => u.Id == deviceAuthCode.UserId && u.Realms.Any(r => r.RealmsName == context.Realm), cancellationToken);
+                    var user = await _authenticationHelper.GetUserByLogin(_userRepository.Query().Include(u => u.Groups).Include(u => u.OAuthUserClaims).Include(u => u.Realms), deviceAuthCode.UserLogin, context.Realm, cancellationToken);
                     context.SetUser(user);
                     foreach (var tokenBuilder in _tokenBuilders)
                         await tokenBuilder.Build(new BuildTokenParameter { Scopes = deviceAuthCode.Scopes }, context, cancellationToken);

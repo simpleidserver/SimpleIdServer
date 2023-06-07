@@ -26,6 +26,7 @@ namespace SimpleIdServer.IdServer.Api.DeviceAuthorization
         {
             var jObjBody = Request.Form.ToJsonObject();
             var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, jObjBody, null, Request.Cookies, string.Empty), prefix ?? Constants.DefaultRealm, new HandlerContextResponse(Response.Cookies));
+            context.SetUrlHelper(Url);
             using (var activity = Tracing.IdServerActivitySource.StartActivity("Get Device Authorization"))
             {
                 try

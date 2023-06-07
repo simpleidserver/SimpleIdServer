@@ -76,12 +76,13 @@ namespace SimpleIdServer.IdServer
         public const string INVALID_SUBJECT_IDTOKENHINT = "subject contained in id_token_hint is invalid";
         public const string INVALID_AUDIENCE_IDTOKENHINT = "audience contained in id_token_hint is invalid";
         public const string INVALID_APPLICATION_TYPE = "application type is invalid";
+        public const string INVALID_AUTH_DEVICE_STATUS_FOR_REJECTION = "the status of the authentication device is invalid, it must be equals to PENDING";
         public const string INVALID_GRANT_MANAGEMENT_ACTION = "the grant_management_action {0} is not valid";
         public const string INVALID_AUTH_DETAILS_LOCATION = "the authorization_details location must be equal to the authorization server {0}";
         public const string INVALID_DECENTRALIZED_IDENTITY_METHOD = "the decentralized identity method {0} doesn't exist";
         public const string INVALID_JWT = "JSON Web Token cannot be read";
         public const string INVALID_NETWORK_NAME = "the network name already exists";
-        public const string INVALID_CLIENT_ID_DEVICE_CODE = "the device code has not been issued for the client";
+        public const string INVALID_CLIENT_ID_DEVICE_CODE = "the device code has not been issued for this client";
         public const string BAD_CODE_VERIFIER = "code_verifier is invalid";
         public const string BAD_TOKEN_FORMAT = "token format {0} is invalid";
         public const string BAD_CODE_CHALLENGE_METHOD = "transform algorithm {0} is not supported";

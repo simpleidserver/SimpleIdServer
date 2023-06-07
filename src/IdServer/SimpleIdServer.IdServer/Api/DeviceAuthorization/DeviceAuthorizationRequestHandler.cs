@@ -24,14 +24,12 @@ namespace SimpleIdServer.IdServer.Api.DeviceAuthorization
     {
         private readonly IDeviceAuthorizationRequestValidator _validator;
         private readonly IDeviceAuthCodeRepository _deviceAuthCodeRepository;
-        private readonly IUrlHelper _urlHelper;
         private readonly IdServerHostOptions _options;
 
-        public DeviceAuthorizationRequestHandler(IDeviceAuthorizationRequestValidator validator, IDeviceAuthCodeRepository deviceAuthCodeRepository, IUrlHelperFactory urlHelperFactory, IActionContextAccessor  actionContextAccessor, IOptions<IdServerHostOptions> options)
+        public DeviceAuthorizationRequestHandler(IDeviceAuthorizationRequestValidator validator, IDeviceAuthCodeRepository deviceAuthCodeRepository, IOptions<IdServerHostOptions> options)
         {
             _validator = validator;
             _deviceAuthCodeRepository = deviceAuthCodeRepository;
-            _urlHelper = urlHelperFactory.GetUrlHelper(actionContextAccessor.ActionContext);
             _options = options.Value;
         }
 
@@ -40,12 +38,11 @@ namespace SimpleIdServer.IdServer.Api.DeviceAuthorization
             await _validator.Validate(context, cancellationToken);
             var deviceCode = Guid.NewGuid().ToString();
             var userCode = GenerateUserCode();
-            var clientId = context.Request.RequestData.GetClientIdFromAuthorizationRequest();
             var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
-            _deviceAuthCodeRepository.Add(DeviceAuthCode.Create(deviceCode, userCode, clientId, scopes, _options.DeviceCodeExpirationInSeconds));
+            _deviceAuthCodeRepository.Add(DeviceAuthCode.Create(deviceCode, userCode, context.Client.Id, scopes, _options.DeviceCodeExpirationInSeconds));
             await _deviceAuthCodeRepository.SaveChanges(cancellationToken);
-            var verificationUri = _urlHelper.Action("Index", "Device");
-            var verificationUriComplete = _urlHelper.Action("Index", "Device", new { userCode = userCode });
+            var verificationUri = $"{context.Request.IssuerName}{context.UrlHelper.Action("Index", "Device")}";
+            var verificationUriComplete = $"{context.Request.IssuerName}{context.UrlHelper.Action("Index", "Device", new { userCode = userCode })}";
             return new JsonObject
             {
                 { DeviceAuthorizationNames.DeviceCode, deviceCode },

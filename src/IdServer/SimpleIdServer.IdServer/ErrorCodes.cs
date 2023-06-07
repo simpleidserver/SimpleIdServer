@@ -13,6 +13,7 @@ namespace SimpleIdServer.IdServer
         public const string INVALID_GRANT = "invalid_grant";
         public const string INVALID_TOKEN = "invalid_token";
         public const string INVALID_SCOPE = "invalid_scope";
+        public const string INVALID_DEVICE_CODE = "invalid_device_code";
         public const string INVALID_REQUEST_OBJECT = "invalid_request_object";
         public const string UNSUPPORTED_GRANT_TYPE = "unsupported_grant_type";
         public const string UNSUPPORTED_TOKEN_TYPE = "unsupported_token_type";

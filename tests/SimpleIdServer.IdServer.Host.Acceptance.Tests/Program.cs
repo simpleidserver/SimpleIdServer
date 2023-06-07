@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Authentication.Certificate;
+﻿using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.CredentialIssuer;
+using SimpleIdServer.IdServer.Host.Acceptance.Tests;
 using SimpleIdServer.OAuth.Host.Acceptance.Tests;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +26,7 @@ builder.Services.AddSIDIdentityServer(o =>
         o.AddInMemoryUMAResources(IdServerConfiguration.UmaResources);
         o.AddInMemoryGroups(IdServerConfiguration.Groups);
         o.AddInMemoryCredentialTemplates(IdServerConfiguration.CredTemplates);
+        o.AddInMemoryDeviceCodes(IdServerConfiguration.DeviceAuthCodes);
         o.AddInMemoryKeys(SimpleIdServer.IdServer.Constants.StandardRealms.Master, new List<SigningCredentials>
         {
             new SigningCredentials(BuildRsaSecurityKey("keyid"), SecurityAlgorithms.RsaSha256),
@@ -51,6 +55,9 @@ builder.Services.AddSIDIdentityServer(o =>
         });
     });
 builder.Services.AddDIDKey();
+var antiforgeryService = builder.Services.First(s => s.ServiceType == typeof(IAntiforgery));
+builder.Services.Remove(antiforgeryService);
+builder.Services.AddTransient<IAntiforgery, FakeAntiforgery>();
 var app = builder.Build()
     .UseCredentialIssuer()
     .UseSID();

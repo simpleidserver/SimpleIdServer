@@ -192,6 +192,17 @@ namespace SimpleIdServer.IdServer
             return this;
         }
 
+        public IdServerInMemoryStoreBuilder AddInMemoryDeviceCodes(ICollection<DeviceAuthCode> deviceCodes)
+        {
+            var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
+            if (!storeDbContext.DeviceAuthCodes.Any())
+            {
+                storeDbContext.DeviceAuthCodes.AddRange(deviceCodes);
+            }
+
+            return this;
+        }
+
         public IdServerInMemoryStoreBuilder AddInMemoryKeys(Domains.Realm realm, ICollection<SigningCredentials> signingCredentials, ICollection<EncryptingCredentials> encryptingCredentials)
         {
             var storeDbContext = _serviceProvider.GetService<StoreDbContext>();

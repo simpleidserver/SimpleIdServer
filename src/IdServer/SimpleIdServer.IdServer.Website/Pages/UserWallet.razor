@@ -80,7 +80,7 @@
     {
         await dialogService.OpenAsync<AddDIDDialog>("Add Decentralized Identifier", new Dictionary<string, object>
         {
-            { "UserId", userState.Value.User.Id }
+            { "UserLogin", userState.Value.User.Id }
         }, new DialogOptions
         {
             Width = "700px",
@@ -94,7 +94,7 @@
     {
         await dialogService.OpenAsync<ShareCredentialOfferDialog>("Share credential", new Dictionary<string, object>
         {
-            { "UserId", userState.Value.User.Id },
+            { "UserLogin", userState.Value.User.Id },
             { "UserName", userState.Value.User.Name }
         }, new DialogOptions
         {

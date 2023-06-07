@@ -61,11 +61,29 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Device Authentication is expired.
+        /// </summary>
+        public static string auth_device_code_expired {
+            get {
+                return ResourceManager.GetString("auth_device_code_expired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Confirm.
         /// </summary>
         public static string confirm {
             get {
                 return ResourceManager.GetString("confirm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Device Authentication is confirmed.
+        /// </summary>
+        public static string confirmed {
+            get {
+                return ResourceManager.GetString("confirmed", resourceCulture);
             }
         }
         
@@ -88,6 +106,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Device Authentication must have a PENDING state.
+        /// </summary>
+        public static string not_pending_auth_device_code {
+            get {
+                return ResourceManager.GetString("not_pending_auth_device_code", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Reject.
         /// </summary>
         public static string reject {
@@ -102,6 +129,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static string scopes {
             get {
                 return ResourceManager.GetString("scopes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Device Authentication doesn&apos;t exist.
+        /// </summary>
+        public static string unknown_user_code {
+            get {
+                return ResourceManager.GetString("unknown_user_code", resourceCulture);
             }
         }
         

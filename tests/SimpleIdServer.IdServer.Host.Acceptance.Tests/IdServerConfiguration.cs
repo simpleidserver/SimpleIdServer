@@ -111,6 +111,50 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             AdminGroup
         };
 
+        public static List<DeviceAuthCode> DeviceAuthCodes = new List<DeviceAuthCode>
+        {
+            new DeviceAuthCode
+            {
+                DeviceCode = "issuedDeviceCode",
+                ClientId = "fiftyEightClient",
+                Status = DeviceAuthCodeStatus.ISSUED,
+                UserCode = Guid.NewGuid().ToString()
+            },
+            new DeviceAuthCode
+            {
+                DeviceCode = "expiredDeviceCode",
+                ClientId = "fiftyEightClient",
+                Status = DeviceAuthCodeStatus.PENDING,
+                ExpirationDateTime = DateTime.UtcNow.AddHours(-2),
+                UserCode = Guid.NewGuid().ToString()
+            },
+            new DeviceAuthCode
+            {
+                DeviceCode = "invalidClientDeviceCode",
+                ClientId = "fiftyEightClient",
+                Status = DeviceAuthCodeStatus.PENDING,
+                ExpirationDateTime = DateTime.UtcNow.AddHours(2),
+                UserCode = Guid.NewGuid().ToString()
+            },
+            new DeviceAuthCode
+            {
+                DeviceCode = "tooManyDeviceCode",
+                ClientId = "sixtyOneClient",
+                ExpirationDateTime = DateTime.UtcNow.AddDays(2),
+                Status = DeviceAuthCodeStatus.PENDING,
+                NextAccessDateTime = DateTime.UtcNow.AddDays(2),
+                UserCode = Guid.NewGuid().ToString()
+            },
+            new DeviceAuthCode
+            {
+                DeviceCode = "pendingDeviceCode",
+                ClientId = "sixtyOneClient",
+                ExpirationDateTime = DateTime.UtcNow.AddDays(2),
+                Status = DeviceAuthCodeStatus.PENDING,
+                UserCode = Guid.NewGuid().ToString()
+            }
+        };
+
         public static List<Scope> Scopes => new List<Scope>
         {
             FirstScope,
@@ -197,7 +241,8 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildApiClient("fiftySevenClient", "password").AddScope(StandardScopes.Users).AddScope(StandardScopes.Register).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("fiftyEightClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().EnableTokenInResponseType().TrustOpenIdCredential().DisableConsent().AddScope(StandardScopes.GrantManagementQuery, StandardScopes.GrantManagementRevoke).Build(),
             ClientBuilder.BuildWalletClient("fiftyNineClient", "password").Build(),
-            ClientBuilder.BuildWalletClient("sixtyClient", "password").RequirePin().Build()
+            ClientBuilder.BuildWalletClient("sixtyClient", "password").RequirePin().Build(),
+            ClientBuilder.BuildDeviceClient("sixtyOneClient", "password").AddScope(AdminScope).Build()
         };
 
         public static List<User> Users = new List<User>

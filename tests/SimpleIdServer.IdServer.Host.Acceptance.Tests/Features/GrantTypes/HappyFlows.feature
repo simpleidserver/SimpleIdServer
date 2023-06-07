@@ -439,3 +439,30 @@ Scenario: Use 'urn:ietf:params:oauth:grant-type:pre-authorized_code' grant type 
 	And JWT has authorization_details type 'openid_credential'
 	And JSON exists 'c_nonce'	
 	And JSON exists 'c_nonce_expires_in'	
+
+Scenario: Use 'urn:ietf:params:oauth:grant-type:device_code' grant type to get an access token
+	Given authenticate a user
+
+	When execute HTTP POST request 'https://localhost:8080/device_authorization'
+	| Key           | Value			 |
+	| client_id     | sixtyOneClient |
+	| scope         | admin          |
+
+	And extract JSON from body	
+	And extract parameter 'device_code' from JSON body
+	And extract parameter 'user_code' from JSON body
+
+	And execute HTTP POST request 'https://localhost:8080/Device'
+	| Key      | Value       |
+	| UserCode | $user_code$ |
+	
+	When execute HTTP POST request 'https://localhost:8080/token'
+	| Key           | Value        			                       |
+	| grant_type    | urn:ietf:params:oauth:grant-type:device_code |
+	| client_id     | sixtyOneClient                               |
+	| client_secret | password                                     |
+	| device_code   | $device_code$                                |
+	
+	And extract JSON from body
+
+	Then HTTP status code equals to '200'

@@ -19,6 +19,7 @@
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\CredentialOfferErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\GrantErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\Grants - Copier.feature.cs" />
+	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\GrantTypes\AuthorizationCodeGrantType - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\GrantTypes\AuthorizationCodeGrantTypeErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\GrantTypes\CIBAGrantTypeErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\GrantTypes\HappyFlows - Copier.feature.cs" />
@@ -86,6 +87,9 @@
 	  </Compile>
 	  <Compile Update="Features\CredentialOfferErrors.feature.cs">
 	    <DependentUpon>CredentialOfferErrors.feature</DependentUpon>
+	  </Compile>
+	  <Compile Update="Features\GrantTypes\DeviceAuthorizationGrantTypeErrors.feature.cs">
+	    <DependentUpon>DeviceAuthorizationGrantTypeErrors.feature</DependentUpon>
 	  </Compile>
 	  <Compile Update="Features\GrantTypes\PreAuthorizedCodeErrors.feature.cs">
 	    <DependentUpon>PreAuthorizedCodeErrors.feature</DependentUpon>
@@ -251,6 +255,10 @@
 	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
 	  </SpecFlowFeatureFiles>
 	  <SpecFlowFeatureFiles Update="Features\CredentialOfferErrors.feature">
+	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
+	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+	  </SpecFlowFeatureFiles>
+	  <SpecFlowFeatureFiles Update="Features\GrantTypes\DeviceAuthorizationGrantTypeErrors.feature">
 	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
 	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
 	  </SpecFlowFeatureFiles>

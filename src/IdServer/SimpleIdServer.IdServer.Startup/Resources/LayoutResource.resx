@@ -129,6 +129,9 @@
   <data name="credentials" xml:space="preserve">
     <value>Credentials</value>
   </data>
+  <data name="deviceauth" xml:space="preserve">
+    <value>Device Authentication</value>
+  </data>
   <data name="disconnect" xml:space="preserve">
     <value>Disconnect</value>
   </data>

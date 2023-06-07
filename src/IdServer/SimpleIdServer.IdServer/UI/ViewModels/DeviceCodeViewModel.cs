@@ -11,5 +11,6 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
         public string PictureUri { get; set; }
         public IEnumerable<string> Scopes { get; set; }
         public string UserCode { get; set; }
+        public bool IsConfirmed { get; set; }
     }
 }

@@ -8,7 +8,7 @@ namespace SimpleIdServer.IdServer.Domains
         public string DeviceCode { get; set; } = null!;
         public string UserCode { get; set; } = null!;
         public string ClientId { get; set; } = null!;
-        public string? UserId { get; set; } = null;
+        public string? UserLogin { get; set; } = null;
         public IEnumerable<string> Scopes { get; set; } = new List<string>();
         public DateTime CreateDateTime { get; set; }
         public DateTime UpdateDateTime { get; set; }
@@ -16,12 +16,20 @@ namespace SimpleIdServer.IdServer.Domains
         public DateTime? NextAccessDateTime { get; set; } = null;
         public DeviceAuthCodeStatus Status { get; set; } = DeviceAuthCodeStatus.PENDING;
         public DateTime LastAccessTime { get; set; }
-        public Client Client { get; set; }
+        public Client Client { get; set; } = null!;
+        public User? User { get; set; } = null;
 
         public void Send()
         {
             Status = DeviceAuthCodeStatus.ISSUED;
             UpdateDateTime = DateTime.UtcNow;
+        }
+
+        public void Accept(string userLogin)
+        {
+            Status = DeviceAuthCodeStatus.ACCEPTED;
+            UpdateDateTime = DateTime.UtcNow;
+            UserLogin = userLogin;
         }
 
         public void Next(double slidingTimeInSeconds)

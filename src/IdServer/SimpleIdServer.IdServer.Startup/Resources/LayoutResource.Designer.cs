@@ -97,6 +97,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Device Authentication.
+        /// </summary>
+        public static string deviceauth {
+            get {
+                return ResourceManager.GetString("deviceauth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Disconnect.
         /// </summary>
         public static string disconnect {

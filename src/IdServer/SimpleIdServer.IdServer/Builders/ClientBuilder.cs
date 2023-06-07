@@ -96,7 +96,7 @@ namespace SimpleIdServer.IdServer.Builders
         /// CIBA is enabled.
         /// </summary>
         /// <returns></returns>
-        public static DeviceClientBuilder BuildExternalAuthDeviceClient(string clientId, string subjectName, Domains.Realm realm = null)
+        public static ExternalDeviceClientBuilder BuildExternalAuthDeviceClient(string clientId, string subjectName, Domains.Realm realm = null)
         {
             var client = new Client
             {
@@ -116,6 +116,32 @@ namespace SimpleIdServer.IdServer.Builders
             if (realm == null) client.Realms.Add(Constants.StandardRealms.Master);
             else client.Realms.Add(realm);
             client.GrantTypes.Add(CIBAHandler.GRANT_TYPE);
+            return new ExternalDeviceClientBuilder(client);
+        }
+
+        /// <summary>
+        /// Build a device client.
+        /// </summary>
+        /// <param name="clientId"></param>
+        /// <param name="clientSecret"></param>
+        /// <param name="realm"></param>
+        /// <returns></returns>
+        public static DeviceClientBuilder BuildDeviceClient(string clientId, string clientSecret, Domains.Realm realm = null)
+        {
+            var client = new Client
+            {
+                Id = Guid.NewGuid().ToString(),
+                ClientId = clientId,
+                ClientSecret = clientSecret,
+                ClientType = ClientTypes.EXTERNAL,
+                TokenEndPointAuthMethod = OAuthClientSecretPostAuthenticationHandler.AUTH_METHOD,
+                IdTokenSignedResponseAlg = SecurityAlgorithms.EcdsaSha256,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
+            };
+            if (realm == null) client.Realms.Add(Constants.StandardRealms.Master);
+            else client.Realms.Add(realm);
+            client.GrantTypes.Add(DeviceCodeHandler.GRANT_TYPE);
             return new DeviceClientBuilder(client);
         }
 

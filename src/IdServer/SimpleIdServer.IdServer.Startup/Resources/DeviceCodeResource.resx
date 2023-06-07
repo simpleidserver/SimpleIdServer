@@ -117,8 +117,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="auth_device_code_expired" xml:space="preserve">
+    <value>Device Authentication is expired</value>
+  </data>
   <data name="confirm" xml:space="preserve">
     <value>Confirm</value>
+  </data>
+  <data name="confirmed" xml:space="preserve">
+    <value>Device Authentication is confirmed</value>
   </data>
   <data name="consent_client_access" xml:space="preserve">
     <value>The client '{0}' is requesting access to your account</value>
@@ -126,11 +132,17 @@
   <data name="manage_consents" xml:space="preserve">
     <value>Manage consents</value>
   </data>
+  <data name="not_pending_auth_device_code" xml:space="preserve">
+    <value>Device Authentication must have a PENDING state</value>
+  </data>
   <data name="reject" xml:space="preserve">
     <value>Reject</value>
   </data>
   <data name="scopes" xml:space="preserve">
     <value>Scopes</value>
+  </data>
+  <data name="unknown_user_code" xml:space="preserve">
+    <value>Device Authentication doesn't exist</value>
   </data>
   <data name="usercode" xml:space="preserve">
     <value>User code</value>
