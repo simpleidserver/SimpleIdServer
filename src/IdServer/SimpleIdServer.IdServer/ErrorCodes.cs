@@ -28,6 +28,7 @@ namespace SimpleIdServer.IdServer
         public const string EXPIRED_TOKEN = "expired_token";
         public const string SLOW_DOWN = "slow_down";
         public const string UNKNOWN_USER = "unknown_user";
+        public const string UNKNOWN_ACR = "unknown_acr";
         public const string INVALID_CREDENTIALS = "invalid_credentials";
         public const string INVALID_TARGET = "invalid_target";
         public const string REQUEST_DENIED = "request_denied";

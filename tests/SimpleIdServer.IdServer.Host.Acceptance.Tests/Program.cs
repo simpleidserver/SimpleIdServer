@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.CredentialIssuer;
@@ -56,8 +57,11 @@ builder.Services.AddSIDIdentityServer(o =>
     });
 builder.Services.AddDIDKey();
 var antiforgeryService = builder.Services.First(s => s.ServiceType == typeof(IAntiforgery));
+var memoryDistribution = builder.Services.First(s => s.ServiceType == typeof(IDistributedCache));
 builder.Services.Remove(antiforgeryService);
+builder.Services.Remove(memoryDistribution);
 builder.Services.AddTransient<IAntiforgery, FakeAntiforgery>();
+builder.Services.AddSingleton<IDistributedCache>(SingletonDistributedCache.Instance().Get());
 var app = builder.Build()
     .UseCredentialIssuer()
     .UseSID();

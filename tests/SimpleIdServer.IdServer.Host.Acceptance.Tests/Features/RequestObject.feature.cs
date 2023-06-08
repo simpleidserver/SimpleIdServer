@@ -104,43 +104,15 @@ this.ScenarioInitialize(scenarioInfo);
 #line 5
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table456 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table456.AddRow(new string[] {
-                            "iss",
-                            "thirtyOneClient"});
-                table456.AddRow(new string[] {
-                            "aud",
-                            "aud"});
-                table456.AddRow(new string[] {
-                            "response_type",
-                            "code id_token"});
-                table456.AddRow(new string[] {
-                            "client_id",
-                            "thirtyOneClient"});
-                table456.AddRow(new string[] {
-                            "response_mode",
-                            "query"});
-                table456.AddRow(new string[] {
-                            "scope",
-                            "openid email"});
-                table456.AddRow(new string[] {
-                            "nonce",
-                            "nonce"});
-                table456.AddRow(new string[] {
-                            "redirect_uri",
-                            "http://localhost:8080"});
-#line 6
- testRunner.And("build JWS request object for client \'thirtyOneClient\' and sign with the key \'keyI" +
-                        "d\'", ((string)(null)), table456, "And ");
-#line hidden
                 TechTalk.SpecFlow.Table table457 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table457.AddRow(new string[] {
-                            "request",
-                            "$request$"});
+                            "iss",
+                            "thirtyOneClient"});
+                table457.AddRow(new string[] {
+                            "aud",
+                            "aud"});
                 table457.AddRow(new string[] {
                             "response_type",
                             "code id_token"});
@@ -148,13 +120,41 @@ this.ScenarioInitialize(scenarioInfo);
                             "client_id",
                             "thirtyOneClient"});
                 table457.AddRow(new string[] {
-                            "state",
-                            "state"});
+                            "response_mode",
+                            "query"});
                 table457.AddRow(new string[] {
                             "scope",
                             "openid email"});
+                table457.AddRow(new string[] {
+                            "nonce",
+                            "nonce"});
+                table457.AddRow(new string[] {
+                            "redirect_uri",
+                            "http://localhost:8080"});
+#line 6
+ testRunner.And("build JWS request object for client \'thirtyOneClient\' and sign with the key \'keyI" +
+                        "d\'", ((string)(null)), table457, "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table458 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table458.AddRow(new string[] {
+                            "request",
+                            "$request$"});
+                table458.AddRow(new string[] {
+                            "response_type",
+                            "code id_token"});
+                table458.AddRow(new string[] {
+                            "client_id",
+                            "thirtyOneClient"});
+                table458.AddRow(new string[] {
+                            "state",
+                            "state"});
+                table458.AddRow(new string[] {
+                            "scope",
+                            "openid email"});
 #line 17
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table457, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table458, "When ");
 #line hidden
 #line 25
  testRunner.And("extract parameter \'id_token\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -220,43 +220,15 @@ this.ScenarioInitialize(scenarioInfo);
 #line 40
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table458 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table458.AddRow(new string[] {
-                            "iss",
-                            "thirtyTwoClient"});
-                table458.AddRow(new string[] {
-                            "aud",
-                            "aud"});
-                table458.AddRow(new string[] {
-                            "response_type",
-                            "code id_token"});
-                table458.AddRow(new string[] {
-                            "client_id",
-                            "thirtyTwoClient"});
-                table458.AddRow(new string[] {
-                            "response_mode",
-                            "query"});
-                table458.AddRow(new string[] {
-                            "scope",
-                            "openid email"});
-                table458.AddRow(new string[] {
-                            "nonce",
-                            "nonce"});
-                table458.AddRow(new string[] {
-                            "redirect_uri",
-                            "http://localhost:8080"});
-#line 41
- testRunner.And("build JWE request object for client \'thirtyTwoClient\' and sign with the key \'keyI" +
-                        "d\' and encrypt with the key \'keyid4\'", ((string)(null)), table458, "And ");
-#line hidden
                 TechTalk.SpecFlow.Table table459 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table459.AddRow(new string[] {
-                            "request",
-                            "$request$"});
+                            "iss",
+                            "thirtyTwoClient"});
+                table459.AddRow(new string[] {
+                            "aud",
+                            "aud"});
                 table459.AddRow(new string[] {
                             "response_type",
                             "code id_token"});
@@ -264,13 +236,41 @@ this.ScenarioInitialize(scenarioInfo);
                             "client_id",
                             "thirtyTwoClient"});
                 table459.AddRow(new string[] {
-                            "state",
-                            "state"});
+                            "response_mode",
+                            "query"});
                 table459.AddRow(new string[] {
                             "scope",
                             "openid email"});
+                table459.AddRow(new string[] {
+                            "nonce",
+                            "nonce"});
+                table459.AddRow(new string[] {
+                            "redirect_uri",
+                            "http://localhost:8080"});
+#line 41
+ testRunner.And("build JWE request object for client \'thirtyTwoClient\' and sign with the key \'keyI" +
+                        "d\' and encrypt with the key \'keyid4\'", ((string)(null)), table459, "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table460 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table460.AddRow(new string[] {
+                            "request",
+                            "$request$"});
+                table460.AddRow(new string[] {
+                            "response_type",
+                            "code id_token"});
+                table460.AddRow(new string[] {
+                            "client_id",
+                            "thirtyTwoClient"});
+                table460.AddRow(new string[] {
+                            "state",
+                            "state"});
+                table460.AddRow(new string[] {
+                            "scope",
+                            "openid email"});
 #line 52
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table459, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table460, "When ");
 #line hidden
 #line 60
  testRunner.And("extract parameter \'id_token\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

@@ -7,6 +7,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.Vc.Builders;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text.Json;
 using static SimpleIdServer.IdServer.Constants;
@@ -111,50 +112,6 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             AdminGroup
         };
 
-        public static List<DeviceAuthCode> DeviceAuthCodes = new List<DeviceAuthCode>
-        {
-            new DeviceAuthCode
-            {
-                DeviceCode = "issuedDeviceCode",
-                ClientId = "fiftyEightClient",
-                Status = DeviceAuthCodeStatus.ISSUED,
-                UserCode = Guid.NewGuid().ToString()
-            },
-            new DeviceAuthCode
-            {
-                DeviceCode = "expiredDeviceCode",
-                ClientId = "fiftyEightClient",
-                Status = DeviceAuthCodeStatus.PENDING,
-                ExpirationDateTime = DateTime.UtcNow.AddHours(-2),
-                UserCode = Guid.NewGuid().ToString()
-            },
-            new DeviceAuthCode
-            {
-                DeviceCode = "invalidClientDeviceCode",
-                ClientId = "fiftyEightClient",
-                Status = DeviceAuthCodeStatus.PENDING,
-                ExpirationDateTime = DateTime.UtcNow.AddHours(2),
-                UserCode = Guid.NewGuid().ToString()
-            },
-            new DeviceAuthCode
-            {
-                DeviceCode = "tooManyDeviceCode",
-                ClientId = "sixtyOneClient",
-                ExpirationDateTime = DateTime.UtcNow.AddDays(2),
-                Status = DeviceAuthCodeStatus.PENDING,
-                NextAccessDateTime = DateTime.UtcNow.AddDays(2),
-                UserCode = Guid.NewGuid().ToString()
-            },
-            new DeviceAuthCode
-            {
-                DeviceCode = "pendingDeviceCode",
-                ClientId = "sixtyOneClient",
-                ExpirationDateTime = DateTime.UtcNow.AddDays(2),
-                Status = DeviceAuthCodeStatus.PENDING,
-                UserCode = Guid.NewGuid().ToString()
-            }
-        };
-
         public static List<Scope> Scopes => new List<Scope>
         {
             FirstScope,
@@ -243,6 +200,50 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildWalletClient("fiftyNineClient", "password").Build(),
             ClientBuilder.BuildWalletClient("sixtyClient", "password").RequirePin().Build(),
             ClientBuilder.BuildDeviceClient("sixtyOneClient", "password").AddScope(AdminScope).Build()
+        };
+
+        public static List<DeviceAuthCode> DeviceAuthCodes = new List<DeviceAuthCode>
+        {
+            new DeviceAuthCode
+            {
+                DeviceCode = "issuedDeviceCode",
+                ClientId = "fiftyEightClient",
+                Status = DeviceAuthCodeStatus.ISSUED,
+                UserCode = Guid.NewGuid().ToString()
+            },
+            new DeviceAuthCode
+            {
+                DeviceCode = "expiredDeviceCode",
+                ClientId = "fiftyEightClient",
+                Status = DeviceAuthCodeStatus.PENDING,
+                ExpirationDateTime = DateTime.UtcNow.AddHours(-2),
+                UserCode = Guid.NewGuid().ToString()
+            },
+            new DeviceAuthCode
+            {
+                DeviceCode = "invalidClientDeviceCode",
+                ClientId = "fiftyEightClient",
+                Status = DeviceAuthCodeStatus.PENDING,
+                ExpirationDateTime = DateTime.UtcNow.AddHours(2),
+                UserCode = Guid.NewGuid().ToString()
+            },
+            new DeviceAuthCode
+            {
+                DeviceCode = "tooManyDeviceCode",
+                ClientId = Clients.First(c => c.ClientId == "sixtyOneClient").Id,
+                ExpirationDateTime = DateTime.UtcNow.AddDays(2),
+                Status = DeviceAuthCodeStatus.PENDING,
+                NextAccessDateTime = DateTime.UtcNow.AddDays(2),
+                UserCode = Guid.NewGuid().ToString()
+            },
+            new DeviceAuthCode
+            {
+                DeviceCode = "pendingDeviceCode",
+                ClientId = Clients.First(c => c.ClientId == "sixtyOneClient").Id,
+                ExpirationDateTime = DateTime.UtcNow.AddDays(2),
+                Status = DeviceAuthCodeStatus.PENDING,
+                UserCode = Guid.NewGuid().ToString()
+            }
         };
 
         public static List<User> Users = new List<User>

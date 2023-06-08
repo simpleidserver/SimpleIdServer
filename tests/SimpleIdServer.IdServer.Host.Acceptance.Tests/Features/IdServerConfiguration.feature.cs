@@ -19,7 +19,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class SubjectTypeFeature : object, Xunit.IClassFixture<SubjectTypeFeature.FixtureData>, System.IDisposable
+    public partial class IdServerConfigurationFeature : object, Xunit.IClassFixture<IdServerConfigurationFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
@@ -28,10 +28,10 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
-#line 1 "SubjectType.feature"
+#line 1 "IdServerConfiguration.feature"
 #line hidden
         
-        public SubjectTypeFeature(SubjectTypeFeature.FixtureData fixtureData, SimpleIdServer_IdServer_Host_Acceptance_Tests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
+        public IdServerConfigurationFeature(IdServerConfigurationFeature.FixtureData fixtureData, SimpleIdServer_IdServer_Host_Acceptance_Tests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
             this.TestInitialize();
@@ -40,7 +40,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "SubjectType", "\tCheck the different subject type", ProgrammingLanguage.CSharp, featureTags);
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "IdServerConfiguration", "\tGet the IdServerConfiguration and check its content", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -80,14 +80,14 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Get pairwise subject")]
-        [Xunit.TraitAttribute("FeatureTitle", "SubjectType")]
-        [Xunit.TraitAttribute("Description", "Get pairwise subject")]
-        public void GetPairwiseSubject()
+        [Xunit.SkippableFactAttribute(DisplayName="Get the configuration")]
+        [Xunit.TraitAttribute("FeatureTitle", "IdServerConfiguration")]
+        [Xunit.TraitAttribute("Description", "Get the configuration")]
+        public void GetTheConfiguration()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Get pairwise subject", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Get the configuration", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 4
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -98,47 +98,21 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 5
- testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line hidden
-                TechTalk.SpecFlow.Table table466 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table365 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table466.AddRow(new string[] {
-                            "response_type",
-                            "id_token"});
-                table466.AddRow(new string[] {
-                            "client_id",
-                            "thirtyThreeClient"});
-                table466.AddRow(new string[] {
-                            "state",
-                            "state"});
-                table466.AddRow(new string[] {
-                            "response_mode",
-                            "query"});
-                table466.AddRow(new string[] {
-                            "scope",
-                            "openid email role"});
-                table466.AddRow(new string[] {
-                            "redirect_uri",
-                            "http://localhost:8080"});
-                table466.AddRow(new string[] {
-                            "nonce",
-                            "nonce"});
-                table466.AddRow(new string[] {
-                            "display",
-                            "popup"});
-#line 6
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table466, "When ");
+#line 5
+ testRunner.When("execute HTTP GET request \'https://localhost:8080/.well-known/idserver-configurati" +
+                        "on\'", ((string)(null)), table365, "When ");
 #line hidden
-#line 17
- testRunner.And("extract parameter \'id_token\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 7
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 18
- testRunner.And("extract payload from JWT \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 9
+ testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 20
- testRunner.Then("JWT has \'sub\'=\'ayv4P9i7vUdFDHPXKEY21d2zBHryA4k4PEO80sh4AiQ\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 10
+ testRunner.And("JSON \'$.amrs[0]\'=\'pwd\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -151,12 +125,12 @@ this.ScenarioInitialize(scenarioInfo);
             
             public FixtureData()
             {
-                SubjectTypeFeature.FeatureSetup();
+                IdServerConfigurationFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                SubjectTypeFeature.FeatureTearDown();
+                IdServerConfigurationFeature.FeatureTearDown();
             }
         }
     }

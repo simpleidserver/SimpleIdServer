@@ -28,6 +28,7 @@ namespace SimpleIdServer.IdServer
             public const string Registration = "register";
             public const string OAuthConfiguration = ".well-known/oauth-authorization-server";
             public const string OpenIDConfiguration = ".well-known/openid-configuration";
+            public const string IdServerConfiguration = ".well-known/idserver-configuration";
             public const string UMAConfiguration = ".well-known/uma2-configuration";
             public const string Form = "form";
             public const string AuthSchemeProviders = "authschemeproviders";
@@ -49,6 +50,7 @@ namespace SimpleIdServer.IdServer
             public const string Users = "users";
             public const string Networks = "networks";
             public const string DeviceAuthorization = "device_authorization";
+            public const string AuthenticationClassReferences = "acrs";
         }
 
         public static List<string> AllStandardNotificationModes = new List<string>
@@ -506,6 +508,20 @@ namespace SimpleIdServer.IdServer
                 Id = Guid.NewGuid().ToString(),
                 Type = ScopeTypes.APIRESOURCE,
                 Name = "credential_offer",
+                Realms = new List<Domains.Realm>
+                {
+                    StandardRealms.Master
+                },
+                Protocol = ScopeProtocols.OAUTH,
+                IsExposedInConfigurationEdp = true,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
+            };
+            public static Scope Acrs = new Scope
+            {
+                Id = Guid.NewGuid().ToString(),
+                Type = ScopeTypes.APIRESOURCE,
+                Name = "acrs",
                 Realms = new List<Domains.Realm>
                 {
                     StandardRealms.Master

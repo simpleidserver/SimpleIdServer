@@ -4,7 +4,7 @@
 @inject IState<UserState> userState
 @inject IState<UserCredentialOffersState> credentialOffersState
 
-@if(userState.Value.User != null)
+@if(userState.Value.User != null && !string.IsNullOrWhiteSpace(userState.Value.User.Id))
 {
     <div>
         <RadzenButton class="mb-1" Click="@(args => AddDID())" Icon="add" Text=@(string.IsNullOrWhiteSpace(userState.Value.User.Did) ? "Add DID" : "Update DID") ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
@@ -80,7 +80,7 @@
     {
         await dialogService.OpenAsync<AddDIDDialog>("Add Decentralized Identifier", new Dictionary<string, object>
         {
-            { "UserLogin", userState.Value.User.Id }
+            { "UserId", userState.Value.User.Id }
         }, new DialogOptions
         {
             Width = "700px",

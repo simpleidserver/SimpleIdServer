@@ -324,6 +324,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IPasswordAuthService, PasswordAuthService>();
             services.AddTransient<IUserTransformer, UserTransformer>();
             services.AddTransient<IIdProviderAuthService, LDAPAuthenticationService>();
+            services.AddTransient<IAuthenticationMethodService, PwdAuthenticationMethodService>();
             return services;
         }
 

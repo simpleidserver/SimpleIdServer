@@ -22,6 +22,7 @@ namespace SimpleIdServer.IdServer
         public const string UNKNOWN_CREDENTIAL_OFFER = "the credential offer doesn't exist";
         public const string UNKNOWN_DEVICE_CODE = "the device_code doesn't exist";
         public const string UNKNOWN_NETWORK = "the network {0} doesn't exist";
+        public const string UNKNOWN_ACR = "the acr {0} doesn't exist";
         public const string UNKNOWN_AUTH_SCHEME_PROVIDER_PROPERTIES = "the authentication scheme provider cannot be updated because the following properties are unknown : {0}";
         public const string UNAUTHORIZED_CLIENT = "unauthorized client";
         public const string UNAUTHORIZED_ACCESSTOKEN = "the access token is not authorized to access to the operation";
@@ -167,6 +168,7 @@ namespace SimpleIdServer.IdServer
         public const string UNSUPPORTED_AUTHORIZATION_ENCRYPTED_RESPONSE_ALG = "authorization_encrypted_response_alg is not supported";
         public const string UNSUPPORTED_AUTHORIZATION_ENCRYPTED_RESPONSE_ENC = "authorization_encrypted_response_enc is not supported";
         public const string UNSUPPORTED_CREDENTIAL_TYPE = "the credential type {0} is not supported";
+        public const string UNSUPPORTED_AMRS = "the authentication method references {0} are not supported";
         public const string REFRESH_TOKEN_NOT_ISSUED_BY_CLIENT = "refresh token has not been issued by the client";
         public const string NO_REGISTERED_REDIRECTURI = "no redirect uri has been registered";
         public const string NO_ESSENTIAL_ACR_IS_SUPPORTED = "no essential acr is supported";
@@ -241,5 +243,6 @@ namespace SimpleIdServer.IdServer
         public const string USER_EXISTS = "the user {0} already exists";
         public const string CONTRACT_ALREADY_DEPLOYED = "contract is already deployed";
         public const string NO_CONTRACT = "there is no contract";
+        public const string ACR_WITH_SAME_NAME_EXISTS = "an acr with the same name already exists";
     }
 }
