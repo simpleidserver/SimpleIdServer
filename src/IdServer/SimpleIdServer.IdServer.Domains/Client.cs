@@ -573,5 +573,6 @@ namespace SimpleIdServer.IdServer.Domains
         public const string MOBILE = "MOBILE";
         public const string EXTERNAL = "EXTERNALDEVICE";
         public const string WALLET = "WALLET";
+        public const string DEVICE = "DEVICE";
     }
 }

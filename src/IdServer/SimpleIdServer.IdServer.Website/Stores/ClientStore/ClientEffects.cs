@@ -4,6 +4,7 @@ using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using NetTopologySuite.Geometries;
 using Radzen;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
@@ -157,7 +158,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         }
 
         [EffectMethod]
-        public async Task Handle(AddDeviceApplicationAction action, IDispatcher dispatcher)
+        public async Task Handle(AddExternalDeviceApplicationAction action, IDispatcher dispatcher)
         {
             if (!await ValidateAddClient(action.ClientId, new List<string>(), dispatcher)) return;
             using (var dbContext = new StoreDbContext(_options))
@@ -173,6 +174,26 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 dbContext.Clients.Add(newClient);
                 await dbContext.SaveChangesAsync(CancellationToken.None);
                 dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.EXTERNAL });
+            }
+        }
+
+        [EffectMethod]
+        public async Task Handle(AddDeviceApplicationAction action, IDispatcher dispatcher)
+        {
+            if (!await ValidateAddClient(action.ClientId, new List<string>(), dispatcher)) return;
+            using (var dbContext = new StoreDbContext(_options))
+            {
+                var realm = await GetRealm();
+                var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
+                var scopes = await dbContext.Scopes.Include(s => s.Realms).Where(s => (s.Name == Constants.StandardScopes.OpenIdScope.Name || s.Name == Constants.StandardScopes.Profile.Name) && s.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
+                var newClientBuilder = ClientBuilder.BuildDeviceClient(action.ClientId, action.ClientSecret, activeRealm)
+                    .AddScope(scopes.ToArray());
+                if (!string.IsNullOrWhiteSpace(action.ClientName))
+                    newClientBuilder.SetClientName(action.ClientName);
+                var newClient = newClientBuilder.Build();
+                dbContext.Clients.Add(newClient);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.DEVICE });
             }
         }
 
@@ -246,6 +267,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 grantTypes.Add(CIBAHandler.GRANT_TYPE);
             if (act.IsUMAGrantTypeEnabled)
                 grantTypes.Add(UmaTicketHandler.GRANT_TYPE);
+            if (act.IsDeviceGrantTypeEnabled)
+                grantTypes.Add(DeviceCodeHandler.GRANT_TYPE);
             client.GrantTypes = grantTypes;
             client.IsConsentDisabled = !act.IsConsentEnabled;
             await _clientRepository.SaveChanges(CancellationToken.None);
@@ -265,7 +288,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 IsAuthorizationCodeGrantTypeEnabled = act.IsAuthorizationCodeGrantTypeEnabled,
                 IsCIBAGrantTypeEnabled = act.IsCIBAGrantTypeEnabled,
                 IsUMAGrantTypeEnabled = act.IsUMAGrantTypeEnabled,
-                IsConsentEnabled = act.IsConsentEnabled
+                IsConsentEnabled = act.IsConsentEnabled,
+                IsDeviceGrantTypeEnabled = act.IsDeviceGrantTypeEnabled
             });
         }
 
@@ -540,11 +564,18 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public string? ClientName { get; set; } = null;
     }
 
-    public class AddDeviceApplicationAction
+    public class AddExternalDeviceApplicationAction
     {
         public string ClientId { get; set; } = null!;
         public string? ClientName { get; set; } = null;
         public string SubjectName { get; set; } = null!;
+    }
+
+    public class AddDeviceApplicationAction
+    {
+        public string ClientId { get; set; } = null!;
+        public string ClientName { get; set; } = null!;
+        public string ClientSecret { get; set; } = null!;
     }
 
     public class AddWsFederationApplicationAction
@@ -628,6 +659,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public bool IsCIBAGrantTypeEnabled { get; set; }
         public bool IsUMAGrantTypeEnabled { get; set; }
         public bool IsConsentEnabled { get; set; }
+        public bool IsDeviceGrantTypeEnabled { get; set; }
     }
 
     public class UpdateClientDetailsSuccessAction
@@ -647,6 +679,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public bool IsCIBAGrantTypeEnabled { get; set; }
         public bool IsUMAGrantTypeEnabled { get; set; }
         public bool IsConsentEnabled { get; set; }
+        public bool IsDeviceGrantTypeEnabled { get; set; }
     }
 
     public class ToggleAllClientScopeSelectionAction

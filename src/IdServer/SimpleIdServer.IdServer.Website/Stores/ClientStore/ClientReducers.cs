@@ -111,7 +111,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public static AddClientState ReduceAddWsFederationApplicationAction(AddClientState state, AddWsFederationApplicationAction act) => new(isAdding: true, errorMessage: null);
 
         [ReducerMethod]
-        public static AddClientState ReduceAddDeviceApplicationAction(AddClientState state, AddDeviceApplicationAction act) => new(isAdding: true, errorMessage: null);
+        public static AddClientState ReduceAddDeviceApplicationAction(AddClientState state, AddExternalDeviceApplicationAction act) => new(isAdding: true, errorMessage: null);
 
         [ReducerMethod]
         public static AddClientState ReduceAddClientSuccessAction(AddClientState state, AddClientSuccessAction act) => new(isAdding: false, errorMessage: null);
@@ -207,6 +207,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 grantTypes.Add(CIBAHandler.GRANT_TYPE);
             if (act.IsUMAGrantTypeEnabled)
                 grantTypes.Add(UmaTicketHandler.GRANT_TYPE);
+            if (act.IsDeviceGrantTypeEnabled)
+                grantTypes.Add(DeviceCodeHandler.GRANT_TYPE);
             client.GrantTypes = grantTypes;
             client.IsConsentDisabled = !act.IsConsentEnabled;
             return state with

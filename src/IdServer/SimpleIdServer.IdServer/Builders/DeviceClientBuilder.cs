@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using SimpleIdServer.IdServer.Domains;
+using System.Threading;
 
 namespace SimpleIdServer.IdServer.Builders
 {
@@ -21,6 +22,25 @@ namespace SimpleIdServer.IdServer.Builders
             foreach (var scope in scopes) _client.Scopes.Add(scope);
             return this;
         }
+
+        #endregion
+
+        #region Other Parameters
+
+        public DeviceClientBuilder SetClientName(string clientName, string language = null)
+        {
+            if (string.IsNullOrWhiteSpace(language))
+                language = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
+
+            _client.Translations.Add(new Translation
+            {
+                Key = "client_name",
+                Value = clientName,
+                Language = language
+            });
+            return this;
+        }
+
 
         #endregion
 

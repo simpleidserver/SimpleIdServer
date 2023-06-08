@@ -133,7 +133,7 @@ namespace SimpleIdServer.IdServer.Builders
                 Id = Guid.NewGuid().ToString(),
                 ClientId = clientId,
                 ClientSecret = clientSecret,
-                ClientType = ClientTypes.EXTERNAL,
+                ClientType = ClientTypes.DEVICE,
                 TokenEndPointAuthMethod = OAuthClientSecretPostAuthenticationHandler.AUTH_METHOD,
                 IdTokenSignedResponseAlg = SecurityAlgorithms.EcdsaSha256,
                 CreateDateTime = DateTime.UtcNow,

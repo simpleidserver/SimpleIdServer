@@ -210,30 +210,59 @@
                             <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addClientState.Value.IsAdding)" />
                         </RadzenTemplateForm>
                         break;
-                    // Device
+                    // External Device used for the authentication.
                     case ClientTypes.EXTERNAL:
-                        <RadzenTemplateForm Submit=@AddDeviceApplication TItem="DeviceApplication" Data=@deviceApplication>
+                        <RadzenTemplateForm Submit=@AddExternalDeviceApplication TItem="ExternalDeviceApplication" Data=@externalDeviceApplication>
                             @if (!addClientState.Value.IsAdding && !string.IsNullOrWhiteSpace(addClientState.Value.ErrorMessage))
                             {
                                 <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@addClientState.Value.ErrorMessage</RadzenAlert>
                             }
                             <div>
                                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Identifier</RadzenText>
-                                <RadzenTextBox Name="ClientIdentifier" @bind-Value="@deviceApplication.ClientIdentifier" Class="w-100"></RadzenTextBox>
+                                <RadzenTextBox Name="ClientIdentifier" @bind-Value="@externalDeviceApplication.ClientIdentifier" Class="w-100"></RadzenTextBox>
                                 <RadzenRequiredValidator Component="ClientIdentifier" Text="Identifier is required"></RadzenRequiredValidator>
                             </div>
                             <div>
                                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
-                                <RadzenTextBox Name="ClientName" @bind-Value="@deviceApplication.ClientName" Class="w-100"></RadzenTextBox>
+                                <RadzenTextBox Name="ClientName" @bind-Value="@externalDeviceApplication.ClientName" Class="w-100"></RadzenTextBox>
                             </div>
                             <div>
                                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Subject Name</RadzenText>
-                                <RadzenTextBox Name="SubjectName" @bind-Value="@deviceApplication.SubjectName" Class="w-100"></RadzenTextBox>
+                                <RadzenTextBox Name="SubjectName" @bind-Value="@externalDeviceApplication.SubjectName" Class="w-100"></RadzenTextBox>
                                 <p class="text-muted">
                                     By default the client is configured to use MTLS authentication. <br/>
                                     Subject Name of the client certificate must be specified.
                                 </p>
                                 <RadzenRequiredValidator Component="SubjectName" Text="Subject Name is required"></RadzenRequiredValidator>
+                            </div>
+                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addClientState.Value.IsAdding)" />
+                        </RadzenTemplateForm>
+                        break;
+                    // Device
+                    case ClientTypes.DEVICE:
+                        <RadzenTemplateForm Submit="@AddDeviceApplication" TItem="DeviceApplication" Data="@deviceApplication">
+                            @if (!addClientState.Value.IsAdding && !string.IsNullOrWhiteSpace(addClientState.Value.ErrorMessage))
+                            {
+                                <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@addClientState.Value.ErrorMessage</RadzenAlert>
+                            }
+
+                            <!-- Client Identifier -->
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Identifier</RadzenText>
+                                <RadzenTextBox Name="ClientIdentifier" @bind-Value="@deviceApplication.ClientIdentifier" Class="w-100"></RadzenTextBox>
+                                <RadzenRequiredValidator Component="ClientIdentifier" Text="Identifier is required"></RadzenRequiredValidator>
+                            </div>
+                            <!-- Client Name -->
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+                                <RadzenTextBox Name="ClientName" @bind-Value="@deviceApplication.ClientName" Class="w-100"></RadzenTextBox>
+                                <RadzenRequiredValidator Component="ClientName" Text="Name is required"></RadzenRequiredValidator>
+                            </div>
+                            <!-- Client Secret -->
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Secret</RadzenText>
+                                <RadzenPassword Name="ClientSecret" @bind-Value="@deviceApplication.ClientSecret" Class="w-100"></RadzenPassword>
+                                <RadzenRequiredValidator Component="ClientSecret" Text="Secret is required"></RadzenRequiredValidator>
                             </div>
                             <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addClientState.Value.IsAdding)" />
                         </RadzenTemplateForm>
@@ -287,7 +316,7 @@
         public string RedirectionUris { get; set; } = null!;
     }
 
-    record DeviceApplication
+    record ExternalDeviceApplication
     {
         public string ClientName { get; set; } = null!;
         public string ClientIdentifier { get; set; } = null!;
@@ -300,11 +329,19 @@
         public string ClientIdentifier { get; set; } = null!;
     }
 
+    record DeviceApplication
+    {
+        public string ClientName { get; set; } = null!;
+        public string ClientIdentifier { get; set;} = null!;
+        public string ClientSecret { get; set; } = null!;
+    }
+
     SpaApplication spaApplication = new SpaApplication();
     MachineApplication machineApplication = new MachineApplication();
     WebsiteApplication websiteApplication = new WebsiteApplication();
     MobileApplication mobileApplication = new MobileApplication();
     WsFederationApplication wsFederationApplication = new WsFederationApplication();
+    ExternalDeviceApplication externalDeviceApplication = new ExternalDeviceApplication();
     DeviceApplication deviceApplication = new DeviceApplication();
 
     protected override async Task OnInitializedAsync()
@@ -339,7 +376,8 @@
         new ApplicationType { Name = "Web application", ShortDescription = "Authorization code", Description = "Web application executed on server (ASP.NET CORE, SPRING etc...)", Type = ClientTypes.WEBSITE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/WebsiteClient.png" },
         new ApplicationType { Name = "Mobile", ShortDescription = "Authorization code + PKCE", Description = "A desktop or mobile application running on a user's device", Type = ClientTypes.MOBILE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/MobileClient.png" },
         new ApplicationType { Name = "WS-Fed Relying Party",  ShortDescription = "WS-Federation application", Description = "A WS-Federation relying party commonly used by older Microsoft applications", Type = SimpleIdServer.IdServer.WsFederation.WsFederationConstants.CLIENT_TYPE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/WsFedClient.png" },
-        new ApplicationType { Name = "Device",  ShortDescription = "Client Initiated Backchannel Authentication (CIBA) flow", Description = "Authentication is performed via an Authentication Device by the user who also consents (if required) to the request.", Type = ClientTypes.EXTERNAL, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/DeviceClient.png" }
+        new ApplicationType { Name = "External Device Authentication",  ShortDescription = "Client Initiated Backchannel Authentication (CIBA) flow", Description = "Authentication is performed via an Authentication Device by the user who also consents (if required) to the request.", Type = ClientTypes.EXTERNAL, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/ExternalDeviceClient.png" },
+        new ApplicationType { Name = "Device",  ShortDescription = "Device Authorization grant", Description = "An IoT application or otherwise browserless or input constrained device.", Type = ClientTypes.DEVICE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/DeviceClient.png" }
     };
 
     ApplicationType? SelectedApplicationType { get; set; } = null;
@@ -374,8 +412,13 @@
         dispatcher.Dispatch(new AddWsFederationApplicationAction { ClientId = wsFederationApplication.ClientIdentifier, ClientName = wsFederationApplication.ClientName });
     }
 
+    void AddExternalDeviceApplication(ExternalDeviceApplication deviceApplication)
+    {
+        dispatcher.Dispatch(new AddExternalDeviceApplicationAction { ClientId = deviceApplication.ClientIdentifier, ClientName = deviceApplication.ClientName, SubjectName = deviceApplication.SubjectName });
+    }
+
     void AddDeviceApplication(DeviceApplication deviceApplication)
     {
-        dispatcher.Dispatch(new AddDeviceApplicationAction { ClientId = deviceApplication.ClientIdentifier, ClientName = deviceApplication.ClientName, SubjectName = deviceApplication.SubjectName });
+        dispatcher.Dispatch(new AddDeviceApplicationAction { ClientId = deviceApplication.ClientIdentifier, ClientName = deviceApplication.ClientName, ClientSecret = deviceApplication.ClientSecret });
     }
 }
