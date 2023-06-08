@@ -101,17 +101,17 @@ this.ScenarioInitialize(scenarioInfo);
 #line 5
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table169 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table179 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table169.AddRow(new string[] {
+                table179.AddRow(new string[] {
                             "wallet_client_id",
                             "fiftyNineClient"});
-                table169.AddRow(new string[] {
+                table179.AddRow(new string[] {
                             "credential_template_id",
                             "credTemplate"});
 #line 7
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table169, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table179, "When ");
 #line hidden
 #line 12
  testRunner.And("extract query parameters into JSON", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

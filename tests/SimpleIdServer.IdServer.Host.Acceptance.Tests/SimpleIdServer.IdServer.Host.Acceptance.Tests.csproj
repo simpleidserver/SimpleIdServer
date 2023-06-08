@@ -70,6 +70,9 @@
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Tests\SimpleIdServer.IdServer.Tests.csproj" />
 	</ItemGroup>
 	<ItemGroup>
+	  <Compile Update="Features\AuthenticationClassReferencesErrors.feature.cs">
+	    <DependentUpon>AuthenticationClassReferencesErrors.feature</DependentUpon>
+	  </Compile>
 	  <Compile Update="Features\DeviceAuthorizationErrors.feature.cs">
 	    <DependentUpon>DeviceAuthorizationErrors.feature</DependentUpon>
 	  </Compile>
@@ -237,6 +240,10 @@
 	  </Compile>
 	</ItemGroup>
 	<ItemGroup>
+	  <SpecFlowFeatureFiles Update="Features\AuthenticationClassReferencesErrors.feature">
+	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
+	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+	  </SpecFlowFeatureFiles>
 	  <SpecFlowFeatureFiles Update="Features\DeviceAuthorizationErrors.feature">
 	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
 	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>

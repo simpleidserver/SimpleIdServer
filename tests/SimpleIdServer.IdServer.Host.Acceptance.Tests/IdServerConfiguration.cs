@@ -128,7 +128,8 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             Constants.StandardScopes.Users,
             Constants.StandardScopes.Register,
             Constants.StandardScopes.Provisioning,
-            Constants.StandardScopes.Networks
+            Constants.StandardScopes.Networks,
+            Constants.StandardScopes.Acrs
         };
 
         public static List<ApiResource> ApiResources = new List<ApiResource>
@@ -199,7 +200,9 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildTraditionalWebsiteClient("fiftyEightClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().EnableTokenInResponseType().TrustOpenIdCredential().DisableConsent().AddScope(StandardScopes.GrantManagementQuery, StandardScopes.GrantManagementRevoke).Build(),
             ClientBuilder.BuildWalletClient("fiftyNineClient", "password").Build(),
             ClientBuilder.BuildWalletClient("sixtyClient", "password").RequirePin().Build(),
-            ClientBuilder.BuildDeviceClient("sixtyOneClient", "password").AddScope(AdminScope).Build()
+            ClientBuilder.BuildDeviceClient("sixtyOneClient", "password").AddScope(AdminScope).Build(),
+            ClientBuilder.BuildApiClient("sixtyTwoClient", "password").AddScope(StandardScopes.Acrs).Build(),
+
         };
 
         public static List<DeviceAuthCode> DeviceAuthCodes = new List<DeviceAuthCode>

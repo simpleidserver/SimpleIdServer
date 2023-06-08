@@ -98,11 +98,11 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table175 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table185 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
 #line 5
- testRunner.When("execute HTTP POST request \'https://localhost:8080/device_authorization\'", ((string)(null)), table175, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/device_authorization\'", ((string)(null)), table185, "When ");
 #line hidden
 #line 8
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -138,14 +138,14 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table176 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table186 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table176.AddRow(new string[] {
+                table186.AddRow(new string[] {
                             "client_id",
                             "invalid"});
 #line 15
- testRunner.When("execute HTTP POST request \'https://localhost:8080/device_authorization\'", ((string)(null)), table176, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/device_authorization\'", ((string)(null)), table186, "When ");
 #line hidden
 #line 19
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -181,17 +181,17 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table177 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table187 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table177.AddRow(new string[] {
+                table187.AddRow(new string[] {
                             "client_id",
                             "twelveClient"});
-                table177.AddRow(new string[] {
+                table187.AddRow(new string[] {
                             "scope",
                             "invalid"});
 #line 26
- testRunner.When("execute HTTP POST request \'https://localhost:8080/device_authorization\'", ((string)(null)), table177, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/device_authorization\'", ((string)(null)), table187, "When ");
 #line hidden
 #line 31
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
