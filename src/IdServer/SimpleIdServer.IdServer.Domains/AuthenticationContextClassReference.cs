@@ -29,6 +29,7 @@ namespace SimpleIdServer.IdServer.Domains
         public DateTime CreateDateTime { get; set; }
         [JsonPropertyName(AuthenticationContextClassReferenceNames.UpdateDateTime)]
         public DateTime UpdateDateTime { get; set; }
+        [JsonIgnore]
         public ICollection<Realm> Realms { get; set; } = new List<Realm>();
 
         public bool Equals(AuthenticationContextClassReference other)

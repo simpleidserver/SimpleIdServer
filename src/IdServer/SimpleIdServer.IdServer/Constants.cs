@@ -541,6 +541,7 @@ namespace SimpleIdServer.IdServer
                 AuthenticationMethodReferences = new[] { Areas.Password },
                 Name = "sid-load-01",
                 DisplayName = "First level of assurance",
+                UpdateDateTime = DateTime.UtcNow,
                 Realms = new List<Domains.Realm>
                 {
                     StandardRealms.Master
@@ -552,6 +553,7 @@ namespace SimpleIdServer.IdServer
                 AuthenticationMethodReferences = new[] { Areas.Password },
                 Name = "urn:mace:incommon:iap:silver",
                 DisplayName = "Silver",
+                UpdateDateTime = DateTime.UtcNow,
                 Realms = new List<Domains.Realm>
                 {
                     StandardRealms.Master

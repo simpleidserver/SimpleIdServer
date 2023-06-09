@@ -61,6 +61,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Authentication Class Reference has been added.
+        /// </summary>
+        public static string AcrAdded {
+            get {
+                return ResourceManager.GetString("AcrAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à API Resource with the name &apos;{0}&apos; already exists.
         /// </summary>
         public static string ApiResourceAlreadyExists {
@@ -570,6 +579,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string ScopeResourcesUpdated {
             get {
                 return ResourceManager.GetString("ScopeResourcesUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Selected ACRS have been removed.
+        /// </summary>
+        public static string SelectedAcrsRemoved {
+            get {
+                return ResourceManager.GetString("SelectedAcrsRemoved", resourceCulture);
             }
         }
         

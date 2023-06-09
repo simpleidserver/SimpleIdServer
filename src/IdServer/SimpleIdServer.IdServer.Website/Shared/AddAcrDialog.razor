@@ -1,0 +1,92 @@
+﻿@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.AcrsStore;
+@using SimpleIdServer.IdServer.Website.Stores.IdServerConfigurationStore;
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject IState<UpdateAcrState> updateAcrState
+@inject NotificationService notificationService
+@inject Radzen.DialogService dialogService
+@inject IDispatcher dispatcher
+
+<RadzenTemplateForm Submit=@SubmitAddAcr TItem="AddAcrForm" Data=@addAcr>
+    @if (!updateAcrState.Value.IsUpdating && !string.IsNullOrWhiteSpace(updateAcrState.Value.ErrorMessage))
+    {
+        <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@updateAcrState.Value.ErrorMessage</RadzenAlert>
+    }
+
+    <!-- Name -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+        <RadzenTextBox Name="Name" @bind-Value="@addAcr.Name" Class="w-100"></RadzenTextBox>
+        <RadzenRequiredValidator Component="Name" Text="Name is required"></RadzenRequiredValidator>
+    </div>
+    <!-- DisplayName -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Display Name</RadzenText>
+        <RadzenTextBox Name="Value" @bind-Value="@addAcr.DisplayName" Class="w-100"></RadzenTextBox>
+        <RadzenRequiredValidator Component="Value" Text="Display name is required"></RadzenRequiredValidator>
+    </div>
+    <!-- AMRS -->
+    <div class="mt-3">
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">
+            Choose one or more Authentication Method and update the order.
+            The order is important, because it defines the sequence of actions to authenticate the End-User.
+        </RadzenText>
+        <RadzenDropDown @bind-Value=@selectedAmrs Chips=true Data=@amrs Multiple=true AllowClear=true Placeholder="Select Authentication Methods" class="w-100"></RadzenDropDown>
+    </div>
+    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateAcrState.Value.IsUpdating ? "Adding..." : "Add")" Disabled="@(updateAcrState.Value.IsUpdating)" />
+</RadzenTemplateForm>
+
+@code {
+    record AddAcrForm
+    {
+        public string Name { get; set; }
+        public string DisplayName { get; set; }
+        public string ConcatenatedAmrs { get; set; }
+    }
+
+    AddAcrForm addAcr = new AddAcrForm();
+    IEnumerable<string> selectedAmrs { get; set; } = new List<string>();
+    IEnumerable<string> amrs { get; set; } = new List<string>();
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            SubscribeToAction<GetIdServerConfigurationSuccessAction>((act) =>
+            {
+                amrs = act.Configuration.Amrs.OrderBy(a => a).ToList();
+                StateHasChanged();
+            });
+            SubscribeToAction<AddAcrSuccessAction>((act) =>
+            {
+                dialogService.Close();
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.AcrAdded });
+                StateHasChanged();
+            });
+            dispatcher.Dispatch(new GetIdServerConfigurationAction());
+        }
+    }
+
+    void SubmitAddAcr(AddAcrForm acrForm)
+    {
+        dispatcher.Dispatch(new AddAcrAction { AuthenticationMethodReferences = selectedAmrs.ToList(), DisplayName = acrForm.DisplayName, Name = acrForm.Name });
+    }
+
+    void ToggleChanged(bool isSelected, SelectableAmr amr)
+    {
+        amr.IsSelected = isSelected;
+    }
+
+    protected record SelectableAmr
+    {
+        public SelectableAmr(string amr)
+        {
+            Amr = amr;
+        }
+
+        public string Amr { get; set; }
+        public bool IsSelected { get; set; }
+        public int Order { get; set; }
+    }
+}

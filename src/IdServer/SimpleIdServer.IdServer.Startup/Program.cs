@@ -157,9 +157,11 @@ void SeedData(WebApplication application, string scimBaseUrl)
                 dbContext.Acrs.Add(SimpleIdServer.IdServer.Constants.StandardAcrs.IapSilver);
                 dbContext.Acrs.Add(new SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference
                 {
+                    Id = Guid.NewGuid().ToString(),
                     Name = "email",
                     AuthenticationMethodReferences = new[] { "email" },
                     DisplayName = "Email authentication",
+                    UpdateDateTime = DateTime.UtcNow,
                     Realms = new List<Realm>
                     {
                         SimpleIdServer.IdServer.Constants.StandardRealms.Master
@@ -167,9 +169,11 @@ void SeedData(WebApplication application, string scimBaseUrl)
                 });
                 dbContext.Acrs.Add(new SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference
                 {
+                    Id = Guid.NewGuid().ToString(),
                     Name = "sms",
                     AuthenticationMethodReferences = new[] { "sms" },
                     DisplayName = "Sms authentication",
+                    UpdateDateTime = DateTime.UtcNow,
                     Realms = new List<Realm>
                     {
                         SimpleIdServer.IdServer.Constants.StandardRealms.Master
@@ -177,9 +181,11 @@ void SeedData(WebApplication application, string scimBaseUrl)
                 });
                 dbContext.Acrs.Add(new SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference
                 {
+                    Id = Guid.NewGuid().ToString(),
                     Name = "pwd-email",
                     AuthenticationMethodReferences = new[] { "pwd", "email" },
                     DisplayName = "Password and email authentication",
+                    UpdateDateTime = DateTime.UtcNow,
                     Realms = new List<Realm>
                     {
                         SimpleIdServer.IdServer.Constants.StandardRealms.Master

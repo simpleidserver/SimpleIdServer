@@ -54,13 +54,13 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
             modelBuilder.Entity("AuthenticationContextClassReferenceRealm", b =>
                 {
-                    b.Property<string>("AuthenticationContextClassReferencesName")
+                    b.Property<string>("AuthenticationContextClassReferencesId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("RealmsName")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("AuthenticationContextClassReferencesName", "RealmsName");
+                    b.HasKey("AuthenticationContextClassReferencesId", "RealmsName");
 
                     b.HasIndex("RealmsName");
 
@@ -307,18 +307,34 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference", b =>
                 {
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)")
+                        .HasAnnotation("Relational:JsonPropertyName", "id");
 
                     b.Property<string>("AuthenticationMethodReferences")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "amrs");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("datetime2")
+                        .HasAnnotation("Relational:JsonPropertyName", "create_datetime");
 
                     b.Property<string>("DisplayName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "display_name");
 
-                    b.HasKey("Name");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "name");
+
+                    b.Property<DateTime>("UpdateDateTime")
+                        .HasColumnType("datetime2")
+                        .HasAnnotation("Relational:JsonPropertyName", "update_datetime");
+
+                    b.HasKey("Id");
 
                     b.ToTable("Acrs");
                 });
@@ -2223,7 +2239,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference", null)
                         .WithMany()
-                        .HasForeignKey("AuthenticationContextClassReferencesName")
+                        .HasForeignKey("AuthenticationContextClassReferencesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

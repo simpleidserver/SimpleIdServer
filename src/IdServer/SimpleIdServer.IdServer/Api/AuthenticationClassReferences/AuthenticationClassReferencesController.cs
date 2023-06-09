@@ -70,6 +70,7 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationClassReferences
                         UpdateDateTime = DateTime.UtcNow
                     };
                     record.Realms.Add(realm);
+                    _authenticationContextClassReferenceRepository.Add(record);
                     await _authenticationContextClassReferenceRepository.SaveChanges(cancellationToken);
                     activity?.SetStatus(ActivityStatusCode.Ok, "Authentication Class Reference has been added");
                     return new ContentResult

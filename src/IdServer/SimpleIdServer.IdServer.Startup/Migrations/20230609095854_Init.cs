@@ -15,13 +15,16 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 name: "Acrs",
                 columns: table => new
                 {
-                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DisplayName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AuthenticationMethodReferences = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    AuthenticationMethodReferences = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Acrs", x => x.Name);
+                    table.PrimaryKey("PK_Acrs", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -702,17 +705,17 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 name: "AuthenticationContextClassReferenceRealm",
                 columns: table => new
                 {
-                    AuthenticationContextClassReferencesName = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    AuthenticationContextClassReferencesId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     RealmsName = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AuthenticationContextClassReferenceRealm", x => new { x.AuthenticationContextClassReferencesName, x.RealmsName });
+                    table.PrimaryKey("PK_AuthenticationContextClassReferenceRealm", x => new { x.AuthenticationContextClassReferencesId, x.RealmsName });
                     table.ForeignKey(
-                        name: "FK_AuthenticationContextClassReferenceRealm_Acrs_AuthenticationContextClassReferencesName",
-                        column: x => x.AuthenticationContextClassReferencesName,
+                        name: "FK_AuthenticationContextClassReferenceRealm_Acrs_AuthenticationContextClassReferencesId",
+                        column: x => x.AuthenticationContextClassReferencesId,
                         principalTable: "Acrs",
-                        principalColumn: "Name",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_AuthenticationContextClassReferenceRealm_Realms_RealmsName",

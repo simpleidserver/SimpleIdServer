@@ -402,4 +402,10 @@
   <data name="DIDKeyCreated" xml:space="preserve">
     <value>DID has been generated</value>
   </data>
+  <data name="AcrAdded" xml:space="preserve">
+    <value>Authentication Class Reference has been added</value>
+  </data>
+  <data name="SelectedAcrsRemoved" xml:space="preserve">
+    <value>Selected ACRS have been removed</value>
+  </data>
 </root>
