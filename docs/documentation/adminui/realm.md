@@ -1,10 +1,3 @@
-# Realm
-
-A Realm is a space where you can manage Clients, Scopes, Users, Identity Providers and Certificate Authorities.
-Realms are isolated from one another, but the same resource can be located in one or more Realm.
-
-By default, there is one configured `master` realm.
-
 In the Administration UI, a realm can easily be added. Click on `Active realm : master` and click on the button `Add realm`.
 
 ![Realm Popup](images/realm-1.png)

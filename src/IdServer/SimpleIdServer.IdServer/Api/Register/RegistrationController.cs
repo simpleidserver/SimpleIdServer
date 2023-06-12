@@ -225,7 +225,7 @@ namespace SimpleIdServer.IdServer.Api.Register
         {
             string accessToken;
             if (!TryExtractAccessToken(out accessToken)) return GetClientResult.Error(Unauthorized());
-            var client = await _clientRepository.Query().Include(c => c.Translations).Include(c => c.Realms).FirstOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == realm), cancellationToken);
+            var client = await _clientRepository.Query().Include(c => c.Translations).Include(c => c.Realms).AsNoTracking().FirstOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == realm), cancellationToken);
             if (client == null) return GetClientResult.Error(NotFound());
             if (client.RegistrationAccessToken != accessToken) return GetClientResult.Error(Unauthorized());
             return GetClientResult.Ok(client);
@@ -245,7 +245,7 @@ namespace SimpleIdServer.IdServer.Api.Register
         private async Task<ICollection<Domains.Scope>> GetScopes(string realm, string scope, CancellationToken cancellationToken)
         {
             var scopeNames = string.IsNullOrWhiteSpace(scope) ? _options.DefaultScopes : scope.ToScopes();
-            return await _scopeRepository.Query().Include(s => s.Realms).AsNoTracking().Where(s => scopeNames.Contains(s.Name) && s.Realms.Any(r => r.Name == realm)).ToListAsync(cancellationToken);
+            return await _scopeRepository.Query().Include(s => s.Realms).Where(s => scopeNames.Contains(s.Name) && s.Realms.Any(r => r.Name == realm)).ToListAsync(cancellationToken);
         }
 
         private class GetClientResult

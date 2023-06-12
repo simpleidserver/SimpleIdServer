@@ -1,62 +1,48 @@
 - name: Getting Started
   href: gettingstarted/index.md
 - name: Realm
-  href: idserver/realm.md
-- name: Identity Server
+  href: realm/index.md
+- name: Identity Management
+  href: idmanagement/index.md
+  items: 
+   - name: SCIM - Example messages
+     href: idmanagement/samples.md
+   - name: Azure AD Provisioning
+     href: idmanagement/azuread.md
+- name: OAuth 2.0 and OpenID Connect
+  href: openidconnect/index.md
   items:
-   - name: Persistence
-     href: idserver/persistence.md
-   - name: Authentication
-     href: idserver/authentication.md
-   - name: Protect SPA using angular
-     href: idserver/protectspa.md
-   - name: Protect Server-Side application using ASP.NET CORE
-     href: idserver/protectserversideapp.md
-   - name: Protect REST.API using ASP.NET CORE
-     href: idserver/protectrestapi.md
-   - name: Requesting token
-     href: idserver/requestingtoken.md
-   - name: FAPI
-     items:
-      - name: Protect Server-Side application compliant with FAPI using ASP.NET CORE
-        href: idserver/protectserversideappfapicompliant.md
-      - name: Confidential client use Back Channel Authentication (CIBA)
-        href: idserver/confidentialclientciba.md
-      - name: FAPI Grant Management
-        href: idserver/fapigrantmanagement.md
-- name: SCIM
-  items:
-   - name: Configure Azure AD Provisioning 
-     href: scim/azuread.md
-- name: External Identity Providers
-  items:
-   - name: Add Identity Provider
-     href: identityproviders/add.md
+   - name: Grant types
+     href: openidconnect/grant_types.md
+   - name: Client authentication methods
+     href: openidconnect/clientauthmethods.md
+   - name: Dynamic client registration
+     href: openidconnect/clientregistration.md
+   - name: Level of assurance
+     href: openidconnect/acr.md
+- name: Financial-grade API (FAPI) 2.0
+  href: fapi/index.md
+- name: Credential Issuer
+  href: credentialissuer/index.md
 - name: Identity Provisioning
+  href: identityprovisioning/index.md
   items:
-   - name: Introduction
-     href: identityprovisioning/index.md
    - name: LDAP
      href: identityprovisioning/ldap.md
    - name: SCIM
      href: identityprovisioning/scim.md
-- name: MTLS
+- name: Public Key Infrastructure (PKI)
   items:
    - name: Generate Certificate Authority
-     href: certificateauthorities/generate.md
+     href: pki/generate.md
    - name: Import Certificate Authority
-     href: certificateauthorities/import.md
+     href: pki/import.md
    - name: Generate Client Certificate
-     href: certificateauthorities/clientcertificate.md
-- name: Audit
+     href: pki/clientcertificate.md
+- name: Administration UI  
+  href: adminui/index.md
   items:
-   - name: Monitoring
-     href: auditing/adminui.md
-- name: Certifications
-  href: certifications/index.md
-- name: REST API
-  items:
-   - name: Security
-     href: restapi/security.md
-   - name: Overview
-     href: restapi/overview.html
+   - name: Manage realm
+     href: adminui/realm.md
+   - name: External Identity Providers
+     href: adminui/externalidproviders.md
