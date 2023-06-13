@@ -193,7 +193,7 @@ Scenario: Use 'urn:openid:params:grant-type:ciba' grant type to get an identity 
 	| client_id                 | fortyNineClient  |
 	| client_secret             | password         |
 	| scope                     | admin calendar   |
-	| login_hint                | user             |
+	| login_hint                | user             |	
 	| user_code                 | password         |
 
 	And extract JSON from body

@@ -5,13 +5,13 @@ SimpleIdServer implements the following specifications
 **OpenID Connect**
 
 * OpenID Connect Core 1.0 ([specification](https://openid.net/specs/openid-connect-core-1_0.html))
-* OpenID Connect Discovery 1.0 ([specification](https://openid.net/specs/openid-connect-discovery-1_0.html)
-* OpenID Connect RP-Initiated Logout 1.0 ([specification](https://openid.net/specs/openid-connect-rpinitiated-1_0.html)
-* OpenID Connect Session Management 1.0 ([specification](https://openid.net/specs/openid-connect-session-1_0.html)
-* OpenID Connect Front-Channel Logout 1.0 ([specification](https://openid.net/specs/openid-connect-frontchannel-1_0.html)
-* OpenID Connect Back-Channel Logout 1.0 ([specification](https://openid.net/specs/openid-connect-backchannel-1_0.html)
-* OAuth 2.0 Multiple Response Type Encoding Practices ([specification](https://openid.net/specs/oauth-v2-multiple-response-types-1_0.html)
-* OAuth 2.0 Form Post Response Mode ([specification](https://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html)
+* OpenID Connect Discovery 1.0 ([specification](https://openid.net/specs/openid-connect-discovery-1_0.html))
+* OpenID Connect RP-Initiated Logout 1.0 ([specification](https://openid.net/specs/openid-connect-rpinitiated-1_0.html))
+* OpenID Connect Session Management 1.0 ([specification](https://openid.net/specs/openid-connect-session-1_0.html))
+* OpenID Connect Front-Channel Logout 1.0 ([specification](https://openid.net/specs/openid-connect-frontchannel-1_0.html))
+* OpenID Connect Back-Channel Logout 1.0 ([specification](https://openid.net/specs/openid-connect-backchannel-1_0.html))
+* OAuth 2.0 Multiple Response Type Encoding Practices ([specification](https://openid.net/specs/oauth-v2-multiple-response-types-1_0.html))
+* OAuth 2.0 Form Post Response Mode ([specification](https://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html))
 
 **OAuth 2**
 
@@ -33,4 +33,4 @@ SimpleIdServer implements the following specifications
 * Enterprise Edition: Resource Indicators for OAuth 2.0 ([RFC 8707](https://tools.ietf.org/html/rfc8707))
 * OAuth 2.0 Rich Authorization Requests ([RFC 9396](https://datatracker.ietf.org/doc/html/draft-lodderstedt-oauth-rar))
 * OAuth 2.0 Pushed Authorization Requests ([RFC 9126)](https://datatracker.ietf.org/doc/html/draft-lodderstedt-oauth-par)
-* Grant Management for OAuth 2.0 ([specification](https://openid.net/specs/fapi-grant-management.html)
+* Grant Management for OAuth 2.0 ([specification](https://openid.net/specs/fapi-grant-management.html))

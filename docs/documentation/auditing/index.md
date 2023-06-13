@@ -1,11 +1,11 @@
-# Auditing Screen
+# Auditing
 
-In the Administration UI, there is one Auditing Screen.
-It can be used to monitor the events.
+The administration UI contains an auditing screen used to search for events.
 
 ![Monitoring](images/monitoring-1.png)
 
 Following events are present :
+
 * AuthorizationFailureEvent
 * AuthenticationSuccessEvent
 * ClientAuthenticationFailureEvent

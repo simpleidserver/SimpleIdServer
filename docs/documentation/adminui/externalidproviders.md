@@ -1,27 +1,14 @@
-# Add Identity Providers
+# Managing External Identity Providers
 
-> [!WARNING]
-> If you want to support more External Identity Providers, please create a ticket in Github, otherwise you can wait for the technical documentation.
-> It will explain how to create a lite option, implement the interface IDynamicAuthenticationOptions<TOptions>.
+An external identity provider (IdP) is a service or system that handles the authentication and identity management of users outside of the local application or system.
+It allows users to use their existing credentials from external sources, such as social media platforms (e.g., Google, Facebook, Twitter), enterprise systems (e.g., Active Directory, LDAP), or other third party identity providers.
 
-In the Administration UI, you can add external Identity Providers.
+From the Administration UI, you can add external Identity Provider.
 
-To add an external Identity Provider :
+Procedure :
 
-* Open the IdentityServer website [http://localhost:5002](http://localhost:5002).
-* In the Identity Providers screen, click on `Add Identity Provider` button.
-* Select the type of Identity Provider for example facebook and click on Next.
-
-![Choose Identity Provider](images/add-1.png)
-
-* Fill-in the form, the Display Name is used by the Identity provider to display the list of external authentication methods.
-
-![Details](images/add-2.png)
-
-* Fill-in the form. For more information about the properties, refer to the official documentation from [Microsoft](https://learn.microsoft.com/en-us/aspnet/core/security/authentication/social/?view=aspnetcore-7.0&tabs=visual-studio)
-
-![Properties](images/add-3.png)
-
-Once the External Identity Provider is added, it will be displayed in the authentication screen.
-
-![Authentication](images/add-4.png)
+1. Click **Identity Providers** in the menu.
+2. Click **Add Identity Provider**.
+3. Select the Identity Provider type and click on **Next**.
+4. Enter the details of the Identity Provider and click on **Next**. These properties will be displayed on the authentication screen..
+5. Enter the properties of the Identity Provider and click on **Add**.

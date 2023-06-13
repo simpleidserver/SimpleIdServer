@@ -1,17 +1,12 @@
-In the Administration UI, a realm can easily be added. Click on `Active realm : master` and click on the button `Add realm`.
+# Managing Realm
 
-![Realm Popup](images/realm-1.png)
+From the Administration UI, you can easily add a realm :
 
-You will be redirected to a page, fill-in the form like this and click on the button `Add` to create a `test` realm.
+Procedure:
 
-![Add Realm](images/realm-2.png)
+1. Click **Active realm: master**.
+2. Click **Add realm**.
+3. Enter the details for the new Realm.
+4. Click **Save**. After saving the details, the user-agent will be redirected to the new realm.
 
-`test` realm is now ready to be used. there are two OPENID configurations endpoints :
-* master : [https://localhost:5001/master/.well-known/openid-configuration](https://localhost:5001/master/.well-known/openid-configuration).
-* test: [https://localhost:5001/test/.well-known/openid-configuration](https://localhost:5001/test/.well-known/openid-configuration).
-
-You can authenticate to both `realm` separately with the same `administrator` user.
-* Browse the URL [https://localhost:5001/master](https://localhost:5001/master), authenticate as an administrator : login : `administrator`, password : `password`.
-* Browse the URL [https://localhost:5001/test](https://localhost:5001/test), authenticate with the same credentials.
-
-The user has two active sessions in two different `realm`.
+You can switch the active realm by clicking on **Active realm: <active realm>**.
