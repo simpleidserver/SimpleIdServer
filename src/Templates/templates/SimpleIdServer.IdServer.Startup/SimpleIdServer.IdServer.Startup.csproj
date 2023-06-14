@@ -4,10 +4,13 @@
 		<OutputType>Exe</OutputType>
 	</PropertyGroup>
 	<ItemGroup>
-	  <PackageReference Include="SimpleIdServer.IdServer" Version="3.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.IdServer.Email" Version="3.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.IdServer.Sms" Version="3.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.IdServer.WsFederation" Version="3.0.*-*" />
+	  <PackageReference Include="SimpleIdServer.IdServer" Version="4.0.*-*" />
+	  <PackageReference Include="SimpleIdServer.IdServer.Email" Version="4.0.*-*" />
+	  <PackageReference Include="SimpleIdServer.IdServer.Sms" Version="4.0.*-*" />
+	  <PackageReference Include="SimpleIdServer.IdServer.WsFederation" Version="4.0.*-*" />
+	  <PackageReference Include="SimpleIdServer.Did.Ethr" Version="4.0.*-*" />
+	  <PackageReference Include="SimpleIdServer.Did.Key" Version="4.0.*-*" />
+	  <PackageReference Include="SimpleIdServer.IdServer.CredentialIssuer" Version="4.0.*-*" />
 	  <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.1" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="7.0.1" />
 	  <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />

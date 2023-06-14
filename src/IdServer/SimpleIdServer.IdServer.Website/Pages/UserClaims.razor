@@ -85,7 +85,7 @@
 
     void SaveClaims()
     {
-        var act = new UpdateUserClaimsAction { UserId = UserId, Claims = claimsState.Value.UserClaims.Select(c => c.Value).ToList() };
+        var act = new UpdateUserClaimsAction { UserId = UserId, Claims = claimsState.Value.UserClaims.Where(c => !c.IsRole).Select(c => c.Value).ToList() };
         dispatcher.Dispatch(act);
     }
 

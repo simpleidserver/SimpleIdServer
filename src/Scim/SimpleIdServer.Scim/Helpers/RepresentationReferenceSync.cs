@@ -253,7 +253,7 @@ namespace SimpleIdServer.Scim.Helpers
                 {
                     foreach (var propagatedChildren in _scimRepresentationCommandRepository.FindPaginatedGraphAttributes(newSourceScimRepresentation.Id, valueAttr.Id))
                     {
-                        var typeAttrs = propagatedChildren.Where(c => c.SchemaAttributeId == displayAttr.Id).ToList();
+                        var typeAttrs = propagatedChildren.Where(c => c.SchemaAttributeId == displayAttr.Id && !addedDirectChildrenIds.Contains(c.RepresentationId)).ToList();
                         foreach (var ta in typeAttrs)
                             ta.ValueString = newSourceScimRepresentation.DisplayName;
 

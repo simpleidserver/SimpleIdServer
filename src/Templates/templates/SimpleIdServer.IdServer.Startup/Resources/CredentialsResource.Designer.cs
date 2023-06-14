@@ -22,14 +22,14 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class LayoutResource {
+    public class CredentialsResource {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal LayoutResource() {
+        internal CredentialsResource() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.IdServer.Startup.Resources.LayoutResource", typeof(LayoutResource).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.IdServer.Startup.Resources.CredentialsResource", typeof(CredentialsResource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,92 +61,56 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Authenticate.
+        ///   Recherche une chaîne localisée semblable à There is no wallet.
         /// </summary>
-        public static string authenticate {
+        public static string noWallet {
             get {
-                return ResourceManager.GetString("authenticate", resourceCulture);
+                return ResourceManager.GetString("noWallet", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Choose active session.
+        ///   Recherche une chaîne localisée semblable à Scan the QR code with your wallet.
         /// </summary>
-        public static string choose_session {
+        public static string scanQRCode {
             get {
-                return ResourceManager.GetString("choose_session", resourceCulture);
+                return ResourceManager.GetString("scanQRCode", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Consents.
+        ///   Recherche une chaîne localisée semblable à Select the wallet.
         /// </summary>
-        public static string consents {
+        public static string selectWallet {
             get {
-                return ResourceManager.GetString("consents", resourceCulture);
+                return ResourceManager.GetString("selectWallet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Share.
+        /// </summary>
+        public static string share {
+            get {
+                return ResourceManager.GetString("share", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Share credential with one wallet.
+        /// </summary>
+        public static string shareOneWallet {
+            get {
+                return ResourceManager.GetString("shareOneWallet", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Recherche une chaîne localisée semblable à Credentials.
         /// </summary>
-        public static string credentials {
+        public static string title {
             get {
-                return ResourceManager.GetString("credentials", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à Device Authentication.
-        /// </summary>
-        public static string deviceauth {
-            get {
-                return ResourceManager.GetString("deviceauth", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à Disconnect.
-        /// </summary>
-        public static string disconnect {
-            get {
-                return ResourceManager.GetString("disconnect", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à English.
-        /// </summary>
-        public static string en {
-            get {
-                return ResourceManager.GetString("en", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à French.
-        /// </summary>
-        public static string fr {
-            get {
-                return ResourceManager.GetString("fr", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à Languages.
-        /// </summary>
-        public static string languages {
-            get {
-                return ResourceManager.GetString("languages", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à Language is {0}.
-        /// </summary>
-        public static string selected_language {
-            get {
-                return ResourceManager.GetString("selected_language", resourceCulture);
+                return ResourceManager.GetString("title", resourceCulture);
             }
         }
     }

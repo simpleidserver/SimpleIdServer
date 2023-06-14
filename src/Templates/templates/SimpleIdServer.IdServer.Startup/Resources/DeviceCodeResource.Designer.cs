@@ -22,14 +22,14 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class LayoutResource {
+    public class DeviceCodeResource {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal LayoutResource() {
+        internal DeviceCodeResource() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.IdServer.Startup.Resources.LayoutResource", typeof(LayoutResource).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.IdServer.Startup.Resources.DeviceCodeResource", typeof(DeviceCodeResource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,92 +61,92 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Authenticate.
+        ///   Recherche une chaîne localisée semblable à Device Authentication is expired.
         /// </summary>
-        public static string authenticate {
+        public static string auth_device_code_expired {
             get {
-                return ResourceManager.GetString("authenticate", resourceCulture);
+                return ResourceManager.GetString("auth_device_code_expired", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Choose active session.
+        ///   Recherche une chaîne localisée semblable à Confirm.
         /// </summary>
-        public static string choose_session {
+        public static string confirm {
             get {
-                return ResourceManager.GetString("choose_session", resourceCulture);
+                return ResourceManager.GetString("confirm", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Consents.
+        ///   Recherche une chaîne localisée semblable à Device Authentication is confirmed.
         /// </summary>
-        public static string consents {
+        public static string confirmed {
             get {
-                return ResourceManager.GetString("consents", resourceCulture);
+                return ResourceManager.GetString("confirmed", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Credentials.
+        ///   Recherche une chaîne localisée semblable à The client &apos;{0}&apos; is requesting access to your account.
         /// </summary>
-        public static string credentials {
+        public static string consent_client_access {
             get {
-                return ResourceManager.GetString("credentials", resourceCulture);
+                return ResourceManager.GetString("consent_client_access", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Device Authentication.
+        ///   Recherche une chaîne localisée semblable à Manage consents.
         /// </summary>
-        public static string deviceauth {
+        public static string manage_consents {
             get {
-                return ResourceManager.GetString("deviceauth", resourceCulture);
+                return ResourceManager.GetString("manage_consents", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Disconnect.
+        ///   Recherche une chaîne localisée semblable à Device Authentication must have a PENDING state.
         /// </summary>
-        public static string disconnect {
+        public static string not_pending_auth_device_code {
             get {
-                return ResourceManager.GetString("disconnect", resourceCulture);
+                return ResourceManager.GetString("not_pending_auth_device_code", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à English.
+        ///   Recherche une chaîne localisée semblable à Reject.
         /// </summary>
-        public static string en {
+        public static string reject {
             get {
-                return ResourceManager.GetString("en", resourceCulture);
+                return ResourceManager.GetString("reject", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à French.
+        ///   Recherche une chaîne localisée semblable à Scopes.
         /// </summary>
-        public static string fr {
+        public static string scopes {
             get {
-                return ResourceManager.GetString("fr", resourceCulture);
+                return ResourceManager.GetString("scopes", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Languages.
+        ///   Recherche une chaîne localisée semblable à Device Authentication doesn&apos;t exist.
         /// </summary>
-        public static string languages {
+        public static string unknown_user_code {
             get {
-                return ResourceManager.GetString("languages", resourceCulture);
+                return ResourceManager.GetString("unknown_user_code", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Language is {0}.
+        ///   Recherche une chaîne localisée semblable à User code.
         /// </summary>
-        public static string selected_language {
+        public static string usercode {
             get {
-                return ResourceManager.GetString("selected_language", resourceCulture);
+                return ResourceManager.GetString("usercode", resourceCulture);
             }
         }
     }

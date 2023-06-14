@@ -117,34 +117,34 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="authenticate" xml:space="preserve">
-    <value>Authenticate</value>
+  <data name="auth_device_code_expired" xml:space="preserve">
+    <value>Device Authentication is expired</value>
   </data>
-  <data name="choose_session" xml:space="preserve">
-    <value>Choose active session</value>
+  <data name="confirm" xml:space="preserve">
+    <value>Confirm</value>
   </data>
-  <data name="consents" xml:space="preserve">
-    <value>Consents</value>
+  <data name="confirmed" xml:space="preserve">
+    <value>Device Authentication is confirmed</value>
   </data>
-  <data name="credentials" xml:space="preserve">
-    <value>Credentials</value>
+  <data name="consent_client_access" xml:space="preserve">
+    <value>The client '{0}' is requesting access to your account</value>
   </data>
-  <data name="deviceauth" xml:space="preserve">
-    <value>Device Authentication</value>
+  <data name="manage_consents" xml:space="preserve">
+    <value>Manage consents</value>
   </data>
-  <data name="disconnect" xml:space="preserve">
-    <value>Disconnect</value>
+  <data name="not_pending_auth_device_code" xml:space="preserve">
+    <value>Device Authentication must have a PENDING state</value>
   </data>
-  <data name="en" xml:space="preserve">
-    <value>English</value>
+  <data name="reject" xml:space="preserve">
+    <value>Reject</value>
   </data>
-  <data name="fr" xml:space="preserve">
-    <value>French</value>
+  <data name="scopes" xml:space="preserve">
+    <value>Scopes</value>
   </data>
-  <data name="languages" xml:space="preserve">
-    <value>Languages</value>
+  <data name="unknown_user_code" xml:space="preserve">
+    <value>Device Authentication doesn't exist</value>
   </data>
-  <data name="selected_language" xml:space="preserve">
-    <value>Language is {0}</value>
+  <data name="usercode" xml:space="preserve">
+    <value>User code</value>
   </data>
 </root>

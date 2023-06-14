@@ -160,10 +160,15 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
         [ReducerMethod]
         public static GroupState ReduceRemoveSelectedGroupsSuccessAction(GroupState state, RemoveSelectedGroupsSuccessAction act)
         {
+            if (state.Group == null) return state;
             var group = state.Group;
-            var children = group.Children.ToList();
-            children = children.Where(c => !act.FullPathLst.Contains(c.FullPath)).ToList();
-            group.Children = children;
+            if(group.Children != null)
+            {
+                var children = group.Children.ToList();
+                children = children.Where(c => !act.FullPathLst.Contains(c.FullPath)).ToList();
+                group.Children = children;
+            }
+
             return state with
             {
                 Group = group

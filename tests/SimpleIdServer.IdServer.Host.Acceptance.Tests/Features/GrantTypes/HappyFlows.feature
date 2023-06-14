@@ -72,6 +72,7 @@ Scenario: Use 'authorization_code' grant type to get an access token
 	And JSON '$.token_type'='Bearer'
 	And JSON '$.expires_in'='1800'
 	And parameter 'state'='state'
+	And access_token audience contains 'thirdClient'
 
 Scenario: Use 'authorization_code' grant type to get an access token and use PAR
 	Given authenticate a user
@@ -110,6 +111,7 @@ Scenario: Use 'authorization_code' grant type to get an access token and use PAR
 	And JSON '$.token_type'='Bearer'
 	And JSON '$.expires_in'='1800'
 	And parameter 'state'='state'	
+	And access_token audience contains 'thirdClient'
 
 Scenario: Use 'authorization_code' grant type to get an access token and use PAR and RAR
 	Given authenticate a user
@@ -148,6 +150,7 @@ Scenario: Use 'authorization_code' grant type to get an access token and use PAR
 
 	Then JWT has authorization_details type 'secondDetails'
 	And JWT has authorization_details action 'read'
+	And access_token audience contains 'fiftyFiveClient'
 
 Scenario: Use 'refresh_token' grant type to get an access token
 	When execute HTTP POST request 'https://localhost:8080/token'
@@ -172,6 +175,7 @@ Scenario: Use 'refresh_token' grant type to get an access token
 	And JSON '$.scope'='secondScope'
 	And JSON '$.token_type'='Bearer'
 	And JSON '$.expires_in'='1800'
+	And access_token audience contains 'sixClient'
 
 Scenario: Use 'urn:openid:params:grant-type:ciba' grant type to get an identity token (POLL mode)
 	Given authenticate a user
@@ -215,6 +219,7 @@ Scenario: Use 'urn:openid:params:grant-type:ciba' grant type to get an identity 
 	And extract JSON from body
 	Then HTTP status code equals to '200'
 	And JSON exists 'access_token'	
+	And access_token audience contains 'fortyNineClient'
 
 Scenario: Use 'urn:openid:params:grant-type:ciba' grant type to get an identity token (PUSH mode)
 	Given authenticate a user
@@ -252,6 +257,7 @@ Scenario: Use 'urn:openid:params:grant-type:ciba' grant type to get an identity 
 	And polls until notification is received
 	
 	Then JSON exists 'access_token'
+	And access_token audience contains 'fiftyOneClient'
 
 Scenario: Use 'urn:openid:params:grant-type:ciba' grant type to get an identity token (PING mode)
 	Given authenticate a user

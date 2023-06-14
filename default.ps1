@@ -147,4 +147,20 @@ task test {
     } finally {
         Pop-Location
     }
+
+    Push-Location -Path $base_dir\tests\SimpleIdServer.DID.Tests
+
+    try {
+        exec { & dotnet test -c $config --no-build --no-restore }
+    } finally {
+        Pop-Location
+    }
+
+    Push-Location -Path $base_dir\tests\SimpleIdServer.Vc.Tests
+
+    try {
+        exec { & dotnet test -c $config --no-build --no-restore }
+    } finally {
+        Pop-Location
+    }
 }

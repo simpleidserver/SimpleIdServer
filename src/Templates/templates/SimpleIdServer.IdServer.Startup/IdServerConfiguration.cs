@@ -33,7 +33,14 @@ namespace SimpleIdServer.IdServer.Startup
             SimpleIdServer.IdServer.Constants.StandardScopes.Profile,
             SimpleIdServer.IdServer.Constants.StandardScopes.SAMLProfile,
             SimpleIdServer.IdServer.Constants.StandardScopes.GrantManagementQuery,
-            SimpleIdServer.IdServer.Constants.StandardScopes.GrantManagementRevoke
+            SimpleIdServer.IdServer.Constants.StandardScopes.GrantManagementRevoke,
+            SimpleIdServer.IdServer.Constants.StandardScopes.Users,
+            SimpleIdServer.IdServer.Constants.StandardScopes.Register,
+            SimpleIdServer.IdServer.Constants.StandardScopes.Provisioning,
+            SimpleIdServer.IdServer.Constants.StandardScopes.Address,
+            SimpleIdServer.IdServer.Constants.StandardScopes.Networks,
+            SimpleIdServer.IdServer.Constants.StandardScopes.Role,
+            SimpleIdServer.IdServer.Constants.StandardScopes.CredentialOffer
         };
 
         public static ICollection<User> Users => new List<User>
@@ -45,9 +52,13 @@ namespace SimpleIdServer.IdServer.Startup
         public static ICollection<Client> Clients => new List<Client>
         {
             ClientBuilder.BuildTraditionalWebsiteClient("website", "password", null, "https://localhost:5001/signin-oidc", "https://localhost.com:5001/signin-oidc").AddAuthDataTypes("photo").SetClientName("Website").SetClientLogoUri("https://cdn.logo.com/hotlink-ok/logo-social.png").AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope, SimpleIdServer.IdServer.Constants.StandardScopes.Profile).Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("SIDS-manager", "password", null, "http://localhost:5002/signin-oidc").EnableClientGrantType().SetRequestObjectEncryption().AddPostLogoutUri("http://localhost:5002/signout-callback-oidc").AddAuthDataTypes("photo").SetClientName("SimpleIdServer manager").SetClientLogoUri("https://cdn.logo.com/hotlink-ok/logo-social.png").AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope, SimpleIdServer.IdServer.Constants.StandardScopes.Profile, SimpleIdServer.IdServer.Constants.StandardScopes.Provisioning, SimpleIdServer.IdServer.Constants.StandardScopes.Users, SimpleIdServer.IdServer.Constants.StandardScopes.Networks, SimpleIdServer.IdServer.Constants.StandardScopes.CredentialOffer, SimpleIdServer.IdServer.Constants.StandardScopes.Acrs).Build(),
             WsClientBuilder.BuildWsFederationClient("urn:website").SetClientName("NAME").Build(),
             ClientBuilder.BuildUserAgentClient("oauth", "password", null, "https://oauth.tools/callback/code").AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope, SimpleIdServer.IdServer.Constants.StandardScopes.Profile).Build(),
-            ClientBuilder.BuildTraditionalWebsiteClient("fapi", "password", null, "https://localhost:8443/test/(.*)").SetIdTokenSignedResponseAlg(SecurityAlgorithms.EcdsaSha256).SetRequestObjectSigning(SecurityAlgorithms.EcdsaSha256).SetSigAuthorizationResponse(SecurityAlgorithms.EcdsaSha256).AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope, SimpleIdServer.IdServer.Constants.StandardScopes.Profile).UseClientTlsAuthentication("CN=sidClient, O=Internet Widgits Pty Ltd, S=BE, C=BE").AddSigningKey(new SigningCredentials(SimpleIdServer.IdServer.PemImporter.Import(new SimpleIdServer.IdServer.PemResult("-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEK21CoKCA2Vk5zPM+7+vqtnrq4pIe\nsCLiWObLDFKKf3gJl0hll/ZTI5ww/oRrKIXO/uRe9AkckkKwqrqqXGnvsQ==\n-----END PUBLIC KEY-----", "-----BEGIN EC PRIVATE KEY-----\nMHcCAQEEIDHtu+N0u38ZN7DF/TpycDfaUs8WfPGUB3UusR0uv3TVoAoGCCqGSM49\nAwEHoUQDQgAEK21CoKCA2Vk5zPM+7+vqtnrq4pIesCLiWObLDFKKf3gJl0hll/ZT\nI5ww/oRrKIXO/uRe9AkckkKwqrqqXGnvsQ==\n-----END EC PRIVATE KEY-----"), "keyId"), SecurityAlgorithms.EcdsaSha256), SecurityAlgorithms.EcdsaSha256, SecurityKeyTypes.ECDSA).Build()
+            ClientBuilder.BuildTraditionalWebsiteClient("fapi", "password", null, "https://localhost:8443/test/(.*)").SetIdTokenSignedResponseAlg(SecurityAlgorithms.EcdsaSha256).SetRequestObjectSigning(SecurityAlgorithms.EcdsaSha256).SetSigAuthorizationResponse(SecurityAlgorithms.EcdsaSha256).AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope, SimpleIdServer.IdServer.Constants.StandardScopes.Profile).UseClientTlsAuthentication("CN=sidClient, O=Internet Widgits Pty Ltd, S=BE, C=BE").AddSigningKey(new SigningCredentials(SimpleIdServer.IdServer.PemImporter.Import(new SimpleIdServer.IdServer.PemResult("-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEK21CoKCA2Vk5zPM+7+vqtnrq4pIe\nsCLiWObLDFKKf3gJl0hll/ZTI5ww/oRrKIXO/uRe9AkckkKwqrqqXGnvsQ==\n-----END PUBLIC KEY-----", "-----BEGIN EC PRIVATE KEY-----\nMHcCAQEEIDHtu+N0u38ZN7DF/TpycDfaUs8WfPGUB3UusR0uv3TVoAoGCCqGSM49\nAwEHoUQDQgAEK21CoKCA2Vk5zPM+7+vqtnrq4pIesCLiWObLDFKKf3gJl0hll/ZT\nI5ww/oRrKIXO/uRe9AkckkKwqrqqXGnvsQ==\n-----END EC PRIVATE KEY-----"), "keyId"), SecurityAlgorithms.EcdsaSha256), SecurityAlgorithms.EcdsaSha256, SecurityKeyTypes.ECDSA).Build(),
+            ClientBuilder.BuildApiClient("managementClient", "password").AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.Users).AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.Register).Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("walletClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().EnableTokenInResponseType().TrustOpenIdCredential().Build(),
+            ClientBuilder.BuildDeviceClient("deviceClient", "password").AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope, SimpleIdServer.IdServer.Constants.StandardScopes.Profile).Build()
         };
 
         public static ICollection<UMAResource> Resources = new List<UMAResource>
@@ -69,12 +80,12 @@ namespace SimpleIdServer.IdServer.Startup
         {
            AuthenticationSchemeProviderBuilder.Create(Facebook, "Facebook", "Facebook", "Faceoobk", new FacebookOptionsLite
            {
-               AppId = "569242033233529",            
+               AppId = "569242033233529",
                AppSecret = "12e0f33817634c0a650c0121d05e53eb"
            }).Build()
         };
 
-        public static ICollection<Realm> Realms = new List<Realm>
+        public static ICollection<SimpleIdServer.IdServer.Domains.Realm> Realms = new List<SimpleIdServer.IdServer.Domains.Realm>
         {
             SimpleIdServer.IdServer.Constants.StandardRealms.Master
         };

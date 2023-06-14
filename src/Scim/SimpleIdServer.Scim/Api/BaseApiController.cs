@@ -16,10 +16,8 @@ using SimpleIdServer.Scim.Exceptions;
 using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.ExternalEvents;
 using SimpleIdServer.Scim.Helpers;
-using SimpleIdServer.Scim.Parser;
 using SimpleIdServer.Scim.Parser.Exceptions;
-using SimpleIdServer.Scim.Parser.Expressions;
-using SimpleIdServer.Scim.Persistence;
+using SimpleIdServer.Scim.Queries;
 using SimpleIdServer.Scim.Resources;
 using System;
 using System.Collections.Generic;
@@ -36,8 +34,8 @@ namespace SimpleIdServer.Scim.Api
         private readonly IDeleteRepresentationCommandHandler _deleteRepresentationCommandHandler;
         private readonly IReplaceRepresentationCommandHandler _replaceRepresentationCommandHandler;
         private readonly IPatchRepresentationCommandHandler _patchRepresentationCommandHandler;
-        private readonly ISCIMRepresentationQueryRepository _scimRepresentationQueryRepository;
-        private readonly ISCIMSchemaQueryRepository _scimSchemaQueryRepository;
+        private readonly ISearchRepresentationsQueryHandler _searchRepresentationsQueryHandler;
+        private readonly IGetRepresentationQueryHandler _getRepresentationQueryHandler;
         private readonly IAttributeReferenceEnricher _attributeReferenceEnricher;
         private readonly SCIMHostOptions _options;
         private readonly ILogger _logger;
@@ -45,15 +43,16 @@ namespace SimpleIdServer.Scim.Api
         private readonly IResourceTypeResolver _resourceTypeResolver;
         private readonly IUriProvider _uriProvider;
 
-        public BaseApiController(string resourceType, IAddRepresentationCommandHandler addRepresentationCommandHandler, IDeleteRepresentationCommandHandler deleteRepresentationCommandHandler, IReplaceRepresentationCommandHandler replaceRepresentationCommandHandler, IPatchRepresentationCommandHandler patchRepresentationCommandHandler, ISCIMRepresentationQueryRepository scimRepresentationQueryRepository, ISCIMSchemaQueryRepository scimSchemaQueryRepository, IAttributeReferenceEnricher attributeReferenceEnricher, IOptionsMonitor<SCIMHostOptions> options, ILogger logger, IBusControl busControl, IResourceTypeResolver resourceTypeResolver, IUriProvider uriProvider)
+        public BaseApiController(string resourceType, IAddRepresentationCommandHandler addRepresentationCommandHandler, IDeleteRepresentationCommandHandler deleteRepresentationCommandHandler, IReplaceRepresentationCommandHandler replaceRepresentationCommandHandler, IPatchRepresentationCommandHandler patchRepresentationCommandHandler,
+            ISearchRepresentationsQueryHandler searchRepresentationsQueryHandler, IGetRepresentationQueryHandler getRepresentationQueryHandler, IAttributeReferenceEnricher attributeReferenceEnricher, IOptionsMonitor<SCIMHostOptions> options, ILogger logger, IBusControl busControl, IResourceTypeResolver resourceTypeResolver, IUriProvider uriProvider)
         {
             _resourceType = resourceType;
             _addRepresentationCommandHandler = addRepresentationCommandHandler;
             _deleteRepresentationCommandHandler = deleteRepresentationCommandHandler;
             _replaceRepresentationCommandHandler = replaceRepresentationCommandHandler;
             _patchRepresentationCommandHandler = patchRepresentationCommandHandler;
-            _scimRepresentationQueryRepository = scimRepresentationQueryRepository;
-            _scimSchemaQueryRepository = scimSchemaQueryRepository;
+            _searchRepresentationsQueryHandler = searchRepresentationsQueryHandler;
+            _getRepresentationQueryHandler = getRepresentationQueryHandler;
             _attributeReferenceEnricher = attributeReferenceEnricher;
             _options = options.CurrentValue;
             _logger = logger;
@@ -71,10 +70,12 @@ namespace SimpleIdServer.Scim.Api
         /// </summary>
         /// <param name="searchRequest"></param>
         /// <response code="200">Valid representations are found</response>
+        /// <response code="400">Request is unparsable, syntactically incorrect, or violates schema.</response>
         /// <response code="401">Unauthorized</response>
         /// <response code="404">Valid representations are not found</response>
         /// <returns></returns>
         [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [HttpGet]
@@ -89,7 +90,7 @@ namespace SimpleIdServer.Scim.Api
         /// </summary>
         /// <param name="searchRequest"></param>
         /// <response code="200">Valid representations are found</response>
-        /// <response code="400">Request is not valid</response>
+        /// <response code="400">Request is unparsable, syntactically incorrect, or violates schema.</response>
         /// <response code="401">Unauthorized</response>
         /// <response code="404">Valid representations are not found</response>
         /// <returns></returns>
@@ -108,11 +109,13 @@ namespace SimpleIdServer.Scim.Api
         /// Returns the representation details of a particular representation using its unique ID.
         /// </summary>
         /// <response code="200">Valid representation is found</response>
+        /// <response code="400">Request is unparsable, syntactically incorrect, or violates schema.</response>
         /// <response code="401">Unauthorized</response>
         /// <response code="404">Valid representation is not found</response>
         /// <param name="id">Unique identifier of the resource type.</param>
         /// <returns></returns>
         [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [HttpGet("{id}")]
@@ -128,10 +131,12 @@ namespace SimpleIdServer.Scim.Api
         /// </summary>
         /// <param name="id">Unique identifier of the resource type.</param>
         /// <response code="200">Valid representation is found</response>
+        /// <response code="400">Request is unparsable, syntactically incorrect, or violates schema.</response>
         /// <response code="401">Unauthorized</response>
         /// <response code="404">Valid representation is not found</response>
         /// <returns></returns>
         [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [HttpGet("Me")]
@@ -196,12 +201,14 @@ namespace SimpleIdServer.Scim.Api
         /// Delete a particular representation using its unique ID.
         /// </summary>
         /// <response code="204">Representation is deleted</response>
+        /// <response code="400">Request is unparsable, syntactically incorrect, or violates schema.</response>
         /// <response code="401">Unauthorized</response>
         /// <response code="404">Representation is not found</response>
         /// <response code="500">Something goes wrong in the server</response>
         /// <param name="id">Unique ID of the resource type</param>
         /// <returns></returns>
         [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
@@ -217,12 +224,14 @@ namespace SimpleIdServer.Scim.Api
         /// Delete a particular representation using its unique ID.
         /// </summary>
         /// <response code="204">Representation is deleted</response>
+        /// <response code="400">Request is unparsable, syntactically incorrect, or violates schema.</response>
         /// <response code="401">Unauthorized</response>
         /// <response code="404">Representation is not found</response>
         /// <response code="500">Something goes wrong in the server</response>
         /// <param name="id">Unique ID of the resource type</param>
         /// <returns></returns>
         [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
@@ -354,28 +363,9 @@ namespace SimpleIdServer.Scim.Api
             _logger.LogInformation(Global.StartGetResources);
             try
             {
-                if(searchRequest == null) return this.BuildError(HttpStatusCode.BadRequest, Global.HttpPostNotWellFormatted, SCIMConstants.ErrorSCIMTypes.InvalidSyntax);
-                if (searchRequest.Count > _options.MaxResults || searchRequest.Count == null) searchRequest.Count = _options.MaxResults;
-                var schema = await _scimSchemaQueryRepository.FindRootSCIMSchemaByResourceType(_resourceType);
-                if (schema == null) return new NotFoundResult();
-                var schemaIds = new List<string> { schema.Id };
-                schemaIds.AddRange(schema.SchemaExtensions.Select(s => s.Schema));
-                var schemas = (await _scimSchemaQueryRepository.FindSCIMSchemaByIdentifiers(schemaIds)).ToList();
-                var sortByFilter = SCIMFilterParser.Parse(searchRequest.SortBy, schemas);
-                if (searchRequest.StartIndex <= 0)
-                {
-                    _logger.LogError(Global.StartIndexMustBeSuperiorOrEqualTo1);
-                    return this.BuildError(HttpStatusCode.BadRequest, Global.StartIndexMustBeSuperiorOrEqualTo1);
-                }
-
-                var standardSchemas = new List<SCIMSchema>
-                {
-                    StandardSchemas.StandardResponseSchemas
-                };
-                standardSchemas.AddRange(schemas);
-                var includedAttributes = searchRequest.Attributes == null ? new List<SCIMAttributeExpression>() : searchRequest.Attributes.Select(a => SCIMFilterParser.Parse(a, standardSchemas)).Cast<SCIMAttributeExpression>().ToList();
-                var excludedAttributes = searchRequest.ExcludedAttributes == null ? new List<SCIMAttributeExpression>() : searchRequest.ExcludedAttributes.Select(a => SCIMFilterParser.Parse(a, standardSchemas)).Cast<SCIMAttributeExpression>().ToList();
-                var result = await _scimRepresentationQueryRepository.FindSCIMRepresentations(new SearchSCIMRepresentationsParameter(_resourceType, searchRequest.StartIndex, searchRequest.Count.Value, sortByFilter, searchRequest.SortOrder, SCIMFilterParser.Parse(searchRequest.Filter, schemas), includedAttributes, excludedAttributes));
+                var searchResult = await _searchRepresentationsQueryHandler.Handle(searchRequest, _resourceType);
+                if (searchResult.HasError) return this.BuildError(searchResult);
+                var result = searchResult.Result;
                 var jObj = new JObject
                 {
                     { StandardSCIMRepresentationAttributes.Schemas, new JArray(new [] { StandardSchemas.ListResponseSchemas.Id } ) },
@@ -386,11 +376,6 @@ namespace SimpleIdServer.Scim.Api
                 var resources = new JArray();
                 var baseUrl = _uriProvider.GetAbsoluteUriWithVirtualPath();
                 var representations = result.Content.ToList();
-                foreach(var representation in representations)
-                {
-                    representation.Schemas = schemas;
-                }
-
                 await _attributeReferenceEnricher.Enrich(_resourceType, representations, baseUrl);
                 foreach (var record in representations)
                 {
@@ -424,6 +409,21 @@ namespace SimpleIdServer.Scim.Api
                     ContentType = SCIMConstants.STANDARD_SCIM_CONTENT_TYPE
                 };
             }
+            catch(SCIMNotFoundException ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return this.BuildError(HttpStatusCode.NotFound, ex.Message, SCIMConstants.ErrorSCIMTypes.Unknown);
+            }
+            catch (SCIMSchemaViolatedException ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return this.BuildError(HttpStatusCode.BadRequest, ex.Message, SCIMConstants.ErrorSCIMTypes.InvalidValue);
+            }
+            catch (SCIMBadSyntaxException ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return this.BuildError(HttpStatusCode.BadRequest, ex.Message, SCIMConstants.ErrorSCIMTypes.InvalidSyntax);
+            }
             catch (SCIMFilterException ex)
             {
                 _logger.LogError(ex, ex.Message);
@@ -441,32 +441,23 @@ namespace SimpleIdServer.Scim.Api
             _logger.LogInformation(string.Format(Global.StartGetResource, id));
             try
             {
-                var schema = await _scimSchemaQueryRepository.FindRootSCIMSchemaByResourceType(_resourceType);
-                if (schema == null) return new NotFoundResult();
-                var schemaIds = new List<string> { schema.Id };
-                schemaIds.AddRange(schema.SchemaExtensions.Select(s => s.Schema));
-                var schemas = (await _scimSchemaQueryRepository.FindSCIMSchemaByIdentifiers(schemaIds)).ToList();
-                var standardSchemas = new List<SCIMSchema>
-                {
-                    StandardSchemas.StandardResponseSchemas
-                };
-                standardSchemas.AddRange(schemas);
-                var includedAttributes = parameter.Attributes == null ? new List<SCIMAttributeExpression>() : parameter.Attributes.Select(a => SCIMFilterParser.Parse(a, standardSchemas)).Cast<SCIMAttributeExpression>().ToList();
-                var excludedAttributes = parameter.ExcludedAttributes == null ? new List<SCIMAttributeExpression>() : parameter.ExcludedAttributes.Select(a => SCIMFilterParser.Parse(a, standardSchemas)).Cast<SCIMAttributeExpression>().ToList();
-                var representation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(id, _resourceType, new GetSCIMResourceParameter { ExcludedAttributes = excludedAttributes, IncludedAttributes = includedAttributes });
-                if (representation == null)
-                {
-                    _logger.LogError(string.Format(Global.ResourceNotFound, id));
-                    return this.BuildError(HttpStatusCode.NotFound, string.Format(Global.ResourceNotFound, id), SCIMConstants.ErrorSCIMTypes.Unknown);
-                }
-
-                if(!includedAttributes.Any() && !excludedAttributes.Any())   
-                    representation.ApplyEmptyArray();
-
+                var getRepresentationResult = await _getRepresentationQueryHandler.Handle(id, parameter, _resourceType);
+                if (getRepresentationResult.HasError) return this.BuildError(getRepresentationResult);
+                var representation = getRepresentationResult.Result;
                 await _attributeReferenceEnricher.Enrich(_resourceType, new List<SCIMRepresentation> { representation }, _uriProvider.GetAbsoluteUriWithVirtualPath());
                 return BuildHTTPResult(representation, HttpStatusCode.OK, true);
             }
-            catch(Exception ex)
+            catch (SCIMSchemaViolatedException ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return this.BuildError(HttpStatusCode.BadRequest, ex.Message, SCIMConstants.ErrorSCIMTypes.InvalidValue);
+            }
+            catch (SCIMNotFoundException ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return this.BuildError(HttpStatusCode.NotFound, ex.Message, SCIMConstants.ErrorSCIMTypes.Unknown);
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
                 return this.BuildError(HttpStatusCode.InternalServerError, ex.Message, SCIMConstants.ErrorSCIMTypes.InternalServerError);
@@ -480,7 +471,9 @@ namespace SimpleIdServer.Scim.Api
             try
             {
                 var command = new AddRepresentationCommand(_resourceType, jobj, _uriProvider.GetAbsoluteUriWithVirtualPath());
-                var scimRepresentation = await _addRepresentationCommandHandler.Handle(command);
+                var addRepresentationResult = await _addRepresentationCommandHandler.Handle(command);
+                if (addRepresentationResult.HasError) return this.BuildError(addRepresentationResult);
+                var scimRepresentation = addRepresentationResult.Result;
                 var location = GetLocation(scimRepresentation);
                 var content = scimRepresentation.ToResponse(location, false, mergeExtensionAttributes: _options.MergeExtensionAttributes);
                 if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationAddedEvent(scimRepresentation.Id, scimRepresentation.Version, GetResourceType(scimRepresentation.ResourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
@@ -518,9 +511,16 @@ namespace SimpleIdServer.Scim.Api
             _logger.LogInformation(string.Format(Global.DeleteResource, id));
             try
             {
-                var representation = await _deleteRepresentationCommandHandler.Handle(new DeleteRepresentationCommand(id, _resourceType, _uriProvider.GetAbsoluteUriWithVirtualPath()));
-                if(IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationRemovedEvent(id, representation.Version, GetResourceType(_resourceType), _options.IncludeToken ? Request.GetToken() : string.Empty));
+                var getRepresentationResult = await _deleteRepresentationCommandHandler.Handle(new DeleteRepresentationCommand(id, _resourceType, _uriProvider.GetAbsoluteUriWithVirtualPath()));
+                if (getRepresentationResult.HasError) return this.BuildError(getRepresentationResult);
+                var representation = getRepresentationResult.Result;
+                if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationRemovedEvent(id, representation.Version, GetResourceType(_resourceType), _options.IncludeToken ? Request.GetToken() : string.Empty));
                 return new StatusCodeResult((int)HttpStatusCode.NoContent);
+            }
+            catch (SCIMSchemaViolatedException ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return this.BuildError(HttpStatusCode.BadRequest, ex.Message, SCIMConstants.ErrorSCIMTypes.InvalidValue);
             }
             catch (SCIMNotFoundException ex)
             {
@@ -549,7 +549,9 @@ namespace SimpleIdServer.Scim.Api
             _logger.LogInformation(Global.UpdateResource, id);
             try
             {
-                var newRepresentation = await _replaceRepresentationCommandHandler.Handle(new ReplaceRepresentationCommand(id, _resourceType, representationParameter, _uriProvider.GetAbsoluteUriWithVirtualPath()));
+                var updateResult = await _replaceRepresentationCommandHandler.Handle(new ReplaceRepresentationCommand(id, _resourceType, representationParameter, _uriProvider.GetAbsoluteUriWithVirtualPath()));
+                if (updateResult.HasError) return this.BuildError(updateResult);
+                var newRepresentation = updateResult.Result;
                 var location = GetLocation(newRepresentation);
                 var content = newRepresentation.ToResponse(location, false, mergeExtensionAttributes: _options.MergeExtensionAttributes);
                 if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(newRepresentation.Id, newRepresentation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
@@ -602,7 +604,9 @@ namespace SimpleIdServer.Scim.Api
             _logger.LogInformation(string.Format(Global.PatchResource, id, patchRepresentation == null ? string.Empty : JsonConvert.SerializeObject(patchRepresentation)));
             try
             {
-                var patchResult = await _patchRepresentationCommandHandler.Handle(new PatchRepresentationCommand(id, ResourceType, patchRepresentation, _uriProvider.GetAbsoluteUriWithVirtualPath()));
+                var patchRes = await _patchRepresentationCommandHandler.Handle(new PatchRepresentationCommand(id, ResourceType, patchRepresentation, _uriProvider.GetAbsoluteUriWithVirtualPath()));
+                if (patchRes.HasError) return this.BuildError(patchRes);
+                var patchResult = patchRes.Result;
                 if (!patchResult.IsPatched) return NoContent();
                 var newRepresentation = patchResult.SCIMRepresentation;
                 var location = GetLocation(newRepresentation);

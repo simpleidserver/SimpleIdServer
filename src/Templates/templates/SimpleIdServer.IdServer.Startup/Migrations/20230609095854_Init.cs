@@ -15,13 +15,16 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 name: "Acrs",
                 columns: table => new
                 {
-                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DisplayName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AuthenticationMethodReferences = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    AuthenticationMethodReferences = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Acrs", x => x.Name);
+                    table.PrimaryKey("PK_Acrs", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -75,6 +78,22 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AuthenticationSchemeProviderDefinitions", x => x.Name);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BaseCredentialTemplate",
+                columns: table => new
+                {
+                    TechnicalId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Format = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Discriminator = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BaseCredentialTemplate", x => x.TechnicalId);
                 });
 
             migrationBuilder.CreateTable(
@@ -163,6 +182,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     TokenExpirationTimeInSeconds = table.Column<double>(type: "float", nullable: true),
+                    CNonceExpirationTimeInSeconds = table.Column<double>(type: "float", nullable: true),
                     RefreshTokenExpirationTimeInSeconds = table.Column<double>(type: "float", nullable: true),
                     TokenSignedResponseAlg = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TokenEncryptedResponseAlg = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -186,6 +206,8 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     UserInfoEncryptedResponseEnc = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     BCUserCodeParameter = table.Column<bool>(type: "bit", nullable: false),
                     FrontChannelLogoutUri = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CredentialOfferEndpoint = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserPinRequired = table.Column<bool>(type: "bit", nullable: false),
                     FrontChannelLogoutSessionRequired = table.Column<bool>(type: "bit", nullable: false),
                     BackChannelLogoutSessionRequired = table.Column<bool>(type: "bit", nullable: false),
                     DefaultMaxAge = table.Column<double>(type: "float", nullable: true),
@@ -224,6 +246,28 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Groups",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FullPath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ParentGroupId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Groups", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Groups_Groups_ParentGroupId",
+                        column: x => x.ParentGroupId,
+                        principalTable: "Groups",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "IdentityProvisioningDefinitions",
                 columns: table => new
                 {
@@ -235,6 +279,22 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_IdentityProvisioningDefinitions", x => x.Name);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Networks",
+                columns: table => new
+                {
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RpcUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PrivateAccountKey = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ContractAdr = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Networks", x => x.Name);
                 });
 
             migrationBuilder.CreateTable(
@@ -383,6 +443,77 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         column: x => x.AuthSchemeProviderDefinitionName,
                         principalTable: "AuthenticationSchemeProviderDefinitions",
                         principalColumn: "Name",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CredentialTemplateClaimMapper",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    MapperType = table.Column<int>(type: "int", nullable: false),
+                    SourceUserAttribute = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SourceUserProperty = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TargetClaimPath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsMultiValued = table.Column<bool>(type: "bit", nullable: false),
+                    TokenClaimJsonType = table.Column<int>(type: "int", nullable: true),
+                    CredentialTemplateId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CredentialTemplateClaimMapper", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CredentialTemplateClaimMapper_BaseCredentialTemplate_CredentialTemplateId",
+                        column: x => x.CredentialTemplateId,
+                        principalTable: "BaseCredentialTemplate",
+                        principalColumn: "TechnicalId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CredentialTemplateDisplay",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Locale = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LogoUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LogoAltText = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BackgroundColor = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TextColor = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CredentialTemplateId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CredentialTemplateDisplay", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CredentialTemplateDisplay_BaseCredentialTemplate_CredentialTemplateId",
+                        column: x => x.CredentialTemplateId,
+                        principalTable: "BaseCredentialTemplate",
+                        principalColumn: "TechnicalId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CredentialTemplateParameter",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CredentialTemplateId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    ParameterType = table.Column<int>(type: "int", nullable: false),
+                    IsArray = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CredentialTemplateParameter", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CredentialTemplateParameter_BaseCredentialTemplate_CredentialTemplateId",
+                        column: x => x.CredentialTemplateId,
+                        principalTable: "BaseCredentialTemplate",
+                        principalColumn: "TechnicalId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -574,17 +705,17 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 name: "AuthenticationContextClassReferenceRealm",
                 columns: table => new
                 {
-                    AuthenticationContextClassReferencesName = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    AuthenticationContextClassReferencesId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     RealmsName = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AuthenticationContextClassReferenceRealm", x => new { x.AuthenticationContextClassReferencesName, x.RealmsName });
+                    table.PrimaryKey("PK_AuthenticationContextClassReferenceRealm", x => new { x.AuthenticationContextClassReferencesId, x.RealmsName });
                     table.ForeignKey(
-                        name: "FK_AuthenticationContextClassReferenceRealm_Acrs_AuthenticationContextClassReferencesName",
-                        column: x => x.AuthenticationContextClassReferencesName,
+                        name: "FK_AuthenticationContextClassReferenceRealm_Acrs_AuthenticationContextClassReferencesId",
+                        column: x => x.AuthenticationContextClassReferencesId,
                         principalTable: "Acrs",
-                        principalColumn: "Name",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_AuthenticationContextClassReferenceRealm_Realms_RealmsName",
@@ -636,6 +767,54 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ClientRealm_Realms_RealmsName",
+                        column: x => x.RealmsName,
+                        principalTable: "Realms",
+                        principalColumn: "Name",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CredentialTemplateRealm",
+                columns: table => new
+                {
+                    CredentialTemplatesTechnicalId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RealmsName = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CredentialTemplateRealm", x => new { x.CredentialTemplatesTechnicalId, x.RealmsName });
+                    table.ForeignKey(
+                        name: "FK_CredentialTemplateRealm_BaseCredentialTemplate_CredentialTemplatesTechnicalId",
+                        column: x => x.CredentialTemplatesTechnicalId,
+                        principalTable: "BaseCredentialTemplate",
+                        principalColumn: "TechnicalId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CredentialTemplateRealm_Realms_RealmsName",
+                        column: x => x.RealmsName,
+                        principalTable: "Realms",
+                        principalColumn: "Name",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GroupRealm",
+                columns: table => new
+                {
+                    GroupsId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RealmsName = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GroupRealm", x => new { x.GroupsId, x.RealmsName });
+                    table.ForeignKey(
+                        name: "FK_GroupRealm_Groups_GroupsId",
+                        column: x => x.GroupsId,
+                        principalTable: "Groups",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_GroupRealm_Realms_RealmsName",
                         column: x => x.RealmsName,
                         principalTable: "Realms",
                         principalColumn: "Name",
@@ -714,6 +893,30 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "GroupScope",
+                columns: table => new
+                {
+                    GroupsId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RolesId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GroupScope", x => new { x.GroupsId, x.RolesId });
+                    table.ForeignKey(
+                        name: "FK_GroupScope_Groups_GroupsId",
+                        column: x => x.GroupsId,
+                        principalTable: "Groups",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_GroupScope_Scopes_RolesId",
+                        column: x => x.RolesId,
+                        principalTable: "Scopes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RealmScope",
                 columns: table => new
                 {
@@ -744,15 +947,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     MapperType = table.Column<int>(type: "int", nullable: false),
-                    UserAttributeName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserAttributeStreetName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserAttributeLocalityName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserAttributeRegionName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserAttributePostalCodeName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserAttributeCountryName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserAttributeFormattedName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserPropertyName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TokenClaimName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SourceUserAttribute = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SourceUserProperty = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TargetClaimPath = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SAMLAttributeName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TokenClaimJsonType = table.Column<int>(type: "int", nullable: true),
                     IsMultiValued = table.Column<bool>(type: "bit", nullable: false),
@@ -1037,7 +1234,10 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Source = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IdentityProvisioningId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    IdentityProvisioningId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Did = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DidPrivateHex = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NotificationMode = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1073,6 +1273,73 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CredentialOffers",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CredentialTemplateId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CredentialNames = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ClientId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ExpirationDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    Pin = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PreAuthorizedCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CredIssuerState = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CredentialOffers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CredentialOffers_BaseCredentialTemplate_CredentialTemplateId",
+                        column: x => x.CredentialTemplateId,
+                        principalTable: "BaseCredentialTemplate",
+                        principalColumn: "TechnicalId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CredentialOffers_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DeviceAuthCodes",
+                columns: table => new
+                {
+                    DeviceCode = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ClientId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserLogin = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Scopes = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ExpirationDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    NextAccessDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    LastAccessTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DeviceAuthCodes", x => x.DeviceCode);
+                    table.ForeignKey(
+                        name: "FK_DeviceAuthCodes_Clients_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Clients",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_DeviceAuthCodes_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Grants",
                 columns: table => new
                 {
@@ -1098,6 +1365,30 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     table.ForeignKey(
                         name: "FK_Grants_Users_UserId",
                         column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GroupUser",
+                columns: table => new
+                {
+                    GroupsId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UsersId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GroupUser", x => new { x.GroupsId, x.UsersId });
+                    table.ForeignKey(
+                        name: "FK_GroupUser_Groups_GroupsId",
+                        column: x => x.GroupsId,
+                        principalTable: "Groups",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_GroupUser_Users_UsersId",
+                        column: x => x.UsersId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -1332,6 +1623,46 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 column: "ScopesId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CredentialOffers_CredentialTemplateId",
+                table: "CredentialOffers",
+                column: "CredentialTemplateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CredentialOffers_UserId",
+                table: "CredentialOffers",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CredentialTemplateClaimMapper_CredentialTemplateId",
+                table: "CredentialTemplateClaimMapper",
+                column: "CredentialTemplateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CredentialTemplateDisplay_CredentialTemplateId",
+                table: "CredentialTemplateDisplay",
+                column: "CredentialTemplateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CredentialTemplateParameter_CredentialTemplateId",
+                table: "CredentialTemplateParameter",
+                column: "CredentialTemplateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CredentialTemplateRealm_RealmsName",
+                table: "CredentialTemplateRealm",
+                column: "RealmsName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DeviceAuthCodes_ClientId",
+                table: "DeviceAuthCodes",
+                column: "ClientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DeviceAuthCodes_UserId",
+                table: "DeviceAuthCodes",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Grants_ScopeId",
                 table: "Grants",
                 column: "ScopeId");
@@ -1340,6 +1671,26 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 name: "IX_Grants_UserId",
                 table: "Grants",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GroupRealm_RealmsName",
+                table: "GroupRealm",
+                column: "RealmsName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Groups_ParentGroupId",
+                table: "Groups",
+                column: "ParentGroupId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GroupScope_RolesId",
+                table: "GroupScope",
+                column: "RolesId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GroupUser_UsersId",
+                table: "GroupUser",
+                column: "UsersId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_IdentityProvisioningDefinitionProperty_IdentityProvisioningDefinitionName",
@@ -1509,7 +1860,34 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 name: "ClientScope");
 
             migrationBuilder.DropTable(
+                name: "CredentialOffers");
+
+            migrationBuilder.DropTable(
+                name: "CredentialTemplateClaimMapper");
+
+            migrationBuilder.DropTable(
+                name: "CredentialTemplateDisplay");
+
+            migrationBuilder.DropTable(
+                name: "CredentialTemplateParameter");
+
+            migrationBuilder.DropTable(
+                name: "CredentialTemplateRealm");
+
+            migrationBuilder.DropTable(
+                name: "DeviceAuthCodes");
+
+            migrationBuilder.DropTable(
                 name: "ExtractedRepresentations");
+
+            migrationBuilder.DropTable(
+                name: "GroupRealm");
+
+            migrationBuilder.DropTable(
+                name: "GroupScope");
+
+            migrationBuilder.DropTable(
+                name: "GroupUser");
 
             migrationBuilder.DropTable(
                 name: "IdentityProvisioningDefinitionProperty");
@@ -1528,6 +1906,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
             migrationBuilder.DropTable(
                 name: "ImportSummaries");
+
+            migrationBuilder.DropTable(
+                name: "Networks");
 
             migrationBuilder.DropTable(
                 name: "RealmScope");
@@ -1588,6 +1969,12 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
             migrationBuilder.DropTable(
                 name: "CertificateAuthorities");
+
+            migrationBuilder.DropTable(
+                name: "BaseCredentialTemplate");
+
+            migrationBuilder.DropTable(
+                name: "Groups");
 
             migrationBuilder.DropTable(
                 name: "SerializedFileKeys");

@@ -6,6 +6,6 @@ namespace SimpleIdServer.Scim.Infrastructure
 {
     public interface ISCIMCommandHandler<TCommand, TResult> where TCommand : ISCIMCommand<TResult>
     {
-        Task<TResult> Handle(TCommand request);
+        Task<GenericResult<TResult>> Handle(TCommand request);
     }
 }

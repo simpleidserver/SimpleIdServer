@@ -3,7 +3,6 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
-using SimpleIdServer.Scim.Domains;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -20,18 +19,9 @@ namespace SimpleIdServer.Scim.Extensions
 
         public static bool HasElement(this JObject jObj, string name, string schema)
         {
-            if (jObj.ContainsKey(name) || jObj.ContainsKey($"{schema}:{name}"))
+            string value;
+            if (((value = jObj.GetStringIgnoreCase(name)) != null) || ((value = jObj.GetStringIgnoreCase($"{schema}:{name}")) != null))
             {
-                var value = string.Empty;
-                if (jObj.ContainsKey(name))
-                {
-                    value = jObj[name].ToString();
-                }
-                else
-                {
-                    value = jObj[$"{schema}:{name}"].ToString();
-                }
-
                 return !string.IsNullOrWhiteSpace(value);
             }
 
@@ -46,41 +36,7 @@ namespace SimpleIdServer.Scim.Extensions
                 return false;
             }
 
-            return attr.ContainsKey(name) && !string.IsNullOrWhiteSpace(attr[name].ToString());
-        }
-
-        public static IEnumerable<string> GetSchemas(this JObject jObj)
-        {
-            return GetArrayIgnoreCase(jObj, StandardSCIMRepresentationAttributes.Schemas);
-        }
-
-        public static bool TryGetInt(this JObject jObj, string name, out int result)
-        {
-            result = 0;
-            if (!jObj.ContainsKey(name))
-            {
-                return false;
-            }
-
-            var val = jObj[name].ToString();
-            if (int.TryParse(val, out result))
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        public static bool TryGetString(this JObject jObj, string name, out string result)
-        {
-            result = null;
-            if (!jObj.ContainsKey(name))
-            {
-                return false;
-            }
-
-            result = jObj[name].ToString();
-            return true;
+            return !string.IsNullOrWhiteSpace(attr.GetStringIgnoreCase(name));
         }
 
         public static string GetStringIgnoreCase(this JObject jObj, string name)

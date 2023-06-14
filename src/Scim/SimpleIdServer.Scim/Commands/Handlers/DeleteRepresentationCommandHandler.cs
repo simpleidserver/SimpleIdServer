@@ -4,6 +4,7 @@ using MassTransit;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Exceptions;
 using SimpleIdServer.Scim.Helpers;
+using SimpleIdServer.Scim.Infrastructure;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Resources;
 using System.Threading.Tasks;
@@ -26,14 +27,12 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             _representationReferenceSync = representationReferenceSync;
         }
 
-        public async Task<SCIMRepresentation> Handle(DeleteRepresentationCommand request)
+        public virtual async Task<GenericResult<SCIMRepresentation>> Handle(DeleteRepresentationCommand request)
         {
             var schema = await _scimSchemaCommandRepository.FindRootSCIMSchemaByResourceType(request.ResourceType);
             if (schema == null) throw new SCIMSchemaNotFoundException();
             var representation = await _scimRepresentationCommandRepository.Get(request.Id);
-            if (representation == null)
-                throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, request.Id));
-
+            if (representation == null) throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, request.Id));
             var references = _representationReferenceSync.Sync(request.ResourceType, representation, representation, request.Location, schema, true, true);
             using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
             {
@@ -48,7 +47,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 await transaction.Commit();
             }
 
-            return representation;
+            return GenericResult<SCIMRepresentation>.Ok(representation);
         }
     }
 }

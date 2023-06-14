@@ -7,6 +7,7 @@ using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
 using SimpleIdServer.Scim.Helpers;
+using SimpleIdServer.Scim.Infrastructure;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Resources;
 using System;
@@ -39,7 +40,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             _options = options.Value;
         }
 
-        public async Task<PatchRepresentationResult> Handle(PatchRepresentationCommand patchRepresentationCommand)
+        public async virtual Task<GenericResult<PatchRepresentationResult>> Handle(PatchRepresentationCommand patchRepresentationCommand)
         {
             var schema = await _scimSchemaCommandRepository.FindRootSCIMSchemaByResourceType(patchRepresentationCommand.ResourceType);
             if (schema == null) throw new SCIMSchemaNotFoundException();
@@ -49,13 +50,13 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             return await UpdateRepresentation(existingRepresentation, patchRepresentationCommand, schema);
         }
 
-        private async Task<PatchRepresentationResult> UpdateRepresentation(SCIMRepresentation existingRepresentation, PatchRepresentationCommand patchRepresentationCommand, SCIMSchema schema)
+        private async Task<GenericResult<PatchRepresentationResult>> UpdateRepresentation(SCIMRepresentation existingRepresentation, PatchRepresentationCommand patchRepresentationCommand, SCIMSchema schema)
         {
             var attributeMappings = await _scimAttributeMappingQueryRepository.GetBySourceResourceType(existingRepresentation.ResourceType);
             var oldDisplayName = existingRepresentation.DisplayName;
             var patchResult = existingRepresentation.ApplyPatches(patchRepresentationCommand.PatchRepresentation.Operations, attributeMappings, _options.IgnoreUnsupportedCanonicalValues);
             var displayNameDifferent = existingRepresentation.DisplayName != oldDisplayName;
-            if (!patchResult.Any()) return PatchRepresentationResult.NoPatch();
+            if (!patchResult.Any()) return GenericResult<PatchRepresentationResult>.Ok(PatchRepresentationResult.NoPatch());
             existingRepresentation.SetUpdated(DateTime.UtcNow);
             var references = _representationReferenceSync.Sync(patchRepresentationCommand.ResourceType, existingRepresentation, patchResult, patchRepresentationCommand.Location, schema, displayNameDifferent);
             using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
@@ -73,7 +74,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             }
 
             existingRepresentation.ApplyEmptyArray();
-            return PatchRepresentationResult.Ok(existingRepresentation);
+            return GenericResult<PatchRepresentationResult>.Ok(PatchRepresentationResult.Ok(existingRepresentation));
         }
 
         private void CheckParameter(PatchRepresentationParameter patchRepresentation)

@@ -6,6 +6,11 @@ namespace SimpleIdServer.Scim.Exceptions
 {
     public class SCIMNotFoundException : BaseScimException
     {
+        public SCIMNotFoundException() : base(string.Empty)
+        {
+
+        }
+
         public SCIMNotFoundException(string message) : base(message)
         {
         }

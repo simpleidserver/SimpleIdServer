@@ -9,6 +9,7 @@ using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Helpers;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Persistence.InMemory;
+using SimpleIdServer.Scim.Queries;
 using System;
 using System.Collections.Generic;
 
@@ -29,6 +30,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 o.UsingInMemory();
             });
             services.AddCommandHandlers()
+                .AddQueryHandlers()
                 .AddSCIMRepository()
                 .AddHelpers()
                 .AddInfrastructure();
@@ -54,6 +56,13 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IReplaceRepresentationCommandHandler, ReplaceRepresentationCommandHandler>();
             services.AddTransient<IPatchRepresentationCommandHandler, PatchRepresentationCommandHandler>();
             services.AddTransient<ISCIMRepresentationHelper, SCIMRepresentationHelper>();
+            return services;
+        }
+
+        private static IServiceCollection AddQueryHandlers(this IServiceCollection services)
+        {
+            services.AddTransient<ISearchRepresentationsQueryHandler, SearchRepresentationsQueryHandler>();
+            services.AddTransient<IGetRepresentationQueryHandler, GetRepresentationQueryHandler>();
             return services;
         }
 
