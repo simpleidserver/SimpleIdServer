@@ -62,12 +62,11 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       // Replace with your project's social card
-      image: 'img/docusaurus-social-card.jpg',
       navbar: {
         title: 'SimpleIdServer',
         logo: {
           alt: 'SimpleIdServer',
-          src: 'img/logo.svg',
+          src: 'img/logo-no-shield.svg',
         },
         items: [
           {
@@ -120,7 +119,7 @@ const config = {
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} SimpleIdServer.`,
+        copyright: `Copyright © ${new Date().getFullYear()} Lokit - BEXXXXXXXXXX`,
       },
       prism: {
         theme: lightCodeTheme,

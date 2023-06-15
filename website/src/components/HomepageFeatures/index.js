@@ -5,7 +5,7 @@ import styles from './styles.module.css';
 const FeatureList = [
   {
     title: 'Single-Sign On',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
+    Svg: require('@site/static/img/sso.svg').default,
     description: (
       <>
         User authentication and authorization mechanism that allows individuals to access multiple applications or systems with just one set of login credentials.
@@ -14,7 +14,7 @@ const FeatureList = [
   },
   {
     title: 'Identity Management',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
+    Svg: require('@site/static/img/identity-card.svg').default,
     description: (
       <>
          Manage the lifecycle of digital identities within an organization. To accomplish this, we have chosen SCIM Version 2.0 as the preferred protocol for identity management.
