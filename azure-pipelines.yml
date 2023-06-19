@@ -15,8 +15,25 @@ steps:
     versionSpec: '10.x'
   displayName: 'Install Node.js'
 
-- script: |
-    npm install
-    npm run build
-  workingDirectory: $(Build.Repository.LocalPath)\website
+- task: PowerShell@2
   displayName: 'npm install and build'
+  inputs:
+    targetType: 'inline'
+    script: |
+      npm install
+      npm run build
+    workingDirectory: '$(Build.Repository.LocalPath)\website'
+
+- task: CopyFiles@2
+  displayName: 'Copy website'
+  inputs:
+    SourceFolder: '$(Build.Repository.LocalPath)\website\build'
+    Contents: '**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)\website'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish website'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)\website'
+    ArtifactName: 'website'
+    publishLocation: 'Container'
