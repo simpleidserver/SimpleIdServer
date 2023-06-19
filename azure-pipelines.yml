@@ -18,5 +18,5 @@ steps:
 - script: |
     npm install
     npm run build
-  workingDirectory: $(Agent.BuildDirectory)\website
+  workingDirectory: $(Build.Repository.LocalPath)\website
   displayName: 'npm install and build'
