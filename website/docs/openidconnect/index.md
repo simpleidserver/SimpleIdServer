@@ -1,4 +1,4 @@
-# OAuth 2.0 and OpenID Connect
+# Specifications
 
 SimpleIdServer implements the following specifications
 

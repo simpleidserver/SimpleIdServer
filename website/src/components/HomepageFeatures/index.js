@@ -23,7 +23,7 @@ const FeatureList = [
   },
   {
     title: 'Identity Provisioning',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
+    Svg: require('@site/static/img/id-provisioning.svg').default,
     description: (
       <>
         Refers to the process of creating, modifying, and managing user identities and their associated access privileges within an organization's systems and applications. 
@@ -32,7 +32,7 @@ const FeatureList = [
   },
   {
     title: 'Financial-grade API (FAPI)',
-    Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
+    Svg: require('@site/static/img/fapi.svg').default,
     description: (
       <>
         Set of standards and guidelines developed by the OpenID Foundation to enhance the security and interoperability of APIs in the financial industry. 
@@ -41,7 +41,7 @@ const FeatureList = [
   },
   {
     title: 'Verifiable Credential Issuer',
-    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
+    Svg: require('@site/static/img/credentialissuer.svg').default,
     description: (
       <>
         Entity or organization that issues digital credentials in a verifiable and tamper-proof format, for examples educational degrees, professional certifications or government-issued identification documents.

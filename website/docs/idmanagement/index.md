@@ -1,4 +1,4 @@
-# Identity Management
+# System for Cross-domain Identity Management
 
 The System for Cross-domain Identity Management (SCIM) protocol version 2.0 is utilized for managing the Identity.
 

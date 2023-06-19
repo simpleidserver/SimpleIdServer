@@ -18,7 +18,7 @@ const config = {
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'facebook', // Usually your GitHub org/user name.
+  organizationName: 'simpleidserver', // Usually your GitHub org/user name.
   projectName: 'simpleidserver', // Usually your repo name.
 
   onBrokenLinks: 'throw',
@@ -69,20 +69,22 @@ const config = {
           src: 'img/logo-no-shield.svg',
         },
         items: [
-          {
-            type: 'docSidebar',
-            sidebarId: 'documentationSidebar',
-            position: 'left',
-            label: 'Documentation',
-          },
-          {to: 'consultancy', label: 'Consultancy', position: 'left'},
-          {to: 'blog', label: 'Blog', position: 'left'},
+          { type: 'doc', docId: 'intro', label: 'Documentation', position: 'left' },
+          { type: 'doc', docId: 'consultancy', label: 'Consultancy', position: 'left' },
+          { type: 'doc', docId: 'tutorial/overview', label: 'Tutorial', position: 'left' },
+          { type: 'doc', docId: 'contactus', label: 'Contact us', position: 'left' },
+          /*{ to: 'blog', label: 'Blog', position: 'left'},*/
           {
             href: 'https://github.com/simpleidserver',
             label: 'GitHub',
             position: 'right',
           }
         ],
+      },      
+      docs: {
+        sidebar: {
+          hideable: true,
+        },
       },
       footer: {
         style: 'dark',
@@ -119,7 +121,7 @@ const config = {
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} Lokit - BEXXXXXXXXXX`,
+        copyright: `Copyright © ${new Date().getFullYear()} Lokit - BE0794.185.124`,
       },
       prism: {
         theme: lightCodeTheme,

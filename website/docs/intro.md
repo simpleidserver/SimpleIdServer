@@ -1,8 +1,6 @@
----
-sidebar_position: 1
----
-
 # Preparation
+
+## Template
 
 Install SimpleIdServer templates.
 
@@ -19,7 +17,7 @@ This will add the following templates
 | dotnet new scimef            | Create SCIM Server with EF support. By default, Entity Framework is configured to use SQLServer  |
 | dotnet new scimongodb        | Create SCIM Server with MongoDB support                                                          |
 
-## Create Visual Studio Solution
+### Create Visual Studio Solution
 
 Open a command prompt and execute the following commands to create the directory structure for the solution.
 
@@ -30,7 +28,7 @@ mkdir src
 dotnet new sln -n Quickstart
 ```
 
-## Create IdentityServer project
+### Create IdentityServer project
 
 To create a web project named `IdServer` with the `SimpleIdServer.IdServer` package installed and Entity Framework (EF) configured to use SQLServer, execute the command line :
 
@@ -67,13 +65,13 @@ By default, there is one administrator account configured. You can access their 
 * Login : administrator
 * Password : password
 
-## IdentityServer UI preview
+### IdentityServer UI preview
 
 The IdentityServer UI uses Bootstrap 5.
 
 ![IdentityServer](./images/IdentityServer-1.png)
 
-## Create IdentityServer website project
+### Create IdentityServer website project
 
 create a web project named `IdServerWebsite` with the `SimpleIdServer.IdServer.Website` package installed and Entity Framework (EF) configured to use SQLServer, execute the command line :
 
@@ -93,13 +91,13 @@ The IdentityServer website is now ready to be used.
 
 The website can be used to manage all aspects of an Identity Server solution, such as managing clients, users, and scopes.
 
-## Identity Server website UI preview
+### Identity Server website UI preview
 
 The IdentityServer website UI uses Radzen.
 
 ![IdentityServerWebsite](./images/IdentityServerWebsite-2.png)
 
-## SCIM Security
+### SCIM Security
 
 By default SCIM is configured to use API KEY authentication.
 For clients to perform any operation, they must include one of those keys in the `HTTP HEADER Authorization Bearer` field.
@@ -109,7 +107,7 @@ For clients to perform any operation, they must include one of those keys in the
 | IdServer | ba521b3b-02f7-4a37-b03c-58f713bf88e7 |
 | AzureAd  | 1595a72a-2804-495d-8a8a-2c861e7a736a |
 
-## Create SCIM project with EF support
+### Create SCIM project with EF support
 
 Create a web project named `ScimEF` with the `SimpleIdServer.Scim.Persistence.EF` package installed and Entity Framework (EF) configured to use SQLServer, execute the command line :
 
@@ -134,7 +132,7 @@ dotnet run --urls=http://localhost:5003
 
 Now that the SCIM server is running, you can check its Schemas endpoint by accessing [http://localhost:5003/Schemas](http://localhost:5003/Schemas).
 
-## Create SCIM project with MongoDB support
+### Create SCIM project with MongoDB support
 
 
 To create a web project named ScimMongoDB with the SimpleIdServer.Scim.Persistence.MongoDB package installed and MongoDB support, execute the command line :
@@ -160,7 +158,7 @@ dotnet run --urls=http://localhost:5003
 
 Now that the SCIM server is running, you can check its Schemas endpoint by accessing [http://localhost:5003/Schemas](http://localhost:5003/Schemas).
 
-# Running with docker
+## Running with docker
 
 To execute all the projects in Docker, execute the following commands :
 
