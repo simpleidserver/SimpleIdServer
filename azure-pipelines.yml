@@ -16,7 +16,7 @@ steps:
   displayName: 'Install Node.js'
 
 - script: |
-    workingDirectory: $(Agent.BuildDirectory)\website
     npm install
     npm run build
+  workingDirectory: $(Agent.BuildDirectory)\website
   displayName: 'npm install and build'
