@@ -39,6 +39,9 @@ namespace SimpleIdServer.IdServer.Helpers
         Task<string> AddAuthorizationCode(JsonObject originalRequest, string grantId, double validityPeriodsInSeconds, CancellationToken cancellationToken);
         Task<AuthCode> GetAuthorizationCode(string code, CancellationToken cancellationToken);
         Task RemoveAuthorizationCode(string code, CancellationToken cancellationToken);
+        Task AddPreAuthCode(string preAuthorizationCode, string pin, string clientId, string userId, double validityPeriodsInSeconds, CancellationToken cancellationToken);
+        Task<PreAuthCode> GetPreAuthCode(string preAuthorizationCode, CancellationToken cancellationToken);
+        Task RemovePreAuthCode(string preAuthorizationCode, CancellationToken cancellationToken);
     }
 
     public class AuthCode
@@ -234,6 +237,59 @@ namespace SimpleIdServer.IdServer.Helpers
         public Task RemoveAuthorizationCode(string code, CancellationToken cancellationToken)
         {
             return _distributedCache.RemoveAsync(code, cancellationToken);
+        }
+
+        #endregion
+
+        #region Pre Authorization Code
+
+        public async Task AddPreAuthCode(string preAuthorizationCode, string pin, string clientId, string userId, double validityPeriodsInSeconds, CancellationToken cancellationToken)
+        {
+            var credOffer = new PreAuthCode { ClientId = clientId, Pin = pin, Code = preAuthorizationCode, UserId = userId };
+            var serializedCredOffer = JsonSerializer.Serialize(credOffer);
+            await _distributedCache.SetAsync(preAuthorizationCode, Encoding.UTF8.GetBytes(serializedCredOffer), new DistributedCacheEntryOptions
+            {
+                SlidingExpiration = TimeSpan.FromSeconds(validityPeriodsInSeconds)
+            }, cancellationToken);
+        }
+
+        public Task RemovePreAuthCode(string preAuthorizationCode, CancellationToken cancellationToken) => _distributedCache.RemoveAsync(preAuthorizationCode, cancellationToken);
+
+        public async Task<PreAuthCode> GetPreAuthCode(string preAuthorizationCode, CancellationToken cancellationToken)
+        {
+            var cachedToken = await _distributedCache.GetAsync(preAuthorizationCode, cancellationToken);
+            if (cachedToken == null) return null;
+            return JsonSerializer.Deserialize<PreAuthCode>(Encoding.UTF8.GetString(cachedToken));
+        }
+
+        #endregion
+
+        #region Device Code
+
+        public async Task AddAuthDeviceCode(string deviceCode, string userCode, string clientId, IEnumerable<string> scopes, double validityPeriodsInSeconds, CancellationToken cancellationToken)
+        {
+            var devCode = new DeviceAuthCode { DeviceCode = deviceCode, UserCode = userCode, ClientId = clientId, Scopes = scopes };
+            var json = JsonSerializer.Serialize(devCode);
+            await _distributedCache.SetAsync(deviceCode, Encoding.UTF8.GetBytes(json), new DistributedCacheEntryOptions
+            {
+                SlidingExpiration = TimeSpan.FromSeconds(validityPeriodsInSeconds)
+            }, cancellationToken);
+            await _distributedCache.SetAsync(userCode, Encoding.UTF8.GetBytes(json), new DistributedCacheEntryOptions
+            {
+                SlidingExpiration = TimeSpan.FromSeconds(validityPeriodsInSeconds)
+            }, cancellationToken);
+        }
+
+        public async Task<DeviceAuthCode> GetAuthDeviceCode(string code, CancellationToken cancellationToken)
+        {
+            var cachedToken = await _distributedCache.GetAsync(code, cancellationToken);
+            if (cachedToken == null) return null;
+            return JsonSerializer.Deserialize<DeviceAuthCode>(Encoding.UTF8.GetString(cachedToken));
+        }
+
+        public async Task<DeviceAuthCode> UpdateAuthDeviceCode(DeviceAuthCode authCode)
+        {
+            return null;
         }
 
         #endregion

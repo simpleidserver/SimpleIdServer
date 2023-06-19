@@ -197,7 +197,7 @@ Scenario: Use 'urn:openid:params:grant-type:ciba' grant type to get an identity 
 	| client_id                 | fortyNineClient  |
 	| client_secret             | password         |
 	| scope                     | admin calendar   |
-	| login_hint                | user             |
+	| login_hint                | user             |	
 	| user_code                 | password         |
 
 	And extract JSON from body
@@ -324,7 +324,7 @@ Scenario: Use 'urn:ietf:params:oauth:grant-type:uma-ticket' grant type to get an
 
 	And execute HTTP POST JSON request 'http://localhost/rreguri'
 	| Key             | Value                 |
-	| resource_scopes | [scope1,scope2]       |
+	| resource_scopes | ["scope1","scope2"]   |
 	| subject         | user1                 |
 	| icon_uri        | icon                  |
 	| name#fr         | nom                   |
@@ -345,7 +345,7 @@ Scenario: Use 'urn:ietf:params:oauth:grant-type:uma-ticket' grant type to get an
 	And execute HTTP POST JSON request 'http://localhost/perm'
 	| Key             | Value                 |
 	| resource_id     | $_id$                 |
-	| resource_scopes | [scope1,scope2]       |
+	| resource_scopes | ["scope1","scope2"]   |
 	| Authorization   | Bearer $access_token$ |
 	
 	And extract JSON from body
@@ -417,3 +417,58 @@ Scenario: Use 'urn:openid:params:grant-type:ciba' grant type to get an identity 
 	Then HTTP status code equals to '200'
 	And JWT has authorization_details type 'secondDetails'
 	And JWT has authorization_details action 'read'
+
+Scenario: Use 'urn:ietf:params:oauth:grant-type:pre-authorized_code' grant type to get an access token with authorization details
+	Given authenticate a user
+
+	When execute HTTP POST JSON request 'http://localhost/credential_offer/share'
+	| Key                    | Value             |
+	| wallet_client_id       | fiftyNineClient   |
+	| credential_template_id | credTemplate      |
+
+	And extract query parameters into JSON
+	And extract query parameter 'credential_offer' into JSON
+	And extract parameter '$.grants.urn:ietf:params:oauth:grant-type:pre-authorized_code.pre-authorized_code' from JSON body into 'preAuthorizedCode'
+
+	And execute HTTP POST request 'https://localhost:8080/token'
+	| Key                     | Value                                                                                                                        |
+	| grant_type              | urn:ietf:params:oauth:grant-type:pre-authorized_code                                                                         |
+	| client_id               | fiftyNineClient                                                                                                              |
+	| pre-authorized_code     | $preAuthorizedCode$                                                                                                          |
+	| authorization_details   |  { "type" : "openid_credential", "format": "jwt_vc_json", "types": [ "VerifiableCredential", "UniversityDegreeCredential"] } |
+	
+	And extract JSON from body
+	And extract parameter 'access_token' from JSON body
+	And extract payload from JWT '$access_token$'
+
+	Then HTTP status code equals to '200'
+	And JWT has authorization_details type 'openid_credential'
+	And JSON exists 'c_nonce'	
+	And JSON exists 'c_nonce_expires_in'	
+
+Scenario: Use 'urn:ietf:params:oauth:grant-type:device_code' grant type to get an access token
+	Given authenticate a user
+
+	When execute HTTP POST request 'https://localhost:8080/device_authorization'
+	| Key           | Value			 |
+	| client_id     | sixtyOneClient |
+	| scope         | admin          |
+
+	And extract JSON from body	
+	And extract parameter 'device_code' from JSON body
+	And extract parameter 'user_code' from JSON body
+
+	And execute HTTP POST request 'https://localhost:8080/Device'
+	| Key      | Value       |
+	| UserCode | $user_code$ |
+	
+	When execute HTTP POST request 'https://localhost:8080/token'
+	| Key           | Value        			                       |
+	| grant_type    | urn:ietf:params:oauth:grant-type:device_code |
+	| client_id     | sixtyOneClient                               |
+	| client_secret | password                                     |
+	| device_code   | $device_code$                                |
+	
+	And extract JSON from body
+
+	Then HTTP status code equals to '200'

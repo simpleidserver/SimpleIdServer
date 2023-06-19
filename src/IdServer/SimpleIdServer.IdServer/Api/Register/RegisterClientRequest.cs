@@ -130,6 +130,9 @@ namespace SimpleIdServer.IdServer.Api.Register
         [JsonPropertyName(OAuthClientParameters.AuthorizationEncryptedResponseEnc)]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? AuthorizationEncryptedResponseEnc { get; set; } = null;
+        [BindProperty(Name = OAuthClientParameters.CredentialOfferEndpoint)]
+        [JsonPropertyName(OAuthClientParameters.CredentialOfferEndpoint)]
+        public string? CredentialOfferEndpoint { get; set; } = null;
         [JsonPropertyName(OAuthClientParameters.AuthorizationDataTypes)]
         public ICollection<string> AuthorizationDataTypes { get; set; } = new List<string>();
         [JsonIgnore]
@@ -208,6 +211,8 @@ namespace SimpleIdServer.IdServer.Api.Register
 
             if (AuthorizationDataTypes != null && AuthorizationDataTypes.Any())
                 client.AuthorizationDataTypes = AuthorizationDataTypes;
+
+            client.CredentialOfferEndpoint = CredentialOfferEndpoint;
         }
     }
 }

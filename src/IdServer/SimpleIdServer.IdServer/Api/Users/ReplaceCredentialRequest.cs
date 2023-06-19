@@ -8,7 +8,7 @@ namespace SimpleIdServer.IdServer.Api.Users
     public class ReplaceCredentialRequest
     {
         /// <summary>
-        /// Type of credential for example : pwd, otp.
+        /// Types of credential for example : pwd, otp.
         /// </summary>
         [JsonPropertyName(UserCredentialNames.Type)]
         public string Type { get; set; }

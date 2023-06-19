@@ -2,10 +2,14 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.Did.Extensions;
+using SimpleIdServer.Did.Jwt;
+using SimpleIdServer.OAuth.Host.Acceptance.Tests;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 using TechTalk.SpecFlow;
 
 namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps

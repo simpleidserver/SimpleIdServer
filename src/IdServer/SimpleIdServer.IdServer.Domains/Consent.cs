@@ -113,15 +113,33 @@ namespace SimpleIdServer.IdServer.Domains
                 {
                     var newAuthData = authorizationDetails.FirstOrDefault(s => s.Type == existingAuthData.Type);
                     if (newAuthData == null) continue;
-                    var unknownLocations = newAuthData.Locations.Where(l => !existingAuthData.Locations.Contains(l));
-                    foreach (var unknownLocation in unknownLocations)
-                        existingAuthData.Locations.Add(unknownLocation);
-                    var unknownActions = newAuthData.Actions.Where(a => !existingAuthData.Actions.Contains(a));
-                    foreach (var unknownAction in unknownActions)
-                        existingAuthData.Actions.Add(unknownAction);
-                    var unknownDataTypes = newAuthData.DataTypes.Where(a => !existingAuthData.DataTypes.Contains(a));
-                    foreach (var unknownDataType in unknownDataTypes)
-                        existingAuthData.DataTypes.Add(unknownDataType);
+                    if(newAuthData.Locations != null)
+                    {
+                        var unknownLocations = newAuthData.Locations.Where(l => !existingAuthData.Locations.Contains(l));
+                        foreach (var unknownLocation in unknownLocations)
+                            existingAuthData.AddLocation(unknownLocation);
+                    }
+
+                    if(newAuthData.Actions != null)
+                    {
+                        var unknownActions = newAuthData.Actions.Where(a => !existingAuthData.Actions.Contains(a));
+                        foreach (var unknownAction in unknownActions)
+                            existingAuthData.AddAction(unknownAction);
+                    }
+
+                    if(newAuthData.DataTypes != null)
+                    {
+                        var unknownDataTypes = newAuthData.DataTypes.Where(a => !existingAuthData.DataTypes.Contains(a));
+                        foreach (var unknownDataType in unknownDataTypes)
+                            existingAuthData.AddDataType(unknownDataType);
+                    }
+
+                    if(newAuthData.AdditionalData != null)
+                    {
+                        var unknownAddsData = newAuthData.AdditionalData.Where(t => !existingAuthData.AdditionalData.Any(kvp => kvp.Key == t.Key && kvp.Value == t.Value));
+                        foreach (var unknownAddData in unknownAddsData)
+                            existingAuthData.AddAdditionalData(unknownAddData.Key, unknownAddData.Value);
+                    }
                 }
 
                 AuthorizationDetails = newAuthorizationDetails;

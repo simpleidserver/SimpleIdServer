@@ -28,6 +28,7 @@ namespace SimpleIdServer.IdServer
             public const string Registration = "register";
             public const string OAuthConfiguration = ".well-known/oauth-authorization-server";
             public const string OpenIDConfiguration = ".well-known/openid-configuration";
+            public const string IdServerConfiguration = ".well-known/idserver-configuration";
             public const string UMAConfiguration = ".well-known/uma2-configuration";
             public const string Form = "form";
             public const string AuthSchemeProviders = "authschemeproviders";
@@ -47,6 +48,9 @@ namespace SimpleIdServer.IdServer
             public const string IdentityProvisioning = "provisioning";
             public const string PushedAuthorizationRequest = "par";
             public const string Users = "users";
+            public const string Networks = "networks";
+            public const string DeviceAuthorization = "device_authorization";
+            public const string AuthenticationClassReferences = "acrs";
         }
 
         public static List<string> AllStandardNotificationModes = new List<string>
@@ -172,7 +176,7 @@ namespace SimpleIdServer.IdServer
             public static ScopeClaimMapper BirthDate = ScopeClaimMapper.CreateOpenIdAttributeClaim(JwtRegisteredClaimNames.Birthdate, JwtRegisteredClaimNames.Birthdate, JwtRegisteredClaimNames.Birthdate);
             public static ScopeClaimMapper ZoneInfo = ScopeClaimMapper.CreateOpenIdAttributeClaim(UserClaims.ZoneInfo, UserClaims.ZoneInfo, UserClaims.ZoneInfo); 
             public static ScopeClaimMapper Locale = ScopeClaimMapper.CreateOpenIdAttributeClaim(UserClaims.Locale, UserClaims.Locale, UserClaims.Locale);
-            public static ScopeClaimMapper Address = ScopeClaimMapper.CreateOpenIdAddressClaim(UserClaims.Address);
+            public static List<ScopeClaimMapper> Address = ScopeClaimMapper.CreateOpenIdAddressClaim();
             public static ScopeClaimMapper PhoneNumber = ScopeClaimMapper.CreateOpenIdAttributeClaim(JwtRegisteredClaimNames.PhoneNumber, JwtRegisteredClaimNames.PhoneNumber, JwtRegisteredClaimNames.PhoneNumber);
             public static ScopeClaimMapper PhoneNumberVerified = ScopeClaimMapper.CreateOpenIdAttributeClaim(JwtRegisteredClaimNames.PhoneNumberVerified, JwtRegisteredClaimNames.PhoneNumberVerified, JwtRegisteredClaimNames.PhoneNumberVerified, TokenClaimJsonTypes.BOOLEAN);
             public static ScopeClaimMapper Role = ScopeClaimMapper.CreateOpenIdAttributeClaimArray(UserClaims.Role, UserClaims.Role, UserClaims.Role);
@@ -256,7 +260,7 @@ namespace SimpleIdServer.IdServer
                     StandardClaims.Locale,
                     StandardClaims.UpdatedAt
                 },
-                Realms = new List<Realm>
+                Realms = new List<Domains.Realm>
                 {
                     StandardRealms.Master
                 },
@@ -275,7 +279,7 @@ namespace SimpleIdServer.IdServer
                     StandardClaims.Email,
                     StandardClaims.EmailVerified
                 },
-                Realms = new List<Realm>
+                Realms = new List<Domains.Realm>
                 {
                     StandardRealms.Master
                 },
@@ -289,11 +293,8 @@ namespace SimpleIdServer.IdServer
             {
                 Id = Guid.NewGuid().ToString(),
                 Name = "address",
-                ClaimMappers = new List<ScopeClaimMapper>
-                {
-                    StandardClaims.Address
-                },
-                Realms = new List<Realm>
+                ClaimMappers = StandardClaims.Address,
+                Realms = new List<Domains.Realm>
                 {
                     StandardRealms.Master
                 },
@@ -312,7 +313,7 @@ namespace SimpleIdServer.IdServer
                     StandardClaims.PhoneNumber,
                     StandardClaims.PhoneNumberVerified
                 },
-                Realms = new List<Realm>
+                Realms = new List<Domains.Realm>
                 {
                     StandardRealms.Master
                 },
@@ -330,7 +331,7 @@ namespace SimpleIdServer.IdServer
                 {
                     StandardClaims.Role
                 },
-                Realms = new List<Realm>
+                Realms = new List<Domains.Realm>
                 {
                     StandardRealms.Master
                 },
@@ -348,7 +349,7 @@ namespace SimpleIdServer.IdServer
                 {
                     StandardClaims.Subject
                 },
-                Realms = new List<Realm>
+                Realms = new List<Domains.Realm>
                 {
                     StandardRealms.Master
                 },
@@ -377,7 +378,7 @@ namespace SimpleIdServer.IdServer
                 {
                     StandardClaims.ScimId
                 },
-                Realms = new List<Realm>
+                Realms = new List<Domains.Realm>
                 {
                     StandardRealms.Master
                 },
@@ -390,7 +391,7 @@ namespace SimpleIdServer.IdServer
                 Id = Guid.NewGuid().ToString(),
                 Type = ScopeTypes.IDENTITY,
                 Name = "grant_management_query",
-                Realms = new List<Realm>
+                Realms = new List<Domains.Realm>
                 {
                     StandardRealms.Master
                 },
@@ -404,7 +405,7 @@ namespace SimpleIdServer.IdServer
                 Id = Guid.NewGuid().ToString(),
                 Type = ScopeTypes.IDENTITY,
                 Name = "grant_management_revoke",
-                Realms = new List<Realm>
+                Realms = new List<Domains.Realm>
                 {
                     StandardRealms.Master
                 },
@@ -418,7 +419,7 @@ namespace SimpleIdServer.IdServer
                 Id = Guid.NewGuid().ToString(),
                 Type = ScopeTypes.IDENTITY,
                 Name = "uma_protection",
-                Realms = new List<Realm>
+                Realms = new List<Domains.Realm>
                 {
                     StandardRealms.Master
                 },
@@ -432,7 +433,7 @@ namespace SimpleIdServer.IdServer
                 Id = Guid.NewGuid().ToString(),
                 Type = ScopeTypes.APIRESOURCE,
                 Name = "users",
-                Realms = new List<Realm>
+                Realms = new List<Domains.Realm>
                 {
                     StandardRealms.Master
                 },
@@ -446,7 +447,7 @@ namespace SimpleIdServer.IdServer
                 Id = Guid.NewGuid().ToString(),
                 Type = ScopeTypes.APIRESOURCE,
                 Name = "register",
-                Realms = new List<Realm>
+                Realms = new List<Domains.Realm>
                 {
                     StandardRealms.Master
                 },
@@ -460,7 +461,7 @@ namespace SimpleIdServer.IdServer
                 Id = Guid.NewGuid().ToString(),
                 Type = ScopeTypes.IDENTITY,
                 Name = "saml_profile",
-                Realms = new List<Realm>
+                Realms = new List<Domains.Realm>
                 {
                     StandardRealms.Master
                 },
@@ -474,26 +475,86 @@ namespace SimpleIdServer.IdServer
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
+            public static Scope Provisioning = new Scope
+            {
+                Id = Guid.NewGuid().ToString(),
+                Type = ScopeTypes.APIRESOURCE,
+                Name = "provisioning",
+                Realms = new List<Domains.Realm>
+                {
+                    StandardRealms.Master
+                },
+                Protocol = ScopeProtocols.OAUTH,
+                IsExposedInConfigurationEdp = true,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
+            };
+            public static Scope Networks = new Scope
+            {
+                Id = Guid.NewGuid().ToString(),
+                Type = ScopeTypes.APIRESOURCE,
+                Name = "networks",
+                Realms = new List<Domains.Realm>
+                {
+                    StandardRealms.Master
+                },
+                Protocol = ScopeProtocols.OAUTH,
+                IsExposedInConfigurationEdp = true,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
+            };
+            public static Scope CredentialOffer = new Scope
+            {
+                Id = Guid.NewGuid().ToString(),
+                Type = ScopeTypes.APIRESOURCE,
+                Name = "credential_offer",
+                Realms = new List<Domains.Realm>
+                {
+                    StandardRealms.Master
+                },
+                Protocol = ScopeProtocols.OAUTH,
+                IsExposedInConfigurationEdp = true,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
+            };
+            public static Scope Acrs = new Scope
+            {
+                Id = Guid.NewGuid().ToString(),
+                Type = ScopeTypes.APIRESOURCE,
+                Name = "acrs",
+                Realms = new List<Domains.Realm>
+                {
+                    StandardRealms.Master
+                },
+                Protocol = ScopeProtocols.OAUTH,
+                IsExposedInConfigurationEdp = true,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
+            };
         }
 
         public static class StandardAcrs
         {
             public static AuthenticationContextClassReference FirstLevelAssurance = new AuthenticationContextClassReference
             {
+                Id = Guid.NewGuid().ToString(),
                 AuthenticationMethodReferences = new[] { Areas.Password },
                 Name = "sid-load-01",
                 DisplayName = "First level of assurance",
-                Realms = new List<Realm>
+                UpdateDateTime = DateTime.UtcNow,
+                Realms = new List<Domains.Realm>
                 {
                     StandardRealms.Master
                 }
             };
             public static AuthenticationContextClassReference IapSilver = new AuthenticationContextClassReference
             {
+                Id = Guid.NewGuid().ToString(),
                 AuthenticationMethodReferences = new[] { Areas.Password },
                 Name = "urn:mace:incommon:iap:silver",
                 DisplayName = "Silver",
-                Realms = new List<Realm>
+                UpdateDateTime = DateTime.UtcNow,
+                Realms = new List<Domains.Realm>
                 {
                     StandardRealms.Master
                 }
@@ -502,7 +563,7 @@ namespace SimpleIdServer.IdServer
 
         public static class StandardRealms
         {
-            public static Realm Master = new Realm
+            public static Domains.Realm Master = new Domains.Realm
             {
                 Name = Constants.DefaultRealm,
                 CreateDateTime = DateTime.UtcNow,
@@ -529,15 +590,16 @@ namespace SimpleIdServer.IdServer
         public const string DefaultExternalCookieAuthenticationScheme = "ExternalCookies";
         public const string DefaultCertificateAuthenticationScheme = "Certificate";
         public static string AuthorizationHeaderName = "Authorization";
-        public const string Prefix = "prefix";
         /// <summary>
         /// Direct use of a shared symmetric key as the CEK.
         /// </summary>
         public const string AlgDir = "dir";
-        public const string DefaultRealm = "master";
-        public const string DefaultRealmCookieName = "CurrentRealm";
         public const string ParFormatKey = "urn:ietf:params:oauth:request_uri";
         public const string IdProviderSeparator = ";";
         public const string LDAPDistinguishedName = "LDAP_DISTINGUISHEDNAME";
+        public const string DefaultNotificationMode = "console";
+        public const string DefaultRealm = "master";
+        public const string DefaultRealmCookieName = "CurrentRealm";
+        public const string Prefix = "prefix";
     }
 }

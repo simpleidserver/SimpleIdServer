@@ -30,6 +30,22 @@ namespace SimpleIdServer.IdServer.Options
         /// </summary>
         public int AuthorizationCodeExpirationInSeconds { get; set; } = 600;
         /// <summary>
+        /// Pre Authorization code expiration time in seconds.
+        /// </summary>
+        public int CredOfferExpirationInSeconds { get; set; } = 600;
+        /// <summary>
+        /// Device code expiration time in seconds.
+        /// </summary>
+        public int DeviceCodeExpirationInSeconds { get; set; } = 600;
+        /// <summary>
+        /// The minimum amount of time in seconds that the client SHOULD wait between polling requests to the token endpoint.
+        /// </summary>
+        public int DeviceCodeInterval { get; set; } = 5;
+        /// <summary>
+        /// Expiration time of the issuer state.
+        /// </summary>
+        public int AuthorizationCodeIssuerStateExpirationInSeconds { get; set; } = 600;
+        /// <summary>
         /// Trusted parties used to validate the software statement.
         /// </summary>
         public ICollection<SoftwareStatementTrustedParty> SoftwareStatementTrustedParties { get; set; } = new List<SoftwareStatementTrustedParty>();
@@ -186,6 +202,14 @@ namespace SimpleIdServer.IdServer.Options
         /// Destination folder where representations will be extracted.
         /// </summary>
         public string ExtractRepresentationsFolder { get; set; } = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Extraction");
+        /// <summary>
+        /// If the Credential Issuer is not the same than Authorization Server, then the authorization server must be specified.
+        /// </summary>
+        public string? WalletAuthorizationServer { get; set; } = null;
+        /// <summary>
+        /// Send credential offer by reference using credential_offer_uri parameter.
+        /// </summary>
+        public bool SendCredentialOfferByReference { get; set; } = false;
 
         public int GetIntParameter(string name) => int.Parse(Parameters[name]);
 

@@ -17,7 +17,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             IsLoading = isLoading;
         }
 
-        public IEnumerable<SelectableClient>? Clients { get; set; } = null;
+        public IEnumerable<SelectableClient>? Clients { get; set; }
         public int Count { get; set; } = 0;
         public bool IsLoading { get; set; } = true;
     }

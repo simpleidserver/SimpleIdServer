@@ -11,5 +11,6 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Helpers\SimpleIdServer.IdServer.Helpers.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.Vc\SimpleIdServer.Vc.csproj" />
 	</ItemGroup>
 </Project>

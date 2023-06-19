@@ -8,7 +8,7 @@ namespace SimpleIdServer.IdServer.Builders
 {
     public static class WsClientBuilder
     {
-        public static  WsFederationClientBuilder BuildWsFederationClient(string clientId, Realm realm = null)
+        public static  WsFederationClientBuilder BuildWsFederationClient(string clientId, Domains.Realm realm = null)
         {
             var client = new Client
             {

@@ -40,7 +40,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
 
         public RefreshTokenHandler(
             IRefreshTokenGrantTypeValidator refreshTokenGrantTypeValidator, 
-            IGrantedTokenHelper grantedTokenHelper, 
+            IGrantedTokenHelper grantedTokenHelper,
             IEnumerable<ITokenProfile> tokenProfiles,
             IEnumerable<ITokenBuilder> tokenBuilders, 
             IUserRepository userRepository,

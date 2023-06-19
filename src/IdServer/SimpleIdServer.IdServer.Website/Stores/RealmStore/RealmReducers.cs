@@ -11,7 +11,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.RealmStore
         #region RealmsState
 
         [ReducerMethod]
-        public static RealmsState ReduceGetAllRealmAction(RealmsState state, GetAllRealmAction act) => new(true, new List<Realm>());
+        public static RealmsState ReduceGetAllRealmAction(RealmsState state, GetAllRealmAction act) => new(true, new List<Domains.Realm>());
 
         [ReducerMethod]
         public static RealmsState ReduceGetAllRealmSuccessAction(RealmsState state, GetAllRealmSuccessAction act) => new(false, act.Realms);
@@ -50,7 +50,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.RealmStore
         public static RealmsState ReduceAddRealmSuccessAction(RealmsState state, AddRealmSuccessAction act)
         {
             var realms = state.Realms.ToList();
-            realms.Add(new Realm
+            realms.Add(new Domains.Realm
             {
                 Name= act.Name,
                 Description = act.Description,

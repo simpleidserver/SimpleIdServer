@@ -32,6 +32,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddScoped<NotificationService>();
             services.AddScoped<ContextMenuService>();
             services.AddScoped<TooltipService>();
+            services.AddSingleton<IWebsiteHttpClientFactory, WebsiteHttpClientFactory>();
+            services.AddDIDEthr();
             services.AddTransient<ICertificateAuthorityStore, CertificateAuthorityStore>();
             if (callbackOptions == null) services.Configure<IdServerWebsiteOptions>((o) => { });
             else services.Configure(callbackOptions);
@@ -50,9 +52,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 Environment.Exit(1);
             }
 
-            DefaultSecurityOptions? defaultSecurityOptions = configuration.GetSection(defaultSecurityOptionsSectionName)
-                .Get<DefaultSecurityOptions>();
-
+            DefaultSecurityOptions? defaultSecurityOptions = configuration.GetSection(defaultSecurityOptionsSectionName).Get<DefaultSecurityOptions>();
             if (defaultSecurityOptions == null)
             {
                 Console.WriteLine($"Please configure the '{defaultSecurityOptionsSectionName}' section.");
@@ -111,6 +111,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 config.FallbackPolicy = policyBuilder.Build();
             });
 
+            services.AddSingleton(defaultSecurityOptions);
             return services;
         }
     }

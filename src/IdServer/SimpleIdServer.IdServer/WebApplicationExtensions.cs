@@ -16,9 +16,7 @@ namespace Microsoft.AspNetCore.Builder
         {
             var opts = webApplication.Services.GetRequiredService<IOptions<IdServerHostOptions>>().Value;
             var usePrefix = opts.UseRealm;
-            if (usePrefix)
-                webApplication.UseMiddleware<RealmMiddleware>();
-
+            if(usePrefix) webApplication.UseMiddleware<RealmMiddleware>();
             webApplication.UseCookiePolicy(new CookiePolicyOptions
             {
                 Secure = Http.CookieSecurePolicy.Always
@@ -34,6 +32,10 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.MapControllerRoute("openidConfiguration",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.OpenIDConfiguration,
                 defaults: new { controller = "OpenIdConfiguration", action = "Get" });
+
+            webApplication.MapControllerRoute("idServerConfiguration",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdServerConfiguration,
+                defaults: new { controller = "IdServerConfiguration", action = "Get" });
 
             webApplication.MapControllerRoute("jwks",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Jwks,
@@ -182,6 +184,9 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.MapControllerRoute("replaceCredential",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/credentials",
                 defaults: new { controller = "Users", action = "ReplaceCredential" });
+            webApplication.MapControllerRoute("generateDecentralizedIdentity",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/did",
+                defaults: new { controller = "Users", action = "GenerateDecentralizedIdentity" });
 
             webApplication.MapControllerRoute("extractRepresentations",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{name}/{id}/enqueue",
@@ -189,6 +194,34 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.MapControllerRoute("importRepresentations",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/import",
                 defaults: new { controller = "IdentityProvisioning", action = "Import" });
+
+
+            webApplication.MapControllerRoute("getAllNetworks",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Networks,
+                defaults: new { controller = "Networks", action = "GetAll" });
+            webApplication.MapControllerRoute("removeNetwork",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Networks + "/{name}",
+                defaults: new { controller = "Networks", action = "Remove" });
+            webApplication.MapControllerRoute("addNetwork",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Networks,
+                defaults: new { controller = "Networks", action = "Add" });
+            webApplication.MapControllerRoute("deployContract",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Networks + "/{name}/deploy",
+                defaults: new { controller = "Networks", action = "Deploy" });
+
+            webApplication.MapControllerRoute("deviceAuthorization",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.DeviceAuthorization,
+                defaults: new { controller = "DeviceAuthorization", action = "Post" });
+
+            webApplication.MapControllerRoute("getAllAmrs",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationClassReferences,
+                defaults: new { controller = "AuthenticationClassReferences", action = "GetAll" });
+            webApplication.MapControllerRoute("addAmr",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationClassReferences,
+                defaults: new { controller = "AuthenticationClassReferences", action = "Add" });
+            webApplication.MapControllerRoute("deleteAmr",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationClassReferences + "/{id}",
+                defaults: new { controller = "AuthenticationClassReferences", action = "Delete" });
 
             webApplication.MapControllerRoute(
                 name: "defaultWithArea",

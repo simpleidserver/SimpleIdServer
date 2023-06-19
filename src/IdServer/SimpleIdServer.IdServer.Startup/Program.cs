@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer;
+using SimpleIdServer.IdServer.CredentialIssuer;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Startup;
@@ -44,7 +45,8 @@ var app = builder.Build();
 SeedData(app, builder.Configuration["SCIMBaseUrl"]);
 app.UseCors("AllowAll");
 app.UseSID()
-    .UseWsFederation();
+    .UseWsFederation()
+    .UseCredentialIssuer();
 app.Run();
 
 void RunSqlServerIdServer(IServiceCollection services)
@@ -59,6 +61,7 @@ void RunSqlServerIdServer(IServiceCollection services)
                 o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
             });
         })
+        .AddCredentialIssuer()
         .UseInMemoryMassTransit()
         .AddBackChannelAuthentication()
         .AddEmailAuthentication()
@@ -97,6 +100,8 @@ void RunSqlServerIdServer(IServiceCollection services)
                 opts.Scope.Add("profile");
             });
         });
+    services.AddDIDKey();
+    services.AddDIDEthr();
 }
 
 void SeedData(WebApplication application, string scimBaseUrl)
@@ -152,9 +157,11 @@ void SeedData(WebApplication application, string scimBaseUrl)
                 dbContext.Acrs.Add(SimpleIdServer.IdServer.Constants.StandardAcrs.IapSilver);
                 dbContext.Acrs.Add(new SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference
                 {
+                    Id = Guid.NewGuid().ToString(),
                     Name = "email",
                     AuthenticationMethodReferences = new[] { "email" },
                     DisplayName = "Email authentication",
+                    UpdateDateTime = DateTime.UtcNow,
                     Realms = new List<Realm>
                     {
                         SimpleIdServer.IdServer.Constants.StandardRealms.Master
@@ -162,9 +169,11 @@ void SeedData(WebApplication application, string scimBaseUrl)
                 });
                 dbContext.Acrs.Add(new SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference
                 {
+                    Id = Guid.NewGuid().ToString(),
                     Name = "sms",
                     AuthenticationMethodReferences = new[] { "sms" },
                     DisplayName = "Sms authentication",
+                    UpdateDateTime = DateTime.UtcNow,
                     Realms = new List<Realm>
                     {
                         SimpleIdServer.IdServer.Constants.StandardRealms.Master
@@ -172,15 +181,28 @@ void SeedData(WebApplication application, string scimBaseUrl)
                 });
                 dbContext.Acrs.Add(new SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference
                 {
+                    Id = Guid.NewGuid().ToString(),
                     Name = "pwd-email",
                     AuthenticationMethodReferences = new[] { "pwd", "email" },
                     DisplayName = "Password and email authentication",
+                    UpdateDateTime = DateTime.UtcNow,
                     Realms = new List<Realm>
                     {
                         SimpleIdServer.IdServer.Constants.StandardRealms.Master
                     }
                 });
             }
+
+            if (!dbContext.Networks.Any())
+                dbContext.Networks.Add(new SimpleIdServer.IdServer.Domains.NetworkConfiguration
+                {
+                    Name = "sepolia",
+                    RpcUrl = "https://rpc.sepolia.org",
+                    ContractAdr = SimpleIdServer.Did.Ethr.Constants.DefaultContractAdr,
+                    PrivateAccountKey = "0fda34d0029c91481b1f54b0b68efea94c4572c80b2902cb3a2ab722b41fc1e1",
+                    UpdateDateTime = DateTime.UtcNow,
+                    CreateDateTime = DateTime.UtcNow
+                });
 
             var dbConnection = dbContext.Database.GetDbConnection() as SqlConnection;
             if(dbConnection != null)

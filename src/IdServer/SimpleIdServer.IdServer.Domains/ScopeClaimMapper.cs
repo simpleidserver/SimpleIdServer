@@ -1,54 +1,29 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-
 using SimpleIdServer.IdServer.Domains.DTOs;
 using System.Security.Claims;
 
 namespace SimpleIdServer.IdServer.Domains
 {
-    public class ScopeClaimMapper
+    public class ScopeClaimMapper : IClaimMappingRule
     {
         public ScopeClaimMapper() { }
 
         public string Id { get; set; } = null!;
         public string Name { get; set; } = null!;
-        public ScopeClaimMapperTypes MapperType { get; set; }
+        public MappingRuleTypes MapperType { get; set; }
         /// <summary>
         /// User's attribute name.
         /// </summary>
-        public string? UserAttributeName { get; set; } = null;
-        /// <summary>
-        /// User's attribute name for the street.
-        /// </summary>
-        public string? UserAttributeStreetName { get; set; } = null;
-        /// <summary>
-        /// User's attribute name for the locality.
-        /// </summary>
-        public string? UserAttributeLocalityName { get; set; } = null;
-        /// <summary>
-        /// User's attribute name for the region.
-        /// </summary>
-        public string? UserAttributeRegionName { get; set; } = null;
-        /// <summary>
-        /// User's attribute name for the postal code.
-        /// </summary>
-        public string? UserAttributePostalCodeName { get; set; } = null;
-        /// <summary>
-        /// User's attribute name for the country.
-        /// </summary>
-        public string? UserAttributeCountryName { get; set; } = null;
-        /// <summary>
-        /// User's attribute name for the formatted address..
-        /// </summary>
-        public string? UserAttributeFormattedName { get; set; } = null;
+        public string? SourceUserAttribute { get; set; } = null;
         /// <summary>
         /// User's property name.
         /// </summary>
-        public string? UserPropertyName { get; set; } = null;
+        public string? SourceUserProperty { get; set; } = null;
         /// <summary>
         /// Name of the claim to insert in the token.
         /// </summary>
-        public string? TokenClaimName { get; set; } = null;
+        public string? TargetClaimPath { get; set; } = null;
         /// <summary>
         /// SAML Attribute name.
         /// </summary>
@@ -67,28 +42,76 @@ namespace SimpleIdServer.IdServer.Domains
             {
                 Id = Guid.NewGuid().ToString(),
                 Name = name,
-                MapperType = ScopeClaimMapperTypes.USERATTRIBUTE,
-                UserAttributeName = userAttributeName,
-                TokenClaimName = tokenClaimName,
+                MapperType = MappingRuleTypes.USERATTRIBUTE,
+                SourceUserAttribute = userAttributeName,
+                TargetClaimPath = tokenClaimName,
                 TokenClaimJsonType = claimJsonType
             };
         }
 
-        public static ScopeClaimMapper CreateOpenIdAddressClaim(string name)
+        public static List<ScopeClaimMapper> CreateOpenIdAddressClaim()
         {
-            return new ScopeClaimMapper
+            return CreateOpenIdAddressClaim(AddressClaimNames.Street, AddressClaimNames.Locality, AddressClaimNames.Region, AddressClaimNames.PostalCode, AddressClaimNames.Country, AddressClaimNames.Formatted);
+        }
+
+        public static List<ScopeClaimMapper> CreateOpenIdAddressClaim(string street, string locality, string region, string postalCode, string country, string formatted)
+        {
+            return new List<ScopeClaimMapper>
             {
-                Id = Guid.NewGuid().ToString(),
-                Name = name,
-                MapperType = ScopeClaimMapperTypes.ADDRESS,
-                TokenClaimName = name,
-                TokenClaimJsonType = TokenClaimJsonTypes.JSON,
-                UserAttributeStreetName = AddressClaimNames.Street,
-                UserAttributeLocalityName = AddressClaimNames.Locality,
-                UserAttributeRegionName = AddressClaimNames.Region,
-                UserAttributePostalCodeName = AddressClaimNames.PostalCode,
-                UserAttributeCountryName = AddressClaimNames.Country,
-                UserAttributeFormattedName = AddressClaimNames.Formatted
+                new ScopeClaimMapper
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Street",
+                    MapperType = MappingRuleTypes.USERATTRIBUTE,
+                    SourceUserAttribute = AddressClaimNames.Street,
+                    TargetClaimPath = $"address.{AddressClaimNames.Street}",
+                    TokenClaimJsonType = TokenClaimJsonTypes.STRING
+                },
+                new ScopeClaimMapper
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Locality",
+                    MapperType = MappingRuleTypes.USERATTRIBUTE,
+                    SourceUserAttribute = AddressClaimNames.Locality,
+                    TargetClaimPath = $"address.{AddressClaimNames.Locality}",
+                    TokenClaimJsonType = TokenClaimJsonTypes.STRING
+                },
+                new ScopeClaimMapper
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Region",
+                    MapperType = MappingRuleTypes.USERATTRIBUTE,
+                    SourceUserAttribute = AddressClaimNames.Region,
+                    TargetClaimPath = $"address.{AddressClaimNames.Region}",
+                    TokenClaimJsonType = TokenClaimJsonTypes.STRING
+                },
+                new ScopeClaimMapper
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Postal code",
+                    MapperType = MappingRuleTypes.USERATTRIBUTE,
+                    SourceUserAttribute = AddressClaimNames.PostalCode,
+                    TargetClaimPath = $"address.{AddressClaimNames.PostalCode}",
+                    TokenClaimJsonType = TokenClaimJsonTypes.STRING
+                },
+                new ScopeClaimMapper
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Country",
+                    MapperType = MappingRuleTypes.USERATTRIBUTE,
+                    SourceUserAttribute = AddressClaimNames.Country,
+                    TargetClaimPath = $"address.{AddressClaimNames.Country}",
+                    TokenClaimJsonType = TokenClaimJsonTypes.STRING
+                },
+                new ScopeClaimMapper
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Formatted",
+                    MapperType = MappingRuleTypes.USERATTRIBUTE,
+                    SourceUserAttribute = AddressClaimNames.Formatted,
+                    TargetClaimPath = $"address.{AddressClaimNames.Formatted}",
+                    TokenClaimJsonType = TokenClaimJsonTypes.STRING
+                },
             };
         }
 
@@ -98,9 +121,9 @@ namespace SimpleIdServer.IdServer.Domains
             {
                 Id = Guid.NewGuid().ToString(),
                 Name = name,
-                MapperType = ScopeClaimMapperTypes.USERATTRIBUTE,
-                UserAttributeName = userAttributeName,
-                TokenClaimName = tokenClaimName,
+                MapperType = MappingRuleTypes.USERATTRIBUTE,
+                SourceUserAttribute = userAttributeName,
+                TargetClaimPath = tokenClaimName,
                 TokenClaimJsonType = claimJsonType,
                 IsMultiValued = true
             };
@@ -112,9 +135,9 @@ namespace SimpleIdServer.IdServer.Domains
             {
                 Id = Guid.NewGuid().ToString(),
                 Name = name,
-                MapperType = ScopeClaimMapperTypes.USERPROPERTY,
-                UserPropertyName = userPropertyName,
-                TokenClaimName = tokenClaimName,
+                MapperType = MappingRuleTypes.USERPROPERTY,
+                SourceUserProperty = userPropertyName,
+                TargetClaimPath = tokenClaimName,
                 TokenClaimJsonType = claimJsonType
             };
         }
@@ -125,8 +148,8 @@ namespace SimpleIdServer.IdServer.Domains
             {
                 Id = Guid.NewGuid().ToString(),
                 Name = "sub",
-                TokenClaimName = "sub",
-                MapperType = ScopeClaimMapperTypes.SUBJECT,
+                TargetClaimPath = "sub",
+                MapperType = MappingRuleTypes.SUBJECT,
             };
         }
 
@@ -136,8 +159,8 @@ namespace SimpleIdServer.IdServer.Domains
             {
                 Id = Guid.NewGuid().ToString(),
                 Name = "nameidentifier",
-                TokenClaimName = "sub",
-                MapperType = ScopeClaimMapperTypes.SUBJECT,
+                TargetClaimPath = "sub",
+                MapperType = MappingRuleTypes.SUBJECT,
                 SAMLAttributeName = ClaimTypes.NameIdentifier
             };
         }
@@ -148,29 +171,11 @@ namespace SimpleIdServer.IdServer.Domains
             {
                 Id = Guid.NewGuid().ToString(),
                 Name = name,
-                MapperType = ScopeClaimMapperTypes.USERPROPERTY,
-                UserPropertyName = userPropertyName,
+                MapperType = MappingRuleTypes.USERPROPERTY,
+                SourceUserProperty = userPropertyName,
                 SAMLAttributeName = samlClaimName,
                 TokenClaimJsonType = claimJsonType
             };
         }
-    }
-
-    public enum ScopeClaimMapperTypes
-    {
-        USERATTRIBUTE = 0,
-        USERPROPERTY = 1,
-        ADDRESS = 2,
-        SUBJECT = 3
-    }
-
-    public enum TokenClaimJsonTypes
-    {
-        STRING = 0,
-        LONG = 1,
-        INT = 2,
-        BOOLEAN = 3,
-        JSON = 4,
-        DATETIME = 5
     }
 }

@@ -37,7 +37,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IdServerHostOptions _options;
 
         public PasswordHandler(
-            IPasswordGrantTypeValidator passwordGrantTypeValidator, 
+            IPasswordGrantTypeValidator passwordGrantTypeValidator,
             IUserRepository userRepository, 
             IEnumerable<ITokenProfile> tokenProfiles,
             IEnumerable<ITokenBuilder> tokenBuilders, 

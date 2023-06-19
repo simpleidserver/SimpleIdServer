@@ -29,8 +29,8 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
 {
     public class AuthorizationCodeHandler : BaseCredentialsHandler
     {
-        private readonly IAuthorizationCodeGrantTypeValidator _authorizationCodeGrantTypeValidator;
         private readonly IGrantedTokenHelper _grantedTokenHelper;
+        private readonly IAuthorizationCodeGrantTypeValidator _authorizationCodeGrantTypeValidator;
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
         private readonly IUserRepository _userRepository;
@@ -40,8 +40,8 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly ILogger<AuthorizationCodeHandler> _logger;
 
         public AuthorizationCodeHandler(
+            IGrantedTokenHelper grantedTokenHelper,
             IAuthorizationCodeGrantTypeValidator authorizationCodeGrantTypeValidator, 
-            IGrantedTokenHelper grantedTokenHelper, 
             IEnumerable<ITokenProfile> tokenProfiles,
             IEnumerable<ITokenBuilder> tokenBuilders,
             IUserRepository usrRepository,
@@ -51,8 +51,8 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IOptions<IdServerHostOptions> options,
             ILogger<AuthorizationCodeHandler> logger) : base(clientAuthenticationHelper, options)
         {
-            _authorizationCodeGrantTypeValidator = authorizationCodeGrantTypeValidator;
             _grantedTokenHelper = grantedTokenHelper;
+            _authorizationCodeGrantTypeValidator = authorizationCodeGrantTypeValidator;
             _tokenProfiles = tokenProfiles;
             _tokenBuilders = tokenBuilders;
             _userRepository = usrRepository;
@@ -112,19 +112,18 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     var result = BuildResult(context, extractionResult.Scopes);
                     await Authenticate(previousRequest, context, cancellationToken);
                     context.SetOriginalRequest(previousRequest);
-
+                    var parameters = new BuildTokenParameter { AuthorizationDetails = extractionResult.AuthorizationDetails, Scopes = extractionResult.Scopes, Audiences = extractionResult.Audiences, Claims = claims, GrantId = authCode.GrantId };
                     foreach (var tokenBuilder in _tokenBuilders)
-                        await tokenBuilder.Build(new BuildTokenParameter { AuthorizationDetails = extractionResult.AuthorizationDetails, Scopes = extractionResult.Scopes, Audiences = extractionResult.Audiences, Claims = claims, GrantId = authCode.GrantId }, context, cancellationToken, true);
+                        await tokenBuilder.Build(parameters, context, cancellationToken, true);
 
                     _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? _options.DefaultTokenProfile)).Enrich(context);
                     foreach (var kvp in context.Response.Parameters)
-                    {
                         result.Add(kvp.Key, kvp.Value);
-                    }
 
                     if (!string.IsNullOrWhiteSpace(authCode.GrantId))
                         result.Add(TokenResponseParameters.GrantId, authCode.GrantId);
 
+                    await Enrich(context, result, cancellationToken);
                     await _busControl.Publish(new TokenIssuedSuccessEvent
                     {
                         GrantType = GRANT_TYPE,
@@ -162,6 +161,11 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     return BuildError(HttpStatusCode.BadRequest, ex.Code, ex.Message);
                 }
             }
+        }
+
+        protected virtual Task Enrich(HandlerContext handlerContext, JsonObject result, CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
         }
 
         async Task Authenticate(JsonObject previousQueryParameters, HandlerContext handlerContext, CancellationToken token)

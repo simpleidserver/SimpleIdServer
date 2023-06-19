@@ -54,7 +54,9 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
                             result.DataTypes = record.Value.AsArray().Select(v => v.GetValue<string>()).ToList();
                             break;
                         default:
-                            result.AdditionalData.Add(record.Key, record.Value.ToJsonString());
+                            var val = record.Value as JsonValue;
+                            if (val != null) result.AdditionalData.Add(record.Key, record.Value.GetValue<string>());
+                            else result.AdditionalData.Add(record.Key, record.Value.ToJsonString());
                             break;
                     }
                 }

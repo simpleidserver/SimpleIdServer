@@ -414,7 +414,7 @@ Scenario: web client must have a valid redirect_uri
 
 	And execute HTTP POST JSON request 'http://localhost/register'
 	| Key				                    | Value		              |
-	| redirect_uris		                    | [invalid]	              |
+	| redirect_uris		                    | ["invalid"]             |
 	| application_type	                    | web		              |
 	| Authorization                         | Bearer $access_token$   |
 
@@ -435,10 +435,10 @@ Scenario: redirect_uri cannot contains fragment
 	And extract parameter 'access_token' from JSON body	
 
 	And execute HTTP POST JSON request 'http://localhost/register'
-	| Key                                   | Value                     |
-	| redirect_uris                         | [http://localhost#foobar] |
-	| application_type                      | web                       |
-	| Authorization                         | Bearer $access_token$     |
+	| Key                                   | Value                       |
+	| redirect_uris                         | ["http://localhost#foobar"] |
+	| application_type                      | web                         |
+	| Authorization                         | Bearer $access_token$       |
 
 	And extract JSON from body
 
@@ -458,7 +458,7 @@ Scenario: native client must have a valid redirect_uri
 
 	And execute HTTP POST JSON request 'http://localhost/register'
 	| Key										| Value		                |
-	| redirect_uris								| [invalid]	                |
+	| redirect_uris								| ["invalid"]               |
 	| application_type							| native	                |
 	| Authorization                             | Bearer $access_token$     |
 
@@ -480,7 +480,7 @@ Scenario: redirect_uri must have https scheme
 
 	And execute HTTP POST JSON request 'http://localhost/register'
 	| Key			                            | Value				        |
-	| redirect_uris	                            | [http://localhost]        |
+	| redirect_uris	                            | ["http://localhost"]      |
 	| Authorization                             | Bearer $access_token$     |
 
 	And extract JSON from body
@@ -501,7 +501,7 @@ Scenario: web client cannot have redirect_uri pointing to localhost
 
 	And execute HTTP POST JSON request 'http://localhost/register'
 	| Key			| Value				        |
-	| redirect_uris	| [https://localhost]       |
+	| redirect_uris	| ["https://localhost"]     |
 	| Authorization | Bearer $access_token$     |
 
 	And extract JSON from body

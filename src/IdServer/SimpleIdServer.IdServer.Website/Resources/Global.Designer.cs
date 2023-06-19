@@ -61,6 +61,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Authentication Class Reference has been added.
+        /// </summary>
+        public static string AcrAdded {
+            get {
+                return ResourceManager.GetString("AcrAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à API Resource with the name &apos;{0}&apos; already exists.
         /// </summary>
         public static string ApiResourceAlreadyExists {
@@ -169,11 +178,101 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Credential offer has been added.
+        /// </summary>
+        public static string CredentialOfferAdded {
+            get {
+                return ResourceManager.GetString("CredentialOfferAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Credential subject has been added.
+        /// </summary>
+        public static string CredentialSubjectAdded {
+            get {
+                return ResourceManager.GetString("CredentialSubjectAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Credential template is added.
+        /// </summary>
+        public static string CredentialTemplateAdded {
+            get {
+                return ResourceManager.GetString("CredentialTemplateAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Display has been added.
+        /// </summary>
+        public static string CredentialTemplateDisplayAdded {
+            get {
+                return ResourceManager.GetString("CredentialTemplateDisplayAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The credential template with type &apos;{0}&apos; already exists.
+        /// </summary>
+        public static string CredentialTemplateExists {
+            get {
+                return ResourceManager.GetString("CredentialTemplateExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Credential types are updated.
+        /// </summary>
+        public static string CredentialTypesAreUpdated {
+            get {
+                return ResourceManager.GetString("CredentialTypesAreUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à DID has been generated.
+        /// </summary>
+        public static string DIDKeyCreated {
+            get {
+                return ResourceManager.GetString("DIDKeyCreated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Encryption key has been added.
         /// </summary>
         public static string EncKeyAdded {
             get {
                 return ResourceManager.GetString("EncKeyAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Ethereum contract has been deployed.
+        /// </summary>
+        public static string EthrContractDeployed {
+            get {
+                return ResourceManager.GetString("EthrContractDeployed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Ethereum network has been added.
+        /// </summary>
+        public static string EthrNetworkAdded {
+            get {
+                return ResourceManager.GetString("EthrNetworkAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The ethereum network {0} already exists.
+        /// </summary>
+        public static string EthrNetworkExists {
+            get {
+                return ResourceManager.GetString("EthrNetworkExists", resourceCulture);
             }
         }
         
@@ -484,6 +583,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Selected ACRS have been removed.
+        /// </summary>
+        public static string SelectedAcrsRemoved {
+            get {
+                return ResourceManager.GetString("SelectedAcrsRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Selected Certificate Authorities has been removed.
         /// </summary>
         public static string SelectedCertificateAuthoritiesRemoved {
@@ -534,6 +642,51 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string SelectedClientsRemoved {
             get {
                 return ResourceManager.GetString("SelectedClientsRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Selected credential offers have been removed.
+        /// </summary>
+        public static string SelectedCredentialOffersRemoved {
+            get {
+                return ResourceManager.GetString("SelectedCredentialOffersRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Selected credentials subjects are removed.
+        /// </summary>
+        public static string SelectedCredentialSubjectsRemoved {
+            get {
+                return ResourceManager.GetString("SelectedCredentialSubjectsRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Selected displays have been removed.
+        /// </summary>
+        public static string SelectedCredentialTemplateDisplaysRemoved {
+            get {
+                return ResourceManager.GetString("SelectedCredentialTemplateDisplaysRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Selected credential templates are removed.
+        /// </summary>
+        public static string SelectedCredentialTemplatesRemoved {
+            get {
+                return ResourceManager.GetString("SelectedCredentialTemplatesRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Selected ethereum networks have been removed.
+        /// </summary>
+        public static string SelectedEthrNetworksRemoved {
+            get {
+                return ResourceManager.GetString("SelectedEthrNetworksRemoved", resourceCulture);
             }
         }
         

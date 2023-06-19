@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.ClaimsEnricher;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
+using SimpleIdServer.IdServer.Extractors;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
@@ -28,7 +29,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
         private readonly IClaimsEnricher _claimsEnricher;
         private readonly IAmrHelper _amrHelper;
         private readonly IClaimsJwsPayloadEnricher _claimsJwsPayloadEnricher;
-        private readonly IClaimsExtractor _claimsExtractor;
+        private readonly IScopeClaimsExtractor _scopeClaimsExtractor;
 
         public IdTokenBuilder(
             IOptions<IdServerHostOptions> options,
@@ -36,14 +37,14 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
             IClaimsEnricher claimsEnricher,
             IAmrHelper amrHelper,
             IClaimsJwsPayloadEnricher claimsJwsPayloadEnricher,
-            IClaimsExtractor claimsExtractor)
+            IScopeClaimsExtractor scopeClaimsExtractor)
         {
             _options = options.Value;
             _jwtBuilder = jwtBuilder;
             _claimsEnricher = claimsEnricher;
             _amrHelper = amrHelper;
             _claimsJwsPayloadEnricher = claimsJwsPayloadEnricher;
-            _claimsExtractor = claimsExtractor;
+            _scopeClaimsExtractor = scopeClaimsExtractor;
         }
 
         public string Name => TokenResponseParameters.IdToken;
@@ -100,12 +101,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
             if (activeSession != null)
                 claims.Add(JwtRegisteredClaimNames.Sid, activeSession.SessionId);
 
-            var claimsDic = await _claimsExtractor.ExtractClaims(new ClaimsExtractionParameter
-            {
-                Protocol = ScopeProtocols.OPENID,
-                Context = currentContext,
-                Scopes = scopes
-            });
+            var claimsDic = await _scopeClaimsExtractor.ExtractClaims(currentContext, scopes, ScopeProtocols.OPENID);
             foreach (var claim in claimsDic)
                 claims.Add(claim.Key, claim.Value);
 

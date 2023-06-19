@@ -41,14 +41,11 @@
         <RadzenStepsItem Text="Create" Disabled="@(SelectedMapperType == null)">
             @switch(SelectedMapperType.Type)
             {
-                case ScopeClaimMapperTypes.USERATTRIBUTE:
+                case MappingRuleTypes.USERATTRIBUTE:
                     <UserAttributeScopeMapper ScopeMapperSaved="AddScopeMapper" Scope="@Scope" IsEditModeEnabled="false"></UserAttributeScopeMapper>
                     break;
-                case ScopeClaimMapperTypes.USERPROPERTY:
+                case MappingRuleTypes.USERPROPERTY:
                     <UserPropertyScopeMapper ScopeMapperSaved="AddScopeMapper" Scope="@Scope" IsEditModeEnabled="false"></UserPropertyScopeMapper>
-                    break;
-                case ScopeClaimMapperTypes.ADDRESS:
-                    <UserAddressScopeMapper ScopeMapperSaved="AddScopeMapper" Scope="@Scope" IsEditModeEnabled="false"></UserAddressScopeMapper>
                     break;
             }
         </RadzenStepsItem>
@@ -64,7 +61,7 @@
         public string Name { get; set; } = null!;
         public string ShortDescription { get; set; } = null!;
         public string Description { get; set; } = null!;
-        public ScopeClaimMapperTypes Type { get; set; }
+        public MappingRuleTypes Type { get; set; }
         public string PictureUrl { get; set; } = null!;
         public bool IsSAMLSupported { get; set; } = true;
     }
@@ -85,9 +82,8 @@
 
     ICollection<MapperType> MapperTypes { get; set; } = new List<MapperType>
     {
-        new MapperType { Name = "Attribute", ShortDescription = "User attribute", Description = "Map one user attribute to one claim", Type = ScopeClaimMapperTypes.USERATTRIBUTE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserAttribute.png" },
-        new MapperType { Name = "Property", ShortDescription = "User property", Description = "Map one user property to one claim", Type = ScopeClaimMapperTypes.USERPROPERTY, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserProperty.png" },
-        new MapperType { Name = "Address", ShortDescription = "User address", Description = "Build an address according to the format defined by the OPENID standard <a href='https://openid.net/specs/openid-connect-core-1_0.html#AddressClaim'>https://openid.net/specs/openid-connect-core-1_0.html#AddressClaim</a>", IsSAMLSupported = false, Type = ScopeClaimMapperTypes.ADDRESS, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserAddress.png" }
+        new MapperType { Name = "Attribute", ShortDescription = "User attribute", Description = "Map one user attribute to one claim", Type = MappingRuleTypes.USERATTRIBUTE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserAttribute.png" },
+        new MapperType { Name = "Property", ShortDescription = "User property", Description = "Map one user property to one claim", Type = MappingRuleTypes.USERPROPERTY, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserProperty.png" }
     };
 
     MapperType? SelectedMapperType { get; set; } = null;

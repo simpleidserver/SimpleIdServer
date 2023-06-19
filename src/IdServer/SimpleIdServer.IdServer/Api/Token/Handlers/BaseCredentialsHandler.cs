@@ -6,7 +6,6 @@ using SimpleIdServer.IdServer.Api.Token.Helpers;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
-using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using System.Collections.Generic;
 using System.Linq;

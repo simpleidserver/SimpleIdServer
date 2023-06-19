@@ -15,8 +15,8 @@ namespace SimpleIdServer.IdServer.Stores
     {
         IEnumerable<SigningCredentials> GetAllSigningKeys(string realm);
         IEnumerable<EncryptingCredentials> GetAllEncryptingKeys(string realm);
-        void Add(Realm realm, SigningCredentials signingCredentials);
-        void Add(Realm realm, EncryptingCredentials encryptingCredentials);
+        void Add(Domains.Realm realm, SigningCredentials signingCredentials);
+        void Add(Domains.Realm realm, EncryptingCredentials encryptingCredentials);
     }
 
     public class InMemoryKeyStore : IKeyStore
@@ -72,21 +72,21 @@ namespace SimpleIdServer.IdServer.Stores
             return result;
         }
 
-        public async void Add(Realm realm, SigningCredentials signingCredentials)
+        public async void Add(Domains.Realm realm, SigningCredentials signingCredentials)
         {
             var result = Convert(signingCredentials, realm);
             _fileSerializedKeyStore.Add(result);
             await _fileSerializedKeyStore.SaveChanges(CancellationToken.None);
         }
 
-        public async void Add(Realm realm, EncryptingCredentials encryptingCredentials)
+        public async void Add(Domains.Realm realm, EncryptingCredentials encryptingCredentials)
         {
             var result = Convert(encryptingCredentials, realm);
             _fileSerializedKeyStore.Add(result);
             await _fileSerializedKeyStore.SaveChanges(CancellationToken.None);
         }
 
-        internal async void SetSigningCredentials(Realm realm, IEnumerable<SigningCredentials> signingCredentials)
+        internal async void SetSigningCredentials(Domains.Realm realm, IEnumerable<SigningCredentials> signingCredentials)
         {
             foreach(var signingCredential in signingCredentials)
             {
@@ -97,7 +97,7 @@ namespace SimpleIdServer.IdServer.Stores
             await _fileSerializedKeyStore.SaveChanges(CancellationToken.None);
         }
 
-        internal async void SetEncryptedCredentials(Realm realm, IEnumerable<EncryptingCredentials> encryptedCredentials)
+        internal async void SetEncryptedCredentials(Domains.Realm realm, IEnumerable<EncryptingCredentials> encryptedCredentials)
         {
             foreach (var encryptedCredential in encryptedCredentials)
             {
@@ -108,7 +108,7 @@ namespace SimpleIdServer.IdServer.Stores
             await _fileSerializedKeyStore.SaveChanges(CancellationToken.None);
         }
 
-        public static SerializedFileKey Convert(SigningCredentials credentials, Realm realm)
+        public static SerializedFileKey Convert(SigningCredentials credentials, Domains.Realm realm)
         {
             var symmetric = credentials.Key as SymmetricSecurityKey;
             SerializedFileKey result = null;
@@ -147,7 +147,7 @@ namespace SimpleIdServer.IdServer.Stores
             return result;
         }
 
-        public static SerializedFileKey Convert(EncryptingCredentials credentials, Realm realm)
+        public static SerializedFileKey Convert(EncryptingCredentials credentials, Domains.Realm realm)
         {
             var symmetric = credentials.Key as SymmetricSecurityKey;
             SerializedFileKey result = null;

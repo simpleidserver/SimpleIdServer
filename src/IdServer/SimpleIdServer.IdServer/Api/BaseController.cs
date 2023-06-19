@@ -50,7 +50,7 @@ namespace SimpleIdServer.IdServer.Api
                 throw new OAuthException(ErrorCodes.REQUEST_DENIED, ErrorMessages.UNAUTHORIZED_ACCESS_PERMISSION_API);
         }
 
-        protected ContentResult BuildError(OAuthException ex) => BuildError(HttpStatusCode.InternalServerError, ex.Code, ex.Message);
+        protected ContentResult BuildError(OAuthException ex) => BuildError(ex.StatusCode ?? HttpStatusCode.InternalServerError, ex.Code, ex.Message);
 
         protected ContentResult BuildError(HttpStatusCode statusCode, string error, string errorDescription) => new ContentResult
         {

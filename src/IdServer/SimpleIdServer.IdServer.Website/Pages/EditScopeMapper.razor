@@ -27,16 +27,13 @@ else
     <RadzenCard class="m-3">
         @switch (mapper.MapperType)
         {
-            case ScopeClaimMapperTypes.USERATTRIBUTE:
+            case MappingRuleTypes.USERATTRIBUTE:
                 <UserAttributeScopeMapper ScopeMapperSaved="UpdateScopeMapper" Scope="@scopeState.Value.Scope" ClaimMapper="@mapper" IsEditModeEnabled="true"></UserAttributeScopeMapper>
                 break;
-            case ScopeClaimMapperTypes.USERPROPERTY:
+            case MappingRuleTypes.USERPROPERTY:
                 <UserPropertyScopeMapper ScopeMapperSaved="UpdateScopeMapper" Scope="@scopeState.Value.Scope" ClaimMapper="@mapper" IsEditModeEnabled="true"></UserPropertyScopeMapper>
                 break;
-            case ScopeClaimMapperTypes.ADDRESS:
-                <UserAddressScopeMapper ScopeMapperSaved="UpdateScopeMapper" Scope="@scopeState.Value.Scope" ClaimMapper="@mapper" IsEditModeEnabled="true"></UserAddressScopeMapper>
-                break;
-            case ScopeClaimMapperTypes.SUBJECT:
+            case MappingRuleTypes.SUBJECT:
                 <!-- Name -->
                 <div>
                     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
@@ -47,7 +44,7 @@ else
                     <!-- Token Claim Name -->
                     <div>
                         <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Token Claim Name</RadzenText>
-                        <RadzenTextBox Name="TokenClaimName" @bind-Value="@mapper.TokenClaimName" Class="w-100" Disabled=true></RadzenTextBox>
+                        <RadzenTextBox Name="TokenClaimName" @bind-Value="@mapper.TargetClaimPath" Class="w-100" Disabled=true></RadzenTextBox>
                         <p class="text-muted">Name of the claim to insert into the token</p>
                     </div>
                 }

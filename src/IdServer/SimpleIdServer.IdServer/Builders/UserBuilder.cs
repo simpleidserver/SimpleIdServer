@@ -19,7 +19,7 @@ namespace SimpleIdServer.IdServer.Builders
             _user = new User();
         }
 
-        public static UserBuilder Create(string login, string password, string name = null, Realm realm = null)
+        public static UserBuilder Create(string login, string password, string name = null, Domains.Realm realm = null)
         {
             var result = new UserBuilder();
             result._user.Id = Guid.NewGuid().ToString();
@@ -97,6 +97,12 @@ namespace SimpleIdServer.IdServer.Builders
             return this;
         }
 
+        public UserBuilder AddClaim(string name, string value)
+        {
+            _user.AddClaim(name, value);
+            return this;
+        }
+
         #endregion
 
         #region Consents
@@ -127,6 +133,13 @@ namespace SimpleIdServer.IdServer.Builders
         }
 
         #endregion
+
+        public UserBuilder SetDID(string did, string privateKey)
+        {
+            _user.Did = did;
+            _user.DidPrivateHex = privateKey;
+            return this;
+        }
 
         public UserBuilder AddSession(string id, string realm, DateTime expirationTime)
         {

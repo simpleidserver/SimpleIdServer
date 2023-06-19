@@ -63,6 +63,42 @@ namespace System.Text.Json.Nodes
         #region Authorization request
 
         /// <summary>
+        /// OPTIONAL : STRING containing the wallet's OPENID CONNER ISSUER URL.
+        /// The Credential Issuer will use the discovery process as defined in [SIOPv2] to determine the Wallet's capabilities and endpoints. 
+        /// RECOMMENDED in Dynamic Credential Request.
+        /// </summary>
+        /// <returns></returns>
+        public static string GetWalletIssuer(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.WalletIssuer);
+
+        /// <summary>
+        ///  OPTIONAL. JSON String containing an opaque user hint the Wallet MAY use in subsequent callbacks to optimize the user's experience. 
+        ///  RECOMMENDED in Dynamic Credential Request.
+        /// </summary>
+        /// <param name="jObj"></param>
+        /// <returns></returns>
+        public static string GetUserHint(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.UserHint);
+
+        /// <summary>
+        /// OPTIONAL. String value identifying a certain processing context at the Credential Issuer.
+        /// A value for this parameter is typically passed in a Credential Offer from the Credential Issuer to the Wallet.
+        /// This request parameter is used to pass the issuer_state value back to the Credential Issuer.
+        /// </summary>
+        /// <param name="jObj"></param>
+        /// <returns></returns>
+        public static string GetIssuerState(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.IssuerState);
+
+        /// <summary>
+        /// CONDITIONAL : String containing a presentation definition JSON object.
+        /// </summary>
+        /// <param name="jObj"></param>
+        /// <returns></returns>
+        public static PresentationDefinition GetPresentationDefinition(this JsonObject jObj)
+        {
+            var result = jObj.GetToken(AuthorizationRequestParameters.PresentationDefinition);
+            return null;
+        }
+
+        /// <summary>
         /// Indicates the target service or resource to which access is being requested. 
         /// </summary>
         /// <param name="jObj"></param>
@@ -124,8 +160,12 @@ namespace System.Text.Json.Nodes
         public static ICollection<AuthorizationData> GetAuthorizationDetailsFromAuthorizationRequest(this JsonObject jObj)
         {
             var authDetails = jObj.GetToken(AuthorizationRequestParameters.AuthorizationDetails);
-            return JsonSerializerExtensions.DeserializeAuthorizationDetails(authDetails);
+            return authDetails == null ? new List<AuthorizationData>() : JsonSerializerExtensions.DeserializeAuthorizationDetails(authDetails);
         }
+
+        public static string GetPreAuthorizedCode(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.PreAuthorizedCode);
+
+        public static string GetUserPin(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.UserPin);
 
         public static IEnumerable<string> GetResponseTypesFromAuthorizationRequest(this JsonObject jObj)
         {
@@ -279,6 +319,8 @@ namespace System.Text.Json.Nodes
         public static string GetCodeVerifier(this JsonObject jObj) => jObj.GetStr(TokenRequestParameters.CodeVerifier);
 
         public static string GetRedirectUri(this JsonObject jObj) => jObj.GetStr(TokenRequestParameters.RedirectUri);
+
+        public static string GetDeviceCode(this JsonObject jObj) => jObj.GetStr(TokenRequestParameters.DeviceCode);
 
         public static ClientCredentials GetClientCredentials(this JsonObject jObj)
         {

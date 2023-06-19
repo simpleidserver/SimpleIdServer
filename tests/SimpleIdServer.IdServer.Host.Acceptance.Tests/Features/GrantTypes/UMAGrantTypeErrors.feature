@@ -67,7 +67,7 @@ Scenario: client_token_format must be valid
 
 	And execute HTTP POST JSON request 'http://localhost/rreguri'
 	| Key             | Value                 |
-	| resource_scopes | [scope1]              |
+	| resource_scopes | ["scope1"]            |
 	| subject         | user1                 |
 	| icon_uri        | icon                  |
 	| name#fr         | nom                   |
@@ -83,7 +83,7 @@ Scenario: client_token_format must be valid
 	And execute HTTP POST JSON request 'http://localhost/perm'
 	| Key             | Value                 |
 	| resource_id     | $_id$                 |
-	| resource_scopes | [scope1]              |
+	| resource_scopes | ["scope1"]            |
 	| Authorization   | Bearer $access_token$ |
 	
 	And extract JSON from body
@@ -117,7 +117,7 @@ Scenario: claim_token must be a valid JWT
 
 	And execute HTTP POST JSON request 'http://localhost/rreguri'
 	| Key             | Value                 |
-	| resource_scopes | [scope1]              |
+	| resource_scopes | ["scope1"]            |
 	| subject         | user1                 |
 	| icon_uri        | icon                  |
 	| name#fr         | nom                   |
@@ -133,7 +133,7 @@ Scenario: claim_token must be a valid JWT
 	And execute HTTP POST JSON request 'http://localhost/perm'
 	| Key             | Value                 |
 	| resource_id     | $_id$                 |
-	| resource_scopes | [scope1]              |
+	| resource_scopes | ["scope1"]            |
 	| Authorization   | Bearer $access_token$ |
 	
 	And extract JSON from body
@@ -171,7 +171,7 @@ Scenario: scope must be supported
 
 	And execute HTTP POST JSON request 'http://localhost/rreguri'
 	| Key             | Value                 |
-	| resource_scopes | [scope1]              |
+	| resource_scopes | ["scope1"]            |
 	| subject         | user1                 |
 	| icon_uri        | icon                  |
 	| name#fr         | nom                   |
@@ -187,7 +187,7 @@ Scenario: scope must be supported
 	And execute HTTP POST JSON request 'http://localhost/perm'
 	| Key             | Value                 |
 	| resource_id     | $_id$                 |
-	| resource_scopes | [scope1]              |
+	| resource_scopes | ["scope1"]             |
 	| Authorization   | Bearer $access_token$ |
 	
 	And extract JSON from body
@@ -226,7 +226,7 @@ Scenario: claim_token must contains the claims
 
 	And execute HTTP POST JSON request 'http://localhost/rreguri'
 	| Key             | Value                 |
-	| resource_scopes | [scope1]              |
+	| resource_scopes | ["scope1"]            |
 	| subject         | user1                 |
 	| icon_uri        | icon                  |
 	| name#fr         | nom                   |
@@ -247,7 +247,7 @@ Scenario: claim_token must contains the claims
 	And execute HTTP POST JSON request 'http://localhost/perm'
 	| Key             | Value                 |
 	| resource_id     | $_id$                 |
-	| resource_scopes | [scope1]              |
+	| resource_scopes | ["scope1"]            |
 	| Authorization   | Bearer $access_token$ |
 	
 	And extract JSON from body
@@ -287,7 +287,7 @@ Scenario: User must be authorized
 
 	And execute HTTP POST JSON request 'http://localhost/rreguri'
 	| Key             | Value                 |
-	| resource_scopes | [scope1]              |
+	| resource_scopes | ["scope1"]            |
 	| subject         | user1                 |
 	| icon_uri        | icon                  |
 	| name#fr         | nom                   |
@@ -308,7 +308,7 @@ Scenario: User must be authorized
 	And execute HTTP POST JSON request 'http://localhost/perm'
 	| Key             | Value                 |
 	| resource_id     | $_id$                 |
-	| resource_scopes | [scope1]              |
+	| resource_scopes | ["scope1"]            |
 	| Authorization   | Bearer $access_token$ |
 	
 	And extract JSON from body

@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.IdServer.Domains.DTOs
@@ -17,7 +18,7 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
             if(!string.IsNullOrWhiteSpace(value.Identifier))
                 writer.WriteString(AuthorizationDataParameters.Identifier, value.Identifier);
 
-            if(value.Locations.Any())
+            if(value.Locations != null && value.Locations.Any())
             {
                 writer.WriteStartArray(AuthorizationDataParameters.Locations);
                 foreach (var location in value.Locations)
@@ -25,7 +26,7 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
                 writer.WriteEndArray();
             }
 
-            if (value.Actions.Any())
+            if (value.Actions != null && value.Actions.Any())
             {
                 writer.WriteStartArray(AuthorizationDataParameters.Actions);
                 foreach (var act in value.Actions)
@@ -33,7 +34,7 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
                 writer.WriteEndArray();
             }
 
-            if (value.DataTypes.Any())
+            if (value.DataTypes != null && value.DataTypes.Any())
             {
                 writer.WriteStartArray(AuthorizationDataParameters.DataTypes);
                 foreach (var dt in value.DataTypes)
@@ -46,7 +47,15 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
                 foreach (var kvp in value.AdditionalData)
                 {
                     writer.WritePropertyName(kvp.Key);
-                    writer.WriteRawValue(kvp.Value);
+                    try
+                    {
+                        JsonNode.Parse(kvp.Value);
+                        writer.WriteRawValue(kvp.Value);
+                    }
+                    catch
+                    {
+                        writer.WriteStringValue(kvp.Value);
+                    }
                 }
             }
 

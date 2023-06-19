@@ -40,20 +40,17 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableScopeMapper" Title="Type" Filterable="false" Sortable="false" Width="80px">
             <Template Context="data">
-                @switch(data.Value.MapperType)
+                @switch (data.Value.MapperType)
                 {
-                        case ScopeClaimMapperTypes.USERATTRIBUTE:
-                            <span>User attribute</span>
+                    case MappingRuleTypes.USERATTRIBUTE:
+                        <span>User attribute</span>
                         break;
-                        case ScopeClaimMapperTypes.USERPROPERTY:
-                            <span>User property</span>
-                            break;
-                        case ScopeClaimMapperTypes.ADDRESS:
-                            <span>Address</span>
-                            break;
-                        case ScopeClaimMapperTypes.SUBJECT:
-                            <span>Subject</span>
-                            break;
+                    case MappingRuleTypes.USERPROPERTY:
+                        <span>User property</span>
+                        break;
+                    case MappingRuleTypes.SUBJECT:
+                        <span>Subject</span>
+                        break;
                 }
             </Template>
         </RadzenDataGridColumn>
@@ -110,7 +107,7 @@
         {
             var mapperIds = scopeMappersState.Value.Mappers?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
             if (!mapperIds.Contains(mapper.Value.Id)) mapperIds.Add(mapper.Value.Id);
-            if (scopeMappersState.Value.Mappers.Any(r => mapperIds.Contains(r.Value.Id) && r.Value.MapperType == ScopeClaimMapperTypes.SUBJECT))
+            if (scopeMappersState.Value.Mappers.Any(r => mapperIds.Contains(r.Value.Id) && r.Value.MapperType == MappingRuleTypes.SUBJECT))
             {
                 var isConfirmed = await dialogService.Confirm("Are you sure?", "Remove subject claim mapper", new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
                 if (isConfirmed == null || !isConfirmed.Value) return;

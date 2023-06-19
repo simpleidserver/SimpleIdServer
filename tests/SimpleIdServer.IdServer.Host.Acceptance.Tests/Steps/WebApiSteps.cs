@@ -7,6 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Moq;
+using SimpleIdServer.Did.Extensions;
+using SimpleIdServer.Did.Jwt;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.OAuth.Host.Acceptance.Tests;
@@ -23,6 +25,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
+using DidKeyIdentityDocumentExtractor = SimpleIdServer.Did.Key.IdentityDocumentExtractor;
 
 namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
 {
@@ -325,6 +328,31 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             }
         }
 
+        [When("build proof")]
+        public async void WhenBuildJWTProof(Table table)
+        {
+            var extractor = new DidKeyIdentityDocumentExtractor(new Did.Key.DidKeyOptions());
+            var did = await extractor.Extract(IdServerConfiguration.DidKey, CancellationToken.None);
+            var securityTokenDescriptor = new SecurityTokenDescriptor
+            {
+                Claims = new Dictionary<string, object>(),
+                AdditionalHeaderClaims = new Dictionary<string, object>(),
+
+            };
+            foreach (var row in table.Rows)
+            {
+                var key = row["Key"].ToString();
+                var value = WebApiSteps.ParseValue(_scenarioContext, row["Value"].ToString());
+                if (key == "typ")
+                    securityTokenDescriptor.TokenType = value.ToString();
+                else
+                    securityTokenDescriptor.Claims.Add(row["Key"].ToString(), value);
+            }
+
+            var proof = DidJwtBuilder.GenerateToken(securityTokenDescriptor, did, IdServerConfiguration.PrivateKey.HexToByteArray());
+            _scenarioContext.Set(proof, "proof");
+        }
+
         private void BuildJwsByUsingClientJwk(string keyid, string clientId, string key, Table table, bool isExpired = false)
         {
             using (var scope = _factory.Services.CreateScope())
@@ -368,24 +396,21 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             foreach(var record in table.Rows)
             {
                 var key = record["Key"];
-                object value = record["Value"];
+                object value = ParseValue(_scenarioContext, record["Value"], true);
                 try
                 {
                     value = JsonNode.Parse(value.ToString());
                 }
-                catch
-                {
-                    value = ParseValue(_scenarioContext, record["Value"]);
-                }
+                catch { }
 
                 if (PARAMETERS_IN_HEADER.Contains(key))
                 {
                     continue;
                 }
 
-                if (value is JsonArray)
+                if (value is JsonNode)
                 {
-                    result.Add(key, value as JsonArray);
+                    result.Add(key, value as JsonNode);
                 }
                 else
                 {
@@ -414,19 +439,19 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             return result;
         }
 
-        public static object ParseValue(ScenarioContext scenarioContext, string val)
+        public static object ParseValue(ScenarioContext scenarioContext, string val, bool ignoreArray = false)
         {
             if (val.StartsWith('$') && val.EndsWith('$'))
             {
                 val = val.TrimStart('$').TrimEnd('$');
                 return scenarioContext.Get<object>(val);
             }
-
-            if (val.StartsWith('[') && val.EndsWith(']'))
+            
+            if (!ignoreArray && val.StartsWith('[') && val.EndsWith(']'))
             {
                 val = val.TrimStart('[').TrimEnd(']');
                 var res = new JsonArray();
-                foreach (var item in val.Split(',')) res.Add(item);
+                foreach (var item in val.Split(',')) res.Add(item.Trim(' ').Trim('"'));
                 return res;
             }
 

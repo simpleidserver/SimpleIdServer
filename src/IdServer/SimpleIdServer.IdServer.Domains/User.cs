@@ -60,6 +60,10 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonIgnore]
         public string? IdentityProvisioningId { get; set; } = null;
         [JsonIgnore]
+        public string? Did { get; set; } = null;
+        [JsonIgnore]
+        public string? DidPrivateHex { get; set; } = null;
+        [JsonIgnore]
         public ICollection<Claim> Claims
         {
             get
@@ -96,6 +100,8 @@ namespace SimpleIdServer.IdServer.Domains
             }
         }
         [JsonIgnore]
+        public string NotificationMode { get; set; } = "console";
+        [JsonIgnore]
         public ICollection<RealmUser> Realms { get; set; } = new List<RealmUser>();
         [JsonIgnore]
         public ICollection<UserSession> Sessions { get; set; } = new List<UserSession>();
@@ -113,6 +119,8 @@ namespace SimpleIdServer.IdServer.Domains
         public ICollection<Group> Groups { get; set; } = new List<Group>();
         [JsonIgnore]
         public IdentityProvisioning? IdentityProvisioning { get; set; } = null;
+        [JsonIgnore]
+        public ICollection<UserCredentialOffer> CredentialOffers { get; set; } = new List<UserCredentialOffer>();
 
         #region User claims
 

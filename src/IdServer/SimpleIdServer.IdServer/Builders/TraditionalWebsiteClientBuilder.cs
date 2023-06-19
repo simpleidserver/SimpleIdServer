@@ -53,6 +53,15 @@ namespace SimpleIdServer.IdServer.Builders
         }
 
         /// <summary>
+        /// Enable device code grant-type
+        /// </summary>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder EnableDeviceCodeGrantType()
+        {
+            return this;
+        }
+
+        /// <summary>
         /// Allows the client to use UMA grant-type.
         /// </summary>
         /// <returns></returns>
@@ -60,6 +69,16 @@ namespace SimpleIdServer.IdServer.Builders
         {
             _client.GrantTypes.Add(UmaTicketHandler.GRANT_TYPE);
             return null;
+        }
+
+        /// <summary>
+        /// Allows the client to use client_credentials grant-type.
+        /// </summary>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder EnableClientGrantType()
+        {
+            _client.GrantTypes.Add(ClientCredentialsHandler.GRANT_TYPE);
+            return this;
         }
 
         #endregion

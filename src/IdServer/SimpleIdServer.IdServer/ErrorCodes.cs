@@ -9,9 +9,11 @@ namespace SimpleIdServer.IdServer
         public const string INVALID_REDIRECT_URI = "invalid_redirect_uri";
         public const string INVALID_CLIENT_METADATA = "invalid_client_metadata";
         public const string INVALID_SOFTWARE_STATEMENT = "invalid_software_statement";
+        public const string INVALID_NETWORK = "invalid_network";
         public const string INVALID_GRANT = "invalid_grant";
         public const string INVALID_TOKEN = "invalid_token";
         public const string INVALID_SCOPE = "invalid_scope";
+        public const string INVALID_DEVICE_CODE = "invalid_device_code";
         public const string INVALID_REQUEST_OBJECT = "invalid_request_object";
         public const string UNSUPPORTED_GRANT_TYPE = "unsupported_grant_type";
         public const string UNSUPPORTED_TOKEN_TYPE = "unsupported_token_type";
@@ -26,6 +28,7 @@ namespace SimpleIdServer.IdServer
         public const string EXPIRED_TOKEN = "expired_token";
         public const string SLOW_DOWN = "slow_down";
         public const string UNKNOWN_USER = "unknown_user";
+        public const string UNKNOWN_ACR = "unknown_acr";
         public const string INVALID_CREDENTIALS = "invalid_credentials";
         public const string INVALID_TARGET = "invalid_target";
         public const string REQUEST_DENIED = "request_denied";
@@ -33,5 +36,6 @@ namespace SimpleIdServer.IdServer
         public const string INVALID_RESOURCE_ID = "invalid_resource_id";
         public const string NOT_FOUND = "not_found";
         public const string INVALID_AUTHORIZATION_DETAILS = "invalid_authorization_details";
+        public const string UNEXPECTED_ERROR = "unexpected_error";
     }
 }

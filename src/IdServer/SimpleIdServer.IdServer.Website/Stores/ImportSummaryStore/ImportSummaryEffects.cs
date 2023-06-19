@@ -13,12 +13,14 @@ namespace SimpleIdServer.IdServer.Website.Stores.ImportSummaryStore
     public class ImportSummaryEffects
     {
         private readonly IImportSummaryStore _importSummaryStore;
+        private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly IdServerWebsiteOptions _options;
         private readonly ProtectedSessionStorage _sessionStorage;
 
-        public ImportSummaryEffects(IImportSummaryStore importSummaryStore, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
+        public ImportSummaryEffects(IImportSummaryStore importSummaryStore, IWebsiteHttpClientFactory websiteHttpClientFactory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
         {
             _importSummaryStore = importSummaryStore;
+            _websiteHttpClientFactory = websiteHttpClientFactory;
             _options = options.Value;
             _sessionStorage = sessionStorage;
         }
@@ -46,22 +48,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.ImportSummaryStore
         public async Task Handle(LaunchImportAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var handler = new HttpClientHandler();
-            handler.ServerCertificateCustomValidationCallback =
-                (httpRequestMessage, cert, cetChain, policyErrors) =>
-                {
-                    return true;
-                };
-            using (var httpClient = new HttpClient(handler))
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
             {
-                var requestMessage = new HttpRequestMessage
-                {
-                    RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/provisioning/import")
-                };
-                var httpResult = await httpClient.SendAsync(requestMessage);
-                var tt = "";
-            }
-
+                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/provisioning/import")
+            };
+            await httpClient.SendAsync(requestMessage);
             dispatcher.Dispatch(new LaunchImportSuccessAction());
         }
 

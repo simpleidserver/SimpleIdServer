@@ -34,6 +34,10 @@ namespace SimpleIdServer.IdServer.Store
         public DbSet<ExtractedRepresentation> ExtractedRepresentations { get; set; }
         public DbSet<ImportSummary> ImportSummaries { get; set; }
         public DbSet<Group> Groups { get; set; }
+        public DbSet<CredentialTemplate> CredentialTemplates { get; set; }
+        public DbSet<UserCredentialOffer> CredentialOffers { get; set; }
+        public DbSet<NetworkConfiguration> Networks { get; set; }
+        public DbSet<DeviceAuthCode> DeviceAuthCodes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -45,6 +49,7 @@ namespace SimpleIdServer.IdServer.Store
             builder.ApplyConfiguration(new TranslationConfiguration());
             builder.ApplyConfiguration(new UserClaimConfiguration());
             builder.ApplyConfiguration(new UserConfiguration());
+            builder.ApplyConfiguration(new UserCredentialOfferConfiguration());
             builder.ApplyConfiguration(new UserCredentialConfiguration());
             builder.ApplyConfiguration(new UserExternalAuthProviderConfiguration());
             builder.ApplyConfiguration(new UserSessionConfiguration());
@@ -83,6 +88,12 @@ namespace SimpleIdServer.IdServer.Store
             builder.ApplyConfiguration(new RealmUserConfiguration());
             builder.ApplyConfiguration(new ImportSummaryConfiguration());
             builder.ApplyConfiguration(new GroupConfiguration());
+            builder.ApplyConfiguration(new BaseCredentialTemplateConfiguration());
+            builder.ApplyConfiguration(new CredentialTemplateConfiguration());
+            builder.ApplyConfiguration(new CredentialTemplateDisplayConfiguration());
+            builder.ApplyConfiguration(new CredentialTemplateParameterConfiguration());
+            builder.ApplyConfiguration(new NetworkConfigurationConf());
+            builder.ApplyConfiguration(new DeviceAuthCodeConfiguration());
         }
     }
 }

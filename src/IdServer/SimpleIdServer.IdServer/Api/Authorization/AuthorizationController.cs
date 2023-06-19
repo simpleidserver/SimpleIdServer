@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseModes;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
-using SimpleIdServer.IdServer.Extensions;
 using SimpleIdServer.IdServer.ExternalEvents;
 using System;
 using System.Collections.Generic;
@@ -116,7 +115,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                         area = redirectActionAuthorizationResponse.Area,
                         ui_locales = string.Join(" ", uiLocales)
                     });
-                    activity?.SetStatus(ActivityStatusCode.Error, $"User agent will be redirect to '{url}'");
+                    activity?.SetStatus(ActivityStatusCode.Ok, $"User agent will be redirect to '{url}'");
                     await _busControl.Publish(new AuthorizationFailureEvent
                     {
                         ClientId = context.Client.ClientId,

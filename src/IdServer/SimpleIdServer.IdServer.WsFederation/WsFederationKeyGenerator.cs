@@ -7,7 +7,7 @@ namespace SimpleIdServer.IdServer.WsFederation
 {
     public static class WsFederationKeyGenerator
     {
-        public static SerializedFileKey GenerateWsFederationSigningCredentials(Realm realm)
+        public static SerializedFileKey GenerateWsFederationSigningCredentials(Domains.Realm realm)
         {
             var certificate = KeyGenerator.GenerateSelfSignedCertificate();
             var securityKey = new X509SecurityKey(certificate, "wsFedKid");

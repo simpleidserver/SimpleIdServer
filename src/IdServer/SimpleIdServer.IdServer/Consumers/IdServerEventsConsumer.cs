@@ -25,7 +25,8 @@ namespace SimpleIdServer.IdServer.Consumers
         IConsumer<UserLoginSuccessEvent>, IConsumer<UserLogoutSuccessEvent>,
         IConsumer<PushedAuthorizationRequestSuccessEvent>, IConsumer<PushedAuthorizationRequestFailureEvent>,
         IConsumer<ImportUsersSuccessEvent>, IConsumer<ExtractRepresentationsFailureEvent>,
-        IConsumer<ExtractRepresentationsSuccessEvent>, IConsumer<AddUserSuccessEvent>, IConsumer<RemoveUserSuccessEvent>
+        IConsumer<ExtractRepresentationsSuccessEvent>, IConsumer<AddUserSuccessEvent>, IConsumer<RemoveUserSuccessEvent>,
+        IConsumer<DeviceAuthorizationSuccessEvent>, IConsumer<DeviceAuthorizationFailureEvent>
     {
         private readonly IServiceProvider _serviceProvider;
 
@@ -125,7 +126,7 @@ namespace SimpleIdServer.IdServer.Consumers
                     Id = Guid.NewGuid().ToString(),
                     Description = "Consent Revoked",
                     ClientId = context.Message.ClientId,
-                    Scopes = context.Message.Scopes?.ToArray(),
+                    Scopes = context.Message.Scopes == null ? new string[0] : context.Message.Scopes.ToArray(),
                     Claims = context.Message.Claims?.ToArray(),
                     CreateDateTime = DateTime.UtcNow,
                     UserName = context.Message.UserName,
@@ -227,7 +228,7 @@ namespace SimpleIdServer.IdServer.Consumers
                     Description = "Consent Granted",
                     UserName = context.Message.UserName,
                     ClientId = context.Message.ClientId,
-                    Scopes = context.Message.Scopes?.ToArray(),
+                    Scopes = context.Message.Scopes == null ? new string[0] : context.Message.Scopes.ToArray(),
                     Claims = context.Message.Claims?.ToArray(),
                     CreateDateTime = DateTime.UtcNow,
                     Realm = context.Message.Realm,
@@ -247,7 +248,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 {
                     Id = Guid.NewGuid().ToString(),
                     Description = "Token Issued Failed",
-                    Scopes = context.Message.Scopes?.ToArray(),
+                    Scopes = context.Message.Scopes == null ? new string[0] : context.Message.Scopes.ToArray(),
                     ClientId = context.Message.ClientId,
                     CreateDateTime = DateTime.UtcNow,
                     Realm = context.Message.Realm,
@@ -288,7 +289,7 @@ namespace SimpleIdServer.IdServer.Consumers
                     Id = Guid.NewGuid().ToString(),
                     Description = "Token Issued Success",
                     ClientId = context.Message.ClientId,
-                    Scopes = context.Message.Scopes?.ToArray(),
+                    Scopes = context.Message.Scopes == null ? new string[0] : context.Message.Scopes.ToArray(),
                     CreateDateTime = DateTime.UtcNow,
                     Realm = context.Message.Realm,
                     IsError = false
@@ -345,7 +346,7 @@ namespace SimpleIdServer.IdServer.Consumers
                     Id = Guid.NewGuid().ToString(),
                     ClientId = context.Message.ClientId,
                     UserName = context.Message.UserName,
-                    Scopes = context.Message.Scopes?.ToArray(),
+                    Scopes = context.Message.Scopes == null ? new string[0] : context.Message.Scopes.ToArray(),
                     Description = "UserInfo Failure",
                     CreateDateTime = DateTime.UtcNow,
                     Realm = context.Message.Realm,
@@ -367,7 +368,7 @@ namespace SimpleIdServer.IdServer.Consumers
                     Id = Guid.NewGuid().ToString(),
                     ClientId = context.Message.ClientId,
                     UserName = context.Message.UserName,
-                    Scopes = context.Message.Scopes?.ToArray(),
+                    Scopes = context.Message.Scopes == null ? new string[0] : context.Message.Scopes.ToArray(),
                     Description = "UserInfo Success",
                     CreateDateTime = DateTime.UtcNow,
                     Realm = context.Message.Realm,
@@ -525,6 +526,47 @@ namespace SimpleIdServer.IdServer.Consumers
                     CreateDateTime = DateTime.UtcNow,
                     Realm = context.Message.Realm,
                     IsError = false
+                };
+                auditEventRepository.Add(auditEvt);
+                await auditEventRepository.SaveChanges(CancellationToken.None);
+            }
+        }
+
+        public async Task Consume(ConsumeContext<DeviceAuthorizationSuccessEvent> context)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var auditEventRepository = scope.ServiceProvider.GetRequiredService<IAuditEventRepository>();
+                var auditEvt = new AuditEvent
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Description = "Device Authorization Success",
+                    CreateDateTime = DateTime.UtcNow,
+                    ClientId = context.Message.ClientId,
+                    RequestJSON = context.Message.RequestJSON,
+                    Realm = context.Message.Realm,
+                    IsError = false
+                };
+                auditEventRepository.Add(auditEvt);
+                await auditEventRepository.SaveChanges(CancellationToken.None);
+            }
+        }
+
+        public async Task Consume(ConsumeContext<DeviceAuthorizationFailureEvent> context)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var auditEventRepository = scope.ServiceProvider.GetRequiredService<IAuditEventRepository>();
+                var auditEvt = new AuditEvent
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Description = "Device Authorization Failed",
+                    CreateDateTime = DateTime.UtcNow,
+                    Realm = context.Message.Realm,
+                    IsError = true,
+                    ClientId = context.Message.ClientId,
+                    RequestJSON = context.Message.RequestJSON,
+                    ErrorMessage = context.Message.ErrorMessage
                 };
                 auditEventRepository.Add(auditEvt);
                 await auditEventRepository.SaveChanges(CancellationToken.None);

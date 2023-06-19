@@ -1,0 +1,190 @@
+﻿@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.EthrNetworkStore;
+@using SimpleIdServer.IdServer.Website.Stores.UserStore;
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent;
+@inject DialogService dialogService
+@inject NotificationService notificationService
+@inject IState<SearchEthrNetworksState> searchNetworksState;
+@inject IState<UpdateUserState> updateUserState;
+@inject IDispatcher dispatcher;
+
+<RadzenSteps>
+    <Steps>
+        <RadzenStepsItem Text="DID Method">
+            <div class="row gy-4">
+                @foreach (var didType in DIDTypes)
+                {
+                    <div class="col-md-6">
+                        <RadzenCard @onclick="() => SelectDIDType(didType)" class="@(SelectedDIDType != null && SelectedDIDType.Name == didType.Name ? "selected selectable" : "selectable")">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <RadzenImage Path="@didType.PictureUrl" Style="width: 60px" />
+                                </div>
+                                <div class="col">
+                                    <h5>@didType.Name</h5>
+                                    <p class="text-muted">@(new MarkupString(didType.ShortDescription))</p>
+                                </div>
+                            </div>
+                        </RadzenCard>
+                    </div>
+                }
+            </div>
+
+            <hr />
+
+            @if (SelectedDIDType != null)
+            {
+                <h5><RadzenIcon Icon="info" /> @SelectedDIDType.Name</h5>
+                <p class="text-muted">@(new MarkupString(SelectedDIDType.Description))</p>
+            }
+        </RadzenStepsItem>
+        <RadzenStepsItem Text="Create" Disabled="@(SelectedDIDType == null)">
+            @if (SelectedDIDType != null)
+            {
+                switch (SelectedDIDType.Type)
+                {
+                    // ethr
+                    case "ethr":
+                        @if (!updateUserState.Value.IsUpdating && !string.IsNullOrWhiteSpace(updateUserState.Value.ErrorMessage))
+                        {
+                            <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@updateUserState.Value.ErrorMessage</RadzenAlert>
+                        }
+
+                        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Select ethereum network</RadzenText>
+                        <RadzenTemplateForm Submit="@SubmitGenerateDIDEthr" TItem="GenerateEthrDIDForm" Data="@generateEthrDID">
+                            <!-- Choose Network -->
+                            <RadzenDataGrid AllowFiltering="false"
+                                AllowColumnResize="true"
+                                AllowAlternatingRows="false"
+                                AllowPaging="false"
+                                AllowSorting="true"
+                                PageSize="30"
+                                PagerHorizontalAlign="HorizontalAlign.Left"
+                                ShowPagingSummary="true"
+                                IsLoading="@searchNetworksState.Value.IsLoading"
+                                Count="@searchNetworksState.Value.Count"
+                                Data="@searchNetworksState.Value.Networks"
+                                LoadData="@LoadData"
+                                RowRender="@RowRender"
+                                TItem="SelectableEthrNetwork"
+                                ColumnWidth="300px">
+                                <Columns>
+                                    <RadzenDataGridColumn TItem="SelectableEthrNetwork" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+                                        <HeaderTemplate></HeaderTemplate>
+                                        <Template Context="data">
+                                            <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
+                                        </Template>
+                                    </RadzenDataGridColumn>
+                                    <RadzenDataGridColumn TItem="SelectableEthrNetwork" Property="Value.Name" Filterable="false" Sortable="true" Title="Name" Width="80px" />
+                                    <RadzenDataGridColumn TItem="SelectableEthrNetwork" Property="Value.ContractAdr" Filterable="false" Sortable="true" Title="Contract" Width="80px" />
+                                    <RadzenDataGridColumn TItem="SelectableEthrNetwork" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Update datetime" Width="80px" />
+                                </Columns>
+                            </RadzenDataGrid>
+                            <!-- Public Key -->
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Public Key of your wallet</RadzenText>
+                                <RadzenTextBox Name="PublicKey" @bind-Value="@generateEthrDID.PublicKey" Class="w-100"></RadzenTextBox>
+                                <RadzenRequiredValidator Component="PublicKey" Text="Public Key is required"></RadzenRequiredValidator>
+                                <p class="text-muted">Public Key must be in hexadecimal format.</p>
+                            </div>
+                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateUserState.Value.IsUpdating ? "Adding..." : "Add")" Disabled=updateUserState.Value.IsUpdating />
+                        </RadzenTemplateForm>
+                        break;
+                    // key
+                    case "key":
+                        <RadzenButton class="mt-1" Click=@SubmitGenerateDIDKey Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateUserState.Value.IsUpdating ? "Adding..." : "Add")" Disabled=updateUserState.Value.IsUpdating />
+                        break;
+                }
+            }
+        </RadzenStepsItem>
+    </Steps>
+</RadzenSteps>
+
+@code {
+    [Parameter]
+    public string UserId { get; set; }
+
+    record DIDType
+    {
+        public string Name { get; set; } = null!;
+        public string ShortDescription { get; set; } = null!;
+        public string Description { get; set; } = null!;
+        public string Type { get; set; }
+        public string PictureUrl { get; set; } = null!;
+    }
+
+    record GenerateEthrDIDForm
+    {
+        public string PublicKey { get; set; }
+    }
+
+    bool selectAll = false;
+
+    ICollection<DIDType> DIDTypes = new List<DIDType>
+    {
+        new DIDType { Name = "did:key", ShortDescription = "Doesn't require a DID Registry of any kind", Description = "Concatenation of the Multicodec identifier for the public key type and the raw bytes associated with the public key format. For more information please read the website <a href='https://w3c-ccg.github.io/did-method-key/'>https://w3c-ccg.github.io/did-method-key/</a>", Type = "key", PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/DIDKey.png" },
+        new DIDType { Name = "did:ethr", ShortDescription = "Decentralized Identitier Document is stored in ethereum", Description = "For more information please read the website <a href='https://github.com/decentralized-identity/ethr-did-resolver/blob/master/doc/did-method-spec.md'>https://github.com/decentralized-identity/ethr-did-resolver/blob/master/doc/did-method-spec.md</a>", Type = "ethr", PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/DIDEthr.png" },
+    };
+
+    DIDType? SelectedDIDType { get; set; } = null;
+    GenerateEthrDIDForm generateEthrDID { get; set; } = new GenerateEthrDIDForm();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        SubscribeToAction<GenerateDIDEthrSuccessAction>((act) =>
+        {
+            dialogService.Close();
+            notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.DIDKeyCreated });
+            StateHasChanged();
+        });
+        SubscribeToAction<GenerateDIDKeySuccessAction>((act) =>
+        {
+            dialogService.Close();
+            notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.DIDKeyCreated });
+            StateHasChanged();
+        });
+    }
+
+    void SelectDIDType(DIDType didType)
+    {
+        SelectedDIDType = didType;
+    }
+
+    void LoadData(LoadDataArgs args)
+    {
+        var act = new SearchEthrNetworksAction { Filter = args.Filter, OrderBy = args.OrderBy, Skip = args.Skip, Take = args.Top };
+        dispatcher.Dispatch(act);
+    }
+
+    void ToggleChanged(bool isSelected, SelectableEthrNetwork network)
+    {
+        var act = new SelectOneEthrContractAction { IsSelected = isSelected, Name = network.Value.Name };
+        dispatcher.Dispatch(act);
+    }
+
+    void RowRender(RowRenderEventArgs<SelectableEthrNetwork> row)
+    {
+        const string className = "class";
+        if (row.Data.IsNew)
+            row.Attributes.Add(className, "new");
+        else if (row.Data.IsSelected)
+            row.Attributes.Add(className, "active");
+        else if (row.Attributes.ContainsKey(className))
+            row.Attributes.Remove(className);
+    }
+
+    void SubmitGenerateDIDEthr(GenerateEthrDIDForm ethrDidForm)
+    {
+        var network = searchNetworksState.Value.Networks.FirstOrDefault(n => n.IsSelected);
+        if (network == null) return;
+        var act = new GenerateDIDEthrAction { NetworkName = network.Value.Name, PublicKey = ethrDidForm.PublicKey, UserId = UserId };
+        dispatcher.Dispatch(act);
+    }
+
+    void SubmitGenerateDIDKey()
+    {
+        var act = new GenerateDIDKeyAction { UserId = UserId };
+        dispatcher.Dispatch(act);
+    }
+}

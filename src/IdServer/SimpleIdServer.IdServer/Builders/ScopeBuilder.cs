@@ -22,14 +22,14 @@ namespace SimpleIdServer.IdServer.Builders
                 Id = Guid.NewGuid().ToString(),
                 Name = name, 
                 IsExposedInConfigurationEdp = isExposed,
-                Realms = new List<Realm>
+                Realms = new List<Domains.Realm>
                 {
                     Constants.StandardRealms.Master
                 }
             });
         }
 
-        public static ScopeBuilder CreateRoleScope(Client client, string name, string description, Realm realm = null)
+        public static ScopeBuilder CreateRoleScope(Client client, string name, string description, Domains.Realm realm = null)
         {
             return new ScopeBuilder(new Scope
             {
@@ -40,7 +40,7 @@ namespace SimpleIdServer.IdServer.Builders
                 Description = description,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow,
-                Realms = new List<Realm>
+                Realms = new List<Domains.Realm>
                 {
                     realm ?? Constants.StandardRealms.Master
                 },

@@ -186,6 +186,11 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public double? TokenExpirationTimeInSeconds { get; set; }
         /// <summary>
+        /// Lifetime in seconds of the c_nonce.
+        /// </summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public double? CNonceExpirationTimeInSeconds { get; set; }
+        /// <summary>
         /// Refresh token expiration time in seconds.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.RefreshTokenExpirationTimeInSeconds)]
@@ -351,6 +356,17 @@ namespace SimpleIdServer.IdServer.Domains
         /// RP URL that will cause the RP to log itself out when rendered in an iframe by the OP.
         /// </summary>
         public string? FrontChannelLogoutUri { get; set; } = null;
+        /// <summary>
+        /// URL of the issuance initation endpoint of a Wallet.
+        /// </summary>
+        [JsonPropertyName(OAuthClientParameters.CredentialOfferEndpoint)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? CredentialOfferEndpoint { get; set; } = null;
+        /// <summary>
+        /// If the wallet decided to use Pre-Authorized Code Flow, a PIN value must be sent in the user_pin parameter with the respective token request.
+        /// </summary>
+        [JsonIgnore]
+        public bool UserPinRequired { get; set; } = false;
         [JsonPropertyName(OAuthClientParameters.FrontChannelLogoutSessionRequired)]
         /// <summary>
         /// Boolean value specifying whether the RP requires that iss (issuer) and sid (session id) query parameters be included to identify the RP session
@@ -473,6 +489,8 @@ namespace SimpleIdServer.IdServer.Domains
         public int BCIntervalSeconds { get; set; } = 5;
         [JsonIgnore]
         public ICollection<Realm> Realms { get; set; } = new List<Realm>();
+        [JsonIgnore]
+        public ICollection<DeviceAuthCode> DeviceAuthCodes { get; set; } = new List<DeviceAuthCode>();
 
         public double? GetDoubleParameter(string name)
         {
@@ -554,5 +572,7 @@ namespace SimpleIdServer.IdServer.Domains
         public const string WEBSITE = "WEBSITE";
         public const string MOBILE = "MOBILE";
         public const string EXTERNAL = "EXTERNALDEVICE";
+        public const string WALLET = "WALLET";
+        public const string DEVICE = "DEVICE";
     }
 }

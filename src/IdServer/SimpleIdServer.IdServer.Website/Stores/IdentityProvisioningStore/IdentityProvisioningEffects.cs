@@ -14,12 +14,14 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
     public class IdentityProvisioningEffects
     {
         private readonly IIdentityProvisioningStore _identityProvisioningStore;
+        private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly IdServerWebsiteOptions _options;
         private readonly ProtectedSessionStorage _sessionStorage;
 
-        public IdentityProvisioningEffects(IIdentityProvisioningStore identityProvisioningStore, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
+        public IdentityProvisioningEffects(IIdentityProvisioningStore identityProvisioningStore, IWebsiteHttpClientFactory websiteHttpClientFactory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
         {
             _identityProvisioningStore = identityProvisioningStore;
+            _websiteHttpClientFactory = websiteHttpClientFactory;
             _options = options.Value;
             _sessionStorage = sessionStorage;
         }
@@ -75,21 +77,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         public async Task Handle(LaunchIdentityProvisioningAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var handler = new HttpClientHandler();
-            handler.ServerCertificateCustomValidationCallback =
-                (httpRequestMessage, cert, cetChain, policyErrors) =>
-                {
-                    return true;
-                };
-            using (var httpClient = new HttpClient(handler))
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
             {
-                var requestMessage = new HttpRequestMessage
-                {
-                    RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/provisioning/{action.Name}/{action.Id}/enqueue")
-                };
-                await httpClient.SendAsync(requestMessage);
-            }
-
+                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/provisioning/{action.Name}/{action.Id}/enqueue")
+            };
+            await httpClient.SendAsync(requestMessage);
             dispatcher.Dispatch(new LaunchIdentityProvisioningSuccessAction { Id = action.Id, Name = action.Name });
         }
 

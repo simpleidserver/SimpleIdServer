@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
+using System.Web;
 using TechTalk.SpecFlow;
 
 namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
@@ -22,7 +23,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
         }
 
         [When("extract JSON from body")]
-        public async Task GivenExtractFromBody()
+        public async Task WhenExtractFromBody()
         {
             var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
             var json = await httpResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -40,6 +41,17 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
                 jObj.Add(kvp.Key, queryValues[kvp.Key][0]);
             }
 
+            _scenarioContext.Set(jObj, "jsonHttpBody");
+        }
+
+        [When("extract query parameter '(.*)' into JSON")]
+        public void WhenExtractQueryParameterIntoJSON(string name)
+        {
+            var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
+            var queryValues = QueryHelpers.ParseQuery(httpResponseMessage.RequestMessage.RequestUri.Query);
+            var value = queryValues[name][0].ToString();
+            value = HttpUtility.UrlDecode(value);
+            var jObj = JsonDocument.Parse(value);
             _scenarioContext.Set(jObj, "jsonHttpBody");
         }
 
@@ -65,7 +77,8 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
         public void WhenExtractParameterFromBody(string parameter)
         {
             var jObj = _scenarioContext.Get<JsonDocument>("jsonHttpBody");
-            _scenarioContext.Set(jObj.SelectToken(parameter).Value.GetString(), parameter);
+            var token = jObj.SelectToken(parameter);
+            _scenarioContext.Set(token.Value.GetString(), parameter);
         }
 
         [When("extract parameter '(.*)' from JSON body into '(.*)'")]

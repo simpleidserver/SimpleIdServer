@@ -1,11 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.Configuration;
 using SimpleIdServer.IdServer.DTOs;
-using SimpleIdServer.IdServer.Extensions;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
@@ -51,6 +51,7 @@ namespace SimpleIdServer.IdServer.Api.OpenIdConfiguration
                 prefix = $"{prefix}/";
 
             result.Add(OpenIDConfigurationNames.UserInfoEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.UserInfo}");
+            result.Add(OpenIDConfigurationNames.DeviceAuthorizationEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.DeviceAuthorization}");
             result.Add(OpenIDConfigurationNames.CheckSessionIframe, $"{issuer}/{prefix}{Constants.EndPoints.CheckSession}");
             result.Add(OpenIDConfigurationNames.EndSessionEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.EndSession}");
             result.Add(OpenIDConfigurationNames.BackchannelAuthenticationEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.BCAuthorize}");
@@ -68,7 +69,7 @@ namespace SimpleIdServer.IdServer.Api.OpenIdConfiguration
             result.Add(OpenIDConfigurationNames.UserInfoSigningAlgValuesSupported, JsonSerializer.SerializeToNode(Constants.AllSigningAlgs));
             result.Add(OpenIDConfigurationNames.UserInfoEncryptionAlgValuesSupported, JsonSerializer.SerializeToNode(Constants.AllEncAlgs));
             result.Add(OpenIDConfigurationNames.UserInfoEncryptionEncValuesSupported, JsonSerializer.SerializeToNode(Constants.AllEncryptions));
-            result.Add(OpenIDConfigurationNames.ClaimsSupported, JsonSerializer.SerializeToNode(claims.DistinctBy(c => c.TokenClaimName).Select(c => c.TokenClaimName)));
+            result.Add(OpenIDConfigurationNames.ClaimsSupported, JsonSerializer.SerializeToNode(claims.DistinctBy(c => c.TargetClaimPath).Select(c => c.TargetClaimPath)));
             result.Add(OpenIDConfigurationNames.ClaimsParameterSupported, true);
             result.Add(OpenIDConfigurationNames.BackchannelTokenDeliveryModesSupported, JsonSerializer.SerializeToNode(Constants.AllStandardNotificationModes));
             result.Add(OpenIDConfigurationNames.BackchannelAuthenticationRequestSigningAlgValues, JsonSerializer.SerializeToNode(Constants.AllSigningAlgs));

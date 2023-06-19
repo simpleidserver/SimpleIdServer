@@ -14,7 +14,7 @@ Scenario: add UMA resource
 
 	And execute HTTP POST JSON request 'http://localhost/rreguri'
 	| Key             | Value                 |
-	| resource_scopes | [scope1,scope2]       |
+	| resource_scopes | ["scope1","scope2"]   |
 	| subject         | user1                 |
 	| icon_uri        | icon                  |
 	| name#fr         | nom                   |
@@ -43,7 +43,7 @@ Scenario: get UMA resource
 
 	And execute HTTP POST JSON request 'http://localhost/rreguri'
 	| Key             | Value                 |
-	| resource_scopes | [scope1,scope2]       |
+	| resource_scopes | ["scope1","scope2"]   |
 	| subject         | user1                 |
 	| icon_uri        | icon                  |
 	| name#fr         | nom                   |
@@ -84,7 +84,7 @@ Scenario: delete UMA resource
 
 	And execute HTTP POST JSON request 'http://localhost/rreguri'
 	| Key             | Value                 |
-	| resource_scopes | [scope1,scope2]       |
+	| resource_scopes | ["scope1","scope2"]   |
 	| subject         | user1                 |
 	| icon_uri        | icon                  |
 	| name#fr         | nom                   |
@@ -116,7 +116,7 @@ Scenario: add UMA permissions
 
 	And execute HTTP POST JSON request 'http://localhost/rreguri'
 	| Key             | Value                 |
-	| resource_scopes | [scope1,scope2]       |
+	| resource_scopes | ["scope1","scope2"]   |
 	| subject         | user1                 |
 	| icon_uri        | icon                  |
 	| name#fr         | nom                   |
@@ -152,7 +152,7 @@ Scenario: delete UMA permissions
 
 	And execute HTTP POST JSON request 'http://localhost/rreguri'
 	| Key             | Value                 |
-	| resource_scopes | [scope1,scope2]       |
+	| resource_scopes | ["scope1","scope2"]   |
 	| subject         | user1                 |
 	| icon_uri        | icon                  |
 	| name#fr         | nom                   |

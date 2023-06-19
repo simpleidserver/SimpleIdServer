@@ -16,7 +16,7 @@ namespace SimpleIdServer.IdServer.Builders
             _identityProvisioning = identityProvisioning;
         }
 
-        public static IdentityProvisioningBuilder Create<TOpts>(IdentityProvisioningDefinition definition, string name, string description, TOpts options, Realm realm = null)
+        public static IdentityProvisioningBuilder Create<TOpts>(IdentityProvisioningDefinition definition, string name, string description, TOpts options, Domains.Realm realm = null)
         {
             var properties = Serializer.PropertiesSerializer.SerializeProperties<IdentityProvisioningProperty>(options);
             var result = new IdentityProvisioning

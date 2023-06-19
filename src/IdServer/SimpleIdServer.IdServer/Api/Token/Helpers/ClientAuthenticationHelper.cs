@@ -1,7 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Authenticate;
+using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json.Nodes;
@@ -13,6 +13,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Helpers
     public interface IClientAuthenticationHelper
     {
         Task<Client> AuthenticateClient(string realm, JsonObject jObjHeader, JsonObject jObjBody, X509Certificate2 certificate, string issuerName, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT);
+        bool TryGetClientId(string realm, JsonObject jObjHeader, JsonObject jObjBody, X509Certificate2 certificate, out string clientId);
     }
 
     public class ClientAuthenticationHelper : IClientAuthenticationHelper
@@ -30,6 +31,12 @@ namespace SimpleIdServer.IdServer.Api.Token.Helpers
             var oauthClient = await _authenticateClient.Authenticate(authenticateInstruction, issuerName, cancellationToken, errorCode: errorCode);
             if (oauthClient == null) throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_CREDENTIAL);
             return oauthClient;
+        }
+
+        public bool TryGetClientId(string realm, JsonObject jObjHeader, JsonObject jObjBody, X509Certificate2 certificate, out string clientId)
+        {
+            var authenticateInstruction = BuildAuthenticateInstruction(realm, jObjHeader, jObjBody, certificate);
+            return _authenticateClient.TryGetClientId(authenticateInstruction, out clientId);
         }
 
         private AuthenticateInstruction BuildAuthenticateInstruction(string realm, JsonObject jObjHeader, JsonObject jObjBody, X509Certificate2 certificate)

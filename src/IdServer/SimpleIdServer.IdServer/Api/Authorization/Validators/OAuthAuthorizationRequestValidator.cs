@@ -24,6 +24,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
     public class OAuthAuthorizationRequestValidator : IAuthorizationRequestValidator
     {
         private readonly IEnumerable<IResponseTypeHandler> _responseTypeHandlers;
+        private readonly IUserHelper _userHelper;
         private readonly IClientRepository _clientRepository;
         private readonly IGrantHelper _grantHelper;
         private readonly IAmrHelper _amrHelper;
@@ -33,9 +34,10 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
         private readonly IJwtBuilder _jwtBuilder;
         private readonly IdServerHostOptions _options;
 
-        public OAuthAuthorizationRequestValidator(IEnumerable<IResponseTypeHandler> responseTypeHandlers, IClientRepository clientRepository, IGrantHelper grantHelper, IAmrHelper amrHelper, IExtractRequestHelper extractRequestHelper, IEnumerable<IOAuthResponseMode> oauthResponseModes, IClientHelper clientHelper, IJwtBuilder jwtBuilder, IOptions<IdServerHostOptions> options)
+        public OAuthAuthorizationRequestValidator(IEnumerable<IResponseTypeHandler> responseTypeHandlers, IUserHelper userHelper, IClientRepository clientRepository, IGrantHelper grantHelper, IAmrHelper amrHelper, IExtractRequestHelper extractRequestHelper, IEnumerable<IOAuthResponseMode> oauthResponseModes, IClientHelper clientHelper, IJwtBuilder jwtBuilder, IOptions<IdServerHostOptions> options)
         {
             _responseTypeHandlers = responseTypeHandlers;
+            _userHelper = userHelper;
             _clientRepository = clientRepository;
             _grantHelper = grantHelper;
             _amrHelper = amrHelper;
@@ -206,7 +208,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
             }
 
             var grantManagementAction = context.Request.RequestData.GetGrantManagementActionFromAuthorizationRequest();
-            if (string.IsNullOrWhiteSpace(grantManagementAction) && !context.User.HasOpenIDConsent(context.Realm, clientId, request, claims, authDetails))
+            if (string.IsNullOrWhiteSpace(grantManagementAction) && !_userHelper.HasOpenIDConsent(context.User, context.Realm, clientId, request, claims, authDetails))
             {
                 RedirectToConsentView(context);
             }

@@ -7,9 +7,6 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI;
-using Twilio;
-using Twilio.Rest.Api.V2010.Account;
-using Twilio.Types;
 
 namespace SimpleIdServer.IdServer.Sms.UI.Services
 {
@@ -21,15 +18,18 @@ namespace SimpleIdServer.IdServer.Sms.UI.Services
 
     public class SmsAuthService : ISmsAuthService
     {
+        private readonly ISmsUserNotificationService _notificationService;
         private readonly IUserRepository _userRepository;
         private readonly IEnumerable<IOTPAuthenticator> _otpAuthenticators;
         private readonly IdServerSmsOptions _smsHostOptions;
 
         public SmsAuthService(
+            ISmsUserNotificationService notificationService,
             IUserRepository userRepository,
             IEnumerable<IOTPAuthenticator> otpAuthenticators,
             IOptions<IdServerSmsOptions> smsHostOptions)
         {
+            _notificationService = notificationService;
             _userRepository = userRepository;
             _otpAuthenticators = otpAuthenticators;
             _smsHostOptions = smsHostOptions.Value;
@@ -63,11 +63,7 @@ namespace SimpleIdServer.IdServer.Sms.UI.Services
 
             var otpAuthenticator = _otpAuthenticators.Single(a => a.Alg == activeOtp.OTPAlg);
             var otpCode = otpAuthenticator.GenerateOtp(activeOtp);
-            TwilioClient.Init(_smsHostOptions.AccountSid, _smsHostOptions.AuthToken);
-            await MessageResource.CreateAsync(
-                body: string.Format(_smsHostOptions.Message, otpCode),
-                from: new PhoneNumber(_smsHostOptions.FromPhoneNumber),
-                to: new PhoneNumber(phoneNumber));
+            await _notificationService.Send(string.Format(_smsHostOptions.Message, otpCode), user);
             return otpCode;
         }
     }

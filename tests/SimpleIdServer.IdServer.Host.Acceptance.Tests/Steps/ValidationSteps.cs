@@ -34,6 +34,12 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
         public void ThenExists(string key)
         {
             var jsonHttpBody = _scenarioContext["jsonHttpBody"] as JsonDocument;
+            if(jsonHttpBody == null)
+            {
+                var jsonObj = _scenarioContext["jsonHttpBody"] as JsonObject;
+                if (jsonObj != null) jsonHttpBody = JsonDocument.Parse(jsonObj.ToJsonString());
+            }
+
             Assert.True(jsonHttpBody.SelectToken(key) != null);
         }
 

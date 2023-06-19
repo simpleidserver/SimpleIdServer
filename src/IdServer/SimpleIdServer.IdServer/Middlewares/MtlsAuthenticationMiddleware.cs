@@ -56,7 +56,7 @@ namespace SimpleIdServer.IdServer.Middlewares
                     { ErrorResponseParameters.ErrorDescription, ErrorMessages.CERTIFICATE_IS_REQUIRED }
                 };
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                context.Response.Headers.Add("Content-Type", "application/json");
+                context.Response.Headers.Add("Content-Types", "application/json");
                 await context.Response.WriteAsync(error.ToString(), Encoding.UTF8);
             }
 

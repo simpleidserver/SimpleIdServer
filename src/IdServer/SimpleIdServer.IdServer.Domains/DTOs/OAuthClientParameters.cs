@@ -70,5 +70,6 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
         public const string AuthorizationEncryptedResponseAlg = "authorization_encrypted_response_alg";
         public const string AuthorizationEncryptedResponseEnc = "authorization_encrypted_response_enc";
         public const string AuthorizationDataTypes = "authorization_data_types";
+        public const string CredentialOfferEndpoint = "credential_offer_endpoint";
     }
 }

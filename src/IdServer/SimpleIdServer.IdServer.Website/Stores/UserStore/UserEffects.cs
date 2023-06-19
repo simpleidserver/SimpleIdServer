@@ -4,12 +4,17 @@ using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using QRCoder;
 using Radzen;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Website.Resources;
 using SimpleIdServer.IdServer.Website.Stores.Base;
+using System.Drawing.Imaging;
 using System.Linq.Dynamic.Core;
+using System.Text;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.IdServer.Website.Stores.UserStore
 {
@@ -18,21 +23,30 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         private readonly ILoggerFactory _loggerFactory;
         private readonly IUserRepository _userRepository;
         private readonly IGroupRepository _groupRepository;
+        private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly ProtectedSessionStorage _sessionStorage;
         private readonly DbContextOptions<StoreDbContext> _options;
+        private readonly IdServerWebsiteOptions _websiteOptions;
+        private readonly DefaultSecurityOptions _securityOptions;
 
         public UserEffects(
             ILoggerFactory loggerFactory,
             IUserRepository userRepository,
             IGroupRepository groupRepository,
+            IWebsiteHttpClientFactory websiteHttpClientFactory,
             ProtectedSessionStorage sessionStorage,
-            DbContextOptions<StoreDbContext> options)
+            DbContextOptions<StoreDbContext> options,
+            IOptions<IdServerWebsiteOptions> websiteOptions,
+            DefaultSecurityOptions securityOptions)
         {
             _loggerFactory = loggerFactory;
             _userRepository = userRepository;
             _groupRepository = groupRepository;
+            _websiteHttpClientFactory = websiteHttpClientFactory;
             _sessionStorage = sessionStorage;
             _options = options;
+            _websiteOptions = websiteOptions.Value;
+            _securityOptions = securityOptions;
         }
 
         [EffectMethod]
@@ -57,7 +71,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         public async Task Handle(GetUserAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.OAuthUserClaims).Include(u => u.Groups).Include(u => u.Consents).ThenInclude(c => c.Scopes).Include(u => u.Sessions).Include(u => u.Credentials).Include(u => u.ExternalAuthProviders).AsNoTracking().SingleOrDefaultAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
+            var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.OAuthUserClaims).Include(u => u.CredentialOffers).Include(u => u.Groups).Include(u => u.Consents).ThenInclude(c => c.Scopes).Include(u => u.Sessions).Include(u => u.Credentials).Include(u => u.ExternalAuthProviders).Include(u => u.CredentialOffers).AsNoTracking().SingleOrDefaultAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
             if (user == null)
             {
                 dispatcher.Dispatch(new GetUserFailureAction { ErrorMessage = string.Format(Global.UnknownUser, action.UserId) });
@@ -279,6 +293,125 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             });
 
             logger.LogInformation($"The user '{action.Name}' was added succesfully.");
+        }
+
+        [EffectMethod]
+        public async Task Handle(RemoveSelectedUserCredentialOffersAction action, IDispatcher dispatcher)
+        {
+            var user = await _userRepository.Query().Include(u => u.CredentialOffers).FirstOrDefaultAsync(u => u.Id == action.UserId);
+            user.CredentialOffers = user.CredentialOffers.Where(c => !action.CredentialOffersId.Contains(c.Id)).ToList();
+            await _userRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new RemoveSelectedUserCredentialOffersSuccessAction { CredentialOffersId = action.CredentialOffersId });
+        }
+
+        [EffectMethod]
+        public async Task Handle(ShareCredentialOfferAction action, IDispatcher dispatcher)
+        {
+            var realm = await GetRealm();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var request = new JsonObject
+            {
+                { "credential_template_id", action.CredentialTemplateId },
+                { "wallet_client_id", action.ClientId }
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{_websiteOptions.IdServerBaseUrl}/{realm}/credential_offer/share/{action.UserName}"),
+                Method = HttpMethod.Post,
+                Content = new StringContent(request.ToJsonString(), Encoding.UTF8, "application/json")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            if(httpResult.StatusCode == System.Net.HttpStatusCode.Redirect)
+            {
+                var credentialOffer = httpResult.Headers.Location.OriginalString;
+                var picture = GetQRCode(credentialOffer);
+                dispatcher.Dispatch(new ShareCredentialOfferSuccessAction { Picture = picture, CredentialOffer = credentialOffer });
+                dispatcher.Dispatch(new GetUserAction { UserId = action.UserId });
+                return;
+            }
+
+            var jObj = JsonObject.Parse(json);
+            dispatcher.Dispatch(new ShareCredentialOfferFailureAction { ErrorMessage = jObj["error_description"].GetValue<string>() });
+
+            string GetQRCode(string url)
+            {
+                var qrGenerator = new QRCodeGenerator();
+                var qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
+                var qrCode = new QRCode(qrCodeData);
+                var bitMap = qrCode.GetGraphic(20);
+                byte[] payload = null;
+                using (var stream = new MemoryStream())
+                {
+                    bitMap.Save(stream, ImageFormat.Png);
+                    payload = stream.ToArray();
+                }
+
+                return $"data:image/jpeg;base64,{Convert.ToBase64String(payload)}";
+            }
+        }
+
+        [EffectMethod]
+        public async Task Handle(GenerateDIDEthrAction action, IDispatcher dispatcher)
+        {
+            var realm = await GetRealm();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var request = new JsonObject
+            {
+                { "method", "ethr" },
+                { "publicKey", action.PublicKey },
+                { "network", action.NetworkName }
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{_websiteOptions.IdServerBaseUrl}/{realm}/users/{action.UserId}/did"),
+                Method = HttpMethod.Post,
+                Content = new StringContent(request.ToJsonString(), Encoding.UTF8, "application/json")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            try
+            {
+                httpResult.EnsureSuccessStatusCode();
+                var jObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new GenerateDIDEthrSuccessAction { UserId = action.UserId, Did = jObj["did"].GetValue<string>(), DidPrivateHex = jObj["private_key"].GetValue<string>() });
+            }
+            catch
+            {
+                var jObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new GenerateDIDEthrFailureAction { ErrorMessage = jObj["error_description"].GetValue<string>() });
+            }
+        }
+
+
+        [EffectMethod]
+        public async Task Handle(GenerateDIDKeyAction action, IDispatcher dispatcher)
+        {
+            var realm = await GetRealm();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var request = new JsonObject
+            {
+                { "method", "key" }
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{_websiteOptions.IdServerBaseUrl}/{realm}/users/{action.UserId}/did"),
+                Method = HttpMethod.Post,
+                Content = new StringContent(request.ToJsonString(), Encoding.UTF8, "application/json")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            try
+            {
+                httpResult.EnsureSuccessStatusCode();
+                var jObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new GenerateDIDKeySuccessAction { UserId = action.UserId, Did = jObj["did"].GetValue<string>(), DidPrivateHex = jObj["private_key"].GetValue<string>() });
+            }
+            catch
+            {
+                var jObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new GenerateDIDKeyFailureAction { ErrorMessage = jObj["error_description"].GetValue<string>() });
+            }
         }
 
         private async Task<string> GetRealm()
@@ -533,7 +666,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
     public class AddUserSuccessAction
     {
         /// <summary>
-        /// The generated user's Id.
+        /// The generated user's TechnicalId.
         /// </summary>
         public string Id { get; set; }
 
@@ -574,5 +707,88 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
     public class RemoveSelectedUsersSuccessAction
     {
         public IEnumerable<string> UserIds { get; set; }
+    }
+
+    public class ToggleAllUserCredentialOffersAction
+    {
+        public bool IsSelected { get; set; }
+    }
+
+    public class ToggleUserCredentialOfferAction
+    {
+        public bool IsSelected { get; set; }
+        public string CredentialOfferId { get; set; }
+        public string UserId { get; set; }
+    }
+
+    public class RemoveSelectedUserCredentialOffersAction
+    {
+        public ICollection<string> CredentialOffersId { get; set; }
+        public string UserId { get; set; }
+    }
+
+    public class RemoveSelectedUserCredentialOffersSuccessAction
+    {
+        public ICollection<string> CredentialOffersId { get; set; }
+    }
+
+    public class ShareCredentialOfferAction
+    {
+        public string UserId { get; set; }
+        public string UserName { get; set; }
+        public string CredentialTemplateId { get; set; }
+        public string ClientId { get; set; }
+    }
+
+    public class ShareCredentialOfferSuccessAction
+    {
+        public string Picture { get; set; }
+        public string CredentialOffer { get; set; }
+    }
+
+    public class ShareCredentialOfferFailureAction
+    {
+        public string ErrorMessage { get; set; }
+    }
+
+    public class AddCredentialOfferSuccessAction
+    {
+        public UserCredentialOffer CredentialOffer { get; set; }
+    }
+
+    public class GenerateDIDEthrAction
+    {
+        public string UserId { get; set; }
+        public string PublicKey { get; set; }
+        public string NetworkName { get; set; }
+    }
+
+    public class GenerateDIDEthrSuccessAction
+    {
+        public string UserId { get; set; }
+        public string Did { get; set; }
+        public string DidPrivateHex { get; set; }
+    }
+
+    public class GenerateDIDEthrFailureAction
+    {
+        public string ErrorMessage { get; set; }
+    }
+
+    public class GenerateDIDKeyAction
+    {
+        public string UserId { get; set; }
+    }
+
+    public class GenerateDIDKeySuccessAction
+    {
+        public string UserId { get; set; }
+        public string Did { get; set; }
+        public string DidPrivateHex { get; set; }
+    }
+
+    public class GenerateDIDKeyFailureAction
+    {
+        public string ErrorMessage { get; set; }
     }
 }

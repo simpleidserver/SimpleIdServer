@@ -6,15 +6,18 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer;
+using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Api.Authorization;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseModes;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
 using SimpleIdServer.IdServer.Api.Authorization.Validators;
 using SimpleIdServer.IdServer.Api.BCAuthorize;
 using SimpleIdServer.IdServer.Api.Configuration;
+using SimpleIdServer.IdServer.Api.DeviceAuthorization;
 using SimpleIdServer.IdServer.Api.Jwks;
 using SimpleIdServer.IdServer.Api.Register;
 using SimpleIdServer.IdServer.Api.Token;
@@ -31,6 +34,7 @@ using SimpleIdServer.IdServer.Authenticate.AssertionParsers;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.ClaimsEnricher;
 using SimpleIdServer.IdServer.ClaimTokenFormats;
+using SimpleIdServer.IdServer.Extractors;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Infrastructures;
 using SimpleIdServer.IdServer.Jobs;
@@ -67,6 +71,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 opt.ConstraintMap.Add("realmPrefix", typeof(RealmRoutePrefixConstraint));
             });
             Tracing.Init();
+            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddControllersWithViews();
             services.AddDataProtection();
             services.AddDistributedMemoryCache();
@@ -85,6 +90,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddOAuthIntrospectionTokenApi()
                 .AddRegisterApi()
                 .AddBCAuthorizeApi()
+                .AddDeviceAuthorizationApi()
                 .AddIdentityProvisioning();
             services.AddAuthorization();
             services.Configure<AuthorizationOptions>(o =>
@@ -185,6 +191,13 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
+        private static IServiceCollection AddDeviceAuthorizationApi(this IServiceCollection services)
+        {
+            services.AddTransient<IDeviceAuthorizationRequestHandler, DeviceAuthorizationRequestHandler>();
+            services.AddTransient<IDeviceAuthorizationRequestValidator, DeviceAuthorizationRequestValidator>();
+            return services;
+        }
+
         private static IServiceCollection AddSubjectTypeBuilder(this IServiceCollection services)
         {
             services.AddTransient<ISubjectTypeBuilder, PairWiseSubjectTypeBuidler>();
@@ -214,6 +227,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IGrantTypeHandler, AuthorizationCodeHandler>();
             services.AddTransient<IGrantTypeHandler, CIBAHandler>();
             services.AddTransient<IGrantTypeHandler, UmaTicketHandler>();
+            services.AddTransient<IGrantTypeHandler, PreAuthorizedCodeHandler>();
+            services.AddTransient<IGrantTypeHandler, DeviceCodeHandler>();
             services.AddTransient<ICIBAGrantTypeValidator, CIBAGrantTypeValidator>();
             services.AddTransient<IClientAuthenticationHelper, ClientAuthenticationHelper>();
             services.AddTransient<IRevokeTokenRequestHandler, RevokeTokenRequestHandler>();
@@ -233,12 +248,15 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IClaimTokenFormat, OpenIDClaimTokenFormat>();
             services.AddTransient<IUmaTicketGrantTypeValidator, UmaTicketGrantTypeValidator>();
             services.AddTransient<IAuthenticationHelper, AuthenticationHelper>();
+            services.AddTransient<IScopeClaimsExtractor, ScopeClaimsExtractor>();
             services.AddTransient<IClaimsExtractor, ClaimsExtractor>();
-            services.AddTransient<IMapperClaimsExtractor, UserAttributeClaimsExtractor>();
-            services.AddTransient<IMapperClaimsExtractor, UserPropertyClaimsExtractor>();
-            services.AddTransient<IMapperClaimsExtractor, UserAddressClaimsExtractor>();
-            services.AddTransient<IMapperClaimsExtractor, UserSubClaimsExtractor>();
+            services.AddTransient<IClaimExtractor, AttributeClaimExtractor>();
+            services.AddTransient<IClaimExtractor, PropertyClaimExtractor>();
+            services.AddTransient<IClaimExtractor, SubClaimExtractor>();
+            services.AddTransient<IUserHelper, UserHelper>();
+            services.AddTransient<IPreAuthorizedCodeValidator, PreAuthorizedCodeValidator>();
             services.AddTransient<IKeyStore, InMemoryKeyStore>();
+            services.AddTransient<IDeviceCodeGrantTypeValidator, DeviceCodeGrantTypeValidator>();
             return services;
         }
 
@@ -264,7 +282,8 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddTransient<IBCAuthorizeHandler, BCAuthorizeHandler>();
             services.AddTransient<IBCAuthorizeRequestValidator, BCAuthorizeRequestValidator>();
-            services.AddTransient<IBCNotificationService, BCConsoleNotificationService>();
+            services.AddTransient<IBCNotificationService, BCNotificationService>();
+            services.AddTransient<IUserNotificationService, ConsoleNotificationService>();
             return services;
         }
 
@@ -305,6 +324,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IPasswordAuthService, PasswordAuthService>();
             services.AddTransient<IUserTransformer, UserTransformer>();
             services.AddTransient<IIdProviderAuthService, LDAPAuthenticationService>();
+            services.AddTransient<IAuthenticationMethodService, PwdAuthenticationMethodService>();
             return services;
         }
 

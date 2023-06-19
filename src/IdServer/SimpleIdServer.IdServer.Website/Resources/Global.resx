@@ -357,4 +357,55 @@
   <data name="SelectedUsersRemoved" xml:space="preserve">
     <value>Selected users are removed</value>
   </data>
+  <data name="SelectedCredentialTemplatesRemoved" xml:space="preserve">
+    <value>Selected credential templates are removed</value>
+  </data>
+  <data name="CredentialTemplateExists" xml:space="preserve">
+    <value>The credential template with type '{0}' already exists</value>
+  </data>
+  <data name="CredentialTemplateAdded" xml:space="preserve">
+    <value>Credential template is added</value>
+  </data>
+  <data name="SelectedCredentialTemplateDisplaysRemoved" xml:space="preserve">
+    <value>Selected displays have been removed</value>
+  </data>
+  <data name="CredentialTemplateDisplayAdded" xml:space="preserve">
+    <value>Display has been added</value>
+  </data>
+  <data name="SelectedCredentialSubjectsRemoved" xml:space="preserve">
+    <value>Selected credentials subjects are removed</value>
+  </data>
+  <data name="CredentialTypesAreUpdated" xml:space="preserve">
+    <value>Credential types are updated</value>
+  </data>
+  <data name="CredentialSubjectAdded" xml:space="preserve">
+    <value>Credential subject has been added</value>
+  </data>
+  <data name="CredentialOfferAdded" xml:space="preserve">
+    <value>Credential offer has been added</value>
+  </data>
+  <data name="SelectedCredentialOffersRemoved" xml:space="preserve">
+    <value>Selected credential offers have been removed</value>
+  </data>
+  <data name="EthrNetworkExists" xml:space="preserve">
+    <value>The ethereum network {0} already exists</value>
+  </data>
+  <data name="EthrContractDeployed" xml:space="preserve">
+    <value>Ethereum contract has been deployed</value>
+  </data>
+  <data name="EthrNetworkAdded" xml:space="preserve">
+    <value>Ethereum network has been added</value>
+  </data>
+  <data name="SelectedEthrNetworksRemoved" xml:space="preserve">
+    <value>Selected ethereum networks have been removed</value>
+  </data>
+  <data name="DIDKeyCreated" xml:space="preserve">
+    <value>DID has been generated</value>
+  </data>
+  <data name="AcrAdded" xml:space="preserve">
+    <value>Authentication Class Reference has been added</value>
+  </data>
+  <data name="SelectedAcrsRemoved" xml:space="preserve">
+    <value>Selected ACRS have been removed</value>
+  </data>
 </root>

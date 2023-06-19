@@ -13,6 +13,7 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.ExternalEvents;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.AuthProviders;
@@ -30,24 +31,28 @@ namespace SimpleIdServer.IdServer.UI
     public class HomeController : Controller
     {
         private readonly IdServerHostOptions _options;
+        private readonly IUserHelper _userHelper;
         private readonly IUserRepository _userRepository;
         private readonly IClientRepository _clientRepository;
         private readonly IUmaPendingRequestRepository _pendingRequestRepository;
         private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
         private readonly IOTPQRCodeGenerator _otpQRCodeGenerator;
+        private readonly ICredentialTemplateRepository _credentialTemplateRepository;
         private readonly IBusControl _busControl;
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(IOptions<IdServerHostOptions> options, IUserRepository userRepository, IClientRepository clientRepository, 
+        public HomeController(IOptions<IdServerHostOptions> options, IUserHelper userHelper, IUserRepository userRepository, IClientRepository clientRepository, 
             IUmaPendingRequestRepository pendingRequestRepository, IAuthenticationSchemeProvider authenticationSchemeProvider,
-            IOTPQRCodeGenerator otpQRCodeGenerator, IBusControl busControl, ILogger<HomeController> logger)
+            IOTPQRCodeGenerator otpQRCodeGenerator, ICredentialTemplateRepository credentialTemplateRepository, IBusControl busControl, ILogger<HomeController> logger)
         {
             _options = options.Value;
+            _userHelper = userHelper;
             _userRepository = userRepository;
             _clientRepository = clientRepository;
             _pendingRequestRepository = pendingRequestRepository;
             _authenticationSchemeProvider = authenticationSchemeProvider;
             _otpQRCodeGenerator = otpQRCodeGenerator;
+            _credentialTemplateRepository = credentialTemplateRepository;
             _busControl = busControl;
             _logger = logger;
         }
@@ -136,12 +141,41 @@ namespace SimpleIdServer.IdServer.UI
 
         [HttpGet]
         [Authorize(Constants.Policies.Authenticated)]
+        public async Task<IActionResult> Credentials([FromRoute] string prefix, CancellationToken cancellationToken)
+        {
+            prefix = prefix ?? Constants.DefaultRealm;
+            var credentials = await GetCredentialTemplates();
+            return View(new CredentialsViewModel
+            {
+                Credentials = credentials,
+                ClientIds = await GetClients()
+            });
+
+            async Task<ICollection<CredentialTemplateViewModel>> GetCredentialTemplates()
+            {
+                var credentialTemplates = await _credentialTemplateRepository.Query().Include(c => c.DisplayLst).Include(c => c.Realms).AsNoTracking().Where(c => c.Realms.All(r => r.Name == prefix)).ToListAsync(cancellationToken);
+                return credentialTemplates.Select(c => new CredentialTemplateViewModel
+                {
+                    Id = c.TechnicalId,
+                    Display = c.Display
+                }).ToList();
+            }
+
+            async Task<IEnumerable<string>> GetClients()
+            {
+                var clients = await _clientRepository.Query().Include(c => c.Realms).Where(c => c.ClientType == ClientTypes.WALLET && c.Realms.All(r => r.Name == prefix)).ToListAsync(cancellationToken);
+                return clients.Select(c => c.ClientId);
+            }
+        }
+
+        [HttpGet]
+        [Authorize(Constants.Policies.Authenticated)]
         public async Task<IActionResult> RejectConsent([FromRoute] string prefix, string consentId, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
             var user = await _userRepository.Query().Include(u => u.Consents).Include(u => u.Realms).FirstAsync(c => c.Name == nameIdentifier && c.Realms.Any(r => r.RealmsName == prefix), cancellationToken);
-            if (!user.HasOpenIDConsent(consentId))
+            if (!_userHelper.HasOpenIDConsent(user, consentId))
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request" });
 
             user.RejectConsent(consentId);

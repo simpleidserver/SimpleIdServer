@@ -17,7 +17,7 @@ namespace SimpleIdServer.IdServer.Builders
             _ca = ca;
         }
 
-        public static CertificateAuthorityBuilder Create(string subjectName, Realm realm = null, int numberOfDays = 365)
+        public static CertificateAuthorityBuilder Create(string subjectName, Domains.Realm realm = null, int numberOfDays = 365)
         {
             var caResult = KeyGenerator.GenerateCertificateAuthority(subjectName, numberOfDays); 
             var privateKey = new string(PemEncoding.Write("PRIVATE KEY", caResult.Item2.ExportPkcs8PrivateKey()));
@@ -37,7 +37,7 @@ namespace SimpleIdServer.IdServer.Builders
             return new CertificateAuthorityBuilder(result);
         }
 
-        public static CertificateAuthorityBuilder Import(X509Certificate2 certificate, StoreLocation storeLocation, StoreName storeName, X509FindType findType, string findValue, Realm realm = null)
+        public static CertificateAuthorityBuilder Import(X509Certificate2 certificate, StoreLocation storeLocation, StoreName storeName, X509FindType findType, string findValue, Domains.Realm realm = null)
         {
             var result = new CertificateAuthority
             {

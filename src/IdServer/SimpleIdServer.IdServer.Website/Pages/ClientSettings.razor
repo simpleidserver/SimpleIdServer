@@ -112,6 +112,15 @@
                                 </div>
                             }
 
+                            @if(Client.ClientType == ClientTypes.DEVICE)
+                            {
+                                <!-- DEVICE -->
+                                <div>
+                                    <RadzenCheckBox Name="IsDeviceGrantTypeEnabled" @bind-Value=updateClient.IsDeviceGrantTypeEnabled></RadzenCheckBox>
+                                    <RadzenLabel Text="Device" Component="IsDeviceGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
+                                </div>
+                            }
+
                             @if (Client.ClientType == ClientTypes.SPA)
                             {
                                 <!-- Authorization code  -->
@@ -214,6 +223,7 @@
         public bool IsCIBAGrantTypeEnabled { get; set; }
         public bool IsUMAGrantTypeEnabled { get; set; }
         public bool IsConsentEnabled { get; set; }
+        public bool IsDeviceGrantTypeEnabled { get; set; }
     }
 
     UpdateClient updateClient = new UpdateClient();
@@ -259,6 +269,8 @@
             updateClient.IsCIBAGrantTypeEnabled = true;
         if (this.Client.GrantTypes.Contains(UmaTicketHandler.GRANT_TYPE))
             updateClient.IsUMAGrantTypeEnabled = true;
+        if (this.Client.GrantTypes.Contains(DeviceCodeHandler.GRANT_TYPE))
+            updateClient.IsDeviceGrantTypeEnabled = true;
     }
 
     void SubmitUpdateClient(UpdateClient client)
@@ -279,7 +291,8 @@
             IsAuthorizationCodeGrantTypeEnabled = client.IsAuthorizationCodeGrantTypeEnabled,
             IsCIBAGrantTypeEnabled = client.IsCIBAGrantTypeEnabled,
             IsUMAGrantTypeEnabled = client.IsUMAGrantTypeEnabled,
-            IsConsentEnabled = client.IsConsentEnabled
+            IsConsentEnabled = client.IsConsentEnabled,
+            IsDeviceGrantTypeEnabled = client.IsDeviceGrantTypeEnabled
         });
     }
 

@@ -15,13 +15,37 @@ namespace SimpleIdServer.IdServer.Builders
     public class ClientBuilder
     {
         /// <summary>
+        /// Build wallet client - use credential offer - cross device (with information pre-submitted by the End-User).
+        /// </summary>
+        /// <param name="clientId"></param>
+        /// <param name="realm"></param>
+        /// <returns></returns>
+        public static WalletClientBuilder BuildWalletClient(string clientId, string clientSecret, Domains.Realm realm = null)
+        {
+            var client = new Client
+            {
+                Id = Guid.NewGuid().ToString(),
+                ClientId = clientId,
+                ClientSecret = clientSecret,
+                ClientType = ClientTypes.WALLET,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
+            };
+            if (realm == null) client.Realms.Add(Constants.StandardRealms.Master);
+            else client.Realms.Add(realm);
+            client.GrantTypes.Add(PreAuthorizedCodeHandler.GRANT_TYPE);
+            client.GrantTypes.Add(ClientCredentialsHandler.GRANT_TYPE);
+            return new WalletClientBuilder(client);
+        }
+
+        /// <summary>
         /// Build client for REST.API.
         /// By default client_credentials grant-type is used to obtain an access token outside of the context of a user.
         /// </summary>
         /// <param name="clientId"></param>
         /// <param name="clientSecret"></param>
         /// <returns></returns>
-        public static ApiClientBuilder BuildApiClient(string clientId, string clientSecret, Realm realm = null)
+        public static ApiClientBuilder BuildApiClient(string clientId, string clientSecret, Domains.Realm realm = null)
         {
             var client = new Client
             {
@@ -47,7 +71,7 @@ namespace SimpleIdServer.IdServer.Builders
         /// <param name="clientSecret"></param>
         /// <param name="redirectUrls"></param>
         /// <returns></returns>
-        public static TraditionalWebsiteClientBuilder BuildTraditionalWebsiteClient(string clientId, string clientSecret, Realm realm = null, params string[] redirectUrls)
+        public static TraditionalWebsiteClientBuilder BuildTraditionalWebsiteClient(string clientId, string clientSecret, Domains.Realm realm = null, params string[] redirectUrls)
         {
             var client = new Client
             {
@@ -72,7 +96,7 @@ namespace SimpleIdServer.IdServer.Builders
         /// CIBA is enabled.
         /// </summary>
         /// <returns></returns>
-        public static DeviceClientBuilder BuildExternalAuthDeviceClient(string clientId, string subjectName, Realm realm = null)
+        public static ExternalDeviceClientBuilder BuildExternalAuthDeviceClient(string clientId, string subjectName, Domains.Realm realm = null)
         {
             var client = new Client
             {
@@ -92,6 +116,32 @@ namespace SimpleIdServer.IdServer.Builders
             if (realm == null) client.Realms.Add(Constants.StandardRealms.Master);
             else client.Realms.Add(realm);
             client.GrantTypes.Add(CIBAHandler.GRANT_TYPE);
+            return new ExternalDeviceClientBuilder(client);
+        }
+
+        /// <summary>
+        /// Build a device client.
+        /// </summary>
+        /// <param name="clientId"></param>
+        /// <param name="clientSecret"></param>
+        /// <param name="realm"></param>
+        /// <returns></returns>
+        public static DeviceClientBuilder BuildDeviceClient(string clientId, string clientSecret, Domains.Realm realm = null)
+        {
+            var client = new Client
+            {
+                Id = Guid.NewGuid().ToString(),
+                ClientId = clientId,
+                ClientSecret = clientSecret,
+                ClientType = ClientTypes.DEVICE,
+                TokenEndPointAuthMethod = OAuthClientSecretPostAuthenticationHandler.AUTH_METHOD,
+                IdTokenSignedResponseAlg = SecurityAlgorithms.EcdsaSha256,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
+            };
+            if (realm == null) client.Realms.Add(Constants.StandardRealms.Master);
+            else client.Realms.Add(realm);
+            client.GrantTypes.Add(DeviceCodeHandler.GRANT_TYPE);
             return new DeviceClientBuilder(client);
         }
 
@@ -103,7 +153,7 @@ namespace SimpleIdServer.IdServer.Builders
         /// <param name="clientSecret"></param>
         /// <param name="redirectUrls"></param>
         /// <returns></returns>
-        public static MobileClientBuilder BuildMobileApplication(string clientId, string clientSecret, Realm realm = null, params string[] redirectUrls)
+        public static MobileClientBuilder BuildMobileApplication(string clientId, string clientSecret, Domains.Realm realm = null, params string[] redirectUrls)
         {
             var client = new Client
             {
@@ -131,7 +181,7 @@ namespace SimpleIdServer.IdServer.Builders
         /// <param name="clientSecret"></param>
         /// <param name="redirectUrls"></param>
         /// <returns></returns>
-        public static UserAgentClientBuilder BuildUserAgentClient(string clientId, string clientSecret, Realm realm = null, params string[] redirectUrls)
+        public static UserAgentClientBuilder BuildUserAgentClient(string clientId, string clientSecret, Domains.Realm realm = null, params string[] redirectUrls)
         {
             var client = new Client
             {

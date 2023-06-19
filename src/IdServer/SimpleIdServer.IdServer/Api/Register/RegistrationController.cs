@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -8,7 +9,6 @@ using Microsoft.Extensions.Primitives;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
-using SimpleIdServer.IdServer.Extensions;
 using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
@@ -225,7 +225,7 @@ namespace SimpleIdServer.IdServer.Api.Register
         {
             string accessToken;
             if (!TryExtractAccessToken(out accessToken)) return GetClientResult.Error(Unauthorized());
-            var client = await _clientRepository.Query().Include(c => c.Translations).Include(c => c.Realms).FirstOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == realm), cancellationToken);
+            var client = await _clientRepository.Query().Include(c => c.Translations).Include(c => c.Realms).AsNoTracking().FirstOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == realm), cancellationToken);
             if (client == null) return GetClientResult.Error(NotFound());
             if (client.RegistrationAccessToken != accessToken) return GetClientResult.Error(Unauthorized());
             return GetClientResult.Ok(client);
@@ -245,7 +245,7 @@ namespace SimpleIdServer.IdServer.Api.Register
         private async Task<ICollection<Domains.Scope>> GetScopes(string realm, string scope, CancellationToken cancellationToken)
         {
             var scopeNames = string.IsNullOrWhiteSpace(scope) ? _options.DefaultScopes : scope.ToScopes();
-            return await _scopeRepository.Query().Include(s => s.Realms).AsNoTracking().Where(s => scopeNames.Contains(s.Name) && s.Realms.Any(r => r.Name == realm)).ToListAsync(cancellationToken);
+            return await _scopeRepository.Query().Include(s => s.Realms).Where(s => scopeNames.Contains(s.Name) && s.Realms.Any(r => r.Name == realm)).ToListAsync(cancellationToken);
         }
 
         private class GetClientResult

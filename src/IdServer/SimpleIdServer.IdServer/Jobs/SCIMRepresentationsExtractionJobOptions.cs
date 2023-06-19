@@ -9,7 +9,7 @@ namespace SimpleIdServer.IdServer.Jobs
     {
         [VisibleProperty("SCIMEdp", "SCIM Endpoint")]
         public string SCIMEdp { get; set; }
-        [VisibleProperty("Authentication Type", "Select the type of authentication")]
+        [VisibleProperty("Authentication Types", "Select the type of authentication")]
         public ClientAuthenticationTypes AuthenticationType { get; set; }
         [VisibleProperty("API Key", "Value is present in the appsettings.json file")]
         public string ApiKey { get; set; }

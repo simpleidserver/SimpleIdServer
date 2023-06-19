@@ -27,7 +27,6 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Error");
 }
 
-
 app.UseStaticFiles();
 app.UseRouting();
 app.UseCookiePolicy();

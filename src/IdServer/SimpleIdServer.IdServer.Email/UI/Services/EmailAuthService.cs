@@ -6,8 +6,6 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI;
-using System.Net;
-using System.Net.Mail;
 
 namespace SimpleIdServer.IdServer.Email.UI.Services
 {
@@ -19,12 +17,14 @@ namespace SimpleIdServer.IdServer.Email.UI.Services
 
     public class EmailAuthService : IEmailAuthService
     {
+        private readonly IEmailUserNotificationService _notificationService;
         private readonly IUserRepository _userRepository;
         private readonly IEnumerable<IOTPAuthenticator> _otpAuthenticators;
         private readonly IdServerEmailOptions _emailOptions;
 
-        public EmailAuthService(IUserRepository userRepository, IEnumerable<IOTPAuthenticator> otpAuthenticators, IOptions<IdServerEmailOptions> emailOptions)
+        public EmailAuthService(IEmailUserNotificationService notificationService, IUserRepository userRepository, IEnumerable<IOTPAuthenticator> otpAuthenticators, IOptions<IdServerEmailOptions> emailOptions)
         {
+            _notificationService = notificationService;
             _userRepository= userRepository;
             _otpAuthenticators = otpAuthenticators;
             _emailOptions = emailOptions.Value;
@@ -58,26 +58,7 @@ namespace SimpleIdServer.IdServer.Email.UI.Services
 
             var otpAuthenticator = _otpAuthenticators.Single(a => a.Alg == activeOtp.OTPAlg.Value);
             var otpCode = otpAuthenticator.GenerateOtp(activeOtp);
-            using (var smtpClient = new SmtpClient())
-            {
-                smtpClient.EnableSsl = _emailOptions.SmtpEnableSsl;
-                smtpClient.UseDefaultCredentials = false;
-                smtpClient.Credentials = new NetworkCredential(_emailOptions.SmtpUserName, _emailOptions.SmtpPassword);
-                smtpClient.Host = _emailOptions.SmtpHost;
-                smtpClient.Port = _emailOptions.SmtpPort;
-                smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
-                var mailMessage = new MailMessage
-                {
-                    From = new MailAddress(_emailOptions.FromEmail),
-                    Subject = _emailOptions.Subject,
-                    Body = string.Format(_emailOptions.HttpBody, otpCode),
-                    IsBodyHtml = true
-                };
-
-                mailMessage.To.Add(email);
-                smtpClient.Send(mailMessage);
-            }
-
+            await _notificationService.Send(string.Format(_emailOptions.HttpBody, otpCode), user);
             return otpCode;
         }
     }

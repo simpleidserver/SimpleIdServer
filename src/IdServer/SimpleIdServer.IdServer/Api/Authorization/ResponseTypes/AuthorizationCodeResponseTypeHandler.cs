@@ -53,7 +53,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseTypes
             foreach (var record in context.Request.RequestData)
             {
                 if (record.Value is JsonValue)
-                    dic.Add(record.Key, QueryCollectionExtensions.GetValue(record.Value.GetValue<string>()));
+                    dic.Add(record.Key, QueryCollectionExtensions.GetValue(record.Value.GetValue<object>().ToString()));
                 else
                     dic.Add(record.Key, QueryCollectionExtensions.GetValue(record.Value.ToJsonString()));
             }

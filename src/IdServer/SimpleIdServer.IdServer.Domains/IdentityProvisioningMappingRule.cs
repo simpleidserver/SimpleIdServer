@@ -3,7 +3,7 @@
 
 namespace SimpleIdServer.IdServer.Domains
 {
-    public class IdentityProvisioningMappingRule : IMappingRule
+    public class IdentityProvisioningMappingRule : IProvisioningMappingRule
     {
         public string Id { get; set; } = null!;
         public string From { get; set; } = null!;

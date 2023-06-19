@@ -1,0 +1,137 @@
+﻿@page "/acrs"
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.AcrsStore;
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject DialogService dialogService
+@inject ContextMenuService contextMenuService
+@inject NotificationService notificationService
+@inject IDispatcher dispatcher
+@inject IState<AcrsState> acrsState
+
+<p class="text-muted">
+    ACR refers to Authentication Context Class Reference.
+    It is used to increase the user's level of assurance before they access anything sensitive.
+</p>
+
+<RadzenButton class="mb-1" Click="@(args => AddAcr())" Icon="add" Text="Add Authentication Context Reference" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+
+<RadzenDataGrid @ref="acrsGrid" 
+                AllowFiltering="true"
+                AllowColumnResize="true"
+                AllowAlternatingRows="false"
+                AllowSorting="true"
+                PageSize="30"
+                AllowPaging="true"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="true"
+                IsLoading="@acrsState.Value.IsLoading"
+                Count="@acrsState.Value.Count"
+                Data="@acrsState.Value.Acrs"
+                LoadData="@LoadData"
+                RowRender="@RowRender"
+                TItem="SelectableAcr"
+                ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn TItem="SelectableAcr" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <HeaderTemplate>
+                <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
+            </HeaderTemplate>
+            <Template Context="data">
+                <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableAcr" Property="Value.Name" Filterable="false" Sortable="false" Title="Name" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableAcr" Property="Value.DisplayName" Filterable="false" Sortable="false" Title="Display name" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableAcr" Filterable="false" Sortable="false" Title="Name" Width="80px">
+            <Template Context="data">
+                @foreach(var amr in data.Value.AuthenticationMethodReferences)
+                {
+                    <RadzenBadge Text="@amr" IsPill="true" />
+                }
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableAcr" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Update datetime" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableAcr" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
+            <Template Context="data">
+                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    RadzenDataGrid<SelectableAcr> acrsGrid;
+    bool selectAll = false;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            SubscribeToAction<DeleteSelectedAcrsSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedAcrsRemoved });
+                StateHasChanged();
+            });
+            if (!acrsState.Value.IsLoading)
+                acrsGrid.Reload();
+        }
+    }
+
+    void ToggleChanged(bool isSelected, SelectableAcr acr)
+    {
+        var act = new ToggleAcrSelectionAction { IsSelected = isSelected, Name = acr.Value.Name };
+        dispatcher.Dispatch(act);
+    }
+
+    void ToggleAll(bool isSelected)
+    {
+        var act = new ToggleAllAcrSelectionAction { IsSelected = isSelected };
+        dispatcher.Dispatch(act);
+    }
+
+    void ShowMoreContextMenu(SelectableAcr acr, MouseEventArgs args)
+    {
+        contextMenuService.Open(args, new List<ContextMenuItem>
+        {
+            new ContextMenuItem { Text = "Delete", Value = 1 }
+        }, (a) =>
+        {
+            if (a.Value.Equals(1))
+            {
+                var acrIds = acrsState.Value.Acrs?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
+                if (!acrIds.Contains(acr.Value.Id)) acrIds.Add(acr.Value.Id);
+                var act = new DeleteSelectedAcrsAction { Ids = acrIds };
+                dispatcher.Dispatch(act);
+                contextMenuService.Close();
+            }
+        });
+    }
+
+    void LoadData(LoadDataArgs args)
+    {
+        var act = new GetAllAcrsAction();
+        dispatcher.Dispatch(act);
+    }
+
+    void RowRender(RowRenderEventArgs<SelectableAcr> row)
+    {
+        const string className = "class";
+        if (row.Data.IsNew)
+            row.Attributes.Add(className, "new");
+        else if (row.Data.IsSelected)
+            row.Attributes.Add(className, "active");
+        else if (row.Attributes.ContainsKey(className))
+            row.Attributes.Remove(className);
+    }
+    
+    async void AddAcr() {
+        await dialogService.OpenAsync<AddAcrDialog>("Add Authentication Context Reference", new Dictionary<string, object>(), new DialogOptions
+         {
+             Width = "700px",
+             Height = "512px",
+             Resizable = true,
+             Draggable = true
+         });
+    }
+}

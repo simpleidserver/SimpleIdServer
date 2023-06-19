@@ -1,14 +1,22 @@
-﻿using Microsoft.AspNetCore.Authentication.Certificate;
+﻿using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.IdServer.CredentialIssuer;
+using SimpleIdServer.IdServer.Host.Acceptance.Tests;
 using SimpleIdServer.OAuth.Host.Acceptance.Tests;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddSIDIdentityServer()
+builder.Services.AddSIDIdentityServer(o =>
+{
+    o.WalletAuthorizationServer = "http://localhost";
+})
     .UseInMemoryStore(o =>
     {
         o.AddInMemoryRealms(IdServerConfiguration.Realms);
@@ -18,6 +26,8 @@ builder.Services.AddSIDIdentityServer()
         o.AddInMemoryApiResources(IdServerConfiguration.ApiResources);
         o.AddInMemoryUMAResources(IdServerConfiguration.UmaResources);
         o.AddInMemoryGroups(IdServerConfiguration.Groups);
+        o.AddInMemoryCredentialTemplates(IdServerConfiguration.CredTemplates);
+        o.AddInMemoryDeviceCodes(IdServerConfiguration.DeviceAuthCodes);
         o.AddInMemoryKeys(SimpleIdServer.IdServer.Constants.StandardRealms.Master, new List<SigningCredentials>
         {
             new SigningCredentials(BuildRsaSecurityKey("keyid"), SecurityAlgorithms.RsaSha256),
@@ -35,6 +45,7 @@ builder.Services.AddSIDIdentityServer()
         });
     })
     .UseInMemoryMassTransit()
+    .AddCredentialIssuer()
     .AddBackChannelAuthentication()
     .AddAuthentication(o =>
     {
@@ -44,8 +55,16 @@ builder.Services.AddSIDIdentityServer()
             m.RevocationMode = System.Security.Cryptography.X509Certificates.X509RevocationMode.NoCheck;
         });
     });
-
-var app = builder.Build().UseSID();
+builder.Services.AddDIDKey();
+var antiforgeryService = builder.Services.First(s => s.ServiceType == typeof(IAntiforgery));
+var memoryDistribution = builder.Services.First(s => s.ServiceType == typeof(IDistributedCache));
+builder.Services.Remove(antiforgeryService);
+builder.Services.Remove(memoryDistribution);
+builder.Services.AddTransient<IAntiforgery, FakeAntiforgery>();
+builder.Services.AddSingleton<IDistributedCache>(SingletonDistributedCache.Instance().Get());
+var app = builder.Build()
+    .UseCredentialIssuer()
+    .UseSID();
 app.Run();
 
 static RsaSecurityKey BuildRsaSecurityKey(string keyid) => new RsaSecurityKey(RSA.Create())
