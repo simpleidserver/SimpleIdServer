@@ -28,24 +28,27 @@ steps:
   displayName: 'Publish SimpleIdServer'
   inputs:
     command: 'publish'
-    publishWebProjects: true
+    publishWebProjects: false
     zipAfterPublish: false
+    modifyOutputPath: false
     workingDirectory: '$(Build.Repository.LocalPath)\src\IdServer\SimpleIdServer.IdServer.Startup'
 
 - task: DotNetCoreCLI@2
   displayName: 'Publish SimpleIdServer Website'
   inputs:
     command: 'publish'
-    publishWebProjects: true
+    publishWebProjects: false
     zipAfterPublish: false
+    modifyOutputPath: false
     workingDirectory: '$(Build.Repository.LocalPath)\src\IdServer\SimpleIdServer.IdServer.Website.Startup'
 
 - task: DotNetCoreCLI@2
   displayName: 'Publish SCIM'
   inputs:
     command: 'publish'
-    publishWebProjects: true
+    publishWebProjects: false
     zipAfterPublish: false
+    modifyOutputPath: false
     workingDirectory: '$(Build.Repository.LocalPath)\src\Scim\SimpleIdServer.Scim.SqlServer.Startup'
 
 - task: CopyFiles@2
