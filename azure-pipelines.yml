@@ -25,6 +25,7 @@ steps:
     workingDirectory: '$(Build.Repository.LocalPath)\website'
 
 - task: DotNetCoreCLI@2
+  displayName: 'Publish SimpleIdServer'
   inputs:
     command: 'publish'
     publishWebProjects: true
@@ -32,11 +33,20 @@ steps:
     workingDirectory: '$(Build.Repository.LocalPath)\src\IdServer\SimpleIdServer.IdServer.Startup'
 
 - task: DotNetCoreCLI@2
+  displayName: 'Publish SimpleIdServer Website'
   inputs:
     command: 'publish'
     publishWebProjects: true
     zipAfterPublish: false
     workingDirectory: '$(Build.Repository.LocalPath)\src\IdServer\SimpleIdServer.IdServer.Website.Startup'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Publish SCIM'
+  inputs:
+    command: 'publish'
+    publishWebProjects: true
+    zipAfterPublish: false
+    workingDirectory: '$(Build.Repository.LocalPath)\src\Scim\SimpleIdServer.Scim.SqlServer.Startup'
 
 - task: CopyFiles@2
   displayName: 'Copy website'
@@ -45,9 +55,51 @@ steps:
     Contents: '**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)\website'
 
+- task: CopyFiles@2
+  displayName: 'Copy SimpleIdServer'
+  inputs:
+    SourceFolder: '$(Build.ArtifactStagingDirectory)\src\IdServer\SimpleIdServer.IdServer.Startup\bin\Debug\net7.0\publish'
+    Contents: '**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)\simpleidserver'
+
+- task: CopyFiles@2
+  displayName: 'Copy SimpleIdServer website'
+  inputs:
+    SourceFolder: '$(Build.ArtifactStagingDirectory)\src\IdServer\SimpleIdServer.IdServer.Website.Startup\bin\Debug\net7.0\publish'
+    Contents: '**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)\simpleidserverwebsite'
+
+- task: CopyFiles@2
+  displayName: 'Copy SCIM'
+  inputs:
+    SourceFolder: '$(Build.ArtifactStagingDirectory)\src\Scim\SimpleIdServer.Scim.SqlServer.Startup\bin\Debug\net7.0\publish'
+    Contents: '**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)\scim'
+
 - task: PublishBuildArtifacts@1
-  displayName: 'Publish website'
+  displayName: 'Publish website artifacts'
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)\website'
     ArtifactName: 'website'
+    publishLocation: 'Container'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish simpleidserver artifacts'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)\simpleidserver'
+    ArtifactName: 'simpleidserver'
+    publishLocation: 'Container'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish simpleidserver website artifacts'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)\simpleidserverwebsite'
+    ArtifactName: 'simpleidserverwebsite'
+    publishLocation: 'Container'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish SCIM'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)\scim'
+    ArtifactName: 'scim'
     publishLocation: 'Container'
