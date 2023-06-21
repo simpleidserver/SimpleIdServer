@@ -34,6 +34,7 @@ builder.Services.Configure<KestrelServerOptions>(options =>
     });
 });
 builder.Configuration.AddJsonFile("appsettings.json")
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
     .AddEnvironmentVariables();
 builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
     .AllowAnyMethod()
