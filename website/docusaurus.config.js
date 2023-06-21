@@ -7,7 +7,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'SimpleIdServer',
-  tagline: 'Open Source Identity and Access Management utilizing .NET',
+  tagline: 'Introducing the First Open Source Identity and Access Management Solution Developed with .NET',
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
