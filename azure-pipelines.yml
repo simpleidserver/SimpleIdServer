@@ -24,6 +24,20 @@ steps:
       npm run build
     workingDirectory: '$(Build.Repository.LocalPath)\website'
 
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: true
+    zipAfterPublish: false
+    workingDirectory: '$(Build.Repository.LocalPath)\src\IdServer\SimpleIdServer.IdServer.Startup'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: true
+    zipAfterPublish: false
+    workingDirectory: '$(Build.Repository.LocalPath)\src\IdServer\SimpleIdServer.IdServer.Website.Startup'
+
 - task: CopyFiles@2
   displayName: 'Copy website'
   inputs:

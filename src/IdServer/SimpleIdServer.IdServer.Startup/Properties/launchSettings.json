@@ -2,10 +2,10 @@
   "profiles": {
     "SimpleIdServer.IdServer.Startup": {
       "commandName": "Project",
+      "applicationUrl": "https://localhost:5001",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "applicationUrl": "https://localhost:5001"
+      }
     }
   }
 }
