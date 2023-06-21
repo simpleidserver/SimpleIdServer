@@ -58,21 +58,21 @@ steps:
 - task: CopyFiles@2
   displayName: 'Copy SimpleIdServer'
   inputs:
-    SourceFolder: '$(Build.ArtifactStagingDirectory)\src\IdServer\SimpleIdServer.IdServer.Startup\bin\Debug\net7.0\publish'
+    SourceFolder: '$(Build.Repository.LocalPath)\src\IdServer\SimpleIdServer.IdServer.Startup\bin\Debug\net7.0\publish'
     Contents: '**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)\simpleidserver'
 
 - task: CopyFiles@2
   displayName: 'Copy SimpleIdServer website'
   inputs:
-    SourceFolder: '$(Build.ArtifactStagingDirectory)\src\IdServer\SimpleIdServer.IdServer.Website.Startup\bin\Debug\net7.0\publish'
+    SourceFolder: '$(Build.Repository.LocalPath)\src\IdServer\SimpleIdServer.IdServer.Website.Startup\bin\Debug\net7.0\publish'
     Contents: '**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)\simpleidserverwebsite'
 
 - task: CopyFiles@2
   displayName: 'Copy SCIM'
   inputs:
-    SourceFolder: '$(Build.ArtifactStagingDirectory)\src\Scim\SimpleIdServer.Scim.SqlServer.Startup\bin\Debug\net7.0\publish'
+    SourceFolder: '$(Build.Repository.LocalPath)\src\Scim\SimpleIdServer.Scim.SqlServer.Startup\bin\Debug\net7.0\publish'
     Contents: '**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)\scim'
 
