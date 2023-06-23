@@ -11,33 +11,34 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
 {
     public class GroupEffects
     {
-        private readonly IGroupRepository _groupRepository;
+        private readonly IDbContextFactory<StoreDbContext> _factory;
         private readonly ProtectedSessionStorage _sessionStorage;
-        private readonly DbContextOptions<StoreDbContext> _options;
 
-        public GroupEffects(IGroupRepository groupRepository, ProtectedSessionStorage sessionStorage, DbContextOptions<StoreDbContext> options) 
+        public GroupEffects(IDbContextFactory<StoreDbContext> factory, ProtectedSessionStorage sessionStorage) 
         {
-            _groupRepository = groupRepository;
+            _factory = factory;
             _sessionStorage = sessionStorage;
-            _options = options;
         }
 
         [EffectMethod]
         public async Task Handle(SearchGroupsAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            IQueryable<Group> query = _groupRepository.Query().Include(c => c.Realms).Where(c => c.Realms.Any(r => r.Name == realm) && (!action.OnlyRoot || action.OnlyRoot && c.Name == c.FullPath)).AsNoTracking();
-            if (!string.IsNullOrWhiteSpace(action.Filter))
-                query = query.Where(SanitizeExpression(action.Filter));
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                IQueryable<Group> query = dbContext.Groups.Include(c => c.Realms).Where(c => c.Realms.Any(r => r.Name == realm) && (!action.OnlyRoot || action.OnlyRoot && c.Name == c.FullPath)).AsNoTracking();
+                if (!string.IsNullOrWhiteSpace(action.Filter))
+                    query = query.Where(SanitizeExpression(action.Filter));
 
-            if (!string.IsNullOrWhiteSpace(action.OrderBy))
-                query = query.OrderBy(SanitizeExpression(action.OrderBy));
-            else
-                query = query.OrderBy(q => q.FullPath);
+                if (!string.IsNullOrWhiteSpace(action.OrderBy))
+                    query = query.OrderBy(SanitizeExpression(action.OrderBy));
+                else
+                    query = query.OrderBy(q => q.FullPath);
 
-            var nb = query.Count();
-            var groups = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
-            dispatcher.Dispatch(new SearchGroupsSuccessAction { Groups = groups, Count = nb });
+                var nb = query.Count();
+                var groups = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
+                dispatcher.Dispatch(new SearchGroupsSuccessAction { Groups = groups, Count = nb });
+            }
 
             string SanitizeExpression(string expression) => expression.Replace("Group.", "").Replace("Value", "");
         }
@@ -45,34 +46,37 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
         [EffectMethod]
         public async Task Handle(RemoveSelectedGroupsAction action, IDispatcher dispatcher)
         {
-            var groups = new List<Group>();
-            foreach(var fullPath in action.FullPathLst)
-                groups.AddRange(await _groupRepository.Query().Where(g => g.FullPath.StartsWith(fullPath)).ToListAsync(CancellationToken.None));
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                var groups = new List<Group>();
+                foreach (var fullPath in action.FullPathLst)
+                    groups.AddRange(await dbContext.Groups.Where(g => g.FullPath.StartsWith(fullPath)).ToListAsync(CancellationToken.None));
 
-            _groupRepository.DeleteRange(groups);
-            await _groupRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new RemoveSelectedGroupsSuccessAction { FullPathLst = action.FullPathLst });
+                dbContext.Groups.RemoveRange(groups);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new RemoveSelectedGroupsSuccessAction { FullPathLst = action.FullPathLst });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(AddGroupAction action, IDispatcher dispatcher)
         {
-            var fullPath = action.Name;
-            if (!string.IsNullOrWhiteSpace(action.ParentId))
+            using (var dbContext = _factory.CreateDbContext())
             {
-                var parent = await _groupRepository.Query().SingleAsync(g => g.Id == action.ParentId);
-                fullPath = $"{parent.FullPath}.{action.Name}";
-            }
+                var fullPath = action.Name;
+                if (!string.IsNullOrWhiteSpace(action.ParentId))
+                {
+                    var parent = await dbContext.Groups.SingleAsync(g => g.Id == action.ParentId);
+                    fullPath = $"{parent.FullPath}.{action.Name}";
+                }
 
-            var exists = await _groupRepository.Query().AnyAsync(g => g.FullPath == fullPath, CancellationToken.None);
-            if(exists)
-            {
-                dispatcher.Dispatch(new AddGroupFailureAction { ErrorMessage = string.Format(Resources.Global.GroupAlreadyExists, action.Name) });
-                return;
-            }
+                var exists = await dbContext.Groups.AnyAsync(g => g.FullPath == fullPath, CancellationToken.None);
+                if (exists)
+                {
+                    dispatcher.Dispatch(new AddGroupFailureAction { ErrorMessage = string.Format(Resources.Global.GroupAlreadyExists, action.Name) });
+                    return;
+                }
 
-            using (var dbContext = new StoreDbContext(_options))
-            {
                 var id = Guid.NewGuid().ToString();
                 var realm = await GetRealm();
                 var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
@@ -102,25 +106,28 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
         [EffectMethod]
         public async Task Handle(GetGroupAction action, IDispatcher dispatcher)
         {
-            var grp = await _groupRepository.Query().Include(m => m.Children).Include(m => m.Roles).AsNoTracking().SingleOrDefaultAsync(g => g.Id== action.Id, CancellationToken.None);
-            if(grp == null)
+            using (var dbContext = _factory.CreateDbContext())
             {
-                dispatcher.Dispatch(new GetGroupFailureAction { ErrorMessage =  Resources.Global.UnknownGroup });
-                return;
-            }
+                var grp = await dbContext.Groups.Include(m => m.Children).Include(m => m.Roles).AsNoTracking().SingleOrDefaultAsync(g => g.Id == action.Id, CancellationToken.None);
+                if (grp == null)
+                {
+                    dispatcher.Dispatch(new GetGroupFailureAction { ErrorMessage = Resources.Global.UnknownGroup });
+                    return;
+                }
 
-            var rootGroup = grp;
-            var fullPath = grp.FullPath;
-            var splittedFullPath = fullPath.Split('.');
-            if(splittedFullPath.Count() > 1)
-                rootGroup = await _groupRepository.Query().Include(m => m.Children).AsNoTracking().SingleAsync(g => g.FullPath == splittedFullPath[0], CancellationToken.None);
-            dispatcher.Dispatch(new GetGroupSuccessAction { Group = grp, RootGroup = rootGroup });
+                var rootGroup = grp;
+                var fullPath = grp.FullPath;
+                var splittedFullPath = fullPath.Split('.');
+                if (splittedFullPath.Count() > 1)
+                    rootGroup = await dbContext.Groups.Include(m => m.Children).AsNoTracking().SingleAsync(g => g.FullPath == splittedFullPath[0], CancellationToken.None);
+                dispatcher.Dispatch(new GetGroupSuccessAction { Group = grp, RootGroup = rootGroup });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(AddGroupRolesAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = new StoreDbContext(_options))
+            using (var dbContext = _factory.CreateDbContext())
             {
                 var grp = await dbContext.Groups.Include(g => g.Roles).SingleAsync(g => g.Id == action.GroupId);
                 var roles = await dbContext.Scopes.Where(s => action.ScopeNames.Contains(s.Name)).ToListAsync();
@@ -135,14 +142,17 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
         [EffectMethod]
         public async Task Handle(RemoveSelectedGroupRolesAction action, IDispatcher dispatcher)
         {
-            var grp = await _groupRepository.Query().Include(m => m.Roles).SingleAsync(g => g.Id == action.Id, CancellationToken.None);
-            grp.Roles = grp.Roles.Where(r => !action.RoleIds.Contains(r.Id)).ToList();
-            await _groupRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new RemoveSelectedGroupRolesSuccessAction
+            using (var dbContext = _factory.CreateDbContext())
             {
-                Id = action.Id,
-                RoleIds = action.RoleIds
-            });
+                var grp = await dbContext.Groups.Include(m => m.Roles).SingleAsync(g => g.Id == action.Id, CancellationToken.None);
+                grp.Roles = grp.Roles.Where(r => !action.RoleIds.Contains(r.Id)).ToList();
+                await dbContext.SaveChangesAsync();
+                dispatcher.Dispatch(new RemoveSelectedGroupRolesSuccessAction
+                {
+                    Id = action.Id,
+                    RoleIds = action.RoleIds
+                });
+            }
         }
 
         private async Task<string> GetRealm()

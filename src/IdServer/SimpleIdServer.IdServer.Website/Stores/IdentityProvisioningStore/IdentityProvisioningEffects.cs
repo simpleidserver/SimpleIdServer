@@ -13,14 +13,14 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
 {
     public class IdentityProvisioningEffects
     {
-        private readonly IIdentityProvisioningStore _identityProvisioningStore;
+        private readonly IDbContextFactory<StoreDbContext> _factory;
         private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly IdServerWebsiteOptions _options;
         private readonly ProtectedSessionStorage _sessionStorage;
 
-        public IdentityProvisioningEffects(IIdentityProvisioningStore identityProvisioningStore, IWebsiteHttpClientFactory websiteHttpClientFactory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
+        public IdentityProvisioningEffects(IDbContextFactory<StoreDbContext> factory, IWebsiteHttpClientFactory websiteHttpClientFactory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
         {
-            _identityProvisioningStore = identityProvisioningStore;
+            _factory = factory;
             _websiteHttpClientFactory = websiteHttpClientFactory;
             _options = options.Value;
             _sessionStorage = sessionStorage;
@@ -30,16 +30,19 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         public async Task Handle(SearchIdentityProvisioningAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            IQueryable<IdentityProvisioning> query = _identityProvisioningStore.Query().Include(c => c.Realms).Where(c => c.Realms.Any(r => r.Name == realm)).AsNoTracking();
-            if (!string.IsNullOrWhiteSpace(action.Filter))
-                query = query.Where(SanitizeExpression(action.Filter));
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                IQueryable<IdentityProvisioning> query = dbContext.IdentityProvisioningLst.Include(c => c.Realms).Where(c => c.Realms.Any(r => r.Name == realm)).AsNoTracking();
+                if (!string.IsNullOrWhiteSpace(action.Filter))
+                    query = query.Where(SanitizeExpression(action.Filter));
 
-            if (!string.IsNullOrWhiteSpace(action.OrderBy))
-                query = query.OrderBy(SanitizeExpression(action.OrderBy));
+                if (!string.IsNullOrWhiteSpace(action.OrderBy))
+                    query = query.OrderBy(SanitizeExpression(action.OrderBy));
 
-            var nb = query.Count();
-            var identityProvisioningLst = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
-            dispatcher.Dispatch(new SearchIdentityProvisioningSuccessAction { IdentityProvisioningLst = identityProvisioningLst, Count = nb });
+                var nb = query.Count();
+                var identityProvisioningLst = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
+                dispatcher.Dispatch(new SearchIdentityProvisioningSuccessAction { IdentityProvisioningLst = identityProvisioningLst, Count = nb });
+            }
 
             string SanitizeExpression(string expression) => expression.Replace("Value.", "");
         }
@@ -48,29 +51,35 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         public async Task Handle(RemoveSelectedIdentityProvisioningAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var toBeRemoved = await _identityProvisioningStore.Query().Include(c => c.Realms).Where(c => c.Realms.Any(r => r.Name == realm) && action.Ids.Contains(c.Id)).ToListAsync();
-            _identityProvisioningStore.DeleteRange(toBeRemoved);
-            await _identityProvisioningStore.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new RemoveSelectedIdentityProvisioningSuccessAction { Ids = action.Ids });
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                var toBeRemoved = await dbContext.IdentityProvisioningLst.Include(c => c.Realms).Where(c => c.Realms.Any(r => r.Name == realm) && action.Ids.Contains(c.Id)).ToListAsync();
+                dbContext.IdentityProvisioningLst.RemoveRange(toBeRemoved);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new RemoveSelectedIdentityProvisioningSuccessAction { Ids = action.Ids });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(GetIdentityProvisioningAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var result = await _identityProvisioningStore.Query().Include(c => c.Realms)
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                var result = await dbContext.IdentityProvisioningLst.Include(c => c.Realms)
                 .Include(c => c.Properties)
                 .Include(c => c.Definition).ThenInclude(d => d.Properties)
                 .Include(c => c.Definition).ThenInclude(d => d.MappingRules)
                 .Include(c => c.Histories)
                 .SingleOrDefaultAsync(c => c.Realms.Any(r => r.Name == realm) && action.Id == c.Id);
-            if(result == null)
-            {
-                dispatcher.Dispatch(new GetIdentityProvisioningFailureAction { ErrorMessage = Global.UnknownIdentityProvisioning });
-                return;
-            }
+                if (result == null)
+                {
+                    dispatcher.Dispatch(new GetIdentityProvisioningFailureAction { ErrorMessage = Global.UnknownIdentityProvisioning });
+                    return;
+                }
 
-            dispatcher.Dispatch(new GetIdentityProvisioningSuccessAction { IdentityProvisioning = result });
+                dispatcher.Dispatch(new GetIdentityProvisioningSuccessAction { IdentityProvisioning = result });
+            }
         }
 
         [EffectMethod]
@@ -89,50 +98,62 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         [EffectMethod]
         public async Task Handle(UpdateIdProvisioningPropertiesAction action, IDispatcher dispatcher)
         {
-            var result = await _identityProvisioningStore.Query().Include(p => p.Properties).SingleAsync(i => i.Id == action.Id);
-            result.Properties.Clear();
-            foreach(var property in action.Properties)
-                result.Properties.Add(property);
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                var result = await dbContext.IdentityProvisioningLst.Include(p => p.Properties).SingleAsync(i => i.Id == action.Id);
+                result.Properties.Clear();
+                foreach (var property in action.Properties)
+                    result.Properties.Add(property);
 
-            await _identityProvisioningStore.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new UpdateIdProvisioningPropertiesSuccessAction { Id = action.Id, Properties = action.Properties });
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new UpdateIdProvisioningPropertiesSuccessAction { Id = action.Id, Properties = action.Properties });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(UpdateIdProvisioningDetailsAction action, IDispatcher dispatcher)
         {
-            var result = await _identityProvisioningStore.Query().SingleAsync(i => i.Id == action.Id);
-            result.Description = action.Description;
-            await _identityProvisioningStore.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new UpdateIdProvisioningDetailsSuccessAction { Description = action.Description, Id = action.Id });
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                var result = await dbContext.IdentityProvisioningLst.SingleAsync(i => i.Id == action.Id);
+                result.Description = action.Description;
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new UpdateIdProvisioningDetailsSuccessAction { Description = action.Description, Id = action.Id });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(RemoveSelectedIdentityProvisioningMappingRulesAction action, IDispatcher dispatcher)
         {
-            var result = await _identityProvisioningStore.Query().Include(i => i.Definition).ThenInclude(d => d.MappingRules).SingleAsync(i => i.Id == action.Id);
-            var mappingRules = result.Definition.MappingRules;
-            result.Definition.MappingRules = result.Definition.MappingRules.Where(r => !action.MappingRuleIds.Contains(r.Id)).ToList();
-            await _identityProvisioningStore.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new RemoveSelectedIdentityProvisioningMappingRulesSuccessAction { Id = action.Id, MappingRuleIds = action.MappingRuleIds });
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                var result = await dbContext.IdentityProvisioningLst.Include(i => i.Definition).ThenInclude(d => d.MappingRules).SingleAsync(i => i.Id == action.Id);
+                var mappingRules = result.Definition.MappingRules;
+                result.Definition.MappingRules = result.Definition.MappingRules.Where(r => !action.MappingRuleIds.Contains(r.Id)).ToList();
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new RemoveSelectedIdentityProvisioningMappingRulesSuccessAction { Id = action.Id, MappingRuleIds = action.MappingRuleIds });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(AddIdentityProvisioningMappingRuleAction action, IDispatcher dispatcher)
         {
-            var result = await _identityProvisioningStore.Query().Include(i => i.Definition).ThenInclude(d => d.MappingRules).SingleAsync(i => i.Id == action.Id);
-            var mappingRules = result.Definition.MappingRules;
-            var newId = Guid.NewGuid().ToString();
-            mappingRules.Add(new IdentityProvisioningMappingRule
+            using (var dbContext = _factory.CreateDbContext())
             {
-                From= action.From,
-                Id = newId,
-                MapperType = action.MappingRule,
-                TargetUserAttribute = action.TargetUserAttribute,
-                TargetUserProperty = action.TargetUserProperty
-            });
-            await _identityProvisioningStore.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new AddIdentityProvisioningMappingRuleSuccessAction { NewId = newId, Id = action.Id, MappingRule = action.MappingRule, From = action.From, TargetUserAttribute = action.TargetUserAttribute, TargetUserProperty = action.TargetUserProperty });
+                var result = await dbContext.IdentityProvisioningLst.Include(i => i.Definition).ThenInclude(d => d.MappingRules).SingleAsync(i => i.Id == action.Id);
+                var mappingRules = result.Definition.MappingRules;
+                var newId = Guid.NewGuid().ToString();
+                mappingRules.Add(new IdentityProvisioningMappingRule
+                {
+                    From = action.From,
+                    Id = newId,
+                    MapperType = action.MappingRule,
+                    TargetUserAttribute = action.TargetUserAttribute,
+                    TargetUserProperty = action.TargetUserProperty
+                });
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new AddIdentityProvisioningMappingRuleSuccessAction { NewId = newId, Id = action.Id, MappingRule = action.MappingRule, From = action.From, TargetUserAttribute = action.TargetUserAttribute, TargetUserProperty = action.TargetUserProperty });
+            }
         }
 
         private async Task<string> GetRealm()

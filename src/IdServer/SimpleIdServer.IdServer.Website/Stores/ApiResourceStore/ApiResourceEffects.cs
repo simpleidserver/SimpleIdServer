@@ -12,16 +12,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
 {
     public class ApiResourceEffects
     {
-        private readonly IApiResourceRepository _apiResourceRepository;
         private readonly IScopeRepository _scopeRepository;
-        private readonly DbContextOptions<StoreDbContext> _options;
+        private readonly IDbContextFactory<StoreDbContext> _factory;
         private readonly ProtectedSessionStorage _sessionStorage;
 
-        public ApiResourceEffects(IApiResourceRepository apiResourceRepository, IScopeRepository scopeRepository, DbContextOptions<StoreDbContext> options, ProtectedSessionStorage sessionStorage)
+        public ApiResourceEffects(IDbContextFactory<StoreDbContext> factory, ProtectedSessionStorage sessionStorage)
         {
-            _apiResourceRepository = apiResourceRepository;
-            _scopeRepository = scopeRepository;
-            _options = options;
+            _factory = factory;
             _sessionStorage = sessionStorage;
         }
 
@@ -29,23 +26,26 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
         public async Task Handle(SearchApiResourcesAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            IQueryable<ApiResource> query = _apiResourceRepository.Query().Include(r => r.Realms).AsNoTracking().Where(r => r.Realms.Any(r => r.Name == realm));
-            if (!string.IsNullOrWhiteSpace(action.Filter))
-                query = query.Where(SanitizeExpression(action.Filter));
-
-            if (!string.IsNullOrWhiteSpace(action.OrderBy))
-                query = query.OrderBy(SanitizeExpression(action.OrderBy));
-
-            var nb = query.Count();
-            var apiResources = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
-            var selectedResources = new List<string>();
-            if(!string.IsNullOrWhiteSpace(action.ScopeName))
+            using (var dbContext = _factory.CreateDbContext())
             {
-                var scope = await _scopeRepository.Query().Include(s => s.ApiResources).AsNoTracking().SingleAsync(s => s.Name == action.ScopeName);
-                selectedResources = scope.ApiResources.Select(r => r.Name).ToList();
-            }
+                IQueryable<ApiResource> query = dbContext.ApiResources.Include(r => r.Realms).AsNoTracking().Where(r => r.Realms.Any(r => r.Name == realm));
+                if (!string.IsNullOrWhiteSpace(action.Filter))
+                    query = query.Where(SanitizeExpression(action.Filter));
 
-            dispatcher.Dispatch(new SearchApiResourcesSuccessAction { ApiResources = apiResources, SelectedApiResources = selectedResources, Count = nb });
+                if (!string.IsNullOrWhiteSpace(action.OrderBy))
+                    query = query.OrderBy(SanitizeExpression(action.OrderBy));
+
+                var nb = query.Count();
+                var apiResources = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
+                var selectedResources = new List<string>();
+                if (!string.IsNullOrWhiteSpace(action.ScopeName))
+                {
+                    var scope = await _scopeRepository.Query().Include(s => s.ApiResources).AsNoTracking().SingleAsync(s => s.Name == action.ScopeName);
+                    selectedResources = scope.ApiResources.Select(r => r.Name).ToList();
+                }
+
+                dispatcher.Dispatch(new SearchApiResourcesSuccessAction { ApiResources = apiResources, SelectedApiResources = selectedResources, Count = nb });
+            }
 
             string SanitizeExpression(string expression) => expression.Replace("Value.", "");
         }
@@ -54,14 +54,14 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
         public async Task Handle(AddApiResourceAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            if (await _apiResourceRepository.Query().Include(r =>r.Realms).AsNoTracking().AnyAsync(r => r.Name == action.Name && r.Realms.Any(r => r.Name == realm)))
+            using (var dbContext = _factory.CreateDbContext())
             {
-                dispatcher.Dispatch(new AddApiResourceFailureAction { Name = action.Name, ErrorMessage = string.Format(Global.ApiResourceAlreadyExists, action.Name) });
-                return;
-            }
+                if (await dbContext.ApiResources.Include(r => r.Realms).AsNoTracking().AnyAsync(r => r.Name == action.Name && r.Realms.Any(r => r.Name == realm)))
+                {
+                    dispatcher.Dispatch(new AddApiResourceFailureAction { Name = action.Name, ErrorMessage = string.Format(Global.ApiResourceAlreadyExists, action.Name) });
+                    return;
+                }
 
-            using (var dbContext = new StoreDbContext(_options))
-            {
                 var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
                 var apiResource = new ApiResource
                 {
@@ -82,7 +82,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
         public async Task Handle(UpdateApiScopeResourcesAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            using (var dbContext = new StoreDbContext(_options))
+            using (var dbContext = _factory.CreateDbContext())
             {
                 var scope = await dbContext.Scopes.Include(r => r.Realms).Include(s => s.ApiResources).SingleAsync(s => s.Name == action.Name && s.Realms.Any(r => r.Name == realm), CancellationToken.None);
                 var apiResources = await dbContext.ApiResources.Where(s => action.Resources.Contains(s.Name)).ToListAsync(CancellationToken.None);

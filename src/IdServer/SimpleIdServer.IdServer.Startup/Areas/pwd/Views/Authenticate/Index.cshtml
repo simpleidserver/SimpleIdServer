@@ -22,6 +22,13 @@
 {
     @Html.AntiForgeryToken()
     <input type="hidden" value="@Model.ReturnUrl" name="ReturnUrl" />
+    <div class="alert alert-info">
+        Default credentials :
+        <p>
+            <b>Login: </b>administrator<br/>
+            <b>Password: </b>password
+        </p>
+    </div>
     <!-- Login -->
     <div class="input-group mb-3">
         <input type="text" value="@Model.Login" name="Login" class="form-control" placeholder="@AuthenticatePasswordResource.login">

@@ -7,7 +7,24 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddStore(this IServiceCollection services, Action<DbContextOptionsBuilder>? action = null, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        public static IServiceCollection AddStore(this IServiceCollection services, Action<DbContextOptionsBuilder>? action = null)
+        {
+            var lifetime = ServiceLifetime.Scoped;
+            RegisterDepedencies(services);
+            if (action != null) services.AddDbContext<StoreDbContext>(action, lifetime);
+            else services.AddDbContext<StoreDbContext>(o => o.UseInMemoryDatabase("identityServer"), lifetime);
+            return services;
+        }
+
+        public static IServiceCollection AddStoreWithFactory(this IServiceCollection services, Action<DbContextOptionsBuilder>? action = null)
+        {
+            RegisterDepedencies(services);
+            if (action != null) services.AddDbContextFactory<StoreDbContext>(action);
+            else services.AddDbContextFactory<StoreDbContext>(o => o.UseInMemoryDatabase("identityServer"));
+            return services;
+        }
+
+        private static void RegisterDepedencies(IServiceCollection services)
         {
             services.AddTransient<IClientRepository, ClientRepository>();
             services.AddTransient<IScopeRepository, ScopeRepository>();
@@ -36,9 +53,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<ICredentialOfferRepository, CredentialOfferRepository>();
             services.AddTransient<IIdentityDocumentConfigurationStore, IdentityDocumentConfigurationStore>();
             services.AddTransient<IDeviceAuthCodeRepository, DeviceAuthCodeRepository>();
-            if (action != null) services.AddDbContext<StoreDbContext>(action, lifetime);
-            else services.AddDbContext<StoreDbContext>(o => o.UseInMemoryDatabase("identityServer"), lifetime);
-            return services;
         }
     }
 }

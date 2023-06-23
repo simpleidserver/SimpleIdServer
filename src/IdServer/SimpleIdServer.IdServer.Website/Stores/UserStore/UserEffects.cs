@@ -4,7 +4,6 @@ using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using QRCoder;
 using Radzen;
 using SimpleIdServer.IdServer.Domains;
@@ -21,31 +20,24 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
     public class UserEffects
     {
         private readonly ILoggerFactory _loggerFactory;
-        private readonly IUserRepository _userRepository;
-        private readonly IGroupRepository _groupRepository;
+        private readonly IDbContextFactory<StoreDbContext> _factory;
         private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly ProtectedSessionStorage _sessionStorage;
-        private readonly DbContextOptions<StoreDbContext> _options;
         private readonly IdServerWebsiteOptions _websiteOptions;
         private readonly DefaultSecurityOptions _securityOptions;
 
         public UserEffects(
             ILoggerFactory loggerFactory,
-            IUserRepository userRepository,
-            IGroupRepository groupRepository,
+            IDbContextFactory<StoreDbContext> factory,
             IWebsiteHttpClientFactory websiteHttpClientFactory,
             ProtectedSessionStorage sessionStorage,
             DbContextOptions<StoreDbContext> options,
-            IOptions<IdServerWebsiteOptions> websiteOptions,
             DefaultSecurityOptions securityOptions)
         {
             _loggerFactory = loggerFactory;
-            _userRepository = userRepository;
-            _groupRepository = groupRepository;
+            _factory = factory;
             _websiteHttpClientFactory = websiteHttpClientFactory;
             _sessionStorage = sessionStorage;
-            _options = options;
-            _websiteOptions = websiteOptions.Value;
             _securityOptions = securityOptions;
         }
 
@@ -53,16 +45,19 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         public async Task Handle(SearchUsersAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            IQueryable<User> query = _userRepository.Query().Include(u => u.Realms).Include(u => u.OAuthUserClaims).Where(u => u.Realms.Any(r => r.RealmsName == realm)).AsNoTracking();
-            if (!string.IsNullOrWhiteSpace(action.Filter))
-                query = query.Where(SanitizeExpression(action.Filter));
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                IQueryable<User> query = dbContext.Users.Include(u => u.Realms).Include(u => u.OAuthUserClaims).Where(u => u.Realms.Any(r => r.RealmsName == realm)).AsNoTracking();
+                if (!string.IsNullOrWhiteSpace(action.Filter))
+                    query = query.Where(SanitizeExpression(action.Filter));
 
-            if (!string.IsNullOrWhiteSpace(action.OrderBy))
-                query = query.OrderBy(SanitizeExpression(action.OrderBy));
+                if (!string.IsNullOrWhiteSpace(action.OrderBy))
+                    query = query.OrderBy(SanitizeExpression(action.OrderBy));
 
-            var count = query.Count();
-            var users = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
-            dispatcher.Dispatch(new SearchUsersSuccessAction { Users = users, Count = count });
+                var count = query.Count();
+                var users = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
+                dispatcher.Dispatch(new SearchUsersSuccessAction { Users = users, Count = count });
+            }
 
             string SanitizeExpression(string expression) => expression.Replace("Value.", "");
         }
@@ -71,144 +66,177 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         public async Task Handle(GetUserAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.OAuthUserClaims).Include(u => u.CredentialOffers).Include(u => u.Groups).Include(u => u.Consents).ThenInclude(c => c.Scopes).Include(u => u.Sessions).Include(u => u.Credentials).Include(u => u.ExternalAuthProviders).Include(u => u.CredentialOffers).AsNoTracking().SingleOrDefaultAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
-            if (user == null)
+            using (var dbContext = _factory.CreateDbContext())
             {
-                dispatcher.Dispatch(new GetUserFailureAction { ErrorMessage = string.Format(Global.UnknownUser, action.UserId) });
-                return;
-            }
+                var user = await dbContext.Users.Include(u => u.Realms).Include(u => u.OAuthUserClaims).Include(u => u.CredentialOffers).Include(u => u.Groups).Include(u => u.Consents).ThenInclude(c => c.Scopes).Include(u => u.Sessions).Include(u => u.Credentials).Include(u => u.ExternalAuthProviders).Include(u => u.CredentialOffers).AsNoTracking().SingleOrDefaultAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
+                if (user == null)
+                {
+                    dispatcher.Dispatch(new GetUserFailureAction { ErrorMessage = string.Format(Global.UnknownUser, action.UserId) });
+                    return;
+                }
 
-            user.Consents = user.Consents.Where(c => c.Realm == realm).ToList();
-            user.Sessions = user.Sessions.Where(c => c.Realm == realm).ToList();
-            dispatcher.Dispatch(new GetUserSuccessAction { User = user });
+                user.Consents = user.Consents.Where(c => c.Realm == realm).ToList();
+                user.Sessions = user.Sessions.Where(c => c.Realm == realm).ToList();
+                dispatcher.Dispatch(new GetUserSuccessAction { User = user });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(UpdateUserDetailsAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.OAuthUserClaims).SingleOrDefaultAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
-            user.UpdateEmail(action.Email);
-            user.UpdateName(action.Firstname);
-            user.UpdateLastname(action.Lastname);
-            user.UpdateDateTime = DateTime.UtcNow;
-            await _userRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new UpdateUserDetailsSuccessAction { Email = action.Email, Firstname = action.Firstname, Lastname = action.Lastname, UserId = action.UserId });
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                var user = await dbContext.Users.Include(u => u.Realms).Include(u => u.OAuthUserClaims).SingleOrDefaultAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
+                user.UpdateEmail(action.Email);
+                user.UpdateName(action.Firstname);
+                user.UpdateLastname(action.Lastname);
+                user.UpdateDateTime = DateTime.UtcNow;
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new UpdateUserDetailsSuccessAction { Email = action.Email, Firstname = action.Firstname, Lastname = action.Lastname, UserId = action.UserId });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(RevokeUserConsentAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.Consents).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
-            var consent = user.Consents.Single(c => c.Id == action.ConsentId);
-            user.Consents.Remove(consent);
-            await _userRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new RevokeUserConsentSuccessAction { ConsentId = action.ConsentId, UserId = action.UserId });
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                var user = await dbContext.Users.Include(u => u.Realms).Include(u => u.Consents).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
+                var consent = user.Consents.Single(c => c.Id == action.ConsentId);
+                user.Consents.Remove(consent);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new RevokeUserConsentSuccessAction { ConsentId = action.ConsentId, UserId = action.UserId });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(UnlinkExternalAuthProviderAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.ExternalAuthProviders).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
-            var externalAuthProvider = user.ExternalAuthProviders.Single(c => c.Scheme == action.Scheme && c.Subject == action.Subject);
-            user.ExternalAuthProviders.Remove(externalAuthProvider);
-            await _userRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new UnlinkExternalAuthProviderSuccessAction { Scheme = action.Scheme, Subject = action.Subject, UserId = action.UserId });
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                var user = await dbContext.Users.Include(u => u.Realms).Include(u => u.ExternalAuthProviders).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
+                var externalAuthProvider = user.ExternalAuthProviders.Single(c => c.Scheme == action.Scheme && c.Subject == action.Subject);
+                user.ExternalAuthProviders.Remove(externalAuthProvider);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new UnlinkExternalAuthProviderSuccessAction { Scheme = action.Scheme, Subject = action.Subject, UserId = action.UserId });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(RevokeUserSessionAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.Sessions).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
-            var session = user.Sessions.Single(s => s.SessionId == action.SessionId);
-            session.State = UserSessionStates.Rejected;
-            await _userRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new RevokeUserSessionSuccessAction { SessionId = action.SessionId, UserId = action.UserId });
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                var user = await dbContext.Users.Include(u => u.Realms).Include(u => u.Sessions).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
+                var session = user.Sessions.Single(s => s.SessionId == action.SessionId);
+                session.State = UserSessionStates.Rejected;
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new RevokeUserSessionSuccessAction { SessionId = action.SessionId, UserId = action.UserId });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(UpdateUserClaimsAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.OAuthUserClaims).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
-            user.OAuthUserClaims.Clear();
-            var fileteredClaims = action.Claims.Where(c => !string.IsNullOrWhiteSpace(c.Value) && !string.IsNullOrWhiteSpace(c.Name));
-            foreach (var cl in fileteredClaims)
-                user.OAuthUserClaims.Add(new UserClaim { Id = Guid.NewGuid().ToString(), Name = cl.Name, Value = cl.Value });
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                var user = await dbContext.Users.Include(u => u.Realms).Include(u => u.OAuthUserClaims).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
+                user.OAuthUserClaims.Clear();
+                var fileteredClaims = action.Claims.Where(c => !string.IsNullOrWhiteSpace(c.Value) && !string.IsNullOrWhiteSpace(c.Name));
+                foreach (var cl in fileteredClaims)
+                    user.OAuthUserClaims.Add(new UserClaim { Id = Guid.NewGuid().ToString(), Name = cl.Name, Value = cl.Value });
 
-            await _userRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new UpdateUserClaimsSuccessAction { UserId = action.UserId, Claims = fileteredClaims.ToList() });
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new UpdateUserClaimsSuccessAction { UserId = action.UserId, Claims = fileteredClaims.ToList() });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(AddUserCredentialAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.Credentials).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
-            if (action.IsDefault)
+            using (var dbContext = _factory.CreateDbContext())
             {
-                foreach (var act in user.Credentials.Where(c => c.CredentialType == action.Credential.CredentialType))
-                    act.IsActive = false;
-                action.Credential.IsActive = true;
-            }
+                var user = await dbContext.Users.Include(u => u.Realms).Include(u => u.Credentials).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
+                if (action.IsDefault)
+                {
+                    foreach (var act in user.Credentials.Where(c => c.CredentialType == action.Credential.CredentialType))
+                        act.IsActive = false;
+                    action.Credential.IsActive = true;
+                }
 
-            user.Credentials.Add(action.Credential);
-            await _userRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new AddUserCredentialSuccessAction { Credential = action.Credential, IsDefault = action.IsDefault });
+                user.Credentials.Add(action.Credential);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new AddUserCredentialSuccessAction { Credential = action.Credential, IsDefault = action.IsDefault });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(UpdateUserCredentialAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.Credentials).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
-            var credential = user.Credentials.Single(c => c.Id == action.Credential.Id);
-            credential.Value = action.Credential.Value;
-            credential.OTPAlg = action.Credential.OTPAlg;
-            await _userRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new UpdateUserCredentialSuccessAction { Credential = action.Credential });
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                var user = await dbContext.Users.Include(u => u.Realms).Include(u => u.Credentials).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
+                var credential = user.Credentials.Single(c => c.Id == action.Credential.Id);
+                credential.Value = action.Credential.Value;
+                credential.OTPAlg = action.Credential.OTPAlg;
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new UpdateUserCredentialSuccessAction { Credential = action.Credential });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(RemoveUserCredentialAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.Credentials).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
-            var credential = user.Credentials.Single(c => c.Id == action.CredentialId);
-            user.Credentials.Remove(credential);
-            await _userRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new RemoveUserCredentialSuccessAction { CredentialId = action.CredentialId });
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                var user = await dbContext.Users.Include(u => u.Realms).Include(u => u.Credentials).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
+                var credential = user.Credentials.Single(c => c.Id == action.CredentialId);
+                user.Credentials.Remove(credential);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new RemoveUserCredentialSuccessAction { CredentialId = action.CredentialId });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(DefaultUserCredentialAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.Credentials).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
-            var credential = user.Credentials.Single(c => c.Id == action.CredentialId);
-            foreach (var cred in user.Credentials.Where(c => c.CredentialType == credential.CredentialType))
-                cred.IsActive = false;
-            credential.IsActive = true;
-            await _userRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new DefaultUserCredentialSuccessAction { CredentialId = action.CredentialId, UserId = action.UserId });
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                var user = await dbContext.Users.Include(u => u.Realms).Include(u => u.Credentials).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
+                var credential = user.Credentials.Single(c => c.Id == action.CredentialId);
+                foreach (var cred in user.Credentials.Where(c => c.CredentialType == credential.CredentialType))
+                    cred.IsActive = false;
+                credential.IsActive = true;
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new DefaultUserCredentialSuccessAction { CredentialId = action.CredentialId, UserId = action.UserId });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(RemoveSelectedUserGroupAction action, IDispatcher dispatcher)
         {
-            var user = await _userRepository.Query().Include(u => u.Groups).SingleAsync(u => u.Id == action.UserId);
-            user.Groups = user.Groups.Where(g => !action.GroupIds.Contains(g.Id)).ToList();
-            await _userRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new RemoveSelectedUserGroupSuccessAction { GroupIds = action.GroupIds, UserId = action.UserId });
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                var user = await dbContext.Users.Include(u => u.Groups).SingleAsync(u => u.Id == action.UserId);
+                user.Groups = user.Groups.Where(g => !action.GroupIds.Contains(g.Id)).ToList();
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new RemoveSelectedUserGroupSuccessAction { GroupIds = action.GroupIds, UserId = action.UserId });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(AssignUserGroupsAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = new StoreDbContext(_options))
+            using (var dbContext = _factory.CreateDbContext())
             {
                 var realm = await GetRealm();
                 var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
@@ -225,20 +253,26 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         public async Task Handle(ResolveUserRolesAction action, IDispatcher dispatcher)
         {
             if (!action.IsSelected) return;
-            var user = await _userRepository.Query().Include(u => u.Groups).AsNoTracking().SingleAsync(u => u.Id == action.UserId);
-            var grpPathLst = user.Groups.SelectMany(g => g.ResolveAllPath()).Distinct();
-            var allGroups = await _groupRepository.Query().Include(g => g.Roles).AsNoTracking().Where(g => grpPathLst.Contains(g.FullPath)).ToListAsync();
-            var roles = allGroups.SelectMany(g => g.Roles).Select(r => r.Name).Distinct();
-            dispatcher.Dispatch(new ResolveUserRolesSuccessAction { Roles = roles, UserId = user.Id });
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                var user = await dbContext.Users.Include(u => u.Groups).AsNoTracking().SingleAsync(u => u.Id == action.UserId);
+                var grpPathLst = user.Groups.SelectMany(g => g.ResolveAllPath()).Distinct();
+                var allGroups = await dbContext.Groups.Include(g => g.Roles).AsNoTracking().Where(g => grpPathLst.Contains(g.FullPath)).ToListAsync();
+                var roles = allGroups.SelectMany(g => g.Roles).Select(r => r.Name).Distinct();
+                dispatcher.Dispatch(new ResolveUserRolesSuccessAction { Roles = roles, UserId = user.Id });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(RemoveSelectedUsersAction action, IDispatcher dispatcher)
         {
-            var users = await _userRepository.Query().Where(u => action.UserIds.Contains(u.Id)).ToListAsync();
-            _userRepository.Remove(users);
-            await _userRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new RemoveSelectedUsersSuccessAction { UserIds = action.UserIds });
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                var users = await dbContext.Users.Where(u => action.UserIds.Contains(u.Id)).ToListAsync();
+                dbContext.Users.RemoveRange(users);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new RemoveSelectedUsersSuccessAction { UserIds = action.UserIds });
+            }
         }
 
         [EffectMethod]
@@ -253,55 +287,61 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
                 return;
             }
 
-            string nameLower = action.Name.ToLower();
-            bool userExists = _userRepository.Query().Any(u => u.Name.ToLower() == nameLower);
-
-            if (userExists)
+            using (var dbContext = _factory.CreateDbContext())
             {
-                string message = $"The user '{action.Name}' already exists.";
-                dispatcher.Dispatch(new AddUserFailureAction() { ErrorMessage = message });
-                logger.LogDebug(message);
-                return;
+                string nameLower = action.Name.ToLower();
+                bool userExists = dbContext.Users.Any(u => u.Name.ToLower() == nameLower);
+
+                if (userExists)
+                {
+                    string message = $"The user '{action.Name}' already exists.";
+                    dispatcher.Dispatch(new AddUserFailureAction() { ErrorMessage = message });
+                    logger.LogDebug(message);
+                    return;
+                }
+
+                string id = Guid.NewGuid().ToString();
+                string realm = await GetRealm();
+
+                var newUser = new User()
+                {
+                    Id = id,
+                    Name = action.Name,
+                    Firstname = action.Firstname,
+                    Lastname = action.Lastname,
+                    Email = action.Email,
+                    CreateDateTime = DateTime.UtcNow,
+                    UpdateDateTime = DateTime.UtcNow
+                };
+
+                newUser.Realms.Add(new RealmUser() { RealmsName = realm, UsersId = id });
+                dbContext.Users.Add(newUser);
+
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+
+                dispatcher.Dispatch(new AddUserSuccessAction()
+                {
+                    Id = id,
+                    Email = action.Email,
+                    Firstname = action.Firstname,
+                    Lastname = action.Lastname,
+                    Name = action.Name
+                });
+
+                logger.LogInformation($"The user '{action.Name}' was added succesfully.");
             }
-
-            string id = Guid.NewGuid().ToString();
-            string realm = await GetRealm();
-
-            var newUser = new User()
-            {
-                Id = id,
-                Name = action.Name,
-                Firstname = action.Firstname,
-                Lastname = action.Lastname,
-                Email = action.Email,
-                CreateDateTime = DateTime.UtcNow,
-                UpdateDateTime = DateTime.UtcNow
-            };
-
-            newUser.Realms.Add(new RealmUser() { RealmsName = realm, UsersId = id });
-            _userRepository.Add(newUser);
-
-            await _userRepository.SaveChanges(CancellationToken.None);
-
-            dispatcher.Dispatch(new AddUserSuccessAction()
-            {
-                Id = id,
-                Email = action.Email,
-                Firstname = action.Firstname,
-                Lastname = action.Lastname,
-                Name = action.Name
-            });
-
-            logger.LogInformation($"The user '{action.Name}' was added succesfully.");
         }
 
         [EffectMethod]
         public async Task Handle(RemoveSelectedUserCredentialOffersAction action, IDispatcher dispatcher)
         {
-            var user = await _userRepository.Query().Include(u => u.CredentialOffers).FirstOrDefaultAsync(u => u.Id == action.UserId);
-            user.CredentialOffers = user.CredentialOffers.Where(c => !action.CredentialOffersId.Contains(c.Id)).ToList();
-            await _userRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new RemoveSelectedUserCredentialOffersSuccessAction { CredentialOffersId = action.CredentialOffersId });
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                var user = await dbContext.Users.Include(u => u.CredentialOffers).FirstOrDefaultAsync(u => u.Id == action.UserId);
+                user.CredentialOffers = user.CredentialOffers.Where(c => !action.CredentialOffersId.Contains(c.Id)).ToList();
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new RemoveSelectedUserCredentialOffersSuccessAction { CredentialOffersId = action.CredentialOffersId });
+            }
         }
 
         [EffectMethod]

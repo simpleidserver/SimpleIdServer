@@ -11,12 +11,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.Auditing
 {
     public class AuditingRecordEffects
     {
-        private readonly IAuditEventRepository _auditingEventRepository;
+        private readonly IDbContextFactory<StoreDbContext> _factory;
         private readonly ProtectedSessionStorage _sessionStorage;
 
-        public AuditingRecordEffects(IAuditEventRepository auditingEventRepository, ProtectedSessionStorage protectedSessionStorage)
+        public AuditingRecordEffects(IDbContextFactory<StoreDbContext> factory, ProtectedSessionStorage protectedSessionStorage)
         {
-            _auditingEventRepository = auditingEventRepository;
+            _factory = factory;
             _sessionStorage = protectedSessionStorage;
         }
 
@@ -24,19 +24,22 @@ namespace SimpleIdServer.IdServer.Website.Stores.Auditing
         public async Task Handle(SearchAuditingRecordsAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            IQueryable<AuditEvent> query = _auditingEventRepository.Query().AsNoTracking().Where(r => r.Realm == realm);
-            if (action.DisplayOnlyErrors)
-                query = query.Where(r => r.IsError);
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                IQueryable<AuditEvent> query = dbContext.AuditEvents.AsNoTracking().Where(r => r.Realm == realm);
+                if (action.DisplayOnlyErrors)
+                    query = query.Where(r => r.IsError);
 
-            if (!string.IsNullOrWhiteSpace(action.Filter))
-                query = query.Where(SanitizeExpression(action.Filter));
+                if (!string.IsNullOrWhiteSpace(action.Filter))
+                    query = query.Where(SanitizeExpression(action.Filter));
 
-            if (!string.IsNullOrWhiteSpace(action.OrderBy))
-                query = query.OrderBy(SanitizeExpression(action.OrderBy));
+                if (!string.IsNullOrWhiteSpace(action.OrderBy))
+                    query = query.OrderBy(SanitizeExpression(action.OrderBy));
 
-            var nb = query.Count();
-            var auditEvents = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
-            dispatcher.Dispatch(new SearchAuditingRecordsSuccessAction { AuditEvents = auditEvents, Count = nb });
+                var nb = query.Count();
+                var auditEvents = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
+                dispatcher.Dispatch(new SearchAuditingRecordsSuccessAction { AuditEvents = auditEvents, Count = nb });
+            }
 
             string SanitizeExpression(string expression) => expression.Replace("Value.", "");
         }

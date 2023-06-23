@@ -92,9 +92,9 @@ By default, there is one administrator account configured. You can access their 
 
 The IdentityServer UI uses Bootstrap 5.
 
-![IdentityServer](images/IdentityServer-1.png)
+![IdentityServer](./images/IdentityServer-1.png)
 
-## Create IdentityServer website project
+### Create IdentityServer website project
 
 create a web project named `IdServerWebsite` with the `SimpleIdServer.IdServer.Website` package installed and Entity Framework (EF) configured to use SQLServer, execute the command line :
 
@@ -118,7 +118,7 @@ The website can be used to manage all aspects of an Identity Server solution, su
 
 The IdentityServer website UI uses Radzen.
 
-![IdentityServerWebsite](images/IdentityServerWebsite-2.png)
+![IdentityServerWebsite](./images/IdentityServerWebsite-2.png)
 
 ## SCIM Security
 

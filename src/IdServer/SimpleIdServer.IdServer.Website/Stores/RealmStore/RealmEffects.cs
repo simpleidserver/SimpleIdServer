@@ -12,14 +12,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.RealmStore
 {
     public class RealmEffects
     {
-        private readonly IRealmRepository _realmRepository;
-        private readonly DbContextOptions<StoreDbContext> _options;
+        private readonly IDbContextFactory<StoreDbContext> _factory;
         private readonly ProtectedSessionStorage _sessionStorage;
 
-        public RealmEffects(IRealmRepository realmRepository, DbContextOptions<StoreDbContext> options, ProtectedSessionStorage  protectedSessionStorage)
+        public RealmEffects(IDbContextFactory<StoreDbContext> factory, ProtectedSessionStorage  protectedSessionStorage)
         {
-            _realmRepository = realmRepository;
-            _options = options;
+            _factory = factory;
             _sessionStorage = protectedSessionStorage;
         }
 
@@ -27,22 +25,25 @@ namespace SimpleIdServer.IdServer.Website.Stores.RealmStore
         [EffectMethod]
         public async Task Handle(GetAllRealmAction action, IDispatcher dispatcher)
         {
-            IEnumerable<Domains.Realm> realms = await _realmRepository.Query().AsNoTracking().ToListAsync();
-            dispatcher.Dispatch(new GetAllRealmSuccessAction { Realms = realms});
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                IEnumerable<Domains.Realm> realms = await dbContext.Realms.AsNoTracking().ToListAsync();
+                dispatcher.Dispatch(new GetAllRealmSuccessAction { Realms = realms });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(AddRealmAction action, IDispatcher dispatcher)
         {
-            if(await _realmRepository.Query().AsNoTracking().AnyAsync(r => r.Name == action.Name))
+            using (var dbContext = _factory.CreateDbContext())
             {
-                var act = new AddRealmFailureAction { ErrorMessage = string.Format(Global.RealmExists, action.Name) };
-                dispatcher.Dispatch(act);
-                return;
-            }
+                if (await dbContext.Realms.AsNoTracking().AnyAsync(r => r.Name == action.Name))
+                {
+                    var act = new AddRealmFailureAction { ErrorMessage = string.Format(Global.RealmExists, action.Name) };
+                    dispatcher.Dispatch(act);
+                    return;
+                }
 
-            using(var dbContext = new StoreDbContext(_options))
-            {
                 var realm = new Domains.Realm { Name = action.Name, Description = action.Description, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow };
                 dbContext.Realms.Add(realm);
                 var users = await dbContext.Users.Include(u => u.Realms).Where(u => WebsiteConfiguration.StandardUsers.Contains(u.Name)).ToListAsync();
@@ -60,13 +61,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.RealmStore
                 foreach (var scope in scopes)
                     scope.Realms.Add(realm);
 
-                foreach(var acr in acrs)
+                foreach (var acr in acrs)
                     acr.Realms.Add(realm);
 
-                foreach(var key in keys)
+                foreach (var key in keys)
                     key.Realms.Add(realm);
 
-                foreach(var certificateAuthority in certificateAuthorities)
+                foreach (var certificateAuthority in certificateAuthorities)
                     certificateAuthority.Realms.Add(realm);
 
                 await dbContext.SaveChangesAsync();

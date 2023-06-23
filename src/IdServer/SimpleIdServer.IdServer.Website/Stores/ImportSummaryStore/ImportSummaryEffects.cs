@@ -12,14 +12,14 @@ namespace SimpleIdServer.IdServer.Website.Stores.ImportSummaryStore
 {
     public class ImportSummaryEffects
     {
-        private readonly IImportSummaryStore _importSummaryStore;
+        private readonly IDbContextFactory<StoreDbContext> _factory;
         private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly IdServerWebsiteOptions _options;
         private readonly ProtectedSessionStorage _sessionStorage;
 
-        public ImportSummaryEffects(IImportSummaryStore importSummaryStore, IWebsiteHttpClientFactory websiteHttpClientFactory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
+        public ImportSummaryEffects(IDbContextFactory<StoreDbContext> factory, IWebsiteHttpClientFactory websiteHttpClientFactory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
         {
-            _importSummaryStore = importSummaryStore;
+            _factory = factory;
             _websiteHttpClientFactory = websiteHttpClientFactory;
             _options = options.Value;
             _sessionStorage = sessionStorage;
@@ -30,16 +30,19 @@ namespace SimpleIdServer.IdServer.Website.Stores.ImportSummaryStore
         public async Task Handle(SearchImportSummariesAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            IQueryable<ImportSummary> query = _importSummaryStore.Query().Where(c => c.RealmName == realm).AsNoTracking();
-            if (!string.IsNullOrWhiteSpace(action.Filter))
-                query = query.Where(SanitizeExpression(action.Filter));
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                IQueryable<ImportSummary> query = dbContext.ImportSummaries.Where(c => c.RealmName == realm).AsNoTracking();
+                if (!string.IsNullOrWhiteSpace(action.Filter))
+                    query = query.Where(SanitizeExpression(action.Filter));
 
-            if (!string.IsNullOrWhiteSpace(action.OrderBy))
-                query = query.OrderBy(SanitizeExpression(action.OrderBy));
+                if (!string.IsNullOrWhiteSpace(action.OrderBy))
+                    query = query.OrderBy(SanitizeExpression(action.OrderBy));
 
-            var nb = query.Count();
-            var importSummaries = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
-            dispatcher.Dispatch(new SearchImportSummariesSuccessAction { ImportSummaries = importSummaries, Count = nb });
+                var nb = query.Count();
+                var importSummaries = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
+                dispatcher.Dispatch(new SearchImportSummariesSuccessAction { ImportSummaries = importSummaries, Count = nb });
+            }
 
             string SanitizeExpression(string expression) => expression.Replace("Value.", "");
         }

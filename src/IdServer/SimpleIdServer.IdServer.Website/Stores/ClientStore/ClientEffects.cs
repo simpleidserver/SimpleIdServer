@@ -4,7 +4,6 @@ using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using NetTopologySuite.Geometries;
 using Radzen;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
@@ -19,31 +18,32 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
 {
     public class ClientEffects
     {
-        private readonly IClientRepository _clientRepository;
+        private readonly IDbContextFactory<StoreDbContext> _factory;
         private readonly ProtectedSessionStorage _sessionStorage;
-        private readonly DbContextOptions<StoreDbContext> _options;
 
-        public ClientEffects(IClientRepository clientRepository, ProtectedSessionStorage sessionStorage, DbContextOptions<StoreDbContext> options)
+        public ClientEffects(IDbContextFactory<StoreDbContext> factory, ProtectedSessionStorage sessionStorage)
         {
-            _clientRepository = clientRepository;
+            _factory = factory;
             _sessionStorage = sessionStorage;
-            _options = options;
         }
 
         [EffectMethod]
         public async Task Handle(SearchClientsAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            IQueryable<Client> query = _clientRepository.Query().Include(c => c.Translations).Include(c => c.Realms).Include(c => c.Scopes).Where(c => c.Realms.Any(r => r.Name == realm)).AsNoTracking();
-            if (!string.IsNullOrWhiteSpace(action.Filter))
-                query = query.Where(SanitizeExpression(action.Filter));
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                IQueryable<Client> query = dbContext.Clients.Include(c => c.Translations).Include(c => c.Realms).Include(c => c.Scopes).Where(c => c.Realms.Any(r => r.Name == realm)).AsNoTracking();
+                if (!string.IsNullOrWhiteSpace(action.Filter))
+                    query = query.Where(SanitizeExpression(action.Filter));
 
-            if (!string.IsNullOrWhiteSpace(action.OrderBy))
-                query = query.OrderBy(SanitizeExpression(action.OrderBy));
+                if (!string.IsNullOrWhiteSpace(action.OrderBy))
+                    query = query.OrderBy(SanitizeExpression(action.OrderBy));
 
-            var nb = query.Count();
-            var clients = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
-            dispatcher.Dispatch(new SearchClientsSuccessAction { Clients = clients, Count = nb });
+                var nb = query.Count();
+                var clients = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
+                dispatcher.Dispatch(new SearchClientsSuccessAction { Clients = clients, Count = nb });
+            }
 
             string SanitizeExpression(string expression) => expression.Replace("Value.", "");
         }
@@ -52,17 +52,20 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public async Task Handle(GetAllClientsAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            IQueryable<Client> query = _clientRepository.Query().Include(c => c.Translations).Include(c => c.Realms).Include(c => c.Scopes).Where(c => c.Realms.Any(r => r.Name == realm)).AsNoTracking();
-            var nb = query.Count();
-            var clients = await query.ToListAsync(CancellationToken.None);
-            dispatcher.Dispatch(new SearchClientsSuccessAction { Clients = clients, Count = nb });
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                IQueryable<Client> query = dbContext.Clients.Include(c => c.Translations).Include(c => c.Realms).Include(c => c.Scopes).Where(c => c.Realms.Any(r => r.Name == realm)).AsNoTracking();
+                var nb = query.Count();
+                var clients = await query.ToListAsync(CancellationToken.None);
+                dispatcher.Dispatch(new SearchClientsSuccessAction { Clients = clients, Count = nb });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(AddSpaClientAction action, IDispatcher dispatcher)
         {
             if (!await ValidateAddClient(action.ClientId, action.RedirectionUrls, dispatcher)) return;
-            using (var dbContext = new StoreDbContext(_options))
+            using (var dbContext = _factory.CreateDbContext())
             {
                 var realm = await GetRealm();
                 var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
@@ -82,7 +85,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public async Task Handle(AddMachineClientApplicationAction action, IDispatcher dispatcher)
         {
             if (!await ValidateAddClient(action.ClientId, new List<string>(), dispatcher)) return;
-            using (var dbContext = new StoreDbContext(_options))
+            using (var dbContext = _factory.CreateDbContext())
             {
                 var realm = await GetRealm();
                 var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
@@ -100,7 +103,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public async Task Handle(AddWebsiteApplicationAction action, IDispatcher dispatcher)
         {
             if (!await ValidateAddClient(action.ClientId, new List<string>(), dispatcher)) return;
-            using (var dbContext = new StoreDbContext(_options))
+            using (var dbContext = _factory.CreateDbContext())
             {
                 var realm = await GetRealm();
                 var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
@@ -141,7 +144,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public async Task Handle(AddMobileApplicationAction action, IDispatcher dispatcher)
         {
             if (!await ValidateAddClient(action.ClientId, new List<string>(), dispatcher)) return;
-            using (var dbContext = new StoreDbContext(_options))
+            using (var dbContext = _factory.CreateDbContext())
             {
                 var realm = await GetRealm();
                 var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
@@ -161,7 +164,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public async Task Handle(AddExternalDeviceApplicationAction action, IDispatcher dispatcher)
         {
             if (!await ValidateAddClient(action.ClientId, new List<string>(), dispatcher)) return;
-            using (var dbContext = new StoreDbContext(_options))
+            using (var dbContext = _factory.CreateDbContext())
             {
                 var realm = await GetRealm();
                 var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
@@ -181,7 +184,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public async Task Handle(AddDeviceApplicationAction action, IDispatcher dispatcher)
         {
             if (!await ValidateAddClient(action.ClientId, new List<string>(), dispatcher)) return;
-            using (var dbContext = new StoreDbContext(_options))
+            using (var dbContext = _factory.CreateDbContext())
             {
                 var realm = await GetRealm();
                 var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
@@ -201,7 +204,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public async Task Handle(AddWsFederationApplicationAction action, IDispatcher dispatcher)
         {
             if (!await ValidateAddClient(action.ClientId, new List<string>(), dispatcher)) return;
-            using (var dbContext = new StoreDbContext(_options))
+            using (var dbContext = _factory.CreateDbContext())
             {
                 var realm = await GetRealm();
                 var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
@@ -222,96 +225,108 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public async Task Handle(RemoveSelectedClientsAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var clients = await _clientRepository.Query().Include(c => c.Realms).Where(c => action.ClientIds.Contains(c.ClientId) && c.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
-            _clientRepository.DeleteRange(clients);
-            await _clientRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new RemoveSelectedClientsSuccessAction { ClientIds = action.ClientIds });
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                var clients = await dbContext.Clients.Include(c => c.Realms).Where(c => action.ClientIds.Contains(c.ClientId) && c.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
+                dbContext.Clients.RemoveRange(clients);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new RemoveSelectedClientsSuccessAction { ClientIds = action.ClientIds });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(GetClientAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var client = await _clientRepository.Query().Include(c => c.Realms).Include(c => c.Translations).Include(c => c.Scopes).Include(c => c.SerializedJsonWebKeys).AsNoTracking().SingleOrDefaultAsync(c => c.ClientId == action.ClientId && c.Realms.Any(r => r.Name == realm), CancellationToken.None);
-            if(client == null)
+            using (var dbContext = _factory.CreateDbContext())
             {
-                dispatcher.Dispatch(new GetClientFailureAction { ErrorMessage = string.Format(Global.UnknownClient, action.ClientId) });
-                return;
-            }
+                var client = await dbContext.Clients.Include(c => c.Realms).Include(c => c.Translations).Include(c => c.Scopes).Include(c => c.SerializedJsonWebKeys).AsNoTracking().SingleOrDefaultAsync(c => c.ClientId == action.ClientId && c.Realms.Any(r => r.Name == realm), CancellationToken.None);
+                if (client == null)
+                {
+                    dispatcher.Dispatch(new GetClientFailureAction { ErrorMessage = string.Format(Global.UnknownClient, action.ClientId) });
+                    return;
+                }
 
-            dispatcher.Dispatch(new GetClientSuccessAction { Client = client });
+                dispatcher.Dispatch(new GetClientSuccessAction { Client = client });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(UpdateClientDetailsAction act, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var client = await _clientRepository.Query().Include(c => c.Realms).Include(c => c.Translations).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm), CancellationToken.None);
-            client.RedirectionUrls = act.RedirectionUrls.Split(';');
-            client.UpdateClientName(act.ClientName);
-            client.PostLogoutRedirectUris = act.PostLogoutRedirectUris.Split(';');
-            client.FrontChannelLogoutSessionRequired = act.FrontChannelLogoutSessionRequired;
-            client.FrontChannelLogoutUri = act.FrontChannelLogoutUri;
-            client.BackChannelLogoutUri = act.BackChannelLogoutUri;
-            client.BackChannelLogoutSessionRequired = act.BackChannelLogoutSessionRequired;
-            var grantTypes = new List<string>();
-            if (act.IsClientCredentialsGrantTypeEnabled)
-                grantTypes.Add(ClientCredentialsHandler.GRANT_TYPE);
-            if (act.IsPasswordGrantTypeEnabled)
-                grantTypes.Add(PasswordHandler.GRANT_TYPE);
-            if (act.IsRefreshTokenGrantTypeEnabled)
-                grantTypes.Add(RefreshTokenHandler.GRANT_TYPE);
-            if (act.IsAuthorizationCodeGrantTypeEnabled)
-                grantTypes.Add(AuthorizationCodeHandler.GRANT_TYPE);
-            if (act.IsCIBAGrantTypeEnabled)
-                grantTypes.Add(CIBAHandler.GRANT_TYPE);
-            if (act.IsUMAGrantTypeEnabled)
-                grantTypes.Add(UmaTicketHandler.GRANT_TYPE);
-            if (act.IsDeviceGrantTypeEnabled)
-                grantTypes.Add(DeviceCodeHandler.GRANT_TYPE);
-            client.GrantTypes = grantTypes;
-            client.IsConsentDisabled = !act.IsConsentEnabled;
-            await _clientRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new UpdateClientDetailsSuccessAction
+            using (var dbContext = _factory.CreateDbContext())
             {
-                ClientId = act.ClientId,
-                ClientName = act.ClientName,
-                RedirectionUrls = act.RedirectionUrls,
-                PostLogoutRedirectUris = act.PostLogoutRedirectUris,
-                FrontChannelLogoutSessionRequired = act.FrontChannelLogoutSessionRequired,
-                FrontChannelLogoutUri = act.FrontChannelLogoutUri,
-                BackChannelLogoutUri = act.BackChannelLogoutUri,
-                BackChannelLogoutSessionRequired = act.BackChannelLogoutSessionRequired,
-                IsClientCredentialsGrantTypeEnabled = act.IsClientCredentialsGrantTypeEnabled,
-                IsPasswordGrantTypeEnabled = act.IsPasswordGrantTypeEnabled,
-                IsRefreshTokenGrantTypeEnabled = act.IsRefreshTokenGrantTypeEnabled,
-                IsAuthorizationCodeGrantTypeEnabled = act.IsAuthorizationCodeGrantTypeEnabled,
-                IsCIBAGrantTypeEnabled = act.IsCIBAGrantTypeEnabled,
-                IsUMAGrantTypeEnabled = act.IsUMAGrantTypeEnabled,
-                IsConsentEnabled = act.IsConsentEnabled,
-                IsDeviceGrantTypeEnabled = act.IsDeviceGrantTypeEnabled
-            });
+                var client = await dbContext.Clients.Include(c => c.Realms).Include(c => c.Translations).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm), CancellationToken.None);
+                client.RedirectionUrls = act.RedirectionUrls.Split(';');
+                client.UpdateClientName(act.ClientName);
+                client.PostLogoutRedirectUris = act.PostLogoutRedirectUris.Split(';');
+                client.FrontChannelLogoutSessionRequired = act.FrontChannelLogoutSessionRequired;
+                client.FrontChannelLogoutUri = act.FrontChannelLogoutUri;
+                client.BackChannelLogoutUri = act.BackChannelLogoutUri;
+                client.BackChannelLogoutSessionRequired = act.BackChannelLogoutSessionRequired;
+                var grantTypes = new List<string>();
+                if (act.IsClientCredentialsGrantTypeEnabled)
+                    grantTypes.Add(ClientCredentialsHandler.GRANT_TYPE);
+                if (act.IsPasswordGrantTypeEnabled)
+                    grantTypes.Add(PasswordHandler.GRANT_TYPE);
+                if (act.IsRefreshTokenGrantTypeEnabled)
+                    grantTypes.Add(RefreshTokenHandler.GRANT_TYPE);
+                if (act.IsAuthorizationCodeGrantTypeEnabled)
+                    grantTypes.Add(AuthorizationCodeHandler.GRANT_TYPE);
+                if (act.IsCIBAGrantTypeEnabled)
+                    grantTypes.Add(CIBAHandler.GRANT_TYPE);
+                if (act.IsUMAGrantTypeEnabled)
+                    grantTypes.Add(UmaTicketHandler.GRANT_TYPE);
+                if (act.IsDeviceGrantTypeEnabled)
+                    grantTypes.Add(DeviceCodeHandler.GRANT_TYPE);
+                client.GrantTypes = grantTypes;
+                client.IsConsentDisabled = !act.IsConsentEnabled;
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new UpdateClientDetailsSuccessAction
+                {
+                    ClientId = act.ClientId,
+                    ClientName = act.ClientName,
+                    RedirectionUrls = act.RedirectionUrls,
+                    PostLogoutRedirectUris = act.PostLogoutRedirectUris,
+                    FrontChannelLogoutSessionRequired = act.FrontChannelLogoutSessionRequired,
+                    FrontChannelLogoutUri = act.FrontChannelLogoutUri,
+                    BackChannelLogoutUri = act.BackChannelLogoutUri,
+                    BackChannelLogoutSessionRequired = act.BackChannelLogoutSessionRequired,
+                    IsClientCredentialsGrantTypeEnabled = act.IsClientCredentialsGrantTypeEnabled,
+                    IsPasswordGrantTypeEnabled = act.IsPasswordGrantTypeEnabled,
+                    IsRefreshTokenGrantTypeEnabled = act.IsRefreshTokenGrantTypeEnabled,
+                    IsAuthorizationCodeGrantTypeEnabled = act.IsAuthorizationCodeGrantTypeEnabled,
+                    IsCIBAGrantTypeEnabled = act.IsCIBAGrantTypeEnabled,
+                    IsUMAGrantTypeEnabled = act.IsUMAGrantTypeEnabled,
+                    IsConsentEnabled = act.IsConsentEnabled,
+                    IsDeviceGrantTypeEnabled = act.IsDeviceGrantTypeEnabled
+                });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(RemoveSelectedClientScopesAction act, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var client = await _clientRepository.Query().Include(c => c.Realms).Include(c => c.Scopes).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm), CancellationToken.None);
-            client.Scopes = client.Scopes.Where(s => !act.ScopeNames.Contains(s.Name)).ToList();
-            await _clientRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new RemoveSelectedClientScopesSuccessAction
+            using (var dbContext = _factory.CreateDbContext())
             {
-                ClientId = act.ClientId,
-                ScopeNames = act.ScopeNames
-            });
+                var client = await dbContext.Clients.Include(c => c.Realms).Include(c => c.Scopes).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm), CancellationToken.None);
+                client.Scopes = client.Scopes.Where(s => !act.ScopeNames.Contains(s.Name)).ToList();
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new RemoveSelectedClientScopesSuccessAction
+                {
+                    ClientId = act.ClientId,
+                    ScopeNames = act.ScopeNames
+                });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(AddClientScopesAction act, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            using (var dbContext = new StoreDbContext(_options))
+            using (var dbContext = _factory.CreateDbContext())
             {
                 var client = await dbContext.Clients.Include(c => c.Realms).Include(c => c.Scopes).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm), CancellationToken.None);
                 var newScopes = await dbContext.Scopes.Where(s => act.ScopeNames.Contains(s.Name)).ToListAsync();
@@ -330,66 +345,75 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public async Task Handle(GenerateSigKeyAction act, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var client = await _clientRepository.Query().Include(c => c.Realms).AsNoTracking().Include(c => c.SerializedJsonWebKeys).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm));
-            if(client.JsonWebKeys.Any(j => j.KeyId == act.KeyId))
+            using (var dbContext = _factory.CreateDbContext())
             {
-                dispatcher.Dispatch(new GenerateKeyFailureAction { ErrorMessage = string.Format(Global.SigKeyAlreadyExists, act.KeyId) });
-                return;
-            }
+                var client = await dbContext.Clients.Include(c => c.Realms).AsNoTracking().Include(c => c.SerializedJsonWebKeys).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm));
+                if (client.JsonWebKeys.Any(j => j.KeyId == act.KeyId))
+                {
+                    dispatcher.Dispatch(new GenerateKeyFailureAction { ErrorMessage = string.Format(Global.SigKeyAlreadyExists, act.KeyId) });
+                    return;
+                }
 
-            SigningCredentials sigCredentials = null;
-            switch(act.KeyType)
-            {
-                case SecurityKeyTypes.RSA:
-                    sigCredentials = ClientKeyGenerator.GenerateRSASignatureKey(act.KeyId, act.Alg);
-                    break;
-                case SecurityKeyTypes.CERTIFICATE:
-                    sigCredentials = ClientKeyGenerator.GenerateX509CertificateSignatureKey(act.KeyId, act.Alg);
-                    break;
-                case SecurityKeyTypes.ECDSA:
-                    sigCredentials = ClientKeyGenerator.GenerateECDsaSignatureKey(act.KeyId, act.Alg);
-                    break;
-            }
+                SigningCredentials sigCredentials = null;
+                switch (act.KeyType)
+                {
+                    case SecurityKeyTypes.RSA:
+                        sigCredentials = ClientKeyGenerator.GenerateRSASignatureKey(act.KeyId, act.Alg);
+                        break;
+                    case SecurityKeyTypes.CERTIFICATE:
+                        sigCredentials = ClientKeyGenerator.GenerateX509CertificateSignatureKey(act.KeyId, act.Alg);
+                        break;
+                    case SecurityKeyTypes.ECDSA:
+                        sigCredentials = ClientKeyGenerator.GenerateECDsaSignatureKey(act.KeyId, act.Alg);
+                        break;
+                }
 
-            var pemResult = PemConverter.ConvertFromSecurityKey(sigCredentials.Key);
-            dispatcher.Dispatch(new GenerateSigKeySuccessAction { Alg = act.Alg, KeyId = act.KeyId, Credentials = sigCredentials, Pem = pemResult, KeyType = act.KeyType, JsonWebKey = sigCredentials.SerializeJWKStr() });
+                var pemResult = PemConverter.ConvertFromSecurityKey(sigCredentials.Key);
+                dispatcher.Dispatch(new GenerateSigKeySuccessAction { Alg = act.Alg, KeyId = act.KeyId, Credentials = sigCredentials, Pem = pemResult, KeyType = act.KeyType, JsonWebKey = sigCredentials.SerializeJWKStr() });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(GenerateEncKeyAction act, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var client = await _clientRepository.Query().Include(c => c.Realms).AsNoTracking().Include(c => c.SerializedJsonWebKeys).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm));
-            if (client.JsonWebKeys.Any(j => j.KeyId == act.KeyId))
+            using (var dbContext = _factory.CreateDbContext())
             {
-                dispatcher.Dispatch(new GenerateKeyFailureAction { ErrorMessage = string.Format(Global.SigKeyAlreadyExists, act.KeyId) });
-                return;
-            }
+                var client = await dbContext.Clients.Include(c => c.Realms).AsNoTracking().Include(c => c.SerializedJsonWebKeys).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm));
+                if (client.JsonWebKeys.Any(j => j.KeyId == act.KeyId))
+                {
+                    dispatcher.Dispatch(new GenerateKeyFailureAction { ErrorMessage = string.Format(Global.SigKeyAlreadyExists, act.KeyId) });
+                    return;
+                }
 
-            EncryptingCredentials encCredentials = null;
-            switch (act.KeyType)
-            {
-                case SecurityKeyTypes.RSA:
-                    encCredentials = ClientKeyGenerator.GenerateRSAEncryptionKey(act.KeyId, act.Alg, act.Enc);
-                    break;
-                case SecurityKeyTypes.CERTIFICATE:
-                    encCredentials = ClientKeyGenerator.GenerateCertificateEncryptionKey(act.KeyId, act.Alg, act.Enc);
-                    break;
-            }
+                EncryptingCredentials encCredentials = null;
+                switch (act.KeyType)
+                {
+                    case SecurityKeyTypes.RSA:
+                        encCredentials = ClientKeyGenerator.GenerateRSAEncryptionKey(act.KeyId, act.Alg, act.Enc);
+                        break;
+                    case SecurityKeyTypes.CERTIFICATE:
+                        encCredentials = ClientKeyGenerator.GenerateCertificateEncryptionKey(act.KeyId, act.Alg, act.Enc);
+                        break;
+                }
 
-            var pemResult = PemConverter.ConvertFromSecurityKey(encCredentials.Key);
-            dispatcher.Dispatch(new GenerateEncKeySuccessAction { Alg = act.Alg, KeyId = act.KeyId, Credentials = encCredentials, Pem = pemResult, KeyType = act.KeyType, Enc = act.Enc, JsonWebKey = encCredentials.SerializeJWKStr() });
+                var pemResult = PemConverter.ConvertFromSecurityKey(encCredentials.Key);
+                dispatcher.Dispatch(new GenerateEncKeySuccessAction { Alg = act.Alg, KeyId = act.KeyId, Credentials = encCredentials, Pem = pemResult, KeyType = act.KeyType, Enc = act.Enc, JsonWebKey = encCredentials.SerializeJWKStr() });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(AddSigKeyAction act, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var client = await _clientRepository.Query().Include(c => c.Realms).Include(c => c.SerializedJsonWebKeys).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm));
-            var jsonWebKey = act.Credentials.SerializePublicJWK();
-            client.Add(act.KeyId, jsonWebKey, Constants.JWKUsages.Sig, act.KeyType);
-            await _clientRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new AddSigKeySuccessAction { Alg = act.Alg, ClientId = act.ClientId, Credentials = act.Credentials, KeyId = act.KeyId, KeyType = act.KeyType });
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                var client = await dbContext.Clients.Include(c => c.Realms).Include(c => c.SerializedJsonWebKeys).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm));
+                var jsonWebKey = act.Credentials.SerializePublicJWK();
+                client.Add(act.KeyId, jsonWebKey, Constants.JWKUsages.Sig, act.KeyType);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new AddSigKeySuccessAction { Alg = act.Alg, ClientId = act.ClientId, Credentials = act.Credentials, KeyId = act.KeyId, KeyType = act.KeyType });
+            }
         }
 
 
@@ -397,68 +421,80 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public async Task Handle(AddEncKeyAction act, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var client = await _clientRepository.Query().Include(c => c.Realms).Include(c => c.SerializedJsonWebKeys).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm));
-            var jsonWebKey = act.Credentials.SerializePublicJWK();
-            client.Add(act.KeyId, jsonWebKey, Constants.JWKUsages.Enc, act.KeyType);
-            await _clientRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new AddEncKeySuccessAction { Alg = act.Alg, ClientId = act.ClientId, Credentials = act.Credentials, KeyId = act.KeyId, KeyType = act.KeyType, Enc = act.Enc  });
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                var client = await dbContext.Clients.Include(c => c.Realms).Include(c => c.SerializedJsonWebKeys).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm));
+                var jsonWebKey = act.Credentials.SerializePublicJWK();
+                client.Add(act.KeyId, jsonWebKey, Constants.JWKUsages.Enc, act.KeyType);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new AddEncKeySuccessAction { Alg = act.Alg, ClientId = act.ClientId, Credentials = act.Credentials, KeyId = act.KeyId, KeyType = act.KeyType, Enc = act.Enc });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(RemoveSelectedClientKeysAction act, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var client = await _clientRepository.Query().Include(c => c.Realms).Include(c => c.SerializedJsonWebKeys).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm));
-            client.SerializedJsonWebKeys = client.SerializedJsonWebKeys.Where(j => !act.KeyIds.Contains(j.Kid)).ToList();
-            await _clientRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new RemoveSelectedClientKeysSuccessAction { ClientId = act.ClientId, KeyIds = act.KeyIds });
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                var client = await dbContext.Clients.Include(c => c.Realms).Include(c => c.SerializedJsonWebKeys).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm));
+                client.SerializedJsonWebKeys = client.SerializedJsonWebKeys.Where(j => !act.KeyIds.Contains(j.Kid)).ToList();
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new RemoveSelectedClientKeysSuccessAction { ClientId = act.ClientId, KeyIds = act.KeyIds });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(UpdateJWKSUrlAction act, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var client = await _clientRepository.Query().Include(c => c.Realms).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm));
-            client.JwksUri = act.JWKSUrl;
-            await _clientRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new UpdateJWKSUrlSuccessAction { ClientId = act.ClientId, JWKSUrl = act.JWKSUrl });
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                var client = await dbContext.Clients.Include(c => c.Realms).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm));
+                client.JwksUri = act.JWKSUrl;
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new UpdateJWKSUrlSuccessAction { ClientId = act.ClientId, JWKSUrl = act.JWKSUrl });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(UpdateClientCredentialsAction act, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var client = await _clientRepository.Query().Include(c => c.Realms).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm));
-            client.TokenEndPointAuthMethod = act.AuthMethod;
-            if (client.TokenEndPointAuthMethod == OAuthClientSecretPostAuthenticationHandler.AUTH_METHOD || client.TokenEndPointAuthMethod == OAuthClientSecretBasicAuthenticationHandler.AUTH_METHOD)
-                client.ClientSecret = act.ClientSecret;
-            else if(client.TokenEndPointAuthMethod == OAuthClientTlsClientAuthenticationHandler.AUTH_METHOD)
+            using (var dbContext = _factory.CreateDbContext())
             {
-                client.TlsClientAuthSubjectDN = act.TlsClientAuthSubjectDN;
-                client.TlsClientAuthSanDNS = act.TlsClientAuthSanDNS;
-                client.TlsClientAuthSanEmail = act.TlsClientAuthSanEmail;
-                client.TlsClientAuthSanIP = act.TlsClientAuthSanIP;
-            }
+                var client = await dbContext.Clients.Include(c => c.Realms).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm));
+                client.TokenEndPointAuthMethod = act.AuthMethod;
+                if (client.TokenEndPointAuthMethod == OAuthClientSecretPostAuthenticationHandler.AUTH_METHOD || client.TokenEndPointAuthMethod == OAuthClientSecretBasicAuthenticationHandler.AUTH_METHOD)
+                    client.ClientSecret = act.ClientSecret;
+                else if (client.TokenEndPointAuthMethod == OAuthClientTlsClientAuthenticationHandler.AUTH_METHOD)
+                {
+                    client.TlsClientAuthSubjectDN = act.TlsClientAuthSubjectDN;
+                    client.TlsClientAuthSanDNS = act.TlsClientAuthSanDNS;
+                    client.TlsClientAuthSanEmail = act.TlsClientAuthSanEmail;
+                    client.TlsClientAuthSanIP = act.TlsClientAuthSanIP;
+                }
 
-            client.UpdateDateTime = DateTime.UtcNow;
-            await _clientRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new UpdateClientCredentialsSuccessAction 
-            {
-                AuthMethod = act.AuthMethod, 
-                ClientId = act.ClientId,
-                ClientSecret = act.ClientSecret,
-                TlsClientAuthSubjectDN = act.TlsClientAuthSubjectDN,
-                TlsClientAuthSanDNS = act.TlsClientAuthSanDNS,
-                TlsClientAuthSanEmail = act.TlsClientAuthSanEmail,
-                TlsClientAuthSanIP = act.TlsClientAuthSanIP
-            });
+                client.UpdateDateTime = DateTime.UtcNow;
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new UpdateClientCredentialsSuccessAction
+                {
+                    AuthMethod = act.AuthMethod,
+                    ClientId = act.ClientId,
+                    ClientSecret = act.ClientSecret,
+                    TlsClientAuthSubjectDN = act.TlsClientAuthSubjectDN,
+                    TlsClientAuthSanDNS = act.TlsClientAuthSanDNS,
+                    TlsClientAuthSanEmail = act.TlsClientAuthSanEmail,
+                    TlsClientAuthSanIP = act.TlsClientAuthSanIP
+                });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(AddClientRoleAction act, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            using (var dbContext = new StoreDbContext(_options))
+            using (var dbContext = _factory.CreateDbContext())
             {
                 var r = await dbContext.Realms.SingleAsync(r => r.Name == realm);
                 var client = await dbContext.Clients.SingleAsync(c => c.ClientId == act.ClientId);
@@ -475,25 +511,28 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         private async Task<bool> ValidateAddClient(string clientId, IEnumerable<string> redirectionUrls, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            var errors = new List<string>();
-            foreach (var redirectionUrl in redirectionUrls)
-                if (!ValidateRedirectionUrl(redirectionUrl, out string errorMessage))
-                    errors.Add(errorMessage);
-
-            if(errors.Any())
+            using (var dbContext = _factory.CreateDbContext())
             {
-                dispatcher.Dispatch(new AddClientFailureAction { ClientId = clientId, ErrorMessage = string.Join(",", errors) });
-                return false;
-            }
+                var errors = new List<string>();
+                foreach (var redirectionUrl in redirectionUrls)
+                    if (!ValidateRedirectionUrl(redirectionUrl, out string errorMessage))
+                        errors.Add(errorMessage);
 
-            var existingClient = await _clientRepository.Query().Include(c => c.Realms).AsNoTracking().AnyAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == realm), CancellationToken.None);
-            if (existingClient)
-            {
-                dispatcher.Dispatch(new AddClientFailureAction { ClientId = clientId, ErrorMessage = Global.ClientAlreadyExists });
-                return false;
-            }
+                if (errors.Any())
+                {
+                    dispatcher.Dispatch(new AddClientFailureAction { ClientId = clientId, ErrorMessage = string.Join(",", errors) });
+                    return false;
+                }
 
-            return true;
+                var existingClient = await dbContext.Clients.Include(c => c.Realms).AsNoTracking().AnyAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == realm), CancellationToken.None);
+                if (existingClient)
+                {
+                    dispatcher.Dispatch(new AddClientFailureAction { ClientId = clientId, ErrorMessage = Global.ClientAlreadyExists });
+                    return false;
+                }
+
+                return true;
+            }
         }
 
         private bool ValidateRedirectionUrl(string redirectionUrl, out string errorMessage)

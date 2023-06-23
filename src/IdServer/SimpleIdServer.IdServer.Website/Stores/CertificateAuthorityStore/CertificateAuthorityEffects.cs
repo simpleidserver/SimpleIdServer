@@ -6,42 +6,39 @@ using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
-using SimpleIdServer.IdServer.Stores;
 using System.Linq.Dynamic.Core;
-using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 
 namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
 {
     public class CertificateAuthorityEffects
     {
-        private readonly ICertificateAuthorityRepository _certificateAuthorityRepository;
-        private readonly ICertificateAuthorityStore _certificateAuthorityStore;
+        private readonly IDbContextFactory<StoreDbContext> _factory;
         private readonly ProtectedSessionStorage _sessionStorage;
-        private readonly DbContextOptions<StoreDbContext> _options;
 
-        public CertificateAuthorityEffects(ICertificateAuthorityRepository certificateAuthorityRepository, ICertificateAuthorityStore certificateAuthorityStore, ProtectedSessionStorage sessionStorage, DbContextOptions<StoreDbContext> options)
+        public CertificateAuthorityEffects(IDbContextFactory<StoreDbContext> factory, ProtectedSessionStorage sessionStorage)
         {
-            _certificateAuthorityRepository = certificateAuthorityRepository;
-            _certificateAuthorityStore = certificateAuthorityStore;
+            _factory = factory;
             _sessionStorage = sessionStorage;
-            _options = options;
         }
 
         [EffectMethod]
         public async Task Handle(SearchCertificateAuthoritiesAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            IQueryable<CertificateAuthority> query = _certificateAuthorityRepository.Query().Include(c => c.Realms).Where(c => c.Realms.Any(r => r.Name == realm)).AsNoTracking();
-            if (!string.IsNullOrWhiteSpace(action.Filter))
-                query = query.Where(SanitizeExpression(action.Filter));
+            using(var dbContext = _factory.CreateDbContext())
+            {
+                IQueryable<CertificateAuthority> query = dbContext.CertificateAuthorities.Include(c => c.Realms).Where(c => c.Realms.Any(r => r.Name == realm)).AsNoTracking();
+                if (!string.IsNullOrWhiteSpace(action.Filter))
+                    query = query.Where(SanitizeExpression(action.Filter));
 
-            if (!string.IsNullOrWhiteSpace(action.OrderBy))
-                query = query.OrderBy(SanitizeExpression(action.OrderBy));
+                if (!string.IsNullOrWhiteSpace(action.OrderBy))
+                    query = query.OrderBy(SanitizeExpression(action.OrderBy));
 
-            var nb = query.Count();
-            var clients = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
-            dispatcher.Dispatch(new SearchCertificateAuthoritiesSuccessAction { CertificateAuthorities = clients, Count = nb });
+                var nb = query.Count();
+                var clients = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
+                dispatcher.Dispatch(new SearchCertificateAuthoritiesSuccessAction { CertificateAuthorities = clients, Count = nb });
+            }
 
             string SanitizeExpression(string expression) => expression.Replace("Value.", "");
         }
@@ -98,7 +95,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
         [EffectMethod]
         public async Task Handle(SaveCertificateAuthorityAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = new StoreDbContext(_options))
+            using (var dbContext = _factory.CreateDbContext())
             {
                 var realm = await GetRealm();
                 var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
@@ -113,46 +110,61 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
         [EffectMethod]
         public async Task Handle(RemoveSelectedCertificateAuthoritiesAction action, IDispatcher dispatcher)
         {
-            var cas = await _certificateAuthorityRepository.Query().Where(c => action.Ids.Contains(c.Id)).ToListAsync();
-            _certificateAuthorityRepository.Delete(cas);
-            await _certificateAuthorityRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new RemoveSelectedCertificateAuthoritiesSuccessAction { Ids = action.Ids });
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                var cas = await dbContext.CertificateAuthorities.Where(c => action.Ids.Contains(c.Id)).ToListAsync();
+                dbContext.CertificateAuthorities.RemoveRange(cas);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new RemoveSelectedCertificateAuthoritiesSuccessAction { Ids = action.Ids });
+            }    
         }
 
         [EffectMethod]
         public async Task Handle(GetCertificateAuthorityAction action, IDispatcher dispatcher)
         {
-            var kvp = await _certificateAuthorityStore.Get(action.Id, CancellationToken.None);
-            dispatcher.Dispatch(new GetCertificateAuthoritySuccessAction { CertificateAuthority = kvp.Value.Item1, Certificate = kvp.Value.Item2 });
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                var ca = await dbContext.CertificateAuthorities.FirstOrDefaultAsync(a => a.Id == action.Id);
+                var store = new IdServer.Stores.CertificateAuthorityStore(null);
+                var certificate = store.Get(ca);
+                dispatcher.Dispatch(new GetCertificateAuthoritySuccessAction { CertificateAuthority = ca, Certificate = certificate });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(RemoveSelectedClientCertificatesAction action, IDispatcher dispatcher)
         {
-            var ca = await _certificateAuthorityRepository.Query().Include(c => c.ClientCertificates).FirstAsync(c => c.Id == action.CertificateAuthorityId);
-            ca.ClientCertificates = ca.ClientCertificates.Where(c => !action.CertificateClientIds.Contains(c.Id)).ToList();
-            await _certificateAuthorityRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new RemoveSelectedClientCertificatesSuccessAction { CertificateAuthorityId = action.CertificateAuthorityId, CertificateClientIds = action.CertificateClientIds });
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                var ca = await dbContext.CertificateAuthorities.Include(c => c.ClientCertificates).FirstAsync(c => c.Id == action.CertificateAuthorityId);
+                ca.ClientCertificates = ca.ClientCertificates.Where(c => !action.CertificateClientIds.Contains(c.Id)).ToList();
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new RemoveSelectedClientCertificatesSuccessAction { CertificateAuthorityId = action.CertificateAuthorityId, CertificateClientIds = action.CertificateClientIds });
+            }
         }
 
         [EffectMethod]
         public async Task Handle(AddClientCertificateAction action, IDispatcher dispatcher)
         {
-            var ca = await _certificateAuthorityRepository.Query().Include(c => c.ClientCertificates).FirstAsync(c => c.Id == action.CertificateAuthorityId);
-            var certificate = _certificateAuthorityStore.Get(ca);
-            var pem = KeyGenerator.GenerateClientCertificate(certificate, action.SubjectName, action.NbDays);
-            var record = new ClientCertificate
+            using (var dbContext = _factory.CreateDbContext())
             {
-                Id = Guid.NewGuid().ToString(),
-                Name = action.SubjectName,
-                PublicKey = pem.PublicKey,
-                PrivateKey = pem.PrivateKey,
-                StartDateTime = DateTime.UtcNow,
-                EndDateTime = DateTime.UtcNow.AddDays(action.NbDays)
-            };
-            ca.ClientCertificates.Add(record);
-            await _certificateAuthorityRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new AddClientCertificateSuccessAction { CertificateAuthorityId = action.CertificateAuthorityId, ClientCertificate = record });
+                var ca = await dbContext.CertificateAuthorities.Include(c => c.ClientCertificates).FirstAsync(c => c.Id == action.CertificateAuthorityId);
+                var store = new IdServer.Stores.CertificateAuthorityStore(null);
+                var certificate = store.Get(ca);
+                var pem = KeyGenerator.GenerateClientCertificate(certificate, action.SubjectName, action.NbDays);
+                var record = new ClientCertificate
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = action.SubjectName,
+                    PublicKey = pem.PublicKey,
+                    PrivateKey = pem.PrivateKey,
+                    StartDateTime = DateTime.UtcNow,
+                    EndDateTime = DateTime.UtcNow.AddDays(action.NbDays)
+                };
+                ca.ClientCertificates.Add(record);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new AddClientCertificateSuccessAction { CertificateAuthorityId = action.CertificateAuthorityId, ClientCertificate = record });
+            }
         }
 
         private async Task<string> GetRealm()

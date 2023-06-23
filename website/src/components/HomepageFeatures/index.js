@@ -48,6 +48,15 @@ const FeatureList = [
       </>
     ),
   },
+  {
+    title: 'Workspace',
+    Svg: require('@site/static/img/workspace.svg').default,
+    description: (
+      <>
+        SimpleIdServer has introduced the concept of realms, which serves the purpose of segregating various resources, including clients and users, into distinct realms.
+      </>
+    ),
+  },
 ];
 
 function Feature({Svg, title, description}) {
@@ -68,7 +77,7 @@ export default function HomepageFeatures() {
   return (
     <section className={styles.features}>
       <div className="container">
-        <h2>Featured Capabilities</h2>
+        <h1>Featured Capabilities</h1>
         <div className="row">
           {FeatureList.map((props, idx) => (
             <Feature key={idx} {...props} />

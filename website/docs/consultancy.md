@@ -19,3 +19,5 @@ We provide expertise in the following areas:
 The support provided by SimpleIdServer is free of charge, and the source code is open source, licensed under the Apache-2 license.
 
 When it comes to GIT, we kindly request that you take a moment to read the [code of conduct](https://github.com/simpleidserver/SimpleIdServer/blob/master/CONTRIBUTING.md) before initiating an issue.
+
+[If you appreciate our project and wish to extend your support, you have the opportunity to sponsor it or make a donation.](https://github.com/sponsors/simpleidserver?o=esb)

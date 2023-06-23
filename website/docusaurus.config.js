@@ -54,13 +54,20 @@ const config = {
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
         },
-      }),
-    ],
+        sitemap: {
+          changefreq: 'weekly',
+          priority: 0.5,
+          ignorePatterns: ['/tags/**'],
+          filename: 'sitemap.xml',
+        },
+      })
+    ]
   ],
 
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      metadata: [{name: 'keywords', content: 'openid, oauth2, scim, fapi, iam, identity, access, simpleidserver'}],
       // Replace with your project's social card
       navbar: {
         title: 'SimpleIdServer',
