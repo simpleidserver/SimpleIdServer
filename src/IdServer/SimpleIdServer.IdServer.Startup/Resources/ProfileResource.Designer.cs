@@ -88,7 +88,7 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à These apps have been granted access to interact with your SimpleIdServer account. To prevent them from future access, click &quot;Revoke Access&quot;.
+        ///   Recherche une chaîne localisée semblable à These apps have been granted access to interact with your SimpleIdServer account. To prevent them from accessing it in the future, click on &apos;Revoke Access&apos;.
         /// </summary>
         public static string approved_apps_description {
             get {
@@ -196,7 +196,7 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Users ask access to some of your resources. Click on &quot;Revoke Access&quot; to revoke pending request.
+        ///   Recherche une chaîne localisée semblable à Users have requested access to some of your resources. Click on &apos;Revoke Access&apos; to deny pending requests..
         /// </summary>
         public static string pending_request_description {
             get {

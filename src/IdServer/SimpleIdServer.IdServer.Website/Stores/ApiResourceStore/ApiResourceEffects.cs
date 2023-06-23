@@ -12,7 +12,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
 {
     public class ApiResourceEffects
     {
-        private readonly IScopeRepository _scopeRepository;
         private readonly IDbContextFactory<StoreDbContext> _factory;
         private readonly ProtectedSessionStorage _sessionStorage;
 
@@ -40,7 +39,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
                 var selectedResources = new List<string>();
                 if (!string.IsNullOrWhiteSpace(action.ScopeName))
                 {
-                    var scope = await _scopeRepository.Query().Include(s => s.ApiResources).AsNoTracking().SingleAsync(s => s.Name == action.ScopeName);
+                    var scope = await dbContext.Scopes.Include(s => s.ApiResources).AsNoTracking().SingleAsync(s => s.Name == action.ScopeName);
                     selectedResources = scope.ApiResources.Select(r => r.Name).ToList();
                 }
 

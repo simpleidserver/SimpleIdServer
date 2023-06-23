@@ -29,7 +29,7 @@ const sidebars = {
     { 
       type: 'category', 
       label: 'Tutorial',       
-      items: [ 'tutorial/spa', 'tutorial/regularweb', 'tutorial/protectapi', 'tutorial/highlysecuredregularweb', 'tutorial/ciba', 'tutorial/grantmgt' ] 
+      items: [ 'tutorial/spa', 'tutorial/regularweb', 'tutorial/protectapi', 'tutorial/m2m', 'tutorial/highlysecuredregularweb', 'tutorial/ciba', 'tutorial/grantmgt' ] 
     }
   ]
   // By default, Docusaurus generates a sidebar from the docs folder structure

@@ -53,7 +53,7 @@ The source code of this project can be found [here](https://github.com/simpleids
 
 Utilize the administration UI to configure a new OpenID client :
 
-1. Open the IdentityServer website at [http://localhost:5002](http://localhost:5002).
+1. Open the IdentityServer website at [https://localhost:5002](https://localhost:5002).
 2. In the Clients screen, click on `Add client` button.
 3. Select `Web application` and click on next.
 4. Fill-in the form like this and click on the `Save` button to confirm the creation.

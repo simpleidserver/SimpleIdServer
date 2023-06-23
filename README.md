@@ -1,12 +1,14 @@
 # Simpleidserver core
 
+![Simpleidserver](images/logo.svg)
+
 [![Build status](https://ci.appveyor.com/api/projects/status/shtqlxhbda6gtdag?svg=true)](https://ci.appveyor.com/project/simpleidserver/simpleidserver)
 [![Join the chat at https://app.gitter.im/#/room/#simpleidserver:gitter.im](https://badges.gitter.im/repo.svg)](https://app.gitter.im/#/room/#simpleidserver:gitter.im)
 
 SimpleIdServer is an open source framework enabling the support of OPENID, OAUTH2.0, SCIM2.0, UMA2.0, FAPI and CIBA. It streamlines development, configuration and deployment of custom access control servers. 
 Thanks to its modularity and extensibility, SimpleIdServer can be customized to the specific needs of your organization for authentication, authorization and more.
 
-For project documentation, please visit [docs](https://simpleidserver.github.io/SimpleIdServer/documentation/gettingstarted/index.html).
+[Website](http://simpleidserver.com), [Documentation](https://simpleidserver.com/docs/intro) and [Demo](https://website.simpleidserver.com/).
 
 ## Packages
 
@@ -103,11 +105,11 @@ cd src
 dotnet new idserverwebsite -n IdServerWebsite --connectionString "Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True"
 ```
 
-Run the `IdServerWebsite` project, it must listens on the url `http://localhost:5002`.
+Run the `IdServerWebsite` project, it must listens on the url `https://localhost:5002`.
 
 ```
 cd src/IdServerWebsite
-dotnet run --urls=http://localhost:5002
+dotnet run --urls=https://localhost:5002
 ```
 
 The IdentityServer website is now ready to be used.
@@ -146,14 +148,14 @@ cd ..
 dotnet sln add ./src/ScimEF/ScimEF.csproj
 ```
 
-Run the ScimEF project, ensuring that it listens on the URL `http://localhost:5003`.
+Run the ScimEF project, ensuring that it listens on the URL `https://localhost:5003`.
 
 ```
 cd src/SCIMEF
-dotnet run --urls=http://localhost:5003
+dotnet run --urls=https://localhost:5003
 ```
 
-Now that the SCIM server is running, you can check its Schemas endpoint by accessing [http://localhost:5003/Schemas](http://localhost:5003/Schemas).
+Now that the SCIM server is running, you can check its Schemas endpoint by accessing [https://localhost:5003/Schemas](https://localhost:5003/Schemas).
 
 ## Create SCIM project with MongoDB support
 
@@ -172,14 +174,14 @@ cd ..
 dotnet sln add ./src/ScimMongoDB/ScimMongoDB.csproj
 ```
 
-Run the ScimMongoDB project, ensuring that it listens on the URL `http://localhost:5003`.
+Run the ScimMongoDB project, ensuring that it listens on the URL `https://localhost:5003`.
 
 ```
 cd src/ScimMongoDB
-dotnet run --urls=http://localhost:5003
+dotnet run --urls=https://localhost:5003
 ```
 
-Now that the SCIM server is running, you can check its Schemas endpoint by accessing [http://localhost:5003/Schemas](http://localhost:5003/Schemas).
+Now that the SCIM server is running, you can check its Schemas endpoint by accessing [https://localhost:5003/Schemas](https://localhost:5003/Schemas).
 
 # Running with docker
 

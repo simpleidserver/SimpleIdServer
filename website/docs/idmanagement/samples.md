@@ -7,7 +7,7 @@ Minimal request for creating a user, username is the only mandatory field.
 **Request**
 
 ```
-HTTP POST: http://<domainUri>/Users
+HTTP POST: https://<domainUri>/Users
 
 Authorization: Bearer ba521b3b-02f7-4a37-b03c-58f713bf88e7 
 
@@ -50,7 +50,7 @@ Authorization: Bearer ba521b3b-02f7-4a37-b03c-58f713bf88e7
     "created": "2023-06-12T11:12:45.0268402Z",
     "lastModified": "2023-06-12T11:12:45.0269172Z",
     "version": 0,
-    "location": "http://localhost:5003/Users/6dc4ceb0-b376-4d4c-9ef0-e6c25e359754"
+    "location": "https://localhost:5003/Users/6dc4ceb0-b376-4d4c-9ef0-e6c25e359754"
   },
   "externalId": "external",
   "schemas": [
@@ -66,7 +66,7 @@ Authorization: Bearer ba521b3b-02f7-4a37-b03c-58f713bf88e7
 **Request**
 
 ```
-HTTP GET: http://<domainUri>:5003/Users/<id>
+HTTP GET: https://<domainUri>:5003/Users/<id>
 
 Authorization: Bearer ba521b3b-02f7-4a37-b03c-58f713bf88e7
 ```
@@ -76,7 +76,7 @@ Authorization: Bearer ba521b3b-02f7-4a37-b03c-58f713bf88e7
 **Request**
 
 ```
-HTTP GET: http://<domainUri>:5003/Users?filter=(emails[type eq "home"]) and (active eq false)
+HTTP GET: https://<domainUri>:5003/Users?filter=(emails[type eq "home"]) and (active eq false)
 
 Authorization: Bearer ba521b3b-02f7-4a37-b03c-58f713bf88e7
 ``` 
@@ -102,7 +102,7 @@ The operators supported in the expression are listed below :
 **Request**
 
 ```
-HTTP DELETE: http://<domainUri>:5003/Users/<id>
+HTTP DELETE: https://<domainUri>:5003/Users/<id>
 
 Authorization: Bearer ba521b3b-02f7-4a37-b03c-58f713bf88e7
 ```
@@ -114,7 +114,7 @@ Authorization: Bearer ba521b3b-02f7-4a37-b03c-58f713bf88e7
 **Request**
 
 ```
-HTTP PATCH: http://<domainUri>:5003/Users/<id>
+HTTP PATCH: https://<domainUri>:5003/Users/<id>
 
 Authorization: Bearer ba521b3b-02f7-4a37-b03c-58f713bf88e7
 
@@ -144,7 +144,7 @@ Authorization: Bearer ba521b3b-02f7-4a37-b03c-58f713bf88e7
 **Request**
 
 ```
-HTTP PATCH: http://<domainUri>:5003/Users/<id>
+HTTP PATCH: https://<domainUri>:5003/Users/<id>
 
 Authorization: Bearer ba521b3b-02f7-4a37-b03c-58f713bf88e7
 
@@ -166,7 +166,7 @@ Authorization: Bearer ba521b3b-02f7-4a37-b03c-58f713bf88e7
 **Request**
 
 ```
-HTTP PATCH: http://<domainUri>:5003/Users/<id>
+HTTP PATCH: https://<domainUri>:5003/Users/<id>
 
 Authorization: Bearer ba521b3b-02f7-4a37-b03c-58f713bf88e7
 
@@ -191,7 +191,7 @@ Request used for creating a group, displayName is the only mandatory field.
 **Request**
 
 ```
-HTTP PATCH: http://<domainUri>:5003/Groups
+HTTP PATCH: https://<domainUri>:5003/Groups
 
 Authorization: Bearer ba521b3b-02f7-4a37-b03c-58f713bf88e7
 
@@ -208,7 +208,7 @@ Authorization: Bearer ba521b3b-02f7-4a37-b03c-58f713bf88e7
 **Request**
 
 ```
-HTTP PATCH: http://<domainUri>:5003/Groups/<id>
+HTTP PATCH: https://<domainUri>:5003/Groups/<id>
 
 Authorization: Bearer ba521b3b-02f7-4a37-b03c-58f713bf88e7
 
@@ -233,7 +233,7 @@ The user representation will contain a reference to the group in its `groups` pr
 ### Remove a user from a group
 
 ```
-HTTP PATCH: http://<domainUri>:5003/Groups/<id>
+HTTP PATCH: https://<domainUri>:5003/Groups/<id>
 
 Authorization: Bearer ba521b3b-02f7-4a37-b03c-58f713bf88e7
 
