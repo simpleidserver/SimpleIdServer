@@ -9,7 +9,7 @@
 
 @if (idProviderState.Value.IsLoading)
 {
-    <RadzenText class="mt-3 mb-3" Text="Wait..." TextStyle="TextStyle.DisplayH6" />
+    <RadzenText class="mt-3 mb-3" Text="Wait..." TextStyle="TextStyle.DisplayH3" />
 }
 else
 {
@@ -18,21 +18,23 @@ else
         <RadzenBreadCrumbItem Text="Identity Provider details" />
     </RadzenBreadCrumb>
 
-    <RadzenText class="mt-3 mb-3" Text="@idProviderState.Value.Provider.DisplayName" TextStyle="TextStyle.DisplayH6" />
+    <RadzenText class="mt-3 mb-3" Text="@idProviderState.Value.Provider.DisplayName" TextStyle="TextStyle.DisplayH3" />
     
-    <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
-        <Tabs>            
-            <RadzenTabsItem Text="Details">
-                <IdProviderDetails IdProvider="@idProviderState.Value.Provider"></IdProviderDetails>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="Properties">
-                <IdProviderProperties IdProvider="@idProviderState.Value.Provider"></IdProviderProperties>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="Mappers">
-                <IdProviderMappers IdProvider="@idProviderState.Value.Provider"></IdProviderMappers>
-            </RadzenTabsItem>
-        </Tabs>
-    </RadzenTabs>
+    <RadzenCard>
+        <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
+            <Tabs>            
+                <RadzenTabsItem Text="Details">
+                    <IdProviderDetails IdProvider="@idProviderState.Value.Provider"></IdProviderDetails>
+                </RadzenTabsItem>
+                <RadzenTabsItem Text="Properties">
+                    <IdProviderProperties IdProvider="@idProviderState.Value.Provider"></IdProviderProperties>
+                </RadzenTabsItem>
+                <RadzenTabsItem Text="Mappers">
+                    <IdProviderMappers IdProvider="@idProviderState.Value.Provider"></IdProviderMappers>
+                </RadzenTabsItem>
+            </Tabs>
+        </RadzenTabs>
+    </RadzenCard>
 }
 
 @code {

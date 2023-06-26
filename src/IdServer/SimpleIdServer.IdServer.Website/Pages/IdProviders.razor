@@ -9,7 +9,19 @@
 @inject IState<SearchIdProvidersState> searchIdProvidersState
 @inject IDispatcher dispatcher
 
-<RadzenButton class="mb-1" Click="@(args => AddIdProvider())" Icon="add" Text="Add Identity Provider" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+
+<div class="row">
+    <div class="col">
+        <RadzenText class="mt-3 mb-3 no-margin" Text="Identity Providers" TextStyle="TextStyle.DisplayH3" />
+        <p>
+            Configure external Identity Providers such as Facebook, Twitter, GitHub, and others, so that your users can log in using them.
+        </p>
+    </div>
+    <div class="col-3">
+        <RadzenButton class="mb-1" Click="@(args => AddIdProvider())" Icon="add" Text="Add Identity Provider" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+    </div>
+</div>
+
 
 <RadzenDataGrid @ref=idProvidersGrid
                 AllowFiltering="true"

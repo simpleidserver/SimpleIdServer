@@ -9,7 +9,17 @@
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
 
-<RadzenButton class="mb-1" Click="@(args => AddScope())" Icon="add" Text="Add scope" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+<div class="row">
+    <div class="col">
+        <RadzenText class="mt-3 mb-3 no-margin" Text="Scopes" TextStyle="TextStyle.DisplayH3" />
+        <p>
+            Specify the precise actions or resources that a client application can access on behalf of an end-user.
+        </p>
+    </div>
+    <div class="col-3">
+        <RadzenButton class="mb-1" Click="@(args => AddScope())" Icon="add" Text="Add scope" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+    </div>
+</div>
 
 <RadzenDataGrid @ref=scopesGrid
         AllowFiltering="true" 

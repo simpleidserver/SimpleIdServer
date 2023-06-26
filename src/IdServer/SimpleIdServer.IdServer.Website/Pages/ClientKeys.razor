@@ -11,7 +11,7 @@
 @inject IDispatcher dispatcher
 
 <div>
-    <p class="text-muted">If "Use JWKS URL" switch is on, you need to fill a valid JWKS URL. After saving, admin can download keys from the JWKS URL.</p>
+    <p class="text-muted">If the 'Use JWKS URL' switch is enabled, you need to provide a valid JWKS URL. After saving, the administrator can download keys from the JWKS URL.</p>
     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Use JWKS URL</RadzenText>
     <RadzenSwitch Change="HandleUseJWKSUrl" @bind-Value=@isJWKSUrlUsed></RadzenSwitch>
     <RadzenTemplateForm Submit=@UpdateJWKSUrl TItem="UpdateJWKSUrlForm" Data=@updateJWKSUrl>

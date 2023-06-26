@@ -9,7 +9,18 @@
 @using SimpleIdServer.IdServer.Website.Stores.GroupStore;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 
-<RadzenButton class="mb-1" Click="@(args => AddGroup())" Icon="add" Text="Add group" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+
+<div class="row">
+    <div class="col">
+        <RadzenText class="mt-3 mb-3 no-margin" Text="Groups" TextStyle="TextStyle.DisplayH3" />
+        <p>
+            Create and manage Groups for your Applications. Groups contain collections of Permissions and can be assigned to Users.
+        </p>
+    </div>
+    <div class="col-3">
+        <RadzenButton class="mb-1" Click="@(args => AddGroup())" Icon="add" Text="Add group" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+    </div>
+</div>
 
 <RadzenDataGrid @ref="groupsGrid"
         AllowFiltering="true" 

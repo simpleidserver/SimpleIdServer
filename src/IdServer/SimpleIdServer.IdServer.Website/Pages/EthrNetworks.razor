@@ -8,12 +8,17 @@
 @using SimpleIdServer.IdServer.Website.Stores.EthrNetworkStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
-<p class="text-muted">
-    Smart contracts used during the generation of Distributed Identity (DID) can be deployed here.
-    By default Ethereum is used.
-</p>
-
-<RadzenButton class="mb-1" Click="@(args => AddNetwork())" Icon="add" Text="Add ethereum network" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+<div class="row">
+    <div class="col">
+        <RadzenText class="mt-3 mb-3 no-margin" Text="Ethereum networks" TextStyle="TextStyle.DisplayH3" />
+        <p>
+            Smart contracts utilized during the generation of Distributed Identity (DID) can be deployed here. Ethereum is the default platform used.
+        </p>
+    </div>
+    <div class="col-3">
+        <RadzenButton class="mb-1" Click="@(args => AddNetwork())" Icon="add" Text="Add ethereum network" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+    </div>
+</div>
 
 <RadzenDataGrid @ref="networksGrid"
                 AllowFiltering="true"

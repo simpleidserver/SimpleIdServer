@@ -11,7 +11,7 @@
 
 @if(idProviderState.Value.IsLoading)
 {
-    <RadzenText class="mt-3 mb-3" Text="Wait..." TextStyle="TextStyle.DisplayH6" />
+    <RadzenText class="mt-3 mb-3" Text="Wait..." TextStyle="TextStyle.DisplayH3" />
 }
 else
 {
@@ -21,17 +21,18 @@ else
         <RadzenBreadCrumbItem Text="@(mapper.Name)" />
     </RadzenBreadCrumb>
 
-    <RadzenText class="mt-3 mb-3" Text="@mapper.Name" TextStyle="TextStyle.DisplayH6" />
-    
-    @switch (mapper.MapperType)
-    {
-        case MappingRuleTypes.USERATTRIBUTE:
-            <UserAttributeIdProviderMapper Mapper=mapper AuthProviderMapperUpdated=@UpdateAuthProviderMapper></UserAttributeIdProviderMapper>
-            break;
-        case MappingRuleTypes.USERPROPERTY:
-            <UserPropertyIdProviderMapper Mapper=mapper AuthProviderMapperUpdated=@UpdateAuthProviderMapper></UserPropertyIdProviderMapper>
-            break;
-    }
+    <RadzenText class="mt-3 mb-3" Text="@mapper.Name" TextStyle="TextStyle.DisplayH3" />
+    <RadzenCard>
+        @switch (mapper.MapperType)
+        {
+            case MappingRuleTypes.USERATTRIBUTE:
+                <UserAttributeIdProviderMapper Mapper=mapper AuthProviderMapperUpdated=@UpdateAuthProviderMapper></UserAttributeIdProviderMapper>
+                break;
+            case MappingRuleTypes.USERPROPERTY:
+                <UserPropertyIdProviderMapper Mapper=mapper AuthProviderMapperUpdated=@UpdateAuthProviderMapper></UserPropertyIdProviderMapper>
+                break;   
+        }
+    </RadzenCard>
 }
 
 @code {

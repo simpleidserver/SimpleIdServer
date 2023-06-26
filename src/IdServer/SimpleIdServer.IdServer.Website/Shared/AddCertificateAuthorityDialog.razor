@@ -194,8 +194,8 @@
 
     public ICollection<CertificateAuthorityType> CertificateAuthorityTypes = new List<CertificateAuthorityType>
     {
-        new CertificateAuthorityType { Name = "Generate", ShortDescription = "Generate one Certificate Authority", Description = "Generate one Certificate Authority and store into the database", Source = CertificateAuthoritySources.DB, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/db.png" },
-        new CertificateAuthorityType { Name = "Certificate Store", ShortDescription = "Use Certificate Store", Description = "Use Certificate Authority from your local Certificate Store. <br/> The Certificate must contains a <b>Private Key</b>, it will be used to generate Client Certificate.", Source = CertificateAuthoritySources.CERTIFICATESTORE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/certificatestore.png" }
+        new CertificateAuthorityType { Name = "Generate", ShortDescription = "Generate one Certificate Authority", Description = "Generate a Certificate Authority and store it in the database.", Source = CertificateAuthoritySources.DB, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/db.png" },
+        new CertificateAuthorityType { Name = "Certificate Store", ShortDescription = "Use Certificate Store", Description = "Utilize the Certificate Authority from your local Certificate Store. The Certificate must contain a <b>Private Key</b>, which will be used to generate the Client Certificate.", Source = CertificateAuthoritySources.CERTIFICATESTORE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/certificatestore.png" }
     };
 
     void SelectCertificateAuthorityType(CertificateAuthorityType type)

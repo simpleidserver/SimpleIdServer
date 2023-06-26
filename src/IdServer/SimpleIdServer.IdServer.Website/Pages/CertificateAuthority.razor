@@ -9,7 +9,7 @@
 
 @if(certificateAuthorityState.Value.IsLoading)
 {
-    <RadzenText class="mt-3 mb-3" Text="Wait..." TextStyle="TextStyle.DisplayH6" />
+    <RadzenText class="mt-3 mb-3" Text="Wait..." TextStyle="TextStyle.DisplayH3" />
 }
 else
 {
@@ -18,23 +18,24 @@ else
         <RadzenBreadCrumbItem Text="Certificate Authority Details" />
     </RadzenBreadCrumb>
 
-    <RadzenText class="mt-3 mb-3" Text="@certificateAuthorityState.Value.CertificateAuthority.SubjectName" TextStyle="TextStyle.DisplayH6" />
+    <RadzenText class="mt-3 mb-3" Text="@certificateAuthorityState.Value.CertificateAuthority.SubjectName" TextStyle="TextStyle.DisplayH3" />
 
     <div class="mb-1">
         <RadzenBadge Text="@(Enum.GetName(typeof(CertificateAuthoritySources), certificateAuthorityState.Value.CertificateAuthority.Source))" IsPill="true" />
     </div>
 
-
-    <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
-        <Tabs>
-            <RadzenTabsItem Text="Details">
-                <CertificateAuthorityDetails></CertificateAuthorityDetails>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="Client Certificates">
-                <CertificateAuthorityClients CertificateAuthority="@certificateAuthorityState.Value.CertificateAuthority"></CertificateAuthorityClients>
-            </RadzenTabsItem>
-        </Tabs>
-    </RadzenTabs>
+    <RadzenCard>
+        <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
+            <Tabs>
+                <RadzenTabsItem Text="Details">
+                    <CertificateAuthorityDetails></CertificateAuthorityDetails>
+                </RadzenTabsItem>
+                <RadzenTabsItem Text="Client Certificates">
+                    <CertificateAuthorityClients CertificateAuthority="@certificateAuthorityState.Value.CertificateAuthority"></CertificateAuthorityClients>
+                </RadzenTabsItem>
+            </Tabs>
+        </RadzenTabs>
+    </RadzenCard>
 }
 
 @code {

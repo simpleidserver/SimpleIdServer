@@ -10,7 +10,7 @@
 
 @if(userState.Value.IsLoading)
 {    
-    <RadzenText class="mt-3 mb-3" Text="Wait..." TextStyle="TextStyle.DisplayH6" />
+    <RadzenText class="mt-3 mb-3 no-margin" Text="Wait..." TextStyle="TextStyle.DisplayH3" />
 }
 else
 {
@@ -19,41 +19,43 @@ else
         <RadzenBreadCrumbItem Text="User details" />
     </RadzenBreadCrumb>
 
-    <RadzenText class="mt-3 mb-3" Text="@userState.Value.User?.Name" TextStyle="TextStyle.DisplayH6" />
+    <RadzenText class="mt-3 mb-3 no-margin" Text="@userState.Value.User?.Name" TextStyle="TextStyle.DisplayH3" />
     
     @if (!string.IsNullOrWhiteSpace(userState.Value.User?.Source))
     {
         <RadzenBadge class="mb-3" Text="@userState.Value.User?.Source" IsPill="true" BadgeStyle="BadgeStyle.Info"></RadzenBadge>
     }
 
-    <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
-        <Tabs>
-            <RadzenTabsItem Text="Details">
-                <UserSettings User="@userState.Value.User"></UserSettings>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="Consents" >
-                <UserConsents User="@userState.Value.User"></UserConsents>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="Credentials">
-                <UserCredentials User="@userState.Value.User"></UserCredentials>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="Wallet">
-                <UserWallet></UserWallet>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="Groups">
-                <UserGroups User="@userState.Value.User"></UserGroups>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="Claims">
-                <UserClaims UserId="@userState.Value.User?.Id"></UserClaims>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="Sessions">
-                <UserSessions User="@userState.Value.User"></UserSessions>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="External Identity Providers">
-                <UserProfiles User="@userState.Value.User"></UserProfiles>
-            </RadzenTabsItem>
-        </Tabs>
-    </RadzenTabs>
+    <RadzenCard>
+        <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
+            <Tabs>
+                <RadzenTabsItem Text="Details">
+                    <UserSettings User="@userState.Value.User"></UserSettings>
+                </RadzenTabsItem>
+                <RadzenTabsItem Text="Consents" >
+                    <UserConsents User="@userState.Value.User"></UserConsents>
+                </RadzenTabsItem>
+                <RadzenTabsItem Text="Credentials">
+                    <UserCredentials User="@userState.Value.User"></UserCredentials>
+                </RadzenTabsItem>
+                <RadzenTabsItem Text="Wallet">
+                    <UserWallet></UserWallet>
+                </RadzenTabsItem>
+                <RadzenTabsItem Text="Groups">
+                    <UserGroups User="@userState.Value.User"></UserGroups>
+                </RadzenTabsItem>
+                <RadzenTabsItem Text="Claims">
+                    <UserClaims UserId="@userState.Value.User?.Id"></UserClaims>
+                </RadzenTabsItem>
+                <RadzenTabsItem Text="Sessions">
+                    <UserSessions User="@userState.Value.User"></UserSessions>
+                </RadzenTabsItem>
+                <RadzenTabsItem Text="External Identity Providers">
+                    <UserProfiles User="@userState.Value.User"></UserProfiles>
+                </RadzenTabsItem>
+            </Tabs>
+        </RadzenTabs>
+    </RadzenCard>
 }
 
 @code {

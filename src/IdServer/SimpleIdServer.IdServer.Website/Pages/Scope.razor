@@ -11,7 +11,7 @@
 
 @if (scopeState.Value.IsLoading)
 {    
-    <RadzenText class="mt-3 mb-3" Text="Wait..." TextStyle="TextStyle.DisplayH6" />
+    <RadzenText class="mt-3 mb-3" Text="Wait..." TextStyle="TextStyle.DisplayH3" />
 }
 else
 {
@@ -20,7 +20,7 @@ else
         <RadzenBreadCrumbItem Text="Scope details" />
     </RadzenBreadCrumb>
 
-    <RadzenText class="mt-3 mb-3" Text="@scopeState.Value.Scope?.Name" TextStyle="TextStyle.DisplayH6" />
+    <RadzenText class="mt-3 mb-3 no-margin" Text="@scopeState.Value.Scope?.Name" TextStyle="TextStyle.DisplayH3" />
 
     <div class="mb-1">
         @if (scopeState.Value.Scope.Type == ScopeTypes.IDENTITY)
@@ -46,25 +46,27 @@ else
         }
     </div>
 
-    <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
-        <Tabs>
-            <RadzenTabsItem Text="Details">
-                <ScopeSettings Scope="@scopeState.Value.Scope"></ScopeSettings>
-            </RadzenTabsItem>
-            @if (scopeState.Value.Scope.Type == ScopeTypes.IDENTITY)
-            {
-                <RadzenTabsItem Text="Mappers">
-                    <ScopeMappers Scope="@scopeState.Value.Scope"></ScopeMappers>
+    <RadzenCard>
+        <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
+            <Tabs>
+                <RadzenTabsItem Text="Details">
+                    <ScopeSettings Scope="@scopeState.Value.Scope"></ScopeSettings>
                 </RadzenTabsItem>
-            }
-            else if(scopeState.Value.Scope.Type == ScopeTypes.APIRESOURCE)
-            {
-                <RadzenTabsItem Text="API Resources">
-                    <ScopeResources Scope="@scopeState.Value.Scope"></ScopeResources>
-                </RadzenTabsItem>
-            }
-        </Tabs>
-    </RadzenTabs>
+                @if (scopeState.Value.Scope.Type == ScopeTypes.IDENTITY)
+                {
+                    <RadzenTabsItem Text="Mappers">
+                        <ScopeMappers Scope="@scopeState.Value.Scope"></ScopeMappers>
+                    </RadzenTabsItem>
+                }
+                else if(scopeState.Value.Scope.Type == ScopeTypes.APIRESOURCE)
+                {
+                    <RadzenTabsItem Text="API Resources">
+                        <ScopeResources Scope="@scopeState.Value.Scope"></ScopeResources>
+                    </RadzenTabsItem>
+                }
+            </Tabs>
+        </RadzenTabs>
+    </RadzenCard>
 }
 
 @code {

@@ -1,4 +1,12 @@
-﻿.rz-card.selected,
+﻿.no-margin {
+    margin: 0px !important;
+}
+
+.ml-auto {
+    margin-left: auto !important;
+}
+
+.rz-card.selected,
 .rz-grid-table .new {
     background-color: #d3f0d3;
 }

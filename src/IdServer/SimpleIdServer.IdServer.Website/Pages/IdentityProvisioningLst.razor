@@ -11,7 +11,10 @@
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @using SimpleIdServer.IdServer.Website.Stores.ImportSummaryStore;
 
-<RadzenText class="mb-3" Text="Extract" TextStyle="TextStyle.DisplayH6" />
+<RadzenText class="mb-3 no-margin" Text="Extract" TextStyle="TextStyle.DisplayH3" />
+<p>
+    Extract users/groups from one or more storage sources and store the results into CSV files.
+</p>
 
 <RadzenDataGrid @ref="identityProvisioningGrid"
                 AllowFiltering="true"
@@ -67,9 +70,17 @@
     </Columns>
 </RadzenDataGrid>
 
-<RadzenText class="mt-3 mb-3" Text="Import" TextStyle="TextStyle.DisplayH6" />
-
-<RadzenButton class="mb-1" Click="@(args => LaunchImport())" Icon="launch" Text="Import" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+<div class="row mt-2">
+    <div class="col">
+        <RadzenText class="mt-3 mb-3 no-margin" Text="Import" TextStyle="TextStyle.DisplayH3" />
+        <p>
+            Import the extracted users/groups into the Identity Server.
+        </p>
+    </div>
+    <div class="col-3">
+        <RadzenButton class="mb-1" Click="@(args => LaunchImport())" Icon="launch" Text="Import" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+    </div>
+</div>
 
 <RadzenDataGrid @ref="importSummaryGrid"
                 AllowFiltering="true"

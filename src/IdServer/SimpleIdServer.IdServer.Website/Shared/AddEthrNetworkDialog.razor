@@ -24,7 +24,7 @@
         <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">RPC URL</RadzenText>
         <RadzenTextBox Name="RpcUrl" @bind-Value="@addEthrNetwork.RpcUrl" class="w-100"></RadzenTextBox>
         <RadzenRequiredValidator Component="RpcUrl" Text="RPC Url is required"></RadzenRequiredValidator>
-        <p class="text-muted">URL of the ethereum provider for example : <b>mainnet: https://rpc.sepolia.org</b></p>
+        <p class="text-muted">URL of the ethereum provider, for example, <b>mainnet: https://rpc.sepolia.org</b></p>
     </div>
     <!-- Private Account Key -->
     <div>
@@ -32,8 +32,7 @@
         <RadzenTextBox Name="PrivateAccountKey" @bind-Value="@addEthrNetwork.PrivateAccountKey" class="w-100"></RadzenTextBox>
         <RadzenRequiredValidator Component="PrivateAccountKey" Text="Private account key is required"></RadzenRequiredValidator>
         <p class="text-muted">
-            Private key of your ethereum account. <br/>
-            Must be encoded into hexadecimal
+            The private key of your Ethereum account  must be encoded into hexadecimal.
         </p>
     </div>
     <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateEthrNetwork.Value.IsUpdating ? "Adding..." : "Add")" Disabled=updateEthrNetwork.Value.IsUpdating />

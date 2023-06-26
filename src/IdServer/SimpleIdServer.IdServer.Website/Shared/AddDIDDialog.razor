@@ -122,8 +122,8 @@
 
     ICollection<DIDType> DIDTypes = new List<DIDType>
     {
-        new DIDType { Name = "did:key", ShortDescription = "Doesn't require a DID Registry of any kind", Description = "Concatenation of the Multicodec identifier for the public key type and the raw bytes associated with the public key format. For more information please read the website <a href='https://w3c-ccg.github.io/did-method-key/'>https://w3c-ccg.github.io/did-method-key/</a>", Type = "key", PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/DIDKey.png" },
-        new DIDType { Name = "did:ethr", ShortDescription = "Decentralized Identitier Document is stored in ethereum", Description = "For more information please read the website <a href='https://github.com/decentralized-identity/ethr-did-resolver/blob/master/doc/did-method-spec.md'>https://github.com/decentralized-identity/ethr-did-resolver/blob/master/doc/did-method-spec.md</a>", Type = "ethr", PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/DIDEthr.png" },
+        new DIDType { Name = "did:key", ShortDescription = "Does not require any kind of DID Registry", Description = "Concatenation of the Multicodec identifier for the public key type and the raw bytes associated with the public key format. For more information please read the website <a href='https://w3c-ccg.github.io/did-method-key/'>https://w3c-ccg.github.io/did-method-key/</a>", Type = "key", PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/DIDKey.png" },
+        new DIDType { Name = "did:ethr", ShortDescription = "The Decentralized Identifier (DID) document is stored on Ethereum.", Description = "For more information please read the website <a href='https://github.com/decentralized-identity/ethr-did-resolver/blob/master/doc/did-method-spec.md'>https://github.com/decentralized-identity/ethr-did-resolver/blob/master/doc/did-method-spec.md</a>", Type = "ethr", PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/DIDEthr.png" },
     };
 
     DIDType? SelectedDIDType { get; set; } = null;

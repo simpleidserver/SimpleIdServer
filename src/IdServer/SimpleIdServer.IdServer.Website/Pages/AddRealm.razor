@@ -7,25 +7,27 @@
 @inject NotificationService notificationService
 @inject NavigationManager navigationManager
 
-<RadzenTemplateForm Submit=@SubmitAddRealm TItem="AddRealmForm" Data=@addRealmForm>
-    @if (!updateRealmState.Value.IsUpdating && !string.IsNullOrWhiteSpace(updateRealmState.Value.ErrorMessage))
-    {
-        <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@updateRealmState.Value.ErrorMessage</RadzenAlert>
-    }
+<RadzenCard>
+    <RadzenTemplateForm Submit=@SubmitAddRealm TItem="AddRealmForm" Data=@addRealmForm>
+        @if (!updateRealmState.Value.IsUpdating && !string.IsNullOrWhiteSpace(updateRealmState.Value.ErrorMessage))
+        {
+            <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@updateRealmState.Value.ErrorMessage</RadzenAlert>
+        }
 
-    <!-- Name -->
-    <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
-        <RadzenTextBox Name="Name" @bind-Value="@addRealmForm.Name" Class="w-100"></RadzenTextBox>
-        <RadzenRequiredValidator Component="Name" Text="Name is required"></RadzenRequiredValidator>
-    </div>
-    <!-- Description -->
-    <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Description</RadzenText>
-        <RadzenTextArea Name="Description" @bind-Value="@addRealmForm.Description" Class="w-100"></RadzenTextArea>
-    </div>
-    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateRealmState.Value.IsUpdating ? "Adding..." : "Add")" Disabled=updateRealmState.Value.IsUpdating />
-</RadzenTemplateForm>
+        <!-- Name -->
+        <div>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+            <RadzenTextBox Name="Name" @bind-Value="@addRealmForm.Name" Class="w-100"></RadzenTextBox>
+            <RadzenRequiredValidator Component="Name" Text="Name is required"></RadzenRequiredValidator>
+        </div>
+        <!-- Description -->
+        <div>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Description</RadzenText>
+            <RadzenTextArea Name="Description" @bind-Value="@addRealmForm.Description" Class="w-100"></RadzenTextArea>
+        </div>
+        <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateRealmState.Value.IsUpdating ? "Adding..." : "Add")" Disabled=updateRealmState.Value.IsUpdating />
+    </RadzenTemplateForm>
+</RadzenCard>
 
 @code {
     record AddRealmForm
