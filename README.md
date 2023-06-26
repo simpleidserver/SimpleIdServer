@@ -1,6 +1,6 @@
 # Simpleidserver core
 
-![Simpleidserver](images/logo.svg)
+<img src="images/logo.svg" alt="SimpleIdServer" style="width:200px;"/>
 
 [![Build status](https://ci.appveyor.com/api/projects/status/shtqlxhbda6gtdag?svg=true)](https://ci.appveyor.com/project/simpleidserver/simpleidserver)
 [![Join the chat at https://app.gitter.im/#/room/#simpleidserver:gitter.im](https://badges.gitter.im/repo.svg)](https://app.gitter.im/#/room/#simpleidserver:gitter.im)
