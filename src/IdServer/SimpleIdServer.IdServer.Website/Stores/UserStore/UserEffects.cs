@@ -10,7 +10,6 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Website.Resources;
 using SimpleIdServer.IdServer.Website.Stores.Base;
-using System.Drawing.Imaging;
 using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Text.Json.Nodes;
@@ -378,16 +377,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             {
                 var qrGenerator = new QRCodeGenerator();
                 var qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
-                var qrCode = new QRCode(qrCodeData);
-                var bitMap = qrCode.GetGraphic(20);
-                byte[] payload = null;
-                using (var stream = new MemoryStream())
-                {
-                    bitMap.Save(stream, ImageFormat.Png);
-                    payload = stream.ToArray();
-                }
-
-                return $"data:image/jpeg;base64,{Convert.ToBase64String(payload)}";
+                var qrCode = new Base64QRCode(qrCodeData);
+                var payload = qrCode.GetGraphic(20);
+                return $"data:image/jpeg;base64,{payload}";
             }
         }
 

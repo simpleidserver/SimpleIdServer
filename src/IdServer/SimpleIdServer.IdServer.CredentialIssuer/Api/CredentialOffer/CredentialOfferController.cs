@@ -18,8 +18,6 @@ using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
-using System.Drawing.Imaging;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
@@ -257,15 +255,8 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialOffer
         {
             var qrGenerator = new QRCodeGenerator();
             var qrCodeData = qrGenerator.CreateQrCode(res.Url, QRCodeGenerator.ECCLevel.Q);
-            var qrCode = new QRCode(qrCodeData);
-            var img = qrCode.GetGraphic(20);
-            byte[] payload = null;
-            using (var stream = new MemoryStream())
-            {
-                img.Save(stream, ImageFormat.Png);
-                payload = stream.ToArray();
-            }
-
+            var qrCode = new PngByteQRCode(qrCodeData);
+            var payload = qrCode.GetGraphic(20);
             return File(payload, "image/png");
         }
 

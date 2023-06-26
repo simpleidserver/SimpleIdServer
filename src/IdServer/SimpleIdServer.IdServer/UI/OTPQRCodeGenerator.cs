@@ -5,15 +5,13 @@ using QRCoder;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Options;
 using System;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
 
 namespace SimpleIdServer.IdServer.UI
 {
     public interface IOTPQRCodeGenerator
     {
         byte[] GenerateQRCode(User user);
+        byte[] GenerateQRCode(User user, UserCredential credential);
     }
 
     public class OTPQRCodeGenerator : IOTPQRCodeGenerator
@@ -25,29 +23,24 @@ namespace SimpleIdServer.IdServer.UI
             _options = options.Value;
         }
 
-        public byte[] GenerateQRCode(User user)
+        public byte[] GenerateQRCode(User user) => GenerateQRCode(user, user.ActiveOTP);
+
+        public byte[] GenerateQRCode(User user, UserCredential credential)
         {
-            var alg = Enum.GetName(typeof(OTPAlgs), user.ActiveOTP.OTPAlg).ToLowerInvariant();
-            var url = $"otpauth://{alg}/{_options.OTPIssuer}:{user.Name}?secret={user.ActiveOTP.Value}&issuer={_options.OTPIssuer}&algorithm=SHA1";
+            var alg = Enum.GetName(typeof(OTPAlgs), credential.OTPAlg).ToLowerInvariant();
+            var url = $"otpauth://{alg}/{_options.OTPIssuer}:{user.Name}?secret={credential.Value}&issuer={_options.OTPIssuer}&algorithm=SHA1";
             if (_options.OTPAlg == OTPAlgs.HOTP)
-                url = $"{url}&counter={user.ActiveOTP.OTPCounter}";
+                url = $"{url}&counter={credential.OTPCounter}";
             if (_options.OTPAlg == OTPAlgs.TOTP)
                 url = $"{url}&period={_options.TOTPStep}";
-            byte[] payload = null;
             var result = GetQRCode();
-            using (var stream = new MemoryStream())
-            {
-                result.Save(stream, ImageFormat.Png);
-                payload = stream.ToArray();
-            }
+            return result;
 
-            return payload;
-
-            Bitmap GetQRCode()
+            byte[] GetQRCode()
             {
                 var qrGenerator = new QRCodeGenerator();
                 var qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
-                var qrCode = new QRCode(qrCodeData);
+                var qrCode = new PngByteQRCode(qrCodeData);
                 return qrCode.GetGraphic(20);
             }
         }
