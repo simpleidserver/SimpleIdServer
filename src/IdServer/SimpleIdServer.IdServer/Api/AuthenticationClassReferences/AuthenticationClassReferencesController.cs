@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Domains.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
@@ -24,13 +25,15 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationClassReferences
         private readonly IRealmRepository _realmRepository;
         private readonly IJwtBuilder _jwtBuilder;
         private readonly IEnumerable<IAuthenticationMethodService> _authMethodServices;
+        private readonly ILogger<AuthenticationClassReferencesController> _logger;
 
-        public AuthenticationClassReferencesController(IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository, IRealmRepository realmRepository, IJwtBuilder jwtBuilder, IEnumerable<IAuthenticationMethodService> authMethodServices)
+        public AuthenticationClassReferencesController(IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository, IRealmRepository realmRepository, IJwtBuilder jwtBuilder, IEnumerable<IAuthenticationMethodService> authMethodServices, ILogger<AuthenticationClassReferencesController> logger)
         {
             _authenticationContextClassReferenceRepository = authenticationContextClassReferenceRepository;
             _realmRepository = realmRepository;
             _jwtBuilder = jwtBuilder;
             _authMethodServices = authMethodServices;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -45,6 +48,7 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationClassReferences
             }
             catch (OAuthException ex)
             {
+                _logger.LogError(ex.ToString());
                 return BuildError(ex);
             }
         }
@@ -83,6 +87,7 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationClassReferences
                 catch(OAuthException ex)
                 {
                     activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+                    _logger.LogError(ex.ToString());
                     return BuildError(ex);
                 }
             }

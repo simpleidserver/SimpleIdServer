@@ -214,7 +214,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     await _busControl.Publish(new TokenIssuedSuccessEvent
                     {
                         GrantType = GRANT_TYPE,
-                        ClientId = context.Client.Id,
+                        ClientId = context.Client.ClientId,
                         Scopes = scopes,
                         Realm = context.Realm
                     });
@@ -226,7 +226,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     await _busControl.Publish(new TokenIssuedFailureEvent
                     {
                         GrantType = GRANT_TYPE,
-                        ClientId = context.Client?.Id,
+                        ClientId = context.Client?.ClientId,
                         Scopes = scopeLst,
                         Realm = context.Realm,
                         ErrorMessage = ex.Message

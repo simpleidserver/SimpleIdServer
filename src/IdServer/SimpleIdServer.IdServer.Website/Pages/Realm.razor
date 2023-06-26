@@ -1,0 +1,71 @@
+﻿@page "/realm"
+@using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
+@inject IOptions<IdServerWebsiteOptions> Options;
+@inject IState<RealmsState> realmsState
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+
+<div>
+    <RadzenButton Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="Add Realm" />
+    <RadzenButton Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="Choose Realm" />
+</div>
+
+<RadzenRow Gap="1rem" class="mt-2">
+    <!-- Servers -->
+    <RadzenColumn Size="6">
+        <RadzenCard Variant="Variant.Filled">
+            <RadzenText TextStyle="TextStyle.DisplayH6">Servers</RadzenText>
+            <!-- OpenID Connect -->
+            <div class="row">
+                <div class="col-2">
+                    <RadzenLabel Text="OpenID Connect" Style="padding: 0px;" />
+                </div>
+                <div class="col">
+                    <RadzenTextBox Value=@GetOpenIdConnectUrl() Class="w-100"></RadzenTextBox>
+                </div>
+            </div>
+            <!-- WSFederation -->
+            <div class="row mt-2">
+                <div class="col-2">
+                    <RadzenLabel Text="WS-Federation" Style="padding: 0px;"></RadzenLabel>
+                </div>
+                <div class="col">
+                    <RadzenTextBox Value=@GetFederationMetadataUrl() Class="w-100"></RadzenTextBox>
+                </div>
+            </div>
+        </RadzenCard>
+    </RadzenColumn>
+    <!-- Number of clients -->
+    <RadzenColumn Size="3">
+        <RadzenCard Variant="Variant.Filled">
+            <RadzenText TextStyle="TextStyle.DisplayH6">Users</RadzenText>
+            <RadzenText TextStyle="TextStyle.DisplayH3">0</RadzenText>
+        </RadzenCard>
+    </RadzenColumn>
+    <!-- Number of users -->
+    <RadzenColumn Size="3">
+        <RadzenCard Variant="Variant.Filled">
+            <RadzenText TextStyle="TextStyle.DisplayH6">Clients</RadzenText>
+            <RadzenText TextStyle="TextStyle.DisplayH3">0</RadzenText>
+        </RadzenCard>
+    </RadzenColumn>
+    <!-- Authentication success since 6 hours -->
+    <RadzenColumn Size="6">
+        <RadzenCard Variant="Variant.Filled">
+            <RadzenText TextStyle="TextStyle.DisplayH6">Successful authentication since 6 hours ago</RadzenText>
+            <RadzenText TextStyle="TextStyle.DisplayH3" Style="color: green;">0</RadzenText>
+        </RadzenCard>
+    </RadzenColumn>
+    <!-- Authentication attempt since 6 hours -->
+    <RadzenColumn Size="6">
+        <RadzenCard Variant="Variant.Filled">
+            <RadzenText TextStyle="TextStyle.DisplayH6">Authentication attempt since 6 hours ago</RadzenText>
+            <RadzenText TextStyle="TextStyle.DisplayH3" Style="color: red;">0</RadzenText>
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    public string GetOpenIdConnectUrl() => $"{Options.Value.IdServerBaseUrl}/{realmsState.Value.ActiveRealm}/.well-known/openid-configuration";
+    public string GetFederationMetadataUrl() => $"{Options.Value.IdServerBaseUrl}/{realmsState.Value.ActiveRealm}/FederationMetadata/2007-06/FederationMetadata.xml";
+}
