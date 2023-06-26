@@ -1,4 +1,26 @@
-﻿.login .divider {
+﻿.loginContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 80px;
+}
+
+.login {
+    width: 400px;
+}
+
+@media (max-width: 600px) {
+    .loginContainer {
+        padding-top: 0px;
+        display: block;
+    }
+
+    .login {
+        width: auto;
+    }
+}
+
+.login .divider {
     display: flex;
     align-items: center;
     margin-top: 1.5rem;

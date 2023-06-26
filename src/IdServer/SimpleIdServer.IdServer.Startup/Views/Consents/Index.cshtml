@@ -7,9 +7,9 @@
     Layout = "~/Views/Shared/_CommonLayout.cshtml";
 }
 
-<div class="modal consent">
-    <div class="modal-dialog">
-        <div class="modal-content">
+<div class="consentContainer">
+    <div class="card consent">
+        <div class="card-body">
             <!-- Rejection form -->
             <form method="post" action="@Url.Action("Reject", "Consents")" id="rejectForm">
                 @Html.AntiForgeryToken()
@@ -102,15 +102,3 @@
         </div>
     </div>
 </div>
-
-@section Scripts {
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $(".consent").modal({
-                backdrop: 'static',
-                keyboard: true
-            });
-            $(".consent").modal('show');
-        });
-    </script>
-}

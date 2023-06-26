@@ -1,4 +1,26 @@
-﻿.consent .modal-content {
+﻿.consentContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 80px;
+}
+
+.consent {
+    width: 400px;
+}
+
+@media (max-width: 600px) {
+    .consentContainer {
+        padding-top: 0px;
+        display: block;
+    }
+
+    .consent {
+        width: auto;
+    }
+}
+
+.consent .modal-content {
     padding: 20px;
 }
 

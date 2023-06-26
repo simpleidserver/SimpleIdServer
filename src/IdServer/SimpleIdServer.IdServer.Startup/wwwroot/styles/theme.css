@@ -4,6 +4,10 @@
     --sid-separator-bg: #eee;
 }
 
+body.orange {
+    background-color: #f3f3f3;
+}
+
 .orange .navbar-nav {
     --bs-nav-link-color: #e7e2e2;
     --bs-nav-link-hover-color: white;
