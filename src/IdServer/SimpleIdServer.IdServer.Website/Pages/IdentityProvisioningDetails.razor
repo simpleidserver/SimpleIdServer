@@ -5,20 +5,23 @@
 @inject NotificationService notificationService
 @inject IDispatcher dispatcher
 
-<RadzenTemplateForm Submit=@SubmitUpdateIdProvisioningDetails TItem="UpdateIdentityProvisioningDetails" Data=@updateIdentityProvisioning>
-    <!-- Name -->
-    <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
-        <RadzenTextBox Name="Name" @bind-Value="@updateIdentityProvisioning.Name" Class="w-100" Disabled=true></RadzenTextBox>
-    </div>
-    <!-- Description -->
-    <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Description</RadzenText>
-        <RadzenTextArea Name="Description" @bind-Value="@updateIdentityProvisioning.Description" Class="w-100"></RadzenTextArea>
-        <RadzenRequiredValidator Component="Description" Text="Description is required"></RadzenRequiredValidator>
-    </div>
-    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Update" />
-</RadzenTemplateForm>
+@if (IdProvisioning != null)
+{
+    <RadzenTemplateForm Submit=@SubmitUpdateIdProvisioningDetails TItem="UpdateIdentityProvisioningDetails" Data=@updateIdentityProvisioning>
+        <!-- Name -->
+        <div>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+            <RadzenTextBox Name="Name" @bind-Value="@updateIdentityProvisioning.Name" Class="w-100" Disabled=true></RadzenTextBox>
+        </div>
+        <!-- Description -->
+        <div>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Description</RadzenText>
+            <RadzenTextArea Name="Description" @bind-Value="@updateIdentityProvisioning.Description" Class="w-100"></RadzenTextArea>
+            <RadzenRequiredValidator Component="Description" Text="Description is required"></RadzenRequiredValidator>
+        </div>
+        <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Update" />
+    </RadzenTemplateForm>
+}
 
 @code {
     record UpdateIdentityProvisioningDetails

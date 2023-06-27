@@ -9,48 +9,51 @@
 
 <p class="text-muted">List of active/inactive user sessions.</p>
 
-<RadzenDataGrid AllowFiltering="true" 
-        AllowColumnResize="true"
-        AllowAlternatingRows="false" 
-        AllowSorting="true" 
-        PageSize="30" 
-        AllowPaging="true" 
-        PagerHorizontalAlign="HorizontalAlign.Left" 
-        ShowPagingSummary="true"
-        IsLoading="@updateUserState.Value.IsUpdating"
-        Count="@User.Sessions.Count"
-        Data="@User.Sessions"
-        TItem="UserSession" 
-        ColumnWidth="300px">
-    <Columns>
-        <RadzenDataGridColumn TItem="UserSession" Property="AuthenticationDateTime" Title="Authentication time" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Width="80px" />
-        <RadzenDataGridColumn TItem="UserSession" Property="ExpirationDateTime" Title="Expiration time" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" />
-        <RadzenDataGridColumn TItem="UserSession" Title="State" Filterable="false" Sortable="false" Width="80px">
-            <Template Context="data">
-                @if(data.State == UserSessionStates.Rejected)
-                {
-                    <RadzenBadge Text="Rejected" IsPill="true" BadgeStyle="BadgeStyle.Danger" />
-                }
-                else if (data.State == UserSessionStates.Active && data.ExpirationDateTime > DateTime.UtcNow)
-                {
-                    <RadzenBadge Text="Active" IsPill="true" BadgeStyle="BadgeStyle.Success"></RadzenBadge>
-                }
-                else
-                {
-                    <RadzenBadge Text="Expired" IsPill="true" BadgeStyle="BadgeStyle.Danger"></RadzenBadge>
-                }
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="UserSession" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
-            <Template Context="data">
-                @if(data.State == UserSessionStates.Active && data.ExpirationDateTime > DateTime.UtcNow)
-                {
-                    <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
-                }
-            </Template>
-        </RadzenDataGridColumn>
-    </Columns>
-</RadzenDataGrid>
+@if(User != null)
+{
+    <RadzenDataGrid AllowFiltering="true"
+                AllowColumnResize="true"
+                AllowAlternatingRows="false"
+                AllowSorting="true"
+                PageSize="30"
+                AllowPaging="true"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="true"
+                IsLoading="@updateUserState.Value.IsUpdating"
+                Count="@User.Sessions.Count"
+                Data="@User.Sessions"
+                TItem="UserSession"
+                ColumnWidth="300px">
+        <Columns>
+            <RadzenDataGridColumn TItem="UserSession" Property="AuthenticationDateTime" Title="Authentication time" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Width="80px" />
+            <RadzenDataGridColumn TItem="UserSession" Property="ExpirationDateTime" Title="Expiration time" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" />
+            <RadzenDataGridColumn TItem="UserSession" Title="State" Filterable="false" Sortable="false" Width="80px">
+                <Template Context="data">
+                    @if (data.State == UserSessionStates.Rejected)
+                    {
+                        <RadzenBadge Text="Rejected" IsPill="true" BadgeStyle="BadgeStyle.Danger" />
+                    }
+                    else if (data.State == UserSessionStates.Active && data.ExpirationDateTime > DateTime.UtcNow)
+                    {
+                        <RadzenBadge Text="Active" IsPill="true" BadgeStyle="BadgeStyle.Success"></RadzenBadge>
+                    }
+                    else
+                    {
+                        <RadzenBadge Text="Expired" IsPill="true" BadgeStyle="BadgeStyle.Danger"></RadzenBadge>
+                    }
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="UserSession" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+                <Template Context="data">
+                    @if (data.State == UserSessionStates.Active && data.ExpirationDateTime > DateTime.UtcNow)
+                    {
+                        <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                    }
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+}
 
 @code {
     [Parameter]

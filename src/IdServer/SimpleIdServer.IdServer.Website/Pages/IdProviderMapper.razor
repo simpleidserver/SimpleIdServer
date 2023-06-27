@@ -9,31 +9,24 @@
 @inject NotificationService notificationService
 @inject IState<IdProviderState> idProviderState
 
-@if(idProviderState.Value.IsLoading)
-{
-    <RadzenText class="mt-3 mb-3" Text="Wait..." TextStyle="TextStyle.DisplayH3" />
-}
-else
-{
-    <RadzenBreadCrumb>
-        <RadzenBreadCrumbItem Path="/idproviders" Text="Identity Providers" />
-        <RadzenBreadCrumbItem Path=@($"/idproviders/{id}/mappers") Text="Identity Provider mappers" />
-        <RadzenBreadCrumbItem Text="@(mapper.Name)" />
-    </RadzenBreadCrumb>
+<RadzenBreadCrumb>
+    <RadzenBreadCrumbItem Path="/idproviders" Text="Identity Providers" />
+    <RadzenBreadCrumbItem Path=@($"/idproviders/{id}/mappers") Text="Identity Provider mappers" />
+    <RadzenBreadCrumbItem Text="@(mapper?.Name)" />
+</RadzenBreadCrumb>
 
-    <RadzenText class="mt-3 mb-3" Text="@mapper.Name" TextStyle="TextStyle.DisplayH3" />
-    <RadzenCard>
-        @switch (mapper.MapperType)
-        {
-            case MappingRuleTypes.USERATTRIBUTE:
-                <UserAttributeIdProviderMapper Mapper=mapper AuthProviderMapperUpdated=@UpdateAuthProviderMapper></UserAttributeIdProviderMapper>
-                break;
-            case MappingRuleTypes.USERPROPERTY:
-                <UserPropertyIdProviderMapper Mapper=mapper AuthProviderMapperUpdated=@UpdateAuthProviderMapper></UserPropertyIdProviderMapper>
-                break;   
-        }
-    </RadzenCard>
-}
+<RadzenText class="mt-3 mb-3" Text="@mapper?.Name" TextStyle="TextStyle.DisplayH3" />
+<RadzenCardLoader IsLoading=@idProviderState.Value.IsLoading Variant="Variant.Filled">
+    @switch (mapper?.MapperType)
+    {
+        case MappingRuleTypes.USERATTRIBUTE:
+            <UserAttributeIdProviderMapper Mapper=mapper AuthProviderMapperUpdated=@UpdateAuthProviderMapper></UserAttributeIdProviderMapper>
+            break;
+        case MappingRuleTypes.USERPROPERTY:
+            <UserPropertyIdProviderMapper Mapper=mapper AuthProviderMapperUpdated=@UpdateAuthProviderMapper></UserPropertyIdProviderMapper>
+            break;   
+    }
+</RadzenCardLoader>
 
 @code {
     [Parameter]
@@ -45,7 +38,7 @@ else
     {
         get
         {
-            return idProviderState.Value.Provider.Mappers.Single(m => m.Id == mapperId);
+            return idProviderState.Value.Provider?.Mappers.Single(m => m.Id == mapperId);
         }
     }
 

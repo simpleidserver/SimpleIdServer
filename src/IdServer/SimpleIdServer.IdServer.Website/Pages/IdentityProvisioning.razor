@@ -9,40 +9,33 @@
 @inject IState<IdentityProvisioningState> identityProvisioningState
 @inject IDispatcher dispatcher
 
-@if (identityProvisioningState.Value.IsLoading)
-{    
-    <RadzenText class="mt-3 mb-3" Text="Wait..." TextStyle="TextStyle.DisplayH3" />
-}
-else
-{
-    <RadzenBreadCrumb>
-        <RadzenBreadCrumbItem Path="/identityprovisioning" Text="Identity Provisioning" />
-        <RadzenBreadCrumbItem Text="Identity Provisioning details" />
-    </RadzenBreadCrumb>
+<RadzenBreadCrumb>
+    <RadzenBreadCrumbItem Path="/identityprovisioning" Text="Identity Provisioning" />
+    <RadzenBreadCrumbItem Text="Identity Provisioning details" />
+</RadzenBreadCrumb>
 
-    <RadzenText class="mt-3 mb-3" Text="@identityProvisioningState.Value.IdentityProvisioning?.Name" TextStyle="TextStyle.DisplayH3" />
+<RadzenText class="mt-3 mb-3" Text="@identityProvisioningState.Value.IdentityProvisioning?.Name" TextStyle="TextStyle.DisplayH3" />
 
-    <RadzenButton class="mb-1" Click="@(args => LaunchIdentityProvisioning())" Icon="launch" Text="Launch" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+<RadzenButton class="mb-1" Click="@(args => LaunchIdentityProvisioning())" Icon="launch" Text="Launch" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
 
-    <RadzenCard>
-        <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
-            <Tabs>
-                <RadzenTabsItem Text="Details">
-                    <IdentityProvisioningDetails IdProvisioning="@identityProvisioningState.Value.IdentityProvisioning"></IdentityProvisioningDetails>
-                </RadzenTabsItem>
-                <RadzenTabsItem Text="Properties">
-                    <IdentityProvisioningProperties IdProvisioning="@identityProvisioningState.Value.IdentityProvisioning"></IdentityProvisioningProperties>
-                </RadzenTabsItem>
-                <RadzenTabsItem Text="Mapping rules">
-                    <IdentityProvisioningMappingRules IdProvisioning="@identityProvisioningState.Value.IdentityProvisioning"></IdentityProvisioningMappingRules>
-                </RadzenTabsItem>
-                <RadzenTabsItem Text="Histories" >
-                    <IdentityProvisioningHistories IdentityProvisioning="@identityProvisioningState.Value.IdentityProvisioning"></IdentityProvisioningHistories>
-                </RadzenTabsItem>
-            </Tabs>
-        </RadzenTabs>
-    </RadzenCard>
-}
+<RadzenCardLoader IsLoading=@identityProvisioningState.Value.IsLoading Variant="Variant.Filled">
+    <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
+        <Tabs>
+            <RadzenTabsItem Text="Details">
+                <IdentityProvisioningDetails IdProvisioning="@identityProvisioningState.Value.IdentityProvisioning"></IdentityProvisioningDetails>
+            </RadzenTabsItem>
+            <RadzenTabsItem Text="Properties">
+                <IdentityProvisioningProperties IdProvisioning="@identityProvisioningState.Value.IdentityProvisioning"></IdentityProvisioningProperties>
+            </RadzenTabsItem>
+            <RadzenTabsItem Text="Mapping rules">
+                <IdentityProvisioningMappingRules IdProvisioning="@identityProvisioningState.Value.IdentityProvisioning"></IdentityProvisioningMappingRules>
+            </RadzenTabsItem>
+            <RadzenTabsItem Text="Histories" >
+                <IdentityProvisioningHistories IdentityProvisioning="@identityProvisioningState.Value.IdentityProvisioning"></IdentityProvisioningHistories>
+            </RadzenTabsItem>
+        </Tabs>
+    </RadzenTabs>
+</RadzenCardLoader>
 
 @code {
     Dictionary<string, int> mappingActionNameToIndex = new Dictionary<string, int>

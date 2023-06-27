@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using SimpleIdServer.IdServer.Domains;
 
 namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
@@ -18,7 +17,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         }
 
         public IEnumerable<SelectableAuthenticationSchemeProviderMapper> Mappers { get; set; } = new List<SelectableAuthenticationSchemeProviderMapper>();
-        public bool IsLoading { get; set; }
+        public bool IsLoading { get; set; } = true;
         public int Count { get; set; }
     }
 

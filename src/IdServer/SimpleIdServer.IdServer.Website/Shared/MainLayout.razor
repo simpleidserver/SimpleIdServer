@@ -90,21 +90,4 @@
         base.OnInitialized();
         dispatcher.Dispatch(new GetActiveRealmAction());
     }
-
-    async void ShowRealms(MenuItemEventArgs args)
-    {
-        /*
-        if (state.Value.IsLoading || args.Text != "Active Realm : " + activeRealm) return;
-        await dialogService.OpenAsync<SelectRealmDialog>("Select Realm", new Dictionary<string, object>
-        {
-            { "activeRealm", activeRealm }
-        }, new DialogOptions
-        {
-            Width = "700px",
-            Height = "512px",
-            Resizable = true,
-            Draggable = true
-        });
-        */
-    }
 }

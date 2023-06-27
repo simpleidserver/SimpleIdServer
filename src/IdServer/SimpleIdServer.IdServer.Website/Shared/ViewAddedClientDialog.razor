@@ -1,0 +1,51 @@
+﻿@using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Website.Stores.ClientStore;
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
+@inject IOptions<IdServerWebsiteOptions> Options;
+@inject IState<RealmsState> realmsState
+
+<p>
+    The <RadzenBadge Text="@Client.ClientType" IsPill="true" /> client named <RadzenBadge Text="@Client.ClientName" IsPill="true" /> has been created. Please use the following properties to configure your client.
+</p>
+
+<!-- Client Identifier -->
+<div>
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Client Identifier</RadzenText>
+    <RadzenTextBox @bind-Value="@Client.ClientId" Class="w-100"></RadzenTextBox>
+</div>
+
+<!-- Json Web Key -->
+@if(!string.IsNullOrWhiteSpace(Client.JsonWebKeyStr))
+{
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Json Web Key</RadzenText>
+        <RadzenTextArea Rows=10 Name="Description" @bind-Value="@Client.JsonWebKeyStr" Class="w-100"></RadzenTextArea>
+        <p class="text-muted">The public JSON Web Key is used to verify the <b>request</b> object.</p>
+    </div>
+}
+
+@switch(Client.ClientType)
+{
+    case SimpleIdServer.IdServer.WsFederation.WsFederationConstants.CLIENT_TYPE:
+        <!-- WSFederation -->
+        <div>
+            <RadzenLabel Text="WS-Federation" Style="padding: 0px;"></RadzenLabel>
+            <RadzenTextBox Value=@GetFederationMetadataUrl() Class="w-100"></RadzenTextBox>
+        </div>
+        break;
+    default:
+        <!-- OpenID Connect -->
+        <div>
+            <RadzenLabel Text="OpenID Connect" Style="padding: 0px;" />
+            <RadzenTextBox Value=@GetOpenIdConnectUrl() Class="w-100"></RadzenTextBox>
+        </div>
+        break;
+}
+
+@code {
+    string GetOpenIdConnectUrl() => $"{Options.Value.IdServerBaseUrl}/{realmsState.Value.ActiveRealm}/.well-known/openid-configuration";
+    string GetFederationMetadataUrl() => $"{Options.Value.IdServerBaseUrl}/{realmsState.Value.ActiveRealm}/FederationMetadata/2007-06/FederationMetadata.xml";
+
+    [Parameter]
+    public AddClientSuccessAction Client { get; set; }
+}

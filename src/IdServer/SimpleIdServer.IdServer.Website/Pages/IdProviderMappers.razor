@@ -7,9 +7,11 @@
 @inject NotificationService notificationService
 @inject IState<IdProviderMappersState> idProviderMappersState
 
-<RadzenButton class="mb-1" Click="@(args => AddIdProviderMapper())" Icon="add" Text="Add Mapper" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+@if(IdProvider != null)
+{
+    <RadzenButton class="mb-1" Click="@(args => AddIdProviderMapper())" Icon="add" Text="Add Mapper" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
 
-<RadzenDataGrid AllowFiltering="true"
+    <RadzenDataGrid AllowFiltering="true"
                 AllowColumnResize="true"
                 AllowAlternatingRows="false"
                 AllowSorting="true"
@@ -23,32 +25,33 @@
                 RowRender="@RowRender"
                 TItem="SelectableAuthenticationSchemeProviderMapper"
                 ColumnWidth="300px">
-    <Columns>
-        <RadzenDataGridColumn TItem="SelectableAuthenticationSchemeProviderMapper" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
-            <HeaderTemplate>
-                <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
-            </HeaderTemplate>
-            <Template Context="data">
-                <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableAuthenticationSchemeProviderMapper" Property="Value.Name" Filterable="false" Sortable="false" SortOrder=SortOrder.Ascending Title="Name" Width="80px">
-            <Template Context="data">
-                <RadzenLink Text="@data.Value.Name" Path="@($"/idproviders/{IdProvider.Name}/mappers/{data.Value.Id}")" />
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableAuthenticationSchemeProviderMapper" Filterable="false" Sortable="false" Title="Type" Width="80px">
-            <Template Context="data">
-                <RadzenBadge Text=@(Enum.GetName(typeof(MappingRuleTypes), data.Value.MapperType)) IsPill="true" />
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableAuthenticationSchemeProviderMapper" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
-            <Template Context="data">
-                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
-            </Template>
-        </RadzenDataGridColumn>
-    </Columns>
-</RadzenDataGrid>
+        <Columns>
+            <RadzenDataGridColumn TItem="SelectableAuthenticationSchemeProviderMapper" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+                <HeaderTemplate>
+                    <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
+                </HeaderTemplate>
+                <Template Context="data">
+                    <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="SelectableAuthenticationSchemeProviderMapper" Property="Value.Name" Filterable="false" Sortable="false" SortOrder=SortOrder.Ascending Title="Name" Width="80px">
+                <Template Context="data">
+                    <RadzenLink Text="@data.Value.Name" Path="@($"/idproviders/{IdProvider.Name}/mappers/{data.Value.Id}")" />
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="SelectableAuthenticationSchemeProviderMapper" Filterable="false" Sortable="false" Title="Type" Width="80px">
+                <Template Context="data">
+                    <RadzenBadge Text=@(Enum.GetName(typeof(MappingRuleTypes), data.Value.MapperType)) IsPill="true" />
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="SelectableAuthenticationSchemeProviderMapper" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
+                <Template Context="data">
+                    <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>    
+}
 
 @code {
     [Parameter]

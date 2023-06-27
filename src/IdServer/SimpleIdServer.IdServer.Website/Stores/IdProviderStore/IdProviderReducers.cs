@@ -234,7 +234,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         #region IdProviderMappersState
 
         [ReducerMethod]
-        public static IdProviderMappersState ReduceGetIdProviderAction(IdProviderMappersState state, GetIdProviderAction act) => new IdProviderMappersState(null, true) { Count = 0 };
+        public static IdProviderMappersState ReduceGetIdProviderAction(IdProviderMappersState state, GetIdProviderAction act) => new IdProviderMappersState(new List<AuthenticationSchemeProviderMapper>(), true) { Count = 0 };
 
         [ReducerMethod]
         public static IdProviderMappersState ReduceGetIdProviderSuccessAction(IdProviderMappersState state, GetIdProviderSuccessAction act) => new IdProviderMappersState(act.IdProvider.Mappers, false)

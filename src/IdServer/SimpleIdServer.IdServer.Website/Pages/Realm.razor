@@ -63,14 +63,14 @@
     <RadzenColumn Size="3">
         <RadzenCardLoader Variant="Variant.Filled" IsLoading=@statisticsState.Value.IsLoading>
             <RadzenText TextStyle="TextStyle.DisplayH6">Users</RadzenText>
-            <RadzenText TextStyle="TextStyle.DisplayH3">@statisticsState.Value.NbClients</RadzenText>
+            <RadzenText TextStyle="TextStyle.DisplayH3">@statisticsState.Value.NbUsers</RadzenText>
         </RadzenCardLoader>
     </RadzenColumn>
     <!-- Number of users -->
     <RadzenColumn Size="3">
         <RadzenCardLoader Variant="Variant.Filled" IsLoading=@statisticsState.Value.IsLoading>
             <RadzenText TextStyle="TextStyle.DisplayH6">Clients</RadzenText>
-            <RadzenText TextStyle="TextStyle.DisplayH3">@statisticsState.Value.NbUsers</RadzenText>
+            <RadzenText TextStyle="TextStyle.DisplayH3">@statisticsState.Value.NbClients</RadzenText>
         </RadzenCardLoader>
     </RadzenColumn>
     <!-- Authentication success today -->
@@ -91,9 +91,9 @@
 
 @code {
     string activeRealm;
-    public string GetOpenIdConnectUrl() => $"{Options.Value.IdServerBaseUrl}/{realmsState.Value.ActiveRealm}/.well-known/openid-configuration";
-    public string GetFederationMetadataUrl() => $"{Options.Value.IdServerBaseUrl}/{realmsState.Value.ActiveRealm}/FederationMetadata/2007-06/FederationMetadata.xml";
-    public string GetSCIMSchemasUrl() => $"{Options.Value.SCIMUrl}/Schemas";
+    string GetOpenIdConnectUrl() => $"{Options.Value.IdServerBaseUrl}/{realmsState.Value.ActiveRealm}/.well-known/openid-configuration";
+    string GetFederationMetadataUrl() => $"{Options.Value.IdServerBaseUrl}/{realmsState.Value.ActiveRealm}/FederationMetadata/2007-06/FederationMetadata.xml";
+    string GetSCIMSchemasUrl() => $"{Options.Value.SCIMUrl}/Schemas";
 
     void AddRealm()
     {

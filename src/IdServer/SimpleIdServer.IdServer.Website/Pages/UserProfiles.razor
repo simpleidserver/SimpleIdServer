@@ -9,30 +9,33 @@
 
 <p class="text-muted">List of external identification providers (such as Facebook and Google) linked to the user's profile.</p>
 
-<RadzenDataGrid AllowFiltering="true" 
-        AllowColumnResize="true"
-        AllowAlternatingRows="false" 
-        AllowSorting="true" 
-        PageSize="30" 
-        AllowPaging="true" 
-        PagerHorizontalAlign="HorizontalAlign.Left" 
-        ShowPagingSummary="true"
-        IsLoading="@updateUserState.Value.IsUpdating"
-        Count="@User.ExternalAuthProviders.Count"
-        Data="@User.ExternalAuthProviders"
-        TItem="UserExternalAuthProvider" 
-        ColumnWidth="300px">
-    <Columns>
-        <RadzenDataGridColumn TItem="UserExternalAuthProvider" Property="Scheme" Title="Name" Filterable="false" Sortable="false" Width="80px" />
-        <RadzenDataGridColumn TItem="UserExternalAuthProvider" Property="Subject" Title="Login" Filterable="false" Sortable="false" Width="80px" />
-        <RadzenDataGridColumn TItem="UserExternalAuthProvider" Property="CreateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Created at" Width="80px" />
-        <RadzenDataGridColumn TItem="UserExternalAuthProvider" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
-            <Template Context="data">
-                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
-            </Template>
-        </RadzenDataGridColumn>
-    </Columns>
-</RadzenDataGrid>
+@if(User != null)
+{
+    <RadzenDataGrid AllowFiltering="true" 
+            AllowColumnResize="true"
+            AllowAlternatingRows="false" 
+            AllowSorting="true" 
+            PageSize="30" 
+            AllowPaging="true" 
+            PagerHorizontalAlign="HorizontalAlign.Left" 
+            ShowPagingSummary="true"
+            IsLoading="@updateUserState.Value.IsUpdating"
+            Count="@User.ExternalAuthProviders.Count"
+            Data="@User.ExternalAuthProviders"
+            TItem="UserExternalAuthProvider" 
+            ColumnWidth="300px">
+        <Columns>
+            <RadzenDataGridColumn TItem="UserExternalAuthProvider" Property="Scheme" Title="Name" Filterable="false" Sortable="false" Width="80px" />
+            <RadzenDataGridColumn TItem="UserExternalAuthProvider" Property="Subject" Title="Login" Filterable="false" Sortable="false" Width="80px" />
+            <RadzenDataGridColumn TItem="UserExternalAuthProvider" Property="CreateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Created at" Width="80px" />
+            <RadzenDataGridColumn TItem="UserExternalAuthProvider" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+                <Template Context="data">
+                    <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>    
+}
 
 @code {
     [Parameter]

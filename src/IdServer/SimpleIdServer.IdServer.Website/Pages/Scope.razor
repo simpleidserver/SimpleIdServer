@@ -9,65 +9,58 @@
 @inject IState<ScopeState> scopeState
 @inject IDispatcher dispatcher
 
-@if (scopeState.Value.IsLoading)
-{    
-    <RadzenText class="mt-3 mb-3" Text="Wait..." TextStyle="TextStyle.DisplayH3" />
-}
-else
-{
-    <RadzenBreadCrumb>
-        <RadzenBreadCrumbItem Path="/scopes" Text="Scopes" />
-        <RadzenBreadCrumbItem Text="Scope details" />
-    </RadzenBreadCrumb>
+<RadzenBreadCrumb>
+    <RadzenBreadCrumbItem Path="/scopes" Text="Scopes" />
+    <RadzenBreadCrumbItem Text="Scope details" />
+</RadzenBreadCrumb>
 
-    <RadzenText class="mt-3 mb-3 no-margin" Text="@scopeState.Value.Scope?.Name" TextStyle="TextStyle.DisplayH3" />
+<RadzenText class="mt-3 mb-3 no-margin" Text="@scopeState.Value.Scope?.Name" TextStyle="TextStyle.DisplayH3" />
 
-    <div class="mb-1">
-        @if (scopeState.Value.Scope.Type == ScopeTypes.IDENTITY)
-        {
-            <RadzenBadge Text="Identity Scope" IsPill="true" />
-        }
-        else
-        {
-            <RadzenBadge Text="API Scope" IsPill="true" />
-        }
+<div class="mb-1">
+    @if (scopeState.Value.Scope.Type == ScopeTypes.IDENTITY)
+    {
+        <RadzenBadge Text="Identity Scope" IsPill="true" />
+    }
+    else
+    {
+        <RadzenBadge Text="API Scope" IsPill="true" />
+    }
 
-        @if (scopeState.Value.Scope.Protocol == ScopeProtocols.OPENID)
-        {
-            <RadzenBadge Text="OPENID" IsPill="true" />
-        }
-        else if (scopeState.Value.Scope.Protocol == ScopeProtocols.SAML)
-        {
-            <RadzenBadge Text="SAML" IsPill="true" />
-        }
-        else if (scopeState.Value.Scope.Protocol == ScopeProtocols.OAUTH)
-        {
-            <RadzenBadge Text="OAUTH" IsPill="true" />
-        }
-    </div>
+    @if (scopeState.Value.Scope.Protocol == ScopeProtocols.OPENID)
+    {
+        <RadzenBadge Text="OPENID" IsPill="true" />
+    }
+    else if (scopeState.Value.Scope.Protocol == ScopeProtocols.SAML)
+    {
+        <RadzenBadge Text="SAML" IsPill="true" />
+    }
+    else if (scopeState.Value.Scope.Protocol == ScopeProtocols.OAUTH)
+    {
+        <RadzenBadge Text="OAUTH" IsPill="true" />
+    }
+</div>
 
-    <RadzenCard>
-        <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
-            <Tabs>
-                <RadzenTabsItem Text="Details">
-                    <ScopeSettings Scope="@scopeState.Value.Scope"></ScopeSettings>
+<RadzenCardLoader Variant="Variant.Filled" IsLoading=scopeState.Value.IsLoading>
+    <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
+        <Tabs>
+            <RadzenTabsItem Text="Details">
+                <ScopeSettings Scope="@scopeState.Value.Scope"></ScopeSettings>
+            </RadzenTabsItem>
+            @if (scopeState.Value.Scope.Type == ScopeTypes.IDENTITY)
+            {
+                <RadzenTabsItem Text="Mappers">
+                    <ScopeMappers Scope="@scopeState.Value.Scope"></ScopeMappers>
                 </RadzenTabsItem>
-                @if (scopeState.Value.Scope.Type == ScopeTypes.IDENTITY)
-                {
-                    <RadzenTabsItem Text="Mappers">
-                        <ScopeMappers Scope="@scopeState.Value.Scope"></ScopeMappers>
-                    </RadzenTabsItem>
-                }
-                else if(scopeState.Value.Scope.Type == ScopeTypes.APIRESOURCE)
-                {
-                    <RadzenTabsItem Text="API Resources">
-                        <ScopeResources Scope="@scopeState.Value.Scope"></ScopeResources>
-                    </RadzenTabsItem>
-                }
-            </Tabs>
-        </RadzenTabs>
-    </RadzenCard>
-}
+            }
+            else if(scopeState.Value.Scope.Type == ScopeTypes.APIRESOURCE)
+            {
+                <RadzenTabsItem Text="API Resources">
+                    <ScopeResources Scope="@scopeState.Value.Scope"></ScopeResources>
+                </RadzenTabsItem>
+            }
+        </Tabs>
+    </RadzenTabs>
+</RadzenCardLoader>
 
 @code {
     Dictionary<string, (int, IEnumerable<ScopeTypes>)> mappingActionNameToIndex = new Dictionary<string, (int, IEnumerable<ScopeTypes>)>

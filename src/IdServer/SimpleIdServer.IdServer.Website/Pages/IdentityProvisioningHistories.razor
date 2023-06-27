@@ -12,53 +12,56 @@
 
 <p class="text-muted">Execution history.</p>
 
-<RadzenDataGrid AllowFiltering="true" 
-        AllowColumnResize="true"
-        AllowAlternatingRows="false" 
-        AllowSorting="true" 
-        PageSize="30" 
-        AllowPaging="true" 
-        PagerHorizontalAlign="HorizontalAlign.Left" 
-        ShowPagingSummary="true"
-        IsLoading="@updateUserState.Value.IsUpdating"
-        Count="@IdentityProvisioning.Histories.Count"
-        Data="@IdentityProvisioning.Histories"
-        TItem="IdentityProvisioningHistory" 
-        ColumnWidth="300px">
-    <Columns>
-        <RadzenDataGridColumn TItem="IdentityProvisioningHistory" Property="StartDateTime" Title="Start" Filterable="false" Sortable="true" SortOrder="SortOrder.Descending" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" />
-        <RadzenDataGridColumn TItem="IdentityProvisioningHistory" Property="EndDateTime" Title="End" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" />
-        <RadzenDataGridColumn TItem="IdentityProvisioningHistory" Property="NbRepresentations" Title="Number of extracted representations" Filterable="false" Sortable="false" Width="80px" />
-        <RadzenDataGridColumn TItem="IdentityProvisioningHistory" Title="Status" Filterable="false" Sortable="false" Width="80px">
-            <Template Context="data">
-                @if (data.Status == IdentityProvisioningHistoryStatus.IMPORT)
-                {                    
-                    <RadzenBadge Text="Imported" IsPill="true" BadgeStyle="BadgeStyle.Success"></RadzenBadge>
-                }
-                else if (data.Status == IdentityProvisioningHistoryStatus.START)
-                {
-                    <RadzenBadge Text="Started" IsPill="true" BadgeStyle="BadgeStyle.Info"></RadzenBadge>
-                }
-                else if (data.Status == IdentityProvisioningHistoryStatus.EXPORT)
-                {
-                    <RadzenBadge Text="Exported" IsPill="true" BadgeStyle="BadgeStyle.Info"></RadzenBadge>
-                }
-                else if(data.Status == IdentityProvisioningHistoryStatus.ERROR)
-                {
-                    <RadzenBadge Text="Failed to extract" IsPill="true" BadgeStyle="BadgeStyle.Danger"></RadzenBadge>
-                }
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="IdentityProvisioningHistory" Title="Error Message" Filterable="false" Sortable="false" Width="80px">
-            <Template Context="data">
-                @if (!string.IsNullOrWhiteSpace(data.ErrorMessage))
-                {
-                    <RadzenButton Icon="search" Click="@(args => ShowAudit(data))" />
-                }
-            </Template>
-        </RadzenDataGridColumn>
-    </Columns>
-</RadzenDataGrid>
+@if(IdentityProvisioning != null)
+{
+    <RadzenDataGrid AllowFiltering="true"
+                AllowColumnResize="true"
+                AllowAlternatingRows="false"
+                AllowSorting="true"
+                PageSize="30"
+                AllowPaging="true"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="true"
+                IsLoading="@updateUserState.Value.IsUpdating"
+                Count="@IdentityProvisioning.Histories.Count"
+                Data="@IdentityProvisioning.Histories"
+                TItem="IdentityProvisioningHistory"
+                ColumnWidth="300px">
+        <Columns>
+            <RadzenDataGridColumn TItem="IdentityProvisioningHistory" Property="StartDateTime" Title="Start" Filterable="false" Sortable="true" SortOrder="SortOrder.Descending" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" />
+            <RadzenDataGridColumn TItem="IdentityProvisioningHistory" Property="EndDateTime" Title="End" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" />
+            <RadzenDataGridColumn TItem="IdentityProvisioningHistory" Property="NbRepresentations" Title="Number of extracted representations" Filterable="false" Sortable="false" Width="80px" />
+            <RadzenDataGridColumn TItem="IdentityProvisioningHistory" Title="Status" Filterable="false" Sortable="false" Width="80px">
+                <Template Context="data">
+                    @if (data.Status == IdentityProvisioningHistoryStatus.IMPORT)
+                    {
+                        <RadzenBadge Text="Imported" IsPill="true" BadgeStyle="BadgeStyle.Success"></RadzenBadge>
+                    }
+                    else if (data.Status == IdentityProvisioningHistoryStatus.START)
+                    {
+                        <RadzenBadge Text="Started" IsPill="true" BadgeStyle="BadgeStyle.Info"></RadzenBadge>
+                    }
+                    else if (data.Status == IdentityProvisioningHistoryStatus.EXPORT)
+                    {
+                        <RadzenBadge Text="Exported" IsPill="true" BadgeStyle="BadgeStyle.Info"></RadzenBadge>
+                    }
+                    else if (data.Status == IdentityProvisioningHistoryStatus.ERROR)
+                    {
+                        <RadzenBadge Text="Failed to extract" IsPill="true" BadgeStyle="BadgeStyle.Danger"></RadzenBadge>
+                    }
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="IdentityProvisioningHistory" Title="Error Message" Filterable="false" Sortable="false" Width="80px">
+                <Template Context="data">
+                    @if (!string.IsNullOrWhiteSpace(data.ErrorMessage))
+                    {
+                        <RadzenButton Icon="search" Click="@(args => ShowAudit(data))" />
+                    }
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+}
 
 @code {
     [Parameter]

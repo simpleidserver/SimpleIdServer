@@ -62,8 +62,8 @@
                                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Redirection URLs</RadzenText>
                                 <RadzenTextBox Name="RedirectionUris" @bind-Value="@spaApplication.RedirectionUris" Class="w-100"></RadzenTextBox>
                                 <p class="text-muted">
-                                    Redirection URLs must be passed as a list of URL separated by <b>;</b>. <br />
-                                    URL must be valid and must not contain fragment for example (http://localhost#fragment)
+                                    Redirection URLs must be passed as a list of URLs separated by <b>;</b>. <br />
+                                    URLs must be valid and must not contain fragments, for example (http://localhost#fragment)
                                 </p>
                                 <RadzenRequiredValidator Component="RedirectionUris" Text="At leat one redirection URL must be specified"></RadzenRequiredValidator>
                             </div>
@@ -119,8 +119,8 @@
                                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Redirection URLs</RadzenText>
                                 <RadzenTextBox Name="RedirectionUris" @bind-Value="@websiteApplication.RedirectionUris" Class="w-100"></RadzenTextBox>
                                 <p class="text-muted">
-                                    Redirection URLs must be passed as a list of URL separated by <b>;</b>. <br />
-                                    URL must be valid and must not contain fragment for example (http://localhost#fragment)
+                                    Redirection URLs must be passed as a list of URLs separated by <b>;</b>. <br />
+                                    URLs must be valid and must not contain fragments, for example (http://localhost#fragment)
                                 </p>
                                 <RadzenRequiredValidator Component="RedirectionUris" Text="At leat one redirection URL must be specified"></RadzenRequiredValidator>
                             </div>
@@ -146,16 +146,16 @@
                             @if (websiteApplication.IsFAPICompliant)
                             {
                                 <RadzenAlert AlertStyle="AlertStyle.Info" ShowIcon="false" Variant="Variant.Flat" AllowClose="false" Shade="Shade.Lighter">
-                                    Client will be configured to use <b>tls_client_auth</b> authentication method. <br />
+                                    The client will be configured to use <b>tls_client_auth</b> authentication method. <br />
                                     A Signature Key with algorithm <b>ES256</b> will be added. <br />
-                                    The <b>authorization_signed_response_alg</b> will be set to <b>ES256</b>, this value is used by Identity Server during the generation of the authorization response (JARM).
+                                    The <b>authorization_signed_response_alg</b> will be set to <b>ES256</b>. This value is used by Identity Server during the generation of the authorization response (JARM).
                                 </RadzenAlert>
                                 <div>                                    
                                     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Subject Name</RadzenText>
                                     <RadzenTextBox Name="SubjectName" @bind-Value="@websiteApplication.SubjectName" Class="w-100"></RadzenTextBox>
                                     <p class="text-muted">
                                         MTLS authentication is configured by default. <br/>
-                                        Subject Name is used to check the validity of the Client Certificate.
+                                        The Subject Name is used to verify the validity of the Client Certificate.
                                     </p>
                                 </div>
                             }
@@ -183,8 +183,8 @@
                                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Redirection URLs</RadzenText>
                                 <RadzenTextBox Name="RedirectionUris" @bind-Value="@mobileApplication.RedirectionUris" Class="w-100"></RadzenTextBox>
                                 <p class="text-muted">
-                                    Redirection URLs must be passed as a list of URL separated by <b>;</b>. <br />
-                                    URL must be valid and must not contain fragment for example (http://localhost#fragment)
+                                    Redirection URLs must be passed as a list of URLs separated by <b>;</b>. <br />
+                                    URLs must be valid and must not contain fragments, for example (http://localhost#fragment)
                                 </p>
                                 <RadzenRequiredValidator Component="RedirectionUris" Text="At leat one redirection URL must be specified"></RadzenRequiredValidator>
                             </div>
@@ -230,8 +230,8 @@
                                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Subject Name</RadzenText>
                                 <RadzenTextBox Name="SubjectName" @bind-Value="@externalDeviceApplication.SubjectName" Class="w-100"></RadzenTextBox>
                                 <p class="text-muted">
-                                    By default the client is configured to use MTLS authentication. <br/>
-                                    Subject Name of the client certificate must be specified.
+                                    By default, the client is configured to use MTLS authentication. <br/>
+                                    The Subject Name of the client certificate must be specified.
                                 </p>
                                 <RadzenRequiredValidator Component="SubjectName" Text="Subject Name is required"></RadzenRequiredValidator>
                             </div>
@@ -351,20 +351,17 @@
         {
             dialogService.Close();
             notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = string.Format(Global.ClientAdded, act.ClientId) });
-            if (!string.IsNullOrWhiteSpace(act.JsonWebKeyStr))
-            {
-                await dialogService.OpenAsync<ViewGeneratedJsonWebKey>("Generated Json Web Key", new Dictionary<string, object>
-                            {
-                            { "JsonWebKeyStr", act.JsonWebKeyStr}
-                            }, new DialogOptions
-                            {
-                                Width = "700px",
-                                Height = "512px",
-                                Resizable = true,
-                                Draggable = true
-                            });
-            }
 
+            await dialogService.OpenAsync<ViewAddedClientDialog>("Client has been added", new Dictionary<string, object>
+            {
+                { "Client", act }
+            }, new DialogOptions
+            {
+                Width = "700px",
+                Height = "512px",
+                Resizable = true,
+                Draggable = true
+            });
             StateHasChanged();
         });
     }

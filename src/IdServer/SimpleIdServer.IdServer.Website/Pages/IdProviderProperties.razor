@@ -6,7 +6,10 @@
 @inject DialogService dialogService
 @inject NotificationService notificationService
 
-<EditIdProvider IdProviderSaved=@SaveIdProvider IdProvider=@IdProvider IdProviderDef=@IdProvider.AuthSchemeProviderDefinition IsAddForm=false></EditIdProvider>
+@if(IdProvider != null)
+{
+    <EditIdProvider IdProviderSaved=@SaveIdProvider IdProvider=@IdProvider IdProviderDef=@IdProvider.AuthSchemeProviderDefinition IsAddForm=false></EditIdProvider>
+}
 
 @code {
     [Parameter]

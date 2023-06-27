@@ -11,65 +11,68 @@
 
 <p class="text-muted">List of consents accepted by the user for specific clients.</p>
 
-<RadzenDataGrid AllowFiltering="true" 
-        AllowColumnResize="true"
-        AllowAlternatingRows="false" 
-        AllowSorting="true" 
-        PageSize="30" 
-        AllowPaging="true" 
-        PagerHorizontalAlign="HorizontalAlign.Left" 
-        ShowPagingSummary="true"
-        IsLoading="@updateUserState.Value.IsUpdating"
-        Count="@User.Consents.Count"
-        Data="@User.Consents"
-        TItem="Consent" 
-        ColumnWidth="300px">
-    <Columns>
-        <RadzenDataGridColumn TItem="Consent" Property="ClientId" Title="Client" Filterable="false" Sortable="false" Width="80px" />
-        <RadzenDataGridColumn TItem="Consent" Title="Status" Filterable="false" Sortable="false" Width="80px">
-            <Template Context="data">
-                @if(data.Status == ConsentStatus.PENDING)
-                {                    
-                    <RadzenBadge Text="Pending" IsPill="true" BadgeStyle="BadgeStyle.Danger"></RadzenBadge>
-                }
-                else
-                {
-                    <RadzenBadge Text="Confirmed" IsPill="true" BadgeStyle="BadgeStyle.Success"></RadzenBadge>
-                }
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Consent" Title="Scopes" Filterable="false" Sortable="false" Width="80px">
-            <Template Context="data">
-                @foreach(var scope in data.Scopes)
-                {
-                    <RadzenBadge Text="@scope.Scope" IsPill="true" />
-                }
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Consent" Title="Claims" Filterable="false" Sortable="false" Width="80px">
-            <Template Context="data">
-                @foreach (var claim in data.Claims.Where(c => !string.IsNullOrWhiteSpace(c)))
-                {
-                    <RadzenBadge Text="@claim" IsPill="true" />
-                }
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Consent" Title="Authorization Details" Filterable="false" Sortable="false" Width="80px">
-            <Template Context="data">
-                @foreach (var authData in data.AuthorizationDetails)
-                {
-                    <RadzenBadge Text="@(authData.Type + ": " + ( (authData.Actions == null || !authData.Actions.Any()) ? string.Empty : string.Join(";", authData.Actions)))" IsPill="true" />
-                }
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Consent" Property="UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Created at" Width="80px" />
-        <RadzenDataGridColumn TItem="Consent" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
-            <Template Context="data">
-                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
-            </Template>
-        </RadzenDataGridColumn>
-    </Columns>
-</RadzenDataGrid>
+@if(User != null)
+{
+    <RadzenDataGrid AllowFiltering="true" 
+            AllowColumnResize="true"
+            AllowAlternatingRows="false" 
+            AllowSorting="true" 
+            PageSize="30" 
+            AllowPaging="true" 
+            PagerHorizontalAlign="HorizontalAlign.Left" 
+            ShowPagingSummary="true"
+            IsLoading="@updateUserState.Value.IsUpdating"
+            Count="@User.Consents.Count"
+            Data="@User.Consents"
+            TItem="Consent" 
+            ColumnWidth="300px">
+        <Columns>
+            <RadzenDataGridColumn TItem="Consent" Property="ClientId" Title="Client" Filterable="false" Sortable="false" Width="80px" />
+            <RadzenDataGridColumn TItem="Consent" Title="Status" Filterable="false" Sortable="false" Width="80px">
+                <Template Context="data">
+                    @if(data.Status == ConsentStatus.PENDING)
+                    {                    
+                        <RadzenBadge Text="Pending" IsPill="true" BadgeStyle="BadgeStyle.Danger"></RadzenBadge>
+                    }
+                    else
+                    {
+                        <RadzenBadge Text="Confirmed" IsPill="true" BadgeStyle="BadgeStyle.Success"></RadzenBadge>
+                    }
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Consent" Title="Scopes" Filterable="false" Sortable="false" Width="80px">
+                <Template Context="data">
+                    @foreach(var scope in data.Scopes)
+                    {
+                        <RadzenBadge Text="@scope.Scope" IsPill="true" />
+                    }
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Consent" Title="Claims" Filterable="false" Sortable="false" Width="80px">
+                <Template Context="data">
+                    @foreach (var claim in data.Claims.Where(c => !string.IsNullOrWhiteSpace(c)))
+                    {
+                        <RadzenBadge Text="@claim" IsPill="true" />
+                    }
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Consent" Title="Authorization Details" Filterable="false" Sortable="false" Width="80px">
+                <Template Context="data">
+                    @foreach (var authData in data.AuthorizationDetails)
+                    {
+                        <RadzenBadge Text="@(authData.Type + ": " + ( (authData.Actions == null || !authData.Actions.Any()) ? string.Empty : string.Join(";", authData.Actions)))" IsPill="true" />
+                    }
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Consent" Property="UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Created at" Width="80px" />
+            <RadzenDataGridColumn TItem="Consent" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+                <Template Context="data">
+                    <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+}
 
 @code {
     [Parameter]

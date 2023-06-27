@@ -12,20 +12,16 @@
 @inject IState<ScopeState> scopeState
 @inject NotificationService notificationService
 
-@if (scopeState.Value.IsLoading || string.IsNullOrWhiteSpace(name))
-{
-    <RadzenText class="mt-3 mb-3" Text="Wait..." TextStyle="TextStyle.DisplayH6" />
-}
-else
-{
-    <RadzenBreadCrumb>
-        <RadzenBreadCrumbItem Path="/scopes" Text="Scopes" />
-        <RadzenBreadCrumbItem Path=@("/scopes/" + id + "/mappers") Text="Scope details" />
-        <RadzenBreadCrumbItem Text="Mapper details" />
-    </RadzenBreadCrumb>
+<RadzenBreadCrumb>
+    <RadzenBreadCrumbItem Path="/scopes" Text="Scopes" />
+    <RadzenBreadCrumbItem Path=@("/scopes/" + id + "/mappers") Text="Scope details" />
+    <RadzenBreadCrumbItem Text="Mapper details" />
+</RadzenBreadCrumb>
 
-    <RadzenCard class="m-3">
-        @switch (mapper.MapperType)
+<RadzenCardLoader class="m-3" Variant=Variant.Filled IsLoading=@scopeState.Value.IsLoading>
+    @if(mapper != null)
+    {
+        switch (mapper.MapperType)
         {
             case MappingRuleTypes.USERATTRIBUTE:
                 <UserAttributeScopeMapper ScopeMapperSaved="UpdateScopeMapper" Scope="@scopeState.Value.Scope" ClaimMapper="@mapper" IsEditModeEnabled="true"></UserAttributeScopeMapper>
@@ -39,28 +35,31 @@ else
                     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
                     <RadzenTextBox Name="Name" @bind-Value="@mapper.Name" Class="w-100" Disabled="true"></RadzenTextBox>
                 </div>
-                @if (scopeState.Value.Scope.Protocol == ScopeProtocols.OPENID)
+                @if (scopeState.Value.Scope != null)
                 {
-                    <!-- Token Claim Name -->
-                    <div>
-                        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Token Claim Name</RadzenText>
-                        <RadzenTextBox Name="TokenClaimName" @bind-Value="@mapper.TargetClaimPath" Class="w-100" Disabled=true></RadzenTextBox>
-                        <p class="text-muted">Name of the claim to insert into the token</p>
-                    </div>
-                }
-                else
-                {
-                    <!-- Token Claim Name -->
-                    <div>
-                        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">SAML Attribute Name</RadzenText>
-                        <RadzenTextBox Name="SAMLAttributeName" @bind-Value="@mapper.SAMLAttributeName" Class="w-100"></RadzenTextBox>
-                        <p class="text-muted">SAML Attribute Name</p>
-                    </div>
+                    if (scopeState.Value.Scope.Protocol == ScopeProtocols.OPENID)
+                    {
+                        <!-- Token Claim Name -->
+                        <div>
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Token Claim Name</RadzenText>
+                            <RadzenTextBox Name="TokenClaimName" @bind-Value="@mapper.TargetClaimPath" Class="w-100" Disabled=true></RadzenTextBox>
+                            <p class="text-muted">Name of the claim to insert into the token</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- Token Claim Name -->
+                        <div>
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">SAML Attribute Name</RadzenText>
+                            <RadzenTextBox Name="SAMLAttributeName" @bind-Value="@mapper.SAMLAttributeName" Class="w-100"></RadzenTextBox>
+                            <p class="text-muted">SAML Attribute Name</p>
+                        </div>
+                    }
                 }
                 break;
-        }
-    </RadzenCard>
-}
+        }        
+    }
+</RadzenCardLoader>
 
 
 @code {
@@ -68,7 +67,7 @@ else
     public string id { get; set; } = null!;
     [Parameter]
     public string name { get; set; } = null!;
-    ScopeClaimMapper mapper => scopeState.Value.Scope.ClaimMappers.Single(m => m.Name == name);
+    ScopeClaimMapper mapper => scopeState.Value.Scope?.ClaimMappers.SingleOrDefault(m => m.Name == name);
 
     protected override void OnAfterRender(bool firstRender)
     {

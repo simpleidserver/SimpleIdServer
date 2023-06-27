@@ -1,29 +1,24 @@
 ﻿@page "/groups/{id}/{action}"
-@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inherits Fluxor.Blazor.Web.Components.FluxorLayout
 @using Microsoft.EntityFrameworkCore;
 @using SimpleIdServer.IdServer.Store;
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.GroupStore;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
-@inject IDispatcher dispatcher
+@layout MainLayout
 @inject DialogService dialogService
 @inject NavigationManager navigationManager
 @inject NotificationService notificationService
+@inject IDispatcher dispatcher
 @inject IGroupRepository groupRepository
 @inject IState<GroupState> groupState
 
-@if(groupState.Value.IsLoading)
-{
-    <RadzenText class="mt-3 mb-3" Text="Wait..." TextStyle="TextStyle.DisplayH3" />
-}
-else
-{
     <RadzenBreadCrumb>
         <RadzenBreadCrumbItem Path="/groups" Text="Groups" />
         <RadzenBreadCrumbItem Text="Group details" />
     </RadzenBreadCrumb>
 
-    <RadzenText class="mt-3 mb-3 no-margin" Text="@groupState.Value.Group.Name" TextStyle="TextStyle.DisplayH3" />
+    <RadzenText class="mt-3 mb-3 no-margin" Text="@groupState.Value.Group?.Name" TextStyle="TextStyle.DisplayH3" />
 
     <RadzenBreadCrumb>
         @foreach (var groupName in groupNames)
@@ -32,6 +27,7 @@ else
         }
     </RadzenBreadCrumb>
 
+<RadzenCardLoader Variant="Variant.Filled" IsLoading=@groupState.Value.IsLoading>
     <RadzenSplitter>
         <RadzenSplitterPane Size="10%">
             <RadzenTree Expand="@OnExpand" Data=@groups>
@@ -40,22 +36,20 @@ else
         </RadzenSplitterPane>
         <RadzenSplitterPane>
             <div class="ml-3">
-                <RadzenCard>
-                    <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
-                        <Tabs>
-                            <RadzenTabsItem Text="Children">
-                                <GroupChildren Group="@groupState.Value.Group"></GroupChildren>
-                            </RadzenTabsItem>
-                            <RadzenTabsItem Text="Roles">
-                                <GroupRoles Group="@groupState.Value.Group"></GroupRoles>
-                            </RadzenTabsItem>
-                        </Tabs>
-                    </RadzenTabs>
-                </RadzenCard>
+                <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
+                    <Tabs>
+                        <RadzenTabsItem Text="Children">
+                            <GroupChildren Group="@groupState.Value.Group"></GroupChildren>
+                        </RadzenTabsItem>
+                        <RadzenTabsItem Text="Roles">
+                            <GroupRoles Group="@groupState.Value.Group"></GroupRoles>
+                        </RadzenTabsItem>
+                    </Tabs>
+                </RadzenTabs>
             </div>
         </RadzenSplitterPane>
     </RadzenSplitter>
-}
+</RadzenCardLoader>
 
 @code {
     ICollection<SimpleIdServer.IdServer.Domains.Group> groups;

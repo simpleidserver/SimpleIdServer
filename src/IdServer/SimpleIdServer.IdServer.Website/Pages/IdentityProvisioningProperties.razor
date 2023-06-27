@@ -6,7 +6,7 @@
 @inject DialogService dialogService
 @inject NotificationService notificationService
 
-<EditIdentityProvisioning IdProvisioningSaved=@SaveIdProvisioning IdProvisioning=@IdProvisioning IdProvisioningDef=@IdProvisioning.Definition IsAddForm=false />
+<EditIdentityProvisioning IdProvisioningSaved=@SaveIdProvisioning IdProvisioning=@IdProvisioning IdProvisioningDef=@IdProvisioning?.Definition IsAddForm=false />
 
 @code {
     [Parameter]

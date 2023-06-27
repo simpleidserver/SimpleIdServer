@@ -36,6 +36,7 @@
     }
     <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateScopeState.Value.IsUpdating ? "Updating..." : "Update")" Disabled=@updateScopeState.Value.IsUpdating />
 </RadzenTemplateForm>
+
 @code {
     [Parameter]
     public SimpleIdServer.IdServer.Domains.Scope Scope { get; set; }
