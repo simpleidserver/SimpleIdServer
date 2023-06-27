@@ -3,8 +3,9 @@
 
 namespace SimpleIdServer.IdServer.ExternalEvents
 {
-    public class UpdateUserCredentialSuccessEvent
+    public class UpdateUserCredentialSuccessEvent : IExternalEvent
     {
+        public string EventName => nameof(UpdateUserCredentialSuccessEvent);
         public string Realm { get; set; }
         public string Name { get; set; }
         public string Type { get; set; }

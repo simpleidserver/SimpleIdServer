@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Email.UI.Services;
 using SimpleIdServer.IdServer.Email.UI.ViewModels;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
@@ -108,6 +109,12 @@ namespace SimpleIdServer.IdServer.Email.UI
                     catch (BaseUIException ex)
                     {
                         ModelState.AddModelError(ex.Code, ex.Code);
+                        await Bus.Publish(new UserLoginFailureEvent
+                        {
+                            Realm = prefix,
+                            Amr = Constants.AMR,
+                            Login = viewModel.Email
+                        });
                         return View(viewModel);
                     }
             }

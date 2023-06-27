@@ -43,6 +43,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 var auditEvt = new AuditEvent
                 {
                     Id = Guid.NewGuid().ToString(),
+                    EventName = context.Message.EventName,
                     Description = "Authorization Failed",
                     CreateDateTime = DateTime.UtcNow,
                     Realm = context.Message.Realm,
@@ -64,6 +65,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 var auditEvt = new AuditEvent
                 {
                     Id = Guid.NewGuid().ToString(),
+                    EventName = context.Message.EventName,
                     Description = "Authorization Success",
                     CreateDateTime = DateTime.UtcNow,
                     ClientId = context.Message.ClientId,
@@ -85,6 +87,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 var auditEvt = new AuditEvent
                 {
                     Id = Guid.NewGuid().ToString(),
+                    EventName = context.Message.EventName,
                     Description = "Client Authentication Success",
                     CreateDateTime = DateTime.UtcNow,
                     ClientId = context.Message.ClientId,
@@ -105,6 +108,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 var auditEvt = new AuditEvent
                 {
                     Id = Guid.NewGuid().ToString(),
+                    EventName = context.Message.EventName,
                     Description = "Client Registration Success",
                     CreateDateTime = DateTime.UtcNow,
                     RequestJSON = context.Message.RequestJSON,
@@ -124,6 +128,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 var auditEvt = new AuditEvent
                 {
                     Id = Guid.NewGuid().ToString(),
+                    EventName = context.Message.EventName,
                     Description = "Consent Revoked",
                     ClientId = context.Message.ClientId,
                     Scopes = context.Message.Scopes == null ? new string[0] : context.Message.Scopes.ToArray(),
@@ -146,6 +151,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 var auditEvt = new AuditEvent
                 {
                     Id = Guid.NewGuid().ToString(),
+                    EventName = context.Message.EventName,
                     Description = "User Login Success",
                     CreateDateTime = DateTime.UtcNow,
                     UserName = context.Message.UserName,
@@ -165,6 +171,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 var auditEvt = new AuditEvent
                 {
                     Id = Guid.NewGuid().ToString(),
+                    EventName = context.Message.EventName,
                     Description = "Client Registration Failed",
                     CreateDateTime = DateTime.UtcNow,
                     RequestJSON = context.Message.RequestJSON,
@@ -185,6 +192,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 var auditEvt = new AuditEvent
                 {
                     Id = Guid.NewGuid().ToString(),
+                    EventName = context.Message.EventName,
                     Description = "Client Authentication Failed",
                     ClientId = context.Message.ClientId,
                     AuthMethod = context.Message.AuthMethod,
@@ -205,6 +213,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 var auditEvt = new AuditEvent
                 {
                     Id = Guid.NewGuid().ToString(),
+                    EventName = context.Message.EventName,
                     Description = "Token Introspection Failed",
                     CreateDateTime = DateTime.UtcNow,
                     ClientId = context.Message.ClientId,
@@ -225,6 +234,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 var auditEvt = new AuditEvent
                 {
                     Id = Guid.NewGuid().ToString(),
+                    EventName = context.Message.EventName,
                     Description = "Consent Granted",
                     UserName = context.Message.UserName,
                     ClientId = context.Message.ClientId,
@@ -247,6 +257,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 var auditEvt = new AuditEvent
                 {
                     Id = Guid.NewGuid().ToString(),
+                    EventName = context.Message.EventName,
                     Description = "Token Issued Failed",
                     Scopes = context.Message.Scopes == null ? new string[0] : context.Message.Scopes.ToArray(),
                     ClientId = context.Message.ClientId,
@@ -268,6 +279,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 var auditEvt = new AuditEvent
                 {
                     Id = Guid.NewGuid().ToString(),
+                    EventName = context.Message.EventName,
                     Description = "Token Introspection Success",
                     ClientId = context.Message.ClientId,
                     CreateDateTime = DateTime.UtcNow,
@@ -287,6 +299,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 var auditEvt = new AuditEvent
                 {
                     Id = Guid.NewGuid().ToString(),
+                    EventName = context.Message.EventName,
                     Description = "Token Issued Success",
                     ClientId = context.Message.ClientId,
                     Scopes = context.Message.Scopes == null ? new string[0] : context.Message.Scopes.ToArray(),
@@ -307,6 +320,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 var auditEvt = new AuditEvent
                 {
                     Id = Guid.NewGuid().ToString(),
+                    EventName = context.Message.EventName,
                     Description = "Token Revoked Success",
                     CreateDateTime = DateTime.UtcNow,
                     Realm = context.Message.Realm,
@@ -325,6 +339,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 var auditEvt = new AuditEvent
                 {
                     Id = Guid.NewGuid().ToString(),
+                    EventName = context.Message.EventName,
                     Description = "Token Revoked Failure",
                     CreateDateTime = DateTime.UtcNow,
                     Realm = context.Message.Realm,
@@ -344,6 +359,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 var auditEvt = new AuditEvent
                 {
                     Id = Guid.NewGuid().ToString(),
+                    EventName = context.Message.EventName,
                     ClientId = context.Message.ClientId,
                     UserName = context.Message.UserName,
                     Scopes = context.Message.Scopes == null ? new string[0] : context.Message.Scopes.ToArray(),
@@ -366,6 +382,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 var auditEvt = new AuditEvent
                 {
                     Id = Guid.NewGuid().ToString(),
+                    EventName = context.Message.EventName,
                     ClientId = context.Message.ClientId,
                     UserName = context.Message.UserName,
                     Scopes = context.Message.Scopes == null ? new string[0] : context.Message.Scopes.ToArray(),
@@ -387,6 +404,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 var auditEvt = new AuditEvent
                 {
                     Id = Guid.NewGuid().ToString(),
+                    EventName = context.Message.EventName,
                     Description = "UserInfo Logout",
                     UserName = context.Message.UserName,
                     CreateDateTime = DateTime.UtcNow,
@@ -406,6 +424,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 var auditEvt = new AuditEvent
                 {
                     Id = Guid.NewGuid().ToString(),
+                    EventName = context.Message.EventName,
                     Description = "Pushed Authorization Failed",
                     CreateDateTime = DateTime.UtcNow,
                     Realm = context.Message.Realm,
@@ -427,6 +446,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 var auditEvt = new AuditEvent
                 {
                     Id = Guid.NewGuid().ToString(),
+                    EventName = context.Message.EventName,
                     Description = "Pushed Authorization Success",
                     CreateDateTime = DateTime.UtcNow,
                     ClientId = context.Message.ClientId,
@@ -448,6 +468,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 var auditEvt = new AuditEvent
                 {
                     Id = Guid.NewGuid().ToString(),
+                    EventName = context.Message.EventName,
                     Description = $"{context.Message.NbUsers} users have been imported",
                     CreateDateTime = DateTime.UtcNow,
                     Realm = context.Message.Realm,
@@ -466,6 +487,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 var auditEvt = new AuditEvent
                 {
                     Id = Guid.NewGuid().ToString(),
+                    EventName = context.Message.EventName,
                     Description = $"Extract {context.Message.NbRepresentations} users from {context.Message.IdentityProvisioningName}",
                     CreateDateTime = DateTime.UtcNow,
                     Realm = context.Message.Realm,
@@ -484,6 +506,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 var auditEvt = new AuditEvent
                 {
                     Id = Guid.NewGuid().ToString(),
+                    EventName = context.Message.EventName,
                     Description = $"Fail to extract users from {context.Message.IdentityProvisioningName}",
                     CreateDateTime = DateTime.UtcNow,
                     Realm = context.Message.Realm,
@@ -503,6 +526,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 var auditEvt = new AuditEvent
                 {
                     Id = Guid.NewGuid().ToString(),
+                    EventName = context.Message.EventName,
                     Description = $"User with the name '{context.Message.Name}' has been added",
                     CreateDateTime = DateTime.UtcNow,
                     Realm = context.Message.Realm,
@@ -522,6 +546,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 var auditEvt = new AuditEvent
                 {
                     Id = Guid.NewGuid().ToString(),
+                    EventName = context.Message.EventName,
                     Description = $"User with the name '{context.Message.Name}' has been removed",
                     CreateDateTime = DateTime.UtcNow,
                     Realm = context.Message.Realm,
@@ -540,6 +565,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 var auditEvt = new AuditEvent
                 {
                     Id = Guid.NewGuid().ToString(),
+                    EventName = context.Message.EventName,
                     Description = "Device Authorization Success",
                     CreateDateTime = DateTime.UtcNow,
                     ClientId = context.Message.ClientId,
@@ -560,6 +586,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 var auditEvt = new AuditEvent
                 {
                     Id = Guid.NewGuid().ToString(),
+                    EventName = context.Message.EventName,
                     Description = "Device Authorization Failed",
                     CreateDateTime = DateTime.UtcNow,
                     Realm = context.Message.Realm,

@@ -4,8 +4,9 @@ using System.Collections.Generic;
 
 namespace SimpleIdServer.IdServer.ExternalEvents
 {
-    public class TokenIssuedFailureEvent
+    public class TokenIssuedFailureEvent : IExternalEvent
     {
+        public string EventName => nameof(TokenIssuedFailureEvent);
         public string ClientId { get; set; }
         public IEnumerable<string> Scopes { get; set; }
         public string GrantType { get; set; }

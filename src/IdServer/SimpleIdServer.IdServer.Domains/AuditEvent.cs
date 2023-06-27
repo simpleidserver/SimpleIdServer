@@ -5,6 +5,7 @@ namespace SimpleIdServer.IdServer.Domains
     public class AuditEvent
     {
         public string Id { get; set; } = null!;
+        public string EventName { get; set; } = null!;
         public string Realm { get; set; } = null!;
         public bool IsError { get; set; }
         public string Description { get; set; } = null!;

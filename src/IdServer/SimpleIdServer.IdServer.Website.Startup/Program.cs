@@ -11,6 +11,7 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddSIDWebsite(o =>
 {
     o.IdServerBaseUrl = builder.Configuration["IdServerBaseUrl"];
+    o.SCIMUrl = builder.Configuration["ScimBaseUrl"];
 }, o =>
 {
     o.UseSqlServer(builder.Configuration.GetConnectionString("IdServer"), o =>

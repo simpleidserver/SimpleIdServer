@@ -31,8 +31,8 @@
         </div>
     </RadzenHeader>
     <RadzenSidebar @bind-Expanded="@sidebarExpanded">
-        <RadzenPanelMenu Click="@(args => ShowRealms(args))">
-            <RadzenPanelMenuItem Text=@("Active Realm : " + activeRealm) />
+        <RadzenPanelMenu>
+            <RadzenPanelMenuItem Text=@("Active Realm : " + activeRealm) Path="/realm" />
             <RadzenPanelMenuItem Text="Manage" />
             <RadzenPanelMenuItem Text="Clients" Icon="apps" Path="/clients" />
             <RadzenPanelMenuItem Text="Scopes" Icon="visibility" Path="/scopes" />
@@ -93,6 +93,7 @@
 
     async void ShowRealms(MenuItemEventArgs args)
     {
+        /*
         if (state.Value.IsLoading || args.Text != "Active Realm : " + activeRealm) return;
         await dialogService.OpenAsync<SelectRealmDialog>("Select Realm", new Dictionary<string, object>
         {
@@ -104,5 +105,6 @@
             Resizable = true,
             Draggable = true
         });
+        */
     }
 }

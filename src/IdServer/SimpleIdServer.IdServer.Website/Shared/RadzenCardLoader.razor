@@ -1,0 +1,77 @@
+﻿@inherits RadzenComponentWithChildren
+
+<style>
+    .rz-card-loader {
+        position: relative;
+    }
+
+    .rz-datatable-loading {
+        border-radius: 0.25rem;
+        padding: 1.25rem;
+        z-index: 10;
+        background-color: #ffcfaf7d;
+    }
+
+    .rz-datatable-loading-content {
+        z-index: 5;
+    }
+</style>
+
+@if (Visible)
+{
+    <div @ref="@Reference"
+     @attributes="Attributes"
+     class="@GetCssClass()"
+     style="@Style"
+     id="@GetId()">
+        @if (IsLoading)
+        {
+            <div class="rz-datatable-loading"></div>
+            <div class="rz-datatable-loading-content">
+                <RadzenIcon Icon="refresh" Style="animation: rotation 500ms linear infinite" />
+            </div>
+        }
+
+        @ChildContent
+    </div>
+}
+
+@code{
+    [Parameter]
+    public bool IsLoading { get; set; }
+    [Parameter]
+    public Variant Variant { get; set; } = Variant.Filled;
+
+    public new ElementReference Reference
+    {
+        get
+        {
+            return base.Element;
+        }
+        set
+        {
+
+            SetProperty(this, nameof(base.Element), value);
+        }
+    }
+
+    private void SetProperty(object instance, string propertyName, object newValue)
+    {
+        var type = instance.GetType();
+        var property = type.GetProperty(propertyName);
+
+        if (property != null)
+        {
+            property.SetValue(instance, newValue, null);
+        }
+    }
+
+    protected override string GetComponentCssClass()
+    {
+        var classList = new List<string>();
+        classList.Add("rz-card");
+        classList.Add("rz-card-loader");
+        classList.Add($"rz-variant-{Variant.ToString().ToLowerInvariant()}");
+        return string.Join(" ", classList);
+    }
+}

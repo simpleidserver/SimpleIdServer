@@ -5,8 +5,9 @@ using System.Collections.Generic;
 
 namespace SimpleIdServer.IdServer.ExternalEvents
 {
-    public class ConsentGrantedEvent
+    public class ConsentGrantedEvent : IExternalEvent
     {
+        public string EventName => nameof(ConsentGrantedEvent);
         public string UserName { get; set; }
         public string ClientId { get; set; }
         public IEnumerable<string> Scopes { get; set; }

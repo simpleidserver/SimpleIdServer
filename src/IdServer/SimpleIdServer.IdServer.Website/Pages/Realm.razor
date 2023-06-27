@@ -1,19 +1,34 @@
 ﻿@page "/realm"
 @using Microsoft.Extensions.Options;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
+@using SimpleIdServer.IdServer.Website.Stores.StatisticStore;
 @inject IOptions<IdServerWebsiteOptions> Options;
 @inject IState<RealmsState> realmsState
+@inject IState<StatisticsState> statisticsState
+@inject IDispatcher dispatcher
+@inject DialogService dialogService
+@inject NavigationManager navigationManager
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
+<style>
+    .red {
+        color: red;
+    }
+
+    .green {
+        color: green;
+    }
+</style>
+
 <div>
-    <RadzenButton Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="Add Realm" />
-    <RadzenButton Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="Choose Realm" />
+    <RadzenButton Click=@((args) => AddRealm()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="Add Realm" />
+    <RadzenButton Click=@((args) => ChooseRealm()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="Choose Realm" />
 </div>
 
 <RadzenRow Gap="1rem" class="mt-2">
     <!-- Servers -->
     <RadzenColumn Size="6">
-        <RadzenCard Variant="Variant.Filled">
+        <RadzenCardLoader Variant="Variant.Filled" IsLoading=false>
             <RadzenText TextStyle="TextStyle.DisplayH6">Servers</RadzenText>
             <!-- OpenID Connect -->
             <div class="row">
@@ -33,39 +48,82 @@
                     <RadzenTextBox Value=@GetFederationMetadataUrl() Class="w-100"></RadzenTextBox>
                 </div>
             </div>
-        </RadzenCard>
+            <!-- SCIM Endpoint -->
+            <div class="row mt-2">
+                <div class="col-2">
+                    <RadzenLabel Text="SCIM endpoint" Style="padding: 0px;"></RadzenLabel>
+                </div>
+                <div class="col">
+                    <RadzenTextBox Value=@GetSCIMSchemasUrl() Class="w-100"></RadzenTextBox>
+                </div>
+            </div>
+        </RadzenCardLoader>
     </RadzenColumn>
     <!-- Number of clients -->
     <RadzenColumn Size="3">
-        <RadzenCard Variant="Variant.Filled">
+        <RadzenCardLoader Variant="Variant.Filled" IsLoading=@statisticsState.Value.IsLoading>
             <RadzenText TextStyle="TextStyle.DisplayH6">Users</RadzenText>
-            <RadzenText TextStyle="TextStyle.DisplayH3">0</RadzenText>
-        </RadzenCard>
+            <RadzenText TextStyle="TextStyle.DisplayH3">@statisticsState.Value.NbClients</RadzenText>
+        </RadzenCardLoader>
     </RadzenColumn>
     <!-- Number of users -->
     <RadzenColumn Size="3">
-        <RadzenCard Variant="Variant.Filled">
+        <RadzenCardLoader Variant="Variant.Filled" IsLoading=@statisticsState.Value.IsLoading>
             <RadzenText TextStyle="TextStyle.DisplayH6">Clients</RadzenText>
-            <RadzenText TextStyle="TextStyle.DisplayH3">0</RadzenText>
-        </RadzenCard>
+            <RadzenText TextStyle="TextStyle.DisplayH3">@statisticsState.Value.NbUsers</RadzenText>
+        </RadzenCardLoader>
     </RadzenColumn>
-    <!-- Authentication success since 6 hours -->
+    <!-- Authentication success today -->
     <RadzenColumn Size="6">
-        <RadzenCard Variant="Variant.Filled">
-            <RadzenText TextStyle="TextStyle.DisplayH6">Successful authentication since 6 hours ago</RadzenText>
-            <RadzenText TextStyle="TextStyle.DisplayH3" Style="color: green;">0</RadzenText>
-        </RadzenCard>
+        <RadzenCardLoader Variant="Variant.Filled" IsLoading=@statisticsState.Value.IsLoading>
+            <RadzenText TextStyle="TextStyle.DisplayH6">Successful authentication today</RadzenText>
+            <RadzenText TextStyle="TextStyle.DisplayH3" class="green">@statisticsState.Value.NbValidAuthentications</RadzenText>
+        </RadzenCardLoader>
     </RadzenColumn>
-    <!-- Authentication attempt since 6 hours -->
+    <!-- Authentication attempt today -->
     <RadzenColumn Size="6">
-        <RadzenCard Variant="Variant.Filled">
-            <RadzenText TextStyle="TextStyle.DisplayH6">Authentication attempt since 6 hours ago</RadzenText>
-            <RadzenText TextStyle="TextStyle.DisplayH3" Style="color: red;">0</RadzenText>
-        </RadzenCard>
+        <RadzenCardLoader Variant="Variant.Filled" IsLoading=@statisticsState.Value.IsLoading>
+            <RadzenText TextStyle="TextStyle.DisplayH6">Authentication attempt today</RadzenText>
+            <RadzenText TextStyle="TextStyle.DisplayH3" class="red">@statisticsState.Value.NbInvalidAuthentications</RadzenText>
+        </RadzenCardLoader>
     </RadzenColumn>
 </RadzenRow>
 
 @code {
+    string activeRealm;
     public string GetOpenIdConnectUrl() => $"{Options.Value.IdServerBaseUrl}/{realmsState.Value.ActiveRealm}/.well-known/openid-configuration";
     public string GetFederationMetadataUrl() => $"{Options.Value.IdServerBaseUrl}/{realmsState.Value.ActiveRealm}/FederationMetadata/2007-06/FederationMetadata.xml";
+    public string GetSCIMSchemasUrl() => $"{Options.Value.SCIMUrl}/Schemas";
+
+    void AddRealm()
+    {
+        navigationManager.NavigateTo("/realm/add");
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            SubscribeToAction<SelectRealmSuccessAction>((act) =>
+            {
+                dispatcher.Dispatch(new GetStatisticsAction());
+            });
+            dispatcher.Dispatch(new GetStatisticsAction());
+        }
+    }
+
+    async void ChooseRealm()
+    {
+        await dialogService.OpenAsync<SelectRealmDialog>("Select Realm", new Dictionary<string, object>
+        {
+            { "activeRealm", realmsState.Value.ActiveRealm }
+        }, new DialogOptions
+        {
+            Width = "700px",
+            Height = "512px",
+            Resizable = true,
+            Draggable = true
+        });
+    }
 }

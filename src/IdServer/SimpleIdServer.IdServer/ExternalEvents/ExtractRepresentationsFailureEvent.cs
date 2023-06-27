@@ -3,8 +3,9 @@
 
 namespace SimpleIdServer.IdServer.ExternalEvents
 {
-    public class ExtractRepresentationsFailureEvent
+    public class ExtractRepresentationsFailureEvent : IExternalEvent
     {
+        public string EventName => nameof(ExtractRepresentationsFailureEvent);
         public string IdentityProvisioningName { get; set; }
         public string ErrorMessage { get; set; }
         public string Realm { get; set; }

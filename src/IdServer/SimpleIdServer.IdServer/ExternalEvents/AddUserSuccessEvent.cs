@@ -4,8 +4,9 @@ using System.Collections.Generic;
 
 namespace SimpleIdServer.IdServer.ExternalEvents
 {
-    public class AddUserSuccessEvent
+    public class AddUserSuccessEvent : IExternalEvent
     {
+        public string EventName => nameof(AddUserSuccessEvent);
         public string Realm { get; set; }
         public string Id { get; set; }
         public string Name { get; set; }

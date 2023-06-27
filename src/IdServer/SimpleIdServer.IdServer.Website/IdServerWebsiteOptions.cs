@@ -6,5 +6,6 @@ namespace SimpleIdServer.IdServer.Website
     public class IdServerWebsiteOptions
     {
         public string IdServerBaseUrl { get; set; } = "https://localhost:5001";
+        public string SCIMUrl { get; set; } = "https://localhost:5003";
     }
 }

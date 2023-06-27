@@ -4,8 +4,9 @@ using System.Collections.Generic;
 
 namespace SimpleIdServer.IdServer.ExternalEvents
 {
-    public class UserInfoSuccessEvent
+    public class UserInfoSuccessEvent : IExternalEvent
     {
+        public string EventName => nameof(UserInfoSuccessEvent);
         public string ClientId { get; set; }
         public string UserName { get; set; }
         public IEnumerable<string> Scopes { get; set; }

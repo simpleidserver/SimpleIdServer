@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
@@ -106,6 +107,12 @@ namespace SimpleIdServer.IdServer.UI
             catch (BaseUIException ex)
             {
                 ModelState.AddModelError(ex.Code, ex.Code);
+                await Bus.Publish(new UserLoginFailureEvent
+                {
+                    Realm = prefix,
+                    Amr = Constants.Areas.Password,
+                    Login = viewModel.Login
+                });
                 return View(viewModel);
             }
         }

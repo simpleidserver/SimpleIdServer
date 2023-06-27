@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SimpleIdServer.IdServer.Store;
 
@@ -11,9 +12,11 @@ using SimpleIdServer.IdServer.Store;
 namespace SimpleIdServer.IdServer.Startup.Migrations
 {
     [DbContext(typeof(StoreDbContext))]
-    partial class StoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230627135756_AddEventName")]
+    partial class AddEventName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

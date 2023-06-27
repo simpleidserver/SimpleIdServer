@@ -53,6 +53,7 @@ namespace SimpleIdServer.IdServer.UI
         protected IClientRepository ClientRepository => _clientRepository;
         protected IUserRepository UserRepository => _userRepository;
         protected IdServerHostOptions Options => _options;
+        protected IBusControl Bus => _busControl;
 
         protected JsonObject ExtractQuery(string returnUrl)
         {

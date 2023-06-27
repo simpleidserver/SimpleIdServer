@@ -3,8 +3,9 @@
 
 namespace SimpleIdServer.IdServer.ExternalEvents
 {
-    public class ClientAuthenticationSuccessEvent
+    public class ClientAuthenticationSuccessEvent : IExternalEvent
     {
+        public string EventName => nameof(ClientAuthenticationSuccessEvent);
         public string ClientId { get; set; }
         public string AuthMethod { get; set; }
         public string Realm { get; set; }

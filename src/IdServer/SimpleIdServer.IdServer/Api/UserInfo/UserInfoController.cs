@@ -162,7 +162,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
 
                     await _busControl.Publish(new UserInfoSuccessEvent
                     {
-                        ClientId = oauthClient.Id,
+                        ClientId = oauthClient.ClientId,
                         Realm = prefix,
                         Scopes = scopes,
                         UserName = user.Name

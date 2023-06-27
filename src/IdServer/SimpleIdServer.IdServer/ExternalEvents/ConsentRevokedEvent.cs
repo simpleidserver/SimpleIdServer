@@ -4,8 +4,9 @@ using System.Collections.Generic;
 
 namespace SimpleIdServer.IdServer.ExternalEvents
 {
-    public class ConsentRevokedEvent
+    public class ConsentRevokedEvent : IExternalEvent
     {
+        public string EventName => nameof(ConsentRevokedEvent);
         public string UserName { get; set; }
         public string ClientId { get; set; }
         public IEnumerable<string> Scopes { get; set; }

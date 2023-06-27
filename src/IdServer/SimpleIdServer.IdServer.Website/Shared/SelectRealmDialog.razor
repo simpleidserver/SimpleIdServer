@@ -15,8 +15,6 @@
     <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Select"  />
 </RadzenTemplateForm>
 
-<RadzenButton class="mt-1 w-100" Click=@((args) => AddRealm()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="Add Realm" />
-
 @code {
     [Parameter]
     public string activeRealm { get; set; }
@@ -38,10 +36,5 @@
     {
         dispatcher.Dispatch(new SelectRealmAction { Realm = realm.Name });
         this.dialogService.Close();
-    }
-
-    void AddRealm()
-    {
-        navigationManager.NavigateTo("/realm/add");
     }
 }

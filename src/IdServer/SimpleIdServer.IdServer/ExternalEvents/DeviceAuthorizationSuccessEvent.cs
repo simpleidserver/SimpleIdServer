@@ -3,8 +3,9 @@
 
 namespace SimpleIdServer.IdServer.ExternalEvents
 {
-    public class DeviceAuthorizationSuccessEvent
+    public class DeviceAuthorizationSuccessEvent : IExternalEvent
     {
+        public string EventName => nameof(DeviceAuthorizationSuccessEvent);
         public string ClientId { get; set; }
         public string Realm { get; set; }
         public string RequestJSON { get; set; }

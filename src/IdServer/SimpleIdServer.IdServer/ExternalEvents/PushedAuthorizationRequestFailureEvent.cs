@@ -2,8 +2,9 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 namespace SimpleIdServer.IdServer.ExternalEvents
 {
-    public class PushedAuthorizationRequestFailureEvent
+    public class PushedAuthorizationRequestFailureEvent : IExternalEvent
     {
+        public string EventName => nameof(PushedAuthorizationRequestFailureEvent);
         public string ClientId { get; set; }
         public string RequestJSON { get; set; }
         public string ErrorMessage { get; set; }
