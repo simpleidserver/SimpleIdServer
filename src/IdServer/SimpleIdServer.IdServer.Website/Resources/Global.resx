@@ -408,4 +408,7 @@
   <data name="SelectedAcrsRemoved" xml:space="preserve">
     <value>Selected ACRS have been removed</value>
   </data>
+  <data name="ClientAdvancedSettingsUpdated" xml:space="preserve">
+    <value>Advanced settings have been updated</value>
+  </data>
 </root>

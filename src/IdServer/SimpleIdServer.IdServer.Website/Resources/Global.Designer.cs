@@ -124,6 +124,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Advanced settings have been updated.
+        /// </summary>
+        public static string ClientAdvancedSettingsUpdated {
+            get {
+                return ResourceManager.GetString("ClientAdvancedSettingsUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Client cannot be added because an another client exists with the same name.
         /// </summary>
         public static string ClientAlreadyExists {

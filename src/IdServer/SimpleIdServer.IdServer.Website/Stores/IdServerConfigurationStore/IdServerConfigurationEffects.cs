@@ -30,6 +30,15 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdServerConfigurationStore
             dispatcher.Dispatch(new GetIdServerConfigurationSuccessAction(configuration));
         }
 
+        [EffectMethod]
+        public async Task Handle(GetOpenIdServerConfigurationAction action, IDispatcher dispatcher)
+        {
+            var realm = await GetRealm();
+            var httpClient = _httpClientFactory.Get();
+            var configuration = await httpClient.GetFromJsonAsync<OpenIdServerConfigurationResult>($"{_options.IdServerBaseUrl}/{realm}/.well-known/openid-configuration");
+            dispatcher.Dispatch(new GetOpenIdServerConfigurationSuccessAction(configuration));
+        }
+
         private async Task<string> GetRealm()
         {
             var realm = await _sessionStorage.GetAsync<string>("realm");
@@ -39,6 +48,11 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdServerConfigurationStore
     }
 
     public class GetIdServerConfigurationAction
+    {
+
+    }
+
+    public class GetOpenIdServerConfigurationAction
     {
 
     }
@@ -53,9 +67,25 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdServerConfigurationStore
         public IdServerConfigurationResult Configuration { get; private set; }
     }
 
+    public class GetOpenIdServerConfigurationSuccessAction
+    {
+        public GetOpenIdServerConfigurationSuccessAction(OpenIdServerConfigurationResult configuration)
+        {
+            Configuration = configuration;
+        }
+
+        public OpenIdServerConfigurationResult Configuration { get; private set; }
+    }
+
     public class IdServerConfigurationResult
     {
         [JsonPropertyName("amrs")]
         public IEnumerable<string> Amrs { get; set; }
+    }
+
+    public class OpenIdServerConfigurationResult
+    {
+        [JsonPropertyName("response_types_supported")]
+        public IEnumerable<string> ResponseTypesSupported { get; set; }
     }
 }

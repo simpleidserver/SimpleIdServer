@@ -4,6 +4,7 @@ using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Nethereum.Contracts.Standards.ENS.ETHRegistrarController.ContractDefinition;
 using Radzen;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
@@ -416,7 +417,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             }
         }
 
-
         [EffectMethod]
         public async Task Handle(AddEncKeyAction act, IDispatcher dispatcher)
         {
@@ -504,6 +504,28 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 dispatcher.Dispatch(new AddClientRoleSuccessAction
                 {
                     Scope = scope
+                });
+            }
+        }
+
+        [EffectMethod]
+        public async Task Handle(UpdateAdvancedClientSettingsAction act, IDispatcher dispatcher)
+        {
+            var realm = await GetRealm();
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                var client = await dbContext.Clients.Include(c => c.Realms).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm));
+                client.IdTokenSignedResponseAlg = act.IdTokenSignedResponseAlg;
+                client.AuthorizationSignedResponseAlg = act.AuthorizationSignedResponseAlg;
+                client.AuthorizationDataTypes = string.IsNullOrWhiteSpace(act.AuthorizationDataTypes) ? null : act.AuthorizationDataTypes.Split(';');
+                client.ResponseTypes = act.ResponseTypes?.ToList();
+                await dbContext.SaveChangesAsync();
+                dispatcher.Dispatch(new UpdateAdvancedClientSettingsSuccessAction
+                {
+                    AuthorizationDataTypes = client.AuthorizationDataTypes,
+                    ResponseTypes = act.ResponseTypes,
+                    AuthorizationSignedResponseAlg = act.AuthorizationSignedResponseAlg,
+                    IdTokenSignedResponseAlg = act.IdTokenSignedResponseAlg
                 });
             }
         }
@@ -927,5 +949,22 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
     public class ToggleAllClientRolesAction
     {
         public bool IsSelected { get; set; }
+    }
+
+    public class UpdateAdvancedClientSettingsAction
+    {
+        public string ClientId { get; set; } = null!;
+        public string? IdTokenSignedResponseAlg { get; set; }
+        public string? AuthorizationSignedResponseAlg { get; set; }
+        public string? AuthorizationDataTypes { get; set; }
+        public IEnumerable<string> ResponseTypes { get; set; }
+    }
+
+    public class UpdateAdvancedClientSettingsSuccessAction
+    {
+        public string? IdTokenSignedResponseAlg { get; set; }
+        public string? AuthorizationSignedResponseAlg { get; set; }
+        public IEnumerable<string> AuthorizationDataTypes { get; set; }
+        public IEnumerable<string> ResponseTypes { get; set; }
     }
 }

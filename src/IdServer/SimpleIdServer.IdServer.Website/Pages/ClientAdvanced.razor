@@ -1,6 +1,7 @@
 ﻿@using SimpleIdServer.IdServer.Api.Token.Handlers;
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.ClientStore;
+@using SimpleIdServer.IdServer.Website.Stores.IdServerConfigurationStore;
 @using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
 @using SimpleIdServer.IdServer.Website.Stores.UserStore;
 @using SimpleIdServer.IdServer.WsFederation
@@ -52,6 +53,17 @@
                         <p class="text-muted">Authorization data types must be passed as a list separated by <b>;</b></p>
                     </div>
                 </div>
+                <!-- Response types -->
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, "Informs the Authorization Server of the desired authorization processing flow, including what parameters are returned from the endpoints used."))" />
+                        <RadzenLabel Text="Response types" Style="padding: 0px;" />
+                    </div>
+                    <div class="col">
+                        <RadzenDropDown @bind-Value=@selectedResponseTypes Chips=true Data=@responseTypes Multiple=true AllowClear=true Placeholder="Select Response Types" class="w-100"></RadzenDropDown>
+                    </div>
+                </div>
+                <!-- Response modes -->
             </RadzenAccordionItem>
         </Items>
     </RadzenAccordion>
@@ -59,10 +71,12 @@
     <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateClientState.Value.IsUpdating ? "Updating..." : "Update")" Disabled=@updateClientState.Value.IsUpdating />
 </RadzenTemplateForm>
 
-
 @code {
     [Parameter]
     public SimpleIdServer.IdServer.Domains.Client Client { get; set; }
+
+    IEnumerable<string> selectedResponseTypes { get; set; } = new List<string>();
+    IEnumerable<string> responseTypes { get; set; } = new List<string>();
 
     record UpdateAdvancedClient
     {
@@ -78,6 +92,17 @@
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
+            SubscribeToAction<GetOpenIdServerConfigurationSuccessAction>((act) =>
+            {
+                responseTypes = act.Configuration.ResponseTypesSupported.OrderBy(a => a).ToList();
+                StateHasChanged();
+            });
+            SubscribeToAction<UpdateAdvancedClientSettingsSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.ClientAdvancedSettingsUpdated });
+                StateHasChanged();
+            });
+            dispatcher.Dispatch(new GetOpenIdServerConfigurationAction());
         }
     }
 
@@ -91,10 +116,19 @@
             AuthorizationSignedResponseAlg = Client.AuthorizationSignedResponseAlg,
             AuthorizationDataTypes = Client.AuthorizationDataTypes == null || !Client.AuthorizationDataTypes.Any() ? string.Empty : string.Join(";", Client.AuthorizationDataTypes)
         };
+        selectedResponseTypes = Client.ResponseTypes.Where(r => !string.IsNullOrWhiteSpace(r));
     }
 
     void SubmitUpdateClient(UpdateAdvancedClient client)
     {
+        dispatcher.Dispatch(new UpdateAdvancedClientSettingsAction
+        {
+            AuthorizationDataTypes = client.AuthorizationDataTypes,
+            AuthorizationSignedResponseAlg = client.AuthorizationSignedResponseAlg,
+            IdTokenSignedResponseAlg = client.IdTokenSignedResponseAlg,
+            ResponseTypes = selectedResponseTypes,
+            ClientId = Client.ClientId
+        });
     }
 
     void ShowTooltip(ElementReference eltRef, string msg)

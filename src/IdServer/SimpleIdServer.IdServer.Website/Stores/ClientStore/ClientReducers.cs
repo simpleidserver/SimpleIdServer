@@ -166,6 +166,18 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             IsUpdating = false
         };
 
+        [ReducerMethod]
+        public static UpdateClientState ReduceUpdateAdvancedClientSettingsAction(UpdateClientState state, UpdateAdvancedClientSettingsAction act) => state with
+        {
+            IsUpdating = true
+        };
+
+        [ReducerMethod]
+        public static UpdateClientState ReduceUpdateAdvancedClientSettingsSuccessAction(UpdateClientState state, UpdateAdvancedClientSettingsSuccessAction act) => state with
+        {
+            IsUpdating = false
+        };
+
         #endregion
 
         #region ClientState
@@ -244,6 +256,20 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             }
 
             client.UpdateDateTime = DateTime.UtcNow;
+            return state with
+            {
+                Client = client
+            };
+        }
+
+        [ReducerMethod]
+        public static ClientState ReduceUpdateAdvancedClientSettingsSuccessAction(ClientState state, UpdateAdvancedClientSettingsSuccessAction act)
+        {
+            var client = state.Client;
+            client.IdTokenSignedResponseAlg = act.IdTokenSignedResponseAlg;
+            client.AuthorizationSignedResponseAlg = act.AuthorizationSignedResponseAlg;
+            client.AuthorizationDataTypes = act.AuthorizationDataTypes?.ToList();
+            client.ResponseTypes = act.ResponseTypes?.ToList();
             return state with
             {
                 Client = client
