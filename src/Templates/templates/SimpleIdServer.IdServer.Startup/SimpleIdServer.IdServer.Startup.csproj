@@ -4,18 +4,23 @@
 		<OutputType>Exe</OutputType>
 	</PropertyGroup>
 	<ItemGroup>
-	  <PackageReference Include="SimpleIdServer.IdServer" Version="4.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.IdServer.Email" Version="4.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.IdServer.Sms" Version="4.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.IdServer.WsFederation" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.Did.Ethr" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.Did.Key" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.CredentialIssuer" Version="4.0.*-*" />
+	  <PackageReference Include="SimpleIdServer.IdServer.Email" Version="4.0.*-*" />
+	  <PackageReference Include="SimpleIdServer.IdServer.PostgreMigrations" Version="4.0.*-*" />
+	  <PackageReference Include="SimpleIdServer.IdServer.Sms" Version="4.0.*-*" />
+	  <PackageReference Include="SimpleIdServer.IdServer.SqlServerMigrations" Version="4.0.*-*" />
+	  <PackageReference Include="SimpleIdServer.IdServer.WsFederation" Version="4.0.*-*" />
+	  <PackageReference Include="SimpleIdServer.IdServer" Version="4.0.*-*" />
 	  <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.1" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="7.0.1" />
 	  <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="7.0.*" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.*" />
+	  <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.*" />
+	  <PackageReference Include="Microsoft.Extensions.Caching.SqlServer" Version="7.0.*" />
+	  <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="7.0.*" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.*">
 		<PrivateAssets>all</PrivateAssets>
 		<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
@@ -26,6 +31,11 @@
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>
 	    <DependentUpon>AccountsResource.resx</DependentUpon>
+	  </Compile>
+	  <Compile Update="Resources\DeviceCodeResource.Designer.cs">
+	    <DependentUpon>DeviceCodeResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
 	  </Compile>
 	  <Compile Update="Resources\ProfileResource.Designer.cs">
 	    <DependentUpon>ProfileResource.resx</DependentUpon>
@@ -46,6 +56,11 @@
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>
 	    <DependentUpon>AuthenticatePasswordResource.resx</DependentUpon>
+	  </Compile>
+	  <Compile Update="Resources\CredentialsResource.Designer.cs">
+	    <DependentUpon>CredentialsResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
 	  </Compile>
 	  <Compile Update="Resources\ScopesResource.Designer.cs">
 	    <DependentUpon>ScopesResource.resx</DependentUpon>
@@ -88,6 +103,10 @@
 	    <Generator>PublicResXFileCodeGenerator</Generator>
 	    <LastGenOutput>AccountsResource.Designer.cs</LastGenOutput>
 	  </EmbeddedResource>
+	  <EmbeddedResource Update="Resources\DeviceCodeResource.resx">
+	    <LastGenOutput>DeviceCodeResource.Designer.cs</LastGenOutput>
+	    <Generator>PublicResXFileCodeGenerator</Generator>
+	  </EmbeddedResource>
 	  <EmbeddedResource Update="Resources\ProfileResource.resx">
 	    <LastGenOutput>ProfileResource.Designer.cs</LastGenOutput>
 	    <Generator>PublicResXFileCodeGenerator</Generator>
@@ -103,6 +122,10 @@
 	  <EmbeddedResource Update="Resources\AuthenticatePasswordResource.resx">
 	    <Generator>PublicResXFileCodeGenerator</Generator>
 	    <LastGenOutput>AuthenticatePasswordResource.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Resources\CredentialsResource.resx">
+	    <LastGenOutput>CredentialsResource.Designer.cs</LastGenOutput>
+	    <Generator>PublicResXFileCodeGenerator</Generator>
 	  </EmbeddedResource>
 	  <EmbeddedResource Update="Resources\ScopesResource.resx">
 	    <LastGenOutput>ScopesResource.Designer.cs</LastGenOutput>
@@ -132,8 +155,5 @@
 	    <Generator>PublicResXFileCodeGenerator</Generator>
 	    <LastGenOutput>LayoutResource.Designer.cs</LastGenOutput>
 	  </EmbeddedResource>
-	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="Migrations\" />
 	</ItemGroup>
 </Project>

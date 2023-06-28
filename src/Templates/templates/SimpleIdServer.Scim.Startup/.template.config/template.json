@@ -1,0 +1,47 @@
+{
+  "author": "SimpleIdServer",
+  "classifications": [
+    "SCIM"
+  ],
+  "name": "SCIM Server",
+  "identity": "SimpleIdServer.Scim.Startup",
+  "groupIdentity": "SimpleIdServer.Scim.Startup",
+  "shortName": "scim",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "symbols": {
+	  "connectionString": {
+		  "type": "parameter",
+		  "defaultValue": "Data Source=.;Initial Catalog=SCIM;Integrated Security=True;TrustServerCertificate=True",
+		  "replaces": "Data Source=.;Initial Catalog=SCIM;Integrated Security=True;TrustServerCertificate=True",
+		  "isRequired": true,
+		  "description": "Connection string"
+	  },
+	  "type": {
+		  "type": "parameter",
+		  "defaultValue": "SQLSERVER",
+		  "replaces": "SQLSERVER",
+		  "isRequired": false,
+		  "description": "Type of store",
+		  "choices": [
+			  {
+				"choice": "SQLSERVER",
+				"description": "SQLSERVER"
+			  },
+			  {
+				"choice": "POSTGRE",
+				"description": "POSTGRE"
+			  },
+			  {
+				"choice": "MONGODB",
+				"description": "MONGODB"
+			  }
+		  ]
+	  }
+  },
+  "sourceName": "SimpleIdServer.Scim.Startup",
+  "preferNameDirectory": "true",
+  "primaryOutputs": [ { "path": "SimpleIdServer.Scim.Startup.csproj" } ]
+}

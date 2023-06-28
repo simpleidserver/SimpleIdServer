@@ -15,12 +15,64 @@
     "type": "project"
   },
   "symbols": {
-	  "connectionString": {
+	  "storageConnectionString": {
 		  "type": "parameter",
 		  "defaultValue": "Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True",
-		  "replaces": "Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True",
+		  "replaces": "STORAGE-CONNECTIONSTRING",
 		  "isRequired": true,
-		  "description": "Connection string"
+		  "description": "Connection string for the storage."
+	  },
+	  "distributedCacheConnectionString": {
+		  "type": "parameter",
+		  "defaultValue": "Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True",
+		  "replaces": "DISTRIBUTEDCACHE-CONNECTIONSTRING",
+		  "isRequired": true,
+		  "description": "Connection string for the distributed cache."
+	  },
+	  "storageType": {
+		  "type": "parameter",
+		  "defaultValue": "SQLSERVER",
+		  "replaces": "STORAGE-TYPE",
+		  "isRequired": false,
+		  "description": "Type of storage",
+		  "choices": [
+			  {
+				"choice": "SQLSERVER",
+				"description": "SQLSERVER"
+			  },
+			  {
+				"choice": "POSTGRE",
+				"description": "POSTGRE"
+			  }
+		  ]
+	  },
+	  "distributedCacheType": {
+		  "type": "parameter",
+		  "defaultValue": "SQLSERVER",
+		  "replaces": "DISTRIBUTEDCACHE-TYPE",
+		  "isRequired": false,
+		  "description": "Type of distributed cache",
+		  "choices": [
+			  {
+				"choice": "INMEMORY",
+				"description": "INMEMORY"
+			  },
+			  {
+				"choice": "SQLSERVER",
+				"description": "SQLSERVER"
+			  },
+			  {
+				"choice": "REDIS",
+				"description": "REDIS"
+			  }
+		  ]
+	  },
+	  "redisInstanceName": {
+		  "type": "parameter",
+		  "defaultValue": "SampleInstance",
+		  "replaces": "REDIS-INSTANCENAME",
+		  "isRequired": false,
+		  "description": "Instance name of REDIS."
 	  }
   },
   "sourceName": "SimpleIdServer.IdServer.Startup",

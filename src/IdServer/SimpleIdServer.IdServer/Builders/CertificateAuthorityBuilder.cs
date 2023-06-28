@@ -28,8 +28,8 @@ namespace SimpleIdServer.IdServer.Builders
                 PrivateKey = pem.PrivateKey,
                 PublicKey = pem.PublicKey,
                 UpdateDateTime = DateTime.UtcNow,
-                StartDateTime = caResult.Item1.NotBefore,
-                EndDateTime = caResult.Item1.NotAfter,
+                StartDateTime = caResult.Item1.NotBefore.ToUniversalTime(),
+                EndDateTime = caResult.Item1.NotAfter.ToUniversalTime(),
                 Source = CertificateAuthoritySources.DB,
                 SubjectName = subjectName,
             };
@@ -43,8 +43,8 @@ namespace SimpleIdServer.IdServer.Builders
             {
                 Id = Guid.NewGuid().ToString(),
                 UpdateDateTime = DateTime.UtcNow,
-                StartDateTime = certificate.NotBefore,
-                EndDateTime = certificate.NotAfter,
+                StartDateTime = certificate.NotBefore.ToUniversalTime(),
+                EndDateTime = certificate.NotAfter.ToUniversalTime(),
                 Source = CertificateAuthoritySources.CERTIFICATESTORE,
                 SubjectName = certificate.SubjectName.Name,
                 StoreLocation = storeLocation,

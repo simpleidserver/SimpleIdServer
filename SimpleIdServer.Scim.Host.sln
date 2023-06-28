@@ -7,11 +7,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01. Core Layer", "01. Core 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim", "src\Scim\SimpleIdServer.Scim\SimpleIdServer.Scim.csproj", "{4B26792A-6960-4270-92C1-65C4C1FD59F3}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03. Testing Layer", "03. Testing Layer", "{E5F2ACD7-7D4E-449B-94D3-62F8185E7AAE}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "04. Testing Layer", "04. Testing Layer", "{E5F2ACD7-7D4E-449B-94D3-62F8185E7AAE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02. Starting Layer", "02. Starting Layer", "{011E8E6E-5B36-4E0C-A4AE-FF7B11579380}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.Startup", "src\Scim\SimpleIdServer.Scim.Startup\SimpleIdServer.Scim.Startup.csproj", "{A1C64BA0-42BE-4BF2-B06E-663D7122AD48}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.Host.Acceptance.Tests", "tests\SimpleIdServer.Scim.Host.Acceptance.Tests\SimpleIdServer.Scim.Host.Acceptance.Tests.csproj", "{C3E22928-FC40-47EF-A886-B37B7B96D9B4}"
 EndProject
@@ -37,11 +35,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "V6", "V6", "{58CB45EB-8FD5-
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.Persistence.EF", "src\Scim\SimpleIdServer.Scim.Persistence.EF\SimpleIdServer.Scim.Persistence.EF.csproj", "{B6B92BA0-2A6F-40DA-A01A-3FF9887D2A7E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.SqlServer.Startup", "src\Scim\SimpleIdServer.Scim.SqlServer.Startup\SimpleIdServer.Scim.SqlServer.Startup.csproj", "{C35CE988-5C38-4F4A-A0FF-E3213CEAC764}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.Postgre.Startup", "src\Scim\SimpleIdServer.Scim.Postgre.Startup\SimpleIdServer.Scim.Postgre.Startup.csproj", "{CD9B7A82-EBE7-48D1-AB24-195217BA4604}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.Client", "src\Scim\SimpleIdServer.Scim.Client\SimpleIdServer.Scim.Client.csproj", "{42EAA673-67AC-4406-908D-490E01C16D58}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.Startup", "src\Scim\SimpleIdServer.Scim.Startup\SimpleIdServer.Scim.Startup.csproj", "{5B2199C4-EEFC-46DB-970D-8254D5BA88B3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03. Migrations Layer", "03. Migrations Layer", "{EBD2D625-0911-46C2-A899-836706A82BC0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.PostgreMigrations", "src\Scim\SimpleIdServer.Scim.PostgreMigrations\SimpleIdServer.Scim.PostgreMigrations.csproj", "{7DBBF997-362E-441C-9D36-572A635FC35B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.SqlServerMigrations", "src\Scim\SimpleIdServer.Scim.SqlServerMigrations\SimpleIdServer.Scim.SqlServerMigrations.csproj", "{02AF94F7-ADB2-4966-8FF7-0D9AE90BE703}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,10 +57,6 @@ Global
 		{4B26792A-6960-4270-92C1-65C4C1FD59F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4B26792A-6960-4270-92C1-65C4C1FD59F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4B26792A-6960-4270-92C1-65C4C1FD59F3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A1C64BA0-42BE-4BF2-B06E-663D7122AD48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A1C64BA0-42BE-4BF2-B06E-663D7122AD48}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A1C64BA0-42BE-4BF2-B06E-663D7122AD48}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A1C64BA0-42BE-4BF2-B06E-663D7122AD48}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C3E22928-FC40-47EF-A886-B37B7B96D9B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C3E22928-FC40-47EF-A886-B37B7B96D9B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C3E22928-FC40-47EF-A886-B37B7B96D9B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -101,10 +101,6 @@ Global
 		{B6B92BA0-2A6F-40DA-A01A-3FF9887D2A7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6B92BA0-2A6F-40DA-A01A-3FF9887D2A7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6B92BA0-2A6F-40DA-A01A-3FF9887D2A7E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C35CE988-5C38-4F4A-A0FF-E3213CEAC764}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C35CE988-5C38-4F4A-A0FF-E3213CEAC764}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C35CE988-5C38-4F4A-A0FF-E3213CEAC764}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C35CE988-5C38-4F4A-A0FF-E3213CEAC764}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CD9B7A82-EBE7-48D1-AB24-195217BA4604}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CD9B7A82-EBE7-48D1-AB24-195217BA4604}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CD9B7A82-EBE7-48D1-AB24-195217BA4604}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -113,13 +109,24 @@ Global
 		{42EAA673-67AC-4406-908D-490E01C16D58}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{42EAA673-67AC-4406-908D-490E01C16D58}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{42EAA673-67AC-4406-908D-490E01C16D58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B2199C4-EEFC-46DB-970D-8254D5BA88B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B2199C4-EEFC-46DB-970D-8254D5BA88B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B2199C4-EEFC-46DB-970D-8254D5BA88B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B2199C4-EEFC-46DB-970D-8254D5BA88B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DBBF997-362E-441C-9D36-572A635FC35B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DBBF997-362E-441C-9D36-572A635FC35B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DBBF997-362E-441C-9D36-572A635FC35B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DBBF997-362E-441C-9D36-572A635FC35B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02AF94F7-ADB2-4966-8FF7-0D9AE90BE703}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02AF94F7-ADB2-4966-8FF7-0D9AE90BE703}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02AF94F7-ADB2-4966-8FF7-0D9AE90BE703}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02AF94F7-ADB2-4966-8FF7-0D9AE90BE703}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{4B26792A-6960-4270-92C1-65C4C1FD59F3} = {E47E7F9F-C5CA-4459-AF46-F320F155B69E}
-		{A1C64BA0-42BE-4BF2-B06E-663D7122AD48} = {011E8E6E-5B36-4E0C-A4AE-FF7B11579380}
 		{C3E22928-FC40-47EF-A886-B37B7B96D9B4} = {E5F2ACD7-7D4E-449B-94D3-62F8185E7AAE}
 		{7DF81302-13C8-42F6-9AA4-F1E21071D19A} = {E5F2ACD7-7D4E-449B-94D3-62F8185E7AAE}
 		{02A2B0B2-3328-4340-8E20-06256544935E} = {E47E7F9F-C5CA-4459-AF46-F320F155B69E}
@@ -132,9 +139,11 @@ Global
 		{AE3CAD86-99BE-47E9-AE91-341874E08948} = {58CB45EB-8FD5-422A-A2AF-7B1C1A60C429}
 		{58CB45EB-8FD5-422A-A2AF-7B1C1A60C429} = {011E8E6E-5B36-4E0C-A4AE-FF7B11579380}
 		{B6B92BA0-2A6F-40DA-A01A-3FF9887D2A7E} = {E47E7F9F-C5CA-4459-AF46-F320F155B69E}
-		{C35CE988-5C38-4F4A-A0FF-E3213CEAC764} = {011E8E6E-5B36-4E0C-A4AE-FF7B11579380}
 		{CD9B7A82-EBE7-48D1-AB24-195217BA4604} = {011E8E6E-5B36-4E0C-A4AE-FF7B11579380}
 		{42EAA673-67AC-4406-908D-490E01C16D58} = {E47E7F9F-C5CA-4459-AF46-F320F155B69E}
+		{5B2199C4-EEFC-46DB-970D-8254D5BA88B3} = {011E8E6E-5B36-4E0C-A4AE-FF7B11579380}
+		{7DBBF997-362E-441C-9D36-572A635FC35B} = {EBD2D625-0911-46C2-A899-836706A82BC0}
+		{02AF94F7-ADB2-4966-8FF7-0D9AE90BE703} = {EBD2D625-0911-46C2-A899-836706A82BC0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E7923ED0-C7DA-4D19-81E6-E3EEE579FE7A}

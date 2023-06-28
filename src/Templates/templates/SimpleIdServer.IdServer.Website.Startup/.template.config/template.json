@@ -13,12 +13,29 @@
     "type": "project"
   },
   "symbols": {
-	  "connectionString": {
+	  "storageConnectionString": {
 		  "type": "parameter",
 		  "defaultValue": "Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True",
-		  "replaces": "Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True",
+		  "replaces": "STORAGE-CONNECTIONSTRING",
 		  "isRequired": true,
-		  "description": "Connection string"
+		  "description": "Connection string for the storage."
+	  },
+	  "storageType": {
+		  "type": "parameter",
+		  "defaultValue": "SQLSERVER",
+		  "replaces": "STORAGE-TYPE",
+		  "isRequired": false,
+		  "description": "Type of storage",
+		  "choices": [
+			  {
+				"choice": "SQLSERVER",
+				"description": "SQLSERVER"
+			  },
+			  {
+				"choice": "POSTGRE",
+				"description": "POSTGRE"
+			  }
+		  ]
 	  }
   },
   "sourceName": "SimpleIdServer.IdServer.Website.Startup",

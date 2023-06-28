@@ -18,7 +18,7 @@ function CopyFolder{
 		$TargetFolderPath
 	)
 	
-	$Excluded = (".template.config", "template.json", "*.csproj")
+	$Excluded = (".template.config", "template.json", "*.csproj", "appsettings.json")
 	
 	if (Test-Path $TargetFolderPath) {	
 		Get-ChildItem -Path $TargetFolderPath -Recurse -Exclude $Excluded | Remove-Item -recurse -force
@@ -42,8 +42,12 @@ task dockerBuild -depends clean {
 	$Env:TAG = $suffix
 	exec { dotnet publish $source_dir\IdServer\SimpleIdServer.IdServer.Startup\SimpleIdServer.IdServer.Startup.csproj -c $config -o $result_dir\docker\IdServer }
 	exec { dotnet publish $source_dir\IdServer\SimpleIdServer.IdServer.Website.Startup\SimpleIdServer.IdServer.Website.Startup.csproj -c $config -o $result_dir\docker\IdServerWebsite }
-	exec { dotnet publish $source_dir\Scim\SimpleIdServer.Scim.SqlServer.Startup\SimpleIdServer.Scim.SqlServer.Startup.csproj -c $config -o $result_dir\docker\Scim }
+	exec { dotnet publish $source_dir\Scim\SimpleIdServer.Scim.Startup\SimpleIdServer.Scim.Startup.csproj -c $config -o $result_dir\docker\Scim }
 	exec { docker-compose build }
+}
+
+task buildInstaller -depends clean {
+	exec { dotnet publish $source_dir\IdServer\SimpleIdServer.IdServer.Startup\SimpleIdServer.IdServer.Startup.csproj -c $config -o $result_dir\installer\IdServer }
 }
 
 task dockerUp {
@@ -75,16 +79,13 @@ task buildTemplate {
 	$IdServerPathTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Startup"
 	$IdServerWebsitePathSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Website.Startup"
 	$IdServerWebsitePathTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Website.Startup"
-	$ScimSQLServerPathSource = "$source_dir/Scim/SimpleIdServer.Scim.SqlServer.Startup"
-	$ScimSQLServerPathTarget = "$source_dir/Templates/templates/SimpleIdServer.Scim.SqlServer.Startup"
-	$ScimMongoDBPathSource = "$source_dir/Scim/SimpleIdServer.Scim.MongoDb.Startup"
-	$ScimMongoDBPathTarget = "$source_dir/Templates/templates/SimpleIdServer.Scim.MongoDb.Startup"
+	$ScimPathSource = "$source_dir/Scim/SimpleIdServer.Scim.Startup"
+	$ScimPathTarget = "$source_dir/Templates/templates/SimpleIdServer.Scim.Startup"
 	
 	
 	CopyFolder $IdServerPathSource $IdServerPathTarget
 	CopyFolder $IdServerWebsitePathSource $IdServerWebsitePathTarget
-	CopyFolder $ScimSQLServerPathSource $ScimSQLServerPathTarget
-	CopyFolder $ScimMongoDBPathSource $ScimMongoDBPathTarget
+	CopyFolder $ScimPathSource $ScimPathTarget
 }
  
 task pack -depends release, compile, buildTemplate {
@@ -97,6 +98,8 @@ task pack -depends release, compile, buildTemplate {
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Website\SimpleIdServer.IdServer.Website.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.WsFederation\SimpleIdServer.IdServer.WsFederation.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.CredentialIssuer\SimpleIdServer.IdServer.CredentialIssuer.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.PostgreMigrations\SimpleIdServer.IdServer.PostgreMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.SqlServerMigrations\SimpleIdServer.IdServer.SqlServerMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.OpenIdConnect\SimpleIdServer.OpenIdConnect.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.Did\SimpleIdServer.Did.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.Did.Ethr\SimpleIdServer.Did.Ethr.csproj -c $config --no-build $versionSuffix --output $result_dir }
@@ -112,6 +115,8 @@ task pack -depends release, compile, buildTemplate {
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Persistence.MongoDB\SimpleIdServer.Scim.Persistence.MongoDB.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Swashbuckle\SimpleIdServer.Scim.Swashbuckle.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.SwashbuckleV6\SimpleIdServer.Scim.SwashbuckleV6.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.SqlServerMigrations\SimpleIdServer.Scim.SqlServerMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.PostgreMigrations\SimpleIdServer.Scim.PostgreMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Templates\SimpleIdServer.Templates.csproj -c $config --no-build $versionSuffix --output $result_dir }
 }
 
