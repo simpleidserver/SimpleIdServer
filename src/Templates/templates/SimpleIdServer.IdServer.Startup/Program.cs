@@ -13,15 +13,23 @@ using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.CredentialIssuer;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Sms;
-using SimpleIdServer.IdServer.Startup;
+using SimpleIdServer.IdServer.Startup.Configurations;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.WsFederation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Reflection;
 using System.Security.Cryptography;
+
+const string CreateTableFormat = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DistributedCache' and xtype='U') " +
+    "CREATE TABLE [dbo].[DistributedCache] (" +
+    "Id nvarchar(449) COLLATE SQL_Latin1_General_CP1_CS_AS NOT NULL, " +
+    "Value varbinary(MAX) NOT NULL, " +
+    "ExpiresAtTime datetimeoffset NOT NULL, " +
+    "SlidingExpirationInSeconds bigint NULL," +
+    "AbsoluteExpiration datetimeoffset NULL, " +
+    "PRIMARY KEY (Id))";
 
 ServicePointManager.ServerCertificateValidationCallback += (o, c, ch, er) => true;
 var builder = WebApplication.CreateBuilder(args);
@@ -34,13 +42,14 @@ builder.Services.Configure<KestrelServerOptions>(options =>
     });
 });
 builder.Configuration.AddJsonFile("appsettings.json")
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
     .AddEnvironmentVariables();
 builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
     .AllowAnyMethod()
     .AllowAnyHeader()));
 builder.Services.AddRazorPages()
     .AddRazorRuntimeCompilation();
-RunSqlServerIdServer(builder.Services);
+ConfigureIdServer(builder.Services);
 var app = builder.Build();
 SeedData(app, builder.Configuration["SCIMBaseUrl"]);
 app.UseCors("AllowAll");
@@ -49,18 +58,10 @@ app.UseSID()
     .UseCredentialIssuer();
 app.Run();
 
-void RunSqlServerIdServer(IServiceCollection services)
+void ConfigureIdServer(IServiceCollection services)
 {
-    var name = Assembly.GetExecutingAssembly().GetName().Name;
     services.AddSIDIdentityServer()
-        .UseEFStore(o =>
-        {
-            o.UseSqlServer(builder.Configuration.GetConnectionString("IdServer"), o =>
-            {
-                o.MigrationsAssembly(name);
-                o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-            });
-        })
+        .UseEFStore(o => ConfigureStorage(o))
         .AddCredentialIssuer()
         .UseInMemoryMassTransit()
         .AddBackChannelAuthentication()
@@ -85,7 +86,7 @@ void RunSqlServerIdServer(IServiceCollection services)
             });
             a.AddOIDCAuthentication(opts =>
             {
-                opts.Authority = "https://localhost:5001";
+                opts.Authority = builder.Configuration["Authority"];
                 opts.ClientId = "website";
                 opts.ClientSecret = "password";
                 opts.ResponseType = "code";
@@ -102,6 +103,54 @@ void RunSqlServerIdServer(IServiceCollection services)
         });
     services.AddDIDKey();
     services.AddDIDEthr();
+    ConfigureDistributedCache();
+}
+
+void ConfigureDistributedCache()
+{
+    var section = builder.Configuration.GetSection(nameof(DistributedCacheConfiguration));
+    var conf = section.Get<DistributedCacheConfiguration>();
+    switch(conf.Type)
+    {
+        case DistributedCacheTypes.SQLSERVER:
+            builder.Services.AddDistributedSqlServerCache(opts =>
+            {
+                opts.ConnectionString = conf.ConnectionString;
+                opts.SchemaName = "dbo";
+                opts.TableName = "DistributedCache";
+            });
+            break;
+        case DistributedCacheTypes.REDIS:
+            builder.Services.AddStackExchangeRedisCache(opts =>
+            {
+                opts.Configuration = conf.ConnectionString;
+                opts.InstanceName = conf.InstanceName;
+            });
+            break;
+    }
+}
+
+void ConfigureStorage(DbContextOptionsBuilder b)
+{
+    var section = builder.Configuration.GetSection(nameof(StorageConfiguration));
+    var conf = section.Get<StorageConfiguration>();
+    switch(conf.Type) 
+    {
+        case StorageTypes.SQLSERVER:
+            b.UseSqlServer(conf.ConnectionString, o =>
+            {
+                o.MigrationsAssembly("SimpleIdServer.IdServer.SqlServerMigrations");
+                o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+            });
+            break;
+        case StorageTypes.POSTGRE:
+            b.UseNpgsql(conf.ConnectionString, o =>
+            {
+                o.MigrationsAssembly("SimpleIdServer.IdServer.PostgreMigrations");
+                o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+            });
+            break;
+    }
 }
 
 void SeedData(WebApplication application, string scimBaseUrl)
@@ -112,34 +161,34 @@ void SeedData(WebApplication application, string scimBaseUrl)
         {
             dbContext.Database.Migrate();
             if (!dbContext.Realms.Any())
-                dbContext.Realms.AddRange(IdServerConfiguration.Realms);
+                dbContext.Realms.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Realms);
 
             if (!dbContext.Scopes.Any())
-                dbContext.Scopes.AddRange(IdServerConfiguration.Scopes);
+                dbContext.Scopes.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Scopes);
 
             if (!dbContext.Users.Any())
-                dbContext.Users.AddRange(IdServerConfiguration.Users);
+                dbContext.Users.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Users);
 
             if (!dbContext.Clients.Any())
-                dbContext.Clients.AddRange(IdServerConfiguration.Clients);
+                dbContext.Clients.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Clients);
 
             if (!dbContext.UmaPendingRequest.Any())
-                dbContext.UmaPendingRequest.AddRange(IdServerConfiguration.PendingRequests);
+                dbContext.UmaPendingRequest.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.PendingRequests);
 
             if (!dbContext.UmaResources.Any())
-                dbContext.UmaResources.AddRange(IdServerConfiguration.Resources);
+                dbContext.UmaResources.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Resources);
 
             if (!dbContext.AuthenticationSchemeProviderDefinitions.Any())
-                dbContext.AuthenticationSchemeProviderDefinitions.AddRange(IdServerConfiguration.ProviderDefinitions);
+                dbContext.AuthenticationSchemeProviderDefinitions.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.ProviderDefinitions);
 
             if (!dbContext.AuthenticationSchemeProviders.Any())
-                dbContext.AuthenticationSchemeProviders.AddRange(IdServerConfiguration.Providers);
+                dbContext.AuthenticationSchemeProviders.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Providers);
 
             if (!dbContext.IdentityProvisioningDefinitions.Any())
-                dbContext.IdentityProvisioningDefinitions.AddRange(IdServerConfiguration.IdentityProvisioningDefLst);
+                dbContext.IdentityProvisioningDefinitions.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.IdentityProvisioningDefLst);
 
             if (!dbContext.IdentityProvisioningLst.Any())
-                dbContext.IdentityProvisioningLst.AddRange(IdServerConfiguration.GetIdentityProvisiongLst(scimBaseUrl));
+                dbContext.IdentityProvisioningLst.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.GetIdentityProvisiongLst(scimBaseUrl));
 
             if (!dbContext.SerializedFileKeys.Any())
             {
@@ -149,7 +198,7 @@ void SeedData(WebApplication application, string scimBaseUrl)
             }
 
             if(!dbContext.CertificateAuthorities.Any())
-                dbContext.CertificateAuthorities.AddRange(IdServerConfiguration.CertificateAuthorities);
+                dbContext.CertificateAuthorities.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.CertificateAuthorities);
 
             if (!dbContext.Acrs.Any())
             {
@@ -210,6 +259,9 @@ void SeedData(WebApplication application, string scimBaseUrl)
                 if (dbConnection.State != System.Data.ConnectionState.Open) dbConnection.Open();
                 var cmd = dbConnection.CreateCommand();
                 cmd.CommandText = "ALTER DATABASE IdServer SET ALLOW_SNAPSHOT_ISOLATION ON";
+                cmd.ExecuteNonQuery();
+                cmd = dbConnection.CreateCommand();
+                cmd.CommandText = CreateTableFormat;
                 cmd.ExecuteNonQuery();
             }
 

@@ -8,7 +8,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.Scim.SqlServer.Startup.Services
+namespace SimpleIdServer.Scim.Startup.Services
 {
     public class ApiKeyProvider : IApiKeyProvider
     {

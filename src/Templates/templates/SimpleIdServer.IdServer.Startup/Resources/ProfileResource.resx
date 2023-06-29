@@ -127,7 +127,7 @@
     <value>Name</value>
   </data>
   <data name="approved_apps_description" xml:space="preserve">
-    <value>These apps have been granted access to interact with your SimpleIdServer account. To prevent them from future access, click "Revoke Access"</value>
+    <value>These apps have been granted access to interact with your SimpleIdServer account. To prevent them from accessing it in the future, click on 'Revoke Access'</value>
   </data>
   <data name="approved_apps_title" xml:space="preserve">
     <value>Approved applications</value>
@@ -163,7 +163,7 @@
     <value>One Time Password is not configured</value>
   </data>
   <data name="pending_request_description" xml:space="preserve">
-    <value>Users ask access to some of your resources. Click on "Revoke Access" to revoke pending request</value>
+    <value>Users have requested access to some of your resources. Click on 'Revoke Access' to deny pending requests.</value>
   </data>
   <data name="pending_request_title" xml:space="preserve">
     <value>Pending requests</value>

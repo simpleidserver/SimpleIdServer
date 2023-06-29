@@ -1,7 +1,7 @@
-FROM mcr.microsoft.com/dotnet/aspnet:6.0
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS runtime
 
 COPY build/results/docker/Scim/ App/
 
 WORKDIR /App
 
-ENTRYPOINT ["dotnet", "SimpleIdServer.Scim.SqlServer.Startup.dll"]
+ENTRYPOINT ["dotnet", "SimpleIdServer.Scim.Startup.dll"]

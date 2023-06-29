@@ -77,6 +77,7 @@ const config = {
         },
         items: [
           { type: 'doc', docId: 'intro', label: 'Documentation', position: 'left' },
+          { type: 'doc', docId: 'download', label: 'Download', position: 'left' },
           { type: 'doc', docId: 'consultancy', label: 'Consultancy', position: 'left' },
           { type: 'doc', docId: 'tutorial/overview', label: 'Tutorial', position: 'left' },
           { type: 'doc', docId: 'contactus', label: 'Contact us', position: 'left' },

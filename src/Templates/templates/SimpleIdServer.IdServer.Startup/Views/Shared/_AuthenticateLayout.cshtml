@@ -7,9 +7,9 @@
     Layout = "~/Views/Shared/_CommonLayout.cshtml";
 }
 
-<div class="modal login">
-    <div class="modal-dialog">
-        <div class="modal-content">
+<div class="loginContainer">
+    <div class="card login">
+        <div class="card-body">
             <div class="clientinfo">
                 @Html.ClientPicture(Model.LogoUri)
             </div>
@@ -33,31 +33,19 @@
                     }
                 </ul>
             </div>
-            <div class="footer">
-                @if (!string.IsNullOrWhiteSpace(Model.TosUri))
-                {
-                    <a href="@Model.TosUri" target="_blank">@AuthenticatePasswordResource.tos</a>
-                }
+        </div>
+        <div class="card-footer">
+            @if (!string.IsNullOrWhiteSpace(Model.TosUri))
+            {
+                <a href="@Model.TosUri" target="_blank">@AuthenticatePasswordResource.tos</a>
+            }
 
-                @if (!string.IsNullOrWhiteSpace(Model.PolicyUri))
-                {
-                    <a href="@Model.PolicyUri" target="_blank">@AuthenticatePasswordResource.policy</a>
-                }
-            </div>
+            @if (!string.IsNullOrWhiteSpace(Model.PolicyUri))
+            {
+                <a href="@Model.PolicyUri" target="_blank">@AuthenticatePasswordResource.policy</a>
+            }
         </div>
     </div>
 </div>
-
-@section Scripts {
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $(".login").modal({
-                backdrop: 'static',
-                keyboard: true
-            });
-            $(".login").modal('show');
-        });
-    </script>
-}
 
 @RenderSection("SubScripts", required: false)

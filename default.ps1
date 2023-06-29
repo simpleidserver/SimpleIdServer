@@ -26,12 +26,12 @@ function CopyFolder{
 		New-Item $TargetFolderPath -Type Directory
 	}
 	
-	Copy-Item -Path $SourceFolderPath/* -Destination $TargetFolderPath -Exclude *.csproj -recurse -force
+	Copy-Item -Path $SourceFolderPath/* -Destination $TargetFolderPath -Exclude $Excluded -recurse -force
 }
 
 task default -depends local
 task local -depends compile, test
-task ci -depends clean, release, local, pack
+task ci -depends clean, release, local, pack, buildInstaller
 
 task clean {
 	rd "$source_dir\artifacts" -recurse -force  -ErrorAction SilentlyContinue | out-null
@@ -46,14 +46,51 @@ task dockerBuild -depends clean {
 	exec { docker-compose build }
 }
 
-task buildInstaller -depends clean {
-	exec { dotnet publish $source_dir\IdServer\SimpleIdServer.IdServer.Startup\SimpleIdServer.IdServer.Startup.csproj -c $config -o $result_dir\installer\IdServer }
-}
-
 task dockerUp {
 	$Env:TAG = $suffix
 	exec { docker-compose up }
 }
+
+task buildInstaller {
+    New-Item $result_dir\windows64\IdServer -Type Directory
+    New-Item $result_dir\windows64\IdServerWebsite -Type Directory
+    New-Item $result_dir\windows64\Scim -Type Directory
+	
+    New-Item $result_dir\linux64\IdServer -Type Directory
+    New-Item $result_dir\linux64\IdServerWebsite -Type Directory
+    New-Item $result_dir\linux64\Scim -Type Directory
+	
+	Copy-Item -Path $base_dir\scripts\IdServer\Windows\run.ps1 -Destination $result_dir\windows64\IdServer -force
+	Copy-Item -Path $base_dir\scripts\IdServerWebsite\Windows\run.ps1 -Destination $result_dir\windows64\IdServerWebsite -force
+	Copy-Item -Path $base_dir\scripts\Scim\Windows\run.ps1 -Destination $result_dir\windows64\Scim -force
+	
+	Copy-Item -Path $base_dir\scripts\IdServer\Linux\* -Destination $result_dir\linux64\IdServer -recurse -force
+	Copy-Item -Path $base_dir\scripts\IdServerWebsite\Linux\* -Destination $result_dir\linux64\IdServerWebsite -recurse -force
+	Copy-Item -Path $base_dir\scripts\Scim\Linux\* -Destination $result_dir\linux64\Scim -recurse -force
+	
+	exec { dotnet publish $source_dir\IdServer\SimpleIdServer.IdServer.Startup\SimpleIdServer.IdServer.Startup.csproj -c $config -o $result_dir\windows64\IdServer\Server -r win-x64 }
+	exec { dotnet publish $source_dir\IdServer\SimpleIdServer.IdServer.Website.Startup\SimpleIdServer.IdServer.Website.Startup.csproj -c $config -o $result_dir\windows64\IdServerWebsite\Server -r win-x64 }
+	exec { dotnet publish $source_dir\Scim\SimpleIdServer.Scim.Startup\SimpleIdServer.Scim.Startup.csproj -c $config -o $result_dir\windows64\Scim\Server -r win-x64 }
+	
+	exec { dotnet publish $source_dir\IdServer\SimpleIdServer.IdServer.Startup\SimpleIdServer.IdServer.Startup.csproj -c $config -o $result_dir\linux64\IdServer\Server -r linux-x64 }
+	exec { dotnet publish $source_dir\IdServer\SimpleIdServer.IdServer.Website.Startup\SimpleIdServer.IdServer.Website.Startup.csproj -c $config -o $result_dir\linux64\IdServerWebsite\Server -r linux-x64 }
+	exec { dotnet publish $source_dir\Scim\SimpleIdServer.Scim.Startup\SimpleIdServer.Scim.Startup.csproj -c $config -o $result_dir\linux64\Scim\Server -r linux-x64 }
+	
+	$compress = @{
+	  Path = "$result_dir\windows64\*"
+	  CompressionLevel = "Fastest"
+	  DestinationPath = "$result_dir\SimpleIdServer-Windows-x64.zip"
+	}
+	Compress-Archive @compress
+	
+	$compress = @{
+	  Path = "$result_dir\linux64\*"
+	  CompressionLevel = "Fastest"
+	  DestinationPath = "$result_dir\SimpleIdServer-Linux-x64.zip"
+	}
+	Compress-Archive @compress
+}
+
 
 task release {
     $global:config = "release"

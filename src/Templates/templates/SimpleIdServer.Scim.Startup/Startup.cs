@@ -11,26 +11,27 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Persistence.EF;
-using SimpleIdServer.Scim.SqlServer.Startup.Consumers;
-using SimpleIdServer.Scim.SqlServer.Startup.Services;
+using SimpleIdServer.Scim.Startup.Configurations;
+using SimpleIdServer.Scim.Startup.Consumers;
+using SimpleIdServer.Scim.Startup.Services;
 using SimpleIdServer.Scim.SwashbuckleV6;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace SimpleIdServer.Scim.SqlServer.Startup
+namespace SimpleIdServer.Scim.Startup
 {
     public class Startup
     {
-        private readonly IWebHostEnvironment _webHostEnvironment;
-
-        public Startup(IWebHostEnvironment webHostEnvironment, IConfiguration configuration) 
+        public Startup(IWebHostEnvironment env, IConfiguration configuration) 
         {
-            _webHostEnvironment = webHostEnvironment;
+            Env = env;
             Configuration = configuration;
         }
 
+        public IWebHostEnvironment Env { get; private set; }
         public IConfiguration Configuration { get; private set; }
 
         public void ConfigureServices(IServiceCollection services)
@@ -79,17 +80,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                     cfg.ConfigureEndpoints(context);
                 });
             });
-            services.AddScimStoreEF(options =>
-            {
-                options.UseSqlServer(Configuration.GetConnectionString("db"), o =>
-                {
-                    o.MigrationsAssembly(migrationsAssembly);
-                    o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-                });
-            }, options =>
-            {
-                options.DefaultSchema = "scim";
-            });
+            ConfigureStorage(services);
         }
 
         public void Configure(IApplicationBuilder app)
@@ -106,12 +97,15 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
 
         private void InitializeDatabase(IApplicationBuilder app)
         {
+            var section = Configuration.GetSection(nameof(StorageConfiguration));
+            var conf = section.Get<StorageConfiguration>();
+            if (conf.Type == StorageTypes.MONGODB) return;
             using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
                 using (var context = scope.ServiceProvider.GetService<SCIMDbContext>())
                 {
                     context.Database.Migrate();
-                    var basePath = Path.Combine(_webHostEnvironment.ContentRootPath, "Schemas");
+                    var basePath = Path.Combine(Env.ContentRootPath, "Schemas");
                     var userSchema = SimpleIdServer.Scim.SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMResourceTypes.User, true);
                     var eidUserSchema = SimpleIdServer.Scim.SCIMSchemaExtractor.Extract(Path.Combine(basePath, "EIDUserSchema.json"), SCIMResourceTypes.User);
                     var groupSchema = SimpleIdServer.Scim.SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMResourceTypes.Group, true);
@@ -172,6 +166,106 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                     context.SaveChanges();
                 }
             }
+        }
+
+        private void ConfigureStorage(IServiceCollection services)
+        {
+            var section = Configuration.GetSection(nameof(StorageConfiguration));
+            var conf = section.Get<StorageConfiguration>();
+            if (conf.Type == StorageTypes.MONGODB) ConfigureMongoDbStorage(services, conf);
+            else ConfigureEFStorage(services, conf);
+        }
+
+        private void ConfigureMongoDbStorage(IServiceCollection services, StorageConfiguration conf)
+        {
+            var basePath = Path.Combine(Env.ContentRootPath, "Schemas");
+            var userSchema = SimpleIdServer.Scim.SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMResourceTypes.User, true);
+            var eidUserSchema = SimpleIdServer.Scim.SCIMSchemaExtractor.Extract(Path.Combine(basePath, "EIDUserSchema.json"), SCIMResourceTypes.User);
+            var groupSchema = SimpleIdServer.Scim.SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMResourceTypes.Group, true);
+            var entrepriseUser = SimpleIdServer.Scim.SCIMSchemaExtractor.Extract(Path.Combine(basePath, "EnterpriseUser.json"), SCIMResourceTypes.User);
+            userSchema.SchemaExtensions.Add(new SCIMSchemaExtension
+            {
+                Id = Guid.NewGuid().ToString(),
+                Schema = "urn:ietf:params:scim:schemas:extension:eid:2.0:User"
+            });
+            userSchema.SchemaExtensions.Add(new SCIMSchemaExtension
+            {
+                Id = Guid.NewGuid().ToString(),
+                Schema = "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"
+            });
+            var schemas = new List<SCIMSchema>
+            {
+                userSchema,
+                groupSchema,
+                eidUserSchema,
+                entrepriseUser
+            };
+            services.AddScimStoreMongoDB(opt =>
+            {
+                opt.ConnectionString = conf.ConnectionString;
+                opt.Database = "scim";
+                opt.CollectionMappings = "mappings";
+                opt.CollectionRepresentations = "representations";
+                opt.CollectionSchemas = "schemas";
+                opt.SupportTransaction = false;
+            }, schemas,
+            new List<SCIMAttributeMapping>
+            {
+                new SCIMAttributeMapping
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    SourceAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id,
+                    SourceResourceType = StandardSchemas.UserSchema.ResourceType,
+                    SourceAttributeSelector = "groups",
+                    TargetResourceType = StandardSchemas.GroupSchema.ResourceType,
+                    TargetAttributeId = groupSchema.Attributes.First(a => a.Name == "members").Id
+                },
+                new SCIMAttributeMapping
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    SourceAttributeId = groupSchema.Attributes.First(a => a.Name == "members").Id,
+                    SourceResourceType = StandardSchemas.GroupSchema.ResourceType,
+                    SourceAttributeSelector = "members",
+                    TargetResourceType = StandardSchemas.UserSchema.ResourceType,
+                    TargetAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id,
+                    Mode = Mode.PROPAGATE_INHERITANCE
+                },
+                new SCIMAttributeMapping
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    SourceAttributeId = groupSchema.Attributes.First(a => a.Name == "members").Id,
+                    SourceResourceType = StandardSchemas.GroupSchema.ResourceType,
+                    SourceAttributeSelector = "members",
+                    TargetResourceType = StandardSchemas.GroupSchema.ResourceType
+                }
+            });
+        }
+
+        private void ConfigureEFStorage(IServiceCollection services, StorageConfiguration conf)
+        {
+            services.AddScimStoreEF(options =>
+            {
+                switch (conf.Type)
+                {
+                    case StorageTypes.SQLSERVER:
+                        options.UseSqlServer(conf.ConnectionString, o =>
+                        {
+                            o.MigrationsAssembly("SimpleIdServer.Scim.SqlServerMigrations");
+                            o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+                        });
+                        break;
+                    case StorageTypes.POSTGRE:
+                        options.UseNpgsql(conf.ConnectionString, o =>
+                        {
+                            o.MigrationsAssembly("SimpleIdServer.Scim.PostgreMigrations");
+                            o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+                        });
+                        break;
+                }
+            }, options =>
+            {
+                options.DefaultSchema = "scim";
+            });
         }
     }
 }

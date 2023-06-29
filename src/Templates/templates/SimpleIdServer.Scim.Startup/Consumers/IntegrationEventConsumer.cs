@@ -3,7 +3,7 @@ using SimpleIdServer.Scim.ExternalEvents;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.Scim.SqlServer.Startup.Consumers
+namespace SimpleIdServer.Scim.Startup.Consumers
 {
     public class IntegrationEventConsumer : IConsumer<RepresentationRefAttributeAddedEvent>
     {

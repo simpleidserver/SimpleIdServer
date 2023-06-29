@@ -1,22 +1,41 @@
 using Microsoft.EntityFrameworkCore;
+using SimpleIdServer.IdServer.Website.Startup.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Configuration.AddJsonFile("appsettings.json")
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
     .AddEnvironmentVariables();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSIDWebsite(o =>
 {
     o.IdServerBaseUrl = builder.Configuration["IdServerBaseUrl"];
-}, o =>
+    o.SCIMUrl = builder.Configuration["ScimBaseUrl"];
+}, o => ConfigureStorage(o));
+
+void ConfigureStorage(DbContextOptionsBuilder b)
 {
-    o.UseSqlServer(builder.Configuration.GetConnectionString("IdServer"), o =>
+    var section = builder.Configuration.GetSection(nameof(StorageConfiguration));
+    var conf = section.Get<StorageConfiguration>();
+    switch (conf.Type)
     {
-        o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-    });
-});
+        case StorageTypes.SQLSERVER:
+            b.UseSqlServer(conf.ConnectionString, o =>
+            {
+                o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+            });
+            break;
+        case StorageTypes.POSTGRE:
+            b.UseNpgsql(conf.ConnectionString, o =>
+            {
+                o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+            });
+            break;
+    }
+}
+
 builder.Services.AddDefaultSecurity(builder.Configuration);
 
 var app = builder.Build();

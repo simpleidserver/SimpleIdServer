@@ -3,7 +3,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace SimpleIdServer.Scim.SqlServer.Startup
+namespace SimpleIdServer.Scim.Startup
 {
     public class Program
     {

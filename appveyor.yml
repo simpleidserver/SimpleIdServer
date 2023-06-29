@@ -15,6 +15,8 @@ test: off
 artifacts:
 - path: build\results\*.nupkg
   name: NuGet
+- path: build\results\*.zip
+  name: Installers
 deploy:
 - provider: NuGet
   name: production
@@ -24,3 +26,11 @@ deploy:
   on:
     branch: master
     appveyor_repo_tag: true
+- provider: GitHub
+  auth_token:
+    secure: HOUtOslKBc67NRKq2uLaQi4ufR5FbIc82D7khvpNVZzR0750UR659E0Scov2KVbdAw1LbnJ3+D0LPmgZgaGCmnnfzUZDIsBlv4u0AaflbGWBJBC6EPLGvWLOC7vPUIZp
+  artifact: /.*\.zip/
+  on:
+    branch: master
+    appveyor_repo_tag: true
+  
