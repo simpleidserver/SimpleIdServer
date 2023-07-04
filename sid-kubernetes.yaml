@@ -1,0 +1,276 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sid
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: testsecret-tls
+  namespace: sid
+data:
+  tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUVjekNDQXR1Z0F3SUJBZ0lRWTVTd0JuTWJ3eXh1OHk0dGZtNmdXVEFOQmdrcWhraUc5dzBCQVFzRkFEQ0IKaVRFZU1Cd0dBMVVFQ2hNVmJXdGpaWEowSUdSbGRtVnNiM0J0Wlc1MElFTkJNUzh3TFFZRFZRUUxEQ1pVU0VGQwpRVkpVWEdoaFltRnlRSFJvWVdKaGNuUWdLSFJvYVdWeWNua2dhR0ZpWVhKMEtURTJNRFFHQTFVRUF3d3RiV3RqClpYSjBJRlJJUVVKQlVsUmNhR0ZpWVhKQWRHaGhZbUZ5ZENBb2RHaHBaWEp5ZVNCb1lXSmhjblFwTUI0WERUSXoKTURjd05ERTRORFV4T0ZvWERUSTFNVEF3TkRFNE5EVXhPRm93V2pFbk1DVUdBMVVFQ2hNZWJXdGpaWEowSUdSbApkbVZzYjNCdFpXNTBJR05sY25ScFptbGpZWFJsTVM4d0xRWURWUVFMRENaVVNFRkNRVkpVWEdoaFltRnlRSFJvCllXSmhjblFnS0hSb2FXVnljbmtnYUdGaVlYSjBLVENDQVNJd0RRWUpLb1pJaHZjTkFRRUJCUUFEZ2dFUEFEQ0MKQVFvQ2dnRUJBTVRpSGQ4YW5HYnhXcnV6MzVTQTliU1E0MlNBZklqVytURXlRRXlKNVVZZXFnNlhNR3FMa2FqKwoxcmtlVmRSaUkxemhVdGJZUkxPRHBpRzd5TUJrWGRvVHFwbTVBNk5PZXdDbG14L2FNOEgwZzdack5KOFQ4VE82CnJ6Tzl1QlJNMkppdjNZaENDdjBWZUJHdnQ4OGhjRGxDTmxWTDFDcVBXTFYzUFBKbzVTRHBBR1EyZll0cmVPb0oKRHhUYjlSbEp6WGo1RWNEZXZWejZXdUptbDdJektOVjNjNk1WRlRHajd5YUh0S2hDQUlkTldOUnhWeEZ5WjNrYgppcVliQzRmSjRjRThtRytXWFVlVFVnR1VJcTNMRGJOTnpMN2xxVnNIdE5LckJyTW81Y0tISFpoTitJNGZXZVpvClpLd1dzU2lOdU9BcGorb09nUXBqSmk3Uk8vMVpTNmtDQXdFQUFhT0JoRENCZ1RBT0JnTlZIUThCQWY4RUJBTUMKQmFBd0V3WURWUjBsQkF3d0NnWUlLd1lCQlFVSEF3RXdId1lEVlIwakJCZ3dGb0FVdktrbmt0blhvelFORTluagpVbGZIZXBaYTA4c3dPUVlEVlIwUkJESXdNSUlWYzJsa0xuTjJZeTVqYkhWemRHVnlMbXh2WTJGc2doY3FMbk5wClpDNXpkbU11WTJ4MWMzUmxjaTVzYjJOaGJEQU5CZ2txaGtpRzl3MEJBUXNGQUFPQ0FZRUFqMFlZYjNzTmd3T0oKbGEwMXNvRytCUjBQYThYYnQ5REJsVW83MHl0ekM5aElSZDNIQ25qNlNaTnB1eTFXNDFRMzg0d2ZJWmFGOHRZcgpUaXBybHZaQjFYMG1NQkZIVVg0TU9PYi9wL2xZejBtMm9Ba1hBL3FHc3NtTHFlVTRkMEdWTkRzT1RKYkVCeUZrCkZiVWFvekd4K3NzUVB0VUUzMEF3RzdGRXlreHJzckFveDdGeEYyTUV0c29GQkNXb3UxZWdmTDFuMFZkUncwWGcKMjJZd3NCUmpuV0MxV0ZQWENjdmNjenR1TDNZS1FGL3ZvTG1tUitiaXkvVmdVaVI4RmVuN0FpVU43ZTQrMmdFRgpoMmd6VWszb29BQ3ZqRjIyd1Zpd2k1NVY3MzIxNm9ET1RxK1N1Ym1NWmtLRjlmYzZRVW5tOGJ1d0JhWUxEZDlRCmR3VURLVWZyNDNvWVZxdXhVcHhwVVp4eXRvc3RDQjZCRkpOSFdIY3UyUHkwQWZrTlIzaWdpTEFkSVVtT3JVZ3EKSlI4bXYwcnN4OWRnTng2aWVIMkdiOUtnNkw5Y0pPUWFNdlczUWNmRExnektXN09kOTExQU50b0l1UjAvbXVVYgpaWGJ2NlNQRCtJRXI1MGxHdC9EUENUYjZuaXp0YmhTbmxBSjFYaExSTSt2UjJhclN2V3pwCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0=
+  tls.key: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2QUlCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktZd2dnU2lBZ0VBQW9JQkFRREU0aDNmR3B4bThWcTcKczkrVWdQVzBrT05rZ0h5STF2a3hNa0JNaWVWR0hxb09sekJxaTVHby90YTVIbFhVWWlOYzRWTFcyRVN6ZzZZaAp1OGpBWkYzYUU2cVp1UU9qVG5zQXBac2YyalBCOUlPMmF6U2ZFL0V6dXE4enZiZ1VUTmlZcjkySVFncjlGWGdSCnI3ZlBJWEE1UWpaVlM5UXFqMWkxZHp6eWFPVWc2UUJrTm4yTGEzanFDUThVMi9VWlNjMTQrUkhBM3IxYytscmkKWnBleU15alZkM09qRlJVeG8rOG1oN1NvUWdDSFRWalVjVmNSY21kNUc0cW1Hd3VIeWVIQlBKaHZsbDFIazFJQgpsQ0t0eXcyelRjeSs1YWxiQjdUU3F3YXpLT1hDaHgyWVRmaU9IMW5tYUdTc0ZyRW9qYmpnS1kvcURvRUtZeVl1CjBUdjlXVXVwQWdNQkFBRUNnZ0VBU0NzMmxleDBQa3ZrWFgrZXlobkhkeXZSSHFyMmUxYUp1NTNXOGZkdUlwamsKN3pvK1ZoL1pBZUNBSnhWV2t1WnlYZjUrVmlDcWRqOGdxNmJnL0owTnhmMkZnSm5RR3BHUEJ2cXRkU3lQNGwzVgoxZzFRR2F1K3M1NlAwR0NQMUdraTBEMU84RDU5TnE0aStDQzRPT1hoOUNzd0xXNEJWS1I4K08rL1dJQlkxUW5QCk13ZlRDNGJGSHpXakFEVWpyK29sNG5kWWFtYlhBMTdDQk9mdFpkbEZORUtnZ1lKSzNiU1RvSTNVUDdZaUhyT1QKUGJqY2t6cC9BdXlCTlk0d1hkRTZZRFFsK0pOWExoVHlNRUExMHVOK3BlRVhXRFM5VG9makN5ckxtajZJOENKeQpmTDZDNWZpbUpTaERqSXEwTFpldjRRWktJUUM3bDJnU0lCbkVXZmhMQVFLQmdRRGdRNGdCb2VsSDVzK3A2WTIyCjlyVVo1c01MdEpheC9aSG5TUHFWeFdlZTM3UTVPeXZhbW1BUTRqYmpkZTNmcGhkQmpNeUlaUkxxdFdveldLeFcKWmJodVZhQ2lpNDk1dXE0Smx2b1VzVTVOUmJvUnlqY3hMZVpLOEpZSFFsUEdremlVa1pFUXpIaHZwVzFKRFFqNApJZlNQeW9Ecm5rOWJFWE10cmtnTUxZaVJvUUtCZ1FEZ3ZxbkxYT2pHTkFNVHRuK3QyMVZrd3BiQTVxUGQzZzAvCjNhVWs2Wm9IU1BBakRtQ3ZDTExHN1laUWpvanNIRmppaHZsWGdGR0dYSVdvcHpnd29YTDNUTTUxcDJZbVJzNksKQS9SZUJwNUNzRVNYMURYZGFPUE5jaUNGRi9US2RYYjdCRERubEsvRThwa3E1T0gxcmQwSmZjVkFzcEtBaWtZUgp0cVBOUU1jTkNRS0JnSGNSNCtoWit1MytFa3Y0Z1JHZnMwL3BRYTI1V0Rsd2xFTGtjSWVNcEJPcVdwbjRYTFJZCk9xRThPa0JTb05XWjdjY1Q1cFNVZFpMQWQzNkRtaHpWTFRNSHE1NGgweStpZWowRk9BbzhpWUpsZndGckNCckkKYi9saCs0WW5KU3ZOaHNENitMYWVtV05OeGRSL1l6KzdaNG5nenNwSzUzOUdxSXljZUF4Zk1KK0JBb0dBVVZKcwpXaHU2VnMzSE4wRFlIbTY1RFlhanloVXF3a054QStVTnRyZVlkbjViOWpOanBMSS9EbUF3TThIL3BYLzBZYk41ClVjSXF2YldJMzZmeVd4WndaUyt6blRyL2FXWkJvZ3NnUjAyWndvUEpyaTZwZHY1WFA2WEdRcUtTZnhmVi82cGEKajlGcmNKWmYrZmRzRTl2Zm1XbWJFSGdOTHRuWjFOc0RsbWVVSHhFQ2dZQTM5Rk12NmR4UHFnZVpVZ0FaTjlJOQo1WDBHbHBuTkZVNGFucWM5UU5jL0pwaGlVd1M1S2EwN3kxV0lITUhXYzljb2VtZlFoKzM1bjVReVAzb1BWZVg4CkxBUDRBdE9YdUVzZVZtdWRoRXBSODF3bFJqS0prcFkvcDdmaGpHTnJ2dkVMQlJRQnpTOWgxcFRsUjRoNUxkLysKbDlyL0ZNaXRGV2dSMzUvREt5YjF1Zz09Ci0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0=
+type: kubernetes.io/tls
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-service
+  namespace: sid
+spec:
+  selector:
+    app: db
+  type: NodePort  
+  ports:
+    - protocol: TCP
+      port: 1433
+      targetPort: 1433
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sid-virtual-host-ingress
+  namespace: sid
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
+spec:
+  tls:
+  - hosts:
+      - scim.sid.svc.cluster.local
+      - idserver.sid.svc.cluster.local
+      - website.sid.svc.cluster.local
+    secretName: testsecret-tls
+  rules:
+  - host: "scim.sid.svc.cluster.local"
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: scim
+            port:
+              number: 80
+  - host: "idserver.sid.svc.cluster.local"
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: idserver
+            port:
+              number: 80
+  - host: "website.sid.svc.cluster.local"
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: website
+            port:
+              number: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scim
+  namespace: sid
+spec:
+  type: NodePort
+  selector:
+    app: scim-deploy
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+    - name: https
+      protocol: TCP
+      port: 443
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: idserver
+  namespace: sid
+spec:
+  type: NodePort
+  selector:
+    app: idserver-deploy
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+    - name: https
+      protocol: TCP
+      port: 443
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: website
+  namespace: sid
+spec:
+  type: NodePort
+  selector:
+    app: website-deploy
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+    - name: https
+      protocol: TCP
+      port: 443
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-deployment
+  namespace: sid
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db
+  minReadySeconds: 5
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      containers:
+        - name: db
+          image: mcr.microsoft.com/mssql/server:2022-latest
+          ports:
+            - containerPort: 1433
+          env:
+            - name: "ACCEPT_EULA"
+              value: "Y"
+            - name: "SA_PASSWORD"
+              value: "D54DE7hHpkG9"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scim-deployment
+  namespace: sid
+  labels:
+    app: scim-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scim-deploy
+  template:
+    metadata:
+      labels:
+        app: scim-deploy
+    spec:
+      subdomain: localhost
+      containers:
+      - name: scim-deploy
+        image: simpleidserver/scim:ci-local
+        imagePullPolicy: Never
+        ports:
+          - containerPort: 80
+        env:
+            - name: "ASPNETCORE_URLS"
+              value: "http://*:80;https://*:443"              
+            - name: "ASPNETCORE_Kestrel__Certificates__Default__Password"
+              value: "password"
+            - name: "ASPNETCORE_Kestrel__Certificates__Default__Path"
+              value: "/certificates/sid.pfx"
+            - name: "ASPNETCORE_FORWARDEDHEADERS_ENABLED"
+              value: "true"
+            - name: "StorageConfiguration__ConnectionString"
+              value: "Data Source=db-service,1433;Initial Catalog=Scim;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: idserver-deployment
+  namespace: sid
+  labels:
+    app: idserver-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: idserver-deploy
+  template:
+    metadata:
+      labels:
+        app: idserver-deploy
+    spec:
+      subdomain: localhost
+      containers:
+      - name: idserver-deploy
+        image: simpleidserver/idserver:ci-local
+        imagePullPolicy: Never
+        ports:
+          - containerPort: 80
+        env:
+            - name: "ASPNETCORE_URLS"
+              value: "http://*:80;https://*:443"    
+            - name: "ASPNETCORE_Kestrel__Certificates__Default__Password"
+              value: "password"
+            - name: "ASPNETCORE_Kestrel__Certificates__Default__Path"
+              value: "/certificates/sid.pfx"
+            - name: "ASPNETCORE_FORWARDEDHEADERS_ENABLED"
+              value: "true"
+            - name: "DistributedCacheConfiguration__ConnectionString"
+              value: "Data Source=db-service,1433;Initial Catalog=IdServer;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"
+            - name: "StorageConfiguration__ConnectionString"
+              value: "Data Source=db-service,1433;Initial Catalog=IdServer;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"
+            - name: "SCIMBaseUrl"
+              value: "https://scim.sid.svc.cluster.local"
+            - name: "Authority"
+              value: "https://idserver.sid.svc.cluster.local"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: website-deployment
+  namespace: sid
+  labels:
+    app: website-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: website-deploy
+  template:
+    metadata:
+      labels:
+        app: website-deploy
+    spec:
+      subdomain: localhost
+      containers:
+      - name: website-deploy
+        image: simpleidserver/website:ci-local
+        imagePullPolicy: Never
+        ports:
+          - containerPort: 80
+        env:
+            - name: "ASPNETCORE_URLS"
+              value: "http://*:80;https://*:443"    
+            - name: "ASPNETCORE_Kestrel__Certificates__Default__Password"
+              value: "password"
+            - name: "ASPNETCORE_Kestrel__Certificates__Default__Path"
+              value: "/certificates/sid.pfx"
+            - name: "ASPNETCORE_FORWARDEDHEADERS_ENABLED"
+              value: "true"
+            - name: "DefaultSecurityOptions__Issuer"
+              value: "https://idserver.sid.svc.cluster.local/master"
+            - name: "DefaultSecurityOptions__IgnoreCertificateError"
+              value: "true"
+            - name: "IdServerBaseUrl"
+              value: "https://idserver.sid.svc.cluster.local"
+            - name: "ScimBaseUrl"
+              value: "https://scim.sid.svc.cluster.local"
+            - name: "StorageConfiguration__ConnectionString"
+              value: "Data Source=db-service,1433;Initial Catalog=IdServer;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"

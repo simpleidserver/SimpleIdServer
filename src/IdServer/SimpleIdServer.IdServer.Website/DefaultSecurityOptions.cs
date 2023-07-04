@@ -10,4 +10,5 @@ public class DefaultSecurityOptions
     public string ClientSecret { get; set; }
     public string Scope { get; set; }
     public string? RequiredRole { get; set; }
+    public bool IgnoreCertificateError { get; set; }
 }

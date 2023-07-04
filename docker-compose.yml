@@ -1,5 +1,21 @@
 version: "3.9"
 services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    container_name: nginx
+    ports:
+      - '443:443'
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./compose/certificates:/etc/nginx/certs:ro
+      - ./compose/proxy.conf:/etc/nginx/conf.d/customproxy.conf:ro
+    networks:
+      proxy_net:
+        aliases:
+          - idserver.localhost.com
+          - scim.localhost.com
+          - website.localhost.com
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
     volumes:
@@ -7,52 +23,62 @@ services:
     environment:
       ACCEPT_EULA: Y
       MSSQL_SA_PASSWORD : "D54DE7hHpkG9"
+    networks:
+      proxy_net: null
   scim:
     build:
       context: .
       dockerfile: ./ScimDockerFile
     image: simpleidserver/scim:${TAG}
     environment:
-      ASPNETCORE_URLS : "https://*:5003"
-      StorageConfiguration__ConnectionString: "Data Source=db;Initial Catalog=IdServer;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"
-    ports:
-      - "5003:5003"
+      VIRTUAL_HOST: "scim.localhost.com"
+      ASPNETCORE_URLS : "http://*:80"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: true
+      StorageConfiguration__ConnectionString: "Data Source=db;Initial Catalog=Scim;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"
     depends_on:
       - db
+    networks:
+      proxy_net: null
   idserver:
     build:
       context: .
       dockerfile: ./IdServer
     image: simpleidserver/idserver:${TAG}
     environment:
-      ASPNETCORE_URLS : "https://*:5001"
-      ASPNETCORE_Kestrel__Certificates__Default__Password: "password"
-      ASPNETCORE_Kestrel__Certificates__Default__Path: "/certificates/localhost.pfx"
+      VIRTUAL_HOST: "idserver.localhost.com"
+      ASPNETCORE_URLS : "http://*:80"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: true
       DistributedCacheConfiguration__ConnectionString: "Data Source=db;Initial Catalog=IdServer;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"
       StorageConfiguration__ConnectionString: "Data Source=db;Initial Catalog=IdServer;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"
-      SCIMBaseUrl: "http://scim:5003"
-    ports:
-      - "5001:5001"
+      SCIMBaseUrl: "https://scim.localhost.com"
+      Authority: "https://idserver.localhost.com"
     depends_on:
       - db
       - scim
-    volumes:
-      - ./certificates:/certificates
+    networks:
+      proxy_net: null
   website:
     build:
       context: .
       dockerfile: ./IdServerWebsite
     image: simpleidserver/website:${TAG}
     environment:
-      ASPNETCORE_URLS : "http://*:5002"
-      IdServerBaseUrl: "https://idserver:5001"
-      IdServerBaseUrl: "https://scim:5003"
+      VIRTUAL_HOST: "website.localhost.com"
+      ASPNETCORE_URLS : "http://*:80"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: true
+      DefaultSecurityOptions__Issuer: "https://idserver.localhost.com/master"
+      DefaultSecurityOptions__IgnoreCertificateError: "true"
+      IdServerBaseUrl: "https://idserver.localhost.com"
+      ScimBaseUrl: "https://scim.localhost.com"
       StorageConfiguration__ConnectionString: "Data Source=db;Initial Catalog=IdServer;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"
-    ports:
-      - "5002:5002"
     depends_on:
       - db
       - idserver
       - scim
+    networks:
+      proxy_net: null
+networks:
+  proxy_net:
+    driver: bridge
 volumes:
   mssqldata:

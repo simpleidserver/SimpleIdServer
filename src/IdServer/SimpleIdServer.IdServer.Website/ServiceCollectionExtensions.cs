@@ -45,7 +45,6 @@ namespace Microsoft.Extensions.DependencyInjection
             string authoritySectionName = nameof(IdServerWebsiteOptions.IdServerBaseUrl);
             string defaultSecurityOptionsSectionName = nameof(DefaultSecurityOptions);
             string? authority = configuration.GetValue<string>(authoritySectionName);
-
             if (string.IsNullOrEmpty(authority))
             {
                 Console.WriteLine($"Please configure the '{authoritySectionName}' section.");
@@ -73,6 +72,18 @@ namespace Microsoft.Extensions.DependencyInjection
             })
             .AddOpenIdConnect("oidc", config =>
             {
+                if(defaultSecurityOptions.IgnoreCertificateError)
+                {
+                    var handler = new HttpClientHandler
+                    {
+                        ServerCertificateCustomValidationCallback = (httpRequestMessage, cert, cetChain, policyErrors) =>
+                        {
+                            return true;
+                        }
+                    };
+                    config.BackchannelHttpHandler = handler;
+                }
+
                 config.NonceCookie.SecurePolicy = CookieSecurePolicy.Always;
                 config.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
                 config.Authority = defaultSecurityOptions.Issuer;
