@@ -76,7 +76,7 @@ const config = {
           src: 'img/logo-no-shield.svg',
         },
         items: [
-          { type: 'doc', docId: 'intro', label: 'Documentation', position: 'left' },
+          { type: 'doc', docId: 'installation', label: 'Documentation', position: 'left' },
           { type: 'doc', docId: 'download', label: 'Download', position: 'left' },
           { type: 'doc', docId: 'consultancy', label: 'Consultancy', position: 'left' },
           { type: 'doc', docId: 'tutorial/overview', label: 'Tutorial', position: 'left' },

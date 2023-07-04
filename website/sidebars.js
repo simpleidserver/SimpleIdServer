@@ -14,7 +14,9 @@
 /** @type {import('@docusaurus/plugin-content-docs').SidebarsConfig} */
 const sidebars = {
   docs: [
-    'intro',
+    'installation',
+    'dotnettemplate',
+    'architecture',
     'realm/index',
     { type: 'category', label: 'Identity Management', items:[ 'idmanagement/index', 'idmanagement/azuread', 'idmanagement/samples' ] },
     { type: 'category', label: 'OAuth 2.0 and OpenID Connect', items:[ 'openidconnect/index', 'openidconnect/grant_types', 'openidconnect/clientauthmethods', 'openidconnect/clientregistration', 'openidconnect/acr' ] },
