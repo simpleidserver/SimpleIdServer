@@ -29,6 +29,15 @@ function CopyFolder{
 	Copy-Item -Path $SourceFolderPath/* -Destination $TargetFolderPath -Exclude $Excluded -recurse -force
 }
 
+function GetDockerVersion {
+	$env = $env:DOCKER_VERSION
+	if($env -eq $NULL) {
+		$env = 'ci-local'
+	}
+	
+	return $env	
+}
+
 task default -depends local
 task local -depends compile, test
 task ci -depends clean, release, local, pack, buildInstaller
@@ -39,7 +48,8 @@ task clean {
 }
 
 task dockerBuild -depends clean {
-	$Env:TAG = $suffix
+	$Env:TAG = GetDockerVersion
+	echo "Docker version: $Env:TAG"
 	exec { dotnet publish $source_dir\IdServer\SimpleIdServer.IdServer.Startup\SimpleIdServer.IdServer.Startup.csproj -c $config -o $result_dir\docker\IdServer }
 	exec { dotnet publish $source_dir\IdServer\SimpleIdServer.IdServer.Website.Startup\SimpleIdServer.IdServer.Website.Startup.csproj -c $config -o $result_dir\docker\IdServerWebsite }
 	exec { dotnet publish $source_dir\Scim\SimpleIdServer.Scim.Startup\SimpleIdServer.Scim.Startup.csproj -c $config -o $result_dir\docker\Scim }
@@ -47,7 +57,7 @@ task dockerBuild -depends clean {
 }
 
 task dockerUp {
-	$Env:TAG = $suffix
+	$Env:TAG = GetDockerVersion
 	exec { docker-compose up }
 }
 
