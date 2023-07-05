@@ -75,7 +75,7 @@ steps:
 - task: CopyFiles@2
   displayName: 'Copy SCIM'
   inputs:
-    SourceFolder: '$(Build.Repository.LocalPath)\src\Scim\SimpleIdServer.Scim.SqlServer.Startup\bin\Debug\net6.0\publish'
+    SourceFolder: '$(Build.Repository.LocalPath)\src\Scim\SimpleIdServer.Scim.Startup\bin\Debug\net7.0\publish'
     Contents: '**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)\scim'
 
