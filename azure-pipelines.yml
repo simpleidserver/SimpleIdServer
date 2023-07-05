@@ -10,10 +10,6 @@ pool:
   name: Default
 
 steps:
-- task: UseDotNet@2
-  inputs:
-    packageType: 'sdk'
-    version: '7.x'
 - task: NodeTool@0
   inputs:
     versionSpec: '16.14.x'
@@ -53,7 +49,7 @@ steps:
     publishWebProjects: false
     zipAfterPublish: false
     modifyOutputPath: false
-    workingDirectory: '$(Build.Repository.LocalPath)\src\Scim\SimpleIdServer.Scim.SqlServer.Startup'
+    workingDirectory: '$(Build.Repository.LocalPath)\src\Scim\SimpleIdServer.Scim.Startup'
 
 - task: CopyFiles@2
   displayName: 'Copy website'
