@@ -28,7 +28,7 @@ deploy:
     appveyor_repo_tag: true
 - provider: GitHub
   auth_token:
-    secure: HOUtOslKBc67NRKq2uLaQi4ufR5FbIc82D7khvpNVZzR0750UR659E0Scov2KVbdAw1LbnJ3+D0LPmgZgaGCmnnfzUZDIsBlv4u0AaflbGWBJBC6EPLGvWLOC7vPUIZp
+    secure: HOUtOslKBc67NRKq2uLaQpPg5IqFGRPl3XrO8Q8VrVCOIg5T/DjOj4PcS3ge+Jd1YAmln0spAAFx+dUhvPfqd1XEO8XDQAZYMK27PZ8/aI0cKQejYBrL4zaBC8ygx0R
   artifact: /.*\.zip/
   on:
     branch: master
