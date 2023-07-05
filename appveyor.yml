@@ -20,7 +20,7 @@ artifacts:
 deploy:
 - provider: GitHub
   auth_token:
-    secure: HOUtOslKBc67NRKq2uLaQti9dguUYzDp8Nit0HKGsBR3jFtZuttFil+tWDsUvXepwWWGKSSu55s+n2VQ1L/udjeFL80Yk44zZgayoGjQLxWBlJVHpf+NbpQgyisZmMMp
+    secure: Czcu42wI76bvJ76aYnPdzYwsgKzV72ojXmOZk0C3jL0H2tnPsGGnffXCQ3EP+700
   artifact: /.*\.zip/
   on:
     branch: master
