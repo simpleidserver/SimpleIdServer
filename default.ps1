@@ -53,7 +53,11 @@ task dockerBuild -depends clean {
 	exec { dotnet publish $source_dir\IdServer\SimpleIdServer.IdServer.Startup\SimpleIdServer.IdServer.Startup.csproj -c $config -o $result_dir\docker\IdServer }
 	exec { dotnet publish $source_dir\IdServer\SimpleIdServer.IdServer.Website.Startup\SimpleIdServer.IdServer.Website.Startup.csproj -c $config -o $result_dir\docker\IdServerWebsite }
 	exec { dotnet publish $source_dir\Scim\SimpleIdServer.Scim.Startup\SimpleIdServer.Scim.Startup.csproj -c $config -o $result_dir\docker\Scim }
-	exec { docker-compose build --no-cache }
+	exec { docker-compose -f local-docker-compose.yml build --no-cache }
+}
+
+task dockerPublish -depends dockerBuild {
+	{ exec docker-compose -f local-docker-compose.yml push }
 }
 
 task dockerUp {
@@ -70,13 +74,22 @@ task buildInstaller {
     New-Item $result_dir\linux64\IdServerWebsite -Type Directory
     New-Item $result_dir\linux64\Scim -Type Directory
 	
+    New-Item $result_dir\docker -Type Directory
+	
+    New-Item $result_dir\kubernetes -Type Directory
+	
 	Copy-Item -Path $base_dir\scripts\IdServer\Windows\run.ps1 -Destination $result_dir\windows64\IdServer -force
 	Copy-Item -Path $base_dir\scripts\IdServerWebsite\Windows\run.ps1 -Destination $result_dir\windows64\IdServerWebsite -force
 	Copy-Item -Path $base_dir\scripts\Scim\Windows\run.ps1 -Destination $result_dir\windows64\Scim -force
 	
 	Copy-Item -Path $base_dir\scripts\IdServer\Linux\* -Destination $result_dir\linux64\IdServer -recurse -force
 	Copy-Item -Path $base_dir\scripts\IdServerWebsite\Linux\* -Destination $result_dir\linux64\IdServerWebsite -recurse -force
-	Copy-Item -Path $base_dir\scripts\Scim\Linux\* -Destination $result_dir\linux64\Scim -recurse -force
+	Copy-Item -Path $base_dir\scripts\Scim\Linux\* -Destination $result_dir\linux64\Scim -recurse -force	
+
+	Copy-Item -Path $base_dir\docker-compose.yml -Destination $result_dir\docker\docker-compose.yml
+	Copy-Item -Path $base_dir\compose -Destination $result_dir\docker -recurse -force
+	
+	Copy-Item -Path $base_dir\sid-kubernetes.yaml -Destination $result_dir\kubernetes -recurse -force
 	
 	exec { dotnet publish $source_dir\IdServer\SimpleIdServer.IdServer.Startup\SimpleIdServer.IdServer.Startup.csproj -c $config -o $result_dir\windows64\IdServer\Server -r win-x64 }
 	exec { dotnet publish $source_dir\IdServer\SimpleIdServer.IdServer.Website.Startup\SimpleIdServer.IdServer.Website.Startup.csproj -c $config -o $result_dir\windows64\IdServerWebsite\Server -r win-x64 }
@@ -97,6 +110,20 @@ task buildInstaller {
 	  Path = "$result_dir\linux64\*"
 	  CompressionLevel = "Fastest"
 	  DestinationPath = "$result_dir\SimpleIdServer-Linux-x64.zip"
+	}
+	Compress-Archive @compress
+	
+	$compress = @{
+	  Path = "$result_dir\docker\*"
+	  CompressionLevel = "Fastest"
+	  DestinationPath = "$result_dir\Docker.zip"
+	}
+	Compress-Archive @compress
+	
+	$compress = @{
+	  Path = "$result_dir\kubernetes\*"
+	  CompressionLevel = "Fastest"
+	  DestinationPath = "$result_dir\Kubernetes.zip"
 	}
 	Compress-Archive @compress
 }

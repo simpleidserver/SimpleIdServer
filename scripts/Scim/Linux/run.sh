@@ -11,7 +11,7 @@ VERSION=""
 pushd $EXECUTABLE_DIR > /dev/null
 
 sleep 2
-eval "./$EXECUTABLE --urls=https://localhost:5002";
+eval "./$EXECUTABLE --urls=https://localhost:5003";
 EXITCODE=$?
 
 popd > /dev/null

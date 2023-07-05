@@ -173,7 +173,8 @@ spec:
       subdomain: localhost
       containers:
       - name: scim-deploy
-        image: simpleidserver/scim:4.0.1
+        image: simpleidserver/scim:ci-local
+        imagePullPolicy: Never
         ports:
           - containerPort: 80
         env:
@@ -208,7 +209,8 @@ spec:
       subdomain: localhost
       containers:
       - name: idserver-deploy
-        image: simpleidserver/idserver:4.0.1
+        image: simpleidserver/idserver:ci-local
+        imagePullPolicy: Never
         ports:
           - containerPort: 80
         env:
@@ -249,7 +251,8 @@ spec:
       subdomain: localhost
       containers:
       - name: website-deploy
-        image: simpleidserver/website:4.0.1
+        image: simpleidserver/website:ci-local
+        imagePullPolicy: Never
         ports:
           - containerPort: 80
         env:
