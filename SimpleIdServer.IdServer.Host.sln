@@ -71,6 +71,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.Pos
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.SqlServerMigrations", "src\IdServer\SimpleIdServer.IdServer.SqlServerMigrations\SimpleIdServer.IdServer.SqlServerMigrations.csproj", "{D2236B28-D0E4-40F3-8865-95EE667FBE4F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.DPoP", "src\IdServer\SimpleIdServer.DPoP\SimpleIdServer.DPoP.csproj", "{12D662D9-3775-4178-998D-FBB2231612B6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -181,6 +183,10 @@ Global
 		{D2236B28-D0E4-40F3-8865-95EE667FBE4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D2236B28-D0E4-40F3-8865-95EE667FBE4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D2236B28-D0E4-40F3-8865-95EE667FBE4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12D662D9-3775-4178-998D-FBB2231612B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12D662D9-3775-4178-998D-FBB2231612B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12D662D9-3775-4178-998D-FBB2231612B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12D662D9-3775-4178-998D-FBB2231612B6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -216,6 +222,7 @@ Global
 		{C4D217EA-25FB-4B0C-B92A-FD342D13F83C} = {4796A22B-91A9-42AF-87CA-F69392696B0A}
 		{B188D040-77C3-4C6D-A5CE-A1D65F6935A1} = {DA65BA14-7FA4-4D99-A11D-C67F75F03771}
 		{D2236B28-D0E4-40F3-8865-95EE667FBE4F} = {DA65BA14-7FA4-4D99-A11D-C67F75F03771}
+		{12D662D9-3775-4178-998D-FBB2231612B6} = {4796A22B-91A9-42AF-87CA-F69392696B0A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FE1E2C8-475E-4592-8609-D331B1D01730}

@@ -754,6 +754,10 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "credential_offer_endpoint");
 
+                    b.Property<bool>("DPOPBoundAccessTokens")
+                        .HasColumnType("bit")
+                        .HasAnnotation("Relational:JsonPropertyName", "dpop_bound_access_tokens");
+
                     b.Property<string>("DefaultAcrValues")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")

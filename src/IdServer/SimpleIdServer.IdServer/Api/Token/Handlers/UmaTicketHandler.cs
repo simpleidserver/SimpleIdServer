@@ -39,13 +39,14 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IUmaPendingRequestRepository _umaPendingRequestRepository;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
+        private readonly IDPOPProofValidator _dpopProofValidator;
         private readonly IBusControl _busControl;
 
         public UmaTicketHandler(IUmaTicketGrantTypeValidator umaTicketGrantTypeValidator, IUmaPermissionTicketHelper umaPermissionTicketHelper, 
             IEnumerable<IClaimTokenFormat> claimTokenFormats, IUmaResourceRepository umaResourceRepository,
             IUmaPendingRequestRepository umaPendingRequestRepository, IEnumerable<ITokenBuilder> tokenBuilders,
-            IEnumerable<ITokenProfile> tokenProfiles, IClientAuthenticationHelper clientAuthenticationHelper, 
-            IBusControl busControl, IOptions<IdServerHostOptions> options) : base(clientAuthenticationHelper, options)
+            IEnumerable<ITokenProfile> tokenProfiles, IClientAuthenticationHelper clientAuthenticationHelper,
+            IDPOPProofValidator dpopProofValidator, IBusControl busControl, IOptions<IdServerHostOptions> options) : base(clientAuthenticationHelper, options)
         {
             _umaTicketGrantTypeValidator = umaTicketGrantTypeValidator;
             _umaPermissionTicketHelper = umaPermissionTicketHelper;
@@ -54,6 +55,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             _umaPendingRequestRepository = umaPendingRequestRepository;
             _tokenBuilders = tokenBuilders;
             _tokenProfiles = tokenProfiles;
+            _dpopProofValidator = dpopProofValidator;
             _busControl = busControl;
         }
 
@@ -73,6 +75,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     var oauthClient = await AuthenticateClient(context, cancellationToken);
                     context.SetClient(oauthClient);
                     activity?.SetTag("client_id", oauthClient.ClientId);
+                    _dpopProofValidator.Validate(context);
                     var ticket = context.Request.RequestData.GetTicket();
                     var claimTokenFormat = context.Request.RequestData.GetClaimTokenFormat();
                     if (string.IsNullOrWhiteSpace(claimTokenFormat))

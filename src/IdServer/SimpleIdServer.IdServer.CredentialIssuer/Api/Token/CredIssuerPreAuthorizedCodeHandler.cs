@@ -27,7 +27,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Token
         private readonly CredentialIssuerOptions _options;
         private readonly ICredIssuerTokenHelper _tokenHelper;
 
-        public CredIssuerPreAuthorizedCodeHandler(ICredentialOfferRepository credentialOfferRepository, IOptions<CredentialIssuerOptions> opts, ICredIssuerTokenHelper tokenHelper, IPreAuthorizedCodeValidator validator, IBusControl busControl, IClientAuthenticationHelper clientAuthenticationHelper, IGrantedTokenHelper grantedTokenHelper, IEnumerable<ITokenProfile> tokenProfiles, IEnumerable<ITokenBuilder> tokenBuilders, IGrantHelper audienceHelper, IOptions<IdServerHostOptions> options) : base(validator, busControl, clientAuthenticationHelper, tokenProfiles, tokenBuilders, audienceHelper, grantedTokenHelper, options)
+        public CredIssuerPreAuthorizedCodeHandler(ICredentialOfferRepository credentialOfferRepository, IOptions<CredentialIssuerOptions> opts, ICredIssuerTokenHelper tokenHelper, IPreAuthorizedCodeValidator validator, IBusControl busControl, IClientAuthenticationHelper clientAuthenticationHelper, IGrantedTokenHelper grantedTokenHelper, IEnumerable<ITokenProfile> tokenProfiles, IEnumerable<ITokenBuilder> tokenBuilders, IGrantHelper audienceHelper, IDPOPProofValidator dpopProofValidator, IOptions<IdServerHostOptions> options) : base(validator, busControl, clientAuthenticationHelper, tokenProfiles, tokenBuilders, audienceHelper, grantedTokenHelper, dpopProofValidator, options)
         {
             _credentialOfferRepository = credentialOfferRepository;
             _options = opts.Value;

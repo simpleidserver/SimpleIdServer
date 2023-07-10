@@ -4,6 +4,7 @@ using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using QRCoder;
 using Radzen;
 using SimpleIdServer.IdServer.Domains;
@@ -30,13 +31,14 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             IDbContextFactory<StoreDbContext> factory,
             IWebsiteHttpClientFactory websiteHttpClientFactory,
             ProtectedSessionStorage sessionStorage,
-            DbContextOptions<StoreDbContext> options,
+            IOptions<IdServerWebsiteOptions> websiteOptions,
             DefaultSecurityOptions securityOptions)
         {
             _loggerFactory = loggerFactory;
             _factory = factory;
             _websiteHttpClientFactory = websiteHttpClientFactory;
             _sessionStorage = sessionStorage;
+            _websiteOptions = websiteOptions.Value;
             _securityOptions = securityOptions;
         }
 

@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.IdServer;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Cryptography;
 using System.Text.Json.Nodes;
@@ -9,9 +8,9 @@ namespace Microsoft.IdentityModel.Tokens
 {
     public static class SigningCredentialsExtensions
     {
-        public static JsonWebKey SerializePublicJWK(this SigningCredentials credentials)
+        public static JsonWebKey SerializePublicJWK(this SigningCredentials credentials, string use = "sig")
         {
-            if(credentials.Key is RsaSecurityKey rsa)
+            if (credentials.Key is RsaSecurityKey rsa)
             {
                 var parameters = rsa.Rsa.ExportParameters(false);
                 credentials = new SigningCredentials(new RsaSecurityKey(parameters) { KeyId = credentials.Kid }, credentials.Algorithm);
@@ -23,20 +22,20 @@ namespace Microsoft.IdentityModel.Tokens
                 credentials = new SigningCredentials(new ECDsaSecurityKey(ECDsa.Create(parameters)) { KeyId = credentials.Kid }, credentials.Algorithm);
             }
 
-            var result = SerializeJWK(credentials);
+            var result = SerializeJWK(credentials, use);
             return result;
         }
 
-        public static string SerializeJWKStr(this SigningCredentials credentials)
+        public static string SerializeJWKStr(this SigningCredentials credentials, string use = "sig")
         {
-            var jsonWebKey = SerializeJWK(credentials);
+            var jsonWebKey = SerializeJWK(credentials, use);
             return JsonNode.Parse(JsonExtensions.SerializeToJson(jsonWebKey)).AsObject().ToJsonString();
         }
 
-        public static JsonWebKey SerializeJWK(this SigningCredentials credentials)
+        public static JsonWebKey SerializeJWK(this SigningCredentials credentials, string use = "sig")
         {
             var result = JsonWebKeyConverter.ConvertFromSecurityKey(credentials.Key);
-            result.Use = Constants.JWKUsages.Sig;
+            if (!string.IsNullOrWhiteSpace(use)) result.Use = use;
             result.Alg = credentials.Algorithm;
             if (credentials.Key is X509SecurityKey)
             {

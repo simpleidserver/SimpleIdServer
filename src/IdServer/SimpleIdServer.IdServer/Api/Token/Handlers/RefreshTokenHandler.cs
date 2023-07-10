@@ -36,6 +36,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IUserRepository _userRepository;
         private readonly IGrantHelper _audienceHelper;
         private readonly IBusControl _busControl;
+        private readonly IDPOPProofValidator _dpopProofValidator;
         private readonly ILogger<RefreshTokenHandler> _logger;
 
         public RefreshTokenHandler(
@@ -47,6 +48,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IClientAuthenticationHelper clientAuthenticationHelper,
             IGrantHelper audienceHelper,
             IBusControl busControl,
+            IDPOPProofValidator dpopProofValidator,
             IOptions<IdServerHostOptions> options,
             ILogger<RefreshTokenHandler> logger) : base(clientAuthenticationHelper, options)
         {
@@ -56,6 +58,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             _tokenBuilders = tokenBuilders;
             _userRepository = userRepository;
             _busControl = busControl;
+            _dpopProofValidator = dpopProofValidator;
             _audienceHelper = audienceHelper;
             _logger = logger;
         }
@@ -76,6 +79,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     var oauthClient = await AuthenticateClient(context, cancellationToken);
                     context.SetClient(oauthClient);
                     activity?.SetTag("client_id", oauthClient.ClientId);
+                    _dpopProofValidator.Validate(context);
                     var refreshToken = context.Request.RequestData.GetRefreshToken();
                     var tokenResult = await _grantedTokenHelper.GetRefreshToken(refreshToken, cancellationToken);
                     if (tokenResult == null)

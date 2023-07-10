@@ -28,6 +28,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         }
 
         public abstract string GrantType { get; }
+
         public abstract Task<IActionResult> Handle(HandlerContext context, CancellationToken cancellationToken);
         protected IdServerHostOptions Options => _options;
 

@@ -33,7 +33,7 @@ namespace SimpleIdServer.IdServer.Api.TokenIntrospection
             var jObjBody = Request.Form.ToJsonObject();
             try
             {
-                var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, jObjBody, jObjHeader, Request.Cookies, clientCertificate), prefix);
+                var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, jObjBody, jObjHeader, Request.Cookies, clientCertificate, HttpContext.Request.Method), prefix);
                 return await _requestHandler.Handle(context, cancellationToken);
             }
             catch (OAuthUnauthorizedException ex)

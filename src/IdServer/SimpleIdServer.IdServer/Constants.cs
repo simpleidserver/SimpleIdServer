@@ -590,6 +590,7 @@ namespace SimpleIdServer.IdServer
         public const string DefaultExternalCookieAuthenticationScheme = "ExternalCookies";
         public const string DefaultCertificateAuthenticationScheme = "Certificate";
         public static string AuthorizationHeaderName = "Authorization";
+        public const string DPOPHeaderName = "DPoP";
         /// <summary>
         /// Direct use of a shared symmetric key as the CEK.
         /// </summary>

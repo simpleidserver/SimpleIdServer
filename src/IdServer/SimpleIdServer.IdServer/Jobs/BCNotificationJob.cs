@@ -121,7 +121,7 @@ namespace SimpleIdServer.IdServer.Jobs
 
             async Task<Dictionary<string, string>> BuildParameters()
             {
-                var context = new HandlerContext(new HandlerContextRequest(null, null, new JsonObject(), null, null, (X509Certificate2)null), bcAuthorize.Realm);
+                var context = new HandlerContext(new HandlerContextRequest(null, null, new JsonObject(), null, null, (X509Certificate2)null, string.Empty), bcAuthorize.Realm);
                 context.SetUser(parameter.Users.First(u => u.Id == bcAuthorize.UserId));
                 context.SetClient(parameter.Clients.First(c => c.ClientId == bcAuthorize.ClientId && c.Realms.Any(r => r.Name == bcAuthorize.Realm)));
                 foreach (var tokenBuilder in _tokenBuilders)

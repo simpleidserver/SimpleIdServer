@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "SimpleIdServer.Vc.Jwt": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:52267;http://localhost:52268"
+    }
+  }
+}

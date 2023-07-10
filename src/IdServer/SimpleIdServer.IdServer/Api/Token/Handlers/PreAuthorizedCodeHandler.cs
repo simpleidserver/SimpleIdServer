@@ -33,6 +33,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
         private readonly IGrantHelper _audienceHelper;
         private readonly IGrantedTokenHelper _grantedTokenHelper;
+        private readonly IDPOPProofValidator _dpopProofValidator;
         private readonly IdServerHostOptions _options;
 
         public PreAuthorizedCodeHandler(
@@ -43,6 +44,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IEnumerable<ITokenBuilder> tokenBuilders,
             IGrantHelper audienceHelper,
             IGrantedTokenHelper grantedTokenHelper,
+            IDPOPProofValidator dpopProofValidator,
             IOptions<IdServerHostOptions> options) : base(clientAuthenticationHelper, options)
         {
             _validator = validator;
@@ -51,6 +53,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             _tokenBuilders = tokenBuilders;
             _audienceHelper = audienceHelper;
             _grantedTokenHelper = grantedTokenHelper;
+            _dpopProofValidator = dpopProofValidator;
             _options = options.Value;
         }
 
@@ -68,6 +71,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     activity?.SetTag("realm", context.Realm);
                     var validationResult = await _validator.Validate(context, cancellationToken);
                     activity?.SetTag("client_id", validationResult.Client.Id);
+                    _dpopProofValidator.Validate(context);
                     var scopes = ScopeHelper.Validate(context.Request.RequestData.GetStr(TokenRequestParameters.Scope), validationResult.Client.Scopes.Select(s => s.Name));
                     var resources = context.Request.RequestData.GetResourcesFromAuthorizationRequest();
                     var authDetails = context.Request.RequestData.GetAuthorizationDetailsFromAuthorizationRequest();

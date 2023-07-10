@@ -33,7 +33,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
     public class WebApiSteps
     {
         private static object _lck = new object();
-        private static IEnumerable<string> PARAMETERS_IN_HEADER = new[] { "Authorization", "X-Testing-ClientCert" };
+        private static IEnumerable<string> PARAMETERS_IN_HEADER = new[] { "Authorization", "X-Testing-ClientCert", "DPoP" };
         private ScenarioContext _scenarioContext;
         private CustomWebApplicationFactory<Program> _factory;
 
@@ -421,19 +421,15 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             return result;
         }
 
-        private Dictionary<string, string> ExtractHeaders(Table table)
+        private List<KeyValuePair<string, string>> ExtractHeaders(Table table)
         {
-            var result = new Dictionary<string, string>();
+            var result = new List<KeyValuePair<string, string>>();
             foreach(var record in table.Rows)
             {
                 var key = record["Key"];
                 var value = ParseValue(_scenarioContext, record["Value"]).ToString();
-                if (!PARAMETERS_IN_HEADER.Contains(key))
-                {
-                    continue;
-                }
-
-                result.Add(key, value.ToString());
+                if (!PARAMETERS_IN_HEADER.Contains(key)) continue;
+                result.Add(new KeyValuePair<string, string>(key, value.ToString()));
             }
 
             return result;

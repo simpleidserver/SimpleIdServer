@@ -37,6 +37,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IGrantHelper _audienceHelper;
         private readonly IdServerHostOptions _options;
         private readonly IBusControl _busControl;
+        private readonly IDPOPProofValidator _dpopProofValidator;
         private readonly ILogger<AuthorizationCodeHandler> _logger;
 
         public AuthorizationCodeHandler(
@@ -48,6 +49,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IClientAuthenticationHelper clientAuthenticationHelper,
             IGrantHelper audienceHelper,
             IBusControl busControl,
+            IDPOPProofValidator dpopProofValidator,
             IOptions<IdServerHostOptions> options,
             ILogger<AuthorizationCodeHandler> logger) : base(clientAuthenticationHelper, options)
         {
@@ -59,6 +61,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             _audienceHelper = audienceHelper;
             _options = options.Value;
             _busControl = busControl;
+            _dpopProofValidator = dpopProofValidator;
             _logger = logger;
         }
 
@@ -78,6 +81,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     var oauthClient = await AuthenticateClient(context, cancellationToken);
                     context.SetClient(oauthClient);
                     activity?.SetTag("client_id", oauthClient.ClientId);
+                    _dpopProofValidator.Validate(context);
                     var code = context.Request.RequestData.GetAuthorizationCode();
                     var redirectUri = context.Request.RequestData.GetRedirectUri();
                     var authCode = await _grantedTokenHelper.GetAuthorizationCode(code, cancellationToken);

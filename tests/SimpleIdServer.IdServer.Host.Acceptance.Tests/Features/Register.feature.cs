@@ -98,23 +98,23 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table413 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table426 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table413.AddRow(new string[] {
+                table426.AddRow(new string[] {
                             "client_id",
                             "fiftySevenClient"});
-                table413.AddRow(new string[] {
+                table426.AddRow(new string[] {
                             "client_secret",
                             "password"});
-                table413.AddRow(new string[] {
+                table426.AddRow(new string[] {
                             "scope",
                             "register"});
-                table413.AddRow(new string[] {
+                table426.AddRow(new string[] {
                             "grant_type",
                             "client_credentials"});
 #line 5
- testRunner.When("execute HTTP POST request \'http://localhost/token\'", ((string)(null)), table413, "When ");
+ testRunner.When("execute HTTP POST request \'http://localhost/token\'", ((string)(null)), table426, "When ");
 #line hidden
 #line 12
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -122,86 +122,86 @@ this.ScenarioInitialize(scenarioInfo);
 #line 13
  testRunner.And("extract parameter \'access_token\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table414 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table427 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table414.AddRow(new string[] {
+                table427.AddRow(new string[] {
                             "Authorization",
                             "Bearer $access_token$"});
-                table414.AddRow(new string[] {
+                table427.AddRow(new string[] {
                             "redirect_uris",
                             "[\"https://web.com\"]"});
-                table414.AddRow(new string[] {
+                table427.AddRow(new string[] {
                             "response_types",
                             "[\"token\"]"});
-                table414.AddRow(new string[] {
+                table427.AddRow(new string[] {
                             "grant_types",
                             "[\"implicit\"]"});
-                table414.AddRow(new string[] {
+                table427.AddRow(new string[] {
                             "client_name",
                             "name"});
-                table414.AddRow(new string[] {
+                table427.AddRow(new string[] {
                             "client_name#fr",
                             "nom"});
-                table414.AddRow(new string[] {
+                table427.AddRow(new string[] {
                             "client_name#en",
                             "name"});
-                table414.AddRow(new string[] {
+                table427.AddRow(new string[] {
                             "application_type",
                             "web"});
-                table414.AddRow(new string[] {
+                table427.AddRow(new string[] {
                             "token_endpoint_auth_method",
                             "client_secret_jwt"});
-                table414.AddRow(new string[] {
+                table427.AddRow(new string[] {
                             "sector_identifier_uri",
                             "https://localhost/sector"});
-                table414.AddRow(new string[] {
+                table427.AddRow(new string[] {
                             "subject_type",
                             "public"});
-                table414.AddRow(new string[] {
+                table427.AddRow(new string[] {
                             "id_token_signed_response_alg",
                             "RS256"});
-                table414.AddRow(new string[] {
+                table427.AddRow(new string[] {
                             "id_token_encrypted_response_alg",
                             "RSA-OAEP"});
-                table414.AddRow(new string[] {
+                table427.AddRow(new string[] {
                             "id_token_encrypted_response_enc",
                             "A256CBC-HS512"});
-                table414.AddRow(new string[] {
+                table427.AddRow(new string[] {
                             "userinfo_signed_response_alg",
                             "RS256"});
-                table414.AddRow(new string[] {
+                table427.AddRow(new string[] {
                             "userinfo_encrypted_response_alg",
                             "RSA-OAEP"});
-                table414.AddRow(new string[] {
+                table427.AddRow(new string[] {
                             "userinfo_encrypted_response_enc",
                             "A256CBC-HS512"});
-                table414.AddRow(new string[] {
+                table427.AddRow(new string[] {
                             "request_object_signing_alg",
                             "RS256"});
-                table414.AddRow(new string[] {
+                table427.AddRow(new string[] {
                             "request_object_encryption_alg",
                             "RSA-OAEP"});
-                table414.AddRow(new string[] {
+                table427.AddRow(new string[] {
                             "request_object_encryption_enc",
                             "A256CBC-HS512"});
-                table414.AddRow(new string[] {
+                table427.AddRow(new string[] {
                             "default_max_age",
                             "2"});
-                table414.AddRow(new string[] {
+                table427.AddRow(new string[] {
                             "require_auth_time",
                             "true"});
-                table414.AddRow(new string[] {
+                table427.AddRow(new string[] {
                             "default_acr_values",
                             "[\"a\",\"b\"]"});
-                table414.AddRow(new string[] {
+                table427.AddRow(new string[] {
                             "post_logout_redirect_uris",
                             "[\"http://localhost/logout\"]"});
-                table414.AddRow(new string[] {
+                table427.AddRow(new string[] {
                             "initiate_login_uri",
                             "https://localhost/loginuri"});
 #line 15
- testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table414, "And ");
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table427, "And ");
 #line hidden
 #line 43
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -309,23 +309,23 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table415 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table428 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table415.AddRow(new string[] {
+                table428.AddRow(new string[] {
                             "client_id",
                             "fiftySevenClient"});
-                table415.AddRow(new string[] {
+                table428.AddRow(new string[] {
                             "client_secret",
                             "password"});
-                table415.AddRow(new string[] {
+                table428.AddRow(new string[] {
                             "scope",
                             "register"});
-                table415.AddRow(new string[] {
+                table428.AddRow(new string[] {
                             "grant_type",
                             "client_credentials"});
 #line 74
- testRunner.When("execute HTTP POST request \'http://localhost/token\'", ((string)(null)), table415, "When ");
+ testRunner.When("execute HTTP POST request \'http://localhost/token\'", ((string)(null)), table428, "When ");
 #line hidden
 #line 81
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -333,86 +333,86 @@ this.ScenarioInitialize(scenarioInfo);
 #line 82
  testRunner.And("extract parameter \'access_token\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table416 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table429 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table416.AddRow(new string[] {
+                table429.AddRow(new string[] {
                             "Authorization",
                             "Bearer $access_token$"});
-                table416.AddRow(new string[] {
+                table429.AddRow(new string[] {
                             "redirect_uris",
                             "[\"https://web.com\"]"});
-                table416.AddRow(new string[] {
+                table429.AddRow(new string[] {
                             "response_types",
                             "[\"token\"]"});
-                table416.AddRow(new string[] {
+                table429.AddRow(new string[] {
                             "grant_types",
                             "[\"implicit\"]"});
-                table416.AddRow(new string[] {
+                table429.AddRow(new string[] {
                             "client_name",
                             "name"});
-                table416.AddRow(new string[] {
+                table429.AddRow(new string[] {
                             "client_name#fr",
                             "nom"});
-                table416.AddRow(new string[] {
+                table429.AddRow(new string[] {
                             "client_name#en",
                             "name"});
-                table416.AddRow(new string[] {
+                table429.AddRow(new string[] {
                             "application_type",
                             "web"});
-                table416.AddRow(new string[] {
+                table429.AddRow(new string[] {
                             "token_endpoint_auth_method",
                             "client_secret_jwt"});
-                table416.AddRow(new string[] {
+                table429.AddRow(new string[] {
                             "sector_identifier_uri",
                             "https://localhost/sector"});
-                table416.AddRow(new string[] {
+                table429.AddRow(new string[] {
                             "subject_type",
                             "public"});
-                table416.AddRow(new string[] {
+                table429.AddRow(new string[] {
                             "id_token_signed_response_alg",
                             "RS256"});
-                table416.AddRow(new string[] {
+                table429.AddRow(new string[] {
                             "id_token_encrypted_response_alg",
                             "RSA-OAEP"});
-                table416.AddRow(new string[] {
+                table429.AddRow(new string[] {
                             "id_token_encrypted_response_enc",
                             "A256CBC-HS512"});
-                table416.AddRow(new string[] {
+                table429.AddRow(new string[] {
                             "userinfo_signed_response_alg",
                             "RS256"});
-                table416.AddRow(new string[] {
+                table429.AddRow(new string[] {
                             "userinfo_encrypted_response_alg",
                             "RSA-OAEP"});
-                table416.AddRow(new string[] {
+                table429.AddRow(new string[] {
                             "userinfo_encrypted_response_enc",
                             "A256CBC-HS512"});
-                table416.AddRow(new string[] {
+                table429.AddRow(new string[] {
                             "request_object_signing_alg",
                             "RS256"});
-                table416.AddRow(new string[] {
+                table429.AddRow(new string[] {
                             "request_object_encryption_alg",
                             "RSA-OAEP"});
-                table416.AddRow(new string[] {
+                table429.AddRow(new string[] {
                             "request_object_encryption_enc",
                             "A256CBC-HS512"});
-                table416.AddRow(new string[] {
+                table429.AddRow(new string[] {
                             "default_max_age",
                             "2"});
-                table416.AddRow(new string[] {
+                table429.AddRow(new string[] {
                             "require_auth_time",
                             "true"});
-                table416.AddRow(new string[] {
+                table429.AddRow(new string[] {
                             "default_acr_values",
                             "[\"a\",\"b\"]"});
-                table416.AddRow(new string[] {
+                table429.AddRow(new string[] {
                             "post_logout_redirect_uris",
                             "[\"http://localhost/logout\"]"});
-                table416.AddRow(new string[] {
+                table429.AddRow(new string[] {
                             "initiate_login_uri",
                             "https://localhost/loginuri"});
 #line 84
- testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table416, "And ");
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table429, "And ");
 #line hidden
 #line 112
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -423,14 +423,14 @@ this.ScenarioInitialize(scenarioInfo);
 #line 114
  testRunner.And("extract parameter \'registration_access_token\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table417 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table430 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table417.AddRow(new string[] {
+                table430.AddRow(new string[] {
                             "Authorization",
                             "Bearer $registration_access_token$"});
 #line 115
- testRunner.And("execute HTTP GET request \'http://localhost/register/$client_id$\'", ((string)(null)), table417, "And ");
+ testRunner.And("execute HTTP GET request \'http://localhost/register/$client_id$\'", ((string)(null)), table430, "And ");
 #line hidden
 #line 119
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

@@ -94,7 +94,7 @@
     {
         await dialogService.OpenAsync<ShareCredentialOfferDialog>("Share credential", new Dictionary<string, object>
         {
-            { "UserLogin", userState.Value.User.Id },
+            { "UserId", userState.Value.User.Id },
             { "UserName", userState.Value.User.Name }
         }, new DialogOptions
         {

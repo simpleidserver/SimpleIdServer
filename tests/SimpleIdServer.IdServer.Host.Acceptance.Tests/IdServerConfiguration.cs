@@ -202,6 +202,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildWalletClient("sixtyClient", "password").RequirePin().Build(),
             ClientBuilder.BuildDeviceClient("sixtyOneClient", "password").AddScope(AdminScope).Build(),
             ClientBuilder.BuildApiClient("sixtyTwoClient", "password").AddScope(StandardScopes.Acrs).Build(),
+            ClientBuilder.BuildApiClient("sixtyThreeClient", "password").AddScope(FirstScope).UseDPOPProof().Build()
 
         };
 

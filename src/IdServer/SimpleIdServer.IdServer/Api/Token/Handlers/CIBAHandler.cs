@@ -30,6 +30,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IBCAuthorizeRepository _bcAuthorizeRepository;
         private readonly IBusControl _busControl;
+        private readonly IDPOPProofValidator _dpopProofValidator;
 
         public CIBAHandler(
             ILogger<CIBAHandler> logger,
@@ -40,7 +41,8 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IClientAuthenticationHelper clientAuthenticationHelper,
             IOptions<IdServerHostOptions> options,
             IBCAuthorizeRepository bcAuthorizeRepository,
-            IBusControl busControl) : base(clientAuthenticationHelper, options)
+            IBusControl busControl,
+            IDPOPProofValidator dpopProofValidator) : base(clientAuthenticationHelper, options)
         {
             _logger = logger;
             _userRepository = userRepository;
@@ -49,6 +51,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             _tokenProfiles = tokensProfiles;
             _bcAuthorizeRepository = bcAuthorizeRepository;
             _busControl = busControl;
+            _dpopProofValidator = dpopProofValidator;
         }
 
         public const string GRANT_TYPE = "urn:openid:params:grant-type:ciba";
@@ -66,6 +69,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     var oauthClient = await AuthenticateClient(context, cancellationToken);
                     context.SetClient(oauthClient);
                     activity?.SetTag("client_id", oauthClient.ClientId);
+                    _dpopProofValidator.Validate(context);
                     var authRequest = await _cibaGrantTypeValidator.Validate(context, cancellationToken);
                     scopeLst = authRequest.Scopes;
                     activity?.SetTag("scopes", string.Join(",", authRequest.Scopes));

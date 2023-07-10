@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "SimpleIdServer.Scim.Client": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:52262;http://localhost:52263"
+    }
+  }
+}

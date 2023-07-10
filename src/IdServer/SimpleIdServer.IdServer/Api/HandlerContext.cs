@@ -6,6 +6,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Middlewares;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json.Nodes;
 using System.Web;
@@ -89,9 +90,10 @@ namespace SimpleIdServer.IdServer.Api
             Referer = referer;
         }
 
-        public HandlerContextRequest(string issuerName, string userSubject, JsonObject data, JsonObject httpHeader, IRequestCookieCollection cookies, X509Certificate2 certificate) : this(issuerName, userSubject, data, httpHeader, cookies)
+        public HandlerContextRequest(string issuerName, string userSubject, JsonObject data, JsonObject httpHeader, IRequestCookieCollection cookies, X509Certificate2 certificate, string httpMethod) : this(issuerName, userSubject, data, httpHeader, cookies)
         {
             Certificate = certificate;
+            HttpMethod = httpMethod;
         }
 
         public string IssuerName { get; private set; }
@@ -102,6 +104,7 @@ namespace SimpleIdServer.IdServer.Api
         public IRequestCookieCollection Cookies { get; set; }
         public X509Certificate2 Certificate { get; set; }
         public string Referer { get; set; }
+        public string HttpMethod { get; set; }
 
         public void SetRequestData(JsonObject data)
         {

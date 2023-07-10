@@ -29,6 +29,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
         private readonly IGrantHelper _audienceHelper;
         private readonly IBusControl _busControl;
+        private readonly IDPOPProofValidator _dpopProofValidator;
         private readonly IdServerHostOptions _options;
 
         public ClientCredentialsHandler(
@@ -38,6 +39,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IEnumerable<ITokenBuilder> tokenBuilders, 
             IClientAuthenticationHelper clientAuthenticationHelper,
             IBusControl busControl,
+            IDPOPProofValidator dpopProofValidator,
             IOptions<IdServerHostOptions> options) : base(clientAuthenticationHelper, options)
         {
             _clientCredentialsGrantTypeValidator = clientCredentialsGrantTypeValidator;
@@ -45,6 +47,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             _tokenBuilders = tokenBuilders;
             _audienceHelper = audienceHelper;
             _busControl = busControl;
+            _dpopProofValidator = dpopProofValidator;
             _options = options.Value;
         }
 
@@ -64,6 +67,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     var oauthClient = await AuthenticateClient(context, cancellationToken);
                     context.SetClient(oauthClient);
                     activity?.SetTag("client_id", oauthClient.ClientId);
+                    _dpopProofValidator.Validate(context);
                     var scopes = ScopeHelper.Validate(context.Request.RequestData.GetStr(TokenRequestParameters.Scope), oauthClient.Scopes.Select(s => s.Name));
                     var resources = context.Request.RequestData.GetResourcesFromAuthorizationRequest();
                     var authDetails = context.Request.RequestData.GetAuthorizationDetailsFromAuthorizationRequest();

@@ -1,5 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+
 namespace SimpleIdServer.IdServer
 {
     public class ErrorMessages
@@ -38,6 +40,7 @@ namespace SimpleIdServer.IdServer
         public const string DUPLICATE_SCOPES = "duplicate scopes : {0}";
         public const string UNAUTHORIZED_TO_SCOPES = "unauthorized to scopes : {0}";
         public const string INVALID_CLAIMS = "claims {0} are invalid";
+        public const string INVALID_DPOP_HEADER = "the DPoP parameter must be a string";
         public const string INVALID_PREAUTHORIZEDCODE = "either the pre-authorized code has expired or is invalid";
         public const string INVALID_IDTOKENHINT = "id_token_hint is invalid";
         public const string INVALID_ISSUED_DEVICE_CODE = "the device code has already been used to get a token";
@@ -145,6 +148,7 @@ namespace SimpleIdServer.IdServer
         public const string MISSING_ID_TOKEN_HINT = "id_token_hint parameter is missing";
         public const string MISSING_RESPONSE_TYPE_CLAIM = "the response_type claim is missing";
         public const string MISSING_CLIENT_ID_CLAIM = "the client_id claim is missing";
+        public const string MISSING_DPOP_PROOF = "the DPOP Proof is missing";
         public const string UNSUPPORTED_USERINFO_SIGNED_RESPONSE_ALG = "userinfo_signed_response_alg is not supported";
         public const string UNSUPPORTED_TOKEN_ENCRYPTED_RESPONSE_ALG = "token_encrypted_response_alg is not supported";
         public const string UNSUPPORTED_IDTOKEN_ENCRYPTED_RESPONSE_ALG = "id_token_encrypted_response_alg is not supported";
@@ -198,6 +202,7 @@ namespace SimpleIdServer.IdServer
         public const string ONLY_HYBRID_WORKFLOWS_ARE_SUPPORTED = "only hybrid workflow are supported";
         public const string UNKNOWN_JSON_WEB_KEY = "unknown json web key '{0}'";
         public const string TOO_MANY_AUTH_REQUEST = "you tried too many times to get a token";
+        public const string TOO_MANY_DPOP_HEADER = "too many DPoP parameters are passed in the header";
         public const string AUTH_REQUEST_EXPIRED = "the authorization request is expired";
         public const string REDIRECT_URI_CONTAINS_FRAGMENT = "the redirect_uri cannot contains fragment";
         public const string CLIENT_ID_CANNOT_BE_EXTRACTED = "client identifier cannot be extracted from the initial request";
@@ -244,5 +249,6 @@ namespace SimpleIdServer.IdServer
         public const string CONTRACT_ALREADY_DEPLOYED = "contract is already deployed";
         public const string NO_CONTRACT = "there is no contract";
         public const string ACR_WITH_SAME_NAME_EXISTS = "an acr with the same name already exists";
+        public const string NOT_WELL_FORMED_DPOP_TOKEN = "the DPoP proof must be a Json Web Token";
     }
 }

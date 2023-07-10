@@ -28,7 +28,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             var jObjBody = Request.Form.ToJsonObject();
             var jObjHeader = Request.Headers.ToJsonObject();
             var clientCertificate = await Request.HttpContext.Connection.GetClientCertificateAsync();
-            var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, jObjBody, jObjHeader, null, clientCertificate), prefix ?? Constants.DefaultRealm);
+            var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, jObjBody, jObjHeader, null, clientCertificate, HttpContext.Request.Method), prefix ?? Constants.DefaultRealm);
             context.SetUrlHelper(Url);
             return await _bcAuthorizeHandler.Create(context, cancellationToken);
         }

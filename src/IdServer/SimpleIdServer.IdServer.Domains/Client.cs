@@ -435,6 +435,13 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? AuthorizationEncryptedResponseEnc { get; set; } = null;
         /// <summary>
+        /// Boolean value specifying whether the client always uses DPoP for token requests.
+        /// If omitted, the default value is false.
+        /// </summary>
+        [JsonPropertyName(OAuthClientParameters.DPOPBoundAccessTokens)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public bool DPOPBoundAccessTokens { get; set; } = false;
+        /// <summary>
         /// Enable or disble the consent screen.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.IsConsentDisabled)]

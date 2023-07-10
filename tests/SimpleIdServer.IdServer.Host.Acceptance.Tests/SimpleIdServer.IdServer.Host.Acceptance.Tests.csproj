@@ -100,6 +100,12 @@
 	  <Compile Update="Features\IdServerConfiguration.feature.cs">
 	    <DependentUpon>IdServerConfiguration.feature</DependentUpon>
 	  </Compile>
+	  <Compile Update="Features\DPOPErrors.feature.cs">
+	    <Visible>true</Visible>
+	    <DependentUpon>DPOPErrors.feature</DependentUpon>
+	    <DesignTime>true</DesignTime>
+	    <AutoGen>true</AutoGen>
+	  </Compile>
 	  <Compile Update="Features\Users.feature.cs">
 	    <DependentUpon>Users.feature</DependentUpon>
 	  </Compile>
@@ -277,6 +283,10 @@
 	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
 	  </SpecFlowFeatureFiles>
 	  <SpecFlowFeatureFiles Update="Features\IdServerConfiguration.feature">
+	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
+	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+	  </SpecFlowFeatureFiles>
+	  <SpecFlowFeatureFiles Update="Features\DPOPErrors.feature">
 	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
 	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
 	  </SpecFlowFeatureFiles>

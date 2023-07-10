@@ -237,6 +237,20 @@ namespace SimpleIdServer.IdServer.Builders
 
         #endregion
 
+        #region DPOP
+
+        /// <summary>
+        /// DPOP Proof is required
+        /// </summary>
+        /// <returns></returns>
+        public ApiClientBuilder UseDPOPProof()
+        {
+            _client.DPOPBoundAccessTokens = true;
+            return this;
+        }
+
+        #endregion
+
         public Client Build() => _client;
     }
 }

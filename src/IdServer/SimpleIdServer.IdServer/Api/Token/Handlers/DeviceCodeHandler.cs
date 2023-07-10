@@ -8,7 +8,6 @@ using SimpleIdServer.IdServer.Api.Token.Helpers;
 using SimpleIdServer.IdServer.Api.Token.TokenBuilders;
 using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
 using SimpleIdServer.IdServer.Api.Token.Validators;
-using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
@@ -32,6 +31,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IAuthenticationHelper _authenticationHelper;
         private readonly IBusControl _busControl;
+        private readonly IDPOPProofValidator _dpopProofValidator;
 
         public DeviceCodeHandler(
             IClientAuthenticationHelper clientAuthenticationHelper,
@@ -42,7 +42,8 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IOptions<IdServerHostOptions> options,
             IDeviceCodeGrantTypeValidator validator,
             IAuthenticationHelper authenticationHelper,
-            IBusControl busControl) : base(clientAuthenticationHelper, options)
+            IBusControl busControl,
+            IDPOPProofValidator dpopProofValidator) : base(clientAuthenticationHelper, options)
         {
             _validator = validator;
             _busControl = busControl;
@@ -51,6 +52,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             _tokenBuilders = tokenBuilders;
             _tokenProfiles = tokenProfiles;
             _authenticationHelper = authenticationHelper;
+            _dpopProofValidator = dpopProofValidator;
         }
 
         public override string GrantType => GRANT_TYPE;
@@ -68,6 +70,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     var oauthClient = await AuthenticateClient(context, cancellationToken);
                     context.SetClient(oauthClient);
                     activity?.SetTag("client_id", oauthClient.ClientId);
+                    _dpopProofValidator.Validate(context);
                     var deviceAuthCode = await _validator.Validate(context, cancellationToken);
                     scopeLst = deviceAuthCode.Scopes;
                     activity?.SetTag("scopes", string.Join(",", deviceAuthCode.Scopes));
