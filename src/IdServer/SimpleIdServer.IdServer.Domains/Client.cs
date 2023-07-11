@@ -468,6 +468,15 @@ namespace SimpleIdServer.IdServer.Domains
         public ICollection<ClientJsonWebKey> SerializedJsonWebKeys { get; set; } = new List<ClientJsonWebKey>();
         [JsonIgnore]
         public string? ClientType { get; set; } = null;
+        /// <summary>
+        /// Nonce is required in the DPoP proof.
+        /// </summary>
+        [JsonIgnore]
+        public bool IsDPOPNonceRequired { get; set; } = false;
+        /// <summary>
+        /// Lifetime of a DPOP nonce.
+        /// </summary>
+        public double DPOPNonceLifetimeInSeconds { get; set; } = 5 * 60;
         [JsonIgnore]
         public ICollection<Translation> Translations { get; set; } = new List<Translation>();
         [JsonIgnore]

@@ -10,3 +10,4 @@ Scenario: Get the configuration
 	And JSON 'userinfo_endpoint'='https://localhost:8080/userinfo'
 	And JSON 'pushed_authorization_request_endpoint '='https://localhost:8080/par'
 	And JSON 'require_pushed_authorization_requests'='false'
+	And JSON exists 'dpop_signing_alg_values_supported'

@@ -27,7 +27,6 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IUserRepository _userRepository;
         private readonly ICIBAGrantTypeValidator _cibaGrantTypeValidator;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
-        private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IBCAuthorizeRepository _bcAuthorizeRepository;
         private readonly IBusControl _busControl;
         private readonly IDPOPProofValidator _dpopProofValidator;
@@ -42,13 +41,12 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IOptions<IdServerHostOptions> options,
             IBCAuthorizeRepository bcAuthorizeRepository,
             IBusControl busControl,
-            IDPOPProofValidator dpopProofValidator) : base(clientAuthenticationHelper, options)
+            IDPOPProofValidator dpopProofValidator) : base(clientAuthenticationHelper, tokensProfiles, options)
         {
             _logger = logger;
             _userRepository = userRepository;
             _cibaGrantTypeValidator = cibaGrantTypeValidator;
             _tokenBuilders = tokenBuilders;
-            _tokenProfiles = tokensProfiles;
             _bcAuthorizeRepository = bcAuthorizeRepository;
             _busControl = busControl;
             _dpopProofValidator = dpopProofValidator;
@@ -69,7 +67,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     var oauthClient = await AuthenticateClient(context, cancellationToken);
                     context.SetClient(oauthClient);
                     activity?.SetTag("client_id", oauthClient.ClientId);
-                    _dpopProofValidator.Validate(context);
+                    await _dpopProofValidator.Validate(context);
                     var authRequest = await _cibaGrantTypeValidator.Validate(context, cancellationToken);
                     scopeLst = authRequest.Scopes;
                     activity?.SetTag("scopes", string.Join(",", authRequest.Scopes));
@@ -78,7 +76,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     foreach (var tokenBuilder in _tokenBuilders)
                         await tokenBuilder.Build(new BuildTokenParameter { Scopes = authRequest.Scopes, AuthorizationDetails = authRequest.AuthorizationDetails }, context, cancellationToken);
 
-                    _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? Options.DefaultTokenProfile)).Enrich(context);
+                    AddTokenProfile(context);
                     var result = BuildResult(context, authRequest.Scopes);
                     foreach (var kvp in context.Response.Parameters)
                         result.Add(kvp.Key, kvp.Value);

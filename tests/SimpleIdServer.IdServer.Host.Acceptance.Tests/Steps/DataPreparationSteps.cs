@@ -46,26 +46,6 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             _scenarioContext.Set(jws, key);
         }
 
-        [Given("build DPoP proof")]
-        public void GivenBuildDPoPProof(Table table)
-        {
-            var dpopHandler = new DPoPHandler();
-            var claims = new List<Claim>();
-            foreach (var row in table.Rows) claims.Add(new Claim(row["Key"], row["Value"]));
-            var dpopProof = dpopHandler.CreateRSA(claims);
-            _scenarioContext.Set(dpopProof.Token, "DPOP");
-        }
-
-        [Given("build DPoP proof with big lifetime")]
-        public void GivenBuildDPoPProofWithBigLifetime(Table table)
-        {
-            var dpopHandler = new DPoPHandler();
-            var claims = new List<Claim>();
-            foreach (var row in table.Rows) claims.Add(new Claim(row["Key"], row["Value"]));
-            var dpopProof = dpopHandler.CreateRSA(claims, expiresInSeconds: 500);
-            _scenarioContext.Set(dpopProof.Token, "DPOP");
-        }
-
         [Given("build expiration time and add '(.*)' seconds")]
         public void GivenBuildExpirationTime(int seconds) => _scenarioContext.Set(DateTime.UtcNow.AddSeconds(seconds).ConvertToUnixTimestamp(), "exp");
 

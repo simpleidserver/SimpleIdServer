@@ -146,6 +146,13 @@ namespace System.Text.Json.Nodes
 
         public static string GetNonceFromAuthorizationRequest(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.Nonce);
 
+        /// <summary>
+        /// This parameter can be used to bind the issued authorization code to a specific key.
+        /// </summary>
+        /// <param name="jObj"></param>
+        /// <returns></returns>
+        public static string GetDPOPJktFromAuthorizationRequest(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.DPOPJkt);
+
         public static IEnumerable<string> GetScopesFromAuthorizationRequest(this JsonObject jObj)
         {
             var scope = jObj.GetStr(AuthorizationRequestParameters.Scope);

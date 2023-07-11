@@ -107,3 +107,39 @@ Scenario: Send 'grant_type=refresh_token,refresh_token=$refreshtoken$,client_id=
 	Then HTTP status code equals to '400'
 	And JSON '$.error'='invalid_request'
 	And JSON '$.error_description'='refresh token is expired'
+
+Scenario: DPoP must be bound to the access token
+	When build DPoP proof
+	| Key | Value                          |
+	| htm | POST                           |
+	| htu | https://localhost:8080/token   |
+
+	And build DPoP proof and store into 'DPOP2'
+	| Key | Value                          |
+	| htm | POST                           |
+	| htu | https://localhost:8080/token   |
+
+	And execute HTTP POST request 'https://localhost:8080/token'
+	| Key           | Value              |
+	| grant_type    | client_credentials |
+	| scope         | firstScope         |
+	| client_id     | sixtyThreeClient   |
+	| client_secret | password           |
+	| DPoP          | $DPOP$             |
+
+	And extract JSON from body
+	And extract parameter '$.refresh_token' from JSON body into 'refreshToken'
+	
+	And execute HTTP POST request 'https://localhost:8080/token'
+	| Key           | Value            |
+	| grant_type    | refresh_token    |
+	| refresh_token | $refreshToken$   |
+	| client_id     | sixtyThreeClient |
+	| client_secret | password         |
+	| DPoP          | $DPOP2$          |
+
+	And extract JSON from body
+
+	Then HTTP status code equals to '400'
+	And JSON '$.error'='invalid_dpop_proof'
+	And JSON '$.error_description'='DPoP must be bound to the access token'

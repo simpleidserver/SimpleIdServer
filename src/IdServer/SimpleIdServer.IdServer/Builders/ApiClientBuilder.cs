@@ -243,9 +243,10 @@ namespace SimpleIdServer.IdServer.Builders
         /// DPOP Proof is required
         /// </summary>
         /// <returns></returns>
-        public ApiClientBuilder UseDPOPProof()
+        public ApiClientBuilder UseDPOPProof(bool isNonceRequired = false)
         {
             _client.DPOPBoundAccessTokens = true;
+            _client.IsDPOPNonceRequired = isNonceRequired;
             return this;
         }
 

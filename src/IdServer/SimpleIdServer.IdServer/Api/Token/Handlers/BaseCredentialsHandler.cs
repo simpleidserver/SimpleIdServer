@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.Token.Helpers;
+using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
@@ -19,11 +20,13 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
     public abstract class BaseCredentialsHandler : IGrantTypeHandler
     {
         private readonly IClientAuthenticationHelper _clientAuthenticationHelper;
+        private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IdServerHostOptions _options;
 
-        public BaseCredentialsHandler(IClientAuthenticationHelper clientAuthenticationHelper, IOptions<IdServerHostOptions> options)
+        public BaseCredentialsHandler(IClientAuthenticationHelper clientAuthenticationHelper, IEnumerable<ITokenProfile> tokenProfiles, IOptions<IdServerHostOptions> options)
         {
             _clientAuthenticationHelper = clientAuthenticationHelper;
+            _tokenProfiles = tokenProfiles;
             _options = options.Value;
         }
 
@@ -75,6 +78,17 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             if ((result == null || !result.Any()) && previousRequest != null)
                 result = previousRequest.GetAuthorizationDetailsFromAuthorizationRequest();
             return result;
+        }
+
+        protected void AddTokenProfile(HandlerContext context)
+        {
+            if(context.DPOPProof != null)
+            {
+                context.Response.Add(TokenResponseParameters.TokenType, Constants.DPOPHeaderName);
+                return;
+            }
+
+            _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? _options.DefaultTokenProfile)).Enrich(context);
         }
 
         protected JsonObject BuildResult(HandlerContext context, IEnumerable<string> scopes)

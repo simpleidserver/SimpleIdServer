@@ -39,6 +39,7 @@ Scenario: Register a complete client
 	| default_acr_values              | ["a","b"]                    |
 	| post_logout_redirect_uris       | ["http://localhost/logout"]  |
 	| initiate_login_uri              | https://localhost/loginuri   |
+	| dpop_bound_access_tokens        | true                         |
 
 	And extract JSON from body
 	
@@ -69,6 +70,7 @@ Scenario: Register a complete client
 	Then JSON 'default_max_age'='2'
 	Then JSON 'require_auth_time'='true'
 	Then JSON 'initiate_login_uri'='https://localhost/loginuri'	
+	Then JSON 'dpop_bound_access_tokens'='true'
 
 Scenario: Get a client
 	When execute HTTP POST request 'http://localhost/token'

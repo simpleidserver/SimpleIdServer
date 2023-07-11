@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.DPoP;
 using SimpleIdServer.IdServer.Api.Token.Helpers;
 using SimpleIdServer.IdServer.Api.Token.TokenBuilders;
 using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
@@ -19,7 +20,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Net;
 using System.Text.Json.Nodes;
 using System.Threading;
@@ -31,7 +31,6 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
     {
         private readonly IRefreshTokenGrantTypeValidator _refreshTokenGrantTypeValidator;
         private readonly IGrantedTokenHelper _grantedTokenHelper;
-        private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
         private readonly IUserRepository _userRepository;
         private readonly IGrantHelper _audienceHelper;
@@ -50,11 +49,10 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IBusControl busControl,
             IDPOPProofValidator dpopProofValidator,
             IOptions<IdServerHostOptions> options,
-            ILogger<RefreshTokenHandler> logger) : base(clientAuthenticationHelper, options)
+            ILogger<RefreshTokenHandler> logger) : base(clientAuthenticationHelper, tokenProfiles, options)
         {
             _refreshTokenGrantTypeValidator = refreshTokenGrantTypeValidator;
             _grantedTokenHelper = grantedTokenHelper;
-            _tokenProfiles = tokenProfiles;
             _tokenBuilders = tokenBuilders;
             _userRepository = userRepository;
             _busControl = busControl;
@@ -79,7 +77,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     var oauthClient = await AuthenticateClient(context, cancellationToken);
                     context.SetClient(oauthClient);
                     activity?.SetTag("client_id", oauthClient.ClientId);
-                    _dpopProofValidator.Validate(context);
+                    await _dpopProofValidator.Validate(context);
                     var refreshToken = context.Request.RequestData.GetRefreshToken();
                     var tokenResult = await _grantedTokenHelper.GetRefreshToken(refreshToken, cancellationToken);
                     if (tokenResult == null)
@@ -93,6 +91,12 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                         _logger.LogError($"refresh token '{refreshToken}' is expired");
                         await _grantedTokenHelper.RemoveRefreshToken(refreshToken, cancellationToken);
                         return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.REFRESH_TOKEN_IS_EXPIRED);
+                    }
+
+                    if(context.DPOPProof != null)
+                    {
+                        var receivedJkt = context.DPOPProof.PublicKey().CreateThumbprint();
+                        if (tokenResult.Jkt != receivedJkt) throw new OAuthException(ErrorCodes.INVALID_DPOP_PROOF, ErrorMessages.INVALID_DPOP_BOUND_TO_ACCESS_TOKEN);
                     }
 
                     var jwsPayload = JsonObject.Parse(tokenResult.Data).AsObject();
@@ -144,11 +148,9 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     foreach (var tokenBuilder in _tokenBuilders)
                         await tokenBuilder.Build(new BuildTokenParameter { AuthorizationDetails = extractionResult.AuthorizationDetails, Scopes = extractionResult.Scopes, Audiences = extractionResult.Audiences, Claims = claims, GrantId = tokenResult.GrantId }, context, cancellationToken);
 
-                    _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? Options.DefaultTokenProfile)).Enrich(context);
+                    AddTokenProfile(context);
                     foreach (var kvp in context.Response.Parameters)
-                    {
                         result.Add(kvp.Key, kvp.Value);
-                    }
 
                     if (!string.IsNullOrWhiteSpace(tokenResult.GrantId))
                         result.Add(TokenResponseParameters.GrantId, tokenResult.GrantId);

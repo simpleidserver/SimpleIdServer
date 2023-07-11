@@ -28,7 +28,6 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IDeviceAuthCodeRepository _deviceAuthCodeRepository;
         private readonly IUserRepository _userRepository;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
-        private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IAuthenticationHelper _authenticationHelper;
         private readonly IBusControl _busControl;
         private readonly IDPOPProofValidator _dpopProofValidator;
@@ -43,14 +42,13 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IDeviceCodeGrantTypeValidator validator,
             IAuthenticationHelper authenticationHelper,
             IBusControl busControl,
-            IDPOPProofValidator dpopProofValidator) : base(clientAuthenticationHelper, options)
+            IDPOPProofValidator dpopProofValidator) : base(clientAuthenticationHelper, tokenProfiles, options)
         {
             _validator = validator;
             _busControl = busControl;
             _deviceAuthCodeRepository = deviceAuthCodeRepository;
             _userRepository = userRepository;
             _tokenBuilders = tokenBuilders;
-            _tokenProfiles = tokenProfiles;
             _authenticationHelper = authenticationHelper;
             _dpopProofValidator = dpopProofValidator;
         }
@@ -70,7 +68,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     var oauthClient = await AuthenticateClient(context, cancellationToken);
                     context.SetClient(oauthClient);
                     activity?.SetTag("client_id", oauthClient.ClientId);
-                    _dpopProofValidator.Validate(context);
+                    await _dpopProofValidator.Validate(context);
                     var deviceAuthCode = await _validator.Validate(context, cancellationToken);
                     scopeLst = deviceAuthCode.Scopes;
                     activity?.SetTag("scopes", string.Join(",", deviceAuthCode.Scopes));
@@ -79,7 +77,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     foreach (var tokenBuilder in _tokenBuilders)
                         await tokenBuilder.Build(new BuildTokenParameter { Scopes = deviceAuthCode.Scopes }, context, cancellationToken);
 
-                    _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? Options.DefaultTokenProfile)).Enrich(context);
+                    AddTokenProfile(context);
                     var result = BuildResult(context, deviceAuthCode.Scopes);
                     foreach (var kvp in context.Response.Parameters)
                         result.Add(kvp.Key, kvp.Value);

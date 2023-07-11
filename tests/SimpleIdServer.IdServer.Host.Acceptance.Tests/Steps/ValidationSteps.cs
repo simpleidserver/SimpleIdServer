@@ -139,6 +139,13 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             Assert.True(jwt.Claims.Any(c => c.Type == key && c.Value == value) == false);
         }
 
+        [Then("access_token contains jkt")]
+        public void ThenAccessTokenContainsJkt()
+        {
+            var cnf = JsonObject.Parse(GetAccessToken().Claims.First(c => c.Type == "cnf").Value).AsObject();
+            Assert.True(cnf.ContainsKey("jkt"));
+        }
+
         [Then("JWT contains '(.*)'")]
         public void ThenJWTContainsClaim(string key) => Assert.True(GetJWT().Claims.Any(c => c.Type == key) == true);
 
@@ -214,6 +221,13 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
         {
             var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
             Assert.True(httpResponseMessage.RequestMessage.RequestUri.AbsoluteUri.Contains(baseUrl) == true);
+        }
+
+        [Then("HTTP header '(.*)' exists")]
+        public void ThenHttpHeaderExists(string key)
+        {
+            var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
+            Assert.True(httpResponseMessage.Headers.Contains(key));
         }
 
         [Then("HTTP header has '(.*)'='(.*)'")]

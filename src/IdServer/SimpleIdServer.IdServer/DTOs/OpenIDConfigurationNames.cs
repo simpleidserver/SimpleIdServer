@@ -42,5 +42,6 @@ namespace SimpleIdServer.IdServer.DTOs
         public const string AuthorizationDetailsSupported = "authorization_details_supported";
         public const string CredentialOfferEndpoint = "credential_offer_endpoint";
         public const string DeviceAuthorizationEndpoint = "device_authorization_endpoint";
+        public const string DPOPSigningAlgValuesSupported = "dpop_signing_alg_values_supported";
     }
 }

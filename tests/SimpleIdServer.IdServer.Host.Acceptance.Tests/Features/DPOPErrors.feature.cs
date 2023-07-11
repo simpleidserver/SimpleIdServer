@@ -267,7 +267,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "Key",
                             "Value"});
 #line 47
- testRunner.Given("build DPoP proof", ((string)(null)), table191, "Given ");
+ testRunner.When("build DPoP proof", ((string)(null)), table191, "When ");
 #line hidden
                 TechTalk.SpecFlow.Table table192 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
@@ -288,7 +288,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "DPoP",
                             "$DPOP$"});
 #line 50
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table192, "When ");
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table192, "And ");
 #line hidden
 #line 58
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -331,7 +331,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "htm",
                             "htm"});
 #line 64
- testRunner.Given("build DPoP proof", ((string)(null)), table193, "Given ");
+ testRunner.When("build DPoP proof", ((string)(null)), table193, "When ");
 #line hidden
                 TechTalk.SpecFlow.Table table194 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
@@ -352,7 +352,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "DPoP",
                             "$DPOP$"});
 #line 68
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table194, "When ");
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table194, "And ");
 #line hidden
 #line 76
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -398,7 +398,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "htu",
                             "htu"});
 #line 82
- testRunner.Given("build DPoP proof", ((string)(null)), table195, "Given ");
+ testRunner.When("build DPoP proof", ((string)(null)), table195, "When ");
 #line hidden
                 TechTalk.SpecFlow.Table table196 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
@@ -419,7 +419,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "DPoP",
                             "$DPOP$"});
 #line 87
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table196, "When ");
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table196, "And ");
 #line hidden
 #line 95
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -468,7 +468,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "htu",
                             "htu"});
 #line 101
- testRunner.Given("build DPoP proof", ((string)(null)), table197, "Given ");
+ testRunner.When("build DPoP proof", ((string)(null)), table197, "When ");
 #line hidden
                 TechTalk.SpecFlow.Table table198 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
@@ -489,7 +489,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "DPoP",
                             "$DPOP$"});
 #line 106
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table198, "When ");
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table198, "And ");
 #line hidden
 #line 114
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -536,7 +536,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "htu",
                             "https://localhost:8080/token"});
 #line 120
- testRunner.Given("build DPoP proof with big lifetime", ((string)(null)), table199, "Given ");
+ testRunner.When("build DPoP proof with big lifetime", ((string)(null)), table199, "When ");
 #line hidden
                 TechTalk.SpecFlow.Table table200 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
@@ -557,7 +557,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "DPoP",
                             "$DPOP$"});
 #line 125
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table200, "When ");
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table200, "And ");
 #line hidden
 #line 133
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -571,6 +571,76 @@ this.ScenarioInitialize(scenarioInfo);
 #line 136
  testRunner.And("JSON \'$.error_description\'=\'the DPoP cannot have a validity superior to 300 secon" +
                         "ds\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="DPoP nonce is required")]
+        [Xunit.TraitAttribute("FeatureTitle", "DPOPErrors")]
+        [Xunit.TraitAttribute("Description", "DPoP nonce is required")]
+        public void DPoPNonceIsRequired()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("DPoP nonce is required", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 138
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table201 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table201.AddRow(new string[] {
+                            "htm",
+                            "POST"});
+                table201.AddRow(new string[] {
+                            "htu",
+                            "https://localhost:8080/token"});
+#line 139
+ testRunner.When("build DPoP proof", ((string)(null)), table201, "When ");
+#line hidden
+                TechTalk.SpecFlow.Table table202 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table202.AddRow(new string[] {
+                            "grant_type",
+                            "client_credentials"});
+                table202.AddRow(new string[] {
+                            "scope",
+                            "firstScope"});
+                table202.AddRow(new string[] {
+                            "client_id",
+                            "sixtyFourClient"});
+                table202.AddRow(new string[] {
+                            "client_secret",
+                            "password"});
+                table202.AddRow(new string[] {
+                            "DPoP",
+                            "$DPOP$"});
+#line 144
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table202, "And ");
+#line hidden
+#line 152
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 153
+ testRunner.Then("HTTP status code equals to \'401\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 154
+ testRunner.And("JSON \'$.error\'=\'use_dpop_nonce\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 155
+ testRunner.And("JSON \'$.error_description\'=\'Authorization Server required nonce in DPoP proof\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 156
+ testRunner.And("HTTP header \'DPoP-Nonce\' exists", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();

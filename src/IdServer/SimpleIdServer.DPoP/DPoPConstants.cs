@@ -10,6 +10,7 @@ namespace SimpleIdServer.DPoP
         public static class DPoPClaims
         {
             public const string Htm = "htm";
+            public const string Nonce = "nonce";
             public const string Htu = "htu";
         }
     }

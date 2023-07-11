@@ -73,6 +73,7 @@ namespace SimpleIdServer.IdServer
         public const string INVALID_ALG_USED_TO_SIGN_IDTOKENHINT = "the alg used to sign the id_token_hint is invalid";
         public const string INVALID_RESPONSE_TYPE_CLAIM = "the response_type claim is invalid";
         public const string INVALID_CLIENT_ID_CLAIM = "the client_id claim is invalid";
+        public const string INVALID_DPOP_BOUND_TO_ACCESS_TOKEN = "DPoP must be bound to the access token";
         public const string INVALID_SIGNATURE_ALG = "the signature algorithm is invalid";
         public const string INVALID_AUTH_REQUEST_ID = "authorization request doesn't exist";
         public const string INVALID_CLIENT_IDTOKENHINT = "client_id contained in the id_token_hint is invalid";
@@ -250,5 +251,7 @@ namespace SimpleIdServer.IdServer
         public const string NO_CONTRACT = "there is no contract";
         public const string ACR_WITH_SAME_NAME_EXISTS = "an acr with the same name already exists";
         public const string NOT_WELL_FORMED_DPOP_TOKEN = "the DPoP proof must be a Json Web Token";
+        public const string USE_DPOP_NONCE = "Authorization Server required nonce in DPoP proof";
+        public const string DPOP_JKT_MISMATCH = "there is a mismatch between the dpop_jkt and the DPoP proof";
     }
 }

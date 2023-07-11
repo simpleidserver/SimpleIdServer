@@ -142,4 +142,56 @@ Scenario: authorization code cannot be used twice
 	And extract JSON from body
 	Then HTTP status code equals to '400'
 	Then JSON 'error'='invalid_grant'
-	Then JSON 'error_description'='authorization code has already been used, all tokens previously issued have been revoked'
+	Then JSON 'error_description'='authorization code has already been used, all tokens previously issued have been revoked'	
+
+Scenario: cannot have a mismatch between dpop_jkt and the DPoP proof
+	Given authenticate a user
+
+	When build DPoP proof
+	| Key   | Value                          |
+	| htm   | POST                           |
+	| htu   | https://localhost:8080/token   |
+
+	And execute HTTP GET request 'https://localhost:8080/authorization'
+	| Key           | Value                 |
+	| response_type | code                  |
+	| client_id     | sixtyFiveClient       |
+	| state         | state                 |
+	| redirect_uri  | http://localhost:8080 |
+	| response_mode | query                 |
+	| scope         | secondScope			|	
+	| dpop_jkt      | invalid               |
+
+	And extract parameter 'code' from redirect url
+	
+	And execute HTTP POST request 'https://localhost:8080/token'
+	| Key           | Value        			|
+	| client_id     | sixtyFiveClient		|
+	| client_secret | password     			|
+	| grant_type    | authorization_code	|
+	| code			| $code$				|
+	| redirect_uri  | http://localhost:8080	|
+	| DPoP          | $DPOP$                |
+
+	And extract header 'DPoP-Nonce' to 'nonce'
+
+	And build DPoP proof
+	| Key   | Value                          |
+	| htm   | POST                           |
+	| htu   | https://localhost:8080/token   |
+	| nonce | $nonce$                        |
+	
+	And execute HTTP POST request 'https://localhost:8080/token'
+	| Key           | Value        			|
+	| client_id     | sixtyFiveClient		|
+	| client_secret | password     			|
+	| grant_type    | authorization_code	|
+	| code			| $code$				|
+	| redirect_uri  | http://localhost:8080	|
+	| DPoP          | $DPOP$                |
+
+	And extract JSON from body
+
+	Then HTTP status code equals to '400'
+	Then JSON 'error'='invalid_dpop_proof'
+	Then JSON 'error_description'='there is a mismatch between the dpop_jkt and the DPoP proof'

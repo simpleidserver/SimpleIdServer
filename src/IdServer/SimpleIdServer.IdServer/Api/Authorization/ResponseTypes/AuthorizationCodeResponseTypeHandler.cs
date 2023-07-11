@@ -59,7 +59,8 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseTypes
             }
 
             CheckPKCEParameters(context);
-            var authCode = await _grantedTokenHelper.AddAuthorizationCode(dic, parameter.GrantId, _options.AuthorizationCodeExpirationInSeconds, cancellationToken);
+            var dpopJkt = context.Request.RequestData.GetDPOPJktFromAuthorizationRequest();
+            var authCode = await _grantedTokenHelper.AddAuthorizationCode(dic, parameter.GrantId, _options.AuthorizationCodeExpirationInSeconds, dpopJkt, cancellationToken);
             context.Response.Add(AuthorizationResponseParameters.Code, authCode);
             var isScopeContainsOfflineAccess = parameter.Scopes.Contains(Constants.StandardScopes.OfflineAccessScope.Name);
             if (isScopeContainsOfflineAccess)

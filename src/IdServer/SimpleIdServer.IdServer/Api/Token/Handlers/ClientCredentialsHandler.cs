@@ -25,12 +25,10 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
     public class ClientCredentialsHandler : BaseCredentialsHandler
     {
         private readonly IClientCredentialsGrantTypeValidator _clientCredentialsGrantTypeValidator;
-        private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
         private readonly IGrantHelper _audienceHelper;
         private readonly IBusControl _busControl;
         private readonly IDPOPProofValidator _dpopProofValidator;
-        private readonly IdServerHostOptions _options;
 
         public ClientCredentialsHandler(
             IClientCredentialsGrantTypeValidator clientCredentialsGrantTypeValidator,
@@ -40,15 +38,13 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IClientAuthenticationHelper clientAuthenticationHelper,
             IBusControl busControl,
             IDPOPProofValidator dpopProofValidator,
-            IOptions<IdServerHostOptions> options) : base(clientAuthenticationHelper, options)
+            IOptions<IdServerHostOptions> options) : base(clientAuthenticationHelper, tokenProfiles, options)
         {
             _clientCredentialsGrantTypeValidator = clientCredentialsGrantTypeValidator;
-            _tokenProfiles = tokenProfiles;
             _tokenBuilders = tokenBuilders;
             _audienceHelper = audienceHelper;
             _busControl = busControl;
             _dpopProofValidator = dpopProofValidator;
-            _options = options.Value;
         }
 
         public const string GRANT_TYPE = "client_credentials";
@@ -67,7 +63,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     var oauthClient = await AuthenticateClient(context, cancellationToken);
                     context.SetClient(oauthClient);
                     activity?.SetTag("client_id", oauthClient.ClientId);
-                    _dpopProofValidator.Validate(context);
+                    await _dpopProofValidator.Validate(context);
                     var scopes = ScopeHelper.Validate(context.Request.RequestData.GetStr(TokenRequestParameters.Scope), oauthClient.Scopes.Select(s => s.Name));
                     var resources = context.Request.RequestData.GetResourcesFromAuthorizationRequest();
                     var authDetails = context.Request.RequestData.GetAuthorizationDetailsFromAuthorizationRequest();
@@ -78,7 +74,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     foreach (var tokenBuilder in _tokenBuilders)
                         await tokenBuilder.Build(new BuildTokenParameter { Audiences = extractionResult.Audiences, Scopes = extractionResult.Scopes }, context, cancellationToken);
 
-                    _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? _options.DefaultTokenProfile)).Enrich(context);
+                    AddTokenProfile(context);
                     foreach (var kvp in context.Response.Parameters)
                         result.Add(kvp.Key, kvp.Value);
                     await _busControl.Publish(new TokenIssuedSuccessEvent
@@ -102,6 +98,12 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                         ErrorMessage = ex.Message
                     });
                     activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+                    return BuildError(HttpStatusCode.Unauthorized, ex.Code, ex.Message);
+                }
+                catch (OAuthDPoPRequiredException ex)
+                {
+                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+                    context.Response.Response.Headers.Add(Constants.DPOPNonceHeaderName, ex.Nonce);
                     return BuildError(HttpStatusCode.Unauthorized, ex.Code, ex.Message);
                 }
                 catch (OAuthException ex)

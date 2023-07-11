@@ -438,6 +438,21 @@ namespace SimpleIdServer.IdServer.Builders
 
         #endregion
 
+        #region DPOP
+
+        /// <summary>
+        /// DPOP Proof is required
+        /// </summary>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder UseDPOPProof(bool isNonceRequired = false)
+        {
+            _client.DPOPBoundAccessTokens = true;
+            _client.IsDPOPNonceRequired = isNonceRequired;
+            return this;
+        }
+
+        #endregion
+
         #region Other parameters
 
         /// <summary>

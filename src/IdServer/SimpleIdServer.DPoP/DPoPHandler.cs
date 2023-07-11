@@ -4,7 +4,6 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -39,8 +38,6 @@ namespace SimpleIdServer.DPoP
             if (string.IsNullOrWhiteSpace(htu)) return DPoPValidationResult.Error($"the parameter {DPoPConstants.DPoPClaims.Htu} is missing");
             if (htm != httpMethod) return DPoPValidationResult.Error($"the {DPoPConstants.DPoPClaims.Htm} parameter must be equals to {httpMethod}");
             if (htu != httpRequest) return DPoPValidationResult.Error($"the {DPoPConstants.DPoPClaims.Htu} parameter must be equals to {httpRequest}");
-
-            var jwk = JsonExtensions.DeserializeFromJson<JsonWebKey>(jwkJson);
             if (!IsSigValid()) return DPoPValidationResult.Error("the DPoP signature is not valid");
             var valParameters = new TokenValidationParameters
             {
@@ -57,23 +54,7 @@ namespace SimpleIdServer.DPoP
 
             var lifetime = (jwt.ValidTo - jwt.IssuedAt).TotalSeconds;
             if (lifetime > validityTimeSeconds) return DPoPValidationResult.Error($"the DPoP cannot have a validity superior to {validityTimeSeconds} seconds");
-
-            /*
-            var jwk = JsonExtensions.DeserializeFromJson<JsonWebKey>(jwkJson);
-            var validationParameters = new TokenValidationParameters { ValidateLifetime = true };
-            var expires = jwt.ValidTo;
-            var notBefore = jwt.ValidFrom;
-            // await Validators.ValidateIssuerAsync(jsonWebToken.Issuer, jsonWebToken, validationParameters, configuration).ConfigureAwait(false);
-            // Validators.ValidateLifetime(notBefore, expires, jwt, validationParameters);
-
-
-            var isSigValid = false;
-            if (!isSigValid) return DPoPValidationResult.Error("the DPoP signature is not valid");
-            var validityTime = (jwt.ValidTo - jwt.IssuedAt).TotalMilliseconds;
-            if (validityTime > validityTimeMS) return DPoPValidationResult.Error($"the lifetime of the DPOP cannot exceed {validityTimeMS} MS");
-            */
-
-            return DPoPValidationResult.Ok();
+            return DPoPValidationResult.Ok(jwt);
 
             bool IsSigValid()
             {

@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using Moq;
 using SimpleIdServer.Did.Extensions;
 using SimpleIdServer.Did.Jwt;
+using SimpleIdServer.DPoP;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.OAuth.Host.Acceptance.Tests;
@@ -17,6 +18,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
@@ -351,6 +354,66 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
 
             var proof = DidJwtBuilder.GenerateToken(securityTokenDescriptor, did, IdServerConfiguration.PrivateKey.HexToByteArray());
             _scenarioContext.Set(proof, "proof");
+        }
+
+        [When("extract header '(.*)' to '(.*)'")]
+        public void WhenExtractHTTPHeader(string parameter, string name)
+        {
+            var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
+            var value = httpResponseMessage.Headers.First(c => c.Key == parameter).Value.First();
+            _scenarioContext.Set(value, name);
+        }
+
+        [When("build DPoP proof")]
+        public void WhenBuildDPoPProof(Table table)
+        {
+            var dpopHandler = new DPoPHandler();
+            var claims = new List<Claim>();
+            foreach (var row in table.Rows)
+            {
+                var value = WebApiSteps.ParseValue(_scenarioContext, row["Value"].ToString());
+                claims.Add(new Claim(row["Key"], value.ToString()));
+            }
+
+            if(!_scenarioContext.ContainsKey("securityKey"))
+            {
+                var dpopProof = dpopHandler.CreateES(claims);
+                _scenarioContext.Set(dpopProof.Token, "DPOP");
+                return;
+            }
+
+            var securityKey = _scenarioContext.Get<ECDsaSecurityKey>("securityKey");
+            _scenarioContext.Set(dpopHandler.Create(claims, securityKey, SecurityAlgorithms.EcdsaSha256).Token, "DPOP");
+        }
+
+        [When("build DPoP proof and store into '(.*)'")]
+        public void WhenBuildDPoPProofAndStore(string key, Table table)
+        {
+            var dpopHandler = new DPoPHandler();
+            var claims = new List<Claim>();
+            foreach (var row in table.Rows) claims.Add(new Claim(row["Key"], row["Value"]));
+            var dpopProof = dpopHandler.CreateES(claims);
+            _scenarioContext.Set(dpopProof.Token, key);
+        }
+
+        [When("build DPoP proof with big lifetime")]
+        public void WhenBuildDPoPProofWithBigLifetime(Table table)
+        {
+            var dpopHandler = new DPoPHandler();
+            var claims = new List<Claim>();
+            foreach (var row in table.Rows) claims.Add(new Claim(row["Key"], row["Value"]));
+            var dpopProof = dpopHandler.CreateRSA(claims, expiresInSeconds: 500);
+            _scenarioContext.Set(dpopProof.Token, "DPOP");
+        }
+
+        [When("build security key")]
+        public void WhenBuildSecurityKeyAndStore()
+        {
+            var curve = ECCurve.NamedCurves.nistP256;
+            var securityKey = new ECDsaSecurityKey(ECDsa.Create(curve));
+            var jkt = Base64UrlEncoder.Encode(securityKey.ComputeJwkThumbprint());
+            _scenarioContext.Set(securityKey, "securityKey");
+            _scenarioContext.Set(jkt, "jkt");
         }
 
         private void BuildJwsByUsingClientJwk(string keyid, string clientId, string key, Table table, bool isExpired = false)

@@ -44,10 +44,10 @@ Scenario: DPoP header is not a JWT
 	And JSON '$.error_description'='DPoP Proof must be a Json Web Token'
 
 Scenario: htm parameter is required
-	Given build DPoP proof
+	When build DPoP proof
 	| Key | Value |
 	
-	When execute HTTP POST request 'https://localhost:8080/token'
+	And execute HTTP POST request 'https://localhost:8080/token'
 	| Key           | Value              |
 	| grant_type    | client_credentials |
 	| scope         | firstScope         |
@@ -61,11 +61,11 @@ Scenario: htm parameter is required
 	And JSON '$.error_description'='the parameter htm is missing'
 
 Scenario: htu parameter is required
-	Given build DPoP proof
+	When build DPoP proof
 	| Key | Value |
 	| htm | htm   |
 	
-	When execute HTTP POST request 'https://localhost:8080/token'
+	And execute HTTP POST request 'https://localhost:8080/token'
 	| Key           | Value              |
 	| grant_type    | client_credentials |
 	| scope         | firstScope         |
@@ -79,12 +79,12 @@ Scenario: htu parameter is required
 	And JSON '$.error_description'='the parameter htu is missing'
 
 Scenario: htm parameter must match the HTTP method of the current request
-	Given build DPoP proof
+	When build DPoP proof
 	| Key | Value |
 	| htm | GET   |
 	| htu | htu   |
 	
-	When execute HTTP POST request 'https://localhost:8080/token'
+	And execute HTTP POST request 'https://localhost:8080/token'
 	| Key           | Value              |
 	| grant_type    | client_credentials |
 	| scope         | firstScope         |
@@ -98,12 +98,12 @@ Scenario: htm parameter must match the HTTP method of the current request
 	And JSON '$.error_description'='the htm parameter must be equals to POST'
 
 Scenario: htu parameter must match the HTTP URI value for the HTTP request in which the JWT was received
-	Given build DPoP proof
+	When build DPoP proof
 	| Key | Value |
 	| htm | POST  |
 	| htu | htu   |
 	
-	When execute HTTP POST request 'https://localhost:8080/token'
+	And execute HTTP POST request 'https://localhost:8080/token'
 	| Key           | Value              |
 	| grant_type    | client_credentials |
 	| scope         | firstScope         |
@@ -117,12 +117,12 @@ Scenario: htu parameter must match the HTTP URI value for the HTTP request in wh
 	And JSON '$.error_description'='the htu parameter must be equals to https://localhost:8080/token'
 
 Scenario: DPoP proof cannot have a lifetime superior to the limit
-	Given build DPoP proof with big lifetime
+	When build DPoP proof with big lifetime
 	| Key | Value                          |
 	| htm | POST                           |
 	| htu | https://localhost:8080/token   |
 	
-	When execute HTTP POST request 'https://localhost:8080/token'
+	And execute HTTP POST request 'https://localhost:8080/token'
 	| Key           | Value              |
 	| grant_type    | client_credentials |
 	| scope         | firstScope         |
@@ -134,3 +134,23 @@ Scenario: DPoP proof cannot have a lifetime superior to the limit
 	Then HTTP status code equals to '400'
 	And JSON '$.error'='invalid_dpop_proof'
 	And JSON '$.error_description'='the DPoP cannot have a validity superior to 300 seconds'
+
+Scenario: DPoP nonce is required
+	When build DPoP proof
+	| Key | Value                          |
+	| htm | POST                           |
+	| htu | https://localhost:8080/token   |
+	
+	And execute HTTP POST request 'https://localhost:8080/token'
+	| Key           | Value              |
+	| grant_type    | client_credentials |
+	| scope         | firstScope         |
+	| client_id     | sixtyFourClient    |
+	| client_secret | password           |
+	| DPoP          | $DPOP$             |
+
+	And extract JSON from body
+	Then HTTP status code equals to '401'
+	And JSON '$.error'='use_dpop_nonce'
+	And JSON '$.error_description'='Authorization Server required nonce in DPoP proof'
+	And HTTP header 'DPoP-Nonce' exists

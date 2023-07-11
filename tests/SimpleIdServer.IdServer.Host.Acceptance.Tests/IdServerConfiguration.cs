@@ -102,6 +102,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                         { "types", JsonSerializer.Serialize(new List<string> { "VerifiableCredential", "UniversityDegreeCredential" }) }
                     }
                 })
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "sixtyFiveClient", "secondScope")
                 .AddClaim("degreeType", "BachelorDegree")
                 .AddClaim("degreeName", "Bachelor of Science and Arts")
                 .SetDID(DidKey, PrivateKey)
@@ -202,7 +203,9 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildWalletClient("sixtyClient", "password").RequirePin().Build(),
             ClientBuilder.BuildDeviceClient("sixtyOneClient", "password").AddScope(AdminScope).Build(),
             ClientBuilder.BuildApiClient("sixtyTwoClient", "password").AddScope(StandardScopes.Acrs).Build(),
-            ClientBuilder.BuildApiClient("sixtyThreeClient", "password").AddScope(FirstScope).UseDPOPProof().Build()
+            ClientBuilder.BuildApiClient("sixtyThreeClient", "password").AddScope(FirstScope).UseDPOPProof().EnableRefreshTokenGrantType().Build(),
+            ClientBuilder.BuildApiClient("sixtyFourClient", "password").AddScope(FirstScope).UseDPOPProof(true).EnableRefreshTokenGrantType().Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("sixtyFiveClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().UseDPOPProof(true).AddScope(SecondScope).Build(),
 
         };
 

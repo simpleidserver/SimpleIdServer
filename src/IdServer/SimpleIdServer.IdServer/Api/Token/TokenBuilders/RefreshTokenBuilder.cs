@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
+using SimpleIdServer.DPoP;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
@@ -41,7 +42,11 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
 
             var authorizationCode = string.Empty;
             handlerContext.Response.TryGet(AuthorizationResponseParameters.Code, out authorizationCode);
-            var refreshToken = await GrantedTokenHelper.AddRefreshToken(handlerContext.Client.ClientId, authorizationCode, parameter.GrantId, dic, handlerContext.OriginalRequest, handlerContext.Client.RefreshTokenExpirationTimeInSeconds ?? _options.DefaultRefreshTokenExpirationTimeInSeconds, cancellationToken);
+            string jkt = null;
+            if(handlerContext.DPOPProof != null)
+                jkt = handlerContext.DPOPProof.PublicKey().CreateThumbprint();
+
+            var refreshToken = await GrantedTokenHelper.AddRefreshToken(handlerContext.Client.ClientId, authorizationCode, parameter.GrantId, dic, handlerContext.OriginalRequest, handlerContext.Client.RefreshTokenExpirationTimeInSeconds ?? _options.DefaultRefreshTokenExpirationTimeInSeconds, jkt, cancellationToken);
             handlerContext.Response.Add(TokenResponseParameters.RefreshToken, refreshToken);
         }
     }

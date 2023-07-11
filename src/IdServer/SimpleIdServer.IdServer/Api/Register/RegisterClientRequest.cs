@@ -135,6 +135,9 @@ namespace SimpleIdServer.IdServer.Api.Register
         public string? CredentialOfferEndpoint { get; set; } = null;
         [JsonPropertyName(OAuthClientParameters.AuthorizationDataTypes)]
         public ICollection<string> AuthorizationDataTypes { get; set; } = new List<string>();
+        [BindProperty(Name = OAuthClientParameters.DPOPBoundAccessTokens)]
+        [JsonPropertyName(OAuthClientParameters.DPOPBoundAccessTokens)]
+        public bool DPOPBoundAccessTokens { get; set; } = false;
         [JsonIgnore]
         public ICollection<TranslationRequest> Translations { get; set; } = new List<TranslationRequest>();
 
@@ -213,6 +216,7 @@ namespace SimpleIdServer.IdServer.Api.Register
                 client.AuthorizationDataTypes = AuthorizationDataTypes;
 
             client.CredentialOfferEndpoint = CredentialOfferEndpoint;
+            client.DPOPBoundAccessTokens = DPOPBoundAccessTokens;
         }
     }
 }

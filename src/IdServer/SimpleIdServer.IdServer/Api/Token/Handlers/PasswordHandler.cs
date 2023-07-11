@@ -29,7 +29,6 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
     {
         private readonly IPasswordGrantTypeValidator _passwordGrantTypeValidator;
         private readonly IUserRepository _userRepository;
-        private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
         private readonly IGrantHelper _audienceHelper;
         private readonly IAuthenticationHelper _userHelper;
@@ -47,11 +46,10 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IAuthenticationHelper userHelper,
             IBusControl busControl,
             IDPOPProofValidator dpopProofValidator,
-            IOptions<IdServerHostOptions> options) : base(clientAuthenticationHelper, options)
+            IOptions<IdServerHostOptions> options) : base(clientAuthenticationHelper, tokenProfiles, options)
         {
             _passwordGrantTypeValidator = passwordGrantTypeValidator;
             _userRepository = userRepository;
-            _tokenProfiles = tokenProfiles;
             _tokenBuilders = tokenBuilders;
             _audienceHelper = audienceHelper;
             _userHelper = userHelper;
@@ -76,7 +74,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     var oauthClient = await AuthenticateClient(context, cancellationToken);
                     context.SetClient(oauthClient);
                     activity?.SetTag("client_id", oauthClient.ClientId);
-                    _dpopProofValidator.Validate(context);
+                    await _dpopProofValidator.Validate(context);
                     var scopes = ScopeHelper.Validate(context.Request.RequestData.GetStr(TokenRequestParameters.Scope), oauthClient.Scopes.Select(s => s.Name));
                     var resources = context.Request.RequestData.GetResourcesFromAuthorizationRequest();
                     var authDetails = context.Request.RequestData.GetAuthorizationDetailsFromAuthorizationRequest();
@@ -97,7 +95,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     foreach (var tokenBuilder in _tokenBuilders)
                         await tokenBuilder.Build(new BuildTokenParameter { AuthorizationDetails = extractionResult.AuthorizationDetails, Scopes = extractionResult.Scopes, Audiences = extractionResult.Audiences }, context, cancellationToken);
 
-                    _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? _options.DefaultTokenProfile)).Enrich(context);
+                    AddTokenProfile(context);
                     foreach (var kvp in context.Response.Parameters)
                         result.Add(kvp.Key, kvp.Value);
                     await _busControl.Publish(new TokenIssuedSuccessEvent

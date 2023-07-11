@@ -15,5 +15,6 @@ namespace SimpleIdServer.IdServer.Domains
         public string? GrantId { get; set; } = null;
         public DateTime? ExpirationTime { get; set; }
         public DateTime CreateDateTime { get; set; }
+        public string? Jkt { get; set; } = null;
     }
 }

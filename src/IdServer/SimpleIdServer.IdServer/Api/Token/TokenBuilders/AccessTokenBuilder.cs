@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.DPoP;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Helpers;
@@ -70,14 +71,21 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
         protected virtual SecurityTokenDescriptor BuildTokenDescriptor(IEnumerable<string> scopes, ICollection<AuthorizationData> authorizationDetails, IEnumerable<string> audiences, HandlerContext handlerContext)
         {
             var tokenDescriptor = _grantedTokenHelper.BuildAccessToken(handlerContext.Client.ClientId, audiences, scopes, authorizationDetails, handlerContext.GetIssuer(), handlerContext.Client.TokenExpirationTimeInSeconds ?? _options.DefaultTokenExpirationTimeInSeconds);
+            var cnf = new Dictionary<string, object>();
             if (handlerContext.Request.Certificate != null)
             {
                 var thumbprint = Hash(handlerContext.Request.Certificate.RawData);
-                tokenDescriptor.Claims.Add(ConfirmationClaimTypes.Cnf, new Dictionary<string, object>
-                {
-                    { JsonWebKeyParameterNames.X5tS256, thumbprint }
-                });
+                cnf.Add(JsonWebKeyParameterNames.X5tS256, thumbprint);
             }
+
+            if (handlerContext.DPOPProof != null)
+            {
+                var publicKey = handlerContext.DPOPProof.PublicKey();
+                cnf.Add(AdditionalJsonWebKeyParameterNames.Jkt, publicKey.CreateThumbprint());
+            }
+
+            if(cnf.Any())
+                tokenDescriptor.Claims.Add(ConfirmationClaimTypes.Cnf, cnf);
 
             return tokenDescriptor;
         }

@@ -591,6 +591,7 @@ namespace SimpleIdServer.IdServer
         public const string DefaultCertificateAuthenticationScheme = "Certificate";
         public static string AuthorizationHeaderName = "Authorization";
         public const string DPOPHeaderName = "DPoP";
+        public const string DPOPNonceHeaderName = "DPoP-Nonce";
         /// <summary>
         /// Direct use of a shared symmetric key as the CEK.
         /// </summary>

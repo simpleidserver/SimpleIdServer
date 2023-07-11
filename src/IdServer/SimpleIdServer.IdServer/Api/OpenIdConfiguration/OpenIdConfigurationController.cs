@@ -86,6 +86,7 @@ namespace SimpleIdServer.IdServer.Api.OpenIdConfiguration
             result.Add(OpenIDConfigurationNames.AuthorizationEncryptionEncValuesSupported, JsonSerializer.SerializeToNode(Constants.AllEncryptions));
             result.Add(OpenIDConfigurationNames.RequirePushedAuthorizationRequests, _options.RequiredPushedAuthorizationRequest);
             result.Add(OpenIDConfigurationNames.AuthorizationDetailsSupported, true);
+            result.Add(OpenIDConfigurationNames.DPOPSigningAlgValuesSupported, JsonSerializer.SerializeToNode(Constants.AllSigningAlgs));
             if (_options.MtlsEnabled)
             {
                 result.Add(OpenIDConfigurationNames.MtlsEndpointAliases, JsonSerializer.SerializeToNode(new JsonObject

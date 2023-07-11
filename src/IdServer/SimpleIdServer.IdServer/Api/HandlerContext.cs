@@ -2,11 +2,11 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Middlewares;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json.Nodes;
 using System.Web;
@@ -25,8 +25,14 @@ namespace SimpleIdServer.IdServer.Api
             Cookies = cookies;
         }
 
+        public HandlerContextResponse(HttpResponse response) : this()
+        {
+            Response = response;
+        }
+
         public IResponseCookies Cookies { get; set; }
         public Dictionary<string, string> Parameters { get; private set; }
+        public HttpResponse Response { get; private set; }
 
         /// <summary>
         /// Add parameter.
@@ -165,6 +171,7 @@ namespace SimpleIdServer.IdServer.Api
 
         public User User { get; private set; }
         public Client Client { get; private set; }
+        public JsonWebToken DPOPProof { get; private set; }
         public HandlerContextRequest Request { get; private set; }
         public string Realm { get; private set; }
         public JsonObject OriginalRequest { get; private set; }
@@ -208,5 +215,7 @@ namespace SimpleIdServer.IdServer.Api
         public void SetOriginalRequest(JsonObject request) => OriginalRequest = request;
 
         public void SetUrlHelper(IUrlHelper urlHelper) => UrlHelper = urlHelper;
+
+        public void SetDPOPProof(JsonWebToken jwt) => DPOPProof = jwt;
     }
 }

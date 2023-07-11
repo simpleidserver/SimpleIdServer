@@ -32,11 +32,11 @@ namespace SimpleIdServer.IdServer.Helpers
         Task<bool> AddAccessToken(string token, string clientId, string authorizationCode, string grantId, CancellationToken cancellationToken);
         Task<JsonWebToken> GetAccessToken(string accessToken, CancellationToken cancellationToken);
         Task<bool> TryRemoveAccessToken(string accessToken, string clientId, CancellationToken cancellationToken);
-        Task<string> AddRefreshToken(string clientId, string authorizationCode, string grantId, JsonObject currentRequest, JsonObject originalRequest, double validityPeriodsInSeconds, CancellationToken cancellationToken);
+        Task<string> AddRefreshToken(string clientId, string authorizationCode, string grantId, JsonObject currentRequest, JsonObject originalRequest, double validityPeriodsInSeconds, string jkt, CancellationToken cancellationToken);
         Task<Token> GetRefreshToken(string refreshToken, CancellationToken cancellationToken);
         Task RemoveRefreshToken(string refreshToken, CancellationToken cancellationToken);
         Task<bool> TryRemoveRefreshToken(string refreshToken, string clientId, CancellationToken cancellationToken);
-        Task<string> AddAuthorizationCode(JsonObject originalRequest, string grantId, double validityPeriodsInSeconds, CancellationToken cancellationToken);
+        Task<string> AddAuthorizationCode(JsonObject originalRequest, string grantId, double validityPeriodsInSeconds, string dpopJkt, CancellationToken cancellationToken);
         Task<AuthCode> GetAuthorizationCode(string code, CancellationToken cancellationToken);
         Task RemoveAuthorizationCode(string code, CancellationToken cancellationToken);
         Task AddPreAuthCode(string preAuthorizationCode, string pin, string clientId, string userId, double validityPeriodsInSeconds, CancellationToken cancellationToken);
@@ -48,6 +48,7 @@ namespace SimpleIdServer.IdServer.Helpers
     {
         public JsonObject OriginalRequest { get; set; }
         public string GrantId { get; set; }
+        public string DPOPJkt { get; set; }
     }
 
     public class GrantedTokenHelper : IGrantedTokenHelper
@@ -166,7 +167,7 @@ namespace SimpleIdServer.IdServer.Helpers
             return cache;
         }
 
-        public async Task<string> AddRefreshToken(string clientId, string authorizationCode, string grantId, JsonObject request, JsonObject originalRequest, double validityPeriodsInSeconds, CancellationToken cancellationToken)
+        public async Task<string> AddRefreshToken(string clientId, string authorizationCode, string grantId, JsonObject request, JsonObject originalRequest, double validityPeriodsInSeconds, string jkt, CancellationToken cancellationToken)
         {
             var refreshToken = Guid.NewGuid().ToString();
             _tokenRepository.Add(new Token
@@ -179,7 +180,8 @@ namespace SimpleIdServer.IdServer.Helpers
                 AuthorizationCode = authorizationCode,
                 ExpirationTime = DateTime.UtcNow.AddSeconds(validityPeriodsInSeconds),
                 CreateDateTime = DateTime.UtcNow,
-                GrantId = grantId
+                GrantId = grantId,
+                Jkt = jkt
             });
             await _tokenRepository.SaveChanges(cancellationToken);
             return refreshToken;
@@ -219,13 +221,14 @@ namespace SimpleIdServer.IdServer.Helpers
             return JsonSerializer.Deserialize<AuthCode>(Encoding.UTF8.GetString(cache));
         }
 
-        public async Task<string> AddAuthorizationCode(JsonObject originalRequest, string grantId, double validityPeriodsInSeconds, CancellationToken cancellationToken)
+        public async Task<string> AddAuthorizationCode(JsonObject originalRequest, string grantId, double validityPeriodsInSeconds, string dpopJkt, CancellationToken cancellationToken)
         {
             var code = Guid.NewGuid().ToString();
             var serializedAuthCode = JsonSerializer.Serialize(new AuthCode
             {
                 GrantId = grantId,
-                OriginalRequest = originalRequest
+                OriginalRequest = originalRequest,
+                DPOPJkt = dpopJkt
             });
             await _distributedCache.SetAsync(code, Encoding.UTF8.GetBytes(serializedAuthCode), new DistributedCacheEntryOptions
             {

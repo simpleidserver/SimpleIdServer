@@ -69,7 +69,28 @@ namespace SimpleIdServer.IdServer.Api.TokenIntrospection
                         [IntrospectionResponseParameters.Active] = true
                     };
                     foreach (var cl in accessToken.Claims.GroupBy(c => c.Type))
-                        result.Add(cl.Key, cl.Count() == 1 ? cl.First().Value : JsonSerializer.Serialize(cl.Select(c => c.Value)));
+                    {
+                        if(cl.Count() == 1)
+                        {
+                            JsonNode v;
+                            try
+                            {
+                                v = JsonNode.Parse(cl.First().Value);
+                            }
+                            catch
+                            {
+                                v = JsonValue.Create(cl.First().Value);
+                            }
+
+                            result.Add(cl.Key, v);
+                        }
+                        else
+                        {
+                            var arr = JsonSerializer.SerializeToNode(cl.Select(c => c.Value));
+                            result.Add(cl.Key, arr);
+                        }
+                    }
+
                     await _busControl.Publish(new TokenIntrospectionSuccessEvent
                     {
                         ClientId = client.ClientId,

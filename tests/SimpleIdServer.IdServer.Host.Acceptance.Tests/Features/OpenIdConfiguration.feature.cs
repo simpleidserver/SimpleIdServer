@@ -98,12 +98,12 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table413 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table438 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
 #line 5
  testRunner.When("execute HTTP GET request \'https://localhost:8080/.well-known/openid-configuration" +
-                        "\'", ((string)(null)), table413, "When ");
+                        "\'", ((string)(null)), table438, "When ");
 #line hidden
 #line 7
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -119,6 +119,9 @@ this.ScenarioInitialize(scenarioInfo);
 #line hidden
 #line 12
  testRunner.And("JSON \'require_pushed_authorization_requests\'=\'false\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 13
+ testRunner.And("JSON exists \'dpop_signing_alg_values_supported\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();

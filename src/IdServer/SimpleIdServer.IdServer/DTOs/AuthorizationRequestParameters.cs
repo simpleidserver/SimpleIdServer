@@ -40,5 +40,6 @@ namespace SimpleIdServer.IdServer.DTOs
         public const string IssuerState = "issuer_state";
         public const string PreAuthorizedCode = "pre-authorized_code";
         public const string UserPin = "user_pin";
+        public const string DPOPJkt = "dpop_jkt";
     }
 }

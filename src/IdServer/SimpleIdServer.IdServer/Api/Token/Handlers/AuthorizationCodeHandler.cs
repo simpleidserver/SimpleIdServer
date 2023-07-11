@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
+using SimpleIdServer.DPoP;
 using SimpleIdServer.IdServer.Api.Token.Helpers;
 using SimpleIdServer.IdServer.Api.Token.TokenBuilders;
 using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
@@ -31,11 +32,9 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
     {
         private readonly IGrantedTokenHelper _grantedTokenHelper;
         private readonly IAuthorizationCodeGrantTypeValidator _authorizationCodeGrantTypeValidator;
-        private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
         private readonly IUserRepository _userRepository;
         private readonly IGrantHelper _audienceHelper;
-        private readonly IdServerHostOptions _options;
         private readonly IBusControl _busControl;
         private readonly IDPOPProofValidator _dpopProofValidator;
         private readonly ILogger<AuthorizationCodeHandler> _logger;
@@ -43,7 +42,6 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         public AuthorizationCodeHandler(
             IGrantedTokenHelper grantedTokenHelper,
             IAuthorizationCodeGrantTypeValidator authorizationCodeGrantTypeValidator, 
-            IEnumerable<ITokenProfile> tokenProfiles,
             IEnumerable<ITokenBuilder> tokenBuilders,
             IUserRepository usrRepository,
             IClientAuthenticationHelper clientAuthenticationHelper,
@@ -51,15 +49,14 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IBusControl busControl,
             IDPOPProofValidator dpopProofValidator,
             IOptions<IdServerHostOptions> options,
-            ILogger<AuthorizationCodeHandler> logger) : base(clientAuthenticationHelper, options)
+            IEnumerable<ITokenProfile> tokenProfiles,
+            ILogger<AuthorizationCodeHandler> logger) : base(clientAuthenticationHelper, tokenProfiles, options)
         {
             _grantedTokenHelper = grantedTokenHelper;
             _authorizationCodeGrantTypeValidator = authorizationCodeGrantTypeValidator;
-            _tokenProfiles = tokenProfiles;
             _tokenBuilders = tokenBuilders;
             _userRepository = usrRepository;
             _audienceHelper = audienceHelper;
-            _options = options.Value;
             _busControl = busControl;
             _dpopProofValidator = dpopProofValidator;
             _logger = logger;
@@ -81,7 +78,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     var oauthClient = await AuthenticateClient(context, cancellationToken);
                     context.SetClient(oauthClient);
                     activity?.SetTag("client_id", oauthClient.ClientId);
-                    _dpopProofValidator.Validate(context);
+                    await _dpopProofValidator.Validate(context);
                     var code = context.Request.RequestData.GetAuthorizationCode();
                     var redirectUri = context.Request.RequestData.GetRedirectUri();
                     var authCode = await _grantedTokenHelper.GetAuthorizationCode(code, cancellationToken);
@@ -100,6 +97,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                         return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.BAD_AUTHORIZATION_CODE);
                     }
 
+                    CheckDPOPJkt(context, authCode);
                     var previousClientId = previousRequest.GetClientId();
                     var previousRedirectUrl = previousRequest.GetRedirectUri();
                     var claims = previousRequest.GetClaimsFromAuthorizationRequest();
@@ -120,7 +118,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     foreach (var tokenBuilder in _tokenBuilders)
                         await tokenBuilder.Build(parameters, context, cancellationToken, true);
 
-                    _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? _options.DefaultTokenProfile)).Enrich(context);
+                    AddTokenProfile(context);
                     foreach (var kvp in context.Response.Parameters)
                         result.Add(kvp.Key, kvp.Value);
 
@@ -151,6 +149,12 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
                     return BuildError(HttpStatusCode.Unauthorized, ex.Code, ex.Message);
                 }
+                catch (OAuthDPoPRequiredException ex)
+                {
+                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+                    context.Response.Response.Headers.Add(Constants.DPOPNonceHeaderName, ex.Nonce);
+                    return BuildError(HttpStatusCode.Unauthorized, ex.Code, ex.Message);
+                }
                 catch (OAuthException ex)
                 {
                     await _busControl.Publish(new TokenIssuedFailureEvent
@@ -177,6 +181,12 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             if (!previousQueryParameters.ContainsKey(JwtRegisteredClaimNames.Sub))
                 return;
             handlerContext.SetUser(await _userRepository.Query().AsNoTracking().Include(u => u.OAuthUserClaims).Include(u => u.Groups).Include(u => u.Realms).FirstOrDefaultAsync(u => u.Name == previousQueryParameters[JwtRegisteredClaimNames.Sub].GetValue<string>() && u.Realms.Any(r => r.RealmsName == handlerContext.Realm), token));
+        }
+
+        void CheckDPOPJkt(HandlerContext context, AuthCode authCode)
+        {
+            if (context.DPOPProof == null || string.IsNullOrWhiteSpace(authCode.DPOPJkt)) return;
+            if (context.DPOPProof.PublicKey().CreateThumbprint() != authCode.DPOPJkt) throw new OAuthException(ErrorCodes.INVALID_DPOP_PROOF, ErrorMessages.DPOP_JKT_MISMATCH);
         }
     }
 }

@@ -472,3 +472,123 @@ Scenario: Use 'urn:ietf:params:oauth:grant-type:device_code' grant type to get a
 	And extract JSON from body
 
 	Then HTTP status code equals to '200'
+
+Scenario: Use 'client_credentials' grant type and DPoP to get an access token
+	When build DPoP proof
+	| Key | Value                          |
+	| htm | POST                           |
+	| htu | https://localhost:8080/token   |
+
+	And execute HTTP POST request 'https://localhost:8080/token'
+	| Key           | Value              |
+	| client_id     | sixtyThreeClient	 |
+	| client_secret | password           |
+	| scope         | firstScope	     |
+	| grant_type    | client_credentials |
+	| DPoP          | $DPOP$             |
+
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	And JSON '$.scope'='firstScope'
+	And JSON '$.token_type'='DPoP'
+	And JSON '$.expires_in'='1800'
+	And access_token contains jkt
+
+Scenario: Use 'refresh_token' grant type and DPoP to get an access token
+	When build DPoP proof
+	| Key | Value                          |
+	| htm | POST                           |
+	| htu | https://localhost:8080/token   |
+
+	And execute HTTP POST request 'https://localhost:8080/token'
+	| Key           | Value              |
+	| grant_type    | client_credentials |
+	| scope         | firstScope         |
+	| client_id     | sixtyThreeClient   |
+	| client_secret | password           |
+	| DPoP          | $DPOP$             |
+
+	And extract JSON from body
+	And extract parameter '$.refresh_token' from JSON body into 'refreshToken'
+	
+	And execute HTTP POST request 'https://localhost:8080/token'
+	| Key           | Value            |
+	| grant_type    | refresh_token    |
+	| refresh_token | $refreshToken$   |
+	| client_id     | sixtyThreeClient |
+	| client_secret | password         |
+	| DPoP          | $DPOP$           |
+
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	And JSON '$.scope'='firstScope'
+	And JSON '$.token_type'='DPoP'
+	And JSON '$.expires_in'='1800'
+	And access_token contains jkt
+
+Scenario: Use 'authorization_code' grant type to get an access token and use PAR and DPoP
+	Given authenticate a user
+
+	When build security key
+
+	And execute HTTP POST request 'https://localhost:8080/par'
+	| Key           | Value                 |
+	| response_type | code                  |
+	| client_id     | sixtyFiveClient       |
+	| state         | state                 |
+	| redirect_uri  | http://localhost:8080 |
+	| response_mode | query                 |
+	| scope         | secondScope			|
+	| dpop_jkt      | $jkt$                 |
+
+	And extract JSON from body
+	And extract parameter 'request_uri' from JSON body
+
+	And execute HTTP GET request 'https://localhost:8080/authorization'
+	| Key           | Value              |
+	| client_id     | sixtyFiveClient    |
+	| request_uri   | $request_uri$      |
+
+	And extract parameter 'code' from redirect url
+	And extract parameter 'state' from redirect url
+
+	And build DPoP proof
+	| Key | Value                          |
+	| htm | POST                           |
+	| htu | https://localhost:8080/token   |
+	
+	And execute HTTP POST request 'https://localhost:8080/token'
+	| Key           | Value        			|
+	| client_id     | sixtyFiveClient    	|
+	| client_secret | password     			|
+	| grant_type    | authorization_code	|
+	| code			| $code$				|	
+	| redirect_uri  | http://localhost:8080	|
+	| DPoP          | $DPOP$                |	
+
+	And extract header 'DPoP-Nonce' to 'nonce'
+
+	And build DPoP proof
+	| Key   | Value                          |
+	| htm   | POST                           |
+	| htu   | https://localhost:8080/token   |
+	| nonce | $nonce$                        |
+	
+	And execute HTTP POST request 'https://localhost:8080/token'
+	| Key           | Value        			|
+	| client_id     | sixtyFiveClient    	|
+	| client_secret | password     			|
+	| grant_type    | authorization_code	|
+	| code			| $code$				|	
+	| redirect_uri  | http://localhost:8080	|
+	| DPoP          | $DPOP$                |
+
+	And extract JSON from body
+
+	Then HTTP status code equals to '200'
+	And JSON '$.scope'='secondScope'
+	And JSON '$.token_type'='DPoP'
+	And JSON '$.expires_in'='1800'
+	And access_token contains jkt
