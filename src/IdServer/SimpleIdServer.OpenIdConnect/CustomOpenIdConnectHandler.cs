@@ -11,6 +11,7 @@ using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.DPoP;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -46,6 +47,8 @@ namespace SimpleIdServer.OpenIdConnect
         {
             "jwt", "query.jwt", "fragment.jwt", "form_post.jwt"
         };
+        private SecurityKey _dPoPSecurityKey;
+        private DateTime? _lastDPoPSecurityKeyRotationDateTime = null;
         private OpenIdConnectConfiguration? _configuration;
         protected HttpClient Backchannel => Options.Backchannel; 
         protected new OpenIdConnectEvents Events
@@ -389,6 +392,7 @@ namespace SimpleIdServer.OpenIdConnect
                         {
                             return tokenValidatedContext.Result;
                         }
+
                         authorizationResponse = tokenValidatedContext.ProtocolMessage;
                         tokenEndpointResponse = tokenValidatedContext.TokenEndpointResponse;
                         user = tokenValidatedContext.Principal!;
@@ -880,6 +884,24 @@ namespace SimpleIdServer.OpenIdConnect
             if (Options.ClientAuthenticationType == ClientAuthenticationTypes.CLIENT_SECRET_POST)
                 tokenEndpointRequest.ClientSecret = Options.ClientSecret;
 
+            if(Options.ClientAuthenticationType == ClientAuthenticationTypes.PRIVATE_KEY_JWT)
+            {
+                var descriptor = new SecurityTokenDescriptor
+                {
+                    Claims = new Dictionary<string, object>
+                    {
+                        { "sub", Options.ClientId }
+                    },
+                    Issuer = Options.ClientId,
+                    Audience = Options.Authority,
+                    SigningCredentials = Options.SigningCredentials
+                };
+                var handler = new JsonWebTokenHandler();
+                var clientAssertion = handler.CreateToken(descriptor);
+                tokenEndpointRequest.ClientAssertion = clientAssertion;
+                tokenEndpointRequest.ClientAssertionType = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
+            }
+
             // PKCE https://tools.ietf.org/html/rfc7636#section-4.5, see HandleChallengeAsyncInternal
             if (properties.Items.TryGetValue(OAuthConstants.CodeVerifierKey, out var codeVerifier))
             {
@@ -1137,6 +1159,9 @@ namespace SimpleIdServer.OpenIdConnect
 
             if (Options.ClientAuthenticationType == ClientAuthenticationTypes.TLS_CLIENT_AUTH && Options.MTLSCertificate == null)
                 throw new InvalidOperationException("The tls_client_auth authentication method cannot be used because the certificate is missing");
+
+            if (Options.ClientAuthenticationType == ClientAuthenticationTypes.PRIVATE_KEY_JWT && Options.SigningCredentials == null)
+                throw new InvalidOperationException("The private_key_jwt authentication method cannot be used beacuse the JWK is missing");
         }
 
         private class PARResponse
@@ -1163,7 +1188,7 @@ namespace SimpleIdServer.OpenIdConnect
         /// </summary>
         /// <param name="tokenEndpointRequest">The request that will be sent to the token endpoint and is available for customization.</param>
         /// <returns>OpenIdConnect message that has tokens inside it.</returns>
-        protected virtual async Task<OpenIdConnectMessage> RedeemAuthorizationCodeAsync(OpenIdConnectMessage tokenEndpointRequest)
+        protected virtual async Task<OpenIdConnectMessage> RedeemAuthorizationCodeAsync(OpenIdConnectMessage tokenEndpointRequest, string dpopNonce = null)
         {
             Logger.RedeemingCodeForTokens();
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, tokenEndpointRequest.TokenEndpoint ?? _configuration?.TokenEndpoint);
@@ -1172,8 +1197,10 @@ namespace SimpleIdServer.OpenIdConnect
             switch(Options.ClientAuthenticationType)
             {
                 case ClientAuthenticationTypes.CLIENT_SECRET_POST:
+                case ClientAuthenticationTypes.PRIVATE_KEY_JWT:
                     requestMessage.Version = Backchannel.DefaultRequestVersion;
-                    responseMessage = await Backchannel.SendAsync(requestMessage, Context.RequestAborted);
+                    if (Options.IsDPoPUsed) responseMessage = await RequestTokenWithDPoP();
+                    else responseMessage = await Backchannel.SendAsync(requestMessage, Context.RequestAborted);
                     break;
                 case ClientAuthenticationTypes.TLS_CLIENT_AUTH:
                     var mtlsEndpointAliases = _configuration.AdditionalData[MtlsEndpointAliasesName];
@@ -1225,10 +1252,29 @@ namespace SimpleIdServer.OpenIdConnect
 
             if (!responseMessage.IsSuccessStatusCode)
             {
+                if (message.Error == "use_dpop_nonce") return await RedeemAuthorizationCodeAsync(tokenEndpointRequest, responseMessage.Headers.First(h => h.Key == "DPoP-Nonce").Value.First());
                 throw CreateOpenIdConnectProtocolException(message, responseMessage);
             }
 
             return message;
+
+            async Task<HttpResponseMessage> RequestTokenWithDPoP()
+            {
+                RotateDPoPSecurityKey();
+                var handler = new DPoPHandler();
+                var dpop = handler.Create("POST", _configuration.TokenEndpoint, _dPoPSecurityKey, SecurityAlgorithms.EcdsaSha256, dpopNonce);
+                requestMessage.Headers.Add("DPoP", dpop.Token);
+                return await Backchannel.SendAsync(requestMessage, Context.RequestAborted);
+            }
+        }
+
+        private void RotateDPoPSecurityKey()
+        {
+            if (_lastDPoPSecurityKeyRotationDateTime == null || _lastDPoPSecurityKeyRotationDateTime.Value.AddSeconds(Options.DPoPSecurityKeyRotationInSeconds) >= DateTime.UtcNow)
+            {
+                _dPoPSecurityKey = new ECDsaSecurityKey(ECDsa.Create(ECCurve.NamedCurves.nistP256));
+                _lastDPoPSecurityKeyRotationDateTime = DateTime.UtcNow;
+            }
         }
 
         /// <summary>

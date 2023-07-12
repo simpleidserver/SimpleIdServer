@@ -4,9 +4,14 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
-	
 	<ItemGroup>
-		<PackageReference Include="SimpleIdServer.OpenIdConnect" Version="3.0.*-*" />
+	  <Content Remove="JWK.json" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Include="JWK.json" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="SimpleIdServer.OpenIdConnect" Version="4.0.*-*" />
 	</ItemGroup>
 	
 	<ItemGroup>

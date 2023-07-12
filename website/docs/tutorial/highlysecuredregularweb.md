@@ -2,11 +2,19 @@
 
 In this tutorial, we will provide a comprehensive explanation of the process involved in creating a highly secure regular Web Application that adheres to all the security recommendations outlined in the FAPI (Financial-grade API) specifications. The FAPI specifications can be found at [https://openid.net/specs/fapi-2_0-baseline.html#name-requirements-for-clients](https://openid.net/specs/fapi-2_0-baseline.html#name-requirements-for-clients) :
 
-* The client shall support MTLS as mechanism for sender-constrained access tokens.
+* The client shall support `MTLS` or `DPoP` as mechanism for sender-constrained access tokens.
 * The client shall include `request` or `request_uri` parameter as defined in Section 6 of [OIDC](https://openid.net/specs/openid-connect-core-1_0.html) in the authentication request.
 * If the Authorization Request is too large for example a [Rich Authorization Request](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-rar-23), then it is recommended to use [Pushed Authorization Request (PAR)](https://datatracker.ietf.org/doc/html/rfc9126).
 * [JWT-Secured OAUTH2.0 authorisation response](https://openid.net/specs/openid-financial-api-jarm.html) (JARM) is used to sign and / or encrypt the authorisation response, it protects against replay, credential leaks and mix-up attacks.
-* The PS256 or ES256 algorithms must be used.
+* The `PS256` or `ES256` algorithms must be used.
+
+Based on the algorithm you have chosen to implement for Proof of Possession, please refer to the appropriate chapter to configure your highly secure web application
+
+:::info
+The source code of this project can be found [here](https://github.com/simpleidserver/SimpleIdServer/tree/master/samples/HighlySecuredServersideWebsite).
+:::
+
+## MTLS
 
 The website will be configured with the following settings:
 
@@ -19,13 +27,9 @@ The website will be configured with the following settings:
 | Pushed Authorization Request             | Yes             |
 | Response Mode                            | jwt             |
 
-:::info
-The source code of this project can be found [here](https://github.com/simpleidserver/SimpleIdServer/tree/master/samples/HighlySecuredServersideWebsite).
-:::
-
 To incorporate all the FAPI recommendations into your regular web application, it is necessary to follow the following steps:
 
-## 1. Configure client certificate
+### 1. Configure client certificate
 
 Utilize the administration UI to create a client certificate.
 
@@ -35,7 +39,7 @@ Utilize the administration UI to create a client certificate.
 4. Set the value of the Subject Name to `CN=websiteFAPI` and click on the `Add` button.
 5. Click on the `Download` button located next to the certificate.
 
-## 2. Configure an application
+### 2. Configure an application
 
 1. Open the IdentityServer website at [https://localhost:5002](https://localhost:5002).
 2. On the Clients screen, click on the `Add client` button.
@@ -44,18 +48,19 @@ Utilize the administration UI to create a client certificate.
 
 | Property                | Value                             |
 | ----------------------- | --------------------------------- |
-| Identifier              | protectedServersideApp            |
+| Identifier              | websiteFAPIMTLS                   |
 | Secret                  | password                          |
-| Name                    | protectedServersideApp            |
-| Redirection URLs        | http://localhost:7000/signin-oidc |
-| Compliant with FAPI 1.0 | true                              |
+| Name                    | websiteFAPIMTLS                   |
+| Redirection URLs        | http://localhost:5003/signin-oidc |
+| Compliant with FAPI 2.0 | true                              |
+| Proof of Possession     | Mutual-TLS Client Authentication  |
 | Subject Name            | CN=websiteFAPI                    |
 
-5. The generated JSON Web Key will be displayed. Copy the corresponding value and save it in a text file. It is used by the Authorization Server to construct a signed JWT Authorization Response.
+5. The generated JSON Web Key will be displayed. Copy the corresponding value and save it in a text file. It will be used by the web application to construct a signed `request` parameter.
 
 Now your client is ready to be used, you can develop the regular website.
 
-## 3. Create ASP.NET CORE Application
+### 3. Create ASP.NET CORE Application
 
 Finally, create and configure an ASP.NET CORE Application.
 
@@ -70,7 +75,7 @@ dotnet new sln -n HighlySecuredServersideWebsite
 
 :::info
 This NuGet Package includes support for all the features provided by the official `Microsoft.AspNetCore.Authentication.OpenIdConnect` NuGet Package.
-Additionally, it introduces new features such as the `tls_client_auth` Client Authentication Method and supports new authorization response types including `jwt`, `query.jwt`, `fragment.jwt`, `form_post.jwt`, `fragment.jwt`, and `Pushed Authorization Request (PAR)`.
+Additionally, it introduces new features such as the `tls_client_auth` Client Authentication Method and supports new authorization response types including `jwt`, `query.jwt`, `fragment.jwt`, `form_post.jwt`, `fragment.jwt`, `Pushed Authorization Request (PAR)` and `DPoP`.
 :::
 
 ```
@@ -87,7 +92,7 @@ cd ..\..
 dotnet sln add ./src/Website/Website.csproj
 ```
 
-3. In the `Program.cs` file, make the following modifications to configure the OPENID authentication: Replace the `JWK` variable with the content of the file you copied earlier (step 2.5). Ensure that you replace the certificate `CN=websiteFAPI.pfx` with the one you downloaded earlier (step 1.5)..
+3. In the `Program.cs` file, make the following modifications to configure the OPENID authentication: Replace the content of the `JWK.json` file with the content from the file you copied earlier (step 2.5). Make sure to replace the certificate `CN=websiteFAPI.pfx` with the one you downloaded earlier (step 1.5).
 
 | Configuration                            | Value           |
 | ---------------------------------------- | --------------- |
@@ -99,64 +104,167 @@ dotnet sln add ./src/Website/Website.csproj
 | Response Mode                            | jwt             |
 
 ```
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Cryptography.X509Certificates;
-
-var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-builder.Services.AddControllersWithViews();
-
-const string JWK = "{\"alg\":\"ES256\",\"crv\":\"P-256\",\"d\":\"mf1MvmivRY_TdH-J7gAt7ak4DYGnyLIqIZ3dgHL5NHk\",\"kid\":\"keyId\",\"kty\":\"EC\",\"use\":\"sig\",\"x\":\"MdwuTbn0TCQYgsER0-NeE3vtSx3H4HD9sSD7Zfkxt8k\",\"y\":\"ec27GOT5l3Mu8pzZsj6doPBNbCIp_5afjoP66qPfu4o\"}";
-var jsonWebKey = JsonExtensions.DeserializeFromJson<JsonWebKey>(JWK);
-var certificate = new X509Certificate2(Path.Combine(Directory.GetCurrentDirectory(), "CN=websiteFAPI.pfx"));
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultScheme = "Cookies";
-    options.DefaultChallengeScheme = "sid";
-})
-    .AddCookie("Cookies")
-    .AddCustomOpenIdConnect("sid", options =>
+    var certificate = new X509Certificate2(Path.Combine(Directory.GetCurrentDirectory(), "CN=websiteFAPI.pfx"));
+    var serializedJwk = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "JWK.json")); 
+    var jsonWebKey = JsonExtensions.DeserializeFromJson<JsonWebKey>(serializedJwk);
+    builder.Services.AddAuthentication(options =>
     {
-        options.SignInScheme = "Cookies";
-        options.ResponseType = "code";
-        options.ResponseMode = "jwt";
-        options.Authority = "https://localhost:5001/master";
-        options.RequireHttpsMetadata = false;
-        options.ClientId = "websiteFAPI";
-        options.GetClaimsFromUserInfoEndpoint = true;
-        options.SaveTokens = true;
-        options.MTLSCertificate = null;
-        options.ClientAuthenticationType = SimpleIdServer.OpenIdConnect.ClientAuthenticationTypes.TLS_CLIENT_AUTH;
-        options.RequestType = SimpleIdServer.OpenIdConnect.RequestTypes.PAR;
-        options.MTLSCertificate = certificate;
-        options.SigningCredentials = new SigningCredentials(jsonWebKey, jsonWebKey.Alg);
-    });
+        options.DefaultScheme = "Cookies";
+        options.DefaultChallengeScheme = "sid";
+    })
+        .AddCookie("Cookies")
+        .AddCustomOpenIdConnect("sid", options =>
+        {
+            options.SignInScheme = "Cookies";
+            options.ResponseType = "code";
+            options.ResponseMode = "jwt";
+            options.Authority = "https://localhost:5001/master";
+            options.RequireHttpsMetadata = false;
+            options.ClientId = "websiteFAPIMTLS";
+            options.GetClaimsFromUserInfoEndpoint = true;
+            options.SaveTokens = true;
+            options.UseMTLSProof(certificate, new SigningCredentials(jsonWebKey, jsonWebKey.Alg));
+        });
+```
 
-var app = builder.Build();
+4. Add a `ClaimsController` controller with one protected operation.
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+```
+public class ClaimsController : Controller
 {
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    [Authorize]
+    public IActionResult Index()
+    {
+        return View();
+    }
 }
+```
 
-app.UseCookiePolicy(new CookiePolicyOptions
-{
-    Secure = CookieSecurePolicy.Always
-});
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-app.UseRouting();
-app.UseAuthorization();
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+5. Create a view `Views\Claims\Index.cshtml` with the following content. This view will display all the claims of the authenticated user.
 
-app.Run();
+```
+<ul>
+    @foreach (var claim in User.Claims)
+    {
+        <li>@claim.Type : @claim.Value</li>
+    }
+</ul>
+```
+
+6. In a command prompt, navigate to the directory `src\Website` and launch the application.
+
+```
+dotnet run --urls=http://localhost:5003
+```
+
+Finally, browse the following URL: [http://localhost:5003/claims](http://localhost:5003/claims). The User-Agent will be automatically redirected to the OpenID server.
+Submit the following credentials and confirm the consent. You will be redirected to the screen where your claims will be displayed
+
+| Credential | Value         |
+| ---------- | ------------- |
+| Login      | administrator |
+| Password   | password      |
+
+## DPoP
+
+The website will be configured with the following settings:
+
+| Configuration                            | Value           |
+| ---------------------------------------- | --------------- |
+| Client Authentication Method             | private_key_jwt |
+| Authorization Signed Response Algorithm  | ES256           | 
+| Identity Token Signed Response Algorithm | ES256           |
+| Request Object Signed Response Algorithm | ES256           |
+| Pushed Authorization Request             | Yes             |
+| Response Mode                            | jwt             |
+
+To incorporate all the FAPI recommendations into your regular web application, it is necessary to follow the following steps:
+
+### 1. Configure an application
+
+1. Open the IdentityServer website at [https://localhost:5002](https://localhost:5002).
+2. On the Clients screen, click on the `Add client` button.
+3. Select `Web application` and click on next.
+4. Fill-in the form like this and click on the `Save` button to confirm the creation.
+
+| Property                | Value                             |
+| ----------------------- | --------------------------------- |
+| Identifier              | websiteFAPIDPoP                   |
+| Secret                  | password                          |
+| Name                    | websiteFAPIDPoP                   |
+| Redirection URLs        | http://localhost:5003/signin-oidc |
+| Compliant with FAPI 2.0 | true                              |
+| Proof of Possession     | DPoP                              |
+
+5. The generated JSON Web Key will be displayed. Copy the corresponding value and save it in a text file. It will be used by the web application to construct a signed `request` parameter and a signed `DPoP Proof`.
+
+Now your client is ready to be used, you can develop the regular website.
+
+
+### 2. Create ASP.NET CORE Application
+
+Finally, create and configure an ASP.NET CORE Application.
+
+1. Open a command prompt and execute the following commands to create the directory structure for the solution.
+
+```
+mkdir HighlySecuredServersideWebsite
+cd HighlySecuredServersideWebsite
+mkdir src
+dotnet new sln -n HighlySecuredServersideWebsite
+```
+
+:::info
+This NuGet Package includes support for all the features provided by the official `Microsoft.AspNetCore.Authentication.OpenIdConnect` NuGet Package.
+Additionally, it introduces new features such as the `tls_client_auth` Client Authentication Method and supports new authorization response types including `jwt`, `query.jwt`, `fragment.jwt`, `form_post.jwt`, `fragment.jwt`, `Pushed Authorization Request (PAR)` and `DPoP`.
+:::
+
+```
+cd src
+dotnet new mvc -n Website
+cd Website
+dotnet add package SimpleIdServer.OpenIdConnect
+```
+
+2. Add the `Website` project into your Visual Studio solution.
+
+```
+cd ..\..
+dotnet sln add ./src/Website/Website.csproj
+```
+
+3. In the `Program.cs` file, make the following modifications to configure the OPENID authentication: Replace the content of the `JWK.json` file with the content from the file you copied earlier (step 2.5).
+
+| Configuration                            | Value           |
+| ---------------------------------------- | --------------- |
+| Client Authentication Method             | private_key_jwt |
+| Authorization Signed Response Algorithm  | ES256           | 
+| Identity Token Signed Response Algorithm | ES256           |
+| Request Object Signed Response Algorithm | ES256           |
+| Pushed Authorization Request             | Yes             |
+| Response Mode                            | jwt             |
+
+```
+    var serializedJwk = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "JWK.json"));
+    var jwk = JsonExtensions.DeserializeFromJson<JsonWebKey>(serializedJwk);
+    builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultScheme = "Cookies";
+        options.DefaultChallengeScheme = "sid";
+    })
+        .AddCookie("Cookies")
+        .AddCustomOpenIdConnect("sid", options =>
+        {
+            options.SignInScheme = "Cookies";
+            options.ResponseType = "code";
+            options.ResponseMode = "jwt";
+            options.Authority = "https://localhost:5001/master";
+            options.RequireHttpsMetadata = false;
+            options.ClientId = "websiteFAPIDPoP";
+            options.GetClaimsFromUserInfoEndpoint = true;
+            options.SaveTokens = true;
+            options.UseDPoPProof(new SigningCredentials(jwk, jwk.Alg));
+        });
 ```
 
 4. Add a `ClaimsController` controller with one protected operation.

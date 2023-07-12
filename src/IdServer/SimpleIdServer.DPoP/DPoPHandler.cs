@@ -100,6 +100,17 @@ namespace SimpleIdServer.DPoP
             return Create(claims, securityKey, alg, expiresInSeconds);
         }
 
+        public DPoPGenerationResult Create(string htm, string htu, SecurityKey securityKey, string alg, string nonce, double expiresInSeconds = 200)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(DPoPConstants.DPoPClaims.Htm, htm),
+                new Claim(DPoPConstants.DPoPClaims.Htu, htu)
+            };
+            if (!string.IsNullOrWhiteSpace(nonce)) claims.Add(new Claim(DPoPConstants.DPoPClaims.Nonce, nonce));
+            return Create(claims, securityKey, alg, expiresInSeconds);
+        }
+
         public DPoPGenerationResult Create(IEnumerable<Claim> claims, SecurityKey securityKey, string alg, double expiresInSeconds = 200)
         {
             var jwk = JsonWebKeyConverter.ConvertFromSecurityKey(securityKey);

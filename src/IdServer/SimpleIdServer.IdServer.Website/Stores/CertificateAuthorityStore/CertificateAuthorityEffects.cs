@@ -124,7 +124,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
         {
             using (var dbContext = _factory.CreateDbContext())
             {
-                var ca = await dbContext.CertificateAuthorities.FirstOrDefaultAsync(a => a.Id == action.Id);
+                var ca = await dbContext.CertificateAuthorities.Include(c => c.ClientCertificates).FirstOrDefaultAsync(a => a.Id == action.Id);
                 var store = new IdServer.Stores.CertificateAuthorityStore(null);
                 var certificate = store.Get(ca);
                 dispatcher.Dispatch(new GetCertificateAuthoritySuccessAction { CertificateAuthority = ca, Certificate = certificate });

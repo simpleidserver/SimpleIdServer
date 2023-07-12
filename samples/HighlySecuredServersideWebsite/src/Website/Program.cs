@@ -6,32 +6,58 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+// ConfigureMTLS();
+ConfigureDPoP();
 
-const string JWK = "{\"alg\":\"ES256\",\"crv\":\"P-256\",\"d\":\"-U73QZxHx-pGMJhC9SG7Do4H0N4q6nvY4Fs2GGDVyFM\",\"kid\":\"keyId\",\"kty\":\"EC\",\"use\":\"sig\",\"x\":\"ikA6jQpF1OUjUw2wxXodnej6-LB7zVJZO7mlcIj9h0g\",\"y\":\"wED_dsFzH4YeJqrZqo_V-9B3gCAcwKg3N62oKenLkr8\"}";
-var jsonWebKey = JsonExtensions.DeserializeFromJson<JsonWebKey>(JWK);
-var certificate = new X509Certificate2(Path.Combine(Directory.GetCurrentDirectory(), "CN=websiteFAPI.pfx"));
-builder.Services.AddAuthentication(options =>
+void ConfigureMTLS()
 {
-    options.DefaultScheme = "Cookies";
-    options.DefaultChallengeScheme = "sid";
-})
-    .AddCookie("Cookies")
-    .AddCustomOpenIdConnect("sid", options =>
+    var certificate = new X509Certificate2(Path.Combine(Directory.GetCurrentDirectory(), "CN=websiteFAPI.pfx"));
+    var serializedJwk = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "JWK.json")); 
+    var jsonWebKey = JsonExtensions.DeserializeFromJson<JsonWebKey>(serializedJwk);
+    builder.Services.AddAuthentication(options =>
     {
-        options.SignInScheme = "Cookies";
-        options.ResponseType = "code";
-        options.ResponseMode = "jwt";
-        options.Authority = "https://localhost:5001/master";
-        options.RequireHttpsMetadata = false;
-        options.ClientId = "websiteFAPI";
-        options.GetClaimsFromUserInfoEndpoint = true;
-        options.SaveTokens = true;
-        options.MTLSCertificate = null;
-        options.ClientAuthenticationType = SimpleIdServer.OpenIdConnect.ClientAuthenticationTypes.TLS_CLIENT_AUTH;
-        options.RequestType = SimpleIdServer.OpenIdConnect.RequestTypes.PAR;
-        options.MTLSCertificate = certificate;
-        options.SigningCredentials = new SigningCredentials(jsonWebKey, jsonWebKey.Alg);
-    });
+        options.DefaultScheme = "Cookies";
+        options.DefaultChallengeScheme = "sid";
+    })
+        .AddCookie("Cookies")
+        .AddCustomOpenIdConnect("sid", options =>
+        {
+            options.SignInScheme = "Cookies";
+            options.ResponseType = "code";
+            options.ResponseMode = "jwt";
+            options.Authority = "https://localhost:5001/master";
+            options.RequireHttpsMetadata = false;
+            options.ClientId = "websiteFAPIMTLS";
+            options.GetClaimsFromUserInfoEndpoint = true;
+            options.SaveTokens = true;
+            options.UseMTLSProof(certificate, new SigningCredentials(jsonWebKey, jsonWebKey.Alg));
+        });
+
+}
+
+void ConfigureDPoP()
+{
+    var serializedJwk = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "JWK.json"));
+    var jwk = JsonExtensions.DeserializeFromJson<JsonWebKey>(serializedJwk);
+    builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultScheme = "Cookies";
+        options.DefaultChallengeScheme = "sid";
+    })
+        .AddCookie("Cookies")
+        .AddCustomOpenIdConnect("sid", options =>
+        {
+            options.SignInScheme = "Cookies";
+            options.ResponseType = "code";
+            options.ResponseMode = "jwt";
+            options.Authority = "https://localhost:5001/master";
+            options.RequireHttpsMetadata = false;
+            options.ClientId = "websiteFAPIDPoP";
+            options.GetClaimsFromUserInfoEndpoint = true;
+            options.SaveTokens = true;
+            options.UseDPoPProof(new SigningCredentials(jwk, jwk.Alg));
+        });
+}
 
 var app = builder.Build();
 
