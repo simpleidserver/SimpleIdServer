@@ -4,7 +4,6 @@ using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Nethereum.Contracts.Standards.ENS.ETHRegistrarController.ContractDefinition;
 using Radzen;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
@@ -116,13 +115,21 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 string jsonWebKeyStr = null;
                 if(action.IsFAPICompliant)
                 {
-                    newClientBuilder.UseClientTlsAuthentication(action.SubjectName);
                     newClientBuilder.SetSigAuthorizationResponse(SecurityAlgorithms.EcdsaSha256);
                     newClientBuilder.SetIdTokenSignedResponseAlg(SecurityAlgorithms.EcdsaSha256);
                     newClientBuilder.SetRequestObjectSigning(SecurityAlgorithms.EcdsaSha256);
                     var ecdsaSig = ClientKeyGenerator.GenerateECDsaSignatureKey("keyId", SecurityAlgorithms.EcdsaSha256);
                     jsonWebKeyStr = ecdsaSig.SerializeJWKStr();
                     newClientBuilder.AddSigningKey(ecdsaSig, SecurityAlgorithms.EcdsaSha256, SecurityKeyTypes.ECDSA);
+                    if (action.IsDPoP)
+                    {
+                        newClientBuilder.UseClientPrivateKeyJwtAuthentication();
+                        newClientBuilder.UseDPOPProof(false);
+                    }
+                    else
+                    {
+                        newClientBuilder.UseClientTlsAuthentication(action.SubjectName);
+                    }
                 }
 
                 if(action.HasAccessToGrant)
@@ -517,15 +524,21 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 var client = await dbContext.Clients.Include(c => c.Realms).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm));
                 client.IdTokenSignedResponseAlg = act.IdTokenSignedResponseAlg;
                 client.AuthorizationSignedResponseAlg = act.AuthorizationSignedResponseAlg;
-                client.AuthorizationDataTypes = string.IsNullOrWhiteSpace(act.AuthorizationDataTypes) ? null : act.AuthorizationDataTypes.Split(';');
+                client.AuthorizationDataTypes = string.IsNullOrWhiteSpace(act.AuthorizationDataTypes) ? new List<string>() : act.AuthorizationDataTypes.Split(';');
                 client.ResponseTypes = act.ResponseTypes?.ToList();
+                client.DPOPBoundAccessTokens = act.IsDPoPRequired;
+                client.DPOPNonceLifetimeInSeconds = act.DPOPNonceLifetimeInSeconds;
+                client.IsDPOPNonceRequired = act.IsDPoPNonceRequired;
                 await dbContext.SaveChangesAsync();
                 dispatcher.Dispatch(new UpdateAdvancedClientSettingsSuccessAction
                 {
                     AuthorizationDataTypes = client.AuthorizationDataTypes,
                     ResponseTypes = act.ResponseTypes,
                     AuthorizationSignedResponseAlg = act.AuthorizationSignedResponseAlg,
-                    IdTokenSignedResponseAlg = act.IdTokenSignedResponseAlg
+                    IdTokenSignedResponseAlg = act.IdTokenSignedResponseAlg,
+                    DPOPNonceLifetimeInSeconds = act.DPOPNonceLifetimeInSeconds,
+                    IsDPoPNonceRequired = act.IsDPoPNonceRequired,
+                    IsDPoPRequired = act.IsDPoPRequired
                 });
             }
         }
@@ -616,6 +629,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public string? SubjectName { get; set; } = null;
         public bool HasAccessToGrant { get; set; } = false;
         public string? AuthDataTypes { get; set; } = null;
+        public bool IsDPoP { get; set; } = false;
     }
 
     public class AddMobileApplicationAction
@@ -958,6 +972,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public string? AuthorizationSignedResponseAlg { get; set; }
         public string? AuthorizationDataTypes { get; set; }
         public IEnumerable<string> ResponseTypes { get; set; }
+        public bool IsDPoPRequired { get; set; } = false;
+        public bool IsDPoPNonceRequired { get; set; } = false;
+        public double DPOPNonceLifetimeInSeconds { get; set; }
     }
 
     public class UpdateAdvancedClientSettingsSuccessAction
@@ -966,5 +983,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public string? AuthorizationSignedResponseAlg { get; set; }
         public IEnumerable<string> AuthorizationDataTypes { get; set; }
         public IEnumerable<string> ResponseTypes { get; set; }
+        public bool IsDPoPRequired { get; set; } = false;
+        public bool IsDPoPNonceRequired { get; set; } = false;
+        public double DPOPNonceLifetimeInSeconds { get; set; }
+    }
+
+    public class GenerateClientSigKeyAction
+    {
+
     }
 }

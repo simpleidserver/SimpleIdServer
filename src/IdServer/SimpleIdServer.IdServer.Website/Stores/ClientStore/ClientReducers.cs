@@ -270,6 +270,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             client.AuthorizationSignedResponseAlg = act.AuthorizationSignedResponseAlg;
             client.AuthorizationDataTypes = act.AuthorizationDataTypes?.ToList();
             client.ResponseTypes = act.ResponseTypes?.ToList();
+            client.DPOPBoundAccessTokens = act.IsDPoPRequired;
+            client.IsDPOPNonceRequired = act.IsDPoPNonceRequired;
+            client.DPOPNonceLifetimeInSeconds = act.DPOPNonceLifetimeInSeconds;
             return state with
             {
                 Client = client

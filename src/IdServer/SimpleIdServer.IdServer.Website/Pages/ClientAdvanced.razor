@@ -63,7 +63,36 @@
                         <RadzenDropDown @bind-Value=@selectedResponseTypes Chips=true Data=@responseTypes Multiple=true AllowClear=true Placeholder="Select Response Types" class="w-100"></RadzenDropDown>
                     </div>
                 </div>
-                <!-- Response modes -->
+                <!-- DPoP -->
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, "DPoP is an application-level mechanism for sender-constraining OAuth access and refresh tokens."))" />
+                        <RadzenLabel Text="Is DPoP required?" Style="padding: 0px;" />
+                    </div>
+                    <div class="col">
+                        <RadzenCheckBox @bind-Value="@updateAdvancedClient.IsDPoPRequired" />
+                    </div>
+                </div>
+                <!-- DPoP Nonce -->
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, "May be used by the authorization server to limit the lifetime of DPoP Proof."))" />
+                        <RadzenLabel Text="Is DPoP Nonce required?" Style="padding: 0px;" />
+                    </div>
+                    <div class="col">
+                        <RadzenCheckBox @bind-Value="@updateAdvancedClient.IsDPoPNonceRequired" />
+                    </div>
+                </div>
+                <!-- DPoP Nonce lifetime in seconds -->
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, "Lifetime of a DPoP nonce in seconds."))" />
+                        <RadzenLabel Text="Lifetime of DPoP Nonce" Style="padding: 0px;" />
+                    </div>
+                    <div class="col">
+                        <RadzenNumeric @bind-Value=@updateAdvancedClient.DPOPNonceLifetimeInSeconds />
+                    </div>
+                </div>
             </RadzenAccordionItem>
         </Items>
     </RadzenAccordion>
@@ -83,6 +112,9 @@
         public string? IdTokenSignedResponseAlg { get; set; } = null;
         public string? AuthorizationSignedResponseAlg { get; set; } = null;
         public string? AuthorizationDataTypes { get; set; } = null;
+        public bool IsDPoPRequired { get; set; } = false;
+        public bool IsDPoPNonceRequired { get; set; } = false;
+        public double DPOPNonceLifetimeInSeconds { get; set; }
     }
 
     UpdateAdvancedClient updateAdvancedClient = new UpdateAdvancedClient();
@@ -114,7 +146,10 @@
         {
             IdTokenSignedResponseAlg = Client.IdTokenSignedResponseAlg,
             AuthorizationSignedResponseAlg = Client.AuthorizationSignedResponseAlg,
-            AuthorizationDataTypes = Client.AuthorizationDataTypes == null || !Client.AuthorizationDataTypes.Any() ? string.Empty : string.Join(";", Client.AuthorizationDataTypes)
+            AuthorizationDataTypes = Client.AuthorizationDataTypes == null || !Client.AuthorizationDataTypes.Any() ? string.Empty : string.Join(";", Client.AuthorizationDataTypes),
+            IsDPoPRequired = Client.DPOPBoundAccessTokens,
+            IsDPoPNonceRequired = Client.IsDPOPNonceRequired,
+            DPOPNonceLifetimeInSeconds = Client.DPOPNonceLifetimeInSeconds
         };
         selectedResponseTypes = Client.ResponseTypes.Where(r => !string.IsNullOrWhiteSpace(r));
     }
@@ -127,7 +162,10 @@
             AuthorizationSignedResponseAlg = client.AuthorizationSignedResponseAlg,
             IdTokenSignedResponseAlg = client.IdTokenSignedResponseAlg,
             ResponseTypes = selectedResponseTypes,
-            ClientId = Client.ClientId
+            ClientId = Client.ClientId,
+            DPOPNonceLifetimeInSeconds = client.DPOPNonceLifetimeInSeconds,
+            IsDPoPNonceRequired = client.IsDPoPNonceRequired,
+            IsDPoPRequired = client.IsDPoPRequired
         });
     }
 

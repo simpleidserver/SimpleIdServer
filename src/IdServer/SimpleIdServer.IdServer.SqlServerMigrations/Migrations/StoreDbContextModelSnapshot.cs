@@ -17,7 +17,7 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.8")
+                .HasAnnotation("ProductVersion", "7.0.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -758,6 +758,9 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .HasColumnType("bit")
                         .HasAnnotation("Relational:JsonPropertyName", "dpop_bound_access_tokens");
 
+                    b.Property<double>("DPOPNonceLifetimeInSeconds")
+                        .HasColumnType("float");
+
                     b.Property<string>("DefaultAcrValues")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
@@ -799,6 +802,9 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.Property<bool>("IsConsentDisabled")
                         .HasColumnType("bit")
                         .HasAnnotation("Relational:JsonPropertyName", "is_consent_disabled");
+
+                    b.Property<bool>("IsDPOPNonceRequired")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsResourceParameterRequired")
                         .HasColumnType("bit");
@@ -1609,6 +1615,9 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
 
                     b.Property<bool>("IsRegistrationAccessToken")
                         .HasColumnType("bit");
+
+                    b.Property<string>("Jkt")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("OriginalData")
                         .HasColumnType("nvarchar(max)");

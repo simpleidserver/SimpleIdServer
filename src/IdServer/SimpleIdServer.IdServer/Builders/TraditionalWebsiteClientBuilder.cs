@@ -404,6 +404,17 @@ namespace SimpleIdServer.IdServer.Builders
         }
 
         /// <summary>
+        /// Use 'private_key_jwt' as authentication method.
+        /// For more information : https://oauth.net/private-key-jwt/
+        /// </summary>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder UseClientPrivateKeyJwtAuthentication()
+        {
+            _client.TokenEndPointAuthMethod = OAuthClientPrivateKeyJwtAuthenticationHandler.AUTH_METHOD;
+            return this;
+        }
+
+        /// <summary>
         /// PKCE is an extension to the Authorization Code flow to prevent CSRF and 
         /// For more information: https://oauth.net/2/pkce/
         /// </summary>

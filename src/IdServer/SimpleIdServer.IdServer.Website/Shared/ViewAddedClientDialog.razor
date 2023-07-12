@@ -20,7 +20,10 @@
     <div>
         <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Json Web Key</RadzenText>
         <RadzenTextArea Rows=10 Name="Description" @bind-Value="@Client.JsonWebKeyStr" Class="w-100"></RadzenTextArea>
-        <p class="text-muted">The public JSON Web Key is used to verify the <b>request</b> object.</p>
+        <p class="text-muted">
+            Check the JWT request object at <a href='https://openid.net/specs/openid-connect-core-1_0.html#JWTRequests' target='_blank'>OpenID Connect Core 1.0 - JWT Requests</a>. 
+            This key is used in the <i>private_key_jwt</i> and <i>client_secret_jwt</i> authentication flows, as described in <a href='https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication' target='_blank'>OpenID Connect Core 1.0 - Client Authentication.</a>
+        </p>
     </div>
 }
 
