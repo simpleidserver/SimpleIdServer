@@ -112,39 +112,97 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                     .AddScope(scopes.ToArray());
                 if (!string.IsNullOrWhiteSpace(action.ClientName))
                     newClientBuilder.SetClientName(action.ClientName);
-                string jsonWebKeyStr = null;
-                if(action.IsFAPICompliant)
-                {
-                    newClientBuilder.SetSigAuthorizationResponse(SecurityAlgorithms.EcdsaSha256);
-                    newClientBuilder.SetIdTokenSignedResponseAlg(SecurityAlgorithms.EcdsaSha256);
-                    newClientBuilder.SetRequestObjectSigning(SecurityAlgorithms.EcdsaSha256);
-                    var ecdsaSig = ClientKeyGenerator.GenerateECDsaSignatureKey("keyId", SecurityAlgorithms.EcdsaSha256);
-                    jsonWebKeyStr = ecdsaSig.SerializeJWKStr();
-                    newClientBuilder.AddSigningKey(ecdsaSig, SecurityAlgorithms.EcdsaSha256, SecurityKeyTypes.ECDSA);
-                    if (action.IsDPoP)
-                    {
-                        newClientBuilder.UseClientPrivateKeyJwtAuthentication();
-                        newClientBuilder.UseDPOPProof(false);
-                    }
-                    else
-                    {
-                        newClientBuilder.UseClientTlsAuthentication(action.SubjectName);
-                    }
-                }
-
-                if(action.HasAccessToGrant)
-                {
-                    scopes = await dbContext.Scopes.Include(s => s.Realms).Where(s => (s.Name == Constants.StandardScopes.GrantManagementQuery.Name || s.Name == Constants.StandardScopes.GrantManagementRevoke.Name) && s.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
-                    newClientBuilder.AddScope(scopes.ToArray());
-                    var authDataTypes = string.IsNullOrWhiteSpace(action.AuthDataTypes) || action.AuthDataTypes == null ? null : action.AuthDataTypes.Split(';');
-                    if(authDataTypes != null)
-                        newClientBuilder.AddAuthDataTypes(authDataTypes);
-                }
-
                 var newClient = newClientBuilder.Build();
                 dbContext.Clients.Add(newClient);
                 await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.WEBSITE, JsonWebKeyStr = jsonWebKeyStr });
+                dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.WEBSITE });
+            }
+        }
+
+        [EffectMethod]
+        public async Task Handle(AddHighlySecuredWebsiteApplicationAction action, IDispatcher dispatcher)
+        {
+            if (!await ValidateAddClient(action.ClientId, new List<string>(), dispatcher)) return;
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                var realm = await GetRealm();
+                var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
+                var scopes = await dbContext.Scopes.Include(s => s.Realms).Where(s => (s.Name == Constants.StandardScopes.OpenIdScope.Name || s.Name == Constants.StandardScopes.Profile.Name) && s.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
+                var newClientBuilder = ClientBuilder.BuildTraditionalWebsiteClient(action.ClientId, action.ClientSecret, activeRealm, action.RedirectionUrls.ToArray())
+                    .AddScope(scopes.ToArray());
+                if (!string.IsNullOrWhiteSpace(action.ClientName))
+                    newClientBuilder.SetClientName(action.ClientName);
+
+                // FAPI2.0
+                string jsonWebKeyStr = null;
+                newClientBuilder.SetSigAuthorizationResponse(SecurityAlgorithms.EcdsaSha256);
+                newClientBuilder.SetIdTokenSignedResponseAlg(SecurityAlgorithms.EcdsaSha256);
+                newClientBuilder.SetRequestObjectSigning(SecurityAlgorithms.EcdsaSha256);
+                var ecdsaSig = ClientKeyGenerator.GenerateECDsaSignatureKey("keyId", SecurityAlgorithms.EcdsaSha256);
+                jsonWebKeyStr = ecdsaSig.SerializeJWKStr();
+                newClientBuilder.AddSigningKey(ecdsaSig, SecurityAlgorithms.EcdsaSha256, SecurityKeyTypes.ECDSA);
+                if (action.IsDPoP)
+                {
+                    newClientBuilder.UseClientPrivateKeyJwtAuthentication();
+                    newClientBuilder.UseDPOPProof(false);
+                }
+                else
+                {
+                    newClientBuilder.UseClientTlsAuthentication(action.SubjectName);
+                }
+
+                var newClient = newClientBuilder.Build();
+                newClient.ClientType = ClientTypes.HIGHLYSECUREDWEBSITE;
+                dbContext.Clients.Add(newClient);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.HIGHLYSECUREDWEBSITE, JsonWebKeyStr = jsonWebKeyStr });
+            }
+        }
+
+        [EffectMethod]
+        public async Task Handle(AddHighlySecuredWebsiteApplicationWithGrantMgtSupportAction action, IDispatcher dispatcher)
+        {
+            if (!await ValidateAddClient(action.ClientId, new List<string>(), dispatcher)) return;
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                var realm = await GetRealm();
+                var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
+                var scopes = await dbContext.Scopes.Include(s => s.Realms).Where(s => (s.Name == Constants.StandardScopes.OpenIdScope.Name || s.Name == Constants.StandardScopes.Profile.Name) && s.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
+                var newClientBuilder = ClientBuilder.BuildTraditionalWebsiteClient(action.ClientId, action.ClientSecret, activeRealm, action.RedirectionUrls.ToArray())
+                    .AddScope(scopes.ToArray());
+                if (!string.IsNullOrWhiteSpace(action.ClientName))
+                    newClientBuilder.SetClientName(action.ClientName);
+
+                // FAPI2.0
+                string jsonWebKeyStr = null;
+                newClientBuilder.SetSigAuthorizationResponse(SecurityAlgorithms.EcdsaSha256);
+                newClientBuilder.SetIdTokenSignedResponseAlg(SecurityAlgorithms.EcdsaSha256);
+                newClientBuilder.SetRequestObjectSigning(SecurityAlgorithms.EcdsaSha256);
+                var ecdsaSig = ClientKeyGenerator.GenerateECDsaSignatureKey("keyId", SecurityAlgorithms.EcdsaSha256);
+                jsonWebKeyStr = ecdsaSig.SerializeJWKStr();
+                newClientBuilder.AddSigningKey(ecdsaSig, SecurityAlgorithms.EcdsaSha256, SecurityKeyTypes.ECDSA);
+                if (action.IsDPoP)
+                {
+                    newClientBuilder.UseClientPrivateKeyJwtAuthentication();
+                    newClientBuilder.UseDPOPProof(false);
+                }
+                else
+                {
+                    newClientBuilder.UseClientTlsAuthentication(action.SubjectName);
+                }
+
+                // Grant management
+                scopes = await dbContext.Scopes.Include(s => s.Realms).Where(s => (s.Name == Constants.StandardScopes.GrantManagementQuery.Name || s.Name == Constants.StandardScopes.GrantManagementRevoke.Name) && s.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
+                newClientBuilder.AddScope(scopes.ToArray());
+                var authDataTypes = string.IsNullOrWhiteSpace(action.AuthDataTypes) || action.AuthDataTypes == null ? null : action.AuthDataTypes.Split(';');
+                if (authDataTypes != null)
+                    newClientBuilder.AddAuthDataTypes(authDataTypes);
+
+                var newClient = newClientBuilder.Build();
+                newClient.ClientType = ClientTypes.GRANTMANAGEMENT;
+                dbContext.Clients.Add(newClient);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.GRANTMANAGEMENT, JsonWebKeyStr = jsonWebKeyStr });
             }
         }
 
@@ -625,11 +683,27 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public string ClientId { get; set; } = null!;
         public string ClientSecret { get; set; } = null!;
         public string? ClientName { get; set; } = null;
-        public bool IsFAPICompliant { get; set; } = false;
+    }
+
+    public class AddHighlySecuredWebsiteApplicationAction
+    {
+        public IEnumerable<string> RedirectionUrls { get; set; } = new List<string>();
+        public string ClientId { get; set; } = null!;
+        public string ClientSecret { get; set; } = null!;
+        public string? ClientName { get; set; } = null;
         public string? SubjectName { get; set; } = null;
-        public bool HasAccessToGrant { get; set; } = false;
-        public string? AuthDataTypes { get; set; } = null;
         public bool IsDPoP { get; set; } = false;
+    }
+
+    public class AddHighlySecuredWebsiteApplicationWithGrantMgtSupportAction
+    {
+        public IEnumerable<string> RedirectionUrls { get; set; } = new List<string>();
+        public string ClientId { get; set; } = null!;
+        public string ClientSecret { get; set; } = null!;
+        public string? ClientName { get; set; } = null;
+        public string? SubjectName { get; set; } = null;
+        public bool IsDPoP { get; set; } = false;
+        public string? AuthDataTypes { get; set; } = null;
     }
 
     public class AddMobileApplicationAction

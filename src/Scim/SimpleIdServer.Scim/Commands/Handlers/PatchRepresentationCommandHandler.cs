@@ -59,18 +59,18 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             if (!patchResult.Any()) return GenericResult<PatchRepresentationResult>.Ok(PatchRepresentationResult.NoPatch());
             existingRepresentation.SetUpdated(DateTime.UtcNow);
             var references = _representationReferenceSync.Sync(patchRepresentationCommand.ResourceType, existingRepresentation, patchResult, patchRepresentationCommand.Location, schema, displayNameDifferent);
-            using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
+            using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
             {
                 foreach (var reference in references)
                 {
-                    await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes);
-                    await _scimRepresentationCommandRepository.BulkUpdate(reference.UpdatedRepresentationAttributes);
-                    await _scimRepresentationCommandRepository.BulkDelete(reference.RemovedRepresentationAttributes);
+                    await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes).ConfigureAwait(false);
+                    await _scimRepresentationCommandRepository.BulkUpdate(reference.UpdatedRepresentationAttributes).ConfigureAwait(false);
+                    await _scimRepresentationCommandRepository.BulkDelete(reference.RemovedRepresentationAttributes).ConfigureAwait(false);
                     await Notify(reference);
                 }
 
-                await _scimRepresentationCommandRepository.Update(existingRepresentation);
-                await transaction.Commit();
+                await _scimRepresentationCommandRepository.Update(existingRepresentation).ConfigureAwait(false);
+                await transaction.Commit().ConfigureAwait(false);
             }
 
             existingRepresentation.ApplyEmptyArray();

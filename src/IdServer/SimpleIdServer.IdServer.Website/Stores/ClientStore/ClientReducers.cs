@@ -104,6 +104,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public static AddClientState ReduceAddWebsiteApplicationAction(AddClientState state, AddWebsiteApplicationAction act) => new(isAdding: true, errorMessage: null);
 
         [ReducerMethod]
+        public static AddClientState ReduceAddHighlySecuredWebsiteApplicationAction(AddClientState state, AddHighlySecuredWebsiteApplicationAction act) => new(isAdding: true, errorMessage: null);
+
+        [ReducerMethod]
+        public static AddClientState ReduceAddHighlySecuredWebsiteApplicationWithGrantMgtSupportAction(AddClientState state, AddHighlySecuredWebsiteApplicationWithGrantMgtSupportAction act) => new(isAdding: true, errorMessage: null);
+
+        [ReducerMethod]
         public static AddClientState ReduceAddMobileApplicationAction(AddClientState state, AddMobileApplicationAction act) => new(isAdding: true, errorMessage: null);
 
         [ReducerMethod]

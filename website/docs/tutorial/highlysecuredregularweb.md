@@ -43,8 +43,9 @@ Utilize the administration UI to create a client certificate.
 
 1. Open the IdentityServer website at [https://localhost:5002](https://localhost:5002).
 2. On the Clients screen, click on the `Add client` button.
-3. Select `Web application` and click on next.
-4. Fill-in the form like this and click on the `Save` button to confirm the creation.
+3. Choose `FAPI2.0` template.
+4. Select `Highly secure Web Application` and click on next.
+5. Fill-in the form like this and click on the `Save` button to confirm the creation.
 
 | Property                | Value                             |
 | ----------------------- | --------------------------------- |
@@ -52,11 +53,10 @@ Utilize the administration UI to create a client certificate.
 | Secret                  | password                          |
 | Name                    | websiteFAPIMTLS                   |
 | Redirection URLs        | http://localhost:5003/signin-oidc |
-| Compliant with FAPI 2.0 | true                              |
 | Proof of Possession     | Mutual-TLS Client Authentication  |
 | Subject Name            | CN=websiteFAPI                    |
 
-5. The generated JSON Web Key will be displayed. Copy the corresponding value and save it in a text file. It will be used by the web application to construct a signed `request` parameter.
+6. The generated JSON Web Key will be displayed. Copy the corresponding value and save it in a text file. It will be used by the web application to construct a signed `request` parameter.
 
 Now your client is ready to be used, you can develop the regular website.
 
@@ -184,8 +184,9 @@ To incorporate all the FAPI recommendations into your regular web application, i
 
 1. Open the IdentityServer website at [https://localhost:5002](https://localhost:5002).
 2. On the Clients screen, click on the `Add client` button.
-3. Select `Web application` and click on next.
-4. Fill-in the form like this and click on the `Save` button to confirm the creation.
+3. Choose `FAPI2.0` template.
+4. Select `Highly secure Web Application` and click on next.
+5. Fill-in the form like this and click on the `Save` button to confirm the creation.
 
 | Property                | Value                             |
 | ----------------------- | --------------------------------- |
@@ -193,10 +194,9 @@ To incorporate all the FAPI recommendations into your regular web application, i
 | Secret                  | password                          |
 | Name                    | websiteFAPIDPoP                   |
 | Redirection URLs        | http://localhost:5003/signin-oidc |
-| Compliant with FAPI 2.0 | true                              |
 | Proof of Possession     | DPoP                              |
 
-5. The generated JSON Web Key will be displayed. Copy the corresponding value and save it in a text file. It will be used by the web application to construct a signed `request` parameter and a signed `DPoP Proof`.
+6. The generated JSON Web Key will be displayed. Copy the corresponding value and save it in a text file. It will be used by the web application to construct a signed `request` parameter and a signed `DPoP Proof`.
 
 Now your client is ready to be used, you can develop the regular website.
 

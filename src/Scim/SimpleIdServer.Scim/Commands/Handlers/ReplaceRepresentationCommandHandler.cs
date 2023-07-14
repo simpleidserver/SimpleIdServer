@@ -84,18 +84,18 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             
             var isReferenceProperty = await _representationReferenceSync.IsReferenceProperty(replaceRepresentationCommand.Representation.Attributes.GetKeys());
             var references = _representationReferenceSync.Sync(updateResult.AttributeMappingLst, replaceRepresentationCommand.ResourceType, oldRepresentation, existingRepresentation, replaceRepresentationCommand.Location, schema, !isReferenceProperty);
-            using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
+            using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
             {
                 foreach (var reference in references)
                 {
-                    await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes);
-                    await _scimRepresentationCommandRepository.BulkDelete(reference.RemovedRepresentationAttributes);
-                    await _scimRepresentationCommandRepository.BulkUpdate(reference.UpdatedRepresentationAttributes);
+                    await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes).ConfigureAwait(false);
+                    await _scimRepresentationCommandRepository.BulkDelete(reference.RemovedRepresentationAttributes).ConfigureAwait(false);
+                    await _scimRepresentationCommandRepository.BulkUpdate(reference.UpdatedRepresentationAttributes).ConfigureAwait(false);
                     await Notify(reference);
                 }
 
-                await _scimRepresentationCommandRepository.Update(existingRepresentation);
-                await transaction.Commit();
+                await _scimRepresentationCommandRepository.Update(existingRepresentation).ConfigureAwait(false);
+                await transaction.Commit().ConfigureAwait(false);
                 existingRepresentation.ApplyEmptyArray();
                 return GenericResult<SCIMRepresentation>.Ok(existingRepresentation);
             }

@@ -34,17 +34,17 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var representation = await _scimRepresentationCommandRepository.Get(request.Id);
             if (representation == null) throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, request.Id));
             var references = _representationReferenceSync.Sync(request.ResourceType, representation, representation, request.Location, schema, true, true);
-            using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
+            using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
             {
                 foreach (var reference in references)
                 {
-                    await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes);
-                    await _scimRepresentationCommandRepository.BulkDelete(reference.RemovedRepresentationAttributes);
+                    await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes).ConfigureAwait(false);
+                    await _scimRepresentationCommandRepository.BulkDelete(reference.RemovedRepresentationAttributes).ConfigureAwait(false);
                     await Notify(reference);
                 }
 
-                await _scimRepresentationCommandRepository.Delete(representation);
-                await transaction.Commit();
+                await _scimRepresentationCommandRepository.Delete(representation).ConfigureAwait(false);
+                await transaction.Commit().ConfigureAwait(false);
             }
 
             return GenericResult<SCIMRepresentation>.Ok(representation);
