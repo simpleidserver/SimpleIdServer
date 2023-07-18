@@ -1,0 +1,14 @@
+﻿@using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Options;
+@using SimpleIdServer.IdServer.Startup.Resources;
+@model SimpleIdServer.IdServer.Sms.UI.ViewModels.AuthenticateSmsViewModel
+@inject IOptions<IdServerHostOptions> configuration
+
+@{
+    ViewBag.Title = AuthenticateSmsResource.title;
+}
+
+@section SubScripts {
+    <script type="text/javascript">
+    </script>
+}

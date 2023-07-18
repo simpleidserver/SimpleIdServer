@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Domains;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Security.Claims;
 
 namespace SimpleIdServer.IdServer
@@ -602,6 +603,7 @@ namespace SimpleIdServer.IdServer
         public const string DefaultNotificationMode = "console";
         public const string DefaultRealm = "master";
         public const string DefaultRealmCookieName = "CurrentRealm";
+        public const string DefaultCurrentAmrCookieName = "currentAmr";
         public const string Prefix = "prefix";
     }
 }

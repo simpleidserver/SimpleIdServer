@@ -16,6 +16,7 @@ using SimpleIdServer.IdServer.UI.Services;
 using System;
 using System.Linq;
 using System.Security.Claims;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
@@ -88,6 +89,13 @@ namespace SimpleIdServer.IdServer.UI
             ViewBag.SuccessMessage = msg;
         }
 
+        protected async Task<User> FetchAuthenticatedUser(string realm, CancellationToken cancellationToken)
+        {
+            if (!HttpContext.Request.Cookies.ContainsKey(Constants.DefaultCurrentAmrCookieName)) return null;
+            var amr = JsonSerializer.Deserialize<AmrAuthInfo>(HttpContext.Request.Cookies[Constants.DefaultCurrentAmrCookieName]);
+            return await _userRepository.Query().Include(u => u.Realms).Include(c => c.OAuthUserClaims).FirstOrDefaultAsync(u => u.Realms.Any(r => r.RealmsName == realm) && u.Id == amr.UserId, cancellationToken);
+        }
+
         protected async Task<IActionResult> Authenticate(string realm, string returnUrl, string currentAmr, User user, CancellationToken token, bool rememberLogin = false)
         {
             if (!IsProtected(returnUrl))
@@ -108,6 +116,7 @@ namespace SimpleIdServer.IdServer.UI
                 return await Sign(realm, unprotectedUrl, currentAmr, user, token, rememberLogin);
             }
 
+            HttpContext.Response.Cookies.Append(Constants.DefaultCurrentAmrCookieName, JsonSerializer.Serialize(new AmrAuthInfo(user.Id, amr)));
             return RedirectToAction("Index", "Authenticate", new { area = amr, ReturnUrl = returnUrl });
         }
 
@@ -156,6 +165,18 @@ namespace SimpleIdServer.IdServer.UI
                 HttpOnly = false,
                 SameSite = SameSiteMode.None
             });
+        }
+
+        private record AmrAuthInfo
+        {
+            public AmrAuthInfo(string userId, string amr)
+            {
+                UserId = userId;
+                Amr = amr;
+            }
+
+            public string UserId { get; private set; }
+            public string Amr { get; private set; }
         }
     }
 }

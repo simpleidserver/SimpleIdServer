@@ -120,6 +120,9 @@
   <data name="authenticate" xml:space="preserve">
     <value>Authenticate</value>
   </data>
+  <data name="bad_email" xml:space="preserve">
+    <value>Email is not correct</value>
+  </data>
   <data name="code_validity" xml:space="preserve">
     <value>Code has a validity of {0} seconds</value>
   </data>

@@ -15,6 +15,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Startup.Configurations;
 using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Webauthn;
 using SimpleIdServer.IdServer.WsFederation;
 using System;
 using System.Collections.Generic;
@@ -67,6 +68,7 @@ void ConfigureIdServer(IServiceCollection services)
         .AddBackChannelAuthentication()
         .AddEmailAuthentication()
         .AddSmsAuthentication()
+        .AddWebauthnAuthentication()
         .EnableConfigurableAuthentication()
         .UseRealm()
         .AddAuthentication(callback: (a) =>

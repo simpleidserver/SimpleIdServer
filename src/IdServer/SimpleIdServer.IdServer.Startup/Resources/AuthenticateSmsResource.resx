@@ -135,6 +135,9 @@
   <data name="invalid_confirmationcode" xml:space="preserve">
     <value>Confirmation code is invalid</value>
   </data>
+  <data name="missing_phonenumber" xml:space="preserve">
+    <value>Phone number is missing</value>
+  </data>
   <data name="no_active_otp" xml:space="preserve">
     <value>There is no OTP configured</value>
   </data>

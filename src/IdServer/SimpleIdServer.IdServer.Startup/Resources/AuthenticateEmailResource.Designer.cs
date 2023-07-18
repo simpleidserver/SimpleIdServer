@@ -70,6 +70,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Email is not correct.
+        /// </summary>
+        public static string bad_email {
+            get {
+                return ResourceManager.GetString("bad_email", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Code has a validity of {0} seconds.
         /// </summary>
         public static string code_validity {

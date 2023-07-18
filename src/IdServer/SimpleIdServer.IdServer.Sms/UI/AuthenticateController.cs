@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.JsonWebTokens;
+using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
@@ -45,17 +47,26 @@ namespace SimpleIdServer.IdServer.Sms.UI
 
             try
             {
+                prefix = prefix ?? SimpleIdServer.IdServer.Constants.DefaultRealm;
+                var authenticatedUser = await FetchAuthenticatedUser(prefix, cancellationToken);
                 var query = ExtractQuery(returnUrl);
                 var clientId = query.GetClientIdFromAuthorizationRequest();
                 var client = await ClientRepository.Query().Include(c => c.Translations).Include(c => c.Realms).FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == prefix), cancellationToken);
                 var loginHint = query.GetLoginHintFromAuthorizationRequest();
+                bool isPhoneNumberMissing = false;
+                UserClaim phoneNumberClaim = null;
+                if (authenticatedUser != null && (phoneNumberClaim = authenticatedUser.OAuthUserClaims.FirstOrDefault(c => c.Name == JwtRegisteredClaimNames.PhoneNumber)) == null)
+                    isPhoneNumberMissing = true;
+                else if(authenticatedUser != null && phoneNumberClaim != null) loginHint = phoneNumberClaim.Value;
                 return View(new AuthenticateSmsViewModel(returnUrl,
                     prefix,
                     loginHint,
                     client.ClientName,
                     client.LogoUri,
                     client.TosUri,
-                    client.PolicyUri));
+                    client.PolicyUri,
+                    isPhoneNumberMissing,
+                    authenticatedUser != null));
             }
             catch (CryptographicException)
             {
@@ -72,10 +83,12 @@ namespace SimpleIdServer.IdServer.Sms.UI
             if (viewModel == null)
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
 
+            var authenticatedUser = await FetchAuthenticatedUser(prefix, token);
+            viewModel.CheckRequiredFields(ModelState);
+            viewModel.CheckPhoneNumber(ModelState, authenticatedUser);
             switch (viewModel.Action)
             {
                 case "SENDCONFIRMATIONCODE":
-                    viewModel.CheckRequiredFields(ModelState);
                     if (!ModelState.IsValid)
                         return View(viewModel);
 
@@ -91,7 +104,6 @@ namespace SimpleIdServer.IdServer.Sms.UI
                         return View(viewModel);
                     }
                 default:
-                    viewModel.CheckRequiredFields(ModelState);
                     viewModel.CheckConfirmationCode(ModelState);
                     if (!ModelState.IsValid)
                         return View(viewModel);

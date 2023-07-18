@@ -115,6 +115,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Phone number is missing.
+        /// </summary>
+        public static string missing_phonenumber {
+            get {
+                return ResourceManager.GetString("missing_phonenumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à There is no OTP configured.
         /// </summary>
         public static string no_active_otp {

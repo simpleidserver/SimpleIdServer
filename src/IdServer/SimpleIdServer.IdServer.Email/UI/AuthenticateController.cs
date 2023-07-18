@@ -40,22 +40,27 @@ namespace SimpleIdServer.IdServer.Email.UI
         [HttpGet]
         public async Task<IActionResult> Index([FromRoute] string prefix, string returnUrl, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(returnUrl))
-                return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
-
+            if (string.IsNullOrWhiteSpace(returnUrl)) return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
             try
             {
+                prefix = prefix ?? SimpleIdServer.IdServer.Constants.DefaultRealm;
+                var authenticatedUser = await FetchAuthenticatedUser(prefix, cancellationToken);
                 var query = ExtractQuery(returnUrl);
                 var clientId = query.GetClientIdFromAuthorizationRequest();
                 var client = await ClientRepository.Query().Include(c => c.Realms).Include(c => c.Translations).FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == prefix), cancellationToken);
                 var loginHint = query.GetLoginHintFromAuthorizationRequest();
+                bool isEmailMissing = false;
+                if (authenticatedUser != null && string.IsNullOrWhiteSpace(authenticatedUser.Email)) isEmailMissing = true;
+                else if (authenticatedUser != null) loginHint = authenticatedUser.Email;
                 return View(new AuthenticateEmailViewModel(returnUrl,
                     prefix,
                     loginHint,
                     client.ClientName,
                     client.LogoUri,
                     client.TosUri,
-                    client.PolicyUri));
+                    client.PolicyUri,
+                    isEmailMissing,
+                    authenticatedUser != null));
             }
             catch (CryptographicException)
             {
@@ -72,10 +77,12 @@ namespace SimpleIdServer.IdServer.Email.UI
             if (viewModel == null)
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
 
+            var authenticatedUser = await FetchAuthenticatedUser(prefix, token);
+            viewModel.CheckRequiredFields(ModelState);
+            viewModel.CheckEmail(ModelState, authenticatedUser);
             switch (viewModel.Action)
             {
                 case "SENDCONFIRMATIONCODE":
-                    viewModel.CheckRequiredFields(ModelState);
                     if (!ModelState.IsValid)
                         return View(viewModel);
 
@@ -91,7 +98,6 @@ namespace SimpleIdServer.IdServer.Email.UI
                         return View(viewModel);
                     }
                 default:
-                    viewModel.CheckRequiredFields(ModelState);
                     viewModel.CheckConfirmationCode(ModelState);
                     if (!ModelState.IsValid)
                         return View(viewModel);

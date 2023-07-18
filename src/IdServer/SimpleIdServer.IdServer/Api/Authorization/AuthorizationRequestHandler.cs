@@ -69,7 +69,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             catch (OAuthLoginRequiredException ex)
             {
                 context.Request.RequestData.Remove(AuthorizationRequestParameters.Prompt);
-                return new RedirectActionAuthorizationResponse("Index", "Authenticate", context.Request.OriginalRequestData, ex.Area, true, new List<string> { _options.GetSessionCookieName() });
+                return new RedirectActionAuthorizationResponse("Index", "Authenticate", context.Request.OriginalRequestData, ex.Area, true, new List<string> { _options.GetSessionCookieName(), Constants.DefaultCurrentAmrCookieName });
             }
             catch (OAuthSelectAccountRequiredException)
             {

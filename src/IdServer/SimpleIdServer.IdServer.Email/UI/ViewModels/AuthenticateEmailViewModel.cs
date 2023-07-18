@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.UI.ViewModels;
 
 namespace SimpleIdServer.IdServer.Email.UI.ViewModels
@@ -10,7 +11,7 @@ namespace SimpleIdServer.IdServer.Email.UI.ViewModels
     {
         public AuthenticateEmailViewModel() { }
 
-        public AuthenticateEmailViewModel(string returnUrl, string realm, string email, string clientName, string logoUri, string tosUri, string policyUri)
+        public AuthenticateEmailViewModel(string returnUrl, string realm, string email, string clientName, string logoUri, string tosUri, string policyUri, bool isEmailMissing, bool isAuthInProgress)
         {
             ReturnUrl = returnUrl;
             Realm = realm;
@@ -19,11 +20,21 @@ namespace SimpleIdServer.IdServer.Email.UI.ViewModels
             LogoUri = logoUri;
             TosUri = tosUri;
             PolicyUri = policyUri;
+            IsEmailMissing = isEmailMissing;
+            IsAuthInProgress = isAuthInProgress;
         }
 
         public string Email { get; set; }
         public string Action { get; set; }
         public long? OTPCode { get; set; }
+        public bool IsEmailMissing { get; set; } = false;
+        public bool IsAuthInProgress { get; set; } = false;
+
+        public void CheckEmail(ModelStateDictionary modelStateDictionary, User user)
+        {
+            if(user != null && user.Email != Email)
+                modelStateDictionary.AddModelError("bad_email", "bad_email");
+        }
 
         public void CheckRequiredFields(ModelStateDictionary modelStateDictionary)
         {
