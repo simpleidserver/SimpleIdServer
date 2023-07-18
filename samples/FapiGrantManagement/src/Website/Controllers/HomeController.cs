@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using System.Diagnostics;
+using System.Security.Authentication;
 using System.Text.Json.Nodes;
 using Website.Models;
 using Website.Stores;
@@ -8,68 +10,52 @@ namespace Website.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly IUserStore _userStore;
+    private readonly IBankInfoStore _bankInfoStore;
+    private readonly WebsiteOptions _options;
 
-    public HomeController(IUserStore userStore)
+    public HomeController(IBankInfoStore bankInfoStore, IOptions<WebsiteOptions> options)
     {
-        _userStore = userStore;
+        _bankInfoStore = bankInfoStore;
+        _options = options.Value;
     }
 
-    public IActionResult Index()
-    {
-        return View();
-    }
+    public IActionResult Index() => View();
 
-    public IActionResult Privacy()
-    {
-        return View();
-    }
+    public IActionResult Privacy() => View();
 
-    public IActionResult AuthenticateBank()
+    [Route("callback/{bankName}")]
+    public async Task<IActionResult> Callback(string bankName)
     {
-        const string bankAccountName = "bank";
-        const string userId = "userId";
-        const string clientId = "fapiGrant";
-        const string callbackUrl = "http://localhost:7000/callback";
-        const string authorizationDetails = "{ \"type\" : \"account_information\", \"actions\" : [\"read\"] }";
-        var userGrant = _userStore.Get(userId).GetGrant(bankAccountName);
-        var url = $"https://localhost:5001/master/authorization?client_id={clientId}&redirect_uri={callbackUrl}&response_type=code&scope=openid profile&authorization_details={authorizationDetails}";
-        if (userGrant == null)
-            url += "&code&grant_management_action=create";
-        return Redirect(url);
-    }
-
-    [Route("callback")]
-    public async Task<IActionResult> Callback()
-    {
-        const string bankAccountName = "bank";
-        const string userId = "userId";
-        var user = _userStore.Get(userId);
+        var bankInfo = _bankInfoStore.GetAll().First(b => b.Name == bankName);
         var accessToken = await GetAccessToken();
-        var accounts = await GetAccounts();
-        return View(new CallbackViewModel
-        {
-            GrantId = user.GetGrant(bankAccountName).GrantId,
-            Accounts = accounts
-        });
+        AccessTokenStore.Instance().Add(bankName, accessToken);
+        await _bankInfoStore.SaveChanges(CancellationToken.None);
+        return RedirectToAction("Index");
 
         async Task<string> GetAccessToken()
         {
             var authorizationCode = Request.Query["code"].First();
-            using (var httpClient = new HttpClient())
+            var handler = new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; },
+                CheckCertificateRevocationList = false,
+                ClientCertificateOptions = ClientCertificateOption.Manual,
+                SslProtocols = SslProtocols.Tls12
+            };
+            handler.ClientCertificates.Add(_options.MTLSCertificate);
+            using (var httpClient = new HttpClient(handler))
             {
                 var requestMessage = new HttpRequestMessage
                 {
                     Method = HttpMethod.Post,
-                    RequestUri = new Uri("https://localhost:5001/master/token"),
+                    RequestUri = new Uri(bankInfo.TokenUrl),
                     Content = new FormUrlEncodedContent(new Dictionary<string, string>
-                {
-                    { "client_id", "fapiGrant" },
-                    { "client_secret", "password" },
-                    { "grant_type", "authorization_code" },
-                    { "code", authorizationCode },
-                    { "redirect_uri", "http://localhost:7000/callback" }
-                })
+                    {
+                        { "client_id", bankInfo.ClientId },
+                        { "grant_type", "authorization_code" },
+                        { "code", authorizationCode },
+                        { "redirect_uri", $"{_options.CallbackUrl}/{bankName}" }
+                    })
                 };
                 var httpResult = await httpClient.SendAsync(requestMessage);
                 var json = await httpResult.Content.ReadAsStringAsync();
@@ -77,29 +63,10 @@ public class HomeController : Controller
                 if (jsonObj.ContainsKey("grant_id"))
                 {
                     var grantId = jsonObj["grant_id"].GetValue<string>();
-                    user.Grants.Add(new UserGrant
-                    {
-                        BankAccount = bankAccountName,
-                        GrantId = grantId
-                    });
+                    bankInfo.GrantId = grantId;
                 }
-                return jsonObj["access_token"].GetValue<string>();
-            }
-        }
 
-        async Task<IEnumerable<string>> GetAccounts()
-        {
-            using(var httpClient = new HttpClient())
-            {
-                var requestMessage = new HttpRequestMessage
-                {
-                    Method = HttpMethod.Get,
-                    RequestUri = new Uri("http://localhost:7001/AccountInfo")
-                };
-                requestMessage.Headers.Add("Authorization", $"Bearer {accessToken}");
-                var httpResponse = await httpClient.SendAsync(requestMessage);
-                var json = await httpResponse.Content.ReadAsStringAsync();
-                return JsonArray.Parse(json).AsArray().Select(x => x.GetValue<string>());
+                return jsonObj["access_token"].GetValue<string>();
             }
         }
     }

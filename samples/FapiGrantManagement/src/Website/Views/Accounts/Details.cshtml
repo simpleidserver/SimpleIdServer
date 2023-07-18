@@ -1,0 +1,20 @@
+﻿@using Website.ViewModels;
+
+@{
+    ViewData["Title"] = "Bank accounts";
+}
+
+@model BankDetailsViewModel
+
+<h1>@Model.Name</h1>
+
+<h3>List of accounts</h3>
+
+<ul class="list-group">
+    @foreach(var account in Model.Accounts)
+    {
+        <li class="list-group-item">
+            @account
+        </li>
+    }
+</ul>

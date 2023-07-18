@@ -1,31 +1,32 @@
+using System.Security.Cryptography.X509Certificates;
+using Website;
 using Website.Models;
 using Website.Stores;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+var certificate = new X509Certificate2(Path.Combine(Directory.GetCurrentDirectory(), "CN=fapiGrant.pfx"));
 builder.Services.AddControllersWithViews();
-builder.Services.AddSingleton<IUserStore>(new UserStore(new List<User>
+builder.Services.Configure<WebsiteOptions>(o =>
 {
-    new User { Id = "userId" }
+    o.MTLSCertificate = certificate;
+});
+builder.Services.AddSingleton<IBankInfoStore>(new BankInfoStore(new List<BankInfo>
+{
+    new BankInfo { Name = "Bank", ClientId = "fapiGrant", AuthorizationUrl = "https://localhost:5001/master/authorization", ClientSecret = "password", TokenUrl = "https://localhost:5001/master/token" }
 }));
-var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseAuthorization();
-
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

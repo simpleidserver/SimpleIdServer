@@ -34,7 +34,7 @@
                     </div>
                 </div>
             </RadzenAccordionItem>
-            @if (Client.ClientType == ClientTypes.SPA || Client.ClientType == ClientTypes.WEBSITE || Client.ClientType == ClientTypes.EXTERNAL || Client.ClientType == ClientTypes.MOBILE)
+            @if (Client.ClientType == ClientTypes.SPA || Client.ClientType == ClientTypes.WEBSITE || Client.ClientType == ClientTypes.EXTERNAL || Client.ClientType == ClientTypes.MOBILE || Client.ClientType == ClientTypes.HIGHLYSECUREDWEBSITE || Client.ClientType == ClientTypes.GRANTMANAGEMENT)
             {
                 <RadzenAccordionItem Text="Access settings" Selected=true>
                     <!-- Redirect URIs -->
@@ -88,7 +88,7 @@
                                 </div>
                             }
 
-                            @if (Client.ClientType == ClientTypes.WEBSITE || Client.ClientType == ClientTypes.MOBILE || Client.ClientType == ClientTypes.EXTERNAL)
+                            @if (Client.ClientType == ClientTypes.WEBSITE || Client.ClientType == ClientTypes.MOBILE || Client.ClientType == ClientTypes.EXTERNAL || Client.ClientType == ClientTypes.HIGHLYSECUREDWEBSITE || Client.ClientType == ClientTypes.GRANTMANAGEMENT)
                             {
                                 <!-- Authorization code  -->
                                 <div>
@@ -134,7 +134,7 @@
                 </RadzenAccordionItem>
             }
 
-            @if (Client.ClientType == ClientTypes.SPA || Client.ClientType == ClientTypes.WEBSITE || Client.ClientType == ClientTypes.MOBILE || Client.ClientType == ClientTypes.EXTERNAL)
+            @if (Client.ClientType == ClientTypes.SPA || Client.ClientType == ClientTypes.WEBSITE || Client.ClientType == ClientTypes.HIGHLYSECUREDWEBSITE || Client.ClientType == ClientTypes.GRANTMANAGEMENT || Client.ClientType == ClientTypes.MOBILE || Client.ClientType == ClientTypes.EXTERNAL)
             {
                 <RadzenAccordionItem Text="Login settings" Selected=true>
                     <!-- Consent required -->
@@ -150,7 +150,7 @@
             }
 
             
-            @if (Client.ClientType == ClientTypes.WEBSITE || Client.ClientType == ClientTypes.SPA || Client.ClientType == ClientTypes.MOBILE || Client.ClientType == ClientTypes.EXTERNAL)
+            @if (Client.ClientType == ClientTypes.WEBSITE || Client.ClientType == ClientTypes.HIGHLYSECUREDWEBSITE || Client.ClientType == ClientTypes.GRANTMANAGEMENT || Client.ClientType == ClientTypes.SPA || Client.ClientType == ClientTypes.MOBILE || Client.ClientType == ClientTypes.EXTERNAL)
             {
                 <RadzenAccordionItem Text="Logout settings" Selected=true>
                     <!-- Front-channel logout session required -->

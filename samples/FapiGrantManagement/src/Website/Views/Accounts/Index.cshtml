@@ -1,0 +1,25 @@
+﻿@using Website.ViewModels;
+
+@{
+    ViewData["Title"] = "Link a bank account";
+}
+
+@model IEnumerable<GrantedBankInfoViewModel>
+
+<h1>You've access to the following bank accounts</h1>
+
+<div class="row">
+    @foreach(var bankInfo in Model)
+    {
+        <a href="@Url.Action("Details", "Accounts", new { bankName = bankInfo.BankName })">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">@bankInfo.BankName</h5>
+                        <p class="text-muted">The grant_id is <b>@bankInfo.GrantId</b></p>
+                    </div>
+                </div>
+            </div>
+        </a>
+    }
+</div>

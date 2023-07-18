@@ -1,0 +1,24 @@
+﻿@using Website.ViewModels;
+
+@{
+    ViewData["Title"] = "Link a bank account";
+}
+
+@model IEnumerable<BankInfoViewModel>
+
+<h1>Request account information</h1>
+
+<div class="row">
+    @foreach(var bankInfo in Model)
+    {
+        <a href="@Url.Action("Link", "Banks", new { name = bankInfo.Name })">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">@bankInfo.Name</h5>
+                    </div>
+                </div>
+            </div>
+        </a>
+    }
+</div>

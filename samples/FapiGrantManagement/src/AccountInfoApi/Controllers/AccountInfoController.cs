@@ -11,6 +11,6 @@ public class AccountInfoController : ControllerBase
     [HttpGet(Name = "Accounts")]
     public IEnumerable<string> Get()
     {
-        return new List<string> { "account" };
+        return new List<string> { "BE91798829733676", "BE90321175762332", "BE56631811788388" };
     }
 }

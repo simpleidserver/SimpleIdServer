@@ -52,9 +52,9 @@ Utilize the administration UI to configure a new OpenID client :
 | Name         | cibaConformance |
 | Subject Name | CN=client       |
 
-## 3. Create a console application
+## 3. Create a consumption device
 
-Finally, create and configure a console application.
+Finally, create and configure a consumption device.
 
 1. Open a command prompt and execute the following commands to create the directory structure for the solution.
 
