@@ -5,7 +5,14 @@ It is designed for scenarios where the end-user may not have a browser or cannot
 
 According to the specification found at [https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html](https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html), Client-Initiated Backchannel Authentication (CIBA) is not applicable to Public Clients. Only Confidential Clients, such as Console Applications, Websites, or REST APIs, are eligible to use CIBA.
 
-In this tutorial, we will explain how to create a Console Application that initiates a CIBA Authentication Request and obtains an Access Token by polling the `Token` endpoint.
+The CIBA specification defines two types of devices:
+
+* `Consumption Device` : This device initiates the CIBA flow by interacting with the OPENID Server.
+* `Authentication Device` : This device receives notifications coming from the OPENID Server.
+
+A classical use case is an E-Commerce REST API requesting an access token from the OPENID Server of the Bank. In this scenario, the `Consumption Device` is represented by the REST API, and the `Authentication Device` is the Bank Mobile Application. The Bank Mobile Application receives notifications from the OPENID Server. When the end-user accepts the consent, the Consumption Device can obtain an access token and interact with the Bank API to initiate the money transfer.
+
+In this tutorial, we will explain how to create a Console Application (`Consumption Device`) that initiates a CIBA Authentication Request and obtains an Access Token by polling the `Token` endpoint.
 
 The client will have the following configuration:
 
@@ -35,8 +42,9 @@ Utilize the administration UI to configure a new OpenID client :
 
 1. Open the IdentityServer website at [https://localhost:5002](https://localhost:5002).
 2. In the Clients screen, click on `Add client` button.
-3. Select `Device` and click on next.
-4. Fill-in the form like this and click on the `Save` button to confirm the creation.
+3. Choose `FAPI2.0`.
+4. Select `Device` and click on next.
+5. Fill-in the form like this and click on the `Save` button to confirm the creation.
 
 | Parameter    | Value           |
 | ------------ | --------------- |
@@ -121,7 +129,7 @@ while(cont)
 
 5. Replace the `CN=client.pfx` certificate with the one you have previously downloaded.
 
-When you run the application, a green message will be displayed in the Identity Server instance.
+When you run the application, a `green message` will be displayed in the Identity Server instance.
 Copy the URL from the browser and authenticate using the following credentials:
 
 | Credential | Value    |
