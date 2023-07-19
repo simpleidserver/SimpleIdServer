@@ -13,6 +13,7 @@ using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.Services;
+using SimpleIdServer.IdServer.UI.ViewModels;
 using System;
 using System.Linq;
 using System.Security.Claims;
@@ -56,9 +57,11 @@ namespace SimpleIdServer.IdServer.UI
         protected IdServerHostOptions Options => _options;
         protected IBusControl Bus => _busControl;
 
-        protected JsonObject ExtractQuery(string returnUrl)
+        protected JsonObject ExtractQuery(string returnUrl) => ExtractQueryFromUnprotectedUrl(Unprotect(returnUrl));
+
+        protected JsonObject ExtractQueryFromUnprotectedUrl(string returnUrl)
         {
-            var query = Unprotect(returnUrl).GetQueries().ToJsonObject();
+            var query = returnUrl.GetQueries().ToJsonObject();
             if (query.ContainsKey("returnUrl"))
                 return ExtractQuery(query["returnUrl"].GetValue<string>());
 
@@ -89,11 +92,28 @@ namespace SimpleIdServer.IdServer.UI
             ViewBag.SuccessMessage = msg;
         }
 
-        protected async Task<User> FetchAuthenticatedUser(string realm, CancellationToken cancellationToken)
+        protected async Task<User> FetchAuthenticatedUser(string realm, AmrAuthInfo amrInfo, CancellationToken cancellationToken)
+        {
+            if (amrInfo == null || string.IsNullOrWhiteSpace(amrInfo.UserId)) return null;
+            return await _userRepository.Query().Include(u => u.Realms).Include(c => c.OAuthUserClaims).FirstOrDefaultAsync(u => u.Realms.Any(r => r.RealmsName == realm) && u.Id == amrInfo.UserId, cancellationToken);
+        }
+
+        protected async Task<AmrAuthInfo> ResolveAmrInfo(JsonObject query, string realm, Client client, CancellationToken cancellationToken)
+        {
+            var amrInfo = GetAmrInfo();
+            if (amrInfo != null) return amrInfo;
+            var acrValues = query.GetAcrValuesFromAuthorizationRequest();
+            var requestedClaims = query.GetClaimsFromAuthorizationRequest();
+            var acr = await _amrHelper.FetchDefaultAcr(realm, acrValues, requestedClaims, client, cancellationToken);
+            if (acr == null) return null;
+            return new AmrAuthInfo(null, acr.AuthenticationMethodReferences, acr.AuthenticationMethodReferences.First());
+        }
+
+        protected AmrAuthInfo GetAmrInfo()
         {
             if (!HttpContext.Request.Cookies.ContainsKey(Constants.DefaultCurrentAmrCookieName)) return null;
             var amr = JsonSerializer.Deserialize<AmrAuthInfo>(HttpContext.Request.Cookies[Constants.DefaultCurrentAmrCookieName]);
-            return await _userRepository.Query().Include(u => u.Realms).Include(c => c.OAuthUserClaims).FirstOrDefaultAsync(u => u.Realms.Any(r => r.RealmsName == realm) && u.Id == amr.UserId, cancellationToken);
+            return amr;
         }
 
         protected async Task<IActionResult> Authenticate(string realm, string returnUrl, string currentAmr, User user, CancellationToken token, bool rememberLogin = false)
@@ -116,7 +136,8 @@ namespace SimpleIdServer.IdServer.UI
                 return await Sign(realm, unprotectedUrl, currentAmr, user, token, rememberLogin);
             }
 
-            HttpContext.Response.Cookies.Append(Constants.DefaultCurrentAmrCookieName, JsonSerializer.Serialize(new AmrAuthInfo(user.Id, amr)));
+            var allAmr = acr.AuthenticationMethodReferences;
+            HttpContext.Response.Cookies.Append(Constants.DefaultCurrentAmrCookieName, JsonSerializer.Serialize(new AmrAuthInfo(user.Id, allAmr, amr)));
             return RedirectToAction("Index", "Authenticate", new { area = amr, ReturnUrl = returnUrl });
         }
 
@@ -165,18 +186,6 @@ namespace SimpleIdServer.IdServer.UI
                 HttpOnly = false,
                 SameSite = SameSiteMode.None
             });
-        }
-
-        private record AmrAuthInfo
-        {
-            public AmrAuthInfo(string userId, string amr)
-            {
-                UserId = userId;
-                Amr = amr;
-            }
-
-            public string UserId { get; private set; }
-            public string Amr { get; private set; }
         }
     }
 }

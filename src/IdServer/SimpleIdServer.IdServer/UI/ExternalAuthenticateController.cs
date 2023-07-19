@@ -98,15 +98,10 @@ namespace SimpleIdServer.IdServer.UI
 
             var user = await JustInTimeProvision(prefix, result, cancellationToken);
             await HttpContext.SignOutAsync(Constants.DefaultExternalCookieAuthenticationScheme);
-            var returnUrl = "~/";
             if (result.Properties.Items.ContainsKey(RETURN_URL_NAME))
-            {
-                returnUrl = result.Properties.Items[RETURN_URL_NAME];
-                if(IsProtected(returnUrl))
-                    returnUrl = Unprotect(returnUrl);
-            }
+                return await Authenticate(prefix, result.Properties.Items[RETURN_URL_NAME], Constants.Areas.Password, user, cancellationToken, false);     
 
-            return await Sign(prefix, returnUrl, "externalAuth", user, cancellationToken, true);
+            return await Sign(prefix, "~/", Constants.Areas.Password, user, cancellationToken, false);
         }
 
         private async Task<User> JustInTimeProvision(string realm, AuthenticateResult authResult, CancellationToken cancellationToken)

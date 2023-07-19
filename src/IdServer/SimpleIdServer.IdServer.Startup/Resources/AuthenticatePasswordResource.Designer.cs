@@ -70,6 +70,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Login is missing.
+        /// </summary>
+        public static string invalid_login {
+            get {
+                return ResourceManager.GetString("invalid_login", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Login.
         /// </summary>
         public static string login {

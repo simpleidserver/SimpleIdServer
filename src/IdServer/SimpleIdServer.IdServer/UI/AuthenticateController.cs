@@ -25,11 +25,13 @@ namespace SimpleIdServer.IdServer.UI
     [Area(Constants.Areas.Password)]
     public class AuthenticateController : BaseAuthenticateController
     {
+        private readonly IAuthenticationHelper _authenticationHelper;
         private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
         private readonly IPasswordAuthService _passwordAuthService;
 
-        public AuthenticateController(IAuthenticationSchemeProvider authenticationSchemeProvider, IPasswordAuthService passwordAuthService, IOptions<IdServerHostOptions> options, IDataProtectionProvider dataProtectionProvider, IClientRepository clientRepository, IAmrHelper amrHelper, IUserRepository userRepository, IUserTransformer userTransformer, IBusControl busControl) : base(options, dataProtectionProvider, clientRepository, amrHelper, userRepository, userTransformer, busControl)
+        public AuthenticateController(IAuthenticationHelper authenticationHelper, IAuthenticationSchemeProvider authenticationSchemeProvider, IPasswordAuthService passwordAuthService, IOptions<IdServerHostOptions> options, IDataProtectionProvider dataProtectionProvider, IClientRepository clientRepository, IAmrHelper amrHelper, IUserRepository userRepository, IUserTransformer userTransformer, IBusControl busControl) : base(options, dataProtectionProvider, clientRepository, amrHelper, userRepository, userTransformer, busControl)
         {
+            _authenticationHelper = authenticationHelper;
             _authenticationSchemeProvider = authenticationSchemeProvider;
             _passwordAuthService = passwordAuthService;
         }
@@ -52,6 +54,16 @@ namespace SimpleIdServer.IdServer.UI
                     var str = prefix ?? Constants.DefaultRealm;
                     var client = await ClientRepository.Query().Include(c => c.Realms).Include(c => c.Translations).FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name ==  str), cancellationToken);
                     var loginHint = query.GetLoginHintFromAuthorizationRequest();
+                    var amrInfo = await ResolveAmrInfo(query, prefix, client, cancellationToken);
+                    var authenticatedUser = await FetchAuthenticatedUser(str, amrInfo, cancellationToken);
+                    bool isLoginMissing = false;
+                    if (authenticatedUser != null)
+                    {
+                        var login = _authenticationHelper.GetLogin(authenticatedUser);
+                        if (string.IsNullOrWhiteSpace(login)) isLoginMissing = true;
+                        else loginHint = login;
+                    }
+
                     return View(new AuthenticatePasswordViewModel(loginHint,
                         returnUrl,
                         prefix,
@@ -63,7 +75,10 @@ namespace SimpleIdServer.IdServer.UI
                         {
                             AuthenticationScheme = e.Name,
                             DisplayName = e.DisplayName
-                        }).ToList()));
+                        }).ToList(),
+                        isLoginMissing,
+                        authenticatedUser != null,
+                        amrInfo));
                 }
 
                 return View(new AuthenticatePasswordViewModel(
@@ -89,7 +104,10 @@ namespace SimpleIdServer.IdServer.UI
             if (viewModel == null)
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
 
-            viewModel.Check(ModelState);
+            prefix = prefix ?? Constants.DefaultRealm;
+            var amrInfo = GetAmrInfo();
+            var authenticatedUser = await FetchAuthenticatedUser(prefix, amrInfo, token);
+            viewModel.Check(ModelState, authenticatedUser == null ? null : _authenticationHelper.GetLogin(authenticatedUser));
             if (!ModelState.IsValid)
                 return View(viewModel);
 

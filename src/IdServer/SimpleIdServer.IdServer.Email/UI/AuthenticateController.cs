@@ -44,10 +44,11 @@ namespace SimpleIdServer.IdServer.Email.UI
             try
             {
                 prefix = prefix ?? SimpleIdServer.IdServer.Constants.DefaultRealm;
-                var authenticatedUser = await FetchAuthenticatedUser(prefix, cancellationToken);
                 var query = ExtractQuery(returnUrl);
                 var clientId = query.GetClientIdFromAuthorizationRequest();
                 var client = await ClientRepository.Query().Include(c => c.Realms).Include(c => c.Translations).FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == prefix), cancellationToken);
+                var amrInfo = await ResolveAmrInfo(query, prefix, client, cancellationToken);
+                var authenticatedUser = await FetchAuthenticatedUser(prefix, amrInfo, cancellationToken);
                 var loginHint = query.GetLoginHintFromAuthorizationRequest();
                 bool isEmailMissing = false;
                 if (authenticatedUser != null && string.IsNullOrWhiteSpace(authenticatedUser.Email)) isEmailMissing = true;
@@ -60,7 +61,8 @@ namespace SimpleIdServer.IdServer.Email.UI
                     client.TosUri,
                     client.PolicyUri,
                     isEmailMissing,
-                    authenticatedUser != null));
+                    authenticatedUser != null,
+                    amrInfo));
             }
             catch (CryptographicException)
             {
@@ -77,7 +79,8 @@ namespace SimpleIdServer.IdServer.Email.UI
             if (viewModel == null)
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
 
-            var authenticatedUser = await FetchAuthenticatedUser(prefix, token);
+            var amrInfo = GetAmrInfo();
+            var authenticatedUser = await FetchAuthenticatedUser(prefix, amrInfo, token);
             viewModel.CheckRequiredFields(ModelState);
             viewModel.CheckEmail(ModelState, authenticatedUser);
             switch (viewModel.Action)

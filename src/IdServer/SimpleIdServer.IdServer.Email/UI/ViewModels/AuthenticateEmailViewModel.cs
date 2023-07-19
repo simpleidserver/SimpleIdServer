@@ -11,7 +11,7 @@ namespace SimpleIdServer.IdServer.Email.UI.ViewModels
     {
         public AuthenticateEmailViewModel() { }
 
-        public AuthenticateEmailViewModel(string returnUrl, string realm, string email, string clientName, string logoUri, string tosUri, string policyUri, bool isEmailMissing, bool isAuthInProgress)
+        public AuthenticateEmailViewModel(string returnUrl, string realm, string email, string clientName, string logoUri, string tosUri, string policyUri, bool isEmailMissing, bool isAuthInProgress, AmrAuthInfo amrAuthInfo)
         {
             ReturnUrl = returnUrl;
             Realm = realm;
@@ -22,6 +22,7 @@ namespace SimpleIdServer.IdServer.Email.UI.ViewModels
             PolicyUri = policyUri;
             IsEmailMissing = isEmailMissing;
             IsAuthInProgress = isAuthInProgress;
+            AmrAuthInfo = amrAuthInfo;
         }
 
         public string Email { get; set; }

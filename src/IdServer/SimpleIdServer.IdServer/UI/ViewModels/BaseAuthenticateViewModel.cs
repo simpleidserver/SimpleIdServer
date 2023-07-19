@@ -14,5 +14,20 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
         public bool RememberLogin { get; set; }
         public string Realm { get; set; }
         public ICollection<ExternalIdProvider> ExternalIdsProviders { get; set; } = new List<ExternalIdProvider>();
+        public AmrAuthInfo AmrAuthInfo { get; set; } = null;
+    }
+
+    public record AmrAuthInfo
+    {
+        public AmrAuthInfo(string userId, IEnumerable<string> allAmr, string currentAmr)
+        {
+            UserId = userId;
+            AllAmr = allAmr;
+            CurrentAmr = currentAmr;
+        }
+
+        public string UserId { get; private set; }
+        public IEnumerable<string> AllAmr { get; set; }
+        public string CurrentAmr { get; private set; }
     }
 }

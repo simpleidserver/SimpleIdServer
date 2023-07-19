@@ -42,7 +42,15 @@ else
         <input type="hidden" name="Action" value="AUTHENTICATE" />
         <!-- Email -->
         <div class="input-group mb-3">
-            <input asp-for="Email" placeholder="@AuthenticateEmailResource.email" type="text" class="form-control" disabled="@Model.IsAuthInProgress" />
+            @if(Model.IsAuthInProgress)
+            {
+                <input asp-for="Email" placeholder="@AuthenticateEmailResource.email" type="text" class="form-control" disabled="disabled" />
+                <input asp-for="Email" placeholder="@AuthenticateEmailResource.email" type="hidden" class="form-control" />
+            }
+            else
+            {
+                <input asp-for="Email" placeholder="@AuthenticateEmailResource.email" type="text" class="form-control" />
+            }
         </div>
         <!-- Confirmation code -->
         <div class="input-group mb-3">
@@ -52,6 +60,8 @@ else
             <input type="checkbox" asp-for="RememberLogin " />
             <label>@AuthenticateEmailResource.remember_login</label>
         </div>
+        <input asp-for="IsEmailMissing" type="hidden" class="form-control" />
+        <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
         <button type="submit" class="btn btn-primary">@AuthenticateEmailResource.authenticate</button>
     }
 
@@ -68,8 +78,18 @@ else
             <input type="hidden" asp-for="ReturnUrl" />
             <input type="hidden" name="Action" value="SENDCONFIRMATIONCODE" />
             <div class="input-group mb-3">
-                <input asp-for="Email" type="text" class="form-control" placeholder="@AuthenticateEmailResource.email" disabled="@Model.IsAuthInProgress" />
+                @if(Model.IsAuthInProgress)
+                {
+                    <input asp-for="Email" placeholder="@AuthenticateEmailResource.email" type="text" class="form-control" disabled="disabled" />
+                    <input asp-for="Email" placeholder="@AuthenticateEmailResource.email" type="hidden" class="form-control" />
+                }
+                else
+                {
+                    <input asp-for="Email" placeholder="@AuthenticateEmailResource.email" type="text" class="form-control" />
+                }
             </div>
+            <input asp-for="IsEmailMissing" type="hidden" class="form-control" />
+            <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
             <button type="submit" class="btn btn-primary">@AuthenticateEmailResource.sendconfirmationcode</button>
         }
     </div>

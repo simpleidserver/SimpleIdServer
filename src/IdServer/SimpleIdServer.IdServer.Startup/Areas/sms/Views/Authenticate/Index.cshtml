@@ -40,7 +40,15 @@ else
         <input type="hidden" asp-for="ReturnUrl" />
         <input type="hidden" name="Action" value="AUTHENTICATE" />
         <div class="input-group mb-3">
-            <input asp-for="PhoneNumber" type="text" class="form-control" placeholder="@AuthenticateSmsResource.phonenumber" disabled="@Model.IsAuthInProgress" />
+            @if (Model.IsAuthInProgress)
+            {
+                <input asp-for="PhoneNumber" placeholder="@AuthenticateEmailResource.email" type="text" class="form-control" disabled="disabled" />
+                <input asp-for="PhoneNumber" placeholder="@AuthenticateSmsResource.phonenumber" type="hidden" class="form-control" />
+            }
+            else
+            {
+                <input asp-for="PhoneNumber" placeholder="@AuthenticateSmsResource.phonenumber" type="text" class="form-control" />
+            }
         </div>
         <div class="input-group mb-3">
             <input asp-for="OTPCode" type="password" class="form-control" placeholder="@AuthenticateSmsResource.confirmationcode" />
@@ -49,6 +57,8 @@ else
             <input type="checkbox" asp-for="RememberLogin " />
             <label>@AuthenticateSmsResource.remember_login</label>
         </div>
+        <input asp-for="IsPhoneNumberMissing" type="hidden" class="form-control" />
+        <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
         <button type="submit" class="btn btn-primary card-link">@AuthenticateSmsResource.authenticate</button>
     }
 
@@ -65,8 +75,18 @@ else
             <input type="hidden" asp-for="ReturnUrl" />
             <input type="hidden" name="Action" value="SENDCONFIRMATIONCODE" />
             <div class="input-group mb-3">
-                <input asp-for="PhoneNumber" type="text" class="form-control" placeholder="@AuthenticateSmsResource.phonenumber" disabled="@Model.IsAuthInProgress" />
+                @if (Model.IsAuthInProgress)
+                {
+                    <input asp-for="PhoneNumber" placeholder="@AuthenticateEmailResource.email" type="text" class="form-control" disabled="disabled" />
+                    <input asp-for="PhoneNumber" placeholder="@AuthenticateSmsResource.phonenumber" type="hidden" class="form-control" />
+                }
+                else
+                {
+                    <input asp-for="PhoneNumber" placeholder="@AuthenticateSmsResource.phonenumber" type="text" class="form-control" />
+                }
             </div>
+            <input asp-for="IsPhoneNumberMissing" type="hidden" class="form-control" />
+            <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
             <button type="submit" class="btn btn-primary card-link">@AuthenticateSmsResource.sendconfirmationcode</button>
         }
     </div>

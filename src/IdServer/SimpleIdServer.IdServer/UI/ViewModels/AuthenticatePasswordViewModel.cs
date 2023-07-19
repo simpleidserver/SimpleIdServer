@@ -16,7 +16,7 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
             ExternalIdsProviders = externalIdProviders;
         }
 
-        public AuthenticatePasswordViewModel(string login, string returnUrl, string realm, string clientName, string logoUri, string tosUri, string policyUri, ICollection<ExternalIdProvider> externalIdProviders)
+        public AuthenticatePasswordViewModel(string login, string returnUrl, string realm, string clientName, string logoUri, string tosUri, string policyUri, ICollection<ExternalIdProvider> externalIdProviders, bool isLoginMissing, bool isAuthInProgress, AmrAuthInfo amrAuthInfo)
         {
             Login = login;
             ReturnUrl = returnUrl;
@@ -26,13 +26,21 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
             TosUri = tosUri;
             PolicyUri = policyUri;
             ExternalIdsProviders = externalIdProviders;
+            IsLoginMissing = isLoginMissing;
+            IsAuthInProgress = isAuthInProgress;
+            AmrAuthInfo = amrAuthInfo;
         }
 
         public string Login { get; set; }
         public string Password { get; set; }
+        public bool IsLoginMissing { get; set; } = false;
+        public bool IsAuthInProgress { get; set; } = false;
 
-        public void Check(ModelStateDictionary modelStateDictionary)
+        public void Check(ModelStateDictionary modelStateDictionary, string expectedLogin)
         {
+            if(!string.IsNullOrEmpty(expectedLogin) && expectedLogin != Login)
+                modelStateDictionary.AddModelError("invalid_login", "invalid_login");
+
             if (string.IsNullOrWhiteSpace(ReturnUrl))
                 modelStateDictionary.AddModelError("missing_return_url", "missing_return_url");
 

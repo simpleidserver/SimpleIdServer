@@ -7,7 +7,6 @@ using System;
 using System.DirectoryServices.Protocols;
 using System.Linq;
 using System.Net;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace SimpleIdServer.IdServer.UI.Services
 {

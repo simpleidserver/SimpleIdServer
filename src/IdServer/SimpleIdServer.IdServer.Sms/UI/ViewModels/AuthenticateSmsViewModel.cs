@@ -12,7 +12,7 @@ namespace SimpleIdServer.IdServer.Sms.UI.ViewModels
     {
         public AuthenticateSmsViewModel() { }
 
-        public AuthenticateSmsViewModel(string returnUrl, string realm, string phoneNumber, string clientName, string logoUri, string tosUri, string policyUri, bool isPhoneNumberMissing, bool isAuthInProgress)
+        public AuthenticateSmsViewModel(string returnUrl, string realm, string phoneNumber, string clientName, string logoUri, string tosUri, string policyUri, bool isPhoneNumberMissing, bool isAuthInProgress, AmrAuthInfo amrAuthInfo)
         {
             ReturnUrl = returnUrl;
             Realm = realm;
@@ -23,6 +23,7 @@ namespace SimpleIdServer.IdServer.Sms.UI.ViewModels
             PolicyUri = policyUri;
             IsPhoneNumberMissing = isPhoneNumberMissing;
             IsAuthInProgress = isAuthInProgress;
+            AmrAuthInfo = amrAuthInfo;
         }
 
         public string PhoneNumber { get; set; }

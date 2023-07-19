@@ -73,3 +73,73 @@
     border-top: 1px solid #eee;
 
 }
+
+.progressbar {
+    margin-bottom: 30px;
+    overflow: hidden;
+    color: lightgrey;
+    padding: 0px;
+    display: flex;
+    flex-direction: row;
+}
+
+.progressbar .active {
+    color: var(--bs-primary);
+}
+
+.progressbar li {
+    list-style-type: none;
+    font-size: 15px;
+    float: left;
+    position: relative;
+    font-weight: 400;
+    z-index: 2;
+    flex: 1 1 0;
+    text-align:center;
+}
+
+.progressbar #step1:before {
+    content: "1"
+}
+
+.progressbar #step2:before {
+    content: "2"
+}
+
+.progressbar #step3:before {
+    content: "3"
+}
+
+.progressbar #step4:before {
+    content: "4"
+}
+
+.progressbar li:before {
+    width: 25px;
+    height: 25px;
+    line-height: 20px;
+    display: block;
+    font-size: 15px;
+    color: #ffffff;
+    background: lightgray;
+    border-radius: 50%;
+    text-align: center;
+    margin: 0 auto 10px auto;
+    padding: 2px;
+}
+
+.progressbar li:after {
+    content: '';
+    width: 100%;
+    height: 2px;
+    background: lightgray;
+    position: absolute;
+    left: 0;
+    top: 12px;
+    z-index: -1;
+}
+
+.progressbar li.active:before,
+.progressbar li.active:after {
+    background: var(--bs-primary);
+}
