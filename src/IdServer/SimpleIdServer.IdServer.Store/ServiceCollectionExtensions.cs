@@ -53,6 +53,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<ICredentialOfferRepository, CredentialOfferRepository>();
             services.AddTransient<IIdentityDocumentConfigurationStore, IdentityDocumentConfigurationStore>();
             services.AddTransient<IDeviceAuthCodeRepository, DeviceAuthCodeRepository>();
+            services.AddTransient<IUserCredentialRepository, UserCredentialRepository>();
         }
     }
 }

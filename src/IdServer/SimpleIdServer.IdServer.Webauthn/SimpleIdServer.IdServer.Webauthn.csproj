@@ -11,7 +11,4 @@
 	<ItemGroup>
 		<PackageReference Include="Fido2.AspNet" Version="4.0.*-*" />
 	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="UI\ViewModels\" />
-	</ItemGroup>
 </Project>

@@ -35,6 +35,11 @@
 	    <AutoGen>True</AutoGen>
 	    <DependentUpon>AccountsResource.resx</DependentUpon>
 	  </Compile>
+	  <Compile Update="Resources\AuthenticateWebauthnResource.Designer.cs">
+	    <DependentUpon>AuthenticateWebauthnResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
 	  <Compile Update="Resources\DeviceCodeResource.Designer.cs">
 	    <DependentUpon>DeviceCodeResource.resx</DependentUpon>
 	    <DesignTime>True</DesignTime>
@@ -105,6 +110,10 @@
 	  <EmbeddedResource Update="Resources\AccountsResource.resx">
 	    <Generator>PublicResXFileCodeGenerator</Generator>
 	    <LastGenOutput>AccountsResource.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Resources\AuthenticateWebauthnResource.resx">
+	    <LastGenOutput>AuthenticateWebauthnResource.Designer.cs</LastGenOutput>
+	    <Generator>PublicResXFileCodeGenerator</Generator>
 	  </EmbeddedResource>
 	  <EmbeddedResource Update="Resources\DeviceCodeResource.resx">
 	    <LastGenOutput>DeviceCodeResource.Designer.cs</LastGenOutput>

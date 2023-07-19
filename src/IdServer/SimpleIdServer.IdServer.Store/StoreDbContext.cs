@@ -32,6 +32,7 @@ namespace SimpleIdServer.IdServer.Store
         public DbSet<IdentityProvisioning> IdentityProvisioningLst { get; set; }
         public DbSet<IdentityProvisioningDefinition> IdentityProvisioningDefinitions { get; set; }
         public DbSet<UserClaim> UserClaims { get; set; }
+        public DbSet<UserCredential> UserCredential { get; set; }
         public DbSet<ExtractedRepresentation> ExtractedRepresentations { get; set; }
         public DbSet<ImportSummary> ImportSummaries { get; set; }
         public DbSet<Group> Groups { get; set; }
