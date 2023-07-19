@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.Server.Kestrel.Https;
 using Microsoft.Data.SqlClient;
@@ -61,7 +62,7 @@ app.Run();
 
 void ConfigureIdServer(IServiceCollection services)
 {
-    services.AddSIDIdentityServer()
+    services.AddSIDIdentityServer(dataProtectionBuilderCallback: ConfigureDataProtection)
         .UseEFStore(o => ConfigureStorage(o))
         .AddCredentialIssuer()
         .UseInMemoryMassTransit()
@@ -153,6 +154,11 @@ void ConfigureStorage(DbContextOptionsBuilder b)
             });
             break;
     }
+}
+
+void ConfigureDataProtection(IDataProtectionBuilder dataProtectionBuilder)
+{
+    dataProtectionBuilder.PersistKeysToDbContext<StoreDbContext>();
 }
 
 void SeedData(WebApplication application, string scimBaseUrl)

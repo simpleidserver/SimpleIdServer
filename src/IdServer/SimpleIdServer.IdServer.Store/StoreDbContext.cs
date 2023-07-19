@@ -1,12 +1,13 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store.Configurations;
 
 namespace SimpleIdServer.IdServer.Store
 {
-    public class StoreDbContext : DbContext
+    public class StoreDbContext : DbContext, IDataProtectionKeyContext
     {
         public StoreDbContext(DbContextOptions<StoreDbContext> options) : base(options) { }
 
@@ -38,6 +39,7 @@ namespace SimpleIdServer.IdServer.Store
         public DbSet<UserCredentialOffer> CredentialOffers { get; set; }
         public DbSet<NetworkConfiguration> Networks { get; set; }
         public DbSet<DeviceAuthCode> DeviceAuthCodes { get; set; }
+        public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

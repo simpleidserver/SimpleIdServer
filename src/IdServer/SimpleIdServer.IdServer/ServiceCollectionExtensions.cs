@@ -4,6 +4,7 @@ using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -62,7 +63,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        public static IdServerStoreChooser AddSIDIdentityServer(this IServiceCollection services, Action<IdServerHostOptions>? callback = null)
+        public static IdServerStoreChooser AddSIDIdentityServer(this IServiceCollection services, Action<IdServerHostOptions>? callback = null, Action<IDataProtectionBuilder>? dataProtectionBuilderCallback = null)
         {
             if (callback != null) services.Configure(callback);
             else services.Configure<IdServerHostOptions>(o => { });
@@ -73,7 +74,8 @@ namespace Microsoft.Extensions.DependencyInjection
             Tracing.Init();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddControllersWithViews();
-            services.AddDataProtection();
+            var b = services.AddDataProtection();
+            if (dataProtectionBuilderCallback != null) dataProtectionBuilderCallback(b);
             services.AddDistributedMemoryCache();
             services.AddResponseModeHandlers()
                 .AddOAuthClientAuthentication()
