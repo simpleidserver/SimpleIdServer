@@ -61,6 +61,24 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Authenticate.
+        /// </summary>
+        public static string authenticate {
+            get {
+                return ResourceManager.GetString("authenticate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Credential is added.
+        /// </summary>
+        public static string credential_added {
+            get {
+                return ResourceManager.GetString("credential_added", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Login.
         /// </summary>
         public static string login {
@@ -70,11 +88,56 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Attestation is missing.
+        /// </summary>
+        public static string missing_attestation {
+            get {
+                return ResourceManager.GetString("missing_attestation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à FIDO2 credential is missing.
+        /// </summary>
+        public static string missing_credential {
+            get {
+                return ResourceManager.GetString("missing_credential", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Login is missing.
+        /// </summary>
+        public static string missing_login {
+            get {
+                return ResourceManager.GetString("missing_login", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Register.
         /// </summary>
         public static string register {
             get {
                 return ResourceManager.GetString("register", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Remember my login.
+        /// </summary>
+        public static string remember_login {
+            get {
+                return ResourceManager.GetString("remember_login", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à User with same login already exists.
+        /// </summary>
+        public static string user_already_exists {
+            get {
+                return ResourceManager.GetString("user_already_exists", resourceCulture);
             }
         }
     }

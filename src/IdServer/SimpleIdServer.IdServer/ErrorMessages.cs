@@ -253,5 +253,6 @@ namespace SimpleIdServer.IdServer
         public const string NOT_WELL_FORMED_DPOP_TOKEN = "the DPoP proof must be a Json Web Token";
         public const string USE_DPOP_NONCE = "Authorization Server required nonce in DPoP proof";
         public const string DPOP_JKT_MISMATCH = "there is a mismatch between the dpop_jkt and the DPoP proof";
+        public const string USER_NOT_AUTHENTICATED = "you're not authenticated";
     }
 }

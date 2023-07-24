@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Events;
 using SimpleIdServer.IdServer.Helpers;
@@ -24,7 +25,7 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.UI
 {
-    public class BaseAuthenticateController : Controller
+    public class BaseAuthenticateController : BaseController
     {
         private readonly IdServerHostOptions _options;
         private readonly IDataProtector _dataProtector;
@@ -95,7 +96,7 @@ namespace SimpleIdServer.IdServer.UI
         protected async Task<User> FetchAuthenticatedUser(string realm, AmrAuthInfo amrInfo, CancellationToken cancellationToken)
         {
             if (amrInfo == null || string.IsNullOrWhiteSpace(amrInfo.UserId)) return null;
-            return await _userRepository.Query().Include(u => u.Realms).Include(c => c.OAuthUserClaims).FirstOrDefaultAsync(u => u.Realms.Any(r => r.RealmsName == realm) && u.Id == amrInfo.UserId, cancellationToken);
+            return await _userRepository.Query().Include(u => u.Realms).Include(c => c.OAuthUserClaims).Include(u => u.Credentials).FirstOrDefaultAsync(u => u.Realms.Any(r => r.RealmsName == realm) && u.Id == amrInfo.UserId, cancellationToken);
         }
 
         protected async Task<AmrAuthInfo> ResolveAmrInfo(JsonObject query, string realm, Client client, CancellationToken cancellationToken)

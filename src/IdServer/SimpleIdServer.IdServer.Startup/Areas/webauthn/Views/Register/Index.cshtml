@@ -12,52 +12,92 @@
     var makeCredentialUrl = Url.Action("MakeCredential", "Register", new { area = "webauthn" });
 }
 
-<!-- Login form -->
-<form id="registerWebauthn" target="#">    
-    @Html.AntiForgeryToken()
-    <div class="input-group mb-3">
-        <input asp-for="Login" placeholder="@AuthenticateWebauthnResource.login" type="text" class="form-control" />
-    </div>
-    <button type="submit" class="btn btn-primary card-link">@AuthenticateWebauthnResource.register</button>
-</form>
+<div id="registrationContainer">
+    <ul class="list-group mb-3" id="errors">
+        @if (!ViewData.ModelState.IsValid)
+        {
+            @foreach (var modelState in ViewData.ModelState.Values)
+            {
+                foreach (var error in modelState.Errors)
+                {
+                    <li class="list-group-item list-group-item-danger">@AuthenticateWebauthnResource.ResourceManager.GetString(error.ErrorMessage)</li>
+                }
+            }
+        }
+    </ul>
+
+    <!-- Registration form -->
+    @using (Html.BeginForm("Index", "Register", new { area = "webauthn" }, FormMethod.Post, null, new { id = "registerWebauthn" }))
+    {
+        @Html.AntiForgeryToken()
+        <div class="input-group mb-3">
+            <input asp-for="Login" placeholder="@AuthenticateWebauthnResource.login" type="text" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary card-link">@AuthenticateWebauthnResource.register</button>
+    }
+</div>
+
+<div class="alert alert-success" id="registerSuccessMessage" style="display: none;">
+    @AuthenticateWebauthnResource.credential_added
+</div>
 
 @section SubScripts {
     <script type="text/javascript">
         $(document).ready(function() {
             var makeCredentialOptionsUrl = "@makeCredentialOptionsUrl";
             var makeCredentialUrl = "@makeCredentialUrl";
-            async function registerCredential(newCredential) {                
+
+            var toggleBtn = function(isDisabled) {
+                $("#registerWebauthn button[type='submit']").attr('disabled', isDisabled);
+            }
+
+            var displayError = function(errorJson) {
+                console.error(errorJson);
+                $("#errors").empty();
+                $("#errors").append("<li class='list-group-item list-group-item-danger'>" + errorJson["error_description"] + "</li>");
+            }
+
+            var displaySuccessMessage = function () {
+                $("#registerSuccessMessage").css('display', '');
+                $("#registrationContainer").css('display', 'none');
+            }
+
+            async function registerCredential(newCredential, form) {                
                 let attestationObject = new Uint8Array(newCredential.response.attestationObject);
                 let clientDataJSON = new Uint8Array(newCredential.response.clientDataJSON);
                 let rawId = new Uint8Array(newCredential.rawId);
-                const data = {                    
+                const serializedAuthenticatorAttestationRawResponse = JSON.stringify({                    
                     id: newCredential.id,
                     rawId: coerceToBase64Url(rawId),
                     type: newCredential.type,
                     extensions: newCredential.getClientExtensionResults(),
                     response: {
-                        AttestationObject: coerceToBase64Url(attestationObject),
+                        attestationObject: coerceToBase64Url(attestationObject),
                         clientDataJSON: coerceToBase64Url(clientDataJSON)
                     }
-                };
-                let response;
-                try
-                {
-                    response = await fetch(makeCredentialUrl, {
-                        method: 'POST',
-                        body: JSON.stringify(data),
-                        headers: {
-                            "Accept": "application/json",
-                            "Content-Type": "application/json"
-                        }
-                    });
-                }
-                catch(e) {
-
-                }
+                });
+                var login = $("#registerWebauthn input[name='Login']").val();
+                form.serializedAuthenticatorAttestationRawResponse = serializedAuthenticatorAttestationRawResponse;
+                fetch(makeCredentialUrl, {
+                    method: 'POST',
+                    body: JSON.stringify(form),
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                        "RequestVerificationToken": form["__RequestVerificationToken"]
+                    }
+                }).then(() => {
+                    toggleBtn(false);
+                    displaySuccessMessage();
+                }).catch((e) => {        
+                    toggleBtn(false);            
+                    displayError(e);
+                });
             }
 
-            async function makeCredential(login) {
+            async function makeCredential(login, form) {
+                toggleBtn(true);
+
                 let response = await fetch(makeCredentialOptionsUrl, {
                     method: 'POST',
                     body: JSON.stringify({ Login: login }),
@@ -67,6 +107,12 @@
                     }
                 });
                 let makeCredentialOptions = await response.json();
+                if(!response.ok) {
+                    toggleBtn(false);
+                    displayError(makeCredentialOptions);
+                    return;
+                }
+
                 makeCredentialOptions.challenge = coerceToArrayBuffer(makeCredentialOptions.challenge);
                 makeCredentialOptions.user.id = coerceToArrayBuffer(makeCredentialOptions.user.id);
                 makeCredentialOptions.excludeCredentials = makeCredentialOptions.excludeCredentials.map((c) => {
@@ -82,16 +128,17 @@
                 } catch (e) {
                     var msg = "Could not create credentials in browser. Probably because the username is already registered with your authenticator. Please change username or authenticator."
                     console.error(msg, e);
+                    toggleBtn(false);
                     return;
                 }
 
-                await registerCredential(newCredential);
+                await registerCredential(newCredential, form);
             };
 
-            $("#registerWebauthn").submit(function(e) {
+            $("#registerWebauthn").submit(function (e) {
                 e.preventDefault();
                 var login = $("#registerWebauthn input[name='Login']").val();
-                makeCredential(login);
+                makeCredential(login, convertFormToJSON($(e.target)));
             });
         });
     </script>

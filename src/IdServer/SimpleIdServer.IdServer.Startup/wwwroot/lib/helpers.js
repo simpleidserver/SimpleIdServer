@@ -1,4 +1,13 @@
-﻿coerceToArrayBuffer = function (thing, name) {
+﻿convertFormToJSON = function (form) {
+    return $(form)
+        .serializeArray()
+        .reduce(function (json, { name, value }) {
+            json[name] = value;
+            return json;
+        }, {});
+}
+
+coerceToArrayBuffer = function (thing, name) {
     if (typeof thing === "string") {
         // base64url to base64
         thing = thing.replace(/-/g, "+").replace(/_/g, "/");

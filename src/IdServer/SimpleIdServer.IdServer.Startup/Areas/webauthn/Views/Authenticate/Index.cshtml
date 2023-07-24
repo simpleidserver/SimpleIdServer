@@ -1,15 +1,162 @@
 ﻿@using Microsoft.Extensions.Options;
 @using SimpleIdServer.IdServer.Options;
 @using SimpleIdServer.IdServer.Startup.Resources;
-@model SimpleIdServer.IdServer.Sms.UI.ViewModels.AuthenticateSmsViewModel
+@model SimpleIdServer.IdServer.Webauthn.UI.ViewModels.AuthenticateWebauthnViewModel;
 @inject IOptions<IdServerHostOptions> configuration
 
 @{
     ViewBag.Title = AuthenticateSmsResource.title;
     Layout = "~/Views/Shared/_AuthenticateLayout.cshtml";
+    var makeAssertionsOptionsUrl = Url.Action("MakeAssertionOptions", "Authenticate", new { area = "webauthn" });
+    var authenticateUrl = Url.Action("Index", "Authenticate", new { area = "webauthn" });
+}
+
+<ul class="list-group mb-3" id="errors">
+    @if (!ViewData.ModelState.IsValid)
+    {
+        @foreach (var modelState in ViewData.ModelState.Values)
+        {
+            foreach (var error in modelState.Errors)
+            {
+                <li class="list-group-item list-group-item-danger">@AuthenticateWebauthnResource.ResourceManager.GetString(error.ErrorMessage)</li>
+            }
+        }
+    }
+</ul>
+
+@if (Model.IsFidoMissing)
+{
+    <div class="alert alert-danger">
+        @AuthenticateWebauthnResource.missing_credential
+    </div>
+}
+else
+{
+    <!-- Login form -->
+    @using (Html.BeginForm("Index", "Authenticate", new { area = "webauthn", returnUrl = Model.ReturnUrl }, FormMethod.Post, null, new { id = "fido2Auth" }))
+    {
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="ReturnUrl" />
+        <div class="input-group mb-3">
+            @if (Model.IsAuthInProgress)
+            {
+                <input asp-for="Login" placeholder="@AuthenticateWebauthnResource.login" type="text" class="form-control" disabled="disabled" />
+                <input asp-for="Login" placeholder="@AuthenticateWebauthnResource.login" type="hidden" class="form-control" />
+            }
+            else
+            {
+                <input asp-for="Login" placeholder="@AuthenticateWebauthnResource.login" type="text" class="form-control" />
+            }
+        </div>
+        <div>
+            <input type="checkbox" asp-for="RememberLogin " />
+            <label>@AuthenticateWebauthnResource.remember_login</label>
+        </div>
+        <input asp-for="IsFidoMissing" type="hidden" class="form-control" />
+        <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
+        <button type="submit" class="btn btn-primary card-link">@AuthenticateWebauthnResource.authenticate</button>        
+    }
 }
 
 @section SubScripts {
     <script type="text/javascript">
+        $(document).ready(function () {
+            $(".login input[name='RememberLogin']").change(function (e) {
+                $(this).val($(this).is(':checked'));
+            });
+            
+            var makeAssertionsUrl = "@makeAssertionsOptionsUrl";
+            var authenticateUrl = "@authenticateUrl";
+
+            var toggleBtn = function(isDisabled) {
+                $("#fido2Auth button[type='submit']").attr('disabled', isDisabled);
+            }
+
+            var displayError = function (errorJson) {
+                console.error(errorJson);
+                $("#errors").empty();
+                $("#errors").append("<li  class='list-group-item list-group-item-danger'>" + errorJson["error_description"] + "</li>");
+            }
+
+            async function makeAssertion(credential, form) {
+                let authData = new Uint8Array(credential.response.authenticatorData);
+                let clientDataJSON = new Uint8Array(credential.response.clientDataJSON);
+                let rawId = new Uint8Array(credential.rawId);
+                let sig = new Uint8Array(credential.response.signature);
+                const serializedAuthenticatorAssertionRawResponse = JSON.stringify({
+                    id: credential.id,
+                    rawId: coerceToBase64Url(rawId),
+                    type: credential.type,
+                    extensions: credential.getClientExtensionResults(),
+                    response: {
+                        authenticatorData: coerceToBase64Url(authData),
+                        clientDataJSON: coerceToBase64Url(clientDataJSON),
+                        signature: coerceToBase64Url(sig)
+                    }
+                });
+                $.ajax({
+                    type: 'POST',
+                    url: authenticateUrl,
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("RequestVerificationToken", form["__RequestVerificationToken"]);
+                    },
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify({
+                        SerializedAuthenticatorAssertionRawResponse: serializedAuthenticatorAssertionRawResponse,
+                        Login: form.Login,
+                        RememberLogin: form.RememberLogin == "true",
+                        ReturnUrl: form.ReturnUrl
+                    }),
+                    dataType: "json",
+                    success: function(e) {
+                        window.location.href = e.redirect;
+                    },
+                    error: function(e) {
+                        toggleBtn(false);
+                        displayError(e);
+                    }
+                });
+            }
+
+            async function makeAssertionOptions(form) {
+                toggleBtn(true);
+                let response = await fetch(makeAssertionsUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({ login : form.Login }),
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    }
+                });
+                const makeAssertionOptions = await response.json();
+                if (!response.ok) {
+                    toggleBtn(false);
+                    displayError(makeAssertionOptions);
+                    return;
+                }
+
+                const challenge = makeAssertionOptions.challenge.replace(/-/g, "+").replace(/_/g, "/");
+                makeAssertionOptions.challenge = Uint8Array.from(atob(challenge), c => c.charCodeAt(0));
+                makeAssertionOptions.allowCredentials.forEach(function (listItem) {
+                    var fixedId = listItem.id.replace(/\_/g, "/").replace(/\-/g, "+");
+                    listItem.id = Uint8Array.from(atob(fixedId), c => c.charCodeAt(0));
+                });
+                let credential;
+                try {
+                    credential = await navigator.credentials.get({ publicKey: makeAssertionOptions })
+                } catch (err) {
+                    console.error(err);
+                    toggleBtn(false);
+                    return;
+                }
+
+                await makeAssertion(credential, form);
+            }
+
+            $("#fido2Auth").submit(function(e) {
+                e.preventDefault();
+                makeAssertionOptions(convertFormToJSON($(e.target)));
+            });
+        });
     </script>
 }
