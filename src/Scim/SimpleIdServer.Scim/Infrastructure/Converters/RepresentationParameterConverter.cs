@@ -12,6 +12,8 @@ namespace SimpleIdServer.Scim.Infrastructure.Converters
 {
     public class RepresentationParameterConverter : JsonConverter
     {
+        public override bool CanWrite => false;
+
         public override bool CanConvert(Type objectType)
         {
             return objectType.GetTypeInfo().Equals(typeof(RepresentationParameter).GetTypeInfo());
@@ -31,9 +33,6 @@ namespace SimpleIdServer.Scim.Infrastructure.Converters
             return result;
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            throw new NotImplementedException();
-        }
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) => throw new NotImplementedException();
     }
 }

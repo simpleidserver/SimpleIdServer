@@ -11,6 +11,8 @@ namespace SimpleIdServer.Scim.Infrastructure.Converters
 {
     public class PatchOperationParameterConverter : JsonConverter
     {
+        public override bool CanWrite => false;
+
         public override bool CanConvert(Type objectType)
         {
             return objectType.GetTypeInfo().Equals(typeof(PatchOperationParameter).GetTypeInfo());
@@ -30,8 +32,6 @@ namespace SimpleIdServer.Scim.Infrastructure.Converters
             return result;
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-        }
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) => throw new NotImplementedException();
     }
 }
