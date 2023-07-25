@@ -21,7 +21,7 @@
     </ul>
 }
 
-@if(Model.IsPhoneNumberMissing)
+@if(Model.IsLoginMissing)
 {
     <div class="alert alert-danger">
         @AuthenticateSmsResource.missing_phonenumber
@@ -34,7 +34,7 @@ else
     </div>
 
     <!-- Login form -->
-    @using (Html.BeginForm("Index", "Authenticate", new { area = "sms", returnUrl = Model.ReturnUrl }, FormMethod.Post))
+    @using (Html.BeginForm("Index", "Authenticate", new { area = SimpleIdServer.IdServer.Sms.Constants.AMR, returnUrl = Model.ReturnUrl }, FormMethod.Post))
     {
         @Html.AntiForgeryToken()
         <input type="hidden" asp-for="ReturnUrl" />
@@ -42,12 +42,12 @@ else
         <div class="input-group mb-3">
             @if (Model.IsAuthInProgress)
             {
-                <input asp-for="PhoneNumber" placeholder="@AuthenticateEmailResource.email" type="text" class="form-control" disabled="disabled" />
-                <input asp-for="PhoneNumber" placeholder="@AuthenticateSmsResource.phonenumber" type="hidden" class="form-control" />
+                <input asp-for="Login" placeholder="@AuthenticateSmsResource.phonenumber" type="text" class="form-control" disabled="disabled" />
+                <input asp-for="Login" placeholder="@AuthenticateSmsResource.phonenumber" type="hidden" class="form-control" />
             }
             else
             {
-                <input asp-for="PhoneNumber" placeholder="@AuthenticateSmsResource.phonenumber" type="text" class="form-control" />
+                <input asp-for="Login" placeholder="@AuthenticateSmsResource.phonenumber" type="text" class="form-control" />
             }
         </div>
         <div class="input-group mb-3">
@@ -57,7 +57,7 @@ else
             <input type="checkbox" asp-for="RememberLogin " />
             <label>@AuthenticateSmsResource.remember_login</label>
         </div>
-        <input asp-for="IsPhoneNumberMissing" type="hidden" class="form-control" />
+        <input asp-for="IsLoginMissing" type="hidden" class="form-control" />
         <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
         <button type="submit" class="btn btn-primary card-link">@AuthenticateSmsResource.authenticate</button>
     }
@@ -69,7 +69,7 @@ else
             <div class="alert alert-success">@AuthenticateSmsResource.ResourceManager.GetString(ViewBag.SuccessMessage)</div>
         }
 
-        @using (Html.BeginForm("Index", "Authenticate", new { area = "sms", returnUrl = Model.ReturnUrl }, FormMethod.Post))
+        @using (Html.BeginForm("Index", "Authenticate", new { area = SimpleIdServer.IdServer.Sms.Constants.AMR, returnUrl = Model.ReturnUrl }, FormMethod.Post))
         {
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="ReturnUrl" />
@@ -77,15 +77,15 @@ else
             <div class="input-group mb-3">
                 @if (Model.IsAuthInProgress)
                 {
-                    <input asp-for="PhoneNumber" placeholder="@AuthenticateEmailResource.email" type="text" class="form-control" disabled="disabled" />
-                    <input asp-for="PhoneNumber" placeholder="@AuthenticateSmsResource.phonenumber" type="hidden" class="form-control" />
+                    <input asp-for="Login" placeholder="@AuthenticateSmsResource.phonenumber" type="text" class="form-control" disabled="disabled" />
+                    <input asp-for="Login" placeholder="@AuthenticateSmsResource.phonenumber" type="hidden" class="form-control" />
                 }
                 else
                 {
-                    <input asp-for="PhoneNumber" placeholder="@AuthenticateSmsResource.phonenumber" type="text" class="form-control" />
+                    <input asp-for="Login" placeholder="@AuthenticateSmsResource.phonenumber" type="text" class="form-control" />
                 }
             </div>
-            <input asp-for="IsPhoneNumberMissing" type="hidden" class="form-control" />
+            <input asp-for="IsLoginMissing" type="hidden" class="form-control" />
             <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
             <button type="submit" class="btn btn-primary card-link">@AuthenticateSmsResource.sendconfirmationcode</button>
         }

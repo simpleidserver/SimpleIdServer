@@ -8,15 +8,7 @@ namespace SimpleIdServer.IdServer.Webauthn.UI.ViewModels
     public class RegisterWebauthnViewModel
     {
         public string Login { get; set; }
+        public string DisplayName { get; set; }
         public string SerializedAuthenticatorAttestationRawResponse { get; set; }
-
-        public void CheckRequiredFields(ModelStateDictionary modelStateDictionary)
-        {
-            if (string.IsNullOrWhiteSpace(Login))
-                modelStateDictionary.AddModelError("missing_login", "missing_login");
-
-            if (string.IsNullOrWhiteSpace(SerializedAuthenticatorAttestationRawResponse))
-                modelStateDictionary.AddModelError("missing_attestation", "missing_attestation");
-        }
     }
 }

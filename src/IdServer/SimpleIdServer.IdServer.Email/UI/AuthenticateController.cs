@@ -1,132 +1,70 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using SimpleIdServer.IdServer.Email.UI.Services;
+using SimpleIdServer.IdServer.Api;
+using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Email.UI.ViewModels;
-using SimpleIdServer.IdServer.Exceptions;
-using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.UI.Services;
-using System.Security.Cryptography;
-using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.IdServer.Email.UI
 {
     [Area(Constants.AMR)]
-    public class AuthenticateController : BaseAuthenticateController
+    public class AuthenticateController : BaseOTPAuthenticateController<AuthenticateEmailViewModel>
     {
-        private readonly IEmailAuthService _emailAuthService;
+        private readonly IdServerEmailOptions _options;
 
         public AuthenticateController(
-            IEmailAuthService emailAuthService, 
-            IOptions<IdServerHostOptions> options, 
+            IEnumerable<IUserNotificationService> notificationServices,
+            IEnumerable<IOTPAuthenticator> otpAuthenticators,
+            IOptions<IdServerHostOptions> options,
+            IOptions<IdServerEmailOptions> emailOptions,
+            IAuthenticationSchemeProvider authenticationSchemeProvider,
             IDataProtectionProvider dataProtectionProvider, 
             IClientRepository clientRepository, 
             IAmrHelper amrHelper,
             IUserRepository userRepository, 
             IUserTransformer userTransformer, 
-            IBusControl busControl) : base(options, dataProtectionProvider, clientRepository, amrHelper, userRepository, userTransformer, busControl)
+            IBusControl busControl) : base(notificationServices, otpAuthenticators, options, authenticationSchemeProvider, dataProtectionProvider, clientRepository, amrHelper, userRepository, userTransformer, busControl)
         {
-            _emailAuthService = emailAuthService;
+            _options = emailOptions.Value;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Index([FromRoute] string prefix, string returnUrl, CancellationToken cancellationToken)
+        protected override bool IsExternalIdProvidersDisplayed => false;
+
+        protected override string Amr => Constants.AMR;
+
+        protected override string FormattedMessage => _options.HttpBody;
+
+        protected override bool TryGetLogin(User user, out string login)
         {
-            if (string.IsNullOrWhiteSpace(returnUrl)) return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
-            try
-            {
-                prefix = prefix ?? SimpleIdServer.IdServer.Constants.DefaultRealm;
-                var query = ExtractQuery(returnUrl);
-                var clientId = query.GetClientIdFromAuthorizationRequest();
-                var client = await ClientRepository.Query().Include(c => c.Realms).Include(c => c.Translations).FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == prefix), cancellationToken);
-                var amrInfo = await ResolveAmrInfo(query, prefix, client, cancellationToken);
-                var authenticatedUser = await FetchAuthenticatedUser(prefix, amrInfo, cancellationToken);
-                var loginHint = query.GetLoginHintFromAuthorizationRequest();
-                bool isEmailMissing = false;
-                if (authenticatedUser != null && string.IsNullOrWhiteSpace(authenticatedUser.Email)) isEmailMissing = true;
-                else if (authenticatedUser != null) loginHint = authenticatedUser.Email;
-                return View(new AuthenticateEmailViewModel(returnUrl,
-                    prefix,
-                    loginHint,
-                    client.ClientName,
-                    client.LogoUri,
-                    client.TosUri,
-                    client.PolicyUri,
-                    isEmailMissing,
-                    authenticatedUser != null,
-                    amrInfo));
-            }
-            catch (CryptographicException)
-            {
-                return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
-            }
+            login = null;
+            if (user == null || string.IsNullOrWhiteSpace(user.Email)) return false;
+            login = user.Email;
+            return true;
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Index([FromRoute] string prefix, AuthenticateEmailViewModel viewModel, CancellationToken token)
+        protected override void EnrichViewModel(AuthenticateEmailViewModel viewModel, User user)
         {
-            viewModel.Realm = prefix;
-            prefix = prefix ?? SimpleIdServer.IdServer.Constants.DefaultRealm;
-            if (viewModel == null)
-                return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
 
-            var amrInfo = GetAmrInfo();
-            var authenticatedUser = await FetchAuthenticatedUser(prefix, amrInfo, token);
-            viewModel.CheckRequiredFields(ModelState);
-            viewModel.CheckEmail(ModelState, authenticatedUser);
-            switch (viewModel.Action)
-            {
-                case "SENDCONFIRMATIONCODE":
-                    if (!ModelState.IsValid)
-                        return View(viewModel);
+        }
 
-                    try
-                    {
-                        await _emailAuthService.SendCode(viewModel.Email, token);
-                        SetSuccessMessage("confirmationcode_sent");
-                        return View(viewModel);
-                    }
-                    catch (BaseUIException ex)
-                    {
-                        ModelState.AddModelError(ex.Code, ex.Code);
-                        return View(viewModel);
-                    }
-                default:
-                    viewModel.CheckConfirmationCode(ModelState);
-                    if (!ModelState.IsValid)
-                        return View(viewModel);
-
-                    try
-                    {
-                        var user = await _emailAuthService.Authenticate(viewModel.Email, viewModel.OTPCode.Value, token);
-                        return await Authenticate(prefix, viewModel.ReturnUrl, Constants.AMR, user, token, viewModel.RememberLogin);
-                    }
-                    catch (CryptographicException)
-                    {
-                        ModelState.AddModelError("invalid_request", "cryptographic_error");
-                        return View(viewModel);
-                    }
-                    catch (BaseUIException ex)
-                    {
-                        ModelState.AddModelError(ex.Code, ex.Code);
-                        await Bus.Publish(new UserLoginFailureEvent
-                        {
-                            Realm = prefix,
-                            Amr = Constants.AMR,
-                            Login = viewModel.Email
-                        });
-                        return View(viewModel);
-                    }
-            }
+        protected override async Task<User> AuthenticateUser(string login, string realm, CancellationToken cancellationToken)
+        {
+            var user = await UserRepository.Query()
+                .Include(u => u.Realms)
+                .Include(u => u.Credentials)
+                .Include(u => u.OAuthUserClaims)
+                .FirstOrDefaultAsync(u => u.Realms.Any(r => r.RealmsName == realm) && u.Email == login, cancellationToken);
+            return user;
         }
     }
 }

@@ -123,6 +123,9 @@
   <data name="credential_added" xml:space="preserve">
     <value>Credential is added</value>
   </data>
+  <data name="display_name" xml:space="preserve">
+    <value>Display name</value>
+  </data>
   <data name="login" xml:space="preserve">
     <value>Login</value>
   </data>

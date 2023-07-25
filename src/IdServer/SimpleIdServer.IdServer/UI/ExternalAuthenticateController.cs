@@ -15,7 +15,6 @@ using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.Services;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -30,7 +29,6 @@ namespace SimpleIdServer.IdServer.UI
         public const string RETURN_URL_NAME = "returnUrl";
         private readonly ILogger<ExternalAuthenticateController> _logger;
         private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
-        private readonly IServiceProvider _serviceProvider;
         private readonly IUserTransformer _userTransformer;
         private readonly IAuthenticationSchemeProviderRepository _authenticationSchemeProviderRepository;
         private readonly IAuthenticationHelper _authenticationHelper;
@@ -44,16 +42,14 @@ namespace SimpleIdServer.IdServer.UI
             IUserRepository userRepository,
             ILogger<ExternalAuthenticateController> logger,
             IAuthenticationSchemeProvider authenticationSchemeProvider,
-            IServiceProvider serviceProvider,
             IUserTransformer userTransformer,
             IAuthenticationSchemeProviderRepository authenticationSchemeProviderRepository,
             IAuthenticationHelper authenticationHelper,
             IRealmRepository realmRepository,
-            IBusControl busControl) : base(options, dataProtectionProvider, clientRepository, amrHelper, userRepository, userTransformer, busControl)
+            IBusControl busControl) : base(clientRepository, userRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, options)
         {
             _logger = logger;
             _authenticationSchemeProvider = authenticationSchemeProvider;
-            _serviceProvider = serviceProvider;
             _userTransformer = userTransformer;
             _authenticationSchemeProviderRepository = authenticationSchemeProviderRepository;
             _authenticationHelper = authenticationHelper;

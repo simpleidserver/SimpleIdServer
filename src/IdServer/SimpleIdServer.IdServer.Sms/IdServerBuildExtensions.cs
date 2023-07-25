@@ -3,7 +3,6 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using SimpleIdServer.IdServer.Api;
-using SimpleIdServer.IdServer.Sms.UI.Services;
 
 namespace SimpleIdServer.IdServer.Sms
 {
@@ -19,7 +18,6 @@ namespace SimpleIdServer.IdServer.Sms
         {
             if (callback != null) idServerBuilder.Services.Configure(callback);
             else idServerBuilder.Services.Configure<IdServerSmsOptions>(o => { });
-            idServerBuilder.Services.AddTransient<ISmsAuthService, SmsAuthService>();
             idServerBuilder.Services.AddTransient<IUserNotificationService, SmsUserNotificationService>();
             idServerBuilder.Services.AddTransient<ISmsUserNotificationService, SmsUserNotificationService>();
             idServerBuilder.Services.AddTransient<IAuthenticationMethodService, SmsAuthenticationMethodService>();

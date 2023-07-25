@@ -4,7 +4,6 @@
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Email;
-using SimpleIdServer.IdServer.Email.UI.Services;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -20,7 +19,6 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             if (callback != null) idServerBuilder.Services.Configure(callback);
             else idServerBuilder.Services.Configure<IdServerEmailOptions>(o => { });
-            idServerBuilder.Services.AddTransient<IEmailAuthService, EmailAuthService>();
             idServerBuilder.Services.AddTransient<IUserNotificationService, EmailUserNotificationService>();
             idServerBuilder.Services.AddTransient<IEmailUserNotificationService, EmailUserNotificationService>();
             idServerBuilder.Services.AddTransient<IAuthenticationMethodService, EmailAuthenticationMethodService>();

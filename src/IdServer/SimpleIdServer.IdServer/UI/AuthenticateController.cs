@@ -6,133 +6,77 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using SimpleIdServer.IdServer.Exceptions;
-using SimpleIdServer.IdServer.ExternalEvents;
+using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
-using SimpleIdServer.IdServer.UI.AuthProviders;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
+using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.UI
 {
     [Area(Constants.Areas.Password)]
-    public class AuthenticateController : BaseAuthenticateController
+    public class AuthenticateController : BaseAuthenticationMethodController<AuthenticatePasswordViewModel>
     {
+        private readonly IEnumerable<IIdProviderAuthService> _authServices;
         private readonly IAuthenticationHelper _authenticationHelper;
-        private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
-        private readonly IPasswordAuthService _passwordAuthService;
 
-        public AuthenticateController(IAuthenticationHelper authenticationHelper, IAuthenticationSchemeProvider authenticationSchemeProvider, IPasswordAuthService passwordAuthService, IOptions<IdServerHostOptions> options, IDataProtectionProvider dataProtectionProvider, IClientRepository clientRepository, IAmrHelper amrHelper, IUserRepository userRepository, IUserTransformer userTransformer, IBusControl busControl) : base(options, dataProtectionProvider, clientRepository, amrHelper, userRepository, userTransformer, busControl)
+        public AuthenticateController(IEnumerable<IIdProviderAuthService> authServices, IAuthenticationHelper authenticationHelper, IAuthenticationSchemeProvider authenticationSchemeProvider, IOptions<IdServerHostOptions> options, IDataProtectionProvider dataProtectionProvider, IClientRepository clientRepository, IAmrHelper amrHelper, IUserRepository userRepository, IUserTransformer userTransformer, IBusControl busControl) : base(options, authenticationSchemeProvider, dataProtectionProvider, clientRepository, amrHelper, userRepository, userTransformer, busControl)
         {
+            _authServices = authServices;
             _authenticationHelper = authenticationHelper;
-            _authenticationSchemeProvider = authenticationSchemeProvider;
-            _passwordAuthService = passwordAuthService;
         }
 
+        protected override string Amr => Constants.Areas.Password;
 
-        [HttpGet]
-        public async Task<IActionResult> Index([FromRoute] string prefix, string returnUrl, CancellationToken cancellationToken)
+        protected override bool TryGetLogin(User user, out string login)
         {
-            if (string.IsNullOrWhiteSpace(returnUrl))
-                return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
-
-            try
-            {
-                var schemes = await _authenticationSchemeProvider.GetAllSchemesAsync();
-                var externalIdProviders = ExternalProviderHelper.GetExternalAuthenticationSchemes(schemes);
-                if (IsProtected(returnUrl))
-                {
-                    var query = ExtractQuery(returnUrl);
-                    var clientId = query.GetClientIdFromAuthorizationRequest();
-                    var str = prefix ?? Constants.DefaultRealm;
-                    var client = await ClientRepository.Query().Include(c => c.Realms).Include(c => c.Translations).FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name ==  str), cancellationToken);
-                    var loginHint = query.GetLoginHintFromAuthorizationRequest();
-                    var amrInfo = await ResolveAmrInfo(query, prefix, client, cancellationToken);
-                    var authenticatedUser = await FetchAuthenticatedUser(str, amrInfo, cancellationToken);
-                    bool isLoginMissing = false;
-                    if (authenticatedUser != null)
-                    {
-                        var login = _authenticationHelper.GetLogin(authenticatedUser);
-                        if (string.IsNullOrWhiteSpace(login)) isLoginMissing = true;
-                        else loginHint = login;
-                    }
-
-                    return View(new AuthenticatePasswordViewModel(loginHint,
-                        returnUrl,
-                        prefix,
-                        client.ClientName,
-                        client.LogoUri,
-                        client.TosUri,
-                        client.PolicyUri,
-                        externalIdProviders.Select(e => new ExternalIdProvider
-                        {
-                            AuthenticationScheme = e.Name,
-                            DisplayName = e.DisplayName
-                        }).ToList(),
-                        isLoginMissing,
-                        authenticatedUser != null,
-                        amrInfo));
-                }
-
-                return View(new AuthenticatePasswordViewModel(
-                    returnUrl,
-                    prefix,
-                    externalIdProviders.Select(e => new ExternalIdProvider
-                    {
-                        AuthenticationScheme = e.Name,
-                        DisplayName = e.DisplayName
-                    }).ToList()));
-            }
-            catch (CryptographicException)
-            {
-                return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
-            }
+            login = null;
+            if (user == null) return false;
+            var res = _authenticationHelper.GetLogin(user);
+            if(string.IsNullOrWhiteSpace(res)) return false;
+            login = res;
+            return true;
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Index([FromRoute] string prefix, AuthenticatePasswordViewModel viewModel, CancellationToken token)
+        protected override void EnrichViewModel(AuthenticatePasswordViewModel viewModel, User user)
         {
-            viewModel.Realm = prefix;
-            if (viewModel == null)
-                return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
 
-            prefix = prefix ?? Constants.DefaultRealm;
-            var amrInfo = GetAmrInfo();
-            var authenticatedUser = await FetchAuthenticatedUser(prefix, amrInfo, token);
-            viewModel.Check(ModelState, authenticatedUser == null ? null : _authenticationHelper.GetLogin(authenticatedUser));
-            if (!ModelState.IsValid)
-                return View(viewModel);
+        }
 
-            try
+        protected override bool IsExternalIdProvidersDisplayed => true;
+
+        protected override Task<ValidationStatus> ValidateCredentials(AuthenticatePasswordViewModel viewModel, User user, CancellationToken cancellationToken)
+        {
+            var authService = _authServices.SingleOrDefault(s => s.Name == user.Source);
+            if(authService != null)
             {
-                prefix = prefix ?? Constants.DefaultRealm;
-                var user = await _passwordAuthService.Authenticate(prefix, viewModel.Login, viewModel.Password, token);
-                return await Authenticate(prefix, viewModel.ReturnUrl, Constants.Areas.Password, user, token, viewModel.RememberLogin);
+                if (!authService.Authenticate(user, user.IdentityProvisioning, viewModel.Password)) return Task.FromResult(ValidationStatus.INVALIDCREDENTIALS);
             }
-            catch (CryptographicException)
+            else
             {
-                ModelState.AddModelError("invalid_request", "invalid_request");
-                return View(viewModel);
+                var credential = user.Credentials.FirstOrDefault(c => c.CredentialType == Constants.Areas.Password);
+                var hash = PasswordHelper.ComputeHash(viewModel.Password);
+                if (credential == null || credential.Value != hash && credential.IsActive)
+                    return Task.FromResult(ValidationStatus.INVALIDCREDENTIALS);
             }
-            catch (BaseUIException ex)
-            {
-                ModelState.AddModelError(ex.Code, ex.Code);
-                await Bus.Publish(new UserLoginFailureEvent
-                {
-                    Realm = prefix,
-                    Amr = Constants.Areas.Password,
-                    Login = viewModel.Login
-                });
-                return View(viewModel);
-            }
+
+            return Task.FromResult(ValidationStatus.AUTHENTICATE);
+        }
+
+        protected override async Task<User> AuthenticateUser(string login, string realm, CancellationToken cancellationToken)
+        {
+            var user = await _authenticationHelper.GetUserByLogin(UserRepository.Query()
+                .Include(u => u.Realms)
+                .Include(u => u.IdentityProvisioning).ThenInclude(i => i.Properties)
+                .Include(u => u.Groups)
+                .Include(c => c.OAuthUserClaims)
+                .Include(u => u.Credentials), login, realm, cancellationToken);
+            return user;
         }
     }
 }

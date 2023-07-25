@@ -26,7 +26,7 @@
 }
 else
 {
-    @using (Html.BeginForm("Index", "Authenticate", new { area = "pwd", returnUrl = Model.ReturnUrl }, FormMethod.Post))
+    @using (Html.BeginForm("Index", "Authenticate", new { area = SimpleIdServer.IdServer.Constants.Areas.Password, returnUrl = Model.ReturnUrl }, FormMethod.Post))
     {
         @Html.AntiForgeryToken()
         <input type="hidden" value="@Model.ReturnUrl" name="ReturnUrl" />
@@ -41,7 +41,7 @@ else
         <div class="input-group mb-3">
             @if (Model.IsAuthInProgress)
             {
-                <input asp-for="Login" placeholder="@AuthenticateEmailResource.email" type="text" class="form-control" disabled="disabled" />
+                <input asp-for="Login" placeholder="@AuthenticatePasswordResource.login" type="text" class="form-control" disabled="disabled" />
                 <input asp-for="Login" placeholder="@AuthenticatePasswordResource.login" type="hidden" class="form-control" />
             }
             else

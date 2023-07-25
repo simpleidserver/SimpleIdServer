@@ -324,7 +324,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IOTPQRCodeGenerator, OTPQRCodeGenerator>();
             services.AddTransient<ISessionManager, SessionManager>();
             // services.AddTransient<IAuthenticationSchemeProvider, DynamicAuthenticationSchemeProvider>();
-            services.AddTransient<IPasswordAuthService, PasswordAuthService>();
             services.AddTransient<IUserTransformer, UserTransformer>();
             services.AddTransient<IIdProviderAuthService, LDAPAuthenticationService>();
             services.AddTransient<IAuthenticationMethodService, PwdAuthenticationMethodService>();

@@ -24,16 +24,22 @@
     }
 </ul>
 
-@if (Model.IsFidoMissing)
+@if (Model.IsFidoCredentialsMissing)
 {
     <div class="alert alert-danger">
         @AuthenticateWebauthnResource.missing_credential
     </div>
 }
+else if (Model.IsLoginMissing)
+{    
+    <div class="alert alert-danger">
+        @AuthenticateWebauthnResource.missing_login
+    </div>
+}
 else
 {
     <!-- Login form -->
-    @using (Html.BeginForm("Index", "Authenticate", new { area = "webauthn", returnUrl = Model.ReturnUrl }, FormMethod.Post, null, new { id = "fido2Auth" }))
+    @using (Html.BeginForm("Index", "Authenticate", new { area = "webauthn" }, FormMethod.Post, null, new { id = "fido2Auth" }))
     {
         @Html.AntiForgeryToken()
         <input type="hidden" asp-for="ReturnUrl" />
@@ -52,8 +58,9 @@ else
             <input type="checkbox" asp-for="RememberLogin " />
             <label>@AuthenticateWebauthnResource.remember_login</label>
         </div>
-        <input asp-for="IsFidoMissing" type="hidden" class="form-control" />
+        <input asp-for="IsFidoCredentialsMissing" type="hidden" class="form-control" />
         <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
+        <input asp-for="SerializedAuthenticatorAssertionRawResponse" type="hidden" class="form-control" />
         <button type="submit" class="btn btn-primary card-link">@AuthenticateWebauthnResource.authenticate</button>        
     }
 }
@@ -94,28 +101,9 @@ else
                         signature: coerceToBase64Url(sig)
                     }
                 });
-                $.ajax({
-                    type: 'POST',
-                    url: authenticateUrl,
-                    beforeSend: function (xhr) {
-                        xhr.setRequestHeader("RequestVerificationToken", form["__RequestVerificationToken"]);
-                    },
-                    contentType: "application/json; charset=utf-8",
-                    data: JSON.stringify({
-                        SerializedAuthenticatorAssertionRawResponse: serializedAuthenticatorAssertionRawResponse,
-                        Login: form.Login,
-                        RememberLogin: form.RememberLogin == "true",
-                        ReturnUrl: form.ReturnUrl
-                    }),
-                    dataType: "json",
-                    success: function(e) {
-                        window.location.href = e.redirect;
-                    },
-                    error: function(e) {
-                        toggleBtn(false);
-                        displayError(e);
-                    }
-                });
+                $("#fido2Auth").unbind("submit");
+                $("#fido2Auth input[name='SerializedAuthenticatorAssertionRawResponse']").val(serializedAuthenticatorAssertionRawResponse);
+                $("#fido2Auth").trigger("submit");
             }
 
             async function makeAssertionOptions(form) {

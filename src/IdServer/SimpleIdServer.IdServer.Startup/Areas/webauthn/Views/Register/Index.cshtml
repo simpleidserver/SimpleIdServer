@@ -33,6 +33,9 @@
         <div class="input-group mb-3">
             <input asp-for="Login" placeholder="@AuthenticateWebauthnResource.login" type="text" class="form-control" />
         </div>
+        <div class="input-group mb-3">
+            <input asp-for="DisplayName" placeholder="@AuthenticateWebauthnResource.display_name" type="text" class="form-control" />
+        </div>
         <button type="submit" class="btn btn-primary card-link">@AuthenticateWebauthnResource.register</button>
     }
 </div>
@@ -95,12 +98,12 @@
                 });
             }
 
-            async function makeCredential(login, form) {
+            async function makeCredential(login, displayName, form) {
                 toggleBtn(true);
 
                 let response = await fetch(makeCredentialOptionsUrl, {
                     method: 'POST',
-                    body: JSON.stringify({ Login: login }),
+                    body: JSON.stringify({ Login: login, DisplayName: displayName }),
                     headers: {
                         "Accept": "application/json",
                         "Content-Type": "application/json"
@@ -138,7 +141,8 @@
             $("#registerWebauthn").submit(function (e) {
                 e.preventDefault();
                 var login = $("#registerWebauthn input[name='Login']").val();
-                makeCredential(login, convertFormToJSON($(e.target)));
+                var displayName = $("#registerWebauthn input[name='DisplayName']").val();
+                makeCredential(login, displayName, convertFormToJSON($(e.target)));
             });
         });
     </script>

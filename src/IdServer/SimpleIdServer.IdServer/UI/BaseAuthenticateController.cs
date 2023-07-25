@@ -2,60 +2,61 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Events;
-using SimpleIdServer.IdServer.Helpers;
-using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Store;
-using SimpleIdServer.IdServer.UI.Services;
-using SimpleIdServer.IdServer.UI.ViewModels;
-using System;
-using System.Linq;
 using System.Security.Claims;
-using System.Text.Json;
-using System.Text.Json.Nodes;
-using System.Threading;
 using System.Threading.Tasks;
+using System.Threading;
+using System;
+using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Helpers;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
+using SimpleIdServer.IdServer.UI.ViewModels;
+using Microsoft.AspNetCore.Http;
+using SimpleIdServer.IdServer.UI.Services;
+using SimpleIdServer.IdServer.Options;
+using System.Text.Json.Nodes;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Extensions.Options;
+using System.Linq;
 
 namespace SimpleIdServer.IdServer.UI
 {
     public class BaseAuthenticateController : BaseController
     {
-        private readonly IdServerHostOptions _options;
-        private readonly IDataProtector _dataProtector;
         private readonly IClientRepository _clientRepository;
-        private readonly IAmrHelper _amrHelper;
         private readonly IUserRepository _userRepository;
-        private readonly IUserTransformer _userTransformer;
+        private readonly IAmrHelper _amrHelper;
         private readonly IBusControl _busControl;
+        private readonly IUserTransformer _userTransformer;
+        private readonly IDataProtector _dataProtector;
+        private readonly IdServerHostOptions _options;
 
         public BaseAuthenticateController(
-            IOptions<IdServerHostOptions> options,
-            IDataProtectionProvider dataProtectionProvider,
             IClientRepository clientRepository,
-            IAmrHelper amrHelper,
             IUserRepository userRepository,
+            IAmrHelper amrHelper,
+            IBusControl busControl,
             IUserTransformer userTransformer,
-            IBusControl busControl)
+            IDataProtectionProvider dataProtectionProvider,
+            IOptions<IdServerHostOptions> options)
         {
-            _options = options.Value;
-            _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
             _clientRepository = clientRepository;
-            _amrHelper = amrHelper;
             _userRepository = userRepository;
-            _userTransformer = userTransformer;
+            _amrHelper = amrHelper;
             _busControl = busControl;
+            _userTransformer = userTransformer;
+            _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
+            _options = options.Value;
         }
 
-        protected IClientRepository ClientRepository => _clientRepository;
         protected IUserRepository UserRepository => _userRepository;
+        protected IClientRepository ClientRepository => _clientRepository;
         protected IdServerHostOptions Options => _options;
+        protected IAmrHelper AmrHelper => _amrHelper;
         protected IBusControl Bus => _busControl;
 
         protected JsonObject ExtractQuery(string returnUrl) => ExtractQueryFromUnprotectedUrl(Unprotect(returnUrl));
@@ -86,35 +87,6 @@ namespace SimpleIdServer.IdServer.UI
             {
                 return false;
             }
-        }
-
-        protected void SetSuccessMessage(string msg)
-        {
-            ViewBag.SuccessMessage = msg;
-        }
-
-        protected async Task<User> FetchAuthenticatedUser(string realm, AmrAuthInfo amrInfo, CancellationToken cancellationToken)
-        {
-            if (amrInfo == null || string.IsNullOrWhiteSpace(amrInfo.UserId)) return null;
-            return await _userRepository.Query().Include(u => u.Realms).Include(c => c.OAuthUserClaims).Include(u => u.Credentials).FirstOrDefaultAsync(u => u.Realms.Any(r => r.RealmsName == realm) && u.Id == amrInfo.UserId, cancellationToken);
-        }
-
-        protected async Task<AmrAuthInfo> ResolveAmrInfo(JsonObject query, string realm, Client client, CancellationToken cancellationToken)
-        {
-            var amrInfo = GetAmrInfo();
-            if (amrInfo != null) return amrInfo;
-            var acrValues = query.GetAcrValuesFromAuthorizationRequest();
-            var requestedClaims = query.GetClaimsFromAuthorizationRequest();
-            var acr = await _amrHelper.FetchDefaultAcr(realm, acrValues, requestedClaims, client, cancellationToken);
-            if (acr == null) return null;
-            return new AmrAuthInfo(null, acr.AuthenticationMethodReferences, acr.AuthenticationMethodReferences.First());
-        }
-
-        protected AmrAuthInfo GetAmrInfo()
-        {
-            if (!HttpContext.Request.Cookies.ContainsKey(Constants.DefaultCurrentAmrCookieName)) return null;
-            var amr = JsonSerializer.Deserialize<AmrAuthInfo>(HttpContext.Request.Cookies[Constants.DefaultCurrentAmrCookieName]);
-            return amr;
         }
 
         protected async Task<IActionResult> Authenticate(string realm, string returnUrl, string currentAmr, User user, CancellationToken token, bool rememberLogin = false)

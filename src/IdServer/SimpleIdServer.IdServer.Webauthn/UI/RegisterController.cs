@@ -3,18 +3,15 @@
 
 using Fido2NetLib;
 using Fido2NetLib.Objects;
-using MassTransit;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
-using SimpleIdServer.IdServer.UI;
-using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.Webauthn.UI.ViewModels;
 using System.Text;
 using System.Text.Json;
@@ -22,39 +19,33 @@ using System.Text.Json;
 namespace SimpleIdServer.IdServer.Webauthn.UI
 {
     [Area(Constants.AMR)]
-    public class RegisterController : BaseAuthenticateController
+    public class RegisterController : BaseController
     {
         private const string fidoCookieName = "fido2.attestationOptions";
         private readonly IFido2 _fido2;
         private readonly IAuthenticationHelper _authenticationHelper;
         private readonly IUserCredentialRepository _userCredentialRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IdServerHostOptions _options;
 
         public RegisterController(
             IFido2 fido2,
             IAuthenticationHelper authenticationHelper,
             IUserCredentialRepository userCredentialRepository,
             IOptions<IdServerHostOptions> options,
-            IDataProtectionProvider dataProtectionProvider,
-            IClientRepository clientRepository,
-            IAmrHelper amrHelper,
-            IUserRepository userRepository,
-            IUserTransformer userTransformer,
-            IBusControl busControl) : base(options, dataProtectionProvider, clientRepository, amrHelper, userRepository, userTransformer, busControl)
+            IUserRepository userRepository)
         {
             _fido2 = fido2;
             _authenticationHelper = authenticationHelper;
             _userCredentialRepository = userCredentialRepository;
+            _userRepository = userRepository;
+            _options = options.Value;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index([FromRoute] string prefix, CancellationToken cancellationToken)
+        public IActionResult Index([FromRoute] string prefix)
         {
-            prefix = prefix ?? IdServer.Constants.DefaultRealm;
-            var amrInfo = GetAmrInfo();
-            var authenticatedUser = await FetchAuthenticatedUser(prefix, amrInfo, cancellationToken);
-            string loginHint = null;
-            if(authenticatedUser != null) loginHint = _authenticationHelper.GetLogin(authenticatedUser);
-            return View(new RegisterWebauthnViewModel { Login = loginHint });
+            return View(new RegisterWebauthnViewModel { Login = string.Empty });
         }
 
         [HttpPost]
@@ -63,12 +54,11 @@ namespace SimpleIdServer.IdServer.Webauthn.UI
             prefix = prefix ?? IdServer.Constants.DefaultRealm;
             if (request == null) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, IdServer.ErrorMessages.INVALID_INCOMING_REQUEST);
             if (string.IsNullOrWhiteSpace(request.Login)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.MISSING_PARAMETER, nameof(RegisterWebauthnViewModel.Login)));
+            if (string.IsNullOrWhiteSpace(request.DisplayName)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.MISSING_PARAMETER, nameof(RegisterWebauthnViewModel.DisplayName)));
             var existingKeys = new List<PublicKeyCredentialDescriptor>();
-            var amrInfo = GetAmrInfo();
-            var user = await FetchAuthenticatedUser(prefix, amrInfo, cancellationToken);
+            var user = await _authenticationHelper.GetUserByLogin(_userRepository.Query().Include(u => u.Credentials), request.Login, prefix, cancellationToken);
             if (user == null)
             {
-                user = await _authenticationHelper.GetUserByLogin(UserRepository.Query().Include(u => u.Credentials), request.Login, prefix, cancellationToken);
                 if (user != null) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.USER_ALREADY_EXISTS, request.Login));
             }
 
@@ -80,7 +70,7 @@ namespace SimpleIdServer.IdServer.Webauthn.UI
             if (user != null) existingKeys = user.GetStoredFidoCredentials().Select(c => c.Descriptor).ToList();
             var fidoUser = new Fido2User
             {
-                Name = request.Login,
+                Name = request.DisplayName,
                 Id = Encoding.UTF8.GetBytes(request.Login)
             };
             var exts = new AuthenticationExtensionsClientInputs()
@@ -105,27 +95,21 @@ namespace SimpleIdServer.IdServer.Webauthn.UI
             if (string.IsNullOrWhiteSpace(viewModel.Login)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.MISSING_PARAMETER, "login"));
             if (string.IsNullOrWhiteSpace(viewModel.SerializedAuthenticatorAttestationRawResponse)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.MISSING_PARAMETER, "serializedAuthenticatorAttestationRawResponse"));
 
-            var amrInfo = GetAmrInfo();
-            var user = await FetchAuthenticatedUser(prefix, amrInfo, cancellationToken);
-            if (user == null)
+            var user = await _authenticationHelper.GetUserByLogin(_userRepository.Query().Include(u => u.Credentials), viewModel.Login, prefix, cancellationToken);
+            if (user != null) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.USER_ALREADY_EXISTS, viewModel.Login));
+            user = new Domains.User
             {
-                user = await _authenticationHelper.GetUserByLogin(UserRepository.Query().Include(u => u.Credentials), viewModel.Login, prefix, cancellationToken);
-                if (user != null) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.USER_ALREADY_EXISTS, viewModel.Login));
-
-                user = new Domains.User
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Name = viewModel.Login,
-                    UpdateDateTime = DateTime.UtcNow,
-                    CreateDateTime = DateTime.UtcNow
-                };
-                if (Options.IsEmailUsedDuringAuthentication) user.Email = viewModel.Login;
-                user.Realms.Add(new RealmUser
-                {
-                    RealmsName = prefix
-                });
-                UserRepository.Add(user);
-            }
+                Id = Guid.NewGuid().ToString(),
+                Name = viewModel.Login,
+                UpdateDateTime = DateTime.UtcNow,
+                CreateDateTime = DateTime.UtcNow
+            };
+            if (_options.IsEmailUsedDuringAuthentication) user.Email = viewModel.Login;
+            user.Realms.Add(new RealmUser
+            {
+                RealmsName = prefix
+            });
+            _userRepository.Add(user);
 
             var attestationResponse = JsonSerializer.Deserialize<AuthenticatorAttestationRawResponse>(viewModel.SerializedAuthenticatorAttestationRawResponse);
             var options = CredentialCreateOptions.FromJson(jsonOptions);
@@ -137,7 +121,7 @@ namespace SimpleIdServer.IdServer.Webauthn.UI
             }, cancellationToken: cancellationToken);
 
             user.AddFidoCredential(success.Result);
-            await UserRepository.SaveChanges(cancellationToken);
+            await _userRepository.SaveChanges(cancellationToken);
             return NoContent();
         }
     }
