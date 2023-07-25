@@ -64,9 +64,17 @@ namespace SimpleIdServer.Scim.Domains
         public decimal? ValueDecimal { get; set; }
         public string ValueBinary { get; set; }
         public string Namespace { get; set; }
+        [Newtonsoft.Json.JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
         public SCIMSchemaAttribute SchemaAttribute { get; set; }
+        [Newtonsoft.Json.JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
         public SCIMRepresentation Representation { get; set; }
+        [Newtonsoft.Json.JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
         public ICollection<SCIMRepresentationAttribute> Children { get; set; }
+        [Newtonsoft.Json.JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
         public ICollection<SCIMRepresentationAttribute> CachedChildren { get; set; }
 
         #endregion

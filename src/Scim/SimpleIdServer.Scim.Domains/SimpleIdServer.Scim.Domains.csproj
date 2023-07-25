@@ -4,4 +4,8 @@
     <Description>Contains the domain classes of SCIM2.0.</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="11.0.*" />
+		<PackageReference Include="System.Text.Json" Version="6.0.*" />
+	</ItemGroup>
 </Project>
