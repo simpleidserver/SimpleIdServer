@@ -123,6 +123,7 @@ namespace SimpleIdServer.IdServer.UI
             if (viewModel == null)
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
             var amrInfo = GetAmrInfo();
+            await UpdateViewModel(viewModel);
             var authenticatedUser = await FetchAuthenticatedUser(prefix, amrInfo, token);
             if(authenticatedUser == null)
             {
@@ -150,6 +151,24 @@ namespace SimpleIdServer.IdServer.UI
             }
 
             return await Authenticate(prefix, viewModel.ReturnUrl, Amr, authenticatedUser, token, viewModel.RememberLogin);
+        }
+
+        protected async Task UpdateViewModel(T viewModel)
+        {
+            IEnumerable<Microsoft.AspNetCore.Authentication.AuthenticationScheme> externalIdProviders = new List<Microsoft.AspNetCore.Authentication.AuthenticationScheme>();
+            if (IsExternalIdProvidersDisplayed)
+            {
+                var schemes = await _authenticationSchemeProvider.GetAllSchemesAsync();
+                externalIdProviders = ExternalProviderHelper.GetExternalAuthenticationSchemes(schemes);
+            }
+
+            var amrInfo = GetAmrInfo();
+            viewModel.AmrAuthInfo = amrInfo;
+            viewModel.ExternalIdsProviders = externalIdProviders.Select(e => new ExternalIdProvider
+            {
+                AuthenticationScheme = e.Name,
+                DisplayName = e.DisplayName
+            }).ToList();
         }
 
         protected abstract Task<User> AuthenticateUser(string login, string realm, CancellationToken cancellationToken);

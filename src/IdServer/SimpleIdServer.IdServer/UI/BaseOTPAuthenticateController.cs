@@ -40,7 +40,7 @@ namespace SimpleIdServer.IdServer.UI
                 case "SENDCONFIRMATIONCODE":
                     var notificationService = _notificationServices.First(n => n.Name == Amr);
                     var otpCode = otpAuthenticator.GenerateOtp(activeOtp);
-                    // await notificationService.Send(string.Format(FormattedMessage, otpCode), user);
+                    await notificationService.Send(string.Format(FormattedMessage, otpCode), user);
                     SetSuccessMessage("confirmationcode_sent");
                     return ValidationStatus.NOCONTENT;
                 default:
