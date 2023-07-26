@@ -514,7 +514,9 @@ namespace SimpleIdServer.Scim.Api
                 var getRepresentationResult = await _deleteRepresentationCommandHandler.Handle(new DeleteRepresentationCommand(id, _resourceType, _uriProvider.GetAbsoluteUriWithVirtualPath()));
                 if (getRepresentationResult.HasError) return this.BuildError(getRepresentationResult);
                 var representation = getRepresentationResult.Result;
-                if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationRemovedEvent(id, representation.Version, GetResourceType(_resourceType), _options.IncludeToken ? Request.GetToken() : string.Empty));
+                var location = GetLocation(representation);
+                var content = representation.ToResponse(location, false, mergeExtensionAttributes: _options.MergeExtensionAttributes);
+                if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationRemovedEvent(id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
                 return new StatusCodeResult((int)HttpStatusCode.NoContent);
             }
             catch (SCIMSchemaViolatedException ex)
