@@ -167,6 +167,9 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.MapControllerRoute("endSessionCallback",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.EndSessionCallback,
                 defaults: new { controller = "CheckSession", action = "EndSessionCallback" });
+            webApplication.MapControllerRoute("activeSession",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.ActiveSession,
+                defaults: new { controller = "CheckSession", action = "IsActive" });
 
             webApplication.MapControllerRoute("form",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Form,

@@ -150,6 +150,7 @@ namespace SimpleIdServer.IdServer
         public const string MISSING_RESPONSE_TYPE_CLAIM = "the response_type claim is missing";
         public const string MISSING_CLIENT_ID_CLAIM = "the client_id claim is missing";
         public const string MISSING_DPOP_PROOF = "the DPOP Proof is missing";
+        public const string MISSING_SESSIONID = "the session identifier is missing";
         public const string UNSUPPORTED_USERINFO_SIGNED_RESPONSE_ALG = "userinfo_signed_response_alg is not supported";
         public const string UNSUPPORTED_TOKEN_ENCRYPTED_RESPONSE_ALG = "token_encrypted_response_alg is not supported";
         public const string UNSUPPORTED_IDTOKEN_ENCRYPTED_RESPONSE_ALG = "id_token_encrypted_response_alg is not supported";
@@ -254,5 +255,6 @@ namespace SimpleIdServer.IdServer
         public const string USE_DPOP_NONCE = "Authorization Server required nonce in DPoP proof";
         public const string DPOP_JKT_MISMATCH = "there is a mismatch between the dpop_jkt and the DPoP proof";
         public const string USER_NOT_AUTHENTICATED = "you're not authenticated";
+        public const string INACTIVE_SESSION = "the session is not active";
     }
 }

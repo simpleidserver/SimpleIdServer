@@ -6,5 +6,6 @@ export const authCodeFlowConfig: AuthConfig = {
   clientId: 'protectedSpa',
   responseType: 'code',
   scope: 'openid profile',
-  showDebugInformation: true
+  showDebugInformation: true,
+  sessionChecksEnabled: true
 };

@@ -5,9 +5,12 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Middlewares;
+using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Store;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -43,6 +46,8 @@ namespace SimpleIdServer.IdServer.Auth
         private string _sessionKey;
         private Task<AuthenticateResult> _readCookieTask;
         private AuthenticationTicket _refreshTicket;
+        private readonly IUserSessionResitory _userSessionResitory;
+        private readonly IdServerHostOptions _options;
 
         /// <summary>
         /// Initializes a new instance of <see cref="CookieAuthenticationHandler"/>.
@@ -51,9 +56,12 @@ namespace SimpleIdServer.IdServer.Auth
         /// <param name="logger">The <see cref="ILoggerFactory"/>.</param>
         /// <param name="encoder">The <see cref="UrlEncoder"/>.</param>
         /// <param name="clock">The <see cref="ISystemClock"/>.</param>
-        public IdServerCookieAuthenticationHandler(IOptionsMonitor<CookieAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock)
+        public IdServerCookieAuthenticationHandler(IUserSessionResitory userSessionResitory, IOptions<IdServerHostOptions> idServerHostOptions,IOptionsMonitor<CookieAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock)
             : base(options, logger, encoder, clock)
-        { }
+        {
+            _userSessionResitory = userSessionResitory;
+            _options = idServerHostOptions.Value;
+        }
 
         /// <summary>
         /// The handler calls methods on the events which give the application control at certain points where processing is occurring.
@@ -181,6 +189,7 @@ namespace SimpleIdServer.IdServer.Auth
             var currentUtc = Clock.UtcNow;
             var expiresUtc = ticket.Properties.ExpiresUtc;
 
+
             if (expiresUtc != null && expiresUtc.Value < currentUtc)
             {
                 if (Options.SessionStore != null)
@@ -190,7 +199,17 @@ namespace SimpleIdServer.IdServer.Auth
                     // Clear out the session key if its expired, so renew doesn't try to use it
                     _sessionKey = null;
                 }
+
                 return AuthenticateResults.ExpiredTicket;
+            }
+
+            var sessionId = Options.CookieManager.GetRequestCookie(Context, _options.GetSessionCookieName());
+            if(!string.IsNullOrWhiteSpace(sessionId))
+            {
+                var realm = RealmContext.Instance().Realm;
+                realm = realm ?? Constants.DefaultRealm;
+                var userSession = await _userSessionResitory.Query().FirstOrDefaultAsync(u => u.SessionId == sessionId && u.Realm == realm);
+                if(userSession == null || !userSession.IsActive()) return AuthenticateResults.ExpiredTicket;
             }
 
             // Finally we have a valid ticket

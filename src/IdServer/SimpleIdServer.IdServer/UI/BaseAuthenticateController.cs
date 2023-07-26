@@ -2,26 +2,26 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Events;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using System.Threading;
-using System;
-using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Helpers;
-using Microsoft.EntityFrameworkCore;
-using System.Text.Json;
-using SimpleIdServer.IdServer.UI.ViewModels;
-using Microsoft.AspNetCore.Http;
-using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.Options;
-using System.Text.Json.Nodes;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.UI.Services;
+using SimpleIdServer.IdServer.UI.ViewModels;
+using System;
 using System.Linq;
+using System.Security.Claims;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.UI
 {
@@ -116,7 +116,7 @@ namespace SimpleIdServer.IdServer.UI
 
         protected async Task<IActionResult> Sign(string realm, string returnUrl, string currentAmr, User user, CancellationToken token, bool rememberLogin = false)
         {
-            await AddSession(realm, user, currentAmr, token);
+            await AddSession(realm, user, token);
             var offset = DateTimeOffset.UtcNow.AddSeconds(_options.CookieAuthExpirationTimeInSeconds);
             var claims = _userTransformer.Transform(user);
             var claimsIdentity = new ClaimsIdentity(claims, currentAmr);
@@ -146,11 +146,10 @@ namespace SimpleIdServer.IdServer.UI
             return Redirect(returnUrl);
         }
 
-        protected async Task AddSession(string realm, User user, string currentAmr, CancellationToken cancellationToken)
+        protected async Task AddSession(string realm, User user, CancellationToken cancellationToken)
         {
             var currentDateTime = DateTime.UtcNow;
             var expirationDateTime = currentDateTime.AddSeconds(_options.CookieAuthExpirationTimeInSeconds);
-            var claims = user.Claims;
             user.AddSession(realm, expirationDateTime);
             await _userRepository.SaveChanges(cancellationToken);
             Response.Cookies.Append(_options.GetSessionCookieName(), user.GetActiveSession(realm).SessionId, new CookieOptions

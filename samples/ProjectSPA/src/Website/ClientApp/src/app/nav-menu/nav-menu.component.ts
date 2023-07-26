@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { OAuthService } from 'angular-oauth2-oidc';
+import { filter } from 'rxjs';
 import { authCodeFlowConfig } from '../auth-config';
 
 @Component({
@@ -7,12 +8,13 @@ import { authCodeFlowConfig } from '../auth-config';
   templateUrl: './nav-menu.component.html',
   styleUrls: ['./nav-menu.component.css']
 })
-export class NavMenuComponent {
+export class NavMenuComponent implements OnInit {
   isExpanded = false;
   isConnected: boolean = false;
   name: string = "";
 
   constructor(private oauthService: OAuthService) {
+    this.oauthService.setupAutomaticSilentRefresh();
     this.oauthService.configure(authCodeFlowConfig);
     this.oauthService.loadDiscoveryDocumentAndTryLogin();
     var claims: any = this.oauthService.getIdentityClaims();
@@ -22,6 +24,18 @@ export class NavMenuComponent {
 
     this.isConnected = true;
     this.name = claims["sub"];
+  }
+
+  ngOnInit() {
+    this.oauthService.events.pipe(filter(e => e.type === 'token_received')).subscribe(e => {
+      var claims: any = this.oauthService.getIdentityClaims();
+      this.isConnected = true;
+      this.name = claims["sub"];
+    });
+    this.oauthService.events.pipe(filter(e => e.type === 'session_terminated')).subscribe(e => {
+      this.isConnected = false;
+      this.name = "";
+    });
   }
 
   login(evt: any) {

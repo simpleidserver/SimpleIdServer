@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -15,7 +16,6 @@ using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
-using SimpleIdServer.IdServer.Extensions;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
@@ -33,9 +33,10 @@ using System.Web;
 
 namespace SimpleIdServer.IdServer.UI
 {
-    public class CheckSessionController : Controller
+    public class CheckSessionController : BaseController
     {
         private readonly IdServerHostOptions _options;
+        private readonly IBusControl _busControl;
         private readonly IUserRepository _userRepository;
         private readonly IClientRepository _clientRepository;
         private readonly IJwtBuilder _jwtBuilder;
@@ -43,12 +44,14 @@ namespace SimpleIdServer.IdServer.UI
 
         public CheckSessionController(
             IOptions<IdServerHostOptions> options,
+            IBusControl busControl,
             IUserRepository userRepository,
             IClientRepository clientRepository,
             IJwtBuilder jwtBuilder,
             IdServer.Infrastructures.IHttpClientFactory httpClientFactory)
         {
             _options = options.Value;
+            _busControl = busControl;
             _userRepository = userRepository;
             _clientRepository = clientRepository;
             _jwtBuilder = jwtBuilder;
@@ -58,13 +61,30 @@ namespace SimpleIdServer.IdServer.UI
         [HttpGet]
         public IActionResult Index([FromRoute] string prefix)
         {
+            var issuer = Request.GetAbsoluteUriWithVirtualPath();
             var newHtml = Html.Replace("{cookieName}", _options.GetSessionCookieName());
+            newHtml = newHtml.Replace("{activeSessionUrl}", $"{issuer}/{prefix}/{Constants.EndPoints.ActiveSession}");
             return new ContentResult
             {
                 ContentType = "text/html",
                 StatusCode = (int)HttpStatusCode.OK,
                 Content = newHtml
             };
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> IsActive([FromRoute] string prefix, CancellationToken cancellationToken)
+        {
+            prefix = prefix ?? Constants.DefaultRealm;
+            if (!User.Identity.IsAuthenticated) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.ACCESS_DENIED, ErrorMessages.USER_NOT_AUTHENTICATED);
+            var kvp = Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName());
+            if (string.IsNullOrWhiteSpace(kvp.Value)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_SESSIONID);
+            var userId = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            var user = await _userRepository.Query().Include(u => u.Sessions).Include(u => u.Realms).FirstOrDefaultAsync(u => u.Name == userId && u.Realms.Any(r => r.RealmsName == prefix), cancellationToken);
+            if (user == null) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.UNKNOWN_USER, ErrorMessages.USER_NOT_AUTHENTICATED);
+            var session = user.Sessions.First(s => s.SessionId == kvp.Value);
+            if (!session.IsActive()) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INACTIVE_SESSION, ErrorMessages.INACTIVE_SESSION);
+            return NoContent();
         }
 
         [Authorize(Constants.Policies.Authenticated)]
@@ -291,6 +311,11 @@ namespace SimpleIdServer.IdServer.UI
             public Client Client { get; set; }
         }
 
+        protected class CheckSessionResult
+        {
+            public bool IsValid { get; set; }
+        }
+
         private const string Html = @"<!DOCTYPE html>
 <html>
 <head>
@@ -299,6 +324,7 @@ namespace SimpleIdServer.IdServer.UI
 </head>
 <body>
     <script id='cookie-name' type='application/json'>{cookieName}</script>
+    <script id='activesession-url' type='application/json'>{activeSessionUrl}</script>
     <script>
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /*  SHA-256 implementation in JavaScript                (c) Chris Veness 2002-2014 / MIT Licence  */
@@ -499,7 +525,8 @@ if (typeof define == 'function' && define.amd) define([], function() { return Sh
         function computeSessionStateHash(clientId, origin, sessionId, salt) {
             return hash(clientId + origin + sessionId + salt);
         }
-        function calculateSessionStateResult(origin, message) {
+
+        async function calculateSessionStateResult(origin, message) {
             try {
                 if (!origin || !message) {
                     return 'error';
@@ -522,6 +549,12 @@ if (typeof define == 'function' && define.amd) define([], function() { return Sh
                 if (!clientHash || !salt) {
                     return 'error';
                 }
+
+                var response = await fetch(activeSessionUrl);
+                if(!response.ok) {
+                    return 'changed';
+                }
+
                 var currentSessionId = getBrowserSessionId();
                 var expectedHash = computeSessionStateHash(clientId, origin, currentSessionId, salt);
                 return clientHash === expectedHash ? 'unchanged' : 'changed';
@@ -530,13 +563,16 @@ if (typeof define == 'function' && define.amd) define([], function() { return Sh
                 return 'error';
             }
         }
+
         var cookieNameElem = document.getElementById('cookie-name');
+        var activeSessionUrl = document.getElementById('activesession-url').textContent.trim();
         if (cookieNameElem) {
             var cookieName = cookieNameElem.textContent.trim();
         }
+
         if (cookieName && window.parent !== window) {
-            window.addEventListener('message', function(e) {
-                var result = calculateSessionStateResult(e.origin, e.data);
+            window.addEventListener('message', async function (e) {
+                var result = await calculateSessionStateResult(e.origin, e.data);
                 e.source.postMessage(result, e.origin);
             }, false);
         }

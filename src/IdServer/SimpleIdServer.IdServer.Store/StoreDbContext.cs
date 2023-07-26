@@ -41,6 +41,7 @@ namespace SimpleIdServer.IdServer.Store
         public DbSet<NetworkConfiguration> Networks { get; set; }
         public DbSet<DeviceAuthCode> DeviceAuthCodes { get; set; }
         public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
+        public DbSet<UserSession> UserSession { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

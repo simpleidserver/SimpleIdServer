@@ -43,6 +43,7 @@ namespace SimpleIdServer.IdServer
             public const string CheckSession = "check_session";
             public const string EndSession = "end_session";
             public const string EndSessionCallback = "end_session_callback";
+            public const string ActiveSession = "active_session";
             public const string Grants = "grants";
             public const string UMAPermissions = "perm";
             public const string UMAResources = "rreguri";

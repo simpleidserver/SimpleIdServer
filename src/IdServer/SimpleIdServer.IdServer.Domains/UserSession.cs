@@ -12,6 +12,8 @@ namespace SimpleIdServer.IdServer.Domains
         public string Realm { get; set; }
         public User User { get; set; }
 
+        public bool IsActive() => State == UserSessionStates.Active && DateTime.UtcNow <= ExpirationDateTime;
+
         public object Clone()
         {
             return new UserSession
