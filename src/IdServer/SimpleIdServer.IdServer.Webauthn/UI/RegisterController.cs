@@ -81,6 +81,7 @@ namespace SimpleIdServer.IdServer.Webauthn.UI
             };
             var options = _fido2.RequestNewCredential(fidoUser, existingKeys, authenticatorSelection, AttestationConveyancePreference.None, exts);
             HttpContext.Response.Cookies.Append(fidoCookieName, options.ToJson());
+
             return Json(options);
         }
 

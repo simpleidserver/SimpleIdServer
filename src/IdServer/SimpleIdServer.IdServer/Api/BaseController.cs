@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
@@ -48,6 +49,18 @@ namespace SimpleIdServer.IdServer.Api
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, extractionResult.Error);
             if (!extractionResult.Jwt.Claims.Any(c => c.Type == "scope" && c.Value == scope))
                 throw new OAuthException(ErrorCodes.REQUEST_DENIED, ErrorMessages.UNAUTHORIZED_ACCESS_PERMISSION_API);
+        }
+
+        protected bool TryGetIdentityToken(string realm, IJwtBuilder jwtBuilder, out JsonWebToken jsonWebToken)
+        {
+            jsonWebToken = null;
+            var bearerToken = ExtractBearerToken();
+            if (string.IsNullOrWhiteSpace(bearerToken)) return false;
+            var extractionResult = jwtBuilder.ReadSelfIssuedJsonWebToken(realm, bearerToken);
+            if (extractionResult.Error != null)
+                return false;
+            jsonWebToken = extractionResult.Jwt;
+            return true;
         }
 
         protected ContentResult BuildError(OAuthException ex) => BuildError(ex.StatusCode ?? HttpStatusCode.InternalServerError, ex.Code, ex.Message);

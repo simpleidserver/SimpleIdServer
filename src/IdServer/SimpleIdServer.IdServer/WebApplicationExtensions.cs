@@ -226,6 +226,10 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationClassReferences + "/{id}",
                 defaults: new { controller = "AuthenticationClassReferences", action = "Delete" });
 
+            webApplication.MapControllerRoute("getFidoConfiguration",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.FidoConfiguration,
+                defaults: new { controller = "FidoConfiguration", action = "Index" });
+
             webApplication.MapControllerRoute(
                 name: "defaultWithArea",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + "{area:exists}/{controller=Home}/{action=Index}/{id?}");

@@ -52,4 +52,10 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Compile Update="EnrollPage.xaml.cs">
+	    <DependentUpon>EnrollPage.xaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
 </Project>

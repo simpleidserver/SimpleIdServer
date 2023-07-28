@@ -7,8 +7,8 @@ namespace SimpleIdServer.IdServer.Webauthn.UI.ViewModels
 {
     public class RegisterWebauthnViewModel
     {
-        public string Login { get; set; }
-        public string DisplayName { get; set; }
-        public string SerializedAuthenticatorAttestationRawResponse { get; set; }
+        public string Login { get; set; } = null!;
+        public string DisplayName { get; set; } = null!;
+        public string SerializedAuthenticatorAttestationRawResponse { get; set; } = null!;
     }
 }

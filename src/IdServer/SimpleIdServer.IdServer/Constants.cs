@@ -30,6 +30,7 @@ namespace SimpleIdServer.IdServer
             public const string OAuthConfiguration = ".well-known/oauth-authorization-server";
             public const string OpenIDConfiguration = ".well-known/openid-configuration";
             public const string IdServerConfiguration = ".well-known/idserver-configuration";
+            public const string FidoConfiguration = ".well-known/fido-configuration";
             public const string UMAConfiguration = ".well-known/uma2-configuration";
             public const string Form = "form";
             public const string AuthSchemeProviders = "authschemeproviders";
@@ -53,6 +54,8 @@ namespace SimpleIdServer.IdServer
             public const string Networks = "networks";
             public const string DeviceAuthorization = "device_authorization";
             public const string AuthenticationClassReferences = "acrs";
+            public const string FIDORegistration = "fido/u2f/registration";
+            public const string FIDOAuthentication = "fido/u2f/authentication";
         }
 
         public static List<string> AllStandardNotificationModes = new List<string>
