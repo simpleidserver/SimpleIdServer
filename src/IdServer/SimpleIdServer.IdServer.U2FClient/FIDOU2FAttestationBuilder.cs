@@ -18,7 +18,7 @@ namespace SimpleIdServer.IdServer.U2FClient
         public X509BasicConstraintsExtension notCAExt = new X509BasicConstraintsExtension(false, false, 0, false);
         public string Format = "fido-u2f";
 
-        public AuthenticatorAttestationRawResponse BuildEnrollResponse(AttestationParameter parameter)
+        public EnrollResult BuildEnrollResponse(EnrollParameter parameter)
         {
             var clientDataJson = JsonSerializer.SerializeToUtf8Bytes(new
             {
@@ -29,8 +29,8 @@ namespace SimpleIdServer.IdServer.U2FClient
             var credentialId = RandomNumberGenerator.GetBytes(16);
             var attestationCertificate = BuildAttestationCertificate();
             var publicKey = GetCredentialPublicKey(attestationCertificate);
-            var signature = BuildVerificationData(parameter, publicKey, attestationCertificate, clientDataJson, credentialId);
-            var authData = GetAuthData(publicKey, parameter, credentialId);
+            var signature = BuildEnrollSignature(parameter.Rp, publicKey, attestationCertificate, clientDataJson, credentialId);
+            var authData = GetAuthData(publicKey, parameter.Rp, credentialId);
             var attestationObject = new CborMap {
                 // The attestation statement format identifier.
                 { "fmt", "fido-u2f" },
@@ -58,6 +58,38 @@ namespace SimpleIdServer.IdServer.U2FClient
                 RawId = credentialId,
                 Type = PublicKeyCredentialType.PublicKey
             };
+            return new EnrollResult(attestationCertificate, rawResponse, credentialId);
+        }
+
+        public AuthenticatorAssertionRawResponse BuildAuthResponse(AuthenticationParameter parameter)
+        {
+            var clientDataJson = JsonSerializer.SerializeToUtf8Bytes(new
+            {
+                type = "webauthn.get",
+                challenge = parameter.Challenge,
+                origin = parameter.Rp
+            });
+            var publicKey = GetCredentialPublicKey(parameter.Certificate);
+            var authData = GetAuthData(publicKey, parameter.Rp, parameter.CredentialId, parameter.Signcount);
+            var signature = BuildAuthSignature(authData, clientDataJson, parameter.Certificate);
+            var userHandle = new byte[16];
+            RandomNumberGenerator.Fill(userHandle);
+            var rawResponse = new AuthenticatorAssertionRawResponse
+            {
+                Response = new AuthenticatorAssertionRawResponse.AssertionResponse
+                {
+                    // AttestationObject = attestationObject,
+                    AuthenticatorData = authData.ToByteArray(),
+                    Signature = signature,
+                    ClientDataJson = clientDataJson,
+                    UserHandle = userHandle
+                },
+                // credential identifier on the device
+                Id = parameter.CredentialId,
+                // credential identifier on the device
+                RawId = parameter.CredentialId,
+                Type = PublicKeyCredentialType.PublicKey
+            };
             return rawResponse;
         }
 
@@ -77,9 +109,9 @@ namespace SimpleIdServer.IdServer.U2FClient
             return new AttestationCertificateResult(attestnCert, ecdsaAtt);
         }
 
-        private byte[] BuildVerificationData(AttestationParameter parameter, CredentialPublicKey credentialPublicKey, AttestationCertificateResult certificate, byte[] clientDataJson, byte[] credentialId)
+        private byte[] BuildEnrollSignature(string rp, CredentialPublicKey credentialPublicKey, AttestationCertificateResult certificate, byte[] clientDataJson, byte[] credentialId)
         {
-            var rpIdHash = SHA256.HashData(Encoding.UTF8.GetBytes(parameter.Rp));
+            var rpIdHash = SHA256.HashData(Encoding.UTF8.GetBytes(rp));
             var clientDataHash = SHA256.HashData(clientDataJson);
             var x = (byte[])credentialPublicKey.GetCborObject().GetValue((long)COSE.KeyTypeParameter.X);
             var y = (byte[])credentialPublicKey.GetCborObject().GetValue((long)COSE.KeyTypeParameter.Y);
@@ -95,41 +127,36 @@ namespace SimpleIdServer.IdServer.U2FClient
             var signature = SignData(COSE.KeyType.EC2, COSE.Algorithm.ES256, verificationData, certificate.PrivateKey, null, null);
 
             return signature;
+        }
 
-            /*
-            AuthenticatorData GetAuthData()
+        private byte[] BuildAuthSignature(AuthenticatorData authData, byte[] clientDataJson, AttestationCertificateResult certificate)
+        {
+            var authDataPayload = authData.ToByteArray();
+            var hashedClientDataJson = SHA256.HashData(clientDataJson);
+            byte[] data = new byte[authDataPayload.Length + hashedClientDataJson.Length];
+            Buffer.BlockCopy(authDataPayload, 0, data, 0, authDataPayload.Length);
+            Buffer.BlockCopy(hashedClientDataJson, 0, data, authDataPayload.Length, hashedClientDataJson.Length);
+            var signature = SignData(COSE.KeyType.EC2, COSE.Algorithm.ES256, data, certificate.PrivateKey, null, null);
+            return signature;
+        }
+
+        private AuthenticatorData GetAuthData(CredentialPublicKey credentialPublicKey, string rp, byte[] credentialId, uint? sigCount = null)
+        {
+            var rpIdHash = SHA256.HashData(Encoding.UTF8.GetBytes(rp));
+            var flags = AuthenticatorFlags.AT | AuthenticatorFlags.ED | AuthenticatorFlags.UP | AuthenticatorFlags.UV;
+            if(sigCount == null)
             {
                 byte[] signCount = RandomNumberGenerator.GetBytes(2);
-                var flags = AuthenticatorFlags.AT | AuthenticatorFlags.ED | AuthenticatorFlags.UP | AuthenticatorFlags.UV;
-                var sigCount = BitConverter.ToUInt16(signCount, 0);
-                var acd = new AttestedCredentialData(new Guid("F1D0F1D0-F1D0-F1D0-F1D0-F1D0F1D0F1D0"), credentialId, credentialPublicKey);
-                var extBytes = new CborMap { { "sid", true } }.Encode();
-                return new AuthenticatorData(rpIdHash, flags, sigCount, acd, new Fido2NetLib.Objects.Extensions(extBytes));
+                sigCount = BitConverter.ToUInt16(signCount, 0);
             }
-            */
-        }
+            else
+            {
+                sigCount++;
+            }
 
-        private AuthenticatorData GetAuthData(CredentialPublicKey credentialPublicKey, AttestationParameter parameter, byte[] credentialId)
-        {
-            var rpIdHash = SHA256.HashData(Encoding.UTF8.GetBytes(parameter.Rp));
-            byte[] signCount = RandomNumberGenerator.GetBytes(2);
-            var flags = AuthenticatorFlags.AT | AuthenticatorFlags.ED | AuthenticatorFlags.UP | AuthenticatorFlags.UV;
-            var sigCount = BitConverter.ToUInt16(signCount, 0);
             var acd = new AttestedCredentialData(Guid.Empty, credentialId, credentialPublicKey);
             var extBytes = new CborMap { { "sid", true } }.Encode();
-            return new AuthenticatorData(rpIdHash, flags, sigCount, acd, new Fido2NetLib.Objects.Extensions(extBytes));
-        }
-
-        public record AttestationCertificateResult
-        {
-            public AttestationCertificateResult(X509Certificate2 attestationCertificate, ECDsa privateKey)
-            {
-                AttestationCertificate = attestationCertificate;
-                PrivateKey = privateKey;
-            }
-
-            public X509Certificate2 AttestationCertificate { get; private set; }
-            public ECDsa PrivateKey { get; private set; }
+            return new AuthenticatorData(rpIdHash, flags, sigCount.Value, acd, new Fido2NetLib.Objects.Extensions(extBytes));
         }
     }
 }

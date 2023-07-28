@@ -3,9 +3,12 @@
 
 namespace SimpleIdServer.IdServer.U2FClient
 {
-    public class AttestationParameter
+    public class AuthenticationParameter
     {
         public string Rp { get; set; } = "https://localhost:5001";
-        public byte[] Challenge { get; set; } = null;
+        public byte[] CredentialId { get; set; } = null!;
+        public byte[] Challenge { get; set; } = null!;
+        public uint Signcount { get; set; }
+        public AttestationCertificateResult Certificate { get; set; } = null!;
     }
 }

@@ -1,25 +1,23 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-
 using Fido2NetLib;
 using Fido2NetLib.Objects;
 using NUnit.Framework;
-using SimpleIdServer.IdServer.U2FClient;
 using System.Text;
 
 namespace SimpleIdServer.IdServer.U2FClient.Tests
 {
     public class MakeCredentialsFixture
     {
-        [Test]
-        public void When_Build_EnrollResponse_ThenSignatureIsCorrect()
+        private const string RP = "https://localhost:5001";
+        private Fido2 _fido2 = new Fido2(new Fido2Configuration
         {
-            // ARRANGE
-            var fido2 = new Fido2(new Fido2Configuration
-            {
-                ServerDomain = "https://localhost:5001",
-                Origins = new HashSet<string> { "https://localhost:5001" }
-            });
+            ServerDomain = RP,
+            Origins = new HashSet<string> { RP }
+        });
+
+        private CredentialCreateOptions GetCredentialCreateOptions()
+        {
             var user = "user";
             var authenticatorSelection = new AuthenticatorSelection
             {
@@ -37,21 +35,79 @@ namespace SimpleIdServer.IdServer.U2FClient.Tests
                 UserVerificationMethod = true,
                 DevicePubKey = new AuthenticationExtensionsDevicePublicKeyInputs() { Attestation = "none" }
             };
-            var options = fido2.RequestNewCredential(fidoUser, new List<PublicKeyCredentialDescriptor>(), authenticatorSelection, AttestationConveyancePreference.None, exts);
+            return _fido2.RequestNewCredential(fidoUser, new List<PublicKeyCredentialDescriptor>(), authenticatorSelection, AttestationConveyancePreference.None, exts);
+        }
+
+        [Test]
+        public void When_Build_EnrollResponse_ThenSignatureIsCorrect()
+        {
+            // ARRANGE
+            var options = GetCredentialCreateOptions();
             var attestationBuilder = new FIDOU2FAttestationBuilder();
 
             // ACT
-            var response = attestationBuilder.BuildEnrollResponse(new AttestationParameter
+            var response = attestationBuilder.BuildEnrollResponse(new EnrollParameter
             {
                 Challenge = options.Challenge
             });
-            var success = fido2.MakeNewCredentialAsync(response, options, async (arg, c) =>
+            var success = _fido2.MakeNewCredentialAsync(response.Response, options, async (arg, c) =>
             {
                 return true;
             }).Result;
 
             // ACT
-            Assert.NotNull(response);
+            Assert.IsTrue(success.Status == "ok");
+        }
+
+        [Test]
+        public async Task When_Build_AuthenticateResponse_Then_SignatureIsCorrect()
+        {
+            // ARRANGE
+            var options = GetCredentialCreateOptions();
+            var attestationBuilder = new FIDOU2FAttestationBuilder();
+            var response = attestationBuilder.BuildEnrollResponse(new EnrollParameter
+            {
+                Challenge = options.Challenge
+            });
+            var success = _fido2.MakeNewCredentialAsync(response.Response, options, async (arg, c) =>
+            {
+                return true;
+            }).Result;
+            var result = success.Result;
+            var exts = new AuthenticationExtensionsClientInputs()
+            {
+                Extensions = true,
+                UserVerificationMethod = true,
+                DevicePubKey = new AuthenticationExtensionsDevicePublicKeyInputs()
+            };
+            var descriptor = new PublicKeyCredentialDescriptor(result.CredentialId)
+            {
+                Id = result.Id
+            };
+            var assertionOptions = _fido2.GetAssertionOptions(
+                new List<PublicKeyCredentialDescriptor> { descriptor },
+                UserVerificationRequirement.Discouraged,
+                exts
+            );
+
+            // ACT
+            var storedCounter = result.SignCount;
+            var authResponse = attestationBuilder.BuildAuthResponse(new AuthenticationParameter
+            {
+                Challenge = assertionOptions.Challenge,
+                Rp = RP,
+                Certificate = response.AttestationCertificate,
+                CredentialId = response.CredentialId,
+                Signcount = storedCounter
+            });
+            IsUserHandleOwnerOfCredentialIdAsync callback = (args, cancellationToken) =>
+            {
+                return Task.FromResult(true);
+            };
+            var res = await _fido2.MakeAssertionAsync(authResponse, assertionOptions, result.PublicKey, new List<byte[]> { result.PublicKey }, storedCounter, callback);
+
+            // ASSERT
+            Assert.IsTrue(res.Status == "ok");
         }
     }
 }
