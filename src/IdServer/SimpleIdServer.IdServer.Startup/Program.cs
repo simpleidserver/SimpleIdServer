@@ -13,10 +13,10 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.CredentialIssuer;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Fido;
 using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Startup.Configurations;
 using SimpleIdServer.IdServer.Store;
-using SimpleIdServer.IdServer.Webauthn;
 using SimpleIdServer.IdServer.WsFederation;
 using System;
 using System.Collections.Generic;
@@ -57,6 +57,7 @@ SeedData(app, builder.Configuration["SCIMBaseUrl"]);
 app.UseCors("AllowAll");
 app.UseSID()
     .UseWsFederation()
+    .UseFIDO()
     .UseCredentialIssuer();
 app.Run();
 
@@ -69,7 +70,7 @@ void ConfigureIdServer(IServiceCollection services)
         .AddBackChannelAuthentication()
         .AddEmailAuthentication()
         .AddSmsAuthentication()
-        .AddWebauthnAuthentication()
+        .AddFidoAuthentication()
         .EnableConfigurableAuthentication()
         .UseRealm()
         .AddAuthentication(callback: (a) =>

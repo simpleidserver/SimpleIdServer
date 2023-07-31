@@ -4,10 +4,10 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Webauthn.Models;
 using System.Text.Json;
 
-namespace SimpleIdServer.IdServer.Webauthn.Extensions
+namespace SimpleIdServer.IdServer.Fido.Extensions
 {
     public static class UserCredentialExtensions
     {
-        public static StoredFidoCredential GetFidoCredential(this UserCredential userCredential) => userCredential.CredentialType == Webauthn.Constants.CredentialType ? JsonSerializer.Deserialize<StoredFidoCredential>(userCredential.Value) : null;
+        public static StoredFidoCredential GetFidoCredential(this UserCredential userCredential) => userCredential.CredentialType == Fido.Constants.CredentialType ? JsonSerializer.Deserialize<StoredFidoCredential>(userCredential.Value) : null;
     }
 }

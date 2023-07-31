@@ -3,12 +3,14 @@
 using Fido2NetLib;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace SimpleIdServer.IdServer.Webauthn
+namespace SimpleIdServer.IdServer.Fido
 {
     public static class IdServerBuilderExtensions
     {
-        public static IdServerBuilder AddWebauthnAuthentication(this IdServerBuilder idServerBuilder, Action<Fido2Configuration> fidoAction = null)
+        public static IdServerBuilder AddFidoAuthentication(this IdServerBuilder idServerBuilder, Action<FidoOptions> callbackFidoOptions = null, Action<Fido2Configuration> fidoAction = null)
         {
+            if (callbackFidoOptions == null) idServerBuilder.Services.Configure<FidoOptions>((o) => { });
+            else idServerBuilder.Services.Configure(callbackFidoOptions);
             if (fidoAction == null) idServerBuilder.Services.AddFido2(o => 
             {
                 o.ServerName = "SimpleIdServer";

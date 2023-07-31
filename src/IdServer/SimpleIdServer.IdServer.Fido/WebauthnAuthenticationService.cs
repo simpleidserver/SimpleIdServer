@@ -1,10 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-namespace SimpleIdServer.IdServer.Webauthn
+
+namespace SimpleIdServer.IdServer.Fido
 {
-    public class Constants
+    public class WebauthnAuthenticationService : IAuthenticationMethodService
     {
-        public const string AMR = "webauthn";
-        public const string CredentialType = "fido";
+        public string Amr => Constants.AMR;
     }
 }

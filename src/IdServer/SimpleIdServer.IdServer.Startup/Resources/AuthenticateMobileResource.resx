@@ -126,6 +126,9 @@
   <data name="display_name" xml:space="preserve">
     <value>Display name</value>
   </data>
+  <data name="generate_qrcode" xml:space="preserve">
+    <value>Generate QR Code</value>
+  </data>
   <data name="login" xml:space="preserve">
     <value>Login</value>
   </data>
@@ -142,10 +145,13 @@
     <value>Register</value>
   </data>
   <data name="register_title" xml:space="preserve">
-    <value>Register web authentication</value>
+    <value>Register SID Mobile application</value>
   </data>
   <data name="remember_login" xml:space="preserve">
     <value>Remember my login</value>
+  </data>
+  <data name="scan_mobileapp" xml:space="preserve">
+    <value>Scan the QR code with your mobile application</value>
   </data>
   <data name="user_already_exists" xml:space="preserve">
     <value>User with same login already exists</value>

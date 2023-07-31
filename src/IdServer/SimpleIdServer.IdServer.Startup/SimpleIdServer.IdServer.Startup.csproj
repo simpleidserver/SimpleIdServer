@@ -8,10 +8,10 @@
 	  <ProjectReference Include="..\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.CredentialIssuer\SimpleIdServer.IdServer.CredentialIssuer.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Email\SimpleIdServer.IdServer.Email.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.IdServer.Fido\SimpleIdServer.IdServer.Fido.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.PostgreMigrations\SimpleIdServer.IdServer.PostgreMigrations.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Sms\SimpleIdServer.IdServer.Sms.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.SqlServerMigrations\SimpleIdServer.IdServer.SqlServerMigrations.csproj" />
-	  <ProjectReference Include="..\SimpleIdServer.IdServer.Webauthn\SimpleIdServer.IdServer.Webauthn.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.WsFederation\SimpleIdServer.IdServer.WsFederation.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
 	</ItemGroup>
@@ -34,6 +34,11 @@
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>
 	    <DependentUpon>AccountsResource.resx</DependentUpon>
+	  </Compile>
+	  <Compile Update="Resources\AuthenticateMobileResource.Designer.cs">
+	    <DependentUpon>AuthenticateMobileResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
 	  </Compile>
 	  <Compile Update="Resources\AuthenticateWebauthnResource.Designer.cs">
 	    <DependentUpon>AuthenticateWebauthnResource.resx</DependentUpon>
@@ -110,6 +115,10 @@
 	  <EmbeddedResource Update="Resources\AccountsResource.resx">
 	    <Generator>PublicResXFileCodeGenerator</Generator>
 	    <LastGenOutput>AccountsResource.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Resources\AuthenticateMobileResource.resx">
+	    <LastGenOutput>AuthenticateMobileResource.Designer.cs</LastGenOutput>
+	    <Generator>PublicResXFileCodeGenerator</Generator>
 	  </EmbeddedResource>
 	  <EmbeddedResource Update="Resources\AuthenticateWebauthnResource.resx">
 	    <LastGenOutput>AuthenticateWebauthnResource.Designer.cs</LastGenOutput>

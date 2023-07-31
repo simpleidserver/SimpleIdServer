@@ -46,7 +46,7 @@ namespace SimpleIdServer.IdServer.Api.OpenIdConfiguration
                 .Where(s => s.IsExposedInConfigurationEdp && s.Realms.Any(r => r.Name == prefix))
                 .SelectMany(s => s.ClaimMappers)
                 .ToListAsync(cancellationToken);
-
+            
             if (!string.IsNullOrWhiteSpace(prefix))
                 prefix = $"{prefix}/";
 

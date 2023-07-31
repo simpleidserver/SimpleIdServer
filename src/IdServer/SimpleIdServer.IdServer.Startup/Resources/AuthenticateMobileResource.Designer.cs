@@ -22,14 +22,14 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class AuthenticateWebauthnResource {
+    public class AuthenticateMobileResource {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal AuthenticateWebauthnResource() {
+        internal AuthenticateMobileResource() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.IdServer.Startup.Resources.AuthenticateWebauthnResource", typeof(AuthenticateWebauthnResource).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.IdServer.Startup.Resources.AuthenticateMobileResource", typeof(AuthenticateMobileResource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -84,6 +84,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static string display_name {
             get {
                 return ResourceManager.GetString("display_name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Generate QR Code.
+        /// </summary>
+        public static string generate_qrcode {
+            get {
+                return ResourceManager.GetString("generate_qrcode", resourceCulture);
             }
         }
         
@@ -133,7 +142,7 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Register web authentication.
+        ///   Recherche une chaîne localisée semblable à Register SID Mobile application.
         /// </summary>
         public static string register_title {
             get {
@@ -147,6 +156,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static string remember_login {
             get {
                 return ResourceManager.GetString("remember_login", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Scan the QR code with your mobile application.
+        /// </summary>
+        public static string scan_mobileapp {
+            get {
+                return ResourceManager.GetString("scan_mobileapp", resourceCulture);
             }
         }
         

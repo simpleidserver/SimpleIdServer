@@ -73,13 +73,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.Sql
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.DPoP", "src\IdServer\SimpleIdServer.DPoP\SimpleIdServer.DPoP.csproj", "{12D662D9-3775-4178-998D-FBB2231612B6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.Webauthn", "src\IdServer\SimpleIdServer.IdServer.Webauthn\SimpleIdServer.IdServer.Webauthn.csproj", "{38CEDEF7-0049-4FCF-9E56-BF7D4BAEF2BF}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.Mobileauth", "src\IdServer\SimpleIdServer.IdServer.Mobileauth\SimpleIdServer.IdServer.Mobileauth.csproj", "{588AF0E1-1AF5-49AC-BB13-86DF28808294}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.U2FClient", "src\IdServer\SimpleIdServer.IdServer.U2FClient\SimpleIdServer.IdServer.U2FClient.csproj", "{CA49CB9A-D5FE-47D9-8B3B-8F65607D42B2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.U2FClient.Tests", "tests\SimpleIdServer.IdServer.U2FClient.Tests\SimpleIdServer.IdServer.U2FClient.Tests.csproj", "{218C2BC4-55F0-4A94-8460-571BFF1DD65C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.Fido", "src\IdServer\SimpleIdServer.IdServer.Fido\SimpleIdServer.IdServer.Fido.csproj", "{F6B5BABF-D8F8-4406-BC23-7AEA69F10C80}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -195,10 +195,6 @@ Global
 		{12D662D9-3775-4178-998D-FBB2231612B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12D662D9-3775-4178-998D-FBB2231612B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12D662D9-3775-4178-998D-FBB2231612B6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{38CEDEF7-0049-4FCF-9E56-BF7D4BAEF2BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{38CEDEF7-0049-4FCF-9E56-BF7D4BAEF2BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{38CEDEF7-0049-4FCF-9E56-BF7D4BAEF2BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{38CEDEF7-0049-4FCF-9E56-BF7D4BAEF2BF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{588AF0E1-1AF5-49AC-BB13-86DF28808294}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{588AF0E1-1AF5-49AC-BB13-86DF28808294}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{588AF0E1-1AF5-49AC-BB13-86DF28808294}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -211,6 +207,10 @@ Global
 		{218C2BC4-55F0-4A94-8460-571BFF1DD65C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{218C2BC4-55F0-4A94-8460-571BFF1DD65C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{218C2BC4-55F0-4A94-8460-571BFF1DD65C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6B5BABF-D8F8-4406-BC23-7AEA69F10C80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6B5BABF-D8F8-4406-BC23-7AEA69F10C80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6B5BABF-D8F8-4406-BC23-7AEA69F10C80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6B5BABF-D8F8-4406-BC23-7AEA69F10C80}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -247,10 +247,10 @@ Global
 		{B188D040-77C3-4C6D-A5CE-A1D65F6935A1} = {DA65BA14-7FA4-4D99-A11D-C67F75F03771}
 		{D2236B28-D0E4-40F3-8865-95EE667FBE4F} = {DA65BA14-7FA4-4D99-A11D-C67F75F03771}
 		{12D662D9-3775-4178-998D-FBB2231612B6} = {4796A22B-91A9-42AF-87CA-F69392696B0A}
-		{38CEDEF7-0049-4FCF-9E56-BF7D4BAEF2BF} = {4796A22B-91A9-42AF-87CA-F69392696B0A}
 		{588AF0E1-1AF5-49AC-BB13-86DF28808294} = {4796A22B-91A9-42AF-87CA-F69392696B0A}
 		{CA49CB9A-D5FE-47D9-8B3B-8F65607D42B2} = {4796A22B-91A9-42AF-87CA-F69392696B0A}
 		{218C2BC4-55F0-4A94-8460-571BFF1DD65C} = {033E4EF3-2FB5-450A-9B35-616D9B0D6EAA}
+		{F6B5BABF-D8F8-4406-BC23-7AEA69F10C80} = {4796A22B-91A9-42AF-87CA-F69392696B0A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FE1E2C8-475E-4592-8609-D331B1D01730}

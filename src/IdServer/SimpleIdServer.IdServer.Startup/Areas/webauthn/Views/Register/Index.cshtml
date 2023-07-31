@@ -1,15 +1,13 @@
 ﻿@using Microsoft.Extensions.Options;
 @using SimpleIdServer.IdServer.Options;
 @using SimpleIdServer.IdServer.Startup.Resources;
-@model SimpleIdServer.IdServer.Webauthn.UI.ViewModels.RegisterWebauthnViewModel
+@model SimpleIdServer.IdServer.Fido.UI.ViewModels.RegisterWebauthnViewModel
 
 @inject IOptions<IdServerHostOptions> configuration
 
 @{
     Layout = "~/Views/Shared/_RegisterLayout.cshtml";
-    ViewBag.Title = AuthenticateSmsResource.title;
-    var makeCredentialOptionsUrl = Url.Action("MakeCredentialsOptions", "Register", new { area = "webauthn" });
-    var makeCredentialUrl = Url.Action("MakeCredential", "Register", new { area = "webauthn" });
+    ViewBag.Title = AuthenticateWebauthnResource.register_title;
 }
 
 <div id="registrationContainer">
@@ -27,9 +25,7 @@
     </ul>
 
     <!-- Registration form -->
-    @using (Html.BeginForm("Index", "Register", new { area = "webauthn" }, FormMethod.Post, null, new { id = "registerWebauthn" }))
-    {
-        @Html.AntiForgeryToken()
+    <form id="registerWebauthn">
         <div class="input-group mb-3">
             <input asp-for="Login" placeholder="@AuthenticateWebauthnResource.login" type="text" class="form-control" />
         </div>
@@ -37,7 +33,7 @@
             <input asp-for="DisplayName" placeholder="@AuthenticateWebauthnResource.display_name" type="text" class="form-control" />
         </div>
         <button type="submit" class="btn btn-primary card-link">@AuthenticateWebauthnResource.register</button>
-    }
+    </form>
 </div>
 
 <div class="alert alert-success" id="registerSuccessMessage" style="display: none;">
@@ -47,8 +43,8 @@
 @section SubScripts {
     <script type="text/javascript">
         $(document).ready(function() {
-            var makeCredentialOptionsUrl = "@makeCredentialOptionsUrl";
-            var makeCredentialUrl = "@makeCredentialUrl";
+            var beginRegisterUrl = "@Model.BeginRegisterUrl";
+            var endRegisterUrl = "@Model.EndRegisterUrl";
 
             var toggleBtn = function(isDisabled) {
                 $("#registerWebauthn button[type='submit']").attr('disabled', isDisabled);
@@ -65,7 +61,7 @@
                 $("#registrationContainer").css('display', 'none');
             }
 
-            async function registerCredential(newCredential, form) {                
+            async function registerCredential(newCredential, form, sessionId) {                
                 let attestationObject = new Uint8Array(newCredential.response.attestationObject);
                 let clientDataJSON = new Uint8Array(newCredential.response.clientDataJSON);
                 let rawId = new Uint8Array(newCredential.rawId);
@@ -79,15 +75,17 @@
                         clientDataJSON: coerceToBase64Url(clientDataJSON)
                     }
                 });
-                var login = $("#registerWebauthn input[name='Login']").val();
-                form.serializedAuthenticatorAttestationRawResponse = serializedAuthenticatorAttestationRawResponse;
-                fetch(makeCredentialUrl, {
+                form.attestation = serializedAuthenticatorAttestationRawResponse;
+                fetch(endRegisterUrl, {
                     method: 'POST',
-                    body: JSON.stringify(form),
+                    body: JSON.stringify({
+                        attestation: serializedAuthenticatorAttestationRawResponse,
+                        login: login,
+                        session_id: sessionId
+                    }),
                     headers: {
                         "Accept": "application/json",
-                        "Content-Type": "application/json",
-                        "RequestVerificationToken": form["__RequestVerificationToken"]
+                        "Content-Type": "application/json"
                     }
                 }).then(() => {
                     toggleBtn(false);
@@ -101,21 +99,23 @@
             async function makeCredential(login, displayName, form) {
                 toggleBtn(true);
 
-                let response = await fetch(makeCredentialOptionsUrl, {
+                let response = await fetch(beginRegisterUrl, {
                     method: 'POST',
-                    body: JSON.stringify({ Login: login, DisplayName: displayName }),
+                    body: JSON.stringify({ login: login, display_name: displayName }),
                     headers: {
                         "Accept": "application/json",
                         "Content-Type": "application/json"
                     }
                 });
-                let makeCredentialOptions = await response.json();
+                let responseJson = await response.json();
                 if(!response.ok) {
                     toggleBtn(false);
-                    displayError(makeCredentialOptions);
+                    displayError(responseJson);
                     return;
                 }
 
+                let makeCredentialOptions = responseJson["credential_create_options"];
+                let sessionId = responseJson["session_id"];
                 makeCredentialOptions.challenge = coerceToArrayBuffer(makeCredentialOptions.challenge);
                 makeCredentialOptions.user.id = coerceToArrayBuffer(makeCredentialOptions.user.id);
                 makeCredentialOptions.excludeCredentials = makeCredentialOptions.excludeCredentials.map((c) => {
@@ -135,7 +135,7 @@
                     return;
                 }
 
-                await registerCredential(newCredential, form);
+                await registerCredential(newCredential, form, sessionId);
             };
 
             $("#registerWebauthn").submit(function (e) {

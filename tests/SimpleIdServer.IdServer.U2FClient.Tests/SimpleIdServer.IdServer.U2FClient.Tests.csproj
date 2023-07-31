@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.IdServer.U2FClient\SimpleIdServer.IdServer.U2FClient.csproj" />
-    <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.IdServer.Webauthn\SimpleIdServer.IdServer.Webauthn.csproj" />
     <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
   </ItemGroup>
 
