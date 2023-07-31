@@ -14,7 +14,9 @@ namespace SimpleIdServer.IdServer.Webauthn.UI.ViewModels
         }
 
         public bool IsFidoCredentialsMissing { get; set; } = false;
-        public string SerializedAuthenticatorAssertionRawResponse { get; set; }
+        public string SessionId { get; set; }
+        public string BeginLoginUrl { get; set; } = null!;
+        public string EndLoginUrl { get; set; } = null!;
 
         public override void CheckRequiredFields(User user, ModelStateDictionary modelStateDictionary)
         {
@@ -24,8 +26,8 @@ namespace SimpleIdServer.IdServer.Webauthn.UI.ViewModels
             if (string.IsNullOrWhiteSpace(Login))
                 modelStateDictionary.AddModelError("missing_login", "missing_login");
 
-            if (string.IsNullOrWhiteSpace(SerializedAuthenticatorAssertionRawResponse))
-                modelStateDictionary.AddModelError("missing_assertion", "missing_assertion");
+            if (string.IsNullOrWhiteSpace(SessionId))
+                modelStateDictionary.AddModelError("missing_session_id", "missing_session_id");
         }
     }
 }

@@ -54,7 +54,8 @@ namespace SimpleIdServer.IdServer.Api
         protected bool TryGetIdentityToken(string realm, IJwtBuilder jwtBuilder, out JsonWebToken jsonWebToken)
         {
             jsonWebToken = null;
-            var bearerToken = ExtractBearerToken();
+            string bearerToken;
+            if (TryExtractBearerToken(out bearerToken)) return false;
             if (string.IsNullOrWhiteSpace(bearerToken)) return false;
             var extractionResult = jwtBuilder.ReadSelfIssuedJsonWebToken(realm, bearerToken);
             if (extractionResult.Error != null)

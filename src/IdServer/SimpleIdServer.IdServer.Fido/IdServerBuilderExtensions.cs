@@ -13,7 +13,6 @@ namespace SimpleIdServer.IdServer.Fido
             else idServerBuilder.Services.Configure(callbackFidoOptions);
             if (fidoAction == null) idServerBuilder.Services.AddFido2(o => 
             {
-                o.ServerName = "SimpleIdServer";
                 o.ServerDomain = "localhost";
                 o.Origins = new HashSet<string> { "https://localhost:5001" };
             });

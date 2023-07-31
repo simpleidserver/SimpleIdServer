@@ -61,11 +61,11 @@
                 $("#registrationContainer").css('display', 'none');
             }
 
-            async function registerCredential(newCredential, form, sessionId) {                
+            async function registerCredential(newCredential, sessionId, login) {                
                 let attestationObject = new Uint8Array(newCredential.response.attestationObject);
                 let clientDataJSON = new Uint8Array(newCredential.response.clientDataJSON);
                 let rawId = new Uint8Array(newCredential.rawId);
-                const serializedAuthenticatorAttestationRawResponse = JSON.stringify({                    
+                const serializedAuthenticatorAttestationRawResponse = {                    
                     id: newCredential.id,
                     rawId: coerceToBase64Url(rawId),
                     type: newCredential.type,
@@ -74,9 +74,9 @@
                         attestationObject: coerceToBase64Url(attestationObject),
                         clientDataJSON: coerceToBase64Url(clientDataJSON)
                     }
-                });
-                form.attestation = serializedAuthenticatorAttestationRawResponse;
-                fetch(endRegisterUrl, {
+                };
+
+                let response = await fetch(endRegisterUrl, {
                     method: 'POST',
                     body: JSON.stringify({
                         attestation: serializedAuthenticatorAttestationRawResponse,
@@ -87,16 +87,19 @@
                         "Accept": "application/json",
                         "Content-Type": "application/json"
                     }
-                }).then(() => {
-                    toggleBtn(false);
-                    displaySuccessMessage();
-                }).catch((e) => {        
-                    toggleBtn(false);            
-                    displayError(e);
                 });
+                if (!response.ok) {
+                    let responseJson = await response.json();
+                    toggleBtn(false);
+                    displayError(responseJson);
+                    return;
+                }
+
+                toggleBtn(false);
+                displaySuccessMessage();
             }
 
-            async function makeCredential(login, displayName, form) {
+            async function makeCredential(login, displayName) {
                 toggleBtn(true);
 
                 let response = await fetch(beginRegisterUrl, {
@@ -135,14 +138,14 @@
                     return;
                 }
 
-                await registerCredential(newCredential, form, sessionId);
+                await registerCredential(newCredential, sessionId, login);
             };
 
             $("#registerWebauthn").submit(function (e) {
                 e.preventDefault();
                 var login = $("#registerWebauthn input[name='Login']").val();
                 var displayName = $("#registerWebauthn input[name='DisplayName']").val();
-                makeCredential(login, displayName, convertFormToJSON($(e.target)));
+                makeCredential(login, displayName);
             });
         });
     </script>

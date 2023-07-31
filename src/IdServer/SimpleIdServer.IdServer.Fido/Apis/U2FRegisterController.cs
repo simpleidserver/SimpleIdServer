@@ -12,7 +12,6 @@ using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Fido.DTOs;
 using SimpleIdServer.IdServer.Helpers;
-using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using System.Text;
@@ -24,18 +23,16 @@ namespace SimpleIdServer.IdServer.Fido.Apis
     {
         private readonly IAuthenticationHelper _authenticationHelper;
         private readonly IUserRepository _userRepository;
-        private readonly IJwtBuilder _jwtBuilder;
         private readonly IFido2 _fido2;
         private readonly IDistributedCache _distributedCache;
         private readonly IUserCredentialRepository _userCredentialRepository;
         private readonly FidoOptions _options;
         private readonly IdServerHostOptions _idServerHostOptions;
 
-        public U2FRegisterController(IAuthenticationHelper authenticationHelper, IUserRepository userRepository, IJwtBuilder jwtBuilder, IFido2 fido2, IDistributedCache distributedCache, IUserCredentialRepository userCredentialRepository, IOptions<FidoOptions> options, IOptions<IdServerHostOptions> idServerHostOptions)
+        public U2FRegisterController(IAuthenticationHelper authenticationHelper, IUserRepository userRepository, IFido2 fido2, IDistributedCache distributedCache, IUserCredentialRepository userCredentialRepository, IOptions<FidoOptions> options, IOptions<IdServerHostOptions> idServerHostOptions)
         {
             _authenticationHelper = authenticationHelper;
             _userRepository = userRepository;
-            _jwtBuilder = jwtBuilder;
             _fido2 = fido2;
             _distributedCache = distributedCache;
             _userCredentialRepository=  userCredentialRepository;

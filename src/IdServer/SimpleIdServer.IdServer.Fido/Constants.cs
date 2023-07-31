@@ -16,6 +16,8 @@ namespace SimpleIdServer.IdServer.Fido
             public const string EndRegister = "u2f/end-register";
             public const string BeginLogin = "u2f/begin-login";
             public const string EndLogin = "u2f/end-login";
+            public const string LoginStatus = "u2f/login-register";
+            public const string BeginQRCodeLogin = "u2f/begin-qr-login";
         }
     }
 }

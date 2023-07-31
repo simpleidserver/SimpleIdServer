@@ -15,10 +15,10 @@ namespace Microsoft.AspNetCore.Builder
             var opts = webApplication.Services.GetRequiredService<IOptions<IdServerHostOptions>>().Value;
             var usePrefix = opts.UseRealm;
 
-            webApplication.MapControllerRoute("U2FStatusRegistration",
+            webApplication.MapControllerRoute("beginQRRegister",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.BeginQRCodeRegister,
                 defaults: new { controller = "U2FRegister", action = "BeginQRCode" });
-            webApplication.MapControllerRoute("beginQRRegister",
+            webApplication.MapControllerRoute("U2FStatusRegistration",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RegisterStatus + "/{sessionId}",
                 defaults: new { controller = "U2FRegister", action = "GetStatus" });
             webApplication.MapControllerRoute("beginRegister",
@@ -28,6 +28,12 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.EndRegister,
                 defaults: new { controller = "U2FRegister", action = "End" });
 
+            webApplication.MapControllerRoute("beginQRLogin",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.BeginQRCodeLogin,
+                defaults: new { controller = "U2FLogin", action = "BeginQRCode" });
+            webApplication.MapControllerRoute("U2FStatusLogin",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.LoginStatus + "/{sessionId}",
+                defaults: new { controller = "U2FLogin", action = "GetStatus" });
             webApplication.MapControllerRoute("beginLogin",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.BeginLogin,
                 defaults: new { controller = "U2FLogin", action = "Begin" });

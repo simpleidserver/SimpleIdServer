@@ -60,7 +60,9 @@ else
         </div>
         <input asp-for="IsFidoCredentialsMissing" type="hidden" class="form-control" />
         <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
-        <input asp-for="SerializedAuthenticatorAssertionRawResponse" type="hidden" class="form-control" />
+        <input asp-for="BeginLoginUrl" type="hidden" class="form-control" />
+        <input asp-for="EndLoginUrl" type="hidden" class="form-control" />
+        <input asp-for="SessionId" type="hidden" class="form-control" />
         <button type="submit" class="btn btn-primary card-link">@AuthenticateWebauthnResource.authenticate</button>        
     }
 }
@@ -72,6 +74,8 @@ else
                 $(this).val($(this).is(':checked'));
             });
             
+            var beginLoginUrl = "@Model.BeginLoginUrl";
+            var endLoginUrl = "@Model.EndLoginUrl";
             var makeAssertionsUrl = "@makeAssertionsOptionsUrl";
             var authenticateUrl = "@authenticateUrl";
 
@@ -85,12 +89,12 @@ else
                 $("#errors").append("<li  class='list-group-item list-group-item-danger'>" + errorJson["error_description"] + "</li>");
             }
 
-            async function makeAssertion(credential, form) {
+            async function makeAssertion(credential, form, sessionId) {
                 let authData = new Uint8Array(credential.response.authenticatorData);
                 let clientDataJSON = new Uint8Array(credential.response.clientDataJSON);
                 let rawId = new Uint8Array(credential.rawId);
                 let sig = new Uint8Array(credential.response.signature);
-                const serializedAuthenticatorAssertionRawResponse = JSON.stringify({
+                const assertion = {
                     id: credential.id,
                     rawId: coerceToBase64Url(rawId),
                     type: credential.type,
@@ -100,15 +104,32 @@ else
                         clientDataJSON: coerceToBase64Url(clientDataJSON),
                         signature: coerceToBase64Url(sig)
                     }
+                };
+                let response = await fetch(endLoginUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({ login: form.Login, session_id: sessionId, assertion: assertion }),
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    }
                 });
+
+                if (!response.ok) {
+                    const json = await response.json();
+                    toggleBtn(false);
+                    displayError(json);
+                    return;
+                }
+                
+
                 $("#fido2Auth").unbind("submit");
-                $("#fido2Auth input[name='SerializedAuthenticatorAssertionRawResponse']").val(serializedAuthenticatorAssertionRawResponse);
+                $("#fido2Auth input[name='SessionId']").val(sessionId);
                 $("#fido2Auth").trigger("submit");
             }
 
             async function makeAssertionOptions(form) {
                 toggleBtn(true);
-                let response = await fetch(makeAssertionsUrl, {
+                let response = await fetch(beginLoginUrl, {
                     method: 'POST',
                     body: JSON.stringify({ login : form.Login }),
                     headers: {
@@ -116,13 +137,15 @@ else
                         "Content-Type": "application/json"
                     }
                 });
-                const makeAssertionOptions = await response.json();
+                const json = await response.json();
                 if (!response.ok) {
                     toggleBtn(false);
-                    displayError(makeAssertionOptions);
+                    displayError(json);
                     return;
                 }
 
+                const makeAssertionOptions = json["assertion"];
+                const sessionId = json["session_id"];
                 const challenge = makeAssertionOptions.challenge.replace(/-/g, "+").replace(/_/g, "/");
                 makeAssertionOptions.challenge = Uint8Array.from(atob(challenge), c => c.charCodeAt(0));
                 makeAssertionOptions.allowCredentials.forEach(function (listItem) {
@@ -138,7 +161,7 @@ else
                     return;
                 }
 
-                await makeAssertion(credential, form);
+                await makeAssertion(credential, form, sessionId);
             }
 
             $("#fido2Auth").submit(function(e) {

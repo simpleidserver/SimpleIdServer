@@ -124,6 +124,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The session_id is missing.
+        /// </summary>
+        public static string missing_session_id {
+            get {
+                return ResourceManager.GetString("missing_session_id", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Register.
         /// </summary>
         public static string register {
@@ -147,6 +156,24 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static string remember_login {
             get {
                 return ResourceManager.GetString("remember_login", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The session must be validate.
+        /// </summary>
+        public static string session_not_validated {
+            get {
+                return ResourceManager.GetString("session_not_validated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Either the session is expired or doesn&apos;t exist.
+        /// </summary>
+        public static string unknown_session {
+            get {
+                return ResourceManager.GetString("unknown_session", resourceCulture);
             }
         }
         
