@@ -6,5 +6,7 @@ namespace SimpleIdServer.IdServer.Fido.DTOs
     {
         public const string SessionId = "session_id";
         public const string CredentialCreateOptions = "credential_create_options";
+        public const string EndRegisterUrl = "end_register_url";
+        public const string Login = "login";
     }
 }

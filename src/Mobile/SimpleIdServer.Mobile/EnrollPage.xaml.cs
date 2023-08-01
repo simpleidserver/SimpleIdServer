@@ -1,18 +1,19 @@
 ﻿namespace SimpleIdServer.Mobile;
+using SimpleIdServer.Mobile.Stores;
 
 public partial class EnrollPage : ContentPage
 {
-	public EnrollPage()
+	private readonly ICertificateStore _certificateStore;
+
+    public EnrollPage(ICertificateStore certificateStore)
 	{
 		InitializeComponent();
+		_certificateStore = certificateStore;
 	}
 
-	private void OnEnrollClicked(object sender, EventArgs e)
+	private async void OnEnrollClicked(object sender, EventArgs e)
 	{
-        // ENROLL : https://developer.tru.id/docs/authenticator/integration
-        // TEST WITH TRU.ID
-
-        // Scan the QR Code
+		await Shell.Current.GoToAsync("scanqrcode");
+		// await Navigation.PushModalAsync(new QRCodeScannerPage(_certificateStore));
     }
 }
-

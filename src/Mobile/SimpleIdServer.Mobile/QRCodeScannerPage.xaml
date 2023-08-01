@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:DataType="local:QRCodeScannerViewModel"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:local="clr-namespace:SimpleIdServer.Mobile.ViewModels"
+             xmlns:converters="clr-namespace:SimpleIdServer.Mobile.Converters"
+             xmlns:common="clr-namespace:SimpleIdServer.Mobile.Common"
+             xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.MAUI.Controls"
+             x:Class="SimpleIdServer.Mobile.QRCodeScannerPage"
+             Title="Scan QR Code">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:BarcodeDetectionEventArgsConverter x:Key="barcodeDetectionEventArgsConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <Grid>
+        <common:Loader IsVisible="{Binding Path=IsLoading}" ZIndex="2" />
+        <Grid Margin="20" ZIndex="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="10" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+            <zxing:CameraBarcodeReaderView x:Name="cameraBarCodeReader" Grid.Row="0">
+                <zxing:CameraBarcodeReaderView.Behaviors>
+                    <toolkit:EventToCommandBehavior EventName="BarcodesDetected" Command="{Binding ScanQRCodeCommand}" EventArgsConverter="{StaticResource barcodeDetectionEventArgsConverter}" />
+                </zxing:CameraBarcodeReaderView.Behaviors>
+            </zxing:CameraBarcodeReaderView>
+            <Button Text="Close" Command="{Binding CloseCommand}" Grid.Row="2" />
+        </Grid>
+    </Grid>
+</ContentPage>

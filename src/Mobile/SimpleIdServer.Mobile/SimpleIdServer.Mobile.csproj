@@ -50,12 +50,34 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
+		<PackageReference Include="ZXing.Net.Maui.Comet" Version="0.3.0-preview.1" />
+		<PackageReference Include="ZXing.Net.Maui.Controls" Version="0.3.0-preview.1" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="5.2.*" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\..\IdServer\SimpleIdServer.IdServer.U2FClient\SimpleIdServer.IdServer.U2FClient.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Common\Loader.xaml.cs">
+	    <DependentUpon>Loader.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="QRCodeScannerPage.xaml.cs">
+	    <DependentUpon>QRCodeScannerPage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="EnrollPage.xaml.cs">
 	    <DependentUpon>EnrollPage.xaml</DependentUpon>
 	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiXaml Update="Common\Loader.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="QRCodeScannerPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	</ItemGroup>
 
 </Project>

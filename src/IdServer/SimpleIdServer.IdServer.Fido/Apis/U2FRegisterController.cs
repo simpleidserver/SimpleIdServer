@@ -3,6 +3,7 @@
 
 using Fido2NetLib;
 using Fido2NetLib.Objects;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
@@ -47,7 +48,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             var session = await _distributedCache.GetStringAsync(sessionId, cancellationToken);
             if (string.IsNullOrWhiteSpace(session)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.SESSION_CANNOT_BE_EXTRACTED);
             var sessionRecord = JsonSerializer.Deserialize<SessionRecord>(session);
-            if (sessionRecord.IsValidated) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.REGISTRATION_NOT_CONFIRMED);
+            if (!sessionRecord.IsValidated) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.REGISTRATION_NOT_CONFIRMED);
             return NoContent();
         }
 
@@ -60,6 +61,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             var qrCodeData = qrGenerator.CreateQrCode(JsonSerializer.Serialize(kvp.Item1), QRCodeGenerator.ECCLevel.Q);
             var qrCode = new PngByteQRCode(qrCodeData);
             var payload = qrCode.GetGraphic(20);
+            Response.Headers.Add("SessionId", kvp.Item1.SessionId);
             return File(payload, "image/png");
         }
 
@@ -123,6 +125,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
 
         protected async Task<(BeginU2FRegisterResult, ContentResult)> CommonBegin(string prefix, BeginU2FRegisterRequest request, CancellationToken cancellationToken)
         {
+            var issuer = Request.GetAbsoluteUriWithVirtualPath();
             prefix = prefix ?? IdServer.Constants.DefaultRealm;
             if (request == null) return (null, BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, IdServer.ErrorMessages.INVALID_INCOMING_REQUEST));
             if (string.IsNullOrWhiteSpace(request.Login)) return (null, BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.MISSING_PARAMETER, BeginU2FRegisterRequestNames.Login)));
@@ -160,7 +163,9 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             return (new BeginU2FRegisterResult
             {
                 CredentialCreateOptions = options,
-                SessionId = sessionId
+                SessionId = sessionId,
+                EndRegisterUrl = $"{issuer}/{prefix}/{Constants.EndPoints.EndRegister}",
+                Login = request.Login
             }, null);
         }
 

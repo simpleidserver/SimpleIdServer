@@ -11,7 +11,6 @@ Console.WriteLine("Enter the display name");
 var displayName = Console.ReadLine();
 
 var rp = "https://localhost:5001";
-var baseHost = "localhost";
 var beginRegisterResult = await BeginRegister();
 var attestationBuilder = new FIDOU2FAttestationBuilder();
 var response = attestationBuilder.BuildEnrollResponse(new EnrollParameter
@@ -36,7 +35,7 @@ async Task<BeginU2FRegisterResult> BeginRegister()
         var requestMessage = new HttpRequestMessage
         {
             Method = HttpMethod.Post,
-            RequestUri = new Uri($"{baseHost}/master/u2f/begin-register"),
+            RequestUri = new Uri($"{rp}/master/u2f/begin-register"),
             Content = new StringContent(jObj.ToJsonString(), Encoding.UTF8, "application/json")
         };
         var httpResponse = await httpClient.SendAsync(requestMessage);
@@ -58,7 +57,7 @@ async Task EndRegister(EnrollResult enroll, string sessionId, string login)
         var requestMessage = new HttpRequestMessage
         {
             Method = HttpMethod.Post,
-            RequestUri = new Uri($"{baseHost}/master/u2f/end-register"),
+            RequestUri = new Uri($"{rp}/master/u2f/end-register"),
             Content = new StringContent(JsonSerializer.Serialize(dic), Encoding.UTF8, "application/json")
         };
         var httpResponse = await httpClient.SendAsync(requestMessage);

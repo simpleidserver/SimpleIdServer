@@ -11,5 +11,9 @@ namespace SimpleIdServer.IdServer.Fido.DTOs
         public string SessionId { get; set; } = null!;
         [JsonPropertyName(BeginU2FRegisterResultNames.CredentialCreateOptions)]
         public CredentialCreateOptions CredentialCreateOptions { get; set; } = null!;
+        [JsonPropertyName(BeginU2FRegisterResultNames.EndRegisterUrl)]
+        public string EndRegisterUrl { get; set; } = null!;
+        [JsonPropertyName(BeginU2FRegisterResultNames.Login)]
+        public string Login { get; set; } = null!;
     }
 }

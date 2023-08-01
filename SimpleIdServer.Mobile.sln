@@ -5,6 +5,8 @@ VisualStudioVersion = 17.4.33122.133
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Mobile", "src\Mobile\SimpleIdServer.Mobile\SimpleIdServer.Mobile.csproj", "{DAA5D83F-0A10-4532-BFAD-AC321D9E9D07}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.U2FClient", "src\IdServer\SimpleIdServer.IdServer.U2FClient\SimpleIdServer.IdServer.U2FClient.csproj", "{E82B46A3-287A-4E03-81E4-AF3EE9CB1600}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,6 +19,10 @@ Global
 		{DAA5D83F-0A10-4532-BFAD-AC321D9E9D07}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DAA5D83F-0A10-4532-BFAD-AC321D9E9D07}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DAA5D83F-0A10-4532-BFAD-AC321D9E9D07}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{E82B46A3-287A-4E03-81E4-AF3EE9CB1600}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E82B46A3-287A-4E03-81E4-AF3EE9CB1600}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E82B46A3-287A-4E03-81E4-AF3EE9CB1600}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E82B46A3-287A-4E03-81E4-AF3EE9CB1600}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -74,16 +74,17 @@
             }
 
             async function checkStatus(sessionId) {
-                var interval = setInterval(async function(){
+                setTimeout(async function(){
                     let response = await fetch(registerStatusUrl + "/" + sessionId, {
                         method: 'GET'
                     });
                     if (!response.ok) {
                         let responseJson = await response.json();
                         displayError(responseJson);
+                        await checkStatus(sessionId);
+                        return;
                     }
 
-                    clearInterval();
                     displaySuccessMessage();
                 }, 1000);
             }
@@ -107,10 +108,12 @@
                     return;
                 }
                 
+                const sessionId = response.headers.get('SessionId');
                 const blob = await response.blob();
                 const img = URL.createObjectURL(blob);
 
                 displayQRCode(img);
+                await checkStatus(sessionId);
             };
 
             $("#registerMobile").submit(function (e) {
