@@ -1,6 +1,4 @@
-﻿using SimpleIdServer.Mobile.Services;
-using SimpleIdServer.Mobile.Stores;
-using SimpleIdServer.Mobile.ViewModels;
+﻿using SimpleIdServer.Mobile.ViewModels;
 
 namespace SimpleIdServer.Mobile;
 

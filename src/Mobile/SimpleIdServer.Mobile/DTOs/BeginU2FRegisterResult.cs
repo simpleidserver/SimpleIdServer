@@ -1,7 +1,7 @@
 ﻿using Fido2NetLib;
 using System.Text.Json.Serialization;
 
-namespace SimpleIdServer.Mobile.Models;
+namespace SimpleIdServer.Mobile.DTOs;
 
 public class BeginU2FRegisterResult
 {

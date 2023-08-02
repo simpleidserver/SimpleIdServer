@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
+using Plugin.Firebase.CloudMessaging;
 using SimpleIdServer.Mobile.Services;
-using SimpleIdServer.Mobile.Stores;
 using SimpleIdServer.Mobile.ViewModels;
 using ZXing.Net.Maui.Controls;
 
@@ -16,16 +16,21 @@ public static class MauiProgram
 			.UseMauiApp<App>()
             .UseBarcodeReader()
             .UseMauiCommunityToolkit()
+			.RegisterFirebaseServices()
             .ConfigureFonts(fonts =>
 			{
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
 			});
-		builder.Services.AddTransient<ICertificateStore, CertificateStore>();
 		builder.Services.AddTransient<IPromptService, PromptService>();
 		builder.Services.AddTransient<EnrollPage>();
 		builder.Services.AddTransient<QRCodeScannerPage>();
 		builder.Services.AddTransient<QRCodeScannerViewModel>();
+        builder.Services.Configure<MobileOptions>(o =>
+		{
+			o.PushType = "firebase";
+			o.IsDev = true;
+        });
 #if DEBUG
         builder.Logging.AddDebug();
 #endif

@@ -2040,15 +2040,32 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("text");
 
-                    b.Property<string>("SerializedOptions")
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DeviceType")
                         .HasColumnType("text");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
+                    b.Property<string>("Manufacturer")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Model")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PushToken")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PushType")
                         .HasColumnType("text");
 
                     b.Property<string>("UserId")
                         .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Version")
                         .HasColumnType("text");
 
                     b.HasKey("Id");

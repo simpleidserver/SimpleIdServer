@@ -1,7 +1,9 @@
-﻿using SimpleIdServer.IdServer.U2FClient;
+﻿using Microsoft.Extensions.Options;
+using Plugin.Firebase.CloudMessaging;
+using SimpleIdServer.IdServer.U2FClient;
+using SimpleIdServer.Mobile.DTOs;
 using SimpleIdServer.Mobile.Models;
 using SimpleIdServer.Mobile.Services;
-using SimpleIdServer.Mobile.Stores;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -15,13 +17,13 @@ namespace SimpleIdServer.Mobile.ViewModels
     {
         private bool _isNotScanned = true;
         private bool _isLoading = false;
-        private readonly ICertificateStore _certificateStore;
         private readonly IPromptService _promptService;
+        private readonly MobileOptions _options;
 
-        public QRCodeScannerViewModel(ICertificateStore certificateStore, IPromptService promptService)
+        public QRCodeScannerViewModel(IPromptService promptService, IOptions<MobileOptions> options)
         {
-            _certificateStore = certificateStore;
             _promptService = promptService;
+            _options = options.Value;
             ScanQRCodeCommand = new Command<BarcodeDetectionEventArgs>(async (c) =>
             {
                 await ScanQRCode(c);
@@ -70,6 +72,7 @@ namespace SimpleIdServer.Mobile.ViewModels
             IsLoading = true;
             try
             {
+                var fcmToken = await CrossFirebaseCloudMessaging.Current.GetTokenAsync();
                 var firstResult = e.Results.First();
                 var value = firstResult.Value;
                 if (string.IsNullOrWhiteSpace(value)) return;
@@ -83,17 +86,29 @@ namespace SimpleIdServer.Mobile.ViewModels
                     Rp = beginResult.CredentialCreateOptions.Rp.Id
                 });
                 var handler = new HttpClientHandler();
-                handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) =>
+                if(_options.IgnoreHttps) handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) =>
                 {
                     return true;
                 };
                 using (var httpClient = new HttpClient(handler))
                 {
+                    var deviceInfo = DeviceInfo.Current;
+                    var deviceData = new Dictionary<string, string>
+                    {
+                        { "device_type", Enum.GetName(typeof(DevicePlatform), deviceInfo.Platform) },
+                        { "model", deviceInfo.Model },
+                        { "manufacturer", deviceInfo.Manufacturer },
+                        { "name", deviceInfo.Name },
+                        { "version", deviceInfo.VersionString },
+                        { "push_token", fcmToken },
+                        { "push_type", _options.PushType }
+                    };
                     var dic = new Dictionary<string, object>
                     {
                         { "login", beginResult.Login },
                         { "session_id", beginResult.SessionId },
-                        { "attestation", enrollResponse.Response }
+                        { "attestation", enrollResponse.Response },
+                        { "device_data", deviceData }
                     };
                     var requestMessage = new HttpRequestMessage
                     {
@@ -104,7 +119,9 @@ namespace SimpleIdServer.Mobile.ViewModels
                     var httpResponse = await httpClient.SendAsync(requestMessage);
                     httpResponse.EnsureSuccessStatusCode();
                 }
-                await _certificateStore.Add(enrollResponse.CredentialId, new CertificateRecord(enrollResponse.AttestationCertificate.AttestationCertificate, enrollResponse.AttestationCertificate.PrivateKey));
+
+                var credentialRecord = new CredentialRecord(enrollResponse.CredentialId, enrollResponse.AttestationCertificate.AttestationCertificate, enrollResponse.AttestationCertificate.PrivateKey);
+                await App.Database.AddCredentialRecord(credentialRecord);
                 IsLoading = false;
                 await _promptService.ShowAlert("Success", "Your mobile device has been enrolled");
                 await Shell.Current.GoToAsync("..");
@@ -118,7 +135,7 @@ namespace SimpleIdServer.Mobile.ViewModels
                 IsLoading = false;
             }
 
-            string SanitizeEndRegisterUrl(string url) => url.Replace("localhost", "10.0.2.2");
+            string SanitizeEndRegisterUrl(string url) => _options.IsDev ? url.Replace("localhost", "192.168.50.125") : url;
         }
     }
 }

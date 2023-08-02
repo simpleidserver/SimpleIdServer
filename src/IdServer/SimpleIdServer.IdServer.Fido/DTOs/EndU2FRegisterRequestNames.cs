@@ -8,5 +8,6 @@ namespace SimpleIdServer.IdServer.Fido.DTOs
         public const string SessionId = "session_id";
         public const string Login = "login";
         public const string AuthenticatorAttestationRawResponse = "attestation";
+        public const string DeviceData = "device_data";
     }
 }

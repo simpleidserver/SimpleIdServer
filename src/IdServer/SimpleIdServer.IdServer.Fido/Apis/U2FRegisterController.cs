@@ -102,6 +102,22 @@ namespace SimpleIdServer.IdServer.Fido.Apis
                 {
                     RealmsName = prefix
                 });
+                if(request.DeviceData != null)
+                {
+                    user.Devices.Add(new UserDevice
+                    {
+                        CreateDateTime = DateTime.UtcNow,
+                        DeviceType = request.DeviceData.DeviceType,
+                        Id = Guid.NewGuid().ToString(),
+                        Manufacturer = request.DeviceData.Manufacturer,
+                        Model = request.DeviceData.Model,
+                        Name = request.DeviceData.Name,
+                        PushToken = request.DeviceData.PushToken,
+                        PushType = request.DeviceData.PushType,
+                        Version = request.DeviceData.Version
+                    });
+                }
+
                 _userRepository.Add(user);
             }
 
@@ -162,7 +178,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             }, cancellationToken);
             return (new BeginU2FRegisterResult
             {
-                CredentialCreateOptions = options,
+                // CredentialCreateOptions = options,
                 SessionId = sessionId,
                 EndRegisterUrl = $"{issuer}/{prefix}/{Constants.EndPoints.EndRegister}",
                 Login = request.Login

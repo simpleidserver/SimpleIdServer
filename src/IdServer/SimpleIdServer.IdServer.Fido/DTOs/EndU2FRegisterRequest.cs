@@ -13,5 +13,7 @@ namespace SimpleIdServer.IdServer.Fido.DTOs
         public string? Login { get; set; } = null;
         [JsonPropertyName(EndU2FRegisterRequestNames.AuthenticatorAttestationRawResponse)]
         public AuthenticatorAttestationRawResponse AuthenticatorAttestationRawResponse { get; set; } = null!;
+        [JsonPropertyName(EndU2FRegisterRequestNames.DeviceData)]
+        public EndU2FRegisterDeviceRequest DeviceData { get; set; } = null!;
     }
 }
