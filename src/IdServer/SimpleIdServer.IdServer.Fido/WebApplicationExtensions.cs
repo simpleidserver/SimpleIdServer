@@ -18,6 +18,9 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.MapControllerRoute("beginQRRegister",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.BeginQRCodeRegister,
                 defaults: new { controller = "U2FRegister", action = "BeginQRCode" });
+            webApplication.MapControllerRoute("readRegisterQRCode",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.ReadRegisterQRCode + "/{sessionId}",
+                defaults: new { controller = "U2FRegister", action = "ReadQRCode" });
             webApplication.MapControllerRoute("U2FStatusRegistration",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RegisterStatus + "/{sessionId}",
                 defaults: new { controller = "U2FRegister", action = "GetStatus" });

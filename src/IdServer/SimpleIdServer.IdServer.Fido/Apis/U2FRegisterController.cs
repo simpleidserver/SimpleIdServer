@@ -18,7 +18,8 @@ using SimpleIdServer.IdServer.Store;
 using System.Text;
 using System.Text.Json;
 
-namespace SimpleIdServer.IdServer.Fido.Apis
+namespace SimpleIdServer.IdServer.Fido.Apisgi
+
 {
     public class U2FRegisterController : BaseController
     {
@@ -55,14 +56,38 @@ namespace SimpleIdServer.IdServer.Fido.Apis
         [HttpPost]
         public async Task<IActionResult> BeginQRCode([FromRoute] string prefix, [FromBody] BeginU2FRegisterRequest request, CancellationToken cancellationToken)
         {
+            var issuer = Request.GetAbsoluteUriWithVirtualPath();
+            prefix = prefix ?? IdServer.Constants.DefaultRealm;
             var kvp = await CommonBegin(prefix, request, cancellationToken);
             if (kvp.Item2 != null) return kvp.Item2;
             var qrGenerator = new QRCodeGenerator();
-            var qrCodeData = qrGenerator.CreateQrCode(JsonSerializer.Serialize(kvp.Item1), QRCodeGenerator.ECCLevel.Q);
+            var qrCodeData = qrGenerator.CreateQrCode(JsonSerializer.Serialize(new QRCodeResult
+            {
+                SessionId = kvp.Item1.SessionId,
+                ReadQRCodeURL = $"{issuer}/{prefix}/{Constants.EndPoints.ReadRegisterQRCode}/{kvp.Item1.SessionId}"
+            }), QRCodeGenerator.ECCLevel.Q);
             var qrCode = new PngByteQRCode(qrCodeData);
             var payload = qrCode.GetGraphic(20);
             Response.Headers.Add("SessionId", kvp.Item1.SessionId);
             return File(payload, "image/png");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ReadQRCode([FromRoute] string prefix, string sessionId, CancellationToken cancellationToken)
+        {
+            var issuer = Request.GetAbsoluteUriWithVirtualPath();
+            prefix = prefix ?? IdServer.Constants.DefaultRealm;
+            if (string.IsNullOrWhiteSpace(sessionId)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.MISSING_PARAMETER, nameof(sessionId)));
+            var session = await _distributedCache.GetStringAsync(sessionId, cancellationToken);
+            if (string.IsNullOrWhiteSpace(session)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.SESSION_CANNOT_BE_EXTRACTED);
+            var sessionRecord = JsonSerializer.Deserialize<SessionRecord>(session);
+            return new OkObjectResult(new BeginU2FRegisterResult
+            {
+                CredentialCreateOptions = sessionRecord.Options,
+                SessionId = sessionId,
+                EndRegisterUrl = $"{issuer}/{prefix}/{Constants.EndPoints.EndRegister}",
+                Login = sessionRecord.Login
+            });
         }
 
         [HttpPost]
@@ -171,14 +196,14 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             };
             var options = _fido2.RequestNewCredential(fidoUser, existingKeys, authenticatorSelection, AttestationConveyancePreference.None, exts);
             var sessionId = Guid.NewGuid().ToString();
-            var sessionRecord = new SessionRecord(options);
+            var sessionRecord = new SessionRecord(options, request.Login);
             await _distributedCache.SetStringAsync(sessionId, JsonSerializer.Serialize(sessionRecord), new DistributedCacheEntryOptions
             {
                 SlidingExpiration = _options.U2FExpirationTimeInSeconds
             }, cancellationToken);
             return (new BeginU2FRegisterResult
             {
-                // CredentialCreateOptions = options,
+                CredentialCreateOptions = options,
                 SessionId = sessionId,
                 EndRegisterUrl = $"{issuer}/{prefix}/{Constants.EndPoints.EndRegister}",
                 Login = request.Login
@@ -187,13 +212,15 @@ namespace SimpleIdServer.IdServer.Fido.Apis
 
         private record SessionRecord
         {
-            public SessionRecord(CredentialCreateOptions options)
+            public SessionRecord(CredentialCreateOptions options, string login)
             {
                 Options = options;
+                Login = login;
             }
 
             public string SerializedOptions { get; private set; }
             public bool IsValidated { get; set; } = false;
+            public string Login { get; set; } = null!;
 
             public CredentialCreateOptions Options
             {

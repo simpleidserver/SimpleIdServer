@@ -72,21 +72,60 @@ namespace SimpleIdServer.Mobile.ViewModels
             IsLoading = true;
             try
             {
-                var fcmToken = await CrossFirebaseCloudMessaging.Current.GetTokenAsync();
                 var firstResult = e.Results.First();
-                var value = firstResult.Value;
-                if (string.IsNullOrWhiteSpace(value)) return;
-                var beginResult = JsonSerializer.Deserialize<BeginU2FRegisterResult>(value);
-                if (beginResult == null) return;
-
+                var qrCodeResult = firstResult.Value;
+                if (string.IsNullOrWhiteSpace(qrCodeResult)) return;
+                var beginResult = await ReadQRCode(qrCodeResult);
                 var attestationBuilder = new FIDOU2FAttestationBuilder();
                 var enrollResponse = attestationBuilder.BuildEnrollResponse(new EnrollParameter
                 {
                     Challenge = beginResult.CredentialCreateOptions.Challenge,
                     Rp = beginResult.CredentialCreateOptions.Rp.Id
                 });
+                await EndRegister(beginResult, enrollResponse);
+                var credentialRecord = new CredentialRecord(enrollResponse.CredentialId, enrollResponse.AttestationCertificate.AttestationCertificate, enrollResponse.AttestationCertificate.PrivateKey);
+                await App.Database.AddCredentialRecord(credentialRecord);
+                IsLoading = false;
+                await _promptService.ShowAlert("Success", "Your mobile device has been enrolled");
+                await Shell.Current.GoToAsync("..");
+            }
+            catch
+            {
+                IsLoading = false;
+                await _promptService.ShowAlert("Error", "An error occured while trying to parse the QR Code");
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+
+            async Task<BeginU2FRegisterResult> ReadQRCode(string qrCodeValue)
+            {
                 var handler = new HttpClientHandler();
-                if(_options.IgnoreHttps) handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) =>
+                if (_options.IgnoreHttps) handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) =>
+                {
+                    return true;
+                };
+                var qrCodeResult = JsonSerializer.Deserialize<QRCodeResult>(qrCodeValue);
+                using (var httpClient = new HttpClient(handler))
+                {
+                    var requestMessage = new HttpRequestMessage
+                    {
+                        Method = HttpMethod.Get,
+                        RequestUri = new Uri(SanitizeEndRegisterUrl(qrCodeResult.ReadQRCodeURL))
+                    };
+                    var httpResponse = await httpClient.SendAsync(requestMessage);
+                    httpResponse.EnsureSuccessStatusCode();
+                    var json = await httpResponse.Content.ReadAsStringAsync();
+                    return JsonSerializer.Deserialize<BeginU2FRegisterResult>(json);
+                }
+            }
+
+            async Task EndRegister(BeginU2FRegisterResult beginResult, EnrollResult enrollResponse)
+            {
+                var fcmToken = await CrossFirebaseCloudMessaging.Current.GetTokenAsync();
+                var handler = new HttpClientHandler();
+                if (_options.IgnoreHttps) handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) =>
                 {
                     return true;
                 };
@@ -95,7 +134,7 @@ namespace SimpleIdServer.Mobile.ViewModels
                     var deviceInfo = DeviceInfo.Current;
                     var deviceData = new Dictionary<string, string>
                     {
-                        { "device_type", Enum.GetName(typeof(DevicePlatform), deviceInfo.Platform) },
+                        { "device_type", deviceInfo.Platform.ToString() },
                         { "model", deviceInfo.Model },
                         { "manufacturer", deviceInfo.Manufacturer },
                         { "name", deviceInfo.Name },
@@ -119,20 +158,6 @@ namespace SimpleIdServer.Mobile.ViewModels
                     var httpResponse = await httpClient.SendAsync(requestMessage);
                     httpResponse.EnsureSuccessStatusCode();
                 }
-
-                var credentialRecord = new CredentialRecord(enrollResponse.CredentialId, enrollResponse.AttestationCertificate.AttestationCertificate, enrollResponse.AttestationCertificate.PrivateKey);
-                await App.Database.AddCredentialRecord(credentialRecord);
-                IsLoading = false;
-                await _promptService.ShowAlert("Success", "Your mobile device has been enrolled");
-                await Shell.Current.GoToAsync("..");
-            }
-            catch
-            {
-                await _promptService.ShowAlert("Error", "An error occured while trying to parse the QR Code");
-            }
-            finally
-            {
-                IsLoading = false;
             }
 
             string SanitizeEndRegisterUrl(string url) => _options.IsDev ? url.Replace("localhost", "192.168.50.125") : url;
