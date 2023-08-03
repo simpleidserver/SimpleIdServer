@@ -42,7 +42,7 @@ namespace SimpleIdServer.Scim.Helpers
 						var type = values.FirstOrDefault(v => v.SchemaAttribute.Name == "type");
 						var reference = values.FirstOrDefault(v => v.SchemaAttribute.Name == "$ref");
 						var schema = representation.GetSchema(attr);
-						var referenceAttribute = representation.GetSchema(attr).GetChildren(attr.SchemaAttribute).FirstOrDefault(v => v.Name == "$ref");
+						var referenceAttribute = schema?.GetChildren(attr.SchemaAttribute).FirstOrDefault(v => v.Name == "$ref");
 						if (value == null || string.IsNullOrWhiteSpace(value.ValueString) || reference != null || referenceAttribute == null || type == null || type.ValueString != attributeMapping.TargetResourceType)
                         {
 							continue;
