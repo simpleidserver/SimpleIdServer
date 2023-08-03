@@ -83,7 +83,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             await CheckSCIMRepresentationExistsForGivenUniqueAttributes(uniqueGlobalAttributes, existingRepresentation.Id);
             
             var isReferenceProperty = await _representationReferenceSync.IsReferenceProperty(replaceRepresentationCommand.Representation.Attributes.GetKeys());
-            var references = _representationReferenceSync.Sync(updateResult.AttributeMappingLst, replaceRepresentationCommand.ResourceType, oldRepresentation, existingRepresentation, replaceRepresentationCommand.Location, schema, !isReferenceProperty);
+            var references = _representationReferenceSync.Sync(updateResult.AttributeMappingLst, replaceRepresentationCommand.ResourceType, oldRepresentation, existingRepresentation, replaceRepresentationCommand.Location, schema, !isReferenceProperty).ToList();
             using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
             {
                 foreach (var reference in references)
@@ -91,11 +91,11 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                     await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes).ConfigureAwait(false);
                     await _scimRepresentationCommandRepository.BulkDelete(reference.RemovedRepresentationAttributes).ConfigureAwait(false);
                     await _scimRepresentationCommandRepository.BulkUpdate(reference.UpdatedRepresentationAttributes).ConfigureAwait(false);
-                    await Notify(reference);
                 }
 
                 await _scimRepresentationCommandRepository.Update(existingRepresentation).ConfigureAwait(false);
                 await transaction.Commit().ConfigureAwait(false);
+                await NotifyAllReferences(references).ConfigureAwait(false);
                 existingRepresentation.ApplyEmptyArray();
                 return GenericResult<SCIMRepresentation>.Ok(existingRepresentation);
             }
