@@ -7,5 +7,7 @@ namespace SimpleIdServer.IdServer.Fido.DTOs
     {
         public const string SessionId = "session_id";
         public const string Assertion = "assertion";
+        public const string EndLoginUrl = "end_login_url";
+        public const string Login = "login";
     }
 }

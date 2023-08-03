@@ -3,6 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="SimpleIdServer.Mobile.EnrollPage">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Keys" Order="Secondary" />
+    </ContentPage.ToolbarItems>
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -14,9 +17,9 @@
                 Source="credentialissuer.png"
                 HorizontalOptions="Center"
                 HeightRequest="400" />
-            <Label Text="Authenticate to the website and scan the QR Code to enroll your mobile device. It will be used by SimpleIdServer as an authentication device"
+            <Label Text="Scan the QR Code to enroll your mobile device or to authenticate to the website."
                 Grid.Row="2"
-               HorizontalOptions="Center"/>
+                HorizontalOptions="Center"/>
         </StackLayout>
         <Button 
                 Text="Scan QR Code"

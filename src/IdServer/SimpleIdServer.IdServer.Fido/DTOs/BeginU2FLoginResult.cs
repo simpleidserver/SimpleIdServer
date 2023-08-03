@@ -10,7 +10,11 @@ namespace SimpleIdServer.IdServer.Fido.DTOs
     {
         [JsonPropertyName(BeginU2FLoginResultNames.SessionId)]
         public string SessionId { get; set; } = null!;
+        [JsonPropertyName(BeginU2FLoginResultNames.Login)]
+        public string Login { get; set; } = null!;
         [JsonPropertyName(BeginU2FLoginResultNames.Assertion)]
         public AssertionOptions Assertion { get; set; } = null!;
+        [JsonPropertyName(BeginU2FLoginResultNames.EndLoginUrl)]
+        public string EndLoginUrl { get; set; } = null!;
     }
 }

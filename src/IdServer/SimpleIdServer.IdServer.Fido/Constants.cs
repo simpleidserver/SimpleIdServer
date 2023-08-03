@@ -14,10 +14,11 @@ namespace SimpleIdServer.IdServer.Fido
             public const string RegisterStatus = "u2f/status-register";
             public const string BeginQRCodeRegister = "u2f/begin-qr-register";
             public const string ReadRegisterQRCode = "u2f/register-qr";
+            public const string ReadLoginQRCode = "u2f/login-qr";
             public const string EndRegister = "u2f/end-register";
             public const string BeginLogin = "u2f/begin-login";
             public const string EndLogin = "u2f/end-login";
-            public const string LoginStatus = "u2f/login-register";
+            public const string LoginStatus = "u2f/login-status";
             public const string BeginQRCodeLogin = "u2f/begin-qr-login";
         }
     }

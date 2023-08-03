@@ -43,6 +43,9 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.MapControllerRoute("endLogin",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.EndLogin,
                 defaults: new { controller = "U2FLogin", action = "End" });
+            webApplication.MapControllerRoute("readLoginQRCode",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.ReadLoginQRCode + "/{sessionId}",
+                defaults: new { controller = "U2FLogin", action = "ReadQRCode" });
 
             return webApplication;
         }

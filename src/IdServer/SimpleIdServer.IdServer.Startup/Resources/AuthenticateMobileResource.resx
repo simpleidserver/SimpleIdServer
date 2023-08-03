@@ -120,6 +120,9 @@
   <data name="authenticate" xml:space="preserve">
     <value>Authenticate</value>
   </data>
+  <data name="auth_title" xml:space="preserve">
+    <value>Authenticate with your mobile device</value>
+  </data>
   <data name="credential_added" xml:space="preserve">
     <value>Credential is added</value>
   </data>
@@ -140,6 +143,9 @@
   </data>
   <data name="missing_login" xml:space="preserve">
     <value>Login is missing</value>
+  </data>
+  <data name="missing_session_id" xml:space="preserve">
+    <value>Session Identifier is missing</value>
   </data>
   <data name="register" xml:space="preserve">
     <value>Register</value>

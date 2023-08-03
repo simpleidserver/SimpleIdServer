@@ -8,5 +8,7 @@ namespace SimpleIdServer.Mobile.DTOs
         public string SessionId { get; set; } = null!;
         [JsonPropertyName("read_qrcode_url")]
         public string ReadQRCodeURL { get; set; } = null!;
+        [JsonPropertyName("action")]
+        public string Action { get; set; } = null!;
     }
 }

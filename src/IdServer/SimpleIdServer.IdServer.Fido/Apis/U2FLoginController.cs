@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fido2NetLib;
 using Fido2NetLib.Objects;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
@@ -44,21 +45,47 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             if (string.IsNullOrWhiteSpace(sessionId)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.MISSING_PARAMETER, nameof(sessionId)));
             var session = await _distributedCache.GetStringAsync(sessionId, cancellationToken);
             if (string.IsNullOrWhiteSpace(session)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.SESSION_CANNOT_BE_EXTRACTED);
-            var sessionRecord = JsonSerializer.Deserialize<SessionRecord>(session);
-            if (sessionRecord.IsValidated) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.REGISTRATION_NOT_CONFIRMED);
+            var sessionRecord = JsonSerializer.Deserialize<AuthenticationSessionRecord>(session);
+            if (!sessionRecord.IsValidated) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.REGISTRATION_NOT_CONFIRMED);
             return NoContent();
         }
 
         [HttpPost]
         public async Task<IActionResult> BeginQRCode([FromRoute] string prefix, [FromBody] BeginU2FLoginRequest request, CancellationToken cancellationToken)
         {
+            var issuer = Request.GetAbsoluteUriWithVirtualPath();
+            prefix = prefix ?? IdServer.Constants.DefaultRealm;
             var kvp = await CommonBegin(prefix, request, cancellationToken);
             if (kvp.Item2 != null) return kvp.Item2;
             var qrGenerator = new QRCodeGenerator();
-            var qrCodeData = qrGenerator.CreateQrCode(JsonSerializer.Serialize(kvp.Item1), QRCodeGenerator.ECCLevel.Q);
+            var qrCodeData = qrGenerator.CreateQrCode(JsonSerializer.Serialize(new QRCodeResult
+            {
+                Action = "login",
+                SessionId = kvp.Item1.SessionId,
+                ReadQRCodeURL = $"{issuer}/{prefix}/{Constants.EndPoints.ReadLoginQRCode}/{kvp.Item1.SessionId}"
+            }), QRCodeGenerator.ECCLevel.Q);
             var qrCode = new PngByteQRCode(qrCodeData);
             var payload = qrCode.GetGraphic(20);
+            Response.Headers.Add("SessionId", kvp.Item1.SessionId);
             return File(payload, "image/png");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ReadQRCode([FromRoute] string prefix, string sessionId, CancellationToken cancellationToken)
+        {
+            var issuer = Request.GetAbsoluteUriWithVirtualPath();
+            prefix = prefix ?? IdServer.Constants.DefaultRealm;
+            if (string.IsNullOrWhiteSpace(sessionId)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.MISSING_PARAMETER, nameof(sessionId)));
+            var session = await _distributedCache.GetStringAsync(sessionId, cancellationToken);
+            if (string.IsNullOrWhiteSpace(session)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.SESSION_CANNOT_BE_EXTRACTED);
+            var sessionRecord = JsonSerializer.Deserialize<AuthenticationSessionRecord>(session);
+            return new OkObjectResult(new BeginU2FLoginResult
+            {
+                Assertion = sessionRecord.Options,
+                SessionId = sessionId,
+                EndLoginUrl = $"{issuer}/{prefix}/{Constants.EndPoints.EndLogin}",
+                Login = sessionRecord.Login
+            });
         }
 
         [HttpPost]
@@ -84,7 +111,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             if (authenticatedUser == null)
                 return BuildError(System.Net.HttpStatusCode.Unauthorized, ErrorCodes.ACCESS_DENIED, string.Format(IdServer.ErrorMessages.UNKNOWN_USER, login));
 
-            var sessionRecord = JsonSerializer.Deserialize<SessionRecord>(session);
+            var sessionRecord = JsonSerializer.Deserialize<AuthenticationSessionRecord>(session);
             var options = sessionRecord.Options;
             var storedCredentials = authenticatedUser.GetStoredFidoCredentials();
             IsUserHandleOwnerOfCredentialIdAsync callback = (args, cancellationToken) =>
@@ -113,6 +140,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
 
         protected async Task<(BeginU2FLoginResult, IActionResult)> CommonBegin(string prefix, BeginU2FLoginRequest request, CancellationToken cancellationToken)
         {
+            var issuer = Request.GetAbsoluteUriWithVirtualPath();
             prefix = prefix ?? IdServer.Constants.DefaultRealm;
             if (request == null) return (null, BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, IdServer.ErrorMessages.INVALID_INCOMING_REQUEST));
             JsonWebToken jsonWebToken = null;
@@ -137,7 +165,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
                 exts
             );
             var sessionId = Guid.NewGuid().ToString();
-            var sessionRecord = new SessionRecord(options);
+            var sessionRecord = new AuthenticationSessionRecord(options, request.Login);
             await _distributedCache.SetStringAsync(sessionId, JsonSerializer.Serialize(sessionRecord), new DistributedCacheEntryOptions
             {
                 SlidingExpiration = _options.U2FExpirationTimeInSeconds
@@ -145,25 +173,29 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             return (new BeginU2FLoginResult
             {
                 SessionId = sessionId,
-                Assertion = options
+                Assertion = options,
+                EndLoginUrl = $"{issuer}/{prefix}/{Constants.EndPoints.EndLogin}",
+                Login = request.Login
             }, null);
         }
     }
 
-    public record SessionRecord
+    public record AuthenticationSessionRecord
     {
-        public SessionRecord()
+        public AuthenticationSessionRecord()
         {
 
         }
 
-        public SessionRecord(AssertionOptions assertionOptions)
+        public AuthenticationSessionRecord(AssertionOptions assertionOptions, string login)
         {
             SerializedOptions = assertionOptions.ToJson();
+            Login = login;
         }
 
         public string SerializedOptions { get; private set; }
         public bool IsValidated { get; set; } = false;
+        public string Login { get; set; } = null!;
 
         public AssertionOptions Options
         {

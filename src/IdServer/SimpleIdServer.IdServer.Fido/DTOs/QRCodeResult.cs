@@ -7,6 +7,8 @@ namespace SimpleIdServer.IdServer.Fido.DTOs
 {
     public class QRCodeResult
     {
+        [JsonPropertyName(QRCodeResultNames.Action)]
+        public string Action { get; set; } = null!;
         [JsonPropertyName(QRCodeResultNames.SessionId)]
         public string SessionId { get; set; } = null!;
         [JsonPropertyName(QRCodeResultNames.ReadQRCodeURL)]

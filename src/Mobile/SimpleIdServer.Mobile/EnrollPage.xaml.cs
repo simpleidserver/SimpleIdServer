@@ -1,7 +1,7 @@
 ﻿namespace SimpleIdServer.Mobile;
 public partial class EnrollPage : ContentPage
 {
-    public EnrollPage()
+	public EnrollPage()
 	{
 		InitializeComponent();
 	}

@@ -11,19 +11,21 @@ namespace SimpleIdServer.Mobile.Models
 
         }
 
-        public CredentialRecord(byte[] credentialId, X509Certificate2 certificate, ECDsa privateKey)
+        public CredentialRecord(byte[] credentialId, X509Certificate2 certificate, ECDsa privateKey, uint sigCount)
         {
             Id = Convert.ToBase64String(credentialId);
             PublicKey = Convert.ToBase64String(certificate.RawData);
-            ECDsaPublicPem = privateKey.ExportSubjectPublicKeyInfoPem();
-            ECDsaPrivatePem = privateKey.ExportECPrivateKeyPem();
+            ECDsaPublic = privateKey.ExportSubjectPublicKeyInfo();
+            ECDsaPrivate = privateKey.ExportECPrivateKey();
+            SigCount = sigCount;
         }
 
         [PrimaryKey]
         public string Id { get; set; }
-        public string PublicKey { get; private set; }
-        public string ECDsaPublicPem { get; private set; }
-        public string ECDsaPrivatePem { get; private set; }
+        public string PublicKey { get; set; }
+        public byte[] ECDsaPublic { get; set; }
+        public byte[] ECDsaPrivate { get; set; }
+        public uint SigCount { get; set; }
         public X509Certificate2 Certificate
         {
             get
@@ -36,9 +38,16 @@ namespace SimpleIdServer.Mobile.Models
             get
             {
                 var ecdsa = ECDsa.Create();
-                ecdsa.ImportFromPem(ECDsaPublicPem);
-                ecdsa.ImportFromPem(ECDsaPrivatePem);
+                ecdsa.ImportSubjectPublicKeyInfo(ECDsaPublic, out var _);
+                ecdsa.ImportECPrivateKey(ECDsaPrivate, out var _);
                 return ecdsa;
+            }
+        }
+        public byte[] IdPayload
+        {
+            get
+            {
+                return Convert.FromBase64String(Id);
             }
         }
     }

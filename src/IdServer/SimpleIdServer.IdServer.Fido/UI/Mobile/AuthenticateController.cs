@@ -19,30 +19,21 @@ using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.UI.Services;
 using System.Text.Json;
 
-namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
+namespace SimpleIdServer.IdServer.Fido.UI.Mobile
 {
-    [Area(Constants.AMR)]
-    public class AuthenticateController : BaseAuthenticationMethodController<AuthenticateWebauthnViewModel>
+    [Area(Constants.MobileAMR)]
+    public class AuthenticateController : BaseAuthenticationMethodController<AuthenticateMobileViewModel>
     {
         private readonly IAuthenticationHelper _authenticationHelper;
         private readonly IDistributedCache _distributedCache;
 
-        public AuthenticateController(IAuthenticationHelper authenticationHelper,
-            IDistributedCache distributedCache,
-            IAuthenticationSchemeProvider authenticationSchemeProvider,
-            IOptions<IdServerHostOptions> options,
-            IDataProtectionProvider dataProtectionProvider,
-            IClientRepository clientRepository,
-            IAmrHelper amrHelper,
-            IUserRepository userRepository,
-            IUserTransformer userTransformer,
-            IBusControl busControl) : base(options, authenticationSchemeProvider, dataProtectionProvider, clientRepository, amrHelper, userRepository, userTransformer, busControl)
+        public AuthenticateController(IAuthenticationHelper authenticationHelper, IDistributedCache distributedCache, IOptions<IdServerHostOptions> options, IAuthenticationSchemeProvider authenticationSchemeProvider, IDataProtectionProvider dataProtectionProvider, IClientRepository clientRepository, IAmrHelper amrHelper, IUserRepository userRepository, IUserTransformer userTransformer, IBusControl busControl) : base(options, authenticationSchemeProvider, dataProtectionProvider, clientRepository, amrHelper, userRepository, userTransformer, busControl)
         {
             _authenticationHelper = authenticationHelper;
-            _distributedCache = distributedCache;
+            _distributedCache= distributedCache;
         }
 
-        protected override string Amr => Constants.AMR;
+        protected override string Amr => Constants.MobileAMR;
 
         protected override bool IsExternalIdProvidersDisplayed => false;
 
@@ -56,15 +47,14 @@ namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
             return true;
         }
 
-        protected override void EnrichViewModel(AuthenticateWebauthnViewModel viewModel, User user)
+        protected override void EnrichViewModel(AuthenticateMobileViewModel viewModel, User user)
         {
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
-            if (user != null && !user.GetStoredFidoCredentials().Any()) viewModel.IsFidoCredentialsMissing = true;
-            viewModel.BeginLoginUrl = $"{issuer}/{viewModel.Realm}/{Constants.EndPoints.BeginLogin}";
-            viewModel.EndLoginUrl = $"{issuer}/{viewModel.Realm}/{Constants.EndPoints.EndLogin}";
+            viewModel.BeginLoginUrl = $"{issuer}/{viewModel.Realm}/{Constants.EndPoints.BeginQRCodeLogin}";
+            viewModel.LoginStatusUrl = $"{issuer}/{viewModel.Realm}/{Constants.EndPoints.LoginStatus}";
         }
 
-        protected override async Task<ValidationStatus> ValidateCredentials(AuthenticateWebauthnViewModel viewModel, User user, CancellationToken cancellationToken)
+        protected override async Task<ValidationStatus> ValidateCredentials(AuthenticateMobileViewModel viewModel, User user, CancellationToken cancellationToken)
         {
             var session = await _distributedCache.GetStringAsync(viewModel.SessionId, cancellationToken);
             if (string.IsNullOrWhiteSpace(session))
@@ -74,7 +64,7 @@ namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
             }
 
             var sessionRecord = JsonSerializer.Deserialize<AuthenticationSessionRecord>(session);
-            if(!sessionRecord.IsValidated)
+            if (!sessionRecord.IsValidated)
             {
                 ModelState.AddModelError("session_not_validated", "session_not_validated");
                 return ValidationStatus.NOCONTENT;
@@ -82,7 +72,6 @@ namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
 
             return ValidationStatus.AUTHENTICATE;
         }
-
 
         protected override async Task<User> AuthenticateUser(string login, string realm, CancellationToken cancellationToken)
         {

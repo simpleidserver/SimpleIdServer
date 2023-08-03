@@ -42,5 +42,11 @@ namespace SimpleIdServer.Mobile
             await Init();
             await _database.InsertAsync(credentialRecord);
         }
+
+        public async Task UpdateCredentialRecord(CredentialRecord credentialRecord)
+        {
+            await Init();
+            await _database.UpdateAsync(credentialRecord);
+        }
     }
 }

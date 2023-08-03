@@ -61,6 +61,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Authenticate with your mobile device.
+        /// </summary>
+        public static string auth_title {
+            get {
+                return ResourceManager.GetString("auth_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Authenticate.
         /// </summary>
         public static string authenticate {
@@ -129,6 +138,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static string missing_login {
             get {
                 return ResourceManager.GetString("missing_login", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Session Identifier is missing.
+        /// </summary>
+        public static string missing_session_id {
+            get {
+                return ResourceManager.GetString("missing_session_id", resourceCulture);
             }
         }
         

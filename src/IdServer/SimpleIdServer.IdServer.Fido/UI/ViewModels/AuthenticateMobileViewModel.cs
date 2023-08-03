@@ -6,23 +6,19 @@ using SimpleIdServer.IdServer.UI.ViewModels;
 
 namespace SimpleIdServer.IdServer.Fido.UI.ViewModels
 {
-    public class AuthenticateWebauthnViewModel : BaseAuthenticateViewModel
+    public class AuthenticateMobileViewModel : BaseAuthenticateViewModel
     {
-        public AuthenticateWebauthnViewModel()
+        public AuthenticateMobileViewModel()
         {
 
         }
 
-        public bool IsFidoCredentialsMissing { get; set; } = false;
         public string SessionId { get; set; }
         public string BeginLoginUrl { get; set; } = null!;
-        public string EndLoginUrl { get; set; } = null!;
+        public string LoginStatusUrl { get; set; } = null!;
 
         public override void CheckRequiredFields(User user, ModelStateDictionary modelStateDictionary)
         {
-            if (string.IsNullOrWhiteSpace(ReturnUrl))
-                modelStateDictionary.AddModelError("missing_return_url", "missing_return_url");
-
             if (string.IsNullOrWhiteSpace(Login))
                 modelStateDictionary.AddModelError("missing_login", "missing_login");
 

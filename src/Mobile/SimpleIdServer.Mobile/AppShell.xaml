@@ -10,7 +10,7 @@
             <ShellContent
                 Title="Enroll"
                 ContentTemplate="{DataTemplate local:EnrollPage}"
-                Route="EnrollPage" />
+                Route="enroll" />
         </Tab>
     </TabBar>
 </Shell>
