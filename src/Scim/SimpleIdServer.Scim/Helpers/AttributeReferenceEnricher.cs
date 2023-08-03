@@ -34,6 +34,7 @@ namespace SimpleIdServer.Scim.Helpers
 			{
 				foreach(var representation in representationLst)
                 {
+	                var controllerName = _resourceTypeResolver.ResolveByResourceType(attributeMapping.TargetResourceType).ControllerName;
 					var attrs = representation.GetAttributesByAttrSchemaId(attributeMapping.SourceAttributeId).ToList();
 					foreach(var attr in attrs)
                     {
@@ -47,8 +48,7 @@ namespace SimpleIdServer.Scim.Helpers
                         {
 							continue;
                         }
-
-						var controllerName = _resourceTypeResolver.ResolveByResourceType(attributeMapping.TargetResourceType).ControllerName;
+						
 						representation.AddAttribute(attr, new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), referenceAttribute, referenceAttribute.SchemaId)
 						{
 							ValueReference = $"{baseUrl}/{controllerName}/{value.ValueString}"
