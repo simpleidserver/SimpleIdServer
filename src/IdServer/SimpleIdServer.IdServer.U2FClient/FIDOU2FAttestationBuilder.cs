@@ -24,7 +24,7 @@ namespace SimpleIdServer.IdServer.U2FClient
             {
                 type = "webauthn.create",
                 challenge = parameter.Challenge,
-                origin = parameter.Rp
+                origin = parameter.Origin
             });
             var credentialId = RandomNumberGenerator.GetBytes(16);
             var attestationCertificate = BuildAttestationCertificate();
@@ -67,7 +67,7 @@ namespace SimpleIdServer.IdServer.U2FClient
             {
                 type = "webauthn.get",
                 challenge = parameter.Challenge,
-                origin = parameter.Rp
+                origin = parameter.Origin
             });
             var publicKey = GetCredentialPublicKey(parameter.Certificate);
             var authData = GetAuthData(publicKey, parameter.Rp, parameter.CredentialId, parameter.Signcount);

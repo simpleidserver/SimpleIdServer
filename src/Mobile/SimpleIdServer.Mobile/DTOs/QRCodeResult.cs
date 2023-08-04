@@ -10,5 +10,11 @@ namespace SimpleIdServer.Mobile.DTOs
         public string ReadQRCodeURL { get; set; } = null!;
         [JsonPropertyName("action")]
         public string Action { get; set; } = null!;
+
+        public string GetOrigin()
+        {
+            var uri = new Uri(ReadQRCodeURL); 
+            return uri.GetLeftPart(UriPartial.Authority);
+        }
     }
 }

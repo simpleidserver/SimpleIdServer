@@ -23,7 +23,7 @@
 </ul>
 
 @if (Model.IsLoginMissing)
-{    
+{
     <div class="alert alert-danger">
         @AuthenticateMobileResource.missing_login
     </div>
@@ -54,7 +54,7 @@ else
         <input asp-for="BeginLoginUrl" type="hidden" class="form-control" />
         <input asp-for="LoginStatusUrl" type="hidden" class="form-control" />
         <input asp-for="SessionId" type="hidden" class="form-control" />
-        <button type="submit" class="btn btn-primary card-link">@AuthenticateMobileResource.authenticate</button>        
+        <button type="submit" class="btn btn-primary card-link">@AuthenticateMobileResource.generate_qrcode</button>
     }
 
     <!-- QR Code-->

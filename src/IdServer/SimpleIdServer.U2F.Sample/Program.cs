@@ -16,7 +16,7 @@ var attestationBuilder = new FIDOU2FAttestationBuilder();
 var response = attestationBuilder.BuildEnrollResponse(new EnrollParameter
 {
     Challenge = beginRegisterResult.CredentialCreateOptions.Challenge,
-    Rp = rp
+    Rp = beginRegisterResult.CredentialCreateOptions.Rp.Id
 });
 await EndRegister(response, beginRegisterResult.SessionId, login);
 Console.WriteLine("User '{0}' has been registered");

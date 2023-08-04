@@ -99,7 +99,8 @@ namespace SimpleIdServer.Mobile.ViewModels
                 var enrollResponse = attestationBuilder.BuildEnrollResponse(new EnrollParameter
                 {
                     Challenge = beginResult.CredentialCreateOptions.Challenge,
-                    Rp = beginResult.CredentialCreateOptions.Rp.Id
+                    Rp = beginResult.CredentialCreateOptions.Rp.Id,
+                    Origin = qrCodeResult.GetOrigin()
                 });
                 var endRegisterResult = await EndRegister(beginResult, enrollResponse);
                 
@@ -189,9 +190,11 @@ namespace SimpleIdServer.Mobile.ViewModels
                     Rp = beginResult.Assertion.RpId,
                     Certificate = new AttestationCertificateResult(selectedCredential.Certificate, selectedCredential.PrivateKey),
                     CredentialId = selectedCredential.IdPayload,
-                    Signcount = selectedCredential.SigCount
+                    Signcount = selectedCredential.SigCount,
+                    Origin = qrCodeResult.GetOrigin()
                 });
                 await EndAuthenticate(beginResult, authResponse);
+                selectedCredential.SigCount++;
                 await App.Database.UpdateCredentialRecord(selectedCredential);
                 IsLoading = false;
                 await _promptService.ShowAlert("Success", "You are authenticated");

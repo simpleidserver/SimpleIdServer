@@ -11,9 +11,10 @@ namespace SimpleIdServer.IdServer.Fido
         {
             if (callbackFidoOptions == null) idServerBuilder.Services.Configure<FidoOptions>((o) => { });
             else idServerBuilder.Services.Configure(callbackFidoOptions);
-            if (fidoAction == null) idServerBuilder.Services.AddFido2(o => 
+            if (fidoAction == null) idServerBuilder.Services.AddFido2(o =>
             {
-                o.ServerDomain = "https://localhost:5001";
+                o.ServerName = "SimpleIdServer";
+                o.ServerDomain = "localhost";
                 o.Origins = new HashSet<string> { "https://localhost:5001" };
             });
             else idServerBuilder.Services.AddFido2(fidoAction);
