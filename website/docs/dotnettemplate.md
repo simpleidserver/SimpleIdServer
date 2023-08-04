@@ -12,8 +12,7 @@ This will add the following templates
 | ---------------------------- | ------------------------------------------------------------------------------------------------ |
 | dotnet new idserver          | Create Identity Server. By default, Entity Framework is configured to use SQLServer              |
 | dotnet new idserverwebsite   | Create Identity Server website. By default, Entity Framework is configured to use SQLServer      |
-| dotnet new scimef            | Create SCIM Server with EF support. By default, Entity Framework is configured to use SQLServer  |
-| dotnet new scimongodb        | Create SCIM Server with MongoDB support                                                          |
+| dotnet new scim              | Create SCIM Server.                                                                              |
 
 ## Create Visual Studio Solution
 
@@ -32,7 +31,7 @@ To create a web project named `IdServer` with the `SimpleIdServer.IdServer` pack
 
 ```
 cd src
-dotnet new idserver -n IdServer --connectionString "Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True"
+dotnet new idserver -n IdServer --storageConnectionString "Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True" --distributedCacheConnectionString "Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True"
 ```
 
 The following files will be created within a new `src/IdServer` directory :
@@ -75,7 +74,7 @@ create a web project named `IdServerWebsite` with the `SimpleIdServer.IdServer.W
 
 ```
 cd src
-dotnet new idserverwebsite -n IdServerWebsite --connectionString "Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True"
+dotnet new idserverwebsite -n IdServerWebsite --storageConnectionString "Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True"
 ```
 
 Run the `IdServerWebsite` project, it must listens on the url `https://localhost:5002`.
@@ -111,7 +110,7 @@ Create a web project named `ScimEF` with the `SimpleIdServer.Scim.Persistence.EF
 
 ```
 cd src
-dotnet new scimef -n ScimEF --connectionString "Data Source=.;Initial Catalog=SCIM;Integrated Security=True;TrustServerCertificate=True"
+dotnet new scim -n ScimEF --connectionString "Data Source=.;Initial Catalog=SCIM;Integrated Security=True;TrustServerCertificate=True" -t "SQLSERVER"
 ```
 
 Next, add the `ScimEF` project into the Visual Studio Solution
@@ -137,7 +136,7 @@ To create a web project named ScimMongoDB with the SimpleIdServer.Scim.Persisten
 
 ```
 cd src
-dotnet new scimongodb -n ScimMongoDB --connectionString "mongodb://localhost:27017"
+dotnet new scim -n ScimMongoDB --connectionString "mongodb://localhost:27017" -t "MONGODB"
 ```
 
 Next, add the `ScimMongoDB` project into the Visual Studio Solution
