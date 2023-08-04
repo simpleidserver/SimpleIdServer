@@ -51,6 +51,16 @@ steps:
     modifyOutputPath: false
     workingDirectory: '$(Build.Repository.LocalPath)\src\Scim\SimpleIdServer.Scim.Startup'
 
+- task: DotNetCoreCLI@2
+  displayName: 'Publish Mobile application'
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    arguments: '-f net7.0-android -c Release -p:AndroidKeyStore=true -p:AndroidSigningKeyStore=sidmobile.keystore -p:AndroidSigningKeyAlias=sidkey -p:AndroidSigningKeyPass=password -p:AndroidSigningStorePass=password'
+    zipAfterPublish: false
+    modifyOutputPath: false
+    workingDirectory: '$(Build.Repository.LocalPath)\src\Mobile\SimpleIdServer.Mobile'
+
 - task: CopyFiles@2
   displayName: 'Copy website'
   inputs:
