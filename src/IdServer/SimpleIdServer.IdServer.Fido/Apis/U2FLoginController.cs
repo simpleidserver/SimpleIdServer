@@ -46,7 +46,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             var session = await _distributedCache.GetStringAsync(sessionId, cancellationToken);
             if (string.IsNullOrWhiteSpace(session)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.SESSION_CANNOT_BE_EXTRACTED);
             var sessionRecord = JsonSerializer.Deserialize<AuthenticationSessionRecord>(session);
-            if (!sessionRecord.IsValidated) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.REGISTRATION_NOT_CONFIRMED);
+            if (!sessionRecord.IsValidated) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTHENTICATION_NOT_CONFIRMED);
             return NoContent();
         }
 
