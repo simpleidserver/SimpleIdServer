@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using System.Collections.Generic;
+using System.Linq;
 using MassTransit;
 using SimpleIdServer.Scim.ExternalEvents;
 using SimpleIdServer.Scim.Helpers;
@@ -19,14 +20,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
         }
         
         protected async Task NotifyAllReferences(List<RepresentationSyncResult> references) {
-            var tasks = new List<Task>();
-            foreach (var reference in references) {
-                // TODO remove
-                reference.AddedRepresentationAttributes.ForEach(x => { x.Representation = null; });
-                reference.RemovedRepresentationAttributes.ForEach(x => { x.Representation = null; });
-                reference.UpdatedRepresentationAttributes.ForEach(x => { x.Representation = null; });
-                tasks.Add(Notify(reference));
-            }
+            var tasks = references.Select(Notify).ToList();
             await Task.WhenAll(tasks);
         }
 

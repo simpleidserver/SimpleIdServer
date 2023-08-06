@@ -21,7 +21,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
 
         public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId)
         {
-            return _scimDbContext.SCIMRepresentationLst
+            return _scimDbContext.SCIMRepresentationLst.AsNoTracking()
                 .Include(r => r.FlatAttributes)
                 .Include(r => r.Schemas).ThenInclude(s => s.Attributes).FirstOrDefaultAsync(r => r.Id == representationId);
         }
