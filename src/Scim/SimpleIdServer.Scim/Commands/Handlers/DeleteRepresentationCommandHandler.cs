@@ -1,5 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+
+using System.Linq;
 using MassTransit;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Exceptions;
@@ -33,18 +35,18 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             if (schema == null) throw new SCIMSchemaNotFoundException();
             var representation = await _scimRepresentationCommandRepository.Get(request.Id);
             if (representation == null) throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, request.Id));
-            var references = _representationReferenceSync.Sync(request.ResourceType, representation, representation, request.Location, schema, true, true);
+            var references = _representationReferenceSync.Sync(request.ResourceType, representation, representation, request.Location, schema, true, true).ToList();
             using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
             {
                 foreach (var reference in references)
                 {
                     await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes).ConfigureAwait(false);
                     await _scimRepresentationCommandRepository.BulkDelete(reference.RemovedRepresentationAttributes).ConfigureAwait(false);
-                    await Notify(reference);
                 }
 
                 await _scimRepresentationCommandRepository.Delete(representation).ConfigureAwait(false);
                 await transaction.Commit().ConfigureAwait(false);
+                await NotifyAllReferences(references).ConfigureAwait(false);
             }
 
             return GenericResult<SCIMRepresentation>.Ok(representation);
