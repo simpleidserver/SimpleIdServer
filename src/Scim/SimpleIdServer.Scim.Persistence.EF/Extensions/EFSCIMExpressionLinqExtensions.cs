@@ -43,7 +43,6 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
             {
                 filteredAttrs = filteredAttrs.Where(a => a.RepresentationId == id);
                 var result = await representations.FirstOrDefaultAsync(r => r.Id == id && r.ResourceType == resourceType);
-                var includedFullPathLst = (includedAttributes != null && includedAttributes.Any()) ? includedAttributes.Where(i => i is SCIMComplexAttributeExpression).Select(i => i.GetFullPath()) : new List<string>();
                 result.FlatAttributes = filteredAttrs.ToList();
                 return result;
             }

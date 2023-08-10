@@ -1,10 +1,9 @@
-﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.Scim.Domains;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -30,67 +29,79 @@ namespace SimpleIdServer.Scim.Persistence.EF
                 .Include(r => r.Schemas).ThenInclude(s => s.Attributes).FirstOrDefaultAsync(r => r.Id == id, token);
             return result;
         }
-
-        public async Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByIds(IEnumerable<string> representationIds)
+        
+        public async Task<List<SCIMRepresentation>> FindPaginatedRepresentations(List<string> representationIds, string resourceType = null, int nbRecords = 50, bool ignoreAttributes = false)
         {
-            IEnumerable<SCIMRepresentation> result = await _scimDbContext.SCIMRepresentationLst.Include(r => r.FlatAttributes)
-                .Where(r => representationIds.Contains(r.Id))
-                .ToListAsync();
+            var chunks = representationIds.Chunk(nbRecords).ToList();
+            var representations = new List<SCIMRepresentation>();
+            foreach (var chunk in chunks) {
+                var query = _scimDbContext.SCIMRepresentationLst
+                    .Include(r => r.FlatAttributes)
+                    .Where(r => chunk.Contains(r.Id))
+                    .AsNoTracking();
+                if (!string.IsNullOrWhiteSpace(resourceType))
+                    query = query.Where(r => r.ResourceType == resourceType);
+
+                var result = await query.ToListAsync();
+                representations.AddRange(result);
+            }
+
+            return representations;
+        }
+
+        public async Task<List<SCIMRepresentationAttribute>> FindPaginatedGraphAttributes(string valueStr, string schemaAttributeId, int nbRecords = 50, string sourceRepresentationId = null)
+        {
+            var parentAttributeIds = await GetParentAttributeIds(valueStr, schemaAttributeId, sourceRepresentationId);
+            var result = await GetRelatedAttributes(nbRecords, parentAttributeIds);
             return result;
         }
 
-        public IEnumerable<IEnumerable<SCIMRepresentation>> FindPaginatedRepresentations(IEnumerable<string> representationIds,  string resourceType = null, int nbRecords = 50, bool ignoreAttributes = false)
+        private async Task<List<string>> GetParentAttributeIds(string valueStr, string schemaAttributeId, string sourceRepresentationId)
         {
-            var nb = representationIds.Count();
-            var nbPages = Math.Ceiling((decimal)(nb / nbRecords));
-            for(var i = 0; i <= nbPages; i++)
-            {
-                var filter = representationIds.Skip(i * nbRecords).Take(nbRecords);
-                var result = _scimDbContext.SCIMRepresentationLst.Include(r => r.FlatAttributes)
-                    .Where(r => filter.Contains(r.Id))
-                    .AsNoTracking();
-                if (!string.IsNullOrWhiteSpace(resourceType))
-                    yield return result.Where(r => r.ResourceType == resourceType);
-                else yield return result;
-            }
-        }
-
-        public IEnumerable<IEnumerable<SCIMRepresentationAttribute>> FindPaginatedGraphAttributes(string valueStr, string schemaAttributeId, int nbRecords = 50, string sourceRepresentationId = null)
-        {
-            var query = _scimDbContext.SCIMRepresentationAttributeLst.AsNoTracking()
+            var parentAttributeIds = await _scimDbContext.SCIMRepresentationAttributeLst.AsNoTracking()
                 .Where(a => a.SchemaAttributeId == schemaAttributeId && a.ValueString == valueStr || (sourceRepresentationId != null && a.ValueString == sourceRepresentationId))
                 .OrderBy(r => r.ParentAttributeId)
                 .Select(r => r.ParentAttributeId)
-                .AsNoTracking();
-            var nb = query.Count();
-            var nbPages = Math.Ceiling((decimal)(nb / nbRecords));
-            for (var i = 0; i <= nbPages; i++)
-            {
-                var parentIds = query.Skip(i * nbRecords).Take(nbRecords);
-                var result = _scimDbContext.SCIMRepresentationAttributeLst.AsNoTracking()
-                    .Where(a => parentIds.Contains(a.Id) || parentIds.Contains(a.ParentAttributeId));
-                yield return result;
-            }
+                .AsNoTracking()
+                .ToListAsync();
+            return parentAttributeIds;
         }
 
-        public IEnumerable<IEnumerable<SCIMRepresentationAttribute>> FindPaginatedGraphAttributes(IEnumerable<string> representationIds,  string valueStr, string schemaAttributeId, int nbRecords = 50, string sourceRepresentationId = null)
+        private async Task<List<SCIMRepresentationAttribute>> GetRelatedAttributes(int nbRecords, List<string> parentAttributeIds)
         {
-            var nb = representationIds.Count();
-            var nbPages = Math.Ceiling((decimal)(nb / nbRecords));
-            for (var i = 0; i <= nbPages; i++)
-            {
-                var filter = representationIds.Skip(i * nbRecords).Take(nbRecords);
-                var parentIds = _scimDbContext.SCIMRepresentationAttributeLst.AsNoTracking()
-                    .Where(a => a.SchemaAttributeId == schemaAttributeId && filter.Contains(a.RepresentationId) && a.ValueString == valueStr || (sourceRepresentationId != null && a.ValueString == sourceRepresentationId))
-                    .Select(r => r.ParentAttributeId)
-                    .AsNoTracking()
-                    .ToList();
-                var result = _scimDbContext.SCIMRepresentationAttributeLst.AsNoTracking()
-                    .Where(a => parentIds.Contains(a.Id) || parentIds.Contains(a.ParentAttributeId))
-                    .AsNoTracking()
-                    .ToList();
-                yield return result;
+            var result = new List<SCIMRepresentationAttribute>();
+            var chunks = parentAttributeIds.Chunk(nbRecords).ToList();
+            foreach (var chunk in chunks) {
+                result.AddRange(
+                    await _scimDbContext.SCIMRepresentationAttributeLst.AsNoTracking()
+                    .Where(a => chunk.Contains(a.Id) || chunk.Contains(a.ParentAttributeId))
+                    .ToListAsync()
+                );
             }
+            return result;
+        }
+
+        public async Task<List<SCIMRepresentationAttribute>> FindPaginatedGraphAttributes(IEnumerable<string> representationIds, string valueStr, string schemaAttributeId, int nbRecords = 50, string sourceRepresentationId = null)
+        {
+            var parentIds = await _scimDbContext.SCIMRepresentationAttributeLst.AsNoTracking()
+                .Where(a => a.SchemaAttributeId == schemaAttributeId &&
+                            representationIds.Contains(a.RepresentationId) &&
+                            a.ValueString == valueStr ||
+                            (sourceRepresentationId != null && a.ValueString == sourceRepresentationId))
+                .Select(r => r.ParentAttributeId)
+                .AsNoTracking()
+                .Distinct()
+                .ToListAsync();
+            var attributes = new List<SCIMRepresentationAttribute>();
+            var chunks = parentIds.Chunk(nbRecords).ToList();
+            foreach (var chunk in chunks) {
+                var result = await _scimDbContext.SCIMRepresentationAttributeLst.AsNoTracking()
+                    .Where(a => chunk.Contains(a.Id) || chunk.Contains(a.ParentAttributeId))
+                    .AsNoTracking()
+                    .ToListAsync();
+                attributes.AddRange(result);
+            }
+            return attributes;
         }
 
         public Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string schemaAttributeId, string value, string endpoint = null)
@@ -111,9 +122,9 @@ namespace SimpleIdServer.Scim.Persistence.EF
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationsByAttributeFullPath(string fullPath, IEnumerable<string> values, string resourceType)
+        public async Task<List<SCIMRepresentation>> FindSCIMRepresentationsByAttributeFullPath(string fullPath, IEnumerable<string> values, string resourceType)
         {
-            IEnumerable<SCIMRepresentation> result = await _scimDbContext.SCIMRepresentationLst.Include(r => r.FlatAttributes)
+            List<SCIMRepresentation> result = await _scimDbContext.SCIMRepresentationLst.Include(r => r.FlatAttributes)
                 .Where(r => r.ResourceType == resourceType && r.FlatAttributes.Any(a => a.FullPath == fullPath && values.Contains(a.ValueString)))
                 .AsNoTracking()
                 .ToListAsync();

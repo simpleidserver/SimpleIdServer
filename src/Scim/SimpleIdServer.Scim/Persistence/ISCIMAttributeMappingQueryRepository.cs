@@ -1,4 +1,4 @@
-﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Scim.Domains;
 using System.Collections.Generic;
@@ -8,8 +8,8 @@ namespace SimpleIdServer.Scim.Persistence
 {
     public interface ISCIMAttributeMappingQueryRepository
     {
-        Task<IEnumerable<SCIMAttributeMapping>> GetBySourceAttributes(IEnumerable<string> sourceAttributes);
-        Task<IEnumerable<SCIMAttributeMapping>> GetBySourceResourceType(string sourceResourceType);
-        Task<IEnumerable<SCIMAttributeMapping>> GetAll();
+        Task<List<SCIMAttributeMapping>> GetBySourceAttributes(IEnumerable<string> sourceAttributes);
+        Task<List<SCIMAttributeMapping>> GetBySourceResourceType(string sourceResourceType);
+        Task<List<SCIMAttributeMapping>> GetAll();
     }
 }

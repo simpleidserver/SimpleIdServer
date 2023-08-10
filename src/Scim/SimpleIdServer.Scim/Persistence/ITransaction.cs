@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Persistence
 {
-    public interface ITransaction : IDisposable
+    public interface ITransaction : IDisposable, IAsyncDisposable
     {
         Task Commit(CancellationToken token = default(CancellationToken));
     }

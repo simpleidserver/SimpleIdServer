@@ -1,4 +1,4 @@
-﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
 using SimpleIdServer.Scim.Domain;
@@ -72,15 +72,13 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var uniqueGlobalAttributes = scimRepresentation.FlatAttributes.Where(s => s.IsLeaf()).Where(a => a.SchemaAttribute.MultiValued == false && a.SchemaAttribute.Uniqueness == SCIMSchemaAttributeUniqueness.GLOBAL);
             await CheckSCIMRepresentationExistsForGivenUniqueAttributes(uniqueServerAttributeIds, addRepresentationCommand.ResourceType);
             await CheckSCIMRepresentationExistsForGivenUniqueAttributes(uniqueGlobalAttributes);
-            var refIterator = _representationReferenceSync.Sync(addRepresentationCommand.ResourceType, new SCIMRepresentation(), scimRepresentation, addRepresentationCommand.Location, schema);
-            using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
+            var references = await _representationReferenceSync.Sync(addRepresentationCommand.ResourceType, new SCIMRepresentation(), scimRepresentation, addRepresentationCommand.Location, schema);
+            await using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
             {
-                var references = new List<RepresentationSyncResult>();
                 await _scimRepresentationCommandRepository.Add(scimRepresentation).ConfigureAwait(false);
-                foreach (var reference in refIterator)
+                foreach (var reference in references)
                 {
                     await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes).ConfigureAwait(false);
-                    references.Add(reference);
                 }
 
                 await transaction.Commit().ConfigureAwait(false);
