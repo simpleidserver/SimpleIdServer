@@ -30,7 +30,7 @@ namespace SimpleIdServer.Scim.Persistence.EF {
         }
 
         public async Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType, GetSCIMResourceParameter parameter) {
-            var query = _scimDbContext.SCIMRepresentationLst
+            var query = _scimDbContext.SCIMRepresentationLst.AsNoTracking()
                 .Include(r => r.Schemas).ThenInclude(s => s.Attributes)
                 .Include(r => r.FlatAttributes).ThenInclude(s => s.SchemaAttribute);
             return await query.BuildResult(_scimDbContext, parameter.IncludedAttributes, parameter.ExcludedAttributes, representationId, resourceType);
