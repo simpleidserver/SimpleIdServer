@@ -6,14 +6,10 @@
 trigger:
 - master
 
-variables:
-  revisionNumber: $(Rev:r)
-
 pool:
   name: Default
 
 steps:
-
 - powershell: |
      $gitVersion = git describe --abbrev=0 --tags
      $buildNumber = $gitVersion + "." + $env:BUILD_BUILDNUMBER
