@@ -32,7 +32,7 @@
     <input type="hidden" asp-for="ReturnUrl" />
     <input type="hidden" name="Action" value="AUTHENTICATE" />
     <div class="input-group mb-3">
-        <input asp-for="PhoneNumber" type="text" class="form-control" placeholder="@AuthenticateSmsResource.phonenumber" />
+        <input asp-for="Login" type="text" class="form-control" placeholder="@AuthenticateSmsResource.phonenumber" />
     </div>
     <div class="input-group mb-3">
         <input asp-for="OTPCode" type="password" class="form-control" placeholder="@AuthenticateSmsResource.confirmationcode" />
@@ -55,7 +55,7 @@
     <input type="hidden" asp-for="ReturnUrl" />
     <input type="hidden" name="Action" value="SENDCONFIRMATIONCODE" />
     <div class="input-group mb-3">
-        <input asp-for="PhoneNumber" type="text" class="form-control" placeholder="@AuthenticateSmsResource.phonenumber" />
+        <input asp-for="Login" type="text" class="form-control" placeholder="@AuthenticateSmsResource.phonenumber" />
     </div>
     <button type="submit" class="btn btn-primary card-link">@AuthenticateSmsResource.sendconfirmationcode</button>
 }
