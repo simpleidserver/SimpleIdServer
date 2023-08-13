@@ -10,6 +10,12 @@ pool:
   name: Default
 
 steps:
+
+- powershell: |
+     Write-Host "##vso[task.setvariable variable=gitTag;isoutput=true]git describe --abbrev=0 --tags"
+     Write-Host "##vso[task.setvariable variable=buildVersion;isoutput=true]$(gitTag)+"."+$(Rev:r)"
+  name: gitVersion
+
 - task: NodeTool@0
   inputs:
     versionSpec: '16.14.x'
