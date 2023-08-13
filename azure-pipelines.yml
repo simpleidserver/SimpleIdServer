@@ -16,7 +16,7 @@ steps:
 
 - powershell: |
      $gitVersion = git describe --abbrev=0 --tags
-     $buildNumber = $gitVersion + "." + $(revisionNumber)
+     $buildNumber = $gitVersion + "." + $env:BUILD_BUILDNUMBER
      Write-Host "##vso[task.setvariable variable=buildVersion;isoutput=true]$buildNumber"
   name: gitVersion
 
