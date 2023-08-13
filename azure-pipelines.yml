@@ -18,6 +18,7 @@ steps:
      $gitVersion = git describe --abbrev=0 --tags
      $buildNumber = $gitVersion + "." + $env:BUILD_BUILDNUMBER
      Write-Host "##vso[task.setvariable variable=buildVersion;isoutput=true]$buildNumber"
+     Write-Host "Build number is $buildNumber"
   name: gitVersion
 
 - task: NodeTool@0
@@ -66,7 +67,7 @@ steps:
   inputs:
     command: 'publish'
     publishWebProjects: false
-    arguments: '-f net7.0-android -c Release -p:AndroidKeyStore=true -p:AndroidSigningKeyStore=sidmobile.keystore -p:AndroidSigningKeyAlias=sidkey -p:AndroidSigningKeyPass=password -p:AndroidSigningStorePass=password'
+    arguments: '--version-suffix $(buildVersion) -f net7.0-android -c Release -p:AndroidKeyStore=true -p:AndroidSigningKeyStore=sidmobile.keystore -p:AndroidSigningKeyAlias=sidkey -p:AndroidSigningKeyPass=password -p:AndroidSigningStorePass=password'
     zipAfterPublish: false
     modifyOutputPath: false
     workingDirectory: '$(Build.Repository.LocalPath)\src\Mobile\SimpleIdServer.Mobile'
