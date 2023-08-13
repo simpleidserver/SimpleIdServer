@@ -6,6 +6,9 @@
 trigger:
 - master
 
+variables:
+  revisionNumber: $(Rev:r)
+
 pool:
   name: Default
 
@@ -13,7 +16,7 @@ steps:
 
 - powershell: |
      $gitVersion = git describe --abbrev=0 --tags
-     $buildNumber = $gitVersion + "." + $(Rev:r)
+     $buildNumber = $gitVersion + "." + $(revisionNumber)
      Write-Host "##vso[task.setvariable variable=buildVersion;isoutput=true]$buildNumber"
   name: gitVersion
 
