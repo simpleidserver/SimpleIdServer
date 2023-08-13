@@ -10,6 +10,10 @@ pool:
   name: Default
 
 steps:
+- checkout: self
+  fetchDepth: 0
+  fetchTags: true
+
 - powershell: |
      $gitVersion = git describe --abbrev=0 --tags
      $buildNumber = $gitVersion + "." + $env:BUILD_BUILDNUMBER
