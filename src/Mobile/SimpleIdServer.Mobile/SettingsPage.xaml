@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:local="clr-namespace:SimpleIdServer.Mobile.ViewModels"
+             x:DataType="local:SettingsPageViewModel"
+             xmlns:converters="clr-namespace:SimpleIdServer.Mobile.Converters"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SimpleIdServer.Mobile.SettingsPage">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:ToggledEventArgsConverter x:Key="toggledEventArgsConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Label Text="Enable developer mode" VerticalOptions="Center"></Label>
+        <Switch IsToggled="{Binding Path=IsDeveloperModeEnabled}">
+            <Switch.Behaviors>
+                <toolkit:EventToCommandBehavior EventName="Toggled" Command="{Binding ToggleDeveloperModeComand}" EventArgsConverter="{StaticResource toggledEventArgsConverter}" />
+            </Switch.Behaviors>
+        </Switch>
+    </Grid>
+</ContentPage>

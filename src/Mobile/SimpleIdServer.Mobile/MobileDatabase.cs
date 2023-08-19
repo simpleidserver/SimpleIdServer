@@ -12,7 +12,6 @@ namespace SimpleIdServer.Mobile
         {
             if (_database != null) return;
 
-
             var secureStorage = SecureStorage.Default;
             var sqlitePassword = await secureStorage.GetAsync("sqlitePassword");
             if(sqlitePassword == null)
@@ -24,6 +23,8 @@ namespace SimpleIdServer.Mobile
             var options = new SQLiteConnectionString(_dbPath, true, sqlitePassword);
             _database = new SQLiteAsyncConnection(options);
             await _database.CreateTableAsync<CredentialRecord>();
+            var result = await _database.CreateTableAsync<MobileSettings>();
+            if(result == CreateTableResult.Created) await _database.InsertAsync(new MobileSettings { Id = Guid.NewGuid().ToString() });
         }
 
         public MobileDatabase(string dbPath)
@@ -37,6 +38,13 @@ namespace SimpleIdServer.Mobile
             return await _database.Table<CredentialRecord>().ToListAsync();
         }
 
+        public async Task<MobileSettings> GetMobileSettings()
+        {
+            await Init();
+            var result =  await _database.Table<MobileSettings>().FirstAsync();
+            return result;
+        }
+
         public async Task AddCredentialRecord(CredentialRecord credentialRecord)
         {
             await Init();
@@ -47,6 +55,12 @@ namespace SimpleIdServer.Mobile
         {
             await Init();
             await _database.UpdateAsync(credentialRecord);
+        }
+
+        public async Task UpdateMobileSettings(MobileSettings mobileSettings)
+        {
+            await Init();
+            await _database.UpdateAsync(mobileSettings);
         }
     }
 }

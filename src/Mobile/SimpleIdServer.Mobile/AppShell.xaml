@@ -12,5 +12,11 @@
                 ContentTemplate="{DataTemplate local:EnrollPage}"
                 Route="enroll" />
         </Tab>
+        <Tab Title="Settings">
+            <ShellContent 
+                Title="Settings"
+                ContentTemplate="{DataTemplate local:SettingsPage}"
+                Route="settings" />
+        </Tab>
     </TabBar>
 </Shell>

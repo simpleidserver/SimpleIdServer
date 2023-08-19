@@ -24,8 +24,11 @@ public static class MauiProgram
 			});
 		builder.Services.AddTransient<IPromptService, PromptService>();
 		builder.Services.AddTransient<EnrollPage>();
+		builder.Services.AddTransient<SettingsPage>();
 		builder.Services.AddTransient<QRCodeScannerPage>();
 		builder.Services.AddTransient<QRCodeScannerViewModel>();
+        builder.Services.AddTransient<EnrollViewModel>();
+		builder.Services.AddTransient<SettingsPageViewModel>();
         builder.Services.Configure<MobileOptions>(o =>
 		{
 			o.PushType = "firebase";
