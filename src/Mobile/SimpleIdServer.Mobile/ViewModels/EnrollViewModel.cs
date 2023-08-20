@@ -12,9 +12,13 @@ public class EnrollViewModel : INotifyPropertyChanged
     public EnrollViewModel(SettingsPageViewModel settings)
     {
         Settings = settings;
-        EnterQRCodeCommand = new Command(() =>
+        SubmitQRCodeCommand = new Command(async () =>
         {
-
+            await Shell.Current.GoToAsync("enrollsubmitqrcode");
+        });
+        ScanQRCodeCommand = new Command(async () =>
+        {
+            await Shell.Current.GoToAsync("enrollscanqrcode");
         });
     }
 
@@ -35,7 +39,9 @@ public class EnrollViewModel : INotifyPropertyChanged
 
     public SettingsPageViewModel Settings { get; private set; }
 
-    public ICommand EnterQRCodeCommand { get; private set; }
+    public ICommand SubmitQRCodeCommand { get; private set; }
+
+    public ICommand ScanQRCodeCommand { get; private set; }
 
     public void OnPropertyChanged([CallerMemberName] string name = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 

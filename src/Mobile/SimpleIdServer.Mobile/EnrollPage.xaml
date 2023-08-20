@@ -27,11 +27,11 @@
             <Button 
                 Text="Scan QR Code"
                 HorizontalOptions="Fill"
-                Clicked="OnEnrollClicked" />
+                Command="{Binding Path=ScanQRCodeCommand}" />
             <Button 
                 Text="Enter QR Code"
                 HorizontalOptions="Fill"
-                Command="{Binding Path=EnterQRCodeCommand}"
+                Command="{Binding Path=SubmitQRCodeCommand}"
                 IsVisible="{Binding Path=IsDeveloperModeEnabled}" />
         </StackLayout>
     </Grid>

@@ -9,5 +9,9 @@ namespace SimpleIdServer.IdServer.Fido
         /// Expiration time in seconds of the U2F FIDO session identifier.
         /// </summary>
         public TimeSpan U2FExpirationTimeInSeconds { get; set; } = TimeSpan.FromSeconds(5 * 60);
+        /// <summary>
+        /// Enable or disable the developer mode.
+        /// </summary>
+        public bool IsDeveloperModeEnabled { get; set; } = false;
     }
 }

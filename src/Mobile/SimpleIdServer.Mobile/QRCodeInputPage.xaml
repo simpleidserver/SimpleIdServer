@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:DataType="local:QRCodeInputViewModel"
+             xmlns:local="clr-namespace:SimpleIdServer.Mobile.ViewModels"
+             xmlns:common="clr-namespace:SimpleIdServer.Mobile.Common"
+             x:Class="SimpleIdServer.Mobile.QRCodeInputPage"
+             Shell.TabBarIsVisible="false"
+             Title="Enter QR Code">
+    <Grid>
+        <common:Loader IsVisible="{Binding Path=IsLoading}" ZIndex="2" />
+        <Grid Margin="20" ZIndex="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="10" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="10" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+            <Editor Text="{Binding QRCode, Mode=TwoWay}" Placeholder="Enter QR Code" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Grid.Row="0"></Editor>
+            <Button Text="Save" Command="{Binding SubmitQRCodeCommand}" Grid.Row="2" />
+            <Button Text="Close" Command="{Binding CloseCommand}" Grid.Row="4" />
+        </Grid>
+    </Grid>
+</ContentPage>

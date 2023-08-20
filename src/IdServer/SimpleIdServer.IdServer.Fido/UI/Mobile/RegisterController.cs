@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Fido.UI.ViewModels;
 
@@ -8,9 +9,11 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
     [Area(Constants.MobileAMR)]
     public class RegisterController : BaseController
     {
-        public RegisterController()
-        {
+        private readonly FidoOptions _options;
 
+        public RegisterController(IOptions<FidoOptions> options)
+        {
+            _options = options.Value;
         }
 
         [HttpGet]
@@ -23,7 +26,8 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
             {
                 Login = string.Empty,
                 BeginRegisterUrl = $"{issuer}/{prefix}{Constants.EndPoints.BeginQRCodeRegister}",
-                RegisterStatusUrl = $"{issuer}/{prefix}{Constants.EndPoints.RegisterStatus}"
+                RegisterStatusUrl = $"{issuer}/{prefix}{Constants.EndPoints.RegisterStatus}",
+                IsDeveloperModeEnabled = _options.IsDeveloperModeEnabled
             });
         }
     }

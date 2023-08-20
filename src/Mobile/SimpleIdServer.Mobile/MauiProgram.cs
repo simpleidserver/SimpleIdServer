@@ -26,6 +26,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<EnrollPage>();
 		builder.Services.AddTransient<SettingsPage>();
 		builder.Services.AddTransient<QRCodeScannerPage>();
+		builder.Services.AddTransient<QRCodeInputPage>();
 		builder.Services.AddTransient<QRCodeScannerViewModel>();
         builder.Services.AddTransient<EnrollViewModel>();
 		builder.Services.AddTransient<SettingsPageViewModel>();

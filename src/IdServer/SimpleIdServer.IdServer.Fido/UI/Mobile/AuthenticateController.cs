@@ -24,11 +24,13 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
     [Area(Constants.MobileAMR)]
     public class AuthenticateController : BaseAuthenticationMethodController<AuthenticateMobileViewModel>
     {
+        private readonly FidoOptions _options;
         private readonly IAuthenticationHelper _authenticationHelper;
         private readonly IDistributedCache _distributedCache;
 
-        public AuthenticateController(IAuthenticationHelper authenticationHelper, IDistributedCache distributedCache, IOptions<IdServerHostOptions> options, IAuthenticationSchemeProvider authenticationSchemeProvider, IDataProtectionProvider dataProtectionProvider, IClientRepository clientRepository, IAmrHelper amrHelper, IUserRepository userRepository, IUserTransformer userTransformer, IBusControl busControl) : base(options, authenticationSchemeProvider, dataProtectionProvider, clientRepository, amrHelper, userRepository, userTransformer, busControl)
+        public AuthenticateController(IOptions<FidoOptions> fidoOptions, IAuthenticationHelper authenticationHelper, IDistributedCache distributedCache, IOptions<IdServerHostOptions> options, IAuthenticationSchemeProvider authenticationSchemeProvider, IDataProtectionProvider dataProtectionProvider, IClientRepository clientRepository, IAmrHelper amrHelper, IUserRepository userRepository, IUserTransformer userTransformer, IBusControl busControl) : base(options, authenticationSchemeProvider, dataProtectionProvider, clientRepository, amrHelper, userRepository, userTransformer, busControl)
         {
+            _options = fidoOptions.Value;
             _authenticationHelper = authenticationHelper;
             _distributedCache= distributedCache;
         }
@@ -52,6 +54,7 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
             viewModel.BeginLoginUrl = $"{issuer}/{viewModel.Realm}/{Constants.EndPoints.BeginQRCodeLogin}";
             viewModel.LoginStatusUrl = $"{issuer}/{viewModel.Realm}/{Constants.EndPoints.LoginStatus}";
+            viewModel.IsDeveloperModeEnabled = _options.IsDeveloperModeEnabled;
         }
 
         protected override async Task<ValidationStatus> ValidateCredentials(AuthenticateMobileViewModel viewModel, User user, CancellationToken cancellationToken)

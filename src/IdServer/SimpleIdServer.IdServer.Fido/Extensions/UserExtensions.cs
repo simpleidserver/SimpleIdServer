@@ -19,10 +19,7 @@ namespace SimpleIdServer.IdServer.Domains
                 {
                     Type = attestation.Type,
                     Id = attestation.Id,
-                    Descriptor = new PublicKeyCredentialDescriptor(attestation.CredentialId)
-                    {
-                        Id = attestation.Id
-                    },
+                    Descriptor = new PublicKeyCredentialDescriptor(attestation.Id),
                     PublicKey = attestation.PublicKey,
                     UserHandle = attestation.User.Id,
                     SignCount = attestation.Counter,

@@ -151,6 +151,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à QR Code.
+        /// </summary>
+        public static string qrcode {
+            get {
+                return ResourceManager.GetString("qrcode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Register.
         /// </summary>
         public static string register {

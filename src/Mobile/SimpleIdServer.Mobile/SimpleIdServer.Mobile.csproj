@@ -85,6 +85,9 @@
 	  <Compile Update="Common\Loader.xaml.cs">
 	    <DependentUpon>Loader.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="QRCodeInputPage.xaml.cs">
+	    <DependentUpon>QRCodeInputPage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="SettingsPage.xaml.cs">
 	    <DependentUpon>SettingsPage.xaml</DependentUpon>
 	  </Compile>
@@ -98,6 +101,9 @@
 
 	<ItemGroup>
 	  <MauiXaml Update="Common\Loader.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="QRCodeInputPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="SettingsPage.xaml">

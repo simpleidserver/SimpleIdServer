@@ -61,6 +61,14 @@ else
     <div id="qrCode" style="display: none; text-align: center;">
         <h3>@AuthenticateMobileResource.scan_mobileapp</h3>
         <img src="#" style="max-width:280px;"/>
+        @if(Model.IsDeveloperModeEnabled)
+        {
+            <div class="divider"></div>
+            <div id="qrCodeText">
+                <h3>@AuthenticateMobileResource.qrcode</h3>
+                <textarea class="form-control" rows="5"></textarea>
+            </div>
+        }
     </div>
 }
 
@@ -84,10 +92,14 @@ else
                 $("#errors").append("<li  class='list-group-item list-group-item-danger'>" + errorJson["error_description"] + "</li>");
             }
 
-            var displayQRCode = function(img) {
+            var displayQRCode = function (img, qrCode) {
                 $("#mobileAuth").css("display", "none");
                 $("#qrCode").css("display", "");
                 $("#qrCode img").attr("src", img);
+                var qrCodeText = $("#qrCodeText");
+                if (qrCodeText.length > 0) {
+                    $("#qrCodeText textarea").val(qrCode);
+                }
             }
 
             async function checkStatus(sessionId) {
@@ -123,12 +135,13 @@ else
                     displayError(json);
                     return;
                 }
-                
+
                 const sessionId = response.headers.get('SessionId');
+                const qrCode = response.headers.get('QRCode');
                 const blob = await response.blob();
                 const img = URL.createObjectURL(blob);
 
-                displayQRCode(img);
+                displayQRCode(img, qrCode);
                 await checkStatus(sessionId);
             }
 

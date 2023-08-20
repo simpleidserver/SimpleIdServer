@@ -8,6 +8,7 @@
              xmlns:common="clr-namespace:SimpleIdServer.Mobile.Common"
              xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.MAUI.Controls"
              x:Class="SimpleIdServer.Mobile.QRCodeScannerPage"
+             Shell.TabBarIsVisible="false"
              Title="Scan QR Code">
     <ContentPage.Resources>
         <ResourceDictionary>

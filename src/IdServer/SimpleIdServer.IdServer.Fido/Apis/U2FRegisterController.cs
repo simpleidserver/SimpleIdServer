@@ -60,15 +60,17 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             var kvp = await CommonBegin(prefix, request, cancellationToken);
             if (kvp.Item2 != null) return kvp.Item2;
             var qrGenerator = new QRCodeGenerator();
-            var qrCodeData = qrGenerator.CreateQrCode(JsonSerializer.Serialize(new QRCodeResult
+            var json = JsonSerializer.Serialize(new QRCodeResult
             {
                 Action = "register",
                 SessionId = kvp.Item1.SessionId,
                 ReadQRCodeURL = $"{issuer}/{prefix}/{Constants.EndPoints.ReadRegisterQRCode}/{kvp.Item1.SessionId}"
-            }), QRCodeGenerator.ECCLevel.Q);
+            });
+            var qrCodeData = qrGenerator.CreateQrCode(json, QRCodeGenerator.ECCLevel.Q);
             var qrCode = new PngByteQRCode(qrCodeData);
             var payload = qrCode.GetGraphic(20);
             Response.Headers.Add("SessionId", kvp.Item1.SessionId);
+            Response.Headers.Add("QRCode", json);
             return File(payload, "image/png");
         }
 

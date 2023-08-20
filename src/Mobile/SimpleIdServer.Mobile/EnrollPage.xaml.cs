@@ -12,11 +12,6 @@ public partial class EnrollPage : ContentPage
 		InitializeComponent();
 	}
 
-	private async void OnEnrollClicked(object sender, EventArgs e)
-	{
-		await Shell.Current.GoToAsync("scanqrcode");
-    }
-
     protected override void OnAppearing()
     {
         base.OnAppearing();

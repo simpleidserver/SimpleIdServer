@@ -70,7 +70,7 @@ void ConfigureIdServer(IServiceCollection services)
         .AddBackChannelAuthentication()
         .AddEmailAuthentication()
         .AddSmsAuthentication()
-        .AddFidoAuthentication()
+        .AddFidoAuthentication(c => c.IsDeveloperModeEnabled = true)
         .EnableConfigurableAuthentication()
         .UseRealm()
         .AddAuthentication(callback: (a) =>

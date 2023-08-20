@@ -147,6 +147,9 @@
   <data name="missing_session_id" xml:space="preserve">
     <value>Session Identifier is missing</value>
   </data>
+  <data name="qrcode" xml:space="preserve">
+    <value>QR Code</value>
+  </data>
   <data name="register" xml:space="preserve">
     <value>Register</value>
   </data>

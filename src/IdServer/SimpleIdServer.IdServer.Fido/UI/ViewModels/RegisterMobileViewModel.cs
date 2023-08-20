@@ -8,5 +8,6 @@ namespace SimpleIdServer.IdServer.Fido.UI.ViewModels
         public string DisplayName { get; set; } = null!;
         public string BeginRegisterUrl { get; set; } = null!;
         public string RegisterStatusUrl { get; set; } = null!;
+        public bool IsDeveloperModeEnabled { get; set; } = false;
     }
 }

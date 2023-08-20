@@ -20,7 +20,7 @@ public partial class App : Application
 
 		MainPage = new AppShell();
 
-		Routing.RegisterRoute("enroll", typeof(EnrollPage));
-		Routing.RegisterRoute("scanqrcode", typeof(QRCodeScannerPage));
-	}
+		Routing.RegisterRoute("enrollscanqrcode", typeof(QRCodeScannerPage));
+        Routing.RegisterRoute("enrollsubmitqrcode", typeof(QRCodeInputPage));
+    }
 }
