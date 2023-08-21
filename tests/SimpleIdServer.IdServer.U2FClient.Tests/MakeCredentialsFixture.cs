@@ -80,10 +80,7 @@ namespace SimpleIdServer.IdServer.U2FClient.Tests
                 UserVerificationMethod = true,
                 DevicePubKey = new AuthenticationExtensionsDevicePublicKeyInputs()
             };
-            var descriptor = new PublicKeyCredentialDescriptor(result.CredentialId)
-            {
-                Id = result.Id
-            };
+            var descriptor = new PublicKeyCredentialDescriptor(result.Id);
             var assertionOptions = _fido2.GetAssertionOptions(
                 new List<PublicKeyCredentialDescriptor> { descriptor },
                 UserVerificationRequirement.Discouraged,

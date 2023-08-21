@@ -34,7 +34,7 @@
     <input type="hidden" name="Action" value="AUTHENTICATE" />
     <!-- Email -->
     <div class="input-group mb-3">
-        <input asp-for="Email" placeholder="@AuthenticateEmailResource.email" type="text" class="form-control" />
+        <input asp-for="Login" placeholder="@AuthenticateEmailResource.email" type="text" class="form-control" />
     </div>
     <!-- Confirmation code -->
     <div class="input-group mb-3">
@@ -64,7 +64,7 @@
         <input type="hidden" asp-for="ReturnUrl" />
         <input type="hidden" name="Action" value="SENDCONFIRMATIONCODE" />
         <div class="input-group mb-3">
-            <input asp-for="Email" type="text" class="form-control" placeholder="@AuthenticateEmailResource.email" />
+            <input asp-for="Login" type="text" class="form-control" placeholder="@AuthenticateEmailResource.email" />
         </div>
         <button type="submit" class="btn btn-primary">@AuthenticateEmailResource.sendconfirmationcode</button>
     }

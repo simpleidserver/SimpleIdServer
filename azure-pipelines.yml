@@ -10,6 +10,17 @@ pool:
   name: Default
 
 steps:
+- checkout: self
+  fetchDepth: 0
+  fetchTags: true
+
+- powershell: |
+     $gitVersion = git describe --abbrev=0 --tags
+     $buildNumber = $gitVersion + "." + $env:BUILD_BUILDNUMBER
+     Write-Host "##vso[task.setvariable variable=buildVersion;isoutput=true]$buildNumber"
+     Write-Host "Build number is $buildNumber"
+  name: gitVersion
+
 - task: NodeTool@0
   inputs:
     versionSpec: '16.14.x'
@@ -50,6 +61,16 @@ steps:
     zipAfterPublish: false
     modifyOutputPath: false
     workingDirectory: '$(Build.Repository.LocalPath)\src\Scim\SimpleIdServer.Scim.Startup'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Publish Mobile application'
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    arguments: '--version-suffix $(buildVersion) -f net7.0-android -c Release -p:AndroidKeyStore=true -p:AndroidSigningKeyStore=sidmobile.keystore -p:AndroidSigningKeyAlias=sidkey -p:AndroidSigningKeyPass=password -p:AndroidSigningStorePass=password'
+    zipAfterPublish: false
+    modifyOutputPath: false
+    workingDirectory: '$(Build.Repository.LocalPath)\src\Mobile\SimpleIdServer.Mobile'
 
 - task: CopyFiles@2
   displayName: 'Copy website'
@@ -105,4 +126,11 @@ steps:
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)\scim'
     ArtifactName: 'scim'
+    publishLocation: 'Container'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish SCIM'
+  inputs:
+    PathtoPublish: '$(Build.Repository.LocalPath)\src\Mobile\SimpleIdServer.Mobile\bin\Release\net7.0-android\publish'
+    ArtifactName: 'mobileApp'
     publishLocation: 'Container'
