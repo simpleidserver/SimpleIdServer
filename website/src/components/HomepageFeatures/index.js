@@ -57,6 +57,15 @@ const FeatureList = [
       </>
     ),
   },
+  {
+    title: 'Mobile Application',    
+    Svg: require('@site/static/img/credentialissuer.svg').default,
+    description: (
+      <>
+        The mobile application can function as an authentication device, utilizing public-key encryption as outlined in the <a href="https://fidoalliance.org/specifications/">FIDO U2F authentication standard</a>.
+      </>
+    )
+  }
 ];
 
 function Feature({Svg, title, description}) {

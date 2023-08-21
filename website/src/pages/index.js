@@ -20,7 +20,12 @@ function HomepageHeader() {
           <Link
             className="button button--secondary button--lg"
             to="https://website.simpleidserver.com">
-            Demo
+            Demo Administration Website
+          </Link>
+          <Link 
+            className="button button--secondary button--lg"
+            to="https://appetize.io/app/pndcdf5lgtouyv72pdegfij2ri?device=pixel4&osVersion=11.0&scale=75">
+              Demo Mobile Application
           </Link>
         </div>
       </div>

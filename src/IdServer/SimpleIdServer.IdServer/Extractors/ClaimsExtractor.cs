@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -44,8 +45,15 @@ namespace SimpleIdServer.IdServer.Extractors
             {
                 var extractor = _extractors.Single(e => e.MappingRuleType == mappingRule.MapperType);
                 var value = extractor.Extract(context, mappingRule);
-                var splittedPath = mappingRule.TargetClaimPath.Split('.');
-                Populate(dic, value, splittedPath);
+                if (Uri.TryCreate(mappingRule.TargetClaimPath, UriKind.Absolute, out Uri r))
+                {
+                    dic.Add(mappingRule.TargetClaimPath, value);
+                }
+                else
+                {
+                    var splittedPath = mappingRule.TargetClaimPath.Split('.');
+                    Populate(dic, value, splittedPath);
+                }
             }
 
             return dic;

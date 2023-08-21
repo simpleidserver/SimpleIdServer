@@ -105,6 +105,7 @@ public class ClaimsController : Controller
         return View();
     }
 }
+```
 
 6. Create a view `Views\Claims\Index.cshtml` with the following content. This view will display all the claims of the authenticated user.
 
