@@ -12,7 +12,8 @@ namespace SimpleIdServer.IdServer.U2FClient.Tests
         private const string RP = "https://localhost:5001";
         private Fido2 _fido2 = new Fido2(new Fido2Configuration
         {
-            ServerDomain = RP,
+            ServerName = "SimpleIdServer",
+            ServerDomain = "localhost",
             Origins = new HashSet<string> { RP }
         });
 
@@ -92,7 +93,7 @@ namespace SimpleIdServer.IdServer.U2FClient.Tests
             var authResponse = attestationBuilder.BuildAuthResponse(new AuthenticationParameter
             {
                 Challenge = assertionOptions.Challenge,
-                Rp = RP,
+                Rp = "localhost",
                 Certificate = response.AttestationCertificate,
                 CredentialId = response.CredentialId,
                 Signcount = storedCounter

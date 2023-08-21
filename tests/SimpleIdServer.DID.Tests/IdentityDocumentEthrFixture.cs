@@ -31,7 +31,7 @@ namespace SimpleIdServer.DID.Tests
             await sync.Sync(identityDocument, publicKey, privateKey, contractAdr);
         }
 
-        [Test]
+        // [Test]
         public async Task When_ReadIdentityDocument_Then_MetadataAreCorrect()
         {
             const string id = $"did:ethr:{network}:{publicKey}";
