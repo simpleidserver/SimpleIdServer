@@ -72,13 +72,15 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var uniqueGlobalAttributes = scimRepresentation.FlatAttributes.Where(s => s.IsLeaf()).Where(a => a.SchemaAttribute.MultiValued == false && a.SchemaAttribute.Uniqueness == SCIMSchemaAttributeUniqueness.GLOBAL);
             await CheckSCIMRepresentationExistsForGivenUniqueAttributes(uniqueServerAttributeIds, addRepresentationCommand.ResourceType);
             await CheckSCIMRepresentationExistsForGivenUniqueAttributes(uniqueGlobalAttributes);
-            var references = _representationReferenceSync.Sync(addRepresentationCommand.ResourceType, new SCIMRepresentation(), scimRepresentation, addRepresentationCommand.Location, schema).ToList();
+            var refIterator = _representationReferenceSync.Sync(addRepresentationCommand.ResourceType, new SCIMRepresentation(), scimRepresentation, addRepresentationCommand.Location, schema);
             using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
             {
+                var references = new List<RepresentationSyncResult>();
                 await _scimRepresentationCommandRepository.Add(scimRepresentation).ConfigureAwait(false);
-                foreach (var reference in references)
+                foreach (var reference in refIterator)
                 {
                     await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes).ConfigureAwait(false);
+                    references.Add(reference);
                 }
 
                 await transaction.Commit().ConfigureAwait(false);

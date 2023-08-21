@@ -10,6 +10,7 @@ using SimpleIdServer.Scim.Infrastructure;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Resources;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace SimpleIdServer.Scim.Commands.Handlers
 {
@@ -35,13 +36,15 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             if (schema == null) throw new SCIMSchemaNotFoundException();
             var representation = await _scimRepresentationCommandRepository.Get(request.Id);
             if (representation == null) throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, request.Id));
-            var references = _representationReferenceSync.Sync(request.ResourceType, representation, representation, request.Location, schema, true, true).ToList();
+            var refIterator = _representationReferenceSync.Sync(request.ResourceType, representation, representation, request.Location, schema, true, true);
             using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
             {
-                foreach (var reference in references)
+                var references = new List<RepresentationSyncResult>();
+                foreach (var reference in refIterator)
                 {
                     await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes).ConfigureAwait(false);
                     await _scimRepresentationCommandRepository.BulkDelete(reference.RemovedRepresentationAttributes).ConfigureAwait(false);
+                    references.Add(reference);
                 }
 
                 await _scimRepresentationCommandRepository.Delete(representation).ConfigureAwait(false);

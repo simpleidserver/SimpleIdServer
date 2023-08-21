@@ -106,17 +106,17 @@ namespace SimpleIdServer.Scim.Parser.Expressions
 
         #region Filter Representations
 
-        public static LambdaExpression Evaluate(this SCIMExpression expression, IQueryable<SCIMRepresentation> representations)
+        public static LambdaExpression Evaluate<T>(this SCIMExpression expression, IQueryable<T> representations) where T : SCIMRepresentation
         {
-            var representationParameter = Expression.Parameter(typeof(SCIMRepresentation), "rp");
+            var representationParameter = Expression.Parameter(typeof(T), "rp");
             var anyLambdaExpression = expression.Evaluate(representationParameter);
             var enumarableType = typeof(Queryable);
             var whereMethod = enumarableType.GetMethods()
                  .Where(m => m.Name == "Where" && m.IsGenericMethodDefinition)
-                 .Where(m => m.GetParameters().Count() == 2).First().MakeGenericMethod(typeof(SCIMRepresentation));
-            var equalLambda = Expression.Lambda<Func<SCIMRepresentation, bool>>(anyLambdaExpression, representationParameter);
+                 .Where(m => m.GetParameters().Count() == 2).First().MakeGenericMethod(typeof(T));
+            var equalLambda = Expression.Lambda<Func<T, bool>>(anyLambdaExpression, representationParameter);
             var whereExpr = Expression.Call(whereMethod, Expression.Constant(representations), equalLambda);
-            var finalSelectArg = Expression.Parameter(typeof(IQueryable<SCIMRepresentation>), "f");
+            var finalSelectArg = Expression.Parameter(typeof(IQueryable<T>), "f");
             var finalSelectRequestBody = Expression.Lambda(whereExpr, new ParameterExpression[] { finalSelectArg });
             return finalSelectRequestBody;
         }

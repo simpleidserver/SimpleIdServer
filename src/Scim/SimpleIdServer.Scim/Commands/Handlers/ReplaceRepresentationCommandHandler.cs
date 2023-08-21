@@ -83,14 +83,16 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             await CheckSCIMRepresentationExistsForGivenUniqueAttributes(uniqueGlobalAttributes, existingRepresentation.Id);
             
             var isReferenceProperty = await _representationReferenceSync.IsReferenceProperty(replaceRepresentationCommand.Representation.Attributes.GetKeys());
-            var references = _representationReferenceSync.Sync(updateResult.AttributeMappingLst, replaceRepresentationCommand.ResourceType, oldRepresentation, existingRepresentation, replaceRepresentationCommand.Location, schema, !isReferenceProperty).ToList();
+            var refIterator = _representationReferenceSync.Sync(updateResult.AttributeMappingLst, replaceRepresentationCommand.ResourceType, oldRepresentation, existingRepresentation, replaceRepresentationCommand.Location, schema, !isReferenceProperty);
             using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
             {
-                foreach (var reference in references)
+                var references = new List<RepresentationSyncResult>();
+                foreach (var reference in refIterator)
                 {
                     await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes).ConfigureAwait(false);
                     await _scimRepresentationCommandRepository.BulkDelete(reference.RemovedRepresentationAttributes).ConfigureAwait(false);
                     await _scimRepresentationCommandRepository.BulkUpdate(reference.UpdatedRepresentationAttributes).ConfigureAwait(false);
+                    references.Add(reference);
                 }
 
                 await _scimRepresentationCommandRepository.Update(existingRepresentation).ConfigureAwait(false);

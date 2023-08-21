@@ -58,14 +58,16 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var displayNameDifferent = existingRepresentation.DisplayName != oldDisplayName;
             if (!patchResult.Any()) return GenericResult<PatchRepresentationResult>.Ok(PatchRepresentationResult.NoPatch());
             existingRepresentation.SetUpdated(DateTime.UtcNow);
-            var references = _representationReferenceSync.Sync(patchRepresentationCommand.ResourceType, existingRepresentation, patchResult, patchRepresentationCommand.Location, schema, displayNameDifferent).ToList();
+            var refIterator = _representationReferenceSync.Sync(patchRepresentationCommand.ResourceType, existingRepresentation, patchResult, patchRepresentationCommand.Location, schema, displayNameDifferent);
             using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
             {
-                foreach (var reference in references)
+                var references = new List<RepresentationSyncResult>();
+                foreach (var reference in refIterator)
                 {
                     await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes).ConfigureAwait(false);
                     await _scimRepresentationCommandRepository.BulkUpdate(reference.UpdatedRepresentationAttributes).ConfigureAwait(false);
                     await _scimRepresentationCommandRepository.BulkDelete(reference.RemovedRepresentationAttributes).ConfigureAwait(false);
+                    references.Add(reference);
                 }
                 
                 await _scimRepresentationCommandRepository.Update(existingRepresentation).ConfigureAwait(false);
