@@ -67,7 +67,7 @@ steps:
   inputs:
     command: 'publish'
     publishWebProjects: false
-    arguments: '--version-suffix $(buildVersion) -f net7.0-android -c Release -p:AndroidKeyStore=true -p:AndroidSigningKeyStore=sidmobile.keystore -p:AndroidSigningKeyAlias=sidkey -p:AndroidSigningKeyPass=password -p:AndroidSigningStorePass=password'
+    arguments: '-f net7.0-android -c Release -p:AndroidKeyStore=true -p:AndroidSigningKeyStore=sidmobile.keystore -p:AndroidSigningKeyAlias=sidkey -p:AndroidSigningKeyPass=password -p:AndroidSigningStorePass=password'
     zipAfterPublish: false
     modifyOutputPath: false
     workingDirectory: '$(Build.Repository.LocalPath)\src\Mobile\SimpleIdServer.Mobile'
