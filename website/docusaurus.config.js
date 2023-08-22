@@ -81,6 +81,12 @@ const config = {
           { type: 'doc', docId: 'consultancy', label: 'Consultancy', position: 'left' },
           { type: 'doc', docId: 'tutorial/overview', label: 'Tutorial', position: 'left' },
           { type: 'doc', docId: 'contactus', label: 'Contact us', position: 'left' },
+          {
+            type: 'docsVersionDropdown',
+            position: 'right',
+            dropdownItemsAfter: [{to: '/versions', label: 'All versions'}],
+            dropdownActiveClassDisabled: true,
+          },
           /*{ to: 'blog', label: 'Blog', position: 'left'},*/
           {
             href: 'https://github.com/simpleidserver',
