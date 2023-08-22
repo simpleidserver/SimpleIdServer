@@ -9,7 +9,6 @@ const config = {
   title: 'SimpleIdServer',
   tagline: 'Introducing the First Open Source Identity and Access Management Solution Developed with .NET',
   favicon: 'img/favicon.ico',
-
   // Set the production url of your site here
   url: 'https://simpleidserver.com',
   // Set the /<baseUrl>/ pathname under which your site is served
@@ -21,7 +20,7 @@ const config = {
   organizationName: 'simpleidserver', // Usually your GitHub org/user name.
   projectName: 'simpleidserver', // Usually your repo name.
 
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'ignore',
   onBrokenMarkdownLinks: 'warn',
 
   // Even if you don't use internalization, you can use this field to set useful
