@@ -70,7 +70,17 @@ void ConfigureIdServer(IServiceCollection services)
         .AddBackChannelAuthentication()
         .AddEmailAuthentication()
         .AddSmsAuthentication()
-        .AddFidoAuthentication(c => c.IsDeveloperModeEnabled = true)
+        .AddFidoAuthentication(c =>
+        {
+            c.IsDeveloperModeEnabled = true;
+        }, f =>
+        {
+            var authority = builder.Configuration["Authority"];
+            var url = new Uri(authority);
+            f.ServerName = "SimpleIdServer";
+            f.ServerDomain = url.Host;
+            f.Origins = new HashSet<string> { authority };
+        })
         .EnableConfigurableAuthentication()
         .UseRealm()
         .AddAuthentication(callback: (a) =>
