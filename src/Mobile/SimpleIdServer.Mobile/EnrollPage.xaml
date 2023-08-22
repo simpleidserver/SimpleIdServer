@@ -32,7 +32,7 @@
                 Text="Enter QR Code"
                 HorizontalOptions="Fill"
                 Command="{Binding Path=SubmitQRCodeCommand}"
-                IsVisible="{Binding Path=IsDeveloperModeEnabled}" />
+                IsVisible="{Binding Path=IsDeveloperModeEnabled}"  />
         </StackLayout>
     </Grid>
 </ContentPage>

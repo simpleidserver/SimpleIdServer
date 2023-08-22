@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
-using Plugin.Firebase.CloudMessaging;
 using SimpleIdServer.Mobile.Services;
 using SimpleIdServer.Mobile.ViewModels;
 using ZXing.Net.Maui.Controls;
@@ -28,6 +27,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<QRCodeScannerPage>();
 		builder.Services.AddTransient<QRCodeInputPage>();
 		builder.Services.AddTransient<QRCodeScannerViewModel>();
+		builder.Services.AddTransient<QRCodeInputViewModel>();
         builder.Services.AddTransient<EnrollViewModel>();
 		builder.Services.AddTransient<SettingsPageViewModel>();
         builder.Services.Configure<MobileOptions>(o =>

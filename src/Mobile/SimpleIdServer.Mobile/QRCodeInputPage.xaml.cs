@@ -4,7 +4,7 @@ namespace SimpleIdServer.Mobile;
 
 public partial class QRCodeInputPage : ContentPage
 {
-	public QRCodeInputPage(QRCodeScannerViewModel viewModel)
+    public QRCodeInputPage(QRCodeInputViewModel viewModel)
     {
         BindingContext = viewModel;
         InitializeComponent();
