@@ -38,11 +38,11 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             return result;
         }
 
-        public async Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByIds(IEnumerable<string> representationIds)
+        public async Task<List<SCIMRepresentation>> FindSCIMRepresentationByIds(IEnumerable<string> representationIds)
         {
             var result = await _scimDbContext.SCIMRepresentationLst.AsQueryable()
                 .Where(r => representationIds.Contains(r.Id))
-                .ToMongoListAsync<SCIMRepresentationModel>();
+                .ToMongoListAsync();
             if (result.Any())
             {
                 var references = result.SelectMany(r => r.SchemaRefs).Distinct().ToList();
@@ -51,11 +51,12 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                     representation.Schemas = schemas.Where(s => representation.SchemaRefs.Any(r => r.Id == s.Id)).ToList();
             }
 
-            return result;
+            return result.Select(x => x as SCIMRepresentation).ToList();
         }
 
-        public IEnumerable<IEnumerable<SCIMRepresentation>> FindPaginatedRepresentations(IEnumerable<string> representationIds, string resourceType = null, int nbRecords = 50, bool ignoreAttributes = false)
+        public Task<List<SCIMRepresentation>> FindPaginatedRepresentations(List<string> representationIds, string resourceType = null, int nbRecords = 50, bool ignoreAttributes = false)
         {
+            var representations = new List<SCIMRepresentation>();
             var nb = representationIds.Count();
             var nbPages = Math.Ceiling((decimal)(nb / nbRecords));
             for (var i = 0; i <= nbPages; i++)
@@ -71,12 +72,15 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                 foreach(var representation in result)
                     representation.Schemas = schemas.Where(s => representation.SchemaRefs.Any(r => r.Id == s.Id)).ToList();
 
-                yield return result;
+                representations.AddRange(result);
             }
+
+            return Task.FromResult(representations);
         }
 
-        public IEnumerable<IEnumerable<SCIMRepresentationAttribute>> FindPaginatedGraphAttributes(string valueStr, string schemaAttributeId, int nbRecords = 50, string sourceRepresentationId = null)
+        public Task<List<SCIMRepresentationAttribute>> FindPaginatedGraphAttributes(string valueStr, string schemaAttributeId, int nbRecords = 50, string sourceRepresentationId = null)
         {
+            var attributes = new List<SCIMRepresentationAttribute>();
             var query = _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
                 .Where(a => a.SchemaAttributeId == schemaAttributeId && a.ValueString == valueStr || (sourceRepresentationId != null && a.ValueString == sourceRepresentationId))
                 .OrderBy(r => r.ParentAttributeId)
@@ -89,12 +93,14 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                 var result = _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
                     .Where(a => parentIds.Contains(a.Id) || parentIds.Contains(a.ParentAttributeId))
                     .ToMongoListAsync().Result;
-                yield return result;
+                attributes.AddRange(result);
             }
+            return Task.FromResult(attributes);
         }
 
-        public IEnumerable<IEnumerable<SCIMRepresentationAttribute>> FindPaginatedGraphAttributes(IEnumerable<string> representationIds, string valueStr, string schemaAttributeId, int nbRecords = 50, string sourceRepresentationId = null)
+        public Task<List<SCIMRepresentationAttribute>> FindPaginatedGraphAttributes(IEnumerable<string> representationIds, string valueStr, string schemaAttributeId, int nbRecords = 50, string sourceRepresentationId = null)
         {
+            var attributes = new List<SCIMRepresentationAttribute>();
             var nb = representationIds.Count();
             var nbPages = Math.Ceiling((decimal)(nb / nbRecords));
             for (var i = 0; i <= nbPages; i++)
@@ -107,8 +113,9 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                 var result = _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
                     .Where(a => parentIds.Contains(a.Id) || parentIds.Contains(a.ParentAttributeId))
                     .ToMongoListAsync().Result;
-                yield return result;
+                attributes.AddRange(result);
             }
+            return Task.FromResult(attributes);
         }
 
         public async Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string schemaAttributeId, string value, string endpoint = null)
@@ -143,7 +150,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             return result;
         }
 
-        public async Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationsByAttributeFullPath(string fullPath, IEnumerable<string> values, string resourceType)
+        public async Task<List<SCIMRepresentation>> FindSCIMRepresentationsByAttributeFullPath(string fullPath, IEnumerable<string> values, string resourceType)
         {
             var representationIds = await _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
                 .Where(a => a.FullPath == fullPath && values.Contains(a.ValueString))
@@ -160,7 +167,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                     representation.Schemas = schemas.Where(s => representation.SchemaRefs.Any(r => r.Id == s.Id)).ToList();
             }
 
-            return result;
+            return result.Select(x => x as SCIMRepresentation).ToList();
         }
 
         public async Task<ITransaction> StartTransaction(CancellationToken token)
