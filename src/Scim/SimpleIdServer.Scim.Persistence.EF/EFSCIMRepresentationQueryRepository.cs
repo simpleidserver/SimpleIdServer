@@ -8,7 +8,8 @@ using SimpleIdServer.Scim.Persistence.EF.Extensions;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.Scim.Persistence.EF {
+namespace SimpleIdServer.Scim.Persistence.EF 
+{
     public class EFSCIMRepresentationQueryRepository : ISCIMRepresentationQueryRepository 
     {
         private readonly SCIMDbContext _scimDbContext;
@@ -20,7 +21,7 @@ namespace SimpleIdServer.Scim.Persistence.EF {
 
         public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId) 
         {
-            return _scimDbContext.SCIMRepresentationLst
+            return _scimDbContext.SCIMRepresentationLst.AsNoTracking()
                 .Include(r => r.FlatAttributes)
                 .Include(r => r.Schemas).ThenInclude(s => s.Attributes).FirstOrDefaultAsync(r => r.Id == representationId);
         }

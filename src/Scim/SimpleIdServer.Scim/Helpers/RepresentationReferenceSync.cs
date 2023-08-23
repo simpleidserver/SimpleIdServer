@@ -95,7 +95,8 @@ namespace SimpleIdServer.Scim.Helpers
                             var fa = rep.FlatAttributes.SingleOrDefault(a => a.SchemaAttributeId == targetAttributeValue.Id && a.ValueString == newSourceScimRepresentation.Id);
                             if(fa == null)
                                 result.AddReferenceAttributes(BuildScimRepresentationAttribute(rep.Id, attributeMapping.TargetAttributeId, newSourceScimRepresentation, mode, newSourceScimRepresentation.ResourceType, targetSchema));
-                            else {
+                            else 
+                            {
                                 var type = rep.FlatAttributes.Single(a => a.SchemaAttributeId == targetAttributeType.Id && a.ParentAttributeId == fa.ParentAttributeId);
                                 if(type.ValueString != "direct")
                                 {
@@ -180,7 +181,8 @@ namespace SimpleIdServer.Scim.Helpers
                             else
                             {
                                 var typeAttr = rep.FlatAttributes.Single(a => a.SchemaAttributeId == targetAttributeType.Id && a.ParentAttributeId == attr.ParentAttributeId);
-                                if(typeAttr.ValueString != "direct") {
+                                if(typeAttr.ValueString != "direct") 
+                                {
                                     typeAttr.ValueString = "direct";
                                     result.UpdateReferenceAttributes(new List<SCIMRepresentationAttribute> { typeAttr });
                                 }
@@ -335,7 +337,8 @@ namespace SimpleIdServer.Scim.Helpers
                                     foreach (var pa in parentAttrs)
                                     {
                                         var subAttrs = children.Where(c => c.ParentAttributeId == pa.Id).ToList();
-                                        if (subAttrs.Any(a => a.SchemaAttributeId == valueAttr.Id && notRemovedChldIds.Contains(a.ValueString))) {
+                                        if (subAttrs.Any(a => a.SchemaAttributeId == valueAttr.Id && notRemovedChldIds.Contains(a.ValueString))) 
+                                        {
                                             atLeastOneParent = true;
                                             break;
                                         }
@@ -421,7 +424,8 @@ namespace SimpleIdServer.Scim.Helpers
                 await _scimRepresentationCommandRepository.FindPaginatedGraphAttributes(childrenIds, scimRepresentation.Id, targetAttributeId.Id, sourceRepresentationId: sourceRepresentationId)
             };
 
-            foreach (var child in allChildren.Where(c => childrenIds.Contains(c.Id))) {
+            foreach (var child in allChildren.Where(c => childrenIds.Contains(c.Id))) 
+            {
                 children.AddRange(await ResolvePropagatedChildren(sourceRepresentationId, child, selfReferenceAttribute, targetAttributeId, allChildren));
             }
 
