@@ -9,47 +9,56 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Persistence.EF {
-    public class EFSCIMRepresentationQueryRepository : ISCIMRepresentationQueryRepository {
+    public class EFSCIMRepresentationQueryRepository : ISCIMRepresentationQueryRepository 
+    {
         private readonly SCIMDbContext _scimDbContext;
 
-        public EFSCIMRepresentationQueryRepository(SCIMDbContext scimDbContext) {
+        public EFSCIMRepresentationQueryRepository(SCIMDbContext scimDbContext) 
+        {
             _scimDbContext = scimDbContext;
         }
 
-        public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId) {
+        public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId) 
+        {
             return _scimDbContext.SCIMRepresentationLst
                 .Include(r => r.FlatAttributes)
                 .Include(r => r.Schemas).ThenInclude(s => s.Attributes).FirstOrDefaultAsync(r => r.Id == representationId);
         }
 
-        public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType) {
+        public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType) 
+        {
             return _scimDbContext.SCIMRepresentationLst
                 .Include(r => r.FlatAttributes).ThenInclude(s => s.SchemaAttribute)
                 .Include(r => r.Schemas).ThenInclude(s => s.Attributes)
                 .FirstOrDefaultAsync(r => r.Id == representationId && r.ResourceType == resourceType);
         }
 
-        public async Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType, GetSCIMResourceParameter parameter) {
+        public async Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType, GetSCIMResourceParameter parameter) 
+        {
             var query = _scimDbContext.SCIMRepresentationLst.AsNoTracking()
                 .Include(r => r.Schemas).ThenInclude(s => s.Attributes)
                 .Include(r => r.FlatAttributes).ThenInclude(s => s.SchemaAttribute);
             return await query.BuildResult(_scimDbContext, parameter.IncludedAttributes, parameter.ExcludedAttributes, representationId, resourceType);
         }
 
-        public async Task<SearchSCIMRepresentationsResponse> FindSCIMRepresentations(SearchSCIMRepresentationsParameter parameter) {
+        public async Task<SearchSCIMRepresentationsResponse> FindSCIMRepresentations(SearchSCIMRepresentationsParameter parameter) 
+        {
             IQueryable<SCIMRepresentation> queryableRepresentations = _scimDbContext.SCIMRepresentationLst
                 .Include(r => r.FlatAttributes)
                 .Where(s => s.ResourceType == parameter.ResourceType);
-            if (parameter.SortBy == null) {
+            if (parameter.SortBy == null) 
+            {
                 queryableRepresentations = queryableRepresentations.OrderBy(s => s.Id);
             }
 
-            if (parameter.Filter != null) {
+            if (parameter.Filter != null) 
+            {
                 var evaluatedExpression = parameter.Filter.Evaluate(queryableRepresentations);
                 queryableRepresentations = (IQueryable<SCIMRepresentation>)evaluatedExpression.Compile().DynamicInvoke(queryableRepresentations);
             }
 
-            if (parameter.SortBy != null) {
+            if (parameter.SortBy != null) 
+            {
                 return await parameter.SortBy.EvaluateOrderBy(
                     _scimDbContext,
                     queryableRepresentations,
