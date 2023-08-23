@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.WsFederation;
 using Microsoft.IdentityModel.Xml;
-using SimpleIdServer.IdServer.Extensions;
 using SimpleIdServer.IdServer.Stores;
 using System.Net;
 using System.Text;
@@ -16,7 +15,6 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
 {
     public class MetadataController : BaseWsFederationController
     {
-
         public MetadataController(IOptions<IdServerWsFederationOptions> options, IKeyStore keyStore) : base(options, keyStore) { }
 
         [HttpGet]
