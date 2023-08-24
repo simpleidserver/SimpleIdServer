@@ -17,7 +17,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Models
             }
 
             var collectionName = refs.First().CollectionName;
-            var ids = refs.Select(r => r.Id);
+            var ids = refs.Select(r => r.Id.AsString);
             var filter = Builders<T>.Filter.In(x => x.Id, ids);
             return mongoDatabase.GetCollection<T>(collectionName).Find(filter).ToList();
         }

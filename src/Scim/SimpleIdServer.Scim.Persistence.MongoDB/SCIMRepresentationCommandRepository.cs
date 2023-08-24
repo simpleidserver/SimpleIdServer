@@ -222,17 +222,18 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
         public async Task<bool> Update(SCIMRepresentation data, CancellationToken token)
         {
             var record = new SCIMRepresentationModel(data, _options.CollectionSchemas, _options.CollectionRepresentationAttributes);
+            foreach (var flatAttr in data.FlatAttributes) flatAttr.RepresentationId = data.Id;
             if (_session != null)
             {
                 await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(_session, s => s.Id == data.Id, record);
                 foreach (var attr in data.FlatAttributes)
-                    await _scimDbContext.SCIMRepresentationAttributeLst.ReplaceOneAsync(_session, s => s.Id == attr.Id, attr);
+                    await _scimDbContext.SCIMRepresentationAttributeLst.ReplaceOneAsync(_session, s => s.Id == attr.Id, attr, new ReplaceOptions { IsUpsert = true });
             }
             else
             {
                 await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(s => s.Id == data.Id, record);
                 foreach(var attr in data.FlatAttributes)
-                    await _scimDbContext.SCIMRepresentationAttributeLst.ReplaceOneAsync(s => s.Id == attr.Id, attr);
+                    await _scimDbContext.SCIMRepresentationAttributeLst.ReplaceOneAsync(s => s.Id == attr.Id, attr, new ReplaceOptions { IsUpsert = true });
             }
 
             return true;
@@ -302,7 +303,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             if (_session != null)
             {
                 foreach(var attr in scimRepresentationAttributes)
-                    await _scimDbContext.SCIMRepresentationAttributeLst.ReplaceOneAsync(_session, s => s.Id == attr.Id, attr);
+                    await _scimDbContext.SCIMRepresentationAttributeLst.ReplaceOneAsync(_session, s => s.Id == attr.Id, attr, new ReplaceOptions { IsUpsert = true });
                 foreach (var representation in result)
                 {
                     var updatedAttributes = scimRepresentationAttributes.Where(r => r.RepresentationId == representation.Id);
@@ -315,7 +316,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             else
             {
                 foreach (var attr in scimRepresentationAttributes)
-                    await _scimDbContext.SCIMRepresentationAttributeLst.ReplaceOneAsync(s => s.Id == attr.Id, attr);
+                    await _scimDbContext.SCIMRepresentationAttributeLst.ReplaceOneAsync(s => s.Id == attr.Id, attr, new ReplaceOptions { IsUpsert = true });
                 foreach (var representation in result)
                 {
                     var updatedAttributes = scimRepresentationAttributes.Where(r => r.RepresentationId == representation.Id);
