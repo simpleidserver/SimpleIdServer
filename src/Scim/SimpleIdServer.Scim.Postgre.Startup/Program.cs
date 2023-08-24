@@ -12,7 +12,7 @@ namespace SimpleIdServer.Scim.Postgre.Startup
             var host = Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults((cfg) =>
                 {
-                    cfg.UseUrls("http://*:5002");
+                    cfg.UseUrls("https://*:5003");
                     cfg.UseStartup<Startup>();
                 })
                 .Build();
