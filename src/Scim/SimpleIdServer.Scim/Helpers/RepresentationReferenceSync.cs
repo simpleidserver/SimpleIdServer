@@ -101,7 +101,7 @@ namespace SimpleIdServer.Scim.Helpers
                                 if(type.ValueString != "direct")
                                 {
                                     type.ValueString = "direct";
-                                    result.UpdateReferenceAttributes(new List<SCIMRepresentationAttribute> { type });
+                                    result.UpdateReferenceAttributes(new List<SCIMRepresentationAttribute> { type }, sync);
                                 }
                             }
 
@@ -130,7 +130,7 @@ namespace SimpleIdServer.Scim.Helpers
                     }
             }
 
-            var syncIndirectReferences = await SyncIndirectReferences(newSourceScimRepresentation, allAdded, allRemoved, propagatedAttribute, selfReferenceAttribute, mappedSchemas, location, mode, updateAllReferences);
+            var syncIndirectReferences = await SyncIndirectReferences(newSourceScimRepresentation, allAdded, allRemoved, propagatedAttribute, selfReferenceAttribute, mappedSchemas, sync, updateAllReferences);
             sync.AddRange(syncIndirectReferences);
             return sync;
         }
@@ -186,7 +186,7 @@ namespace SimpleIdServer.Scim.Helpers
                                 if(typeAttr.ValueString != "direct") 
                                 {
                                     typeAttr.ValueString = "direct";
-                                    result.UpdateReferenceAttributes(new List<SCIMRepresentationAttribute> { typeAttr });
+                                    result.UpdateReferenceAttributes(new List<SCIMRepresentationAttribute> { typeAttr }, sync);
                                 }
                             }
 
@@ -215,7 +215,7 @@ namespace SimpleIdServer.Scim.Helpers
             }
 
 
-            var syncIndirectReferences = await SyncIndirectReferences(newSourceScimRepresentation, allAdded, allRemoved, propagatedAttribute, selfReferenceAttribute, mappedSchemas, location, mode, updateAllReference);
+            var syncIndirectReferences = await SyncIndirectReferences(newSourceScimRepresentation, allAdded, allRemoved, propagatedAttribute, selfReferenceAttribute, mappedSchemas, sync, updateAllReference);
             sync.AddRange(syncIndirectReferences);
             return sync;
         }
@@ -226,7 +226,7 @@ namespace SimpleIdServer.Scim.Helpers
             return attributes.All(a => attrs.Any(at => at.SourceAttributeSelector == a));
         }
 
-        protected async Task<List<RepresentationSyncResult>> SyncIndirectReferences(SCIMRepresentation newSourceScimRepresentation, List<RepresentationModified> allAdded, List<RepresentationModified> allRemoved, SCIMAttributeMapping propagatedAttribute, SCIMAttributeMapping selfReferenceAttribute, List<SCIMSchema> mappedSchemas, string location, Mode mode, bool updateAllReference)
+        protected async Task<List<RepresentationSyncResult>> SyncIndirectReferences(SCIMRepresentation newSourceScimRepresentation, List<RepresentationModified> allAdded, List<RepresentationModified> allRemoved, SCIMAttributeMapping propagatedAttribute, SCIMAttributeMapping selfReferenceAttribute, List<SCIMSchema> mappedSchemas, List<RepresentationSyncResult> sync, bool updateAllReference)
         {
             // Update 'indirect' references.
             var references = new List<RepresentationSyncResult>();
@@ -254,7 +254,7 @@ namespace SimpleIdServer.Scim.Helpers
                     foreach (var ta in typeAttrs)
                         ta.ValueString = newSourceScimRepresentation.DisplayName;
 
-                    result.UpdateReferenceAttributes(typeAttrs);
+                    result.UpdateReferenceAttributes(typeAttrs, sync);
 
                     references.Add(result);
                 }
@@ -476,7 +476,7 @@ namespace SimpleIdServer.Scim.Helpers
         {
             var attributes = new List<SCIMRepresentationAttribute>();
             var targetSchemaAttribute = targetSchema.GetAttributeById(attributeId);
-            var values = targetSchema.GetChildren(targetSchemaAttribute).ToList();
+            var values = targetSchema.GetChildren(targetSchemaAttribute);
             var value = values.FirstOrDefault(s => s.Name == SCIMConstants.StandardSCIMReferenceProperties.Value);
             var display = values.FirstOrDefault(s => IsDisplayName(s.Name));
             var type = values.FirstOrDefault(s => s.Name == SCIMConstants.StandardSCIMReferenceProperties.Type);

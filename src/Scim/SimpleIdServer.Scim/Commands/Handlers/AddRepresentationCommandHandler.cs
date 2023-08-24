@@ -83,7 +83,6 @@ namespace SimpleIdServer.Scim.Commands.Handlers
 
                 await transaction.Commit().ConfigureAwait(false);
                 await NotifyAllReferences(references).ConfigureAwait(false);
-
             }
 
             scimRepresentation.ApplyEmptyArray();

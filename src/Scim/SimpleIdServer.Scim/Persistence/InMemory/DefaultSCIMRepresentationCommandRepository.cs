@@ -13,8 +13,11 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
     {
         public DefaultSCIMRepresentationCommandRepository(List<SCIMRepresentation> lstData) : base(lstData) { }
         
-        public Task<List<SCIMRepresentation>> FindPaginatedRepresentations(List<string> representationIds, string resourceType = null, int nbRecords = 50, bool ignoreAttributes = false) {
-            return Task.FromResult(LstData.Where(r => r.ResourceType == resourceType || string.IsNullOrWhiteSpace(resourceType)).ToList());
+        public Task<List<SCIMRepresentation>> FindPaginatedRepresentations(List<string> representationIds, string resourceType = null, int nbRecords = 50, bool ignoreAttributes = false)
+        {
+            var representations = LstData.AsQueryable().Where(r => representationIds.Contains(r.Id));
+            if (!string.IsNullOrWhiteSpace(resourceType)) representations = representations.Where(r => r.ResourceType == resourceType);
+            return Task.FromResult(representations.ToList());
         }
 
         public Task<List<SCIMRepresentationAttribute>> FindPaginatedGraphAttributes(string valueStr, string schemaAttributeId, int nbRecords = 50, string sourceRepresentationId = null)

@@ -84,17 +84,20 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             
             var isReferenceProperty = await _representationReferenceSync.IsReferenceProperty(replaceRepresentationCommand.Representation.Attributes.GetKeys());
             var references = await _representationReferenceSync.Sync(updateResult.AttributeMappingLst.ToList(), replaceRepresentationCommand.ResourceType, oldRepresentation, existingRepresentation, replaceRepresentationCommand.Location, schema, !isReferenceProperty);
-            await using var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false);
-            foreach (var reference in references)
+            await using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
             {
-                await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes).ConfigureAwait(false);
-                await _scimRepresentationCommandRepository.BulkDelete(reference.RemovedRepresentationAttributes).ConfigureAwait(false);
-                await _scimRepresentationCommandRepository.BulkUpdate(reference.UpdatedRepresentationAttributes).ConfigureAwait(false);
+                foreach (var reference in references)
+                {
+                    await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes).ConfigureAwait(false);
+                    await _scimRepresentationCommandRepository.BulkDelete(reference.RemovedRepresentationAttributes).ConfigureAwait(false);
+                    await _scimRepresentationCommandRepository.BulkUpdate(reference.UpdatedRepresentationAttributes).ConfigureAwait(false);
+                }
+
+                await _scimRepresentationCommandRepository.Update(existingRepresentation).ConfigureAwait(false);
+                await transaction.Commit().ConfigureAwait(false);
+                await NotifyAllReferences(references).ConfigureAwait(false);
             }
 
-            await _scimRepresentationCommandRepository.Update(existingRepresentation).ConfigureAwait(false);
-            await transaction.Commit().ConfigureAwait(false);
-            await NotifyAllReferences(references).ConfigureAwait(false);
             existingRepresentation.ApplyEmptyArray();
             return GenericResult<SCIMRepresentation>.Ok(existingRepresentation);
         }
