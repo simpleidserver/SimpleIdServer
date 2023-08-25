@@ -58,7 +58,8 @@ app.UseCors("AllowAll");
 app.UseSID()
     .UseWsFederation()
     .UseFIDO()
-    .UseCredentialIssuer();
+    .UseCredentialIssuer()
+    .UseSamlIdp();
 app.Run();
 
 void ConfigureIdServer(IServiceCollection services)
@@ -70,6 +71,7 @@ void ConfigureIdServer(IServiceCollection services)
         .AddBackChannelAuthentication()
         .AddEmailAuthentication()
         .AddSmsAuthentication()
+        .AddSamlIdp()
         .AddFidoAuthentication(c =>
         {
             c.IsDeveloperModeEnabled = true;

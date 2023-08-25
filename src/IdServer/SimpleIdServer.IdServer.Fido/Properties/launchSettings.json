@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "SimpleIdServer.IdServer.Fido": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:54498;http://localhost:54499"
+    }
+  }
+}

@@ -1,18 +1,18 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using ITfoxtec.Identity.Saml2;
-using ITfoxtec.Identity.Saml2.MvcCore.Configuration;
+using SimpleIdServer.IdServer.Saml.Idp;
+using SimpleIdServer.IdServer.Saml.Idp.Factories;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
 public static class IdBuilderExtensions
 {
-    public static IdServerBuilder AddSamlAuthentication(this IdServerBuilder builder, Action<Saml2Configuration> saml2ConfigurationCallback = null)
+    public static IdServerBuilder AddSamlIdp(this IdServerBuilder builder, Action<SamlIdpOptions> samlIdpConfigurationCallback = null)
     {
-        var samlConfiguration = new Saml2Configuration();
-        if (saml2ConfigurationCallback != null) builder.Services.Configure(saml2ConfigurationCallback);
-        else builder.Services.Configure<Saml2Configuration>(c => { });
-        builder.Services.AddSaml2();
+        var samlConfiguration = new SamlIdpOptions();
+        if (samlIdpConfigurationCallback != null) builder.Services.Configure(samlIdpConfigurationCallback);
+        else builder.Services.Configure<SamlIdpOptions>(c => { });
+        builder.Services.AddTransient<ISaml2ConfigurationFactory, Saml2ConfigurationFactory>();
         return builder;
     }
 }

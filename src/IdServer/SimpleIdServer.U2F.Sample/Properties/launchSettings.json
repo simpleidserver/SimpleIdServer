@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "SimpleIdServer.U2F.Sample": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:54496;http://localhost:54497"
+    }
+  }
+}

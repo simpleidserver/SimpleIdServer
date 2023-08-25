@@ -10,6 +10,7 @@
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Email\SimpleIdServer.IdServer.Email.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Fido\SimpleIdServer.IdServer.Fido.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.PostgreMigrations\SimpleIdServer.IdServer.PostgreMigrations.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.IdServer.Saml.Idp\SimpleIdServer.IdServer.Saml.Idp.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Sms\SimpleIdServer.IdServer.Sms.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.SqlServerMigrations\SimpleIdServer.IdServer.SqlServerMigrations.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.WsFederation\SimpleIdServer.IdServer.WsFederation.csproj" />

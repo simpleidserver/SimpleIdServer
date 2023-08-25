@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "SimpleIdServer.IdServer.PostgreMigrations": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:54486;http://localhost:54487"
+    }
+  }
+}

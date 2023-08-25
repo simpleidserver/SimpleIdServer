@@ -79,7 +79,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.U2F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.Fido", "src\IdServer\SimpleIdServer.IdServer.Fido\SimpleIdServer.IdServer.Fido.csproj", "{F6B5BABF-D8F8-4406-BC23-7AEA69F10C80}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleIdServer.U2F.Sample", "src\IdServer\SimpleIdServer.U2F.Sample\SimpleIdServer.U2F.Sample.csproj", "{4E256D36-E158-49BD-AC8A-6E7F26AF1F90}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.U2F.Sample", "src\IdServer\SimpleIdServer.U2F.Sample\SimpleIdServer.U2F.Sample.csproj", "{4E256D36-E158-49BD-AC8A-6E7F26AF1F90}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.Saml.Idp", "src\IdServer\SimpleIdServer.IdServer.Saml.Idp\SimpleIdServer.IdServer.Saml.Idp.csproj", "{11B3DF91-E492-481C-BEC2-160C82632533}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -211,6 +213,10 @@ Global
 		{4E256D36-E158-49BD-AC8A-6E7F26AF1F90}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4E256D36-E158-49BD-AC8A-6E7F26AF1F90}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4E256D36-E158-49BD-AC8A-6E7F26AF1F90}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11B3DF91-E492-481C-BEC2-160C82632533}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11B3DF91-E492-481C-BEC2-160C82632533}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11B3DF91-E492-481C-BEC2-160C82632533}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11B3DF91-E492-481C-BEC2-160C82632533}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -251,6 +257,7 @@ Global
 		{218C2BC4-55F0-4A94-8460-571BFF1DD65C} = {033E4EF3-2FB5-450A-9B35-616D9B0D6EAA}
 		{F6B5BABF-D8F8-4406-BC23-7AEA69F10C80} = {4796A22B-91A9-42AF-87CA-F69392696B0A}
 		{4E256D36-E158-49BD-AC8A-6E7F26AF1F90} = {68306EFF-55D9-497B-9482-FEB81C485914}
+		{11B3DF91-E492-481C-BEC2-160C82632533} = {4796A22B-91A9-42AF-87CA-F69392696B0A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FE1E2C8-475E-4592-8609-D331B1D01730}

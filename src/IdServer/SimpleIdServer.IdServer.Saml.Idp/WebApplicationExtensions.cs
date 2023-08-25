@@ -17,7 +17,11 @@ public static class WebApplicationExtensions
 
         webApplication.MapControllerRoute("getSamlMetadataIdp",
             pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.RouteNames.Metadata,
-            defaults: new { controller = "Metadata", action = "Get" });
+            defaults: new { controller = "SamlMetadata", action = "Get" });
+
+        webApplication.MapControllerRoute("ssoHttpRedirect",
+            pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.RouteNames.SingleSignOnHttpRedirect,
+            defaults: new { controller = "SamlSSO", action = "LoginGet" });
 
         return webApplication;
     }

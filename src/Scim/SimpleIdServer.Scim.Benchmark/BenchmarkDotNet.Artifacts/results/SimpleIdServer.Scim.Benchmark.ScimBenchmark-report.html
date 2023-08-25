@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>SimpleIdServer.Scim.Benchmark.ScimBenchmark-20230824-213015</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet=v0.13.1, OS=Windows 10.0.22621
+Intel Core i7-8750H CPU 2.20GHz (Coffee Lake), 1 CPU, 12 logical and 6 physical cores
+.NET SDK=7.0.100
+  [Host]     : .NET 5.0.17 (5.0.1722.21314), X64 RyuJIT
+  Job-PQFZNH : .NET 5.0.17 (5.0.1722.21314), X64 RyuJIT
+</code></pre>
+<pre><code>IterationCount=300  RunStrategy=ColdStart  
+</code></pre>
+
+<table>
+<thead><tr><th>  Method</th><th>Mean</th><th>Error</th><th>StdDev</th><th>Median</th><th>Min</th><th> Max</th>
+</tr>
+</thead><tbody><tr><td>AddUserToGroup</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td>
+</tr><tr><td>SearchUsers</td><td>354.5 ms</td><td>34.33 ms</td><td>178.9 ms</td><td>293.7 ms</td><td>148.0 ms</td><td>1,135.3 ms</td>
+</tr></tbody></table>
+</body>
+</html>

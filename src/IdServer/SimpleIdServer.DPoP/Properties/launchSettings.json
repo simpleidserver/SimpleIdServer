@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "SimpleIdServer.DPoP": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:54492;http://localhost:54493"
+    }
+  }
+}

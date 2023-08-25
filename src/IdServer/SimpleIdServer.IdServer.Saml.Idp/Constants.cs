@@ -4,6 +4,8 @@ namespace SimpleIdServer.IdServer.Saml.Idp
 {
     public static class Constants
     {
+        public const string CLIENT_TYPE = "SAML";
+
         public static class RouteNames
         {
             public const string Prefix = "saml";
