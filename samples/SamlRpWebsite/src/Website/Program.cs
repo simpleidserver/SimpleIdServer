@@ -13,6 +13,7 @@ builder.Services.AddAuthentication(options =>
     .AddCookie("Cookies")
     .AddSamlSp("samlSp", options =>
     {
+        options.SPId = "samlSp";
         options.IdpMetadataUrl = "https://localhost:5001/master/saml/metadata";
         var currentPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
         options.SigningCertificate = X509Certificate2.CreateFromPemFile(Path.Combine(currentPath, "sidClient.crt"), Path.Combine(currentPath, "sidClient.key"));
@@ -31,8 +32,8 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
+
 app.UseAuthentication();
 app.UseAuthorization();
 

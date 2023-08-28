@@ -113,7 +113,7 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
             {
                 var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, null, null, null, (X509Certificate2)null, null), realm ?? Constants.DefaultRealm);
                 context.SetUser(user);
-                var claims = (await _claimsExtractor.ExtractClaims(context, client.Scopes, ScopeProtocols.SAML)).Select(c => new Claim(c.Key, c.Value.ToString())).ToList(); ;
+                var claims = (await _claimsExtractor.ExtractClaims(context, client.Scopes, ScopeProtocols.SAML)).Select(c => new Claim(c.Key, c.Value.ToString())).ToList();
                 if (claims.Count(t => t.Type == ClaimTypes.NameIdentifier) == 0)
                     throw new OAuthException(ErrorCodes.INVALID_RP, ErrorMessages.NO_CLAIM);
 

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using ITfoxtec.Identity.Saml2;
+using ITfoxtec.Identity.Saml2.Schemas.Metadata;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Domains;
@@ -12,8 +13,8 @@ namespace SimpleIdServer.IdServer.Saml.Idp.Factories
 {
     public interface ISaml2ConfigurationFactory
     {
-        Saml2Configuration BuildSamlIdpConfiguration(string issuer, string prefix);
-        Saml2Configuration BuildSamSpConfiguration(Client rp);
+        Saml2Configuration BuildSamlIdpConfiguration(string issuer, string realm);
+        Task<(Saml2Configuration, EntityDescriptor)> BuildSamSpConfiguration(Client rp, CancellationToken cancellationToken);
     }
 
     public class Saml2ConfigurationFactory : ISaml2ConfigurationFactory
@@ -40,22 +41,41 @@ namespace SimpleIdServer.IdServer.Saml.Idp.Factories
             return result;
         }
 
-        public Saml2Configuration BuildSamSpConfiguration(Client rp)
+        public async Task<(Saml2Configuration, EntityDescriptor)> BuildSamSpConfiguration(Client rp, CancellationToken cancellationToken)
         {
-            var signingCertificate = rp.GetSaml2SigningCertificate();
+            var spMetadata = await LoadSPMetadata(rp, cancellationToken);
+            var signingCertificate = spMetadata.SPSsoDescriptor.SigningCertificates.First();
             var result = new Saml2Configuration
             {
                 Issuer = rp.ClientId,
                 SignAuthnRequest = signingCertificate != null,
-                SigningCertificate = signingCertificate
-            };            
-            return result;
+                SigningCertificate = signingCertificate,
+                RevocationMode = _options.RevocationMode,
+                CertificateValidationMode = _options.CertificateValidationMode
+            };
+            if(signingCertificate != null) result.SignatureValidationCertificates.Add(signingCertificate);
+            return (result, spMetadata);
         }
 
         private List<X509Certificate2> GetSigningCertificates(string realm)
         {
             var keys = _keyStore.GetAllSigningKeys(realm);
             return keys.Select(k => k.Key).Where(k => k is X509SecurityKey).Cast<X509SecurityKey>().Select(k => k.Certificate).ToList();
+        }
+
+        private async Task<EntityDescriptor> LoadSPMetadata(Client client, CancellationToken cancellationToken)
+        {
+            var spMetadataUrl = client.GetSaml2SpMetadataUrl();
+            if (string.IsNullOrWhiteSpace(spMetadataUrl)) throw new Saml2BindingException("Client doesn't contain metadata URL");
+            using (var httpClient = new HttpClient())
+            {
+                var httpResult = await httpClient.GetAsync(spMetadataUrl, cancellationToken);
+                var xml = await httpResult.Content.ReadAsStringAsync();
+                var entityDescriptor = new EntityDescriptor();
+                entityDescriptor = entityDescriptor.ReadSPSsoDescriptor(xml);
+                if (entityDescriptor.SPSsoDescriptor == null) throw new Saml2BindingException($"SPSsoDescriptor not loaded from metadata '{spMetadataUrl}'.");
+                return entityDescriptor;
+            }
         }
     }
 }

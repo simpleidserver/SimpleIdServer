@@ -51,12 +51,7 @@ namespace SimpleIdServer.IdServer.Saml.Idp.Apis
                 {
                     new ArtifactResolutionService { Binding = ProtocolBindings.ArtifactSoap, Index = 1, Location = new Uri($"{issuer}/{Constants.RouteNames.SingleSignOnArtifact}") }
                 },
-                NameIDFormats = new Uri[] { NameIdentifierFormats.X509SubjectName },
-                Attributes = new SamlAttribute[]
-                {
-                    new SamlAttribute("urn:oid:1.3.6.1.4.1.5923.1.1.1.6", friendlyName: "eduPersonPrincipalName"),
-                    new SamlAttribute("urn:oid:1.3.6.1.4.1.5923.1.1.1.1", new string[] { "member", "student", "employee" })
-                }
+                NameIDFormats = new Uri[] { NameIdentifierFormats.Persistent }
             };
             entityDescriptor.ContactPersons = _options.ContactPersons;
             var metadata = new Saml2Metadata(entityDescriptor);

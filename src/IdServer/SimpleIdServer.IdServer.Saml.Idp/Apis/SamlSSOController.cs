@@ -4,12 +4,28 @@
 using ITfoxtec.Identity.Saml2;
 using ITfoxtec.Identity.Saml2.MvcCore;
 using ITfoxtec.Identity.Saml2.Schemas;
+using ITfoxtec.Identity.Saml2.Schemas.Metadata;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens.Saml2;
+using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.DTOs;
+using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Extractors;
+using SimpleIdServer.IdServer.Saml.Idp.DTOs;
+using SimpleIdServer.IdServer.Saml.Idp.Extensions;
 using SimpleIdServer.IdServer.Saml.Idp.Factories;
 using SimpleIdServer.IdServer.Store;
+using System.Security.Claims;
+using System.Security.Cryptography.X509Certificates;
+using System.Text.Json;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace SimpleIdServer.IdServer.Saml2.Api
 {
@@ -17,92 +33,222 @@ namespace SimpleIdServer.IdServer.Saml2.Api
     {
         private readonly IClientRepository _clientRepository;
         private readonly ISaml2ConfigurationFactory _saml2ConfigurationFactory;
+        private readonly IDataProtector _dataProtector;
+        private readonly IScopeClaimsExtractor _scopeClaimsExtractor;
+        private readonly IDistributedCache _distributedCache;
+        private readonly IUserRepository _userRepository;
+        private readonly ILogger<SamlSSOController> _logger;
 
-        public SamlSSOController(IClientRepository clientRepository, ISaml2ConfigurationFactory saml2ConfigurationFactory)
+        public SamlSSOController(IClientRepository clientRepository, ISaml2ConfigurationFactory saml2ConfigurationFactory, IDataProtectionProvider dataProtectionProvider, IScopeClaimsExtractor scopeClaimsExtractor, IDistributedCache distributedCache, IUserRepository userRepository, ILogger<SamlSSOController> logger)
         {
             _clientRepository = clientRepository;
             _saml2ConfigurationFactory = saml2ConfigurationFactory;
+            _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
+            _scopeClaimsExtractor = scopeClaimsExtractor;
+            _distributedCache = distributedCache;
+            _userRepository = userRepository;
+            _logger = logger;
         }
 
         [HttpGet]
         public async Task<IActionResult> LoginGet([FromRoute] string prefix, CancellationToken cancellationToken)
         {
-            prefix = prefix ?? SimpleIdServer.IdServer.Constants.DefaultRealm;
+            prefix = prefix ?? Constants.DefaultRealm;
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
-            // Read the saml request.
             var requestBinding = new Saml2RedirectBinding();
             var deserializedHttpRequest = Request.ToGenericHttpRequest();
-            var saml2AuthnRequest = requestBinding.ReadSamlRequest(deserializedHttpRequest, new Saml2AuthnRequest(new Saml2Configuration()));
-            var client = await _clientRepository.Query()
-                .Include(c => c.Realms)
-                .Include(c => c.SerializedJsonWebKeys)
-                .Include(c => c.SerializedParameters)
-                .AsNoTracking().SingleOrDefaultAsync(c => c.ClientId == saml2AuthnRequest.Issuer && c.Realms.Any(r => r.Name == prefix), cancellationToken);
-            if (client == null) throw new Saml2BindingException($"the client '{saml2AuthnRequest.Issuer}' doesn't exist");
+            ClientResult clientResult = null;
+            var requestedIssuer = requestBinding.ReadSamlRequest(deserializedHttpRequest, new Saml2AuthnRequest(new Saml2Configuration())).Issuer;
+            try
+            {
+                clientResult = await GetClient(requestedIssuer, prefix, cancellationToken);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+                return BuildError(ex);
+            }
 
-            var spSamlConfiguration = _saml2ConfigurationFactory.BuildSamSpConfiguration(client);
+            if (User == null || User.Identity == null || User.Identity.IsAuthenticated == false)
+                return RedirectToLoginPage();
+             
+            Saml2AuthnRequest saml2AuthnRequest = new Saml2AuthnRequest(clientResult.SpSamlConfiguration);
             try
             {
                 requestBinding.Unbind(deserializedHttpRequest, saml2AuthnRequest);
-                return null;
+                return await BuildLoginResponse(saml2AuthnRequest, clientResult, Saml2StatusCodes.Success, requestBinding.RelayState, issuer, prefix, cancellationToken);
             }
-            catch(Exception)
+            catch(Exception ex)
             {
-                return BuildPostResponse(saml2AuthnRequest, Saml2StatusCodes.Responder, requestBinding.RelayState, issuer, prefix, client);
+                _logger.LogError(ex.ToString());
+                return await BuildLoginResponse(saml2AuthnRequest, clientResult, Saml2StatusCodes.Responder, requestBinding.RelayState, issuer, prefix, cancellationToken);
+            }
+
+            IActionResult RedirectToLoginPage()
+            {
+                var queryStr = Request.QueryString.Value.TrimStart('?');
+                var returnUrl = $"{issuer}/{prefix}/{Saml.Idp.Constants.RouteNames.SingleSignOnHttpRedirect}?{AuthorizationRequestParameters.ClientId}={clientResult.Client.ClientId}&{queryStr}";
+                var url = Url.Action("Index", "Authenticate", new
+                {
+                    returnUrl = _dataProtector.Protect(returnUrl),
+                    area = Constants.Areas.Password
+                });
+                return Redirect(url);
             }
         }
 
-        private IActionResult BuildPostResponse(Saml2Request request, Saml2StatusCodes status, string relayState, string issuer, string realm, Client client)
+        [HttpGet]
+        public async Task<IActionResult> LoginArtifact([FromRoute] string prefix, CancellationToken cancellationToken)
         {
+            prefix = prefix ?? Constants.DefaultRealm;
+            var soapEnvelope = new Saml2SoapEnvelope();
+            var httpRequest = await Request.ToGenericHttpRequestAsync(readBodyAsString: true);
+            var issuer = soapEnvelope.ReadSamlRequest(httpRequest, new Saml2ArtifactResolve(new Saml2Configuration())).Issuer;
+            ClientResult clientResult = null;
+            try
+            {
+                clientResult = await GetClient(issuer, prefix, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+                return BuildError(ex);
+            }
+
+            var saml2ArtifactResolve = new Saml2ArtifactResolve(clientResult.SpSamlConfiguration);
+            try
+            {
+                var idpSamlConfiguration = _saml2ConfigurationFactory.BuildSamlIdpConfiguration(issuer, prefix);
+                soapEnvelope.Unbind(httpRequest, saml2ArtifactResolve);
+                var json = await _distributedCache.GetStringAsync(saml2ArtifactResolve.Artifact, cancellationToken);
+                if (string.IsNullOrWhiteSpace(json)) throw new OAuthException(string.Empty, $"Saml2AuthnResponse not found by Artifact '{saml2ArtifactResolve.Artifact}' in the cache.");
+                await _distributedCache.RemoveAsync(saml2ArtifactResolve.Artifact, cancellationToken);
+                var cachedSaml2AuthnResponse = JsonSerializer.Deserialize<Saml2AuthnResponse>(json);
+                var saml2ArtifactResponse = new Saml2ArtifactResponse(idpSamlConfiguration, cachedSaml2AuthnResponse)
+                {
+                    InResponseTo = saml2ArtifactResolve.Id
+                };
+                soapEnvelope.Bind(saml2ArtifactResponse);
+                return soapEnvelope.ToActionResult();
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+                return BuildError(ex);
+            }
+        }
+
+        private async Task<ClientResult> GetClient(string issuer, string realm, CancellationToken cancellationToken)
+        {
+            var client = await _clientRepository.Query()
+                .Include(c => c.Realms)
+                .Include(c => c.Scopes).ThenInclude(s => s.ClaimMappers)
+                .Include(c => c.SerializedJsonWebKeys)
+                .AsNoTracking().SingleOrDefaultAsync(c => c.ClientId == issuer && c.Realms.Any(r => r.Name == realm), cancellationToken);
+            if (client == null) throw new OAuthException(string.Empty, $"the client '{issuer}' doesn't exist");
+            var kvp = await _saml2ConfigurationFactory.BuildSamSpConfiguration(client, cancellationToken);
+            return new ClientResult { Client = client, SpSamlConfiguration = kvp.Item1, EntityDescriptor = kvp.Item2 };
+
+        }
+
+        private Task<IActionResult> BuildLoginResponse(Saml2Request request, ClientResult clientResult, Saml2StatusCodes status, string relayState, string issuer, string realm, CancellationToken cancellationToken)
+        {
+            if (clientResult.Client.GetUseAcrsArtifact()) return BuildArtifactLoginResponse(request, clientResult, status, relayState, issuer, realm, cancellationToken);
+            else return BuildPostLoginResponse(request, clientResult, status, relayState, issuer, realm, cancellationToken);
+        }
+
+        private async Task<IActionResult> BuildPostLoginResponse(Saml2Request request, ClientResult clientResult, Saml2StatusCodes status, string relayState, string issuer, string realm, CancellationToken cancellationToken)
+        {
+            var destination = clientResult.EntityDescriptor.SPSsoDescriptor.AssertionConsumerServices.Where(a => a.IsDefault).OrderBy(a => a.Index).First().Location;
             var idpSamlConfiguration = _saml2ConfigurationFactory.BuildSamlIdpConfiguration(issuer, realm);
             var responsebinding = new Saml2PostBinding
             {
                 RelayState = relayState
             };
+            var response = await BuildAuthnSamlResponse(request, clientResult, idpSamlConfiguration, status, destination, issuer, realm, cancellationToken);
+            return responsebinding.Bind(response).ToActionResult();
+        }
+
+        private async Task<IActionResult> BuildArtifactLoginResponse(Saml2Request request, ClientResult clientResult, Saml2StatusCodes status, string relayState, string issuer, string realm, CancellationToken cancellationToken)
+        {
+            var destination = clientResult.EntityDescriptor.SPSsoDescriptor.AssertionConsumerServices.Where(a => a.IsDefault).OrderBy(a => a.Index).First().Location;
+            var idpSamlConfiguration = _saml2ConfigurationFactory.BuildSamlIdpConfiguration(issuer, realm);
+            var responsebinding = new Saml2ArtifactBinding
+            {
+                RelayState = realm
+            };
+            var saml2ArtifactResolve = new Saml2ArtifactResolve(idpSamlConfiguration)
+            {
+                Destination = destination
+            };
+            responsebinding.Bind(saml2ArtifactResolve);
+            var response = await BuildAuthnSamlResponse(request, clientResult, idpSamlConfiguration, status, destination, issuer, realm, cancellationToken);
+            await _distributedCache.SetStringAsync(saml2ArtifactResolve.Artifact, JsonSerializer.Serialize(response));
+            return responsebinding.ToActionResult();
+        }
+
+        private async Task<Saml2AuthnResponse> BuildAuthnSamlResponse(Saml2Request request, ClientResult clientResult, Saml2Configuration idpSamlConfiguration, Saml2StatusCodes status, Uri destination, string issuer, string realm, CancellationToken cancellationToken)
+        {
             var response = new Saml2AuthnResponse(idpSamlConfiguration)
             {
                 InResponseTo = request.Id,
                 Status = status,
-                Destination = null
+                Destination = destination
             };
-            // client => destination !!!
-            return responsebinding.Bind(response).ToActionResult();
+            if (status == Saml2StatusCodes.Success)
+            {
+                var claimsIdentity = await BuildSubject(clientResult.Client, issuer, realm, cancellationToken);
+                response.SessionIndex = Guid.NewGuid().ToString();
+                response.NameId = new Saml2NameIdentifier(claimsIdentity.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).Select(c => c.Value).Single(), NameIdentifierFormats.Persistent);
+                response.ClaimsIdentity = claimsIdentity;
+                response.CreateSecurityToken(clientResult.Client.ClientId, subjectConfirmationLifetime: 5, issuedTokenLifetime: 60);
+            }
+
+            return response;
         }
 
-        // Load metadata from RP !!
-        /*
-         * 
-        private async Task LoadRelyingPartyAsync(RelyingParty rp, CancellationTokenSource cancellationTokenSource)
+        private async Task<ClaimsIdentity> BuildSubject(Client client, string issuer, string realm, CancellationToken cancellationToken)
         {
-            try
+            var nameIdentifier = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).Include(u => u.Groups).AsNoTracking().SingleOrDefaultAsync(u => u.Name == nameIdentifier, cancellationToken);
+            var context = new HandlerContext(new HandlerContextRequest(issuer, string.Empty, null, null, null, (X509Certificate2)null, null), realm);
+            context.SetUser(user);
+            var claims = (await _scopeClaimsExtractor.ExtractClaims(context, client.Scopes, ScopeProtocols.SAML)).Select(c => new Claim(c.Key, c.Value.ToString())).ToList();
+            if (claims.Count(t => t.Type == ClaimTypes.NameIdentifier) == 0)
+                throw new OAuthException(string.Empty, "token cannot be generated if there is no claim, please specify one or more scope in the client");
+
+            if (!claims.Any(c => c.Type == ClaimTypes.NameIdentifier))
+                claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Name));
+
+            return new ClaimsIdentity(claims, "idserver");
+        }
+
+        private IActionResult BuildError(Exception ex) => BuildError(ex.ToString());
+
+        private IActionResult BuildError(string errorMessage)
+        {
+            var error = new SamlSSOError { ErrorMessage = errorMessage };
+            using (var stream = new StringWriter())
             {
-                // Load RP if not already loaded.
-                if (string.IsNullOrEmpty(rp.Issuer))
+                using (var writer = XmlWriter.Create(stream))
                 {
-                    var entityDescriptor = new EntityDescriptor();
-                    await entityDescriptor.ReadSPSsoDescriptorFromUrlAsync(httpClientFactory, new Uri(rp.Metadata), cancellationTokenSource.Token);
-                    if (entityDescriptor.SPSsoDescriptor != null)
+                    var serializer = new XmlSerializer(typeof(SamlSSOError));
+                    serializer.Serialize(writer, error);
+                    return new ContentResult
                     {
-                        rp.Issuer = entityDescriptor.EntityId;
-                        rp.AcsDestination = entityDescriptor.SPSsoDescriptor.AssertionConsumerServices.Where(a => a.IsDefault).OrderBy(a => a.Index).First().Location;
-                        var singleLogoutService = entityDescriptor.SPSsoDescriptor.SingleLogoutServices.First();
-                        rp.SingleLogoutDestination = singleLogoutService.ResponseLocation ?? singleLogoutService.Location;
-                        rp.SignatureValidationCertificate = entityDescriptor.SPSsoDescriptor.SigningCertificates.First();
-                    }
-                    else
-                    {
-                        throw new Exception($"SPSsoDescriptor not loaded from metadata '{rp.Metadata}'.");
-                    }
+                        ContentType = "text/html",
+                        Content = stream.ToString(),
+                    };
                 }
             }
-            catch (Exception exc)
-            {
-                //log error
-#if DEBUG
-                Debug.WriteLine($"SPSsoDescriptor error: {exc.ToString()}");
-#endif
-            }
+            
         }
-        */
+
+        private record ClientResult
+        {
+            public Client Client { get; set; } = null!;
+            public Saml2Configuration SpSamlConfiguration { get; set; } = null!;
+            public EntityDescriptor EntityDescriptor { get; set; } = null!;
+        }
     }
 }

@@ -22,6 +22,9 @@ public static class WebApplicationExtensions
         webApplication.MapControllerRoute("ssoHttpRedirect",
             pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.RouteNames.SingleSignOnHttpRedirect,
             defaults: new { controller = "SamlSSO", action = "LoginGet" });
+        webApplication.MapControllerRoute("ssoArtifact",
+            pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.RouteNames.SingleSignOnArtifact,
+            defaults: new { controller = "SamlSSO", action = "LoginArtifact" });
 
         return webApplication;
     }
