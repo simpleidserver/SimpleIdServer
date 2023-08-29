@@ -2,11 +2,12 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using ITfoxtec.Identity.Saml2.Schemas.Metadata;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel.Security;
-using Website.Authentication;
 
-namespace Microsoft.AspNetCore.Authentication;
+namespace SimpleIdServer.IdServer.Saml.Sp;
 
 public class SamlSpOptions : RemoteAuthenticationOptions
 {

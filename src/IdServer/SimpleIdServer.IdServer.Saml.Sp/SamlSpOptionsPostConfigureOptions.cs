@@ -1,9 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 
-namespace Website.Authentication;
+namespace SimpleIdServer.IdServer.Saml.Sp;
 
 public class SamlSpOptionsPostConfigureOptions : IPostConfigureOptions<SamlSpOptions>
 {

@@ -4,12 +4,14 @@ using ITfoxtec.Identity.Saml2;
 using ITfoxtec.Identity.Saml2.MvcCore;
 using ITfoxtec.Identity.Saml2.Schemas;
 using ITfoxtec.Identity.Saml2.Schemas.Metadata;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
-using Website.Authentication;
 
-namespace Microsoft.AspNetCore.Authentication;
+namespace SimpleIdServer.IdServer.Saml.Sp;
 
 public class SamlSpHandler : RemoteAuthenticationHandler<SamlSpOptions>
 {

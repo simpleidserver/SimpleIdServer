@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens.Saml2;
 using SimpleIdServer.IdServer.Api;
@@ -25,7 +24,6 @@ using SimpleIdServer.IdServer.Store;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Web;
 using System.Xml;
 using System.Xml.Serialization;
 
