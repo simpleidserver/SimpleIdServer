@@ -5,6 +5,7 @@
 @using SimpleIdServer.IdServer.Website.Stores.UserStore;
 @using SimpleIdServer.IdServer.WsFederation
 @using SimpleIdServer.IdServer.WsFederation.Extensions;
+@using SimpleIdServer.IdServer.Saml.Idp.Extensions;
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject IDispatcher dispatcher
 @inject IState<UpdateClientState> updateClientState
@@ -64,73 +65,98 @@
             {                
                 <RadzenAccordionItem Text="Capability config" Selected=true>
                     <!-- Grant types -->
-                    <div class="row">
-                        <div class="col-md-2">
-                            <RadzenLabel Text="Access request" Style="padding: 0px;" />
+                    @if(Client.ClientType != SimpleIdServer.IdServer.Saml.Idp.Constants.CLIENT_TYPE)
+                    {
+                        <div class="row">
+                            <div class="col-md-2">
+                                <RadzenLabel Text="Access request" Style="padding: 0px;" />
+                            </div>
+                            <div class="col">
+                                @if (Client.ClientType == ClientTypes.MACHINE)
+                                {
+                                    <!-- Client credentials  -->
+                                    <div>
+                                        <RadzenCheckBox Name="IsClientCredentialsGrantTypeEnabled" Disabled=true @bind-Value=updateClient.IsClientCredentialsGrantTypeEnabled></RadzenCheckBox>
+                                        <RadzenLabel Text="Client credentials" Component="IsClientCredentialsGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
+                                    </div>
+                                    <!-- Password -->
+                                    <div>
+                                        <RadzenCheckBox Name="IsPasswordGrantTypeEnabled" @bind-Value=updateClient.IsPasswordGrantTypeEnabled></RadzenCheckBox>
+                                        <RadzenLabel Text="Password" Component="IsPasswordGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
+                                    </div>
+                                    <!-- Refresh token -->
+                                    <div>
+                                        <RadzenCheckBox Name="IsRefreshTokenGrantTypeEnabled" @bind-Value=updateClient.IsRefreshTokenGrantTypeEnabled></RadzenCheckBox>
+                                        <RadzenLabel Text="Refresh token" Component="IsRefreshTokenGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
+                                    </div>
+                                }
+
+                                @if (Client.ClientType == ClientTypes.WEBSITE || Client.ClientType == ClientTypes.MOBILE || Client.ClientType == ClientTypes.EXTERNAL || Client.ClientType == ClientTypes.HIGHLYSECUREDWEBSITE || Client.ClientType == ClientTypes.GRANTMANAGEMENT)
+                                {
+                                    <!-- Authorization code  -->
+                                    <div>
+                                        <RadzenCheckBox Name="IsAuthorizationCodeGrantTypeEnabled" Disabled=true @bind-Value=updateClient.IsAuthorizationCodeGrantTypeEnabled></RadzenCheckBox>
+                                        <RadzenLabel Text="Authorization code" Component="IsAuthorizationCodeGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
+                                    </div>
+                                    <!-- CIBA -->
+                                    <div>
+                                        <RadzenCheckBox Name="IsCIBAGrantTypeEnabled" @bind-Value=updateClient.IsCIBAGrantTypeEnabled></RadzenCheckBox>
+                                        <RadzenLabel Text="CIBA" Component="IsCIBAGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
+                                    </div>
+                                    <!-- UMA -->
+                                    <div>
+                                        <RadzenCheckBox Name="IsUMAGrantTypeEnabled" @bind-Value=updateClient.IsUMAGrantTypeEnabled></RadzenCheckBox>
+                                        <RadzenLabel Text="UMA" Component="IsUMAGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
+                                    </div>
+                                    <!-- Refresh token -->
+                                    <div>
+                                        <RadzenCheckBox Name="IsRefreshTokenGrantTypeEnabled" @bind-Value=updateClient.IsRefreshTokenGrantTypeEnabled></RadzenCheckBox>
+                                        <RadzenLabel Text="Refresh token" Component="IsRefreshTokenGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
+                                    </div>
+                                }
+
+                                @if (Client.ClientType == ClientTypes.DEVICE)
+                                {
+                                    <!-- DEVICE -->
+                                    <div>
+                                        <RadzenCheckBox Name="IsDeviceGrantTypeEnabled" @bind-Value=updateClient.IsDeviceGrantTypeEnabled></RadzenCheckBox>
+                                        <RadzenLabel Text="Device" Component="IsDeviceGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
+                                    </div>
+                                }
+
+                                @if (Client.ClientType == ClientTypes.SPA)
+                                {
+                                    <!-- Authorization code  -->
+                                    <div>
+                                        <RadzenCheckBox Name="IsAuthorizationCodeGrantTypeEnabled" Disabled=true @bind-Value=updateClient.IsAuthorizationCodeGrantTypeEnabled></RadzenCheckBox>
+                                        <RadzenLabel Text="Authorization code" Component="IsAuthorizationCodeGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
+                                    </div>
+                                }
+                            </div>
+                        </div>                        
+                    }
+
+                    @if (Client.ClientType == SimpleIdServer.IdServer.Saml.Idp.Constants.CLIENT_TYPE)
+                    {
+                        <!-- Metadata Url -->
+                        <div class="row">                            
+                            <div class="col-md-2">
+                                <RadzenLabel Text="Metadata URL" Style="padding: 0px;" />
+                            </div>
+                            <div class="col">
+                                <RadzenTextBox Name="MetadataUrl" @bind-Value="@updateClient.MetadataUrl" Class="w-100"></RadzenTextBox>
+                            </div>
                         </div>
-                        <div class="col">
-                            @if(Client.ClientType == ClientTypes.MACHINE)
-                            {
-                                <!-- Client credentials  -->
-                                <div>
-                                    <RadzenCheckBox Name="IsClientCredentialsGrantTypeEnabled" Disabled=true @bind-Value=updateClient.IsClientCredentialsGrantTypeEnabled></RadzenCheckBox>
-                                    <RadzenLabel Text="Client credentials" Component="IsClientCredentialsGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
-                                </div>
-                                <!-- Password -->
-                                <div>
-                                    <RadzenCheckBox Name="IsPasswordGrantTypeEnabled" @bind-Value=updateClient.IsPasswordGrantTypeEnabled></RadzenCheckBox>
-                                    <RadzenLabel Text="Password" Component="IsPasswordGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
-                                </div>
-                                <!-- Refresh token -->
-                                <div>
-                                    <RadzenCheckBox Name="IsRefreshTokenGrantTypeEnabled" @bind-Value=updateClient.IsRefreshTokenGrantTypeEnabled></RadzenCheckBox>
-                                    <RadzenLabel Text="Refresh token" Component="IsRefreshTokenGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
-                                </div>
-                            }
-
-                            @if (Client.ClientType == ClientTypes.WEBSITE || Client.ClientType == ClientTypes.MOBILE || Client.ClientType == ClientTypes.EXTERNAL || Client.ClientType == ClientTypes.HIGHLYSECUREDWEBSITE || Client.ClientType == ClientTypes.GRANTMANAGEMENT)
-                            {
-                                <!-- Authorization code  -->
-                                <div>
-                                    <RadzenCheckBox Name="IsAuthorizationCodeGrantTypeEnabled" Disabled=true @bind-Value=updateClient.IsAuthorizationCodeGrantTypeEnabled></RadzenCheckBox>
-                                    <RadzenLabel Text="Authorization code" Component="IsAuthorizationCodeGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
-                                </div>
-                                <!-- CIBA -->
-                                <div>
-                                    <RadzenCheckBox Name="IsCIBAGrantTypeEnabled" @bind-Value=updateClient.IsCIBAGrantTypeEnabled></RadzenCheckBox>
-                                    <RadzenLabel Text="CIBA" Component="IsCIBAGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
-                                </div>
-                                <!-- UMA -->
-                                <div>
-                                    <RadzenCheckBox Name="IsUMAGrantTypeEnabled" @bind-Value=updateClient.IsUMAGrantTypeEnabled></RadzenCheckBox>
-                                    <RadzenLabel Text="UMA" Component="IsUMAGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
-                                </div>
-                                <!-- Refresh token -->
-                                <div>
-                                    <RadzenCheckBox Name="IsRefreshTokenGrantTypeEnabled" @bind-Value=updateClient.IsRefreshTokenGrantTypeEnabled></RadzenCheckBox>
-                                    <RadzenLabel Text="Refresh token" Component="IsRefreshTokenGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
-                                </div>
-                            }
-
-                            @if(Client.ClientType == ClientTypes.DEVICE)
-                            {
-                                <!-- DEVICE -->
-                                <div>
-                                    <RadzenCheckBox Name="IsDeviceGrantTypeEnabled" @bind-Value=updateClient.IsDeviceGrantTypeEnabled></RadzenCheckBox>
-                                    <RadzenLabel Text="Device" Component="IsDeviceGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
-                                </div>
-                            }
-
-                            @if (Client.ClientType == ClientTypes.SPA)
-                            {
-                                <!-- Authorization code  -->
-                                <div>
-                                    <RadzenCheckBox Name="IsAuthorizationCodeGrantTypeEnabled" Disabled=true @bind-Value=updateClient.IsAuthorizationCodeGrantTypeEnabled></RadzenCheckBox>
-                                    <RadzenLabel Text="Authorization code" Component="IsAuthorizationCodeGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
-                                </div>
-                            }
+                        <!-- Use Artifact-->
+                        <div class="row">
+                            <div class="col-md-2">
+                                <RadzenLabel Text="Use Artifact" Style="padding: 0px;" />
+                            </div>
+                            <div class="col">
+                                <RadzenCheckBox Name="UseAcs" @bind-Value="@updateClient.UseAcs"></RadzenCheckBox>
+                            </div>
                         </div>
-                    </div>
+                    }
                 </RadzenAccordionItem>
             }
 
@@ -224,6 +250,8 @@
         public bool IsUMAGrantTypeEnabled { get; set; }
         public bool IsConsentEnabled { get; set; }
         public bool IsDeviceGrantTypeEnabled { get; set; }
+        public bool UseAcs { get; set; }
+        public string MetadataUrl { get; set; }
     }
 
     UpdateClient updateClient = new UpdateClient();
@@ -255,7 +283,9 @@
             BackChannelLogoutUri = this.Client.BackChannelLogoutUri,
             FrontChannelLogoutSessionRequired = this.Client.FrontChannelLogoutSessionRequired,
             BackChannelLogoutSessionRequired = this.Client.BackChannelLogoutSessionRequired,
-            IsConsentEnabled = !this.Client.IsConsentDisabled
+            IsConsentEnabled = !this.Client.IsConsentDisabled,
+            UseAcs = this.Client.GetUseAcrsArtifact(),
+            MetadataUrl = this.Client.GetSaml2SpMetadataUrl()
         };
         if (this.Client.GrantTypes.Contains(ClientCredentialsHandler.GRANT_TYPE))
             updateClient.IsClientCredentialsGrantTypeEnabled = true;
@@ -292,7 +322,9 @@
             IsCIBAGrantTypeEnabled = client.IsCIBAGrantTypeEnabled,
             IsUMAGrantTypeEnabled = client.IsUMAGrantTypeEnabled,
             IsConsentEnabled = client.IsConsentEnabled,
-            IsDeviceGrantTypeEnabled = client.IsDeviceGrantTypeEnabled
+            IsDeviceGrantTypeEnabled = client.IsDeviceGrantTypeEnabled,
+            UseAcs = client.UseAcs,
+            MetadataUrl = client.MetadataUrl
         });
     }
 

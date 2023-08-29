@@ -592,5 +592,6 @@ namespace SimpleIdServer.IdServer.Domains
         public const string DEVICE = "DEVICE";
         public const string HIGHLYSECUREDWEBSITE = "HIGHLYSECUREDWEBSITE";
         public const string GRANTMANAGEMENT = "GRANTMANAGEMENT";
+        public const string SAML = "SAML";
     }
 }

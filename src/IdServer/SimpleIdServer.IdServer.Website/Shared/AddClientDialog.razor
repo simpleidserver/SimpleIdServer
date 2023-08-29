@@ -214,7 +214,41 @@
                             </div>
                             <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addClientState.Value.IsAdding)" />
                         </RadzenTemplateForm>
-                        break;
+                        break;                        
+                    // Device
+                    case ClientTypes.SAML:
+                        <RadzenTemplateForm Submit="@AddSamlSpApplication" TItem="SamlSpApplication" Data="@samlSpApplication">
+                            @if (!addClientState.Value.IsAdding && !string.IsNullOrWhiteSpace(addClientState.Value.ErrorMessage))
+                            {
+                                <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@addClientState.Value.ErrorMessage</RadzenAlert>
+                            }
+
+                            <!-- Client Identifier -->
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Identifier</RadzenText>
+                                <RadzenTextBox Name="ClientIdentifier" @bind-Value="@samlSpApplication.ClientIdentifier" Class="w-100"></RadzenTextBox>
+                                <RadzenRequiredValidator Component="ClientIdentifier" Text="Identifier is required"></RadzenRequiredValidator>
+                            </div>
+                            <!-- Client Name -->
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+                                <RadzenTextBox Name="ClientName" @bind-Value="@samlSpApplication.ClientName" Class="w-100"></RadzenTextBox>
+                                <RadzenRequiredValidator Component="ClientName" Text="Name is required"></RadzenRequiredValidator>
+                            </div>
+                            <!-- Metadata Url -->
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Metadata URL</RadzenText>
+                                <RadzenTextBox Name="MetadataUrl" @bind-Value="@samlSpApplication.MetadataUrl" Class="w-100"></RadzenTextBox>
+                                <RadzenRequiredValidator Component="MetadataUrl" Text="Metadata URL is required"></RadzenRequiredValidator>
+                            </div>
+                            <!-- Use Artifact -->
+                            <div>
+                                <RadzenCheckBox Name="UseAcs" @bind-Value="@samlSpApplication.UseAcs"></RadzenCheckBox>
+                                <RadzenLabel Text="Use Artifact?" Component="UseAcs" Style="margin-left: 8px; vertical-align: middle;" />
+                            </div>
+                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addClientState.Value.IsAdding)" />
+                        </RadzenTemplateForm>
+                        break;    
                     // Highly secured web application.
                     case ClientTypes.HIGHLYSECUREDWEBSITE:
                         <RadzenTemplateForm Submit=@AddHighlySecuredWebsiteApplication TItem="HighlySecuredWebApplication" Data=@highlySecuredWebsiteApplication>
@@ -462,6 +496,14 @@
         public string ClientIdentifier { get; set; } = null!;
     }
 
+    record SamlSpApplication
+    {
+        public string ClientName { get; set; } = null!;
+        public string ClientIdentifier { get; set; } = null!;
+        public string MetadataUrl { get; set; } = null!;
+        public bool UseAcs { get; set; } = false;
+    }
+
     record DeviceApplication
     {
         public string ClientName { get; set; } = null!;
@@ -490,6 +532,7 @@
     WsFederationApplication wsFederationApplication = new WsFederationApplication();
     ExternalDeviceApplication externalDeviceApplication = new ExternalDeviceApplication();
     DeviceApplication deviceApplication = new DeviceApplication();
+    SamlSpApplication samlSpApplication = new SamlSpApplication();
     ICollection<ProofOfPossession> ProofOfPossessions { get; set; } = new List<ProofOfPossession>
     {
         DPoP,
@@ -533,6 +576,7 @@
         new ApplicationType { Name = "Web application", ClientTemplate = ClientTemplateTypes.STANDARD, ShortDescription = "Authorization code", Description = "Web application executed on server (ASP.NET CORE, SPRING etc...)", Type = ClientTypes.WEBSITE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/WebsiteClient.png" },
         new ApplicationType { Name = "Mobile", ClientTemplate = ClientTemplateTypes.STANDARD, ShortDescription = "Authorization code + PKCE", Description = "A desktop or mobile application running on a user's device", Type = ClientTypes.MOBILE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/MobileClient.png" },
         new ApplicationType { Name = "WS-Fed Relying Party", ClientTemplate = ClientTemplateTypes.STANDARD,  ShortDescription = "WS-Federation application", Description = "A WS-Federation relying party commonly used by older Microsoft applications", Type = SimpleIdServer.IdServer.WsFederation.WsFederationConstants.CLIENT_TYPE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/WsFedClient.png" },
+        new ApplicationType { Name = "SAML SP", ClientTemplate = ClientTemplateTypes.STANDARD, ShortDescription = "SAML Service Provider", Description = "A Service Provider (SP) is the entity providing the service, typically in the form of an application", Type = SimpleIdServer.IdServer.Saml.Idp.Constants.CLIENT_TYPE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/SAMLSP.png" },
         new ApplicationType { Name = "Device", ClientTemplate = ClientTemplateTypes.STANDARD,  ShortDescription = "Device Authorization grant", Description = "An IoT application or otherwise browserless or input constrained device.", Type = ClientTypes.DEVICE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/DeviceClient.png" },
         new ApplicationType { Name = "Highly secure Web Application", ClientTemplate = ClientTemplateTypes.FAPI, ShortDescription = "Web Application with FAPI 2.0 security requirements.", Description = "The web application is executed on a server (ASP.NET CORE, SPRING, etc.) and implements all the security requirements proposed by FAPI 2.0.", PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/WebsiteClient.png", Type = ClientTypes.HIGHLYSECUREDWEBSITE },
         new ApplicationType { Name = "Grant Management", ClientTemplate = ClientTemplateTypes.FAPI, ShortDescription = "Web application with FAPI 2.0 security requirements and grant management support.", Description = "The web application is executed on a server (ASP.NET CORE, SPRING, etc.) and implements all the security requirements proposed by FAPI 2.0. Additionally, it supports grant management.", PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/WebsiteClient.png", Type = ClientTypes.GRANTMANAGEMENT },
@@ -573,6 +617,11 @@
     void AddWebsiteApplication(WebsiteApplication websiteApplication)
     {
         dispatcher.Dispatch(new AddWebsiteApplicationAction { ClientId = websiteApplication.ClientIdentifier, ClientName = websiteApplication.ClientName, RedirectionUrls = websiteApplication.RedirectionUris.Split(';'), ClientSecret = websiteApplication.ClientSecret });
+    }
+
+    void AddSamlSpApplication(SamlSpApplication samlSpApplication)
+    {
+        dispatcher.Dispatch(new AddSamlSpApplicationAction { ClientIdentifier = samlSpApplication.ClientIdentifier, ClientName = samlSpApplication.ClientName, MetadataUrl = samlSpApplication.MetadataUrl, UseAcs = samlSpApplication.UseAcs });
     }
 
     void AddHighlySecuredWebsiteApplication(HighlySecuredWebApplication websiteApplication)

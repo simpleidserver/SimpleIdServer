@@ -36,6 +36,13 @@
             <RadzenTextBox Value=@GetFederationMetadataUrl() Class="w-100"></RadzenTextBox>
         </div>
         break;
+    case SimpleIdServer.IdServer.Saml.Idp.Constants.CLIENT_TYPE:
+        <!-- SAML -->
+        <div>
+            <RadzenLabel Text="SAML" Style="padding: 0px;"></RadzenLabel>
+            <RadzenTextBox Value=@GetSamlMetadataUrl() Class="w-100"></RadzenTextBox>
+        </div>
+        break;
     default:
         <!-- OpenID Connect -->
         <div>
@@ -48,6 +55,7 @@
 @code {
     string GetOpenIdConnectUrl() => $"{Options.Value.IdServerBaseUrl}/{realmsState.Value.ActiveRealm}/.well-known/openid-configuration";
     string GetFederationMetadataUrl() => $"{Options.Value.IdServerBaseUrl}/{realmsState.Value.ActiveRealm}/FederationMetadata/2007-06/FederationMetadata.xml";
+    string GetSamlMetadataUrl() => $"{Options.Value.IdServerBaseUrl}/{realmsState.Value.ActiveRealm}/saml/metadata";
 
     [Parameter]
     public AddClientSuccessAction Client { get; set; }

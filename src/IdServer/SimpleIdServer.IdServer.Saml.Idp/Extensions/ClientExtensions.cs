@@ -23,6 +23,15 @@ public static class ClientExtensions
         return new X509Certificate2(Convert.FromBase64String(x5cBase64Str));
     }
 
+    public static string GetSerializedSaml2SigningCertificate(this Client client)
+    {
+        var parameters = client.Parameters;
+        if (!parameters.ContainsKey(SAML2_SIG_CERTIFICATE_NAME)) return null;
+        var sigCertificateId = parameters[SAML2_SIG_CERTIFICATE_NAME];
+        var jsonWebKey = client.SerializedJsonWebKeys.Single(j => j.Kid == sigCertificateId);
+        return jsonWebKey.SerializedJsonWebKey;
+    }
+
     public static void SetSaml2SigningCertificate(this Client client, X509Certificate2 sigCertificate, string alg = SecurityAlgorithms.RsaSha256)
     {
         var parameters = client.Parameters;

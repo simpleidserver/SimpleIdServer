@@ -124,6 +124,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         [ReducerMethod]
         public static AddClientState ReduceAddClientFailureAction(AddClientState state, AddClientFailureAction act) => new(isAdding: false, errorMessage: act.ErrorMessage);
 
+        [ReducerMethod]
+        public static AddClientState ReduceAddSamlSpApplicationAction(AddClientState state, AddSamlSpApplicationAction act) => new(isAdding: true, errorMessage: null);
+
         #endregion
 
         #region UpdateClientState

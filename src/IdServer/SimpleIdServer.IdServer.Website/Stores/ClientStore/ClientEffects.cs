@@ -9,6 +9,7 @@ using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Saml.Idp.Extensions;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Website.Resources;
 using SimpleIdServer.IdServer.WsFederation;
@@ -288,6 +289,32 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         }
 
         [EffectMethod]
+        public async Task Handle(AddSamlSpApplicationAction action, IDispatcher dispatcher)
+        {
+            if (!await ValidateAddClient(action.ClientIdentifier, new List<string>(), dispatcher)) return;
+            using (var dbContext = _factory.CreateDbContext())
+            {
+                var certificate = KeyGenerator.GenerateSelfSignedCertificate();
+                var securityKey = new X509SecurityKey(certificate, Guid.NewGuid().ToString());
+                var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.RsaSha256);
+                var realm = await GetRealm();
+                var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
+                var newClientBuilder = SamlSpClientBuilder.BuildSamlSpClient(action.ClientIdentifier, action.MetadataUrl, certificate, activeRealm);
+                if (!string.IsNullOrWhiteSpace(action.ClientName))
+                    newClientBuilder.SetClientName(action.ClientName);
+                newClientBuilder.SetUseAcsArtifact(action.UseAcs);
+                var newClient = newClientBuilder.Build();
+                var scopeNames = newClient.Scopes.Select(s => s.Name);
+                var scopes = await dbContext.Scopes.Where(s => scopeNames.Contains(s.Name)).ToListAsync(CancellationToken.None);
+                newClient.Scopes = scopes;
+                dbContext.Clients.Add(newClient);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+                var serializedJsonWebKey = signingCredentials.SerializeJWKStr();
+                dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientIdentifier, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = SimpleIdServer.IdServer.Saml.Idp.Constants.CLIENT_TYPE, JsonWebKeyStr = serializedJsonWebKey });
+            }
+        }
+
+        [EffectMethod]
         public async Task Handle(RemoveSelectedClientsAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
@@ -348,6 +375,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                     grantTypes.Add(DeviceCodeHandler.GRANT_TYPE);
                 client.GrantTypes = grantTypes;
                 client.IsConsentDisabled = !act.IsConsentEnabled;
+                client.SetUseAcsArtifact(act.UseAcs);
+                client.SetSaml2SpMetadataUrl(act.MetadataUrl);
                 await dbContext.SaveChangesAsync(CancellationToken.None);
                 dispatcher.Dispatch(new UpdateClientDetailsSuccessAction
                 {
@@ -685,6 +714,14 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public string? ClientName { get; set; } = null;
     }
 
+    public class AddSamlSpApplicationAction
+    {
+        public string ClientName { get; set; } = null!;
+        public string ClientIdentifier { get; set; } = null!;
+        public string MetadataUrl { get; set; } = null!;
+        public bool UseAcs { get; set; } = false;
+    }
+
     public class AddHighlySecuredWebsiteApplicationAction
     {
         public IEnumerable<string> RedirectionUrls { get; set; } = new List<string>();
@@ -809,6 +846,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public bool IsUMAGrantTypeEnabled { get; set; }
         public bool IsConsentEnabled { get; set; }
         public bool IsDeviceGrantTypeEnabled { get; set; }
+        public bool UseAcs { get; set; }
+        public string MetadataUrl { get; set; }
     }
 
     public class UpdateClientDetailsSuccessAction

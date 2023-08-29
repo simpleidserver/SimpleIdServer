@@ -167,7 +167,6 @@ namespace SimpleIdServer.IdServer.Saml2.Api
             if (client == null) throw new OAuthException(string.Empty, $"the client '{issuer}' doesn't exist");
             var kvp = await _saml2ConfigurationFactory.BuildSamSpConfiguration(client, cancellationToken);
             return new ClientResult { Client = client, SpSamlConfiguration = kvp.Item1, EntityDescriptor = kvp.Item2 };
-
         }
 
         private Task<IActionResult> BuildLoginResponse(Saml2Request request, ClientResult clientResult, Saml2StatusCodes status, string relayState, string issuer, string realm, CancellationToken cancellationToken)
@@ -259,8 +258,7 @@ namespace SimpleIdServer.IdServer.Saml2.Api
                         Content = stream.ToString(),
                     };
                 }
-            }
-            
+            }            
         }
 
         private record ClientResult
