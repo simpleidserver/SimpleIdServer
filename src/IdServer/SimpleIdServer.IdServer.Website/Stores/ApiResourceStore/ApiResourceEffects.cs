@@ -39,7 +39,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
                 var selectedResources = new List<string>();
                 if (!string.IsNullOrWhiteSpace(action.ScopeName))
                 {
-                    var scope = await dbContext.Scopes.Include(s => s.ApiResources).AsNoTracking().SingleAsync(s => s.Name == action.ScopeName);
+                    var scope = await dbContext.Scopes.Include(s => s.Realms).Include(s => s.ApiResources).AsNoTracking().SingleAsync(s => s.Name == action.ScopeName && s.Realms.Any(r => r.Name == realm));
                     selectedResources = scope.ApiResources.Select(r => r.Name).ToList();
                 }
 
