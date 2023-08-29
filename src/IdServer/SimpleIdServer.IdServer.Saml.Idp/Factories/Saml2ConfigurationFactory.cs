@@ -13,7 +13,7 @@ namespace SimpleIdServer.IdServer.Saml.Idp.Factories
 {
     public interface ISaml2ConfigurationFactory
     {
-        Saml2Configuration BuildSamlIdpConfiguration(string issuer, string realm);
+        Saml2Configuration BuildSamlIdpConfiguration(string url, string issuer, string realm);
         Task<(Saml2Configuration, EntityDescriptor)> BuildSamSpConfiguration(Client rp, CancellationToken cancellationToken);
     }
 
@@ -28,7 +28,7 @@ namespace SimpleIdServer.IdServer.Saml.Idp.Factories
             _options = options.Value;
         }
 
-        public Saml2Configuration BuildSamlIdpConfiguration(string issuer, string realm)
+        public Saml2Configuration BuildSamlIdpConfiguration(string url, string issuer, string realm)
         {
             X509Certificate2 sigCertificate = null;
             if (_options.SignAuthnRequest) sigCertificate = GetSigningCertificates(realm).FirstOrDefault();
@@ -36,7 +36,12 @@ namespace SimpleIdServer.IdServer.Saml.Idp.Factories
             {
                 Issuer = issuer,
                 SignAuthnRequest = _options.SignAuthnRequest,
-                SigningCertificate = sigCertificate
+                SigningCertificate = sigCertificate,
+                ArtifactResolutionService = new Saml2IndexedEndpoint
+                {
+                    Index = 1,
+                    Location = new Uri($"{url}/{realm}/{Constants.RouteNames.SingleSignOnArtifact}")
+                }
             };
             return result;
         }

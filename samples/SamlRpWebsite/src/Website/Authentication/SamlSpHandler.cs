@@ -50,22 +50,25 @@ public class SamlSpHandler : RemoteAuthenticationHandler<SamlSpOptions>
 
     protected override async Task<HandleRequestResult> HandleRemoteAuthenticateAsync()
     {
-        if(HttpMethods.IsPost(Request.Method))
+        if (!HttpMethods.IsPost(Request.Method) && !HttpMethods.IsGet(Request.Method)) return HandleRequestResult.Fail("HTTP Method is not supported");
+        var entityDescriptor = await GetEntityDescriptor(CancellationToken.None);
+        var signingCertificate = entityDescriptor.IdPSsoDescriptor.SigningCertificates.First();
+        var idpConfiguration = new Saml2Configuration
+        {
+            Issuer = Options.SPId,
+            SignAuthnRequest = signingCertificate != null,
+            RevocationMode = Options.RevocationMode,
+            CertificateValidationMode = Options.CertificateValidationMode,
+        };
+        idpConfiguration.AllowedAudienceUris.Add(Options.SPId);
+        idpConfiguration.AllowedIssuer = Options.IdpId;
+        idpConfiguration.ArtifactResolutionService = entityDescriptor.IdPSsoDescriptor.ArtifactResolutionServices.Select(s => new Saml2IndexedEndpoint { Index = s.Index, Location = s.Location }).FirstOrDefault();
+        idpConfiguration.SignatureValidationCertificates.Add(signingCertificate);
+
+        if (HttpMethods.IsPost(Request.Method))
         {
             var binding = new Saml2PostBinding();
-            var entityDescriptor = await GetEntityDescriptor(CancellationToken.None);
-            var signingCertificate = entityDescriptor.IdPSsoDescriptor.SigningCertificates.First();
-            var configuration = new Saml2Configuration
-            {
-                Issuer = Options.SPId,
-                SignAuthnRequest = signingCertificate != null,
-                RevocationMode = Options.RevocationMode,
-                CertificateValidationMode = Options.CertificateValidationMode,
-            };
-            configuration.AllowedAudienceUris.Add(Options.SPId);
-            configuration.AllowedIssuer = Options.IdpId;
-            configuration.SignatureValidationCertificates.Add(signingCertificate);
-            var saml2AuthnResponse = new Saml2AuthnResponse(configuration);
+            var saml2AuthnResponse = new Saml2AuthnResponse(idpConfiguration);
             binding.ReadSamlResponse(Request.ToGenericHttpRequest(), saml2AuthnResponse);
             if(saml2AuthnResponse.Status != Saml2StatusCodes.Success) return HandleRequestResult.Fail("An error occured while trying to parse the SAML2 Response");
             try
@@ -76,6 +79,41 @@ public class SamlSpHandler : RemoteAuthenticationHandler<SamlSpOptions>
                 return HandleRequestResult.Success(authenticationTicket);
             }
             catch(Exception ex)
+            {
+                Logger.LogError(ex.ToString());
+                return HandleRequestResult.Fail(ex.Message);
+            }
+        }
+
+        if(HttpMethods.IsGet(Request.Method))
+        {
+            var spConfiguration = new Saml2Configuration
+            {
+                Issuer = Options.SPId,
+                AllowedIssuer = entityDescriptor.EntityId,
+                SingleSignOnDestination = entityDescriptor.IdPSsoDescriptor.SingleSignOnServices.First().Location,
+                SingleLogoutDestination = entityDescriptor.IdPSsoDescriptor.SingleLogoutServices.First().Location,
+                SigningCertificate = Options.SigningCertificate,
+                SignAuthnRequest = Options.SigningCertificate != null
+            };
+            var binding = new Saml2ArtifactBinding();
+            try
+            {
+                var saml2ArtifactResolve = new Saml2ArtifactResolve(idpConfiguration);
+                binding.Unbind(Request.ToGenericHttpRequest(), saml2ArtifactResolve);
+                saml2ArtifactResolve.Config.SigningCertificate = Options.SigningCertificate;
+                saml2ArtifactResolve.Config.SignAuthnRequest = Options.SigningCertificate != null;
+
+                var soapEnvelope = new Saml2SoapEnvelope();
+                var saml2AuthnResponse = new Saml2AuthnResponse(idpConfiguration);
+                await soapEnvelope.ResolveAsync(new DefaultHttpClientFactory(Options.Backchannel), saml2ArtifactResolve, saml2AuthnResponse); 
+                if (saml2AuthnResponse.Status != Saml2StatusCodes.Success) return HandleRequestResult.Fail($"SAML Response status: {saml2AuthnResponse.Status}");
+                var claimsPrincipal = new ClaimsPrincipal(saml2AuthnResponse.ClaimsIdentity);
+                var authenticationTicket = new AuthenticationTicket(claimsPrincipal, Scheme.Name);
+                return HandleRequestResult.Success(authenticationTicket);
+
+            }
+            catch (Exception ex)
             {
                 Logger.LogError(ex.ToString());
                 return HandleRequestResult.Fail(ex.Message);
@@ -94,5 +132,17 @@ public class SamlSpHandler : RemoteAuthenticationHandler<SamlSpOptions>
         _entityDescriptor = new EntityDescriptor();
         _entityDescriptor = _entityDescriptor.ReadIdPSsoDescriptor(xml);
         return _entityDescriptor;
+    }
+
+    private class DefaultHttpClientFactory : IHttpClientFactory
+    {
+        private readonly HttpClient _httpClient;
+
+        public DefaultHttpClientFactory(HttpClient httpClient)
+        {
+            _httpClient = httpClient;
+        }
+
+        public HttpClient CreateClient(string name) => _httpClient;
     }
 }

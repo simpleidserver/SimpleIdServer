@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens.Saml2;
 using SimpleIdServer.IdServer.Api;
@@ -23,7 +24,8 @@ using SimpleIdServer.IdServer.Saml.Idp.Factories;
 using SimpleIdServer.IdServer.Store;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
-using System.Text.Json;
+using System.Text;
+using System.Web;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -97,7 +99,7 @@ namespace SimpleIdServer.IdServer.Saml2.Api
             }
         }
 
-        [HttpGet]
+        [HttpPost]
         public async Task<IActionResult> LoginArtifact([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
@@ -118,12 +120,12 @@ namespace SimpleIdServer.IdServer.Saml2.Api
             var saml2ArtifactResolve = new Saml2ArtifactResolve(clientResult.SpSamlConfiguration);
             try
             {
-                var idpSamlConfiguration = _saml2ConfigurationFactory.BuildSamlIdpConfiguration(issuer, prefix);
+                var idpSamlConfiguration = _saml2ConfigurationFactory.BuildSamlIdpConfiguration(Request.GetAbsoluteUriWithVirtualPath(), Request.GetAbsoluteUriWithVirtualPath(), prefix);
                 soapEnvelope.Unbind(httpRequest, saml2ArtifactResolve);
-                var json = await _distributedCache.GetStringAsync(saml2ArtifactResolve.Artifact, cancellationToken);
-                if (string.IsNullOrWhiteSpace(json)) throw new OAuthException(string.Empty, $"Saml2AuthnResponse not found by Artifact '{saml2ArtifactResolve.Artifact}' in the cache.");
+                var base64 = await _distributedCache.GetStringAsync(saml2ArtifactResolve.Artifact, cancellationToken);
+                if (string.IsNullOrWhiteSpace(base64)) throw new OAuthException(string.Empty, $"Saml2AuthnResponse not found by Artifact '{saml2ArtifactResolve.Artifact}' in the cache.");
                 await _distributedCache.RemoveAsync(saml2ArtifactResolve.Artifact, cancellationToken);
-                var cachedSaml2AuthnResponse = JsonSerializer.Deserialize<Saml2AuthnResponse>(json);
+                var cachedSaml2AuthnResponse = ReadAuthnResponse(base64);
                 var saml2ArtifactResponse = new Saml2ArtifactResponse(idpSamlConfiguration, cachedSaml2AuthnResponse)
                 {
                     InResponseTo = saml2ArtifactResolve.Id
@@ -135,6 +137,25 @@ namespace SimpleIdServer.IdServer.Saml2.Api
             {
                 _logger.LogError(ex.ToString());
                 return BuildError(ex);
+            }
+
+            Saml2AuthnResponse ReadAuthnResponse(string base64)
+            {
+                var binding = new Saml2PostBinding();
+                var saml2AuthnResponse = new Saml2AuthnResponse(new Saml2Configuration
+                {
+                    AudienceRestricted = false
+                });
+                var fakeHttpRequest = new ITfoxtec.Identity.Saml2.Http.HttpRequest
+                {
+                    Method = "POST",
+                    Form = new System.Collections.Specialized.NameValueCollection
+                    {
+                        { "SAMLResponse", base64 }
+                    }
+                };
+                var req = binding.ReadSamlResponse(fakeHttpRequest, saml2AuthnResponse);
+                return req as Saml2AuthnResponse;
             }
         }
 
@@ -159,8 +180,8 @@ namespace SimpleIdServer.IdServer.Saml2.Api
 
         private async Task<IActionResult> BuildPostLoginResponse(Saml2Request request, ClientResult clientResult, Saml2StatusCodes status, string relayState, string issuer, string realm, CancellationToken cancellationToken)
         {
-            var destination = clientResult.EntityDescriptor.SPSsoDescriptor.AssertionConsumerServices.Where(a => a.IsDefault).OrderBy(a => a.Index).First().Location;
-            var idpSamlConfiguration = _saml2ConfigurationFactory.BuildSamlIdpConfiguration(issuer, realm);
+            var destination = clientResult.EntityDescriptor.SPSsoDescriptor.AssertionConsumerServices.Where(a => a.IsDefault && a.Binding == ProtocolBindings.HttpPost).OrderBy(a => a.Index).First().Location;
+            var idpSamlConfiguration = _saml2ConfigurationFactory.BuildSamlIdpConfiguration(issuer, issuer, realm);
             var responsebinding = new Saml2PostBinding
             {
                 RelayState = relayState
@@ -171,8 +192,8 @@ namespace SimpleIdServer.IdServer.Saml2.Api
 
         private async Task<IActionResult> BuildArtifactLoginResponse(Saml2Request request, ClientResult clientResult, Saml2StatusCodes status, string relayState, string issuer, string realm, CancellationToken cancellationToken)
         {
-            var destination = clientResult.EntityDescriptor.SPSsoDescriptor.AssertionConsumerServices.Where(a => a.IsDefault).OrderBy(a => a.Index).First().Location;
-            var idpSamlConfiguration = _saml2ConfigurationFactory.BuildSamlIdpConfiguration(issuer, realm);
+            var destination = clientResult.EntityDescriptor.SPSsoDescriptor.AssertionConsumerServices.Where(a => a.IsDefault && a.Binding == ProtocolBindings.HttpArtifact).OrderBy(a => a.Index).First().Location;
+            var idpSamlConfiguration = _saml2ConfigurationFactory.BuildSamlIdpConfiguration(issuer, issuer, realm);
             var responsebinding = new Saml2ArtifactBinding
             {
                 RelayState = realm
@@ -183,7 +204,7 @@ namespace SimpleIdServer.IdServer.Saml2.Api
             };
             responsebinding.Bind(saml2ArtifactResolve);
             var response = await BuildAuthnSamlResponse(request, clientResult, idpSamlConfiguration, status, destination, issuer, realm, cancellationToken);
-            await _distributedCache.SetStringAsync(saml2ArtifactResolve.Artifact, JsonSerializer.Serialize(response));
+            await _distributedCache.SetStringAsync(saml2ArtifactResolve.Artifact, Convert.ToBase64String(Encoding.UTF8.GetBytes(response.ToXml().OuterXml)));
             return responsebinding.ToActionResult();
         }
 

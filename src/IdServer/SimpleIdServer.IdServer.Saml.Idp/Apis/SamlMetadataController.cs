@@ -27,7 +27,7 @@ namespace SimpleIdServer.IdServer.Saml.Idp.Apis
         {
             prefix = prefix ?? IdServer.Constants.DefaultRealm;
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
-            var configuration = _saml2ConfigurationFactory.BuildSamlIdpConfiguration(issuer, prefix);
+            var configuration = _saml2ConfigurationFactory.BuildSamlIdpConfiguration(issuer, issuer, prefix);
             var entityDescriptor = new EntityDescriptor(configuration)
             {
                 ValidUntil = 365
@@ -49,7 +49,7 @@ namespace SimpleIdServer.IdServer.Saml.Idp.Apis
                 },
                 ArtifactResolutionServices = new ArtifactResolutionService[]
                 {
-                    new ArtifactResolutionService { Binding = ProtocolBindings.ArtifactSoap, Index = 1, Location = new Uri($"{issuer}/{Constants.RouteNames.SingleSignOnArtifact}") }
+                    new ArtifactResolutionService { Binding = ProtocolBindings.ArtifactSoap, Index = 1, Location = new Uri($"{issuer}/{prefix}/{Constants.RouteNames.SingleSignOnArtifact}") }
                 },
                 NameIDFormats = new Uri[] { NameIdentifierFormats.Persistent }
             };
