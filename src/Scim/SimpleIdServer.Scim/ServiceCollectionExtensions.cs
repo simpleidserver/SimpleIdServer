@@ -69,6 +69,7 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddSCIMRepository(this IServiceCollection services)
         {
             var representations = new List<SCIMRepresentation>();
+            var representationAttributes = new List<SCIMRepresentationAttribute>();
             var schemas = new List<SCIMSchema>();
             schemas.AddRange(new List<SCIMSchema> 
             { 
@@ -76,8 +77,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 StandardSchemas.GroupSchema 
             });
             var provisioningConfigurations = new List<ProvisioningConfiguration>();
-            services.TryAddSingleton<ISCIMRepresentationCommandRepository>(new DefaultSCIMRepresentationCommandRepository(representations));
-            services.TryAddSingleton<ISCIMRepresentationQueryRepository>(new DefaultSCIMRepresentationQueryRepository(representations));
+            services.TryAddSingleton<ISCIMRepresentationCommandRepository>(new DefaultSCIMRepresentationCommandRepository(representations, representationAttributes));
+            services.TryAddSingleton<ISCIMRepresentationQueryRepository>(new DefaultSCIMRepresentationQueryRepository(representations, representationAttributes));
             services.TryAddSingleton<ISCIMSchemaCommandRepository>(new DefaultSchemaCommandRepository(schemas));
             services.TryAddSingleton<ISCIMSchemaQueryRepository>(new DefaultSchemaQueryRepository(schemas));
             services.TryAddSingleton<ISCIMAttributeMappingQueryRepository>(new DefaultAttributeMappingQueryRepository(SCIMConstants.StandardAttributeMapping));
@@ -90,6 +91,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IAttributeReferenceEnricher, AttributeReferenceEnricher>();
             services.AddTransient<IRepresentationReferenceSync, RepresentationReferenceSync>();
             services.AddTransient<IResourceTypeResolver, ResourceTypeResolver>();
+            services.AddTransient<IRepresentationHelper, RepresentationHelper>();
             services.AddHttpContextAccessor();
             services.AddTransient<IUriProvider, UriProvider>();
             return services;

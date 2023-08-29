@@ -146,6 +146,7 @@ namespace SimpleIdServer.Scim.Domain
 
         public static List<SCIMPatchResult> ApplyPatches(this SCIMRepresentation representation, ICollection<PatchOperationParameter> patches, IEnumerable<SCIMAttributeMapping> attributeMappings, bool ignoreUnsupportedCanonicalValues)
         {
+            // TODO !!
             var result = new List<SCIMPatchResult>();
             foreach (var patch in patches)
             {

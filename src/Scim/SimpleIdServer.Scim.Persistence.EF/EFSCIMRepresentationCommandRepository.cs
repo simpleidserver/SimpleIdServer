@@ -4,6 +4,7 @@ using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.Scim.Domains;
+using SimpleIdServer.Scim.Parser.Expressions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -185,6 +186,11 @@ namespace SimpleIdServer.Scim.Persistence.EF
             if (bulkConfig == null) bulkConfig = new BulkConfig();
             _options.BulkOperations[operation](bulkConfig);
             return bulkConfig;
+        }
+
+        public Task<List<SCIMRepresentationAttribute>> FindAttributes(string representationId, SCIMAttributeExpression attrExpression, CancellationToken cancellationToken)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

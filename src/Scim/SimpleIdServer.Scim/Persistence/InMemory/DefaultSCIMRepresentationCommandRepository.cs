@@ -1,6 +1,7 @@
 // Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Scim.Domains;
+using SimpleIdServer.Scim.Parser.Expressions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,8 +12,22 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
 {
     public class DefaultSCIMRepresentationCommandRepository : InMemoryCommandRepository<SCIMRepresentation>, ISCIMRepresentationCommandRepository
     {
-        public DefaultSCIMRepresentationCommandRepository(List<SCIMRepresentation> lstData) : base(lstData) { }
-        
+        private readonly List<SCIMRepresentationAttribute> _attributes;
+
+        public DefaultSCIMRepresentationCommandRepository(List<SCIMRepresentation> lstData, List<SCIMRepresentationAttribute> attributes) : base(lstData) 
+        {
+            _attributes = attributes;
+        }
+
+        public override Task<bool> Add(SCIMRepresentation data, CancellationToken token)
+        {
+            foreach (var attr in data.FlatAttributes) attr.RepresentationId = data.Id;
+            _attributes.AddRange(data.FlatAttributes);
+            data.FlatAttributes.Clear();
+            LstData.Add((SCIMRepresentation)data.Clone());
+            return Task.FromResult(true);
+        }
+
         public Task<List<SCIMRepresentation>> FindPaginatedRepresentations(List<string> representationIds, string resourceType = null, int nbRecords = 50, bool ignoreAttributes = false)
         {
             var representations = LstData.AsQueryable().Where(r => representationIds.Contains(r.Id));
@@ -62,6 +77,16 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             return Task.FromResult(results);
         }
 
+        public Task<List<SCIMRepresentationAttribute>> FindAttributes(string representationId, SCIMAttributeExpression pathExpression, CancellationToken cancellationToken)
+        {
+            var representationAttributes = _attributes.Where(a => a.RepresentationId == representationId).AsQueryable();
+            var allAttributes = new List<SCIMRepresentationAttribute>();
+            var filteredAttributes = pathExpression.EvaluateAttributes(representationAttributes, true);
+            allAttributes.AddRange(filteredAttributes);
+            foreach (var fAttr in filteredAttributes) ResolveChildren(representationAttributes, fAttr.Id, allAttributes);
+            return Task.FromResult(allAttributes);
+        }
+
         public Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string attrSchemaId, string value, string endpoint = null)
         {
             var result = LstData.FirstOrDefault(r => (endpoint == null || endpoint == r.ResourceType) && r.FlatAttributes.Any(a => a.SchemaAttribute.Id == attrSchemaId && a.ValueString == value));
@@ -105,8 +130,7 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
         {
             foreach(var scimRepresentationAttr in scimRepresentationAttributes)
             {
-                var representation = LstData.Single(r => r.Id == scimRepresentationAttr.RepresentationId);
-                representation.FlatAttributes.Add(scimRepresentationAttr);
+                _attributes.Add(scimRepresentationAttr);
             }
 
             return Task.CompletedTask;
@@ -116,9 +140,8 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
         {
             foreach (var scimRepresentationAttr in scimRepresentationAttributes)
             {
-                var representation = LstData.Single(r => r.Id == scimRepresentationAttr.RepresentationId);
-                var attr = representation.FlatAttributes.Single(r => r.Id == scimRepresentationAttr.Id);
-                representation.FlatAttributes.Remove(attr);
+                var attr = _attributes.Single(r => r.Id == scimRepresentationAttr.Id);
+                _attributes.Remove(attr);
             }
 
             return Task.CompletedTask;
@@ -128,13 +151,19 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
         {
             foreach (var scimRepresentationAttr in scimRepresentationAttributes)
             {
-                var representation = LstData.Single(r => r.Id == scimRepresentationAttr.RepresentationId);
-                var attr = representation.FlatAttributes.Single(r => r.Id == scimRepresentationAttr.Id);
-                representation.FlatAttributes.Remove(attr);
-                representation.FlatAttributes.Add(scimRepresentationAttr);
+                var attr = _attributes.Single(r => r.Id == scimRepresentationAttr.Id);
+                _attributes.Remove(attr);
+                _attributes.Add(scimRepresentationAttr);
             }
 
             return Task.CompletedTask;
+        }
+
+        private void ResolveChildren(IQueryable<SCIMRepresentationAttribute> representationAttributes, string parentId, List<SCIMRepresentationAttribute> children)
+        {
+            var filteredAttributes = representationAttributes.Where(a => a.ParentAttributeId == parentId);
+            children.AddRange(filteredAttributes);
+            foreach (var fAttr in filteredAttributes) ResolveChildren(representationAttributes, fAttr.Id, children);
         }
     }
 }

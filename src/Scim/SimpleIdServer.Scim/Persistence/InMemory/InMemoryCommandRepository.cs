@@ -30,7 +30,7 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             return Task.FromResult(result);
         }
 
-        public Task<bool> Add(T data, CancellationToken token)
+        public virtual Task<bool> Add(T data, CancellationToken token)
         {
             _lstData.Add((T)data.Clone());
             return Task.FromResult(true);

@@ -3,6 +3,7 @@
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using SimpleIdServer.Scim.Domains;
+using SimpleIdServer.Scim.Parser.Expressions;
 using SimpleIdServer.Scim.Persistence.MongoDB.Extensions;
 using SimpleIdServer.Scim.Persistence.MongoDB.Models;
 using System;
@@ -326,6 +327,11 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                     await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(s => s.Id == representation.Id, representation);
                 }
             }
+        }
+
+        public Task<List<SCIMRepresentationAttribute>> FindAttributes(string representationId, SCIMAttributeExpression attrExpression, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
     }
 }

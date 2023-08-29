@@ -4,9 +4,10 @@ using SimpleIdServer.Scim.Domains;
 
 namespace SimpleIdServer.Scim.DTOs
 {
-    public class SCIMPatchResult
+    public record SCIMPatchResult
     {
         public string Path { get; set; }
+        public string AttributeId { get; set; }
         public SCIMRepresentationAttribute Attr { get; set; }
         public SCIMPatchOperations Operation { get; set; }
     }

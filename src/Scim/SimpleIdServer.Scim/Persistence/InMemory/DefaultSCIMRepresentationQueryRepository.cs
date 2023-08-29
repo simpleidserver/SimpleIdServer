@@ -12,10 +12,12 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
     public class DefaultSCIMRepresentationQueryRepository : ISCIMRepresentationQueryRepository
     {
         private readonly List<SCIMRepresentation> _representations;
+        private readonly List<SCIMRepresentationAttribute> _attributes;
 
-        public DefaultSCIMRepresentationQueryRepository(List<SCIMRepresentation> representations)
+        public DefaultSCIMRepresentationQueryRepository(List<SCIMRepresentation> representations, List<SCIMRepresentationAttribute> attributes)
         {
             _representations = representations;
+            _attributes = attributes;
         }
 
         public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId)
@@ -23,10 +25,10 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             var result = _representations.FirstOrDefault(r => r.Id == representationId);
             if (result == null)
             {
-                return Task.FromResult(result);
+                return Task.FromResult((SCIMRepresentation)null);
             }
 
-            return Task.FromResult(result);
+            return Task.FromResult(Enrich(result));
         }
 
         public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType)
@@ -34,11 +36,11 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             var result = _representations.FirstOrDefault(r => r.Id == representationId && r.ResourceType == resourceType);
             if (result == null)
             {
-                return Task.FromResult(result);
+                return Task.FromResult((SCIMRepresentation)null);
             }
 
             var clone = (SCIMRepresentation)result.Clone();
-            return Task.FromResult(clone);
+            return Task.FromResult(Enrich(result));
         }
 
         public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType, GetSCIMResourceParameter parameter)
@@ -49,8 +51,9 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
                 return Task.FromResult(result);
             }
 
-            result.FilterAttributes(parameter.IncludedAttributes, parameter.ExcludedAttributes);
-            return Task.FromResult(result);
+            var clone = Enrich(result);
+            clone.FilterAttributes(parameter.IncludedAttributes, parameter.ExcludedAttributes);
+            return Task.FromResult(clone);
         }
 
         public Task<SearchSCIMRepresentationsResponse> FindSCIMRepresentations(SearchSCIMRepresentationsParameter parameter)
@@ -80,6 +83,13 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
         {
             IEnumerable<SCIMRepresentation> representations = _representations.AsQueryable().Where(r => r.ResourceType == resourceType && representationIds.Contains(r.Id));
             return Task.FromResult(representations);
+        }
+
+        private SCIMRepresentation Enrich(SCIMRepresentation representation)
+        {
+            var clone = (SCIMRepresentation)representation.Clone();
+            clone.FlatAttributes = _attributes.Where(a => a.RepresentationId == representation.Id).ToList();
+            return clone;
         }
     }
 }

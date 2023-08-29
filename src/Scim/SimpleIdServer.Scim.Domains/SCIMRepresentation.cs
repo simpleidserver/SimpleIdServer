@@ -382,10 +382,10 @@ namespace SimpleIdServer.Scim.Domains
             return attributes.SelectMany(a => a.ToFlat()).ToList();
         }
 
-        public static List<SCIMRepresentationAttribute> BuildHierarchicalAttributes(ICollection<SCIMRepresentationAttribute> attributes)
+        public static List<SCIMRepresentationAttribute> BuildHierarchicalAttributes(IEnumerable<SCIMRepresentationAttribute> attributes)
         {
             var rootId = string.Empty;
-            if (attributes.Count == 0) return new List<SCIMRepresentationAttribute>();
+            if (attributes.Count() == 0) return new List<SCIMRepresentationAttribute>();
             var parentsDictionary = new Dictionary<string, List<SCIMRepresentationAttribute>>();
             var treeNodes = new List<SCIMRepresentationAttribute>();
             foreach (var scimRepresentationAttribute in attributes)
