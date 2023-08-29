@@ -165,6 +165,7 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                     TargetAttributeId = customUserSchema.Attributes.First(a => a.Name == "entitlements").Id
                 }
             };
+            
             services.AddMvc(o =>
             {
                 o.EnableEndpointRouting = false;

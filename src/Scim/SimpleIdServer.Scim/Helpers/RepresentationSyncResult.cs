@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Scim.Domains;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SimpleIdServer.Scim.Helpers
 {
@@ -15,6 +16,16 @@ namespace SimpleIdServer.Scim.Helpers
 
         public void RemoveReferenceAttributes(IEnumerable<SCIMRepresentationAttribute> attrs) => RemovedRepresentationAttributes.AddRange(attrs);
 
-        public void UpdateReferenceAttributes(IEnumerable<SCIMRepresentationAttribute> attrs) => UpdatedRepresentationAttributes.AddRange(attrs);
+        public void UpdateReferenceAttributes(IEnumerable<SCIMRepresentationAttribute> attrs, IEnumerable<RepresentationSyncResult> result)
+        {
+            var filteredAttrs = attrs.Where(a => CanUpdate(a) && result.All(r => r.CanUpdate(a)));
+            UpdatedRepresentationAttributes.AddRange(filteredAttrs);
+        }
+
+        public bool CanUpdate(SCIMRepresentationAttribute attr)
+        {
+            var allIds = AddedRepresentationAttributes.Select(a => a.Id).Union(RemovedRepresentationAttributes.Select(a => a.Id)).ToList();
+            return !allIds.Contains(attr.Id);
+        }
     }
 }

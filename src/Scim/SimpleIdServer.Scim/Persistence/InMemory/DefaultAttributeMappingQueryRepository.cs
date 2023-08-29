@@ -16,20 +16,20 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             _attributeMappingLst = attributeMappingLst;
         }
 
-        public Task<IEnumerable<SCIMAttributeMapping>> GetAll()
+        public Task<List<SCIMAttributeMapping>> GetAll()
         {
-            IEnumerable<SCIMAttributeMapping> result = _attributeMappingLst;
+            var result = _attributeMappingLst;
             return Task.FromResult(result);
         }
 
-        public Task<IEnumerable<SCIMAttributeMapping>> GetBySourceAttributes(IEnumerable<string> sourceAttributes)
+        public Task<List<SCIMAttributeMapping>> GetBySourceAttributes(IEnumerable<string> sourceAttributes)
         {
-            return Task.FromResult(_attributeMappingLst.Where(a => sourceAttributes.Contains(a.SourceAttributeSelector)));
+            return Task.FromResult(_attributeMappingLst.Where(a => sourceAttributes.Contains(a.SourceAttributeSelector)).ToList());
         }
 
-        public Task<IEnumerable<SCIMAttributeMapping>> GetBySourceResourceType(string sourceResourceType)
+        public Task<List<SCIMAttributeMapping>> GetBySourceResourceType(string sourceResourceType)
         {
-            return Task.FromResult(_attributeMappingLst.Where(a => a.SourceResourceType == sourceResourceType));
+            return Task.FromResult(_attributeMappingLst.Where(a => a.SourceResourceType == sourceResourceType).ToList());
         }
     }
 }

@@ -12,7 +12,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
-using static MassTransit.ValidationResultExtensions;
 
 namespace SimpleIdServer.Scim.Persistence.EF.Extensions
 {
@@ -43,12 +42,10 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
             {
                 filteredAttrs = filteredAttrs.Where(a => a.RepresentationId == id);
                 var result = await representations.FirstOrDefaultAsync(r => r.Id == id && r.ResourceType == resourceType);
-                var includedFullPathLst = (includedAttributes != null && includedAttributes.Any()) ? includedAttributes.Where(i => i is SCIMComplexAttributeExpression).Select(i => i.GetFullPath()) : new List<string>();
                 result.FlatAttributes = filteredAttrs.ToList();
                 return result;
             }
-
-            representations = representations.Include(r => r.FlatAttributes).ThenInclude(s => s.SchemaAttribute);
+            
             return await representations.FirstOrDefaultAsync(r => r.Id == id && r.ResourceType == resourceType);
         }
 

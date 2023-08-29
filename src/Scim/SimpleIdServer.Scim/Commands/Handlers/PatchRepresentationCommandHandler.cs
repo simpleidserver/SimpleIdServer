@@ -1,4 +1,4 @@
-﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
 using Microsoft.Extensions.Options;
@@ -58,16 +58,14 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var displayNameDifferent = existingRepresentation.DisplayName != oldDisplayName;
             if (!patchResult.Any()) return GenericResult<PatchRepresentationResult>.Ok(PatchRepresentationResult.NoPatch());
             existingRepresentation.SetUpdated(DateTime.UtcNow);
-            var refIterator = _representationReferenceSync.Sync(patchRepresentationCommand.ResourceType, existingRepresentation, patchResult, patchRepresentationCommand.Location, schema, displayNameDifferent);
-            using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
+            var references = await _representationReferenceSync.Sync(patchRepresentationCommand.ResourceType, existingRepresentation, patchResult, patchRepresentationCommand.Location, schema, displayNameDifferent);
+            await using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
             {
-                var references = new List<RepresentationSyncResult>();
-                foreach (var reference in refIterator)
+                foreach (var reference in references)
                 {
                     await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes).ConfigureAwait(false);
                     await _scimRepresentationCommandRepository.BulkUpdate(reference.UpdatedRepresentationAttributes).ConfigureAwait(false);
                     await _scimRepresentationCommandRepository.BulkDelete(reference.RemovedRepresentationAttributes).ConfigureAwait(false);
-                    references.Add(reference);
                 }
                 
                 await _scimRepresentationCommandRepository.Update(existingRepresentation).ConfigureAwait(false);
