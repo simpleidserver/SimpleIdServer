@@ -18,19 +18,19 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             _scimDbContext = scimDbContext;
         }
 
-        public async Task<IEnumerable<SCIMAttributeMapping>> GetAll()
+        public async Task<List<SCIMAttributeMapping>> GetAll()
         {
             var attributeMappings = _scimDbContext.SCIMAttributeMappingLst;
             return await attributeMappings.AsQueryable().ToMongoListAsync();
         }
 
-        public async Task<IEnumerable<SCIMAttributeMapping>> GetBySourceAttributes(IEnumerable<string> sourceAttributes)
+        public async Task<List<SCIMAttributeMapping>> GetBySourceAttributes(IEnumerable<string> sourceAttributes)
         {
             var attributeMappings = _scimDbContext.SCIMAttributeMappingLst;
             return await attributeMappings.AsQueryable().Where(a => sourceAttributes.Contains(a.SourceAttributeSelector)).ToMongoListAsync();
         }
 
-        public async Task<IEnumerable<SCIMAttributeMapping>> GetBySourceResourceType(string sourceResourceType)
+        public async Task<List<SCIMAttributeMapping>> GetBySourceResourceType(string sourceResourceType)
         {
             var attributeMappings = _scimDbContext.SCIMAttributeMappingLst;
             return await attributeMappings.AsQueryable().Where(a => a.SourceResourceType == sourceResourceType).ToMongoListAsync();

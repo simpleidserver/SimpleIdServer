@@ -57,11 +57,15 @@ namespace SimpleIdServer.Scim.Persistence.EF
             var removeCollectionMethod = typeof(InternalEntityEntry).GetMethod("RemoveFromCollection", BindingFlags.Public | BindingFlags.Instance);
             foreach (var entry in representations)
             {
-                var representationId = (entry.Entity as SCIMRepresentation).Id;
                 var navigation = entry.EntityType.GetNavigations().Single(n => n.Name == "FlatAttributes");
                 foreach (var attrToRemove in attrsToRemove) removeCollectionMethod.Invoke(entry, new object[] { navigation, attrToRemove });
             }
 #pragma warning restore EF1001
+        }
+
+        public ValueTask DisposeAsync() 
+        {
+            return _dbContextTransaction.DisposeAsync();
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
 using SimpleIdServer.Scim.Domain;
@@ -83,24 +83,23 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             await CheckSCIMRepresentationExistsForGivenUniqueAttributes(uniqueGlobalAttributes, existingRepresentation.Id);
             
             var isReferenceProperty = await _representationReferenceSync.IsReferenceProperty(replaceRepresentationCommand.Representation.Attributes.GetKeys());
-            var refIterator = _representationReferenceSync.Sync(updateResult.AttributeMappingLst, replaceRepresentationCommand.ResourceType, oldRepresentation, existingRepresentation, replaceRepresentationCommand.Location, schema, !isReferenceProperty);
-            using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
+            var references = await _representationReferenceSync.Sync(updateResult.AttributeMappingLst.ToList(), replaceRepresentationCommand.ResourceType, oldRepresentation, existingRepresentation, replaceRepresentationCommand.Location, schema, !isReferenceProperty);
+            await using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
             {
-                var references = new List<RepresentationSyncResult>();
-                foreach (var reference in refIterator)
+                foreach (var reference in references)
                 {
                     await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes).ConfigureAwait(false);
                     await _scimRepresentationCommandRepository.BulkDelete(reference.RemovedRepresentationAttributes).ConfigureAwait(false);
                     await _scimRepresentationCommandRepository.BulkUpdate(reference.UpdatedRepresentationAttributes).ConfigureAwait(false);
-                    references.Add(reference);
                 }
 
                 await _scimRepresentationCommandRepository.Update(existingRepresentation).ConfigureAwait(false);
                 await transaction.Commit().ConfigureAwait(false);
                 await NotifyAllReferences(references).ConfigureAwait(false);
-                existingRepresentation.ApplyEmptyArray();
-                return GenericResult<SCIMRepresentation>.Ok(existingRepresentation);
             }
+
+            existingRepresentation.ApplyEmptyArray();
+            return GenericResult<SCIMRepresentation>.Ok(existingRepresentation);
         }
 
         private async Task<UpdateRepresentationResult> UpdateExistingRepresentation(string resourceType, SCIMRepresentation existingRepresentation, SCIMRepresentation updatedRepresentation)

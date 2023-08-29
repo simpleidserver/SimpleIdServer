@@ -15,5 +15,10 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
         public void Dispose()
         {
         }
+
+        public ValueTask DisposeAsync()
+        {
+            return new ValueTask();
+        }
     }
 }

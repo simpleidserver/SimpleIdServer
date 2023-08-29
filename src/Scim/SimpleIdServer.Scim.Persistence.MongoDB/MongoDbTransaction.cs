@@ -32,10 +32,13 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 
         public void Dispose()
         {
-            if (_clientSessionHandle != null)
-            {
-                _clientSessionHandle.Dispose();
-            }
+            _clientSessionHandle?.Dispose();
+        }
+
+        public ValueTask DisposeAsync()
+        {
+            _clientSessionHandle?.Dispose();
+            return ValueTask.CompletedTask;
         }
     }
 }

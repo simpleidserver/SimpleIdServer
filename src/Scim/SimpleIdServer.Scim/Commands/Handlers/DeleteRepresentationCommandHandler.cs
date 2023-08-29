@@ -1,7 +1,5 @@
-﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-
-using System.Linq;
 using MassTransit;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Exceptions;
@@ -10,7 +8,6 @@ using SimpleIdServer.Scim.Infrastructure;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Resources;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace SimpleIdServer.Scim.Commands.Handlers
 {
@@ -36,15 +33,13 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             if (schema == null) throw new SCIMSchemaNotFoundException();
             var representation = await _scimRepresentationCommandRepository.Get(request.Id);
             if (representation == null) throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, request.Id));
-            var refIterator = _representationReferenceSync.Sync(request.ResourceType, representation, representation, request.Location, schema, true, true);
-            using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
+            var references = await _representationReferenceSync.Sync(request.ResourceType, representation, representation, request.Location, schema, true, true);
+            await using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
             {
-                var references = new List<RepresentationSyncResult>();
-                foreach (var reference in refIterator)
+                foreach (var reference in references)
                 {
                     await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes).ConfigureAwait(false);
                     await _scimRepresentationCommandRepository.BulkDelete(reference.RemovedRepresentationAttributes).ConfigureAwait(false);
-                    references.Add(reference);
                 }
 
                 await _scimRepresentationCommandRepository.Delete(representation).ConfigureAwait(false);
