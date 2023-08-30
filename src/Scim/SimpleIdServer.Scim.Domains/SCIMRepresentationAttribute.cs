@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 
 namespace SimpleIdServer.Scim.Domains
 {
@@ -195,21 +194,17 @@ namespace SimpleIdServer.Scim.Domains
             return false;
         }
 
-        public bool IsLeaf()
-        {
-            return GetLevel() == 1;
-        }
+        public bool IsLeaf() => IsLeaf(FullPath);
 
-        public int GetLevel()
-        {
-            return FullPath.Split('.').Length;
-        }
+        public int GetLevel() => GetLevel(FullPath);
 
-        public string GetParentFullPath()
-        {
-            if (IsLeaf()) return null;
-            return string.Join(".", FullPath.Split('.').Take(GetLevel() - 1));
-        }
+        public string GetParentFullPath() => GetParentFullPath(FullPath);
+
+        public static bool IsLeaf(string path) => GetLevel(path) == 1;
+
+        public static int GetLevel(string path) => path.Split('.').Length;
+
+        public static string GetParentFullPath(string path) => string.Join(".", path.Split('.').Take(GetLevel(path) - 1));
 
         public void UpdateValue(string path, SCIMRepresentationAttribute attr)
         {
@@ -223,12 +218,22 @@ namespace SimpleIdServer.Scim.Domains
             flatAttr.ValueDateTime = attr.ValueDateTime;
             flatAttr.ValueBinary = attr.ValueBinary;
             flatAttr.Children = attr.Children;
-            if(flatAttr.Children != null)
+            flatAttr.CachedChildren = attr.CachedChildren;
+            if (flatAttr.Children != null)
             {
                 foreach(var child in flatAttr.Children)
                 {
-                    child.ParentAttributeId = Id;
-                    child.RepresentationId = RepresentationId;
+                    child.ParentAttributeId = flatAttr.Id;
+                    child.RepresentationId = flatAttr.RepresentationId;
+                }
+            }
+
+            if(flatAttr.CachedChildren != null)
+            {
+                foreach(var child in flatAttr.CachedChildren)
+                {
+                    child.ParentAttributeId = flatAttr.Id;
+                    child.RepresentationId = flatAttr.RepresentationId;
                 }
             }
         }

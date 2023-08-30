@@ -54,9 +54,7 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             }
             return Task.FromResult(results);
         }
-
-
-
+        
         public Task<List<SCIMRepresentationAttribute>> FindPaginatedGraphAttributes(IEnumerable<string> representationIds, string valueStr, string schemaAttributeId, int nbRecords = 50, string sourceRepresentationId = null)
         {
             var allAttributes = LstData.SelectMany(r => r.FlatAttributes);
@@ -172,11 +170,37 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             return Task.CompletedTask;
         }
 
+        public override Task<ITransaction> StartTransaction(CancellationToken token) => Task.FromResult((ITransaction)new SCIMRepresentationTransaction(_attributes));
+
         private void ResolveChildren(IQueryable<SCIMRepresentationAttribute> representationAttributes, string parentId, List<SCIMRepresentationAttribute> children)
         {
             var filteredAttributes = representationAttributes.Where(a => a.ParentAttributeId == parentId);
             children.AddRange(filteredAttributes);
             foreach (var fAttr in filteredAttributes) ResolveChildren(representationAttributes, fAttr.Id, children);
+        }
+    }
+
+    public class SCIMRepresentationTransaction : ITransaction
+    {
+        private readonly List<SCIMRepresentationAttribute> _attributes;
+        public SCIMRepresentationTransaction(List<SCIMRepresentationAttribute> attributes)
+        {
+            _attributes = attributes;
+        }
+
+        public Task Commit(CancellationToken token = default)
+        {
+            foreach (var attr in _attributes) attr.CachedChildren.Clear();
+            return Task.CompletedTask;
+        }
+
+        public void Dispose()
+        {
+        }
+
+        public ValueTask DisposeAsync()
+        {
+            return new ValueTask();
         }
     }
 }

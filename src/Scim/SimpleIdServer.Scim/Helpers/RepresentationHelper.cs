@@ -39,7 +39,6 @@ namespace SimpleIdServer.Scim.Helpers
                 var schemaAttributes = representation.Schemas.SelectMany(_ => _.Attributes);
                 List<SCIMRepresentationAttribute> filteredAttributes = null, hierarchicalNewAttributes = null, hierarchicalFilteredAttributes = null;
                 string fullPath = null;
-                SCIMRepresentationAttribute emptyParent = null;
                 SCIMSchemaAttribute scimExprSchemaAttr = null;
                 if (scimFilter != null)
                 {
@@ -72,15 +71,6 @@ namespace SimpleIdServer.Scim.Helpers
                     }
                 }
 
-                /*
-                if (scimFilter != null && hierarchicalNewAttributes != null && !hierarchicalNewAttributes.Any())
-                {
-                    emptyParent = scimFilter.BuildEmptyAttributes().FirstOrDefault();
-                    emptyParent.UpdateValue(fullPath, patch.Value);
-                    hierarchicalNewAttributes = new List<SCIMRepresentationAttribute> { emptyParent };
-                }
-                */
-
                 var removeCallback = new Action<ICollection<SCIMRepresentationAttribute>>((attrs) =>
                 {
                     foreach (var a in attrs)
@@ -88,7 +78,6 @@ namespace SimpleIdServer.Scim.Helpers
                         result.Remove(a);
                     }
                 });
-
 
                 switch (patch.Operation)
                 {
@@ -117,6 +106,13 @@ namespace SimpleIdServer.Scim.Helpers
                             else
                             {
                                 hierarchicalNewAttributes = FilterDuplicate(hierarchicalFilteredAttributes, hierarchicalNewAttributes);
+                                SCIMRepresentationAttribute arrayParentAttribute = null;
+                                if (hierarchicalFilteredAttributes.Any() && hierarchicalNewAttributes.Any() && scimExprSchemaAttr.MultiValued && !SCIMRepresentationAttribute.IsLeaf(fullPath))
+                                {
+                                    var parentFullPath = SCIMRepresentationAttribute.GetParentFullPath(fullPath);
+                                    arrayParentAttribute = filteredAttributes.First(f => f.FullPath == parentFullPath);
+                                }
+
                                 foreach (var newAttribute in hierarchicalNewAttributes)
                                 {
                                     var newFlatAttributes = newAttribute.ToFlat();
@@ -126,6 +122,8 @@ namespace SimpleIdServer.Scim.Helpers
                                         foreach (var newFlatAttr in newFlatAttributes)
                                         {
                                             newFlatAttr.RepresentationId = representation.Id;
+                                            if (arrayParentAttribute != null && newFlatAttr.FullPath == arrayParentAttribute.FullPath) continue;
+                                            if (arrayParentAttribute != null && newFlatAttr.GetParentFullPath() == arrayParentAttribute.FullPath) newFlatAttr.ParentAttributeId = arrayParentAttribute.Id;
                                             result.Add(newFlatAttr);
                                         }
                                         continue;

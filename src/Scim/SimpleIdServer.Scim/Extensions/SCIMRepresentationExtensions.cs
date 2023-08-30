@@ -510,7 +510,7 @@ namespace SimpleIdServer.Scim.Domain
                 }
 
                 return new EnrichParameter(schema, order, a);
-            });
+            }).ToList();
             EnrichResponse(attributes, jObj, mergeExtensionAttributes, isGetRequest);
             return jObj;
         }

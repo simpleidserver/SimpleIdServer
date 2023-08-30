@@ -403,7 +403,11 @@ namespace SimpleIdServer.Scim.Domains
             }
 
             foreach (var node in treeNodes.Where(node => parentsDictionary.ContainsKey(node.Id)))
+            {
                 node.CachedChildren = parentsDictionary[node.Id];
+                node.Children = parentsDictionary[node.Id];
+            }
+
             foreach(var attr in parentsDictionary[rootId])
                 attr.ComputeValueIndex();
 

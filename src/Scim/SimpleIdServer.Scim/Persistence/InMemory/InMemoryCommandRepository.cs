@@ -24,7 +24,7 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             return Task.FromResult(_lstData.FirstOrDefault(r => r.Id == id));
         }
 
-        public Task<ITransaction> StartTransaction(CancellationToken token)
+        public virtual Task<ITransaction> StartTransaction(CancellationToken token)
         {
             ITransaction result = new DefaultTransaction();
             return Task.FromResult(result);
