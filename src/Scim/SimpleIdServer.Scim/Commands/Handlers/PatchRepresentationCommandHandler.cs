@@ -58,7 +58,8 @@ namespace SimpleIdServer.Scim.Commands.Handlers
         {
             var attributeMappings = await _scimAttributeMappingQueryRepository.GetBySourceResourceType(existingRepresentation.ResourceType);
             var oldDisplayName = existingRepresentation.DisplayName;
-            var patchResultLst = await _representationHelper.Apply(existingRepresentation, patchRepresentationCommand.PatchRepresentation.Operations, attributeMappings, _options.IgnoreUnsupportedCanonicalValues, CancellationToken.None);
+            var patchResult = await _representationHelper.Apply(existingRepresentation, patchRepresentationCommand.PatchRepresentation.Operations, attributeMappings, _options.IgnoreUnsupportedCanonicalValues, CancellationToken.None);
+            var patchResultLst = patchResult.Patches;
             var displayNameDifferent = existingRepresentation.DisplayName != oldDisplayName;
             if (!patchResultLst.Any()) return GenericResult<PatchRepresentationResult>.Ok(PatchRepresentationResult.NoPatch());
             existingRepresentation.SetUpdated(DateTime.UtcNow);

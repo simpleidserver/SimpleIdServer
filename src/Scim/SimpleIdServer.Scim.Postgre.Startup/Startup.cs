@@ -41,6 +41,7 @@ namespace SimpleIdServer.Scim.Postgre.Startup
             }).AddNewtonsoftJson(o => { });
             services.AddLogging(o =>
             {
+                o.AddConsole();
                 o.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
             });
             // services.AddAuthorization(opts => opts.AddDefaultSCIMAuthorizationPolicy());

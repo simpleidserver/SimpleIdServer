@@ -7,7 +7,6 @@ namespace SimpleIdServer.Scim.DTOs
     public record SCIMPatchResult
     {
         public string Path { get; set; }
-        public string AttributeId { get; set; }
         public SCIMRepresentationAttribute Attr { get; set; }
         public SCIMPatchOperations Operation { get; set; }
     }

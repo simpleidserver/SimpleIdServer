@@ -56,6 +56,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 
         public Task<SearchSCIMRepresentationsResponse> FindSCIMRepresentations(SearchSCIMRepresentationsParameter parameter)
         {
+            // JOIN COLLECTION.
             IEnumerable<SCIMRepresentation> result = null;
             int totalResults = 0;
             var collection = _scimDbContext.SCIMRepresentationLst;

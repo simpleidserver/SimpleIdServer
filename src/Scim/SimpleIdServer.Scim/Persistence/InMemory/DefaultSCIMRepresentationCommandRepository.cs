@@ -79,12 +79,25 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
 
         public Task<List<SCIMRepresentationAttribute>> FindAttributes(string representationId, SCIMAttributeExpression pathExpression, CancellationToken cancellationToken)
         {
-            var representationAttributes = _attributes.Where(a => a.RepresentationId == representationId).AsQueryable();
+            var representationAttributes = _attributes.Where(a => a.RepresentationId == representationId);
+            var hierarchicalRepresentationAttributes = SCIMRepresentation.BuildHierarchicalAttributes(representationAttributes).AsQueryable();
             var allAttributes = new List<SCIMRepresentationAttribute>();
-            var filteredAttributes = pathExpression.EvaluateAttributes(representationAttributes, true);
+            var filteredAttributes = pathExpression.EvaluateAttributes(hierarchicalRepresentationAttributes, true);
             allAttributes.AddRange(filteredAttributes);
-            foreach (var fAttr in filteredAttributes) ResolveChildren(representationAttributes, fAttr.Id, allAttributes);
+            foreach (var fAttr in filteredAttributes) ResolveChildren(representationAttributes.AsQueryable(), fAttr.Id, allAttributes);
             return Task.FromResult(allAttributes);
+        }
+
+        public Task<List<SCIMRepresentationAttribute>> FindAttributesByValueIndex(string representationId, string indexValue, string schemaAttributeId, CancellationToken cancellationToken)
+        {
+            var representationAttributes = _attributes.Where(a => a.RepresentationId == representationId);
+            return Task.FromResult(representationAttributes.Where(a => a.ComputedValueIndex == indexValue && a.SchemaAttributeId == schemaAttributeId).ToList());
+        }
+
+        public Task<List<SCIMRepresentationAttribute>> FindAttributesByFullPath(string representationId, string fullPath, CancellationToken cancellationToken)
+        {
+            var representationAttributes = _attributes.Where(a => a.RepresentationId == representationId && a.FullPath.StartsWith(fullPath));
+            return Task.FromResult(representationAttributes.ToList());
         }
 
         public Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string attrSchemaId, string value, string endpoint = null)

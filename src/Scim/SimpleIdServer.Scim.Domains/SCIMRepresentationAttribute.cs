@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 
 namespace SimpleIdServer.Scim.Domains
 {
@@ -64,6 +65,7 @@ namespace SimpleIdServer.Scim.Domains
         public decimal? ValueDecimal { get; set; }
         public string ValueBinary { get; set; }
         public string Namespace { get; set; }
+        public string ComputedValueIndex { get; set; }
         [Newtonsoft.Json.JsonIgnore]
         [System.Text.Json.Serialization.JsonIgnore]
         public SCIMSchemaAttribute SchemaAttribute { get; set; }
@@ -80,6 +82,52 @@ namespace SimpleIdServer.Scim.Domains
         #endregion
 
         #region Getters
+
+        public void ComputeValueIndex()
+        {
+            if (SchemaAttribute.Type != SCIMSchemaAttributeTypes.COMPLEX)
+            {
+                ComputedValueIndex = GetValueIndex();
+                return;
+            }
+
+            var lst = new List<string>();
+            foreach (var child in Children)
+            {
+                child.ComputeValueIndex();
+                var uniqueKey = child.ComputedValueIndex;
+                if (uniqueKey != null) lst.Add(uniqueKey);
+            }
+
+            ComputedValueIndex = string.Join(";", lst);
+        }
+
+        public string GetValueIndex()
+        {
+            string value = null;
+            switch (SchemaAttribute.Type)
+            {
+                case SCIMSchemaAttributeTypes.BINARY:
+                    value = ValueBinary;
+                    break;
+                case SCIMSchemaAttributeTypes.DATETIME:
+                    value = ValueDateTime?.ToString();
+                    break;
+                case SCIMSchemaAttributeTypes.DECIMAL:
+                    value = ValueDecimal?.ToString();
+                    break;
+                case SCIMSchemaAttributeTypes.INTEGER:
+                    return ValueInteger?.ToString();
+                case SCIMSchemaAttributeTypes.REFERENCE:
+                    return ValueReference?.ToString();
+                case SCIMSchemaAttributeTypes.STRING:
+                    return ValueString?.ToString();
+                case SCIMSchemaAttributeTypes.COMPLEX:
+                    return null;
+            }
+
+            return $"{FullPath}={value}";
+        }
 
         public bool IsReadable(bool isGetRequest = false)
         {
@@ -161,6 +209,28 @@ namespace SimpleIdServer.Scim.Domains
         {
             if (IsLeaf()) return null;
             return string.Join(".", FullPath.Split('.').Take(GetLevel() - 1));
+        }
+
+        public void UpdateValue(string path, SCIMRepresentationAttribute attr)
+        {
+            var flatAttrs = ToFlat();
+            var flatAttr = flatAttrs.Single(a => a.FullPath == path);
+            flatAttr.ValueString = attr.ValueString;
+            flatAttr.ValueBoolean = attr.ValueBoolean;
+            flatAttr.ValueReference = attr.ValueReference;
+            flatAttr.ValueInteger = attr.ValueInteger;
+            flatAttr.ValueDecimal = attr.ValueDecimal;
+            flatAttr.ValueDateTime = attr.ValueDateTime;
+            flatAttr.ValueBinary = attr.ValueBinary;
+            flatAttr.Children = attr.Children;
+            if(flatAttr.Children != null)
+            {
+                foreach(var child in flatAttr.Children)
+                {
+                    child.ParentAttributeId = Id;
+                    child.RepresentationId = RepresentationId;
+                }
+            }
         }
 
         public List<SCIMRepresentationAttribute> ToFlat()

@@ -29,6 +29,7 @@ namespace SimpleIdServer.Scim.Parser.Expressions
             var groupingAttrs = GroupingFilter.BuildEmptyAttributes();
             foreach (var child in groupingAttrs)
             {
+                if (first.Children.Any(c => c.FullPath == child.FullPath)) continue;
                 first.Children.Add(child);
                 child.ParentAttributeId = first.Id;
             }
