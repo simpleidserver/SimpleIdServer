@@ -21,6 +21,6 @@ namespace SimpleIdServer.Scim.Helpers
 
         public void Update(SCIMRepresentationAttribute attr) => Patches.Add(new SCIMPatchResult { Attr = attr, Operation = SCIMPatchOperations.REPLACE, Path = attr.FullPath });
 
-        public void AddExternalId() => Patches.Add(new SCIMPatchResult { Attr = new SCIMRepresentationAttribute(), Operation = SCIMPatchOperations.ADD, Path = StandardSCIMRepresentationAttributes.ExternalId });
+        public void AddExternalId() => Patches.Add(new SCIMPatchResult { Attr = new SCIMRepresentationAttribute(), Operation = SCIMPatchOperations.REPLACE, Path = StandardSCIMRepresentationAttributes.ExternalId });
     }
 }

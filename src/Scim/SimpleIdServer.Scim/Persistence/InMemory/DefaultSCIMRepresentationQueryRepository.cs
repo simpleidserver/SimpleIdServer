@@ -58,7 +58,7 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
 
         public Task<SearchSCIMRepresentationsResponse> FindSCIMRepresentations(SearchSCIMRepresentationsParameter parameter)
         {
-            var queryableRepresentations = _representations.AsQueryable().Where(r => r.ResourceType == parameter.ResourceType);
+            var queryableRepresentations = _representations.Select(r => Enrich(r)).AsQueryable().Where(r => r.ResourceType == parameter.ResourceType);
             if (parameter.Filter != null)
             {
                 var evaluatedExpression = parameter.Filter.Evaluate(queryableRepresentations);

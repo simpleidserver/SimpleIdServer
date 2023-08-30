@@ -32,7 +32,7 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
         {
             var representations = LstData.AsQueryable().Where(r => representationIds.Contains(r.Id));
             if (!string.IsNullOrWhiteSpace(resourceType)) representations = representations.Where(r => r.ResourceType == resourceType);
-            return Task.FromResult(representations.ToList());
+            return Task.FromResult(representations.Select(r => Enrich(r)).ToList());
         }
 
         public Task<List<SCIMRepresentationAttribute>> FindPaginatedGraphAttributes(string valueStr, string schemaAttributeId, int nbRecords = 50, string sourceRepresentationId = null)
@@ -57,7 +57,7 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
         
         public Task<List<SCIMRepresentationAttribute>> FindPaginatedGraphAttributes(IEnumerable<string> representationIds, string valueStr, string schemaAttributeId, int nbRecords = 50, string sourceRepresentationId = null)
         {
-            var allAttributes = LstData.SelectMany(r => r.FlatAttributes);
+            var allAttributes = _attributes;
             var nb = representationIds.Count();
             var nbPages = Math.Ceiling((decimal)(nb / nbRecords));
             var results = new List<SCIMRepresentationAttribute>();
@@ -140,10 +140,7 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
         public Task BulkInsert(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes)
         {
             foreach(var scimRepresentationAttr in scimRepresentationAttributes)
-            {
                 _attributes.Add(scimRepresentationAttr);
-            }
-
             return Task.CompletedTask;
         }
 
@@ -151,7 +148,8 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
         {
             foreach (var scimRepresentationAttr in scimRepresentationAttributes)
             {
-                var attr = _attributes.Single(r => r.Id == scimRepresentationAttr.Id);
+                var attr = _attributes.SingleOrDefault(r => r.Id == scimRepresentationAttr.Id);
+                if (attr == null) continue;
                 _attributes.Remove(attr);
             }
 
@@ -162,7 +160,8 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
         {
             foreach (var scimRepresentationAttr in scimRepresentationAttributes)
             {
-                var attr = _attributes.Single(r => r.Id == scimRepresentationAttr.Id);
+                var attr = _attributes.SingleOrDefault(r => r.Id == scimRepresentationAttr.Id);
+                if (attr == null) continue;
                 _attributes.Remove(attr);
                 _attributes.Add(scimRepresentationAttr);
             }
@@ -177,6 +176,13 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             var filteredAttributes = representationAttributes.Where(a => a.ParentAttributeId == parentId);
             children.AddRange(filteredAttributes);
             foreach (var fAttr in filteredAttributes) ResolveChildren(representationAttributes, fAttr.Id, children);
+        }
+
+        private SCIMRepresentation Enrich(SCIMRepresentation representation)
+        {
+            var clone = (SCIMRepresentation)representation.Clone();
+            clone.FlatAttributes = _attributes.Where(a => a.RepresentationId == representation.Id).ToList();
+            return clone;
         }
     }
 

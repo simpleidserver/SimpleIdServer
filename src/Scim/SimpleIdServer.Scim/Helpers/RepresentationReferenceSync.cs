@@ -153,8 +153,7 @@ namespace SimpleIdServer.Scim.Helpers
             foreach (var kvp in attributeMappingLst.GroupBy(m => m.SourceAttributeId))
             {
                 var sourceSchema = mappedSchemas.First(s => s.ResourceType == kvp.First().SourceResourceType && s.Attributes.Any(a => a.Id == kvp.Key));
-
-                var allCurrentIds = newSourceScimRepresentation.GetAttributesByAttrSchemaId(kvp.Key).SelectMany(a => newSourceScimRepresentation.GetChildren(a).Where(v => v.SchemaAttribute.Name == "value")).Select(v => v.ValueString);
+                var allCurrentIds = patchOperations.Where(o => o.Attr.SchemaAttributeId == kvp.Key).SelectMany(pa => patchOperations.Where(p => p.Attr.ParentAttributeId == pa.Attr.Id && p.Attr.SchemaAttribute.Name == "value").Select(p => p.Attr.ValueString));
                 var newIds = patchOperations
                     .Where(p => p.Operation == SCIMPatchOperations.ADD && p.Attr.SchemaAttributeId == kvp.Key)
                     .SelectMany(p => patchOperations.Where(po => po.Attr.ParentAttributeId == p.Attr.Id && po.Attr.SchemaAttribute.Name == SCIMConstants.StandardSCIMReferenceProperties.Value).Select(po => po.Attr.ValueString)).ToList();
@@ -190,7 +189,7 @@ namespace SimpleIdServer.Scim.Helpers
                                 }
                             }
 
-                            UpdateScimRepresentation(newSourceScimRepresentation, rep, schema, sourceAttribute);
+                            UpdateScimRepresentation(result, patchOperations, rep, schema, sourceAttribute);
                         }
 
                         var removedIds = result.RemovedRepresentationAttributes.Where(a => a.SchemaAttributeId == targetAttributeValue.Id).Select(r => r.RepresentationId).ToList();
@@ -468,6 +467,41 @@ namespace SimpleIdServer.Scim.Helpers
                 {
                     ValueString = targetRepresentation.DisplayName,
                     ParentAttributeId = valAttr.ParentAttributeId
+                });
+            }
+        }
+
+        protected virtual void UpdateScimRepresentation(RepresentationSyncResult result, ICollection<SCIMPatchResult> patches, SCIMRepresentation targetRepresentation, SCIMSchema sourceSchema, SCIMSchemaAttribute sourceAttribute)
+        {
+            var sourceAttributeValue = sourceSchema.GetChildren(sourceAttribute).Single(a => a.Name == SCIMConstants.StandardSCIMReferenceProperties.Value);
+            var sourceAttributeType = sourceSchema.GetChildren(sourceAttribute).SingleOrDefault(a => a.Name == SCIMConstants.StandardSCIMReferenceProperties.Type);
+            var sourceAttributeDisplay = sourceSchema.GetChildren(sourceAttribute).SingleOrDefault(a => a.Name == SCIMConstants.StandardSCIMReferenceProperties.Display);
+            var flatAttrs = patches.Select(p => p.Attr);
+            var representationId = flatAttrs.First().RepresentationId;
+            var valAttr = flatAttrs.Single(a => a.SchemaAttributeId == sourceAttributeValue.Id && a.ValueString == targetRepresentation.Id);
+            if (sourceAttributeType != null)
+            {
+                result.AddReferenceAttributes(new List<SCIMRepresentationAttribute>
+                {
+                    new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), sourceAttributeType, sourceAttributeType.SchemaId)
+                    {
+                        ValueString = targetRepresentation.ResourceType,
+                        ParentAttributeId = valAttr.ParentAttributeId,
+                        RepresentationId = representationId
+                    }
+                });
+            }
+
+            if (sourceAttributeDisplay != null)
+            {
+                result.AddReferenceAttributes(new List<SCIMRepresentationAttribute>
+                {
+                    new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), sourceAttributeDisplay, sourceAttributeDisplay.SchemaId)
+                    {
+                        ValueString = targetRepresentation.DisplayName,
+                        ParentAttributeId = valAttr.ParentAttributeId,
+                        RepresentationId = representationId
+                    }
                 });
             }
         }

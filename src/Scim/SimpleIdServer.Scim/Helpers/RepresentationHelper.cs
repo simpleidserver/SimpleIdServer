@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.CodeAnalysis;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
@@ -10,9 +11,11 @@ using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Resources;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using static MassTransit.ValidationResultExtensions;
 
 namespace SimpleIdServer.Scim.Helpers
 {
@@ -71,6 +74,8 @@ namespace SimpleIdServer.Scim.Helpers
                     }
                 }
 
+                if(hierarchicalFilteredAttributes != null && hierarchicalNewAttributes != null) hierarchicalNewAttributes = FilterDuplicate(hierarchicalFilteredAttributes, hierarchicalNewAttributes);
+
                 var removeCallback = new Action<ICollection<SCIMRepresentationAttribute>>((attrs) =>
                 {
                     foreach (var a in attrs)
@@ -95,17 +100,11 @@ namespace SimpleIdServer.Scim.Helpers
 
                             if (hierarchicalFilteredAttributes == null)
                             {
-                                foreach (var newAttribute in hierarchicalNewAttributes)
-                                {
-                                    var existingAttributes = await _scimRepresentationCommandRepository.FindAttributesByValueIndex(representation.Id, newAttribute.ComputedValueIndex, newAttribute.SchemaAttributeId, cancellationToken);
-                                    if (existingAttributes.Any()) continue;
-                                    newAttribute.RepresentationId = representation.Id;
-                                    result.Add(newAttribute);
-                                }
+                                await OverrideRootAttributes(result, hierarchicalNewAttributes, representation, cancellationToken);
                             }
                             else
                             {
-                                hierarchicalNewAttributes = FilterDuplicate(hierarchicalFilteredAttributes, hierarchicalNewAttributes);
+                                
                                 SCIMRepresentationAttribute arrayParentAttribute = null;
                                 if (hierarchicalFilteredAttributes.Any() && hierarchicalNewAttributes.Any() && scimExprSchemaAttr.MultiValued && !SCIMRepresentationAttribute.IsLeaf(fullPath))
                                 {
@@ -115,55 +114,10 @@ namespace SimpleIdServer.Scim.Helpers
 
                                 foreach (var newAttribute in hierarchicalNewAttributes)
                                 {
-                                    var newFlatAttributes = newAttribute.ToFlat();
-                                    // When attribute is multivalued and complex then insert.
-                                    if (scimExprSchemaAttr.Type == SCIMSchemaAttributeTypes.COMPLEX && scimExprSchemaAttr.MultiValued)
-                                    {
-                                        foreach (var newFlatAttr in newFlatAttributes)
-                                        {
-                                            newFlatAttr.RepresentationId = representation.Id;
-                                            if (arrayParentAttribute != null && newFlatAttr.FullPath == arrayParentAttribute.FullPath) continue;
-                                            if (arrayParentAttribute != null && newFlatAttr.GetParentFullPath() == arrayParentAttribute.FullPath) newFlatAttr.ParentAttributeId = arrayParentAttribute.Id;
-                                            result.Add(newFlatAttr);
-                                        }
-                                        continue;
-                                    }
-
-                                    // When attribute is multivalued and not complex then insert.
-                                    if (scimExprSchemaAttr.Type != SCIMSchemaAttributeTypes.COMPLEX && scimExprSchemaAttr.MultiValued)
-                                    {
-                                        newAttribute.RepresentationId = representation.Id;
-                                        result.Add(newAttribute);
-                                        continue;
-                                    }
-
-                                    foreach (var newFlatAttr in newFlatAttributes)
-                                    {
-                                        if (newFlatAttr.SchemaAttribute.Type == SCIMSchemaAttributeTypes.COMPLEX) continue;
-                                        var path = newFlatAttr.FullPath;
-                                        var schemaAttr = newFlatAttr.SchemaAttribute;
-                                        // Update existing attributes.
-                                        var existingAttributes = filteredAttributes.Where(a => a.FullPath == path && !a.IsSimilar(newFlatAttr, true));
-                                        foreach (var attr in existingAttributes)
-                                        {
-                                            var clone = (SCIMRepresentationAttribute)newFlatAttr.Clone();
-                                            clone.Id = attr.Id;
-                                            clone.ParentAttributeId = attr.ParentAttributeId;
-                                            clone.RepresentationId = representation.Id;
-                                            result.Update(clone);
-                                        }
-
-                                        // Orphan parent.
-                                        var orphanParents = hierarchicalFilteredAttributes.Where(a => !a.CachedChildren.Any(c => c.FullPath == fullPath));
-                                        foreach (var orphanParent in orphanParents)
-                                        {
-                                            var clone = (SCIMRepresentationAttribute)newFlatAttr.Clone();
-                                            clone.Id = Guid.NewGuid().ToString();
-                                            clone.ParentAttributeId = orphanParent.Id;
-                                            clone.RepresentationId = representation.Id;
-                                            result.Add(clone);
-                                        }
-                                    }
+                                    if (TryInsertComplexMultivaluedAttribute(result, newAttribute, arrayParentAttribute, scimExprSchemaAttr, representation)) continue;
+                                    if (TryInsertValueIntoArray(result, newAttribute, scimExprSchemaAttr, representation)) continue;
+                                    if (TryInsertWhenTargetLocationIsUnknown(result, newAttribute, hierarchicalFilteredAttributes, representation)) continue;
+                                    ReplaceAttributes(result, newAttribute, hierarchicalFilteredAttributes, filteredAttributes, representation);
                                 }
                             }
                         }
@@ -201,89 +155,11 @@ namespace SimpleIdServer.Scim.Helpers
                             if (complexAttr != null && !hierarchicalFilteredAttributes.Any() && complexAttr.GroupingFilter != null) throw new SCIMNoTargetException(Global.PatchMissingAttribute);
                             if(hierarchicalFilteredAttributes == null)
                             {
-                                foreach(var newAttribute in hierarchicalNewAttributes)
-                                {
-                                    var existingAttributes = await _scimRepresentationCommandRepository.FindAttributesByValueIndex(representation.Id, newAttribute.ComputedValueIndex, newAttribute.SchemaAttributeId, cancellationToken);
-                                    if (existingAttributes.Any()) continue;
-                                    if (newAttribute.SchemaAttribute.Type != SCIMSchemaAttributeTypes.COMPLEX)
-                                    {
-                                        var attrLstToBeRemoved = await _scimRepresentationCommandRepository.FindAttributesByFullPath(representation.Id, newAttribute.FullPath, cancellationToken);
-                                        foreach (var attrToBeRemove in attrLstToBeRemoved) result.Remove(attrToBeRemove);
-                                        newAttribute.RepresentationId = representation.Id;
-                                        result.Add(newAttribute);
-                                    }
-                                    else
-                                    {
-                                        newAttribute.RepresentationId = representation.Id;
-                                        result.Add(newAttribute);
-                                    }
-                                }
+                                await OverrideRootAttributes(result, hierarchicalNewAttributes, representation, cancellationToken);
                             }
                             else
                             {
-                                hierarchicalNewAttributes = FilterDuplicate(hierarchicalFilteredAttributes, hierarchicalNewAttributes);
-                                foreach (var newAttribute in hierarchicalNewAttributes)
-                                {
-                                    var newFlatAttributes = newAttribute.ToFlat();
-                                    foreach (var newFlatAttr in newFlatAttributes)
-                                    {
-                                        if (newFlatAttr.SchemaAttribute.Type == SCIMSchemaAttributeTypes.COMPLEX) continue;
-                                        var path = newFlatAttr.FullPath;
-                                        var schemaAttr = newFlatAttr.SchemaAttribute;
-                                        // Update existing attributes.
-                                        var existingAttributes = filteredAttributes.Where(a => a.FullPath == path && !a.IsSimilar(newFlatAttr, true));
-                                        foreach (var attr in existingAttributes)
-                                        {
-                                            var clone = (SCIMRepresentationAttribute)newFlatAttr.Clone();
-                                            clone.Id = attr.Id;
-                                            clone.ParentAttributeId = attr.ParentAttributeId;
-                                            clone.RepresentationId = representation.Id;
-                                            result.Update(clone);
-                                        }
-
-                                        // Orphan parent.
-                                        var orphanParents = hierarchicalFilteredAttributes.Where(a => !a.CachedChildren.Any(c => c.FullPath == path));
-                                        foreach (var orphanParent in orphanParents)
-                                        {
-                                            var clone = (SCIMRepresentationAttribute)newFlatAttr.Clone();
-                                            clone.Id = Guid.NewGuid().ToString();
-                                            clone.ParentAttributeId = orphanParent.Id;
-                                            clone.RepresentationId = representation.Id;
-                                            result.Add(clone);
-                                        }
-                                    }
-                                }
-
-                                /*
-                                foreach (var parent in parents)
-                                {
-                                    var flatHiearchy = representation.GetFlatHierarchicalChildren(parent).ToList();
-                                    var scimAttributeExpression = scimFilter as SCIMAttributeExpression;
-                                    var newAttributes = ExtractRepresentationAttributesFromJSON(representation.Schemas, schemaAttributes.ToList(), patch.Value, ignoreUnsupportedCanonicalValues);
-                                    var filteredAttrs = attributes.Where(a => a.ParentAttributeId == parent.Id);
-                                    if (IsExactlySimilar(filteredAttrs, newAttributes)) break;
-                                    foreach (var newAttribute in newAttributes.OrderBy(l => l.GetLevel()))
-                                    {
-                                        if (!flatHiearchy.Any(a => a.FullPath == newAttribute.FullPath))
-                                        {
-                                            var parentPath = SCIMRepresentation.GetParentPath(newAttribute.FullPath);
-                                            var p = flatHiearchy.FirstOrDefault(a => a.FullPath == parentPath);
-                                            if (p != null)
-                                            {
-                                                representation.AddAttribute(p, newAttribute);
-                                            }
-                                            else
-                                            {
-                                                representation.AddAttribute(newAttribute);
-                                            }
-
-                                            result.Add(new SCIMPatchResult { Attr = newAttribute, Operation = SCIMPatchOperations.ADD, Path = fullPath });
-                                        }
-                                    }
-
-                                    result.AddRange(Merge(flatHiearchy, newAttributes, fullPath));
-                                }
-                                */
+                                foreach (var newAttribute in hierarchicalNewAttributes) ReplaceAttributes(result, newAttribute, hierarchicalFilteredAttributes, filteredAttributes, representation);
                             }
                         }
                         break;
@@ -291,6 +167,96 @@ namespace SimpleIdServer.Scim.Helpers
             }
 
             return result;
+        }
+
+        private async Task OverrideRootAttributes(SCIMRepresentationPatchResult result, List<SCIMRepresentationAttribute> hierarchicalNewAttributes, SCIMRepresentation representation, CancellationToken cancellationToken)
+        {
+            foreach (var newAttribute in hierarchicalNewAttributes)
+            {
+                var existingAttributes = await _scimRepresentationCommandRepository.FindAttributesByValueIndex(representation.Id, newAttribute.ComputedValueIndex, newAttribute.SchemaAttributeId, cancellationToken);
+                if (existingAttributes.Any()) continue;
+                if (newAttribute.SchemaAttribute.Type != SCIMSchemaAttributeTypes.COMPLEX)
+                {
+                    var attrLstToBeRemoved = await _scimRepresentationCommandRepository.FindAttributesByFullPath(representation.Id, newAttribute.FullPath, cancellationToken);
+                    foreach (var attrToBeRemove in attrLstToBeRemoved) result.Remove(attrToBeRemove);
+                    newAttribute.RepresentationId = representation.Id;
+                    if (attrLstToBeRemoved.Any()) newAttribute.ParentAttributeId = attrLstToBeRemoved.First().ParentAttributeId;
+                    result.Add(newAttribute);
+                }
+                else
+                {
+                    newAttribute.RepresentationId = representation.Id;
+                    result.Add(newAttribute);
+                }
+            }
+        }
+
+        private bool TryInsertComplexMultivaluedAttribute(SCIMRepresentationPatchResult result, SCIMRepresentationAttribute newAttribute, SCIMRepresentationAttribute arrayParentAttribute, SCIMSchemaAttribute scimExprSchemaAttr, SCIMRepresentation representation)
+        {
+            if (!(scimExprSchemaAttr.Type == SCIMSchemaAttributeTypes.COMPLEX && scimExprSchemaAttr.MultiValued)) return false;
+            var newFlatAttributes = newAttribute.ToFlat();
+            foreach (var newFlatAttr in newFlatAttributes)
+            {
+                newFlatAttr.RepresentationId = representation.Id;
+                if (arrayParentAttribute != null && newFlatAttr.FullPath == arrayParentAttribute.FullPath) continue;
+                if (arrayParentAttribute != null && newFlatAttr.GetParentFullPath() == arrayParentAttribute.FullPath) newFlatAttr.ParentAttributeId = arrayParentAttribute.Id;
+                result.Add(newFlatAttr);
+            }
+
+            return true;
+        }
+
+        private bool TryInsertValueIntoArray(SCIMRepresentationPatchResult result, SCIMRepresentationAttribute newAttribute, SCIMSchemaAttribute scimExprSchemaAttr, SCIMRepresentation representation)
+        {
+            if (!(scimExprSchemaAttr.Type != SCIMSchemaAttributeTypes.COMPLEX && scimExprSchemaAttr.MultiValued)) return false;
+            newAttribute.RepresentationId = representation.Id;
+            result.Add(newAttribute);
+            return true;
+        }
+
+        private bool TryInsertWhenTargetLocationIsUnknown(SCIMRepresentationPatchResult result, SCIMRepresentationAttribute newAttribute, List<SCIMRepresentationAttribute> hierarchicalFilteredAttributes, SCIMRepresentation representation)
+        {
+            if (hierarchicalFilteredAttributes.Any()) return false;
+            var newFlatAttributes = newAttribute.ToFlat();
+            foreach (var newFlatAttr in newFlatAttributes)
+            {
+                newFlatAttr.RepresentationId = representation.Id;
+                result.Add(newFlatAttr);
+            }
+
+            return true;
+        }
+
+        private void ReplaceAttributes(SCIMRepresentationPatchResult result, SCIMRepresentationAttribute newAttribute, List<SCIMRepresentationAttribute> hierarchicalFilteredAttributes, List<SCIMRepresentationAttribute> flatFilteredAttributes, SCIMRepresentation representation)
+        {
+            var newFlatAttributes = newAttribute.ToFlat();
+            foreach (var newFlatAttr in newFlatAttributes)
+            {
+                if (newFlatAttr.SchemaAttribute.Type == SCIMSchemaAttributeTypes.COMPLEX) continue;
+                var path = newFlatAttr.FullPath;
+                var schemaAttr = newFlatAttr.SchemaAttribute;
+                // Update existing attributes.
+                var existingAttributes = flatFilteredAttributes.Where(a => a.FullPath == path && !a.IsSimilar(newFlatAttr, true));
+                foreach (var attr in existingAttributes)
+                {
+                    var clone = (SCIMRepresentationAttribute)newFlatAttr.Clone();
+                    clone.Id = attr.Id;
+                    clone.ParentAttributeId = attr.ParentAttributeId;
+                    clone.RepresentationId = representation.Id;
+                    result.Update(clone);
+                }
+
+                // Orphan parent.
+                var orphanParents = hierarchicalFilteredAttributes.Where(a => !a.CachedChildren.Any(c => c.FullPath == path));
+                foreach (var orphanParent in orphanParents)
+                {
+                    var clone = (SCIMRepresentationAttribute)newFlatAttr.Clone();
+                    clone.Id = Guid.NewGuid().ToString();
+                    clone.ParentAttributeId = orphanParent.Id;
+                    clone.RepresentationId = representation.Id;
+                    result.Add(clone);
+                }
+            }
         }
 
         private static bool TryGetExternalId(PatchOperationParameter patchOperation, out string externalId)
