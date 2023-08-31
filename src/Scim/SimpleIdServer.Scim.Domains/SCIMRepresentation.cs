@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 namespace SimpleIdServer.Scim.Domains
@@ -409,10 +410,11 @@ namespace SimpleIdServer.Scim.Domains
                 node.Children = parentsDictionary[node.Id];
             }
 
-            foreach(var attr in parentsDictionary[rootId])
-                attr.ComputeValueIndex();
+            var attrWithNoParentLst = attributes.Where(a => a.ParentAttributeId == rootId || !attributes.Any(c => c.Id == a.ParentAttributeId)).ToList();
+            foreach(var attrWithNoParent in attrWithNoParentLst)
+                attrWithNoParent.ComputeValueIndex();
 
-            return parentsDictionary[rootId];
+            return attrWithNoParentLst;
         }
 
         public static string GetParentPath(string fullPath)

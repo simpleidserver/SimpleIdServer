@@ -40,22 +40,9 @@ namespace SimpleIdServer.Scim.Commands.Handlers
 
         public async virtual Task<GenericResult<EmptyResult>> Handle(ReplaceRepresentationCommand replaceRepresentationCommand)
         {
-            var requestedSchemas = replaceRepresentationCommand.Representation.Schemas;
-            if (!requestedSchemas.Any())
-                throw new SCIMBadSyntaxException(string.Format(Global.AttributeMissing, StandardSCIMRepresentationAttributes.Schemas));
-
-            var schema = await _scimSchemaCommandRepository.FindRootSCIMSchemaByResourceType(replaceRepresentationCommand.ResourceType);
-            if (schema == null) throw new SCIMSchemaNotFoundException();
-            var allSchemas = new List<string> { schema.Id };
-            allSchemas.AddRange(schema.SchemaExtensions.Select(s => s.Schema));
-            var unsupportedSchemas = requestedSchemas.Where(s => !allSchemas.Contains(s));
-            if (unsupportedSchemas.Any())
-                throw new SCIMBadSyntaxException(string.Format(Global.SchemasAreUnknown, string.Join(",", unsupportedSchemas)));
-
-            var existingRepresentation = await _scimRepresentationCommandRepository.Get(replaceRepresentationCommand.Id);
-            if (existingRepresentation == null)
-                throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, replaceRepresentationCommand.Id));
-
+            var kvp = await Validate(replaceRepresentationCommand);
+            var existingRepresentation = kvp.Item1;
+            var schema = kvp.Item2;
             var oldDisplayName = existingRepresentation.DisplayName;
             var patchParameters = new List<PatchOperationParameter>
             {
@@ -70,10 +57,8 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var patchOperations = patchResult.Patches.Where(p => p.Attr != null).ToList();
             var displayNameDifferent = existingRepresentation.DisplayName != oldDisplayName;
             var modifiedAttributes = patchOperations.Where(p => p.Operation != SCIMPatchOperations.REMOVE && p.Attr != null && !p.Attr.IsLeaf() && p.Attr.SchemaAttribute.MultiValued == false).Select(p => p.Attr);
-            var uniqueServerAttributeIds = modifiedAttributes.Where(a => a.SchemaAttribute.Uniqueness == SCIMSchemaAttributeUniqueness.SERVER);
-            var uniqueGlobalAttributes = modifiedAttributes.Where(a => a.SchemaAttribute.Uniqueness == SCIMSchemaAttributeUniqueness.GLOBAL);
-            await CheckSCIMRepresentationExistsForGivenUniqueAttributes(uniqueServerAttributeIds, existingRepresentation.Id, replaceRepresentationCommand.ResourceType);
-            await CheckSCIMRepresentationExistsForGivenUniqueAttributes(uniqueGlobalAttributes, existingRepresentation.Id);
+            await _representationHelper.CheckUniqueness(modifiedAttributes);
+            _representationHelper.CheckMutability(patchOperations);
             var references = await _representationReferenceSync.Sync(existingRepresentation.ResourceType, existingRepresentation, patchOperations, replaceRepresentationCommand.Location, schema, displayNameDifferent);
             await using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
             {
@@ -96,30 +81,33 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             return GenericResult<EmptyResult>.Ok(EmptyResult.Empty);
         }
 
-        private async Task CheckSCIMRepresentationExistsForGivenUniqueAttributes(IEnumerable<SCIMRepresentationAttribute> attributes, string currentId, string endpoint = null)
+        private async Task<(SCIMRepresentation, SCIMSchema)> Validate(ReplaceRepresentationCommand replaceRepresentationCommand)
         {
-            foreach (var attribute in attributes)
-            {
-                SCIMRepresentation record = null;
-                switch (attribute.SchemaAttribute.Type)
-                {
-                    case SCIMSchemaAttributeTypes.STRING:
-                        record = await _scimRepresentationCommandRepository.FindSCIMRepresentationByAttribute(attribute.SchemaAttribute.Id, attribute.ValueString, endpoint);
-                        break;
-                    case SCIMSchemaAttributeTypes.INTEGER:
-                        if (attribute.ValueInteger != null)
-                        {
-                            record = await _scimRepresentationCommandRepository.FindSCIMRepresentationByAttribute(attribute.SchemaAttribute.Id, attribute.ValueInteger.Value, endpoint);
-                        }
+            var requestedSchemas = replaceRepresentationCommand.Representation.Schemas;
+            if (!requestedSchemas.Any())
+                throw new SCIMBadSyntaxException(string.Format(Global.AttributeMissing, StandardSCIMRepresentationAttributes.Schemas));
 
-                        break;
-                }
+            var schema = await _scimSchemaCommandRepository.FindRootSCIMSchemaByResourceType(replaceRepresentationCommand.ResourceType);
+            if (schema == null) throw new SCIMSchemaNotFoundException();
+            var allSchemas = new List<string> { schema.Id };
+            allSchemas.AddRange(schema.SchemaExtensions.Select(s => s.Schema));
+            var unsupportedSchemas = requestedSchemas.Where(s => !allSchemas.Contains(s));
+            if (unsupportedSchemas.Any())
+                throw new SCIMBadSyntaxException(string.Format(Global.SchemasAreUnknown, string.Join(",", unsupportedSchemas)));
 
-                if (record != null && record.Id != currentId)
-                {
-                    throw new SCIMUniquenessAttributeException(string.Format(Global.AttributeMustBeUnique, attribute.SchemaAttribute.Name));
-                }
-            }
+            var existingRepresentation = await _scimRepresentationCommandRepository.Get(replaceRepresentationCommand.Id);
+            if (existingRepresentation == null)
+                throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, replaceRepresentationCommand.Id));
+
+            var schemas = await _scimSchemaCommandRepository.FindSCIMSchemaByIdentifiers(requestedSchemas);
+            _representationHelper.ExtractSCIMRepresentationFromJSON(replaceRepresentationCommand.Representation.Attributes, replaceRepresentationCommand.Representation.ExternalId, schema, schemas.Where(s => s.Id != schema.Id).ToList());
+            
+            return (existingRepresentation, schema);
+        }
+
+        private void CheckMutability()
+        {
+
         }
     }
 }

@@ -1,17 +1,21 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.CodeAnalysis;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
+using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.Parser;
 using SimpleIdServer.Scim.Parser.Expressions;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Resources;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,16 +24,23 @@ namespace SimpleIdServer.Scim.Helpers
     public interface IRepresentationHelper
     {
         Task<SCIMRepresentationPatchResult> Apply(SCIMRepresentation representation, IEnumerable<PatchOperationParameter> patchLst, IEnumerable<SCIMAttributeMapping> attributeMappings, bool ignoreUnsupportedCanonicalValues, CancellationToken cancellationToken);
+        Task CheckUniqueness(IEnumerable<SCIMRepresentationAttribute> attributes);
+        void CheckMutability(List<SCIMPatchResult> patchOperations);
+        SCIMRepresentation ExtractSCIMRepresentationFromJSON(JObject json, string externalId, SCIMSchema mainSchema, ICollection<SCIMSchema> extensionSchemas);
     }
 
     public class RepresentationHelper : IRepresentationHelper
     {
         private readonly ISCIMRepresentationCommandRepository _scimRepresentationCommandRepository;
+        public readonly SCIMHostOptions _options;
 
-        public RepresentationHelper(ISCIMRepresentationCommandRepository scimRepresentationCommandRepository)
+        public RepresentationHelper(ISCIMRepresentationCommandRepository scimRepresentationCommandRepository, IOptions<SCIMHostOptions> options)
         {
             _scimRepresentationCommandRepository = scimRepresentationCommandRepository;
+            _options = options.Value;
         }
+
+        #region Apply patch operations
 
         public async Task<SCIMRepresentationPatchResult> Apply(SCIMRepresentation representation, IEnumerable<PatchOperationParameter> patchLst, IEnumerable<SCIMAttributeMapping> attributeMappings, bool ignoreUnsupportedCanonicalValues, CancellationToken cancellationToken)
         {
@@ -51,9 +62,11 @@ namespace SimpleIdServer.Scim.Helpers
                     fullPath = SCIMAttributeExpression.RemoveNamespace(fullPath);
                     filteredAttributes = await _scimRepresentationCommandRepository.FindAttributes(representation.Id, scimExpr, cancellationToken);
                     hierarchicalFilteredAttributes = SCIMRepresentation.BuildHierarchicalAttributes(filteredAttributes);
+                    var complexAttr = scimFilter as SCIMComplexAttributeExpression;
+                    if (complexAttr != null && !hierarchicalFilteredAttributes.Any() && complexAttr.GroupingFilter != null && patch.Operation == SCIMPatchOperations.REPLACE) throw new SCIMNoTargetException(Global.PatchMissingAttribute);
                 }
 
-                if (patch.Value != null)
+                if (patch.Operation != SCIMPatchOperations.REMOVE)
                 {
                     var attributes = ExtractRepresentationAttributesFromJSON(representation.Schemas, schemaAttributes.ToList(), patch.Value, ignoreUnsupportedCanonicalValues);
                     attributes = RemoveStandardReferenceProperties(attributes, attributeMappings);
@@ -101,7 +114,6 @@ namespace SimpleIdServer.Scim.Helpers
                                 foreach(var standardMultiValuedAttribute in standardMultiValuedAttributes)
                                     if (TryInsertValueIntoArray(result, standardMultiValuedAttribute, null, representation)) continue;
 
-                                // Try to add the attribute.
                                 await OverrideRootAttributes(result, notMultiValuedAttributes, representation, cancellationToken);
                             }
                             else
@@ -142,8 +154,6 @@ namespace SimpleIdServer.Scim.Helpers
                     case SCIMPatchOperations.REPLACE:
                         {
                             UpdateCommonAttributes(patch, representation, result, schemaAttributes);
-                            var complexAttr = scimFilter as SCIMComplexAttributeExpression;
-                            if (complexAttr != null && !hierarchicalFilteredAttributes.Any() && complexAttr.GroupingFilter != null) throw new SCIMNoTargetException(Global.PatchMissingAttribute);
                             if(hierarchicalFilteredAttributes == null)
                             {
                                 await OverrideRootAttributes(result, hierarchicalNewAttributes, representation, cancellationToken);
@@ -172,10 +182,13 @@ namespace SimpleIdServer.Scim.Helpers
                 var computedValueIndexLst = grp.Select(g => g.ComputedValueIndex);
                 var existingAttributes = await _scimRepresentationCommandRepository.FindAttributesByValueIndex(representation.Id, computedValueIndexLst, firstAttribute.SchemaAttributeId, cancellationToken);
                 if (existingAttributes.Count() == grp.Count()) continue;
-                foreach (var newAttribute in grp)
+                var attrLstByPath = await _scimRepresentationCommandRepository.FindAttributesByFullPath(representation.Id, grp.Key, cancellationToken);
+
+                var attrLstToBeRemoved = SCIMRepresentation.BuildHierarchicalAttributes(attrLstByPath).Where(a => !existingAttributes.Any(ea => ea.ComputedValueIndex == a.ComputedValueIndex)).SelectMany(r => r.ToFlat());
+                foreach (var attrToBeRemove in attrLstToBeRemoved) result.Remove(attrToBeRemove);
+
+                foreach (var newAttribute in grp.Where(a => !existingAttributes.Any(ea => ea.ComputedValueIndex == a.ComputedValueIndex)))
                 {
-                    var attrLstToBeRemoved = await _scimRepresentationCommandRepository.FindAttributesByFullPath(representation.Id, newAttribute.FullPath, cancellationToken);
-                    foreach (var attrToBeRemove in attrLstToBeRemoved) result.Remove(attrToBeRemove);
                     if (newAttribute.SchemaAttribute.Type != SCIMSchemaAttributeTypes.COMPLEX)
                     {
                         newAttribute.RepresentationId = representation.Id;
@@ -328,12 +341,12 @@ namespace SimpleIdServer.Scim.Helpers
             {
                 var schemaAttr = schemaAttributes.First();
                 var schema = schemas.FirstOrDefault(s => s.HasAttribute(schemaAttr));
-                result.AddRange(SCIMRepresentationHelper.BuildAttributes(jArr, schemaAttr, schema, ignoreUnsupportedCanonicalValues));
+                result.AddRange(RepresentationHelper.BuildAttributes(jArr, schemaAttr, schema, ignoreUnsupportedCanonicalValues));
             }
             else if (jObj != null)
             {
-                var resolutionResult = SCIMRepresentationHelper.Resolve(jObj, mainSchema, extensionSchemas);
-                result.AddRange(SCIMRepresentationHelper.BuildRepresentationAttributes(resolutionResult, resolutionResult.AllSchemaAttributes, ignoreUnsupportedCanonicalValues, true));
+                var resolutionResult = RepresentationHelper.Resolve(jObj, mainSchema, extensionSchemas);
+                result.AddRange(RepresentationHelper.BuildRepresentationAttributes(resolutionResult, resolutionResult.AllSchemaAttributes, ignoreUnsupportedCanonicalValues, true));
             }
             else if (schemaAttributes.Any() && schemaAttributes.Count() == 1)
             {
@@ -389,6 +402,524 @@ namespace SimpleIdServer.Scim.Helpers
             {
                 if (existingAttributes.Any(a => a.IsSimilar(newHierarchicalAttribute, true))) continue;
                 result.Add(newHierarchicalAttribute);
+            }
+
+            return result;
+        }
+
+        #endregion
+
+        #region Check uniqueness
+
+        public async Task CheckUniqueness(IEnumerable<SCIMRepresentationAttribute> attributes)
+        {
+            var uniqueServerAttributeIds = attributes.Where(a => a.SchemaAttribute.Uniqueness == SCIMSchemaAttributeUniqueness.SERVER);
+            var uniqueGlobalAttributes = attributes.Where(a => a.SchemaAttribute.Uniqueness == SCIMSchemaAttributeUniqueness.GLOBAL);
+            await CheckSCIMRepresentationExistsForGivenUniqueAttributes(uniqueServerAttributeIds);
+            await CheckSCIMRepresentationExistsForGivenUniqueAttributes(uniqueGlobalAttributes);
+        }
+
+        private async Task CheckSCIMRepresentationExistsForGivenUniqueAttributes(IEnumerable<SCIMRepresentationAttribute> attributes)
+        {
+            foreach (var attribute in attributes)
+            {
+                List<SCIMRepresentationAttribute> records = null;
+                switch (attribute.SchemaAttribute.Type)
+                {
+                    case SCIMSchemaAttributeTypes.STRING:
+                        records = await _scimRepresentationCommandRepository.FindAttributesByValue(attribute.SchemaAttribute.Id, attribute.ValueString);
+                        break;
+                    case SCIMSchemaAttributeTypes.INTEGER:
+                        if (attribute.ValueInteger != null)
+                            records = await _scimRepresentationCommandRepository.FindAttributesByValue(attribute.SchemaAttribute.Id, attribute.ValueInteger.Value);
+                        break;
+                }
+
+                if (records != null && records.Any())
+                {
+                    throw new SCIMUniquenessAttributeException(string.Format(Global.AttributeMustBeUnique, attribute.SchemaAttribute.Name));
+                }
+            }
+        }
+
+        #endregion
+
+        #region Check mutability
+
+        public void CheckMutability(List<SCIMPatchResult> patchOperations)
+        {
+            var attrWithBrokenMutability = patchOperations
+                .Where(o => o.Attr != null && (o.Operation == SCIMPatchOperations.REMOVE || o.Operation == SCIMPatchOperations.REPLACE) && (o.Attr.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.IMMUTABLE))
+                .Select(o => o.Attr);
+            if(attrWithBrokenMutability.Any())
+                throw new SCIMImmutableAttributeException(string.Format(Global.AttributeImmutable, string.Join(",", attrWithBrokenMutability.Select(a => a.FullPath).Distinct())));
+        }
+
+        #endregion
+
+        #region Extract
+
+        public SCIMRepresentation ExtractSCIMRepresentationFromJSON(JObject json, string externalId, SCIMSchema mainSchema, ICollection<SCIMSchema> extensionSchemas)
+        {
+            CheckRequiredAttributes(mainSchema, extensionSchemas, json);
+            return BuildRepresentation(json, externalId, mainSchema, extensionSchemas, _options.IgnoreUnsupportedCanonicalValues);
+        }
+
+        public static SCIMRepresentation BuildRepresentation(JObject json, string externalId, SCIMSchema mainSchema, ICollection<SCIMSchema> extensionSchemas, bool ignoreUnsupportedCanonicalValues)
+        {
+            var schemas = new List<SCIMSchema>
+            {
+                mainSchema
+            };
+            schemas.AddRange(extensionSchemas);
+            var result = new SCIMRepresentation
+            {
+                ExternalId = externalId,
+                Schemas = schemas
+            };
+            result.Schemas = schemas;
+            var resolutionResult = Resolve(json, mainSchema, extensionSchemas);
+            result.FlatAttributes = BuildRepresentationAttributes(resolutionResult, resolutionResult.AllSchemaAttributes, ignoreUnsupportedCanonicalValues);
+            var attr = result.FlatAttributes.FirstOrDefault(a => a.SchemaAttribute.Name == "displayName");
+            if (attr != null)
+            {
+                result.DisplayName = attr.ValueString;
+            }
+
+            return result;
+        }
+
+        public static ICollection<SCIMRepresentationAttribute> BuildRepresentationAttributes(ResolutionResult resolutionResult, ICollection<SCIMSchemaAttribute> allSchemaAttributes, bool ignoreUnsupportedCanonicalValues, bool ignoreDefaultAttrs = false)
+        {
+            var attributes = new List<SCIMRepresentationAttribute>();
+            foreach (var record in resolutionResult.Rows)
+            {
+                if (record.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.READONLY)
+                {
+                    continue;
+                }
+
+                // Add attribute
+                if (record.SchemaAttribute.MultiValued)
+                {
+                    var jArr = record.Content as JArray;
+                    if (jArr == null)
+                    {
+                        throw new SCIMSchemaViolatedException(string.Format(Global.AttributeIsNotArray, record.SchemaAttribute.Name));
+                    }
+
+
+                    attributes.AddRange(BuildAttributes(jArr, record.SchemaAttribute, record.Schema, ignoreUnsupportedCanonicalValues));
+                }
+                else
+                {
+                    var jArr = new JArray();
+                    jArr.Add(record.Content);
+                    attributes.AddRange(BuildAttributes(jArr, record.SchemaAttribute, record.Schema, ignoreUnsupportedCanonicalValues));
+                }
+            }
+
+            if (ignoreDefaultAttrs)
+            {
+                return attributes;
+            }
+
+            var defaultAttributes = allSchemaAttributes.Where(a => !attributes.Any(at => at.SchemaAttribute.Name == a.Name) && a.Mutability == SCIMSchemaAttributeMutabilities.READWRITE);
+            foreach (var defaultAttr in defaultAttributes)
+            {
+                var attributeId = Guid.NewGuid().ToString();
+                switch (defaultAttr.Type)
+                {
+                    case SCIMSchemaAttributeTypes.STRING:
+                        if (defaultAttr.DefaultValueString.Any())
+                        {
+                            var defaultValueStr = defaultAttr.DefaultValueString;
+                            if (!defaultAttr.MultiValued)
+                            {
+                                defaultValueStr = new List<string> { defaultValueStr.First() };
+                            }
+
+                            foreach (var str in defaultValueStr)
+                            {
+                                attributes.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, defaultAttr, defaultAttr.SchemaId, valueString: str));
+                            }
+                        }
+
+                        break;
+                    case SCIMSchemaAttributeTypes.INTEGER:
+                        if (defaultAttr.DefaultValueInt.Any())
+                        {
+                            var defaultValueInt = defaultAttr.DefaultValueInt;
+                            if (!defaultAttr.MultiValued)
+                            {
+                                defaultValueInt = new List<int> { defaultValueInt.First() };
+                            }
+
+                            foreach (var i in defaultValueInt)
+                            {
+                                attributes.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, defaultAttr, defaultAttr.SchemaId, valueInteger: i));
+                            }
+                        }
+
+                        break;
+                }
+            }
+
+            return attributes;
+        }
+
+        public static ICollection<SCIMRepresentationAttribute> BuildAttributes(JArray jArr, SCIMSchemaAttribute schemaAttribute, SCIMSchema schema, bool ignoreUnsupportedCanonicalValues)
+        {
+            var result = new List<SCIMRepresentationAttribute>();
+            if (schemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.READONLY)
+            {
+                return result;
+            }
+
+            var attributeId = Guid.NewGuid().ToString();
+            if (schemaAttribute.Type == SCIMSchemaAttributeTypes.COMPLEX)
+            {
+                if (!jArr.Any())
+                {
+                    result.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, schema.Id));
+                }
+                else
+                {
+                    foreach (var jsonProperty in jArr)
+                    {
+                        var rec = jsonProperty as JObject;
+                        if (rec == null)
+                        {
+                            throw new SCIMSchemaViolatedException(string.Format(Global.NotValidJSON, jsonProperty.ToString()));
+                        }
+
+                        var subAttributes = schema.GetChildren(schemaAttribute).ToList();
+                        CheckRequiredAttributes(schema, subAttributes, rec);
+                        var resolutionResult = Resolve(rec, schema, subAttributes);
+                        var parent = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, schema.Id);
+                        var children = BuildRepresentationAttributes(resolutionResult, subAttributes, ignoreUnsupportedCanonicalValues);
+                        foreach (var child in children)
+                        {
+                            if (SCIMRepresentation.GetParentPath(child.FullPath) == parent.FullPath)
+                            {
+                                child.ParentAttributeId = parent.Id;
+                            }
+
+                            result.Add(child);
+                        }
+
+                        result.Add(parent);
+                    }
+                }
+            }
+            else
+            {
+                switch (schemaAttribute.Type)
+                {
+                    case SCIMSchemaAttributeTypes.BOOLEAN:
+                        var valuesBooleanResult = Extract<bool>(jArr);
+                        if (valuesBooleanResult.InvalidValues.Any())
+                        {
+                            throw new SCIMSchemaViolatedException(string.Format(Global.NotValidBoolean, string.Join(",", valuesBooleanResult.InvalidValues)));
+                        }
+
+                        foreach (var b in valuesBooleanResult.Values)
+                        {
+                            var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, schema.Id, valueBoolean: b);
+                            result.Add(record);
+                        }
+                        break;
+                    case SCIMSchemaAttributeTypes.INTEGER:
+                        var valuesIntegerResult = Extract<int>(jArr);
+                        if (valuesIntegerResult.InvalidValues.Any())
+                        {
+                            throw new SCIMSchemaViolatedException(string.Format(Global.NotValidInteger, string.Join(",", valuesIntegerResult.InvalidValues)));
+                        }
+
+                        foreach (var i in valuesIntegerResult.Values)
+                        {
+                            var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, schema.Id, valueInteger: i);
+                            result.Add(record);
+                        }
+                        break;
+                    case SCIMSchemaAttributeTypes.DATETIME:
+                        var valuesDateTimeResult = Extract<DateTime>(jArr);
+                        if (valuesDateTimeResult.InvalidValues.Any())
+                        {
+                            throw new SCIMSchemaViolatedException(string.Format(Global.NotValidDateTime, string.Join(",", valuesDateTimeResult.InvalidValues)));
+                        }
+
+                        foreach (var d in valuesDateTimeResult.Values)
+                        {
+                            var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, schema.Id, valueDateTime: d);
+                            result.Add(record);
+                        }
+                        break;
+                    case SCIMSchemaAttributeTypes.STRING:
+                        var strs = jArr.Select(j => j.Type == JTokenType.Null ? null : j.ToString()).ToList();
+                        if (schemaAttribute.CanonicalValues != null
+                            && schemaAttribute.CanonicalValues.Any()
+                            && !ignoreUnsupportedCanonicalValues
+                            && !strs.All(_ => schemaAttribute.CaseExact ?
+                                schemaAttribute.CanonicalValues.Contains(_)
+                                : schemaAttribute.CanonicalValues.Contains(_, StringComparer.OrdinalIgnoreCase))
+                        )
+                        {
+                            throw new SCIMSchemaViolatedException(string.Format(Global.NotValidCanonicalValue, schemaAttribute.Name));
+                        }
+
+                        foreach (var s in strs)
+                        {
+                            var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, schema.Id, valueString: s);
+                            result.Add(record);
+                        }
+                        break;
+                    case SCIMSchemaAttributeTypes.REFERENCE:
+                        var refs = jArr.Select(j => j.ToString()).ToList();
+                        foreach (var reference in refs)
+                        {
+                            var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, schema.Id, valueReference: reference);
+                            result.Add(record);
+                        }
+                        break;
+                    case SCIMSchemaAttributeTypes.DECIMAL:
+                        var valuesDecimalResult = Extract<decimal>(jArr);
+                        if (valuesDecimalResult.InvalidValues.Any())
+                        {
+                            throw new SCIMSchemaViolatedException(string.Format(Global.NotValidDecimal, string.Join(",", valuesDecimalResult.InvalidValues)));
+                        }
+
+                        foreach (var d in valuesDecimalResult.Values)
+                        {
+                            var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, schema.Id, valueDecimal: d);
+                            result.Add(record);
+                        }
+                        break;
+                    case SCIMSchemaAttributeTypes.BINARY:
+                        var invalidValues = new List<string>();
+                        var valuesBinary = new List<string>();
+                        foreach (var rec in jArr)
+                        {
+                            try
+                            {
+                                Convert.FromBase64String(rec.ToString());
+                                valuesBinary.Add(rec.ToString());
+                            }
+                            catch (FormatException)
+                            {
+                                invalidValues.Add(rec.ToString());
+                            }
+                        }
+
+                        if (invalidValues.Any())
+                        {
+                            throw new SCIMSchemaViolatedException(string.Format(Global.NotValidBase64, string.Join(",", invalidValues)));
+                        }
+
+                        foreach (var b in valuesBinary)
+                        {
+                            var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, schema.Id, valueBinary: b);
+                            result.Add(record);
+                        }
+                        break;
+                }
+            }
+
+            return result;
+        }
+
+        #endregion
+
+        #region Resolve attributes
+
+        public static ResolutionResult Resolve(JObject json, SCIMSchema mainSchema, ICollection<SCIMSchema> extensionSchemas)
+        {
+            var rows = new List<ResolutionRowResult>();
+            var schemas = new List<SCIMSchema>
+            {
+                mainSchema
+            };
+            schemas.AddRange(extensionSchemas);
+            foreach (var kvp in json)
+            {
+                if (kvp.Key == StandardSCIMRepresentationAttributes.Schemas || SCIMConstants.StandardSCIMCommonRepresentationAttributes.Contains(kvp.Key))
+                {
+                    continue;
+                }
+
+                if (extensionSchemas.Any(s => kvp.Key.StartsWith(s.Id, StringComparison.InvariantCultureIgnoreCase)))
+                {
+                    rows.AddRange(ResolveFullQualifiedName(kvp, extensionSchemas));
+                    continue;
+                }
+
+                rows.Add(Resolve(kvp, schemas));
+            }
+
+            return new ResolutionResult(schemas, rows);
+        }
+
+        public static ResolutionResult Resolve(JObject json, SCIMSchema schema, ICollection<SCIMSchemaAttribute> schemaAttributes)
+        {
+            var rows = new List<ResolutionRowResult>();
+            foreach (var kvp in json)
+            {
+                rows.Add(Resolve(kvp, schema, schemaAttributes));
+            }
+
+            return new ResolutionResult(rows);
+        }
+
+        private static ResolutionRowResult Resolve(KeyValuePair<string, JToken> kvp, ICollection<SCIMSchema> allSchemas)
+        {
+            var schema = allSchemas.FirstOrDefault(s => s.Attributes.Any(at => at.FullPath.Equals(kvp.Key, StringComparison.InvariantCultureIgnoreCase)));
+            if (schema == null)
+            {
+                throw new SCIMSchemaViolatedException(string.Format(Global.AttributeIsNotRecognirzed, kvp.Key));
+            }
+
+            return new ResolutionRowResult(schema, schema.Attributes.First(at => at.FullPath.Equals(kvp.Key, StringComparison.InvariantCultureIgnoreCase)), kvp.Value);
+        }
+
+        private static ICollection<ResolutionRowResult> ResolveFullQualifiedName(KeyValuePair<string, JToken> kvp, ICollection<SCIMSchema> extensionSchemas)
+        {
+            var jObj = kvp.Value as JObject;
+            if (jObj == null)
+            {
+                throw new SCIMSchemaViolatedException(string.Format(Global.PropertyCannotContainsArray, kvp.Key));
+            }
+
+            var result = new List<ResolutionRowResult>();
+            var schema = extensionSchemas.First(e => kvp.Key == e.Id);
+            foreach (var skvp in jObj)
+            {
+                var attrSchema = schema.Attributes.FirstOrDefault(a => a.Name == skvp.Key);
+                if (attrSchema == null)
+                {
+                    throw new SCIMSchemaViolatedException(string.Format(Global.AttributeIsNotRecognirzed, skvp.Key));
+                }
+
+                result.Add(new ResolutionRowResult(schema, attrSchema, skvp.Value));
+            }
+
+            return result;
+        }
+
+        private static ResolutionRowResult Resolve(KeyValuePair<string, JToken> kvp, SCIMSchema schema, ICollection<SCIMSchemaAttribute> schemaAttributes)
+        {
+            var attrSchema = schemaAttributes.FirstOrDefault(a => a.Name.Equals(kvp.Key, StringComparison.InvariantCultureIgnoreCase));
+            if (attrSchema == null)
+            {
+                throw new SCIMSchemaViolatedException(string.Format(Global.AttributeIsNotRecognirzed, kvp.Key));
+            }
+
+            return new ResolutionRowResult(schema, attrSchema, kvp.Value);
+        }
+
+        #endregion
+
+        #region Check required attributes
+
+        private static void CheckRequiredAttributes(SCIMSchema mainSchema, ICollection<SCIMSchema> extensionSchemas, JObject json)
+        {
+            CheckRequiredAttributes(mainSchema, json);
+            foreach (var extensionSchema in extensionSchemas)
+            {
+                CheckRequiredAttributes(extensionSchema, json);
+            }
+        }
+
+        private static void CheckRequiredAttributes(SCIMSchema schema, JObject json)
+        {
+            var attributes = schema.HierarchicalAttributes.Select(h => h.Leaf);
+            CheckRequiredAttributes(schema, attributes, json);
+        }
+
+        private static void CheckRequiredAttributes(SCIMSchema schema, IEnumerable<SCIMSchemaAttribute> schemaAttributes, JObject json)
+        {
+            var missingRequiredAttributes = schemaAttributes.Where(a => a.Required && !json.HasElement(a.Name, schema.Id));
+            if (missingRequiredAttributes.Any())
+            {
+                throw new SCIMSchemaViolatedException(string.Format(Global.RequiredAttributesAreMissing, string.Join(",", missingRequiredAttributes.Select(a => $"{schema.Id}:{a.FullPath}"))));
+            }
+        }
+
+        #endregion
+
+        public class ResolutionRowResult
+        {
+            public ResolutionRowResult(SCIMSchemaAttribute schemaAttribute, JToken content)
+            {
+                SchemaAttribute = schemaAttribute;
+                Content = content;
+            }
+
+            public ResolutionRowResult(SCIMSchema schema, SCIMSchemaAttribute schemaAttribute, JToken content) : this(schemaAttribute, content)
+            {
+                Schema = schema;
+            }
+
+            public SCIMSchema Schema { get; set; }
+            public SCIMSchemaAttribute SchemaAttribute { get; set; }
+            public JToken Content { get; set; }
+        }
+
+        public class ResolutionResult
+        {
+            public ResolutionResult(ICollection<ResolutionRowResult> rows)
+            {
+                Rows = rows;
+            }
+
+            public ResolutionResult(ICollection<SCIMSchema> schemas, ICollection<ResolutionRowResult> rows) : this(rows)
+            {
+                Schemas = schemas;
+                Rows = rows;
+            }
+
+            public ICollection<SCIMSchema> Schemas { get; set; }
+            public ICollection<ResolutionRowResult> Rows { get; set; }
+            public ICollection<SCIMSchemaAttribute> AllSchemaAttributes
+            {
+                get
+                {
+                    return Schemas.SelectMany(s => s.HierarchicalAttributes).Select(h => h.Leaf).ToList();
+                }
+            }
+        }
+
+        private class ExtractionResult<T>
+        {
+            public ExtractionResult()
+            {
+                InvalidValues = new List<string>();
+                Values = new List<T>();
+            }
+
+            public ICollection<string> InvalidValues { get; set; }
+            public ICollection<T> Values { get; set; }
+        }
+
+        private static ExtractionResult<T> Extract<T>(JArray jArr) where T : struct
+        {
+            var result = new ExtractionResult<T>();
+            var type = typeof(T);
+            Type[] argTypes = { typeof(string), type.MakeByRefType() };
+            var method = typeof(T).GetMethod("TryParse", BindingFlags.Static | BindingFlags.Public, Type.DefaultBinder, argTypes, null);
+            foreach (var record in jArr)
+            {
+                if (record.Type == JTokenType.Null) continue;
+                var parameters = new object[] { record.ToString(), null };
+                var success = (bool)method.Invoke(null, parameters);
+                if (!success)
+                {
+                    result.InvalidValues.Add(record.ToString());
+                }
+                else
+                {
+                    var retVal = (T)parameters[1];
+                    result.Values.Add(retVal);
+                }
             }
 
             return result;

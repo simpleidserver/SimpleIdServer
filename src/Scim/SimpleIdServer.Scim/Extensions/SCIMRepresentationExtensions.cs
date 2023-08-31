@@ -588,12 +588,12 @@ namespace SimpleIdServer.Scim.Domain
             {
                 var schemaAttr = schemaAttributes.First();
                 var schema = schemas.FirstOrDefault(s => s.HasAttribute(schemaAttr));
-                result.AddRange(SCIMRepresentationHelper.BuildAttributes(jArr, schemaAttr, schema, ignoreUnsupportedCanonicalValues));
+                result.AddRange(RepresentationHelper.BuildAttributes(jArr, schemaAttr, schema, ignoreUnsupportedCanonicalValues));
             }
             else if (jObj != null)
             {
-                var resolutionResult = SCIMRepresentationHelper.Resolve(jObj, mainSchema, extensionSchemas);
-                result.AddRange(SCIMRepresentationHelper.BuildRepresentationAttributes(resolutionResult, resolutionResult.AllSchemaAttributes, ignoreUnsupportedCanonicalValues, true));
+                var resolutionResult = RepresentationHelper.Resolve(jObj, mainSchema, extensionSchemas);
+                result.AddRange(RepresentationHelper.BuildRepresentationAttributes(resolutionResult, resolutionResult.AllSchemaAttributes, ignoreUnsupportedCanonicalValues, true));
             }
             else if (schemaAttributes.Any() && schemaAttributes.Count() == 1)
             {

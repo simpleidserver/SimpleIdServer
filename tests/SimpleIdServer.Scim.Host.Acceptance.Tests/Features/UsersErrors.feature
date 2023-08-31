@@ -321,6 +321,7 @@ Scenario: Error is returned when update and required attribute is missing (HTTP 
 	
 	And extract JSON from body
 	And extract 'id' from JSON body	
+
 	And execute HTTP PUT JSON request 'http://localhost/Users/$id$'
 	| Key            | Value                                            |
 	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User" ] |
@@ -690,6 +691,7 @@ Scenario: Error is returned when required attribute is not passed (HTTP PATCH)
 	| Key              | Value                                                 |
 	| schemas          | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]   |
 	| Operations	   | [ { "op": "replace", "path" : "name.givenName" } ]    |
+
 	And extract JSON from body
 	
 	Then HTTP status code equals to '400'

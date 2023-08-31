@@ -59,6 +59,7 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
                     .Where(a => parentIds.Contains(a.Id) || parentIds.Contains(a.ParentAttributeId));
                 results.AddRange(result);
             }
+
             return Task.FromResult(results);
         }
         
@@ -105,15 +106,16 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             return Task.FromResult(representationAttributes.ToList());
         }
 
-        public Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string attrSchemaId, string value, string endpoint = null)
+        public Task<List<SCIMRepresentationAttribute>> FindAttributesByValue(string attrSchemaId, string value)
         {
-            var result = LstData.FirstOrDefault(r => (endpoint == null || endpoint == r.ResourceType) && r.FlatAttributes.Any(a => a.SchemaAttribute.Id == attrSchemaId && a.ValueString == value));
-            if (result == null)
-            {
-                return Task.FromResult(result);
-            }
+            var result = _attributes.Where(a => a.SchemaAttribute.Id == attrSchemaId && a.ValueString == value).ToList();
+            return Task.FromResult(result);
+        }
 
-            return Task.FromResult((SCIMRepresentation)result.Clone());
+        public Task<List<SCIMRepresentationAttribute>> FindAttributesByValue(string attrSchemaId, int value)
+        {
+            var result = _attributes.Where(a => a.SchemaAttribute.Id == attrSchemaId && a.ValueInteger == value).ToList();
+            return Task.FromResult(result);
         }
 
         public Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string attrSchemaId, int value, string endpoint = null)

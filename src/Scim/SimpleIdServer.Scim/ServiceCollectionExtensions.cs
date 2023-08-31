@@ -55,7 +55,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IDeleteRepresentationCommandHandler, DeleteRepresentationCommandHandler>();
             services.AddTransient<IReplaceRepresentationCommandHandler, ReplaceRepresentationCommandHandler>();
             services.AddTransient<IPatchRepresentationCommandHandler, PatchRepresentationCommandHandler>();
-            services.AddTransient<ISCIMRepresentationHelper, SCIMRepresentationHelper>();
+            services.AddTransient<IRepresentationHelper, RepresentationHelper>();
             return services;
         }
 
