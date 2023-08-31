@@ -3,6 +3,7 @@
 using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -382,7 +383,7 @@ namespace SimpleIdServer.Scim.Api
                     JObject newJObj = null;
                     var location = $"{baseUrl}/{_resourceTypeResolver.ResolveByResourceType(_resourceType).ControllerName}/{record.Id}";
                     bool includeStandardRequest = true;
-                    if(searchRequest.Attributes.Any())
+                    if (searchRequest.Attributes.Any())
                     {
                         record.AddStandardAttributes(location, searchRequest.Attributes, true, false);
                         includeStandardRequest = false;
@@ -409,7 +410,7 @@ namespace SimpleIdServer.Scim.Api
                     ContentType = SCIMConstants.STANDARD_SCIM_CONTENT_TYPE
                 };
             }
-            catch(SCIMNotFoundException ex)
+            catch (SCIMNotFoundException ex)
             {
                 _logger.LogError(ex, ex.Message);
                 return this.BuildError(HttpStatusCode.NotFound, ex.Message, SCIMConstants.ErrorSCIMTypes.Unknown);
@@ -473,13 +474,14 @@ namespace SimpleIdServer.Scim.Api
                 var command = new AddRepresentationCommand(_resourceType, jobj, _uriProvider.GetAbsoluteUriWithVirtualPath());
                 var addRepresentationResult = await _addRepresentationCommandHandler.Handle(command);
                 if (addRepresentationResult.HasError) return this.BuildError(addRepresentationResult);
-                var scimRepresentation = addRepresentationResult.Result;
-                var location = GetLocation(scimRepresentation);
-                var content = scimRepresentation.ToResponse(location, false, mergeExtensionAttributes: _options.MergeExtensionAttributes);
-                if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationAddedEvent(scimRepresentation.Id, scimRepresentation.Version, GetResourceType(scimRepresentation.ResourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
-                return BuildHTTPResult(HttpStatusCode.Created, location, scimRepresentation.Version, content);
+                var kvp = await GetRepresentation(addRepresentationResult.Result);
+                var representation = kvp.Item1;
+                var content = kvp.Item2;
+                var location = GetLocation(representation);
+                if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationAddedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
+                return BuildHTTPResult(HttpStatusCode.Created, location, representation.Version, content);
             }
-            catch(SCIMSchemaViolatedException ex)
+            catch (SCIMSchemaViolatedException ex)
             {
                 _logger.LogError(ex, ex.Message);
                 return this.BuildError(HttpStatusCode.BadRequest, ex.Message, SCIMConstants.ErrorSCIMTypes.InvalidValue);
@@ -494,12 +496,12 @@ namespace SimpleIdServer.Scim.Api
                 _logger.LogError(ex, ex.Message);
                 return this.BuildError(HttpStatusCode.Conflict, ex.Message, SCIMConstants.ErrorSCIMTypes.Uniqueness);
             }
-            catch(SCIMSchemaNotFoundException ex)
+            catch (SCIMSchemaNotFoundException ex)
             {
                 _logger.LogError(ex, ex.Message);
                 return new NotFoundResult();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
                 return this.BuildError(HttpStatusCode.InternalServerError, ex.Message, SCIMConstants.ErrorSCIMTypes.InternalServerError);
@@ -553,11 +555,12 @@ namespace SimpleIdServer.Scim.Api
             {
                 var updateResult = await _replaceRepresentationCommandHandler.Handle(new ReplaceRepresentationCommand(id, _resourceType, representationParameter, _uriProvider.GetAbsoluteUriWithVirtualPath()));
                 if (updateResult.HasError) return this.BuildError(updateResult);
-                var newRepresentation = updateResult.Result;
-                var location = GetLocation(newRepresentation);
-                var content = newRepresentation.ToResponse(location, false, mergeExtensionAttributes: _options.MergeExtensionAttributes);
-                if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(newRepresentation.Id, newRepresentation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
-                return BuildHTTPResult(HttpStatusCode.OK, location, newRepresentation.Version, content);
+                var kvp = await GetRepresentation(id);
+                var representation = kvp.Item1;
+                var content = kvp.Item2;
+                var location = GetLocation(representation);
+                if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
+                return BuildHTTPResult(HttpStatusCode.OK, location, representation.Version, content);
             }
             catch (SCIMUniquenessAttributeException ex)
             {
@@ -574,12 +577,12 @@ namespace SimpleIdServer.Scim.Api
                 _logger.LogError(ex, ex.Message);
                 return this.BuildError(HttpStatusCode.BadRequest, ex.Message, SCIMConstants.ErrorSCIMTypes.InvalidSyntax);
             }
-            catch(SCIMImmutableAttributeException ex)
+            catch (SCIMImmutableAttributeException ex)
             {
                 _logger.LogError(ex, ex.Message);
                 return this.BuildError(HttpStatusCode.BadRequest, ex.Message, SCIMConstants.ErrorSCIMTypes.Mutability);
             }
-            catch(SCIMNotFoundException ex)
+            catch (SCIMNotFoundException ex)
             {
                 _logger.LogError(ex, ex.Message);
                 return this.BuildError(HttpStatusCode.NotFound, ex.Message, SCIMConstants.ErrorSCIMTypes.Unknown);
@@ -610,11 +613,12 @@ namespace SimpleIdServer.Scim.Api
                 if (patchRes.HasError) return this.BuildError(patchRes);
                 var patchResult = patchRes.Result;
                 if (!patchResult.IsPatched) return NoContent();
-                var newRepresentation = patchResult.SCIMRepresentation;
-                var location = GetLocation(newRepresentation);
-                var content = newRepresentation.ToResponse(location, false, mergeExtensionAttributes: _options.MergeExtensionAttributes);
-                if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(newRepresentation.Id, newRepresentation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
-                return BuildHTTPResult(HttpStatusCode.OK, location, newRepresentation.Version, content);
+                var kvp = await GetRepresentation(id);
+                var representation = kvp.Item1;
+                var content = kvp.Item2;
+                var location = GetLocation(representation);
+                if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
+                return BuildHTTPResult(HttpStatusCode.OK, location, representation.Version, content);
             }
             catch (SCIMDuplicateAttributeException ex)
             {
@@ -675,6 +679,16 @@ namespace SimpleIdServer.Scim.Api
             }
 
             return await callback();
+        }
+
+        protected async Task<(SCIMRepresentation, JObject)> GetRepresentation(string id)
+        {
+            var getRepresentationResult = await _getRepresentationQueryHandler.Handle(id, new GetSCIMResourceRequest(), _resourceType);
+            var representation = getRepresentationResult.Result;
+            await _attributeReferenceEnricher.Enrich(_resourceType, new List<SCIMRepresentation> { representation }, _uriProvider.GetAbsoluteUriWithVirtualPath());
+            var location = GetLocation(representation);
+            var content = representation.ToResponse(location, true, mergeExtensionAttributes: _options.MergeExtensionAttributes);
+            return (representation, content);
         }
 
         protected IActionResult BuildHTTPResult(SCIMRepresentation representation, HttpStatusCode status, bool isGetRequest)

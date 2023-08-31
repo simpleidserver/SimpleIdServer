@@ -2,8 +2,14 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 namespace SimpleIdServer.Scim.Infrastructure
 {
-    public interface ISCIMCommand<TResult>
+    public record EmptyResult
     {
-
+        public static EmptyResult Empty
+        {
+            get
+            {
+                return new EmptyResult();
+            }
+        }
     }
 }

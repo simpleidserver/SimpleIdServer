@@ -1,7 +1,6 @@
 // Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
-using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Exceptions;
 using SimpleIdServer.Scim.Helpers;
@@ -35,7 +34,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             _representationReferenceSync = representationReferenceSync;
         }
 
-        public async virtual Task<GenericResult<SCIMRepresentation>> Handle(AddRepresentationCommand addRepresentationCommand)
+        public async virtual Task<GenericResult<string>> Handle(AddRepresentationCommand addRepresentationCommand)
         {
             var requestedSchemas = addRepresentationCommand.Representation.Schemas;
             if (!requestedSchemas.Any())
@@ -85,8 +84,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 await NotifyAllReferences(references).ConfigureAwait(false);
             }
 
-            scimRepresentation.ApplyEmptyArray();
-            return GenericResult<SCIMRepresentation>.Ok(scimRepresentation);
+            return GenericResult<string>.Ok(scimRepresentation.Id);
         }
 
         private async Task CheckSCIMRepresentationExistsForGivenUniqueAttributes(IEnumerable<SCIMRepresentationAttribute> attributes, string endpoint = null)

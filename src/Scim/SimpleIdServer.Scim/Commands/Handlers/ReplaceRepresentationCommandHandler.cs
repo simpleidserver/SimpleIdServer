@@ -1,7 +1,6 @@
 // Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
-using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
@@ -20,7 +19,6 @@ namespace SimpleIdServer.Scim.Commands.Handlers
     {
         private readonly ISCIMAttributeMappingQueryRepository _scimAttributeMappingQueryRepository;
         private readonly ISCIMSchemaCommandRepository _scimSchemaCommandRepository;
-        private readonly ISCIMRepresentationHelper _scimRepresentationHelper;
         private readonly ISCIMRepresentationCommandRepository _scimRepresentationCommandRepository;
         private readonly IRepresentationReferenceSync _representationReferenceSync;
         private readonly IRepresentationHelper _representationHelper;
@@ -28,7 +26,6 @@ namespace SimpleIdServer.Scim.Commands.Handlers
         public ReplaceRepresentationCommandHandler(
             ISCIMAttributeMappingQueryRepository scimAttributeMappingQueryRepository,
             ISCIMSchemaCommandRepository scimSchemaCommandRepository,
-            ISCIMRepresentationHelper scimRepresentationHelper,
             ISCIMRepresentationCommandRepository scimRepresentationCommandRepository,
             IRepresentationReferenceSync representationReferenceSync,
             IRepresentationHelper representationHelper,
@@ -36,13 +33,12 @@ namespace SimpleIdServer.Scim.Commands.Handlers
         {
             _scimAttributeMappingQueryRepository = scimAttributeMappingQueryRepository;
             _scimSchemaCommandRepository = scimSchemaCommandRepository;
-            _scimRepresentationHelper = scimRepresentationHelper;
             _scimRepresentationCommandRepository = scimRepresentationCommandRepository;
             _representationReferenceSync = representationReferenceSync;
             _representationHelper = representationHelper;
         }
 
-        public async virtual Task<GenericResult<SCIMRepresentation>> Handle(ReplaceRepresentationCommand replaceRepresentationCommand)
+        public async virtual Task<GenericResult<EmptyResult>> Handle(ReplaceRepresentationCommand replaceRepresentationCommand)
         {
             var requestedSchemas = replaceRepresentationCommand.Representation.Schemas;
             if (!requestedSchemas.Any())
@@ -56,7 +52,6 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             if (unsupportedSchemas.Any())
                 throw new SCIMBadSyntaxException(string.Format(Global.SchemasAreUnknown, string.Join(",", unsupportedSchemas)));
 
-            var schemas = await _scimSchemaCommandRepository.FindSCIMSchemaByIdentifiers(requestedSchemas);
             var existingRepresentation = await _scimRepresentationCommandRepository.Get(replaceRepresentationCommand.Id);
             if (existingRepresentation == null)
                 throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, replaceRepresentationCommand.Id));
@@ -72,14 +67,14 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             };
             var attributeMappings = await _scimAttributeMappingQueryRepository.GetBySourceResourceType(replaceRepresentationCommand.ResourceType);
             var patchResult = await _representationHelper.Apply(existingRepresentation, patchParameters, attributeMappings, true, CancellationToken.None);
-            var patchOperations = patchResult.Patches;
+            var patchOperations = patchResult.Patches.Where(p => p.Attr != null).ToList();
             var displayNameDifferent = existingRepresentation.DisplayName != oldDisplayName;
-            var modifiedAttributes = patchResult.Patches.Where(p => p.Operation != SCIMPatchOperations.REMOVE && !p.Attr.IsLeaf() && p.Attr.SchemaAttribute.MultiValued == false).Select(p => p.Attr);
+            var modifiedAttributes = patchOperations.Where(p => p.Operation != SCIMPatchOperations.REMOVE && p.Attr != null && !p.Attr.IsLeaf() && p.Attr.SchemaAttribute.MultiValued == false).Select(p => p.Attr);
             var uniqueServerAttributeIds = modifiedAttributes.Where(a => a.SchemaAttribute.Uniqueness == SCIMSchemaAttributeUniqueness.SERVER);
             var uniqueGlobalAttributes = modifiedAttributes.Where(a => a.SchemaAttribute.Uniqueness == SCIMSchemaAttributeUniqueness.GLOBAL);
             await CheckSCIMRepresentationExistsForGivenUniqueAttributes(uniqueServerAttributeIds, existingRepresentation.Id, replaceRepresentationCommand.ResourceType);
             await CheckSCIMRepresentationExistsForGivenUniqueAttributes(uniqueGlobalAttributes, existingRepresentation.Id);
-            var references = await _representationReferenceSync.Sync(existingRepresentation.ResourceType, existingRepresentation, patchResult.Patches, replaceRepresentationCommand.Location, schema, displayNameDifferent);
+            var references = await _representationReferenceSync.Sync(existingRepresentation.ResourceType, existingRepresentation, patchOperations, replaceRepresentationCommand.Location, schema, displayNameDifferent);
             await using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
             {
                 await _scimRepresentationCommandRepository.BulkDelete(patchOperations.Where(p => p.Operation == SCIMPatchOperations.REMOVE).Select(p => p.Attr)).ConfigureAwait(false);
@@ -98,8 +93,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 await NotifyAllReferences(references).ConfigureAwait(false);
             }
 
-            existingRepresentation.ApplyEmptyArray();
-            return GenericResult<SCIMRepresentation>.Ok(existingRepresentation);
+            return GenericResult<EmptyResult>.Ok(EmptyResult.Empty);
         }
 
         private async Task CheckSCIMRepresentationExistsForGivenUniqueAttributes(IEnumerable<SCIMRepresentationAttribute> attributes, string currentId, string endpoint = null)
@@ -126,11 +120,6 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                     throw new SCIMUniquenessAttributeException(string.Format(Global.AttributeMustBeUnique, attribute.SchemaAttribute.Name));
                 }
             }
-        }
-
-        private class UpdateRepresentationResult
-        {
-            public IEnumerable<SCIMAttributeMapping> AttributeMappingLst { get; set; }
         }
     }
 }

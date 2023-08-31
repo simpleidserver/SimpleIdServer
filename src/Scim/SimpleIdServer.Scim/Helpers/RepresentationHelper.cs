@@ -89,7 +89,20 @@ namespace SimpleIdServer.Scim.Helpers
                             UpdateCommonAttributes(patch, representation, result, schemaAttributes);
                             if (hierarchicalFilteredAttributes == null)
                             {
-                                await OverrideRootAttributes(result, hierarchicalNewAttributes, representation, cancellationToken);
+                                var complexMultiValuedAttributes = hierarchicalNewAttributes.Where(a => a.SchemaAttribute.MultiValued && a.SchemaAttribute.Type == SCIMSchemaAttributeTypes.COMPLEX);
+                                var standardMultiValuedAttributes = hierarchicalNewAttributes.Where(a => a.SchemaAttribute.MultiValued && a.SchemaAttribute.Type != SCIMSchemaAttributeTypes.COMPLEX);
+                                var notMultiValuedAttributes = hierarchicalNewAttributes.Where(a => !a.SchemaAttribute.MultiValued).ToList();
+                                foreach(var multiValuedAttribute in complexMultiValuedAttributes)
+                                {
+                                    var arrayParentAttribute = filteredAttributes.FirstOrDefault(f => f.FullPath == multiValuedAttribute.FullPath);
+                                    if (TryInsertComplexMultivaluedAttribute(result, multiValuedAttribute, arrayParentAttribute, null, representation)) continue;
+                                }
+
+                                foreach(var standardMultiValuedAttribute in standardMultiValuedAttributes)
+                                    if (TryInsertValueIntoArray(result, standardMultiValuedAttribute, null, representation)) continue;
+
+                                // Try to add the attribute.
+                                await OverrideRootAttributes(result, notMultiValuedAttributes, representation, cancellationToken);
                             }
                             else
                             {
@@ -137,7 +150,11 @@ namespace SimpleIdServer.Scim.Helpers
                             }
                             else
                             {
-                                foreach (var newAttribute in hierarchicalNewAttributes) ReplaceAttributes(result, newAttribute, hierarchicalFilteredAttributes, filteredAttributes, representation);
+                                foreach (var newAttribute in hierarchicalNewAttributes)
+                                {
+                                    if (TryInsertWhenTargetLocationIsUnknown(result, newAttribute, hierarchicalFilteredAttributes, representation)) continue;
+                                    ReplaceAttributes(result, newAttribute, hierarchicalFilteredAttributes, filteredAttributes, representation);
+                                }
                             }
                         }
                         break;
@@ -149,25 +166,30 @@ namespace SimpleIdServer.Scim.Helpers
 
         private async Task OverrideRootAttributes(SCIMRepresentationPatchResult result, List<SCIMRepresentationAttribute> hierarchicalNewAttributes, SCIMRepresentation representation, CancellationToken cancellationToken)
         {
-            foreach (var newAttribute in hierarchicalNewAttributes)
+            foreach (var grp in hierarchicalNewAttributes.GroupBy(f => f.FullPath))
             {
-                var existingAttributes = await _scimRepresentationCommandRepository.FindAttributesByValueIndex(representation.Id, newAttribute.ComputedValueIndex, newAttribute.SchemaAttributeId, cancellationToken);
-                if (existingAttributes.Any()) continue;
-                var attrLstToBeRemoved = await _scimRepresentationCommandRepository.FindAttributesByFullPath(representation.Id, newAttribute.FullPath, cancellationToken);
-                foreach (var attrToBeRemove in attrLstToBeRemoved) result.Remove(attrToBeRemove);
-                if (newAttribute.SchemaAttribute.Type != SCIMSchemaAttributeTypes.COMPLEX)
+                var firstAttribute = grp.First();
+                var computedValueIndexLst = grp.Select(g => g.ComputedValueIndex);
+                var existingAttributes = await _scimRepresentationCommandRepository.FindAttributesByValueIndex(representation.Id, computedValueIndexLst, firstAttribute.SchemaAttributeId, cancellationToken);
+                if (existingAttributes.Count() == grp.Count()) continue;
+                foreach (var newAttribute in grp)
                 {
-                    newAttribute.RepresentationId = representation.Id;
-                    if (attrLstToBeRemoved.Any()) newAttribute.ParentAttributeId = attrLstToBeRemoved.First().ParentAttributeId;
-                    result.Add(newAttribute);
-                }
-                else
-                {
-                    var flatAttrs = newAttribute.ToFlat();
-                    foreach(var flatAttr in flatAttrs)
+                    var attrLstToBeRemoved = await _scimRepresentationCommandRepository.FindAttributesByFullPath(representation.Id, newAttribute.FullPath, cancellationToken);
+                    foreach (var attrToBeRemove in attrLstToBeRemoved) result.Remove(attrToBeRemove);
+                    if (newAttribute.SchemaAttribute.Type != SCIMSchemaAttributeTypes.COMPLEX)
                     {
-                        flatAttr.RepresentationId = representation.Id;
-                        result.Add(flatAttr);
+                        newAttribute.RepresentationId = representation.Id;
+                        if (attrLstToBeRemoved.Any()) newAttribute.ParentAttributeId = attrLstToBeRemoved.First().ParentAttributeId;
+                        result.Add(newAttribute);
+                    }
+                    else
+                    {
+                        var flatAttrs = newAttribute.ToFlat();
+                        foreach (var flatAttr in flatAttrs)
+                        {
+                            flatAttr.RepresentationId = representation.Id;
+                            result.Add(flatAttr);
+                        }
                     }
                 }
             }
@@ -191,7 +213,7 @@ namespace SimpleIdServer.Scim.Helpers
 
         private bool TryInsertComplexMultivaluedAttribute(SCIMRepresentationPatchResult result, SCIMRepresentationAttribute newAttribute, SCIMRepresentationAttribute arrayParentAttribute, SCIMSchemaAttribute scimExprSchemaAttr, SCIMRepresentation representation)
         {
-            if (!(scimExprSchemaAttr.Type == SCIMSchemaAttributeTypes.COMPLEX && scimExprSchemaAttr.MultiValued)) return false;
+            if (scimExprSchemaAttr != null && !(scimExprSchemaAttr.Type == SCIMSchemaAttributeTypes.COMPLEX && scimExprSchemaAttr.MultiValued)) return false;
             var newFlatAttributes = newAttribute.ToFlat();
             foreach (var newFlatAttr in newFlatAttributes)
             {
@@ -206,7 +228,7 @@ namespace SimpleIdServer.Scim.Helpers
 
         private bool TryInsertValueIntoArray(SCIMRepresentationPatchResult result, SCIMRepresentationAttribute newAttribute, SCIMSchemaAttribute scimExprSchemaAttr, SCIMRepresentation representation)
         {
-            if (!(scimExprSchemaAttr.Type != SCIMSchemaAttributeTypes.COMPLEX && scimExprSchemaAttr.MultiValued)) return false;
+            if (scimExprSchemaAttr != null && !(scimExprSchemaAttr.Type != SCIMSchemaAttributeTypes.COMPLEX && scimExprSchemaAttr.MultiValued)) return false;
             newAttribute.RepresentationId = representation.Id;
             result.Add(newAttribute);
             return true;
@@ -259,7 +281,7 @@ namespace SimpleIdServer.Scim.Helpers
 
         private static bool TryGetExternalId(PatchOperationParameter patchOperation, out string externalId) => TryGetAttributeValue(patchOperation, StandardSCIMRepresentationAttributes.ExternalId, out externalId);
 
-        private static bool TryGetDisplayName(PatchOperationParameter patchOperation, out string displayName) => TryGetAttributeValue(patchOperation, StandardSCIMRepresentationAttributes.ExternalId, out displayName);
+        private static bool TryGetDisplayName(PatchOperationParameter patchOperation, out string displayName) => TryGetAttributeValue(patchOperation, StandardSCIMRepresentationAttributes.DisplayName, out displayName);
 
         private static bool TryGetAttributeValue(PatchOperationParameter patchOperation, string attrName, out string value)
         {

@@ -32,5 +32,6 @@ namespace SimpleIdServer.Scim.Domains
         public const string Uniqueness = "uniqueness";
         public const string SubAttributes = "subAttributes";
         public const string CanonicalValues = "canonicalValues";
+        public const string DisplayName = "displayName";
     }
 }

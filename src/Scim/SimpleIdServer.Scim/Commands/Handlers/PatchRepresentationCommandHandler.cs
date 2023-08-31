@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
 using Microsoft.Extensions.Options;
-using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
@@ -59,16 +58,16 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var attributeMappings = await _scimAttributeMappingQueryRepository.GetBySourceResourceType(existingRepresentation.ResourceType);
             var oldDisplayName = existingRepresentation.DisplayName;
             var patchResult = await _representationHelper.Apply(existingRepresentation, patchRepresentationCommand.PatchRepresentation.Operations, attributeMappings, _options.IgnoreUnsupportedCanonicalValues, CancellationToken.None);
-            var patchResultLst = patchResult.Patches;
+            var patchResultLst = patchResult.Patches.Where(p => p.Attr != null).ToList();
             var displayNameDifferent = existingRepresentation.DisplayName != oldDisplayName;
-            if (!patchResultLst.Any()) return GenericResult<PatchRepresentationResult>.Ok(PatchRepresentationResult.NoPatch());
+            if (!patchResult.Patches.Any()) return GenericResult<PatchRepresentationResult>.Ok(PatchRepresentationResult.NoPatch());
             existingRepresentation.SetUpdated(DateTime.UtcNow);
-            var references = await _representationReferenceSync.Sync(patchRepresentationCommand.ResourceType, existingRepresentation, patchResult.Patches, patchRepresentationCommand.Location, schema, displayNameDifferent);
+            var references = await _representationReferenceSync.Sync(patchRepresentationCommand.ResourceType, existingRepresentation, patchResultLst, patchRepresentationCommand.Location, schema, displayNameDifferent);
             await using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
             {
-                await _scimRepresentationCommandRepository.BulkDelete(patchResultLst.Where(p => p.Operation == SCIMPatchOperations.REMOVE).Select(p => p.Attr)).ConfigureAwait(false);
-                await _scimRepresentationCommandRepository.BulkInsert(patchResultLst.Where(p => p.Operation == SCIMPatchOperations.ADD).Select(p => p.Attr)).ConfigureAwait(false);
-                await _scimRepresentationCommandRepository.BulkUpdate(patchResultLst.Where(p => p.Operation == SCIMPatchOperations.REPLACE).Select(p => p.Attr)).ConfigureAwait(false);
+                await _scimRepresentationCommandRepository.BulkDelete(patchResultLst.Where(p => p.Operation == SCIMPatchOperations.REMOVE && p.Attr != null).Select(p => p.Attr)).ConfigureAwait(false);
+                await _scimRepresentationCommandRepository.BulkInsert(patchResultLst.Where(p => p.Operation == SCIMPatchOperations.ADD && p.Attr != null).Select(p => p.Attr)).ConfigureAwait(false);
+                await _scimRepresentationCommandRepository.BulkUpdate(patchResultLst.Where(p => p.Operation == SCIMPatchOperations.REPLACE && p.Attr != null).Select(p => p.Attr)).ConfigureAwait(false);
                 foreach (var reference in references)
                 {
                     await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes).ConfigureAwait(false);
@@ -81,8 +80,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 await NotifyAllReferences(references).ConfigureAwait(false);
             }
 
-            existingRepresentation.ApplyEmptyArray();
-            return GenericResult<PatchRepresentationResult>.Ok(PatchRepresentationResult.Ok(existingRepresentation));
+            return GenericResult<PatchRepresentationResult>.Ok(PatchRepresentationResult.Ok());
         }
 
         private void CheckParameter(PatchRepresentationParameter patchRepresentation)

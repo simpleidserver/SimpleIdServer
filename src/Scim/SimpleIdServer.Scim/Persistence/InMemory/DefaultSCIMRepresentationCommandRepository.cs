@@ -93,10 +93,10 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             return Task.FromResult(allAttributes);
         }
 
-        public Task<List<SCIMRepresentationAttribute>> FindAttributesByValueIndex(string representationId, string indexValue, string schemaAttributeId, CancellationToken cancellationToken)
+        public Task<List<SCIMRepresentationAttribute>> FindAttributesByValueIndex(string representationId, IEnumerable<string> indexValueLst, string schemaAttributeId, CancellationToken cancellationToken)
         {
             var representationAttributes = _attributes.Where(a => a.RepresentationId == representationId);
-            return Task.FromResult(representationAttributes.Where(a => a.ComputedValueIndex == indexValue && a.SchemaAttributeId == schemaAttributeId).ToList());
+            return Task.FromResult(representationAttributes.Where(a => indexValueLst.Contains(a.ComputedValueIndex) && a.SchemaAttributeId == schemaAttributeId).ToList());
         }
 
         public Task<List<SCIMRepresentationAttribute>> FindAttributesByFullPath(string representationId, string fullPath, CancellationToken cancellationToken)

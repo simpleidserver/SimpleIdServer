@@ -438,10 +438,6 @@ Scenario: Check user can be created (use full qualified name properties)
 	Then HTTP status code equals to '201'	
 	Then HTTP HEADER contains 'Location'
 	Then HTTP HEADER contains 'ETag'
-
-	Then HTTP status code equals to '201'	
-	Then HTTP HEADER contains 'Location'
-	Then HTTP HEADER contains 'ETag'
 	Then JSON exists 'id'
 	Then JSON exists 'meta.created'
 	Then JSON exists 'meta.lastModified'

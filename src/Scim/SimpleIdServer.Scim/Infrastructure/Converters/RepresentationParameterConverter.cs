@@ -27,8 +27,6 @@ namespace SimpleIdServer.Scim.Infrastructure.Converters
                 ExternalId = jo.GetStringIgnoreCase(StandardSCIMRepresentationAttributes.ExternalId),
                 Schemas = jo.GetArrayIgnoreCase(StandardSCIMRepresentationAttributes.Schemas)
             };
-            jo.RemoveIgnoreCase(StandardSCIMRepresentationAttributes.Schemas);
-            jo.RemoveIgnoreCase(StandardSCIMRepresentationAttributes.ExternalId);
             result.Attributes = jo.ToCamelCase() as JObject;
             return result;
         }
