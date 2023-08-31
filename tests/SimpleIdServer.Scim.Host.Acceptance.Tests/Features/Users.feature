@@ -1064,7 +1064,7 @@ Scenario: If the target location does not exist the attribute and value are adde
 	And execute HTTP PATCH JSON request 'http://localhost/Users/$id$'
 	| Key        | Value                                                                              |
 	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]					              |
-	| Operations | [ { "op": "add", "path" : "phones.phoneNumber",  "value" : "Phone" } ]    |
+	| Operations | [ { "op": "add", "path" : "phones.phoneNumber",  "value" : "Phone" } ]			  |
 	
 	And execute HTTP GET request 'http://localhost/Users/$id$'	
 	And extract JSON from body

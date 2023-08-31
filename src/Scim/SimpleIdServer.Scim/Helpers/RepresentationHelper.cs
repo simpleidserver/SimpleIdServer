@@ -11,11 +11,9 @@ using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Resources;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using static MassTransit.ValidationResultExtensions;
 
 namespace SimpleIdServer.Scim.Helpers
 {
@@ -88,16 +86,7 @@ namespace SimpleIdServer.Scim.Helpers
                 {
                     case SCIMPatchOperations.ADD:
                         {
-                            bool hasExternalId = false;
-                            if ((hasExternalId = TryGetExternalId(patch, out string externalId)))
-                            {
-                                representation.ExternalId = externalId;
-                                result.AddExternalId();
-                            }
-
-                            if (!hasExternalId && (schemaAttributes == null || !schemaAttributes.Any()))
-                                throw new SCIMNoTargetException(string.Format(Global.AttributeIsNotRecognirzed, patch.Path));
-
+                            UpdateCommonAttributes(patch, representation, result, schemaAttributes);
                             if (hierarchicalFilteredAttributes == null)
                             {
                                 await OverrideRootAttributes(result, hierarchicalNewAttributes, representation, cancellationToken);
@@ -139,18 +128,7 @@ namespace SimpleIdServer.Scim.Helpers
                         break;
                     case SCIMPatchOperations.REPLACE:
                         {
-                            bool hasExternalId = false;
-                            if ((hasExternalId = TryGetExternalId(patch, out string externalId)))
-                            {
-                                representation.ExternalId = externalId;
-                                result.AddExternalId();
-                            }
-
-                            if (!hasExternalId && (schemaAttributes == null || !schemaAttributes.Any()))
-                            {
-                                throw new SCIMNoTargetException(string.Format(Global.AttributeIsNotRecognirzed, patch.Path));
-                            }
-
+                            UpdateCommonAttributes(patch, representation, result, schemaAttributes);
                             var complexAttr = scimFilter as SCIMComplexAttributeExpression;
                             if (complexAttr != null && !hierarchicalFilteredAttributes.Any() && complexAttr.GroupingFilter != null) throw new SCIMNoTargetException(Global.PatchMissingAttribute);
                             if(hierarchicalFilteredAttributes == null)
@@ -175,20 +153,40 @@ namespace SimpleIdServer.Scim.Helpers
             {
                 var existingAttributes = await _scimRepresentationCommandRepository.FindAttributesByValueIndex(representation.Id, newAttribute.ComputedValueIndex, newAttribute.SchemaAttributeId, cancellationToken);
                 if (existingAttributes.Any()) continue;
+                var attrLstToBeRemoved = await _scimRepresentationCommandRepository.FindAttributesByFullPath(representation.Id, newAttribute.FullPath, cancellationToken);
+                foreach (var attrToBeRemove in attrLstToBeRemoved) result.Remove(attrToBeRemove);
                 if (newAttribute.SchemaAttribute.Type != SCIMSchemaAttributeTypes.COMPLEX)
                 {
-                    var attrLstToBeRemoved = await _scimRepresentationCommandRepository.FindAttributesByFullPath(representation.Id, newAttribute.FullPath, cancellationToken);
-                    foreach (var attrToBeRemove in attrLstToBeRemoved) result.Remove(attrToBeRemove);
                     newAttribute.RepresentationId = representation.Id;
                     if (attrLstToBeRemoved.Any()) newAttribute.ParentAttributeId = attrLstToBeRemoved.First().ParentAttributeId;
                     result.Add(newAttribute);
                 }
                 else
                 {
-                    newAttribute.RepresentationId = representation.Id;
-                    result.Add(newAttribute);
+                    var flatAttrs = newAttribute.ToFlat();
+                    foreach(var flatAttr in flatAttrs)
+                    {
+                        flatAttr.RepresentationId = representation.Id;
+                        result.Add(flatAttr);
+                    }
                 }
             }
+        }
+
+        private void UpdateCommonAttributes(PatchOperationParameter patch, SCIMRepresentation representation, SCIMRepresentationPatchResult result, IEnumerable<SCIMSchemaAttribute> schemaAttributes)
+        {
+            bool hasExternalId = false;
+            if ((hasExternalId = TryGetExternalId(patch, out string externalId)))
+            {
+                representation.ExternalId = externalId;
+                result.AddExternalId();
+            }
+
+            if (!hasExternalId && (schemaAttributes == null || !schemaAttributes.Any()))
+                throw new SCIMNoTargetException(string.Format(Global.AttributeIsNotRecognirzed, patch.Path));
+
+            if (TryGetDisplayName(patch, out string displayName))
+                representation.SetDisplayName(displayName);
         }
 
         private bool TryInsertComplexMultivaluedAttribute(SCIMRepresentationPatchResult result, SCIMRepresentationAttribute newAttribute, SCIMRepresentationAttribute arrayParentAttribute, SCIMSchemaAttribute scimExprSchemaAttr, SCIMRepresentation representation)
@@ -259,25 +257,29 @@ namespace SimpleIdServer.Scim.Helpers
             }
         }
 
-        private static bool TryGetExternalId(PatchOperationParameter patchOperation, out string externalId)
+        private static bool TryGetExternalId(PatchOperationParameter patchOperation, out string externalId) => TryGetAttributeValue(patchOperation, StandardSCIMRepresentationAttributes.ExternalId, out externalId);
+
+        private static bool TryGetDisplayName(PatchOperationParameter patchOperation, out string displayName) => TryGetAttributeValue(patchOperation, StandardSCIMRepresentationAttributes.ExternalId, out displayName);
+
+        private static bool TryGetAttributeValue(PatchOperationParameter patchOperation, string attrName, out string value)
         {
-            externalId = null;
+            value = null;
             if (patchOperation.Value == null)
             {
                 return false;
             }
 
             var jObj = patchOperation.Value as JObject;
-            if (patchOperation.Path == StandardSCIMRepresentationAttributes.ExternalId &&
+            if (patchOperation.Path == attrName &&
                 (patchOperation.Value.GetType() == typeof(string) || patchOperation.Value.GetType() == typeof(JValue)))
             {
-                externalId = patchOperation.Value.ToString();
+                value = patchOperation.Value.ToString();
                 return true;
             }
 
-            if (jObj != null && jObj.ContainsKey(StandardSCIMRepresentationAttributes.ExternalId))
+            if (jObj != null && jObj.ContainsKey(attrName))
             {
-                externalId = jObj[StandardSCIMRepresentationAttributes.ExternalId].ToString();
+                value = jObj[attrName].ToString();
                 return true;
             }
 

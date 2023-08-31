@@ -89,6 +89,7 @@ namespace SimpleIdServer.Scim.Domains
 
         public void AddAttribute(SCIMRepresentationAttribute attribute)
         {
+            attribute.RepresentationId = Id;
             attribute.ComputeValueIndex();
             FlatAttributes.Add(attribute);
         }

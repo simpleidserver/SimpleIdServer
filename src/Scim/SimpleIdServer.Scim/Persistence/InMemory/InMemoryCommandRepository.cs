@@ -19,7 +19,7 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
 
         protected List<T> LstData { get => _lstData; }
 
-        public Task<T> Get(string id, CancellationToken token)
+        public virtual Task<T> Get(string id, bool include, CancellationToken token)
         {
             return Task.FromResult(_lstData.FirstOrDefault(r => r.Id == id));
         }
