@@ -62,17 +62,17 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             scimRepresentation.SetVersion(0);
             scimRepresentation.SetResourceType(addRepresentationCommand.ResourceType);
             await _representationHelper.CheckUniqueness(scimRepresentation.FlatAttributes);
-            // var references = await _representationReferenceSync.Sync(addRepresentationCommand.ResourceType, new SCIMRepresentation(), scimRepresentation, addRepresentationCommand.Location, schema);
+            var references = await _representationReferenceSync.Sync(addRepresentationCommand.ResourceType, new SCIMRepresentation(), scimRepresentation, addRepresentationCommand.Location, schema);
             await using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
             {
                 await _scimRepresentationCommandRepository.Add(scimRepresentation).ConfigureAwait(false);
-                // foreach (var reference in references)
+                foreach (var reference in references)
                 {
-                    // await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes).ConfigureAwait(false);
+                    await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes).ConfigureAwait(false);
                 }
 
                 await transaction.Commit().ConfigureAwait(false);
-                // await NotifyAllReferences(references).ConfigureAwait(false);
+                await NotifyAllReferences(references).ConfigureAwait(false);
             }
 
             return GenericResult<string>.Ok(scimRepresentation.Id);

@@ -13,7 +13,7 @@ namespace SimpleIdServer.Scim.Parser.Expressions
     {
         #region Filter Attributes
 
-        public static ICollection<SCIMRepresentationAttribute> EvaluateAttributes(this SCIMExpression expression, IQueryable<SCIMRepresentationAttribute> attributes, bool isStrictPath)
+        public static ICollection<SCIMRepresentationAttribute> EvaluateAttributes(this SCIMExpression expression, IQueryable<SCIMRepresentationAttribute> attributes, bool isStrictPath, string propertyName = "CachedChildren")
         {
             var attr = expression as SCIMAttributeExpression;
             if (attr.SchemaAttribute == null || string.IsNullOrWhiteSpace(attr.SchemaAttribute.Id))
@@ -23,7 +23,7 @@ namespace SimpleIdServer.Scim.Parser.Expressions
             else
             {
                 var treeNodeParameter = Expression.Parameter(typeof(SCIMRepresentationAttribute), "tn");
-                var anyWhereExpression = expression.EvaluateAttributes(treeNodeParameter);
+                var anyWhereExpression = expression.EvaluateAttributes(treeNodeParameter, propertyName);
                 var enumarableType = typeof(Queryable);
                 var whereMethod = enumarableType.GetMethods()
                      .Where(m => m.Name == "Where" && m.IsGenericMethodDefinition)
@@ -35,19 +35,16 @@ namespace SimpleIdServer.Scim.Parser.Expressions
                 var result = (IQueryable<SCIMRepresentationAttribute>)finalSelectRequestBody.Compile().DynamicInvoke(attributes);
                 var fullPath = attr.GetFullPath(false);
                 return result.ToList();
-                // var res = SCIMRepresentation.BuildFlatAttributes(result.ToList());
-                // return res;
-                // return res.Where((a) => a != null && (isStrictPath ? fullPath == a.FullPath : fullPath.StartsWith(a.FullPath) || a.FullPath.StartsWith(fullPath))).ToList();
             }
         }
-        public static Expression EvaluateAttributes(this SCIMExpression expression, ParameterExpression parameterExpression)
+        public static Expression EvaluateAttributes(this SCIMExpression expression, ParameterExpression parameterExpression, string propertyName = "CachedChildren")
         {
             var attrExpression = expression as SCIMAttributeExpression;
             var logicalExpression = expression as SCIMLogicalExpression;
             var comparisonExpression = expression as SCIMComparisonExpression;
-            if (attrExpression != null) return attrExpression.EvaluateAttributes(parameterExpression);
-            if (logicalExpression != null) return logicalExpression.EvaluateAttributes(parameterExpression);
-            if (comparisonExpression != null) return comparisonExpression.EvaluateAttributes(parameterExpression);
+            if (attrExpression != null) return attrExpression.EvaluateAttributes(parameterExpression, propertyName);
+            if (logicalExpression != null) return logicalExpression.EvaluateAttributes(parameterExpression, propertyName);
+            if (comparisonExpression != null) return comparisonExpression.EvaluateAttributes(parameterExpression, propertyName);
             return null;
         }
 
@@ -64,7 +61,7 @@ namespace SimpleIdServer.Scim.Parser.Expressions
                      .Where(m => m.Name == "Any" && m.IsGenericMethodDefinition)
                      .Where(m => m.GetParameters().Count() == 2).First().MakeGenericMethod(typeof(SCIMRepresentationAttribute));
                 var childAttribute = Expression.Parameter(typeof(SCIMRepresentationAttribute), Guid.NewGuid().ToString());
-                var anyLambdaBody = complex.GroupingFilter.EvaluateAttributes(childAttribute);
+                var anyLambdaBody = complex.GroupingFilter.EvaluateAttributes(childAttribute, propertyName);
                 var anyLambda = Expression.Lambda<Func<SCIMRepresentationAttribute, bool>>(anyLambdaBody, childAttribute);
                 var anyCall = Expression.Call(anyMethod, childrenProperty, anyLambda);
                 equal = Expression.AndAlso(equal, anyCall);
@@ -73,18 +70,18 @@ namespace SimpleIdServer.Scim.Parser.Expressions
             return equal;
         }
 
-        public static Expression EvaluateAttributes(this SCIMLogicalExpression expression, ParameterExpression parameterExpression)
+        public static Expression EvaluateAttributes(this SCIMLogicalExpression expression, ParameterExpression parameterExpression, string propertyName = "CachedChildren")
         {
             switch (expression.LogicalOperator)
             {
                 case SCIMLogicalOperators.AND:
-                    return Expression.AndAlso(expression.LeftExpression.EvaluateAttributes(parameterExpression), expression.RightExpression.EvaluateAttributes(parameterExpression));
+                    return Expression.AndAlso(expression.LeftExpression.EvaluateAttributes(parameterExpression, propertyName), expression.RightExpression.EvaluateAttributes(parameterExpression, propertyName));
                 default:
-                    return Expression.OrElse(expression.LeftExpression.EvaluateAttributes(parameterExpression), expression.RightExpression.EvaluateAttributes(parameterExpression));
+                    return Expression.OrElse(expression.LeftExpression.EvaluateAttributes(parameterExpression, propertyName), expression.RightExpression.EvaluateAttributes(parameterExpression, propertyName));
             }
         }
 
-        public static Expression EvaluateAttributes(this SCIMComparisonExpression expression, ParameterExpression parameterExpression)
+        public static Expression EvaluateAttributes(this SCIMComparisonExpression expression, ParameterExpression parameterExpression, string propertyName = "CachedChildren")
         {
             var schemaAttributeId = Expression.Property(parameterExpression, "SchemaAttributeId");
             var propertyValueString = Expression.Property(parameterExpression, "ValueString");

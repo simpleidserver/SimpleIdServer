@@ -62,24 +62,22 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var displayNameDifferent = existingRepresentation.DisplayName != oldDisplayName;
             if (!patchResult.Patches.Any()) return GenericResult<PatchRepresentationResult>.Ok(PatchRepresentationResult.NoPatch());
             existingRepresentation.SetUpdated(DateTime.UtcNow);
-            // var references = await _representationReferenceSync.Sync(patchRepresentationCommand.ResourceType, existingRepresentation, patchResultLst, patchRepresentationCommand.Location, schema, displayNameDifferent);
+            var references = await _representationReferenceSync.Sync(patchRepresentationCommand.ResourceType, existingRepresentation, patchResultLst, patchRepresentationCommand.Location, schema, displayNameDifferent);
             await using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
             {
                 await _scimRepresentationCommandRepository.BulkDelete(patchResultLst.Where(p => p.Operation == SCIMPatchOperations.REMOVE && p.Attr != null).Select(p => p.Attr)).ConfigureAwait(false);
                 await _scimRepresentationCommandRepository.BulkInsert(patchResultLst.Where(p => p.Operation == SCIMPatchOperations.ADD && p.Attr != null).Select(p => p.Attr)).ConfigureAwait(false);
                 await _scimRepresentationCommandRepository.BulkUpdate(patchResultLst.Where(p => p.Operation == SCIMPatchOperations.REPLACE && p.Attr != null).Select(p => p.Attr)).ConfigureAwait(false);
-                // foreach (var reference in references)
+                foreach (var reference in references)
                 {
-                    /*
                     await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes).ConfigureAwait(false);
                     await _scimRepresentationCommandRepository.BulkUpdate(reference.UpdatedRepresentationAttributes).ConfigureAwait(false);
                     await _scimRepresentationCommandRepository.BulkDelete(reference.RemovedRepresentationAttributes).ConfigureAwait(false);
-                    */
                 }
 
                 await _scimRepresentationCommandRepository.Update(existingRepresentation).ConfigureAwait(false);
                 await transaction.Commit().ConfigureAwait(false);
-                // await NotifyAllReferences(references).ConfigureAwait(false);
+                await NotifyAllReferences(references).ConfigureAwait(false);
             }
 
             return GenericResult<PatchRepresentationResult>.Ok(PatchRepresentationResult.Ok());

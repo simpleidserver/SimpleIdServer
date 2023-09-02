@@ -116,17 +116,16 @@ namespace SimpleIdServer.Scim.Persistence.EF
             return result;
         }
 
-        public async Task<List<SCIMRepresentationAttribute>> FindAttributes(string representationId, SCIMAttributeExpression pathExpression, CancellationToken cancellationToken)
+        public Task<List<SCIMRepresentationAttribute>> FindAttributes(string representationId, SCIMAttributeExpression pathExpression, CancellationToken cancellationToken)
         {
-            var allAttributes = new List<SCIMRepresentationAttribute>();
-            var representationAttributes = await _scimDbContext.SCIMRepresentationAttributeLst.Include(s => s.SchemaAttribute).Where(r => r.RepresentationId == representationId)
-                .AsNoTracking()
-                .ToListAsync();
-            var hierarchicalRepresentationAttributes = SCIMRepresentation.BuildHierarchicalAttributes(representationAttributes).AsQueryable();
-            var filteredAttributes = pathExpression.EvaluateAttributes(hierarchicalRepresentationAttributes, true);
-            allAttributes.AddRange(filteredAttributes);
-            foreach (var fAttr in filteredAttributes) ResolveChildren(representationAttributes.AsQueryable(), fAttr.Id, allAttributes);
-            return allAttributes;
+            var representationAttributes = _scimDbContext.SCIMRepresentationAttributeLst
+                .Include(s => s.SchemaAttribute)
+                .Include(s => s.Children).ThenInclude(s => s.SchemaAttribute)
+                .Where(r => r.RepresentationId == representationId)
+                .AsNoTracking();
+            var filteredAttributes = pathExpression.EvaluateAttributes(representationAttributes, true, "Children").ToList();
+            foreach (var a in filteredAttributes) a.CachedChildren = a.Children;
+            return Task.FromResult(filteredAttributes);
         }
 
         public async Task<List<SCIMRepresentationAttribute>> FindAttributesByAproximativeFullPath(string representationId, string fullPath, CancellationToken cancellationToken)
