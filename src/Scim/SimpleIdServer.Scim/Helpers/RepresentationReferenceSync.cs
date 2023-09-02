@@ -77,7 +77,7 @@ namespace SimpleIdServer.Scim.Helpers
                     {
                         var removedIds = new List<string>();
                         var paginatedResult =
-                            await _scimRepresentationCommandRepository.FindPaginatedGraphAttributes(newIds,
+                            await _scimRepresentationCommandRepository.FindGraphAttributes(newIds,
                                 newSourceScimRepresentation.Id, targetAttributeValue.Id);
 
                         result.RemoveReferenceAttributes(paginatedResult);
@@ -90,7 +90,7 @@ namespace SimpleIdServer.Scim.Helpers
                     }
                     else
                     {
-                        var paginatedResult = await _scimRepresentationCommandRepository.FindPaginatedGraphAttributes(idsToBeRemoved, newSourceScimRepresentation.Id, targetAttributeValue.Id);
+                        var paginatedResult = await _scimRepresentationCommandRepository.FindGraphAttributes(idsToBeRemoved, newSourceScimRepresentation.Id, targetAttributeValue.Id);
                         result.RemoveReferenceAttributes(paginatedResult);
 
                         foreach(var rep in await _scimRepresentationCommandRepository.FindRepresentations(newIds, attributeMapping.TargetResourceType))
@@ -177,10 +177,10 @@ namespace SimpleIdServer.Scim.Helpers
                     if (targetAttributeValue != null)
                     {
                         result = new RepresentationSyncResult();
-                        var paginatedResult = await _scimRepresentationCommandRepository.FindPaginatedGraphAttributes(idsToBeRemoved, newSourceScimRepresentation.Id, targetAttributeValue.Id);
+                        var paginatedResult = await _scimRepresentationCommandRepository.FindGraphAttributes(idsToBeRemoved, newSourceScimRepresentation.Id, targetAttributeValue.Id);
                         result.RemoveReferenceAttributes(paginatedResult);
 
-                        var referencedAttrLst = SCIMRepresentation.BuildHierarchicalAttributes(await _scimRepresentationCommandRepository.FindPaginatedGraphAttributes(newIds, newSourceScimRepresentation.Id, targetAttributeValue.Id));
+                        var referencedAttrLst = SCIMRepresentation.BuildHierarchicalAttributes(await _scimRepresentationCommandRepository.FindGraphAttributes(newIds, newSourceScimRepresentation.Id, targetAttributeValue.Id));
                         // Change indirect to direct.
                         foreach (var referencedAttr in referencedAttrLst)
                         {
@@ -268,7 +268,7 @@ namespace SimpleIdServer.Scim.Helpers
                 List<SCIMRepresentation> allParents = null, allSelfChildren = null; ;
                 if(updateAllReference)
                 {
-                    var propagatedChildren = await _scimRepresentationCommandRepository.FindPaginatedGraphAttributes(newSourceScimRepresentation.Id, valueAttr.Id);
+                    var propagatedChildren = await _scimRepresentationCommandRepository.FindGraphAttributes(newSourceScimRepresentation.Id, valueAttr.Id);
                     var typeAttrs = propagatedChildren.Where(c => c.SchemaAttributeId == displayAttr.Id && !addedDirectChildrenIds.Contains(c.RepresentationId)).ToList();
                     foreach (var ta in typeAttrs)
                         ta.ValueString = newSourceScimRepresentation.DisplayName;
@@ -326,7 +326,7 @@ namespace SimpleIdServer.Scim.Helpers
                     // Refactor this part in order to improve the performance.
                     result = new RepresentationSyncResult();
                     var fullPath = $"{selfReferenceAttribute.SourceAttributeSelector}.{SCIMConstants.StandardSCIMReferenceProperties.Value}";
-                    var existingChildrenIds = (await _scimRepresentationCommandRepository.FindAttributesByFullPath(newSourceScimRepresentation.Id, fullPath, CancellationToken.None)).Select(f => f.ValueString);
+                    var existingChildrenIds = (await _scimRepresentationCommandRepository.FindAttributesByAproximativeFullPath(newSourceScimRepresentation.Id, fullPath, CancellationToken.None)).Select(f => f.ValueString);
                     var allIds = new List<string>();
                     allIds.AddRange(addedIndirectChildrenIds);
                     allIds.AddRange(removedIndirectChildrenIds);
@@ -435,7 +435,7 @@ namespace SimpleIdServer.Scim.Helpers
             var childrenIds = scimRepresentation.FlatAttributes.Where(f => f.FullPath == fullPath).Select(f => f.ValueString).ToList();
             var children = new List<List<SCIMRepresentationAttribute>>
             {
-                await _scimRepresentationCommandRepository.FindPaginatedGraphAttributes(childrenIds, scimRepresentation.Id, targetAttributeId.Id, sourceRepresentationId: sourceRepresentationId)
+                await _scimRepresentationCommandRepository.FindGraphAttributes(childrenIds, scimRepresentation.Id, targetAttributeId.Id, sourceRepresentationId: sourceRepresentationId)
             };
 
             foreach (var child in allChildren.Where(c => childrenIds.Contains(c.Id))) 

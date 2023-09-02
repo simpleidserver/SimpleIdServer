@@ -19,7 +19,7 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
 
         protected List<T> LstData { get => _lstData; }
 
-        public virtual Task<T> Get(string id, bool include, CancellationToken token)
+        public virtual Task<T> Get(string id, CancellationToken token)
         {
             return Task.FromResult(_lstData.FirstOrDefault(r => r.Id == id));
         }
@@ -44,7 +44,7 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             return Task.FromResult(true);
         }
 
-        public Task<bool> Delete(T data, CancellationToken token)
+        public virtual Task<bool> Delete(T data, CancellationToken token)
         {
             _lstData.Remove(_lstData.First(l => l.Equals(data)));
             return Task.FromResult(true);

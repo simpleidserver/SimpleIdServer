@@ -26,121 +26,21 @@ namespace SimpleIdServer.Scim.Persistence.EF
         public async Task<SCIMRepresentation> Get(string id, CancellationToken token = default)
         {
             var result = await _scimDbContext.SCIMRepresentationLst
-                .Include(r => r.FlatAttributes)
                 .Include(r => r.Schemas).ThenInclude(s => s.Attributes).FirstOrDefaultAsync(r => r.Id == id, token);
             return result;
-        }
-        
-        public async Task<List<SCIMRepresentation>> FindRepresentations(List<string> representationIds, string resourceType = null, int nbRecords = 50, bool ignoreAttributes = false)
-        {
-            var chunks = representationIds.Chunk(nbRecords).ToList();
-            var representations = new List<SCIMRepresentation>();
-            foreach (var chunk in chunks) {
-                var query = _scimDbContext.SCIMRepresentationLst
-                    .Include(r => r.FlatAttributes)
-                    .Where(r => chunk.Contains(r.Id))
-                    .AsNoTracking();
-                if (!string.IsNullOrWhiteSpace(resourceType))
-                    query = query.Where(r => r.ResourceType == resourceType);
-
-                var result = await query.ToListAsync();
-                representations.AddRange(result);
-            }
-
-            return representations;
-        }
-
-        public async Task<List<SCIMRepresentationAttribute>> FindPaginatedGraphAttributes(string valueStr, string schemaAttributeId, int nbRecords = 50, string sourceRepresentationId = null)
-        {
-            var parentAttributeIds = await GetParentAttributeIds(valueStr, schemaAttributeId, sourceRepresentationId);
-            var result = await GetRelatedAttributes(nbRecords, parentAttributeIds);
-            return result;
-        }
-
-        private async Task<List<string>> GetParentAttributeIds(string valueStr, string schemaAttributeId, string sourceRepresentationId)
-        {
-            var parentAttributeIds = await _scimDbContext.SCIMRepresentationAttributeLst.AsNoTracking()
-                .Where(a => a.SchemaAttributeId == schemaAttributeId && a.ValueString == valueStr || (sourceRepresentationId != null && a.ValueString == sourceRepresentationId))
-                .OrderBy(r => r.ParentAttributeId)
-                .Select(r => r.ParentAttributeId)
-                .AsNoTracking()
-                .ToListAsync();
-            return parentAttributeIds;
-        }
-
-        private async Task<List<SCIMRepresentationAttribute>> GetRelatedAttributes(int nbRecords, List<string> parentAttributeIds)
-        {
-            var result = new List<SCIMRepresentationAttribute>();
-            var chunks = parentAttributeIds.Chunk(nbRecords).ToList();
-            foreach (var chunk in chunks) {
-                result.AddRange(
-                    await _scimDbContext.SCIMRepresentationAttributeLst.AsNoTracking()
-                    .Where(a => chunk.Contains(a.Id) || chunk.Contains(a.ParentAttributeId))
-                    .ToListAsync()
-                );
-            }
-            return result;
-        }
-
-        public async Task<List<SCIMRepresentationAttribute>> FindPaginatedGraphAttributes(IEnumerable<string> representationIds, string valueStr, string schemaAttributeId, int nbRecords = 50, string sourceRepresentationId = null)
-        {
-            var parentIds = await _scimDbContext.SCIMRepresentationAttributeLst.AsNoTracking()
-                .Where(a => a.SchemaAttributeId == schemaAttributeId &&
-                            representationIds.Contains(a.RepresentationId) &&
-                            a.ValueString == valueStr ||
-                            (sourceRepresentationId != null && a.ValueString == sourceRepresentationId))
-                .Select(r => r.ParentAttributeId)
-                .AsNoTracking()
-                .Distinct()
-                .ToListAsync();
-            var attributes = new List<SCIMRepresentationAttribute>();
-            var chunks = parentIds.Chunk(nbRecords).ToList();
-            foreach (var chunk in chunks) {
-                var result = await _scimDbContext.SCIMRepresentationAttributeLst.AsNoTracking()
-                    .Where(a => chunk.Contains(a.Id) || chunk.Contains(a.ParentAttributeId))
-                    .AsNoTracking()
-                    .ToListAsync();
-                attributes.AddRange(result);
-            }
-            return attributes;
-        }
-
-        public Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string schemaAttributeId, string value, string endpoint = null)
-        {
-            return _scimDbContext.SCIMRepresentationAttributeLst
-                .Include(a => a.Representation).ThenInclude(a => a.FlatAttributes)
-                .Where(a => (endpoint == null || endpoint == a.Representation.ResourceType) && a.SchemaAttributeId == schemaAttributeId && a.ValueString == value)
-                .Select(a => a.Representation)
-                .FirstOrDefaultAsync();
-        }
-
-        public Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string schemaAttributeId, int value, string endpoint = null)
-        {
-            return _scimDbContext.SCIMRepresentationAttributeLst
-                .Include(a => a.Representation).ThenInclude(a => a.FlatAttributes)
-                .Where(a => (endpoint == null || endpoint == a.Representation.ResourceType) && a.SchemaAttributeId == schemaAttributeId && a.ValueInteger != null && a.ValueInteger == value)
-                .Select(a => a.Representation)
-                .FirstOrDefaultAsync();
-        }
-
-        public async Task<List<SCIMRepresentation>> FindSCIMRepresentationsByAttributeFullPath(string fullPath, IEnumerable<string> values, string resourceType)
-        {
-            List<SCIMRepresentation> result = await _scimDbContext.SCIMRepresentationLst.Include(r => r.FlatAttributes)
-                .Where(r => r.ResourceType == resourceType && r.FlatAttributes.Any(a => a.FullPath == fullPath && values.Contains(a.ValueString)))
-                .AsNoTracking()
-                .ToListAsync();
-            return result;
-        }
-
-        public async Task<ITransaction> StartTransaction(CancellationToken token)
-        {
-            var transaction = await _scimDbContext.Database.BeginTransactionAsync(token);
-            return new EFTransaction(_scimDbContext, transaction);
         }
 
         public Task<bool> Add(SCIMRepresentation data, CancellationToken token)
         {
             _scimDbContext.SCIMRepresentationLst.Add(data);
+            foreach (var attr in data.FlatAttributes)
+                _scimDbContext.SCIMRepresentationAttributeLst.Add(attr);
+            return Task.FromResult(true);
+        }
+
+        public Task<bool> Update(SCIMRepresentation data, CancellationToken token)
+        {
+            _scimDbContext.SCIMRepresentationLst.Update(data);
             return Task.FromResult(true);
         }
 
@@ -150,10 +50,139 @@ namespace SimpleIdServer.Scim.Persistence.EF
             return Task.FromResult(true);
         }
 
-        public Task<bool> Update(SCIMRepresentation data, CancellationToken token)
+        public async Task<List<SCIMRepresentation>> FindRepresentations(List<string> representationIds, string resourceType = null, CancellationToken cancellationToken = default(CancellationToken))
         {
-            _scimDbContext.SCIMRepresentationLst.Update(data);
-            return Task.FromResult(true);
+            var query = _scimDbContext.SCIMRepresentationLst
+                .Where(r => representationIds.Contains(r.Id))
+                .AsNoTracking();
+            if (!string.IsNullOrWhiteSpace(resourceType))
+                query = query.Where(r => r.ResourceType == resourceType);
+            var result = await query.ToListAsync(cancellationToken);
+            return result;
+        }
+
+        public async Task<List<SCIMRepresentationAttribute>> FindGraphAttributes(string valueStr, string schemaAttributeId, string sourceRepresentationId = null, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var parentIds = await _scimDbContext.SCIMRepresentationAttributeLst.AsNoTracking()
+                .Where(a => a.SchemaAttributeId == schemaAttributeId && a.ValueString == valueStr || (sourceRepresentationId != null && a.ValueString == sourceRepresentationId))
+                .OrderBy(r => r.ParentAttributeId)
+                .Select(r => r.ParentAttributeId)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+            var result = await _scimDbContext.SCIMRepresentationAttributeLst.Include(s => s.SchemaAttribute).AsNoTracking()
+                    .Where(a => parentIds.Contains(a.Id) || parentIds.Contains(a.ParentAttributeId))
+                    .ToListAsync(cancellationToken);
+            return result;
+        }
+
+        public async Task<List<SCIMRepresentationAttribute>> FindGraphAttributes(IEnumerable<string> representationIds, string valueStr, string schemaAttributeId, string sourceRepresentationId = null, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var parentIds = await _scimDbContext.SCIMRepresentationAttributeLst.AsNoTracking()
+                .Where(a => a.SchemaAttributeId == schemaAttributeId && representationIds.Contains(a.RepresentationId) && a.ValueString == valueStr || (sourceRepresentationId != null && a.ValueString == sourceRepresentationId))
+                .Select(r => r.ParentAttributeId)
+                .AsNoTracking()
+                .Distinct()
+                .ToListAsync(cancellationToken);
+            var result = await _scimDbContext.SCIMRepresentationAttributeLst.Include(s => s.SchemaAttribute).AsNoTracking()
+                    .Where(a => parentIds.Contains(a.Id) || parentIds.Contains(a.ParentAttributeId))
+                    .ToListAsync();
+            return result;
+        }
+
+        public async Task<List<SCIMRepresentationAttribute>> FindGraphAttributesBySchemaAttributeId(string representationId, string schemaAttributeId, CancellationToken cancellationToken)
+        {
+            var ids = await _scimDbContext.SCIMRepresentationAttributeLst.AsNoTracking()
+                .Where(a => a.SchemaAttributeId == schemaAttributeId && a.RepresentationId == representationId)
+                .OrderBy(r => r.Id)
+                .Select(r => r.Id)
+                .ToListAsync(cancellationToken);
+            var result = await _scimDbContext.SCIMRepresentationAttributeLst.Include(s => s.SchemaAttribute)
+                .AsNoTracking()
+                .Where(a => ids.Contains(a.Id) || ids.Contains(a.ParentAttributeId))
+                .ToListAsync(cancellationToken);
+            return result;
+        }
+
+        public async Task<List<SCIMRepresentationAttribute>> FindGraphAttributesBySchemaAttributeId(List<string> representationIds, string schemaAttributeId, CancellationToken cancellationToken)
+        {
+            var ids = await _scimDbContext.SCIMRepresentationAttributeLst.AsNoTracking()
+                .Where(a => a.SchemaAttributeId == schemaAttributeId && representationIds.Contains(a.RepresentationId))
+                .OrderBy(r => r.Id)
+                .Select(r => r.Id)
+                .ToListAsync(cancellationToken);
+            var result = await _scimDbContext.SCIMRepresentationAttributeLst.Include(s => s.SchemaAttribute).AsNoTracking()
+                .Where(a => ids.Contains(a.Id) || ids.Contains(a.ParentAttributeId))
+                .ToListAsync(cancellationToken);
+            return result;
+        }
+
+        public async Task<List<SCIMRepresentationAttribute>> FindAttributes(string representationId, SCIMAttributeExpression pathExpression, CancellationToken cancellationToken)
+        {
+            var allAttributes = new List<SCIMRepresentationAttribute>();
+            var representationAttributes = await _scimDbContext.SCIMRepresentationAttributeLst.Include(s => s.SchemaAttribute).Where(r => r.RepresentationId == representationId)
+                .AsNoTracking()
+                .ToListAsync();
+            var hierarchicalRepresentationAttributes = SCIMRepresentation.BuildHierarchicalAttributes(representationAttributes).AsQueryable();
+            var filteredAttributes = pathExpression.EvaluateAttributes(hierarchicalRepresentationAttributes, true);
+            allAttributes.AddRange(filteredAttributes);
+            foreach (var fAttr in filteredAttributes) ResolveChildren(representationAttributes.AsQueryable(), fAttr.Id, allAttributes);
+            return allAttributes;
+        }
+
+        public async Task<List<SCIMRepresentationAttribute>> FindAttributesByAproximativeFullPath(string representationId, string fullPath, CancellationToken cancellationToken)
+        {
+            var representationAttributes = await _scimDbContext.SCIMRepresentationAttributeLst.Include(a => a.SchemaAttribute).AsNoTracking()
+                .Where(a => a.RepresentationId == representationId && a.FullPath.StartsWith(fullPath))
+                .ToListAsync(cancellationToken);
+            return representationAttributes;
+        }
+        
+        public async Task<List<SCIMRepresentationAttribute>> FindAttributesByExactFullPathAndValues(string fullPath, IEnumerable<string> values, CancellationToken cancellationToken)
+        {
+            var representationAttributes = await _scimDbContext.SCIMRepresentationAttributeLst.Include(a => a.SchemaAttribute).AsNoTracking()
+                .Where(a => values.Contains(a.ValueString) && a.FullPath == fullPath)
+                .ToListAsync(cancellationToken);
+            return representationAttributes;
+        }
+
+        public async Task<List<SCIMRepresentationAttribute>> FindAttributesByExactFullPathAndRepresentationIds(string fullPath, IEnumerable<string> values, CancellationToken cancellationToken)
+        {
+            var representationAttributes = await _scimDbContext.SCIMRepresentationAttributeLst.Include(a => a.SchemaAttribute).AsNoTracking()
+                .Where(a => values.Contains(a.RepresentationId) && a.FullPath == fullPath)
+                .ToListAsync(cancellationToken);
+            return representationAttributes;
+        }
+
+        public async Task<List<SCIMRepresentationAttribute>> FindAttributesBySchemaAttributeAndValues(string schemaAttributeId, IEnumerable<string> values, CancellationToken cancellationToken)
+        {
+            var representationAttributes = await _scimDbContext.SCIMRepresentationAttributeLst.Include(a => a.SchemaAttribute).AsNoTracking()
+                .Where(a => values.Contains(a.ValueString) && a.SchemaAttributeId == schemaAttributeId)
+                .ToListAsync(cancellationToken);
+            return representationAttributes;
+        }
+
+        public async Task<List<SCIMRepresentationAttribute>> FindAttributesByReference(List<string> representationIds, string schemaAttributeId, string value, CancellationToken cancellationToken)
+        {
+            var representationAttributes = await _scimDbContext.SCIMRepresentationAttributeLst.Include(s => s.SchemaAttribute).AsNoTracking()
+                .Where(a => representationIds.Contains(a.RepresentationId) && a.SchemaAttributeId == schemaAttributeId && a.ValueString == value)
+                .ToListAsync(cancellationToken);
+            return representationAttributes;
+        }
+
+        public async Task<List<SCIMRepresentationAttribute>> FindAttributesByValue(string attrSchemaId, string value)
+        {
+            var result = await _scimDbContext.SCIMRepresentationAttributeLst.Include(a => a.SchemaAttribute).AsNoTracking()
+                .Where(a => a.SchemaAttribute.Id == attrSchemaId && a.ValueString == value)
+                .ToListAsync();
+            return result;
+        }
+
+        public async Task<List<SCIMRepresentationAttribute>> FindAttributesByValue(string attrSchemaId, int value)
+        {
+            var result = await _scimDbContext.SCIMRepresentationAttributeLst.Include(a => a.SchemaAttribute).AsNoTracking()
+                .Where(a => a.SchemaAttribute.Id == attrSchemaId && a.ValueInteger == value)
+                .ToListAsync();
+            return result;
         }
 
         public Task BulkInsert(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes)
@@ -172,10 +201,16 @@ namespace SimpleIdServer.Scim.Persistence.EF
         {
             var bulkConfig = new BulkConfig
             {
-                PropertiesToInclude = new List<string> { nameof(SCIMRepresentationAttribute.ValueString) }
+                PropertiesToInclude = new List<string> { nameof(SCIMRepresentationAttribute.ValueString), nameof(SCIMRepresentationAttribute.ComputedValueIndex) }
             };
             bulkConfig = GetBulkConfig(BulkOperations.UPDATE, bulkConfig);
             await _scimDbContext.BulkUpdateAsync(scimRepresentationAttributes.ToList(), bulkConfig);
+        }
+
+        public async Task<ITransaction> StartTransaction(CancellationToken token)
+        {
+            var transaction = await _scimDbContext.Database.BeginTransactionAsync(token);
+            return new EFTransaction(_scimDbContext, transaction);
         }
 
         private BulkConfig GetBulkConfig(BulkOperations operation) => GetBulkConfig(operation, null);
@@ -188,9 +223,11 @@ namespace SimpleIdServer.Scim.Persistence.EF
             return bulkConfig;
         }
 
-        public Task<List<SCIMRepresentationAttribute>> FindAttributes(string representationId, SCIMAttributeExpression attrExpression, CancellationToken cancellationToken)
+        private void ResolveChildren(IQueryable<SCIMRepresentationAttribute> representationAttributes, string parentId, List<SCIMRepresentationAttribute> children)
         {
-            throw new System.NotImplementedException();
+            var filteredAttributes = representationAttributes.Where(a => a.ParentAttributeId == parentId);
+            children.AddRange(filteredAttributes);
+            foreach (var fAttr in filteredAttributes) ResolveChildren(representationAttributes, fAttr.Id, children);
         }
     }
 }

@@ -17,7 +17,7 @@ namespace SimpleIdServer.Scim.Benchmark
     [RPlotExporter]
     public class ScimBenchmark
     {
-        private const string baseUrl = "http://localhost:5002";
+        private const string baseUrl = "https://localhost:5003";
         private string _groupId;
 
         [Benchmark]
