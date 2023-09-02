@@ -13,11 +13,11 @@ using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Resources;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace SimpleIdServer.Scim.Helpers
 {
@@ -139,6 +139,14 @@ namespace SimpleIdServer.Scim.Helpers
                     case SCIMPatchOperations.REMOVE:
                         {
                             if (scimFilter == null) throw new SCIMNoTargetException(string.Format(Global.InvalidPath, patch.Path));
+                            if (SCIMFilterParser.DontContainsFilter(patch.Path) && patch.Value != null)
+                            {
+                                var excludedAttributes = ExtractRepresentationAttributesFromJSON(representation.Schemas, schemaAttributes.ToList(), patch.Value, ignoreUnsupportedCanonicalValues);
+                                excludedAttributes = RemoveStandardReferenceProperties(excludedAttributes, attributeMappings);
+                                excludedAttributes = SCIMRepresentation.BuildHierarchicalAttributes(excludedAttributes);
+                                filteredAttributes = filteredAttributes.Where(a => excludedAttributes.Any(ea => ea.IsSimilar(a, true))).ToList();
+                            }
+
                             var attrToBeRemoved = filteredAttributes.Where(a => a.FullPath == fullPath || a.FullPath.StartsWith(fullPath)).ToList();
                             var removedRequiredAttributes = attrToBeRemoved.Where(a => a.SchemaAttribute.Required);
                             if (removedRequiredAttributes.Any())
@@ -179,20 +187,21 @@ namespace SimpleIdServer.Scim.Helpers
             foreach (var grp in hierarchicalNewAttributes.GroupBy(f => f.FullPath))
             {
                 var firstAttribute = grp.First();
-                var computedValueIndexLst = grp.Select(g => g.ComputedValueIndex);
-                var existingAttributes = await _scimRepresentationCommandRepository.FindAttributesByValueIndex(representation.Id, computedValueIndexLst, firstAttribute.SchemaAttributeId, cancellationToken);
-                if (existingAttributes.Count() == grp.Count()) continue;
-                var attrLstByPath = await _scimRepresentationCommandRepository.FindAttributesByFullPath(representation.Id, grp.Key, cancellationToken);
+                var computedValueIndexLst = grp.Select(g => g.ComputedValueIndex).ToList();
+                var existingAttributes = await _scimRepresentationCommandRepository.FindGraphAttributesBySchemaAttributeId(representation.Id, firstAttribute.SchemaAttributeId, cancellationToken);
+                existingAttributes = SCIMRepresentation.BuildHierarchicalAttributes(existingAttributes);
+                var attributesToBeRemoved = existingAttributes.Where(a => !computedValueIndexLst.Contains(a.ComputedValueIndex));
+                var flatAttributesToBeRemoved = attributesToBeRemoved.SelectMany(r => r.ToFlat());
+                var attributesToBeAdded = grp.Where(a => !existingAttributes.Any(ea => ea.ComputedValueIndex == a.ComputedValueIndex));
+                if (!attributesToBeRemoved.Any() && !attributesToBeAdded.Any()) continue;
+                foreach (var flatAttributeToBeRemoved in flatAttributesToBeRemoved) result.Remove(flatAttributeToBeRemoved);
 
-                var attrLstToBeRemoved = SCIMRepresentation.BuildHierarchicalAttributes(attrLstByPath).Where(a => !existingAttributes.Any(ea => ea.ComputedValueIndex == a.ComputedValueIndex)).SelectMany(r => r.ToFlat());
-                foreach (var attrToBeRemove in attrLstToBeRemoved) result.Remove(attrToBeRemove);
-
-                foreach (var newAttribute in grp.Where(a => !existingAttributes.Any(ea => ea.ComputedValueIndex == a.ComputedValueIndex)))
+                foreach (var newAttribute in attributesToBeAdded)
                 {
                     if (newAttribute.SchemaAttribute.Type != SCIMSchemaAttributeTypes.COMPLEX)
                     {
                         newAttribute.RepresentationId = representation.Id;
-                        if (attrLstToBeRemoved.Any()) newAttribute.ParentAttributeId = attrLstToBeRemoved.First().ParentAttributeId;
+                        if (attributesToBeRemoved.Any()) newAttribute.ParentAttributeId = attributesToBeRemoved.First().ParentAttributeId;
                         result.Add(newAttribute);
                     }
                     else

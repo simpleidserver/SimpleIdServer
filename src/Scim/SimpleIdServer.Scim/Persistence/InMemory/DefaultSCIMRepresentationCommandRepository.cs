@@ -1,6 +1,7 @@
 // Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Scim.Domains;
+using SimpleIdServer.Scim.Helpers;
 using SimpleIdServer.Scim.Parser.Expressions;
 using System;
 using System.Collections.Generic;
@@ -35,7 +36,7 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             return Task.FromResult(true);
         }
 
-        public Task<List<SCIMRepresentation>> FindPaginatedRepresentations(List<string> representationIds, string resourceType = null, int nbRecords = 50, bool ignoreAttributes = false)
+        public Task<List<SCIMRepresentation>> FindRepresentations(List<string> representationIds, string resourceType = null, int nbRecords = 50, bool ignoreAttributes = false)
         {
             var representations = LstData.AsQueryable().Where(r => representationIds.Contains(r.Id));
             if (!string.IsNullOrWhiteSpace(resourceType)) representations = representations.Where(r => r.ResourceType == resourceType);
@@ -44,8 +45,7 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
 
         public Task<List<SCIMRepresentationAttribute>> FindPaginatedGraphAttributes(string valueStr, string schemaAttributeId, int nbRecords = 50, string sourceRepresentationId = null)
         {
-            var allAttributes = LstData.SelectMany(r => r.FlatAttributes);
-            var query = allAttributes
+            var query = _attributes
                 .Where(a => a.SchemaAttributeId == schemaAttributeId && a.ValueString == valueStr || (sourceRepresentationId != null && a.ValueString == sourceRepresentationId))
                 .OrderBy(r => r.ParentAttributeId)
                 .Select(r => r.ParentAttributeId);
@@ -55,7 +55,7 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             for (var i = 0; i <= nbPages; i++)
             {
                 var parentIds = query.Skip(i * nbRecords).Take(nbRecords);
-                var result = allAttributes
+                var result = _attributes
                     .Where(a => parentIds.Contains(a.Id) || parentIds.Contains(a.ParentAttributeId));
                 results.AddRange(result);
             }
@@ -83,6 +83,30 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             return Task.FromResult(results);
         }
 
+        public Task<List<SCIMRepresentationAttribute>> FindGraphAttributesBySchemaAttributeId(string representationId, string schemaAttributeId, CancellationToken cancellationToken)
+        {
+            var query = _attributes
+                .Where(a => a.SchemaAttributeId == schemaAttributeId && a.RepresentationId == representationId)
+                .OrderBy(r => r.Id);
+            var ids = query.Select(p => p.Id).Where(p => p != null);
+            if (!ids.Any()) return Task.FromResult(query.ToList());
+            var result = _attributes
+                    .Where(a => ids.Contains(a.Id) || ids.Contains(a.ParentAttributeId)).ToList();
+            return Task.FromResult(result);
+        }
+
+        public Task<List<SCIMRepresentationAttribute>> FindGraphAttributesBySchemaAttributeId(List<string> representationIds, string schemaAttributeId, CancellationToken cancellationToken)
+        {
+            var query = _attributes
+                .Where(a => a.SchemaAttributeId == schemaAttributeId && representationIds.Contains(a.RepresentationId))
+                .OrderBy(r => r.Id);
+            var ids = query.Select(p => p.Id).Where(p => p != null);
+            if (!ids.Any()) return Task.FromResult(query.ToList());
+            var result = _attributes
+                    .Where(a => ids.Contains(a.Id) || ids.Contains(a.ParentAttributeId)).ToList();
+            return Task.FromResult(result);
+        }
+
         public Task<List<SCIMRepresentationAttribute>> FindAttributes(string representationId, SCIMAttributeExpression pathExpression, CancellationToken cancellationToken)
         {
             var representationAttributes = _attributes.Where(a => a.RepresentationId == representationId);
@@ -103,6 +127,30 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
         public Task<List<SCIMRepresentationAttribute>> FindAttributesByFullPath(string representationId, string fullPath, CancellationToken cancellationToken)
         {
             var representationAttributes = _attributes.Where(a => a.RepresentationId == representationId && a.FullPath.StartsWith(fullPath));
+            return Task.FromResult(representationAttributes.ToList());
+        }
+
+        public Task<List<SCIMRepresentationAttribute>> FindAttributesByExactFullPathAndValues(string fullPath, IEnumerable<string> values, CancellationToken cancellationToken)
+        {
+            var representationAttributes = _attributes.Where(a => values.Contains(a.ValueString) && a.FullPath == fullPath);
+            return Task.FromResult(representationAttributes.ToList());
+        }
+
+        public Task<List<SCIMRepresentationAttribute>> FindAttributesByExactFullPathAndRepresentationIds(string fullPath, IEnumerable<string> values, CancellationToken cancellationToken)
+        {
+            var representationAttributes = _attributes.Where(a => values.Contains(a.RepresentationId) && a.FullPath == fullPath);
+            return Task.FromResult(representationAttributes.ToList());
+        }
+
+        public Task<List<SCIMRepresentationAttribute>> FindAttributesBySchemaAttributeAndValues(string schemaAttributeId, IEnumerable<string> values, CancellationToken cancellationToken)
+        {
+            var representationAttributes = _attributes.Where(a => values.Contains(a.ValueString) && a.SchemaAttributeId == schemaAttributeId);
+            return Task.FromResult(representationAttributes.ToList());
+        }
+
+        public Task<List<SCIMRepresentationAttribute>> FindAttributesByReference(List<string> representationIds, string schemaAttributeId, string value, CancellationToken cancellationToken)
+        {
+            var representationAttributes = _attributes.Where(a => representationIds.Contains(a.RepresentationId) && a.SchemaAttributeId == schemaAttributeId && a.ValueString == value);
             return Task.FromResult(representationAttributes.ToList());
         }
 

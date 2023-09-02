@@ -31,7 +31,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
             return result;
         }
         
-        public async Task<List<SCIMRepresentation>> FindPaginatedRepresentations(List<string> representationIds, string resourceType = null, int nbRecords = 50, bool ignoreAttributes = false)
+        public async Task<List<SCIMRepresentation>> FindRepresentations(List<string> representationIds, string resourceType = null, int nbRecords = 50, bool ignoreAttributes = false)
         {
             var chunks = representationIds.Chunk(nbRecords).ToList();
             var representations = new List<SCIMRepresentation>();

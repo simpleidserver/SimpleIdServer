@@ -181,6 +181,68 @@ Scenario: Check group can be updated with multiple users
 	Then JSON exists 'members[0].value'
 	Then JSON exists 'members[1].value'
 
+Scenario: Add a user to a group (HTTP PATCH)
+	When execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | firstGroup                                        |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen2                                                                                                          |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'userId'
+		
+	And execute HTTP PATCH JSON request 'http://localhost/Groups/$firstGroup$'
+	| Key        | Value                                                                        |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                          |
+	| Operations | [ { "op": "add", "path": "members", "value": [ { "value": "$userId$" } ] } ] |
+
+	And execute HTTP GET request 'http://localhost/Users/$userId$'	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	Then JSON 'groups[0].type'='direct'
+
+Scenario: Remove a user from a group (HTTP PATCH)
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen2                                                                                                          |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'userId'
+
+	When execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | firstGroup                                        |
+	| members     | [ { "value": "$userId$" } ]                       |                                            
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstGroup'
+		
+	And execute HTTP PATCH JSON request 'http://localhost/Groups/$firstGroup$'
+	| Key        | Value                                                    |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]      |
+	| Operations | [ { "op": "remove", "path": "members" } ]				|
+
+	And execute HTTP GET request 'http://localhost/Users/$userId$'	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+
 Scenario: Add a user to a sub group and check user belongs to two groups (HTTP PATCH)
 	When execute HTTP POST JSON request 'http://localhost/Groups'
 	| Key         | Value                                             |

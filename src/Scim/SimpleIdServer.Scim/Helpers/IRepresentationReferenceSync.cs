@@ -9,7 +9,6 @@ namespace SimpleIdServer.Scim.Helpers
 {
     public interface IRepresentationReferenceSync
     {
-        Task<List<RepresentationSyncResult>> Sync(List<SCIMAttributeMapping> attributeMappingLst, string resourceType, SCIMRepresentation oldScimRepresentation, SCIMRepresentation newSourceScimRepresentation, string location, SCIMSchema schema, bool updateAllReferences = false, bool isScimRepresentationRemoved = false);
         Task<List<RepresentationSyncResult>> Sync(string resourceType, SCIMRepresentation newSourceScimRepresentation, ICollection<SCIMPatchResult> patchOperations, string location, SCIMSchema schema, bool updateAllReference = false);
         Task<List<RepresentationSyncResult>> Sync(string resourceType, SCIMRepresentation oldSourceScimRepresentation, SCIMRepresentation newSourceScimRepresentation, string location, SCIMSchema schema, bool updateAllReferences = true, bool isScimRepresentationRemoved = false);
         Task<bool> IsReferenceProperty(ICollection<string> attributes);

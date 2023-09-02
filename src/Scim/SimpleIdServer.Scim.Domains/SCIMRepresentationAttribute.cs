@@ -10,6 +10,11 @@ namespace SimpleIdServer.Scim.Domains
     [DebuggerDisplay("FullPath = {FullPath}, Id = {Id}, ParentAttributeId = {ParentAttributeId}, AttributeId = {AttributeId}")]
     public class SCIMRepresentationAttribute : BaseDomain, IComparable<SCIMRepresentationAttribute>
     {
+        private ICollection<string> _computedAttributeNames = new List<string>
+        {
+            "display", "type"
+        };
+
         public SCIMRepresentationAttribute()
         {
             Children = new List<SCIMRepresentationAttribute>();
@@ -103,6 +108,7 @@ namespace SimpleIdServer.Scim.Domains
 
         public string GetValueIndex()
         {
+            if (_computedAttributeNames.Contains(SchemaAttribute.Name)) return null; 
             string value = null;
             switch (SchemaAttribute.Type)
             {
@@ -269,7 +275,8 @@ namespace SimpleIdServer.Scim.Domains
                 SchemaAttributeId = SchemaAttributeId,
                 Namespace = Namespace,
                 RepresentationId = RepresentationId,
-                ResourceType = ResourceType
+                ResourceType = ResourceType,
+                ComputedValueIndex = ComputedValueIndex
             };
             return result;
         }

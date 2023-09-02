@@ -55,7 +55,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             return result.Select(x => x as SCIMRepresentation).ToList();
         }
 
-        public Task<List<SCIMRepresentation>> FindPaginatedRepresentations(List<string> representationIds, string resourceType = null, int nbRecords = 50, bool ignoreAttributes = false)
+        public Task<List<SCIMRepresentation>> FindRepresentations(List<string> representationIds, string resourceType = null, int nbRecords = 50, bool ignoreAttributes = false)
         {
             var representations = new List<SCIMRepresentation>();
             var nb = representationIds.Count();
