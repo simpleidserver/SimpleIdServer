@@ -5,7 +5,7 @@ using SimpleIdServer.Scim.Infrastructure;
 
 namespace SimpleIdServer.Scim.Commands
 {
-    public class ReplaceRepresentationCommand : ISCIMCommand<EmptyResult>
+    public class ReplaceRepresentationCommand : ISCIMCommand<ReplaceRepresentationResult>
     {
         public ReplaceRepresentationCommand(string id, string resourceType, RepresentationParameter representation, string location)
         {
@@ -19,5 +19,20 @@ namespace SimpleIdServer.Scim.Commands
         public string ResourceType{ get; private set; }
         public RepresentationParameter Representation { get; private set; }
         public string Location { get; }
+    }
+
+    public class ReplaceRepresentationResult
+    {
+        public bool IsReplaced { get; private set; }
+
+        public static ReplaceRepresentationResult NoReplacement()
+        {
+            return new ReplaceRepresentationResult { IsReplaced = false };
+        }
+
+        public static ReplaceRepresentationResult Ok()
+        {
+            return new ReplaceRepresentationResult { IsReplaced = true };
+        }
     }
 }

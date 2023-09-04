@@ -2,11 +2,14 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
 using SimpleIdServer.Scim.Domains;
+using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
 using SimpleIdServer.Scim.Helpers;
 using SimpleIdServer.Scim.Infrastructure;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Resources;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Commands.Handlers
@@ -33,13 +36,20 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             if (schema == null) throw new SCIMSchemaNotFoundException();
             var representation = await _scimRepresentationCommandRepository.Get(request.Id);
             if (representation == null) throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, request.Id));
-            var references = await _representationReferenceSync.Sync(request.ResourceType, representation, representation, request.Location, schema, true, true);
+            var attributes = await _scimRepresentationCommandRepository.FindAttributes(representation.Id, CancellationToken.None);
+            var pathOperations = attributes.Select(a => new SCIMPatchResult
+            {
+                Attr = a,
+                Operation = SCIMPatchOperations.REMOVE,
+                Path = a.FullPath
+            }).ToList();
+            var references = await _representationReferenceSync.Sync(request.ResourceType, representation, pathOperations, request.Location, schema, true);
             await using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
             {
                 foreach (var reference in references)
                 {
-                    await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes).ConfigureAwait(false);
-                    await _scimRepresentationCommandRepository.BulkDelete(reference.RemovedRepresentationAttributes).ConfigureAwait(false);
+                    await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes, representation.Id, true).ConfigureAwait(false);
+                    await _scimRepresentationCommandRepository.BulkDelete(reference.RemovedRepresentationAttributes, representation.Id, true).ConfigureAwait(false);
                 }
 
                 await _scimRepresentationCommandRepository.Delete(representation).ConfigureAwait(false);

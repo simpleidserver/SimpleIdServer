@@ -118,6 +118,12 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             return Task.FromResult(allAttributes);
         }
 
+        public Task<List<SCIMRepresentationAttribute>> FindAttributes(string representationId, CancellationToken cancellationToken)
+        {
+            var representationAttributes = _attributes.Where(a => a.RepresentationId == representationId).ToList();
+            return Task.FromResult(representationAttributes);
+        }
+
         public Task<List<SCIMRepresentationAttribute>> FindAttributesByAproximativeFullPath(string representationId, string fullPath, CancellationToken cancellationToken)
         {
             var representationAttributes = _attributes.Where(a => a.RepresentationId == representationId && a.FullPath.StartsWith(fullPath));
@@ -160,14 +166,14 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             return Task.FromResult(result);
         }
 
-        public Task BulkInsert(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes, bool isReference = false)
+        public Task BulkInsert(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes, string currentRepresentationId, bool isReference = false)
         {
             foreach(var scimRepresentationAttr in scimRepresentationAttributes)
                 _attributes.Add(scimRepresentationAttr);
             return Task.CompletedTask;
         }
 
-        public Task BulkDelete(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes, bool isReference = false)
+        public Task BulkDelete(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes, string currentRepresentationId, bool isReference = false)
         {
             foreach (var scimRepresentationAttr in scimRepresentationAttributes)
             {

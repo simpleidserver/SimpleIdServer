@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
 using SimpleIdServer.Scim.Domains;
+using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
 using SimpleIdServer.Scim.Helpers;
 using SimpleIdServer.Scim.Infrastructure;
@@ -62,13 +63,19 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             scimRepresentation.SetVersion(0);
             scimRepresentation.SetResourceType(addRepresentationCommand.ResourceType);
             await _representationHelper.CheckUniqueness(scimRepresentation.FlatAttributes);
-            var references = await _representationReferenceSync.Sync(addRepresentationCommand.ResourceType, new SCIMRepresentation(), scimRepresentation, addRepresentationCommand.Location, schema);
+            var patchOperations = scimRepresentation.FlatAttributes.Select(a => new SCIMPatchResult
+            {
+                Attr = a,
+                Operation = SCIMPatchOperations.ADD,
+                Path = a.FullPath
+            }).ToList();
+            var references = await _representationReferenceSync.Sync(addRepresentationCommand.ResourceType, scimRepresentation, patchOperations, addRepresentationCommand.Location, schema, false);
             await using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
             {
                 await _scimRepresentationCommandRepository.Add(scimRepresentation).ConfigureAwait(false);
                 foreach (var reference in references)
                 {
-                    await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes, true).ConfigureAwait(false);
+                    await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes, scimRepresentation.Id, true).ConfigureAwait(false);
                 }
 
                 await transaction.Commit().ConfigureAwait(false);

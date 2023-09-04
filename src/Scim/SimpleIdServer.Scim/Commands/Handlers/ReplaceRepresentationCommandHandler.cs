@@ -38,7 +38,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             _representationHelper = representationHelper;
         }
 
-        public async virtual Task<GenericResult<EmptyResult>> Handle(ReplaceRepresentationCommand replaceRepresentationCommand)
+        public async virtual Task<GenericResult<ReplaceRepresentationResult>> Handle(ReplaceRepresentationCommand replaceRepresentationCommand)
         {
             var kvp = await Validate(replaceRepresentationCommand);
             var existingRepresentation = kvp.Item1;
@@ -54,6 +54,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             };
             var attributeMappings = await _scimAttributeMappingQueryRepository.GetBySourceResourceType(replaceRepresentationCommand.ResourceType);
             var patchResult = await _representationHelper.Apply(existingRepresentation, patchParameters, attributeMappings, true, CancellationToken.None);
+            if (!patchResult.Patches.Any()) return GenericResult<ReplaceRepresentationResult>.Ok(ReplaceRepresentationResult.NoReplacement());
             var patchOperations = patchResult.Patches.Where(p => p.Attr != null).ToList();
             var displayNameDifferent = existingRepresentation.DisplayName != oldDisplayName;
             var modifiedAttributes = patchOperations.Where(p => p.Operation != SCIMPatchOperations.REMOVE && p.Attr != null && !p.Attr.IsLeaf() && p.Attr.SchemaAttribute.MultiValued == false).Select(p => p.Attr);
@@ -62,14 +63,14 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var references = await _representationReferenceSync.Sync(existingRepresentation.ResourceType, existingRepresentation, patchOperations, replaceRepresentationCommand.Location, schema, displayNameDifferent);
             await using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
             {
-                await _scimRepresentationCommandRepository.BulkDelete(patchOperations.Where(p => p.Operation == SCIMPatchOperations.REMOVE).Select(p => p.Attr)).ConfigureAwait(false);
-                await _scimRepresentationCommandRepository.BulkInsert(patchOperations.Where(p => p.Operation == SCIMPatchOperations.ADD).Select(p => p.Attr)).ConfigureAwait(false);
+                await _scimRepresentationCommandRepository.BulkDelete(patchOperations.Where(p => p.Operation == SCIMPatchOperations.REMOVE).Select(p => p.Attr), existingRepresentation.Id).ConfigureAwait(false);
+                await _scimRepresentationCommandRepository.BulkInsert(patchOperations.Where(p => p.Operation == SCIMPatchOperations.ADD).Select(p => p.Attr), existingRepresentation.Id).ConfigureAwait(false);
                 await _scimRepresentationCommandRepository.BulkUpdate(patchOperations.Where(p => p.Operation == SCIMPatchOperations.REPLACE).Select(p => p.Attr)).ConfigureAwait(false);
 
                 foreach (var reference in references)
                 {
-                    await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes, true).ConfigureAwait(false);
-                    await _scimRepresentationCommandRepository.BulkDelete(reference.RemovedRepresentationAttributes, true).ConfigureAwait(false);
+                    await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes, existingRepresentation.Id, true).ConfigureAwait(false);
+                    await _scimRepresentationCommandRepository.BulkDelete(reference.RemovedRepresentationAttributes, existingRepresentation.Id, true).ConfigureAwait(false);
                     await _scimRepresentationCommandRepository.BulkUpdate(reference.UpdatedRepresentationAttributes, true).ConfigureAwait(false);
                 }
 
@@ -78,7 +79,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 await NotifyAllReferences(references).ConfigureAwait(false);
             }
 
-            return GenericResult<EmptyResult>.Ok(EmptyResult.Empty);
+            return GenericResult<ReplaceRepresentationResult>.Ok(ReplaceRepresentationResult.Ok());
         }
 
         private async Task<(SCIMRepresentation, SCIMSchema)> Validate(ReplaceRepresentationCommand replaceRepresentationCommand)

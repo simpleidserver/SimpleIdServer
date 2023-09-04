@@ -205,6 +205,9 @@ namespace SimpleIdServer.Scim.SqlServerMigrations.Migrations
                     b.Property<string>("FullPath")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsComputed")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Namespace")
                         .HasColumnType("nvarchar(max)");
 

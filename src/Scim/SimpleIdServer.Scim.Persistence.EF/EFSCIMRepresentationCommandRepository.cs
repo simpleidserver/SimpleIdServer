@@ -128,6 +128,12 @@ namespace SimpleIdServer.Scim.Persistence.EF
             return filteredAttributes;
         }
 
+        public async Task<List<SCIMRepresentationAttribute>> FindAttributes(string representationId, CancellationToken cancellationToken)
+        {
+            var representationAttributes = await _scimDbContext.SCIMRepresentationAttributeLst.Where(r => r.RepresentationId == representationId).ToListAsync(cancellationToken);
+            return representationAttributes;
+        }
+
         public async Task<List<SCIMRepresentationAttribute>> FindAttributesByAproximativeFullPath(string representationId, string fullPath, CancellationToken cancellationToken)
         {
             var representationAttributes = await _scimDbContext.SCIMRepresentationAttributeLst.Include(a => a.SchemaAttribute).AsNoTracking()
@@ -184,20 +190,23 @@ namespace SimpleIdServer.Scim.Persistence.EF
             return result;
         }
 
-        public Task BulkInsert(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes, bool isReference = false)
+        public Task BulkInsert(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes, string currentRepresentationId, bool isReference = false)
         {
+            scimRepresentationAttributes = scimRepresentationAttributes.Where(r => !string.IsNullOrWhiteSpace(r.RepresentationId));
             var bulkConfig = GetBulkConfig(BulkOperations.INSERT);
             return _scimDbContext.BulkInsertAsync(scimRepresentationAttributes.ToList(), bulkConfig);
         }
 
-        public Task BulkDelete(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes, bool isReference = false)
+        public Task BulkDelete(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes, string currentRepresentationId, bool isReference = false)
         {
+            scimRepresentationAttributes = scimRepresentationAttributes.Where(r => !string.IsNullOrWhiteSpace(r.RepresentationId));
             var bulkConfig = GetBulkConfig(BulkOperations.DELETE);
             return _scimDbContext.BulkDeleteAsync(scimRepresentationAttributes.ToList(), bulkConfig);
         }
 
         public async Task BulkUpdate(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes, bool isReference = false)
         {
+            scimRepresentationAttributes = scimRepresentationAttributes.Where(r => !string.IsNullOrWhiteSpace(r.RepresentationId));
             var bulkConfig = new BulkConfig
             {
                 PropertiesToInclude = new List<string> { nameof(SCIMRepresentationAttribute.ValueString), nameof(SCIMRepresentationAttribute.ComputedValueIndex) }

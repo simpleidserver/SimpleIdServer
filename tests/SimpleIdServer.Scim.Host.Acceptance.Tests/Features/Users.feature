@@ -172,8 +172,7 @@ Scenario: Check complex immutable attribute can be updated with the same value
 	
 	And extract JSON from body
 	
-	Then HTTP status code equals to '200'
-	Then JSON 'complexImmutable[0].value'='immutable'		
+	Then HTTP status code equals to '204'
 
 Scenario: Check record can be added into an array of immutable records
 	When execute HTTP POST JSON request 'http://localhost/Users'

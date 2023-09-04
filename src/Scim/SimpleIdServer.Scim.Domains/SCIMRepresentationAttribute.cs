@@ -82,6 +82,7 @@ namespace SimpleIdServer.Scim.Domains
         [Newtonsoft.Json.JsonIgnore]
         [System.Text.Json.Serialization.JsonIgnore]
         public ICollection<SCIMRepresentationAttribute> CachedChildren { get; set; }
+        public bool IsComputed { get; set; }
 
         #endregion
 
@@ -108,7 +109,7 @@ namespace SimpleIdServer.Scim.Domains
 
         public string GetValueIndex()
         {
-            if (_computedAttributeNames.Contains(SchemaAttribute.Name)) return null; 
+            if (IsComputed) return null;
             string value = null;
             switch (SchemaAttribute.Type)
             {

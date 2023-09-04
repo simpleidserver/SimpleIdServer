@@ -555,6 +555,7 @@ namespace SimpleIdServer.Scim.Api
             {
                 var updateResult = await _replaceRepresentationCommandHandler.Handle(new ReplaceRepresentationCommand(id, _resourceType, representationParameter, _uriProvider.GetAbsoluteUriWithVirtualPath()));
                 if (updateResult.HasError) return this.BuildError(updateResult);
+                if (!updateResult.Result.IsReplaced) return NoContent();
                 var kvp = await GetRepresentation(id);
                 var representation = kvp.Item1;
                 var content = kvp.Item2;

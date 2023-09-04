@@ -220,7 +220,7 @@ namespace SimpleIdServer.Scim.Helpers
         private void UpdateCommonAttributes(PatchOperationParameter patch, SCIMRepresentation representation, SCIMRepresentationPatchResult result, IEnumerable<SCIMSchemaAttribute> schemaAttributes)
         {
             bool hasExternalId = false;
-            if ((hasExternalId = TryGetExternalId(patch, out string externalId)))
+            if ((hasExternalId = TryGetExternalId(patch, out string externalId)) && representation.ExternalId != externalId)
             {
                 representation.ExternalId = externalId;
                 result.AddExternalId();
@@ -229,7 +229,7 @@ namespace SimpleIdServer.Scim.Helpers
             if (!hasExternalId && (schemaAttributes == null || !schemaAttributes.Any()))
                 throw new SCIMNoTargetException(string.Format(Global.AttributeIsNotRecognirzed, patch.Path));
 
-            if (TryGetDisplayName(patch, out string displayName))
+            if (TryGetDisplayName(patch, out string displayName) && representation.DisplayName != displayName)
                 representation.SetDisplayName(displayName);
         }
 
@@ -409,7 +409,7 @@ namespace SimpleIdServer.Scim.Helpers
             var result = new List<SCIMRepresentationAttribute>();
             foreach (var newHierarchicalAttribute in newHierarchicalAttributes)
             {
-                if (existingAttributes.Any(a => a.IsSimilar(newHierarchicalAttribute, true))) continue;
+                if (existingAttributes.Any(a => a.ComputedValueIndex == newHierarchicalAttribute.ComputedValueIndex)) continue;
                 result.Add(newHierarchicalAttribute);
             }
 

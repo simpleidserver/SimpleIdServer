@@ -4,7 +4,7 @@ using SimpleIdServer.Scim.Infrastructure;
 
 namespace SimpleIdServer.Scim.Commands.Handlers
 {
-    public interface IReplaceRepresentationCommandHandler : ISCIMCommandHandler<ReplaceRepresentationCommand, EmptyResult>
+    public interface IReplaceRepresentationCommandHandler : ISCIMCommandHandler<ReplaceRepresentationCommand, ReplaceRepresentationResult>
     {
     }
 }
