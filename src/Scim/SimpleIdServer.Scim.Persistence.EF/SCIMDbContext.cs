@@ -18,6 +18,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
 
         public DbSet<SCIMAttributeMapping> SCIMAttributeMappingLst { get; set; }
         public DbSet<SCIMSchema> SCIMSchemaLst { get; set; }
+        public DbSet<SCIMSchemaAttribute> SCIMSchemaAttribute { get; set; }
         public DbSet<SCIMRepresentation> SCIMRepresentationLst { get; set; }
         public DbSet<SCIMRepresentationAttribute> SCIMRepresentationAttributeLst { get; set; }
         public DbSet<ProvisioningConfiguration> ProvisioningConfigurations { get; set; }

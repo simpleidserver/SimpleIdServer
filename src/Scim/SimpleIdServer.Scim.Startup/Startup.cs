@@ -9,8 +9,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
 using SimpleIdServer.Scim.Domains;
-using SimpleIdServer.Scim.Persistence.EF;
+using SimpleIdServer.Scim.Persistence.MongoDB.Extensions;
 using SimpleIdServer.Scim.Startup.Configurations;
 using SimpleIdServer.Scim.Startup.Consumers;
 using SimpleIdServer.Scim.Startup.Services;
@@ -109,10 +110,15 @@ namespace SimpleIdServer.Scim.Startup
         {
             var section = Configuration.GetSection(nameof(StorageConfiguration));
             var conf = section.Get<StorageConfiguration>();
-            if (conf.Type == StorageTypes.MONGODB) return;
+            if (conf.Type == StorageTypes.MONGODB)
+            {
+                // MigrateFrom403To404MongoDB(app);
+                return;
+            }
+
             using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
-                using (var context = scope.ServiceProvider.GetService<SCIMDbContext>())
+                using (var context = scope.ServiceProvider.GetService<Persistence.EF.SCIMDbContext>())
                 {
                     context.Database.Migrate();
                     var basePath = Path.Combine(Env.ContentRootPath, "Schemas");
@@ -174,6 +180,62 @@ namespace SimpleIdServer.Scim.Startup
                     }
 
                     context.SaveChanges();
+                }
+            }
+
+            // MigrateFrom403To404EF(app);
+        }
+
+        private static void MigrateFrom403To404EF(IApplicationBuilder app)
+        {
+            using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+            {
+                using (var context = scope.ServiceProvider.GetService<Persistence.EF.SCIMDbContext>())
+                {
+                    // Update IsComputedField
+                    var targetAttributeIds = context.SCIMAttributeMappingLst.Where(a => a.TargetAttributeId != null).Select(a => a.TargetAttributeId);
+                    var allIds = context.SCIMSchemaAttribute.Where(a => targetAttributeIds.Contains(a.ParentId) && (a.FullPath.EndsWith("display") || a.FullPath.EndsWith("type"))).Select(a => a.Id).ToList();
+                    var filteredAttributes = context.SCIMRepresentationAttributeLst.Where(a => allIds.Contains(a.SchemaAttributeId));
+                    foreach (var filteredAttribute in filteredAttributes)
+                        filteredAttribute.IsComputed = true;
+                    context.SaveChanges();
+
+                    // Update ComputedIndex
+                    var groupedAttributes = context.SCIMRepresentationAttributeLst.Include(a => a.SchemaAttribute).GroupBy(a => a.RepresentationId);
+                    foreach(var grp in groupedAttributes)
+                    {
+                        SCIMRepresentation.BuildHierarchicalAttributes(grp).SelectMany(a => a.ToFlat());
+                    }
+
+                    context.SaveChanges();
+                }
+            }
+        }
+
+        private static async void MigrateFrom403To404MongoDB(IApplicationBuilder app)
+        {
+            using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+            {
+                using (var context = scope.ServiceProvider.GetService<Persistence.MongoDB.SCIMDbContext>())
+                {   
+                    // Update IsComputedField
+                    var targetAttributeIds = await context.SCIMAttributeMappingLst.AsQueryable().Where(a => a.TargetAttributeId != null).Select(a => a.TargetAttributeId).ToMongoListAsync();
+                    var schemas = await context.SCIMSchemaLst.AsQueryable().ToMongoListAsync();
+                    var allIds = schemas.SelectMany(s => s.Attributes).Where(a => targetAttributeIds.Contains(a.ParentId) && (a.FullPath.EndsWith("display") || a.FullPath.EndsWith("type"))).Select(a => a.Id);
+                    var filteredAttributes = await context.SCIMRepresentationAttributeLst.AsQueryable().Where(a => allIds.Contains(a.SchemaAttributeId)).ToMongoListAsync();
+                    foreach (var filteredAttribute in filteredAttributes)
+                        filteredAttribute.IsComputed = true;
+                    foreach (var attr in filteredAttributes)
+                        await context.SCIMRepresentationAttributeLst.ReplaceOneAsync(s => s.Id == attr.Id, attr, new ReplaceOptions { IsUpsert = true });
+
+                    // Update ComputedIndex
+                    var groupedAttributes = context.SCIMRepresentationAttributeLst.AsQueryable().GroupBy(b => b.RepresentationId);
+                    foreach (var grp in groupedAttributes)
+                    {
+                        var attrs = SCIMRepresentation.BuildHierarchicalAttributes(grp).SelectMany(a => a.ToFlat());
+                        foreach (var attr in attrs)
+                            await context.SCIMRepresentationAttributeLst.ReplaceOneAsync(s => s.Id == attr.Id, attr, new ReplaceOptions { IsUpsert = true });
+                    }
                 }
             }
         }

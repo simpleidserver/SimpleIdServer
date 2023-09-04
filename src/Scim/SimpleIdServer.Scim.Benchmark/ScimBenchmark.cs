@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Benchmark
 {
-    [SimpleJob(RunStrategy.ColdStart, targetCount: 300)]
+    [SimpleJob(RunStrategy.ColdStart, targetCount: 50)]
     [MinColumn, MaxColumn, MeanColumn, MedianColumn]
     [CsvExporter]
     [HtmlExporter]
