@@ -68,7 +68,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 await _scimRepresentationCommandRepository.Add(scimRepresentation).ConfigureAwait(false);
                 foreach (var reference in references)
                 {
-                    await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes).ConfigureAwait(false);
+                    await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes, true).ConfigureAwait(false);
                 }
 
                 await transaction.Commit().ConfigureAwait(false);

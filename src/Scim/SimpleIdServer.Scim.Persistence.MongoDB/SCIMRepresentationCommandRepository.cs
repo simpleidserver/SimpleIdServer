@@ -5,6 +5,7 @@ using MongoDB.Driver;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Parser.Expressions;
 using SimpleIdServer.Scim.Persistence.MongoDB.Extensions;
+using SimpleIdServer.Scim.Persistence.MongoDB.Infrastructures;
 using SimpleIdServer.Scim.Persistence.MongoDB.Models;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,8 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 {
     public class SCIMRepresentationCommandRepository : ISCIMRepresentationCommandRepository
     {
+        private List<string> _removedAttributeIds = new List<string>();
+        private List<string> _addedAttributeIds = new List<string>();
         private readonly SCIMDbContext _scimDbContext;
         private readonly IMongoClient _mongoClient;
         private readonly MongoDbOptions _options;
@@ -39,164 +42,37 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             return result;
         }
 
-        public async Task<List<SCIMRepresentation>> FindSCIMRepresentationByIds(IEnumerable<string> representationIds)
-        {
-            var result = await _scimDbContext.SCIMRepresentationLst.AsQueryable()
-                .Where(r => representationIds.Contains(r.Id))
-                .ToMongoListAsync();
-            if (result.Any())
-            {
-                var references = result.SelectMany(r => r.SchemaRefs).Distinct().ToList();
-                var schemas = MongoDBEntity.GetReferences<SCIMSchema>(references, _scimDbContext.Database);
-                foreach (var representation in result)
-                    representation.Schemas = schemas.Where(s => representation.SchemaRefs.Any(r => r.Id == s.Id)).ToList();
-            }
-
-            return result.Select(x => x as SCIMRepresentation).ToList();
-        }
-
-        public Task<List<SCIMRepresentation>> FindRepresentations(List<string> representationIds, string resourceType = null, int nbRecords = 50, bool ignoreAttributes = false)
-        {
-            var representations = new List<SCIMRepresentation>();
-            var nb = representationIds.Count();
-            var nbPages = Math.Ceiling((decimal)(nb / nbRecords));
-            for (var i = 0; i <= nbPages; i++)
-            {
-                var filter = representationIds.Skip(i * nbRecords).Take(nbRecords);
-                var query = _scimDbContext.SCIMRepresentationLst.AsQueryable()
-                    .Where(r => filter.Contains(r.Id));
-                if (!string.IsNullOrWhiteSpace(resourceType))
-                    query = query.Where(r => r.ResourceType == resourceType);
-                var result = query.ToMongoListAsync().Result;
-                var references = result.SelectMany(r => r.SchemaRefs).Distinct().ToList();
-                var schemas = MongoDBEntity.GetReferences<SCIMSchema>(references, _scimDbContext.Database);
-                foreach(var representation in result)
-                    representation.Schemas = schemas.Where(s => representation.SchemaRefs.Any(r => r.Id == s.Id)).ToList();
-
-                representations.AddRange(result);
-            }
-
-            return Task.FromResult(representations);
-        }
-
-        public Task<List<SCIMRepresentationAttribute>> FindPaginatedGraphAttributes(string valueStr, string schemaAttributeId, int nbRecords = 50, string sourceRepresentationId = null)
-        {
-            var attributes = new List<SCIMRepresentationAttribute>();
-            var query = _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
-                .Where(a => a.SchemaAttributeId == schemaAttributeId && a.ValueString == valueStr || (sourceRepresentationId != null && a.ValueString == sourceRepresentationId))
-                .OrderBy(r => r.ParentAttributeId)
-                .Select(r => r.ParentAttributeId);
-            var nb = query.Count();
-            var nbPages = Math.Ceiling((decimal)(nb / nbRecords));
-            for (var i = 0; i <= nbPages; i++)
-            {
-                var parentIds = query.Skip(i * nbRecords).Take(nbRecords).ToMongoListAsync().Result;
-                var result = _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
-                    .Where(a => parentIds.Contains(a.Id) || parentIds.Contains(a.ParentAttributeId))
-                    .ToMongoListAsync().Result;
-                attributes.AddRange(result);
-            }
-            return Task.FromResult(attributes);
-        }
-
-        public Task<List<SCIMRepresentationAttribute>> FindPaginatedGraphAttributes(IEnumerable<string> representationIds, string valueStr, string schemaAttributeId, int nbRecords = 50, string sourceRepresentationId = null)
-        {
-            var attributes = new List<SCIMRepresentationAttribute>();
-            var nb = representationIds.Count();
-            var nbPages = Math.Ceiling((decimal)(nb / nbRecords));
-            for (var i = 0; i <= nbPages; i++)
-            {
-                var filter = representationIds.Skip(i * nbRecords).Take(nbRecords);
-                var parentIds = _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
-                    .Where(a => a.SchemaAttributeId == schemaAttributeId && filter.Contains(a.RepresentationId) && a.ValueString == valueStr || (sourceRepresentationId != null && a.ValueString == sourceRepresentationId))
-                    .Select(r => r.ParentAttributeId)
-                    .ToMongoListAsync().Result;
-                var result = _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
-                    .Where(a => parentIds.Contains(a.Id) || parentIds.Contains(a.ParentAttributeId))
-                    .ToMongoListAsync().Result;
-                attributes.AddRange(result);
-            }
-            return Task.FromResult(attributes);
-        }
-
-        public async Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string schemaAttributeId, string value, string endpoint = null)
-        {
-            var flatAttr = await _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
-                .Where(a => a.SchemaAttributeId == schemaAttributeId && a.ValueString == value)
-                .ToMongoFirstAsync();
-            if (flatAttr == null) return null;
-            var result = await _scimDbContext.SCIMRepresentationLst.AsQueryable()
-                .Where(r => (endpoint == null || endpoint == r.ResourceType) && r.Id == flatAttr.RepresentationId)
-                .ToMongoFirstAsync();
-            if (result == null)
-                return null;
-
-            result.IncludeAll(_scimDbContext.Database);
-            return result;
-        }
-
-        public async Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string schemaAttributeId, int value, string endpoint = null)
-        {
-            var representationIds = await _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
-                .Where(a => a.SchemaAttributeId == schemaAttributeId && a.ValueInteger == value)
-                .Select(a => a.RepresentationId)
-                .ToMongoListAsync();
-            var result = await _scimDbContext.SCIMRepresentationLst.AsQueryable()
-                .Where(r => (endpoint == null || endpoint == r.ResourceType) && representationIds.Contains(r.Id))
-                .ToMongoFirstAsync();
-            if (result == null)
-                return null;
-
-            result.IncludeAll(_scimDbContext.Database);
-            return result;
-        }
-
-        public async Task<List<SCIMRepresentation>> FindSCIMRepresentationsByAttributeFullPath(string fullPath, IEnumerable<string> values, string resourceType)
-        {
-            var representationIds = await _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
-                .Where(a => a.FullPath == fullPath && values.Contains(a.ValueString))
-                .Select(a => a.RepresentationId)
-                .ToMongoListAsync();
-            var result = await _scimDbContext.SCIMRepresentationLst.AsQueryable()
-                .Where(r => r.ResourceType == resourceType && representationIds.Contains(r.Id))
-                .ToMongoListAsync<SCIMRepresentationModel>();
-            if (result.Any())
-            {
-                var references = result.SelectMany(r => r.SchemaRefs).Distinct().ToList();
-                var schemas = MongoDBEntity.GetReferences<SCIMSchema>(references, _scimDbContext.Database);
-                foreach (var representation in result)
-                    representation.Schemas = schemas.Where(s => representation.SchemaRefs.Any(r => r.Id == s.Id)).ToList();
-            }
-
-            return result.Select(x => x as SCIMRepresentation).ToList();
-        }
-
-        public async Task<ITransaction> StartTransaction(CancellationToken token)
-        {
-            if (_options.SupportTransaction)
-            {
-                _session = await _mongoClient.StartSessionAsync(null, token);
-                _session.StartTransaction();
-                return new MongoDbTransaction(_session);
-            }
-
-            _session = null;
-            return new MongoDbTransaction();
-        }
-
         public async Task<bool> Add(SCIMRepresentation representation, CancellationToken token)
         {
             var record = new SCIMRepresentationModel(representation, _options.CollectionSchemas, _options.CollectionRepresentationAttributes);
-            foreach (var flatAttr in record.FlatAttributes) flatAttr.RepresentationId = representation.Id;
+            foreach (var flatAttr in representation.FlatAttributes) flatAttr.RepresentationId = representation.Id;
             if (_session != null)
             {
                 await _scimDbContext.SCIMRepresentationLst.InsertOneAsync(_session, record, null, token);
-                await _scimDbContext.SCIMRepresentationAttributeLst.InsertManyAsync(_session, record.FlatAttributes, cancellationToken: token);
+                await _scimDbContext.SCIMRepresentationAttributeLst.InsertManyAsync(_session, representation.FlatAttributes, cancellationToken: token);
             }
             else
             {
                 await _scimDbContext.SCIMRepresentationLst.InsertOneAsync(record, null, token);
-                await _scimDbContext.SCIMRepresentationAttributeLst.InsertManyAsync(record.FlatAttributes, cancellationToken: token);
+                await _scimDbContext.SCIMRepresentationAttributeLst.InsertManyAsync(representation.FlatAttributes, cancellationToken: token);
+            }
+
+            return true;
+        }
+
+        public async Task<bool> Update(SCIMRepresentation data, CancellationToken token)
+        {
+            var record = new SCIMRepresentationModel(data, _options.CollectionSchemas, _options.CollectionRepresentationAttributes);
+            data.FlatAttributes.Clear();
+            foreach (var newId in _addedAttributeIds) record.AttributeRefs.Add(new CustomMongoDBRef(_options.CollectionRepresentationAttributes, newId));
+            record.AttributeRefs = record.AttributeRefs.Where(r => !_removedAttributeIds.Contains(r.Id.AsString)).ToList();
+            if (_session != null)
+            {
+                await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(_session, s => s.Id == data.Id, record);
+            }
+            else
+            {
+                await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(s => s.Id == data.Id, record);
             }
 
             return true;
@@ -206,7 +82,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
         {
             var attributeIds = data.FlatAttributes.Select(a => a.Id);
             var filter = Builders<SCIMRepresentationAttribute>.Filter.In(a => a.Id, attributeIds);
-            if(_session != null)
+            if (_session != null)
             {
                 await _scimDbContext.SCIMRepresentationLst.DeleteOneAsync(_session, d => d.Id == data.Id, null, token);
                 await _scimDbContext.SCIMRepresentationAttributeLst.DeleteManyAsync(_session, filter);
@@ -220,178 +96,253 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             return true;
         }
 
-        public async Task<bool> Update(SCIMRepresentation data, CancellationToken token)
+        public async Task<List<SCIMRepresentation>> FindRepresentations(List<string> representationIds, string resourceType = null, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var record = new SCIMRepresentationModel(data, _options.CollectionSchemas, _options.CollectionRepresentationAttributes);
-            foreach (var flatAttr in data.FlatAttributes) flatAttr.RepresentationId = data.Id;
-            if (_session != null)
-            {
-                await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(_session, s => s.Id == data.Id, record);
-                foreach (var attr in data.FlatAttributes)
-                    await _scimDbContext.SCIMRepresentationAttributeLst.ReplaceOneAsync(_session, s => s.Id == attr.Id, attr, new ReplaceOptions { IsUpsert = true });
-            }
-            else
-            {
-                await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(s => s.Id == data.Id, record);
-                foreach(var attr in data.FlatAttributes)
-                    await _scimDbContext.SCIMRepresentationAttributeLst.ReplaceOneAsync(s => s.Id == attr.Id, attr, new ReplaceOptions { IsUpsert = true });
-            }
-
-            return true;
+            var query = _scimDbContext.SCIMRepresentationLst.AsQueryable()
+                .Where(r => representationIds.Contains(r.Id));
+            if (!string.IsNullOrWhiteSpace(resourceType))
+                query = query.Where(r => r.ResourceType == resourceType);
+            var result = await query.ToMongoListAsync();
+            var references = result.SelectMany(r => r.SchemaRefs).Distinct().ToList();
+            var schemas = MongoDBEntity.GetReferences<SCIMSchema>(references, _scimDbContext.Database);
+            foreach (var representation in result)
+                representation.Schemas = schemas.Where(s => representation.SchemaRefs.Any(r => r.Id == s.Id)).ToList();
+            return result.Cast<SCIMRepresentation>().ToList();
         }
 
-        public async Task BulkInsert(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes)
+        public async Task<List<SCIMRepresentationAttribute>> FindGraphAttributes(string valueStr, string schemaAttributeId, string sourceRepresentationId = null, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var attributes = new List<SCIMRepresentationAttribute>();
+            var query = _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
+                .Where(a => a.SchemaAttributeId == schemaAttributeId && a.ValueString == valueStr || (sourceRepresentationId != null && a.ValueString == sourceRepresentationId))
+                .OrderBy(r => r.ParentAttributeId)
+                .Select(r => r.ParentAttributeId);
+            var parentIds = await query.ToMongoListAsync();
+            var result = await _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
+                .Where(a => parentIds.Contains(a.Id) || parentIds.Contains(a.ParentAttributeId))
+                .ToMongoListAsync();
+            return result;
+        }
+
+        public async Task<List<SCIMRepresentationAttribute>> FindGraphAttributes(IEnumerable<string> representationIds, string valueStr, string schemaAttributeId, string sourceRepresentationId = null, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var parentIds = await _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
+                .Where(a => a.SchemaAttributeId == schemaAttributeId && representationIds.Contains(a.RepresentationId) && a.ValueString == valueStr || (sourceRepresentationId != null && a.ValueString == sourceRepresentationId))
+                .Select(r => r.ParentAttributeId)
+                .ToMongoListAsync();
+            var result = await _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
+                .Where(a => parentIds.Contains(a.Id) || parentIds.Contains(a.ParentAttributeId))
+                .ToMongoListAsync();
+            return result;
+        }
+
+
+
+        public async Task<List<SCIMRepresentationAttribute>> FindGraphAttributesBySchemaAttributeId(string representationId, string schemaAttributeId, CancellationToken cancellationToken)
+        {
+            var ids = await _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
+                .Where(a => a.SchemaAttributeId == schemaAttributeId && a.RepresentationId == representationId)
+                .OrderBy(r => r.Id)
+                .Select(r => r.Id)
+                .ToMongoListAsync();
+            var result = await _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
+                .Where(a => ids.Contains(a.Id) || ids.Contains(a.ParentAttributeId))
+                .ToMongoListAsync();
+            return result;
+        }
+
+        public async Task<List<SCIMRepresentationAttribute>> FindGraphAttributesBySchemaAttributeId(List<string> representationIds, string schemaAttributeId, CancellationToken cancellationToken)
+        {
+            var ids = await _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
+                .Where(a => a.SchemaAttributeId == schemaAttributeId && representationIds.Contains(a.RepresentationId))
+                .OrderBy(r => r.Id)
+                .Select(r => r.Id)
+                .ToMongoListAsync();
+            var result = await _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
+                .Where(a => ids.Contains(a.Id) || ids.Contains(a.ParentAttributeId))
+                .ToMongoListAsync();
+            return result;
+        }
+
+        public async Task<List<SCIMRepresentationAttribute>> FindAttributes(string representationId, SCIMAttributeExpression pathExpression, CancellationToken cancellationToken)
+        {
+            IQueryable<EnrichedAttribute> representationAttributes = from a in _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
+                    join b in _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable() on a.Id equals b.ParentAttributeId into Children
+                    where a.RepresentationId == representationId
+                    select new EnrichedAttribute
+                    {
+                        Attribute = a,
+                        Children = Children.Select(c => new EnrichedAttribute
+                        {
+                            Attribute = c
+                        })
+                    };
+            var filteredAttributes = await pathExpression.EvaluateMongoDbAttributes(representationAttributes).ToMongoListAsync();
+            var result = new List<SCIMRepresentationAttribute>();
+            foreach (var attr in filteredAttributes)
+            {
+                result.Add(attr.Attribute);
+                result.AddRange(attr.Children.Select(e => e.Attribute));
+            }
+
+            return result;
+        }
+
+        public async Task<List<SCIMRepresentationAttribute>> FindAttributesByAproximativeFullPath(string representationId, string fullPath, CancellationToken cancellationToken)
+        {
+            var representationAttributes = await _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
+                .Where(a => a.RepresentationId == representationId && a.FullPath.StartsWith(fullPath))
+                .ToMongoListAsync();
+            return representationAttributes;
+        }
+
+        public async Task<List<SCIMRepresentationAttribute>> FindAttributesByExactFullPathAndValues(string fullPath, IEnumerable<string> values, CancellationToken cancellationToken)
+        {
+            var representationAttributes = await _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
+                .Where(a => values.Contains(a.ValueString) && a.FullPath == fullPath)
+                .ToMongoListAsync();
+            return representationAttributes;
+        }
+
+        public async Task<List<SCIMRepresentationAttribute>> FindAttributesByExactFullPathAndRepresentationIds(string fullPath, IEnumerable<string> values, CancellationToken cancellationToken)
+        {
+            var representationAttributes = await _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
+                .Where(a => values.Contains(a.RepresentationId) && a.FullPath == fullPath)
+                .ToMongoListAsync();
+            return representationAttributes;
+        }
+
+        public async Task<List<SCIMRepresentationAttribute>> FindAttributesBySchemaAttributeAndValues(string schemaAttributeId, IEnumerable<string> values, CancellationToken cancellationToken)
+        {
+            var representationAttributes = await _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
+                .Where(a => values.Contains(a.ValueString) && a.SchemaAttributeId == schemaAttributeId)
+                .ToMongoListAsync();
+            return representationAttributes;
+        }
+
+        public async Task<List<SCIMRepresentationAttribute>> FindAttributesByReference(List<string> representationIds, string schemaAttributeId, string value, CancellationToken cancellationToken)
+        {
+            var representationAttributes = await _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
+                .Where(a => representationIds.Contains(a.RepresentationId) && a.SchemaAttributeId == schemaAttributeId && a.ValueString == value)
+                .ToMongoListAsync();
+            return representationAttributes;
+        }
+
+        public async Task<List<SCIMRepresentationAttribute>> FindAttributesByValue(string attrSchemaId, string value)
+        {
+            var result = await _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
+                .Where(a => a.SchemaAttribute.Id == attrSchemaId && a.ValueString == value)
+                .ToMongoListAsync();
+            return result;
+        }
+
+        public async Task<List<SCIMRepresentationAttribute>> FindAttributesByValue(string attrSchemaId, int value)
+        {
+            var result = await _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
+                .Where(a => a.SchemaAttribute.Id == attrSchemaId && a.ValueInteger == value)
+                .ToMongoListAsync();
+            return result;
+        }
+
+        public async Task BulkInsert(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes, bool isReference = false)
         {
             if (!scimRepresentationAttributes.Any()) return;
             var representationIds = scimRepresentationAttributes.Select(r => r.RepresentationId).Distinct();
-            var representations = await _scimDbContext.SCIMRepresentationLst.AsQueryable().Where(r => representationIds.Contains(r.Id)).ToMongoListAsync();
+            var result = await _scimDbContext.SCIMRepresentationLst.AsQueryable().Where(r => representationIds.Contains(r.Id)).ToMongoListAsync();
+            _addedAttributeIds.AddRange(scimRepresentationAttributes.Select(a => a.Id));
             if (_session != null)
             {
                 await _scimDbContext.SCIMRepresentationAttributeLst.InsertManyAsync(_session, scimRepresentationAttributes);
-                foreach (var representation in representations)
+                if (isReference)
                 {
-                    var attrs = scimRepresentationAttributes.Where(r => r.RepresentationId == representation.Id).ToList();
-                    foreach (var attr in attrs) representation.FlatAttributes.Add(attr);
-                    await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(_session, s => s.Id == representation.Id, representation);
+                    foreach (var attrs in scimRepresentationAttributes.GroupBy(a => a.RepresentationId))
+                    {
+                        var currentRepresentation = result.Single(r => r.Id == attrs.Key);
+                        foreach (var id in attrs.Select(a => a.Id)) currentRepresentation.AttributeRefs.Add(new CustomMongoDBRef(_options.CollectionRepresentationAttributes, id));
+                        await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(_session, s => s.Id == currentRepresentation.Id, currentRepresentation);
+                    }
                 }
             }
             else
             {
                 await _scimDbContext.SCIMRepresentationAttributeLst.InsertManyAsync(scimRepresentationAttributes);
-                foreach (var representation in representations)
+                if(isReference)
                 {
-                    var attrs = scimRepresentationAttributes.Where(r => r.RepresentationId == representation.Id).ToList();
-                    foreach (var attr in attrs) representation.FlatAttributes.Add(attr);
-                    await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(s => s.Id == representation.Id, representation);
+                    foreach (var attrs in scimRepresentationAttributes.GroupBy(a => a.RepresentationId))
+                    {
+                        var currentRepresentation = result.Single(r => r.Id == attrs.Key);
+                        foreach (var id in attrs.Select(a => a.Id)) currentRepresentation.AttributeRefs.Add(new CustomMongoDBRef(_options.CollectionRepresentationAttributes, id));
+                        await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(s => s.Id == currentRepresentation.Id, currentRepresentation);
+                    }
                 }
             }
         }
 
-        public async Task BulkDelete(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes)
+        public async Task BulkUpdate(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes, bool isReference = false)
+        {
+            if (!scimRepresentationAttributes.Any()) return;
+            if (_session != null)
+            {
+                foreach (var attr in scimRepresentationAttributes)
+                    await _scimDbContext.SCIMRepresentationAttributeLst.ReplaceOneAsync(_session, s => s.Id == attr.Id, attr, new ReplaceOptions { IsUpsert = true });
+            }
+            else
+            {
+                foreach (var attr in scimRepresentationAttributes)
+                    await _scimDbContext.SCIMRepresentationAttributeLst.ReplaceOneAsync(s => s.Id == attr.Id, attr, new ReplaceOptions { IsUpsert = true });
+            }
+        }
+
+        public async Task BulkDelete(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes, bool isReference = false)
         {
             if (!scimRepresentationAttributes.Any()) return;
             var representationIds = scimRepresentationAttributes.Select(r => r.RepresentationId).Distinct();
             var result = await _scimDbContext.SCIMRepresentationLst.AsQueryable().Where(r => representationIds.Contains(r.Id)).ToMongoListAsync();
             var attributeIds = scimRepresentationAttributes.Select(a => a.Id);
             var filter = Builders<SCIMRepresentationAttribute>.Filter.In(a => a.Id, attributeIds);
+            _removedAttributeIds.AddRange(attributeIds);
             if (_session != null)
             {
                 await _scimDbContext.SCIMRepresentationAttributeLst.DeleteManyAsync(_session, filter);
-                foreach (var representation in result)
+                if (isReference)
                 {
-                    var removedAttributeIds = scimRepresentationAttributes.Where(r => r.RepresentationId == representation.Id).Select(r => r.Id);
-                    representation.FlatAttributes = representation.FlatAttributes.Where(r => !removedAttributeIds.Contains(r.Id)).ToList();
-                    await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(_session, s => s.Id == representation.Id, representation);
+                    foreach (var attrs in scimRepresentationAttributes.GroupBy(a => a.RepresentationId))
+                    {
+                        var currentRepresentation = result.Single(r => r.Id == attrs.Key);
+                        var attrIds = attrs.Select(a => a.Id);
+                        currentRepresentation.AttributeRefs = currentRepresentation.AttributeRefs.Where(a => !attrIds.Contains(a.Id.AsString)).ToList();
+                        await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(_session, s => s.Id == currentRepresentation.Id, currentRepresentation);
+                    }
                 }
             }
             else
             {
                 await _scimDbContext.SCIMRepresentationAttributeLst.DeleteManyAsync(filter);
-                foreach (var representation in result)
+                if (isReference)
                 {
-                    var removedAttributeIds = scimRepresentationAttributes.Where(r => r.RepresentationId == representation.Id).Select(r => r.Id);
-                    representation.FlatAttributes = representation.FlatAttributes.Where(r => !removedAttributeIds.Contains(r.Id)).ToList();
-                    await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(s => s.Id == representation.Id, representation);
+                    foreach (var attrs in scimRepresentationAttributes.GroupBy(a => a.RepresentationId))
+                    {
+                        var currentRepresentation = result.Single(r => r.Id == attrs.Key);
+                        var attrIds = attrs.Select(a => a.Id);
+                        currentRepresentation.AttributeRefs = currentRepresentation.AttributeRefs.Where(a => !attrIds.Contains(a.Id.AsString)).ToList();
+                        await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(s => s.Id == currentRepresentation.Id, currentRepresentation);
+                    }
                 }
             }
         }
 
-        public async Task BulkUpdate(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes)
+
+        public async Task<ITransaction> StartTransaction(CancellationToken token)
         {
-            if (!scimRepresentationAttributes.Any()) return;
-            var representationIds = scimRepresentationAttributes.Select(r => r.RepresentationId).Distinct();
-            var result = await _scimDbContext.SCIMRepresentationLst.AsQueryable().Where(r => representationIds.Contains(r.Id)).ToMongoListAsync();
-            if (_session != null)
+            if (_options.SupportTransaction)
             {
-                foreach(var attr in scimRepresentationAttributes)
-                    await _scimDbContext.SCIMRepresentationAttributeLst.ReplaceOneAsync(_session, s => s.Id == attr.Id, attr, new ReplaceOptions { IsUpsert = true });
-                foreach (var representation in result)
-                {
-                    var updatedAttributes = scimRepresentationAttributes.Where(r => r.RepresentationId == representation.Id);
-                    representation.FlatAttributes = representation.FlatAttributes.Where(a => !updatedAttributes.Any(at => at.Id == a.Id)).ToList();
-                    foreach (var attr in updatedAttributes)
-                        representation.FlatAttributes.Add(attr);
-                    await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(_session, s => s.Id == representation.Id, representation);
-                }
+                _session = await _mongoClient.StartSessionAsync(null, token);
+                _session.StartTransaction();
+                return new MongoDbTransaction(_session);
             }
-            else
-            {
-                foreach (var attr in scimRepresentationAttributes)
-                    await _scimDbContext.SCIMRepresentationAttributeLst.ReplaceOneAsync(s => s.Id == attr.Id, attr, new ReplaceOptions { IsUpsert = true });
-                foreach (var representation in result)
-                {
-                    var updatedAttributes = scimRepresentationAttributes.Where(r => r.RepresentationId == representation.Id);
-                    representation.FlatAttributes = representation.FlatAttributes.Where(a => !updatedAttributes.Any(at => at.Id == a.Id)).ToList();
-                    foreach (var attr in updatedAttributes)
-                        representation.FlatAttributes.Add(attr);
-                    await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(s => s.Id == representation.Id, representation);
-                }
-            }
-        }
 
-        public Task<List<SCIMRepresentationAttribute>> FindAttributes(string representationId, SCIMAttributeExpression attrExpression, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<SCIMRepresentation>> FindRepresentations(List<string> representationIds, string resourceType = null, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<SCIMRepresentationAttribute>> FindGraphAttributes(string valueStr, string schemaAttributeId, string sourceRepresentationId = null, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<SCIMRepresentationAttribute>> FindGraphAttributes(IEnumerable<string> representationIds, string valueStr, string schemaAttributeId, string sourceRepresentationId = null, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<SCIMRepresentationAttribute>> FindGraphAttributesBySchemaAttributeId(string representationId, string schemaAttributeId, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<SCIMRepresentationAttribute>> FindGraphAttributesBySchemaAttributeId(List<string> representationIds, string schemaAttributeId, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<SCIMRepresentationAttribute>> FindAttributesByAproximativeFullPath(string representationId, string fullPath, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<SCIMRepresentationAttribute>> FindAttributesByExactFullPathAndValues(string fullPath, IEnumerable<string> values, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<SCIMRepresentationAttribute>> FindAttributesByExactFullPathAndRepresentationIds(string fullPath, IEnumerable<string> representationIds, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<SCIMRepresentationAttribute>> FindAttributesBySchemaAttributeAndValues(string schemaAttributeId, IEnumerable<string> values, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<SCIMRepresentationAttribute>> FindAttributesByReference(List<string> representationIds, string schemaAttributeId, string value, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<SCIMRepresentationAttribute>> FindAttributesByValue(string attrSchemaId, string value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<SCIMRepresentationAttribute>> FindAttributesByValue(string attrSchemaId, int value)
-        {
-            throw new NotImplementedException();
+            _session = null;
+            return new MongoDbTransaction();
         }
     }
 }

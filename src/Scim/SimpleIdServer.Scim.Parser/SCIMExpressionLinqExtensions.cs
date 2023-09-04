@@ -13,12 +13,12 @@ namespace SimpleIdServer.Scim.Parser.Expressions
     {
         #region Filter Attributes
 
-        public static ICollection<SCIMRepresentationAttribute> EvaluateAttributes(this SCIMExpression expression, IQueryable<SCIMRepresentationAttribute> attributes, bool isStrictPath, string propertyName = "CachedChildren")
+        public static IQueryable<SCIMRepresentationAttribute> EvaluateAttributes(this SCIMExpression expression, IQueryable<SCIMRepresentationAttribute> attributes, bool isStrictPath, string propertyName = "CachedChildren")
         {
             var attr = expression as SCIMAttributeExpression;
             if (attr.SchemaAttribute == null || string.IsNullOrWhiteSpace(attr.SchemaAttribute.Id))
             {
-                return new List<SCIMRepresentationAttribute>();
+                return new List<SCIMRepresentationAttribute>().AsQueryable();
             }
             else
             {
@@ -33,10 +33,10 @@ namespace SimpleIdServer.Scim.Parser.Expressions
                 var finalSelectArg = Expression.Parameter(typeof(IQueryable<SCIMRepresentationAttribute>), "f");
                 var finalSelectRequestBody = Expression.Lambda(whereExpr, new ParameterExpression[] { finalSelectArg });
                 var result = (IQueryable<SCIMRepresentationAttribute>)finalSelectRequestBody.Compile().DynamicInvoke(attributes);
-                var fullPath = attr.GetFullPath(false);
-                return result.ToList();
+                return result;
             }
         }
+
         public static Expression EvaluateAttributes(this SCIMExpression expression, ParameterExpression parameterExpression, string propertyName = "CachedChildren")
         {
             var attrExpression = expression as SCIMAttributeExpression;
@@ -105,7 +105,7 @@ namespace SimpleIdServer.Scim.Parser.Expressions
 
         #region Filter Representations
 
-        public static LambdaExpression Evaluate<T>(this SCIMExpression expression, IQueryable<T> representations) where T : SCIMRepresentation
+        public static LambdaExpression Evaluate<T>(this SCIMExpression expression, IQueryable<T> representations)
         {
             var representationParameter = Expression.Parameter(typeof(T), "rp");
             var anyLambdaExpression = expression.Evaluate(representationParameter);
@@ -243,7 +243,7 @@ namespace SimpleIdServer.Scim.Parser.Expressions
             return complexAttr.GroupingFilter.Evaluate(parameterExpression);
         }
 
-        private static Expression BuildComparisonExpression(
+        public static Expression BuildComparisonExpression(
             SCIMComparisonExpression comparisonExpression,
             SCIMSchemaAttribute schemaAttr,
             MemberExpression propertyValueString = null,

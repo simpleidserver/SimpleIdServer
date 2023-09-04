@@ -10,7 +10,7 @@ using System.Reflection;
 
 namespace SimpleIdServer.Scim.Parser.Expressions
 {
-    public static class SCIMExpressionLinqExtensions
+    public static class SCIMParserExpressionLinqExtensions
     {
         #region Order By
 

@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using SimpleIdServer.Persistence.Filters;
@@ -7,7 +8,6 @@ using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Parser.Expressions;
 using SimpleIdServer.Scim.Persistence.MongoDB.Extensions;
-using SimpleIdServer.Scim.Persistence.MongoDB.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,10 +17,12 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
     public class SCIMRepresentationQueryRepository : ISCIMRepresentationQueryRepository
     {
         private readonly SCIMDbContext _scimDbContext;
+        private readonly MongoDbOptions _options;
 
-        public SCIMRepresentationQueryRepository(SCIMDbContext scimDbContext)
+        public SCIMRepresentationQueryRepository(SCIMDbContext scimDbContext, IOptions<MongoDbOptions> options)
         {
             _scimDbContext = scimDbContext;
+            _options = options.Value;
         }
 
         public async Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId)
@@ -54,41 +56,49 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             return FindSCIMRepresentationById(representationId, resourceType);
         }
 
-        public Task<SearchSCIMRepresentationsResponse> FindSCIMRepresentations(SearchSCIMRepresentationsParameter parameter)
+        public async Task<SearchSCIMRepresentationsResponse> FindSCIMRepresentations(SearchSCIMRepresentationsParameter parameter)
         {
-            // JOIN COLLECTION.
-            IEnumerable<SCIMRepresentation> result = null;
-            int totalResults = 0;
-            var collection = _scimDbContext.SCIMRepresentationLst;
-            var queryableRepresentations = collection.AsQueryable().Where(s => s.ResourceType == parameter.ResourceType);
+            IQueryable<EnrichedRepresentation> representationAttributes = from a in _scimDbContext.SCIMRepresentationLst.AsQueryable()
+                join b in _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable() on a.Id equals b.RepresentationId into FlatAttributes
+                select new EnrichedRepresentation
+                {
+                    Representation = a,
+                    FlatAttributes = FlatAttributes
+                };
+            var queryableRepresentations = representationAttributes.Where(s => s.Representation.ResourceType == parameter.ResourceType);
             if(parameter.SortBy == null)
-                queryableRepresentations = queryableRepresentations.OrderBy(s => s.Id);
+                queryableRepresentations = queryableRepresentations.OrderBy(s => s.Representation.Id);
 
             if (parameter.Filter != null)
             {
                 var evaluatedExpression = parameter.Filter.Evaluate(queryableRepresentations);
-                var filtered = evaluatedExpression.Compile().DynamicInvoke(queryableRepresentations) as IMongoQueryable<SCIMRepresentationModel>;
-                totalResults = filtered.Count();
-                var representations = filtered.Skip(parameter.StartIndex <= 1 ? 0 : parameter.StartIndex - 1).Take(parameter.Count);
-                result = representations.ToList();
-            }
-            else
-            {
-                totalResults = queryableRepresentations.Count();
-                var representations = queryableRepresentations.Skip(parameter.StartIndex <= 1 ? 0 : parameter.StartIndex - 1).Take(parameter.Count);
-                result = representations.ToList().Cast<SCIMRepresentation>();
+                queryableRepresentations = evaluatedExpression.Compile().DynamicInvoke(queryableRepresentations) as IMongoQueryable<EnrichedRepresentation>;
             }
 
             if (parameter.SortBy != null)
             {
-                var evaluatedExpression = parameter.SortBy.EvaluateOrderBy(
+                var evaluatedExpression = parameter.SortBy.EvaluateMongoDbOrderBy(
                     queryableRepresentations,
                     parameter.SortOrder ?? SearchSCIMRepresentationOrders.Descending);
-                result = (IEnumerable<SCIMRepresentation>)evaluatedExpression.Compile().DynamicInvoke(queryableRepresentations);
+                var orderedResult = evaluatedExpression.Compile().DynamicInvoke(queryableRepresentations) as IEnumerable<EnrichedRepresentation>;
+                int total = orderedResult.Count();
+                orderedResult = orderedResult.Skip(parameter.StartIndex <= 1 ? 0 : parameter.StartIndex - 1).Take(parameter.Count);
+                var result = orderedResult.ToList();
+                foreach (var record in result) record.Representation.FlatAttributes = record.FlatAttributes.ToList();
+                var representations = result.Select(r => r.Representation);
+                representations.FilterAttributes(parameter.IncludedAttributes, parameter.ExcludedAttributes);
+                return new SearchSCIMRepresentationsResponse(total, representations);
             }
-
-            result.FilterAttributes(parameter.IncludedAttributes, parameter.ExcludedAttributes);
-            return Task.FromResult(new SearchSCIMRepresentationsResponse(totalResults, result));
+            else
+            {
+                int total = queryableRepresentations.Count();
+                queryableRepresentations = queryableRepresentations.Skip(parameter.StartIndex <= 1 ? 0 : parameter.StartIndex - 1).Take(parameter.Count);
+                var result = await queryableRepresentations.ToMongoListAsync();
+                foreach (var record in result) record.Representation.FlatAttributes = record.FlatAttributes.ToList();
+                var representations = result.Select(r => r.Representation);
+                representations.FilterAttributes(parameter.IncludedAttributes, parameter.ExcludedAttributes);
+                return new SearchSCIMRepresentationsResponse(total, representations);
+            }
         }
     }
 }

@@ -70,9 +70,9 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 await _scimRepresentationCommandRepository.BulkUpdate(patchResultLst.Where(p => p.Operation == SCIMPatchOperations.REPLACE && p.Attr != null).Select(p => p.Attr)).ConfigureAwait(false);
                 foreach (var reference in references)
                 {
-                    await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes).ConfigureAwait(false);
-                    await _scimRepresentationCommandRepository.BulkUpdate(reference.UpdatedRepresentationAttributes).ConfigureAwait(false);
-                    await _scimRepresentationCommandRepository.BulkDelete(reference.RemovedRepresentationAttributes).ConfigureAwait(false);
+                    await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes, true).ConfigureAwait(false);
+                    await _scimRepresentationCommandRepository.BulkUpdate(reference.UpdatedRepresentationAttributes, true).ConfigureAwait(false);
+                    await _scimRepresentationCommandRepository.BulkDelete(reference.RemovedRepresentationAttributes, true).ConfigureAwait(false);
                 }
 
                 await _scimRepresentationCommandRepository.Update(existingRepresentation).ConfigureAwait(false);

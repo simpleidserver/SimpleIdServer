@@ -112,7 +112,7 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             var representationAttributes = _attributes.Where(a => a.RepresentationId == representationId);
             var hierarchicalRepresentationAttributes = SCIMRepresentation.BuildHierarchicalAttributes(representationAttributes).AsQueryable();
             var allAttributes = new List<SCIMRepresentationAttribute>();
-            var filteredAttributes = pathExpression.EvaluateAttributes(hierarchicalRepresentationAttributes, true);
+            var filteredAttributes = pathExpression.EvaluateAttributes(hierarchicalRepresentationAttributes, true).ToList();
             allAttributes.AddRange(filteredAttributes);
             foreach (var fAttr in filteredAttributes) ResolveChildren(representationAttributes.AsQueryable(), fAttr.Id, allAttributes);
             return Task.FromResult(allAttributes);
@@ -160,14 +160,14 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             return Task.FromResult(result);
         }
 
-        public Task BulkInsert(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes)
+        public Task BulkInsert(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes, bool isReference = false)
         {
             foreach(var scimRepresentationAttr in scimRepresentationAttributes)
                 _attributes.Add(scimRepresentationAttr);
             return Task.CompletedTask;
         }
 
-        public Task BulkDelete(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes)
+        public Task BulkDelete(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes, bool isReference = false)
         {
             foreach (var scimRepresentationAttr in scimRepresentationAttributes)
             {
@@ -179,7 +179,7 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             return Task.CompletedTask;
         }
 
-        public Task BulkUpdate(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes)
+        public Task BulkUpdate(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes, bool isReference = false)
         {
             foreach (var scimRepresentationAttr in scimRepresentationAttributes)
             {

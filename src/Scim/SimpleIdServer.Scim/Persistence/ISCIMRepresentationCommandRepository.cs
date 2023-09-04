@@ -23,8 +23,8 @@ namespace SimpleIdServer.Scim.Persistence
         Task<List<SCIMRepresentationAttribute>> FindAttributesByReference(List<string> representationIds, string schemaAttributeId, string value, CancellationToken cancellationToken);
         Task<List<SCIMRepresentationAttribute>> FindAttributesByValue(string attrSchemaId, string value);
         Task<List<SCIMRepresentationAttribute>> FindAttributesByValue(string attrSchemaId, int value);
-        Task BulkInsert(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes);
-        Task BulkDelete(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes);
-        Task BulkUpdate(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes);
+        Task BulkInsert(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes, bool isReference = false);
+        Task BulkDelete(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes, bool isReference = false);
+        Task BulkUpdate(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes, bool isReference = false);
     }
 }

@@ -59,7 +59,8 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 				cm.SetIsRootClass(true);
 				cm.UnmapMember(c => c.Schemas);
 				cm.UnmapMember(c => c.HierarchicalAttributes);
-			});
+                cm.UnmapMember(c => c.FlatAttributes);
+            });
 			BsonClassMap.RegisterClassMap<SCIMRepresentationModel>(cm =>
 			{
 				cm.AutoMap();
