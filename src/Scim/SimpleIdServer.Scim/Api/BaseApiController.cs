@@ -433,8 +433,7 @@ namespace SimpleIdServer.Scim.Api
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ex.Message);
-                return this.BuildError(HttpStatusCode.InternalServerError, ex.Message, SCIMConstants.ErrorSCIMTypes.InternalServerError);
+                return await Handle(ex, cancellationToken);
             }
         }
 
@@ -461,8 +460,7 @@ namespace SimpleIdServer.Scim.Api
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ex.Message);
-                return this.BuildError(HttpStatusCode.InternalServerError, ex.Message, SCIMConstants.ErrorSCIMTypes.InternalServerError);
+                return await Handle(ex, cancellationToken);
             }
         }
 
@@ -504,8 +502,7 @@ namespace SimpleIdServer.Scim.Api
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ex.Message);
-                return this.BuildError(HttpStatusCode.InternalServerError, ex.Message, SCIMConstants.ErrorSCIMTypes.InternalServerError);
+                return await Handle(ex, CancellationToken.None);
             }
         }
 
@@ -539,8 +536,7 @@ namespace SimpleIdServer.Scim.Api
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ex.Message);
-                return this.BuildError(HttpStatusCode.InternalServerError, ex.Message, SCIMConstants.ErrorSCIMTypes.InternalServerError);
+                return await Handle(ex, CancellationToken.None);
             }
         }
 
@@ -596,8 +592,7 @@ namespace SimpleIdServer.Scim.Api
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ex.Message);
-                return this.BuildError(HttpStatusCode.InternalServerError, ex.Message, SCIMConstants.ErrorSCIMTypes.InternalServerError);
+                return await Handle(ex, CancellationToken.None);
             }
         }
 
@@ -667,9 +662,17 @@ namespace SimpleIdServer.Scim.Api
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ex.Message);
-                return this.BuildError(HttpStatusCode.InternalServerError, ex.Message, SCIMConstants.ErrorSCIMTypes.InternalServerError);
+                return await Handle(ex, CancellationToken.None);
             }
+        }
+
+        private async Task<IActionResult> Handle(Exception exception, CancellationToken cancellationToken)
+        {
+            _logger.LogError(exception, exception.Message);
+            IActionResult customActionResult;
+            if (_options.SCIMEvents == null || (customActionResult = await _options.SCIMEvents.OnInternalServerError(this.HttpContext, exception, cancellationToken)) == null)
+                return this.BuildError(HttpStatusCode.InternalServerError, exception.Message, SCIMConstants.ErrorSCIMTypes.InternalServerError);
+            return customActionResult;
         }
 
         protected async Task<IActionResult> ExecuteActionIfAuthenticated(Func<Task<IActionResult>> callback)

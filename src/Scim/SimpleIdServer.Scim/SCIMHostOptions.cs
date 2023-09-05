@@ -82,5 +82,9 @@ namespace SimpleIdServer.Scim
         /// Return 204 when the representation is PATCHED or UPDATED.
         /// </summary>
         public bool IsNoContentReturned { get; set; } = false;
+        /// <summary>
+        /// Register to the events.
+        /// </summary>
+        public SCIMHostEvents SCIMEvents { get; set; } = new SCIMHostEvents();
     }
 }
