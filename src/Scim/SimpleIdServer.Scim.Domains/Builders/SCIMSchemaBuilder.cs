@@ -128,6 +128,11 @@ namespace SimpleIdServer.Scim.Domains.Builders
             return this;
         }
 
+        public SCIMSchemaBuilder AddUniqueIdAttribute(string description)
+        {
+            return AddAttribute(StandardSCIMRepresentationAttributes.Id, SCIMSchemaAttributeTypes.STRING, null, true, false, SCIMSchemaAttributeMutabilities.READONLY, SCIMSchemaAttributeReturned.ALWAYS, SCIMSchemaAttributeUniqueness.GLOBAL, description, false);
+        }
+
 
         public SCIMSchemaBuilder AddStringAttribute(string name, Action<SCIMSchemaAttributeBuilder> callback = null, bool caseExact = false, bool required = false,
             SCIMSchemaAttributeMutabilities mutability = SCIMSchemaAttributeMutabilities.READWRITE,

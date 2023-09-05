@@ -189,7 +189,7 @@ namespace SimpleIdServer.Scim.Domains
             }, multiValued: true)
             .Build();
         public static SCIMSchema StandardResponseSchemas = SCIMSchemaBuilder.Create("urn:ietf:params:scim:api:messages:2.0:StandardResponse", "StandardResponse", null, "StandardResponse", true)
-            .AddStringAttribute(StandardSCIMRepresentationAttributes.Id, description: "A unique identifier for a SCIM resource as defined by the service provider", mutability: SCIMSchemaAttributeMutabilities.READONLY)
+            .AddUniqueIdAttribute("A unique identifier for a SCIM resource as defined by the service provider")
             .AddStringAttribute(StandardSCIMRepresentationAttributes.ExternalId, description: " A String that is an identifier for the resource as defined by the provisioning client.")
             .AddStringAttribute(StandardSCIMRepresentationAttributes.Schemas, multiValued: true, description: " A multi valued String specifying schemas." )
             .AddComplexAttribute(StandardSCIMRepresentationAttributes.Meta, callback: c =>
