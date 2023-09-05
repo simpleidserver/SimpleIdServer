@@ -555,7 +555,7 @@ namespace SimpleIdServer.Scim.Api
             {
                 var updateResult = await _replaceRepresentationCommandHandler.Handle(new ReplaceRepresentationCommand(id, _resourceType, representationParameter, _uriProvider.GetAbsoluteUriWithVirtualPath()));
                 if (updateResult.HasError) return this.BuildError(updateResult);
-                if (!updateResult.Result.IsReplaced) return NoContent();
+                if (!updateResult.Result.IsReplaced || _options.IsNoContentReturned) return NoContent();
                 var kvp = await GetRepresentation(id);
                 var representation = kvp.Item1;
                 var content = kvp.Item2;
@@ -613,7 +613,7 @@ namespace SimpleIdServer.Scim.Api
                 var patchRes = await _patchRepresentationCommandHandler.Handle(new PatchRepresentationCommand(id, ResourceType, patchRepresentation, _uriProvider.GetAbsoluteUriWithVirtualPath()));
                 if (patchRes.HasError) return this.BuildError(patchRes);
                 var patchResult = patchRes.Result;
-                if (!patchResult.IsPatched) return NoContent();
+                if (!patchResult.IsPatched || _options.IsNoContentReturned) return NoContent();
                 var kvp = await GetRepresentation(id);
                 var representation = kvp.Item1;
                 var content = kvp.Item2;

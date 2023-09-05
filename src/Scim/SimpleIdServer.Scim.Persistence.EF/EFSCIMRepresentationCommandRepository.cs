@@ -7,6 +7,7 @@ using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Parser.Expressions;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -123,9 +124,11 @@ namespace SimpleIdServer.Scim.Persistence.EF
                 .Include(s => s.Children).ThenInclude(s => s.SchemaAttribute)
                 .Where(r => r.RepresentationId == representationId)
                 .AsNoTracking();
+            if (pathExpression.SchemaAttribute == null || string.IsNullOrWhiteSpace(pathExpression.SchemaAttribute.Id))
+                return new List<SCIMRepresentationAttribute>();
             var filteredAttributes = await pathExpression.EvaluateAttributes(representationAttributes, true, "Children").ToListAsync(cancellationToken);
             foreach (var a in filteredAttributes) a.CachedChildren = a.Children;
-            return filteredAttributes;
+            return filteredAttributes.SelectMany(a => a.ToFlat()).ToList();
         }
 
         public async Task<List<SCIMRepresentationAttribute>> FindAttributes(string representationId, CancellationToken cancellationToken)

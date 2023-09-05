@@ -55,17 +55,7 @@ namespace SimpleIdServer.Scim.Startup
                     options.Realm = "Sample Web API";
                     options.KeyName = "Authorization";
                 });
-            // services.AddAuthorization(opts => opts.AddDefaultSCIMAuthorizationPolicy());
-            services.AddAuthorization(opts =>
-            {
-                opts.AddPolicy("QueryScimResource", p => p.RequireAssertion(_ => true));
-                opts.AddPolicy("AddScimResource", p => p.RequireAssertion(_ => true));
-                opts.AddPolicy("DeleteScimResource", p => p.RequireAssertion(_ => true));
-                opts.AddPolicy("UpdateScimResource", p => p.RequireAssertion(_ => true));
-                opts.AddPolicy("BulkScimResource", p => p.RequireAssertion(_ => true));
-                opts.AddPolicy("UserAuthenticated", p => p.RequireAssertion(_ => true));
-                opts.AddPolicy("Provison", p => p.RequireAssertion(_ => true));
-            });
+            services.AddAuthorization(opts => opts.AddDefaultSCIMAuthorizationPolicy());
             services.AddSwaggerGen(c =>
             {
                 c.SchemaFilter<EnumDocumentFilter>();
@@ -82,6 +72,7 @@ namespace SimpleIdServer.Scim.Startup
             services.AddSCIMSwagger();
             services.AddSIDScim(_ =>
             {
+                _.IsNoContentReturned = false;
                 _.IgnoreUnsupportedCanonicalValues = false;
             }, massTransitOptions: _ =>
             {

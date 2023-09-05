@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.CodeAnalysis;
 using System;
 
 namespace SimpleIdServer.Scim
@@ -77,5 +78,9 @@ namespace SimpleIdServer.Scim
         /// Set the service provider configuration identifier.
         /// </summary>
         public string ServiceProviderConfigId { get; set; } = Guid.NewGuid().ToString();
+        /// <summary>
+        /// Return 204 when the representation is PATCHED or UPDATED.
+        /// </summary>
+        public bool IsNoContentReturned { get; set; } = false;
     }
 }
