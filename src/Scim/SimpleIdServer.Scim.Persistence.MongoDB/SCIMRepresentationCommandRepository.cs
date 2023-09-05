@@ -166,6 +166,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 
         public async Task<List<SCIMRepresentationAttribute>> FindAttributes(string representationId, SCIMAttributeExpression pathExpression, CancellationToken cancellationToken)
         {
+            if (pathExpression.SchemaAttribute == null || string.IsNullOrWhiteSpace(pathExpression.SchemaAttribute.Id)) return new List<SCIMRepresentationAttribute>();
             IQueryable<EnrichedAttribute> representationAttributes = from a in _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
                     join b in _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable() on a.Id equals b.ParentAttributeId into Children
                     where a.RepresentationId == representationId

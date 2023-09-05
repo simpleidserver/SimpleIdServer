@@ -2324,7 +2324,8 @@ this.ScenarioInitialize(scenarioInfo);
                             "[ \"urn:ietf:params:scim:api:messages:2.0:PatchOp\" ]"});
                 table234.AddRow(new string[] {
                             "Operations",
-                            "[ { \"op\" : \"replace\", \"path\": \"phones[phoneNumber eq 03]\" } ]"});
+                            "[ { \"op\" : \"replace\", \"path\": \"phones[phoneNumber eq 03]\", \"value\" : { \"phoneNumb" +
+                                "er\": \"03\", \"type\": \"test\" } } ]"});
 #line 518
  testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table234, "And ");
 #line hidden

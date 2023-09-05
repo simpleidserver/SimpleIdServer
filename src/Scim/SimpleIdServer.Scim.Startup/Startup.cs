@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Persistence.MongoDB.Extensions;
@@ -75,8 +74,8 @@ namespace SimpleIdServer.Scim.Startup
             services.AddSCIMSwagger();
             services.AddSIDScim(_ =>
             {
-                _.IsNoContentReturned = false;
                 _.IgnoreUnsupportedCanonicalValues = false;
+                _.IsNoContentReturned = false;
             }, massTransitOptions: _ =>
             {
                 _.AddConsumer<IntegrationEventConsumer>();

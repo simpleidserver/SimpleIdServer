@@ -516,9 +516,9 @@ Scenario: Error is returned when trying to PATCH and there is no match (HTTP PAT
 	And extract JSON from body
 	And extract 'id' from JSON body	
 	And execute HTTP PATCH JSON request 'http://localhost/Users/$id$'
-	| Key        | Value                                                         |
-	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]           |
-	| Operations | [ { "op" : "replace", "path": "phones[phoneNumber eq 03]" } ] |
+	| Key        | Value                                                                                                            |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                                                              |
+	| Operations | [ { "op" : "replace", "path": "phones[phoneNumber eq 03]", "value" : { "phoneNumber": "03", "type": "test" } } ] |
 
 	And extract JSON from body
 	Then HTTP status code equals to '400'

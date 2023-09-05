@@ -27,7 +27,8 @@ const sidebars = {
     'authenticators',
     'pki/index',
     'auditing/index',
-    { type: 'category', label: 'Administration UI', items : [ 'adminui/index', 'adminui/realm', 'adminui/clients', 'adminui/externalidproviders', 'adminui/certificateauthority' ] }
+    { type: 'category', label: 'Administration UI', items : [ 'adminui/index', 'adminui/realm', 'adminui/clients', 'adminui/externalidproviders', 'adminui/certificateauthority' ] },
+    { type: 'category', label: 'Migration', items: ['migrations/403to404'] }
   ],
   tutorials: [
     'tutorial/overview',    

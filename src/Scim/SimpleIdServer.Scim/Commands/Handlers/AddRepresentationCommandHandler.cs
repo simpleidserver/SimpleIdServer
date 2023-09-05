@@ -69,6 +69,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 Operation = SCIMPatchOperations.ADD,
                 Path = a.FullPath
             }).ToList();
+            scimRepresentation.RefreshHierarchicalAttributesCache();
             var references = await _representationReferenceSync.Sync(addRepresentationCommand.ResourceType, scimRepresentation, patchOperations, addRepresentationCommand.Location, schema, false);
             await using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
             {
