@@ -10,6 +10,7 @@ using SimpleIdServer.Scim.Parser.Expressions;
 using SimpleIdServer.Scim.Persistence.MongoDB.Extensions;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Persistence.MongoDB
@@ -25,7 +26,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             _options = options.Value;
         }
 
-        public async Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId)
+        public async Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, CancellationToken cancellationToken)
         {
             var collection = _scimDbContext.SCIMRepresentationLst;
             var result = await collection.AsQueryable().Where(a => a.Id == representationId).ToMongoFirstAsync();
@@ -38,7 +39,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             return result;
         }
 
-        public async Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType)
+        public async Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType, CancellationToken cancellationToken)
         {
             var collection = _scimDbContext.SCIMRepresentationLst;
             var result = await collection.AsQueryable().Where(a => a.Id == representationId && a.ResourceType == resourceType).ToMongoFirstAsync();
@@ -51,12 +52,12 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             return result;
         }
 
-        public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType, GetSCIMResourceParameter parameter)
+        public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType, GetSCIMResourceParameter parameter, CancellationToken cancellationToken)
         {
-            return FindSCIMRepresentationById(representationId, resourceType);
+            return FindSCIMRepresentationById(representationId, resourceType, cancellationToken);
         }
 
-        public async Task<SearchSCIMRepresentationsResponse> FindSCIMRepresentations(SearchSCIMRepresentationsParameter parameter)
+        public async Task<SearchSCIMRepresentationsResponse> FindSCIMRepresentations(SearchSCIMRepresentationsParameter parameter, CancellationToken cancellationToken)
         {
             IQueryable<EnrichedRepresentation> representationAttributes = from a in _scimDbContext.SCIMRepresentationLst.AsQueryable()
                 join b in _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable() on a.Id equals b.RepresentationId into FlatAttributes

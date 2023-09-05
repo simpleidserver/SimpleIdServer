@@ -55,7 +55,7 @@ namespace SimpleIdServer.Scim.Api
         [Authorize("Provison")]
         public async Task<IActionResult> Provision(string id)
         {
-            var representation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(id);
+            var representation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(id, CancellationToken.None);
             if (representation == null)
             {
                 _logger.LogError(string.Format(Global.ResourceNotFound, id));

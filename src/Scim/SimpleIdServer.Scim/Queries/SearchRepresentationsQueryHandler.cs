@@ -12,6 +12,7 @@ using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Resources;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Queries
@@ -31,7 +32,7 @@ namespace SimpleIdServer.Scim.Queries
             _scimRepresentationQueryRepository = scimRepresentationQueryRepository;
         }
 
-        public virtual async Task<GenericResult<SearchSCIMRepresentationsResponse>> Handle(SearchSCIMResourceParameter searchRequest, string resourceType)
+        public virtual async Task<GenericResult<SearchSCIMRepresentationsResponse>> Handle(SearchSCIMResourceParameter searchRequest, string resourceType, CancellationToken cancellationToken)
         {
             if (searchRequest == null) throw new SCIMBadSyntaxException(Global.HttpPostNotWellFormatted);
             if (searchRequest.Count > _options.MaxResults || searchRequest.Count == null) searchRequest.Count = _options.MaxResults;
@@ -54,7 +55,7 @@ namespace SimpleIdServer.Scim.Queries
             standardSchemas.AddRange(schemas);
             var includedAttributes = searchRequest.Attributes == null ? new List<SCIMAttributeExpression>() : searchRequest.Attributes.Select(a => SCIMFilterParser.Parse(a, standardSchemas)).Cast<SCIMAttributeExpression>().ToList();
             var excludedAttributes = searchRequest.ExcludedAttributes == null ? new List<SCIMAttributeExpression>() : searchRequest.ExcludedAttributes.Select(a => SCIMFilterParser.Parse(a, standardSchemas)).Cast<SCIMAttributeExpression>().ToList();
-            var result = await _scimRepresentationQueryRepository.FindSCIMRepresentations(new SearchSCIMRepresentationsParameter(resourceType, searchRequest.StartIndex, searchRequest.Count.Value, sortByFilter, searchRequest.SortOrder, SCIMFilterParser.Parse(searchRequest.Filter, schemas), includedAttributes, excludedAttributes));
+            var result = await _scimRepresentationQueryRepository.FindSCIMRepresentations(new SearchSCIMRepresentationsParameter(resourceType, searchRequest.StartIndex, searchRequest.Count.Value, sortByFilter, searchRequest.SortOrder, SCIMFilterParser.Parse(searchRequest.Filter, schemas), includedAttributes, excludedAttributes), cancellationToken);
             var representations = result.Content.ToList();
             foreach (var representation in representations) representation.Schemas = schemas;
             return GenericResult<SearchSCIMRepresentationsResponse>.Ok(result);

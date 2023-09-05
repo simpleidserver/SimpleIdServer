@@ -3,12 +3,13 @@
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Infrastructure;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Queries
 {
     public interface IGetRepresentationQueryHandler
     {
-        Task<GenericResult<SCIMRepresentation>> Handle(string id, GetSCIMResourceRequest parameter, string resourceType);
+        Task<GenericResult<SCIMRepresentation>> Handle(string id, GetSCIMResourceRequest parameter, string resourceType, CancellationToken cancellationToken);
     }
 }

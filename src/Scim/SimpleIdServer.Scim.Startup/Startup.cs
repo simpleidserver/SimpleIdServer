@@ -14,6 +14,7 @@ using MongoDB.Driver;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Persistence.MongoDB.Extensions;
 using SimpleIdServer.Scim.Persistence.MongoDB.Infrastructures;
+using SimpleIdServer.Scim.Persistence.MongoDB.Models;
 using SimpleIdServer.Scim.Startup.Configurations;
 using SimpleIdServer.Scim.Startup.Consumers;
 using SimpleIdServer.Scim.Startup.Services;
@@ -230,16 +231,17 @@ namespace SimpleIdServer.Scim.Startup
                             await context.SCIMRepresentationAttributeLst.ReplaceOneAsync(s => s.Id == attr.Id, attr, new ReplaceOptions { IsUpsert = true });
                     }
 
-                    var classMapsField = typeof(BsonClassMap).GetField("__classMaps", BindingFlags.Static | BindingFlags.NonPublic);
-                    var classMaps = (Dictionary<Type, BsonClassMap>)classMapsField.GetValue(null);
                     // Update all the representations
                     var representations = await context.SCIMRepresentationLst.AsQueryable().ToMongoListAsync();
                     foreach(var representation in representations)
                     {
+                        var filter = Builders<SCIMRepresentationModel>.Filter.Eq("_id", representation.Id);
+                        var updateDefinitionBuilder = Builders<SCIMRepresentationModel>.Update;
+                        var updateDefinition = updateDefinitionBuilder.Unset("FlatAttributes");
                         representation.AttributeRefs = representation.FlatAttributes.Select(a => new CustomMongoDBRef("representationAttributes", a.Id)).ToList();
                         representation.FlatAttributes = null;
                         await context.SCIMRepresentationLst.ReplaceOneAsync(s => s.Id == representation.Id, representation, new ReplaceOptions { IsUpsert = true });
-                    }
+                        await context.SCIMRepresentationLst.UpdateOneAsync(filter, updateDefinition);                    }
                 }
             }
         }

@@ -5,6 +5,7 @@ using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Parser.Expressions;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Persistence.InMemory
@@ -20,7 +21,7 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             _attributes = attributes;
         }
 
-        public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId)
+        public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, CancellationToken cancellationToken)
         {
             var result = _representations.FirstOrDefault(r => r.Id == representationId);
             if (result == null)
@@ -31,7 +32,7 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             return Task.FromResult(Enrich(result));
         }
 
-        public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType)
+        public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType, CancellationToken cancellationToken)
         {
             var result = _representations.FirstOrDefault(r => r.Id == representationId && r.ResourceType == resourceType);
             if (result == null)
@@ -43,7 +44,7 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             return Task.FromResult(Enrich(result));
         }
 
-        public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType, GetSCIMResourceParameter parameter)
+        public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType, GetSCIMResourceParameter parameter, CancellationToken cancellationToken)
         {
             var result = _representations.FirstOrDefault(r => r.Id == representationId && r.ResourceType == resourceType);
             if (result == null)
@@ -56,7 +57,7 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             return Task.FromResult(clone);
         }
 
-        public Task<SearchSCIMRepresentationsResponse> FindSCIMRepresentations(SearchSCIMRepresentationsParameter parameter)
+        public Task<SearchSCIMRepresentationsResponse> FindSCIMRepresentations(SearchSCIMRepresentationsParameter parameter, CancellationToken cancellationToken)
         {
             var queryableRepresentations = _representations.Select(r => Enrich(r)).AsQueryable().Where(r => r.ResourceType == parameter.ResourceType);
             if (parameter.Filter != null)
@@ -79,7 +80,7 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             return Task.FromResult(new SearchSCIMRepresentationsResponse(totalResults, result));
         }
 
-        public Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByIds(IEnumerable<string> representationIds, string resourceType)
+        public Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByIds(IEnumerable<string> representationIds, string resourceType, CancellationToken cancellationToken)
         {
             IEnumerable<SCIMRepresentation> representations = _representations.AsQueryable().Where(r => r.ResourceType == resourceType && representationIds.Contains(r.Id));
             return Task.FromResult(representations);

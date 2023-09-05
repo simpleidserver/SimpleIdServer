@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Persistence.EF.Extensions
@@ -25,7 +26,8 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
             IEnumerable<SCIMAttributeExpression> includedAttributes,
             IEnumerable<SCIMAttributeExpression> excludedAttributes,
             string id,
-            string resourceType)
+            string resourceType, 
+            CancellationToken cancellationToken)
         {
             IQueryable<SCIMRepresentationAttribute> filteredAttrs = null;
             if (includedAttributes != null && includedAttributes.Any())
@@ -41,20 +43,21 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
             if (filteredAttrs != null)
             {
                 filteredAttrs = filteredAttrs.Where(a => a.RepresentationId == id);
-                var result = await representations.FirstOrDefaultAsync(r => r.Id == id && r.ResourceType == resourceType);
+                var result = await representations.FirstOrDefaultAsync(r => r.Id == id && r.ResourceType == resourceType, cancellationToken);
                 result.FlatAttributes = filteredAttrs.ToList();
                 return result;
             }
             
-            return await representations.FirstOrDefaultAsync(r => r.Id == id && r.ResourceType == resourceType);
+            return await representations.FirstOrDefaultAsync(r => r.Id == id && r.ResourceType == resourceType, cancellationToken);
         }
 
-        public static SearchSCIMRepresentationsResponse BuildResult(
+        public static async Task<SearchSCIMRepresentationsResponse> BuildResult(
             this IQueryable<SCIMRepresentation> representations,
             SCIMDbContext dbContext,
             IEnumerable<SCIMAttributeExpression> includedAttributes,
             IEnumerable<SCIMAttributeExpression> excludedAttributes,
-            int total)
+            int total,
+            CancellationToken cancellationToken)
         {
             IQueryable<SCIMRepresentationAttribute> filteredAttrs= null;
             if (includedAttributes != null && includedAttributes.Any())
@@ -83,7 +86,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
                                     DisplayName = rep.DisplayName,
                                     Version = rep.Version
                                 };
-                var content = result.AsEnumerable().GroupBy(r => r.Id);
+                var content = (await result.ToListAsync(cancellationToken)).GroupBy(r => r.Id);
                 var includedFullPathLst = (includedAttributes != null && includedAttributes.Any()) ? includedAttributes.Where(i => i is SCIMComplexAttributeExpression).Select(i => i.GetFullPath()) : new List<string>();
                 return new SearchSCIMRepresentationsResponse(total, content.Select(c => new SCIMRepresentation
                 {
@@ -106,7 +109,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
                 }));
             }
 
-            var reps = representations.ToList();
+            var reps = await representations.ToListAsync(cancellationToken);
             return new SearchSCIMRepresentationsResponse(total, reps);
         }
 
@@ -122,7 +125,8 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
             int startIndex,
             int count,
             IEnumerable<SCIMAttributeExpression> includedAttributes,
-            IEnumerable<SCIMAttributeExpression> excludedAttributes)
+            IEnumerable<SCIMAttributeExpression> excludedAttributes,
+            CancellationToken cancellationToken)
         {
             var attrExpression = expression as SCIMAttributeExpression;
             if (attrExpression == null)
@@ -130,17 +134,18 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
                 return null;
             }
 
-            var result = EvaluateOrderByMetadata(dbContext, 
+            var result = await EvaluateOrderByMetadata(dbContext, 
                 attrExpression, 
                 representations, 
                 order, 
                 startIndex, 
                 count,
                 includedAttributes,
-                excludedAttributes);
+                excludedAttributes,
+                cancellationToken);
             if (result == null)
             {
-                result = EvaluateOrderByProperty(
+                result = await EvaluateOrderByProperty(
                     dbContext,
                     attrExpression, 
                     representations, 
@@ -148,13 +153,14 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
                     startIndex, 
                     count,
                     includedAttributes,
-                    excludedAttributes);
+                    excludedAttributes,
+                    cancellationToken);
             }
 
             return result;
         }
 
-        private static SearchSCIMRepresentationsResponse EvaluateOrderByMetadata(
+        private static Task<SearchSCIMRepresentationsResponse> EvaluateOrderByMetadata(
             SCIMDbContext dbContext,
             SCIMAttributeExpression attrExpression, 
             IQueryable<SCIMRepresentation> representations, 
@@ -162,7 +168,8 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
             int startIndex,
             int count,
             IEnumerable<SCIMAttributeExpression> includedAttributes,
-            IEnumerable<SCIMAttributeExpression> excludedAttributes)
+            IEnumerable<SCIMAttributeExpression> excludedAttributes,
+            CancellationToken cancellationToken)
         {
             int total = representations.Count();
             var fullPath = attrExpression.GetFullPath();
@@ -179,10 +186,10 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
             var finalOrderRequestBody = Expression.Lambda(orderExpr, new ParameterExpression[] { finalSelectArg });
             var result = (IQueryable<SCIMRepresentation>)finalOrderRequestBody.Compile().DynamicInvoke(representations);
             var content = result.Skip(startIndex <= 1 ? 0 : startIndex - 1).Take(count);
-            return BuildResult(content, dbContext, includedAttributes, excludedAttributes, total);
+            return BuildResult(content, dbContext, includedAttributes, excludedAttributes, total, cancellationToken);
         }
 
-        private static SearchSCIMRepresentationsResponse EvaluateOrderByProperty(
+        private static async Task<SearchSCIMRepresentationsResponse> EvaluateOrderByProperty(
             SCIMDbContext dbContext,
             SCIMAttributeExpression attrExpression, 
             IQueryable<SCIMRepresentation> representations, 
@@ -190,7 +197,8 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
             int startIndex,
             int count,
             IEnumerable<SCIMAttributeExpression> includedAttributes,
-            IEnumerable<SCIMAttributeExpression> excludedAttributes)
+            IEnumerable<SCIMAttributeExpression> excludedAttributes,
+            CancellationToken cancellationToken)
         {
             int total = representations.Count();
             var lastChild = attrExpression.GetLastChild();
@@ -296,7 +304,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
             }
 
             var content = reprs.Skip(startIndex <= 1 ? 0 : startIndex - 1).Take(count);
-            return BuildResult(content, dbContext, includedAttributes, excludedAttributes, total);
+            return await BuildResult(content, dbContext, includedAttributes, excludedAttributes, total, cancellationToken);
         }
 
         private static MethodInfo GetOrderByType(SearchSCIMRepresentationOrders order, Type lastChildType)

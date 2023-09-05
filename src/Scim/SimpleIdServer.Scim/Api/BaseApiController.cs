@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Api
@@ -81,9 +82,9 @@ namespace SimpleIdServer.Scim.Api
         [ProducesResponseType(404)]
         [HttpGet]
         [Authorize("QueryScimResource")]
-        public virtual Task<IActionResult> Get([FromQuery] SearchSCIMResourceParameter searchRequest)
+        public virtual Task<IActionResult> Get([FromQuery] SearchSCIMResourceParameter searchRequest, CancellationToken cancellationToken)
         {
-            return InternalSearch(searchRequest);
+            return InternalSearch(searchRequest, cancellationToken);
         }
 
         /// <summary>
@@ -101,9 +102,9 @@ namespace SimpleIdServer.Scim.Api
         [ProducesResponseType(404)]
         [HttpPost(".search")]
         [Authorize("QueryScimResource")]
-        public virtual Task<IActionResult> Search([FromBody] SearchSCIMResourceParameter searchRequest)
+        public virtual Task<IActionResult> Search([FromBody] SearchSCIMResourceParameter searchRequest, CancellationToken cancellationToken)
         {
-            return InternalSearch(searchRequest);
+            return InternalSearch(searchRequest, cancellationToken);
         }
 
         /// <summary>
@@ -121,9 +122,9 @@ namespace SimpleIdServer.Scim.Api
         [ProducesResponseType(404)]
         [HttpGet("{id}")]
         [Authorize("QueryScimResource")]
-        public virtual Task<IActionResult> Get(string id, [FromQuery] GetSCIMResourceRequest parameter)
+        public virtual Task<IActionResult> Get(string id, [FromQuery] GetSCIMResourceRequest parameter, CancellationToken cancellationToken)
         {
-            return InternalGet(id, parameter);
+            return InternalGet(id, parameter, cancellationToken);
         }
 
         /// <summary>
@@ -142,11 +143,11 @@ namespace SimpleIdServer.Scim.Api
         [ProducesResponseType(404)]
         [HttpGet("Me")]
         [Authorize("UserAuthenticated")]
-        public virtual Task<IActionResult> GetMe(string id, [FromQuery] GetSCIMResourceRequest parameter)
+        public virtual Task<IActionResult> GetMe(string id, [FromQuery] GetSCIMResourceRequest parameter, CancellationToken cancellationToken)
         {
             return ExecuteActionIfAuthenticated(() =>
             {
-                return InternalGet(id, parameter);
+                return InternalGet(id, parameter, cancellationToken);
             });
         }
 
@@ -359,12 +360,12 @@ namespace SimpleIdServer.Scim.Api
             });
         }
 
-        protected async Task<IActionResult> InternalSearch(SearchSCIMResourceParameter searchRequest)
+        protected async Task<IActionResult> InternalSearch(SearchSCIMResourceParameter searchRequest, CancellationToken cancellationToken)
         {
             _logger.LogInformation(Global.StartGetResources);
             try
             {
-                var searchResult = await _searchRepresentationsQueryHandler.Handle(searchRequest, _resourceType);
+                var searchResult = await _searchRepresentationsQueryHandler.Handle(searchRequest, _resourceType, cancellationToken);
                 if (searchResult.HasError) return this.BuildError(searchResult);
                 var result = searchResult.Result;
                 var jObj = new JObject
@@ -437,12 +438,12 @@ namespace SimpleIdServer.Scim.Api
             }
         }
 
-        protected async Task<IActionResult> InternalGet(string id, GetSCIMResourceRequest parameter)
+        protected async Task<IActionResult> InternalGet(string id, GetSCIMResourceRequest parameter, CancellationToken cancellationToken)
         {
             _logger.LogInformation(string.Format(Global.StartGetResource, id));
             try
             {
-                var getRepresentationResult = await _getRepresentationQueryHandler.Handle(id, parameter, _resourceType);
+                var getRepresentationResult = await _getRepresentationQueryHandler.Handle(id, parameter, _resourceType, cancellationToken);
                 if (getRepresentationResult.HasError) return this.BuildError(getRepresentationResult);
                 var representation = getRepresentationResult.Result;
                 await _attributeReferenceEnricher.Enrich(_resourceType, new List<SCIMRepresentation> { representation }, _uriProvider.GetAbsoluteUriWithVirtualPath());
@@ -684,7 +685,7 @@ namespace SimpleIdServer.Scim.Api
 
         protected async Task<(SCIMRepresentation, JObject)> GetRepresentation(string id)
         {
-            var getRepresentationResult = await _getRepresentationQueryHandler.Handle(id, new GetSCIMResourceRequest(), _resourceType);
+            var getRepresentationResult = await _getRepresentationQueryHandler.Handle(id, new GetSCIMResourceRequest(), _resourceType, CancellationToken.None);
             var representation = getRepresentationResult.Result;
             await _attributeReferenceEnricher.Enrich(_resourceType, new List<SCIMRepresentation> { representation }, _uriProvider.GetAbsoluteUriWithVirtualPath());
             var location = GetLocation(representation);
