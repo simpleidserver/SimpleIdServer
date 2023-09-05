@@ -9,9 +9,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Persistence.MongoDB.Extensions;
+using SimpleIdServer.Scim.Persistence.MongoDB.Infrastructures;
 using SimpleIdServer.Scim.Startup.Configurations;
 using SimpleIdServer.Scim.Startup.Consumers;
 using SimpleIdServer.Scim.Startup.Services;
@@ -208,7 +210,7 @@ namespace SimpleIdServer.Scim.Startup
             using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
                 using (var context = scope.ServiceProvider.GetService<Persistence.MongoDB.SCIMDbContext>())
-                {   
+                {
                     // Update IsComputedField
                     var targetAttributeIds = await context.SCIMAttributeMappingLst.AsQueryable().Where(a => a.TargetAttributeId != null).Select(a => a.TargetAttributeId).ToMongoListAsync();
                     var schemas = await context.SCIMSchemaLst.AsQueryable().ToMongoListAsync();
@@ -226,6 +228,17 @@ namespace SimpleIdServer.Scim.Startup
                         var attrs = SCIMRepresentation.BuildHierarchicalAttributes(grp).SelectMany(a => a.ToFlat());
                         foreach (var attr in attrs)
                             await context.SCIMRepresentationAttributeLst.ReplaceOneAsync(s => s.Id == attr.Id, attr, new ReplaceOptions { IsUpsert = true });
+                    }
+
+                    var classMapsField = typeof(BsonClassMap).GetField("__classMaps", BindingFlags.Static | BindingFlags.NonPublic);
+                    var classMaps = (Dictionary<Type, BsonClassMap>)classMapsField.GetValue(null);
+                    // Update all the representations
+                    var representations = await context.SCIMRepresentationLst.AsQueryable().ToMongoListAsync();
+                    foreach(var representation in representations)
+                    {
+                        representation.AttributeRefs = representation.FlatAttributes.Select(a => new CustomMongoDBRef("representationAttributes", a.Id)).ToList();
+                        representation.FlatAttributes = null;
+                        await context.SCIMRepresentationLst.ReplaceOneAsync(s => s.Id == representation.Id, representation, new ReplaceOptions { IsUpsert = true });
                     }
                 }
             }
@@ -301,7 +314,7 @@ namespace SimpleIdServer.Scim.Startup
                     SourceAttributeSelector = "members",
                     TargetResourceType = StandardSchemas.GroupSchema.ResourceType
                 }
-            });
+            }, useVersion403: false);
         }
 
         private void ConfigureEFStorage(IServiceCollection services, StorageConfiguration conf)

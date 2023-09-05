@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MongoDB.Driver;
-using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Persistence.MongoDB;
@@ -17,9 +16,11 @@ namespace Microsoft.Extensions.DependencyInjection
 			this IServiceCollection services,
 			Action<MongoDbOptions> mongoDbSetup,
 			List<SCIMSchema> initialSchemas = null,
-			List<SCIMAttributeMapping> initialAttributeMapping = null)
+			List<SCIMAttributeMapping> initialAttributeMapping = null,
+			bool useVersion403 = false)
 		{
-			SCIMDbContext.RegisterMappings();
+			if (!useVersion403) SCIMDbContext.RegisterMappings();
+			else SCIMDbContext.RegisterMappings403();
 			if (mongoDbSetup != null)
 			{
 				services.Configure(mongoDbSetup);
