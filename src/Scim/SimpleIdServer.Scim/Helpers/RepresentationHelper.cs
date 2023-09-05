@@ -17,7 +17,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace SimpleIdServer.Scim.Helpers
 {
@@ -44,26 +43,25 @@ namespace SimpleIdServer.Scim.Helpers
 
         public async Task<SCIMRepresentationPatchResult> Apply(SCIMRepresentation representation, IEnumerable<PatchOperationParameter> patchLst, IEnumerable<SCIMAttributeMapping> attributeMappings, bool ignoreUnsupportedCanonicalValues, CancellationToken cancellationToken)
         {
+            var attrSelectors = attributeMappings.Select(a => a.SourceAttributeSelector).Distinct();
             var result = new SCIMRepresentationPatchResult();
             foreach (var patch in patchLst)
             {
+                SCIMAttributeExpression scimExpr = null;
                 var scimFilter = SCIMFilterParser.Parse(patch.Path, representation.Schemas);
                 var schemaAttributes = representation.Schemas.SelectMany(_ => _.Attributes);
                 List<SCIMRepresentationAttribute> filteredAttributes = null, hierarchicalNewAttributes = null, hierarchicalFilteredAttributes = null;
                 string fullPath = null;
                 SCIMSchemaAttribute scimExprSchemaAttr = null;
-                if (scimFilter != null)
+
+                if(scimFilter != null)
                 {
-                    var scimExpr = scimFilter as SCIMAttributeExpression;
+                    scimExpr = scimFilter as SCIMAttributeExpression;
                     if (scimExpr == null) throw new SCIMAttributeException(Global.InvalidAttributeExpression);
                     scimExprSchemaAttr = scimExpr.GetLastChild().SchemaAttribute;
                     fullPath = scimExpr.GetFullPath();
                     schemaAttributes = representation.Schemas.Select(s => s.GetAttribute(fullPath)).Where(s => s != null);
                     fullPath = SCIMAttributeExpression.RemoveNamespace(fullPath);
-                    filteredAttributes = await _scimRepresentationCommandRepository.FindAttributes(representation.Id, scimExpr, cancellationToken);
-                    hierarchicalFilteredAttributes = SCIMRepresentation.BuildHierarchicalAttributes(filteredAttributes);
-                    var complexAttr = scimFilter as SCIMComplexAttributeExpression;
-                    if (complexAttr != null && !hierarchicalFilteredAttributes.Any() && complexAttr.GroupingFilter != null && patch.Operation == SCIMPatchOperations.REPLACE) throw new SCIMNoTargetException(Global.PatchMissingAttribute);
                 }
 
                 if (patch.Operation != SCIMPatchOperations.REMOVE)
@@ -74,7 +72,7 @@ namespace SimpleIdServer.Scim.Helpers
                     if (scimFilter != null && attributes != null && !attributes.Any(a => a.IsLeaf()))
                     {
                         var lst = new List<SCIMRepresentationAttribute>();
-                        foreach(var hNewAttribute in hierarchicalNewAttributes)
+                        foreach (var hNewAttribute in hierarchicalNewAttributes)
                         {
                             var record = scimFilter.BuildEmptyAttributes().FirstOrDefault();
                             record.UpdateValue(hNewAttribute.FullPath, hNewAttribute);
@@ -83,6 +81,28 @@ namespace SimpleIdServer.Scim.Helpers
 
                         hierarchicalNewAttributes = SCIMRepresentation.BuildHierarchicalAttributes(lst);
                     }
+                }
+
+                if (patch.Operation == SCIMPatchOperations.ADD && !(scimFilter is SCIMComplexAttributeExpression) && attrSelectors.Contains(fullPath))
+                {
+                    var computedValueIndexLst = hierarchicalNewAttributes.Select(n => n.ComputedValueIndex).ToList();
+                    var existingAttrs = await _scimRepresentationCommandRepository.FindAttributesByComputedValueIndexAndRepresentationId(computedValueIndexLst, representation.Id, cancellationToken);
+                    var hierarchicalExistingAttrs = SCIMRepresentation.BuildHierarchicalAttributes(existingAttrs);
+                    hierarchicalNewAttributes = FilterDuplicate(hierarchicalExistingAttrs, hierarchicalNewAttributes);
+                    foreach(var newAttr in hierarchicalNewAttributes)
+                    {
+                        TryInsertComplexMultivaluedAttribute(result, newAttr, null, scimExprSchemaAttr, representation);
+                    }
+
+                    continue;
+                }
+
+                if (scimFilter != null)
+                {
+                    filteredAttributes = await _scimRepresentationCommandRepository.FindAttributes(representation.Id, scimExpr, cancellationToken);
+                    hierarchicalFilteredAttributes = SCIMRepresentation.BuildHierarchicalAttributes(filteredAttributes);
+                    var complexAttr = scimFilter as SCIMComplexAttributeExpression;
+                    if (complexAttr != null && !hierarchicalFilteredAttributes.Any() && complexAttr.GroupingFilter != null && patch.Operation == SCIMPatchOperations.REPLACE) throw new SCIMNoTargetException(Global.PatchMissingAttribute);
                 }
 
                 if(hierarchicalFilteredAttributes != null && hierarchicalNewAttributes != null) hierarchicalNewAttributes = FilterDuplicate(hierarchicalFilteredAttributes, hierarchicalNewAttributes);

@@ -107,7 +107,7 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             return Task.FromResult(result);
         }
 
-        public Task<List<SCIMRepresentationAttribute>> FindAttributes(string representationId, SCIMAttributeExpression pathExpression, CancellationToken cancellationToken)
+        public Task<List<SCIMRepresentationAttribute>> FindAttributes(string representationId, SCIMAttributeExpression pathExpression, CancellationToken cancellationToken = default(CancellationToken))
         {
             var representationAttributes = _attributes.Where(a => a.RepresentationId == representationId);
             var hierarchicalRepresentationAttributes = SCIMRepresentation.BuildHierarchicalAttributes(representationAttributes).AsQueryable();
@@ -145,6 +145,12 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
         public Task<List<SCIMRepresentationAttribute>> FindAttributesBySchemaAttributeAndValues(string schemaAttributeId, IEnumerable<string> values, CancellationToken cancellationToken)
         {
             var representationAttributes = _attributes.Where(a => values.Contains(a.ValueString) && a.SchemaAttributeId == schemaAttributeId);
+            return Task.FromResult(representationAttributes.ToList());
+        }
+
+        public Task<List<SCIMRepresentationAttribute>> FindAttributesByComputedValueIndexAndRepresentationId(List<string> computedValueIndexLst, string representationId, CancellationToken cancellationToken)
+        {
+            var representationAttributes = _attributes.Where(a => computedValueIndexLst.Contains(a.ComputedValueIndex) && a.RepresentationId == representationId);
             return Task.FromResult(representationAttributes.ToList());
         }
 

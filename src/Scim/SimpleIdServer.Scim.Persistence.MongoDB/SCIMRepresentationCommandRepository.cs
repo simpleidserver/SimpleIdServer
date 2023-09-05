@@ -228,6 +228,14 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             return representationAttributes;
         }
 
+        public async Task<List<SCIMRepresentationAttribute>> FindAttributesByComputedValueIndexAndRepresentationId(List<string> computedValueIndexLst, string representationId, CancellationToken cancellationToken)
+        {
+            var representationAttributes = await _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
+                .Where(a => computedValueIndexLst.Contains(a.ComputedValueIndex) && a.RepresentationId == representationId)
+                .ToMongoListAsync();
+            return representationAttributes;
+        }
+
         public async Task<List<SCIMRepresentationAttribute>> FindAttributesByReference(List<string> representationIds, string schemaAttributeId, string value, CancellationToken cancellationToken)
         {
             var representationAttributes = await _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()

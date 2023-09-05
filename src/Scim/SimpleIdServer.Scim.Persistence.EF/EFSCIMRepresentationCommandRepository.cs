@@ -7,7 +7,6 @@ using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Parser.Expressions;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -165,6 +164,14 @@ namespace SimpleIdServer.Scim.Persistence.EF
         {
             var representationAttributes = await _scimDbContext.SCIMRepresentationAttributeLst.Include(a => a.SchemaAttribute).AsNoTracking()
                 .Where(a => values.Contains(a.ValueString) && a.SchemaAttributeId == schemaAttributeId)
+                .ToListAsync(cancellationToken);
+            return representationAttributes;
+        }
+
+        public async Task<List<SCIMRepresentationAttribute>> FindAttributesByComputedValueIndexAndRepresentationId(List<string> computedValueIndexLst, string representationId, CancellationToken cancellationToken)
+        {
+            var representationAttributes = await _scimDbContext.SCIMRepresentationAttributeLst.Include(a => a.SchemaAttribute).AsNoTracking()
+                .Where(a => computedValueIndexLst.Contains(a.ComputedValueIndex) && a.RepresentationId == representationId)
                 .ToListAsync(cancellationToken);
             return representationAttributes;
         }
