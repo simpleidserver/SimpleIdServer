@@ -27,6 +27,21 @@
     </div>
 }
 
+<!-- Certificate -->
+@if(Client.Pem != null)
+{
+    <!-- Public Key -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Public Key</RadzenText>
+        <RadzenTextArea Rows=10 Name="Description" Value="@Client.Pem.PublicKey" Class="w-100"></RadzenTextArea>
+    </div>
+    <!-- Private Key -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Private Key</RadzenText>
+        <RadzenTextArea Rows=10 Name="Description" Value="@Client.Pem.PrivateKey" Class="w-100"></RadzenTextArea>
+    </div>
+}
+
 @switch(Client.ClientType)
 {
     case SimpleIdServer.IdServer.WsFederation.WsFederationConstants.CLIENT_TYPE:

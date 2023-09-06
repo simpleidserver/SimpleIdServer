@@ -1,0 +1,87 @@
+{
+  "docs": [
+    "installation",
+    "dotnettemplate",
+    "configuration",
+    "realm/index",
+    {
+      "type": "category",
+      "label": "Identity Management",
+      "items": [
+        "idmanagement/index",
+        "idmanagement/azuread",
+        "idmanagement/samples"
+      ]
+    },
+    "mobileapplication",
+    {
+      "type": "category",
+      "label": "OAuth 2.0 and OpenID Connect",
+      "items": [
+        "openidconnect/index",
+        "openidconnect/grant_types",
+        "openidconnect/clientauthmethods",
+        "openidconnect/clientregistration",
+        "openidconnect/acr"
+      ]
+    },
+    {
+      "type": "category",
+      "label": "Financial-grade API (FAPI)",
+      "items": [
+        "fapi/index",
+        "fapi/securityprofile",
+        "fapi/ciba",
+        "fapi/grantmgt"
+      ]
+    },
+    {
+      "type": "category",
+      "label": "Verifiable Credentials",
+      "items": [
+        "verifiablecredentials/index",
+        "verifiablecredentials/credissuer",
+        "verifiablecredentials/did"
+      ]
+    },
+    "wsfederation",
+    "authenticators",
+    "pki/index",
+    "auditing/index",
+    {
+      "type": "category",
+      "label": "Administration UI",
+      "items": [
+        "adminui/index",
+        "adminui/realm",
+        "adminui/clients",
+        "adminui/externalidproviders",
+        "adminui/certificateauthority"
+      ]
+    },
+    {
+      "type": "category",
+      "label": "Migration",
+      "items": [
+        "migrations/403to404"
+      ]
+    }
+  ],
+  "tutorials": [
+    "tutorial/overview",
+    {
+      "type": "category",
+      "label": "Tutorial",
+      "items": [
+        "tutorial/spa",
+        "tutorial/regularweb",
+        "tutorial/protectapi",
+        "tutorial/m2m",
+        "tutorial/wsfederation",
+        "tutorial/highlysecuredregularweb",
+        "tutorial/ciba",
+        "tutorial/grantmgt"
+      ]
+    }
+  ]
+}

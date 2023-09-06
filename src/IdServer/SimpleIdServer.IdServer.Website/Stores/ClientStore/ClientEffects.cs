@@ -296,7 +296,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             {
                 var certificate = KeyGenerator.GenerateSelfSignedCertificate();
                 var securityKey = new X509SecurityKey(certificate, Guid.NewGuid().ToString());
-                var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.RsaSha256);
                 var realm = await GetRealm();
                 var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
                 var newClientBuilder = SamlSpClientBuilder.BuildSamlSpClient(action.ClientIdentifier, action.MetadataUrl, certificate, activeRealm);
@@ -309,8 +308,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 newClient.Scopes = scopes;
                 dbContext.Clients.Add(newClient);
                 await dbContext.SaveChangesAsync(CancellationToken.None);
-                var serializedJsonWebKey = signingCredentials.SerializeJWKStr();
-                dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientIdentifier, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = SimpleIdServer.IdServer.Saml.Idp.Constants.CLIENT_TYPE, JsonWebKeyStr = serializedJsonWebKey });
+                var pemResult = PemConverter.ConvertFromSecurityKey(securityKey);
+                dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientIdentifier, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = SimpleIdServer.IdServer.Saml.Idp.Constants.CLIENT_TYPE, Pem = pemResult });
             }
         }
 
@@ -790,6 +789,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public string? Language { get; set; } = null;
         public string ClientType { get; set; }
         public string? JsonWebKeyStr { get; set; } = null;
+        public PemResult? Pem { get; set; } = null;
     }
 
     public class RemoveSelectedClientsAction 
