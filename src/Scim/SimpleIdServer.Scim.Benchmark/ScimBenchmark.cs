@@ -4,24 +4,30 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Benchmark
 {
-    [SimpleJob(RunStrategy.ColdStart, targetCount: 50)]
+    [SimpleJob(RunStrategy.ColdStart, targetCount: 150)]
     [MinColumn, MaxColumn, MeanColumn, MedianColumn]
     [CsvExporter]
     [HtmlExporter]
     [RPlotExporter]
     public class ScimBenchmark
     {
+        private const int _maxIterations = 150;
         private const string baseUrl = "https://localhost:5003";
         private string _groupId;
+        private string _secondGroupId;
+        private ConcurrentBag<string> _userIds = new ConcurrentBag<string>();
 
         [Benchmark]
-        public async Task AddUserToGroup()
+        public async Task AddUserToGroupOneByOne()
         {
             using (var httpClient = new HttpClient())
             {
@@ -37,6 +43,28 @@ namespace SimpleIdServer.Scim.Benchmark
         }
 
         [Benchmark]
+        public async Task AddLargeSetOfUsersToOneGroup()
+        {
+            using (var httpClient = new HttpClient())
+            {
+                if (string.IsNullOrWhiteSpace(_secondGroupId))
+                {
+                    _secondGroupId = await AddGroup(httpClient);
+                }
+
+                Console.WriteLine(_userIds.Count());
+                if(_userIds.Count() == _maxIterations - 1)
+                {
+                    await PatchGroup(httpClient, _secondGroupId, _userIds.ToList());
+                    return;
+                }
+
+                var userId = await AddUser(httpClient);
+                _userIds.Add(userId);
+            }
+        }
+
+        // [Benchmark]
         public async Task SearchUsers()
         {
             using (var httpClient = new HttpClient())
@@ -95,13 +123,18 @@ namespace SimpleIdServer.Scim.Benchmark
             await httpClient.GetAsync($"{baseUrl}/Users?excludedAttributes=groups");
         }
 
-        private static async Task PatchGroup(HttpClient httpClient, string groupId, string userId)
+        private static Task PatchGroup(HttpClient httpClient, string groupId, string userId) => PatchGroup(httpClient, groupId, new List<string> { userId });
+
+        private static async Task PatchGroup(HttpClient httpClient, string groupId, List<string> userIds)
         {
             var vals = new JArray();
-            vals.Add(new JObject
+            foreach (var userId in userIds)
             {
-                { "value", userId }
-            });
+                var record = new JObject();
+                record["value"] = userId;
+                vals.Add(record);
+            }
+
             var ops = new JArray();
             ops.Add(new JObject
             {

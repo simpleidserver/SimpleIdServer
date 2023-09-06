@@ -25,15 +25,16 @@ namespace SimpleIdServer.Scim.Commands
     public class PatchRepresentationResult
     {
         public bool IsPatched { get; private set; }
+        public SCIMRepresentation Representation { get; private set; }
 
         public static PatchRepresentationResult NoPatch()
         {
             return new PatchRepresentationResult { IsPatched = false };
         }
 
-        public static PatchRepresentationResult Ok()
+        public static PatchRepresentationResult Ok(SCIMRepresentation representation)
         {
-            return new PatchRepresentationResult { IsPatched = true };
+            return new PatchRepresentationResult { IsPatched = true, Representation = representation };
         }
     }
 }

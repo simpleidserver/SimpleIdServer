@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
 
 namespace SimpleIdServer.Scim.Startup
 {
@@ -75,7 +76,6 @@ namespace SimpleIdServer.Scim.Startup
             services.AddSIDScim(_ =>
             {
                 _.IgnoreUnsupportedCanonicalValues = false;
-                _.IsNoContentReturned = false;
             }, massTransitOptions: _ =>
             {
                 _.AddConsumer<IntegrationEventConsumer>();

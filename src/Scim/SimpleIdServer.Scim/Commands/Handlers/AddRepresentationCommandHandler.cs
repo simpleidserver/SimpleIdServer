@@ -1,6 +1,7 @@
 // Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
+using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
@@ -35,7 +36,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             _representationHelper = representationHelper;
         }
 
-        public async virtual Task<GenericResult<string>> Handle(AddRepresentationCommand addRepresentationCommand)
+        public async virtual Task<GenericResult<SCIMRepresentation>> Handle(AddRepresentationCommand addRepresentationCommand)
         {
             var requestedSchemas = addRepresentationCommand.Representation.Schemas;
             if (!requestedSchemas.Any())
@@ -62,6 +63,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             scimRepresentation.SetUpdated(DateTime.UtcNow);
             scimRepresentation.SetVersion(0);
             scimRepresentation.SetResourceType(addRepresentationCommand.ResourceType);
+            foreach (var attr in scimRepresentation.FlatAttributes) attr.RepresentationId = scimRepresentation.Id;
             await _representationHelper.CheckUniqueness(scimRepresentation.FlatAttributes);
             var patchOperations = scimRepresentation.FlatAttributes.Select(a => new SCIMPatchResult
             {
@@ -83,7 +85,8 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 await NotifyAllReferences(references).ConfigureAwait(false);
             }
 
-            return GenericResult<string>.Ok(scimRepresentation.Id);
+            scimRepresentation.Apply(references, patchOperations);
+            return GenericResult<SCIMRepresentation>.Ok(scimRepresentation);
         }
     }
 }

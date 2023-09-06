@@ -1,6 +1,7 @@
 // Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
+using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
@@ -79,7 +80,8 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 await NotifyAllReferences(references).ConfigureAwait(false);
             }
 
-            return GenericResult<ReplaceRepresentationResult>.Ok(ReplaceRepresentationResult.Ok());
+            existingRepresentation.Apply(references, patchOperations);
+            return GenericResult<ReplaceRepresentationResult>.Ok(ReplaceRepresentationResult.Ok(existingRepresentation));
         }
 
         private async Task<(SCIMRepresentation, SCIMSchema)> Validate(ReplaceRepresentationCommand replaceRepresentationCommand)
@@ -104,11 +106,6 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             _representationHelper.ExtractSCIMRepresentationFromJSON(replaceRepresentationCommand.Representation.Attributes, replaceRepresentationCommand.Representation.ExternalId, schema, schemas.Where(s => s.Id != schema.Id).ToList());
             
             return (existingRepresentation, schema);
-        }
-
-        private void CheckMutability()
-        {
-
         }
     }
 }

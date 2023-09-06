@@ -1,8 +1,10 @@
 // Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using MassTransit;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
+using SimpleIdServer.Scim.Helpers;
 using SimpleIdServer.Scim.Parser.Expressions;
 using System;
 using System.Collections.Generic;
@@ -13,6 +15,27 @@ namespace SimpleIdServer.Scim.Domain
 {
     public static class SCIMRepresentationExtensions
     {
+        public static void Apply(this SCIMRepresentation representation, List<RepresentationSyncResult> syncLst, List<SCIMPatchResult> patchLst)
+        {
+            var patchRemovedAttrs = patchLst.Where(p => p.Attr != null && p.Operation == SCIMPatchOperations.REMOVE);
+            var patchUpdatedAttr = patchLst.Where(p => p.Attr != null && p.Operation == SCIMPatchOperations.REPLACE);
+            representation.FlatAttributes = representation.FlatAttributes.Where(a => !patchRemovedAttrs.Any(r => r.Attr.Id == a.Id) && !patchUpdatedAttr.Any(r => r.Attr.Id == a.Id)).ToList();
+            var patchAddedAttr = patchLst.Where(p => p.Attr != null && p.Operation == SCIMPatchOperations.ADD && !representation.FlatAttributes.Any(a => a.SchemaAttributeId == p.Attr.SchemaAttributeId && a.ComputedValueIndex == p.Attr.ComputedValueIndex));
+            foreach (var p in patchAddedAttr) representation.FlatAttributes.Add(p.Attr);
+            foreach (var p in patchUpdatedAttr) representation.FlatAttributes.Add(p.Attr);
+            foreach(var sync in syncLst)
+            {
+                var attributesAdded = sync.AddedRepresentationAttributes.Where(a => a != null && a.RepresentationId == representation.Id);
+                var attributesRemoved = sync.RemovedRepresentationAttributes.Where(a => a != null && a.RepresentationId == representation.Id);
+                var attributesUpdated = sync.UpdatedRepresentationAttributes.Where(a => a != null && a.RepresentationId == representation.Id);
+                representation.FlatAttributes = representation.FlatAttributes.Where(a => !attributesRemoved.Any(r => r.Id == a.Id) && !attributesUpdated.Any(r => r.Id == a.Id)).ToList();
+                foreach (var attributeAdded in attributesAdded)
+                    representation.FlatAttributes.Add(attributeAdded);
+                foreach (var attributeUpdated in attributesUpdated)
+                    representation.FlatAttributes.Add(attributeUpdated);
+            }
+        }
+
         public static void FilterAttributes(this IEnumerable<SCIMRepresentation> representations, IEnumerable<SCIMAttributeExpression> includedAttributes, IEnumerable<SCIMAttributeExpression> excludedAttributes)
         {
             foreach (var representation in representations) representation.FilterAttributes(includedAttributes, excludedAttributes);

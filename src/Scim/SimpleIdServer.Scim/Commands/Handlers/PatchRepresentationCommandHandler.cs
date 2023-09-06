@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
@@ -80,7 +81,8 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 await NotifyAllReferences(references).ConfigureAwait(false);
             }
 
-            return GenericResult<PatchRepresentationResult>.Ok(PatchRepresentationResult.Ok());
+            existingRepresentation.Apply(references, patchResultLst);
+            return GenericResult<PatchRepresentationResult>.Ok(PatchRepresentationResult.Ok(existingRepresentation));
         }
 
         private void CheckParameter(PatchRepresentationParameter patchRepresentation)

@@ -473,10 +473,10 @@ namespace SimpleIdServer.Scim.Api
                 var command = new AddRepresentationCommand(_resourceType, jobj, _uriProvider.GetAbsoluteUriWithVirtualPath());
                 var addRepresentationResult = await _addRepresentationCommandHandler.Handle(command);
                 if (addRepresentationResult.HasError) return this.BuildError(addRepresentationResult);
-                var kvp = await GetRepresentation(addRepresentationResult.Result);
-                var representation = kvp.Item1;
-                var content = kvp.Item2;
+                var representation = addRepresentationResult.Result;
+                representation.ApplyEmptyArray();
                 var location = GetLocation(representation);
+                var content = representation.ToResponse(location, true, mergeExtensionAttributes: _options.MergeExtensionAttributes);
                 if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationAddedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
                 return BuildHTTPResult(HttpStatusCode.Created, location, representation.Version, content);
             }
@@ -514,6 +514,7 @@ namespace SimpleIdServer.Scim.Api
                 var getRepresentationResult = await _deleteRepresentationCommandHandler.Handle(new DeleteRepresentationCommand(id, _resourceType, _uriProvider.GetAbsoluteUriWithVirtualPath()));
                 if (getRepresentationResult.HasError) return this.BuildError(getRepresentationResult);
                 var representation = getRepresentationResult.Result;
+                representation.ApplyEmptyArray();
                 var location = GetLocation(representation);
                 var content = representation.ToResponse(location, false, mergeExtensionAttributes: _options.MergeExtensionAttributes);
                 if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationRemovedEvent(id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
@@ -552,11 +553,11 @@ namespace SimpleIdServer.Scim.Api
             {
                 var updateResult = await _replaceRepresentationCommandHandler.Handle(new ReplaceRepresentationCommand(id, _resourceType, representationParameter, _uriProvider.GetAbsoluteUriWithVirtualPath()));
                 if (updateResult.HasError) return this.BuildError(updateResult);
-                if (!updateResult.Result.IsReplaced || _options.IsNoContentReturned) return NoContent();
-                var kvp = await GetRepresentation(id);
-                var representation = kvp.Item1;
-                var content = kvp.Item2;
+                if (!updateResult.Result.IsReplaced) return NoContent();
+                var representation = updateResult.Result.Representation;
+                representation.ApplyEmptyArray();
                 var location = GetLocation(representation);
+                var content = representation.ToResponse(location, true, mergeExtensionAttributes: _options.MergeExtensionAttributes);
                 if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
                 return BuildHTTPResult(HttpStatusCode.OK, location, representation.Version, content);
             }
@@ -609,11 +610,11 @@ namespace SimpleIdServer.Scim.Api
                 var patchRes = await _patchRepresentationCommandHandler.Handle(new PatchRepresentationCommand(id, ResourceType, patchRepresentation, _uriProvider.GetAbsoluteUriWithVirtualPath()));
                 if (patchRes.HasError) return this.BuildError(patchRes);
                 var patchResult = patchRes.Result;
-                if (!patchResult.IsPatched || _options.IsNoContentReturned) return NoContent();
-                var kvp = await GetRepresentation(id);
-                var representation = kvp.Item1;
-                var content = kvp.Item2;
+                if (!patchResult.IsPatched) return NoContent();
+                var representation = patchResult.Representation;
+                representation.ApplyEmptyArray();
                 var location = GetLocation(representation);
+                var content = representation.ToResponse(location, true, mergeExtensionAttributes: _options.MergeExtensionAttributes);
                 if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
                 return BuildHTTPResult(HttpStatusCode.OK, location, representation.Version, content);
             }
@@ -684,16 +685,6 @@ namespace SimpleIdServer.Scim.Api
             }
 
             return await callback();
-        }
-
-        protected async Task<(SCIMRepresentation, JObject)> GetRepresentation(string id)
-        {
-            var getRepresentationResult = await _getRepresentationQueryHandler.Handle(id, new GetSCIMResourceRequest(), _resourceType, CancellationToken.None);
-            var representation = getRepresentationResult.Result;
-            await _attributeReferenceEnricher.Enrich(_resourceType, new List<SCIMRepresentation> { representation }, _uriProvider.GetAbsoluteUriWithVirtualPath());
-            var location = GetLocation(representation);
-            var content = representation.ToResponse(location, true, mergeExtensionAttributes: _options.MergeExtensionAttributes);
-            return (representation, content);
         }
 
         protected IActionResult BuildHTTPResult(SCIMRepresentation representation, HttpStatusCode status, bool isGetRequest)
