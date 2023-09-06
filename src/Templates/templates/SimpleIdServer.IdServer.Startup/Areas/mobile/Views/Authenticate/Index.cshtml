@@ -1,0 +1,154 @@
+﻿@using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Options;
+@using SimpleIdServer.IdServer.Startup.Resources;
+@model SimpleIdServer.IdServer.Fido.UI.ViewModels.AuthenticateMobileViewModel;
+@inject IOptions<IdServerHostOptions> configuration
+
+@{
+    ViewBag.Title = AuthenticateMobileResource.auth_title;
+    Layout = "~/Views/Shared/_AuthenticateLayout.cshtml";
+}
+
+<ul class="list-group mb-3" id="errors">
+    @if (!ViewData.ModelState.IsValid)
+    {
+        @foreach (var modelState in ViewData.ModelState.Values)
+        {
+            foreach (var error in modelState.Errors)
+            {
+                <li class="list-group-item list-group-item-danger">@AuthenticateMobileResource.ResourceManager.GetString(error.ErrorMessage)</li>
+            }
+        }
+    }
+</ul>
+
+@if (Model.IsLoginMissing)
+{
+    <div class="alert alert-danger">
+        @AuthenticateMobileResource.missing_login
+    </div>
+}
+else
+{
+    <!-- Login form -->
+    @using (Html.BeginForm("Index", "Authenticate", new { area = "mobile" }, FormMethod.Post, null, new { id = "mobileAuth" }))
+    {
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="ReturnUrl" />
+        <div class="input-group mb-3">
+            @if (Model.IsAuthInProgress)
+            {
+                <input asp-for="Login" placeholder="@AuthenticateMobileResource.login" type="text" class="form-control" disabled="disabled" />
+                <input asp-for="Login" placeholder="@AuthenticateMobileResource.login" type="hidden" class="form-control" />
+            }
+            else
+            {
+                <input asp-for="Login" placeholder="@AuthenticateMobileResource.login" type="text" class="form-control" />
+            }
+        </div>
+        <div>
+            <input type="checkbox" asp-for="RememberLogin " />
+            <label>@AuthenticateMobileResource.remember_login</label>
+        </div>
+        <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
+        <input asp-for="BeginLoginUrl" type="hidden" class="form-control" />
+        <input asp-for="LoginStatusUrl" type="hidden" class="form-control" />
+        <input asp-for="SessionId" type="hidden" class="form-control" />
+        <button type="submit" class="btn btn-primary card-link">@AuthenticateMobileResource.generate_qrcode</button>
+    }
+
+    <!-- QR Code-->
+    <div id="qrCode" style="display: none; text-align: center;">
+        <h3>@AuthenticateMobileResource.scan_mobileapp</h3>
+        <img src="#" style="max-width:280px;"/>
+        @if(Model.IsDeveloperModeEnabled)
+        {
+            <div class="divider"></div>
+            <div id="qrCodeText">
+                <h3>@AuthenticateMobileResource.qrcode</h3>
+                <textarea class="form-control" rows="5"></textarea>
+            </div>
+        }
+    </div>
+}
+
+@section SubScripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".login input[name='RememberLogin']").change(function (e) {
+                $(this).val($(this).is(':checked'));
+            });
+            
+            var beginLoginUrl = "@Model.BeginLoginUrl";
+            var loginStatusUrl = "@Model.LoginStatusUrl";
+
+            var toggleBtn = function(isDisabled) {
+                $("#mobileAuth button[type='submit']").attr('disabled', isDisabled);
+            }
+
+            var displayError = function (errorJson) {
+                console.error(errorJson);
+                $("#errors").empty();
+                $("#errors").append("<li  class='list-group-item list-group-item-danger'>" + errorJson["error_description"] + "</li>");
+            }
+
+            var displayQRCode = function (img, qrCode) {
+                $("#mobileAuth").css("display", "none");
+                $("#qrCode").css("display", "");
+                $("#qrCode img").attr("src", img);
+                var qrCodeText = $("#qrCodeText");
+                if (qrCodeText.length > 0) {
+                    $("#qrCodeText textarea").val(qrCode);
+                }
+            }
+
+            async function checkStatus(sessionId) {
+                setTimeout(async function () {
+                    let response = await fetch(loginStatusUrl + "/" + sessionId, {
+                        method: 'GET'
+                    });
+                    if (!response.ok) {
+                        let responseJson = await response.json();
+                        displayError(responseJson);
+                        await checkStatus(sessionId);
+                    } else {                        
+                        $("#mobileAuth").unbind("submit");
+                        $("#mobileAuth input[name='SessionId']").val(sessionId);
+                        $("#mobileAuth").trigger("submit");
+                    }
+                }, 1000);
+            }
+
+            async function makeAssertionOptions(form) {
+                toggleBtn(true);
+                let response = await fetch(beginLoginUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({ login : form.Login }),
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    }
+                });
+                if (!response.ok) {
+                    const json = await response.json();
+                    toggleBtn(false);
+                    displayError(json);
+                    return;
+                }
+
+                const sessionId = response.headers.get('SessionId');
+                const qrCode = response.headers.get('QRCode');
+                const blob = await response.blob();
+                const img = URL.createObjectURL(blob);
+
+                displayQRCode(img, qrCode);
+                await checkStatus(sessionId);
+            }
+
+            $("#mobileAuth").submit(function(e) {
+                e.preventDefault();
+                makeAssertionOptions(convertFormToJSON($(e.target)));
+            });
+        });
+    </script>
+}

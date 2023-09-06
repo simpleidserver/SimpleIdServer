@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.Server.Kestrel.Https;
 using Microsoft.Data.SqlClient;
@@ -12,6 +13,7 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.CredentialIssuer;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Fido;
 using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Startup.Configurations;
 using SimpleIdServer.IdServer.Store;
@@ -55,18 +57,32 @@ SeedData(app, builder.Configuration["SCIMBaseUrl"]);
 app.UseCors("AllowAll");
 app.UseSID()
     .UseWsFederation()
-    .UseCredentialIssuer();
+    .UseFIDO()
+    .UseCredentialIssuer()
+    .UseSamlIdp();
 app.Run();
 
 void ConfigureIdServer(IServiceCollection services)
 {
-    services.AddSIDIdentityServer()
+    services.AddSIDIdentityServer(dataProtectionBuilderCallback: ConfigureDataProtection)
         .UseEFStore(o => ConfigureStorage(o))
         .AddCredentialIssuer()
         .UseInMemoryMassTransit()
         .AddBackChannelAuthentication()
         .AddEmailAuthentication()
         .AddSmsAuthentication()
+        .AddSamlIdp()
+        .AddFidoAuthentication(c =>
+        {
+            c.IsDeveloperModeEnabled = true;
+        }, f =>
+        {
+            var authority = builder.Configuration["Authority"];
+            var url = new Uri(authority);
+            f.ServerName = "SimpleIdServer";
+            f.ServerDomain = url.Host;
+            f.Origins = new HashSet<string> { authority };
+        })
         .EnableConfigurableAuthentication()
         .UseRealm()
         .AddAuthentication(callback: (a) =>
@@ -151,6 +167,11 @@ void ConfigureStorage(DbContextOptionsBuilder b)
             });
             break;
     }
+}
+
+void ConfigureDataProtection(IDataProtectionBuilder dataProtectionBuilder)
+{
+    dataProtectionBuilder.PersistKeysToDbContext<StoreDbContext>();
 }
 
 void SeedData(WebApplication application, string scimBaseUrl)

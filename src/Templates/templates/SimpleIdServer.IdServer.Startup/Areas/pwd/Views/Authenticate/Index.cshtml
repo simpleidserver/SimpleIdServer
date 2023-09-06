@@ -18,30 +18,50 @@
     </ul>
 }
 
-@using (Html.BeginForm("Index", "Authenticate", new { area = "pwd", returnUrl = Model.ReturnUrl }, FormMethod.Post))
+@if (Model.IsLoginMissing)
 {
-    @Html.AntiForgeryToken()
-    <input type="hidden" value="@Model.ReturnUrl" name="ReturnUrl" />
-    <div class="alert alert-info">
-        Default credentials :
-        <p style="margin: 0px;">
-            <b>Login: </b>administrator<br/>
-            <b>Password: </b>password
-        </p>
+    <div class="alert alert-danger">
+        @AuthenticatePasswordResource.missing_login
     </div>
-    <!-- Login -->
-    <div class="input-group mb-3">
-        <input type="text" value="@Model.Login" name="Login" class="form-control" placeholder="@AuthenticatePasswordResource.login">
-    </div>
-    <!-- Password -->
-    <div class="input-group mb-3">
-        <input type="password" value="@Model.Password" name="Password" class="form-control" placeholder="@AuthenticatePasswordResource.password">
-    </div>
-    <div>
-        <input type="checkbox" value="@Model.RememberLogin" name="RememberLogin" />
-        <label>@AuthenticatePasswordResource.remember_login</label>
-    </div>
-    <button type="submit" class="btn btn-primary">@AuthenticatePasswordResource.submit</button>
+}
+else
+{
+    @using (Html.BeginForm("Index", "Authenticate", new { area = SimpleIdServer.IdServer.Constants.Areas.Password, returnUrl = Model.ReturnUrl }, FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        <input type="hidden" value="@Model.ReturnUrl" name="ReturnUrl" />
+        <div class="alert alert-info">
+            Default credentials :
+            <p style="margin: 0px;">
+                <b>Login: </b>administrator<br />
+                <b>Password: </b>password
+            </p>
+        </div>
+        <!-- Login -->
+        <div class="input-group mb-3">
+            @if (Model.IsAuthInProgress)
+            {
+                <input asp-for="Login" placeholder="@AuthenticatePasswordResource.login" type="text" class="form-control" disabled="disabled" />
+                <input asp-for="Login" placeholder="@AuthenticatePasswordResource.login" type="hidden" class="form-control" />
+            }
+            else
+            {
+                <input asp-for="Login" placeholder="@AuthenticatePasswordResource.login" type="text" class="form-control" />
+            }
+        </div>
+        <!-- Password -->
+        <div class="input-group mb-3">
+            <input type="password" value="@Model.Password" name="Password" class="form-control" placeholder="@AuthenticatePasswordResource.password">
+        </div>
+        <div>
+            <input type="checkbox" value="@Model.RememberLogin" name="RememberLogin" />
+            <label>@AuthenticatePasswordResource.remember_login</label>
+        </div>
+
+        <input asp-for="IsLoginMissing" type="hidden" class="form-control" />
+        <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
+        <button type="submit" class="btn btn-primary">@AuthenticatePasswordResource.submit</button>
+    }
 }
 
 @section SubScripts {

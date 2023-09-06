@@ -22,14 +22,14 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class AuthenticateSmsResource {
+    public class AuthenticateWebauthnResource {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal AuthenticateSmsResource() {
+        internal AuthenticateWebauthnResource() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.IdServer.Startup.Resources.AuthenticateSmsResource", typeof(AuthenticateSmsResource).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.IdServer.Startup.Resources.AuthenticateWebauthnResource", typeof(AuthenticateWebauthnResource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -70,83 +70,83 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Code has a validity of {0} seconds.
+        ///   Recherche une chaîne localisée semblable à Credential is added.
         /// </summary>
-        public static string code_validity {
+        public static string credential_added {
             get {
-                return ResourceManager.GetString("code_validity", resourceCulture);
+                return ResourceManager.GetString("credential_added", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Confirmation code.
+        ///   Recherche une chaîne localisée semblable à Display name.
         /// </summary>
-        public static string confirmationcode {
+        public static string display_name {
             get {
-                return ResourceManager.GetString("confirmationcode", resourceCulture);
+                return ResourceManager.GetString("display_name", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Confirmation code has been sent.
+        ///   Recherche une chaîne localisée semblable à Login.
         /// </summary>
-        public static string confirmationcode_sent {
+        public static string login {
             get {
-                return ResourceManager.GetString("confirmationcode_sent", resourceCulture);
+                return ResourceManager.GetString("login", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à An error occured while trying to decrypt the return url.
+        ///   Recherche une chaîne localisée semblable à Attestation is missing.
         /// </summary>
-        public static string cryptographic_error {
+        public static string missing_attestation {
             get {
-                return ResourceManager.GetString("cryptographic_error", resourceCulture);
+                return ResourceManager.GetString("missing_attestation", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Confirmation code is invalid.
+        ///   Recherche une chaîne localisée semblable à FIDO2 credential is missing.
         /// </summary>
-        public static string invalid_confirmationcode {
+        public static string missing_credential {
             get {
-                return ResourceManager.GetString("invalid_confirmationcode", resourceCulture);
+                return ResourceManager.GetString("missing_credential", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Phone number is missing.
+        ///   Recherche une chaîne localisée semblable à Login is missing.
         /// </summary>
-        public static string missing_phonenumber {
+        public static string missing_login {
             get {
-                return ResourceManager.GetString("missing_phonenumber", resourceCulture);
+                return ResourceManager.GetString("missing_login", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à There is no OTP configured.
+        ///   Recherche une chaîne localisée semblable à The session_id is missing.
         /// </summary>
-        public static string no_active_otp {
+        public static string missing_session_id {
             get {
-                return ResourceManager.GetString("no_active_otp", resourceCulture);
+                return ResourceManager.GetString("missing_session_id", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Phone number.
+        ///   Recherche une chaîne localisée semblable à Register.
         /// </summary>
-        public static string phonenumber {
+        public static string register {
             get {
-                return ResourceManager.GetString("phonenumber", resourceCulture);
+                return ResourceManager.GetString("register", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Policy.
+        ///   Recherche une chaîne localisée semblable à Register web authentication.
         /// </summary>
-        public static string policy {
+        public static string register_title {
             get {
-                return ResourceManager.GetString("policy", resourceCulture);
+                return ResourceManager.GetString("register_title", resourceCulture);
             }
         }
         
@@ -160,38 +160,29 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Send a confirmation code.
+        ///   Recherche une chaîne localisée semblable à The session must be validate.
         /// </summary>
-        public static string sendconfirmationcode {
+        public static string session_not_validated {
             get {
-                return ResourceManager.GetString("sendconfirmationcode", resourceCulture);
+                return ResourceManager.GetString("session_not_validated", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Authenticate.
+        ///   Recherche une chaîne localisée semblable à Either the session is expired or doesn&apos;t exist.
         /// </summary>
-        public static string title {
+        public static string unknown_session {
             get {
-                return ResourceManager.GetString("title", resourceCulture);
+                return ResourceManager.GetString("unknown_session", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Terms of service.
+        ///   Recherche une chaîne localisée semblable à User with same login already exists.
         /// </summary>
-        public static string tos {
+        public static string user_already_exists {
             get {
-                return ResourceManager.GetString("tos", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à Phone number is unknown.
-        /// </summary>
-        public static string unknown_phonenumber {
-            get {
-                return ResourceManager.GetString("unknown_phonenumber", resourceCulture);
+                return ResourceManager.GetString("user_already_exists", resourceCulture);
             }
         }
     }
