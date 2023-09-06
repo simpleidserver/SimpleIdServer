@@ -59,16 +59,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
             var complex = expression as SCIMComplexAttributeExpression;
             if (complex != null)
             {
-                var childrenProperty = Expression.Property(parameterExpression, "Children");
-                var enumerableType = typeof(Enumerable);
-                var anyMethod = enumerableType.GetMethods()
-                     .Where(m => m.Name == "Any" && m.IsGenericMethodDefinition)
-                     .Where(m => m.GetParameters().Count() == 2).First().MakeGenericMethod(typeof(EnrichedAttribute));
-                var childAttribute = Expression.Parameter(typeof(EnrichedAttribute), Guid.NewGuid().ToString());
-                var anyLambdaBody = complex.GroupingFilter.EvaluateAttributes(childAttribute);
-                var anyLambda = Expression.Lambda<Func<EnrichedAttribute, bool>>(anyLambdaBody, childAttribute);
-                var anyCall = Expression.Call(anyMethod, childrenProperty, anyLambda);
-                equal = Expression.AndAlso(equal, anyCall);
+                return complex.GroupingFilter.EvaluateAttributes(parameterExpression);
             }
 
             return equal;

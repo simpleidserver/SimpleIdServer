@@ -9,6 +9,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
     public record EnrichedAttribute
     {
         public SCIMRepresentationAttribute Attribute { get; set; }
-        public IEnumerable<EnrichedAttribute> Children { get; set; }
+        public SCIMRepresentationAttribute Parent { get; set; }
+        public IEnumerable<SCIMRepresentationAttribute> Children { get; set; }
     }
 }

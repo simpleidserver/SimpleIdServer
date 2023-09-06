@@ -168,22 +168,28 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
         {
             if (pathExpression.SchemaAttribute == null || string.IsNullOrWhiteSpace(pathExpression.SchemaAttribute.Id)) return new List<SCIMRepresentationAttribute>();
             IQueryable<EnrichedAttribute> representationAttributes = from a in _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
-                    join b in _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable() on a.Id equals b.ParentAttributeId into Children
-                    where a.RepresentationId == representationId
-                    select new EnrichedAttribute
-                    {
-                        Attribute = a,
-                        Children = Children.Select(c => new EnrichedAttribute
-                        {
-                            Attribute = c
-                        })
-                    };
-            var filteredAttributes = await pathExpression.EvaluateMongoDbAttributes(representationAttributes).ToMongoListAsync();
+                join b in _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable() on a.ParentAttributeId equals b.Id into Parents
+                where a.RepresentationId == representationId
+                select new EnrichedAttribute
+                {
+                    Attribute = a,
+                    Parent = Parents.First(),
+                    Children = new List<SCIMRepresentationAttribute>()
+                };
+            representationAttributes = pathExpression.EvaluateMongoDbAttributes(representationAttributes);
+            var filteredAttributes = from a in representationAttributes
+                join b in _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable() on a.Attribute.ParentAttributeId equals b.ParentAttributeId into Children
+                select new EnrichedAttribute
+                {
+                    Attribute = a.Attribute,
+                    Parent = a.Parent,
+                    Children = Children
+                };
             var result = new List<SCIMRepresentationAttribute>();
             foreach (var attr in filteredAttributes)
             {
-                result.Add(attr.Attribute);
-                result.AddRange(attr.Children.Select(e => e.Attribute));
+                result.Add(attr.Parent);
+                result.AddRange(attr.Children);
             }
 
             return result;
