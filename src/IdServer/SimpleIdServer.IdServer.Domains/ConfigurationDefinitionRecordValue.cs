@@ -6,6 +6,8 @@ public class ConfigurationDefinitionRecordValue : ITranslatable
 {
     private const string NAME_KEY = "name";
 
+    public string Id { get; set; } = null!;
+
     public string Name
     {
         get

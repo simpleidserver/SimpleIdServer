@@ -13,9 +13,10 @@ public class ConfigurationDefinitionExtractor
 {
     public static ConfigurationDefinition Extract<T>(string language = null)
     {
+        var type = typeof(T);
         language ??= Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
-        var result = new ConfigurationDefinition { CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow };
-        var properties = typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public);
+        var result = new ConfigurationDefinition { Id = type.Name, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow };
+        var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
         foreach(var property in properties)
             if (TryExtract(property, language, out ConfigurationDefinitionRecord configurationDefinition)) result.Records.Add(configurationDefinition);
         return result;
@@ -26,13 +27,20 @@ public class ConfigurationDefinitionExtractor
         result = null;
         var configurationRecordAttr = propertyInfo.GetCustomAttribute(typeof(ConfigurationRecordAttribute)) as ConfigurationRecordAttribute;
         if (configurationRecordAttr == null) return false;
-        result = new ConfigurationDefinitionRecord { CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow, Name = propertyInfo.Name };
+        result = new ConfigurationDefinitionRecord { Id = Guid.NewGuid().ToString(), CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow, Name = propertyInfo.Name };
         result.SetDescription(configurationRecordAttr.Description, language);
         result.SetDisplayName(configurationRecordAttr.DisplayName, language);
+        if (configurationRecordAttr.IsProtected)
+        {
+            result.Type = ConfigurationDefinitionRecordTypes.NUMBER;
+            return true;
+        }
+
         if (TryEnrichEnumeration(propertyInfo, result, language)) return true;
         if (TryEnrichList(propertyInfo, result, language)) return true;
         if (TryEnrichBoolean(propertyInfo, result, language)) return true;
         if (TryEnrichNumber(propertyInfo, result, language)) return true;
+        if (TryEnrichDateTime(propertyInfo, result, language)) return true;
         return true;
     }
 
@@ -66,6 +74,14 @@ public class ConfigurationDefinitionExtractor
         record.Type = ConfigurationDefinitionRecordTypes.NUMBER;
         return true;
     }
+
+    private static bool TryEnrichDateTime(PropertyInfo propertyInfo, ConfigurationDefinitionRecord record, string language)
+    {
+        if (propertyInfo.PropertyType != typeof(DateTime)) return false;
+        record.Type = ConfigurationDefinitionRecordTypes.DATETIME;
+        return true;
+    }
+
 
     private static void EnrichEnumeration(Type enumType, ConfigurationDefinitionRecord record, string language)
     {

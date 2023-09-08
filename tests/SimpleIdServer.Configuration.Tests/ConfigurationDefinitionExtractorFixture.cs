@@ -19,6 +19,8 @@ public class ConfigurationDefinitionExtractorFixture
         var statusDefinition = configurationDefinition.Records.Single(r => r.Name == nameof(UserOptions.Status));
         var isActiveDefinition = configurationDefinition.Records.Single(r => r.Name == nameof(UserOptions.IsActive));
         var ageDefinition = configurationDefinition.Records.Single(r => r.Name == nameof(UserOptions.Age));
+        var passwordDefinition = configurationDefinition.Records.Single(r => r.Name == nameof(UserOptions.Password));
+        var birthDateDefinition = configurationDefinition.Records.Single(r => r.Name == nameof(UserOptions.BirthDateTime));
         var genderValues = genderDefinition.Values;
         var statusValues = statusDefinition.Values;
 
@@ -26,12 +28,17 @@ public class ConfigurationDefinitionExtractorFixture
         Assert.That(genderDefinition.Name, Is.EqualTo(nameof(UserOptions.Gender)));
         Assert.That(statusDefinition.Name, Is.EqualTo(nameof(UserOptions.Status)));
         Assert.That(isActiveDefinition.Name, Is.EqualTo(nameof(UserOptions.IsActive)));
+        Assert.That(ageDefinition.Name, Is.EqualTo(nameof(UserOptions.Age)));
+        Assert.That(passwordDefinition.Name, Is.EqualTo(nameof(UserOptions.Password)));
+        Assert.That(birthDateDefinition.Name, Is.EqualTo(nameof(UserOptions.BirthDateTime)));
 
         Assert.That(firstNameDefinition.Type, Is.EqualTo(ConfigurationDefinitionRecordTypes.INPUT));
         Assert.That(genderDefinition.Type, Is.EqualTo(ConfigurationDefinitionRecordTypes.SELECT));
         Assert.That(statusDefinition.Type, Is.EqualTo(ConfigurationDefinitionRecordTypes.MULTISELECT));
         Assert.That(isActiveDefinition.Type, Is.EqualTo(ConfigurationDefinitionRecordTypes.CHECKBOX));
         Assert.That(ageDefinition.Type, Is.EqualTo(ConfigurationDefinitionRecordTypes.NUMBER));
+        Assert.That(passwordDefinition.Type, Is.EqualTo(ConfigurationDefinitionRecordTypes.PASSWORD));
+        Assert.That(birthDateDefinition.Type, Is.EqualTo(ConfigurationDefinitionRecordTypes.DATETIME));
 
         Assert.That(firstNameDefinition.DisplayName, Is.EqualTo("FirstName"));
         Assert.That(firstNameDefinition.Description, Is.EqualTo("Description"));

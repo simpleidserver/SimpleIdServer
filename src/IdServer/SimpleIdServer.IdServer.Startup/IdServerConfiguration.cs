@@ -79,7 +79,7 @@ namespace SimpleIdServer.IdServer.Startup
 
         public static ICollection<AuthenticationSchemeProvider> Providers => new List<AuthenticationSchemeProvider>
         {
-           AuthenticationSchemeProviderBuilder.Create(Facebook, "Facebook", "Facebook", "Faceoobk", new FacebookOptionsLite
+           AuthenticationSchemeProviderBuilder.Create(Facebook, "Facebook", "Facebook", "Facebook", new FacebookOptionsLite
            {
                AppId = "569242033233529",
                AppSecret = "12e0f33817634c0a650c0121d05e53eb"

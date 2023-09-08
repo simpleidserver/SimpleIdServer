@@ -16,6 +16,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Fido;
 using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Startup.Configurations;
+using SimpleIdServer.IdServer.Startup.Converters;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.WsFederation;
 using System;
@@ -43,9 +44,12 @@ builder.Services.Configure<KestrelServerOptions>(options =>
         o.ClientCertificateMode = ClientCertificateMode.AllowCertificate;
     });
 });
-builder.Configuration.AddJsonFile("appsettings.json")
+
+builder.Configuration
+    .AddJsonFile("appsettings.json")
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
     .AddEnvironmentVariables();
+ConfigureCentralizedConfiguration(builder);
 builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
     .AllowAnyMethod()
     .AllowAnyHeader()));
@@ -54,12 +58,14 @@ builder.Services.AddRazorPages()
 ConfigureIdServer(builder.Services);
 var app = builder.Build();
 SeedData(app, builder.Configuration["SCIMBaseUrl"]);
+// app.SeedOptionDefinitions();
 app.UseCors("AllowAll");
 app.UseSID()
     .UseWsFederation()
     .UseFIDO()
     .UseCredentialIssuer()
-    .UseSamlIdp();
+    .UseSamlIdp()
+    .UseAutomaticConfiguration();
 app.Run();
 
 void ConfigureIdServer(IServiceCollection services)
@@ -122,6 +128,29 @@ void ConfigureIdServer(IServiceCollection services)
     ConfigureDistributedCache();
 }
 
+void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
+{
+    var section = builder.Configuration.GetSection(nameof(StorageConfiguration));
+    var conf = section.Get<StorageConfiguration>();
+    builder.AddAutomaticConfiguration(o =>
+    {
+        o.Add<FacebookOptionsLite>();
+        o.UseEFConnector(b =>
+        {
+            switch (conf.Type)
+            {
+                case StorageTypes.SQLSERVER:
+                    b.UseSqlServer(conf.ConnectionString);
+                    break;
+                case StorageTypes.POSTGRE:
+                    b.UseNpgsql(conf.ConnectionString);
+                    break;
+
+            }
+        });
+    });
+}
+
 void ConfigureDistributedCache()
 {
     var section = builder.Configuration.GetSection(nameof(DistributedCacheConfiguration));
@@ -168,6 +197,7 @@ void ConfigureStorage(DbContextOptionsBuilder b)
             break;
     }
 }
+
 
 void ConfigureDataProtection(IDataProtectionBuilder dataProtectionBuilder)
 {

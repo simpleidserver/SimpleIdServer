@@ -15,12 +15,13 @@ public class ConfigurationRecordAttribute : Attribute
 		Description = description;
 	}
 
-	public ConfigurationRecordAttribute(string displayName, string description = null, Dictionary<string, string> values = null) : this(displayName, description)
+	public ConfigurationRecordAttribute(string displayName, string description = null, bool isProtected = false) : this(displayName, description)
 	{
-		Values = values;
+		IsProtected = isProtected;
 	}
 
 	public string DisplayName { get; set; } = null!;
 	public string? Description { get; set; } = null;
+	public bool IsProtected { get; set; } = false;
 	public Dictionary<string, string>? Values { get; set; } = null;
 }

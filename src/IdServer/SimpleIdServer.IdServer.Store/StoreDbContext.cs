@@ -42,6 +42,8 @@ namespace SimpleIdServer.IdServer.Store
         public DbSet<DeviceAuthCode> DeviceAuthCodes { get; set; }
         public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
         public DbSet<UserSession> UserSession { get; set; }
+        public DbSet<ConfigurationDefinition> Definitions { get; set; }
+        public DbSet<ConfigurationKeyPairValueRecord> ConfigurationKeyPairValueRecords { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -98,6 +100,10 @@ namespace SimpleIdServer.IdServer.Store
             builder.ApplyConfiguration(new CredentialTemplateParameterConfiguration());
             builder.ApplyConfiguration(new NetworkConfigurationConf());
             builder.ApplyConfiguration(new DeviceAuthCodeConfiguration());
+            builder.ApplyConfiguration(new ConfigurationDefinitionConfiguration());
+            builder.ApplyConfiguration(new ConfigurationDefinitionRecordConfiguration());
+            builder.ApplyConfiguration(new ConfigurationDefinitionRecordValueConfiguration());
+            builder.ApplyConfiguration(new ConfigurationKeyPairValueRecordConfiguration());
         }
     }
 }

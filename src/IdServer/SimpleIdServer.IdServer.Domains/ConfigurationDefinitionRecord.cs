@@ -57,7 +57,7 @@ public class ConfigurationDefinitionRecord : ITranslatable
         var selectedValue = Values.SingleOrDefault(v => v.Value == value);
         if (selectedValue == null)
         {
-            var record = new ConfigurationDefinitionRecordValue { Value = value };
+            var record = new ConfigurationDefinitionRecordValue { Id = Guid.NewGuid().ToString(), Value = value };
             record.SetName(name, language);
             Values.Add(record);
             return;
@@ -73,5 +73,7 @@ public enum ConfigurationDefinitionRecordTypes
     SELECT = 1,
     MULTISELECT = 2,
     CHECKBOX = 3,
-    NUMBER = 4
+    NUMBER = 4,
+    PASSWORD = 5,
+    DATETIME = 6
 }

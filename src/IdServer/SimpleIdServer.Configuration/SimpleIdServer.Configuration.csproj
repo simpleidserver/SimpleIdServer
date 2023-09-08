@@ -4,6 +4,14 @@
 		<Description>Enabling dynamic configuration in SimpleIdServer.</Description>
 	</PropertyGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\SimpleIdServer.IdServer.Domains\SimpleIdServer.IdServer.Domains.csproj" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.*" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.*" />
+	</ItemGroup>
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
 	</ItemGroup>
 </Project>
