@@ -15,7 +15,7 @@ public class ConfigurationDefinitionExtractor
     {
         var type = typeof(T);
         language ??= Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
-        var result = new ConfigurationDefinition { Id = type.Name, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow };
+        var result = new ConfigurationDefinition { Id = type.Name, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow, FullQualifiedName = type.FullName };
         var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
         foreach(var property in properties)
             if (TryExtract(property, language, out ConfigurationDefinitionRecord configurationDefinition)) result.Records.Add(configurationDefinition);

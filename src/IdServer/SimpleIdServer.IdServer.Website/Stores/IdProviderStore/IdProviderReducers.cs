@@ -1,7 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
-using Microsoft.AspNetCore.Builder;
+using SimpleIdServer.IdServer.Api.AuthenticationSchemeProviders;
 using SimpleIdServer.IdServer.Domains;
 
 namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
@@ -11,7 +11,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         #region SearchIdProvidersState
 
         [ReducerMethod]
-        public static SearchIdProvidersState ReduceGetIdProvidersAction(SearchIdProvidersState state, SearchIdProvidersAction act) => new(idProviders: new List<AuthenticationSchemeProvider>(), true);
+        public static SearchIdProvidersState ReduceGetIdProvidersAction(SearchIdProvidersState state, SearchIdProvidersAction act) => new(idProviders: new List<AuthenticationSchemeProviderResult>(), true);
 
         [ReducerMethod]
         public static SearchIdProvidersState ReduceSearchIdProvidersSuccessAction(SearchIdProvidersState state, SearchIdProvidersSuccessAction act) => new(idProviders: act.IdProviders, false)
@@ -58,7 +58,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         public static SearchIdProvidersState ReduceAddIdProviderSuccessAction(SearchIdProvidersState state, AddIdProviderSuccessAction act)
         {
             var idProviders = state.IdProviders.ToList();
-            idProviders.Add(new SelectableIdProvider(new AuthenticationSchemeProvider { CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow, Description = act.Description, DisplayName = act.DisplayName, Name = act.Name })
+            idProviders.Add(new SelectableIdProvider(new AuthenticationSchemeProviderResult { CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow, Description = act.Description, DisplayName = act.DisplayName, Name = act.Name })
             {
                 IsNew = true
             });
@@ -113,13 +113,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         {
             var provider = state.Provider;
             provider.UpdateDateTime = DateTime.UtcNow;
-            provider.Properties.Clear();
-            foreach (var property in act.Properties)
-                provider.Properties.Add(new AuthenticationSchemeProviderProperty
-                {
-                    PropertyName = property.PropertyName,
-                    Value = property.Value
-                });
             return state with
             {
                 Provider = provider
@@ -234,7 +227,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         #region IdProviderMappersState
 
         [ReducerMethod]
-        public static IdProviderMappersState ReduceGetIdProviderAction(IdProviderMappersState state, GetIdProviderAction act) => new IdProviderMappersState(new List<AuthenticationSchemeProviderMapper>(), true) { Count = 0 };
+        public static IdProviderMappersState ReduceGetIdProviderAction(IdProviderMappersState state, GetIdProviderAction act) => new IdProviderMappersState(new List<AuthenticationSchemeProviderMapperResult>(), true) { Count = 0 };
 
         [ReducerMethod]
         public static IdProviderMappersState ReduceGetIdProviderSuccessAction(IdProviderMappersState state, GetIdProviderSuccessAction act) => new IdProviderMappersState(act.IdProvider.Mappers, false)
@@ -246,7 +239,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         public static IdProviderMappersState ReduceAddAuthenticationSchemeProviderMapperSuccessAction(IdProviderMappersState state, AddAuthenticationSchemeProviderMapperSuccessAction act)
         {
             var mappers = state.Mappers.ToList();
-            mappers.Add(new SelectableAuthenticationSchemeProviderMapper(new AuthenticationSchemeProviderMapper
+            mappers.Add(new SelectableAuthenticationSchemeProviderMapper(new AuthenticationSchemeProviderMapperResult
             {
                 Id = act.Id,
                 MapperType = act.MapperType,

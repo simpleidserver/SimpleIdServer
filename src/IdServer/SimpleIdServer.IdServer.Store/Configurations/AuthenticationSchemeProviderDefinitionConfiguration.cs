@@ -11,7 +11,6 @@ namespace SimpleIdServer.IdServer.Store.Configurations
         public void Configure(EntityTypeBuilder<AuthenticationSchemeProviderDefinition> builder)
         {
             builder.HasKey(a => a.Name);
-            builder.HasMany(a => a.Properties).WithOne(p => p.SchemeProviderDef).OnDelete(DeleteBehavior.Cascade);
             builder.HasMany(a => a.AuthSchemeProviders).WithOne(p => p.AuthSchemeProviderDefinition).OnDelete(DeleteBehavior.Cascade);
         }
     }

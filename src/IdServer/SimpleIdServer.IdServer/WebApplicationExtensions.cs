@@ -226,6 +226,35 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationClassReferences + "/{id}",
                 defaults: new { controller = "AuthenticationClassReferences", action = "Delete" });
 
+
+            webApplication.MapControllerRoute("searchIdProviders",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationSchemeProviders + "/.search",
+                defaults: new { controller = "AuthenticationSchemeProviders", action = "Search" });
+            webApplication.MapControllerRoute("removeIdProvider",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationSchemeProviders + "/{id}",
+                defaults: new { controller = "AuthenticationSchemeProviders", action = "Remove" });
+            webApplication.MapControllerRoute("getIdProvider",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationSchemeProviders + "/{id}",
+                defaults: new { controller = "AuthenticationSchemeProviders", action = "Get" });
+            webApplication.MapControllerRoute("addIdProvider",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationSchemeProviders,
+                defaults: new { controller = "AuthenticationSchemeProviders", action = "Add" });
+            webApplication.MapControllerRoute("updateIdProviderDetails",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationSchemeProviders + "/{id}/details",
+                defaults: new { controller = "AuthenticationSchemeProviders", action = "UpdateDetails" });
+            webApplication.MapControllerRoute("updateIdProviderValues",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationSchemeProviders + "/{id}/values",
+                defaults: new { controller = "AuthenticationSchemeProviders", action = "UpdateValues" });
+            webApplication.MapControllerRoute("addIdProviderMapper",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationSchemeProviders + "/{id}/mappers",
+                defaults: new { controller = "AuthenticationSchemeProviders", action = "AddMapper" });
+            webApplication.MapControllerRoute("removeIdProviderMapper",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationSchemeProviders + "/{id}/mappers/{mapperId}",
+                defaults: new { controller = "AuthenticationSchemeProviders", action = "RemoveMapper" });
+            webApplication.MapControllerRoute("updateIdProviderMapper",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationSchemeProviders + "/{id}/mappers/{mapperId}",
+                defaults: new { controller = "AuthenticationSchemeProviders", action = "UpdateMapper" });
+
             webApplication.MapControllerRoute("getFidoConfiguration",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.FidoConfiguration,
                 defaults: new { controller = "FidoConfiguration", action = "Index" });

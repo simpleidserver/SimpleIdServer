@@ -441,39 +441,12 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.Property<string>("OptionsFullQualifiedName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("OptionsName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Name");
 
                     b.ToTable("AuthenticationSchemeProviderDefinitions");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderDefinitionProperty", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DisplayName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PropertyName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SchemeProviderDefName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SchemeProviderDefName");
-
-                    b.ToTable("AuthenticationSchemeProviderDefinitionProperty");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderMapper", b =>
@@ -506,32 +479,6 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.HasIndex("IdProviderId");
 
                     b.ToTable("AuthenticationSchemeProviderMapper");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderProperty", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("PropertyName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SchemeProviderId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Value")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SchemeProviderId");
-
-                    b.ToTable("AuthenticationSchemeProviderProperty");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthorizedScope", b =>
@@ -1076,6 +1023,10 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
 
                     b.Property<DateTime>("CreateDateTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("FullQualifiedName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdateDateTime")
                         .HasColumnType("datetime2");
@@ -2616,17 +2567,6 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.Navigation("AuthSchemeProviderDefinition");
                 });
 
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderDefinitionProperty", b =>
-                {
-                    b.HasOne("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderDefinition", "SchemeProviderDef")
-                        .WithMany("Properties")
-                        .HasForeignKey("SchemeProviderDefName")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("SchemeProviderDef");
-                });
-
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderMapper", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProvider", "IdProvider")
@@ -2636,17 +2576,6 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .IsRequired();
 
                     b.Navigation("IdProvider");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderProperty", b =>
-                {
-                    b.HasOne("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProvider", "SchemeProvider")
-                        .WithMany("Properties")
-                        .HasForeignKey("SchemeProviderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("SchemeProvider");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthorizedScope", b =>
@@ -3014,15 +2943,11 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProvider", b =>
                 {
                     b.Navigation("Mappers");
-
-                    b.Navigation("Properties");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderDefinition", b =>
                 {
                     b.Navigation("AuthSchemeProviders");
-
-                    b.Navigation("Properties");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.BCAuthorize", b =>

@@ -7,5 +7,6 @@ public class ConfigurationDefinition
     public string Id { get; set; } = null!;
     public DateTime CreateDateTime { get; set; }
     public DateTime UpdateDateTime { get; set; }
+    public string FullQualifiedName { get; set; }
     public ICollection<ConfigurationDefinitionRecord> Records { get; set; } = new List<ConfigurationDefinitionRecord>();
 }

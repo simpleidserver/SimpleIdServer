@@ -38,11 +38,19 @@ public class AutomaticConfigurationProvider : IConfigurationProvider, IDisposabl
         if (string.IsNullOrWhiteSpace(RealmContext.Instance().Realm)) return false;
         var record = _options.ConfigurationDefinitions.SingleOrDefault(d => key.StartsWith(d.Name));
         if (record == null) return false;
-        Data.TryGetValue(key, out value);
-        return true;
+        key = $"{RealmContext.Instance().Realm}:{key}";
+        var result = Data.TryGetValue(key, out value);
+        return result;
     }
 
-    public virtual void Set(string key, string? value) => Data[key] = value;
+    public virtual void Set(string key, string? value)
+    {
+        if (string.IsNullOrWhiteSpace(RealmContext.Instance().Realm)) return;
+        var record = _options.ConfigurationDefinitions.SingleOrDefault(d => key.StartsWith(d.Name));
+        if (record == null) return;
+        key = $"{RealmContext.Instance().Realm}:{key}";
+        _connector.Set(key, value, CancellationToken.None).Wait();
+    }
 
     public virtual void Load()
     {

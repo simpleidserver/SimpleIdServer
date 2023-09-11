@@ -1,4 +1,5 @@
-﻿@using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
+﻿@using SimpleIdServer.IdServer.Api.AuthenticationSchemeProviders;
+@using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
 @using System.Reflection;
 @inject IState<UpdateIdProviderState> updateIdProviderState
 
@@ -30,9 +31,9 @@
 
 @code {
     [Parameter]
-    public EventCallback<AuthenticationSchemeProviderMapper> AuthProviderMapperUpdated { get; set; }
+    public EventCallback<AuthenticationSchemeProviderMapperResult> AuthProviderMapperUpdated { get; set; }
     [Parameter]
-    public AuthenticationSchemeProviderMapper Mapper { get; set; }
+    public AuthenticationSchemeProviderMapperResult Mapper { get; set; }
     IEnumerable<string> userProperties = new List<string>();
 
     record UserPropertyIdProviderMapperForm
@@ -64,7 +65,7 @@
 
     async void SubmitUpdateUserPropertyIdProvider(UserPropertyIdProviderMapperForm value)
     {
-        await AuthProviderMapperUpdated.InvokeAsync(new AuthenticationSchemeProviderMapper
+        await AuthProviderMapperUpdated.InvokeAsync(new AuthenticationSchemeProviderMapperResult
         {
             Name = value.Name,
             SourceClaimName = value.SourceClaimName,

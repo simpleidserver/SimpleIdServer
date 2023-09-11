@@ -13,6 +13,7 @@
 		<PackageReference Include="MassTransit" Version="8.0.*" />
 		<PackageReference Include="System.DirectoryServices" Version="7.0.*" />
 		<PackageReference Include="System.DirectoryServices.Protocols" Version="7.0.0" />
+		<PackageReference Include="System.Linq.Dynamic.Core" Version="1.3.4" />
 	</ItemGroup>
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />

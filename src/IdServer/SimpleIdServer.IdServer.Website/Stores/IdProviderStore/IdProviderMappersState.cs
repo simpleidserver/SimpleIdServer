@@ -1,7 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
-using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Api.AuthenticationSchemeProviders;
 
 namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
 {
@@ -10,7 +10,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
     {
         public IdProviderMappersState() { }
 
-        public IdProviderMappersState(ICollection<AuthenticationSchemeProviderMapper> mappers, bool isLoading)
+        public IdProviderMappersState(ICollection<AuthenticationSchemeProviderMapperResult> mappers, bool isLoading)
         {
             Mappers = mappers?.Select(m => new SelectableAuthenticationSchemeProviderMapper(m));
             IsLoading = isLoading;
@@ -23,12 +23,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
 
     public class SelectableAuthenticationSchemeProviderMapper
     {
-        public SelectableAuthenticationSchemeProviderMapper(AuthenticationSchemeProviderMapper value)
+        public SelectableAuthenticationSchemeProviderMapper(AuthenticationSchemeProviderMapperResult value)
         {
             Value = value;
         }
 
-        public AuthenticationSchemeProviderMapper Value { get; set; }
+        public AuthenticationSchemeProviderMapperResult Value { get; set; }
         public bool IsSelected { get; set; }
         public bool IsNew { get; set; }
     }

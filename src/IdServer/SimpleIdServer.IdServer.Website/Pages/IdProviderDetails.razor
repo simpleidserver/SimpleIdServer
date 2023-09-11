@@ -1,4 +1,5 @@
 ﻿@using Fluxor.Blazor.Web.Components;
+@using SimpleIdServer.IdServer.Api.AuthenticationSchemeProviders;
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
 @inherits FluxorComponent
@@ -28,7 +29,7 @@
 </RadzenTemplateForm>
 @code {
     [Parameter]
-    public AuthenticationSchemeProvider IdProvider { get; set; }
+    public AuthenticationSchemeProviderResult IdProvider { get; set; }
 
     record UpdateIdProviderDetails
     {

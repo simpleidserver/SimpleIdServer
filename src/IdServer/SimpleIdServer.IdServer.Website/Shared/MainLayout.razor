@@ -1,4 +1,5 @@
-﻿@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
+﻿@using SimpleIdServer.IdServer.Website.Stores.ConfigurationDefinitionStore;
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorLayout
 @inject IState<RealmsState> state
 @inject ContextMenuService contextMenuService
@@ -70,8 +71,8 @@
         base.OnAfterRender(firstRender);
         if(firstRender)
         {
-            var act = new GetAllRealmAction();
-            dispatcher.Dispatch(act);
+            dispatcher.Dispatch(new GetAllRealmAction());
+            dispatcher.Dispatch(new GetAllConfigurationDefinitionsAction());
             SubscribeToAction<GetActiveSuccessRealmAction>((act) =>
             {
                 activeRealm = act.Realm;

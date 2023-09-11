@@ -13,6 +13,7 @@ namespace SimpleIdServer.Configuration
     public interface IKeyValueConnector
     {
         Task<Dictionary<string, string>> GetAll(CancellationToken cancellationToken);
+        Task Set(string key, string value, CancellationToken cancellationToken);
     }
 
     public class EFKeyValueConnector : IKeyValueConnector
@@ -28,6 +29,16 @@ namespace SimpleIdServer.Configuration
         {
             var result = await _dbContext.ConfigurationKeyPairValueRecords.ToListAsync(cancellationToken);
             return result.ToDictionary(r => r.Name, r => r.Value);
+        }
+
+        public async Task Set(string key, string value, CancellationToken cancellationToken)
+        {
+            var record = await _dbContext.ConfigurationKeyPairValueRecords.SingleOrDefaultAsync(c => c.Name == key, cancellationToken);
+            if (record == null)
+                _dbContext.ConfigurationKeyPairValueRecords.Add(new IdServer.Domains.ConfigurationKeyPairValueRecord { Name = key, Value = value });
+            else
+                record.Value = value;
+            await _dbContext.SaveChangesAsync(cancellationToken);
         }
     }
 }

@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.Configuration;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.CredentialIssuer;
 using SimpleIdServer.IdServer.Domains;
@@ -58,7 +59,6 @@ builder.Services.AddRazorPages()
 ConfigureIdServer(builder.Services);
 var app = builder.Build();
 SeedData(app, builder.Configuration["SCIMBaseUrl"]);
-// app.SeedOptionDefinitions();
 app.UseCors("AllowAll");
 app.UseSID()
     .UseWsFederation()
@@ -303,6 +303,9 @@ void SeedData(WebApplication application, string scimBaseUrl)
                     UpdateDateTime = DateTime.UtcNow,
                     CreateDateTime = DateTime.UtcNow
                 });
+
+            if(!dbContext.Definitions.Any())
+                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<FacebookOptionsLite>());
 
             var dbConnection = dbContext.Database.GetDbConnection() as SqlConnection;
             if(dbConnection != null)

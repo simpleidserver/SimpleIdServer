@@ -25,6 +25,7 @@ namespace SimpleIdServer.IdServer
         public const string UNKNOWN_DEVICE_CODE = "the device_code doesn't exist";
         public const string UNKNOWN_NETWORK = "the network {0} doesn't exist";
         public const string UNKNOWN_ACR = "the acr {0} doesn't exist";
+        public const string UNKNOWN_AUTH_SCHEME_PROVIDER = "the authentication scheme provider {0} doesn't exist";
         public const string UNKNOWN_AUTH_SCHEME_PROVIDER_PROPERTIES = "the authentication scheme provider cannot be updated because the following properties are unknown : {0}";
         public const string UNAUTHORIZED_CLIENT = "unauthorized client";
         public const string UNAUTHORIZED_ACCESSTOKEN = "the access token is not authorized to access to the operation";
@@ -251,6 +252,7 @@ namespace SimpleIdServer.IdServer
         public const string CONTRACT_ALREADY_DEPLOYED = "contract is already deployed";
         public const string NO_CONTRACT = "there is no contract";
         public const string ACR_WITH_SAME_NAME_EXISTS = "an acr with the same name already exists";
+        public const string AUTHSCHEMEPROVIDER_WITH_SAME_NAME_EXISTS = "an authentication scheme provider with the same name already exists";
         public const string NOT_WELL_FORMED_DPOP_TOKEN = "the DPoP proof must be a Json Web Token";
         public const string USE_DPOP_NONCE = "Authorization Server required nonce in DPoP proof";
         public const string DPOP_JKT_MISMATCH = "there is a mismatch between the dpop_jkt and the DPoP proof";

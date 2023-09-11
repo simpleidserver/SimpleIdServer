@@ -17,6 +17,7 @@
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 	<ItemGroup>
+		<ProjectReference Include="..\SimpleIdServer.Configuration\SimpleIdServer.Configuration.csproj" />
 		<ProjectReference Include="..\SimpleIdServer.Did.Ethr\SimpleIdServer.Did.Ethr.csproj" />
 		<ProjectReference Include="..\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj" />
 		<ProjectReference Include="..\SimpleIdServer.IdServer.Saml.Idp\SimpleIdServer.IdServer.Saml.Idp.csproj" />

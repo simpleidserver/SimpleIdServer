@@ -23,6 +23,11 @@ public class AutomaticConfigurationOptions
         return this;
     }
 
+    public AutomaticConfigurationOptions UseRedisConnector()
+    {
+        return this;
+    }
+
     public AutomaticConfigurationOptions Add<T>()
     {
         var type = typeof(T);

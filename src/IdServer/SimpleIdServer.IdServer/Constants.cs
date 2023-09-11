@@ -54,6 +54,7 @@ namespace SimpleIdServer.IdServer
             public const string Networks = "networks";
             public const string DeviceAuthorization = "device_authorization";
             public const string AuthenticationClassReferences = "acrs";
+            public const string AuthenticationSchemeProviders = "idproviders";
             public const string FIDORegistration = "fido/u2f/registration";
             public const string FIDOAuthentication = "fido/u2f/authentication";
         }
@@ -438,6 +439,20 @@ namespace SimpleIdServer.IdServer
                 Id = Guid.NewGuid().ToString(),
                 Type = ScopeTypes.APIRESOURCE,
                 Name = "users",
+                Realms = new List<Domains.Realm>
+                {
+                    StandardRealms.Master
+                },
+                Protocol = ScopeProtocols.OAUTH,
+                IsExposedInConfigurationEdp = true,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
+            };
+            public static Scope AuthenticationSchemeProviders = new Scope
+            {
+                Id = Guid.NewGuid().ToString(),
+                Type = ScopeTypes.APIRESOURCE,
+                Name = "authenticationschemeproviders",
                 Realms = new List<Domains.Realm>
                 {
                     StandardRealms.Master

@@ -1,4 +1,5 @@
 ﻿@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@using SimpleIdServer.IdServer.Api.AuthenticationSchemeProviders;
 @using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
 @using SimpleIdServer.IdServer.Website.Resources;
 @inject DialogService dialogService
@@ -83,7 +84,7 @@
         SelectedMapperType = mapperType;
     }
 
-    void UpdateAuthProviderMapper(AuthenticationSchemeProviderMapper mapper)
+    void UpdateAuthProviderMapper(AuthenticationSchemeProviderMapperResult mapper)
     {
         var act = new AddAuthenticationSchemeProviderMapperAction
         {

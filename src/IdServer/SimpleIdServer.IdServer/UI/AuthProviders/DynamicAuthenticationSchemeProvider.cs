@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Middlewares;
@@ -43,6 +44,7 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
 
     public class DynamicAuthenticationSchemeProvider : AuthenticationSchemeProvider, ISIDAuthenticationSchemeProvider
     {
+        private readonly IConfiguration _configuration;
         private readonly IServiceProvider _serviceProvider;
         private readonly IdServerHostOptions _options;
         private readonly IDataProtectionProvider _dataProtection;
@@ -50,8 +52,9 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
         private IEnumerable<Domains.AuthenticationSchemeProvider> _cachedAuthenticationProviders;
         private DateTime? _nextExpirationTime;
 
-        public DynamicAuthenticationSchemeProvider(IServiceProvider serviceProvider, IOptions<IdServerHostOptions> opts, IDataProtectionProvider dataProtection, IOptions<AuthenticationOptions> options) : base(options)
+        public DynamicAuthenticationSchemeProvider(IConfiguration configuration, IServiceProvider serviceProvider, IOptions<IdServerHostOptions> opts, IDataProtectionProvider dataProtection, IOptions<AuthenticationOptions> options) : base(options)
         {
+            _configuration = configuration;
             _serviceProvider = serviceProvider;
             _options = opts.Value;
             _dataProtection = dataProtection;
@@ -101,9 +104,9 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
                 {
                     var realm = RealmContext.Instance().Realm;
                     realm = realm ?? Constants.DefaultRealm;
-                    authenticationSchemeProviders = await authenticationSchemeProviderRepository.Query().Include(c => c.Properties)
+                    authenticationSchemeProviders = await authenticationSchemeProviderRepository.Query()
                         .Include(c => c.Realms)
-                        .Include(c => c.AuthSchemeProviderDefinition).ThenInclude(c => c.Properties).Where(c=> c.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
+                        .Include(c => c.AuthSchemeProviderDefinition).Where(c=> c.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
                     if (_options.CacheExternalAuthProvidersInSeconds != null)
                     {
                         _nextExpirationTime = currentDateTime.AddSeconds(_options.CacheExternalAuthProvidersInSeconds.Value);
@@ -126,7 +129,8 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
             var optionType = authenticationHandlerType.GetGenericArguments().First();
             var liteOptionInterface = typeof(IDynamicAuthenticationOptions<>).MakeGenericType(optionType);
             var convert = liteOptionInterface.GetMethod("Convert");
-            var liteOptions = Serializer.PropertiesSerializer.DeserializeOptions(liteOptionType, provider.Properties);
+            var section = _configuration.GetSection($"{provider.Name}:{liteOptionType.Name}");
+            var liteOptions = section.Get(liteOptionType);
             var options = convert.Invoke(liteOptions, new object[] { });
             PostConfigureOptions(optionType, handlerType, options);
             var optionsMonitorType = typeof(ConcreteOptionsMonitor<>).MakeGenericType(optionType);

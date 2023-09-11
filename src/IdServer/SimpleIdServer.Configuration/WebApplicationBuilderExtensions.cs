@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using SimpleIdServer.Configuration;
 using System;
-using System.Linq;
-using System.Reflection;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -18,14 +16,6 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddSingleton(options);
         var configurationBuilder = (IConfigurationBuilder)builder.Configuration;
         configurationBuilder.Add(new AutomaticConfigurationSource(options, options.KeyValueConnector));
-        var configureMethodInfo = typeof(OptionsConfigurationServiceCollectionExtensions).GetMethods(BindingFlags.Static | BindingFlags.Public).First(m => m.Name == "Configure" && m.IsGenericMethod && m.GetParameters().Count() == 2);
-        foreach (var record in options.ConfigurationDefinitions)
-        {
-            var conf = builder.Configuration.GetSection(record.Name);
-            var newMethodInfo = configureMethodInfo.MakeGenericMethod(record.Type);
-            newMethodInfo.Invoke(null, new object[] { builder.Services, conf });
-        }
-
         return builder;
     }
 }

@@ -3,23 +3,30 @@
 using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Api.AuthenticationSchemeProviders;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Store;
-using SimpleIdServer.IdServer.Website.Resources;
-using System.Linq.Dynamic.Core;
+using System.DirectoryServices.Protocols;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
 {
     public class IdProviderEffects
     {
+        private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly IDbContextFactory<StoreDbContext> _factory;
-        private readonly DbContextOptions<StoreDbContext> _options;
+        private readonly IdServerWebsiteOptions _options;
         private readonly ProtectedSessionStorage _sessionStorage;
 
-        public IdProviderEffects(IDbContextFactory<StoreDbContext> factory, DbContextOptions<StoreDbContext> options, ProtectedSessionStorage sessionStorage)
+        public IdProviderEffects(IWebsiteHttpClientFactory websiteHttpClientFactory, IDbContextFactory<StoreDbContext> factory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
         {
+            _websiteHttpClientFactory = websiteHttpClientFactory;
             _factory = factory;
-            _options = options;
+            _options = options.Value;
             _sessionStorage = sessionStorage;
         }
 
@@ -27,104 +34,92 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         public async Task Handle(SearchIdProvidersAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            using (var dbContext = _factory.CreateDbContext())
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var searchRequest = new DTOs.SearchRequest
             {
-                IQueryable<AuthenticationSchemeProvider> query = dbContext.AuthenticationSchemeProviders.Include(p => p.Realms).Where(p => p.Realms.Any(r => r.Name == realm)).AsNoTracking();
-                if (!string.IsNullOrWhiteSpace(action.Filter))
-                    query = query.Where(SanitizeExpression(action.Filter));
+                Filter = SanitizeExpression(action.Filter),
+                OrderBy = SanitizeExpression(action.OrderBy),
+                Skip = action.Skip,
+                Take = action.Take
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/idproviders/.search"),
+                Content = new StringContent(JsonSerializer.Serialize(searchRequest), Encoding.UTF8, "application/json")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<DTOs.SearchResult<AuthenticationSchemeProviderResult>>(json);
+            dispatcher.Dispatch(new SearchIdProvidersSuccessAction { IdProviders = result.Content, Count = result.Count });
 
-                if (!string.IsNullOrWhiteSpace(action.OrderBy))
-                    query = query.OrderBy(SanitizeExpression(action.OrderBy));
-
-                var nb = query.Count();
-                var idProviders = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
-                dispatcher.Dispatch(new SearchIdProvidersSuccessAction { IdProviders = idProviders, Count = nb });
-            }
-
-            string SanitizeExpression(string expression) => expression.Replace("Value.", "");
+            string SanitizeExpression(string expression) => expression?.Replace("Value.", "");
         }
 
         [EffectMethod]
         public async Task Handle(RemoveSelectedIdProvidersAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            using (var dbContext = _factory.CreateDbContext())
+            var httpClient = await _websiteHttpClientFactory.Build();
+            foreach(var id in action.Ids)
             {
-                var idProviders = await dbContext.AuthenticationSchemeProviders.Include(r => r.Realms).Include(p => p.Properties).Where(p => action.Ids.Contains(p.Name) && p.Realms.Any(r => r.Name == realm)).ToListAsync();
-                dbContext.AuthenticationSchemeProviders.RemoveRange(idProviders);
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new RemoveSelectedIdProvidersSuccessAction { Ids = action.Ids });
+                var requestMessage = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Delete,
+                    RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/idproviders/{id}")
+                };
+                await httpClient.SendAsync(requestMessage);
             }
+
+            dispatcher.Dispatch(new RemoveSelectedIdProvidersSuccessAction { Ids = action.Ids });
         }
 
         [EffectMethod]
         public async Task Handle(GetIdProviderAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            using (var dbContext = _factory.CreateDbContext())
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
             {
-                var idProvider = await dbContext.AuthenticationSchemeProviders.Include(i => i.Properties)
-                .Include(i => i.Mappers)
-                .Include(i => i.Realms)
-                .Include(i => i.AuthSchemeProviderDefinition).ThenInclude(d => d.Properties)
-                .AsNoTracking()
-                .SingleOrDefaultAsync(p => p.Name == action.Id && p.Realms.Any(r => r.Name == realm));
-                if (idProvider == null)
-                {
-                    dispatcher.Dispatch(new GetIdProviderFailureAction { ErrorMessage = string.Format(Global.UnknownIdProvider, action.Id) });
-                    return;
-                }
-
-                dispatcher.Dispatch(new GetIdProviderSuccessAction { IdProvider = idProvider });
-            }
-        }
-
-        [EffectMethod]
-        public async Task Handle(GetIdProviderDefsAction action, IDispatcher dispatcher)
-        {
-            using (var dbContext = _factory.CreateDbContext())
-            {
-                var idProviderDefs = await dbContext.AuthenticationSchemeProviderDefinitions.Include(d => d.Properties).AsNoTracking().ToListAsync();
-                dispatcher.Dispatch(new GetIdProviderDefsSuccessAction { AuthProviderDefinitions = idProviderDefs });
-            }
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/idproviders/{action.Id}")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<AuthenticationSchemeProviderResult>(json);
+            dispatcher.Dispatch(new GetIdProviderSuccessAction { IdProvider = result });
         }
 
         [EffectMethod]
         public async Task Handle(AddIdProviderAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = _factory.CreateDbContext())
+            var realm = await GetRealm();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var addRequest = new AddAuthenticationSchemeProviderRequest
             {
-                if (string.IsNullOrWhiteSpace(action.Name))
-                {
-                    dispatcher.Dispatch(new AddIdProviderFailureAction { ErrorMessage = Global.NameIsRequired });
-                    return;
-                }
-
-                var realm = await GetRealm();
-                if (await dbContext.AuthenticationSchemeProviders.Include(r => r.Realms).AsNoTracking().AnyAsync(r => r.Name == action.Name && r.Realms.Any(rl => rl.Name == realm)))
-                {
-                    dispatcher.Dispatch(new AddIdProviderFailureAction { ErrorMessage = string.Format(Global.IdProviderExists, action.Name) });
-                    return;
-                }
-
-                var idProviderDef = await dbContext.AuthenticationSchemeProviderDefinitions.SingleAsync(d => d.Name == action.IdProviderTypeName);
-                var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
-                var idProvider = new AuthenticationSchemeProvider
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Name = action.Name,
-                    Description = action.Description,
-                    DisplayName = action.DisplayName,
-                    CreateDateTime = DateTime.UtcNow,
-                    UpdateDateTime = DateTime.UtcNow,
-                    Properties = action.Properties.ToList(),
-                    AuthSchemeProviderDefinition = idProviderDef,
-                    Mappers = Constants.GetDefaultIdProviderMappers()
-                };
-                idProvider.Realms.Add(activeRealm);
-                dbContext.Add(idProvider);
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new AddIdProviderSuccessAction { Name = action.Name, Description = action.Description, Properties = action.Properties, DisplayName = action.DisplayName });
+                DefinitionName = action.IdProviderTypeName,
+                Description = action.Description,
+                Name = action.Name,
+                DisplayName = action.DisplayName,
+                Values = action.Properties
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/idproviders"),
+                Content = new StringContent(JsonSerializer.Serialize(addRequest), Encoding.UTF8, "application/json")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            try
+            {
+                httpResult.EnsureSuccessStatusCode();
+                dispatcher.Dispatch(new AddIdProviderSuccessAction { Name = action.Name, Description = action.Description, DisplayName = action.DisplayName });
+            }
+            catch
+            {
+                var jsonObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new AddIdProviderFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
             }
         }
 
@@ -132,107 +127,134 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         public async Task Handle(UpdateIdProviderDetailsAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            using (var dbContext = _factory.CreateDbContext())
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var addRequest = new UpdateAuthenticationSchemeProviderDetailsRequest
             {
-                var idProvider = await dbContext.AuthenticationSchemeProviders.Include(r => r.Realms).SingleAsync(a => a.Name == action.Name && a.Realms.Any(r => r.Name == realm));
-                idProvider.Description = action.Description;
-                idProvider.DisplayName = action.DisplayName;
-                idProvider.UpdateDateTime = DateTime.UtcNow;
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new UpdateIdProviderDetailsSuccessAction { Description = action.Description, DisplayName = action.DisplayName, Name = action.Name });
-            }
+                Description = action.Description,
+                DisplayName = action.DisplayName
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Put,
+                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/idproviders/{action.Name}/details"),
+                Content = new StringContent(JsonSerializer.Serialize(addRequest), Encoding.UTF8, "application/json")
+            };
+            await httpClient.SendAsync(requestMessage);
+            dispatcher.Dispatch(new UpdateIdProviderDetailsSuccessAction { Description = action.Description, DisplayName = action.DisplayName, Name = action.Name });
         }
 
         [EffectMethod]
         public async Task Handle(UpdateAuthenticationSchemeProviderPropertiesAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            using (var dbContext = _factory.CreateDbContext())
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var addRequest = new UpdateAuthenticationSchemeProviderValuesRequest
             {
-                var idProvider = await dbContext.AuthenticationSchemeProviders.Include(r => r.Realms).Include(p => p.Properties).SingleAsync(a => a.Name == action.Name && a.Realms.Any(r => r.Name == realm));
-                idProvider.Properties.Clear();
-                foreach (var property in action.Properties)
-                    idProvider.Properties.Add(new AuthenticationSchemeProviderProperty
-                    {
-                        PropertyName = property.PropertyName,
-                        Value = property.Value
-                    });
-                idProvider.UpdateDateTime = DateTime.UtcNow;
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new UpdateAuthenticationSchemeProviderPropertiesSuccessAction { Name = action.Name, Properties = action.Properties });
-            }
+                Values = action.Properties
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Put,
+                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/idproviders/{action.Name}/values"),
+                Content = new StringContent(JsonSerializer.Serialize(addRequest), Encoding.UTF8, "application/json")
+            };
+            await httpClient.SendAsync(requestMessage);
+            dispatcher.Dispatch(new UpdateAuthenticationSchemeProviderPropertiesSuccessAction { Name = action.Name, Properties = action.Properties });
         }
 
         [EffectMethod]
         public async Task Handle(AddAuthenticationSchemeProviderMapperAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            using (var dbContext = _factory.CreateDbContext())
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var addRequest = new AddAuthenticationSchemeProviderMapperRequest
             {
-                var idProvider = await dbContext.AuthenticationSchemeProviders.Include(r => r.Realms).Include(p => p.Mappers).SingleAsync(a => a.Name == action.IdProviderName && a.Realms.Any(r => r.Name == realm));
-                var id = Guid.NewGuid().ToString();
-                idProvider.Mappers.Add(new AuthenticationSchemeProviderMapper
-                {
-                    Id = id,
-                    MapperType = action.MapperType,
-                    Name = action.Name,
-                    SourceClaimName = action.SourceClaimName,
-                    TargetUserAttribute = action.TargetUserAttribute,
-                    TargetUserProperty = action.TargetUserProperty
-                });
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new AddAuthenticationSchemeProviderMapperSuccessAction
-                {
-                    Id = id,
-                    IdProviderName = action.IdProviderName,
-                    MapperType = action.MapperType,
-                    Name = action.Name,
-                    SourceClaimName = action.SourceClaimName,
-                    TargetUserAttribute = action.TargetUserAttribute,
-                    TargetUserProperty = action.TargetUserProperty
-                });
-            }
+                MapperType = action.MapperType,
+                Name = action.Name,
+                SourceClaimName = action.SourceClaimName,
+                TargetUserAttribute = action.TargetUserAttribute,
+                TargetUserProperty = action.TargetUserProperty
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/idproviders/{action.Name}/mappers"),
+                Content = new StringContent(JsonSerializer.Serialize(addRequest), Encoding.UTF8, "application/json")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var newMapper = JsonSerializer.Deserialize<AuthenticationSchemeProviderMapperResult>(json);
+            dispatcher.Dispatch(new AddAuthenticationSchemeProviderMapperSuccessAction
+            {
+                Id = newMapper.Id,
+                IdProviderName = action.IdProviderName,
+                MapperType = action.MapperType,
+                Name = action.Name,
+                SourceClaimName = action.SourceClaimName,
+                TargetUserAttribute = action.TargetUserAttribute,
+                TargetUserProperty = action.TargetUserProperty
+            });
         }
 
         [EffectMethod]
         public async Task Handle(RemoveSelectedAuthenticationSchemeProviderMappersAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            using (var dbContext = _factory.CreateDbContext())
+            var httpClient = await _websiteHttpClientFactory.Build();
+            foreach(var id in action.MapperIds)
             {
-                var idProvider = await dbContext.AuthenticationSchemeProviders.Include(p => p.Realms).Include(p => p.Mappers).SingleAsync(a => a.Name == action.Name && a.Realms.Any(r => r.Name == realm));
-                idProvider.Mappers = idProvider.Mappers.Where(m => !action.MapperIds.Contains(m.Id)).ToList();
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new RemoveSelectedAuthenticationSchemeProviderMappersSuccessAction
+                var requestMessage = new HttpRequestMessage
                 {
-                    Name = action.Name,
-                    MapperIds = action.MapperIds
-                });
+                    Method = HttpMethod.Delete,
+                    RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/idproviders/{action.Name}/mappers/{id}")
+                };
+                await httpClient.SendAsync(requestMessage);
             }
+
+            dispatcher.Dispatch(new RemoveSelectedAuthenticationSchemeProviderMappersSuccessAction
+            {
+                Name = action.Name,
+                MapperIds = action.MapperIds
+            });
         }
 
         [EffectMethod]
         public async Task Handle(UpdateAuthenticationSchemeProviderMapperAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var addRequest = new UpdateAuthenticationSchemeProviderMapperRequest
+            {
+                Name = action.Name,
+                SourceClaimName = action.SourceClaimName,
+                TargetUserAttribute = action.TargetUserAttribute,
+                TargetUserProperty = action.TargetUserProperty
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Put,
+                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/idproviders/{action.Name}/mappers/{action.Id}"),
+                Content = new StringContent(JsonSerializer.Serialize(addRequest), Encoding.UTF8, "application/json")
+            };
+            await httpClient.SendAsync(requestMessage);
+            dispatcher.Dispatch(new UpdateAuthenticationSchemeProviderMapperSuccessAction
+            {
+                Id = action.Id,
+                Name = action.Name,
+                IdProviderName = action.IdProviderName,
+                SourceClaimName = action.SourceClaimName,
+                TargetUserAttribute = action.TargetUserAttribute,
+                TargetUserProperty = action.TargetUserProperty
+            });
+        }
+
+        [EffectMethod]
+        public async Task Handle(GetIdProviderDefsAction action, IDispatcher dispatcher)
+        {
             using (var dbContext = _factory.CreateDbContext())
             {
-                var idProvider = await dbContext.AuthenticationSchemeProviders.Include(p => p.Realms).Include(p => p.Mappers).SingleAsync(a => a.Name == action.IdProviderName && a.Realms.Any(r => r.Name == realm));
-                var mapper = idProvider.Mappers.First(m => m.Id == action.Id);
-                mapper.Name = action.Name;
-                mapper.SourceClaimName = action.SourceClaimName;
-                mapper.TargetUserAttribute = action.TargetUserAttribute;
-                mapper.TargetUserProperty = action.TargetUserProperty;
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new UpdateAuthenticationSchemeProviderMapperSuccessAction
-                {
-                    Id = action.Id,
-                    Name = action.Name,
-                    IdProviderName = action.IdProviderName,
-                    SourceClaimName = action.SourceClaimName,
-                    TargetUserAttribute = action.TargetUserAttribute,
-                    TargetUserProperty = action.TargetUserProperty
-                });
+                var idProviderDefs = await dbContext.AuthenticationSchemeProviderDefinitions.AsNoTracking().ToListAsync();
+                dispatcher.Dispatch(new GetIdProviderDefsSuccessAction { AuthProviderDefinitions = idProviderDefs });
             }
         }
 
@@ -255,7 +277,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
 
     public class SearchIdProvidersSuccessAction
     {
-        public ICollection<AuthenticationSchemeProvider> IdProviders { get; set; }
+        public ICollection<AuthenticationSchemeProviderResult> IdProviders { get; set; }
         public int Count { get; set; }
     }
 
@@ -281,7 +303,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
 
     public class GetIdProviderSuccessAction
     {
-        public AuthenticationSchemeProvider IdProvider { get; set; }
+        public AuthenticationSchemeProviderResult IdProvider { get; set; }
     }
 
     public class ToggleIdProviderSelectionAction
@@ -311,7 +333,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         public string DisplayName { get; set; } = null!;
         public string IdProviderTypeName { get; set; } = null!;
         public string? Description { get; set; } = null;
-        public IEnumerable<AuthenticationSchemeProviderProperty> Properties { get; set; }
+        public Dictionary<string, string> Properties { get; set; }
     }
 
     public class AddIdProviderFailureAction
@@ -324,7 +346,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         public string Name { get; set; } = null!;
         public string DisplayName { get; set; } = null!;
         public string? Description { get; set; } = null;
-        public IEnumerable<AuthenticationSchemeProviderProperty> Properties { get; set; }
+        // public IEnumerable<AuthenticationSchemeProviderProperty> Properties { get; set; }
     }
 
     public class UpdateIdProviderDetailsAction
@@ -344,13 +366,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
     public class UpdateAuthenticationSchemeProviderPropertiesAction
     {
         public string Name { get; set; } = null!;
-        public IEnumerable<AuthenticationSchemeProviderProperty> Properties { get; set; } = new List<AuthenticationSchemeProviderProperty>();
+        public Dictionary<string, string> Properties { get; set; } = new Dictionary<string, string>();
     }
 
     public class UpdateAuthenticationSchemeProviderPropertiesSuccessAction
     {
         public string Name { get; set; } = null!;
-        public IEnumerable<AuthenticationSchemeProviderProperty> Properties { get; set; } = new List<AuthenticationSchemeProviderProperty>();
+        public Dictionary<string, string> Properties { get; set; } = new Dictionary<string, string>();
     }
 
     public class RemoveSelectedAuthenticationSchemeProviderMappersAction

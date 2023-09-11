@@ -9,7 +9,7 @@ namespace SimpleIdServer.IdServer.Domains
         public string? Image { get; set; } = null;
         public string? HandlerFullQualifiedName { get; set; } = null;
         public string? OptionsFullQualifiedName { get; set; } = null;
-        public ICollection<AuthenticationSchemeProviderDefinitionProperty> Properties { get; set; } = new List<AuthenticationSchemeProviderDefinitionProperty>();
+        public string? OptionsName { get; set; } = null;
         public ICollection<AuthenticationSchemeProvider> AuthSchemeProviders { get; set; } = new List<AuthenticationSchemeProvider>();
     }
 }
