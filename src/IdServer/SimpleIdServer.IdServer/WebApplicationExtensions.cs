@@ -194,6 +194,9 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.MapControllerRoute("searchIdProvisioning",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/.search",
                 defaults: new { controller = "IdentityProvisioning", action = "Search" });
+            webApplication.MapControllerRoute("importRepresentations",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/import",
+                defaults: new { controller = "IdentityProvisioning", action = "Import" });
             webApplication.MapControllerRoute("removeIdProvisioning",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}",
                 defaults: new { controller = "IdentityProvisioning", action = "Remove" });
@@ -215,9 +218,6 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.MapControllerRoute("extractRepresentations",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{name}/{id}/enqueue",
                 defaults: new { controller = "IdentityProvisioning", action = "Enqueue" });
-            webApplication.MapControllerRoute("importRepresentations",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/import",
-                defaults: new { controller = "IdentityProvisioning", action = "Import" });
 
 
             webApplication.MapControllerRoute("getAllNetworks",

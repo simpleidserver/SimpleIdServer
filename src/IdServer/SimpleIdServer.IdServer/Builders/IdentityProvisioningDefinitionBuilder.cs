@@ -21,7 +21,7 @@ namespace SimpleIdServer.IdServer.Builders
                 Name = name,
                 Description = description,
                 OptionsName = typeof(T).Name,
-                OptionsFullQualifiedName = typeof(T).FullName,
+                OptionsFullQualifiedName = typeof(T).AssemblyQualifiedName,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             });

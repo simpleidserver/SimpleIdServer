@@ -11,7 +11,7 @@ namespace SimpleIdServer.Configuration;
 public class AutomaticConfigurationOptions
 {
     internal List<AutomaticConfigurationRecord> ConfigurationDefinitions = new List<AutomaticConfigurationRecord>();
-    internal IKeyValueConnector? KeyValueConnector = null;
+    public IKeyValueConnector? KeyValueConnector = null;
 
     public AutomaticConfigurationOptions UseEFConnector(Action<DbContextOptionsBuilder>? action = null)
     {

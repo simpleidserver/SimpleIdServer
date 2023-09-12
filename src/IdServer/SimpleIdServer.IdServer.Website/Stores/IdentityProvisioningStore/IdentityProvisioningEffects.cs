@@ -167,7 +167,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             var requestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/provisionng/{action.Id}/mappers"),
+                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/provisioning/{action.Id}/mappers"),
                 Content = new StringContent(JsonSerializer.Serialize(addRequest), Encoding.UTF8, "application/json")
             };
             var httpResult = await httpClient.SendAsync(requestMessage);

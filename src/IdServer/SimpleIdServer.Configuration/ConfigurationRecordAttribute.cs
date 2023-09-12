@@ -16,14 +16,16 @@ public class ConfigurationRecordAttribute : Attribute
 		Order = order;
 	}
 
-	public ConfigurationRecordAttribute(string displayName, string description = null, int order = 0, bool isProtected = false) : this(displayName, description, order)
+	public ConfigurationRecordAttribute(string displayName, string description = null, int order = 0, bool isProtected = false, string displayCondition = null) : this(displayName, description, order)
 	{
 		IsProtected = isProtected;
+        DisplayCondition = displayCondition;
 	}
 
 	public string DisplayName { get; set; } = null!;
 	public string? Description { get; set; } = null;
 	public bool IsProtected { get; set; } = false;
 	public int Order { get; set; } = 0;
+	public string DisplayCondition { get; set; }
 	public Dictionary<string, string>? Values { get; set; } = null;
 }

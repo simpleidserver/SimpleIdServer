@@ -30,6 +30,7 @@ public class ConfigurationDefinitionExtractor
         result = new ConfigurationDefinitionRecord { Id = Guid.NewGuid().ToString(), CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow, Name = propertyInfo.Name };
         result.SetDescription(configurationRecordAttr.Description, language);
         result.SetDisplayName(configurationRecordAttr.DisplayName, language);
+        result.DisplayCondition = configurationRecordAttr.DisplayCondition;
         result.Order = configurationRecordAttr.Order;
         if (configurationRecordAttr.IsProtected)
         {
@@ -93,8 +94,8 @@ public class ConfigurationDefinitionExtractor
             var enumAttr = field.GetCustomAttribute<ConfigurationRecordEnumAttribute>();
             if (enumAttr == null) continue;
             var name = enumAttr.Description;
-            var value = (int)field.GetValue(inst);
-            record.SetValue(name, language, value.ToString());
+            var value = field.GetValue(inst).ToString();
+            record.SetValue(name, language, value);
         }
     }
 

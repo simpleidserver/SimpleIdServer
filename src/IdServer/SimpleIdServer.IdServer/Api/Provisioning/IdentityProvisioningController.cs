@@ -107,7 +107,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
                     .SingleOrDefaultAsync(p => p.Id == id);
                 if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_IDPROVISIONING, id));
                 var optionKey = $"{result.Name}:{result.Definition.OptionsName}";
-                var optionType = Assembly.GetEntryAssembly().GetType(result.Definition.OptionsFullQualifiedName);
+                var optionType = Type.GetType(result.Definition.OptionsFullQualifiedName);
                 var section = _configuration.GetSection(optionKey);
                 var configuration = section.Get(optionType);
                 return new OkObjectResult(Build(result, configuration));
@@ -238,6 +238,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             return new NoContentResult();
         }
 
+        [HttpGet]
         public IActionResult Import([FromRoute] string prefix)
         {
             prefix = prefix ?? Constants.DefaultRealm;
@@ -267,7 +268,10 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
                 var type = configuration.GetType();
                 var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
                 foreach (var property in properties)
-                    values.Add(property.Name, property.GetValue(configuration).ToString());
+                {
+                    var value = property.GetValue(configuration)?.ToString();
+                    if (!string.IsNullOrWhiteSpace(value)) values.Add(property.Name, value);
+                }
             }
 
             return new IdentityProvisioningResult

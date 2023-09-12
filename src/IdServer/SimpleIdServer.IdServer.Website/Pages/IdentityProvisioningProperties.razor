@@ -7,7 +7,7 @@
 @inject DialogService dialogService
 @inject NotificationService notificationService
 
-@if (IdProvisioning != null)
+@if (IdProvisioning != null && IdProvisioning.Definition != null)
 {
     <EditConfiguration PropertiesSaved=@SaveProperties Name=@IdProvisioning.Definition.OptionsName Values="@IdProvisioning.Values" IsUpdating=@IsUpdating IsAddForm=false></EditConfiguration>
 }
@@ -15,11 +15,11 @@
 @code {
     [Parameter]
     public IdentityProvisioningResult IdProvisioning { get; set; }
-    bool IsUpdating { get; set; } = null;
+    bool IsUpdating { get; set; } = false;
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
-        return base.OnAfterRenderAsync(firstRender);
+        base.OnAfterRenderAsync(firstRender);
         if(firstRender)
         {
             SubscribeToAction<UpdateIdProvisioningPropertiesSuccessAction>((act) =>
@@ -33,7 +33,7 @@
         return Task.CompletedTask;
     }
 
-    void SaveIdProvisioning(IEnumerable<IdentityProvisioningProperty> properties)
+    void SaveProperties(Dictionary<string, string> properties)
     {
         this.IsUpdating = true;
         var act = new UpdateIdProvisioningPropertiesAction { Id = IdProvisioning.Id, Properties = properties };

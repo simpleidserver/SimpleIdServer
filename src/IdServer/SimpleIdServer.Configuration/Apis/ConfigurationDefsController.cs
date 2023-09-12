@@ -29,7 +29,7 @@ public class ConfigurationDefsController : BaseController
         prefix = prefix ?? IdServer.Constants.DefaultRealm;
         CheckAccessToken(prefix, Constants.ConfigurationsScope.Name, _jwtBuilder);
         var confDefs = await _configurationDefinitionStore.Query()
-            .Include(c => c.Records).ThenInclude(r => r.Values)
+            .Include(c => c.Records).ThenInclude(r => r.Values).ThenInclude(r => r.Translations)
             .Include(c => c.Records).ThenInclude(r => r.Translations)
             .AsNoTracking()
             .ToListAsync();
@@ -51,6 +51,7 @@ public class ConfigurationDefsController : BaseController
                 Order = r.Order,
                 Name = r.Name,
                 Type = r.Type,
+                DisplayCondition = r.DisplayCondition,
                 PossibleValues = r.Values.Select(v => new ConfigurationDefRecordValueResult
                 {
                     Id = v.Id,

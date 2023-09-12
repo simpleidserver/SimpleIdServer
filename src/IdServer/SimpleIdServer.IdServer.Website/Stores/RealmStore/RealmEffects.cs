@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Website.Resources;
+using SimpleIdServer.IdServer.Website.Stores.ConfigurationDefinitionStore;
 
 namespace SimpleIdServer.IdServer.Website.Stores.RealmStore
 {

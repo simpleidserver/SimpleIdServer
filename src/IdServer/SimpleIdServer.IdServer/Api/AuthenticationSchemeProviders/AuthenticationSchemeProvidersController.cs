@@ -308,7 +308,10 @@ public class AuthenticationSchemeProvidersController : BaseController
             var type = obj.GetType();
             var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
             foreach (var property in properties)
-                values.Add(property.Name, property.GetValue(obj).ToString());
+            {
+                var value = property.GetValue(obj)?.ToString();
+                if (!string.IsNullOrWhiteSpace(value)) values.Add(property.Name, value);
+            }
         }
 
 		return new AuthenticationSchemeProviderResult

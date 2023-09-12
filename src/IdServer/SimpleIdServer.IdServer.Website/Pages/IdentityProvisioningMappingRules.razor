@@ -1,4 +1,5 @@
-﻿@using SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore;
+﻿@using SimpleIdServer.IdServer.Api.Provisioning;
+@using SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject IState<SearchIdentityProvisioningMappingRuleState> searchIdentityProvisioningMappingRulesState
 @inject ContextMenuService contextMenuService
@@ -50,7 +51,7 @@
 
 @code {
     [Parameter]
-    public Domains.IdentityProvisioning IdProvisioning { get; set; }
+    public IdentityProvisioningResult IdProvisioning { get; set; }
     bool selectAll = false;
 
     void ToggleAll(bool isSelected)

@@ -21,6 +21,8 @@ public class ConfigurationDefRecordResult
     public string DisplayName { get; set; }
     [JsonPropertyName("description")]
     public string Description { get; set; }
+    [JsonPropertyName("display_condition")]
+    public string DisplayCondition { get; set; }
     [JsonPropertyName("possible_values")]
     public ICollection<ConfigurationDefRecordValueResult> PossibleValues { get; set; } = new List<ConfigurationDefRecordValueResult>();
 }

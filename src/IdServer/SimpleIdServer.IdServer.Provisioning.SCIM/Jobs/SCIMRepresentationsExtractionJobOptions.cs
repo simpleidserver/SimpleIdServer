@@ -11,11 +11,11 @@ namespace SimpleIdServer.IdServer.Provisioning.SCIM.Jobs
         public string SCIMEdp { get; set; }
         [ConfigurationRecord("Authentication Types", "Select the type of authentication", order: 1)]
         public ClientAuthenticationTypes AuthenticationType { get; set; }
-        [ConfigurationRecord("API Key", "Value is present in the appsettings.json file", order: 2)]
+        [ConfigurationRecord("API Key", "Value is present in the appsettings.json file", order: 2, DisplayCondition = "AuthenticationType=APIKEY")]
         public string ApiKey { get; set; }
-        [ConfigurationRecord("ClientId", "Client Identifier", order: 3)]
+        [ConfigurationRecord("ClientId", "Client Identifier", order: 3, displayCondition: "AuthenticationType=CLIENT_SECRET_POST")]
         public string ClientId { get; set; }
-        [ConfigurationRecord("ClientSecret", "Client Secret", order: 4, isProtected: true)]
+        [ConfigurationRecord("ClientSecret", "Client Secret", order: 4, isProtected: true, displayCondition:"AuthenticationType=CLIENT_SECRET_POST")]
         public string ClientSecret { get; set; }
         [ConfigurationRecord("Count", "Maximum number of records returned by the SCIM endpoint", order: 5)]
         public int Count { get; set; }

@@ -17,7 +17,7 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.9")
+                .HasAnnotation("ProductVersion", "7.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -125,6 +125,36 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.HasIndex("ScopesId");
 
                     b.ToTable("ClientScope");
+                });
+
+            modelBuilder.Entity("ConfigurationDefinitionRecordTranslation", b =>
+                {
+                    b.Property<string>("ConfigurationDefinitionRecordId")
+                        .HasColumnType("text");
+
+                    b.Property<int>("TranslationsId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ConfigurationDefinitionRecordId", "TranslationsId");
+
+                    b.HasIndex("TranslationsId");
+
+                    b.ToTable("ConfigurationDefinitionRecordTranslation");
+                });
+
+            modelBuilder.Entity("ConfigurationDefinitionRecordValueTranslation", b =>
+                {
+                    b.Property<string>("ConfigurationDefinitionRecordValueId")
+                        .HasColumnType("text");
+
+                    b.Property<int>("TranslationsId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ConfigurationDefinitionRecordValueId", "TranslationsId");
+
+                    b.HasIndex("TranslationsId");
+
+                    b.ToTable("ConfigurationDefinitionRecordValueTranslation");
                 });
 
             modelBuilder.Entity("CredentialTemplateRealm", b =>
@@ -411,39 +441,12 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.Property<string>("OptionsFullQualifiedName")
                         .HasColumnType("text");
 
+                    b.Property<string>("OptionsName")
+                        .HasColumnType("text");
+
                     b.HasKey("Name");
 
                     b.ToTable("AuthenticationSchemeProviderDefinitions");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderDefinitionProperty", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<string>("DisplayName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("PropertyName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("SchemeProviderDefName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SchemeProviderDefName");
-
-                    b.ToTable("AuthenticationSchemeProviderDefinitionProperty");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderMapper", b =>
@@ -476,32 +479,6 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.HasIndex("IdProviderId");
 
                     b.ToTable("AuthenticationSchemeProviderMapper");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderProperty", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("PropertyName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("SchemeProviderId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Value")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SchemeProviderId");
-
-                    b.ToTable("AuthenticationSchemeProviderProperty");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthorizedScope", b =>
@@ -1039,6 +1016,93 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.ToTable("ClientJsonWebKey");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ConfigurationDefinition", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FullQualifiedName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdateDateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Definitions");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ConfigurationDefinitionRecord", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ConfigurationDefinitionId")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DisplayCondition")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdateDateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ConfigurationDefinitionId");
+
+                    b.ToTable("ConfigurationDefinitionRecord");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ConfigurationDefinitionRecordValue", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ConfigurationDefinitionRecordId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ConfigurationDefinitionRecordId");
+
+                    b.ToTable("ConfigurationDefinitionRecordValue");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ConfigurationKeyPairValueRecord", b =>
+                {
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Name");
+
+                    b.ToTable("ConfigurationKeyPairValueRecords");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Consent", b =>
                 {
                     b.Property<string>("Id")
@@ -1258,42 +1322,20 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
+                    b.Property<string>("OptionsFullQualifiedName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OptionsName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("UpdateDateTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Name");
 
                     b.ToTable("IdentityProvisioningDefinitions");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.IdentityProvisioningDefinitionProperty", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<string>("DisplayName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("IdentityProvisioningDefinitionName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("PropertyName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IdentityProvisioningDefinitionName");
-
-                    b.ToTable("IdentityProvisioningDefinitionProperty");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.IdentityProvisioningHistory", b =>
@@ -1360,32 +1402,6 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.HasIndex("IdentityProvisioningDefinitionName");
 
                     b.ToTable("IdentityProvisioningMappingRule");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.IdentityProvisioningProperty", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("IdentityProvisioningId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("PropertyName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Value")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IdentityProvisioningId");
-
-                    b.ToTable("IdentityProvisioningProperty");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ImportSummary", b =>
@@ -2363,6 +2379,36 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ConfigurationDefinitionRecordTranslation", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.ConfigurationDefinitionRecord", null)
+                        .WithMany()
+                        .HasForeignKey("ConfigurationDefinitionRecordId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Translation", null)
+                        .WithMany()
+                        .HasForeignKey("TranslationsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ConfigurationDefinitionRecordValueTranslation", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.ConfigurationDefinitionRecordValue", null)
+                        .WithMany()
+                        .HasForeignKey("ConfigurationDefinitionRecordValueId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Translation", null)
+                        .WithMany()
+                        .HasForeignKey("TranslationsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("CredentialTemplateRealm", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.CredentialTemplate", null)
@@ -2479,17 +2525,6 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.Navigation("AuthSchemeProviderDefinition");
                 });
 
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderDefinitionProperty", b =>
-                {
-                    b.HasOne("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderDefinition", "SchemeProviderDef")
-                        .WithMany("Properties")
-                        .HasForeignKey("SchemeProviderDefName")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("SchemeProviderDef");
-                });
-
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderMapper", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProvider", "IdProvider")
@@ -2499,17 +2534,6 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .IsRequired();
 
                     b.Navigation("IdProvider");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderProperty", b =>
-                {
-                    b.HasOne("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProvider", "SchemeProvider")
-                        .WithMany("Properties")
-                        .HasForeignKey("SchemeProviderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("SchemeProvider");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthorizedScope", b =>
@@ -2548,6 +2572,21 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .WithMany("SerializedJsonWebKeys")
                         .HasForeignKey("ClientId")
                         .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ConfigurationDefinitionRecord", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.ConfigurationDefinition", null)
+                        .WithMany("Records")
+                        .HasForeignKey("ConfigurationDefinitionId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ConfigurationDefinitionRecordValue", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.ConfigurationDefinitionRecord", null)
+                        .WithMany("Values")
+                        .HasForeignKey("ConfigurationDefinitionRecordId");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Consent", b =>
@@ -2613,17 +2652,6 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.Navigation("Definition");
                 });
 
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.IdentityProvisioningDefinitionProperty", b =>
-                {
-                    b.HasOne("SimpleIdServer.IdServer.Domains.IdentityProvisioningDefinition", "IdentityProvisioningDefinition")
-                        .WithMany("Properties")
-                        .HasForeignKey("IdentityProvisioningDefinitionName")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("IdentityProvisioningDefinition");
-                });
-
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.IdentityProvisioningHistory", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.IdentityProvisioning", "IdentityProvisioning")
@@ -2644,17 +2672,6 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .IsRequired();
 
                     b.Navigation("IdentityProvisioningDefinition");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.IdentityProvisioningProperty", b =>
-                {
-                    b.HasOne("SimpleIdServer.IdServer.Domains.IdentityProvisioning", "IdentityProvisioning")
-                        .WithMany("Properties")
-                        .HasForeignKey("IdentityProvisioningId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("IdentityProvisioning");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ImportSummary", b =>
@@ -2862,15 +2879,11 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProvider", b =>
                 {
                     b.Navigation("Mappers");
-
-                    b.Navigation("Properties");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderDefinition", b =>
                 {
                     b.Navigation("AuthSchemeProviders");
-
-                    b.Navigation("Properties");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.BCAuthorize", b =>
@@ -2892,6 +2905,16 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.Navigation("Translations");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ConfigurationDefinition", b =>
+                {
+                    b.Navigation("Records");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ConfigurationDefinitionRecord", b =>
+                {
+                    b.Navigation("Values");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Consent", b =>
                 {
                     b.Navigation("Scopes");
@@ -2906,8 +2929,6 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                 {
                     b.Navigation("Histories");
 
-                    b.Navigation("Properties");
-
                     b.Navigation("Users");
                 });
 
@@ -2916,8 +2937,6 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.Navigation("Instances");
 
                     b.Navigation("MappingRules");
-
-                    b.Navigation("Properties");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Realm", b =>

@@ -1,4 +1,5 @@
-﻿@using SimpleIdServer.IdServer.Website.Resources;
+﻿@using SimpleIdServer.IdServer.Api.Provisioning;
+@using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject DialogService dialogService
@@ -34,7 +35,7 @@
     UpdateIdentityProvisioningDetails updateIdentityProvisioning = new UpdateIdentityProvisioningDetails();
 
     [Parameter]
-    public SimpleIdServer.IdServer.Domains.IdentityProvisioning IdProvisioning { get; set; }
+    public IdentityProvisioningResult IdProvisioning { get; set; }
 
     protected override void OnParametersSet()
     {

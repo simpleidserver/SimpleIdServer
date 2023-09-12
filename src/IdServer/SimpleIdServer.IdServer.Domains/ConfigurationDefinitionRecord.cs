@@ -24,6 +24,7 @@ public class ConfigurationDefinitionRecord : ITranslatable
         }
     }
     public int Order { get; set; }
+    public string? DisplayCondition { get; set; } = null;
     public string? Description
     {
         get

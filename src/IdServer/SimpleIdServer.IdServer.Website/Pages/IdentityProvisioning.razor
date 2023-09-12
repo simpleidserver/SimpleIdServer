@@ -73,11 +73,6 @@
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.IdProvisioningDetailsUpdated });
                 StateHasChanged();
             });
-            SubscribeToAction<UpdateIdProvisioningPropertiesSuccessAction>((act) =>
-            {
-                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.IdProvisioningPropertiesUpdated });
-                StateHasChanged();
-            });
             SubscribeToAction<RemoveSelectedIdentityProvisioningMappingRulesSuccessAction>((act) =>
             {
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedIdentityProvisioningMappingRulesRemoved });

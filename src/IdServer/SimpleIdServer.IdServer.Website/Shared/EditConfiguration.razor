@@ -1,6 +1,7 @@
 ﻿@inherits FluxorComponent
 @using Fluxor.Blazor.Web.Components;
 @using SimpleIdServer.Configuration.DTOs;
+@using SimpleIdServer.Configuration;
 @using SimpleIdServer.IdServer.Website.Stores.ConfigurationDefinitionStore;
 @using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
 @inject IState<ConfigurationDefinitionsState> configurationDefsState;
@@ -22,6 +23,12 @@
                             break;
                         case ConfigurationDefinitionRecordTypes.PASSWORD:
                             <RadzenPassword @bind-Value="@property.Value"></RadzenPassword>
+                            break;
+                        case ConfigurationDefinitionRecordTypes.NUMBER:
+                            <RadzenNumeric @bind-Value="@property.Value"></RadzenNumeric>
+                            break;
+                        case ConfigurationDefinitionRecordTypes.SELECT:
+                            <RadzenDropDown @bind-Value="@property.Value" Data="@property.PossibleValues" Change="@((o) => Select(property, o))" TextProperty="Name" ValueProperty="Value" />
                             break;
                     }                
                 </ChildContent>
@@ -46,6 +53,7 @@
     public bool IsAddForm { get; set; } = false;
     [Parameter]
     public EventCallback<Dictionary<string, string>> PropertiesSaved { get; set; }
+    List<EditableProperty> AllProperties { get; set; }
     List<EditableProperty> Properties { get; set; }
 
     record EditableProperty
@@ -56,28 +64,46 @@
         public string Description { get; set; }
         public string Value { get; set; }
         public int Order { get; set; }
+        public string DisplayCondition { get; set; }
         public ICollection<ConfigurationDefRecordValueResult> PossibleValues { get; set; } = new List<ConfigurationDefRecordValueResult>();
     }
 
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
-        if (configurationDefsState.Value.IsLoading || Properties != null) return;
-        var configuration = configurationDefsState.Value.ConfigurationDefs.SingleOrDefault(c => c.Id == Name);
-        if (configuration == null) return;
-        Properties = configuration.Properties.Select(p => new EditableProperty
+        if (configurationDefsState.Value.IsLoading || AllProperties != null || !configurationDefsState.Value.ConfigurationDefs.Any(d => d.Id == Name)) return;
+        var configuration = configurationDefsState.Value.ConfigurationDefs.Single(c => c.Id == Name);
+        AllProperties = configuration.Properties.Select(p => new EditableProperty
         {
             Name = p.Name,
             Type = p.Type,
             Order = p.Order,
             DisplayName = p.DisplayName,
             Description = p.Description,
-            Value = Values != null && Values.ContainsKey(p.Name) ? Values[p.Name] : string.Empty
+            DisplayCondition = p.DisplayCondition,
+            Value = Values != null && Values.ContainsKey(p.Name) ? Values[p.Name] : string.Empty,
+            PossibleValues = p.PossibleValues
         }).ToList();
+        Refresh();
     }
 
     async void UpdateConfiguration()
     {
-        await PropertiesSaved.InvokeAsync(Properties.ToDictionary(p => p.Name, p => p.Value));
+        await PropertiesSaved.InvokeAsync(GetValues());
     }
+
+    private void Select(EditableProperty p, object o)
+    {
+        p.Value = o.ToString();
+        Refresh();
+    }
+
+    private void Refresh()
+    {
+        var values = GetValues();
+        var configuration = configurationDefsState.Value.ConfigurationDefs.Single(c => c.Id == Name);
+        Properties = AllProperties.Where(p => DisplayConditionEvaluator.IsValid(values, p.DisplayCondition)).ToList();
+    }
+
+    private Dictionary<string, string> GetValues() => AllProperties.ToDictionary(p => p.Name, p => p.Value);
 }

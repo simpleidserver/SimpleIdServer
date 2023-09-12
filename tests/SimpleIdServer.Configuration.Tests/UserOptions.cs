@@ -18,6 +18,8 @@ public class UserOptions
     public string Password { get; set; }
     [ConfigurationRecord("BirthDate", "BirthDate", order: 6)]
     public DateTime BirthDateTime { get; set; }
+    [ConfigurationRecord("IsFemale", "IsFemale", order: 7, displayCondition: "Gender=Female")]
+    public string IsFemale { get; set; }
 }
 
 

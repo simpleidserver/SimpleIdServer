@@ -54,13 +54,13 @@ public class ConfigurationDefinitionExtractorFixture
         Assert.That(genderValues.Count(), Is.EqualTo(2));
         Assert.That(genderValues.First().Name, Is.EqualTo("Male"));
         Assert.That(genderValues.Last().Name, Is.EqualTo("Female"));
-        Assert.That(genderValues.First().Value, Is.EqualTo("0"));
-        Assert.That(genderValues.Last().Value, Is.EqualTo("1"));
+        Assert.That(genderValues.First().Value, Is.EqualTo("MAL"));
+        Assert.That(genderValues.Last().Value, Is.EqualTo("SEX"));
 
         Assert.That(statusValues.Count(), Is.EqualTo(2));
         Assert.That(statusValues.First().Name, Is.EqualTo("Freelance"));
         Assert.That(statusValues.Last().Name, Is.EqualTo("Employee"));
-        Assert.That(statusValues.First().Value, Is.EqualTo("0"));
-        Assert.That(statusValues.Last().Value, Is.EqualTo("1"));
+        Assert.That(statusValues.First().Value, Is.EqualTo("FREELANCE"));
+        Assert.That(statusValues.Last().Value, Is.EqualTo("EMPLOYEE"));
     }
 }

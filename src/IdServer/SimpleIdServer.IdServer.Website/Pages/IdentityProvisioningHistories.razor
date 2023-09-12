@@ -1,4 +1,5 @@
-﻿@using SimpleIdServer.IdServer.Website.Resources;
+﻿@using SimpleIdServer.IdServer.Api.Provisioning;
+@using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @using SimpleIdServer.IdServer.Website.Stores.UserStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
@@ -25,13 +26,13 @@
                 IsLoading="@updateUserState.Value.IsUpdating"
                 Count="@IdentityProvisioning.Histories.Count"
                 Data="@IdentityProvisioning.Histories"
-                TItem="IdentityProvisioningHistory"
+                TItem="IdentityProvisioningHistoryResult"
                 ColumnWidth="300px">
         <Columns>
-            <RadzenDataGridColumn TItem="IdentityProvisioningHistory" Property="StartDateTime" Title="Start" Filterable="false" Sortable="true" SortOrder="SortOrder.Descending" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" />
-            <RadzenDataGridColumn TItem="IdentityProvisioningHistory" Property="EndDateTime" Title="End" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" />
-            <RadzenDataGridColumn TItem="IdentityProvisioningHistory" Property="NbRepresentations" Title="Number of extracted representations" Filterable="false" Sortable="false" Width="80px" />
-            <RadzenDataGridColumn TItem="IdentityProvisioningHistory" Title="Status" Filterable="false" Sortable="false" Width="80px">
+            <RadzenDataGridColumn TItem="IdentityProvisioningHistoryResult" Property="StartDateTime" Title="Start" Filterable="false" Sortable="true" SortOrder="SortOrder.Descending" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" />
+            <RadzenDataGridColumn TItem="IdentityProvisioningHistoryResult" Property="EndDateTime" Title="End" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" />
+            <RadzenDataGridColumn TItem="IdentityProvisioningHistoryResult" Property="NbRepresentations" Title="Number of extracted representations" Filterable="false" Sortable="false" Width="80px" />
+            <RadzenDataGridColumn TItem="IdentityProvisioningHistoryResult" Title="Status" Filterable="false" Sortable="false" Width="80px">
                 <Template Context="data">
                     @if (data.Status == IdentityProvisioningHistoryStatus.IMPORT)
                     {
@@ -51,7 +52,7 @@
                     }
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="IdentityProvisioningHistory" Title="Error Message" Filterable="false" Sortable="false" Width="80px">
+            <RadzenDataGridColumn TItem="IdentityProvisioningHistoryResult" Title="Error Message" Filterable="false" Sortable="false" Width="80px">
                 <Template Context="data">
                     @if (!string.IsNullOrWhiteSpace(data.ErrorMessage))
                     {
@@ -65,10 +66,10 @@
 
 @code {
     [Parameter]
-    public SimpleIdServer.IdServer.Domains.IdentityProvisioning IdentityProvisioning { get; set; }
+    public IdentityProvisioningResult IdentityProvisioning { get; set; }
 
 
-    async void ShowAudit(SimpleIdServer.IdServer.Domains.IdentityProvisioningHistory history)
+    async void ShowAudit(IdentityProvisioningHistoryResult history)
     {
         await dialogService.OpenAsync<RequestDialog>("Error", new Dictionary<string, object>
         {
