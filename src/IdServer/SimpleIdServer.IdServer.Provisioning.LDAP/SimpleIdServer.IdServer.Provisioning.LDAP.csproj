@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Description>Support LDAP provisioning.</Description>
+	</PropertyGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\SimpleIdServer.Configuration\SimpleIdServer.Configuration.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="System.DirectoryServices" Version="7.0.*" />
+		<PackageReference Include="System.DirectoryServices.Protocols" Version="7.0.0" />
+	</ItemGroup>
+</Project>

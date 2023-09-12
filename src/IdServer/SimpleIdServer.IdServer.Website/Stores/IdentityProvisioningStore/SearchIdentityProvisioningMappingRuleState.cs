@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
+using SimpleIdServer.IdServer.Api.Provisioning;
 using SimpleIdServer.IdServer.Domains;
 
 namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
@@ -10,7 +11,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
     {
         public SearchIdentityProvisioningMappingRuleState() { }
 
-        public SearchIdentityProvisioningMappingRuleState(bool isLoading, IEnumerable<IdentityProvisioningMappingRule> mappingRules, int nb)
+        public SearchIdentityProvisioningMappingRuleState(bool isLoading, IEnumerable<IdentityProvisioningMappingRuleResult> mappingRules, int nb)
         {
             MappingRules = mappingRules.Select(c => new SelectableIdentityProvisioningMappingRule(c)).ToList();
             Count = nb;
@@ -24,13 +25,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
 
     public class SelectableIdentityProvisioningMappingRule
     {
-        public SelectableIdentityProvisioningMappingRule(IdentityProvisioningMappingRule mappingRule)
+        public SelectableIdentityProvisioningMappingRule(IdentityProvisioningMappingRuleResult mappingRule)
         {
             Value = mappingRule;
         }
 
         public bool IsSelected { get; set; } = false;
         public bool IsNew { get; set; } = false;
-        public IdentityProvisioningMappingRule Value { get; set; }
+        public IdentityProvisioningMappingRuleResult Value { get; set; }
     }
 }

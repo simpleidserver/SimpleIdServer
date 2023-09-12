@@ -191,6 +191,27 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/did",
                 defaults: new { controller = "Users", action = "GenerateDecentralizedIdentity" });
 
+            webApplication.MapControllerRoute("searchIdProvisioning",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/.search",
+                defaults: new { controller = "IdentityProvisioning", action = "Search" });
+            webApplication.MapControllerRoute("removeIdProvisioning",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}",
+                defaults: new { controller = "IdentityProvisioning", action = "Remove" });
+            webApplication.MapControllerRoute("getIdProvisioning",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}",
+                defaults: new { controller = "IdentityProvisioning", action = "Get" });
+            webApplication.MapControllerRoute("updateIdProvisioningDetails",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}/details",
+                defaults: new { controller = "IdentityProvisioning", action = "UpdateDetails" });
+            webApplication.MapControllerRoute("updateIdProvisioningProperties",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}/values",
+                defaults: new { controller = "IdentityProvisioning", action = "UpdateProperties" });
+            webApplication.MapControllerRoute("removeIdProvisioningMapper",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}/mappers/{mapperId}",
+                defaults: new { controller = "IdentityProvisioning", action = "RemoveMapper" });
+            webApplication.MapControllerRoute("addIdProvisioningMapper",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}/mappers",
+                defaults: new { controller = "IdentityProvisioning", action = "AddMapper" });
             webApplication.MapControllerRoute("extractRepresentations",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{name}/{id}/enqueue",
                 defaults: new { controller = "IdentityProvisioning", action = "Enqueue" });

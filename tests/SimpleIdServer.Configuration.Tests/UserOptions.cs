@@ -4,19 +4,19 @@ namespace SimpleIdServer.Configuration.Tests;
 
 public class UserOptions
 {
-    [ConfigurationRecord("FirstName", "Description")]
+    [ConfigurationRecord("FirstName", "Description", order: 0)]
     public string FirstName { get; set; }
-    [ConfigurationRecord("Gender", "Gender")]
+    [ConfigurationRecord("Gender", "Gender", order: 1)]
     public Genders Gender { get; set; }
-    [ConfigurationRecord("Status", "Status")]
+    [ConfigurationRecord("Status", "Status", order: 2)]
     public List<Status> Status { get; set; }
-    [ConfigurationRecord("IsActive", "IsActive")]
+    [ConfigurationRecord("IsActive", "IsActive", order: 3)]
     public bool IsActive { get; set; }
-    [ConfigurationRecord("Age", "Age")]
+    [ConfigurationRecord("Age", "Age", order: 4)]
     public int Age { get; set; }
-    [ConfigurationRecord("Password", "Password", true)]
+    [ConfigurationRecord("Password", "Password", order: 5, isProtected: true)]
     public string Password { get; set; }
-    [ConfigurationRecord("BirthDate", "BirthDate")]
+    [ConfigurationRecord("BirthDate", "BirthDate", order: 6)]
     public DateTime BirthDateTime { get; set; }
 }
 

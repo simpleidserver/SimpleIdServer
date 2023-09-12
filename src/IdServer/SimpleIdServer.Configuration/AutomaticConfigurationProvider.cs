@@ -36,7 +36,7 @@ public class AutomaticConfigurationProvider : IConfigurationProvider, IDisposabl
     {
         value = null;
         if (string.IsNullOrWhiteSpace(RealmContext.Instance().Realm)) return false;
-        var record = _options.ConfigurationDefinitions.SingleOrDefault(d => key.StartsWith(d.Name));
+        var record = _options.ConfigurationDefinitions.SingleOrDefault(d => key.Contains(d.Name));
         if (record == null) return false;
         key = $"{RealmContext.Instance().Realm}:{key}";
         var result = Data.TryGetValue(key, out value);
@@ -46,10 +46,12 @@ public class AutomaticConfigurationProvider : IConfigurationProvider, IDisposabl
     public virtual void Set(string key, string? value)
     {
         if (string.IsNullOrWhiteSpace(RealmContext.Instance().Realm)) return;
-        var record = _options.ConfigurationDefinitions.SingleOrDefault(d => key.StartsWith(d.Name));
+        var record = _options.ConfigurationDefinitions.SingleOrDefault(d => key.Contains(d.Name));
         if (record == null) return;
         key = $"{RealmContext.Instance().Realm}:{key}";
         _connector.Set(key, value, CancellationToken.None).Wait();
+        if (!Data.ContainsKey(key)) Data.Add(key, value);
+        else Data[key] = value;
     }
 
     public virtual void Load()
@@ -77,6 +79,8 @@ public class AutomaticConfigurationProvider : IConfigurationProvider, IDisposabl
         }
         else
         {
+            var realm = RealmContext.Instance().Realm;
+            if(!string.IsNullOrWhiteSpace(realm)) parentPath = $"{realm}:{parentPath}";
             Debug.Assert(ConfigurationPath.KeyDelimiter == ":");
 
             foreach (KeyValuePair<string, string?> kv in Data)

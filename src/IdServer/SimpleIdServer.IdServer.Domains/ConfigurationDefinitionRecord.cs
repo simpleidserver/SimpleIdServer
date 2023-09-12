@@ -23,6 +23,7 @@ public class ConfigurationDefinitionRecord : ITranslatable
             return GetTranslation(DisplayNames);
         }
     }
+    public int Order { get; set; }
     public string? Description
     {
         get

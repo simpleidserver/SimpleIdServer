@@ -8,6 +8,7 @@ namespace SimpleIdServer.IdServer.Store
     {
         IQueryable<IdentityProvisioning> Query();
         void DeleteRange(IEnumerable<IdentityProvisioning> identityProvisioningLst);
+        void Remove(IdentityProvisioning identityProvisioning);
         Task<int> SaveChanges(CancellationToken cancellationToken);
     }
 
@@ -23,6 +24,8 @@ namespace SimpleIdServer.IdServer.Store
         public IQueryable<IdentityProvisioning> Query() => _dbContext.IdentityProvisioningLst;
 
         public void DeleteRange(IEnumerable<IdentityProvisioning> identityProvisioningLst) => _dbContext.IdentityProvisioningLst.RemoveRange(identityProvisioningLst);
+
+        public void Remove(IdentityProvisioning identityProvisioning) => _dbContext.IdentityProvisioningLst.Remove(identityProvisioning);
 
         public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
     }

@@ -2,25 +2,22 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Api.Provisioning;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Store;
-using SimpleIdServer.IdServer.Website.Resources;
-using System.Linq.Dynamic.Core;
+using System.Text;
+using System.Text.Json;
 
 namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
 {
     public class IdentityProvisioningEffects
     {
-        private readonly IDbContextFactory<StoreDbContext> _factory;
         private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly IdServerWebsiteOptions _options;
         private readonly ProtectedSessionStorage _sessionStorage;
 
-        public IdentityProvisioningEffects(IDbContextFactory<StoreDbContext> factory, IWebsiteHttpClientFactory websiteHttpClientFactory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
+        public IdentityProvisioningEffects(IWebsiteHttpClientFactory websiteHttpClientFactory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
         {
-            _factory = factory;
             _websiteHttpClientFactory = websiteHttpClientFactory;
             _options = options.Value;
             _sessionStorage = sessionStorage;
@@ -30,56 +27,60 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         public async Task Handle(SearchIdentityProvisioningAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            using (var dbContext = _factory.CreateDbContext())
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var searchRequest = new DTOs.SearchRequest
             {
-                IQueryable<IdentityProvisioning> query = dbContext.IdentityProvisioningLst.Include(c => c.Realms).Where(c => c.Realms.Any(r => r.Name == realm)).AsNoTracking();
-                if (!string.IsNullOrWhiteSpace(action.Filter))
-                    query = query.Where(SanitizeExpression(action.Filter));
+                Filter = SanitizeExpression(action.Filter),
+                OrderBy = SanitizeExpression(action.OrderBy),
+                Skip = action.Skip,
+                Take = action.Take
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/provisioning/.search"),
+                Content = new StringContent(JsonSerializer.Serialize(searchRequest), Encoding.UTF8, "application/json")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<DTOs.SearchResult<IdentityProvisioningResult>>(json);
+            dispatcher.Dispatch(new SearchIdentityProvisioningSuccessAction { IdentityProvisioningLst = result.Content, Count = result.Count });
 
-                if (!string.IsNullOrWhiteSpace(action.OrderBy))
-                    query = query.OrderBy(SanitizeExpression(action.OrderBy));
-
-                var nb = query.Count();
-                var identityProvisioningLst = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
-                dispatcher.Dispatch(new SearchIdentityProvisioningSuccessAction { IdentityProvisioningLst = identityProvisioningLst, Count = nb });
-            }
-
-            string SanitizeExpression(string expression) => expression.Replace("Value.", "");
+            string SanitizeExpression(string expression) => expression?.Replace("Value.", "");
         }
 
         [EffectMethod]
         public async Task Handle(RemoveSelectedIdentityProvisioningAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            using (var dbContext = _factory.CreateDbContext())
+            var httpClient = await _websiteHttpClientFactory.Build();
+            foreach (var id in action.Ids)
             {
-                var toBeRemoved = await dbContext.IdentityProvisioningLst.Include(c => c.Realms).Where(c => c.Realms.Any(r => r.Name == realm) && action.Ids.Contains(c.Id)).ToListAsync();
-                dbContext.IdentityProvisioningLst.RemoveRange(toBeRemoved);
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new RemoveSelectedIdentityProvisioningSuccessAction { Ids = action.Ids });
+                var requestMessage = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Delete,
+                    RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/provisioning/{id}")
+                };
+                await httpClient.SendAsync(requestMessage);
             }
+
+            dispatcher.Dispatch(new RemoveSelectedIdentityProvisioningSuccessAction { Ids = action.Ids });
         }
 
         [EffectMethod]
         public async Task Handle(GetIdentityProvisioningAction action, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
-            using (var dbContext = _factory.CreateDbContext())
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
             {
-                var result = await dbContext.IdentityProvisioningLst.Include(c => c.Realms)
-                .Include(c => c.Properties)
-                .Include(c => c.Definition).ThenInclude(d => d.Properties)
-                .Include(c => c.Definition).ThenInclude(d => d.MappingRules)
-                .Include(c => c.Histories)
-                .SingleOrDefaultAsync(c => c.Realms.Any(r => r.Name == realm) && action.Id == c.Id);
-                if (result == null)
-                {
-                    dispatcher.Dispatch(new GetIdentityProvisioningFailureAction { ErrorMessage = Global.UnknownIdentityProvisioning });
-                    return;
-                }
-
-                dispatcher.Dispatch(new GetIdentityProvisioningSuccessAction { IdentityProvisioning = result });
-            }
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/provisioning/{action.Id}")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<IdentityProvisioningResult>(json);
+            dispatcher.Dispatch(new GetIdentityProvisioningSuccessAction { IdentityProvisioning = result });
         }
 
         [EffectMethod]
@@ -98,62 +99,81 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         [EffectMethod]
         public async Task Handle(UpdateIdProvisioningPropertiesAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = _factory.CreateDbContext())
+            var realm = await GetRealm();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var addRequest = new UpdateIdentityProvisioningPropertiesRequest
             {
-                var result = await dbContext.IdentityProvisioningLst.Include(p => p.Properties).SingleAsync(i => i.Id == action.Id);
-                result.Properties.Clear();
-                foreach (var property in action.Properties)
-                    result.Properties.Add(property);
-
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new UpdateIdProvisioningPropertiesSuccessAction { Id = action.Id, Properties = action.Properties });
-            }
+                Values = action.Properties
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Put,
+                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/provisioning/{action.Id}/values"),
+                Content = new StringContent(JsonSerializer.Serialize(addRequest), Encoding.UTF8, "application/json")
+            };
+            await httpClient.SendAsync(requestMessage);
+            dispatcher.Dispatch(new UpdateIdProvisioningPropertiesSuccessAction { Id = action.Id, Properties = action.Properties });
         }
 
         [EffectMethod]
         public async Task Handle(UpdateIdProvisioningDetailsAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = _factory.CreateDbContext())
+            var realm = await GetRealm();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var addRequest = new UpdateIdentityProvisioningDetailsRequest
             {
-                var result = await dbContext.IdentityProvisioningLst.SingleAsync(i => i.Id == action.Id);
-                result.Description = action.Description;
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new UpdateIdProvisioningDetailsSuccessAction { Description = action.Description, Id = action.Id });
-            }
+                Description = action.Description
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Put,
+                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/provisioning/{action.Id}/details"),
+                Content = new StringContent(JsonSerializer.Serialize(addRequest), Encoding.UTF8, "application/json")
+            };
+            await httpClient.SendAsync(requestMessage);
+            dispatcher.Dispatch(new UpdateIdProvisioningDetailsSuccessAction { Description = action.Description, Id = action.Id });
         }
 
         [EffectMethod]
         public async Task Handle(RemoveSelectedIdentityProvisioningMappingRulesAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = _factory.CreateDbContext())
+            var realm = await GetRealm();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            foreach (var id in action.MappingRuleIds)
             {
-                var result = await dbContext.IdentityProvisioningLst.Include(i => i.Definition).ThenInclude(d => d.MappingRules).SingleAsync(i => i.Id == action.Id);
-                var mappingRules = result.Definition.MappingRules;
-                result.Definition.MappingRules = result.Definition.MappingRules.Where(r => !action.MappingRuleIds.Contains(r.Id)).ToList();
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new RemoveSelectedIdentityProvisioningMappingRulesSuccessAction { Id = action.Id, MappingRuleIds = action.MappingRuleIds });
+                var requestMessage = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Delete,
+                    RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/provisioning/{action.Id}/mappers/{id}")
+                };
+                await httpClient.SendAsync(requestMessage);
             }
+
+            dispatcher.Dispatch(new RemoveSelectedIdentityProvisioningMappingRulesSuccessAction { Id = action.Id, MappingRuleIds = action.MappingRuleIds });
         }
 
         [EffectMethod]
         public async Task Handle(AddIdentityProvisioningMappingRuleAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = _factory.CreateDbContext())
+            var realm = await GetRealm();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var addRequest = new AddIdentityProvisioningMapperRequest
             {
-                var result = await dbContext.IdentityProvisioningLst.Include(i => i.Definition).ThenInclude(d => d.MappingRules).SingleAsync(i => i.Id == action.Id);
-                var mappingRules = result.Definition.MappingRules;
-                var newId = Guid.NewGuid().ToString();
-                mappingRules.Add(new IdentityProvisioningMappingRule
-                {
-                    From = action.From,
-                    Id = newId,
-                    MapperType = action.MappingRule,
-                    TargetUserAttribute = action.TargetUserAttribute,
-                    TargetUserProperty = action.TargetUserProperty
-                });
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new AddIdentityProvisioningMappingRuleSuccessAction { NewId = newId, Id = action.Id, MappingRule = action.MappingRule, From = action.From, TargetUserAttribute = action.TargetUserAttribute, TargetUserProperty = action.TargetUserProperty });
-            }
+                MappingRule = action.MappingRule,
+                From = action.From,
+                TargetUserAttribute = action.TargetUserAttribute,
+                TargetUserProperty = action.TargetUserProperty
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/provisionng/{action.Id}/mappers"),
+                Content = new StringContent(JsonSerializer.Serialize(addRequest), Encoding.UTF8, "application/json")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var newMapper = JsonSerializer.Deserialize<IdentityProvisioningMappingRuleResult>(json);
+            dispatcher.Dispatch(new AddIdentityProvisioningMappingRuleSuccessAction { NewId = newMapper.Id, Id = action.Id, MappingRule = action.MappingRule, From = action.From, TargetUserAttribute = action.TargetUserAttribute, TargetUserProperty = action.TargetUserProperty });
         }
 
         private async Task<string> GetRealm()
@@ -174,7 +194,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
 
     public class SearchIdentityProvisioningSuccessAction
     {
-        public IEnumerable<IdentityProvisioning> IdentityProvisioningLst { get; set; }
+        public IEnumerable<IdentityProvisioningResult> IdentityProvisioningLst { get; set; }
         public int Count { get; set; }
     }
 
@@ -190,7 +210,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
 
     public class GetIdentityProvisioningSuccessAction
     {
-        public IdentityProvisioning IdentityProvisioning { get; set; }
+        public IdentityProvisioningResult IdentityProvisioning { get; set; }
     }
 
     public class ToggleAllIdentityProvisioningAction
@@ -229,13 +249,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
     public class UpdateIdProvisioningPropertiesAction
     {
         public string Id { get; set; }
-        public IEnumerable<IdentityProvisioningProperty> Properties { get; set; }
+        public Dictionary<string, string> Properties { get; set; }
     }
 
     public class UpdateIdProvisioningPropertiesSuccessAction
     {
         public string Id { get; set; }
-        public IEnumerable<IdentityProvisioningProperty> Properties { get; set; }
+        public Dictionary<string, string> Properties { get; set; }
     }
 
     public class UpdateIdProvisioningDetailsAction

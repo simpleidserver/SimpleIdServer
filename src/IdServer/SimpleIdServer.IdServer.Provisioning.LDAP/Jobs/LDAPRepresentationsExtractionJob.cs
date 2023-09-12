@@ -4,22 +4,19 @@ using MassTransit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
-using System;
-using System.Collections.Generic;
 using System.DirectoryServices.Protocols;
-using System.IO;
-using System.Linq;
 using System.Net;
 
-namespace SimpleIdServer.IdServer.Jobs
+namespace SimpleIdServer.IdServer.Provisioning.LDAP.Jobs
 {
     public class LDAPRepresentationsExtractionJob : RepresentationExtractionJob<LDAPRepresentationsExtractionJobOptions>
     {
         public const string NAME = "LDAP";
 
-        public LDAPRepresentationsExtractionJob(ILogger<RepresentationExtractionJob<LDAPRepresentationsExtractionJobOptions>> logger, IBusControl busControl, IIdentityProvisioningStore identityProvisioningStore, IExtractedRepresentationRepository extractedRepresentationRepository, IOptions<IdServerHostOptions> options) : base(logger, busControl, identityProvisioningStore, extractedRepresentationRepository, options)
+        public LDAPRepresentationsExtractionJob(Microsoft.Extensions.Configuration.IConfiguration configuration, ILogger<RepresentationExtractionJob<LDAPRepresentationsExtractionJobOptions>> logger, IBusControl busControl, IIdentityProvisioningStore identityProvisioningStore, IExtractedRepresentationRepository extractedRepresentationRepository, IOptions<IdServerHostOptions> options) : base(configuration, logger, busControl, identityProvisioningStore, extractedRepresentationRepository, options)
         {
         }
 

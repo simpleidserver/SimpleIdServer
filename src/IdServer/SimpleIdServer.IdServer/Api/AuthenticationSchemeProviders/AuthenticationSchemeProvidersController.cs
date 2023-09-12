@@ -18,7 +18,6 @@ using System.Reflection;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using static System.Collections.Specialized.BitVector32;
 
 namespace SimpleIdServer.IdServer.Api.AuthenticationSchemeProviders;
 
@@ -81,7 +80,7 @@ public class AuthenticationSchemeProvidersController : BaseController
 				.Include(p => p.Realms)
 				.Where(p => p.Realms.Any(r => r.Name == prefix))
 				.SingleOrDefaultAsync(p => p.Name == id);
-			if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_AUTH_SCHEME_PROVIDER, id));
+			if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_AUTH_SCHEME_PROVIDER, id));
 			_authenticationSchemeProviderRepository.Remove(result);
 			await _authenticationSchemeProviderRepository.SaveChanges(CancellationToken.None);
 			return NoContent();
@@ -130,7 +129,7 @@ public class AuthenticationSchemeProvidersController : BaseController
                 .Query()
 				.Include(r => r.Realms)
 				.AsNoTracking()
-                .SingleAsync(a => a.Name == request.Name && a.Realms.Any(r => r.Name == prefix));
+                .SingleOrDefaultAsync(a => a.Name == request.Name && a.Realms.Any(r => r.Name == prefix));
 			if (instance != null) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTHSCHEMEPROVIDER_WITH_SAME_NAME_EXISTS);
 			var idProviderDef = await _authenticationSchemeProviderDefinitionRepository.Query().SingleAsync(d => d.Name == request.DefinitionName);
 			var realm = await _realmRepository.Query().SingleAsync(r => r.Name == prefix);
@@ -146,7 +145,7 @@ public class AuthenticationSchemeProvidersController : BaseController
 				UpdateDateTime = DateTime.UtcNow
 			};
 			result.Realms.Add(realm);
-            SyncConfiguration(prefix, result, request.Values);
+            SyncConfiguration(result, request.Values);
             _authenticationSchemeProviderRepository.Add(result);
 			await _authenticationSchemeProviderRepository.SaveChanges(CancellationToken.None);
 			return NoContent();
@@ -190,11 +189,12 @@ public class AuthenticationSchemeProvidersController : BaseController
             CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name, _jwtBuilder);
             var instance = await _authenticationSchemeProviderRepository
                 .Query()
+                .Include(r => r.AuthSchemeProviderDefinition)
                 .Include(r => r.Realms)
                 .SingleAsync(a => a.Name == id && a.Realms.Any(r => r.Name == prefix));
             if (instance == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_AUTH_SCHEME_PROVIDER, id));
 			instance.UpdateDateTime = DateTime.UtcNow;
-            SyncConfiguration(prefix, instance, request.Values);
+            SyncConfiguration(instance, request.Values);
             await _authenticationSchemeProviderRepository.SaveChanges(CancellationToken.None);
             return NoContent();
         }
@@ -204,7 +204,7 @@ public class AuthenticationSchemeProvidersController : BaseController
         }
     }
 
-	[HttpPut]
+	[HttpPost]
 	public async Task<IActionResult> AddMapper([FromRoute] string prefix, string id, [FromBody] AddAuthenticationSchemeProviderMapperRequest request)
     {
         prefix = prefix ?? Constants.DefaultRealm;
@@ -215,7 +215,7 @@ public class AuthenticationSchemeProvidersController : BaseController
                 .Query()
                 .Include(r => r.Realms)
                 .Include(r => r.Mappers)
-                .SingleAsync(a => a.Name == id && a.Realms.Any(r => r.Name == prefix));
+                .SingleOrDefaultAsync(a => a.Name == id && a.Realms.Any(r => r.Name == prefix));
             if (instance == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_AUTH_SCHEME_PROVIDER, id));
             instance.UpdateDateTime = DateTime.UtcNow;
             var record = new AuthenticationSchemeProviderMapper
@@ -276,7 +276,7 @@ public class AuthenticationSchemeProvidersController : BaseController
                 .Query()
                 .Include(r => r.Realms)
                 .Include(r => r.Mappers)
-                .SingleAsync(a => a.Name == id && a.Realms.Any(r => r.Name == prefix));
+                .SingleOrDefaultAsync(a => a.Name == id && a.Realms.Any(r => r.Name == prefix));
             if (instance == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_AUTH_SCHEME_PROVIDER, id));
             instance.UpdateDateTime = DateTime.UtcNow;
             var mapper = instance.Mappers.Single(m => m.Id == mapperId);
@@ -293,14 +293,11 @@ public class AuthenticationSchemeProvidersController : BaseController
         }
     }
 
-
-    private void SyncConfiguration(string prefix, AuthenticationSchemeProvider authenticationSchemeProvider, Dictionary<string, string> values)
+    private void SyncConfiguration(AuthenticationSchemeProvider authenticationSchemeProvider, Dictionary<string, string> values)
 	{
-		var optionKey = $"{prefix}:{authenticationSchemeProvider.Name}:{authenticationSchemeProvider.AuthSchemeProviderDefinition.OptionsName}";
+		var optionKey = $"{authenticationSchemeProvider.Name}:{authenticationSchemeProvider.AuthSchemeProviderDefinition.OptionsName}";
 		foreach(var kvp in values)
-		{
 			_configuration[$"{optionKey}:{kvp.Key}"] = kvp.Value;
-		}
 	}
 
 	private static AuthenticationSchemeProviderResult Build(AuthenticationSchemeProvider authenticationSchemeProvider, object obj = null)

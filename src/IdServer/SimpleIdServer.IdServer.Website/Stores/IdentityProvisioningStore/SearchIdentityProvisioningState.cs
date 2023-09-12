@@ -1,7 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
-using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Api.Provisioning;
 
 namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
 {
@@ -10,7 +10,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
     {
         public SearchIdentityProvisioningState() { }
 
-        public SearchIdentityProvisioningState(bool isLoading, IEnumerable<IdentityProvisioning> identityProvisioning, int nb)
+        public SearchIdentityProvisioningState(bool isLoading, IEnumerable<IdentityProvisioningResult> identityProvisioning, int nb)
         {
             Values = identityProvisioning.Select(c => new SelectableIdentityProvisioning(c));
             Count = nb;
@@ -24,13 +24,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
 
     public class SelectableIdentityProvisioning
     {
-        public SelectableIdentityProvisioning(IdentityProvisioning identityProvisioning)
+        public SelectableIdentityProvisioning(IdentityProvisioningResult identityProvisioning)
         {
             Value = identityProvisioning;
         }
 
         public bool IsSelected { get; set; } = false;
         public bool IsNew { get; set; } = false;
-        public IdentityProvisioning Value { get; set; }
+        public IdentityProvisioningResult Value { get; set; }
     }
 }

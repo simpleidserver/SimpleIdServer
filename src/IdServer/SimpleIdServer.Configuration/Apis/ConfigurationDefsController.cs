@@ -30,6 +30,7 @@ public class ConfigurationDefsController : BaseController
         CheckAccessToken(prefix, Constants.ConfigurationsScope.Name, _jwtBuilder);
         var confDefs = await _configurationDefinitionStore.Query()
             .Include(c => c.Records).ThenInclude(r => r.Values)
+            .Include(c => c.Records).ThenInclude(r => r.Translations)
             .AsNoTracking()
             .ToListAsync();
         return Ok(confDefs.Select(d => Build(d)));
@@ -47,6 +48,7 @@ public class ConfigurationDefsController : BaseController
                 Id = r.Id,
                 Description = r.Description,
                 DisplayName = r.DisplayName,
+                Order = r.Order,
                 Name = r.Name,
                 Type = r.Type,
                 PossibleValues = r.Values.Select(v => new ConfigurationDefRecordValueResult

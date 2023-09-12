@@ -30,9 +30,10 @@ public class ConfigurationDefinitionExtractor
         result = new ConfigurationDefinitionRecord { Id = Guid.NewGuid().ToString(), CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow, Name = propertyInfo.Name };
         result.SetDescription(configurationRecordAttr.Description, language);
         result.SetDisplayName(configurationRecordAttr.DisplayName, language);
+        result.Order = configurationRecordAttr.Order;
         if (configurationRecordAttr.IsProtected)
         {
-            result.Type = ConfigurationDefinitionRecordTypes.NUMBER;
+            result.Type = ConfigurationDefinitionRecordTypes.PASSWORD;
             return true;
         }
 

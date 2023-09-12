@@ -83,9 +83,7 @@ namespace SimpleIdServer.IdServer.Store
             builder.ApplyConfiguration(new CertificateAuthorityConfiguration());
             builder.ApplyConfiguration(new ClientCertificateConfiguration());
             builder.ApplyConfiguration(new IdentityProvisioningConfiguration());
-            builder.ApplyConfiguration(new IdentityProvisioningPropertyConfiguration());
             builder.ApplyConfiguration(new IdentityProvisioningDefinitionConfiguration());
-            builder.ApplyConfiguration(new IdentityProvisioningDefinitionPropertyConfiguration());
             builder.ApplyConfiguration(new IdentityProvisioningMappingRuleConfiguration());
             builder.ApplyConfiguration(new IdentityProvisioningHistoryConfiguration());
             builder.ApplyConfiguration(new ExtractedRepresentationConfiguration());

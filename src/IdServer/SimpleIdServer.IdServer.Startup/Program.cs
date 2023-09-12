@@ -15,6 +15,8 @@ using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.CredentialIssuer;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Fido;
+using SimpleIdServer.IdServer.Provisioning.LDAP;
+using SimpleIdServer.IdServer.Provisioning.SCIM;
 using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Startup.Configurations;
 using SimpleIdServer.IdServer.Startup.Converters;
@@ -90,6 +92,8 @@ void ConfigureIdServer(IServiceCollection services)
             f.Origins = new HashSet<string> { authority };
         })
         .EnableConfigurableAuthentication()
+        .AddSCIMProvisioning()
+        .AddLDAPProvisioning()
         .UseRealm()
         .AddAuthentication(callback: (a) =>
         {

@@ -1,7 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
-using IdentityProvisioning = SimpleIdServer.IdServer.Domains.IdentityProvisioning;
+using SimpleIdServer.IdServer.Api.Provisioning;
 
 namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
 {
@@ -10,13 +10,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
     {
         public IdentityProvisioningState() { }
 
-        public IdentityProvisioningState(bool isLoading, IdentityProvisioning identityProvisioning)
+        public IdentityProvisioningState(bool isLoading, IdentityProvisioningResult identityProvisioning)
         {
             IsLoading = isLoading;
             IdentityProvisioning = identityProvisioning;
         }
 
-        public IdentityProvisioning? IdentityProvisioning { get; set; } = new IdentityProvisioning();
+        public IdentityProvisioningResult? IdentityProvisioning { get; set; } = new IdentityProvisioningResult();
         public bool IsLoading { get; set; } = true;
     }
 }

@@ -72,7 +72,7 @@ namespace SimpleIdServer.IdServer.UI
         {
             var user = await _authenticationHelper.GetUserByLogin(UserRepository.Query()
                 .Include(u => u.Realms)
-                .Include(u => u.IdentityProvisioning).ThenInclude(i => i.Properties)
+                .Include(u => u.IdentityProvisioning).ThenInclude(i => i.Definition)
                 .Include(u => u.Groups)
                 .Include(c => c.OAuthUserClaims)
                 .Include(u => u.Credentials), login, realm, cancellationToken);

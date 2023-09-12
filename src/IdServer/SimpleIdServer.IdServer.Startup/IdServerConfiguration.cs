@@ -5,7 +5,8 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Jobs;
+using SimpleIdServer.IdServer.Provisioning.LDAP.Jobs;
+using SimpleIdServer.IdServer.Provisioning.SCIM.Jobs;
 using SimpleIdServer.IdServer.Startup.Converters;
 using System;
 using System.Collections.Generic;
@@ -17,12 +18,12 @@ namespace SimpleIdServer.IdServer.Startup
     {
         private static AuthenticationSchemeProviderDefinition Facebook = AuthenticationSchemeProviderDefinitionBuilder.Create("facebook", "Facebook", typeof(FacebookHandler), typeof(FacebookOptionsLite)).Build();
 
-        private static IdentityProvisioningDefinition Scim = IdentityProvisioningDefinitionBuilder.Create<SCIMRepresentationsExtractionJobOptions>(SimpleIdServer.IdServer.Jobs.SCIMRepresentationsExtractionJob.NAME, "SCIM")
+        private static IdentityProvisioningDefinition Scim = IdentityProvisioningDefinitionBuilder.Create<SCIMRepresentationsExtractionJobOptions>(SimpleIdServer.IdServer.Provisioning.SCIM.Jobs.SCIMRepresentationsExtractionJob.NAME, "SCIM")
             .AddUserSubjectMappingRule("$.userName")
             .AddUserPropertyMappingRule("$.name.familyName", nameof(User.Lastname))
             .AddUserAttributeMappingRule("$.name.givenName", JwtRegisteredClaimNames.GivenName).Build();
 
-        private static IdentityProvisioningDefinition Ldap = IdentityProvisioningDefinitionBuilder.Create<LDAPRepresentationsExtractionJobOptions>(SimpleIdServer.IdServer.Jobs.LDAPRepresentationsExtractionJob.NAME, "LDAP")
+        private static IdentityProvisioningDefinition Ldap = IdentityProvisioningDefinitionBuilder.Create<LDAPRepresentationsExtractionJobOptions>(SimpleIdServer.IdServer.Provisioning.LDAP.Jobs.LDAPRepresentationsExtractionJob.NAME, "LDAP")
             .AddUserSubjectMappingRule("cn")
             .AddLDAPDistinguishedName()
             .Build();
@@ -101,23 +102,8 @@ namespace SimpleIdServer.IdServer.Startup
 
         public static ICollection<IdentityProvisioning> GetIdentityProvisiongLst(string scimEdp) => new List<IdentityProvisioning>
         {
-            IdentityProvisioningBuilder.Create(Scim, "SCIM", "SCIM", new SCIMRepresentationsExtractionJobOptions
-            {
-                Count = 1,
-                SCIMEdp = scimEdp,
-                AuthenticationType = ClientAuthenticationTypes.APIKEY,
-                ApiKey = "ba521b3b-02f7-4a37-b03c-58f713bf88e7"
-            }).Build(),
-            IdentityProvisioningBuilder.Create(Ldap, "LDAP", "LDAP", new LDAPRepresentationsExtractionJobOptions
-            {
-                BatchSize = 1,
-                BindCredentials = "password",
-                BindDN = "cn=admin,dc=xl,dc=com",
-                Server = "localhost",
-                Port = 389,
-                UserObjectClasses = "organizationalPerson,person",
-                UsersDN = "ou=people,dc=xl,dc=com"
-            }).Build()
+            IdentityProvisioningBuilder.Create(Scim, "SCIM", "SCIM").Build(),
+            IdentityProvisioningBuilder.Create(Ldap, "LDAP", "LDAP").Build()
         };
     }
 }

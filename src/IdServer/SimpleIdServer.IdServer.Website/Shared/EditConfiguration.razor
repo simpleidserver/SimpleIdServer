@@ -7,25 +7,31 @@
 
 @if(Properties != null)
 {
-    @foreach (var property in Properties)
-    {
-        <div>
-            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@property.DisplayName</RadzenText>
-            @switch (property.Type)
-            {
-                case ConfigurationDefinitionRecordTypes.INPUT:
-                    <RadzenTextBox @bind-Value="@property.Value" Class="w-100"></RadzenTextBox>
-                    break;
-                case ConfigurationDefinitionRecordTypes.CHECKBOX:
-                    <RadzenCheckBox @bind-Value="@property.Value" Class="w-100"></RadzenCheckBox>
-                    break;
-                case ConfigurationDefinitionRecordTypes.PASSWORD:
-                    <RadzenCheckBox @bind-Value="@property.Value" Class="w-100"></RadzenCheckBox>
-                    break;
-            }
-            <p class="text-muted">@property.Description</p>
-        </div>
-    }
+    <RadzenStack>
+        @foreach (var property in Properties.OrderBy(p => p.Order))
+        {
+            <RadzenFormField Text="@property.DisplayName"  Variant=Variant.Outlined>
+                <ChildContent>
+                    @switch (property.Type)
+                    {
+                        case ConfigurationDefinitionRecordTypes.INPUT:
+                            <RadzenTextBox @bind-Value="@property.Value"></RadzenTextBox>
+                            break;
+                        case ConfigurationDefinitionRecordTypes.CHECKBOX:
+                            <RadzenCheckBox @bind-Value="@property.Value"></RadzenCheckBox>
+                            break;
+                        case ConfigurationDefinitionRecordTypes.PASSWORD:
+                            <RadzenPassword @bind-Value="@property.Value"></RadzenPassword>
+                            break;
+                    }                
+                </ChildContent>
+                <Helper>
+                    <RadzenText TextStyle="TextStyle.Caption">@property.Description</RadzenText>
+                </Helper>
+            </RadzenFormField>
+        }
+    </RadzenStack>
+
     <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(IsUpdating ? (IsAddForm ? "Adding..." : "Updating...") : (IsAddForm ? "Add" : "Update"))" Disabled=@IsUpdating Click="@(args => UpdateConfiguration())" />
 }
     
@@ -49,19 +55,21 @@
         public string DisplayName { get; set; }
         public string Description { get; set; }
         public string Value { get; set; }
+        public int Order { get; set; }
         public ICollection<ConfigurationDefRecordValueResult> PossibleValues { get; set; } = new List<ConfigurationDefRecordValueResult>();
     }
 
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
-        if (configurationDefsState.Value.IsLoading) return;
+        if (configurationDefsState.Value.IsLoading || Properties != null) return;
         var configuration = configurationDefsState.Value.ConfigurationDefs.SingleOrDefault(c => c.Id == Name);
         if (configuration == null) return;
         Properties = configuration.Properties.Select(p => new EditableProperty
         {
             Name = p.Name,
             Type = p.Type,
+            Order = p.Order,
             DisplayName = p.DisplayName,
             Description = p.Description,
             Value = Values != null && Values.ContainsKey(p.Name) ? Values[p.Name] : string.Empty

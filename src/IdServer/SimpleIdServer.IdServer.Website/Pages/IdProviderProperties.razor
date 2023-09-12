@@ -4,17 +4,17 @@
 @using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
 @inherits FluxorComponent
 @inject IDispatcher dispatcher
-@inject DialogService dialogService
 @inject NotificationService notificationService
 
 @if(IdProvider != null)
 {
-    <EditConfiguration PropertiesSaved=@SaveProperties Name=@IdProvider.Definition.OptionsName Values="@IdProvider.Values" IsAddForm=false></EditConfiguration>
+    <EditConfiguration PropertiesSaved=@SaveProperties Name=@IdProvider.Definition.OptionsName Values="@IdProvider.Values" IsUpdating=@IsUpdating IsAddForm=false></EditConfiguration>
 }
 
 @code {
     [Parameter]
     public AuthenticationSchemeProviderResult IdProvider { get; set; }
+    bool IsUpdating { get; set; }
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
@@ -23,7 +23,7 @@
         {
             SubscribeToAction<UpdateAuthenticationSchemeProviderPropertiesSuccessAction>((act) =>
             {
-                dialogService.Close();
+                this.IsUpdating = false;
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.IdProviderPropertiesUpdated });
                 StateHasChanged();
             });
@@ -34,6 +34,7 @@
 
     void SaveProperties(Dictionary<string, string> properties)
     {
+        this.IsUpdating = true;
         var act = new UpdateAuthenticationSchemeProviderPropertiesAction { Name = IdProvider.Name, Properties = properties };
         dispatcher.Dispatch(act);
     }

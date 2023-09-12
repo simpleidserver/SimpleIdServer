@@ -12,7 +12,6 @@ namespace SimpleIdServer.IdServer.Store.Configurations
         public void Configure(EntityTypeBuilder<IdentityProvisioningDefinition> builder)
         {
             builder.HasKey(i => i.Name);
-            builder.HasMany(i => i.Properties).WithOne(p => p.IdentityProvisioningDefinition).OnDelete(DeleteBehavior.Cascade);
             builder.HasMany(i => i.MappingRules).WithOne(p => p.IdentityProvisioningDefinition).OnDelete(DeleteBehavior.Cascade);
             builder.HasMany(i => i.Instances).WithOne(i => i.Definition).OnDelete(DeleteBehavior.Cascade);
         }

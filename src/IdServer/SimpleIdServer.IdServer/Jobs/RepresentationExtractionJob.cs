@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
@@ -27,8 +28,11 @@ namespace SimpleIdServer.IdServer.Jobs
 
     public abstract class RepresentationExtractionJob<T> : IRepresentationExtractionJob where T : class
     {
-        public RepresentationExtractionJob(ILogger<RepresentationExtractionJob<T>> logger, IBusControl busControl, IIdentityProvisioningStore identityProvisioningStore, IExtractedRepresentationRepository  extractedRepresentationRepository, IOptions<IdServerHostOptions> options)
+        private readonly IConfiguration _configuration;
+
+        public RepresentationExtractionJob(IConfiguration configuration, ILogger<RepresentationExtractionJob<T>> logger, IBusControl busControl, IIdentityProvisioningStore identityProvisioningStore, IExtractedRepresentationRepository  extractedRepresentationRepository, IOptions<IdServerHostOptions> options)
         {
+            _configuration = configuration;
             Logger = logger;
             BusControl = busControl;
             IdentityProvisioningStore = identityProvisioningStore;
@@ -49,7 +53,6 @@ namespace SimpleIdServer.IdServer.Jobs
             {
                 Logger.LogInformation($"Start to export {Name} users");
                 var metadata = await IdentityProvisioningStore.Query()
-                    .Include(d => d.Properties)
                     .Include(d => d.Realms)
                     .Include(d => d.Histories)
                     .Include(d => d.Definition).ThenInclude(d => d.MappingRules)
@@ -68,7 +71,8 @@ namespace SimpleIdServer.IdServer.Jobs
                     var folderName = DateTime.Now.ToString("MMddyyyyHHmm");
                     destinationFolder = Path.Combine(destinationFolder, folderName);
                     Directory.CreateDirectory(destinationFolder);
-                    var options = Serializer.PropertiesSerializer.DeserializeOptions<T, IdentityProvisioningProperty>(metadata.Properties);
+                    var section = _configuration.GetSection($"{metadata.Name}:{typeof(T).Name}");
+                    var options = section.Get<T>();
                     using (var transactionScope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = System.Transactions.IsolationLevel.Snapshot }, TransactionScopeAsyncFlowOption.Enabled))
                     {
                         int nbUsers = 0;

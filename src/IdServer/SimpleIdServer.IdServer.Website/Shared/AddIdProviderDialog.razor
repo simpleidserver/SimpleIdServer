@@ -62,7 +62,7 @@
             </div>
         </RadzenStepsItem>
         <RadzenStepsItem Text="Properties" Disabled="@(SelectedIdProvider == null)">
-            <EditConfiguration PropertiesSaved=@SaveIdProvider Name=@SelectedIdProvider.OptionsName></EditConfiguration>
+            <EditConfiguration IsUpdating="@IsAdding" IsAddForm="true" PropertiesSaved=@SaveIdProvider Name=@SelectedIdProvider.OptionsName></EditConfiguration>
         </RadzenStepsItem>
     </Steps>
 </RadzenSteps>
@@ -75,6 +75,7 @@
         public string? Description { get; set; } = null;
     }
 
+    bool IsAdding { get; set; } = false;
     IdProviderInfo info = new IdProviderInfo();
     AuthenticationSchemeProviderDefinition? SelectedIdProvider { get; set; } = null;
 
@@ -88,7 +89,14 @@
             SubscribeToAction<AddIdProviderSuccessAction>((act) =>
             {
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.IdProviderAdded });
+                this.IsAdding = false;
                 dialogService.Close();
+            });
+            SubscribeToAction<AddIdProviderFailureAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
+                this.IsAdding = false;
+                StateHasChanged();
             });
         }
     }
@@ -100,6 +108,7 @@
 
     void SaveIdProvider(Dictionary<string, string> properties)
     {
+        this.IsAdding = true;
         var act = new AddIdProviderAction
         {
             Name = info.Name,

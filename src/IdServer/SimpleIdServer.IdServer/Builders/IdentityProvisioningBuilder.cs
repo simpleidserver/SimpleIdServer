@@ -3,7 +3,6 @@
 
 using SimpleIdServer.IdServer.Domains;
 using System;
-using System.Linq;
 
 namespace SimpleIdServer.IdServer.Builders
 {
@@ -16,9 +15,8 @@ namespace SimpleIdServer.IdServer.Builders
             _identityProvisioning = identityProvisioning;
         }
 
-        public static IdentityProvisioningBuilder Create<TOpts>(IdentityProvisioningDefinition definition, string name, string description, TOpts options, Domains.Realm realm = null)
+        public static IdentityProvisioningBuilder Create(IdentityProvisioningDefinition definition, string name, string description, Domains.Realm realm = null)
         {
-            var properties = Serializer.PropertiesSerializer.SerializeProperties<IdentityProvisioningProperty>(options);
             var result = new IdentityProvisioning
             {
                 Id = Guid.NewGuid().ToString(),
@@ -26,7 +24,6 @@ namespace SimpleIdServer.IdServer.Builders
                 Description = description,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow,
-                Properties = properties.ToList(),
                 Definition = definition
             };
             if (realm == null) result.Realms.Add(Constants.StandardRealms.Master);

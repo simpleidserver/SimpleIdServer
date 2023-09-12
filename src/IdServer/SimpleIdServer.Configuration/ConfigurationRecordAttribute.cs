@@ -9,13 +9,14 @@ namespace SimpleIdServer.Configuration;
 [AttributeUsage(AttributeTargets.Property)]
 public class ConfigurationRecordAttribute : Attribute
 {
-	public ConfigurationRecordAttribute(string displayName, string description = null)
+	public ConfigurationRecordAttribute(string displayName, string description = null, int order = 0)
 	{
 		DisplayName = displayName;
 		Description = description;
+		Order = order;
 	}
 
-	public ConfigurationRecordAttribute(string displayName, string description = null, bool isProtected = false) : this(displayName, description)
+	public ConfigurationRecordAttribute(string displayName, string description = null, int order = 0, bool isProtected = false) : this(displayName, description, order)
 	{
 		IsProtected = isProtected;
 	}
@@ -23,5 +24,6 @@ public class ConfigurationRecordAttribute : Attribute
 	public string DisplayName { get; set; } = null!;
 	public string? Description { get; set; } = null;
 	public bool IsProtected { get; set; } = false;
+	public int Order { get; set; } = 0;
 	public Dictionary<string, string>? Values { get; set; } = null;
 }

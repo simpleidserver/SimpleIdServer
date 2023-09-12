@@ -2,28 +2,24 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using BlushingPenguin.JsonPath;
 using MassTransit;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.Scim.Client;
 using SimpleIdServer.Scim.Client.DTOs;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace SimpleIdServer.IdServer.Jobs
+namespace SimpleIdServer.IdServer.Provisioning.SCIM.Jobs
 {
     public class SCIMRepresentationsExtractionJob : RepresentationExtractionJob<SCIMRepresentationsExtractionJobOptions>
     {
         public const string NAME = "SCIM";
 
-        public SCIMRepresentationsExtractionJob(ILogger<RepresentationExtractionJob<SCIMRepresentationsExtractionJobOptions>> logger, IBusControl busControl, IIdentityProvisioningStore identityProvisioningStore, IExtractedRepresentationRepository extractedRepresentationRepository, IOptions<IdServerHostOptions> options) : base(logger, busControl, identityProvisioningStore, extractedRepresentationRepository, options)
+        public SCIMRepresentationsExtractionJob(IConfiguration configuration, ILogger<RepresentationExtractionJob<SCIMRepresentationsExtractionJobOptions>> logger, IBusControl busControl, IIdentityProvisioningStore identityProvisioningStore, IExtractedRepresentationRepository extractedRepresentationRepository, IOptions<IdServerHostOptions> options) : base(configuration, logger, busControl, identityProvisioningStore, extractedRepresentationRepository, options)
         {
         }
 

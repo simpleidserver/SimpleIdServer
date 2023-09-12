@@ -8,7 +8,7 @@
 	  <None Remove="Stores\CertificateAuthorityStore\CertificateAuthorityEffects.cs~RF4bb578.TMP" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Radzen.Blazor" Version="4.6.*" />
+		<PackageReference Include="Radzen.Blazor" Version="4.15.*" />
 		<PackageReference Include="Fluxor" Version="5.7.*" />
 		<PackageReference Include="Fluxor.Blazor.Web" Version="5.7.*" />
 		<PackageReference Include="Fluxor.Blazor.Web.ReduxDevTools" Version="5.7.*" />

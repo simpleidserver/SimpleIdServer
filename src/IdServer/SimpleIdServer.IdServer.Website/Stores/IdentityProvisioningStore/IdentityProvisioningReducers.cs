@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
+using SimpleIdServer.IdServer.Api.Provisioning;
 using SimpleIdServer.IdServer.Domains;
 
 namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
@@ -10,7 +11,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         #region SearchIdentityProvisioningState
 
         [ReducerMethod]
-        public static SearchIdentityProvisioningState ReduceSearchIdentityProvisioningAction(SearchIdentityProvisioningState state, SearchIdentityProvisioningAction act) => new(true, new List<IdentityProvisioning>(), 0);
+        public static SearchIdentityProvisioningState ReduceSearchIdentityProvisioningAction(SearchIdentityProvisioningState state, SearchIdentityProvisioningAction act) => new(true, new List<IdentityProvisioningResult>(), 0);
 
         [ReducerMethod]
         public static SearchIdentityProvisioningState ReduceSearchIdentityProvisioningSuccessAction(SearchIdentityProvisioningState state, SearchIdentityProvisioningSuccessAction act) => new(false, act.IdentityProvisioningLst, act.Count);
@@ -96,7 +97,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         public static IdentityProvisioningState ReduceUpdateIdProvisioningPropertiesSuccessAction(IdentityProvisioningState state, UpdateIdProvisioningPropertiesSuccessAction act)
         {
             var idProvisioning = state.IdentityProvisioning;
-            idProvisioning.Properties = act.Properties.ToList();
+            idProvisioning.Values = act.Properties;
             return state with
             {
                 IsLoading = false,
@@ -127,7 +128,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         {
             var idProvisioning = state.IdentityProvisioning;
             var histories = state.IdentityProvisioning.Histories.ToList();
-            histories.Add(new IdentityProvisioningHistory
+            histories.Add(new IdentityProvisioningHistoryResult
             {
                 StartDateTime = DateTime.UtcNow,
                 NbRepresentations = 0,
@@ -229,7 +230,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         public static SearchIdentityProvisioningMappingRuleState ReduceAddIdentityProvisioningMappingRuleSuccessAction(SearchIdentityProvisioningMappingRuleState state, AddIdentityProvisioningMappingRuleSuccessAction act)
         {
             var mappingRules = state.MappingRules.ToList();
-            mappingRules.Add(new SelectableIdentityProvisioningMappingRule(new IdentityProvisioningMappingRule
+            mappingRules.Add(new SelectableIdentityProvisioningMappingRule(new IdentityProvisioningMappingRuleResult
             {
                 Id = act.NewId,
                 From = act.From,

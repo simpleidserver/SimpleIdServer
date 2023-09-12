@@ -6,9 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.AuthenticationSchemeProviders;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Store;
-using System.DirectoryServices.Protocols;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -178,7 +176,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
             var requestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/idproviders/{action.Name}/mappers"),
+                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/idproviders/{action.IdProviderName}/mappers"),
                 Content = new StringContent(JsonSerializer.Serialize(addRequest), Encoding.UTF8, "application/json")
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
@@ -233,7 +231,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
             var requestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Put,
-                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/idproviders/{action.Name}/mappers/{action.Id}"),
+                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/idproviders/{action.IdProviderName}/mappers/{action.Id}"),
                 Content = new StringContent(JsonSerializer.Serialize(addRequest), Encoding.UTF8, "application/json")
             };
             await httpClient.SendAsync(requestMessage);

@@ -187,7 +187,7 @@ namespace SimpleIdServer.IdServer.UI
             if (amrInfo == null || string.IsNullOrWhiteSpace(amrInfo.UserId)) return null;
             return await UserRepository.Query()
                 .Include(u => u.Realms)
-                .Include(u => u.IdentityProvisioning).ThenInclude(i => i.Properties)
+                .Include(u => u.IdentityProvisioning).ThenInclude(i => i.Definition)
                 .Include(u => u.Groups)
                 .Include(c => c.OAuthUserClaims)
                 .Include(u => u.Credentials)
