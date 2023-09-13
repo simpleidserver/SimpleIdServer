@@ -11,6 +11,8 @@ public class SchemaResourceAttributeResult
     public string Name { get; set; }
     [JsonPropertyName("type")]
     public string Type { get; set; }
+    [JsonPropertyName("multiValued")]
+    public bool MultiValued {  get; set; }
     [JsonPropertyName("subAttributes")]
     public ICollection<SchemaResourceAttributeResult> SubAttributes { get; set; }
 }

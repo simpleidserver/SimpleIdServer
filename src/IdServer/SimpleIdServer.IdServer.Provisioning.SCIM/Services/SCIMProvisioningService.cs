@@ -87,7 +87,8 @@ public class SCIMProvisioningService : IProvisioningService
                 continue;
             }
 
-            values.Add(token.Value.GetString());
+            var value = token.Value.GetRawText().Trim('"');
+            values.Add(value);
         }
 
         return new ExtractedUserResult
@@ -127,6 +128,11 @@ public class SCIMProvisioningService : IProvisioningService
         {
             var path = $"$.{attr.Name}";
             result.Add(path);
+            if(attr.SubAttributes == null || (attr.Type == "complex" && attr.MultiValued))
+            {
+                continue;
+            }
+
             foreach(var subAttr in attr.SubAttributes)
                 result.Add($"{path}.{subAttr.Name}");
         }
