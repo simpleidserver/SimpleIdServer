@@ -28,6 +28,8 @@ namespace SimpleIdServer.Scim.ExternalEvents
         public int Version { get; set; }
         public string ResourceType { get; set; }
         public string SerializedRepresentation { get; set; }
+        [System.Text.Json.Serialization.JsonIgnore]
+        [Newtonsoft.Json.JsonIgnore]
         public JObject Representation
         {
             get

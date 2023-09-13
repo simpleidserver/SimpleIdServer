@@ -6,7 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.ConformanceSuite.Startup.Converters;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Jobs;
+using SimpleIdServer.IdServer.Provisioning.SCIM.Jobs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +17,7 @@ namespace SimpleIdServer.IdServer.ConformanceSuite.Startup
     {
         private static AuthenticationSchemeProviderDefinition Facebook = AuthenticationSchemeProviderDefinitionBuilder.Create("facebook", "Facebook", typeof(FacebookHandler), typeof(FacebookOptionsLite)).Build();
 
-        private static IdentityProvisioningDefinition Scim = IdentityProvisioningDefinitionBuilder.Create<SCIMRepresentationsExtractionJobOptions>(SCIMRepresentationsExtractionJob.NAME, "SCIM")
+        private static IdentityProvisioningDefinition Scim = IdentityProvisioningDefinitionBuilder.Create<SCIMRepresentationsExtractionJobOptions>(SimpleIdServer.IdServer.Provisioning.SCIM.Jobs.SCIMRepresentationsExtractionJob.NAME, "SCIM")
             .AddUserSubjectMappingRule("$.userName")
             .AddUserPropertyMappingRule("$.name.familyName", nameof(User.Lastname))
             .AddUserAttributeMappingRule("$.name.givenName", JwtRegisteredClaimNames.GivenName).Build();
@@ -64,11 +64,7 @@ namespace SimpleIdServer.IdServer.ConformanceSuite.Startup
 
         public static ICollection<AuthenticationSchemeProvider> Providers => new List<AuthenticationSchemeProvider>
         {
-           AuthenticationSchemeProviderBuilder.Create(Facebook, "Facebook", "Facebook", "Faceoobk", new FacebookOptionsLite
-           {
-               AppId = "569242033233529",            
-               AppSecret = "12e0f33817634c0a650c0121d05e53eb"
-           }).Build()
+           AuthenticationSchemeProviderBuilder.Create(Facebook, "Facebook", "Facebook", "Faceoobk").Build()
         };
 
         public static ICollection<Realm> Realms = new List<Realm>
@@ -78,11 +74,7 @@ namespace SimpleIdServer.IdServer.ConformanceSuite.Startup
 
         public static ICollection<IdentityProvisioning> IdentityProvisiongLst => new List<IdentityProvisioning>
         {
-            IdentityProvisioningBuilder.Create(Scim, "SCIM", "SCIM", new SCIMRepresentationsExtractionJobOptions
-            {
-                Count = 1,
-                SCIMEdp = "http://localhost:5003"
-            }).Build()
+            IdentityProvisioningBuilder.Create(Scim, "SCIM", "SCIM").Build()
         };
     }
 }
