@@ -7,6 +7,7 @@ using SimpleIdServer.IdServer.Api.Provisioning;
 using SimpleIdServer.IdServer.Domains;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
 {
@@ -176,6 +177,31 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             dispatcher.Dispatch(new AddIdentityProvisioningMappingRuleSuccessAction { NewId = newMapper.Id, Id = action.Id, MappingRule = action.MappingRule, From = action.From, TargetUserAttribute = action.TargetUserAttribute, TargetUserProperty = action.TargetUserProperty });
         }
 
+        [EffectMethod]
+        public async Task Handle(TestIdentityProvisioningAction action, IDispatcher dispatcher)
+        {
+            var realm = await GetRealm();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/provisioning/{action.Id}/test")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            try
+            {
+                httpResult.EnsureSuccessStatusCode();
+                var extractionResult = JsonSerializer.Deserialize<TestConnectionResult>(json);
+                dispatcher.Dispatch(new TestIdentityProvisioningSuccessAction { ConnectionResult = extractionResult });
+            }
+            catch
+            {
+                var jsonObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new TestIdentityProvisioningFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
+            }
+        }
+
         private async Task<string> GetRealm()
         {
             var realm = await _sessionStorage.GetAsync<string>("realm");
@@ -310,5 +336,20 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         public string From { get; set; } = null!;
         public string? TargetUserAttribute { get; set; } = null;
         public string? TargetUserProperty { get; set; } = null;
+    }
+
+    public class TestIdentityProvisioningAction
+    {
+        public string Id { get; set; }
+    }
+
+    public class TestIdentityProvisioningFailureAction
+    {
+        public string ErrorMessage { get; set; }
+    }
+
+    public class TestIdentityProvisioningSuccessAction
+    {
+        public TestConnectionResult ConnectionResult { get; set; }
     }
 }

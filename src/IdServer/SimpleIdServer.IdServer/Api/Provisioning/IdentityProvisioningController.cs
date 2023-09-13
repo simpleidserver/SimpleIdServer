@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Hangfire;
+using MassTransit.Testing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -29,13 +30,15 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
         private readonly IServiceProvider _serviceProvider;
         private readonly IJwtBuilder _jwtBuilder;
         private readonly IConfiguration _configuration;
+        private readonly IEnumerable<IProvisioningService> _provisioningServices;
 
-        public IdentityProvisioningController(IIdentityProvisioningStore identityProvisioningStore, IServiceProvider serviceProvider, IJwtBuilder jwtBuilder, IConfiguration configuration)
+        public IdentityProvisioningController(IIdentityProvisioningStore identityProvisioningStore, IServiceProvider serviceProvider, IJwtBuilder jwtBuilder, IConfiguration configuration, IEnumerable<IProvisioningService> provisioningServices)
         {
             _identityProvisioningStore = identityProvisioningStore;
             _serviceProvider = serviceProvider;
             _jwtBuilder = jwtBuilder;
             _configuration = configuration;
+            _provisioningServices = provisioningServices;
         }
 
         [HttpPost]
@@ -226,6 +229,60 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
                 return BuildError(ex);
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> TestConnection([FromRoute] string prefix, string id)
+        {
+            prefix = prefix ?? Constants.DefaultRealm;
+            try
+            {
+                CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name, _jwtBuilder);
+                var result = await _identityProvisioningStore.Query()
+                    .Include(p => p.Realms)
+                    .Include(p => p.Definition).ThenInclude(p => p.MappingRules)
+                    .Where(p => p.Realms.Any(r => r.Name == prefix))
+                    .SingleOrDefaultAsync(p => p.Id == id);
+                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_IDPROVISIONING, id));
+                var provisioningService = _provisioningServices.Single(s => s.Name == result.Definition.Name);
+                var type = Type.GetType(result.Definition.OptionsFullQualifiedName);
+                var section = _configuration.GetSection($"{result.Name}:{result.Definition.OptionsName}");
+                var options = section.Get(type);
+                var extractionResult = await provisioningService.Extract(options, result.Definition).FirstOrDefault();
+                var extractionResultLst = new List<IdentityProvisioningExtractionResult>();
+                if(extractionResult != null)
+                {
+                    extractionResultLst = extractionResult.Users.Select(u => new IdentityProvisioningExtractionResult
+                    {
+                        Id = u.Id,
+                        Values = u.Values,
+                        Version = u.Version
+                    }).ToList();
+                }
+
+                var columns = new List<string> { "Id", "Version" };
+                columns.AddRange(result.Definition.MappingRules.Select(r =>
+                {
+                    if (r.MapperType == MappingRuleTypes.USERATTRIBUTE) return r.TargetUserAttribute;
+                    if(r.MapperType == MappingRuleTypes.USERPROPERTY) return r.TargetUserProperty;
+                    return "Subject";
+                }));
+                var record = new TestConnectionResult
+                {
+                    Columns = columns,
+                    Values = extractionResultLst
+                };
+                return new OkObjectResult(record);
+            }
+            catch(OAuthException ex)
+            {
+                return BuildError(ex);
+            }
+            catch (Exception ex)
+            {
+                return BuildError(ex);
+            }
+        }
+
 
         [HttpGet]
         public IActionResult Enqueue([FromRoute] string prefix, string name, string id)

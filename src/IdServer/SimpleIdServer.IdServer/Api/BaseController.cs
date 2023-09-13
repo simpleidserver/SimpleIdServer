@@ -66,6 +66,8 @@ namespace SimpleIdServer.IdServer.Api
 
         protected ContentResult BuildError(OAuthException ex) => BuildError(ex.StatusCode ?? HttpStatusCode.InternalServerError, ex.Code, ex.Message);
 
+        protected ContentResult BuildError(Exception ex) => BuildError(HttpStatusCode.InternalServerError, ErrorCodes.UNEXPECTED_ERROR, ex.Message);
+
         protected ContentResult BuildError(HttpStatusCode statusCode, string error, string errorDescription) => new ContentResult
         {
             StatusCode = (int)statusCode,

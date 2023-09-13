@@ -1,0 +1,48 @@
+﻿@using Fluxor.Blazor.Web.Components;
+@using SimpleIdServer.IdServer.Api.Provisioning;
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.ApiResourceStore;
+@using SimpleIdServer.IdServer.Website.Stores.ClientStore;
+@using SimpleIdServer.IdServer.Website.Stores.UserStore;
+@inherits FluxorComponent
+@inject Radzen.DialogService dialogService
+@inject NotificationService notificationService
+@inject IState<AddApiResourceState> addApiResourceState
+@inject IDispatcher dispatcher
+
+<RadzenDataGrid 
+                AllowFiltering="false"
+                AllowColumnResize="true"
+                AllowAlternatingRows="true"
+                AllowSorting="false"
+                PageSize="30"
+                AllowPaging="false"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="false"
+                Data="@ConnectionResult.Values"
+                TItem="IdentityProvisioningExtractionResult"
+                ColumnWidth="300px">
+    <Columns>
+        @for (var i = 0; i <= ConnectionResult.Columns.Count() - 1; i++)
+        {
+            var index = i;
+            <RadzenDataGridColumn Title="@ConnectionResult.Columns[i]" TItem="IdentityProvisioningExtractionResult">
+                <Template Context="data">
+                    @GetColumnValue(index, data)
+                </Template>
+            </RadzenDataGridColumn>
+        }
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    [Parameter]
+    public TestConnectionResult ConnectionResult { get; set; }
+
+    private string GetColumnValue(int id, IdentityProvisioningExtractionResult item)
+    {
+        if (id == 0) return item.Id;
+        if (id == 1) return item.Version;
+        return item.Values[id - 2];
+    }
+}

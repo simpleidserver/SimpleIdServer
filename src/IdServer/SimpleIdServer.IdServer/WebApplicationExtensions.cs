@@ -218,6 +218,9 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.MapControllerRoute("extractRepresentations",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{name}/{id}/enqueue",
                 defaults: new { controller = "IdentityProvisioning", action = "Enqueue" });
+            webApplication.MapControllerRoute("idProvisioningTestConnection",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}/test",
+                defaults: new { controller = "IdentityProvisioning", action = "TestConnection" });
 
 
             webApplication.MapControllerRoute("getAllNetworks",

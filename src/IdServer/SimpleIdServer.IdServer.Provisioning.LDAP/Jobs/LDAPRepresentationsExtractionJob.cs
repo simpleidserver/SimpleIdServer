@@ -7,96 +7,48 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
-using System.DirectoryServices.Protocols;
-using System.Net;
 
 namespace SimpleIdServer.IdServer.Provisioning.LDAP.Jobs
 {
     public class LDAPRepresentationsExtractionJob : RepresentationExtractionJob<LDAPRepresentationsExtractionJobOptions>
     {
+        private readonly IProvisioningService _provisioningService;
         public const string NAME = "LDAP";
 
-        public LDAPRepresentationsExtractionJob(Microsoft.Extensions.Configuration.IConfiguration configuration, ILogger<RepresentationExtractionJob<LDAPRepresentationsExtractionJobOptions>> logger, IBusControl busControl, IIdentityProvisioningStore identityProvisioningStore, IExtractedRepresentationRepository extractedRepresentationRepository, IOptions<IdServerHostOptions> options) : base(configuration, logger, busControl, identityProvisioningStore, extractedRepresentationRepository, options)
+        public LDAPRepresentationsExtractionJob(IEnumerable<IProvisioningService> provisioningServices, Microsoft.Extensions.Configuration.IConfiguration configuration, ILogger<RepresentationExtractionJob<LDAPRepresentationsExtractionJobOptions>> logger, IBusControl busControl, IIdentityProvisioningStore identityProvisioningStore, IExtractedRepresentationRepository extractedRepresentationRepository, IOptions<IdServerHostOptions> options) : base(configuration, logger, busControl, identityProvisioningStore, extractedRepresentationRepository, options)
         {
+            _provisioningService = provisioningServices.Single(p => p.Name == NAME);
         }
 
         public override string Name => NAME;
 
         protected override async IAsyncEnumerable<List<ExtractedRepresentation>> FetchUsers(LDAPRepresentationsExtractionJobOptions options, string destinationFolder, IdentityProvisioning identityProvisioning)
         {
-            var pr = new PageResultRequestControl(options.BatchSize);
-            var request = new SearchRequest(options.UsersDN, $"(&{string.Join(string.Empty, options.UserObjectClasses.Split(',').Select(o => $"(objectClass={o})"))})", SearchScope.Subtree);
-            request.Controls.Add(pr);
-            var credentials = new NetworkCredential(options.BindDN, options.BindCredentials);
-            int currentPage = 0;
-            using (var connection = new LdapConnection(new LdapDirectoryIdentifier(options.Server, options.Port), credentials, AuthType.Basic))
+            await foreach (var extractedResult in _provisioningService.Extract(options, identityProvisioning.Definition))
             {
-                connection.SessionOptions.ProtocolVersion = 3;
-                connection.Bind();
-                while(true)
-                {
-                    var response = (SearchResponse)connection.SendRequest(request);
-                    if (!response.Controls.Any()) break;
-                    var pageResponse = (PageResultResponseControl)response.Controls[0];
-                    var extractedRepresentations = ExtractUsers(response.Entries, currentPage, destinationFolder, options, identityProvisioning.Definition);
-                    pr.Cookie = pageResponse.Cookie;
-                    yield return extractedRepresentations;
-                    if (!pageResponse.Cookie.Any()) break;
-                    currentPage++;
-                }
+                var result = WriteFile(extractedResult, destinationFolder, identityProvisioning.Definition);
+                yield return result;
             }
         }
 
-        private List<ExtractedRepresentation> ExtractUsers(SearchResultEntryCollection entries, int currentPage, string destinationFolder, LDAPRepresentationsExtractionJobOptions options, IdentityProvisioningDefinition definition)
+        private List<ExtractedRepresentation> WriteFile(ExtractedResult extractedResult, string destinationFolder, IdentityProvisioningDefinition definition)
         {
             var result = new List<ExtractedRepresentation>();
-            using (var fs = File.CreateText(Path.Combine(destinationFolder, $"{currentPage}.csv")))
+            using (var fs = File.CreateText(Path.Combine(destinationFolder, $"{extractedResult.CurrentPage}.csv")))
             {
                 fs.WriteLine(BuildFileColumns(definition));
-                foreach (SearchResultEntry entry in entries)
+                foreach (var user in extractedResult.Users)
                 {
-                    var userId = GetUserId(entry, options);
-                    var version = GetVersion(entry, options);
+                    fs.WriteLine($"{user.Id}{Constants.IdProviderSeparator}{user.Version}{Constants.IdProviderSeparator}{string.Join(Constants.IdProviderSeparator, user.Values)}");
                     result.Add(new ExtractedRepresentation
                     {
-                        ExternalId = userId,
-                        Version = version
+                        ExternalId = user.Id,
+                        Version = user.Version
                     });
-                    fs.WriteLine($"{userId}{Constants.IdProviderSeparator}{version}{Constants.IdProviderSeparator}{Extract(entry, definition)}");
                 }
             }
 
             return result;
-        }
-
-        private string Extract(SearchResultEntry result, IdentityProvisioningDefinition definition)
-        {
-            var lst = new List<string>();
-            foreach(var mappingRule in definition.MappingRules)
-            {
-                if (!result.Attributes.Contains(mappingRule.From))
-                {
-                    if (mappingRule.From == "distinguishedName") lst.Add(result.DistinguishedName);
-                    continue;
-                }
-
-                var record = result.Attributes[mappingRule.From][0];
-                lst.Add(record.ToString());
-            }
-
-            return string.Join(Constants.IdProviderSeparator, lst);
-        }
-
-        private string GetUserId(SearchResultEntry entry, LDAPRepresentationsExtractionJobOptions options)
-        {
-            if (!entry.Attributes.Contains(options.UUIDLDAPAttribute)) return entry.DistinguishedName;
-            return entry.Attributes[options.UUIDLDAPAttribute][0].ToString();
-        }
-
-        private string GetVersion(SearchResultEntry entry, LDAPRepresentationsExtractionJobOptions options)
-        {
-            if (!entry.Attributes.Contains(options.ModificationDateAttribute)) return Guid.NewGuid().ToString();
-            return entry.Attributes[options.ModificationDateAttribute][0].ToString();
         }
     }
 }

@@ -3,6 +3,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Provisioning.SCIM.Jobs;
+using SimpleIdServer.IdServer.Provisioning.SCIM.Services;
 
 namespace SimpleIdServer.IdServer.Provisioning.SCIM;
 
@@ -11,6 +12,7 @@ public static class IdServerBuilderExtensions
     public static IdServerBuilder AddSCIMProvisioning(this IdServerBuilder builder)
     {
         builder.Services.AddTransient<IRepresentationExtractionJob, SCIMRepresentationsExtractionJob>();
+        builder.Services.AddTransient<IProvisioningService, SCIMProvisioningService>();
         return builder;
     }
 }
