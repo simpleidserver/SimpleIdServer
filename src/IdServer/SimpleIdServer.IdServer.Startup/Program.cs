@@ -65,11 +65,11 @@ var app = builder.Build();
 SeedData(app, builder.Configuration["SCIMBaseUrl"]);
 app.UseCors("AllowAll");
 app.UseSID()
-    .UseWsFederation()
-    .UseFIDO()
-    .UseCredentialIssuer()
-    .UseSamlIdp()
-    .UseAutomaticConfiguration();
+.UseWsFederation()
+.UseFIDO()
+.UseCredentialIssuer()
+.UseSamlIdp()
+.UseAutomaticConfiguration();
 app.Run();
 
 void ConfigureIdServer(IServiceCollection services)

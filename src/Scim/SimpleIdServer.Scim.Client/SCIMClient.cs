@@ -30,6 +30,21 @@ namespace SimpleIdServer.Scim.Client
             _handler = handler;
         }
 
+        public async Task<SchemasResult> GetSchemas(CancellationToken cancellationToken)
+        {
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(GetPath("Schemas"))
+            };
+            var httpClient = GetHttpClient();
+            var httpResult = await httpClient.SendAsync(request, cancellationToken);
+            httpResult.EnsureSuccessStatusCode();
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<SchemasResult>(json);
+            return result;
+        }
+
         public async Task<SearchResult<ResourceTypeResult>> GetResourceTypes(CancellationToken cancellationToken)
         {
             var request = new HttpRequestMessage

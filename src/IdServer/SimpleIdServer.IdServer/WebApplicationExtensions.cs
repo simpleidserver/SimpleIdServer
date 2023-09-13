@@ -221,6 +221,9 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.MapControllerRoute("idProvisioningTestConnection",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}/test",
                 defaults: new { controller = "IdentityProvisioning", action = "TestConnection" });
+            webApplication.MapControllerRoute("idProvisioningAllowedAttributes",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}/allowedattributes",
+                defaults: new { controller = "IdentityProvisioning", action = "GetAllowedAttributes" });
 
 
             webApplication.MapControllerRoute("getAllNetworks",

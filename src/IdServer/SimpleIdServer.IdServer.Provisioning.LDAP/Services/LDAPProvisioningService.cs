@@ -39,6 +39,36 @@ public class LDAPProvisioningService : IProvisioningService
         }
     }
 
+    public Task<IEnumerable<string>> GetAllowedAttributes(object obj)
+    {
+        var result = new List<string>();
+        var options = obj as LDAPRepresentationsExtractionJobOptions;
+        var userObjectClassLst = options.UserObjectClasses.Split(',');
+        var pr = new PageResultRequestControl(1);
+        var credentials = new NetworkCredential(options.BindDN, options.BindCredentials);
+        using (var connection = new LdapConnection(new LdapDirectoryIdentifier(options.Server, options.Port), credentials, AuthType.Basic))
+        {
+            connection.SessionOptions.ProtocolVersion = 3;
+            connection.Bind();
+            foreach (var userObjectClass in userObjectClassLst)
+            {
+                var request = new SearchRequest(options.UsersDN, $"(objectClass={userObjectClass})", System.DirectoryServices.Protocols.SearchScope.Subtree);
+                request.Controls.Add(pr);
+                var response = (SearchResponse)connection.SendRequest(request);
+                var entries = response.Entries;
+                if (entries.Count == 0) continue;
+                var firstEntry = entries[0] as SearchResultEntry;
+                foreach(var attr in firstEntry.Attributes.AttributeNames)
+                {
+                    if (result.Contains(attr.ToString())) continue;
+                    result.Add(attr.ToString());
+                }
+            }
+        }
+
+        return Task.FromResult((IEnumerable<string>)result.Distinct().OrderBy(r => r).ToList());
+    }
+
     private List<ExtractedUserResult> ExtractUsers(SearchResultEntryCollection entries, LDAPRepresentationsExtractionJobOptions options, IdentityProvisioningDefinition definition)
     {
         var result = new List<ExtractedUserResult>();

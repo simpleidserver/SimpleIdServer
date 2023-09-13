@@ -1,0 +1,3 @@
+Install OPENLDAP server
+
+docker run --name openldap-server -p 389:389 -p 636:636 --env LDAP_ORGANISATION="sid" --env LDAP_DOMAIN="sid.com" --env LDAP_BASE_DN="dc=sid,dc=com" --env LDAP_ADMIN_PASSWORD="password" osixia/openldap:latest

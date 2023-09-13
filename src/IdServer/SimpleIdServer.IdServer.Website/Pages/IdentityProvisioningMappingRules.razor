@@ -39,8 +39,11 @@
                 <RadzenBadge IsPill=true Text="@Enum.GetName(typeof(MappingRuleTypes), data.Value.MapperType)" BadgeStyle="BadgeStyle.Primary"></RadzenBadge>
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableIdentityProvisioningMappingRule" Property="Value.TargetUserAttribute" Filterable="false" Sortable="false" Title="Attribute" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableIdentityProvisioningMappingRule" Property="Value.TargetUserProperty" Filterable="false" Sortable="false" Title="Property" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableIdentityProvisioningMappingRule" Filterable="false" Sortable="false" Title="To" Width="80px">
+            <Template Context="data">
+                @GetValue(data)
+            </Template>
+        </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableIdentityProvisioningMappingRule" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
                 <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
@@ -104,5 +107,18 @@
             Resizable = true,
             Draggable = true
         });        
+    }
+
+    string GetValue(SelectableIdentityProvisioningMappingRule rule)
+    {
+        switch(rule.Value.MapperType)
+        {
+            case MappingRuleTypes.USERATTRIBUTE:
+                return rule.Value.TargetUserAttribute;
+            case MappingRuleTypes.USERPROPERTY:
+                return rule.Value.TargetUserProperty;
+        }
+
+        return string.Empty;
     }
 }

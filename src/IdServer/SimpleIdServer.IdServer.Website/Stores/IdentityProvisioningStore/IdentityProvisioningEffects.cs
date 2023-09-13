@@ -202,6 +202,31 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             }
         }
 
+        [EffectMethod]
+        public async Task Handle(GetIdentityProvisioningAllowedAttributesAction action, IDispatcher dispatcher)
+        {
+            var realm = await GetRealm();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/provisioning/{action.Id}/allowedattributes")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            try
+            {
+                httpResult.EnsureSuccessStatusCode();
+                var allowedAttributes = JsonSerializer.Deserialize<List<string>>(json);
+                dispatcher.Dispatch(new GetIdentityProvisioningAllowedAttributesSuccessAction { AllowedAttributes = allowedAttributes });
+            }
+            catch
+            {
+                var jsonObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new GetIdentityProvisioningAllowedAttributesFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
+            }
+        }
+
         private async Task<string> GetRealm()
         {
             var realm = await _sessionStorage.GetAsync<string>("realm");
@@ -351,5 +376,20 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
     public class TestIdentityProvisioningSuccessAction
     {
         public TestConnectionResult ConnectionResult { get; set; }
+    }
+
+    public class GetIdentityProvisioningAllowedAttributesAction
+    {
+        public string Id { get; set; }
+    }
+
+    public class GetIdentityProvisioningAllowedAttributesSuccessAction
+    {
+        public List<string> AllowedAttributes { get; set; }
+    }
+
+    public class GetIdentityProvisioningAllowedAttributesFailureAction
+    {
+        public string ErrorMessage { get; set; }
     }
 }

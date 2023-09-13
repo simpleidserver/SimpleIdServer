@@ -113,6 +113,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
                 var optionType = Type.GetType(result.Definition.OptionsFullQualifiedName);
                 var section = _configuration.GetSection(optionKey);
                 var configuration = section.Get(optionType);
+                var provisioningService = _provisioningServices.Single(p => p.Name == result.Definition.Name);
                 return new OkObjectResult(Build(result, configuration));
             }
             catch (OAuthException ex)
@@ -283,6 +284,35 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetAllowedAttributes([FromRoute] string prefix, string id)
+        {
+            prefix = prefix ?? Constants.DefaultRealm;
+            try
+            {
+                CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name, _jwtBuilder);
+                var result = await _identityProvisioningStore.Query()
+                    .Include(p => p.Realms)
+                    .Include(p => p.Definition).ThenInclude(p => p.MappingRules)
+                    .Where(p => p.Realms.Any(r => r.Name == prefix))
+                    .SingleOrDefaultAsync(p => p.Id == id);
+                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_IDPROVISIONING, id));
+                var provisioningService = _provisioningServices.Single(s => s.Name == result.Definition.Name);
+                var type = Type.GetType(result.Definition.OptionsFullQualifiedName);
+                var section = _configuration.GetSection($"{result.Name}:{result.Definition.OptionsName}");
+                var options = section.Get(type);
+                var allowedAttributes = await provisioningService.GetAllowedAttributes(options);
+                return new OkObjectResult(allowedAttributes);
+            }
+            catch (OAuthException ex)
+            {
+                return BuildError(ex);
+            }
+            catch (Exception ex)
+            {
+                return BuildError(ex);
+            }
+        }
 
         [HttpGet]
         public IActionResult Enqueue([FromRoute] string prefix, string name, string id)

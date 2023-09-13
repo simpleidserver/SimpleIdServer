@@ -30,7 +30,14 @@
                 }
             </div>
         </RadzenStepsItem>
-        <RadzenStepsItem Text="Create" Disabled=@(SelectedMappingRule == null)>
+        <RadzenStepsItem Text="Create" Disabled=@(SelectedMappingRule == null || isAllowedAttributesLoading)>
+            @if(!string.IsNullOrWhiteSpace(errorMessage))
+            {
+                <RadzenAlert AlertStyle="AlertStyle.Danger" AllowClose="false" Variant="Variant.Flat" Shade="Shade.Lighter">
+                   @errorMessage
+                </RadzenAlert>
+            }
+
             @switch(SelectedMappingRule.Type)
             {
                 case MappingRuleTypes.USERATTRIBUTE:
@@ -38,7 +45,7 @@
                         <!-- Token Claim Name -->
                         <div>
                             <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Source</RadzenText>
-                            <RadzenTextBox Name="From" @bind-Value="@userAttributeIdProvisioningMappingRuleForm.From" Class="w-100"></RadzenTextBox>
+                            <RadzenDropDown Name="From" @bind-Value=@userAttributeIdProvisioningMappingRuleForm.From Data=@allowedAttributes Class="w-100" />
                             <RadzenRequiredValidator Component="From" Text="According to the type of identity provisioning, you must specify an LDAP property or a JSON path if you are using SCIM."></RadzenRequiredValidator>
                         </div>
                         <!-- User attribute -->
@@ -55,7 +62,7 @@
                         <!-- Token Claim Name -->
                         <div>
                             <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Source</RadzenText>
-                            <RadzenTextBox Name="From" @bind-Value="@userPropertyIdProvisioningMappingRuleForm.From" Class="w-100"></RadzenTextBox>
+                            <RadzenDropDown Name="From" @bind-Value=@userPropertyIdProvisioningMappingRuleForm.From Data=@allowedAttributes Class="w-100" />
                             <RadzenRequiredValidator Component="From" Text="According to the type of identity provisioning, you must specify an LDAP property or a JSON path if you are using SCIM."></RadzenRequiredValidator>
                         </div>
                         <!-- Property -->
@@ -80,6 +87,9 @@
     [Parameter]
     public string IdProvisioningId { get; set; }
     IEnumerable<string> userProperties = new List<string>();
+    bool isAllowedAttributesLoading { get; set; } = true;
+    string errorMessage { get; set; }
+    List<string> allowedAttributes { get; set; } = new List<string>();
 
     record IdProvisioningMappingRule
     {
@@ -124,6 +134,18 @@
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.IdProvisioningMappingRuleAdded });
                 StateHasChanged();
             });
+            SubscribeToAction<GetIdentityProvisioningAllowedAttributesSuccessAction>((act) =>
+            {
+                isAllowedAttributesLoading = false;
+                allowedAttributes = act.AllowedAttributes;
+                StateHasChanged();
+            });
+            SubscribeToAction<GetIdentityProvisioningAllowedAttributesFailureAction>((act) =>
+            {
+                isAllowedAttributesLoading = false;
+                errorMessage = act.ErrorMessage;
+                StateHasChanged();
+            });
         }
 
         return Task.CompletedTask;
@@ -140,6 +162,8 @@
                     return attr == null ? false : attr.IsVisible;
                 })
                 .Select(p => p.Name);
+        this.isAllowedAttributesLoading = true;
+        dispatcher.Dispatch(new GetIdentityProvisioningAllowedAttributesAction { Id = IdProvisioningId });
     }
 
     void SelectMappingRule(IdProvisioningMappingRule mappingRule)

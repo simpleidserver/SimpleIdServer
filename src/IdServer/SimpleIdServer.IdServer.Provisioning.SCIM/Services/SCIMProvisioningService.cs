@@ -54,6 +54,18 @@ public class SCIMProvisioningService : IProvisioningService
         }
     }
 
+    public async Task<IEnumerable<string>> GetAllowedAttributes(object obj)
+    {
+        const string userResourceId = "urn:ietf:params:scim:schemas:core:2.0:User";
+        var options = obj as SCIMRepresentationsExtractionJobOptions;
+        using (var scimClient = new SCIMClient(options.SCIMEdp))
+        {
+            var schema = await scimClient.GetSchemas(CancellationToken.None);
+            var resource = schema.Resources.Single(r => r.Id == userResourceId);
+            return GetAllowedAttributes(resource);
+        }
+    }
+
     private ExtractedResult ExtractUsers(IEnumerable<RepresentationResult> resources, int currentPage, IdentityProvisioningDefinition definition)
     {
         var result = new ExtractedResult();
@@ -106,5 +118,19 @@ public class SCIMProvisioningService : IProvisioningService
             default:
                 throw new NotImplementedException($"Authentication {options.AuthenticationType} is not supported");
         }
+    }
+
+    private List<string> GetAllowedAttributes(SchemaResourceResult schema)
+    {
+        var result = new List<string>();
+        foreach(var attr in schema.Attributes)
+        {
+            var path = $"$.{attr.Name}";
+            result.Add(path);
+            foreach(var subAttr in attr.SubAttributes)
+                result.Add($"{path}.{subAttr.Name}");
+        }
+
+        return result.Distinct().OrderBy(s => s).ToList();
     }
 }
