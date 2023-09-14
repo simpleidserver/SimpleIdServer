@@ -10,5 +10,6 @@ public class IdentityProvisioningMappingRule : IProvisioningMappingRule
     public MappingRuleTypes MapperType { get; set; }
     public string? TargetUserAttribute { get; set; } = null;
     public string? TargetUserProperty { get; set; } = null;
+    public bool HasMultipleAttribute { get; set; } = false;
     public IdentityProvisioningDefinition IdentityProvisioningDefinition { get; set; } = null!;
 }

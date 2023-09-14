@@ -5,6 +5,8 @@ using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Provisioning.LDAP.Jobs;
 using System.DirectoryServices.Protocols;
 using System.Net;
+using System.Text;
+using System.Text.Json;
 
 namespace SimpleIdServer.IdServer.Provisioning.LDAP.Services;
 
@@ -89,6 +91,7 @@ public class LDAPProvisioningService : IProvisioningService
 
     private List<string> ExtractUser(SearchResultEntry entry, IdentityProvisioningDefinition definition)
     {
+        var invalidMappingRules = new List<string>();
         var lst = new List<string>();
         foreach (var mappingRule in definition.MappingRules)
         {
@@ -98,10 +101,29 @@ public class LDAPProvisioningService : IProvisioningService
                 continue;
             }
 
-            var record = entry.Attributes[mappingRule.From][0];
-            lst.Add(record.ToString());
+            var attribute = entry.Attributes[mappingRule.From];
+            if(mappingRule.MapperType == MappingRuleTypes.USERATTRIBUTE && !mappingRule.HasMultipleAttribute && attribute.Count > 1)
+            {
+                invalidMappingRules.Add($"mapping rule '{mappingRule.From}' is not configured to fetch more than one attribute");
+                continue;
+            }
+
+            if(attribute.Count == 1)
+            {
+                var record = entry.Attributes[mappingRule.From][0];
+                lst.Add(record.ToString());
+            }
+            else
+            {
+                var records = new List<string>();
+                foreach (var record in entry.Attributes[mappingRule.From])
+                    records.Add(Encoding.UTF8.GetString((byte[])record));
+
+                lst.Add(JsonSerializer.Serialize(records));
+            }
         }
 
+        if (invalidMappingRules.Any()) throw new InvalidOperationException(string.Join(",", invalidMappingRules.Distinct()));
         return lst;
     }
 

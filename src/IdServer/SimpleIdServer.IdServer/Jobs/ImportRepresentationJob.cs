@@ -12,9 +12,12 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
@@ -157,32 +160,52 @@ namespace SimpleIdServer.IdServer.Jobs
             foreach(var column in columns.Skip(2))
             {
                 var mappingRule = idProvisioning.Definition.MappingRules.Single(r => r.Id == column);
-                var value = values.ElementAt(index);
-                switch(mappingRule.MapperType)
+                var serializedValue = values.ElementAt(index);
+                if (string.IsNullOrWhiteSpace(serializedValue)) continue;
+                var extractedValues = ExtractValues(serializedValue);
+
+                foreach(var value in extractedValues)
                 {
-                    case MappingRuleTypes.USERATTRIBUTE:
-                        userClaims.Add(new UserClaim
-                        {
-                            Id = $"{externalRepresentationId}_{mappingRule.TargetUserAttribute}",
-                            UserId = externalRepresentationId,
-                            Value = value,
-                            Name = mappingRule.TargetUserAttribute
-                        });
-                        break;
-                    case MappingRuleTypes.SUBJECT:
-                        user.Name = value;
-                        break;
-                    case MappingRuleTypes.USERPROPERTY:
-                        var visibleAttribute = visibleAttributes.SingleOrDefault(a => a.Name == mappingRule.TargetUserProperty);
-                        if (visibleAttribute != null)
-                            visibleAttribute.SetValue(user, value);
-                        break;
+                    switch (mappingRule.MapperType)
+                    {
+                        case MappingRuleTypes.USERATTRIBUTE:
+                            var userClaimId = mappingRule.HasMultipleAttribute ? $"{externalRepresentationId}_{mappingRule.TargetUserAttribute}_{value}" : $"{externalRepresentationId}_{mappingRule.TargetUserAttribute}";
+                            userClaims.Add(new UserClaim
+                            {
+                                Id = userClaimId,
+                                UserId = externalRepresentationId,
+                                Value = value,
+                                Name = mappingRule.TargetUserAttribute
+                            });
+                            break;
+                        case MappingRuleTypes.SUBJECT:
+                            user.Name = value;
+                            break;
+                        case MappingRuleTypes.USERPROPERTY:
+                            var visibleAttribute = visibleAttributes.SingleOrDefault(a => a.Name == mappingRule.TargetUserProperty);
+                            if (visibleAttribute != null)
+                                visibleAttribute.SetValue(user, value);
+                            break;
+                    }
                 }
 
                 index++;
             }
 
             return new ExtractionResult { UserClaims = userClaims, User = user };
+
+            List<string> ExtractValues(string serializedValue)
+            {
+                try
+                {
+                    var jArr = JsonArray.Parse(serializedValue) as JsonArray;
+                    return jArr.Select(r => r.AsValue().GetValue<string>()).ToList();
+                }
+                catch
+                {
+                    return new List<string> { serializedValue };
+                }
+            }
         }
 
         private class ExtractionResult

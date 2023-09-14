@@ -163,7 +163,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
                 MappingRule = action.MappingRule,
                 From = action.From,
                 TargetUserAttribute = action.TargetUserAttribute,
-                TargetUserProperty = action.TargetUserProperty
+                TargetUserProperty = action.TargetUserProperty,
+                HasMultipleAttribute = action.HasMultipleAttribute
             };
             var requestMessage = new HttpRequestMessage
             {
@@ -351,6 +352,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         public string From { get; set; } = null!;
         public string? TargetUserAttribute { get; set; } = null;
         public string? TargetUserProperty { get; set; } = null;
+        public bool HasMultipleAttribute { get; set; }
     }
 
     public class AddIdentityProvisioningMappingRuleSuccessAction

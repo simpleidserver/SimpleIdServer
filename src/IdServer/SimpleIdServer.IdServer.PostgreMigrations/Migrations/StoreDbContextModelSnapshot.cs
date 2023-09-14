@@ -1384,6 +1384,9 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<bool>("HasMultipleAttribute")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("IdentityProvisioningDefinitionName")
                         .IsRequired()
                         .HasColumnType("text");

@@ -214,7 +214,8 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
                     From = request.From,
                     MapperType = request.MappingRule,
                     TargetUserAttribute = request.TargetUserAttribute,
-                    TargetUserProperty = request.TargetUserProperty
+                    TargetUserProperty = request.TargetUserProperty,
+                    HasMultipleAttribute = request.HasMultipleAttribute
                 };
                 result.Definition.MappingRules.Add(record);
                 await _identityProvisioningStore.SaveChanges(CancellationToken.None);

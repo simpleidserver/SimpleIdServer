@@ -78,19 +78,39 @@ public class SCIMProvisioningService : IProvisioningService
     {
         var jsonDoc = JsonDocument.Parse(resource.AdditionalData.ToJsonString());
         var values = new List<string>();
+        var invalidMappingRules = new List<string>();
         foreach (var mappingRule in definition.MappingRules)
         {
-            var token = jsonDoc.SelectToken(mappingRule.From);
-            if (token == null)
+            var tokens = jsonDoc.SelectTokens(mappingRule.From);
+            if (tokens.Count() == 0)
             {
                 values.Add(string.Empty);
                 continue;
             }
 
-            var value = token.Value.GetRawText().Trim('"');
-            values.Add(value);
+            var firstToken = tokens.First();
+            if(firstToken.ValueKind == JsonValueKind.Object)
+            {
+                invalidMappingRules.Add($"mapping rule '{mappingRule.From}' tried to fetch a complex element");
+                continue;
+            }
+
+            var lstValues = tokens.Select(t => t.GetString());
+            if(!mappingRule.HasMultipleAttribute && lstValues.Count() > 1 && mappingRule.MapperType == MappingRuleTypes.USERATTRIBUTE)
+            {
+                invalidMappingRules.Add($"mapping rule '{mappingRule.From}' is not configured to fetch more than one attribute");
+                continue;
+            }
+
+            if (lstValues.Count() == 1) values.Add(lstValues.First());
+            else
+            {
+                var str = JsonSerializer.Serialize(lstValues);
+                values.Add(str);
+            }
         }
 
+        if (invalidMappingRules.Any()) throw new InvalidOperationException(string.Join(",", invalidMappingRules.Distinct()));
         return new ExtractedUserResult
         {
             Id = resource.Id,
@@ -127,14 +147,12 @@ public class SCIMProvisioningService : IProvisioningService
         foreach(var attr in schema.Attributes)
         {
             var path = $"$.{attr.Name}";
-            result.Add(path);
-            if(attr.SubAttributes == null || (attr.Type == "complex" && attr.MultiValued))
-            {
-                continue;
-            }
+            var isComplexMultiValued = attr.Type == "complex" && attr.MultiValued;
+            if (!isComplexMultiValued) result.Add(path);
+            if (attr.SubAttributes == null) continue;
 
-            foreach(var subAttr in attr.SubAttributes)
-                result.Add($"{path}.{subAttr.Name}");
+            foreach (var subAttr in attr.SubAttributes)
+                result.Add(isComplexMultiValued ? $"{path}[*].{subAttr.Name}" : $"{path}.{subAttr.Name}");
         }
 
         return result.Distinct().OrderBy(s => s).ToList();
