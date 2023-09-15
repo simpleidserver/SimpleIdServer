@@ -6,6 +6,7 @@ namespace SimpleIdServer.IdServer
 {
     public class ErrorMessages
     {
+        public const string AUTHENTICATION_METHOD_NOT_FOUND = "the authentication method {0} doesn't exist";
         public const string ACCESS_REVOKED_BY_RESOURCE_OWNER = "access has been revoked by the resource owner";
         public const string OPENID_SCOPE_MISSING = "openid scope is missing";
         public const string UNKNOWN_SCOPE = "unknown scope {0}";

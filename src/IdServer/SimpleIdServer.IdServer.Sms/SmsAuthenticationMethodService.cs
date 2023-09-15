@@ -5,5 +5,7 @@ namespace SimpleIdServer.IdServer.Sms
     public class SmsAuthenticationMethodService : IAuthenticationMethodService
     {
         public string Amr => Constants.AMR;
+        public string Name => "Sms";
+        public Type? OptionsType => typeof(IdServerSmsOptions);
     }
 }

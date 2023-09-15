@@ -15,10 +15,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="idServerBuilder"></param>
         /// <returns></returns>
-        public static IdServerBuilder AddEmailAuthentication(this IdServerBuilder idServerBuilder, Action<IdServerEmailOptions>? callback = null)
+        public static IdServerBuilder AddEmailAuthentication(this IdServerBuilder idServerBuilder)
         {
-            if (callback != null) idServerBuilder.Services.Configure(callback);
-            else idServerBuilder.Services.Configure<IdServerEmailOptions>(o => { });
             idServerBuilder.Services.AddTransient<IUserNotificationService, EmailUserNotificationService>();
             idServerBuilder.Services.AddTransient<IEmailUserNotificationService, EmailUserNotificationService>();
             idServerBuilder.Services.AddTransient<IAuthenticationMethodService, EmailAuthenticationMethodService>();

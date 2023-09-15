@@ -6,6 +6,7 @@
 		<Description>Add sms authentication.</Description>
 	</PropertyGroup>
 	<ItemGroup>
+	  <ProjectReference Include="..\SimpleIdServer.Configuration\SimpleIdServer.Configuration.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
 	</ItemGroup>
 	<ItemGroup>

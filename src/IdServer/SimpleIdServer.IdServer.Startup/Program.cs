@@ -14,6 +14,7 @@ using SimpleIdServer.Configuration;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.CredentialIssuer;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Email;
 using SimpleIdServer.IdServer.Fido;
 using SimpleIdServer.IdServer.Provisioning.LDAP;
 using SimpleIdServer.IdServer.Provisioning.LDAP.Jobs;
@@ -143,6 +144,9 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
         o.Add<FacebookOptionsLite>();
         o.Add<LDAPRepresentationsExtractionJobOptions>();
         o.Add<SCIMRepresentationsExtractionJobOptions>();
+        o.Add<IdServerEmailOptions>();
+        o.Add<IdServerSmsOptions>();
+        o.Add<FidoOptions>();
         o.UseEFConnector(b =>
         {
             switch (conf.Type)
@@ -317,6 +321,9 @@ void SeedData(WebApplication application, string scimBaseUrl)
                 dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<FacebookOptionsLite>());
                 dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<LDAPRepresentationsExtractionJobOptions>());
                 dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<SCIMRepresentationsExtractionJobOptions>());
+                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<IdServerEmailOptions>());
+                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<IdServerSmsOptions>());
+                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<FidoOptions>());
             }
 
             var dbConnection = dbContext.Database.GetDbConnection() as SqlConnection;

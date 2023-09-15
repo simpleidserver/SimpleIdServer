@@ -14,10 +14,8 @@ namespace SimpleIdServer.IdServer.Sms
         /// </summary>
         /// <param name="idServerBuilder"></param>
         /// <returns></returns>
-        public static IdServerBuilder AddSmsAuthentication(this IdServerBuilder idServerBuilder, Action<IdServerSmsOptions>? callback = null)
+        public static IdServerBuilder AddSmsAuthentication(this IdServerBuilder idServerBuilder)
         {
-            if (callback != null) idServerBuilder.Services.Configure(callback);
-            else idServerBuilder.Services.Configure<IdServerSmsOptions>(o => { });
             idServerBuilder.Services.AddTransient<IUserNotificationService, SmsUserNotificationService>();
             idServerBuilder.Services.AddTransient<ISmsUserNotificationService, SmsUserNotificationService>();
             idServerBuilder.Services.AddTransient<IAuthenticationMethodService, SmsAuthenticationMethodService>();

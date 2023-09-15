@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
@@ -20,13 +21,12 @@ namespace SimpleIdServer.IdServer.Email.UI
     [Area(Constants.AMR)]
     public class AuthenticateController : BaseOTPAuthenticateController<AuthenticateEmailViewModel>
     {
-        private readonly IdServerEmailOptions _options;
+        private readonly IConfiguration _configuration;
 
         public AuthenticateController(
             IEnumerable<IUserNotificationService> notificationServices,
             IEnumerable<IOTPAuthenticator> otpAuthenticators,
             IOptions<IdServerHostOptions> options,
-            IOptions<IdServerEmailOptions> emailOptions,
             IAuthenticationSchemeProvider authenticationSchemeProvider,
             IDataProtectionProvider dataProtectionProvider, 
             IClientRepository clientRepository, 
@@ -35,14 +35,13 @@ namespace SimpleIdServer.IdServer.Email.UI
             IUserTransformer userTransformer, 
             IBusControl busControl) : base(notificationServices, otpAuthenticators, options, authenticationSchemeProvider, dataProtectionProvider, clientRepository, amrHelper, userRepository, userTransformer, busControl)
         {
-            _options = emailOptions.Value;
         }
 
         protected override bool IsExternalIdProvidersDisplayed => false;
 
         protected override string Amr => Constants.AMR;
 
-        protected override string FormattedMessage => _options.HttpBody;
+        protected override string FormattedMessage => GetOptions()?.HttpBody;
 
         protected override bool TryGetLogin(User user, out string login)
         {
@@ -65,6 +64,12 @@ namespace SimpleIdServer.IdServer.Email.UI
                 .Include(u => u.OAuthUserClaims)
                 .FirstOrDefaultAsync(u => u.Realms.Any(r => r.RealmsName == realm) && u.Email == login, cancellationToken);
             return user;
+        }
+
+        private IdServerEmailOptions GetOptions()
+        {
+            var section = _configuration.GetSection(typeof(IdServerEmailOptions).Name);
+            return section.Get<IdServerEmailOptions>();
         }
     }
 }

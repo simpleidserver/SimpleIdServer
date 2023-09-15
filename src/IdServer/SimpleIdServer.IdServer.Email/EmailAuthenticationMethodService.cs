@@ -5,5 +5,7 @@ namespace SimpleIdServer.IdServer.Email
     public class EmailAuthenticationMethodService : IAuthenticationMethodService
     {
         public string Amr => Constants.AMR;
+        public string Name => "Email";
+        public Type? OptionsType => typeof(IdServerEmailOptions);
     }
 }

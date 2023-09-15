@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Fido.Apis;
@@ -24,13 +25,13 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
     [Area(Constants.MobileAMR)]
     public class AuthenticateController : BaseAuthenticationMethodController<AuthenticateMobileViewModel>
     {
-        private readonly FidoOptions _options;
+        private readonly IConfiguration _configuration;
         private readonly IAuthenticationHelper _authenticationHelper;
         private readonly IDistributedCache _distributedCache;
 
-        public AuthenticateController(IOptions<FidoOptions> fidoOptions, IAuthenticationHelper authenticationHelper, IDistributedCache distributedCache, IOptions<IdServerHostOptions> options, IAuthenticationSchemeProvider authenticationSchemeProvider, IDataProtectionProvider dataProtectionProvider, IClientRepository clientRepository, IAmrHelper amrHelper, IUserRepository userRepository, IUserTransformer userTransformer, IBusControl busControl) : base(options, authenticationSchemeProvider, dataProtectionProvider, clientRepository, amrHelper, userRepository, userTransformer, busControl)
+        public AuthenticateController(IConfiguration configuration, IAuthenticationHelper authenticationHelper, IDistributedCache distributedCache, IOptions<IdServerHostOptions> options, IAuthenticationSchemeProvider authenticationSchemeProvider, IDataProtectionProvider dataProtectionProvider, IClientRepository clientRepository, IAmrHelper amrHelper, IUserRepository userRepository, IUserTransformer userTransformer, IBusControl busControl) : base(options, authenticationSchemeProvider, dataProtectionProvider, clientRepository, amrHelper, userRepository, userTransformer, busControl)
         {
-            _options = fidoOptions.Value;
+            _configuration = configuration;
             _authenticationHelper = authenticationHelper;
             _distributedCache= distributedCache;
         }
@@ -51,10 +52,11 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
 
         protected override void EnrichViewModel(AuthenticateMobileViewModel viewModel, User user)
         {
+            var options = GetFidoOptions();
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
             viewModel.BeginLoginUrl = $"{issuer}/{viewModel.Realm}/{Constants.EndPoints.BeginQRCodeLogin}";
             viewModel.LoginStatusUrl = $"{issuer}/{viewModel.Realm}/{Constants.EndPoints.LoginStatus}";
-            viewModel.IsDeveloperModeEnabled = _options.IsDeveloperModeEnabled;
+            viewModel.IsDeveloperModeEnabled = options.IsDeveloperModeEnabled;
         }
 
         protected override async Task<ValidationStatus> ValidateCredentials(AuthenticateMobileViewModel viewModel, User user, CancellationToken cancellationToken)
@@ -85,6 +87,12 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
                 .Include(c => c.OAuthUserClaims)
                 .Include(u => u.Credentials), login, realm, cancellationToken);
             return user;
+        }
+
+        private FidoOptions GetFidoOptions()
+        {
+            var section = _configuration.GetSection(typeof(FidoOptions).Name);
+            return section.Get<FidoOptions>();
         }
     }
 }

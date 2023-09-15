@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.JsonWebTokens;
 using QRCoder;
 using SimpleIdServer.IdServer.Api;
@@ -22,21 +22,21 @@ namespace SimpleIdServer.IdServer.Fido.Apis
 {
     public class U2FLoginController : BaseController
     {
+        private readonly IConfiguration _configuration;
         private readonly IAuthenticationHelper _authenticationHelper;
         private readonly IUserRepository _userRepository;
         private readonly IJwtBuilder _jwtBuilder;
         private readonly IDistributedCache _distributedCache;
-        private readonly FidoOptions _options;
         private IFido2 _fido2;
 
-        public U2FLoginController(IAuthenticationHelper authenticationHelper, IUserRepository userRepository, IJwtBuilder jwtBuilder, IDistributedCache distributedCache, IFido2 fido2, IOptions<FidoOptions> options)
+        public U2FLoginController(IConfiguration configuration, IAuthenticationHelper authenticationHelper, IUserRepository userRepository, IJwtBuilder jwtBuilder, IDistributedCache distributedCache, IFido2 fido2)
         {
+            _configuration = configuration;
             _authenticationHelper = authenticationHelper;
             _userRepository = userRepository;
             _jwtBuilder = jwtBuilder;
             _distributedCache = distributedCache;
             _fido2 = fido2;
-            _options = options.Value;
         }
 
         [HttpGet]
@@ -101,6 +101,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
         [HttpPost]
         public async Task<IActionResult> End([FromRoute] string prefix, [FromBody] EndU2FLoginRequest request, CancellationToken cancellationToken)
         {
+            var fidoOptions = GetOptions();
             prefix = prefix ?? IdServer.Constants.DefaultRealm;
             if (request == null) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, IdServer.ErrorMessages.INVALID_INCOMING_REQUEST);
             var session = await _distributedCache.GetStringAsync(request.SessionId, cancellationToken);
@@ -135,13 +136,14 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             sessionRecord.IsValidated = true;
             await _distributedCache.SetStringAsync(request.SessionId, JsonSerializer.Serialize(sessionRecord), new DistributedCacheEntryOptions
             {
-                SlidingExpiration = _options.U2FExpirationTimeInSeconds
+                SlidingExpiration = fidoOptions.U2FExpirationTimeInSeconds
             }, cancellationToken);
             return NoContent();
         }
 
         protected async Task<(BeginU2FLoginResult, IActionResult)> CommonBegin(string prefix, BeginU2FLoginRequest request, CancellationToken cancellationToken)
         {
+            var fidoOptions = GetOptions();
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
             prefix = prefix ?? IdServer.Constants.DefaultRealm;
             if (request == null) return (null, BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, IdServer.ErrorMessages.INVALID_INCOMING_REQUEST));
@@ -170,7 +172,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             var sessionRecord = new AuthenticationSessionRecord(options, request.Login);
             await _distributedCache.SetStringAsync(sessionId, JsonSerializer.Serialize(sessionRecord), new DistributedCacheEntryOptions
             {
-                SlidingExpiration = _options.U2FExpirationTimeInSeconds
+                SlidingExpiration = fidoOptions.U2FExpirationTimeInSeconds
             }, cancellationToken);
             return (new BeginU2FLoginResult
             {
@@ -179,6 +181,12 @@ namespace SimpleIdServer.IdServer.Fido.Apis
                 EndLoginUrl = $"{issuer}/{prefix}/{Constants.EndPoints.EndLogin}",
                 Login = request.Login
             }, null);
+        }
+
+        private FidoOptions GetOptions()
+        {
+            var section = _configuration.GetSection(typeof(FidoOptions).Name);
+            return section.Get<FidoOptions>();
         }
     }
 

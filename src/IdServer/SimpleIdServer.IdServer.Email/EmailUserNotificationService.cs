@@ -1,6 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using System.Net;
@@ -12,30 +12,31 @@ namespace SimpleIdServer.IdServer.Email
 
     public class EmailUserNotificationService : IEmailUserNotificationService
     {
-        private readonly IdServerEmailOptions _emailOptions;
+        private readonly IConfiguration _configuration;
 
-        public EmailUserNotificationService(IOptions<IdServerEmailOptions> options)
+        public EmailUserNotificationService(IConfiguration configuration)
         {
-            _emailOptions = options.Value;
+            _configuration = configuration;
         }
 
         public string Name => Constants.AMR;
 
         public Task Send(string message, User user)
         {
+            var emailOptions = GetOptions();
             var email = user.Email;
             using (var smtpClient = new SmtpClient())
             {
-                smtpClient.EnableSsl = _emailOptions.SmtpEnableSsl;
+                smtpClient.EnableSsl = emailOptions.SmtpEnableSsl;
                 smtpClient.UseDefaultCredentials = false;
-                smtpClient.Credentials = new NetworkCredential(_emailOptions.SmtpUserName, _emailOptions.SmtpPassword);
-                smtpClient.Host = _emailOptions.SmtpHost;
-                smtpClient.Port = _emailOptions.SmtpPort;
+                smtpClient.Credentials = new NetworkCredential(emailOptions.SmtpUserName, emailOptions.SmtpPassword);
+                smtpClient.Host = emailOptions.SmtpHost;
+                smtpClient.Port = emailOptions.SmtpPort;
                 smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
                 var mailMessage = new MailMessage
                 {
-                    From = new MailAddress(_emailOptions.FromEmail),
-                    Subject = _emailOptions.Subject,
+                    From = new MailAddress(emailOptions.FromEmail),
+                    Subject = emailOptions.Subject,
                     Body = message,
                     IsBodyHtml = true
                 };
@@ -45,6 +46,12 @@ namespace SimpleIdServer.IdServer.Email
             }
 
             return Task.CompletedTask;
+        }
+
+        private IdServerEmailOptions GetOptions()
+        {
+            var section = _configuration.GetSection(typeof(IdServerEmailOptions).Name);
+            return section.Get<IdServerEmailOptions>();
         }
     }
 }

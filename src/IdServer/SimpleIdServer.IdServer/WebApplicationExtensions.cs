@@ -286,6 +286,13 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.FidoConfiguration,
                 defaults: new { controller = "FidoConfiguration", action = "Index" });
 
+            webApplication.MapControllerRoute("updateAuthMethodConfigurations",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthMethods + "/{amr}",
+                defaults: new { controller = "AuthMethodConfigurations", action = "Update" });
+            webApplication.MapControllerRoute("getAuthMethodConfigurations",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthMethods + "/{amr}",
+                defaults: new { controller = "AuthMethodConfigurations", action = "Get" });
+
             webApplication.MapControllerRoute(
                 name: "defaultWithArea",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + "{area:exists}/{controller=Home}/{action=Index}/{id?}");

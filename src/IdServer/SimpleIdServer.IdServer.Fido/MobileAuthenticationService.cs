@@ -6,5 +6,7 @@ namespace SimpleIdServer.IdServer.Fido
     public class MobileAuthenticationService : IAuthenticationMethodService
     {
         public string Amr => Constants.MobileAMR;
+        public string Name => "Mobile";
+        public Type? OptionsType => typeof(FidoOptions);
     }
 }

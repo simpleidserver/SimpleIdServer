@@ -1,5 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Identity.Client;
+
 namespace SimpleIdServer.IdServer
 {
     public static class ErrorCodes
@@ -30,6 +32,7 @@ namespace SimpleIdServer.IdServer
         public const string SLOW_DOWN = "slow_down";
         public const string UNKNOWN_USER = "unknown_user";
         public const string UNKNOWN_ACR = "unknown_acr";
+        public const string UNKNOWN_AMR = "unknown_amr";
         public const string INVALID_CREDENTIALS = "invalid_credentials";
         public const string INVALID_TARGET = "invalid_target";
         public const string REQUEST_DENIED = "request_denied";

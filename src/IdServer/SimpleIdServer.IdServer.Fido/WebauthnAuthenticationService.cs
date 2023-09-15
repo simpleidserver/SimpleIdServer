@@ -6,5 +6,7 @@ namespace SimpleIdServer.IdServer.Fido
     public class WebauthnAuthenticationService : IAuthenticationMethodService
     {
         public string Amr => Constants.AMR;
+        public string Name => "Web Authenticaiton (Webauthn)";
+        public Type? OptionsType => typeof(FidoOptions);
     }
 }
