@@ -1,0 +1,58 @@
+﻿@page "/authmethods"
+@inject IState<AuthMethodsState> authMethodsState
+@inject IDispatcher dispatcher
+@inject NotificationService notificationService
+@inject ContextMenuService contextMenuService
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Api.AuthenticationMethods
+@using SimpleIdServer.IdServer.Website.Stores.AuthMethodsStore;
+
+
+<RadzenText class="mb-3 no-margin" Text="Authentication Methods" TextStyle="TextStyle.DisplayH3" />
+
+<RadzenDataGrid @ref="amrsGrid" 
+        AllowFiltering="false" 
+        AllowColumnResize="true"
+        AllowAlternatingRows="false" 
+        AllowSorting="false" 
+        PageSize="30" 
+        AllowPaging="false" 
+        PagerHorizontalAlign="HorizontalAlign.Left" 
+        ShowPagingSummary="true"
+        IsLoading="@authMethodsState.Value.IsLoading"
+        Count="@authMethodsState.Value.Count"
+        Data="@authMethodsState.Value.AuthenticationMethods"
+        LoadData="@LoadData"
+        TItem="AuthenticationMethodResult" 
+        ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn TItem="AuthenticationMethodResult" Filterable="false" Sortable="false" Title="Identifier" Width="80px">
+            <Template Context="data">
+                <RadzenLink Text="@data.Id" Path="@($"/authmethods/{data.Id}/options")" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="AuthenticationMethodResult" Property="Name" Filterable="false" Sortable="false" Title="Name" Width="80px" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    bool selectAll = false;
+    RadzenDataGrid<AuthenticationMethodResult> amrsGrid;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+        {
+            if (!authMethodsState.Value.IsLoading)
+                amrsGrid.Reload();
+        }
+    }
+
+    void LoadData(LoadDataArgs args)
+    {
+        var act = new GetAllAuthMethodAction();
+        dispatcher.Dispatch(act);
+    }
+}

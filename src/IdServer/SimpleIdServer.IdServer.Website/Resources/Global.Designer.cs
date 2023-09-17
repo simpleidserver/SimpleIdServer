@@ -79,6 +79,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Authentication Method has been updated.
+        /// </summary>
+        public static string AuthMethodUpdated {
+            get {
+                return ResourceManager.GetString("AuthMethodUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à You don&apos;t have the permission to read the certificate store.
         /// </summary>
         public static string CannotReadCertificateStore {

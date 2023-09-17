@@ -286,12 +286,15 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.FidoConfiguration,
                 defaults: new { controller = "FidoConfiguration", action = "Index" });
 
+            webApplication.MapControllerRoute("getAllAuthMethods",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthMethods,
+                defaults: new { controller = "AuthenticationMethods", action = "GetAll" });
             webApplication.MapControllerRoute("updateAuthMethodConfigurations",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthMethods + "/{amr}",
-                defaults: new { controller = "AuthMethodConfigurations", action = "Update" });
+                defaults: new { controller = "AuthenticationMethods", action = "Update" });
             webApplication.MapControllerRoute("getAuthMethodConfigurations",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthMethods + "/{amr}",
-                defaults: new { controller = "AuthMethodConfigurations", action = "Get" });
+                defaults: new { controller = "AuthenticationMethods", action = "Get" });
 
             webApplication.MapControllerRoute(
                 name: "defaultWithArea",

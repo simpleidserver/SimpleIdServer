@@ -12,6 +12,8 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationMethods
         public string Id { get; set; }
         [JsonPropertyName(AuthenticationMethodNames.Name)]
         public string Name { get; set; }
+        [JsonPropertyName(AuthenticationMethodNames.OptionsName)]
+        public string OptionsName { get; set; }
         [JsonPropertyName(AuthenticationMethodNames.Values)]
         public Dictionary<string, string> Values { get; set; }
     }

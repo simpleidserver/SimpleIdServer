@@ -11,31 +11,41 @@
     <RadzenStack>
         @foreach (var property in Properties.OrderBy(p => p.Order))
         {
-            <RadzenFormField Text="@property.DisplayName"  Variant=Variant.Outlined>
-                <ChildContent>
-                    @switch (property.Type)
-                    {
-                        case ConfigurationDefinitionRecordTypes.INPUT:
-                            <RadzenTextBox @bind-Value="@property.Value"></RadzenTextBox>
-                            break;
-                        case ConfigurationDefinitionRecordTypes.CHECKBOX:
-                            <RadzenCheckBox @bind-Value="@property.Value"></RadzenCheckBox>
-                            break;
-                        case ConfigurationDefinitionRecordTypes.PASSWORD:
-                            <RadzenPassword @bind-Value="@property.Value"></RadzenPassword>
-                            break;
-                        case ConfigurationDefinitionRecordTypes.NUMBER:
-                            <RadzenNumeric @bind-Value="@property.Value"></RadzenNumeric>
-                            break;
-                        case ConfigurationDefinitionRecordTypes.SELECT:
-                            <RadzenDropDown @bind-Value="@property.Value" Data="@property.PossibleValues" Change="@((o) => Select(property, o))" TextProperty="Name" ValueProperty="Value" />
-                            break;
-                    }                
-                </ChildContent>
-                <Helper>
-                    <RadzenText TextStyle="TextStyle.Caption">@property.Description</RadzenText>
-                </Helper>
-            </RadzenFormField>
+            @if(property.Type != ConfigurationDefinitionRecordTypes.CHECKBOX)
+            {
+                <RadzenFormField Text="@property.DisplayName" Variant=Variant.Outlined>
+                    <ChildContent>
+                        @switch (property.Type)
+                        {
+                            case ConfigurationDefinitionRecordTypes.INPUT:
+                                <RadzenTextBox @bind-Value="@property.Value"></RadzenTextBox>
+                                break;
+                            case ConfigurationDefinitionRecordTypes.PASSWORD:
+                                <RadzenPassword @bind-Value="@property.Value"></RadzenPassword>
+                                break;
+                            case ConfigurationDefinitionRecordTypes.NUMBER:
+                                <RadzenNumeric @bind-Value="@property.Value"></RadzenNumeric>
+                                break;
+                            case ConfigurationDefinitionRecordTypes.SELECT:
+                                <RadzenDropDown @bind-Value="@property.Value" Data="@property.PossibleValues" Change="@((o) => Select(property, o))" TextProperty="Name" ValueProperty="Value" />
+                                break;
+                        }
+                    </ChildContent>
+                    <Helper>
+                        <RadzenText TextStyle="TextStyle.Caption">@property.Description</RadzenText>
+                    </Helper>
+                </RadzenFormField>
+            }
+            else
+            {
+                <div>
+                    <div>
+                        <RadzenCheckBox @bind-Value="@property.ValueBoolean" Name="Checkbox" />
+                        <RadzenLabel Text="@property.DisplayName" Component="Checkbox" Style="margin-left: 8px; vertical-align: middle;" />
+                    </div>
+                    <p class="text-muted">@property.Description</p>
+                </div>
+            }
         }
     </RadzenStack>
 
@@ -63,8 +73,14 @@
         public string DisplayName { get; set; }
         public string Description { get; set; }
         public string Value { get; set; }
+        public bool ValueBoolean { get; set; }
         public int Order { get; set; }
         public string DisplayCondition { get; set; }
+        public string GetValue()
+        {
+            if(Type == ConfigurationDefinitionRecordTypes.CHECKBOX) return ValueBoolean.ToString();
+            return Value;
+        }
         public ICollection<ConfigurationDefRecordValueResult> PossibleValues { get; set; } = new List<ConfigurationDefRecordValueResult>();
     }
 
@@ -73,16 +89,27 @@
         base.OnParametersSet();
         if (configurationDefsState.Value.IsLoading || AllProperties != null || !configurationDefsState.Value.ConfigurationDefs.Any(d => d.Id == Name)) return;
         var configuration = configurationDefsState.Value.ConfigurationDefs.Single(c => c.Id == Name);
-        AllProperties = configuration.Properties.Select(p => new EditableProperty
+        AllProperties = configuration.Properties.Select(p => 
         {
-            Name = p.Name,
-            Type = p.Type,
-            Order = p.Order,
-            DisplayName = p.DisplayName,
-            Description = p.Description,
-            DisplayCondition = p.DisplayCondition,
-            Value = Values != null && Values.ContainsKey(p.Name) ? Values[p.Name] : string.Empty,
-            PossibleValues = p.PossibleValues
+            var vb = false;
+            var value = Values != null && Values.ContainsKey(p.Name) ? Values[p.Name] : string.Empty;
+            if(p.Type == ConfigurationDefinitionRecordTypes.CHECKBOX && bool.TryParse(value, out bool b))
+                vb = b;
+
+            var record = new EditableProperty
+            {
+                Name = p.Name,
+                Type = p.Type,
+                Order = p.Order,
+                DisplayName = p.DisplayName,
+                Description = p.Description,
+                DisplayCondition = p.DisplayCondition,
+                Value = value,
+                ValueBoolean = vb,
+                PossibleValues = p.PossibleValues
+            };
+
+            return record;
         }).ToList();
         Refresh();
     }
@@ -105,5 +132,9 @@
         Properties = AllProperties.Where(p => DisplayConditionEvaluator.IsValid(values, p.DisplayCondition)).ToList();
     }
 
-    private Dictionary<string, string> GetValues() => AllProperties.ToDictionary(p => p.Name, p => p.Value);
+    private Dictionary<string, string> GetValues()
+    {
+        var dic = AllProperties.ToDictionary(p => p.Name, p => p.GetValue());
+        return dic;
+    }
 }

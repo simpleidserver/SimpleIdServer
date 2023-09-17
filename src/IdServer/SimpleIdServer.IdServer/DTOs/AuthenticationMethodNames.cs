@@ -6,6 +6,7 @@ namespace SimpleIdServer.IdServer.DTOs
     {
         public const string Id = "id";
         public const string Name = "name";
+        public const string OptionsName = "options_name";
         public const string Values = "values";
     }
 }

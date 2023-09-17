@@ -1,0 +1,57 @@
+﻿@page "/authmethods/{amr}/options"
+@inject IState<AuthMethodState> authMethodState
+@inject IDispatcher dispatcher
+@inject NotificationService notificationService
+@inject ContextMenuService contextMenuService
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Api.AuthenticationMethods
+@using SimpleIdServer.IdServer.Website.Stores.AuthMethodsStore;
+
+<RadzenBreadCrumb>
+    <RadzenBreadCrumbItem Path="/authmethods" Text="Authentication Methods" />
+    <RadzenBreadCrumbItem Text="Options" />
+</RadzenBreadCrumb>
+
+<RadzenText class="mt-3 mb-3" Text="@authMethodState.Value.AuthenticationMethod?.Name" TextStyle="TextStyle.DisplayH3" />
+
+<RadzenCardLoader Variant="Variant.Filled" IsLoading=@authMethodState.Value.IsLoading>
+    <EditConfiguration PropertiesSaved=@SaveProperties Name=@authMethodState.Value.AuthenticationMethod?.OptionsName Values="@authMethodState.Value.AuthenticationMethod?.Values" IsUpdating=@IsUpdating IsAddForm=false></EditConfiguration>
+</RadzenCardLoader>
+
+@code {
+    bool IsUpdating { get; set; } = false;
+
+    [Parameter]
+    public string amr { get; set; } = null!;
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            SubscribeToAction<UpdateAuthMethodSuccessAction>((act) =>
+            {
+                this.IsUpdating = false;
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.AuthMethodUpdated });
+                StateHasChanged();
+            });
+        }
+
+        return Task.CompletedTask;
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if(string.IsNullOrWhiteSpace(amr)) return;
+        dispatcher.Dispatch(new GetAuthMethodAction { Amr = amr });
+    }
+
+    private void SaveProperties(Dictionary<string, string> properties)
+    {
+        this.IsUpdating = true;
+        var act = new UpdateAuthMethodAction { Amr = amr, Values = properties };
+        dispatcher.Dispatch(act);
+    }
+}

@@ -83,10 +83,7 @@ void ConfigureIdServer(IServiceCollection services)
         .AddEmailAuthentication()
         .AddSmsAuthentication()
         .AddSamlIdp()
-        .AddFidoAuthentication(c =>
-        {
-            c.IsDeveloperModeEnabled = true;
-        }, f =>
+        .AddFidoAuthentication(f =>
         {
             var authority = builder.Configuration["Authority"];
             var url = new Uri(authority);

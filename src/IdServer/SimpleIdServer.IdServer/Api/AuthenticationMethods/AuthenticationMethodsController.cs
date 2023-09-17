@@ -27,10 +27,11 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationMethods
         [HttpGet]
         public IActionResult GetAll()
         {
-            var result = _authMethods.Select(a => new AuthenticationMethodResult
+            var result = _authMethods.Where(a => a.OptionsType != null).Select(a => new AuthenticationMethodResult
             {
                 Id = a.Amr,
                 Name = a.Name,
+                OptionsName = a.OptionsType.Name,
                 Values = null
             });
             return new OkObjectResult(result);
@@ -47,7 +48,7 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationMethods
                 if (authMethod == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.UNKNOWN_ACR, string.Format(string.Format(ErrorMessages.AUTHENTICATION_METHOD_NOT_FOUND, amr)));
                 if (authMethod.OptionsType == null) return NoContent();
                 foreach (var kvp in request.Values)
-                    _configuration[$"{authMethod.OptionsType}:{kvp.Key}"] = kvp.Value;
+                    _configuration[$"{authMethod.OptionsType.Name}:{kvp.Key}"] = kvp.Value;
                 return NoContent();
             }
             catch(OAuthException ex)
@@ -84,6 +85,7 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationMethods
                 {
                     Id = amr,
                     Name = authMethod.Name,
+                    OptionsName = authMethod.OptionsType.Name,
                     Values = values
                 };
                 return new OkObjectResult(result);
