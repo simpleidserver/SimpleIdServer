@@ -21,10 +21,11 @@ namespace SimpleIdServer.IdServer.Email
 
         public string Name => Constants.AMR;
 
-        public Task Send(string message, User user)
+        public Task Send(string message, User user) => Send(message, user.Email);
+
+        public Task Send(string message, string destination)
         {
             var emailOptions = GetOptions();
-            var email = user.Email;
             using (var smtpClient = new SmtpClient())
             {
                 smtpClient.EnableSsl = emailOptions.SmtpEnableSsl;
@@ -41,7 +42,7 @@ namespace SimpleIdServer.IdServer.Email
                     IsBodyHtml = true
                 };
 
-                mailMessage.To.Add(email);
+                mailMessage.To.Add(destination);
                 smtpClient.Send(mailMessage);
             }
 

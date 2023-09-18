@@ -77,5 +77,6 @@ public enum ConfigurationDefinitionRecordTypes
     CHECKBOX = 3,
     NUMBER = 4,
     PASSWORD = 5,
-    DATETIME = 6
+    DATETIME = 6,
+    OTPVALUE = 7
 }

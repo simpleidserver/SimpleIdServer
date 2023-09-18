@@ -38,6 +38,12 @@ public class ConfigurationDefinitionExtractor
             return true;
         }
 
+        if(configurationRecordAttr.IsOTPValue)
+        {
+            result.Type = ConfigurationDefinitionRecordTypes.OTPVALUE;
+            return true;
+        }
+
         if (TryEnrichEnumeration(propertyInfo, result, language)) return true;
         if (TryEnrichList(propertyInfo, result, language)) return true;
         if (TryEnrichBoolean(propertyInfo, result, language)) return true;

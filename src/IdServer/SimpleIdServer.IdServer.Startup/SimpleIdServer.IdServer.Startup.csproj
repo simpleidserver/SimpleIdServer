@@ -39,6 +39,16 @@
 	    <AutoGen>True</AutoGen>
 	    <DependentUpon>AccountsResource.resx</DependentUpon>
 	  </Compile>
+	  <Compile Update="Resources\RegisterSmsResource.Designer.cs">
+	    <DependentUpon>RegisterSmsResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	  <Compile Update="Resources\RegisterEmailResource.Designer.cs">
+	    <DependentUpon>RegisterEmailResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
 	  <Compile Update="Resources\AuthenticateMobileResource.Designer.cs">
 	    <DependentUpon>AuthenticateMobileResource.resx</DependentUpon>
 	    <DesignTime>True</DesignTime>
@@ -119,6 +129,14 @@
 	  <EmbeddedResource Update="Resources\AccountsResource.resx">
 	    <Generator>PublicResXFileCodeGenerator</Generator>
 	    <LastGenOutput>AccountsResource.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Resources\RegisterSmsResource.resx">
+	    <LastGenOutput>RegisterSmsResource.Designer.cs</LastGenOutput>
+	    <Generator>PublicResXFileCodeGenerator</Generator>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Resources\RegisterEmailResource.resx">
+	    <LastGenOutput>RegisterEmailResource.Designer.cs</LastGenOutput>
+	    <Generator>PublicResXFileCodeGenerator</Generator>
 	  </EmbeddedResource>
 	  <EmbeddedResource Update="Resources\AuthenticateMobileResource.resx">
 	    <LastGenOutput>AuthenticateMobileResource.Designer.cs</LastGenOutput>

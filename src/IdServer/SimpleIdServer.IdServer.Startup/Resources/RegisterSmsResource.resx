@@ -117,91 +117,46 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="accept_access" xml:space="preserve">
-    <value>Accept</value>
+  <data name="action_missing" xml:space="preserve">
+    <value>Action is missing</value>
   </data>
-  <data name="account_login" xml:space="preserve">
-    <value>Login</value>
+  <data name="confirmationcode" xml:space="preserve">
+    <value>Confirmation code</value>
   </data>
-  <data name="account_name" xml:space="preserve">
-    <value>Name</value>
+  <data name="create" xml:space="preserve">
+    <value>Create</value>
   </data>
-  <data name="approved_apps_description" xml:space="preserve">
-    <value>These apps have been granted access to interact with your SimpleIdServer account. To prevent them from accessing it in the future, click on 'Revoke Access'</value>
+  <data name="invalid_action" xml:space="preserve">
+    <value>Action is invalid</value>
   </data>
-  <data name="approved_apps_title" xml:space="preserve">
-    <value>Approved applications</value>
+  <data name="invalid_confirmation_code" xml:space="preserve">
+    <value>Confirmation code is not correct</value>
   </data>
-  <data name="auth_details" xml:space="preserve">
-    <value>Authorization Details</value>
+  <data name="otpcode_missing" xml:space="preserve">
+    <value>Confirmation code is missing</value>
   </data>
-  <data name="claims" xml:space="preserve">
-    <value>Claims</value>
+  <data name="otpcode_not_number" xml:space="preserve">
+    <value>Confirmation code is not a number</value>
   </data>
-  <data name="client" xml:space="preserve">
-    <value>Client</value>
+  <data name="phonenumber" xml:space="preserve">
+    <value>Phone number</value>
   </data>
-  <data name="created_at" xml:space="preserve">
-    <value>Created at</value>
+  <data name="register" xml:space="preserve">
+    <value>Register</value>
   </data>
-  <data name="credentials" xml:space="preserve">
-    <value>Credentials</value>
-  </data>
-  <data name="credentials_description" xml:space="preserve">
-    <value>Manage your credentials</value>
-  </data>
-  <data name="description" xml:space="preserve">
-    <value>Description</value>
-  </data>
-  <data name="external_accounts_description" xml:space="preserve">
-    <value>Link one or more external accounts to your profile</value>
-  </data>
-  <data name="external_accounts_title" xml:space="preserve">
-    <value>External accounts</value>
-  </data>
-  <data name="grant_time" xml:space="preserve">
-    <value>Grant datetime</value>
-  </data>
-  <data name="name" xml:space="preserve">
-    <value>Name</value>
-  </data>
-  <data name="no_external_accounts" xml:space="preserve">
-    <value>There is no external account configured</value>
-  </data>
-  <data name="no_otp" xml:space="preserve">
-    <value>One Time Password is not configured</value>
-  </data>
-  <data name="no_pending_request" xml:space="preserve">
-    <value>There is no pending request</value>
-  </data>
-  <data name="pending_request_description" xml:space="preserve">
-    <value>Users have requested access to some of your resources. Click on 'Revoke Access' to deny pending requests.</value>
-  </data>
-  <data name="pending_request_title" xml:space="preserve">
-    <value>Pending requests</value>
-  </data>
-  <data name="qrcode_otp" xml:space="preserve">
-    <value>One Time Password</value>
-  </data>
-  <data name="requester" xml:space="preserve">
-    <value>Requester</value>
-  </data>
-  <data name="resource" xml:space="preserve">
-    <value>Resource</value>
-  </data>
-  <data name="revoke_access" xml:space="preserve">
-    <value>Revoke access</value>
-  </data>
-  <data name="scopes" xml:space="preserve">
-    <value>Scopes</value>
-  </data>
-  <data name="subject" xml:space="preserve">
-    <value>Subject</value>
+  <data name="sendconfirmationcode" xml:space="preserve">
+    <value>Send confirmation code</value>
   </data>
   <data name="title" xml:space="preserve">
-    <value>Profile</value>
+    <value>Register</value>
   </data>
-  <data name="unlink" xml:space="preserve">
-    <value>Unlink</value>
+  <data name="update" xml:space="preserve">
+    <value>Update</value>
+  </data>
+  <data name="user_exists" xml:space="preserve">
+    <value>User with the same phone number already exists</value>
+  </data>
+  <data name="value_missing" xml:space="preserve">
+    <value>Phone number is missing</value>
   </data>
 </root>

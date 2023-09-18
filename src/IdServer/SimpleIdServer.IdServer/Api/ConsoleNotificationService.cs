@@ -10,7 +10,9 @@ namespace SimpleIdServer.IdServer.Api
     {
         public string Name => Constants.DefaultNotificationMode;
 
-        public Task Send(string message, User user)
+        public Task Send(string message, User user) => Send(message, string.Empty);
+
+        public Task Send(string message, string destination)
         {
             var before = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.Green;

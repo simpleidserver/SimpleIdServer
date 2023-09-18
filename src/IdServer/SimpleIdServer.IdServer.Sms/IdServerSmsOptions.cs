@@ -3,10 +3,12 @@
 
 
 using SimpleIdServer.Configuration;
+using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.UI;
 
 namespace SimpleIdServer.IdServer.Sms
 {
-    public class IdServerSmsOptions
+    public class IdServerSmsOptions : IOTPRegisterOptions
     {
         [ConfigurationRecord("Account SID", null, order: 0)]
         public string AccountSid { get; set; }
@@ -16,5 +18,20 @@ namespace SimpleIdServer.IdServer.Sms
         public string FromPhoneNumber { get; set; }
         [ConfigurationRecord("Content of the message", null, order: 3)]
         public string Message { get; set; } = "the confirmation code is {0}";
+        [ConfigurationRecord("OTP Algorithm", null, order: 4)]
+        public OTPTypes OTPType { get; set; } = OTPTypes.TOTP;
+        [ConfigurationRecord("OTP Value", null, order: 5, isOTPValue: true)]
+        public string OTPValue { get; set; } = null;
+        [ConfigurationRecord("OTP Counter", null, order: 6, isOTPValue: true, displayCondition: "OTPAlg=HOTP")]
+        public int OTPCounter { get; set; } = 10;
+        public OTPAlgs OTPAlg => (OTPAlgs)OTPType;
+    }
+
+    public enum OTPTypes
+    {
+        [ConfigurationRecordEnum("HOTP")]
+        HOTP = 0,
+        [ConfigurationRecordEnum("TOTP")]
+        TOTP = 1
     }
 }

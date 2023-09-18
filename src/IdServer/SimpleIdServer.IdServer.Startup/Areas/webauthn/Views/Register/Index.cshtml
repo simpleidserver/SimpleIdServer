@@ -27,7 +27,14 @@
     <!-- Registration form -->
     <form id="registerWebauthn">
         <div class="input-group mb-3">
-            <input asp-for="Login" placeholder="@AuthenticateWebauthnResource.login" type="text" class="form-control" />
+            @if(string.IsNullOrWhiteSpace(Model.Login))
+            {
+                <input asp-for="Login" placeholder="@AuthenticateWebauthnResource.login" type="text" class="form-control" disabled="true" />
+            }
+            else
+            {
+                <input asp-for="Login" placeholder="@AuthenticateWebauthnResource.login" type="text" class="form-control" />
+            }
         </div>
         <div class="input-group mb-3">
             <input asp-for="DisplayName" placeholder="@AuthenticateWebauthnResource.display_name" type="text" class="form-control" />

@@ -11,7 +11,7 @@
     <RadzenStack>
         @foreach (var property in Properties.OrderBy(p => p.Order))
         {
-            @if(property.Type != ConfigurationDefinitionRecordTypes.CHECKBOX)
+            @if(property.Type != ConfigurationDefinitionRecordTypes.CHECKBOX && property.Type != ConfigurationDefinitionRecordTypes.OTPVALUE)
             {
                 <RadzenFormField Text="@property.DisplayName" Variant=Variant.Outlined>
                     <ChildContent>
@@ -35,6 +35,22 @@
                         <RadzenText TextStyle="TextStyle.Caption">@property.Description</RadzenText>
                     </Helper>
                 </RadzenFormField>
+            }
+            else if(property.Type == ConfigurationDefinitionRecordTypes.OTPVALUE)
+            {
+                <RadzenRow Gap="1rem">
+                    <RadzenColumn Size="8">
+                        <RadzenFormField Text="@property.DisplayName" Variant=Variant.Outlined>
+                            <ChildContent>
+                                <RadzenTextBox @bind-Value="@property.Value"></RadzenTextBox>
+                            </ChildContent>
+                            <Helper>
+                                <RadzenText TextStyle="TextStyle.Caption">@property.Description</RadzenText>
+                            </Helper>
+                        </RadzenFormField>
+                    </RadzenColumn>
+                    <RadzenColumn><RadzenButton Click="@((args) => GenerateOTPValue(property))" ButtonStyle="ButtonStyle.Secondary" Text="Generate OTP Value"></RadzenButton></RadzenColumn>
+                </RadzenRow>            
             }
             else
             {
@@ -136,5 +152,11 @@
     {
         var dic = AllProperties.ToDictionary(p => p.Name, p => p.GetValue());
         return dic;
+    }
+
+    private void GenerateOTPValue(EditableProperty property)
+    {
+        var key = KeyGeneration.GenerateRandomKey(20);
+        property.Value = key.ConvertFromBase32();
     }
 }

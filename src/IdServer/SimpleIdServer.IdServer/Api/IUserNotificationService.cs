@@ -10,5 +10,6 @@ namespace SimpleIdServer.IdServer.Api
     {
         string Name { get; }
         Task Send(string message, User user);
+        Task Send(string message, string destination);
     }
 }

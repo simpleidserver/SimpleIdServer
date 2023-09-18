@@ -1,0 +1,59 @@
+﻿@using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Options;
+@using SimpleIdServer.IdServer.Startup;
+@using SimpleIdServer.IdServer.Startup.Resources;
+@model SimpleIdServer.IdServer.UI.ViewModels.OTPRegisterViewModel;
+@inject IOptions<IdServerHostOptions> configuration
+
+@{
+    ViewBag.Title = RegisterSmsResource.title;
+}
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <ul class="list-group">
+        @foreach (var modelState in ViewData.ModelState.Values)
+        {
+            foreach (var error in modelState.Errors)
+            {
+                <li class="list-group-item list-group-item-danger">@RegisterSmsResource.ResourceManager.GetString(error.ErrorMessage)</li>
+            }
+        }
+    </ul>
+}
+
+<!-- Registration form -->
+@using (Html.BeginForm("Index", "Register", new { area = SimpleIdServer.IdServer.Sms.Constants.AMR }, FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="Action" value="REGISTER" />
+    <!-- Email -->
+    <div class="input-group mb-3">
+        <input asp-for="Value" placeholder="@RegisterSmsResource.phonenumber" type="text" class="form-control" />
+    </div>
+    <!-- Confirmation code -->
+    <div class="input-group mb-3">
+        <input asp-for="OTPCode" placeholder="@RegisterSmsResource.confirmationcode" type="password" class="form-control" />
+    </div>
+    @if(User.Identity.IsAuthenticated)
+    {
+        <button type="submit" class="btn btn-primary">@RegisterSmsResource.update</button>
+    }
+    else
+    {
+        <button type="submit" class="btn btn-primary">@RegisterSmsResource.create</button>
+    }
+}
+
+<!-- Send confirmation code -->
+<div class="mt-3">
+    @using (Html.BeginForm("Index", "Register", new { area = SimpleIdServer.IdServer.Sms.Constants.AMR }, FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="Action" value="SENDCONFIRMATIONCODE" />
+        <div class="input-group mb-3">
+            <input asp-for="Value" placeholder="@RegisterSmsResource.phonenumber" type="text" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">@RegisterSmsResource.sendconfirmationcode</button>
+    }
+</div>

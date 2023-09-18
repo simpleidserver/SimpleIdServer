@@ -71,6 +71,7 @@ namespace SimpleIdServer.IdServer.UI
             var consents = await GetConsents();
             var pendingRequests = await GetPendingRequest();
             var externalIdProviders = ExternalProviderHelper.GetExternalAuthenticationSchemes(schemes);
+            // TODO
             return View(new ProfileViewModel
             {
                 Name = user.Name,
