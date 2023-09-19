@@ -138,14 +138,23 @@
   <data name="otpcode_not_number" xml:space="preserve">
     <value>Confirmation code is not a number</value>
   </data>
+  <data name="otpcode_sent" xml:space="preserve">
+    <value>Confirmation code is sent</value>
+  </data>
   <data name="phonenumber" xml:space="preserve">
     <value>Phone number</value>
   </data>
   <data name="register" xml:space="preserve">
     <value>Register</value>
   </data>
+  <data name="register_sms" xml:space="preserve">
+    <value>Register a user</value>
+  </data>
   <data name="sendconfirmationcode" xml:space="preserve">
     <value>Send confirmation code</value>
+  </data>
+  <data name="sms_is_enrolled" xml:space="preserve">
+    <value>Phone number is enrolled</value>
   </data>
   <data name="title" xml:space="preserve">
     <value>Register</value>
@@ -153,7 +162,16 @@
   <data name="update" xml:space="preserve">
     <value>Update</value>
   </data>
+  <data name="update_sms" xml:space="preserve">
+    <value>Enroll your phone</value>
+  </data>
   <data name="user_exists" xml:space="preserve">
+    <value>User with the same name already exists</value>
+  </data>
+  <data name="user_is_created" xml:space="preserve">
+    <value>User is created</value>
+  </data>
+  <data name="value_exists" xml:space="preserve">
     <value>User with the same phone number already exists</value>
   </data>
   <data name="value_missing" xml:space="preserve">

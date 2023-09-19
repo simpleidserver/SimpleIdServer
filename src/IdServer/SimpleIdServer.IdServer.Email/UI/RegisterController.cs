@@ -3,7 +3,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI;
@@ -14,7 +13,7 @@ namespace SimpleIdServer.IdServer.Email.UI;
 [Area(Constants.AMR)]
 public class RegisterController : BaseOTPRegisterController<IdServerEmailOptions>
 {
-    public RegisterController(IUserRepository userRepository, IEnumerable<IOTPAuthenticator> otpAuthenticators, IConfiguration configuration, IUserNotificationService userNotificationService) : base(userRepository, otpAuthenticators, configuration, userNotificationService)
+    public RegisterController(IUserRepository userRepository, IEnumerable<IOTPAuthenticator> otpAuthenticators, IConfiguration configuration, IEmailUserNotificationService userNotificationService) : base(userRepository, otpAuthenticators, configuration, userNotificationService)
     {
     }
 

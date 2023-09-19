@@ -4,10 +4,10 @@ using SimpleIdServer.IdServer.Domains;
 
 namespace SimpleIdServer.IdServer.UI;
 
-public class IOTPRegisterOptions
+public interface IOTPRegisterOptions
 {
-    public OTPAlgs OTPAlg { get; set; } = OTPAlgs.TOTP;
-    public string OTPValue { get; set; } = null;
-    public int OTPCounter { get; set; } = 10;
-    public string HttpBody { get; set; }
+    public OTPAlgs OTPAlg { get; }
+    public string OTPValue { get; set; }
+    public int OTPCounter { get; set; }
+    public string HttpBody { get; }
 }

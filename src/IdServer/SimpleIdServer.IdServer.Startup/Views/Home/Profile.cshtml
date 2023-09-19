@@ -236,8 +236,38 @@
                 <div class="card shadow-sm">
                     <div class="card-body">
                         <h5>@ProfileResource.credentials</h5>
-                        <p>@ProfileResource.credentials_description</p>
-
+                        <div>
+                            @if(Model.AuthenticationMethods != null && Model.AuthenticationMethods.Any(m => m.IsCredentialExists))
+                            {
+                                <p>@ProfileResource.update_your_credentials</p>
+                                foreach(var authenticationMethod in Model.AuthenticationMethods.Where(m => m.IsCredentialExists))
+                                {
+                                    <a class="btn btn-secondary me-1" href="@Url.Action("Index", "Register", new { area = authenticationMethod.Amr })">
+                                        @authenticationMethod.Name
+                                    </a>
+                                }
+                            }
+                            else
+                            {
+                                <p>@ProfileResource.no_credentials_to_update</p>
+                            }
+                        </div>
+                        <div>           
+                            @if(Model.AuthenticationMethods != null && Model.AuthenticationMethods.Any(m => !m.IsCredentialExists))
+                            {
+                                <p>@ProfileResource.enroll_credentials</p>
+                                foreach (var authenticationMethod in Model.AuthenticationMethods.Where(m => !m.IsCredentialExists))
+                                {
+                                    <a class="btn btn-secondary me-1" href="@Url.Action("Index", "Register", new { area = authenticationMethod.Amr })">
+                                        @authenticationMethod.Name
+                                    </a>
+                                }
+                            }
+                            else
+                            {
+                                <p>@ProfileResource.no_credentials_to_create</p>
+                            }
+                        </div>
                     </div>
                 </div>
             </div>

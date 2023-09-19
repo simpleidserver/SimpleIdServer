@@ -10,6 +10,8 @@
     ViewBag.Title = AuthenticateWebauthnResource.register_title;
 }
 
+<h5>@(User.Identity.IsAuthenticated ? AuthenticateWebauthnResource.update_webauthn : AuthenticateWebauthnResource.register_webauthn)</h5>
+
 <div id="registrationContainer">
     <ul class="list-group mb-3" id="errors">
         @if (!ViewData.ModelState.IsValid)
@@ -26,18 +28,20 @@
 
     <!-- Registration form -->
     <form id="registerWebauthn">
-        <div class="input-group mb-3">
-            @if(string.IsNullOrWhiteSpace(Model.Login))
+        <div class="form-floating mb-3">
+            @if(!string.IsNullOrWhiteSpace(Model.Login))
             {
-                <input asp-for="Login" placeholder="@AuthenticateWebauthnResource.login" type="text" class="form-control" disabled="true" />
+                <input asp-for="Login" placeholder="@AuthenticateWebauthnResource.login" id="floatingLogin" type="text" class="form-control" disabled="true" />
             }
             else
             {
-                <input asp-for="Login" placeholder="@AuthenticateWebauthnResource.login" type="text" class="form-control" />
+                <input asp-for="Login" placeholder="@AuthenticateWebauthnResource.login" id="floatingLogin" type="text" class="form-control" />
             }
+            <label for="floatingLogin">@AuthenticateWebauthnResource.login</label>
         </div>
-        <div class="input-group mb-3">
-            <input asp-for="DisplayName" placeholder="@AuthenticateWebauthnResource.display_name" type="text" class="form-control" />
+        <div class="form-floating mb-3">
+            <input asp-for="DisplayName" placeholder="@AuthenticateWebauthnResource.display_name" id="floatingDisplayName" type="text" class="form-control" />
+            <label for="floatingDisplayName">@AuthenticateWebauthnResource.display_name</label>
         </div>
         <button type="submit" class="btn btn-primary card-link">@AuthenticateWebauthnResource.register</button>
     </form>

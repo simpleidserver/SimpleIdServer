@@ -29,7 +29,7 @@ namespace SimpleIdServer.IdServer.Email
         public OTPTypes OTPType { get; set; } = OTPTypes.TOTP;
         [ConfigurationRecord("OTP Value", null, order: 9, isOTPValue: true)]
         public string OTPValue { get; set; } = null;
-        [ConfigurationRecord("OTP Counter", null, order: 10, isOTPValue: true, displayCondition: "OTPAlg=HOTP")]
+        [ConfigurationRecord("OTP Counter", null, order: 10, isOTPValue: true, displayCondition: "OTPType=HOTP")]
         public int OTPCounter { get; set; } = 10;
         public OTPAlgs OTPAlg => (OTPAlgs)OTPType;
     }

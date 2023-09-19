@@ -22,14 +22,14 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class AuthenticateSmsResource {
+    public class RegisterPwdResource {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal AuthenticateSmsResource() {
+        internal RegisterPwdResource() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.IdServer.Startup.Resources.AuthenticateSmsResource", typeof(AuthenticateSmsResource).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.IdServer.Startup.Resources.RegisterPwdResource", typeof(RegisterPwdResource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,137 +61,128 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Authenticate.
+        ///   Recherche une chaîne localisée semblable à Confirmation password.
         /// </summary>
-        public static string authenticate {
+        public static string confirmed_password {
             get {
-                return ResourceManager.GetString("authenticate", resourceCulture);
+                return ResourceManager.GetString("confirmed_password", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Code has a validity of {0} seconds.
+        ///   Recherche une chaîne localisée semblable à Confirmed password is missing.
         /// </summary>
-        public static string code_validity {
+        public static string confirmed_password_missing {
             get {
-                return ResourceManager.GetString("code_validity", resourceCulture);
+                return ResourceManager.GetString("confirmed_password_missing", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Confirmation code.
+        ///   Recherche une chaîne localisée semblable à Create.
         /// </summary>
-        public static string confirmationcode {
+        public static string create {
             get {
-                return ResourceManager.GetString("confirmationcode", resourceCulture);
+                return ResourceManager.GetString("create", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Confirmation code has been sent.
+        ///   Recherche une chaîne localisée semblable à Login.
         /// </summary>
-        public static string confirmationcode_sent {
+        public static string login {
             get {
-                return ResourceManager.GetString("confirmationcode_sent", resourceCulture);
+                return ResourceManager.GetString("login", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à An error occured while trying to decrypt the return url.
+        ///   Recherche une chaîne localisée semblable à Login is missing.
         /// </summary>
-        public static string cryptographic_error {
+        public static string login_missing {
             get {
-                return ResourceManager.GetString("cryptographic_error", resourceCulture);
+                return ResourceManager.GetString("login_missing", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Confirmation code is invalid.
+        ///   Recherche une chaîne localisée semblable à Password.
         /// </summary>
-        public static string invalid_confirmationcode {
+        public static string password {
             get {
-                return ResourceManager.GetString("invalid_confirmationcode", resourceCulture);
+                return ResourceManager.GetString("password", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Phone number is missing.
+        ///   Recherche une chaîne localisée semblable à Password is missing.
         /// </summary>
-        public static string missing_phonenumber {
+        public static string password_missing {
             get {
-                return ResourceManager.GetString("missing_phonenumber", resourceCulture);
+                return ResourceManager.GetString("password_missing", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à There is no OTP configured.
+        ///   Recherche une chaîne localisée semblable à Mismatch between the password and the confirmed password.
         /// </summary>
-        public static string no_active_otp {
+        public static string password_no_match {
             get {
-                return ResourceManager.GetString("no_active_otp", resourceCulture);
+                return ResourceManager.GetString("password_no_match", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Phone number.
+        ///   Recherche une chaîne localisée semblable à Password is updated.
         /// </summary>
-        public static string phonenumber {
+        public static string pwd_updated {
             get {
-                return ResourceManager.GetString("phonenumber", resourceCulture);
+                return ResourceManager.GetString("pwd_updated", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Policy.
+        ///   Recherche une chaîne localisée semblable à Register the user.
         /// </summary>
-        public static string policy {
+        public static string register_pwd {
             get {
-                return ResourceManager.GetString("policy", resourceCulture);
+                return ResourceManager.GetString("register_pwd", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Remember my login.
+        ///   Recherche une chaîne localisée semblable à Register.
         /// </summary>
-        public static string remember_login {
+        public static string register_title {
             get {
-                return ResourceManager.GetString("remember_login", resourceCulture);
+                return ResourceManager.GetString("register_title", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Send a confirmation code.
+        ///   Recherche une chaîne localisée semblable à Update.
         /// </summary>
-        public static string sendconfirmationcode {
+        public static string update {
             get {
-                return ResourceManager.GetString("sendconfirmationcode", resourceCulture);
+                return ResourceManager.GetString("update", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Authenticate.
+        ///   Recherche une chaîne localisée semblable à Update your password.
         /// </summary>
-        public static string title {
+        public static string update_pwd {
             get {
-                return ResourceManager.GetString("title", resourceCulture);
+                return ResourceManager.GetString("update_pwd", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Terms of service.
+        ///   Recherche une chaîne localisée semblable à User is created.
         /// </summary>
-        public static string tos {
+        public static string user_created {
             get {
-                return ResourceManager.GetString("tos", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à Phone number is unknown.
-        /// </summary>
-        public static string unknown_phonenumber {
-            get {
-                return ResourceManager.GetString("unknown_phonenumber", resourceCulture);
+                return ResourceManager.GetString("user_created", resourceCulture);
             }
         }
         
@@ -201,15 +192,6 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static string user_exists {
             get {
                 return ResourceManager.GetString("user_exists", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à Phone number is already taken by an another user.
-        /// </summary>
-        public static string value_exists {
-            get {
-                return ResourceManager.GetString("value_exists", resourceCulture);
             }
         }
     }

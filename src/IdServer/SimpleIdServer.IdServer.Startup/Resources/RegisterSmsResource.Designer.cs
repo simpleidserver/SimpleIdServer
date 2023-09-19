@@ -124,6 +124,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Confirmation code is sent.
+        /// </summary>
+        public static string otpcode_sent {
+            get {
+                return ResourceManager.GetString("otpcode_sent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Phone number.
         /// </summary>
         public static string phonenumber {
@@ -142,11 +151,29 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Register a user.
+        /// </summary>
+        public static string register_sms {
+            get {
+                return ResourceManager.GetString("register_sms", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Send confirmation code.
         /// </summary>
         public static string sendconfirmationcode {
             get {
                 return ResourceManager.GetString("sendconfirmationcode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Phone number is enrolled.
+        /// </summary>
+        public static string sms_is_enrolled {
+            get {
+                return ResourceManager.GetString("sms_is_enrolled", resourceCulture);
             }
         }
         
@@ -169,11 +196,38 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à User with the same phone number already exists.
+        ///   Recherche une chaîne localisée semblable à Enroll your phone.
+        /// </summary>
+        public static string update_sms {
+            get {
+                return ResourceManager.GetString("update_sms", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à User with the same name already exists.
         /// </summary>
         public static string user_exists {
             get {
                 return ResourceManager.GetString("user_exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à User is created.
+        /// </summary>
+        public static string user_is_created {
+            get {
+                return ResourceManager.GetString("user_is_created", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à User with the same phone number already exists.
+        /// </summary>
+        public static string value_exists {
+            get {
+                return ResourceManager.GetString("value_exists", resourceCulture);
             }
         }
         

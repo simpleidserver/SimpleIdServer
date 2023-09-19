@@ -169,6 +169,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Enroll credentials.
+        /// </summary>
+        public static string enroll_credentials {
+            get {
+                return ResourceManager.GetString("enroll_credentials", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Link one or more external accounts to your profile.
         /// </summary>
         public static string external_accounts_description {
@@ -201,6 +210,24 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static string name {
             get {
                 return ResourceManager.GetString("name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à All the credentials have been enrolled.
+        /// </summary>
+        public static string no_credentials_to_create {
+            get {
+                return ResourceManager.GetString("no_credentials_to_create", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à There is no credential to update.
+        /// </summary>
+        public static string no_credentials_to_update {
+            get {
+                return ResourceManager.GetString("no_credentials_to_update", resourceCulture);
             }
         }
         
@@ -318,6 +345,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static string unlink {
             get {
                 return ResourceManager.GetString("unlink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Update your credentials.
+        /// </summary>
+        public static string update_your_credentials {
+            get {
+                return ResourceManager.GetString("update_your_credentials", resourceCulture);
             }
         }
     }

@@ -129,6 +129,9 @@
   <data name="email" xml:space="preserve">
     <value>Email</value>
   </data>
+  <data name="email_is_enrolled" xml:space="preserve">
+    <value>Email is enrolled</value>
+  </data>
   <data name="invalid_action" xml:space="preserve">
     <value>Action is invalid</value>
   </data>
@@ -141,8 +144,14 @@
   <data name="otpcode_not_number" xml:space="preserve">
     <value>Confirmation code is not a number</value>
   </data>
+  <data name="otpcode_sent" xml:space="preserve">
+    <value>Confirmation code is sent</value>
+  </data>
   <data name="register" xml:space="preserve">
     <value>Register</value>
+  </data>
+  <data name="register_email" xml:space="preserve">
+    <value>Register a user</value>
   </data>
   <data name="sendconfirmationcode" xml:space="preserve">
     <value>Send confirmation code</value>
@@ -153,7 +162,16 @@
   <data name="update" xml:space="preserve">
     <value>Update</value>
   </data>
+  <data name="update_email" xml:space="preserve">
+    <value>Update your email</value>
+  </data>
   <data name="user_exists" xml:space="preserve">
+    <value>User with the same name already exists</value>
+  </data>
+  <data name="user_is_created" xml:space="preserve">
+    <value>User is created</value>
+  </data>
+  <data name="value_exists" xml:space="preserve">
     <value>User with the same email already exists</value>
   </data>
   <data name="value_missing" xml:space="preserve">

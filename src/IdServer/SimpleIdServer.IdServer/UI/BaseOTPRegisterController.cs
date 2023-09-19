@@ -53,6 +53,7 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseController where
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Index([FromRoute] string prefix, OTPRegisterViewModel viewModel)
     {
         prefix = prefix ?? Constants.Prefix;
@@ -81,6 +82,7 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseController where
             return View(viewModel);
         }
 
+        var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
         if (User.Identity.IsAuthenticated)
         {
             return await UpdateAuthenticatedUser();
@@ -105,11 +107,10 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseController where
 
         async Task<IActionResult> UpdateAuthenticatedUser()
         {
-            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
             var userExists = await IsUserExists(viewModel.Value, prefix);
             if (userExists)
             {
-                ModelState.AddModelError("user_exists", "user_exists");
+                ModelState.AddModelError("value_exists", "value_exists");
                 return View(viewModel);
             }
 
@@ -129,7 +130,7 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseController where
             var emailIsTaken = await IsUserExists(viewModel.Value, prefix);
             if (emailIsTaken)
             {
-                ModelState.AddModelError("user_exists", "user_exists");
+                ModelState.AddModelError("value_exists", "value_exists");
                 return View(viewModel);
             }
 
@@ -139,7 +140,7 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseController where
             BuildUser(user, viewModel);
             _userRepository.Add(user);
             await _userRepository.SaveChanges(CancellationToken.None);
-            viewModel.IsRegistered = true;
+            viewModel.IsUpdated = true;
             return View(viewModel);
         }
     }

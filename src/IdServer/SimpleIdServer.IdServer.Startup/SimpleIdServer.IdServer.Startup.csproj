@@ -39,6 +39,11 @@
 	    <AutoGen>True</AutoGen>
 	    <DependentUpon>AccountsResource.resx</DependentUpon>
 	  </Compile>
+	  <Compile Update="Resources\RegisterPwdResource.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>RegisterPwdResource.resx</DependentUpon>
+	  </Compile>
 	  <Compile Update="Resources\RegisterSmsResource.Designer.cs">
 	    <DependentUpon>RegisterSmsResource.resx</DependentUpon>
 	    <DesignTime>True</DesignTime>
@@ -129,6 +134,10 @@
 	  <EmbeddedResource Update="Resources\AccountsResource.resx">
 	    <Generator>PublicResXFileCodeGenerator</Generator>
 	    <LastGenOutput>AccountsResource.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Resources\RegisterPwdResource.resx">
+	    <Generator>PublicResXFileCodeGenerator</Generator>
+	    <LastGenOutput>RegisterPwdResource.Designer.cs</LastGenOutput>
 	  </EmbeddedResource>
 	  <EmbeddedResource Update="Resources\RegisterSmsResource.resx">
 	    <LastGenOutput>RegisterSmsResource.Designer.cs</LastGenOutput>

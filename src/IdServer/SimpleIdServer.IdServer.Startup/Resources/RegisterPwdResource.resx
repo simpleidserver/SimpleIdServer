@@ -117,58 +117,49 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="authenticate" xml:space="preserve">
-    <value>Authenticate</value>
+  <data name="confirmed_password" xml:space="preserve">
+    <value>Confirmation password</value>
   </data>
-  <data name="auth_title" xml:space="preserve">
-    <value>Authenticate with your mobile device</value>
+  <data name="confirmed_password_missing" xml:space="preserve">
+    <value>Confirmed password is missing</value>
   </data>
-  <data name="credential_added" xml:space="preserve">
-    <value>Credential is added</value>
-  </data>
-  <data name="display_name" xml:space="preserve">
-    <value>Display name</value>
-  </data>
-  <data name="enroll_mobile" xml:space="preserve">
-    <value>Enroll a new mobile application</value>
-  </data>
-  <data name="generate_qrcode" xml:space="preserve">
-    <value>Generate QR Code</value>
+  <data name="create" xml:space="preserve">
+    <value>Create</value>
   </data>
   <data name="login" xml:space="preserve">
     <value>Login</value>
   </data>
-  <data name="missing_attestation" xml:space="preserve">
-    <value>Attestation is missing</value>
-  </data>
-  <data name="missing_credential" xml:space="preserve">
-    <value>FIDO2 credential is missing</value>
-  </data>
-  <data name="missing_login" xml:space="preserve">
+  <data name="login_missing" xml:space="preserve">
     <value>Login is missing</value>
   </data>
-  <data name="missing_session_id" xml:space="preserve">
-    <value>Session Identifier is missing</value>
+  <data name="password" xml:space="preserve">
+    <value>Password</value>
   </data>
-  <data name="qrcode" xml:space="preserve">
-    <value>QR Code</value>
+  <data name="password_missing" xml:space="preserve">
+    <value>Password is missing</value>
   </data>
-  <data name="register" xml:space="preserve">
-    <value>Register</value>
+  <data name="password_no_match" xml:space="preserve">
+    <value>Mismatch between the password and the confirmed password</value>
   </data>
-  <data name="register_mobile" xml:space="preserve">
-    <value>Register a user</value>
+  <data name="pwd_updated" xml:space="preserve">
+    <value>Password is updated</value>
+  </data>
+  <data name="register_pwd" xml:space="preserve">
+    <value>Register the user</value>
   </data>
   <data name="register_title" xml:space="preserve">
-    <value>Register SID Mobile application</value>
+    <value>Register</value>
   </data>
-  <data name="remember_login" xml:space="preserve">
-    <value>Remember my login</value>
+  <data name="update" xml:space="preserve">
+    <value>Update</value>
   </data>
-  <data name="scan_mobileapp" xml:space="preserve">
-    <value>Scan the QR code with your mobile application</value>
+  <data name="update_pwd" xml:space="preserve">
+    <value>Update your password</value>
   </data>
-  <data name="user_already_exists" xml:space="preserve">
-    <value>User with same login already exists</value>
+  <data name="user_created" xml:space="preserve">
+    <value>User is created</value>
+  </data>
+  <data name="user_exists" xml:space="preserve">
+    <value>User with the same name already exists</value>
   </data>
 </root>

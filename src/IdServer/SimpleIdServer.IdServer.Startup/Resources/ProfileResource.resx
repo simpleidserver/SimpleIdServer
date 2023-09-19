@@ -153,6 +153,9 @@
   <data name="description" xml:space="preserve">
     <value>Description</value>
   </data>
+  <data name="enroll_credentials" xml:space="preserve">
+    <value>Enroll credentials</value>
+  </data>
   <data name="external_accounts_description" xml:space="preserve">
     <value>Link one or more external accounts to your profile</value>
   </data>
@@ -164,6 +167,12 @@
   </data>
   <data name="name" xml:space="preserve">
     <value>Name</value>
+  </data>
+  <data name="no_credentials_to_create" xml:space="preserve">
+    <value>All the credentials have been enrolled</value>
+  </data>
+  <data name="no_credentials_to_update" xml:space="preserve">
+    <value>There is no credential to update</value>
   </data>
   <data name="no_external_accounts" xml:space="preserve">
     <value>There is no external account configured</value>
@@ -203,5 +212,8 @@
   </data>
   <data name="unlink" xml:space="preserve">
     <value>Unlink</value>
+  </data>
+  <data name="update_your_credentials" xml:space="preserve">
+    <value>Update your credentials</value>
   </data>
 </root>

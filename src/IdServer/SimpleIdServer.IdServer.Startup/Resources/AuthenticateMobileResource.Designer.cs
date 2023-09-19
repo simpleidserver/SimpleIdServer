@@ -97,6 +97,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Enroll a new mobile application.
+        /// </summary>
+        public static string enroll_mobile {
+            get {
+                return ResourceManager.GetString("enroll_mobile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Generate QR Code.
         /// </summary>
         public static string generate_qrcode {
@@ -165,6 +174,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static string register {
             get {
                 return ResourceManager.GetString("register", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Register a user.
+        /// </summary>
+        public static string register_mobile {
+            get {
+                return ResourceManager.GetString("register_mobile", resourceCulture);
             }
         }
         

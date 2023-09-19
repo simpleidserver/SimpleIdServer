@@ -39,8 +39,8 @@
             else if(property.Type == ConfigurationDefinitionRecordTypes.OTPVALUE)
             {
                 <RadzenRow Gap="1rem">
-                    <RadzenColumn Size="8">
-                        <RadzenFormField Text="@property.DisplayName" Variant=Variant.Outlined>
+                    <RadzenColumn Size="10">
+                        <RadzenFormField Class="w-100" Text="@property.DisplayName" Variant=Variant.Outlined>
                             <ChildContent>
                                 <RadzenTextBox @bind-Value="@property.Value"></RadzenTextBox>
                             </ChildContent>

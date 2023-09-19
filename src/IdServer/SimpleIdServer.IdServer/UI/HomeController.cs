@@ -39,11 +39,12 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IOTPQRCodeGenerator _otpQRCodeGenerator;
         private readonly ICredentialTemplateRepository _credentialTemplateRepository;
         private readonly IBusControl _busControl;
+        private readonly IEnumerable<IAuthenticationMethodService> _authenticationMethodServices;
         private readonly ILogger<HomeController> _logger;
 
         public HomeController(IOptions<IdServerHostOptions> options, IUserHelper userHelper, IUserRepository userRepository, IClientRepository clientRepository, 
             IUmaPendingRequestRepository pendingRequestRepository, IAuthenticationSchemeProvider authenticationSchemeProvider,
-            IOTPQRCodeGenerator otpQRCodeGenerator, ICredentialTemplateRepository credentialTemplateRepository, IBusControl busControl, ILogger<HomeController> logger)
+            IOTPQRCodeGenerator otpQRCodeGenerator, ICredentialTemplateRepository credentialTemplateRepository, IBusControl busControl, IEnumerable<IAuthenticationMethodService> authenticationMethodServices, ILogger<HomeController> logger)
         {
             _options = options.Value;
             _userHelper = userHelper;
@@ -54,6 +55,7 @@ namespace SimpleIdServer.IdServer.UI
             _otpQRCodeGenerator = otpQRCodeGenerator;
             _credentialTemplateRepository = credentialTemplateRepository;
             _busControl = busControl;
+            _authenticationMethodServices = authenticationMethodServices;
             _logger = logger;
         }
 
@@ -67,17 +69,23 @@ namespace SimpleIdServer.IdServer.UI
             prefix = prefix ?? Constants.DefaultRealm;
             var schemes = await _authenticationSchemeProvider.GetAllSchemesAsync();
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.Query().Include(u => u.Consents).ThenInclude(c => c.Scopes).Include(u => u.ExternalAuthProviders).Include(u => u.Credentials).FirstOrDefaultAsync(u => u.Name == nameIdentifier, cancellationToken);
+            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).Include(u => u.Consents).ThenInclude(c => c.Scopes).Include(u => u.ExternalAuthProviders).Include(u => u.Credentials).FirstOrDefaultAsync(u => u.Name == nameIdentifier, cancellationToken);
             var consents = await GetConsents();
             var pendingRequests = await GetPendingRequest();
+            var methodServices = _authenticationMethodServices.Select(a => new AuthenticationMethodViewModel
+            {
+                Name = a.Name,
+                Amr = a.Amr,
+                IsCredentialExists = a.IsCredentialExists(user)
+            });
             var externalIdProviders = ExternalProviderHelper.GetExternalAuthenticationSchemes(schemes);
-            // TODO
             return View(new ProfileViewModel
             {
                 Name = user.Name,
                 HasOtpKey = user.ActiveOTP != null,
                 Consents = consents,
                 PendingRequests = pendingRequests,
+                AuthenticationMethods = methodServices,
                 Profiles = GetProfiles(),
                 ExternalIdProviders = externalIdProviders.Select(e => new ExternalIdProvider
                 {
@@ -138,6 +146,8 @@ namespace SimpleIdServer.IdServer.UI
                     Subject = a.Subject
                 });
             }
+
+
         }
 
         [HttpGet]

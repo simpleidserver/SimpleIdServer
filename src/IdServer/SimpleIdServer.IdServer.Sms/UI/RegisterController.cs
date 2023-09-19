@@ -16,7 +16,7 @@ namespace SimpleIdServer.IdServer.Sms.UI;
 [Area(Constants.AMR)]
 public class RegisterController : BaseOTPRegisterController<IdServerSmsOptions>
 {
-    public RegisterController(IUserRepository userRepository, IEnumerable<IOTPAuthenticator> otpAuthenticators, IConfiguration configuration, IUserNotificationService userNotificationService) : base(userRepository, otpAuthenticators, configuration, userNotificationService)
+    public RegisterController(IUserRepository userRepository, IEnumerable<IOTPAuthenticator> otpAuthenticators, IConfiguration configuration, ISmsUserNotificationService userNotificationService) : base(userRepository, otpAuthenticators, configuration, userNotificationService)
     {
     }
 
@@ -34,9 +34,9 @@ public class RegisterController : BaseOTPRegisterController<IdServerSmsOptions>
         var phoneNumberCl = user.OAuthUserClaims.FirstOrDefault(c => c.Name == JwtRegisteredClaimNames.PhoneNumber);
         var phoneNumberIsVerifiedCl = user.OAuthUserClaims.FirstOrDefault(c => c.Name == JwtRegisteredClaimNames.PhoneNumberVerified);
         if (phoneNumberCl != null) phoneNumberCl.Value = viewModel.Value;
-        else user.OAuthUserClaims.Add(new UserClaim { Name = JwtRegisteredClaimNames.PhoneNumber, Value = viewModel.Value });
+        else user.OAuthUserClaims.Add(new UserClaim { Id = Guid.NewGuid().ToString(), Name = JwtRegisteredClaimNames.PhoneNumber, Value = viewModel.Value });
         if (phoneNumberIsVerifiedCl != null) phoneNumberIsVerifiedCl.Value = viewModel.IsVerified.ToString();
-        else user.OAuthUserClaims.Add(new UserClaim { Name = JwtRegisteredClaimNames.PhoneNumberVerified, Value = viewModel.IsVerified.ToString() });
+        else user.OAuthUserClaims.Add(new UserClaim { Id = Guid.NewGuid().ToString(), Name = JwtRegisteredClaimNames.PhoneNumberVerified, Value = viewModel.IsVerified.ToString() });
     }
 
     protected override async Task<bool> IsUserExists(string value, string prefix)

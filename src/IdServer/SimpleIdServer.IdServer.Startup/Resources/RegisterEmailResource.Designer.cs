@@ -97,6 +97,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Email is enrolled.
+        /// </summary>
+        public static string email_is_enrolled {
+            get {
+                return ResourceManager.GetString("email_is_enrolled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Action is invalid.
         /// </summary>
         public static string invalid_action {
@@ -133,11 +142,29 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Confirmation code is sent.
+        /// </summary>
+        public static string otpcode_sent {
+            get {
+                return ResourceManager.GetString("otpcode_sent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Register.
         /// </summary>
         public static string register {
             get {
                 return ResourceManager.GetString("register", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Register a user.
+        /// </summary>
+        public static string register_email {
+            get {
+                return ResourceManager.GetString("register_email", resourceCulture);
             }
         }
         
@@ -169,11 +196,38 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à User with the same email already exists.
+        ///   Recherche une chaîne localisée semblable à Update your email.
+        /// </summary>
+        public static string update_email {
+            get {
+                return ResourceManager.GetString("update_email", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à User with the same name already exists.
         /// </summary>
         public static string user_exists {
             get {
                 return ResourceManager.GetString("user_exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à User is created.
+        /// </summary>
+        public static string user_is_created {
+            get {
+                return ResourceManager.GetString("user_is_created", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à User with the same email already exists.
+        /// </summary>
+        public static string value_exists {
+            get {
+                return ResourceManager.GetString("value_exists", resourceCulture);
             }
         }
         

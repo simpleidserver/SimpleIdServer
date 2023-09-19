@@ -171,4 +171,10 @@
   <data name="unknown_email" xml:space="preserve">
     <value>Email is unknown</value>
   </data>
+  <data name="user_exists" xml:space="preserve">
+    <value>User with the same name already exists</value>
+  </data>
+  <data name="value_exists" xml:space="preserve">
+    <value>Email is already taken by an another user</value>
+  </data>
 </root>

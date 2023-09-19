@@ -22,9 +22,10 @@ namespace SimpleIdServer.IdServer.Sms
         public OTPTypes OTPType { get; set; } = OTPTypes.TOTP;
         [ConfigurationRecord("OTP Value", null, order: 5, isOTPValue: true)]
         public string OTPValue { get; set; } = null;
-        [ConfigurationRecord("OTP Counter", null, order: 6, isOTPValue: true, displayCondition: "OTPAlg=HOTP")]
+        [ConfigurationRecord("OTP Counter", null, order: 6, isOTPValue: true, displayCondition: "OTPType=HOTP")]
         public int OTPCounter { get; set; } = 10;
         public OTPAlgs OTPAlg => (OTPAlgs)OTPType;
+        public string HttpBody => Message;
     }
 
     public enum OTPTypes
