@@ -28,6 +28,12 @@ namespace SimpleIdServer.IdServer.Startup
             .AddLDAPDistinguishedName()
             .Build();
 
+        public static ICollection<RegistrationWorkflow> RegistrationWorkflows => new List<RegistrationWorkflow>
+        {
+            RegistrationWorkflowBuilder.New("pwd", true).AddStep("pwd").Build(),
+            RegistrationWorkflowBuilder.New("pwd-email").AddStep("pwd").AddStep("email").Build()
+        };
+
         public static ICollection<Scope> Scopes => new List<Scope>
         {
             SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope,

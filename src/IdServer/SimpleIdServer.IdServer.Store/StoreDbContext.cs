@@ -44,6 +44,7 @@ namespace SimpleIdServer.IdServer.Store
         public DbSet<UserSession> UserSession { get; set; }
         public DbSet<ConfigurationDefinition> Definitions { get; set; }
         public DbSet<ConfigurationKeyPairValueRecord> ConfigurationKeyPairValueRecords { get; set; }
+        public DbSet<RegistrationWorkflow> RegistrationWorkflows { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -100,6 +101,7 @@ namespace SimpleIdServer.IdServer.Store
             builder.ApplyConfiguration(new ConfigurationDefinitionRecordConfiguration());
             builder.ApplyConfiguration(new ConfigurationDefinitionRecordValueConfiguration());
             builder.ApplyConfiguration(new ConfigurationKeyPairValueRecordConfiguration());
+            builder.ApplyConfiguration(new RegistrationWorkflowConfiguration());
         }
     }
 }

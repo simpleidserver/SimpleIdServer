@@ -3,32 +3,55 @@
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SimpleIdServer.IdServer.Api;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Fido.UI.ViewModels;
+using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.UI;
 using System.Security.Claims;
 
 namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
 {
     [Area(Constants.AMR)]
-    public class RegisterController : BaseController
+    public class RegisterController : BaseRegisterController<RegisterWebauthnViewModel>
     {
-        public RegisterController() { }
+        public RegisterController(IOptions<IdServerHostOptions> options, IDistributedCache distributedCache, IUserRepository userRepository) : base(options, distributedCache, userRepository)
+        {
+        }
 
         [HttpGet]
-        public IActionResult Index([FromRoute] string prefix)
+        public async Task<IActionResult> Index([FromRoute] string prefix)
         {
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
             if (!string.IsNullOrWhiteSpace(prefix))
                 prefix = $"{prefix}/";
+            UserRegistrationProgress userRegistrationProgress = null;
+            var viewModel = new RegisterWebauthnViewModel();
             var login = string.Empty;
-            if (User.Identity.IsAuthenticated)
-                login = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            if (!User.Identity.IsAuthenticated)
+            {
+                userRegistrationProgress = await GetRegistrationProgress();
+                if (userRegistrationProgress == null)
+                {
+                    viewModel.IsNotAllowed = true;
+                    return View(viewModel);
+                }
+
+                login = userRegistrationProgress.User?.Name;
+            }
+            else login = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
             return View(new RegisterWebauthnViewModel
             {
                 Login = login,
                 BeginRegisterUrl = $"{issuer}/{prefix}{Constants.EndPoints.BeginRegister}",
-                EndRegisterUrl = $"{issuer}/{prefix}{Constants.EndPoints.EndRegister}"
+                EndRegisterUrl = $"{issuer}/{prefix}{Constants.EndPoints.EndRegister}",
+                Amr = userRegistrationProgress?.Amr,
+                Steps = userRegistrationProgress?.Steps
             });
         }
+
+        protected override void EnrichUser(User user, RegisterWebauthnViewModel viewModel) { }
     }
 }

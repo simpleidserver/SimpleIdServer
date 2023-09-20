@@ -16,6 +16,7 @@ using SimpleIdServer.IdServer.Fido.DTOs;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.UI;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
@@ -111,47 +112,23 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             if (string.IsNullOrWhiteSpace(request.SessionId)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.MISSING_PARAMETER, EndU2FRegisterRequestNames.SessionId));
             if (request.AuthenticatorAttestationRawResponse == null) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.MISSING_PARAMETER, EndU2FRegisterRequestNames.AuthenticatorAttestationRawResponse));
             var login = request.Login;
-            if (User.Identity.IsAuthenticated) login = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            UserRegistrationProgress registrationProgress = null;
+            bool isAuthenticated = User.Identity.IsAuthenticated;
+            if (!isAuthenticated)
+            {
+                login = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                var cookieName = _idServerHostOptions.GetRegistrationCookieName();
+                registrationProgress = await GetRegistrationProgress();
+                if(registrationProgress == null) return BuildError(System.Net.HttpStatusCode.Unauthorized, ErrorCodes.INVALID_REQUEST, ErrorMessages.NOT_ALLOWED_TO_REGISTER);
+            }
+
             if (string.IsNullOrWhiteSpace(request.Login)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.MISSING_PARAMETER, EndU2FRegisterRequestNames.Login));
             var user = await _authenticationHelper.GetUserByLogin(_userRepository.Query().Include(u => u.Credentials), login, prefix, cancellationToken);
-            if (user != null && !User.Identity.IsAuthenticated)
+            if (user != null && !isAuthenticated)
                 return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.USER_ALREADY_EXISTS, login));
             var session = await _distributedCache.GetStringAsync(request.SessionId, cancellationToken);
             if (string.IsNullOrWhiteSpace(session)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.SESSION_CANNOT_BE_EXTRACTED);
-
-            if (user == null)
-            {
-                user = new Domains.User
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Name = login,
-                    UpdateDateTime = DateTime.UtcNow,
-                    CreateDateTime = DateTime.UtcNow
-                };
-                if (_idServerHostOptions.IsEmailUsedDuringAuthentication) user.Email = login;
-                user.Realms.Add(new RealmUser
-                {
-                    RealmsName = prefix
-                });
-                if(request.DeviceData != null)
-                {
-                    user.Devices.Add(new UserDevice
-                    {
-                        CreateDateTime = DateTime.UtcNow,
-                        DeviceType = request.DeviceData.DeviceType,
-                        Id = Guid.NewGuid().ToString(),
-                        Manufacturer = request.DeviceData.Manufacturer,
-                        Model = request.DeviceData.Model,
-                        Name = request.DeviceData.Name,
-                        PushToken = request.DeviceData.PushToken,
-                        PushType = request.DeviceData.PushType,
-                        Version = request.DeviceData.Version
-                    });
-                }
-
-                _userRepository.Add(user);
-            }
-
+            if (!isAuthenticated) user = BuildUser();
             var sessionRecord = JsonSerializer.Deserialize<RegistrationSessionRecord>(session);
             var success = await _fido2.MakeNewCredentialAsync(request.AuthenticatorAttestationRawResponse, sessionRecord.Options, async (arg, c) =>
             {
@@ -166,11 +143,67 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             {
                 SlidingExpiration = fidoOptions.U2FExpirationTimeInSeconds
             }, cancellationToken);
-            await _userRepository.SaveChanges(cancellationToken);
+
+            if(!isAuthenticated) return await HandleWorkflowRegistration();
+            await _userRepository.SaveChanges(CancellationToken.None);
             return new OkObjectResult(new EndU2FRegisterResult
             {
                 Sig = success.Result.SignCount
             });
+
+            User BuildUser()
+            {
+                var result = registrationProgress.User;
+                if (result == null)
+                {
+                    result = new User
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = login,
+                        UpdateDateTime = DateTime.UtcNow,
+                        CreateDateTime = DateTime.UtcNow
+                    };
+                    if (_idServerHostOptions.IsEmailUsedDuringAuthentication) user.Email = login;
+                }
+
+                if (request.DeviceData != null)
+                {
+                    result.Devices.Add(new UserDevice
+                    {
+                        CreateDateTime = DateTime.UtcNow,
+                        DeviceType = request.DeviceData.DeviceType,
+                        Id = Guid.NewGuid().ToString(),
+                        Manufacturer = request.DeviceData.Manufacturer,
+                        Model = request.DeviceData.Model,
+                        Name = request.DeviceData.Name,
+                        PushToken = request.DeviceData.PushToken,
+                        PushType = request.DeviceData.PushType,
+                        Version = request.DeviceData.Version
+                    });
+                }
+
+                return result;
+            }
+
+            async Task<IActionResult> HandleWorkflowRegistration()
+            {
+                var lastStep = registrationProgress.Steps.Last();
+                var currentAmr = registrationProgress.Amr;
+                if (currentAmr == lastStep)
+                {
+                    _userRepository.Add(user);
+                    await _userRepository.SaveChanges(CancellationToken.None);
+                    return new OkObjectResult(new EndU2FRegisterResult
+                    {
+                        Sig = success.Result.SignCount
+                    });
+                }
+
+                registrationProgress.NextAmr();
+                registrationProgress.User = user;
+                await _distributedCache.SetStringAsync(registrationProgress.RegistrationProgressId, JsonSerializer.Serialize(registrationProgress));
+                return RedirectToAction("Index", "Register", new { area = registrationProgress.Amr });
+            }
         }
 
         protected async Task<(BeginU2FRegisterResult, ContentResult)> CommonBegin(string prefix, BeginU2FRegisterRequest request, CancellationToken cancellationToken)
@@ -251,6 +284,17 @@ namespace SimpleIdServer.IdServer.Fido.Apis
                     SerializedOptions = value.ToJson();
                 }
             }
+        }
+
+        private async Task<UserRegistrationProgress> GetRegistrationProgress()
+        {
+            var cookieName = _idServerHostOptions.GetRegistrationCookieName();
+            if (!Request.Cookies.ContainsKey(cookieName)) return null;
+            var cookieValue = Request.Cookies[cookieName];
+            var json = await _distributedCache.GetStringAsync(cookieValue);
+            if (string.IsNullOrWhiteSpace(json)) return null;
+            var registrationProgress = JsonSerializer.Deserialize<UserRegistrationProgress>(json);
+            return registrationProgress;
         }
     }
 }

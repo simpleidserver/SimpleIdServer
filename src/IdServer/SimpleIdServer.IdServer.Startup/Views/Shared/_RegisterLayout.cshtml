@@ -1,6 +1,7 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @using SimpleIdServer.IdServer.Startup.Resources
 @using System.Globalization
+@model SimpleIdServer.IdServer.UI.ViewModels.IRegisterViewModel
 
 @{
     Layout = "~/Views/Shared/_CommonLayout.cshtml";
@@ -9,7 +10,48 @@
 <div class="loginContainer">
     <div class="card login">
         <div class="card-body">
-            @RenderBody()
+            @if(Model.IsNotAllowed)
+            {                
+                <div class="alert alert-danger">@LayoutResource.not_allowed_to_execute_registration</div>
+                IgnoreBody();
+            }
+            else if(Model.IsUpdated)
+            {
+                if(User.Identity.IsAuthenticated)
+                {
+                    <div class="alert alert-success">@LayoutResource.credential_is_updated</div>
+                }
+                else
+                {
+                    <div class="alert alert-success">@LayoutResource.user_is_created</div>
+                }
+
+                IgnoreBody();
+            }
+            else
+            {
+                if (Model.Amr != null && Model.Steps != null)
+                {
+                    <ul class="progressbar">
+                        @{
+                            bool isAmrActive = true;
+                            int i = 1;
+                            foreach (var amr in Model.Steps)
+                            {
+                                var className = isAmrActive ? "active" : string.Empty;
+                                var id = "step" + i;
+                                i++;
+                                if (amr == Model.Amr) isAmrActive = false;
+                                <li class="@className" id="@id">
+                                    <strong>@amr</strong>
+                                </li>
+                            }
+                        }
+                    </ul>
+                }
+
+                @RenderBody()
+            }
         </div>
     </div>
 </div>

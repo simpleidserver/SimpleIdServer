@@ -1,10 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Collections.Generic;
 
 namespace SimpleIdServer.IdServer.UI.ViewModels;
 
-public class OTPRegisterViewModel
+public class OTPRegisterViewModel : IRegisterViewModel
 {
     public string NameIdentifier {  get; set; }
     public string Value { get; set; }
@@ -13,6 +14,9 @@ public class OTPRegisterViewModel
     public string Action { get; set; } = null!;
     public bool IsUpdated { get; set; } = false;
     public bool IsOTPCodeSent { get; set; } = false;
+    public bool IsNotAllowed { get; set; }
+    public string Amr { get; set; }
+    public List<string> Steps { get; set; }
 
     public void Validate(ModelStateDictionary modelState)
     {

@@ -1,40 +1,60 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
-using SimpleIdServer.IdServer.Api;
+using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Fido.UI.ViewModels;
+using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.UI;
 using System.Security.Claims;
 
 namespace SimpleIdServer.IdServer.Fido.UI.Mobile
 {
     [Area(Constants.MobileAMR)]
-    public class RegisterController : BaseController
+    public class RegisterController : BaseRegisterController<RegisterMobileViewModel>
     {
         private readonly IConfiguration _configuration;
 
-        public RegisterController(IConfiguration configuration)
+        public RegisterController(IOptions<IdServerHostOptions> options, IDistributedCache distributedCache, IUserRepository userRepository, IConfiguration configuration) : base(options, distributedCache, userRepository)
         {
             _configuration = configuration;
         }
 
         [HttpGet]
-        public IActionResult Index([FromRoute] string prefix)
+        public async Task<IActionResult> Index([FromRoute] string prefix)
         {
+            var viewModel = new RegisterMobileViewModel();
             var fidoOptions = GetOptions();
+            UserRegistrationProgress userRegistrationProgress = null;
+            var login = string.Empty;
+            if (!User.Identity.IsAuthenticated)
+            {
+                userRegistrationProgress = await GetRegistrationProgress();
+                if(userRegistrationProgress == null)
+                {
+                    viewModel.IsNotAllowed = true;
+                    return View(viewModel);
+                }
+
+                login = userRegistrationProgress.User?.Name;
+            }
+            else login = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
             if (!string.IsNullOrWhiteSpace(prefix))
                 prefix = $"{prefix}/";
-            var login = string.Empty;
-            if(User.Identity.IsAuthenticated)
-                login = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            viewModel.Login = login;
+            viewModel.BeginRegisterUrl = $"{issuer}/{prefix}{Constants.EndPoints.BeginQRCodeRegister}";
+            viewModel.RegisterStatusUrl = $"{issuer}/{prefix}{Constants.EndPoints.RegisterStatus}";
+            viewModel.IsDeveloperModeEnabled = fidoOptions.IsDeveloperModeEnabled;
+            viewModel.Amr = userRegistrationProgress?.Amr;
+            viewModel.Steps = userRegistrationProgress?.Steps;
+            return View(viewModel);
+        }
 
-            return View(new RegisterMobileViewModel
-            {
-                Login = login,
-                BeginRegisterUrl = $"{issuer}/{prefix}{Constants.EndPoints.BeginQRCodeRegister}",
-                RegisterStatusUrl = $"{issuer}/{prefix}{Constants.EndPoints.RegisterStatus}",
-                IsDeveloperModeEnabled = fidoOptions.IsDeveloperModeEnabled
-            });
+        protected override void EnrichUser(User user, RegisterMobileViewModel viewModel)
+        {
         }
 
         private FidoOptions GetOptions()

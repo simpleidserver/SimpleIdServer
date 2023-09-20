@@ -21,5 +21,6 @@ namespace SimpleIdServer.IdServer.Domains
         public ICollection<ImportSummary> ImportSummaries { get; set; } = new List<ImportSummary>();
         public ICollection<Group> Groups { get; set; } = new List<Group>();
         public ICollection<CredentialTemplate> CredentialTemplates { get; set; } = new List<CredentialTemplate>();
+        public ICollection<RegistrationWorkflow> RegistrationWorkflows { get; set; } = new List<RegistrationWorkflow>();
     }
 }

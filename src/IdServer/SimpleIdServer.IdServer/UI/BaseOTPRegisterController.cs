@@ -3,10 +3,12 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
-using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System;
@@ -18,14 +20,14 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.UI;
 
-public abstract class BaseOTPRegisterController<TOptions> : BaseController where TOptions : IOTPRegisterOptions
+public abstract class BaseOTPRegisterController<TOptions> : BaseRegisterController<OTPRegisterViewModel> where TOptions : IOTPRegisterOptions
 {
     private readonly IUserRepository _userRepository;
     private readonly IEnumerable<IOTPAuthenticator> _otpAuthenticators;
     private readonly IConfiguration _configuration;
     private readonly IUserNotificationService _userNotificationService;
 
-    public BaseOTPRegisterController(IUserRepository userRepository, IEnumerable<IOTPAuthenticator> otpAuthenticators, IConfiguration configuration, IUserNotificationService userNotificationService)
+    public BaseOTPRegisterController(IOptions<IdServerHostOptions> options, IDistributedCache distributedCache, IUserRepository userRepository, IEnumerable<IOTPAuthenticator> otpAuthenticators, IConfiguration configuration, IUserNotificationService userNotificationService) : base(options, distributedCache, userRepository)
     {
         _userRepository = userRepository;
         _otpAuthenticators = otpAuthenticators;
@@ -33,7 +35,7 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseController where
         _userNotificationService = userNotificationService;
     }
 
-    protected IUserRepository UserRepository => _userRepository;
+    protected abstract string Amr { get; }
 
 
     [HttpGet]
@@ -41,7 +43,19 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseController where
     {
         prefix = prefix ?? SimpleIdServer.IdServer.Constants.Prefix;
         var viewModel = new OTPRegisterViewModel();
-        if (User.Identity.IsAuthenticated)
+        UserRegistrationProgress registrationProgress = null;
+        var isAuthenticated = User.Identity.IsAuthenticated;
+        if(!isAuthenticated)
+        {
+            registrationProgress = await GetRegistrationProgress();
+            if(registrationProgress == null)
+            {
+                viewModel.IsNotAllowed = true;
+                return View(viewModel);
+            }
+        }
+
+        if (isAuthenticated)
         {
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
             viewModel.NameIdentifier = nameIdentifier;
@@ -49,6 +63,8 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseController where
             Enrich(viewModel, authenticatedUser);
         }
 
+        viewModel.Amr = registrationProgress?.Amr;
+        viewModel.Steps = registrationProgress?.Steps;
         return View(viewModel);
     }
 
@@ -57,6 +73,19 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseController where
     public async Task<IActionResult> Index([FromRoute] string prefix, OTPRegisterViewModel viewModel)
     {
         prefix = prefix ?? Constants.Prefix;
+        UserRegistrationProgress userRegistrationProgress = null;
+        if (!User.Identity.IsAuthenticated)
+        {
+            userRegistrationProgress = await GetRegistrationProgress();
+            if (userRegistrationProgress == null)
+            {
+                viewModel.IsNotAllowed = true;
+                return View(viewModel);
+            }
+        }
+
+        viewModel.Amr = userRegistrationProgress?.Amr;
+        viewModel.Steps = userRegistrationProgress?.Steps;
         viewModel.Validate(ModelState);
         if (!ModelState.IsValid) return View(viewModel);
         var options = GetOptions();
@@ -134,14 +163,7 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseController where
                 return View(viewModel);
             }
 
-            var user = UserBuilder.Create(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), realm: null)
-                .GenerateRandomTOTPKey()
-                .Build();
-            BuildUser(user, viewModel);
-            _userRepository.Add(user);
-            await _userRepository.SaveChanges(CancellationToken.None);
-            viewModel.IsUpdated = true;
-            return View(viewModel);
+            return await base.CreateUser(userRegistrationProgress, viewModel, prefix, Amr);
         }
     }
 
@@ -150,6 +172,12 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseController where
     protected abstract Task<bool> IsUserExists(string value, string prefix);
 
     protected abstract void BuildUser(User user, OTPRegisterViewModel viewModel);
+
+    protected override void EnrichUser(User user, OTPRegisterViewModel viewModel)
+    {
+        BuildUser(user, viewModel);
+        if (user.ActiveOTP == null) user.GenerateTOTP();
+    }
 
     private TOptions GetOptions()
     {

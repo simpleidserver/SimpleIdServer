@@ -64,6 +64,7 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonIgnore]
         public string? DidPrivateHex { get; set; } = null;
         [JsonIgnore]
+        [Newtonsoft.Json.JsonIgnore]
         public ICollection<Claim> Claims
         {
             get

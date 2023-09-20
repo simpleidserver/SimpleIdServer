@@ -162,6 +162,10 @@ namespace SimpleIdServer.IdServer.Options
         /// </summary>
         public string SessionCookieName { get; set; } = CookieAuthenticationDefaults.CookiePrefix + "Session";
         /// <summary>
+        /// NAME of the cookie used to store the state of the registration.
+        /// </summary>
+        public string RegistrationCookieName { get; set; } = CookieAuthenticationDefaults.CookiePrefix + "Registration";
+        /// <summary>
         /// Number of seconds the external authentication providers will be stored.
         /// </summary>
         public int? CacheExternalAuthProvidersInSeconds { get; set; }
@@ -229,6 +233,14 @@ namespace SimpleIdServer.IdServer.Options
             if (!string.IsNullOrWhiteSpace(realm))
                 return $"{SessionCookieName}.{realm}";
             return SessionCookieName;
+        }
+
+        public string GetRegistrationCookieName()
+        {
+            var realm = RealmContext.Instance().Realm;
+            if (!string.IsNullOrWhiteSpace(realm))
+                return $"{RegistrationCookieName}.{realm}";
+            return RegistrationCookieName;
         }
     }
 

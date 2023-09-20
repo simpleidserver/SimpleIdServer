@@ -19,6 +19,7 @@ namespace SimpleIdServer.IdServer
         public const string UNKNOWN_BC_AUTHORIZE = "the back channel authorization {0} doesn't exist";
         public const string UNKNOWN_DEVICE_TYPE = "the device {0} is not supported";
         public const string UNKNOWN_GRANT = "the grant {0} doesn't exist";
+        public const string UNKNOWN_REGISTRATION_WORKFLOW = "no registration workflow has been resolved";
         public const string UNKNOWN_ACCESS_TOKEN = "either the access token has been revoked or is invalid";
         public const string UNKNOWN_UMA_RESOURCE = "the UMA resource doesn't exist";
         public const string UNKNOWN_GROUP_IDS = "the group {0} don't exist";
