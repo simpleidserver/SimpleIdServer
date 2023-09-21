@@ -15,5 +15,7 @@ namespace SimpleIdServer.IdServer.Fido.DTOs
         public string EndRegisterUrl { get; set; } = null!;
         [JsonPropertyName(BeginU2FRegisterResultNames.Login)]
         public string Login { get; set; } = null!;
+        [JsonPropertyName(BeginU2FRegisterResultNames.NextRegistrationRedirectUrl)]
+        public string NextRegistrationRedirectUrl { get; set; }
     }
 }

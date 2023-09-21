@@ -30,7 +30,8 @@ namespace SimpleIdServer.IdServer.Domains
         public int OTPCounter { get; set; } = 0;
         [JsonIgnore]
         public User User { get; set; }
-
+        [JsonIgnore]
+        [Newtonsoft.Json.JsonIgnore]
         public byte[] OTPKey => CredentialType == PWD ? null : Value?.ConvertToBase32();
 
         public object Clone()

@@ -25,6 +25,7 @@ namespace SimpleIdServer.IdServer.Email
 
         public Task Send(string message, string destination)
         {
+            /*
             var emailOptions = GetOptions();
             using (var smtpClient = new SmtpClient())
             {
@@ -45,6 +46,7 @@ namespace SimpleIdServer.IdServer.Email
                 mailMessage.To.Add(destination);
                 smtpClient.Send(mailMessage);
             }
+            */
 
             return Task.CompletedTask;
         }

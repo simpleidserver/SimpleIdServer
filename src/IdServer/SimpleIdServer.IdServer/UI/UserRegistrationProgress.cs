@@ -15,11 +15,16 @@ public class UserRegistrationProgress
     public string Realm { get; set; }
     public User User { get; set; } = null;
 
-    public void NextAmr()
+    public string GetNextAmr()
     {
         var lastStep = Steps.Last();
-        if (Amr == lastStep) return;
+        if (Amr == lastStep) return Amr;
         var nextAmr = Steps.ElementAt(Steps.FindIndex(p => p == Amr) + 1);
-        Amr = nextAmr;
+        return nextAmr;
+    }
+
+    public void NextAmr()
+    {
+        Amr = GetNextAmr();
     }
 }

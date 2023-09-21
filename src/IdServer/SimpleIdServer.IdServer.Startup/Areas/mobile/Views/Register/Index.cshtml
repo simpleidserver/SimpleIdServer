@@ -96,7 +96,7 @@
                 }
             }
 
-            async function checkStatus(sessionId) {
+            async function checkStatus(sessionId, nextRegistrationRedirectUrl) {
                 setTimeout(async function(){
                     let response = await fetch(registerStatusUrl + "/" + sessionId, {
                         method: 'GET'
@@ -108,7 +108,11 @@
                         return;
                     }
 
-                    displaySuccessMessage();
+                    if(nextRegistrationRedirectUrl) {
+                        window.location.href = nextRegistrationRedirectUrl;
+                    } else {
+                        displaySuccessMessage();
+                    }
                 }, 1000);
             }
 
@@ -133,11 +137,16 @@
                 
                 const sessionId = response.headers.get('SessionId');
                 const qrCode = response.headers.get('QRCode');
+                let nextRegistrationRedirectUrl = null;
+                if (responseJson['NextRegistrationRedirectUrl']) {
+                    nextRegistrationRedirectUrl = responseJson['NextRegistrationRedirectUrl'];
+                }
+
                 const blob = await response.blob();
                 const img = URL.createObjectURL(blob);
 
                 displayQRCode(img, qrCode);
-                await checkStatus(sessionId);
+                await checkStatus(sessionId, nextRegistrationRedirectUrl);
             };
 
             $("#registerMobile").submit(function (e) {

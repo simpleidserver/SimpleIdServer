@@ -156,6 +156,9 @@
   <data name="remember_login" xml:space="preserve">
     <value>Remember my login</value>
   </data>
+  <data name="session_not_validate" xml:space="preserve">
+    <value>Registration has not been validated</value>
+  </data>
   <data name="session_not_validated" xml:space="preserve">
     <value>The session must be validate</value>
   </data>

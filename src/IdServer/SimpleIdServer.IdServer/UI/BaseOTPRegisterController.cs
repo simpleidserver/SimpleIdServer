@@ -111,7 +111,6 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseRegisterControll
             return View(viewModel);
         }
 
-        var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
         if (User.Identity.IsAuthenticated)
         {
             return await UpdateAuthenticatedUser();
@@ -136,6 +135,7 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseRegisterControll
 
         async Task<IActionResult> UpdateAuthenticatedUser()
         {
+            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
             var userExists = await IsUserExists(viewModel.Value, prefix);
             if (userExists)
             {

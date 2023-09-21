@@ -115,6 +115,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Session Identitfier is invalid.
+        /// </summary>
+        public static string invalid_session_id {
+            get {
+                return ResourceManager.GetString("invalid_session_id", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Login.
         /// </summary>
         public static string login {
@@ -210,6 +219,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static string scan_mobileapp {
             get {
                 return ResourceManager.GetString("scan_mobileapp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Registration has not been validated.
+        /// </summary>
+        public static string session_not_validate {
+            get {
+                return ResourceManager.GetString("session_not_validate", resourceCulture);
             }
         }
         

@@ -178,6 +178,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Registration has not been validated.
+        /// </summary>
+        public static string session_not_validate {
+            get {
+                return ResourceManager.GetString("session_not_validate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à The session must be validate.
         /// </summary>
         public static string session_not_validated {

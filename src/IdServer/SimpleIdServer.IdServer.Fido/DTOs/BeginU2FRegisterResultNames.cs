@@ -8,5 +8,6 @@ namespace SimpleIdServer.IdServer.Fido.DTOs
         public const string CredentialCreateOptions = "credential_create_options";
         public const string EndRegisterUrl = "end_register_url";
         public const string Login = "login";
+        public const string NextRegistrationRedirectUrl = "next_registration_redirect_url";
     }
 }
