@@ -17,6 +17,7 @@ namespace SimpleIdServer.IdServer
         public const string UNKNOWN_JSON_WEBKEY = "Json Web Key doesn't exist";
         public const string UNKNOWN_PERMISSIONS = "the permissions {0} don't exist";
         public const string UNKNOWN_BC_AUTHORIZE = "the back channel authorization {0} doesn't exist";
+        public const string UNKNOWN_AUTHENTICATION_METHODS = "the authentication methods {0} are unknown";
         public const string UNKNOWN_DEVICE_TYPE = "the device {0} is not supported";
         public const string UNKNOWN_GRANT = "the grant {0} doesn't exist";
         public const string UNKNOWN_REGISTRATION_WORKFLOW = "no registration workflow has been resolved";
@@ -262,5 +263,6 @@ namespace SimpleIdServer.IdServer
         public const string DPOP_JKT_MISMATCH = "there is a mismatch between the dpop_jkt and the DPoP proof";
         public const string USER_NOT_AUTHENTICATED = "you're not authenticated";
         public const string INACTIVE_SESSION = "the session is not active";
+        public const string REGISTRATION_WORFKLOW_EXISTS = "a registration worklow with the same name already exists";
     }
 }

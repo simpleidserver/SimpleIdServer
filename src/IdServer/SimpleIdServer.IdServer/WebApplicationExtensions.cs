@@ -296,6 +296,22 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthMethods + "/{amr}",
                 defaults: new { controller = "AuthenticationMethods", action = "Get" });
 
+            webApplication.MapControllerRoute("getAllRegistrationWorkflows",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RegistrationWorkflows,
+                defaults: new { controller = "RegistrationWorkflows", action = "GetAll" });
+            webApplication.MapControllerRoute("getRegistrationWorkflow",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RegistrationWorkflows + "/{id}",
+                defaults: new { controller = "RegistrationWorkflows", action = "Get" });
+            webApplication.MapControllerRoute("deleteRegistrationWorkflow",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RegistrationWorkflows + "/{id}",
+                defaults: new { controller = "RegistrationWorkflows", action = "Delete" });
+            webApplication.MapControllerRoute("addRegistrationWorkflow",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RegistrationWorkflows,
+                defaults: new { controller = "RegistrationWorkflows", action = "Add" });
+            webApplication.MapControllerRoute("updateRegistrationWorkflow",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RegistrationWorkflows + "/{id}",
+                defaults: new { controller = "RegistrationWorkflows", action = "Update" });
+
             webApplication.MapControllerRoute(
                 name: "defaultWithArea",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + "{area:exists}/{controller=Home}/{action=Index}/{id?}");

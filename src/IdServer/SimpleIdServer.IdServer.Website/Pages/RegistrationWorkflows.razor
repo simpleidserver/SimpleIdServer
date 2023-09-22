@@ -1,0 +1,106 @@
+﻿@page "/registrationworkflows"
+@using SimpleIdServer.IdServer.Website.Stores.RegistrationWorkflowStore;
+@inject IState<RegistrationWorkflowsState> registrationWorkflowsState
+@inject ContextMenuService contextMenuService
+@inject IDispatcher dispatcher
+
+<RadzenText class="mt-3 mb-3 no-margin" Text="Registration Workflows" TextStyle="TextStyle.DisplayH3" />
+
+<RadzenDataGrid @ref="registrationWorkflowsGrid"
+                AllowFiltering="false"
+                AllowColumnResize="true"
+                AllowAlternatingRows="false"
+                AllowSorting="false"
+                PageSize="30"
+                AllowPaging="false"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="false"
+                IsLoading="@registrationWorkflowsState.Value.IsLoading"
+                Count="@registrationWorkflowsState.Value.Count"
+                Data="@registrationWorkflowsState.Value.RegistrationWorkflows"
+                LoadData="@LoadData"
+                RowRender="@RowRender"
+                TItem="SelectableRegistrationWorkflow"
+                ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn TItem="SelectableRegistrationWorkflow" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <HeaderTemplate>
+                <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
+            </HeaderTemplate>
+            <Template Context="data">
+                <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableRegistrationWorkflow" Filterable="false" Sortable="false" Title="Name">
+            <Template Context="data">
+                <RadzenLink Text="@data.RegistrationWorkflow.Name" Path="@($"/registrationworkflows/{data.RegistrationWorkflow.Id}")" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableRegistrationWorkflow" Filterable="false" Sortable="false" Title="Authentication methods">
+            <Template Context="data">
+                @foreach(var step in data.RegistrationWorkflow.Steps)
+                {
+                    <RadzenBadge Text="@step" IsPill="true" />
+                }
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableRegistrationWorkflow" Property="RegistrationWorkflow.UpdateDateTime" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Title="Update datetime" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableRegistrationWorkflow" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <Template Context="data">
+                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    bool selectAll = false;
+    RadzenDataGrid<SelectableRegistrationWorkflow> registrationWorkflowsGrid;
+
+    void LoadData(LoadDataArgs args)
+    {
+        var act = new GetAllRegistrationWorkflowsAction();
+        dispatcher.Dispatch(act);
+    }
+
+    void ToggleAll(bool isSelected)
+    {
+        var act = new ToggleAllRegistrationWorkflowAction { IsSelected = isSelected };
+        dispatcher.Dispatch(act);
+    }
+
+    void ToggleChanged(bool isSelected, SelectableRegistrationWorkflow registrationWorkflow)
+    {
+        var act = new ToggleRegistrationWorkflowAction { IsSelected = isSelected, Id = registrationWorkflow.RegistrationWorkflow.Id };
+        dispatcher.Dispatch(act);
+    }
+
+    void RowRender(RowRenderEventArgs<SelectableRegistrationWorkflow> row)
+    {
+        const string className = "class";
+        if (row.Data.IsNew)
+            row.Attributes.Add(className, "new");
+        else if (row.Data.IsSelected)
+            row.Attributes.Add(className, "active");
+        else if (row.Attributes.ContainsKey(className))
+            row.Attributes.Remove(className);
+    }
+
+    void ShowMoreContextMenu(SelectableRegistrationWorkflow registrationWorkflow, MouseEventArgs args)
+    {
+        contextMenuService.Open(args, new List<ContextMenuItem>
+        {
+            new ContextMenuItem { Text = "Delete", Value = 1 }
+        }, (a) =>
+        {
+            if (a.Value.Equals(1))
+            {
+                // var clientIds = clientState.Value.Clients?.Where(c => c.IsSelected).Select(c => c.Value.ClientId)?.ToList();
+                // if (!clientIds.Contains(client.Value.ClientId)) clientIds.Add(client.Value.ClientId);
+                // var act = new RemoveSelectedClientsAction { ClientIds = clientIds };
+                // dispatcher.Dispatch(act);
+                contextMenuService.Close();
+            }
+        });
+    }
+}

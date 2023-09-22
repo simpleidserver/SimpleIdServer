@@ -8,6 +8,9 @@ namespace SimpleIdServer.IdServer.Store;
 public interface IRegistrationWorkflowRepository
 {
 	IQueryable<RegistrationWorkflow> Query();
+	void Delete(RegistrationWorkflow record);
+	void Add(RegistrationWorkflow record);
+	Task<int> SaveChanges(CancellationToken cancellationToken);
 }
 
 public class RegistrationWorkflowRepository : IRegistrationWorkflowRepository
@@ -19,5 +22,11 @@ public class RegistrationWorkflowRepository : IRegistrationWorkflowRepository
 		_dbContext = dbContext;
 	}
 
-	public IQueryable<RegistrationWorkflow> Query() => _dbContext.RegistrationWorkflows;
+    public IQueryable<RegistrationWorkflow> Query() => _dbContext.RegistrationWorkflows;
+
+    public void Delete(RegistrationWorkflow record) => _dbContext.RegistrationWorkflows.Remove(record);
+
+	public void Add(RegistrationWorkflow record) => _dbContext.RegistrationWorkflows.Add(record);
+
+	public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
 }

@@ -6,7 +6,6 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Domains;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Security.Claims;
 
 namespace SimpleIdServer.IdServer
@@ -58,6 +57,7 @@ namespace SimpleIdServer.IdServer
             public const string FIDORegistration = "fido/u2f/registration";
             public const string FIDOAuthentication = "fido/u2f/authentication";
             public const string AuthMethods = "authmethods";
+            public const string RegistrationWorkflows = "registrationworkflows";
         }
 
         public static List<string> AllStandardNotificationModes = new List<string>
@@ -468,6 +468,20 @@ namespace SimpleIdServer.IdServer
                 Id = Guid.NewGuid().ToString(),
                 Type = ScopeTypes.APIRESOURCE,
                 Name = "authenticationmethods",
+                Realms = new List<Domains.Realm>
+                {
+                    StandardRealms.Master
+                },
+                Protocol = ScopeProtocols.OAUTH,
+                IsExposedInConfigurationEdp = true,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
+            };
+            public static Scope RegistrationWorkflows = new Scope
+            {
+                Id = Guid.NewGuid().ToString(),
+                Type = ScopeTypes.APIRESOURCE,
+                Name = "registrationworkflows",
                 Realms = new List<Domains.Realm>
                 {
                     StandardRealms.Master
