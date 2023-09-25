@@ -15,9 +15,10 @@ public record RegistrationWorkflowState
 
     public RegistrationWorkflowState(RegistrationWorkflowResult value, bool isLoading)
     {
-
+        Value = value;
+        IsLoading = isLoading;
     }
 
-    public RegistrationWorkflowResult Value { get; set; }
+    public RegistrationWorkflowResult Value { get; set; } = new RegistrationWorkflowResult();
     public bool IsLoading { get; set; }
 }

@@ -1,4 +1,5 @@
-﻿@using SimpleIdServer.IdServer.Website.Stores.ConfigurationDefinitionStore;
+﻿@using SimpleIdServer.IdServer.Website.Stores.AuthMethodsStore;
+@using SimpleIdServer.IdServer.Website.Stores.ConfigurationDefinitionStore;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorLayout
 @inject IState<RealmsState> state
@@ -44,16 +45,18 @@
                     <RadzenPanelMenuItem Text="Groups" Icon="group" Path="/groups" />
                 </RadzenPanelMenuItem>
                 <RadzenPanelMenuItem Text="Authentication">
-                    <RadzenPanelMenuItem Text="Authentication Methods" Icon="person" Path="/authmethods" />
                     <RadzenPanelMenuItem Text="Authentication Context" Icon="security" Path="/acrs" />
-                    <RadzenPanelMenuItem Text="Identity Providers" Icon="people" Path="/idproviders" />
+                    <RadzenPanelMenuItem Text="Authentication" Icon="person" Path="/authentications/authmethods" />
                 </RadzenPanelMenuItem>
                 <RadzenPanelMenuItem Text="Credential Management">
                     <RadzenPanelMenuItem Text="Credential templates" Icon="wallet" Path="/credentialtemplates" />
                     <RadzenPanelMenuItem Text="Ethereum networks" Icon="currency_bitcoin" Path="/ethrnetworks" />
                 </RadzenPanelMenuItem>
+                <RadzenPanelMenuItem Text="Identity Provisioning">
+                    <RadzenPanelMenuItem Text="Manual Identity Provisioning" Icon="back_hand" Path="/registrationworkflows"></RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem Text="Automatic Identity Provisioning" Icon="refresh" Path="/identityprovisioning" />
+                </RadzenPanelMenuItem>
                 <RadzenPanelMenuItem Text="Configure" />
-                <RadzenPanelMenuItem Text="Identity Provisioning" Icon="accessibility" Path="/identityprovisioning" />
                 <RadzenPanelMenuItem Text="Certificate Authorities" Icon="shield" Path="/certificateauthorities" />
                 <RadzenPanelMenuItem Text="Auditing" Icon="source" Path="/auditing" />
             </RadzenPanelMenu>
@@ -105,5 +108,6 @@
         this.isLoading = true;
         dispatcher.Dispatch(new GetActiveRealmAction());
         dispatcher.Dispatch(new GetAllRealmAction());
+        dispatcher.Dispatch(new GetAllAuthMethodAction());
     }
 }

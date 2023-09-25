@@ -414,4 +414,13 @@
   <data name="AuthMethodUpdated" xml:space="preserve">
     <value>Authentication Method has been updated</value>
   </data>
+  <data name="SelectedRegistrationWorkflowRemoved" xml:space="preserve">
+    <value>Selected registration workflows have been removed</value>
+  </data>
+  <data name="RegistrationWorkflowAdded" xml:space="preserve">
+    <value>Registration workflow '{0}' has been added</value>
+  </data>
+  <data name="RegistrationWorkflowUpdated" xml:space="preserve">
+    <value>Registration workflow '{0}' has been updated</value>
+  </data>
 </root>

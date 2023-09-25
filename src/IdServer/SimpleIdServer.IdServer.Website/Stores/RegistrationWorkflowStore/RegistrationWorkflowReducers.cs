@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using Fluxor;
+using Nethereum.ABI.Encoders;
 using SimpleIdServer.IdServer.Api.RegistrationWorkflows;
 
 namespace SimpleIdServer.IdServer.Website.Stores.RegistrationWorkflowStore;
@@ -9,6 +10,40 @@ namespace SimpleIdServer.IdServer.Website.Stores.RegistrationWorkflowStore;
 public class RegistrationWorkflowReducers
 {
     #region RegistrationWorkflowsState
+
+    [ReducerMethod]
+    public static RegistrationWorkflowsState ReduceUpdateRegistrationWorkflowAction(RegistrationWorkflowsState state, UpdateRegistrationWorkflowAction act)
+    {
+        return state with
+        {
+            IsLoading = true
+        };
+    }
+
+    [ReducerMethod]
+    public static RegistrationWorkflowsState ReduceUpdateRegistrationWorkflowSuccessAction(RegistrationWorkflowsState state, UpdateRegistrationWorkflowSuccessAction act)
+    {
+        var registrationWorkflows = state.RegistrationWorkflows.ToList();
+        var defaultRegistrationWorkflows = registrationWorkflows.Where(r => r.RegistrationWorkflow.IsDefault);
+        foreach (var defaultRegistrationWorkflow in defaultRegistrationWorkflows) defaultRegistrationWorkflow.RegistrationWorkflow.IsDefault = false;
+        var selectedRegistrationWorkflow = registrationWorkflows.Single(w => w.RegistrationWorkflow.Id == act.Id);
+        selectedRegistrationWorkflow.RegistrationWorkflow.IsDefault = act.IsDefault;
+        return state with
+        {
+            IsLoading = false,
+            RegistrationWorkflows = registrationWorkflows
+        };
+    }
+
+    [ReducerMethod]
+    public static RegistrationWorkflowsState ReduceUpdateRegistrationWorkflowFailureAction(RegistrationWorkflowsState state, UpdateRegistrationWorkflowFailureAction act)
+    {
+        return state with
+        {
+            IsLoading = false
+        };
+    }
+
 
     [ReducerMethod]
     public static RegistrationWorkflowsState ReduceGetAllRegistrationWorkflowsAction(RegistrationWorkflowsState state, GetAllRegistrationWorkflowsAction act) => new RegistrationWorkflowsState(true, new List<RegistrationWorkflowResult>());
@@ -55,7 +90,42 @@ public class RegistrationWorkflowReducers
         return state with
         {
             IsLoading = false,
-            RegistrationWorkflows = registrationWorkflows
+            RegistrationWorkflows = registrationWorkflows,
+            Count = registrationWorkflows.Count
+        };
+    }
+
+    [ReducerMethod]
+    public static RegistrationWorkflowsState ReduceAddRegistrationWorkflowAction(RegistrationWorkflowsState state, AddRegistrationWorkflowAction action)
+    {
+        return state with
+        {
+            IsLoading = true
+        };
+    }
+
+    [ReducerMethod]
+    public static RegistrationWorkflowsState ReduceAddRegistrationWorkflowSuccessAction(RegistrationWorkflowsState state, AddRegistrationWorkflowSuccessAction action)
+    {
+        var registrationWorkflows = state.RegistrationWorkflows.ToList();
+        registrationWorkflows.Add(new SelectableRegistrationWorkflow(new RegistrationWorkflowResult { CreateDateTime = DateTime.UtcNow, Id = action.Id, IsDefault = action.IsDefault, Name = action.Name, Steps = action.Steps, UpdateDateTime = DateTime.UtcNow }, false)
+        {
+            IsNew = true
+        });
+        return state with
+        {
+            RegistrationWorkflows = registrationWorkflows,
+            Count = registrationWorkflows.Count,
+            IsLoading = false
+        };
+    }
+
+    [ReducerMethod]
+    public static RegistrationWorkflowsState ReduceAddRegistrationWorkflowFailureAction(RegistrationWorkflowsState state, AddRegistrationWorkflowFailureAction action)
+    {
+        return state with
+        {
+            IsLoading = false
         };
     }
 

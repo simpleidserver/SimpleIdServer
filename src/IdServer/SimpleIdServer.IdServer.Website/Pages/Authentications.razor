@@ -1,18 +1,57 @@
-﻿@page "/authentications"
+﻿@page "/authentications/{action}"
+@using SimpleIdServer.IdServer.Website.Stores.AuthMethodsStore;
+@using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @inject IDispatcher dispatcher
+@inject NavigationManager navigationManager
+@inherits Fluxor.Blazor.Web.Components.FluxorLayout
 
 <RadzenText class="mt-3 mb-3 no-margin" Text="Authentications" TextStyle="TextStyle.DisplayH3" />
 
-<RadzenTabs>
-    <Tabs>
-        <RadzenTabsItem Text="Authentication methods">
-
-        </RadzenTabsItem>
-        <RadzenTabsItem Text="External identity providers">
-
-        </RadzenTabsItem>
-    </Tabs>
-</RadzenTabs>
+<RadzenCardLoader Variant="Variant.Filled" IsLoading=@isLoading>
+    <RadzenTabs Change="@OnChange" @bind-SelectedIndex="selectedIndex">
+        <Tabs>
+            <RadzenTabsItem Text="Authentication methods">
+                <AuthMethods></AuthMethods>
+            </RadzenTabsItem>
+            <RadzenTabsItem Text="External identity providers">
+                <IdProviders></IdProviders>
+            </RadzenTabsItem>
+        </Tabs>
+    </RadzenTabs>
+</RadzenCardLoader>
 
 @code {
+    Dictionary<string, int> mappingActionNameToIndex = new Dictionary<string, int>
+    {
+        { "authmethods", 0 },
+        { "idproviders", 1 }
+    };
+
+    [Parameter]
+    public string? action { get; set; } = null;
+    int selectedIndex = 0;
+    private bool isLoading { get; set; } = true;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            SubscribeToAction<GetAllAuthMethodSuccessAction>((act) =>
+            {
+                isLoading = false;
+            });
+            SubscribeToAction<SearchIdProvidersSuccessAction>((act) =>
+            {
+                isLoading = false;
+            });
+        }
+    }
+
+    void OnChange(int index)
+    {
+        var rec = mappingActionNameToIndex.Single(kvp => kvp.Value == index);
+        navigationManager.NavigateTo($"/authentications/{rec.Key}");
+    }
 }

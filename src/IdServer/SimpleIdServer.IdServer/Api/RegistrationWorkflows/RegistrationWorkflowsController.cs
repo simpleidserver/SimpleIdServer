@@ -93,10 +93,19 @@ public class RegistrationWorkflowsController : BaseController
             var record = builder.Build();
             _registrationWorkflowRepository.Add(record);
             await _registrationWorkflowRepository.SaveChanges(CancellationToken.None);
+            var json = JsonSerializer.Serialize(new RegistrationWorkflowResult
+            {
+                CreateDateTime = record.CreateDateTime,
+                UpdateDateTime = record.UpdateDateTime,
+                Id = record.Id,
+                IsDefault = record.IsDefault,
+                Name = record.Name,
+                Steps = record.Steps
+            });
             return new ContentResult
             {
                 StatusCode = (int)HttpStatusCode.Created,
-                Content = JsonSerializer.Serialize(record),
+                Content = json,
                 ContentType = "application/json"
             };
         }
@@ -115,12 +124,11 @@ public class RegistrationWorkflowsController : BaseController
             CheckAccessToken(prefix, Constants.StandardScopes.RegistrationWorkflows.Name, _jwtBuilder);
             if (string.IsNullOrWhiteSpace(request.Name)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, RegistrationWorkflowNames.Name));
             if (request.Steps == null || !request.Steps.Any()) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, RegistrationWorkflowNames.Steps));
-            var existingAmrs = _authenticationMethodServices.Select(a => a.Name);
+            var existingAmrs = _authenticationMethodServices.Select(a => a.Amr);
             var unknownAmrs = request.Steps.Where(s => !existingAmrs.Contains(s));
             if (unknownAmrs.Any()) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_AUTHENTICATION_METHODS, string.Join(",", unknownAmrs)));
             var existingRegistrationWorkflow = await _registrationWorkflowRepository.Query().FirstOrDefaultAsync(r => r.RealmName == prefix && r.Id == id);
             if (existingRegistrationWorkflow == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_REGISTRATION_WORKFLOW, id));
-            existingRegistrationWorkflow.Name = request.Name;
             existingRegistrationWorkflow.UpdateDateTime = DateTime.UtcNow;
             existingRegistrationWorkflow.IsDefault = request.IsDefault;
             existingRegistrationWorkflow.Steps = request.Steps;

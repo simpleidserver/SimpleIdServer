@@ -1,0 +1,97 @@
+﻿@using SimpleIdServer.IdServer.Api.RegistrationWorkflows;
+@using SimpleIdServer.IdServer.Website.Stores.AuthMethodsStore;
+
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject IState<AuthMethodsState> authMethodsState
+@inject IDispatcher dispatcher
+
+@if (editForm != null && !authMethodsState.Value.IsLoading)
+{
+    <RadzenTemplateForm Data="@editForm" TItem="RegistrationWorkflowEditForm" Submit="@Submit">
+        <RadzenStack>
+            <!-- Name -->
+            <RadzenFormField Text="Name" Variant=Variant.Outlined>
+                <ChildContent>
+                    @if (IsEditionMode)
+                    {
+                        <RadzenTextBox Name="Name" @bind-Value="@editForm.Name" Disabled=true></RadzenTextBox>
+                    }
+                    else
+                    {
+                        <RadzenTextBox Name="Name" @bind-Value="@editForm.Name"></RadzenTextBox>
+                    }
+                </ChildContent>
+                <Helper>
+                    <RadzenRequiredValidator Component="Name" Text="Name is required." />
+                </Helper>
+            </RadzenFormField>
+            <!-- Steps -->
+            <RadzenFormField Variant="Variant.Outlined">
+                <ChildContent>
+                    <RadzenDropDown @bind-Value=@editForm.Steps Chips=true Data=@AuthMethods Multiple=true AllowClear=true Placeholder="Select Authentication Methods" class="w-100"></RadzenDropDown>
+                </ChildContent>
+                <Helper>
+                    Select one or more registration methods and update the order. The order is important as it determines the sequence of actions for registering the end-user.
+                </Helper>
+            </RadzenFormField>
+            <!-- Is Default -->
+            <div class="mt-3">
+                <RadzenCheckBox Name="IsDefault" @bind-Value=editForm.IsDefault></RadzenCheckBox>
+                <RadzenLabel Text="Is default" Component="IsDefault" Style="margin-left: 8px; vertical-align: middle;" />
+            </div>
+        </RadzenStack>
+        <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(IsUpdating ? (IsEditionMode ? "Updating..." : "Adding...") : (IsEditionMode ? "Update" : "Add"))" Disabled=@IsUpdating />
+    </RadzenTemplateForm>
+}
+
+@code {
+    [Parameter]
+    public RegistrationWorkflowResult RegistrationWorkflow { get; set; }
+    [Parameter]
+    public bool IsEditionMode { get; set; }
+    [Parameter]
+    public bool IsUpdating { get; set; }
+    [Parameter]
+    public EventCallback<RegistrationWorkflowResult> Saved { get; set; }
+    RegistrationWorkflowEditForm editForm = new RegistrationWorkflowEditForm();
+    List<string> AuthMethods
+    {
+        get 
+        {
+            return authMethodsState.Value.AuthenticationMethods.Select(a => a.Id).ToList();
+        }
+    }
+
+    class RegistrationWorkflowEditForm
+    {
+        public string Name { get; set; }
+        public List<string> Steps { get; set; }
+        public bool IsDefault { get; set; }
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if(IsEditionMode)
+        {            
+            if(RegistrationWorkflow != null)
+            {
+                editForm = new RegistrationWorkflowEditForm
+                {
+                    IsDefault = RegistrationWorkflow.IsDefault,
+                    Steps = RegistrationWorkflow.Steps
+                };
+            }
+        }
+        else
+        {
+            editForm = new RegistrationWorkflowEditForm();
+        }
+    }
+
+    async void Submit(RegistrationWorkflowEditForm ef)
+    {
+        var result = new RegistrationWorkflowResult { Id = RegistrationWorkflow?.Id, Name = ef.Name, IsDefault = ef.IsDefault, Steps = ef.Steps };
+        await Saved.InvokeAsync(result);
+    }
+}

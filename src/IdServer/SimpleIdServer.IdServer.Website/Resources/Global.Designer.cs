@@ -511,6 +511,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Registration workflow &apos;{0}&apos; has been added.
+        /// </summary>
+        public static string RegistrationWorkflowAdded {
+            get {
+                return ResourceManager.GetString("RegistrationWorkflowAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Registration workflow &apos;{0}&apos; has been updated.
+        /// </summary>
+        public static string RegistrationWorkflowUpdated {
+            get {
+                return ResourceManager.GetString("RegistrationWorkflowUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Scope &apos;{0}&apos; is added.
         /// </summary>
         public static string ScopeAdded {
@@ -759,6 +777,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string SelectedIdProvidersRemoved {
             get {
                 return ResourceManager.GetString("SelectedIdProvidersRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Selected registration workflows have been removed.
+        /// </summary>
+        public static string SelectedRegistrationWorkflowRemoved {
+            get {
+                return ResourceManager.GetString("SelectedRegistrationWorkflowRemoved", resourceCulture);
             }
         }
         

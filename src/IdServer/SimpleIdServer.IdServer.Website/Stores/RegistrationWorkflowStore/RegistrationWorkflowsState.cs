@@ -20,7 +20,7 @@ public record RegistrationWorkflowsState
         Count = RegistrationWorkflows.Count();
     }
 
-    public bool IsLoading { get; set; } = true;
+    public bool IsLoading { get; set; } = false;
     public List<SelectableRegistrationWorkflow> RegistrationWorkflows { get; set; } = new List<SelectableRegistrationWorkflow>();
     public int Count { get; set; }
 }

@@ -1,4 +1,4 @@
-﻿@page "/idproviders/{id}/{action}"
+﻿@page "/authentications/idproviders/{id}/{action}"
 @using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
@@ -8,7 +8,7 @@
 @inject IDispatcher dispatcher
 
 <RadzenBreadCrumb>
-    <RadzenBreadCrumbItem Path="/idproviders" Text="Identity Providers" />
+    <RadzenBreadCrumbItem Path="/authentications/idproviders" Text="Identity Providers" />
     <RadzenBreadCrumbItem Text="Identity Provider details" />
 </RadzenBreadCrumb>
 
@@ -51,7 +51,7 @@
         {
             SubscribeToAction<SelectRealmSuccessAction>((act) =>
             {
-                navigationManager.NavigateTo("/idproviders");
+                navigationManager.NavigateTo("/authentications/idproviders");
             });
             SubscribeToAction<GetIdProviderFailureAction>((act) =>
             {
@@ -73,6 +73,6 @@
     void OnChange(int index)
     {
         var rec = mappingActionNameToIndex.Single(kvp => kvp.Value == index);
-        navigationManager.NavigateTo($"/idproviders/{id}/{rec.Key}");
+        navigationManager.NavigateTo($"/authentications/idproviders/{id}/{rec.Key}");
     }
 }

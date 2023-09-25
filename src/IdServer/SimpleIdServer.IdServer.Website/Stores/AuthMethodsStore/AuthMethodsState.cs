@@ -21,7 +21,7 @@ public record AuthMethodsState
 		Count = authenticationMethods == null ? 0 : authenticationMethods.Count();
     }
 
-	public IEnumerable<AuthenticationMethodResult> AuthenticationMethods { get; set; }
-	public bool IsLoading { get; set; }
+	public IEnumerable<AuthenticationMethodResult> AuthenticationMethods { get; set; } = new List<AuthenticationMethodResult>();
+	public bool IsLoading { get; set; } = true;
 	public int Count { get; set; }
 }

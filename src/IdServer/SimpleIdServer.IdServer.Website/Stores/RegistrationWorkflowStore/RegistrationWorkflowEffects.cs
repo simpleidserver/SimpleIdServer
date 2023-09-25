@@ -114,6 +114,38 @@ public class RegistrationWorkflowEffects
         }
     }
 
+    [EffectMethod]
+    public async Task Handle(AddRegistrationWorkflowAction action, IDispatcher dispatcher)
+    {
+        var realm = await GetRealm();
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var jsonRequest = JsonSerializer.Serialize(new RegistrationWorkflowResult
+        {
+            Name = action.Name,
+            IsDefault = action.IsDefault,
+            Steps = action.Steps
+        });
+        var requestMessage = new HttpRequestMessage
+        {
+            RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/registrationworkflows"),
+            Method = HttpMethod.Post,
+            Content = new StringContent(jsonRequest, Encoding.UTF8, "application/json")
+        };
+        var httpResult = await httpClient.SendAsync(requestMessage);
+        var json = await httpResult.Content.ReadAsStringAsync();
+        try
+        {
+            httpResult.EnsureSuccessStatusCode();
+            var result = JsonSerializer.Deserialize<RegistrationWorkflowResult>(json);
+            dispatcher.Dispatch(new AddRegistrationWorkflowSuccessAction { Id = result.Id, IsDefault = action.IsDefault, Name = action.Name, Steps = action.Steps });
+        }
+        catch
+        {
+            var jsonObj = JsonObject.Parse(json);
+            dispatcher.Dispatch(new AddRegistrationWorkflowFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
+        }
+    }
+
     private async Task<string> GetRealm()
     {
         var realm = await _sessionStorage.GetAsync<string>("realm");
@@ -174,6 +206,26 @@ public class UpdateRegistrationWorkflowSuccessAction
 }
 
 public class UpdateRegistrationWorkflowFailureAction
+{
+    public string ErrorMessage { get; set; }
+}
+
+public class AddRegistrationWorkflowAction
+{
+    public string Name { get; set; }
+    public bool IsDefault { get; set; }
+    public List<string> Steps { get; set; }
+}
+
+public class AddRegistrationWorkflowSuccessAction
+{
+    public string Id { get; set; }
+    public string Name { get; set; }
+    public bool IsDefault { get; set; }
+    public List<string> Steps { get; set; }
+}
+
+public class AddRegistrationWorkflowFailureAction
 {
     public string ErrorMessage { get; set; }
 }

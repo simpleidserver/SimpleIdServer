@@ -1,4 +1,4 @@
-﻿@page "/authmethods/{amr}/options"
+﻿@page "/authentications/authmethods/{amr}/options"
 @inject IState<AuthMethodState> authMethodState
 @inject IDispatcher dispatcher
 @inject NotificationService notificationService
@@ -9,7 +9,7 @@
 @using SimpleIdServer.IdServer.Website.Stores.AuthMethodsStore;
 
 <RadzenBreadCrumb>
-    <RadzenBreadCrumbItem Path="/authmethods" Text="Authentication Methods" />
+    <RadzenBreadCrumbItem Path="/authentications/authmethods" Text="Authentication methods" />
     <RadzenBreadCrumbItem Text="Options" />
 </RadzenBreadCrumb>
 
