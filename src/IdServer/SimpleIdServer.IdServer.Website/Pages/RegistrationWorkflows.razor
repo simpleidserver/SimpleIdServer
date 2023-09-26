@@ -1,4 +1,5 @@
 ﻿@page "/registrationworkflows"
+@using Microsoft.Extensions.Options;
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @using SimpleIdServer.IdServer.Website.Stores.RegistrationWorkflowStore;
@@ -6,7 +7,9 @@
 @inject NotificationService notificationService
 @inject DialogService dialogService
 @inject ContextMenuService contextMenuService
+@inject IOptions<IdServerWebsiteOptions> Options;
 @inject IState<RegistrationWorkflowsState> registrationWorkflowsState
+@inject IState<RealmsState> realmsState
 @inject IDispatcher dispatcher
 
 <div class="row mt-3 mb-3 ">
@@ -45,7 +48,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableRegistrationWorkflow" Filterable="false" Sortable="false" Title="Name">
             <Template Context="data">
-                @data.RegistrationWorkflow.Name
+                <RadzenLink Path="@GetDemoUrl(data)" Target="_blank">@data.RegistrationWorkflow.Name</RadzenLink>
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableRegistrationWorkflow" Filterable="false" Sortable="false" Title="Registration methods">
@@ -161,5 +164,10 @@
     {
         var updateRegistrationWorkflow = new UpdateRegistrationWorkflowAction { Id = workflow.RegistrationWorkflow.Id, IsDefault = isSelected, Name = workflow.RegistrationWorkflow.Name, Steps = workflow.RegistrationWorkflow.Steps };
         dispatcher.Dispatch(updateRegistrationWorkflow);
+    }
+
+    string GetDemoUrl(SelectableRegistrationWorkflow workflow)
+    {
+        return $"{Options.Value.IdServerBaseUrl}/{realmsState.Value.ActiveRealm}/registration?workflowName={workflow.RegistrationWorkflow.Name}";
     }
 }

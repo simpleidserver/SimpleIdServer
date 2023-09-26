@@ -14,21 +14,36 @@
 /** @type {import('@docusaurus/plugin-content-docs').SidebarsConfig} */
 const sidebars = {
   docs: [
+    'overview',
     'installation',
-    'dotnettemplate',
-    'configuration',
-    'realm/index',
-    { type: 'category', label: 'Identity Management', items:[ 'idmanagement/index', 'idmanagement/azuread', 'idmanagement/samples' ] },
-    'mobileapplication',
-    { type: 'category', label: 'OAuth 2.0 and OpenID Connect', items:[ 'openidconnect/index', 'openidconnect/grant_types', 'openidconnect/clientauthmethods', 'openidconnect/clientregistration', 'openidconnect/acr' ] },
-    { type: 'category', label: 'Financial-grade API (FAPI)', items: [ 'fapi/index', 'fapi/securityprofile', 'fapi/ciba', 'fapi/grantmgt' ] },
-    { type: 'category', label: 'Verifiable Credentials', items: ['verifiablecredentials/index', 'verifiablecredentials/credissuer', 'verifiablecredentials/did'] },
-    'wsfederation',
-    'authenticators',
-    'pki/index',
-    'auditing/index',
-    { type: 'category', label: 'Administration UI', items : [ 'adminui/index', 'adminui/realm', 'adminui/clients', 'adminui/externalidproviders', 'adminui/certificateauthority' ] },
-    { type: 'category', label: 'Migration', items: ['migrations/403to404'] }
+    {
+      type: 'category',
+      label: 'Identity and Access Management',
+      items: [
+        'iam/authmethods',
+        'iam/externalidproviders',
+        {
+          type: 'category',
+          label: 'Identity Provisioning',
+          items: [
+            'iam/automaticidentityprovisioning',
+            'iam/manualidentityprovisioning'
+          ]
+        },
+        {
+          type: 'category',
+          label: 'Security protocols',
+          items: [
+            'iam/openid',
+            'iam/saml2',
+            'iam/wsfederation'
+          ]
+        },
+        'iam/storage',
+        'iam/configuration'
+      ]
+    },
+    'scim20'
   ],
   tutorials: [
     'tutorial/overview',    

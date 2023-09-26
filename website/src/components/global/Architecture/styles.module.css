@@ -1,0 +1,4 @@
+.component:hover > path {
+    fill: #f7ceb2;
+    cursor: pointer;
+}
