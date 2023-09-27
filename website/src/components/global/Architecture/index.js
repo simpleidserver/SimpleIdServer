@@ -1488,7 +1488,7 @@ export default function Architecture() {
          stroke-miterlimit="8"
          fill="#ffffff"
          id="StorageBorder"
-         transform="matrix(0.99999994,-3.325337e-4,-2.0721439e-4,0.99999998,0,0)" /><g
+         transform="matrix(0.99999994,-3.325337e-4,-2.0721439e-4,0.99999998,0,0)" /><Link to="iam/storage"><g
          id="StorageLayerSqlServer"  className={styles['component']}><path
            d="m 905.5,1872.5 c 0,-22.09 17.909,-40 40.001,-40 H 1118.5 c 22.09,0 40,17.91 40,40 v 160 c 0,22.09 -17.91,40 -40,40 H 945.501 c -22.092,0 -40.001,-17.91 -40.001,-40 z"
            stroke="#ffc000"
@@ -1511,13 +1511,13 @@ export default function Architecture() {
            font-weight="700"
            font-size="37px"
            transform="translate(943.796,2050)"
-           id="text1326">SQL SERVER</text></g><text
+           id="text1326">SQL SERVER</text></g></Link><text
          fill="#ffc000"
          font-family="Calibri, Calibri_MSFontService, sans-serif"
          font-weight="400"
          font-size="83px"
          transform="translate(768.231,2191)"
-         id="StorageTitle">Storage Layer</text><g
+         id="StorageTitle">Storage Layer</text><Link to="iam/storage"><g
          id="StorageLayerPostgresql"  className={styles['component']}
          style={{ display: "inline"}}
          transform="translate(-1020.1066,3.3503619)"><path
@@ -1552,7 +1552,7 @@ export default function Architecture() {
            font-weight="700"
            font-size="37px"
            transform="translate(3269.5,2038)"
-           id="text1346">Postgresql</text></g></g><g
+           id="text1346">Postgresql</text></g></Link></g><g
        id="StorageScim"
        style={{ display: "inline"}}
        transform="matrix(0.24843383,-1.3659921e-4,1.3659921e-4,0.24843383,1027.9357,99.367722)"><g
