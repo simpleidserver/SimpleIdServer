@@ -1,4 +1,4 @@
-﻿@page "/idproviders/{id}/mappers/{mapperId}"
+﻿@page "/authentications/idproviders/{id}/mappers/{mapperId}"
 @inherits FluxorComponent
 @using Fluxor.Blazor.Web.Components;
 @using SimpleIdServer.IdServer.Api.AuthenticationSchemeProviders;
@@ -11,8 +11,8 @@
 @inject IState<IdProviderState> idProviderState
 
 <RadzenBreadCrumb>
-    <RadzenBreadCrumbItem Path="/idproviders" Text="Identity Providers" />
-    <RadzenBreadCrumbItem Path=@($"/idproviders/{id}/mappers") Text="Identity Provider mappers" />
+    <RadzenBreadCrumbItem Path="/authentications/idproviders" Text="Identity Providers" />
+    <RadzenBreadCrumbItem Path=@($"/authentications/idproviders/{id}/mappers") Text="Identity Provider mappers" />
     <RadzenBreadCrumbItem Text="@(mapper?.Name)" />
 </RadzenBreadCrumb>
 

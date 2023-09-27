@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './styles.module.css';
+import Link from '@docusaurus/Link';
 
 export default function Architecture() {
   return (    
@@ -1040,7 +1041,7 @@ export default function Architecture() {
          stroke-miterlimit="8"
          fill="#ffffff"
          id="IdServerBorder" /><g
-         id="AuthenticationMethods"><g
+         id="AuthenticationMethods"><Link to="iam/authmethods"><g
            id="Mobile" className={styles['component']}><path
              d="m 907.5,872.834 c 0,-16.753 13.581,-30.334 30.334,-30.334 h 121.336 c 16.75,0 30.33,13.581 30.33,30.334 v 133.336 c 0,16.75 -13.58,30.33 -30.33,30.33 H 937.834 c -16.753,0 -30.334,-13.58 -30.334,-30.33 z"
              stroke="#ffc000"
@@ -1062,7 +1063,7 @@ export default function Architecture() {
              font-weight="700"
              font-size="37px"
              transform="translate(946.287,1008)"
-             id="text1274">Mobile</text></g><g
+             id="text1274">Mobile</text></g></Link><Link to="iam/externalidproviders"><g
            id="Facebook" className={styles['component']}><path
              d="m 905.5,1099.83 c 0,-16.75 13.581,-30.33 30.334,-30.33 h 121.336 c 16.75,0 30.33,13.58 30.33,30.33 v 133.34 c 0,16.75 -13.58,30.33 -30.33,30.33 H 935.834 c -16.753,0 -30.334,-13.58 -30.334,-30.33 z"
              stroke="#ffc000"
@@ -1083,7 +1084,7 @@ export default function Architecture() {
              font-weight="700"
              font-size="37px"
              transform="translate(924.848,1236)"
-             id="text1258">Facebook</text></g><g
+             id="text1258">Facebook</text></g></Link><Link to="iam/authmethods"><g
            id="Password" className={styles['component']}><path
              d="m 1118.5,1104 c 0,-16.84 13.66,-30.5 30.5,-30.5 h 122 c 16.84,0 30.5,13.66 30.5,30.5 v 133 c 0,16.84 -13.66,30.5 -30.5,30.5 h -122 c -16.84,0 -30.5,-13.66 -30.5,-30.5 z"
              stroke="#ffc000"
@@ -1147,7 +1148,7 @@ export default function Architecture() {
              font-weight="700"
              font-size="37px"
              transform="translate(1141.29,1239)"
-             id="text1260">Password</text></g><g
+             id="text1260">Password</text></g></Link><Link to="iam/authmethods"><g
            id="OTP" className={styles['component']}><path
              d="m 1123.5,874.001 c 0,-16.845 13.66,-30.501 30.5,-30.501 h 122 c 16.84,0 30.5,13.656 30.5,30.501 V 1007 c 0,16.84 -13.66,30.5 -30.5,30.5 h -122 c -16.84,0 -30.5,-13.66 -30.5,-30.5 z"
              stroke="#ffc000"
@@ -1169,7 +1170,7 @@ export default function Architecture() {
              font-weight="700"
              font-size="37px"
              transform="translate(1179.48,1009)"
-             id="text1272">OTP</text></g><text
+             id="text1272">OTP</text></g></Link><text
            font-family="Calibri, Calibri_MSFontService, sans-serif"
            font-weight="700"
            font-size="37px"
@@ -1198,7 +1199,7 @@ export default function Architecture() {
            stroke-width="4.58333"
            stroke-miterlimit="8"
            fill="none"
-           id="IdentityProvisioningBorder" /><g
+           id="IdentityProvisioningBorder" /><Link to="iam/automaticidentityprovisioning"><g
            id="LDAP" className={styles['component']}
            transform="translate(-135.96819,13.672075)"><path
              d="m 1585.5,862.834 c 0,-16.753 13.58,-30.334 30.33,-30.334 h 121.34 c 16.75,0 30.33,13.581 30.33,30.334 v 133.332 c 0,16.754 -13.58,30.334 -30.33,30.334 h -121.34 c -16.75,0 -30.33,-13.58 -30.33,-30.334 z"
@@ -1223,7 +1224,7 @@ export default function Architecture() {
              font-weight="700"
              font-size="37px"
              transform="translate(1638.35,1007)"
-             id="text1296">LDAP</text></g><g
+             id="text1296">LDAP</text></g></Link><Link to="iam/automaticidentityprovisioning"><g
            id="IdentityProvisioningScim"
            transform="translate(147.82749,-203.95472)" className={styles['component']}><path
              d="m 1585.5,1082.83 c 0,-16.75 13.58,-30.33 30.33,-30.33 h 121.34 c 16.75,0 30.33,13.58 30.33,30.33 v 133.34 c 0,16.75 -13.58,30.33 -30.33,30.33 h -121.34 c -16.75,0 -30.33,-13.58 -30.33,-30.33 z"
@@ -1247,7 +1248,7 @@ export default function Architecture() {
              font-weight="700"
              font-size="37px"
              transform="translate(1613.71,1211)"
-             id="text1286">SCIM2.0</text></g><g
+             id="text1286">SCIM2.0</text></g></Link><Link to="iam/manualidentityprovisioning"><g
            id="Manual" className={styles['component']}
            transform="translate(4.7003615,14.357244)"><path
              d="m 1585.5,1082.83 c 0,-16.75 13.58,-30.33 30.33,-30.33 h 121.34 c 16.75,0 30.33,13.58 30.33,30.33 v 133.34 c 0,16.75 -13.58,30.33 -30.33,30.33 h -121.34 c -16.75,0 -30.33,-13.58 -30.33,-30.33 z"
@@ -1266,7 +1267,7 @@ export default function Architecture() {
              id="g4634"
              transform="matrix(3.6592868,0.00201203,-0.00201203,3.6592868,1632.0289,1074.1842)"><path
                d="m 7.5,15.5 h -5 a 1,1 0 0 0 -1,1 v 5 a 1,1 0 0 0 1,1 h 5 a 1,1 0 0 0 1,-1 V 20 H 12 a 1,1 0 0 0 0,-2 H 8.5 v -1.5 a 1,1 0 0 0 -1,-1 z m -1,5 h -3 v -3 h 3 z M 4,8.858 V 13 a 1,1 0 0 0 2,0 V 8.858 a 4,4 0 1 0 -2,0 z M 5,3 A 2,2 0 1 1 3,5 2,2 0 0 1 5,3 Z M 20,15.142 V 12 a 1,1 0 0 0 -2,0 v 3.142 a 4,4 0 1 0 2,0 z M 19,21 a 2,2 0 1 1 2,-2 2,2 0 0 1 -2,2 z M 16.5,8.5 h 5 a 1,1 0 0 0 1,-1 v -5 a 1,1 0 0 0 -1,-1 h -5 a 1,1 0 0 0 -1,1 V 4 H 12 a 1,1 0 0 0 0,2 h 3.5 v 1.5 a 1,1 0 0 0 1,1 z m 1,-5 h 3 v 3 h -3 z"
-               id="path4625" /></g></g></g><g
+               id="path4625" /></g></g></Link></g><g
          id="SecurityProtocols"><text
            font-family="Calibri, Calibri_MSFontService, sans-serif"
            font-weight="700"

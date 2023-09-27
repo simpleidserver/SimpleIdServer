@@ -51,6 +51,14 @@
         }
     }
 
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (string.IsNullOrWhiteSpace(action)) return;
+        if (!string.IsNullOrWhiteSpace(action) && mappingActionNameToIndex.ContainsKey(action))
+            selectedIndex = mappingActionNameToIndex[action];
+    }
+
     void OnChange(int index)
     {
         var rec = mappingActionNameToIndex.Single(kvp => kvp.Value == index);

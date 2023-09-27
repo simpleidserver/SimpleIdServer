@@ -1,6 +1,21 @@
 # Installation
 
-You can choose to install SimpleIdServer in one command line, or you can decide to install and deploy each part separately by using DOTNET Template.
+import DocsCards from '@site/src/components/global/DocsCards';
+import DocsCard from '@site/src/components/global/DocsCard';
+
+The entire SimpleIdServer solution can be easily installed and deployed through various methods: [Copy and Paste](#copy-and-paste), [Docker](#docker) or [Kubernetes](#kubernetes).
+
+If you want to install only certain parts of the solution or customize specific features like the UI, you can use our [DOTNET Template](#dotnet-template) project.
+
+
+<DocsCards>
+    <DocsCard header="One-shot installation" href="#copy-and-paste">
+        <p>Install the entire solution with a single command..</p>
+    </DocsCard>
+    <DocsCard header="Custom installation" href="#dotnet-template">
+        <p>Utilize our DOTNET Template to install specific parts of the solution.</p>
+    </DocsCard>
+</DocsCards>
 
 ## Copy and paste
 

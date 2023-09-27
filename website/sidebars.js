@@ -16,6 +16,7 @@ const sidebars = {
   docs: [
     'overview',
     'installation',
+    'glossary',
     {
       type: 'category',
       label: 'Identity and Access Management',

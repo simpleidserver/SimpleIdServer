@@ -37,7 +37,7 @@
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="SelectableAuthenticationSchemeProviderMapper" Property="Value.Name" Filterable="false" Sortable="false" SortOrder=SortOrder.Ascending Title="Name" Width="80px">
                 <Template Context="data">
-                    <RadzenLink Text="@data.Value.Name" Path="@($"/idproviders/{IdProvider.Name}/mappers/{data.Value.Id}")" />
+                    <RadzenLink Text="@data.Value.Name" Path="@($"/authentications/idproviders/{IdProvider.Name}/mappers/{data.Value.Id}")" />
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="SelectableAuthenticationSchemeProviderMapper" Filterable="false" Sortable="false" Title="Type" Width="80px">
