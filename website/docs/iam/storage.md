@@ -17,7 +17,7 @@ Alternatively, if you are comfortable with our solution, you can make modificati
 
 To utilize SQL Server, edit the `appsettings.json` file and modify the following values :
 
-| Json Path                               | Default Value |
+| Json Path                               | Value         |
 | --------------------------------------- | ------------- |
 | $.StorageConfiguration.ConnectionString |               |
 | $.StorageConfiguration.Type             | SQLSERVER     |
@@ -26,7 +26,7 @@ To utilize SQL Server, edit the `appsettings.json` file and modify the following
 
 To utilize Postgresql, edit the `appsettings.json` file and modify the following values :
 
-| Json Path                               | Default Value |
+| Json Path                               | Value         |
 | --------------------------------------- | ------------- |
 | $.StorageConfiguration.ConnectionString |               |
 | $.StorageConfiguration.Type             | POSTGRE       |

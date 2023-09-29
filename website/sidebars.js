@@ -41,17 +41,34 @@ const sidebars = {
           ]
         },
         'iam/storage',
-        'iam/configuration'
+        'iam/configuration',
+        'iam/caching'
       ]
     },
-    'scim20'
+    'scim20',
+    'mobileapplication',
+    {
+      type: 'category',
+      label: 'Advanced settings',
+      items: [
+        'advancedsettings/auditing',
+        'advancedsettings/pki'
+      ]
+    },
+    {
+      type: 'category',
+      label: 'Migrations',
+      items: [
+        'migrations/403to404'
+      ]
+    }
   ],
   tutorials: [
     'tutorial/overview',    
     { 
       type: 'category', 
       label: 'Tutorial',       
-      items: [ 'tutorial/spa', 'tutorial/regularweb', 'tutorial/protectapi', 'tutorial/m2m', 'tutorial/wsfederation', 'tutorial/highlysecuredregularweb', 'tutorial/ciba', 'tutorial/grantmgt' ] 
+      items: [ 'tutorial/spa', 'tutorial/regularweb', 'tutorial/protectapi', 'tutorial/m2m', 'tutorial/wsfederation', 'tutorial/highlysecuredregularweb', 'tutorial/ciba', 'tutorial/grantmgt', 'tutorial/ldap', 'tutorial/scim' ] 
     }
   ]
   // By default, Docusaurus generates a sidebar from the docs folder structure
