@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.Server.Kestrel.Https;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using SimpleIdServer.Configuration.Redis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -144,19 +145,25 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
         o.Add<IdServerEmailOptions>();
         o.Add<IdServerSmsOptions>();
         o.Add<FidoOptions>();
-        o.UseEFConnector(b =>
+        if(conf.Type == StorageTypes.REDIS)
         {
-            switch (conf.Type)
+            o.UseRedisConnector(conf.ConnectionString);
+        }
+        else
+        {
+            o.UseEFConnector(b =>
             {
-                case StorageTypes.SQLSERVER:
-                    b.UseSqlServer(conf.ConnectionString);
-                    break;
-                case StorageTypes.POSTGRE:
-                    b.UseNpgsql(conf.ConnectionString);
-                    break;
-
-            }
-        });
+                switch (conf.Type)
+                {
+                    case StorageTypes.SQLSERVER:
+                        b.UseSqlServer(conf.ConnectionString);
+                        break;
+                    case StorageTypes.POSTGRE:
+                        b.UseNpgsql(conf.ConnectionString);
+                        break;
+                }
+            });
+        }
     });
 }
 

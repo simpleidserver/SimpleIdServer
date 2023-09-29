@@ -1,14 +1,14 @@
 # SCIM
 
-The SCIM server acts as a central repository, where different representations are living together such as Users or Groups.
+The SCIM server acts as a central repository where different representations coexist, including Users or Groups.
 
-It can be used by the [Identity Provider](../glossary) as a provisioning source. When a user is created or updated in SCIM then automatically his local account will be created or updated in the [Identity Provider](../glossary).
+It can be used by the [Identity Provider](../glossary) as a provisioning source. When a user is created or updated in SCIM, their local account in the [Identity Provider](../glossary) will be automatically created or updated.
 
-Only the version 2.0 of SCIM is supported.
+Only version 2.0 of SCIM is supported.
 
 ## Storage
 
-The following storage options are supported. Each Nuget package contains migration scripts to create or update the database structure.
+The following storage options are supported. Each NuGet package contains migration scripts to create or update the database structure.
 
 <table>
     <thead>
@@ -16,7 +16,7 @@ The following storage options are supported. Each Nuget package contains migrati
     </thead>
     <tbody>
         <tr>
-            <td rowspan="2">SQLServer</td>
+            <td rowspan="2"><b>SQLServer</b></td>
             <td rowspan="2"><a href="https://www.nuget.org/packages/SimpleIdServer.Scim.SqlServerMigrations" target="_blank">SimpleIdServer.Scim.SqlServerMigrations</a></td>
             <td>$.StorageConfiguration.ConnectionString</td>
             <td></td>
@@ -26,7 +26,7 @@ The following storage options are supported. Each Nuget package contains migrati
             <td>SQLSERVER</td>
         </tr>
         <tr>
-            <td rowspan="2">Postgresql</td>
+            <td rowspan="2"><b>Postgresql</b></td>
             <td rowspan="2"><a href="https://www.nuget.org/packages/SimpleIdServer.Scim.PostgreMigrations" target="_blank">SimpleIdServer.Scim.PostgreMigrations</a></td>
             <td>$.StorageConfiguration.ConnectionString</td>
             <td></td>
@@ -36,7 +36,7 @@ The following storage options are supported. Each Nuget package contains migrati
             <td>POSTGRE</td>
         </tr>
         <tr>
-            <td rowspan="2">Mongodb</td>
+            <td rowspan="2"><b>Mongodb</b></td>
             <td rowspan="2"></td>
             <td>$.StorageConfiguration.ConnectionString</td>
             <td></td>

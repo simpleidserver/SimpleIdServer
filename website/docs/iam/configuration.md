@@ -2,11 +2,11 @@
 
 Different modules within SimpleIdServer utilize a distributed configuration storage to store their settings, including the Authentication and Provisioning modules.
 
-By default, SQL Server is used to store the configuration, but you also have the option to use the No-SQL Key-Value data store [Redis](https://developer.hashicorp.com/consul).
+By default, SQL Server is used to store the configuration, but you also have the option to use the NoSQL Key-Value data store [Redis](https://redis.io/).
 
 ## Redis
 
-To use Redis as a distributed configuration storage, edit the  `appsettings.json` file and modify the following values :
+To use Redis as a distributed configuration storage, edit the `appsettings.json` file and modify the following values :
 
 | Json Path                                        | Value         |
 | ------------------------------------------------ | ------------- |

@@ -52,6 +52,7 @@ const sidebars = {
       label: 'Advanced settings',
       items: [
         'advancedsettings/auditing',
+        'advancedsettings/realm',
         'advancedsettings/pki'
       ]
     },
@@ -68,7 +69,7 @@ const sidebars = {
     { 
       type: 'category', 
       label: 'Tutorial',       
-      items: [ 'tutorial/spa', 'tutorial/regularweb', 'tutorial/protectapi', 'tutorial/m2m', 'tutorial/wsfederation', 'tutorial/highlysecuredregularweb', 'tutorial/ciba', 'tutorial/grantmgt', 'tutorial/ldap', 'tutorial/scim' ] 
+      items: [ 'tutorial/spa', 'tutorial/regularweb', 'tutorial/protectapi', 'tutorial/m2m', 'tutorial/highlysecuredregularweb', 'tutorial/ciba', 'tutorial/grantmgt','tutorial/wsfederation', 'tutorial/saml', 'tutorial/ldap', 'tutorial/scim' ] 
     }
   ]
   // By default, Docusaurus generates a sidebar from the docs folder structure

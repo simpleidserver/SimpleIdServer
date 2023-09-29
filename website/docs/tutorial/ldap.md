@@ -1,4 +1,4 @@
-# LDAP
+# LDAP - Identity Provisioning
 
 Users stored in the LDAP repository can be imported into the Identity Server.
 

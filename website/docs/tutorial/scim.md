@@ -1,4 +1,4 @@
-# SCIM
+# SCIM - Identity Provisioning
 
 Users stored in SCIM can be imported into the Identity Server.
 

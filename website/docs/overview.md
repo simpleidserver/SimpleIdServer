@@ -2,6 +2,12 @@
 
 import Architecture from '@site/src/components/global/Architecture';
 
+:::info
+
+Click on one of the elements in the architecture diagram to navigate through the documentation.
+
+:::
+
 <Architecture></Architecture>
 
 SimpleIdServer is the first open-source project developed with .NET that comprehensively covers all aspects of an **Identity and Access Management** software

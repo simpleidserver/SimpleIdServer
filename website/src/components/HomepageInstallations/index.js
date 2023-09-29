@@ -8,7 +8,7 @@ export default function HomepageInstallations() {
         <div className="container">
             <h1>Installations</h1>
             <div className="row">
-                <div className="col col--4">
+                <div className="col col--6">
                     <div className="text--center">
                         <OnPremise className={styles.installationSvg} />
                     </div>
@@ -17,7 +17,7 @@ export default function HomepageInstallations() {
                         <p>The Dotnet template tool is utilized for swiftly installing a local version.</p>
                     </div>
                 </div>
-                <div className="col col--4">
+                <div className="col col--6">
                     <div className="text--center">
                         <Docker className={styles.installationSvg} />
                     </div>

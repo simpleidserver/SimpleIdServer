@@ -4,6 +4,7 @@
 		<OutputType>Exe</OutputType>
 	</PropertyGroup>
 	<ItemGroup>
+	  <ProjectReference Include="..\SimpleIdServer.Configuration.Redis\SimpleIdServer.Configuration.Redis.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.Configuration\SimpleIdServer.Configuration.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.Did.Ethr\SimpleIdServer.Did.Ethr.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj" />

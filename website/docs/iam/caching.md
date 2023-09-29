@@ -1,12 +1,12 @@
 # Distributed caching
 
-All the elements with a temporary lifetime for examples Access/Refresh/Identity tokens or temporary codes are stored in a Distributed Cache. When they expired, they are removed from the Data Store.
+All elements with a temporary lifetime, such as access, refresh, identity tokens, or temporary codes, are stored in a Distributed Cache. When they expire, they are removed from the Data Store.
 
-By default, the distributed cahcing is configured to use an SQLServer database. But it is also possible to use the No-SQL Key Value Pair REDIS.
+By default, the distributed caching is configured to use an SQL Server database. However, it is also possible to use the NoSQL Key-Value Pair [REDIS](https://redis.io/).
 
 ## SQL Server
 
-To utilize SQL Server, edit the `appsettings.json` file and modify the following values :
+To use SQL Server as a distributed caching, edit the `appsettings.json` file and modify the following values :
 
 | Json Path                                        | Value     |
 | ------------------------------------------------ | --------- |
@@ -15,7 +15,7 @@ To utilize SQL Server, edit the `appsettings.json` file and modify the following
 
 ## Redis
 
-To utilize Redis, edit the `appsettings.json` file and modify the following values :
+To use SQL Server as a distributed caching, edit the `appsettings.json` file and modify the following values :
 
 | Json Path                                        | Value     |
 | ------------------------------------------------ | --------- |

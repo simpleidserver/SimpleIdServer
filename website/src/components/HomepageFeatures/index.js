@@ -64,13 +64,14 @@ const FeatureList = [
       <>
         The mobile application can function as an authentication device, utilizing public-key encryption as outlined in the <a href="https://fidoalliance.org/specifications/">FIDO U2F authentication standard</a>.
       </>
-    )
+    ),
+    full: true
   }
 ];
 
-function Feature({Svg, title, description}) {
+function Feature({Svg, title, description, full}) {
   return (
-    <div className={clsx('col col--4')}>
+    <div className={full == true ? clsx('col col--12') : clsx('col col--4')}>
       <div className="text--center">
         <Svg className={styles.featureSvg} role="img" />
       </div>

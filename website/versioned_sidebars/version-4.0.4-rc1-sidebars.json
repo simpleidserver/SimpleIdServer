@@ -1,5 +1,6 @@
 {
   "docs": [
+    "overview",
     "installation",
     "dotnettemplate",
     "configuration",
