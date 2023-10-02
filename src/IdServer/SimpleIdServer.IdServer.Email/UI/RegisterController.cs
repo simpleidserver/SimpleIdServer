@@ -6,18 +6,23 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.UI.ViewModels;
+using System.Security.Claims;
 
 namespace SimpleIdServer.IdServer.Email.UI;
 
 [Area(Constants.AMR)]
 public class RegisterController : BaseOTPRegisterController<IdServerEmailOptions>
 {
-    public RegisterController(IOptions<IdServerHostOptions> options, IDistributedCache distributedCache, IUserRepository userRepository, IEnumerable<IOTPAuthenticator> otpAuthenticators, IConfiguration configuration, IEmailUserNotificationService userNotificationService) : base(options, distributedCache, userRepository, otpAuthenticators, configuration, userNotificationService)
+    private readonly IAuthenticationHelper _authenticationHelper;
+
+    public RegisterController(IAuthenticationHelper authenticationHelper, IOptions<IdServerHostOptions> options, IDistributedCache distributedCache, IUserRepository userRepository, IEnumerable<IOTPAuthenticator> otpAuthenticators, IConfiguration configuration, IEmailUserNotificationService userNotificationService) : base(options, distributedCache, userRepository, otpAuthenticators, configuration, userNotificationService)
     {
+        _authenticationHelper = authenticationHelper;
     }
 
     protected override string Amr => Constants.AMR;
@@ -36,7 +41,15 @@ public class RegisterController : BaseOTPRegisterController<IdServerEmailOptions
 
     protected override async Task<bool> IsUserExists(string value, string prefix)
     {
-        var result = await UserRepository.Query().Include(u => u.Realms).AsNoTracking().AnyAsync(u => u.Realms.Any(r => r.RealmsName == prefix) && u.Email == value);
-        return result;
+        string nameIdentifier = string.Empty;
+        if(User.Identity.IsAuthenticated) nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+
+        var filtered = UserRepository.Query().Include(u => u.Realms).AsNoTracking().Where(u => u.Realms.Any(r => r.RealmsName == prefix) && u.Email == value);
+        if(!string.IsNullOrWhiteSpace(nameIdentifier))
+        {
+            filtered = _authenticationHelper.FilterUsersByNotLogin(filtered, nameIdentifier, prefix);
+        }
+
+        return await filtered.AnyAsync();
     }
 }

@@ -230,6 +230,8 @@ spec:
               value: "https://scim.sid.svc.cluster.local"
             - name: "Authority"
               value: "https://idserver.sid.svc.cluster.local"
+            - name: "SCIM__SCIMRepresentationsExtractionJobOptions__SCIMEdp"
+              value: "Data Source=db;Initial Catalog=IdServer;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"
 ---
 apiVersion: apps/v1
 kind: Deployment

@@ -11,7 +11,6 @@ namespace SimpleIdServer.IdServer.Startup.Configurations
     public enum StorageTypes
     {
         SQLSERVER = 0,
-        POSTGRE = 1,
-        REDIS = 2
+        POSTGRE = 1
     }
 }

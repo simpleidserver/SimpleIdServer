@@ -10,6 +10,8 @@
     ViewBag.Title = AuthenticateWebauthnResource.register_title;
 }
 
+<h5>@(User.Identity.IsAuthenticated ? AuthenticateWebauthnResource.update_webauthn : AuthenticateWebauthnResource.register_webauthn)</h5>
+
 <div id="registrationContainer">
     <ul class="list-group mb-3" id="errors">
         @if (!ViewData.ModelState.IsValid)
@@ -26,11 +28,20 @@
 
     <!-- Registration form -->
     <form id="registerWebauthn">
-        <div class="input-group mb-3">
-            <input asp-for="Login" placeholder="@AuthenticateWebauthnResource.login" type="text" class="form-control" />
+        <div class="form-floating mb-3">
+            @if(!string.IsNullOrWhiteSpace(Model.Login))
+            {
+                <input asp-for="Login" placeholder="@AuthenticateWebauthnResource.login" id="floatingLogin" type="text" class="form-control" disabled="true" />
+            }
+            else
+            {
+                <input asp-for="Login" placeholder="@AuthenticateWebauthnResource.login" id="floatingLogin" type="text" class="form-control" />
+            }
+            <label for="floatingLogin">@AuthenticateWebauthnResource.login</label>
         </div>
-        <div class="input-group mb-3">
-            <input asp-for="DisplayName" placeholder="@AuthenticateWebauthnResource.display_name" type="text" class="form-control" />
+        <div class="form-floating mb-3">
+            <input asp-for="DisplayName" placeholder="@AuthenticateWebauthnResource.display_name" id="floatingDisplayName" type="text" class="form-control" />
+            <label for="floatingDisplayName">@AuthenticateWebauthnResource.display_name</label>
         </div>
         <button type="submit" class="btn btn-primary card-link">@AuthenticateWebauthnResource.register</button>
     </form>
@@ -61,7 +72,7 @@
                 $("#registrationContainer").css('display', 'none');
             }
 
-            async function registerCredential(newCredential, sessionId, login) {                
+            async function registerCredential(newCredential, sessionId, login, nextRegistrationRedirectUrl) {
                 let attestationObject = new Uint8Array(newCredential.response.attestationObject);
                 let clientDataJSON = new Uint8Array(newCredential.response.clientDataJSON);
                 let rawId = new Uint8Array(newCredential.rawId);
@@ -88,13 +99,18 @@
                         "Content-Type": "application/json"
                     }
                 });
+                let responseJson = await response.json();
                 if (!response.ok) {
-                    let responseJson = await response.json();
                     toggleBtn(false);
                     displayError(responseJson);
                     return;
                 }
 
+                if (nextRegistrationRedirectUrl) {
+                    window.location.href = nextRegistrationRedirectUrl;
+                    return;
+                }
+                
                 toggleBtn(false);
                 displaySuccessMessage();
             }
@@ -119,6 +135,11 @@
 
                 let makeCredentialOptions = responseJson["credential_create_options"];
                 let sessionId = responseJson["session_id"];
+                let nextRegistrationRedirectUrl = null;
+                if (responseJson['next_registration_redirect_url']) {
+                    nextRegistrationRedirectUrl = responseJson['next_registration_redirect_url'];
+                }
+
                 makeCredentialOptions.challenge = coerceToArrayBuffer(makeCredentialOptions.challenge);
                 makeCredentialOptions.user.id = coerceToArrayBuffer(makeCredentialOptions.user.id);
                 makeCredentialOptions.excludeCredentials = makeCredentialOptions.excludeCredentials.map((c) => {
@@ -138,7 +159,7 @@
                     return;
                 }
 
-                await registerCredential(newCredential, sessionId, login);
+                await registerCredential(newCredential, sessionId, login, nextRegistrationRedirectUrl);
             };
 
             $("#registerWebauthn").submit(function (e) {

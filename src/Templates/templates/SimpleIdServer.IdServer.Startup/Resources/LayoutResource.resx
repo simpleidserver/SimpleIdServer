@@ -129,6 +129,9 @@
   <data name="credentials" xml:space="preserve">
     <value>Credentials</value>
   </data>
+  <data name="credential_is_updated" xml:space="preserve">
+    <value>Credential has been updated</value>
+  </data>
   <data name="deviceauth" xml:space="preserve">
     <value>Device Authentication</value>
   </data>
@@ -144,7 +147,13 @@
   <data name="languages" xml:space="preserve">
     <value>Languages</value>
   </data>
+  <data name="not_allowed_to_execute_registration" xml:space="preserve">
+    <value>You are not allowed to execute the registration action</value>
+  </data>
   <data name="selected_language" xml:space="preserve">
     <value>Language is {0}</value>
+  </data>
+  <data name="user_is_created" xml:space="preserve">
+    <value>User is created</value>
   </data>
 </root>

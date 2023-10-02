@@ -33,7 +33,7 @@ services:
     environment:
       VIRTUAL_HOST: "scim.localhost.com"
       ASPNETCORE_URLS : "http://*:80"
-      ASPNETCORE_FORWARDEDHEADERS_ENABLED: true
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
       StorageConfiguration__ConnectionString: "Data Source=db;Initial Catalog=Scim;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"
     depends_on:
       - db
@@ -47,11 +47,12 @@ services:
     environment:
       VIRTUAL_HOST: "idserver.localhost.com"
       ASPNETCORE_URLS : "http://*:80"
-      ASPNETCORE_FORWARDEDHEADERS_ENABLED: true
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
       DistributedCacheConfiguration__ConnectionString: "Data Source=db;Initial Catalog=IdServer;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"
       StorageConfiguration__ConnectionString: "Data Source=db;Initial Catalog=IdServer;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"
       SCIMBaseUrl: "https://scim.localhost.com"
       Authority: "https://idserver.localhost.com"
+      SCIM__SCIMRepresentationsExtractionJobOptions__SCIMEdp: "Data Source=db;Initial Catalog=IdServer;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"
     depends_on:
       - db
       - scim
@@ -65,7 +66,7 @@ services:
     environment:
       VIRTUAL_HOST: "website.localhost.com"
       ASPNETCORE_URLS : "http://*:80"
-      ASPNETCORE_FORWARDEDHEADERS_ENABLED: true
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
       DefaultSecurityOptions__Issuer: "https://idserver.localhost.com/master"
       DefaultSecurityOptions__IgnoreCertificateError: "true"
       IdServerBaseUrl: "https://idserver.localhost.com"

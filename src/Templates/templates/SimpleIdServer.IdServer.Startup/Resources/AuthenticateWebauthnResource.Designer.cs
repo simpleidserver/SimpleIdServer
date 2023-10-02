@@ -88,6 +88,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Enroll a new web authentication method.
+        /// </summary>
+        public static string enroll_mobile {
+            get {
+                return ResourceManager.GetString("enroll_mobile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Login.
         /// </summary>
         public static string login {
@@ -151,11 +160,29 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Register a user.
+        /// </summary>
+        public static string register_webauthn {
+            get {
+                return ResourceManager.GetString("register_webauthn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Remember my login.
         /// </summary>
         public static string remember_login {
             get {
                 return ResourceManager.GetString("remember_login", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Registration has not been validated.
+        /// </summary>
+        public static string session_not_validate {
+            get {
+                return ResourceManager.GetString("session_not_validate", resourceCulture);
             }
         }
         
@@ -174,6 +201,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static string unknown_session {
             get {
                 return ResourceManager.GetString("unknown_session", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Enroll a new web authentication method.
+        /// </summary>
+        public static string update_webauthn {
+            get {
+                return ResourceManager.GetString("update_webauthn", resourceCulture);
             }
         }
         

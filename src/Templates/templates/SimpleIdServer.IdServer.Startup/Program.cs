@@ -10,12 +10,20 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.Configuration;
+using SimpleIdServer.Configuration.Redis;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.CredentialIssuer;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Email;
 using SimpleIdServer.IdServer.Fido;
+using SimpleIdServer.IdServer.Provisioning.LDAP;
+using SimpleIdServer.IdServer.Provisioning.LDAP.Jobs;
+using SimpleIdServer.IdServer.Provisioning.SCIM;
+using SimpleIdServer.IdServer.Provisioning.SCIM.Jobs;
 using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Startup.Configurations;
+using SimpleIdServer.IdServer.Startup.Converters;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.WsFederation;
 using System;
@@ -43,9 +51,12 @@ builder.Services.Configure<KestrelServerOptions>(options =>
         o.ClientCertificateMode = ClientCertificateMode.AllowCertificate;
     });
 });
-builder.Configuration.AddJsonFile("appsettings.json")
+
+builder.Configuration
+    .AddJsonFile("appsettings.json")
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
     .AddEnvironmentVariables();
+ConfigureCentralizedConfiguration(builder);
 builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
     .AllowAnyMethod()
     .AllowAnyHeader()));
@@ -56,10 +67,11 @@ var app = builder.Build();
 SeedData(app, builder.Configuration["SCIMBaseUrl"]);
 app.UseCors("AllowAll");
 app.UseSID()
-    .UseWsFederation()
-    .UseFIDO()
-    .UseCredentialIssuer()
-    .UseSamlIdp();
+.UseWsFederation()
+.UseFIDO()
+.UseCredentialIssuer()
+.UseSamlIdp()
+.UseAutomaticConfiguration();
 app.Run();
 
 void ConfigureIdServer(IServiceCollection services)
@@ -72,10 +84,7 @@ void ConfigureIdServer(IServiceCollection services)
         .AddEmailAuthentication()
         .AddSmsAuthentication()
         .AddSamlIdp()
-        .AddFidoAuthentication(c =>
-        {
-            c.IsDeveloperModeEnabled = true;
-        }, f =>
+        .AddFidoAuthentication(f =>
         {
             var authority = builder.Configuration["Authority"];
             var url = new Uri(authority);
@@ -84,6 +93,8 @@ void ConfigureIdServer(IServiceCollection services)
             f.Origins = new HashSet<string> { authority };
         })
         .EnableConfigurableAuthentication()
+        .AddSCIMProvisioning()
+        .AddLDAPProvisioning()
         .UseRealm()
         .AddAuthentication(callback: (a) =>
         {
@@ -120,6 +131,40 @@ void ConfigureIdServer(IServiceCollection services)
     services.AddDIDKey();
     services.AddDIDEthr();
     ConfigureDistributedCache();
+}
+
+void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
+{
+    var section = builder.Configuration.GetSection(nameof(DistributedCacheConfiguration));
+    var conf = section.Get<DistributedCacheConfiguration>();
+    builder.AddAutomaticConfiguration(o =>
+    {
+        o.Add<FacebookOptionsLite>();
+        o.Add<LDAPRepresentationsExtractionJobOptions>();
+        o.Add<SCIMRepresentationsExtractionJobOptions>();
+        o.Add<IdServerEmailOptions>();
+        o.Add<IdServerSmsOptions>();
+        o.Add<FidoOptions>();
+        if(conf.Type == DistributedCacheTypes.REDIS)
+        {
+            o.UseRedisConnector(conf.ConnectionString);
+        }
+        else
+        {
+            o.UseEFConnector(b =>
+            {
+                switch (conf.Type)
+                {
+                    case DistributedCacheTypes.INMEMORY:
+                        b.UseInMemoryDatabase(conf.ConnectionString);
+                        break;
+                    case DistributedCacheTypes.SQLSERVER:
+                        b.UseSqlServer(conf.ConnectionString);
+                        break;
+                }
+            });
+        }
+    });
 }
 
 void ConfigureDistributedCache()
@@ -169,6 +214,7 @@ void ConfigureStorage(DbContextOptionsBuilder b)
     }
 }
 
+
 void ConfigureDataProtection(IDataProtectionBuilder dataProtectionBuilder)
 {
     dataProtectionBuilder.PersistKeysToDbContext<StoreDbContext>();
@@ -210,6 +256,9 @@ void SeedData(WebApplication application, string scimBaseUrl)
 
             if (!dbContext.IdentityProvisioningLst.Any())
                 dbContext.IdentityProvisioningLst.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.GetIdentityProvisiongLst(scimBaseUrl));
+
+            if (!dbContext.RegistrationWorkflows.Any())
+                dbContext.RegistrationWorkflows.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.RegistrationWorkflows);
 
             if (!dbContext.SerializedFileKeys.Any())
             {
@@ -273,6 +322,16 @@ void SeedData(WebApplication application, string scimBaseUrl)
                     UpdateDateTime = DateTime.UtcNow,
                     CreateDateTime = DateTime.UtcNow
                 });
+
+            if(!dbContext.Definitions.Any())
+            {
+                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<FacebookOptionsLite>());
+                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<LDAPRepresentationsExtractionJobOptions>());
+                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<SCIMRepresentationsExtractionJobOptions>());
+                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<IdServerEmailOptions>());
+                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<IdServerSmsOptions>());
+                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<FidoOptions>());
+            }
 
             var dbConnection = dbContext.Database.GetDbConnection() as SqlConnection;
             if(dbConnection != null)

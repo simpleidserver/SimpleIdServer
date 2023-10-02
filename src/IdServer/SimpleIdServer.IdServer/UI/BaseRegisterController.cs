@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
@@ -12,7 +11,6 @@ using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System;
 using System.Linq;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -66,6 +64,21 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
 
         registrationProgress.NextAmr();
         registrationProgress.User = user;
+        var json = JsonConvert.SerializeObject(registrationProgress);
+        await DistributedCache.SetStringAsync(registrationProgress.RegistrationProgressId, json);
+        return RedirectToAction("Index", "Register", new { area = registrationProgress.Amr });
+    }
+
+    protected async Task<IActionResult> UpdateUser(UserRegistrationProgress registrationProgress, TViewModel viewModel, string amr)
+    {
+        var lastStep = registrationProgress.Steps.Last();
+        if (lastStep == amr)
+        {
+            viewModel.IsUpdated = true;
+            return View(viewModel);
+        }
+
+        registrationProgress.NextAmr();
         var json = JsonConvert.SerializeObject(registrationProgress);
         await DistributedCache.SetStringAsync(registrationProgress.RegistrationProgressId, json);
         return RedirectToAction("Index", "Register", new { area = registrationProgress.Amr });

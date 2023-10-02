@@ -123,7 +123,6 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             };
 
             var fidoCredentials = authenticatedUser.GetFidoCredentials();
-            var fidoCredential = fidoCredentials.First().GetFidoCredential();
             var credential = fidoCredentials.First(c => c.GetFidoCredential().Descriptor.Id.SequenceEqual(request.Assertion.Id));
             var creds = credential.GetFidoCredential();
             var storedCounter = creds.SignatureCounter;

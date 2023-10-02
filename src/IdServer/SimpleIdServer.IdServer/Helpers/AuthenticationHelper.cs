@@ -15,6 +15,7 @@ namespace SimpleIdServer.IdServer.Helpers
         string GetLogin(User user);
         Task<User> GetUserByLogin(IQueryable<User> users, string login, string realm, CancellationToken cancellationToken = default);
         IQueryable<User> FilterUsersByLogin(IQueryable<User> users, string login, string realm);
+        IQueryable<User> FilterUsersByNotLogin(IQueryable<User> users, string login, string realm);
     }
 
     public class AuthenticationHelper : IAuthenticationHelper
@@ -36,6 +37,12 @@ namespace SimpleIdServer.IdServer.Helpers
         {
             if (_options.IsEmailUsedDuringAuthentication) return users.Where(u => u.Email == login && u.Realms.Any(r => r.RealmsName == realm));
             return users.Where(u => u.Name == login && u.Realms.Any(r => r.RealmsName == realm));
+        }
+
+        public IQueryable<User> FilterUsersByNotLogin(IQueryable<User> users, string login, string realm)
+        {
+            if (_options.IsEmailUsedDuringAuthentication) return users.Where(u => u.Email != login && u.Realms.Any(r => r.RealmsName == realm));
+            return users.Where(u => u.Name != login && u.Realms.Any(r => r.RealmsName == realm));
         }
 
         public string GetLogin(User user) => _options.IsEmailUsedDuringAuthentication ? user.Email : user.Name;

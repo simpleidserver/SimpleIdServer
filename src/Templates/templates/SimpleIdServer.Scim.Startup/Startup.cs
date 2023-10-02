@@ -111,7 +111,7 @@ namespace SimpleIdServer.Scim.Startup
 
             using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
-                using (var context = scope.ServiceProvider.GetService<Persistence.EF.SCIMDbContext>())
+                using (var context = scope.ServiceProvider.GetService<SimpleIdServer.Scim.Persistence.EF.SCIMDbContext>())
                 {
                     context.Database.Migrate();
                     var basePath = Path.Combine(Env.ContentRootPath, "Schemas");
@@ -183,7 +183,7 @@ namespace SimpleIdServer.Scim.Startup
         {
             using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
-                using (var context = scope.ServiceProvider.GetService<Persistence.EF.SCIMDbContext>())
+                using (var context = scope.ServiceProvider.GetService<SimpleIdServer.Scim.Persistence.EF.SCIMDbContext>())
                 {
                     // Update IsComputedField
                     var targetAttributeIds = context.SCIMAttributeMappingLst.Where(a => a.TargetAttributeId != null).Select(a => a.TargetAttributeId);
@@ -209,7 +209,7 @@ namespace SimpleIdServer.Scim.Startup
         {
             using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
-                using (var context = scope.ServiceProvider.GetService<Persistence.MongoDB.SCIMDbContext>())
+                using (var context = scope.ServiceProvider.GetService<SimpleIdServer.Scim.Persistence.MongoDB.SCIMDbContext>())
                 {
                     // Update IsComputedField
                     var targetAttributeIds = await context.SCIMAttributeMappingLst.AsQueryable().Where(a => a.TargetAttributeId != null).Select(a => a.TargetAttributeId).ToMongoListAsync();

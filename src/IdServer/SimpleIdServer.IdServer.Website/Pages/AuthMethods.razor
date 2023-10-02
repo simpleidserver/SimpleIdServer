@@ -11,14 +11,26 @@
         @foreach(var authMethod in authMethodsState.Value.AuthenticationMethods)
         {
             <RadzenColumn Size="4">
-                <RadzenLink Path="@(GetAuthMethodUrl(authMethod))">
+                @if(authMethod.Id == "pwd")
+                {                    
                     <RadzenCard Variant="Variant.Filled">
                         <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
                             <RadzenImage Path="@GetPicture(authMethod)" Style="width: 60px"></RadzenImage>
                             <RadzenText TextStyle="TextStyle.DisplayH6">@authMethod.Name</RadzenText>
                         </RadzenStack>
                     </RadzenCard>
-                </RadzenLink>
+                }
+                else
+                {                    
+                    <RadzenLink Path="@(GetAuthMethodUrl(authMethod))">
+                        <RadzenCard Variant="Variant.Filled">
+                            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
+                                <RadzenImage Path="@GetPicture(authMethod)" Style="width: 60px"></RadzenImage>
+                                <RadzenText TextStyle="TextStyle.DisplayH6">@authMethod.Name</RadzenText>
+                            </RadzenStack>
+                        </RadzenCard>
+                    </RadzenLink>
+                }
             </RadzenColumn>
         }
     </RadzenRow>

@@ -27,11 +27,11 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationMethods
         [HttpGet]
         public IActionResult GetAll()
         {
-            var result = _authMethods.Where(a => a.OptionsType != null).Select(a => new AuthenticationMethodResult
+            var result = _authMethods.Select(a => new AuthenticationMethodResult
             {
                 Id = a.Amr,
                 Name = a.Name,
-                OptionsName = a.OptionsType.Name,
+                OptionsName = a.OptionsType?.Name,
                 Values = null
             });
             return new OkObjectResult(result);

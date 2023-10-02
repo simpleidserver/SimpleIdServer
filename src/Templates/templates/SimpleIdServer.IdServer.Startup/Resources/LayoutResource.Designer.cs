@@ -88,6 +88,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Credential has been updated.
+        /// </summary>
+        public static string credential_is_updated {
+            get {
+                return ResourceManager.GetString("credential_is_updated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Credentials.
         /// </summary>
         public static string credentials {
@@ -142,11 +151,29 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à You are not allowed to execute the registration action.
+        /// </summary>
+        public static string not_allowed_to_execute_registration {
+            get {
+                return ResourceManager.GetString("not_allowed_to_execute_registration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Language is {0}.
         /// </summary>
         public static string selected_language {
             get {
                 return ResourceManager.GetString("selected_language", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à User is created.
+        /// </summary>
+        public static string user_is_created {
+            get {
+                return ResourceManager.GetString("user_is_created", resourceCulture);
             }
         }
     }

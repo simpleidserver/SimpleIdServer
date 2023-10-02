@@ -126,6 +126,9 @@
   <data name="display_name" xml:space="preserve">
     <value>Display name</value>
   </data>
+  <data name="enroll_mobile" xml:space="preserve">
+    <value>Enroll a new web authentication method</value>
+  </data>
   <data name="login" xml:space="preserve">
     <value>Login</value>
   </data>
@@ -147,14 +150,23 @@
   <data name="register_title" xml:space="preserve">
     <value>Register web authentication</value>
   </data>
+  <data name="register_webauthn" xml:space="preserve">
+    <value>Register a user</value>
+  </data>
   <data name="remember_login" xml:space="preserve">
     <value>Remember my login</value>
+  </data>
+  <data name="session_not_validate" xml:space="preserve">
+    <value>Registration has not been validated</value>
   </data>
   <data name="session_not_validated" xml:space="preserve">
     <value>The session must be validate</value>
   </data>
   <data name="unknown_session" xml:space="preserve">
     <value>Either the session is expired or doesn't exist</value>
+  </data>
+  <data name="update_webauthn" xml:space="preserve">
+    <value>Enroll a new web authentication method</value>
   </data>
   <data name="user_already_exists" xml:space="preserve">
     <value>User with same login already exists</value>

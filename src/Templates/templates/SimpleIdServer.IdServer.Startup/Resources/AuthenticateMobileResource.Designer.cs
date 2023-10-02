@@ -97,11 +97,29 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Enroll a new mobile application.
+        /// </summary>
+        public static string enroll_mobile {
+            get {
+                return ResourceManager.GetString("enroll_mobile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Generate QR Code.
         /// </summary>
         public static string generate_qrcode {
             get {
                 return ResourceManager.GetString("generate_qrcode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Session Identitfier is invalid.
+        /// </summary>
+        public static string invalid_session_id {
+            get {
+                return ResourceManager.GetString("invalid_session_id", resourceCulture);
             }
         }
         
@@ -169,6 +187,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Register a user.
+        /// </summary>
+        public static string register_mobile {
+            get {
+                return ResourceManager.GetString("register_mobile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Register SID Mobile application.
         /// </summary>
         public static string register_title {
@@ -192,6 +219,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static string scan_mobileapp {
             get {
                 return ResourceManager.GetString("scan_mobileapp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Registration has not been validated.
+        /// </summary>
+        public static string session_not_validate {
+            get {
+                return ResourceManager.GetString("session_not_validate", resourceCulture);
             }
         }
         

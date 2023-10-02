@@ -29,18 +29,14 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
     {
         prefix = prefix ?? Constants.Prefix;
         var viewModel = new PwdRegisterViewModel();
-        UserRegistrationProgress userRegistrationProgress = null;
-        var isAuthenticated = User.Identity.IsAuthenticated;
-        if(!isAuthenticated)
+        var userRegistrationProgress = await GetRegistrationProgress();
+        if (userRegistrationProgress == null)
         {
-            userRegistrationProgress = await GetRegistrationProgress();
-            if(userRegistrationProgress == null)
-            {
-                viewModel.IsNotAllowed = true;
-                return View(viewModel);
-            }
+            viewModel.IsNotAllowed = true;
+            return View(viewModel);
         }
 
+        var isAuthenticated = User.Identity.IsAuthenticated;
         if(isAuthenticated)
         {
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
@@ -57,22 +53,25 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
     public async Task<IActionResult> Index([FromRoute] string prefix, PwdRegisterViewModel viewModel)
     {
         prefix = prefix ?? Constants.Prefix;
-        UserRegistrationProgress userRegistrationProgress = null;
-        if(!User.Identity.IsAuthenticated)
+        var isAuthenticated = User.Identity.IsAuthenticated;
+        if (isAuthenticated)
         {
-            userRegistrationProgress = await GetRegistrationProgress();
-            if(userRegistrationProgress == null)
-            {
-                viewModel.IsNotAllowed = true;
-                return View(viewModel);
-            }
+            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            viewModel.Login = nameIdentifier;
+        }
+
+        var userRegistrationProgress = await GetRegistrationProgress();
+        if (userRegistrationProgress == null)
+        {
+            viewModel.IsNotAllowed = true;
+            return View(viewModel);
         }
 
         viewModel.Amr = userRegistrationProgress?.Amr;
         viewModel.Steps = userRegistrationProgress?.Steps;
         viewModel.Validate(ModelState);
         if (!ModelState.IsValid) return View(viewModel);
-        if (!User.Identity.IsAuthenticated) return await CreateUser();
+        if (!isAuthenticated) return await CreateUser();
         return await UpdateUser();
 
         async Task<IActionResult> CreateUser()
@@ -91,16 +90,16 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
         {
             var user = await UserRepository.Query().Include(u => u.Credentials).SingleAsync(u => u.Name == viewModel.Login);
             var passwordCredential = user.Credentials.FirstOrDefault(c => c.CredentialType == UserCredential.PWD);
-            if (passwordCredential != null) passwordCredential.Value = viewModel.Password;
+            if (passwordCredential != null) passwordCredential.Value = PasswordHelper.ComputeHash(viewModel.Password);
             else user.Credentials.Add(new UserCredential
             {
                 Id = Guid.NewGuid().ToString(),
-                Value = viewModel.Password,
+                Value = PasswordHelper.ComputeHash(viewModel.Password),
                 CredentialType = UserCredential.PWD,
                 IsActive = true
             });
             await UserRepository.SaveChanges(CancellationToken.None);
-            return View(viewModel);
+            return await base.UpdateUser(userRegistrationProgress, viewModel, Constants.Areas.Password);
         }
     }
 

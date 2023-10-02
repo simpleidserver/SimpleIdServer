@@ -144,8 +144,17 @@
   <data name="created_at" xml:space="preserve">
     <value>Created at</value>
   </data>
+  <data name="credentials" xml:space="preserve">
+    <value>Credentials</value>
+  </data>
+  <data name="credentials_description" xml:space="preserve">
+    <value>Manage your credentials</value>
+  </data>
   <data name="description" xml:space="preserve">
     <value>Description</value>
+  </data>
+  <data name="enroll_credentials" xml:space="preserve">
+    <value>Enroll credentials</value>
   </data>
   <data name="external_accounts_description" xml:space="preserve">
     <value>Link one or more external accounts to your profile</value>
@@ -159,8 +168,20 @@
   <data name="name" xml:space="preserve">
     <value>Name</value>
   </data>
+  <data name="no_credentials_to_create" xml:space="preserve">
+    <value>All the credentials have been enrolled</value>
+  </data>
+  <data name="no_credentials_to_update" xml:space="preserve">
+    <value>There is no credential to update</value>
+  </data>
+  <data name="no_external_accounts" xml:space="preserve">
+    <value>There is no external account configured</value>
+  </data>
   <data name="no_otp" xml:space="preserve">
     <value>One Time Password is not configured</value>
+  </data>
+  <data name="no_pending_request" xml:space="preserve">
+    <value>There is no pending request</value>
   </data>
   <data name="pending_request_description" xml:space="preserve">
     <value>Users have requested access to some of your resources. Click on 'Revoke Access' to deny pending requests.</value>
@@ -191,5 +212,8 @@
   </data>
   <data name="unlink" xml:space="preserve">
     <value>Unlink</value>
+  </data>
+  <data name="update_your_credentials" xml:space="preserve">
+    <value>Update your credentials</value>
   </data>
 </root>

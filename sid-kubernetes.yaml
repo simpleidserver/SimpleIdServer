@@ -173,7 +173,7 @@ spec:
       subdomain: localhost
       containers:
       - name: scim-deploy
-        image: simpleidserver/scim:4.0.1
+        image: simpleidserver/scim:4.0.4
         ports:
           - containerPort: 80
         env:
@@ -208,7 +208,7 @@ spec:
       subdomain: localhost
       containers:
       - name: idserver-deploy
-        image: simpleidserver/idserver:4.0.1
+        image: simpleidserver/idserver:4.0.4
         ports:
           - containerPort: 80
         env:
@@ -228,6 +228,8 @@ spec:
               value: "https://scim.sid.svc.cluster.local"
             - name: "Authority"
               value: "https://idserver.sid.svc.cluster.local"
+            - name: "SCIM__SCIMRepresentationsExtractionJobOptions__SCIMEdp"
+              value: "Data Source=db;Initial Catalog=IdServer;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -249,7 +251,7 @@ spec:
       subdomain: localhost
       containers:
       - name: website-deploy
-        image: simpleidserver/website:4.0.1
+        image: simpleidserver/website:4.0.4
         ports:
           - containerPort: 80
         env:

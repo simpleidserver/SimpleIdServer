@@ -7,11 +7,11 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.Server.Kestrel.Https;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using SimpleIdServer.Configuration.Redis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.Configuration;
+using SimpleIdServer.Configuration.Redis;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.CredentialIssuer;
 using SimpleIdServer.IdServer.Domains;
@@ -135,8 +135,8 @@ void ConfigureIdServer(IServiceCollection services)
 
 void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
 {
-    var section = builder.Configuration.GetSection(nameof(StorageConfiguration));
-    var conf = section.Get<StorageConfiguration>();
+    var section = builder.Configuration.GetSection(nameof(DistributedCacheConfiguration));
+    var conf = section.Get<DistributedCacheConfiguration>();
     builder.AddAutomaticConfiguration(o =>
     {
         o.Add<FacebookOptionsLite>();
@@ -145,7 +145,7 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
         o.Add<IdServerEmailOptions>();
         o.Add<IdServerSmsOptions>();
         o.Add<FidoOptions>();
-        if(conf.Type == StorageTypes.REDIS)
+        if(conf.Type == DistributedCacheTypes.REDIS)
         {
             o.UseRedisConnector(conf.ConnectionString);
         }
@@ -155,11 +155,11 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
             {
                 switch (conf.Type)
                 {
-                    case StorageTypes.SQLSERVER:
-                        b.UseSqlServer(conf.ConnectionString);
+                    case DistributedCacheTypes.INMEMORY:
+                        b.UseInMemoryDatabase(conf.ConnectionString);
                         break;
-                    case StorageTypes.POSTGRE:
-                        b.UseNpgsql(conf.ConnectionString);
+                    case DistributedCacheTypes.SQLSERVER:
+                        b.UseSqlServer(conf.ConnectionString);
                         break;
                 }
             });

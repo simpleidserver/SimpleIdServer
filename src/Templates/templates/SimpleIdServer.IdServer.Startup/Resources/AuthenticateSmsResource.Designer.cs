@@ -194,5 +194,23 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
                 return ResourceManager.GetString("unknown_phonenumber", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à User with the same name already exists.
+        /// </summary>
+        public static string user_exists {
+            get {
+                return ResourceManager.GetString("user_exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Phone number is already taken by an another user.
+        /// </summary>
+        public static string value_exists {
+            get {
+                return ResourceManager.GetString("value_exists", resourceCulture);
+            }
+        }
     }
 }

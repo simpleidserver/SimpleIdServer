@@ -15,6 +15,10 @@
 	  <PackageReference Include="SimpleIdServer.IdServer.SqlServerMigrations" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.WsFederation" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer" Version="4.0.*-*" />
+	  <PackageReference Include="SimpleIdServer.IdServer.Provisioning.LDAP" Version="4.0.*-*" />
+	  <PackageReference Include="SimpleIdServer.IdServer.Provisioning.SCIM" Version="4.0.*-*" />
+	  <PackageReference Include="SimpleIdServer.Configuration" Version="4.0.*-*" />
+	  <PackageReference Include="SimpleIdServer.Configuration.Redis" Version="4.0.*-*" />
 	  <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.1" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="7.0.1" />
 	  <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />

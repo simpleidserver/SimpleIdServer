@@ -142,11 +142,38 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Credentials.
+        /// </summary>
+        public static string credentials {
+            get {
+                return ResourceManager.GetString("credentials", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Manage your credentials.
+        /// </summary>
+        public static string credentials_description {
+            get {
+                return ResourceManager.GetString("credentials_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Description.
         /// </summary>
         public static string description {
             get {
                 return ResourceManager.GetString("description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Enroll credentials.
+        /// </summary>
+        public static string enroll_credentials {
+            get {
+                return ResourceManager.GetString("enroll_credentials", resourceCulture);
             }
         }
         
@@ -187,11 +214,47 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à All the credentials have been enrolled.
+        /// </summary>
+        public static string no_credentials_to_create {
+            get {
+                return ResourceManager.GetString("no_credentials_to_create", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à There is no credential to update.
+        /// </summary>
+        public static string no_credentials_to_update {
+            get {
+                return ResourceManager.GetString("no_credentials_to_update", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à There is no external account configured.
+        /// </summary>
+        public static string no_external_accounts {
+            get {
+                return ResourceManager.GetString("no_external_accounts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à One Time Password is not configured.
         /// </summary>
         public static string no_otp {
             get {
                 return ResourceManager.GetString("no_otp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à There is no pending request.
+        /// </summary>
+        public static string no_pending_request {
+            get {
+                return ResourceManager.GetString("no_pending_request", resourceCulture);
             }
         }
         
@@ -282,6 +345,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static string unlink {
             get {
                 return ResourceManager.GetString("unlink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Update your credentials.
+        /// </summary>
+        public static string update_your_credentials {
+            get {
+                return ResourceManager.GetString("update_your_credentials", resourceCulture);
             }
         }
     }

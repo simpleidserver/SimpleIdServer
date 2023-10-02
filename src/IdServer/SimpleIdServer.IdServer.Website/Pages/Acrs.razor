@@ -1,12 +1,19 @@
 ﻿@page "/acrs"
+@using Microsoft.AspNetCore.Http;
+@using Microsoft.Extensions.Options;
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.AcrsStore;
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject DialogService dialogService
 @inject ContextMenuService contextMenuService
 @inject NotificationService notificationService
+@inject IOptions<IdServerWebsiteOptions> Options;
+@inject IState<RealmsState> realmsState
 @inject IDispatcher dispatcher
 @inject IState<AcrsState> acrsState
+@inject IHttpContextAccessor httpContextAccessor
+@inject DefaultSecurityOptions securityOptions
 
 <div class="row">
     <div class="col">
@@ -46,7 +53,11 @@
                 <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableAcr" Property="Value.Name" Filterable="false" Sortable="false" Title="Name" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableAcr" Filterable="false" Sortable="false" Title="Name" Width="80px">
+            <Template Context="data">
+                <RadzenLink Path="@GetDemoUrl(data)" Target="_blank">@data.Value.Name</RadzenLink>
+            </Template>
+        </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableAcr" Property="Value.DisplayName" Filterable="false" Sortable="false" Title="Display name" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableAcr" Filterable="false" Sortable="false" Title="Name" Width="80px">
             <Template Context="data">
@@ -102,16 +113,16 @@
         {
             new ContextMenuItem { Text = "Delete", Value = 1 }
         }, (a) =>
+    {
+        if (a.Value.Equals(1))
         {
-            if (a.Value.Equals(1))
-            {
-                var acrIds = acrsState.Value.Acrs?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
-                if (!acrIds.Contains(acr.Value.Id)) acrIds.Add(acr.Value.Id);
-                var act = new DeleteSelectedAcrsAction { Ids = acrIds };
-                dispatcher.Dispatch(act);
-                contextMenuService.Close();
-            }
-        });
+            var acrIds = acrsState.Value.Acrs?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
+            if (!acrIds.Contains(acr.Value.Id)) acrIds.Add(acr.Value.Id);
+            var act = new DeleteSelectedAcrsAction { Ids = acrIds };
+            dispatcher.Dispatch(act);
+            contextMenuService.Close();
+        }
+    });
     }
 
     void LoadData(LoadDataArgs args)
@@ -130,7 +141,7 @@
         else if (row.Attributes.ContainsKey(className))
             row.Attributes.Remove(className);
     }
-    
+
     async void AddAcr() {
         await dialogService.OpenAsync<AddAcrDialog>("Add Authentication Context Reference", new Dictionary<string, object>(), new DialogOptions
          {
@@ -139,5 +150,12 @@
              Resizable = true,
              Draggable = true
          });
+    }
+
+    string GetDemoUrl(SelectableAcr selectableAcr)
+    {
+        var issuer = httpContextAccessor.HttpContext.Request.GetAbsoluteUriWithVirtualPath();
+        return $"/login?acrValues={selectableAcr.Value.Name}";
+        // return $"{Options.Value.IdServerBaseUrl}/{realmsState.Value.ActiveRealm}/authorization?client_id={securityOptions.ClientId}&redirect_uri={issuer}/signin-oidc&scope=openid profile&nonce={Guid.NewGuid().ToString()}&acr_values={selectableAcr.Value.Name}&prompt=login&response_type=code&state={Guid.NewGuid().ToString()}";
     }
 }

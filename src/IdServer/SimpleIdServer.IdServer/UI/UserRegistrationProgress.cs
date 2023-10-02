@@ -15,6 +15,14 @@ public class UserRegistrationProgress
     public string Realm { get; set; }
     public User User { get; set; } = null;
 
+    public bool IsLastStep
+    {
+        get
+        {
+            return Steps.Last() == Amr;
+        }
+    }
+
     public string GetNextAmr()
     {
         var lastStep = Steps.Last();

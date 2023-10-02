@@ -10,6 +10,8 @@
     ViewBag.Title = AuthenticateMobileResource.register_title;
 }
 
+<h5>@(User.Identity.IsAuthenticated ? AuthenticateMobileResource.enroll_mobile : AuthenticateMobileResource.register_mobile)</h5>
+
 <div id="registrationContainer">
     <ul class="list-group mb-3" id="errors">
         @if (!ViewData.ModelState.IsValid)
@@ -26,11 +28,20 @@
 
     <!-- Registration form -->
     <form id="registerMobile">
-        <div class="input-group mb-3">
-            <input asp-for="Login" placeholder="@AuthenticateWebauthnResource.login" type="text" class="form-control" />
+        <div class="form-floating mb-3">
+            @if(!string.IsNullOrWhiteSpace(Model.Login))
+            {
+                <input asp-for="Login" placeholder="@AuthenticateWebauthnResource.login" id="floatingLogin" type="text" class="form-control" disabled="true" />
+            }
+            else
+            {
+                <input asp-for="Login" placeholder="@AuthenticateWebauthnResource.login" id="floatingLogin" type="text" class="form-control" />
+            }
+            <label for="floatingLogin">@AuthenticateWebauthnResource.login</label>
         </div>
-        <div class="input-group mb-3">
-            <input asp-for="DisplayName" placeholder="@AuthenticateWebauthnResource.display_name" type="text" class="form-control" />
+        <div class="form-floating mb-3">
+            <input asp-for="DisplayName" placeholder="@AuthenticateWebauthnResource.display_name" id="floatingDisplayName" type="text" class="form-control" />
+            <label for="floatingDisplayName">@AuthenticateWebauthnResource.display_name</label>
         </div>
         <button type="submit" class="btn btn-primary card-link">@AuthenticateMobileResource.generate_qrcode</button>
     </form>
@@ -85,7 +96,7 @@
                 }
             }
 
-            async function checkStatus(sessionId) {
+            async function checkStatus(sessionId, nextRegistrationRedirectUrl) {
                 setTimeout(async function(){
                     let response = await fetch(registerStatusUrl + "/" + sessionId, {
                         method: 'GET'
@@ -97,7 +108,11 @@
                         return;
                     }
 
-                    displaySuccessMessage();
+                    if(nextRegistrationRedirectUrl) {
+                        window.location.href = nextRegistrationRedirectUrl;
+                    } else {
+                        displaySuccessMessage();
+                    }
                 }, 1000);
             }
 
@@ -122,11 +137,16 @@
                 
                 const sessionId = response.headers.get('SessionId');
                 const qrCode = response.headers.get('QRCode');
+                let nextRegistrationRedirectUrl = null;
+                if (responseJson['NextRegistrationRedirectUrl']) {
+                    nextRegistrationRedirectUrl = responseJson['NextRegistrationRedirectUrl'];
+                }
+
                 const blob = await response.blob();
                 const img = URL.createObjectURL(blob);
 
                 displayQRCode(img, qrCode);
-                await checkStatus(sessionId);
+                await checkStatus(sessionId, nextRegistrationRedirectUrl);
             };
 
             $("#registerMobile").submit(function (e) {

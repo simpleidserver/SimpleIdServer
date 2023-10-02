@@ -27,17 +27,17 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
         {
             var viewModel = new RegisterMobileViewModel();
             var fidoOptions = GetOptions();
-            UserRegistrationProgress userRegistrationProgress = null;
+            var userRegistrationProgress = await GetRegistrationProgress();
+            if (userRegistrationProgress == null)
+            {
+                viewModel.IsNotAllowed = true;
+                return View(viewModel);
+            }
+
             var login = string.Empty;
             if (!User.Identity.IsAuthenticated)
             {
                 userRegistrationProgress = await GetRegistrationProgress();
-                if(userRegistrationProgress == null)
-                {
-                    viewModel.IsNotAllowed = true;
-                    return View(viewModel);
-                }
-
                 login = userRegistrationProgress.User?.Name;
             }
             else login = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;

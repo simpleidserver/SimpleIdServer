@@ -43,18 +43,14 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseRegisterControll
     {
         prefix = prefix ?? SimpleIdServer.IdServer.Constants.Prefix;
         var viewModel = new OTPRegisterViewModel();
-        UserRegistrationProgress registrationProgress = null;
-        var isAuthenticated = User.Identity.IsAuthenticated;
-        if(!isAuthenticated)
+        var registrationProgress = await GetRegistrationProgress();
+        if (registrationProgress == null)
         {
-            registrationProgress = await GetRegistrationProgress();
-            if(registrationProgress == null)
-            {
-                viewModel.IsNotAllowed = true;
-                return View(viewModel);
-            }
+            viewModel.IsNotAllowed = true;
+            return View(viewModel);
         }
 
+        var isAuthenticated = User.Identity.IsAuthenticated;
         if (isAuthenticated)
         {
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
@@ -73,15 +69,12 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseRegisterControll
     public async Task<IActionResult> Index([FromRoute] string prefix, OTPRegisterViewModel viewModel)
     {
         prefix = prefix ?? Constants.Prefix;
-        UserRegistrationProgress userRegistrationProgress = null;
-        if (!User.Identity.IsAuthenticated)
+        var isAuthenticated = User.Identity.IsAuthenticated;
+        UserRegistrationProgress userRegistrationProgress = await GetRegistrationProgress();
+        if (userRegistrationProgress == null)
         {
-            userRegistrationProgress = await GetRegistrationProgress();
-            if (userRegistrationProgress == null)
-            {
-                viewModel.IsNotAllowed = true;
-                return View(viewModel);
-            }
+            viewModel.IsNotAllowed = true;
+            return View(viewModel);
         }
 
         viewModel.Amr = userRegistrationProgress?.Amr;
@@ -143,15 +136,14 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseRegisterControll
                 return View(viewModel);
             }
 
-            var authenticatedUser = await _userRepository.Query().Include(u => u.Realms).Include(c => c.OAuthUserClaims).FirstAsync(u => u.Realms.Any(r => r.RealmsName == prefix) && u.Name == nameIdentifier);
+            var authenticatedUser = await _userRepository.Query().Include(u => u.Realms).Include(c => c.OAuthUserClaims).Include(c => c.Credentials).FirstAsync(u => u.Realms.Any(r => r.RealmsName == prefix) && u.Name == nameIdentifier);
             BuildUser(authenticatedUser, viewModel);
             authenticatedUser.UpdateDateTime = DateTime.UtcNow;
             if (authenticatedUser.ActiveOTP == null)
                 authenticatedUser.GenerateTOTP();
 
             await _userRepository.SaveChanges(CancellationToken.None);
-            viewModel.IsUpdated = true;
-            return View(viewModel);
+            return await base.UpdateUser(userRegistrationProgress, viewModel, Amr);
         }
 
         async Task<IActionResult> RegisterUser()

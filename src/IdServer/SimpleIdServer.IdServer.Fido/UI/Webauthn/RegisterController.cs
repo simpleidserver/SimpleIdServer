@@ -27,18 +27,17 @@ namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
             if (!string.IsNullOrWhiteSpace(prefix))
                 prefix = $"{prefix}/";
-            UserRegistrationProgress userRegistrationProgress = null;
             var viewModel = new RegisterWebauthnViewModel();
+            var userRegistrationProgress = await GetRegistrationProgress();
+            if (userRegistrationProgress == null)
+            {
+                viewModel.IsNotAllowed = true;
+                return View(viewModel);
+            }
+
             var login = string.Empty;
             if (!User.Identity.IsAuthenticated)
             {
-                userRegistrationProgress = await GetRegistrationProgress();
-                if (userRegistrationProgress == null)
-                {
-                    viewModel.IsNotAllowed = true;
-                    return View(viewModel);
-                }
-
                 login = userRegistrationProgress.User?.Name;
             }
             else login = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
