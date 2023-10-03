@@ -24,6 +24,7 @@ namespace SimpleIdServer.IdServer.Email.UI
         private readonly IConfiguration _configuration;
 
         public AuthenticateController(
+            IConfiguration configuration,
             IEnumerable<IUserNotificationService> notificationServices,
             IEnumerable<IOTPAuthenticator> otpAuthenticators,
             IOptions<IdServerHostOptions> options,
@@ -35,6 +36,7 @@ namespace SimpleIdServer.IdServer.Email.UI
             IUserTransformer userTransformer, 
             IBusControl busControl) : base(notificationServices, otpAuthenticators, options, authenticationSchemeProvider, dataProtectionProvider, clientRepository, amrHelper, userRepository, userTransformer, busControl)
         {
+            _configuration = configuration;
         }
 
         protected override bool IsExternalIdProvidersDisplayed => false;

@@ -12,7 +12,6 @@
 @inject IState<RealmsState> realmsState
 @inject IDispatcher dispatcher
 @inject IState<AcrsState> acrsState
-@inject IHttpContextAccessor httpContextAccessor
 @inject DefaultSecurityOptions securityOptions
 
 <div class="row">
@@ -154,8 +153,6 @@
 
     string GetDemoUrl(SelectableAcr selectableAcr)
     {
-        var issuer = httpContextAccessor.HttpContext.Request.GetAbsoluteUriWithVirtualPath();
         return $"/login?acrValues={selectableAcr.Value.Name}";
-        // return $"{Options.Value.IdServerBaseUrl}/{realmsState.Value.ActiveRealm}/authorization?client_id={securityOptions.ClientId}&redirect_uri={issuer}/signin-oidc&scope=openid profile&nonce={Guid.NewGuid().ToString()}&acr_values={selectableAcr.Value.Name}&prompt=login&response_type=code&state={Guid.NewGuid().ToString()}";
     }
 }

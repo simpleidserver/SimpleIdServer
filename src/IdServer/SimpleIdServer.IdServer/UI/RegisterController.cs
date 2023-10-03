@@ -29,14 +29,14 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
     {
         prefix = prefix ?? Constants.Prefix;
         var viewModel = new PwdRegisterViewModel();
+        var isAuthenticated = User.Identity.IsAuthenticated;
         var userRegistrationProgress = await GetRegistrationProgress();
-        if (userRegistrationProgress == null)
+        if (userRegistrationProgress == null && !isAuthenticated)
         {
             viewModel.IsNotAllowed = true;
             return View(viewModel);
         }
 
-        var isAuthenticated = User.Identity.IsAuthenticated;
         if(isAuthenticated)
         {
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
@@ -61,7 +61,7 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
         }
 
         var userRegistrationProgress = await GetRegistrationProgress();
-        if (userRegistrationProgress == null)
+        if (userRegistrationProgress == null && !isAuthenticated)
         {
             viewModel.IsNotAllowed = true;
             return View(viewModel);

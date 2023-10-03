@@ -43,14 +43,14 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseRegisterControll
     {
         prefix = prefix ?? SimpleIdServer.IdServer.Constants.Prefix;
         var viewModel = new OTPRegisterViewModel();
+        var isAuthenticated = User.Identity.IsAuthenticated;
         var registrationProgress = await GetRegistrationProgress();
-        if (registrationProgress == null)
+        if (registrationProgress == null && !isAuthenticated)
         {
             viewModel.IsNotAllowed = true;
             return View(viewModel);
         }
 
-        var isAuthenticated = User.Identity.IsAuthenticated;
         if (isAuthenticated)
         {
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
@@ -71,7 +71,7 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseRegisterControll
         prefix = prefix ?? Constants.Prefix;
         var isAuthenticated = User.Identity.IsAuthenticated;
         UserRegistrationProgress userRegistrationProgress = await GetRegistrationProgress();
-        if (userRegistrationProgress == null)
+        if (userRegistrationProgress == null && !isAuthenticated)
         {
             viewModel.IsNotAllowed = true;
             return View(viewModel);

@@ -71,8 +71,8 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
 
     protected async Task<IActionResult> UpdateUser(UserRegistrationProgress registrationProgress, TViewModel viewModel, string amr)
     {
-        var lastStep = registrationProgress.Steps.Last();
-        if (lastStep == amr)
+        var lastStep = registrationProgress?.Steps?.Last();
+        if (lastStep == amr || registrationProgress == null)
         {
             viewModel.IsUpdated = true;
             return View(viewModel);

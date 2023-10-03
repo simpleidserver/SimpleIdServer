@@ -16,9 +16,10 @@ namespace SimpleIdServer.IdServer.Website.Controllers
                 { "scheme", "oidc" },
             };
             var props = new AuthenticationProperties(items);
-            props.Parameters.Add("prompt", "login");
-            props.Parameters.Add("acr_values", acrValues);
-            return Challenge(props, "oidc");
+            props.SetParameter("prompt", "login");
+            props.SetParameter("acr_values", acrValues);
+            var result = Challenge(props, "oidc");
+            return result;
         }
     }
 }

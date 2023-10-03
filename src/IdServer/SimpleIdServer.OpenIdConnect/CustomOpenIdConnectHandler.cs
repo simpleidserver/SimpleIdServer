@@ -703,6 +703,9 @@ namespace SimpleIdServer.OpenIdConnect
                 message.Parameters.Add(OAuthConstants.CodeChallengeMethodKey, OAuthConstants.CodeChallengeMethodS256);
             }
 
+            var acrValues = properties.GetParameter<string>("acr_values");
+            if (!string.IsNullOrWhiteSpace(acrValues)) message.Parameters.Add("acr_values", acrValues);
+
             // Add the 'max_age' parameter to the authentication request if MaxAge is not null.
             // See http://openid.net/specs/openid-connect-core-1_0.html#AuthRequest
             var maxAge = properties.GetParameter<TimeSpan?>(OpenIdConnectParameterNames.MaxAge) ?? Options.MaxAge;

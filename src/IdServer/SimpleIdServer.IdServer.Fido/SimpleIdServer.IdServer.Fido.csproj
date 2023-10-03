@@ -10,6 +10,6 @@
 	  <ProjectReference Include="..\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Fido2.AspNet" Version="4.0.*-*" />
+		<PackageReference Include="Fido2.AspNet" Version="4.0.0-beta3" />
 	</ItemGroup>
 </Project>

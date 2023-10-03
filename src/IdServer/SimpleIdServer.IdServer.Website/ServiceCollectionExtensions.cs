@@ -26,7 +26,6 @@ namespace Microsoft.Extensions.DependencyInjection
                     rdt.Name = "SimpleIdServer";
                 });
             });
-            services.AddHttpContextAccessor();
             services.AddStoreWithFactory(action);
             services.AddScoped<IOTPQRCodeGenerator, OTPQRCodeGenerator>();
             services.AddScoped<DialogService>();
@@ -71,7 +70,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 options.Cookie.HttpOnly = true;
             })
-            .AddOpenIdConnect("oidc", config =>
+            .AddCustomOpenIdConnect("oidc", config =>
             {
                 if(defaultSecurityOptions.IgnoreCertificateError)
                 {

@@ -339,6 +339,16 @@ namespace SimpleIdServer.IdServer.UI
             return File(payload, "image/png");
         }
 
+        [HttpGet]
+        [Authorize(Constants.Policies.Authenticated)]
+        public IActionResult RegisterCredential([FromRoute] string prefix, string name)
+        {
+            prefix = prefix ?? Constants.DefaultRealm;
+            var cookieName = _options.GetRegistrationCookieName();
+            if (Request.Cookies.ContainsKey(cookieName)) Response.Cookies.Delete(cookieName);
+            return Redirect(Url.Action("Index", "Register", new { area = name }));
+        }
+
         [HttpPost]
         public IActionResult SwitchLanguage(string culture, string returnUrl)
         {

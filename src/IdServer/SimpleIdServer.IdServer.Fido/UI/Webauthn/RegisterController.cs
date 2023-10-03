@@ -28,15 +28,16 @@ namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
             if (!string.IsNullOrWhiteSpace(prefix))
                 prefix = $"{prefix}/";
             var viewModel = new RegisterWebauthnViewModel();
+            var isAuthenticated = User.Identity.IsAuthenticated;
             var userRegistrationProgress = await GetRegistrationProgress();
-            if (userRegistrationProgress == null)
+            if (userRegistrationProgress == null && !isAuthenticated)
             {
                 viewModel.IsNotAllowed = true;
                 return View(viewModel);
             }
 
             var login = string.Empty;
-            if (!User.Identity.IsAuthenticated)
+            if (!isAuthenticated)
             {
                 login = userRegistrationProgress.User?.Name;
             }
