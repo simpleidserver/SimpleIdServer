@@ -6,6 +6,6 @@
 		<Description>Contains the logic to register an U2F Client.</Description>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Fido2" Version="4.0.*-*" />
+		<PackageReference Include="Fido2" Version="4.0.0-beta3" />
 	</ItemGroup>
 </Project>
