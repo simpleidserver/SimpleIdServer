@@ -15,15 +15,27 @@
         </Grid.RowDefinitions>
         <StackLayout VerticalOptions="Center" Spacing="10" Grid.Row="0">
             <Image
-                Grid.Row="0"
                 Source="credentialissuer.png"
                 HorizontalOptions="Center"
                 HeightRequest="400" />
             <Label Text="Scan the QR Code to enroll your mobile device or to authenticate to the website."
-                Grid.Row="2"
                 HorizontalOptions="Center"/>
         </StackLayout>
-        <StackLayout Spacing="10" Grid.Row="1">
+        <!-- Display bluetooth devices -->
+        <StackLayout Spacing="10" Grid.Row="1" VerticalOptions="FillAndExpand" IsVisible="{Binding Path=IsDeviceConnectionDisplayed}">
+            <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                <Picker ItemsSource="{Binding Path=Devices}"
+                        SelectedItem="{Binding Path=SelectedDevice}"
+                        ItemDisplayBinding="{Binding Path=Name}"></Picker>
+                <Button Text="Scan devices"
+                        Command="{Binding Path=ScanDevicesCommand}"></Button>
+            </StackLayout>
+            <Button Text="Connect to device"
+                    Command="{Binding Path=ConnectDeviceCommand}"></Button>
+        </StackLayout>
+        <!-- Scan qr code -->
+        <StackLayout Spacing="10" Grid.Row="1" IsVisible="{Binding Path=IsScanDisplayed}">
+            <Label Text="{Binding Path=SelectedDeviceName}"></Label>
             <Button 
                 Text="Scan QR Code"
                 HorizontalOptions="Fill"

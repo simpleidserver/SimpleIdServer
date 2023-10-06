@@ -1,9 +1,13 @@
 ﻿// See https://aka.ms/new-console-template for more information
+using Fido2NetLib.Ctap2;
 using SimpleIdServer.IdServer.U2FClient;
 using SimpleIdServer.U2F.Sample;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+
+
+ParseCTAP();
 
 Console.WriteLine("Enter the login");
 var login = Console.ReadLine();
@@ -63,4 +67,13 @@ async Task EndRegister(EnrollResult enroll, string sessionId, string login)
         var httpResponse = await httpClient.SendAsync(requestMessage);
         var json = await httpResponse.Content.ReadAsStringAsync();
     }
+}
+
+static void ParseCTAP()
+{
+    const string str = "FIDO:/360683885869139583815645925350476913639279862514133358719814316745524891882093535112333197152192774114437227764707350140072365664420931702571879652655874107096654083332";
+    var t = str.Replace("FIDO:/", string.Empty);
+    var hex = Convert.FromHexString(t);
+    var resp = new FidoAuthenticatorResponse(hex);
+    string toto = "";
 }

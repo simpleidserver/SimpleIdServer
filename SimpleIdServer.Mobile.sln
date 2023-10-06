@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Mobile", "sr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.U2FClient", "src\IdServer\SimpleIdServer.IdServer.U2FClient\SimpleIdServer.IdServer.U2FClient.csproj", "{E82B46A3-287A-4E03-81E4-AF3EE9CB1600}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fido2.Ctap2", "src\Mobile\Fido2.Ctap2\Fido2.Ctap2.csproj", "{0E9726C2-96CC-4F88-A639-4868AE8A176A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +25,10 @@ Global
 		{E82B46A3-287A-4E03-81E4-AF3EE9CB1600}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E82B46A3-287A-4E03-81E4-AF3EE9CB1600}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E82B46A3-287A-4E03-81E4-AF3EE9CB1600}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E9726C2-96CC-4F88-A639-4868AE8A176A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E9726C2-96CC-4F88-A639-4868AE8A176A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E9726C2-96CC-4F88-A639-4868AE8A176A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E9726C2-96CC-4F88-A639-4868AE8A176A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

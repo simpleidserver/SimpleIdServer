@@ -1,4 +1,6 @@
-﻿namespace SimpleIdServer.Mobile;
+﻿using SimpleIdServer.Mobile.Helpers;
+
+namespace SimpleIdServer.Mobile;
 
 public partial class App : Application
 {
@@ -12,9 +14,11 @@ public partial class App : Application
 			_database = new MobileDatabase(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "sidDB.db3"));
 			return _database;
 		}
-	}
+    }
 
-	public App()
+    public static IPlatformHelpers PlatformHelper;
+
+    public App(IServiceProvider serviceProvider)
 	{
 		InitializeComponent();
 
@@ -22,5 +26,7 @@ public partial class App : Application
 
 		Routing.RegisterRoute("enrollscanqrcode", typeof(QRCodeScannerPage));
         Routing.RegisterRoute("enrollsubmitqrcode", typeof(QRCodeInputPage));
+
+		PlatformHelper = serviceProvider.GetService<IPlatformHelpers>();
     }
 }

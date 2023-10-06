@@ -101,6 +101,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "07. Configuration", "07. Co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Configuration.Redis", "src\IdServer\SimpleIdServer.Configuration.Redis\SimpleIdServer.Configuration.Redis.csproj", "{3EA05774-266E-4C68-AE40-CE246F8EDD31}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fido2.Ctap2", "src\Mobile\Fido2.Ctap2\Fido2.Ctap2.csproj", "{24E74782-DBCB-48F9-B910-C54786D2AE57}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -259,6 +261,10 @@ Global
 		{3EA05774-266E-4C68-AE40-CE246F8EDD31}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3EA05774-266E-4C68-AE40-CE246F8EDD31}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3EA05774-266E-4C68-AE40-CE246F8EDD31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24E74782-DBCB-48F9-B910-C54786D2AE57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24E74782-DBCB-48F9-B910-C54786D2AE57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24E74782-DBCB-48F9-B910-C54786D2AE57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24E74782-DBCB-48F9-B910-C54786D2AE57}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -309,6 +315,7 @@ Global
 		{E5886E09-671E-4B3E-AA8F-824C39DF94E4} = {4796A22B-91A9-42AF-87CA-F69392696B0A}
 		{CA774DE9-8091-4298-BDB3-924561F36B75} = {4796A22B-91A9-42AF-87CA-F69392696B0A}
 		{3EA05774-266E-4C68-AE40-CE246F8EDD31} = {CA774DE9-8091-4298-BDB3-924561F36B75}
+		{24E74782-DBCB-48F9-B910-C54786D2AE57} = {E5886E09-671E-4B3E-AA8F-824C39DF94E4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FE1E2C8-475E-4592-8609-D331B1D01730}

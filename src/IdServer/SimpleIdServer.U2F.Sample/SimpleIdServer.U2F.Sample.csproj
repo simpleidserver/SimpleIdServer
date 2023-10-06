@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Mobile\Fido2.Ctap2\Fido2.Ctap2.csproj" />
     <ProjectReference Include="..\SimpleIdServer.IdServer.U2FClient\SimpleIdServer.IdServer.U2FClient.csproj" />
   </ItemGroup>
 
