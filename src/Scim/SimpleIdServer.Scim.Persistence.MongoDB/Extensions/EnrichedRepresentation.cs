@@ -8,6 +8,9 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
 {
     public record EnrichedRepresentation
     {
+        public string Id { get; set; }
+        public string ExternalId { get; set; }
+        public int Version { get; set; }
         public SCIMRepresentationModel Representation { get; set; }
         public IEnumerable<SCIMRepresentationAttribute> FlatAttributes { get; set; }
     }

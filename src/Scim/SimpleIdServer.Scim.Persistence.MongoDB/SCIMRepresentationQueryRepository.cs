@@ -63,6 +63,9 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                 join b in _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable() on a.Id equals b.RepresentationId into FlatAttributes
                 select new EnrichedRepresentation
                 {
+                    Id = a.Id,
+                    ExternalId = a.ExternalId,
+                    Version = a.Version,
                     Representation = a,
                     FlatAttributes = FlatAttributes
                 };
