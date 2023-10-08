@@ -20,21 +20,27 @@ namespace SimpleIdServer.Mobile.Platforms.Android.Services
         }
 
         public bool IsAppRegistered { get; set; }
-
         public bool IsConnected => _connectedDevice != null;
-
+        public BluetoothDevice WaitingForDevice => _waitingForDevice;
         public HidDeviceApp HidDeviceApp => _hidDeviceApp;
-
         public List<IProfileListener> Listeners => _listeners;
 
         public void RequestConnect(BluetoothDevice device)
         {
             _waitingForDevice = device;
             _connectedDevice = null;
-            UpdateDevices();
-            if(device != null && device.Equals(_connectedDevice))
+            if(!IsAppRegistered)
             {
-                
+                return;
+            }
+
+            UpdateDevices();
+            if (device != null && device.Equals(_connectedDevice))
+            {
+                foreach(var listener in _listeners)
+                {
+                    listener.OnConnectionStateChanged(device, 0);
+                }
             }
         }
         
@@ -43,6 +49,7 @@ namespace SimpleIdServer.Mobile.Platforms.Android.Services
             _listeners.Add(listener);
             context = context.ApplicationContext;
             _hidDeviceProfile.RegisterServiceListener(context, _profileListener);
+            _hidDeviceApp.RegisterDeviceListener(_profileListener);
             return _hidDeviceProfile;
         }
 
@@ -73,13 +80,9 @@ namespace SimpleIdServer.Mobile.Platforms.Android.Services
                 ProfileState.Connecting,
                 ProfileState.Disconnecting
             });
-            if(connectionStateDevices.Any() && _waitingForDevice != null)
+            if(!connectionStateDevices.Any() && _waitingForDevice != null)
             {
                 _hidDeviceProfile.Connect(_waitingForDevice);
-            }
-
-            if(_connectedDevice == null && connected != null)
-            {
                 _connectedDevice = connected;
                 _waitingForDevice = null;
             }
@@ -99,12 +102,12 @@ namespace SimpleIdServer.Mobile.Platforms.Android.Services
 
         public void OnConnectionStateChanged(BluetoothDevice device, int state)
         {
-            throw new NotImplementedException();
+            // throw new NotImplementedException();
         }
 
         public void OnInterruptData(BluetoothDevice device, int reportId, byte[] data, BluetoothHidDevice inputHost)
         {
-            throw new NotImplementedException();
+            // throw new NotImplementedException();
         }
 
         public void OnServiceStateChanged(IBluetoothProfile proxy)
@@ -125,8 +128,16 @@ namespace SimpleIdServer.Mobile.Platforms.Android.Services
         public void OnStatusChanged(bool registered)
         {
             if (_hidDeviceController.IsAppRegistered == registered) return;
+            _hidDeviceController.IsAppRegistered = registered;
+            foreach(var listener in _hidDeviceController.Listeners)
+            {
+                listener.OnStatusChanged(registered);
+            }
 
-            throw new NotImplementedException();
+            if(registered && _hidDeviceController.WaitingForDevice != null)
+            {
+                (_hidDeviceController.RequestConnect(_hidDeviceController.WaitingForDevice);
+            }
         }
     }
 }

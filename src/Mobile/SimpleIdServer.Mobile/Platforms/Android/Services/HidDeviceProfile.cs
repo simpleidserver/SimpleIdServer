@@ -50,11 +50,11 @@ namespace SimpleIdServer.Mobile.Platforms.Android.Services
             {
                 foreach(var uuid in uuidLst)
                 {
-                    if (HID_UUID.Equals(uuid) || HOGP_UUID.Equals(uuid)) return false;
+                    if (HID_UUID.Equals(uuid) || HOGP_UUID.Equals(uuid)) return true;
                 }
             }
 
-            return true;
+            return false;
         }
 
         public void RegisterServiceListener(AndroidContent.Context context, IServiceStateListener listener)

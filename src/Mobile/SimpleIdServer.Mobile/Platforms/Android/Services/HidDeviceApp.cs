@@ -102,5 +102,10 @@ namespace SimpleIdServer.Mobile.Platforms.Android.Services
                 }
             }
         }
+
+        public override void OnInterruptData(BluetoothDevice device, sbyte reportId, byte[] data)
+        {
+            base.OnInterruptData(device, reportId, data);
+        }
     }
 }
