@@ -116,6 +116,9 @@ namespace SimpleIdServer.Scim.Domains
                 case SCIMSchemaAttributeTypes.BINARY:
                     value = ValueBinary;
                     break;
+                case SCIMSchemaAttributeTypes.BOOLEAN:
+                    value = ValueBoolean.ToString();
+                    break;
                 case SCIMSchemaAttributeTypes.DATETIME:
                     value = ValueDateTime?.ToString();
                     break;

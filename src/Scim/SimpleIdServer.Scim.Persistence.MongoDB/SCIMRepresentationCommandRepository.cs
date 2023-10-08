@@ -188,7 +188,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             var result = new List<SCIMRepresentationAttribute>();
             foreach (var attr in filteredAttributes)
             {
-                result.Add(attr.Parent);
+                if(attr.Parent != null) result.Add(attr.Parent);
                 result.AddRange(attr.Children);
             }
 
