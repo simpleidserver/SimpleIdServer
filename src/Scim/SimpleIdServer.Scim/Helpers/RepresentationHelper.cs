@@ -309,7 +309,7 @@ namespace SimpleIdServer.Scim.Helpers
                 }
 
                 // Orphan parent.
-                var orphanParents = hierarchicalFilteredAttributes.Where(a => !a.CachedChildren.Any(c => c.FullPath == path));
+                var orphanParents = hierarchicalFilteredAttributes.Where(a => a.CachedChildren.Any() && !a.CachedChildren.Any(c => c.FullPath == path));
                 foreach (var orphanParent in orphanParents)
                 {
                     var clone = (SCIMRepresentationAttribute)newFlatAttr.Clone();

@@ -177,19 +177,20 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                     Children = new List<SCIMRepresentationAttribute>()
                 };
             representationAttributes = pathExpression.EvaluateMongoDbAttributes(representationAttributes);
-            var filteredAttributes = from a in representationAttributes
-                join b in _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable() on a.Attribute.ParentAttributeId equals b.ParentAttributeId into Children
-                select new EnrichedAttribute
-                {
-                    Attribute = a.Attribute,
-                    Parent = a.Parent,
-                    Children = Children
-                };
+            var targetedAttributes = await representationAttributes.ToMongoListAsync();
+            var allParentIds = targetedAttributes.Select(a => a.Attribute.ParentAttributeId);
+            var allTargetedAttributeIds = targetedAttributes.Select(a => a.Attribute.Id);
+            var allChildren = await (from a in _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
+                           where a.ParentAttributeId != null && a.RepresentationId == representationId && (allParentIds.Contains(a.ParentAttributeId) || allTargetedAttributeIds.Contains(a.ParentAttributeId))
+                           select a).ToMongoListAsync();
+
             var result = new List<SCIMRepresentationAttribute>();
-            foreach (var attr in filteredAttributes)
+            foreach (var targetedAttribute in targetedAttributes)
             {
-                if(attr.Parent != null) result.Add(attr.Parent);
-                result.AddRange(attr.Children);
+                if (targetedAttribute.Parent != null) result.Add(targetedAttribute.Parent);
+                result.Add(targetedAttribute.Attribute);
+                var siblingAttributes = allChildren.Where(c => (targetedAttribute.Parent != null && c.ParentAttributeId == targetedAttribute.Parent.Id) || (targetedAttribute.Attribute.Id == c.ParentAttributeId)).Where(a => !result.Any(r => r.Id == a.Id));
+                result.AddRange(siblingAttributes);
             }
 
             return result;
