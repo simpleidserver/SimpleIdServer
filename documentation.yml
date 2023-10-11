@@ -1,0 +1,31 @@
+# ASP.NET Core (.NET Framework)
+# Build and test ASP.NET Core projects targeting the full .NET Framework.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+- docs
+
+pool:
+  name: 'Default'
+
+steps:
+- checkout: self
+  fetchDepth: 0
+  fetchTags: true
+
+- task: PowerShell@2
+  displayName: 'npm install and build'
+  inputs:
+    targetType: 'inline'
+    script: |
+      npm install
+      npm run build
+    workingDirectory: '$(Build.Repository.LocalPath)\website'
+
+- task: CopyFiles@2
+  displayName: 'Copy website'
+  inputs:
+    SourceFolder: '$(Build.Repository.LocalPath)\website\build'
+    Contents: '**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)\website'
