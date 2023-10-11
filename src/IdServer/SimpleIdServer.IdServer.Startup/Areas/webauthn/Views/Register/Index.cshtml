@@ -100,12 +100,15 @@
                     }
                 });
                 let responseJson = await response.json();
+
+                console.log('coucou1');
                 if (!response.ok) {
                     toggleBtn(false);
                     displayError(responseJson);
                     return;
                 }
 
+                console.log('coucou');
                 if (nextRegistrationRedirectUrl) {
                     window.location.href = nextRegistrationRedirectUrl;
                     return;

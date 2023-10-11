@@ -86,7 +86,7 @@ const config = {
             dropdownItemsAfter: [{to: '/versions', label: 'All versions'}],
             dropdownActiveClassDisabled: true,
           },
-          /*{ to: 'blog', label: 'Blog', position: 'left'},*/
+          { to: 'blog', label: 'Blog', position: 'left'},
           {
             href: 'https://github.com/simpleidserver',
             label: 'GitHub',

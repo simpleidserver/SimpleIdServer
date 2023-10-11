@@ -7,6 +7,7 @@
 | **Authentication Method** | A process through which the Identity Management System verifies who the user or application is. |
 | **Category** | A category describes the type of client, for example, Single Page Application (SPA) |
 | **Client** | The client is the application that is attempting to act on behalf of the user or access the user's resources. |
+| **Enrollment Process** | Register the mobile application in the Identity Server is necessary if you wish to receive PUSH notifications. |
 | **Identity And Access Management (IAM)** | Identity and Access Management (IAM) is an approach that manages and organizes all of your user identities into one system with a consistent set or rules and policies. | 
 | **Identity Provider (IDP)** | An Identity Provider (IDP) is a system that creates, maintains, and manages a user's digital identity. |
 | **Identity Scope** | OPENID/Identity scopes are used by a client during authentication to authorize access to a user's details, like name and picture. |

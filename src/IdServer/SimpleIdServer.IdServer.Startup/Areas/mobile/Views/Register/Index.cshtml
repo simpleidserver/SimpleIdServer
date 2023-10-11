@@ -127,9 +127,9 @@
                         "Content-Type": "application/json"
                     }
                 });
-
+                
+                let responseJson = await response.json();
                 if(!response.ok) {
-                    let responseJson = await response.json();
                     toggleBtn(false);
                     displayError(responseJson);
                     return;

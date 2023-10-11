@@ -116,8 +116,10 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             var cookieName = _idServerHostOptions.GetRegistrationCookieName();
             var registrationProgress = await GetRegistrationProgress();
             bool isAuthenticated = User.Identity.IsAuthenticated;
-            if (!isAuthenticated) 
-                if(registrationProgress == null) return BuildError(System.Net.HttpStatusCode.Unauthorized, ErrorCodes.INVALID_REQUEST, ErrorMessages.NOT_ALLOWED_TO_REGISTER);
+            if (!isAuthenticated)
+            {
+                if (registrationProgress == null) return BuildError(System.Net.HttpStatusCode.Unauthorized, ErrorCodes.INVALID_REQUEST, ErrorMessages.NOT_ALLOWED_TO_REGISTER);
+            }
             else login = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
             if (string.IsNullOrWhiteSpace(request.Login)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.MISSING_PARAMETER, EndU2FRegisterRequestNames.Login));
             var user = await _authenticationHelper.GetUserByLogin(_userRepository.Query().Include(u => u.Credentials), login, prefix, cancellationToken);
@@ -194,6 +196,10 @@ namespace SimpleIdServer.IdServer.Fido.Apis
                 var currentAmr = registrationProgress.Amr;
                 if (currentAmr == lastStep)
                 {
+                    user.Realms.Add(new RealmUser
+                    {
+                        RealmsName = prefix
+                    });
                     _userRepository.Add(user);
                     await _userRepository.SaveChanges(CancellationToken.None);
                     return new OkObjectResult(new EndU2FRegisterResult
@@ -253,7 +259,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             }, cancellationToken);
             string nextRegistrationRedirectUrl = null;
             var registrationProgress = await GetRegistrationProgress();
-            if(registrationProgress != null || registrationProgress.IsLastStep)
+            if(registrationProgress != null && !registrationProgress.IsLastStep)
             {
                 var nextAmr = registrationProgress.GetNextAmr();
                 nextRegistrationRedirectUrl = $"{issuer}/{prefix}/{nextAmr}/register";
