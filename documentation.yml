@@ -29,3 +29,10 @@ steps:
     SourceFolder: '$(Build.Repository.LocalPath)\website\build'
     Contents: '**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)\website'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish website artifacts'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)\website'
+    ArtifactName: 'website'
+    publishLocation: 'Container'
