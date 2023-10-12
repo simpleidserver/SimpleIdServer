@@ -81,8 +81,11 @@
 	  <Compile Update="Common\Loader.xaml.cs">
 	    <DependentUpon>Loader.xaml</DependentUpon>
 	  </Compile>
-	  <Compile Update="QRCodeInputPage.xaml.cs">
-	    <DependentUpon>QRCodeInputPage.xaml</DependentUpon>
+	  <Compile Update="Components\ViewOTPCode.xaml.cs">
+	    <DependentUpon>ViewOTPCode.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="ViewOtpListPage.xaml.cs">
+	    <DependentUpon>ViewOtpListPage.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="SettingsPage.xaml.cs">
 	    <DependentUpon>SettingsPage.xaml</DependentUpon>
@@ -99,7 +102,10 @@
 	  <MauiXaml Update="Common\Loader.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="QRCodeInputPage.xaml">
+	  <MauiXaml Update="Components\ViewOTPCode.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="ViewOtpListPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="SettingsPage.xaml">

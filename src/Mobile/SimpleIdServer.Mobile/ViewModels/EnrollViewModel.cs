@@ -7,41 +7,26 @@ namespace SimpleIdServer.Mobile.ViewModels;
 
 public class EnrollViewModel : INotifyPropertyChanged
 {
-    private bool _isDeveloperModeEnabled = false;
-
     public EnrollViewModel(SettingsPageViewModel settings)
     {
         Settings = settings;
-        SubmitQRCodeCommand = new Command(async () =>
-        {
-            await Shell.Current.GoToAsync("enrollsubmitqrcode");
-        });
         ScanQRCodeCommand = new Command(async () =>
         {
             await Shell.Current.GoToAsync("enrollscanqrcode");
         });
+        ViewOTPCommand = new Command((async () =>
+        {
+            await Shell.Current.GoToAsync("viewotplist");
+        }));
     }
 
     public event PropertyChangedEventHandler PropertyChanged;
 
-    public bool IsDeveloperModeEnabled
-    {
-        get => _isDeveloperModeEnabled;
-        set
-        {
-            if (_isDeveloperModeEnabled != value)
-            {
-                _isDeveloperModeEnabled = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
     public SettingsPageViewModel Settings { get; private set; }
 
-    public ICommand SubmitQRCodeCommand { get; private set; }
-
     public ICommand ScanQRCodeCommand { get; private set; }
+
+    public ICommand ViewOTPCommand { get; private set; }
 
     public void OnPropertyChanged([CallerMemberName] string name = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
@@ -52,6 +37,5 @@ public class EnrollViewModel : INotifyPropertyChanged
         {
             mobileSettings = await App.Database.GetMobileSettings();
         }).Wait();
-        IsDeveloperModeEnabled = mobileSettings.IsDeveloperModeEnabled;
     }
 }

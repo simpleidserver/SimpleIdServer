@@ -6,7 +6,7 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="SimpleIdServer.Mobile.EnrollPage">
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Keys" Order="Secondary" />
+        <ToolbarItem Text="One Time Password" Order="Secondary" Command="{Binding Path=ViewOTPCommand}" />
     </ContentPage.ToolbarItems>
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -28,11 +28,6 @@
                 Text="Scan QR Code"
                 HorizontalOptions="Fill"
                 Command="{Binding Path=ScanQRCodeCommand}" />
-            <Button 
-                Text="Enter QR Code"
-                HorizontalOptions="Fill"
-                Command="{Binding Path=SubmitQRCodeCommand}"
-                IsVisible="{Binding Path=IsDeveloperModeEnabled}"  />
         </StackLayout>
     </Grid>
 </ContentPage>

@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:local="clr-namespace:SimpleIdServer.Mobile.Components"
+             x:DataType="local:ViewOTPCode"
+             xmlns:converters="clr-namespace:SimpleIdServer.Mobile.Converters"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SimpleIdServer.Mobile.Components.ViewOTPCode">
+    <ContentView.Resources>
+        <ResourceDictionary>
+            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter"></toolkit:InvertedBoolConverter>
+        </ResourceDictionary>
+    </ContentView.Resources>
+    <ContentView.Content>
+        <Grid>
+            <StackLayout IsVisible="{Binding Path=IsOTPCodeExists}">
+                <Label Text="{Binding Path=DisplayMessage}"></Label>
+            </StackLayout>
+            <StackLayout IsVisible="{Binding Path=IsOTPCodeExists, Converter={StaticResource InvertedBoolConverter}}">
+                <Label Text="Select a name"></Label>
+            </StackLayout>
+        </Grid>
+    </ContentView.Content>
+</ContentView>

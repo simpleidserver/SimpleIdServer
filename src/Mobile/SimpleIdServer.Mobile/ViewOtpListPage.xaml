@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:DataType="local:ViewOtpListViewModel"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:local="clr-namespace:SimpleIdServer.Mobile.ViewModels"
+             xmlns:models="clr-namespace:SimpleIdServer.Mobile.Models"
+             xmlns:converters="clr-namespace:SimpleIdServer.Mobile.Converters"
+             xmlns:common="clr-namespace:SimpleIdServer.Mobile.Common"
+             xmlns:components="clr-namespace:SimpleIdServer.Mobile.Components"
+             xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.MAUI.Controls"
+             x:Class="SimpleIdServer.Mobile.ViewOtpListPage"
+             Shell.TabBarIsVisible="false"
+             Title="One time password">
+    <Grid>
+        <common:Loader IsVisible="{Binding Path=IsLoading}" ZIndex="2" />
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="80*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <!-- Display the selected OTP Code -->
+            <components:ViewOTPCode OTPCode="{Binding Path=SelectedOTPCode}" />
+            <!-- Display list of OTP Codes -->
+            <CollectionView Grid.Row="1" ItemsSource="{Binding Path=OTPCodes}" SelectionMode="Single" SelectedItem="{Binding Path=SelectedOTPCode}">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Horizontal" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:OTPCode">
+                        <Label Text="{Binding Path=Issuer}"></Label>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+    </Grid>
+</ContentPage>

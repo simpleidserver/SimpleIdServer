@@ -23,6 +23,7 @@ namespace SimpleIdServer.Mobile
             var options = new SQLiteConnectionString(_dbPath, true, sqlitePassword);
             _database = new SQLiteAsyncConnection(options);
             await _database.CreateTableAsync<CredentialRecord>();
+            await _database.CreateTableAsync<OTPCode>();
             var result = await _database.CreateTableAsync<MobileSettings>();
             if(result == CreateTableResult.Created) await _database.InsertAsync(new MobileSettings { Id = Guid.NewGuid().ToString() });
         }
@@ -30,6 +31,12 @@ namespace SimpleIdServer.Mobile
         public MobileDatabase(string dbPath)
         {
             _dbPath = dbPath;
+        }
+
+        public async Task<List<OTPCode>> GetOTPCodes()
+        {
+            await Init();
+            return await _database.Table<OTPCode>().ToListAsync();
         }
 
         public async Task<List<CredentialRecord>> GetCredentialRecord()
@@ -51,6 +58,12 @@ namespace SimpleIdServer.Mobile
             await _database.InsertAsync(credentialRecord);
         }
 
+        public async Task AddOTPCode(OTPCode otpCode)
+        {
+            await Init();
+            await _database.InsertAsync(otpCode);
+        }
+
         public async Task UpdateCredentialRecord(CredentialRecord credentialRecord)
         {
             await Init();
@@ -61,6 +74,12 @@ namespace SimpleIdServer.Mobile
         {
             await Init();
             await _database.UpdateAsync(mobileSettings);
+        }
+
+        public async Task UpdateOTPCode(OTPCode otpCode)
+        {
+            await Init();
+            await _database.UpdateAsync(otpCode);
         }
     }
 }
