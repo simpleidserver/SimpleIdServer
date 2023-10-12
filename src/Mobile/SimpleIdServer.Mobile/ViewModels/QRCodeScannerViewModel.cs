@@ -69,6 +69,7 @@ public class QRCodeScannerViewModel
             if (await RegisterOTPCode())
             {
                 await _promptService.ShowAlert("Success", "One Time Password has been enrolled");
+                await Shell.Current.GoToAsync("..");
             }
             else
             {

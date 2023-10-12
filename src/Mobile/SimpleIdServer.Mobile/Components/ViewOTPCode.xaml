@@ -5,19 +5,20 @@
              xmlns:converters="clr-namespace:SimpleIdServer.Mobile.Converters"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="SimpleIdServer.Mobile.Components.ViewOTPCode">
+             x:Class="SimpleIdServer.Mobile.Components.ViewOTPCode"
+             x:Name="this">
     <ContentView.Resources>
         <ResourceDictionary>
             <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter"></toolkit:InvertedBoolConverter>
         </ResourceDictionary>
     </ContentView.Resources>
     <ContentView.Content>
-        <Grid>
+        <Grid BindingContext="{x:Reference this}">
             <StackLayout IsVisible="{Binding Path=IsOTPCodeExists}">
-                <Label Text="{Binding Path=DisplayMessage}"></Label>
+                <Label Text="{Binding Path=DisplayMessage}" FontSize="Large"></Label>
             </StackLayout>
             <StackLayout IsVisible="{Binding Path=IsOTPCodeExists, Converter={StaticResource InvertedBoolConverter}}">
-                <Label Text="Select a name"></Label>
+                <Label Text="There is no OTP selected" FontSize="Large"></Label>
             </StackLayout>
         </Grid>
     </ContentView.Content>

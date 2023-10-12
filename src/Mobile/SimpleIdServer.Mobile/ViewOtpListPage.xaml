@@ -16,22 +16,27 @@
         <common:Loader IsVisible="{Binding Path=IsLoading}" ZIndex="2" />
         <Grid Margin="20">
             <Grid.RowDefinitions>
-                <RowDefinition Height="80*" />
                 <RowDefinition Height="*" />
+                <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <!-- Display the selected OTP Code -->
-            <components:ViewOTPCode OTPCode="{Binding Path=SelectedOTPCode}" />
+            <components:ViewOTPCode Grid.Row="0" OTPCode="{Binding Path=SelectedOTPCode}" />
             <!-- Display list of OTP Codes -->
             <CollectionView Grid.Row="1" ItemsSource="{Binding Path=OTPCodes}" SelectionMode="Single" SelectedItem="{Binding Path=SelectedOTPCode}">
                 <CollectionView.ItemsLayout>
                     <LinearItemsLayout Orientation="Horizontal" />
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="models:OTPCode">
-                        <Label Text="{Binding Path=Issuer}"></Label>
+                    <DataTemplate>
+                        <Border x:DataType="models:OTPCode" Padding="16,8">
+                            <StackLayout>
+                                <Label Text="{Binding Path=Issuer}" FontAttributes="Bold"></Label>
+                                <Label Text="{Binding Path=Name}" FontAttributes="Italic"></Label>
+                            </StackLayout>
+                        </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>

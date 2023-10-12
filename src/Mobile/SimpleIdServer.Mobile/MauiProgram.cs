@@ -27,6 +27,7 @@ public static class MauiProgram
 		builder.Services.AddSingleton(new OtpListState());
         builder.Services.AddTransient<EnrollPage>();
 		builder.Services.AddTransient<SettingsPage>();
+		builder.Services.AddTransient<ViewOtpListPage>();
 		builder.Services.AddTransient<QRCodeScannerPage>();
 		builder.Services.AddTransient<QRCodeScannerViewModel>();
         builder.Services.AddTransient<EnrollViewModel>();

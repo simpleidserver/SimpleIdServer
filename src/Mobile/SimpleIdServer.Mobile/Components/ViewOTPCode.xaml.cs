@@ -6,13 +6,12 @@ namespace SimpleIdServer.Mobile.Components;
 public partial class ViewOTPCode : ContentView, INotifyPropertyChanged
 {
 	private string _displayMessage;
-	private bool _isOTPCodeExists;
-	public static readonly BindableProperty OTPCodeProperty = BindableProperty.Create("OTPCode", typeof(OTPCode), typeof(ViewOTPCode), propertyChanged: OnOTPCodeChanged);
+	private bool _isOTPCodeExists = false;
+	public static readonly BindableProperty OTPCodeProperty = BindableProperty.Create(nameof(OTPCode), typeof(OTPCode), typeof(ViewOTPCode), propertyChanged: OnOTPCodeChanged);
 
 	public ViewOTPCode()
 	{
 		InitializeComponent();
-		BindingContext = this;
 	}
 
 	public OTPCode OTPCode
@@ -30,7 +29,7 @@ public partial class ViewOTPCode : ContentView, INotifyPropertyChanged
 			if(_displayMessage != value)
 			{
 				_displayMessage = value;
-				base.OnPropertyChanged();
+				base.OnPropertyChanged(nameof(DisplayMessage));
 			}
 		}
     }
@@ -43,8 +42,7 @@ public partial class ViewOTPCode : ContentView, INotifyPropertyChanged
 			if(_isOTPCodeExists != value)
 			{
 				_isOTPCodeExists = value;
-				base.OnParentChanged();
-
+				base.OnPropertyChanged(nameof(IsOTPCodeExists));
             }
 		}
 	}
@@ -53,6 +51,10 @@ public partial class ViewOTPCode : ContentView, INotifyPropertyChanged
 	{
 		var viewModelOTPCode = bindable as ViewOTPCode;
 		var newOTPCode = newValue as OTPCode;
-		viewModelOTPCode.DisplayMessage = $"{newOTPCode.Name} : the token is";
-	}
+		MainThread.BeginInvokeOnMainThread(() =>
+        {
+            viewModelOTPCode.IsOTPCodeExists = true;
+            viewModelOTPCode.DisplayMessage = $"{newOTPCode.Issuer} : the token for {newOTPCode.Name} is ";
+        });
+    }
 }
