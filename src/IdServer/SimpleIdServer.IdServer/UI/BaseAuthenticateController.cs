@@ -17,6 +17,7 @@ using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -111,6 +112,7 @@ namespace SimpleIdServer.IdServer.UI
 
             var allAmr = acr.AuthenticationMethodReferences;
             HttpContext.Response.Cookies.Append(Constants.DefaultCurrentAmrCookieName, JsonSerializer.Serialize(new AmrAuthInfo(user.Id, allAmr, amr)));
+            await _userRepository.SaveChanges(token);
             return RedirectToAction("Index", "Authenticate", new { area = amr, ReturnUrl = returnUrl });
         }
 

@@ -19,7 +19,9 @@ namespace SimpleIdServer.IdServer.UI
 
         public long GenerateOtp(UserCredential credential)
         {
-            return GenerateOtp(credential.OTPKey, credential.OTPCounter);
+            var result = GenerateOtp(credential.OTPKey, credential.OTPCounter);
+            credential.OTPCounter++;
+            return result;
         }
 
         public bool Verify(long otp, UserCredential credential)
@@ -27,8 +29,14 @@ namespace SimpleIdServer.IdServer.UI
             var key = credential.OTPKey;
             for(long i = credential.OTPCounter - _options.HOTPWindow; i <= credential.OTPCounter; i++)
             {
-                if (GenerateOtp(key, i) == otp)
+                if (GenerateOtp(key, i) == otp) return true;
+            }
+
+            for(long i = credential.OTPCounter + 1; i <= credential.OTPCounter + _options.HOTPWindow; i++)
+            {
+                if(GenerateOtp(key, i) == otp)
                 {
+                    credential.OTPCounter = (int)i;
                     return true;
                 }
             }
