@@ -4,18 +4,17 @@ using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Api;
-using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Sms.UI.ViewModels;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.UI.Services;
+using SimpleIdServer.IdServer.UI.ViewModels;
 
 namespace SimpleIdServer.IdServer.Sms.UI
 {
@@ -28,14 +27,16 @@ namespace SimpleIdServer.IdServer.Sms.UI
             IConfiguration configuration,
             IEnumerable<IUserNotificationService> notificationServices,
             IEnumerable<IOTPAuthenticator> otpAuthenticators,
+            IUserAuthenticationService userAuthenticationService,
             IOptions<IdServerHostOptions> options,
             IAuthenticationSchemeProvider authenticationSchemeProvider,
             IDataProtectionProvider dataProtectionProvider,
+            IAuthenticationHelper authenticationHelper,
             IClientRepository clientRepository,
             IAmrHelper amrHelper,
             IUserRepository userRepository,
             IUserTransformer userTransformer,
-            IBusControl busControl) : base(notificationServices, otpAuthenticators, options, authenticationSchemeProvider, dataProtectionProvider, clientRepository, amrHelper, userRepository, userTransformer, busControl)
+            IBusControl busControl) : base(notificationServices, otpAuthenticators, userAuthenticationService, authenticationSchemeProvider, options, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userTransformer, busControl)
         {
             _configuration = configuration;
         }
@@ -46,29 +47,13 @@ namespace SimpleIdServer.IdServer.Sms.UI
 
         protected override string FormattedMessage => GetOptions()?.Message;
 
-        protected override bool TryGetLogin(User user, out string login)
+        protected override bool TryGetLogin(AmrAuthInfo amr, out string login)
         {
             login = null;
-            if (user == null) return false;
-            var cl = user.OAuthUserClaims.FirstOrDefault(c => c.Name == JwtRegisteredClaimNames.PhoneNumber);
-            if (cl == null || string.IsNullOrWhiteSpace(cl.Value)) return false;
+            if (amr == null || !amr.Claims.Any(cl => cl.Key == JwtRegisteredClaimNames.PhoneNumber)) return false;
+            var cl = amr.Claims.Single(c => c.Key == JwtRegisteredClaimNames.PhoneNumber);
             login = cl.Value;
             return true;
-        }
-
-        protected override void EnrichViewModel(AuthenticateSmsViewModel viewModel, User user)
-        {
-
-        }
-
-        protected override async Task<User> AuthenticateUser(string login, string realm, CancellationToken cancellationToken)
-        {
-            var user = await UserRepository.Query()
-                .Include(u => u.Realms)
-                .Include(u => u.Credentials)
-                .Include(u => u.OAuthUserClaims)
-                .FirstOrDefaultAsync(u => u.Realms.Any(r => r.RealmsName == realm) && u.OAuthUserClaims.Any(c => c.Name == JwtRegisteredClaimNames.PhoneNumber && c.Value == login), cancellationToken);
-            return user;
         }
 
         private IdServerSmsOptions GetOptions()

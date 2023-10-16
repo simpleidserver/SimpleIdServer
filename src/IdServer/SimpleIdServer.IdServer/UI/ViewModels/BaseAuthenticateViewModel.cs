@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using SimpleIdServer.IdServer.Domains;
 using System.Collections.Generic;
+using System.Reflection.Metadata;
 
 namespace SimpleIdServer.IdServer.UI.ViewModels
 {
@@ -25,14 +26,20 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
 
     public record AmrAuthInfo
     {
-        public AmrAuthInfo(string userId, IEnumerable<string> allAmr, string currentAmr)
+        public AmrAuthInfo(string userId, string login, string email, List<KeyValuePair<string, string>> claims, IEnumerable<string> allAmr, string currentAmr)
         {
             UserId = userId;
+            
+            Email = email;
+            Claims = claims;
             AllAmr = allAmr;
             CurrentAmr = currentAmr;
         }
 
         public string UserId { get; private set; }
+        public string Login { get; private set; }
+        public string Email { get; private set; }
+        public List<KeyValuePair<string, string>> Claims { get; set; }
         public IEnumerable<string> AllAmr { get; set; }
         public string CurrentAmr { get; private set; }
     }

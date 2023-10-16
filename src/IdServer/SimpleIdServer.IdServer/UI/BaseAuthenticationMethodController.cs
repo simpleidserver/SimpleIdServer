@@ -29,22 +29,27 @@ namespace SimpleIdServer.IdServer.UI
     public abstract class BaseAuthenticationMethodController<T> : BaseAuthenticateController where T : BaseAuthenticateViewModel
     {
         private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
+        private readonly IUserAuthenticationService _authenticationService;
 
         public BaseAuthenticationMethodController(
             IOptions<IdServerHostOptions> options,
             IAuthenticationSchemeProvider authenticationSchemeProvider,
+            IUserAuthenticationService userAuthenticationService,
             IDataProtectionProvider dataProtectionProvider,
+            IAuthenticationHelper authenticationHelper,
             IClientRepository clientRepository,
             IAmrHelper amrHelper,
             IUserRepository userRepository,
             IUserTransformer userTransformer,
-            IBusControl busControl) : base(clientRepository, userRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, options)
+            IBusControl busControl) : base(clientRepository, userRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, options)
         {
             _authenticationSchemeProvider = authenticationSchemeProvider;
+            _authenticationService = userAuthenticationService;
         }
 
         protected abstract string Amr { get; }
         protected abstract bool IsExternalIdProvidersDisplayed { get; }
+        protected IUserAuthenticationService UserAuthenticationService => _authenticationService;
 
         #region Get Authenticate View
 
@@ -78,9 +83,8 @@ namespace SimpleIdServer.IdServer.UI
                     var client = await ClientRepository.Query().Include(c => c.Realms).Include(c => c.Translations).FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == str), cancellationToken);
                     var loginHint = query.GetLoginHintFromAuthorizationRequest();
                     var amrInfo = await ResolveAmrInfo(query, prefix, client, cancellationToken);
-                    var authenticatedUser = await FetchAuthenticatedUser(str, amrInfo, cancellationToken);
-                    bool isLoginMissing = authenticatedUser != null;
-                    if (authenticatedUser != null && TryGetLogin(authenticatedUser, out string login))
+                    bool isLoginMissing = amrInfo != null && string.IsNullOrWhiteSpace(amrInfo.Login);
+                    if (amrInfo != null && TryGetLogin(amrInfo, out string login))
                     {
                         loginHint = login;
                         isLoginMissing = false;
@@ -92,9 +96,8 @@ namespace SimpleIdServer.IdServer.UI
                     viewModel.TosUri = client.TosUri;
                     viewModel.PolicyUri = client.PolicyUri;
                     viewModel.IsLoginMissing = isLoginMissing;
-                    viewModel.IsAuthInProgress = authenticatedUser != null;
+                    viewModel.IsAuthInProgress = amrInfo != null && !string.IsNullOrWhiteSpace(amrInfo.Login);
                     viewModel.AmrAuthInfo = amrInfo;
-                    EnrichViewModel(viewModel, authenticatedUser);
                     return View(viewModel);
                 }
 
@@ -106,52 +109,49 @@ namespace SimpleIdServer.IdServer.UI
             }
         }
 
-        protected abstract void EnrichViewModel(T viewModel, User user);
-
-        protected abstract bool TryGetLogin(User user, out string login);
-
         #endregion
 
         #region Submit Credentials
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Index([FromRoute] string prefix, T viewModel, CancellationToken token)
+        public async virtual Task<IActionResult> Index([FromRoute] string prefix, T viewModel, CancellationToken token)
         {
             viewModel.Realm = prefix;
             prefix = prefix ?? Constants.DefaultRealm;
-            if (viewModel == null)
+            if (viewModel == null) 
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
             var amrInfo = GetAmrInfo();
             await UpdateViewModel(viewModel);
-            var authenticatedUser = await FetchAuthenticatedUser(prefix, amrInfo, token);
-            if(authenticatedUser == null)
+            var result = await CustomAuthenticate(prefix, amrInfo?.UserId, viewModel, token);
+            if (result.ActionResult != null) return result.ActionResult;
+            CredentialsValidationResult authenticationResult = null;
+            if (result.AuthenticatedUser != null) authenticationResult = await _authenticationService.Validate(prefix, result.AuthenticatedUser, viewModel, token);
+            else authenticationResult = await _authenticationService.Validate(prefix, amrInfo?.UserId, viewModel, token);
+            if (authenticationResult.Status != ValidationStatus.AUTHENTICATE)
             {
-                authenticatedUser = await AuthenticateUser(viewModel.Login, prefix, token);
-                if(authenticatedUser == null)
+                switch(authenticationResult.Status)
                 {
-                    ModelState.AddModelError("unknown_user", "unknown_user");
-                    return View(viewModel);
+                    case Services.ValidationStatus.UNKNOWN_USER:
+                        ModelState.AddModelError("unknown_user", "unknown_user");
+                        return View(viewModel);
+                    case Services.ValidationStatus.NOCONTENT:
+                        return View(viewModel);
+                    case Services.ValidationStatus.INVALIDCREDENTIALS:
+                        await Bus.Publish(new UserLoginFailureEvent
+                        {
+                            Realm = prefix,
+                            Amr = Amr,
+                            Login = viewModel.Login
+                        });
+                        return View(viewModel);
                 }
             }
 
-            viewModel.CheckRequiredFields(authenticatedUser, ModelState);
-            if (!ModelState.IsValid) return View(viewModel);
-            var validationResult = await ValidateCredentials(viewModel, authenticatedUser, token);
-            if (validationResult == ValidationStatus.NOCONTENT) return View(viewModel);
-            if (validationResult == ValidationStatus.INVALIDCREDENTIALS)
-            {
-                await Bus.Publish(new UserLoginFailureEvent
-                {
-                    Realm = prefix,
-                    Amr = Amr,
-                    Login = viewModel.Login
-                });
-                return View(viewModel);
-            }
-
-            return await Authenticate(prefix, viewModel.ReturnUrl, Amr, authenticatedUser, token, viewModel.RememberLogin);
+            return await Authenticate(prefix, viewModel.ReturnUrl, Amr, authenticationResult.AuthenticatedUser, token, viewModel.RememberLogin);
         }
+
+        protected abstract Task<UserAuthenticationResult> CustomAuthenticate(string prefix, string authenticatedUserId, T viewModel, CancellationToken cancellationToken);
 
         protected async Task UpdateViewModel(T viewModel)
         {
@@ -171,28 +171,11 @@ namespace SimpleIdServer.IdServer.UI
             }).ToList();
         }
 
-        protected abstract Task<User> AuthenticateUser(string login, string realm, CancellationToken cancellationToken);
-
-        protected abstract Task<ValidationStatus> ValidateCredentials(T viewModel, User user, CancellationToken cancellationToken);
-
         #endregion
 
-        protected void SetSuccessMessage(string msg)
-        {
-            ViewBag.SuccessMessage = msg;
-        }
+        protected void SetSuccessMessage(string msg) => ViewBag.SuccessMessage = msg;
 
-        protected async Task<User> FetchAuthenticatedUser(string realm, AmrAuthInfo amrInfo, CancellationToken cancellationToken)
-        {
-            if (amrInfo == null || string.IsNullOrWhiteSpace(amrInfo.UserId)) return null;
-            return await UserRepository.Query()
-                .Include(u => u.Realms)
-                .Include(u => u.IdentityProvisioning).ThenInclude(i => i.Definition)
-                .Include(u => u.Groups)
-                .Include(c => c.OAuthUserClaims)
-                .Include(u => u.Credentials)
-                .FirstOrDefaultAsync(u => u.Realms.Any(r => r.RealmsName == realm) && u.Id == amrInfo.UserId, cancellationToken);
-        }
+        protected abstract bool TryGetLogin(AmrAuthInfo amrInfo, out string login);
 
         protected async Task<AmrAuthInfo> ResolveAmrInfo(JsonObject query, string realm, Client client, CancellationToken cancellationToken)
         {
@@ -202,7 +185,7 @@ namespace SimpleIdServer.IdServer.UI
             var requestedClaims = query.GetClaimsFromAuthorizationRequest();
             var acr = await AmrHelper.FetchDefaultAcr(realm, acrValues, requestedClaims, client, cancellationToken);
             if (acr == null) return null;
-            return new AmrAuthInfo(null, acr.AuthenticationMethodReferences, acr.AuthenticationMethodReferences.First());
+            return new AmrAuthInfo(null, null, null, null, acr.AuthenticationMethodReferences, acr.AuthenticationMethodReferences.First());
         }
 
         protected AmrAuthInfo GetAmrInfo()
@@ -211,12 +194,13 @@ namespace SimpleIdServer.IdServer.UI
             var amr = JsonSerializer.Deserialize<AmrAuthInfo>(HttpContext.Request.Cookies[Constants.DefaultCurrentAmrCookieName]);
             return amr;
         }
+    }
 
-        protected enum ValidationStatus
-        {
-            AUTHENTICATE = 0,
-            INVALIDCREDENTIALS = 1,
-            NOCONTENT = 2
-        }
+    public record UserAuthenticationResult
+    {
+        public IActionResult ActionResult { get; set; }
+        public User AuthenticatedUser { get; set; }
+
+        public static UserAuthenticationResult View(IActionResult result) => new UserAuthenticationResult { ActionResult = result };
     }
 }
