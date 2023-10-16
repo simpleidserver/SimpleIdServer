@@ -12,7 +12,6 @@ namespace SimpleIdServer.Mobile.Stores
             _database = App.Database;
         }
 
-
         public ObservableCollection<OTPCode> OTPCodes { get; set; } = new ObservableCollection<OTPCode>();
 
         public async Task Load()

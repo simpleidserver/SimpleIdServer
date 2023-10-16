@@ -22,5 +22,6 @@ public partial class App : Application
 
 		Routing.RegisterRoute("enrollscanqrcode", typeof(QRCodeScannerPage));
 		Routing.RegisterRoute("viewotplist", typeof(ViewOtpListPage));
+		Routing.RegisterRoute("viewcredentiallist", typeof(ViewCredentialListPage));
     }
 }

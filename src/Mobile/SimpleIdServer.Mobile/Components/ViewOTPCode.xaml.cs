@@ -1,5 +1,4 @@
-﻿using Android.Gms.Common;
-using SimpleIdServer.Mobile.Extensions;
+﻿using SimpleIdServer.Mobile.Extensions;
 using SimpleIdServer.Mobile.Models;
 using System.ComponentModel;
 using System.Security.Cryptography;
@@ -17,15 +16,15 @@ public partial class ViewOTPCode : ContentView, INotifyPropertyChanged
 	public static readonly BindableProperty OTPCodeProperty = BindableProperty.Create(nameof(OTPCode), typeof(OTPCode), typeof(ViewOTPCode), propertyChanged: OnOTPCodeChanged);
 
 	public ViewOTPCode()
-	{
-		InitializeComponent();
-		GenerateHOTPCommand = new Command(() =>
-		{
-			GenerateHOTPCode();
-		}, () =>
-		{
-			return OTPCode.Type == OTPCodeTypes.HOTP;
-		});
+    {
+        GenerateHOTPCommand = new Command(() =>
+        {
+            GenerateHOTPCode();
+        }, () =>
+        {
+            return OTPCode?.Type == OTPCodeTypes.HOTP;
+        });
+        InitializeComponent();
     }
 
 	public OTPCode OTPCode
@@ -34,7 +33,7 @@ public partial class ViewOTPCode : ContentView, INotifyPropertyChanged
 		set { SetValue(OTPCodeProperty, value); }
     }
 
-	public ICommand GenerateHOTPCommand { get; private set; }
+	public ICommand GenerateHOTPCommand { get; set; } 
 
     public string DisplayMessage
 	{
@@ -89,7 +88,7 @@ public partial class ViewOTPCode : ContentView, INotifyPropertyChanged
 			if(_description != value)
 			{
 				_description = value;
-				base.OnParentChanged();
+				base.OnPropertyChanged(nameof(Description));
 			}
 		}
 	}
@@ -120,6 +119,9 @@ public partial class ViewOTPCode : ContentView, INotifyPropertyChanged
 		{
 			GenerateHOTPCode();
 		}
+
+		var cmd = (Command)GenerateHOTPCommand;
+		cmd.ChangeCanExecute();
 	}
 
 	private async Task GenerateTOTPCode()

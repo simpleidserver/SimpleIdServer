@@ -20,14 +20,16 @@ public class QRCodeScannerViewModel
     private readonly IPromptService _promptService;
     private readonly IOTPService _otpService;
     private readonly OtpListState _otpListState;
+    private readonly CredentialListState _credentialListState;
     private readonly MobileOptions _options;
 
-    public QRCodeScannerViewModel(IPromptService promptService, IOTPService otpService, OtpListState otpListState, IOptions<MobileOptions> options)
+    public QRCodeScannerViewModel(IPromptService promptService, IOTPService otpService, OtpListState otpListState, CredentialListState credentialListState, IOptions<MobileOptions> options)
     {
         _promptService = promptService;
         _otpService = otpService;
         _options = options.Value;
         _otpListState = otpListState;
+        _credentialListState = credentialListState;
         CloseCommand = new Command(async () =>
         {
             await Shell.Current.GoToAsync("..");
@@ -94,16 +96,16 @@ public class QRCodeScannerViewModel
         {
             var beginResult = await ReadRegisterQRCode(qrCodeResult);
             var attestationBuilder = new FIDOU2FAttestationBuilder();
+            var rp = beginResult.CredentialCreateOptions.Rp.Id;
             var enrollResponse = attestationBuilder.BuildEnrollResponse(new EnrollParameter
             {
                 Challenge = beginResult.CredentialCreateOptions.Challenge,
-                Rp = beginResult.CredentialCreateOptions.Rp.Id,
+                Rp = rp,
                 Origin = qrCodeResult.GetOrigin()
             });
             var endRegisterResult = await EndRegister(beginResult, enrollResponse);
-
-            var credentialRecord = new CredentialRecord(enrollResponse.CredentialId, enrollResponse.AttestationCertificate.AttestationCertificate, enrollResponse.AttestationCertificate.PrivateKey, endRegisterResult.SignCount);
-            await App.Database.AddCredentialRecord(credentialRecord);
+            var credentialRecord = new CredentialRecord(enrollResponse.CredentialId, enrollResponse.AttestationCertificate.AttestationCertificate, enrollResponse.AttestationCertificate.PrivateKey, endRegisterResult.SignCount, rp, beginResult.Login);
+            await _credentialListState.AddCredentialRecord(credentialRecord);
             IsLoading = false;
             await _promptService.ShowAlert("Success", "Your mobile device has been enrolled");
             await Shell.Current.GoToAsync("..");
@@ -177,11 +179,12 @@ public class QRCodeScannerViewModel
 
         async Task Authenticate(QRCodeResult qrCodeResult)
         {
-            var credentialRecords = await App.Database.GetCredentialRecord();
+            await _credentialListState.Load();
+            var credentialRecords = _credentialListState.CredentialRecords.ToList();
             var beginResult = await ReadAuthenticateQRCode(qrCodeResult);
             var attestationBuilder = new FIDOU2FAttestationBuilder();
             var allowCredentials = beginResult.Assertion.AllowCredentials;
-            var selectedCredential = credentialRecords.FirstOrDefault(c => allowCredentials.Any(ac => ac.Id.SequenceEqual(c.IdPayload)));
+            var selectedCredential = credentialRecords.FirstOrDefault(c => allowCredentials.Any(ac => ac.Id.SequenceEqual(c.Credential.IdPayload)))?.Credential;
             var authResponse = attestationBuilder.BuildAuthResponse(new AuthenticationParameter
             {
                 Challenge = beginResult.Assertion.Challenge,

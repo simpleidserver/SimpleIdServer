@@ -7,6 +7,7 @@
              x:Class="SimpleIdServer.Mobile.EnrollPage">
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="One Time Password" Order="Secondary" Command="{Binding Path=ViewOTPCommand}" />
+        <ToolbarItem Text="Credentials" Order="Secondary" Command="{Binding Path=ViewCredentialListCommand}" />
     </ContentPage.ToolbarItems>
     <Grid Margin="20">
         <Grid.RowDefinitions>

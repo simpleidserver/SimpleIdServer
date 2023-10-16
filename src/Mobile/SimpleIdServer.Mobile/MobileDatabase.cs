@@ -39,10 +39,15 @@ namespace SimpleIdServer.Mobile
             return await _database.Table<OTPCode>().ToListAsync();
         }
 
-        public async Task<List<CredentialRecord>> GetCredentialRecord()
+        public async Task<List<CredentialRecord>> GetCredentialRecords()
         {
             await Init();
             return await _database.Table<CredentialRecord>().ToListAsync();
+        }
+
+        public async Task RemoveCredentialRecord(CredentialRecord credentialRecord)
+        {
+            await _database.DeleteAsync(credentialRecord);
         }
 
         public async Task<MobileSettings> GetMobileSettings()

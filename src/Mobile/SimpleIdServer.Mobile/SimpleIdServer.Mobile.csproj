@@ -84,6 +84,9 @@
 	  <Compile Update="Components\ViewOTPCode.xaml.cs">
 	    <DependentUpon>ViewOTPCode.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="ViewCredentialListPage.xaml.cs">
+	    <DependentUpon>ViewCredentialListPage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="ViewOtpListPage.xaml.cs">
 	    <DependentUpon>ViewOtpListPage.xaml</DependentUpon>
 	  </Compile>
@@ -103,6 +106,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Components\ViewOTPCode.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="ViewCredentialListPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="ViewOtpListPage.xaml">

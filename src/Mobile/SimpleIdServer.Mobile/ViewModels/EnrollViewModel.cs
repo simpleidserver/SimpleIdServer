@@ -18,6 +18,10 @@ public class EnrollViewModel : INotifyPropertyChanged
         {
             await Shell.Current.GoToAsync("viewotplist");
         }));
+        ViewCredentialListCommand = new Command((async () =>
+        {
+            await Shell.Current.GoToAsync("viewcredentiallist");
+        }));
     }
 
     public event PropertyChangedEventHandler PropertyChanged;
@@ -27,6 +31,8 @@ public class EnrollViewModel : INotifyPropertyChanged
     public ICommand ScanQRCodeCommand { get; private set; }
 
     public ICommand ViewOTPCommand { get; private set; }
+
+    public ICommand ViewCredentialListCommand {  get; private set; }
 
     public void OnPropertyChanged([CallerMemberName] string name = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 

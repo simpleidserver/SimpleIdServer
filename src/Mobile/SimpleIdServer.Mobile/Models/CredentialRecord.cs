@@ -11,13 +11,16 @@ namespace SimpleIdServer.Mobile.Models
 
         }
 
-        public CredentialRecord(byte[] credentialId, X509Certificate2 certificate, ECDsa privateKey, uint sigCount)
+        public CredentialRecord(byte[] credentialId, X509Certificate2 certificate, ECDsa privateKey, uint sigCount, string rp, string login)
         {
             Id = Convert.ToBase64String(credentialId);
             PublicKey = Convert.ToBase64String(certificate.RawData);
             ECDsaPublic = privateKey.ExportSubjectPublicKeyInfo();
             ECDsaPrivate = privateKey.ExportECPrivateKey();
             SigCount = sigCount;
+            CreateDateTime = DateTime.UtcNow;
+            Rp = rp;
+            Login = login;
         }
 
         [PrimaryKey]
@@ -25,6 +28,9 @@ namespace SimpleIdServer.Mobile.Models
         public string PublicKey { get; set; }
         public byte[] ECDsaPublic { get; set; }
         public byte[] ECDsaPrivate { get; set; }
+        public string Rp { get; set; }
+        public string Login { get; set; }
+        public DateTime CreateDateTime { get; set; }
         public uint SigCount { get; set; }
         public X509Certificate2 Certificate
         {
