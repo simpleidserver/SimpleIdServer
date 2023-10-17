@@ -4,17 +4,17 @@ using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
-using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Email.Services;
 using SimpleIdServer.IdServer.Email.UI.ViewModels;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.UI.Services;
+using SimpleIdServer.IdServer.UI.ViewModels;
 
 namespace SimpleIdServer.IdServer.Email.UI
 {
@@ -27,14 +27,16 @@ namespace SimpleIdServer.IdServer.Email.UI
             IConfiguration configuration,
             IEnumerable<IUserNotificationService> notificationServices,
             IEnumerable<IOTPAuthenticator> otpAuthenticators,
+            IUserEmailAuthenticationService userAuthenticationService,
             IOptions<IdServerHostOptions> options,
             IAuthenticationSchemeProvider authenticationSchemeProvider,
-            IDataProtectionProvider dataProtectionProvider, 
+            IDataProtectionProvider dataProtectionProvider,
+            IAuthenticationHelper authenticationHelper,
             IClientRepository clientRepository, 
             IAmrHelper amrHelper,
             IUserRepository userRepository, 
             IUserTransformer userTransformer, 
-            IBusControl busControl) : base(notificationServices, otpAuthenticators, options, authenticationSchemeProvider, dataProtectionProvider, clientRepository, amrHelper, userRepository, userTransformer, busControl)
+            IBusControl busControl) : base(notificationServices, otpAuthenticators, userAuthenticationService, authenticationSchemeProvider, options, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userTransformer, busControl)
         {
             _configuration = configuration;
         }
@@ -45,27 +47,17 @@ namespace SimpleIdServer.IdServer.Email.UI
 
         protected override string FormattedMessage => GetOptions()?.HttpBody;
 
-        protected override bool TryGetLogin(User user, out string login)
+        protected override bool TryGetLogin(AmrAuthInfo amr, out string login)
         {
             login = null;
-            if (user == null || string.IsNullOrWhiteSpace(user.Email)) return false;
-            login = user.Email;
+            if (amr == null || string.IsNullOrWhiteSpace(amr.Email)) return false;
+            login = amr.Email;
             return true;
         }
 
-        protected override void EnrichViewModel(AuthenticateEmailViewModel viewModel, User user)
+        protected override void EnrichViewModel(AuthenticateEmailViewModel viewModel)
         {
 
-        }
-
-        protected override async Task<User> AuthenticateUser(string login, string realm, CancellationToken cancellationToken)
-        {
-            var user = await UserRepository.Query()
-                .Include(u => u.Realms)
-                .Include(u => u.Credentials)
-                .Include(u => u.OAuthUserClaims)
-                .FirstOrDefaultAsync(u => u.Realms.Any(r => r.RealmsName == realm) && u.Email == login, cancellationToken);
-            return user;
         }
 
         private IdServerEmailOptions GetOptions()

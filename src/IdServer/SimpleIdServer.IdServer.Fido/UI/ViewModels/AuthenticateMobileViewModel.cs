@@ -18,7 +18,7 @@ namespace SimpleIdServer.IdServer.Fido.UI.ViewModels
         public string LoginStatusUrl { get; set; } = null!;
         public bool IsDeveloperModeEnabled { get; set; } = false;
 
-        public override void CheckRequiredFields(User user, ModelStateDictionary modelStateDictionary)
+        public override void CheckRequiredFields(ModelStateDictionary modelStateDictionary)
         {
             if (string.IsNullOrWhiteSpace(Login))
                 modelStateDictionary.AddModelError("missing_login", "missing_login");

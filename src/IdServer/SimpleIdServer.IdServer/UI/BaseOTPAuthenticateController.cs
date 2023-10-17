@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
-using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
@@ -23,7 +22,19 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IEnumerable<IUserNotificationService> _notificationServices;
         private readonly IEnumerable<IOTPAuthenticator> _otpAuthenticators;
 
-        protected BaseOTPAuthenticateController(IEnumerable<IUserNotificationService> notificationServices, IEnumerable<IOTPAuthenticator> otpAuthenticators, IOptions<IdServerHostOptions> options, IAuthenticationSchemeProvider authenticationSchemeProvider, IDataProtectionProvider dataProtectionProvider, IClientRepository clientRepository, IAmrHelper amrHelper, IUserRepository userRepository, IUserTransformer userTransformer, IBusControl busControl) : base(options, authenticationSchemeProvider, dataProtectionProvider, clientRepository, amrHelper, userRepository, userTransformer, busControl)
+        protected BaseOTPAuthenticateController(
+            IEnumerable<IUserNotificationService> notificationServices,
+            IEnumerable<IOTPAuthenticator> otpAuthenticators,
+            IUserAuthenticationService userAuthenticationService,
+            IAuthenticationSchemeProvider authenticationSchemeProvider,
+            IOptions<IdServerHostOptions> options,
+            IDataProtectionProvider dataProtectionProvider,
+            IAuthenticationHelper authenticationHelper,
+            IClientRepository clientRepository,
+            IAmrHelper amrHelper,
+            IUserRepository userRepository,
+            IUserTransformer userTransformer,
+            IBusControl busControl) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userTransformer, busControl)
         {
             _notificationServices = notificationServices;
             _otpAuthenticators = otpAuthenticators;
@@ -31,24 +42,37 @@ namespace SimpleIdServer.IdServer.UI
 
         protected abstract string FormattedMessage { get; }
 
-        protected override async Task<ValidationStatus> ValidateCredentials(T viewModel, User user, CancellationToken cancellationToken)
+        protected override async Task<UserAuthenticationResult> CustomAuthenticate(string prefix, string authenticatedUserId, T viewModel, CancellationToken cancellationToken)
         {
-            var activeOtp = user.ActiveOTP;
+            var authenticatedUser = await UserAuthenticationService.GetUser(authenticatedUserId, viewModel, prefix, cancellationToken);
+            if (authenticatedUser == null)
+            {
+                ModelState.AddModelError("unknown_user", "unknown_user");
+                return UserAuthenticationResult.Error(View(viewModel));
+            }
+
+            var activeOtp = authenticatedUser.ActiveOTP;
             var otpAuthenticator = _otpAuthenticators.Single(a => a.Alg == activeOtp.OTPAlg);
-            switch (viewModel.Action)
+            switch(viewModel.Action)
             {
                 case "SENDCONFIRMATIONCODE":
                     var notificationService = _notificationServices.First(n => n.Name == Amr);
                     var otpCode = otpAuthenticator.GenerateOtp(activeOtp);
-                    await notificationService.Send(string.Format(FormattedMessage, otpCode), user);
+                    await notificationService.Send(string.Format(FormattedMessage, otpCode), authenticatedUser);
                     SetSuccessMessage("confirmationcode_sent");
-                    return ValidationStatus.NOCONTENT;
+                    return UserAuthenticationResult.Error(View(viewModel));
                 default:
                     viewModel.CheckConfirmationCode(ModelState);
-                    if (!ModelState.IsValid) return ValidationStatus.NOCONTENT;
-                    if (!otpAuthenticator.Verify(viewModel.OTPCode.Value, activeOtp)) return ValidationStatus.INVALIDCREDENTIALS;
-                    return ValidationStatus.AUTHENTICATE;
+                    if (!ModelState.IsValid) return UserAuthenticationResult.Error(View(viewModel));
+                    break;
             }
+
+            return UserAuthenticationResult.Ok(authenticatedUser);
+        }
+
+        protected override void EnrichViewModel(T viewModel)
+        {
+
         }
     }
 }

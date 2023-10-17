@@ -107,7 +107,6 @@ public partial class ViewOTPCode : ContentView, INotifyPropertyChanged
 		if(_totpCancellationTokenSource != null)
 		{
 			_totpCancellationTokenSource.Cancel();
-			_totpCancellationTokenSource = null;
 		}
 
 		if(otpCode.Type == OTPCodeTypes.TOTP)
@@ -127,6 +126,7 @@ public partial class ViewOTPCode : ContentView, INotifyPropertyChanged
 	private async Task GenerateTOTPCode()
 	{
 		int remainingTimeInSeconds = OTPCode.Period;
+		Description = string.Empty;
 		while (!_totpCancellationTokenSource.IsCancellationRequested)
 		{
 			if(remainingTimeInSeconds == OTPCode.Period || remainingTimeInSeconds == 0)
@@ -137,6 +137,7 @@ public partial class ViewOTPCode : ContentView, INotifyPropertyChanged
             }
 
 			await Task.Delay(1000);
+			if (_totpCancellationTokenSource.IsCancellationRequested) return;
 			remainingTimeInSeconds--;
 			Description = $"The code is still valid {remainingTimeInSeconds} seconds";
 		}

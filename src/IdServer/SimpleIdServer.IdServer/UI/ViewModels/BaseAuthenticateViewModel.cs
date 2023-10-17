@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using SimpleIdServer.IdServer.Domains;
 using System.Collections.Generic;
 
 namespace SimpleIdServer.IdServer.UI.ViewModels
@@ -20,19 +19,25 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
         public bool IsAuthInProgress { get; set; } = false;
         public ICollection<ExternalIdProvider> ExternalIdsProviders { get; set; } = new List<ExternalIdProvider>();
         public AmrAuthInfo AmrAuthInfo { get; set; } = null;
-        public abstract void CheckRequiredFields(User user, ModelStateDictionary modelStateDictionary);
+        public abstract void CheckRequiredFields(ModelStateDictionary modelStateDictionary);
     }
 
     public record AmrAuthInfo
     {
-        public AmrAuthInfo(string userId, IEnumerable<string> allAmr, string currentAmr)
+        public AmrAuthInfo(string userId, string login, string email, List<KeyValuePair<string, string>> claims, IEnumerable<string> allAmr, string currentAmr)
         {
             UserId = userId;
+            Login = login;
+            Email = email;
+            Claims = claims;
             AllAmr = allAmr;
             CurrentAmr = currentAmr;
         }
 
         public string UserId { get; private set; }
+        public string Login { get; private set; }
+        public string Email { get; private set; }
+        public List<KeyValuePair<string, string>> Claims { get; set; }
         public IEnumerable<string> AllAmr { get; set; }
         public string CurrentAmr { get; private set; }
     }

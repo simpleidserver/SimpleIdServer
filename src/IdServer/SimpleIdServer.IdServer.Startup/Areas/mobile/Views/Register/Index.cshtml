@@ -104,7 +104,7 @@
                     if (!response.ok) {
                         let responseJson = await response.json();
                         displayError(responseJson);
-                        await checkStatus(sessionId);
+                        await checkStatus(sessionId, nextRegistrationRedirectUrl);
                         return;
                     }
 
@@ -127,9 +127,9 @@
                         "Content-Type": "application/json"
                     }
                 });
-                
-                let responseJson = await response.json();
-                if(!response.ok) {
+
+                if (!response.ok) {
+                    let responseJson = await response.json();
                     toggleBtn(false);
                     displayError(responseJson);
                     return;
@@ -137,15 +137,12 @@
                 
                 const sessionId = response.headers.get('SessionId');
                 const qrCode = response.headers.get('QRCode');
-                let nextRegistrationRedirectUrl = null;
-                if (responseJson['NextRegistrationRedirectUrl']) {
-                    nextRegistrationRedirectUrl = responseJson['NextRegistrationRedirectUrl'];
-                }
+                let nextRegistrationRedirectUrl = response.headers.get('NextRegistrationRedirectUrl');
 
                 const blob = await response.blob();
                 const img = URL.createObjectURL(blob);
-
                 displayQRCode(img, qrCode);
+                console.log(nextRegistrationRedirectUrl);
                 await checkStatus(sessionId, nextRegistrationRedirectUrl);
             };
 

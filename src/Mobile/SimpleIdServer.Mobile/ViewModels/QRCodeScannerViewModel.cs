@@ -22,6 +22,7 @@ public class QRCodeScannerViewModel
     private readonly OtpListState _otpListState;
     private readonly CredentialListState _credentialListState;
     private readonly MobileOptions _options;
+    private SemaphoreSlim _lck = new SemaphoreSlim(1, 1);
 
     public QRCodeScannerViewModel(IPromptService promptService, IOTPService otpService, OtpListState otpListState, CredentialListState credentialListState, IOptions<MobileOptions> options)
     {
@@ -36,7 +37,7 @@ public class QRCodeScannerViewModel
         });
         ScanQRCodeCommand = new Command<BarcodeDetectionEventArgs>(async (c) =>
         {
-            if (c == null || c.Results == null || !c.Results.Any()) return;
+            if (c == null || c.Results == null || !c.Results.Any() || IsLoading) return;
             var firstResult = c.Results.First().Value;
             await ScanQRCode(firstResult);
         });
@@ -64,6 +65,7 @@ public class QRCodeScannerViewModel
     protected async Task ScanQRCode(string qrCodeValue)
     {
         if (IsLoading) return;
+        await _lck.WaitAsync();
         IsLoading = true;
         try
         {
@@ -71,7 +73,10 @@ public class QRCodeScannerViewModel
             if (await RegisterOTPCode())
             {
                 await _promptService.ShowAlert("Success", "One Time Password has been enrolled");
-                await Shell.Current.GoToAsync("..");
+                await App.Current.Dispatcher.DispatchAsync(async () =>
+                {
+                    await Shell.Current.GoToAsync("..");
+                });
             }
             else
             {
@@ -88,6 +93,7 @@ public class QRCodeScannerViewModel
         finally
         {
             IsLoading = false;
+            _lck.Release();
         }
 
         #region Register
@@ -106,9 +112,11 @@ public class QRCodeScannerViewModel
             var endRegisterResult = await EndRegister(beginResult, enrollResponse);
             var credentialRecord = new CredentialRecord(enrollResponse.CredentialId, enrollResponse.AttestationCertificate.AttestationCertificate, enrollResponse.AttestationCertificate.PrivateKey, endRegisterResult.SignCount, rp, beginResult.Login);
             await _credentialListState.AddCredentialRecord(credentialRecord);
-            IsLoading = false;
             await _promptService.ShowAlert("Success", "Your mobile device has been enrolled");
-            await Shell.Current.GoToAsync("..");
+            await App.Current.Dispatcher.DispatchAsync(async () =>
+            {
+                await Shell.Current.GoToAsync("..");
+            });
         }
 
         async Task<BeginU2FRegisterResult> ReadRegisterQRCode(QRCodeResult qrCodeResult)
@@ -197,9 +205,11 @@ public class QRCodeScannerViewModel
             await EndAuthenticate(beginResult, authResponse);
             selectedCredential.SigCount++;
             await App.Database.UpdateCredentialRecord(selectedCredential);
-            IsLoading = false;
             await _promptService.ShowAlert("Success", "You are authenticated");
-            await Shell.Current.GoToAsync("..");
+            await App.Current.Dispatcher.DispatchAsync(async () =>
+            {
+                await Shell.Current.GoToAsync("..");
+            });
         }
 
         async Task<BeginU2FAuthenticateResult> ReadAuthenticateQRCode(QRCodeResult qrCodeResult)
@@ -269,7 +279,6 @@ public class QRCodeScannerViewModel
                     existingOtpCode.Counter = otpCode.Counter;
                     existingOtpCode.Period = otpCode.Period;
                     await _otpListState.UpdateOTPCode(existingOtpCode);
-                    IsLoading = false;
                 }
                 else await _otpListState.AddOTPCode(otpCode);
                 return true;

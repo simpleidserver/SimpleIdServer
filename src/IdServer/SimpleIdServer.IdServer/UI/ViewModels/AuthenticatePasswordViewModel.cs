@@ -11,7 +11,7 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
 
         public string Password { get; set; }
 
-        public override void CheckRequiredFields(User user, ModelStateDictionary modelStateDictionary)
+        public override void CheckRequiredFields(ModelStateDictionary modelStateDictionary)
         {
             if (string.IsNullOrWhiteSpace(ReturnUrl))
                 modelStateDictionary.AddModelError("missing_return_url", "missing_return_url");

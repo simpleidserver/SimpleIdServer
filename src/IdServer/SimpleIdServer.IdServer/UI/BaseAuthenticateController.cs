@@ -16,6 +16,7 @@ using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Claims;
@@ -34,6 +35,7 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IBusControl _busControl;
         private readonly IUserTransformer _userTransformer;
         private readonly IDataProtector _dataProtector;
+        private readonly IAuthenticationHelper _authenticationHelper;
         private readonly IdServerHostOptions _options;
 
         public BaseAuthenticateController(
@@ -43,6 +45,7 @@ namespace SimpleIdServer.IdServer.UI
             IBusControl busControl,
             IUserTransformer userTransformer,
             IDataProtectionProvider dataProtectionProvider,
+            IAuthenticationHelper authenticationHelper,
             IOptions<IdServerHostOptions> options)
         {
             _clientRepository = clientRepository;
@@ -51,6 +54,7 @@ namespace SimpleIdServer.IdServer.UI
             _busControl = busControl;
             _userTransformer = userTransformer;
             _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
+            _authenticationHelper = authenticationHelper;
             _options = options.Value;
         }
 
@@ -59,6 +63,7 @@ namespace SimpleIdServer.IdServer.UI
         protected IdServerHostOptions Options => _options;
         protected IAmrHelper AmrHelper => _amrHelper;
         protected IBusControl Bus => _busControl;
+        protected IAuthenticationHelper AuthenticationHelper => _authenticationHelper;
 
         protected JsonObject ExtractQuery(string returnUrl) => ExtractQueryFromUnprotectedUrl(Unprotect(returnUrl));
 
@@ -111,8 +116,9 @@ namespace SimpleIdServer.IdServer.UI
             }
 
             var allAmr = acr.AuthenticationMethodReferences;
-            HttpContext.Response.Cookies.Append(Constants.DefaultCurrentAmrCookieName, JsonSerializer.Serialize(new AmrAuthInfo(user.Id, allAmr, amr)));
-            await _userRepository.SaveChanges(token);
+            var login = _authenticationHelper.GetLogin(user);
+            HttpContext.Response.Cookies.Append(Constants.DefaultCurrentAmrCookieName, JsonSerializer.Serialize(new AmrAuthInfo(user.Id, login, user.Email, user.OAuthUserClaims.Select(c => new KeyValuePair<string, string>(c.Name, c.Value)).ToList(), allAmr, amr)));
+	        await _userRepository.SaveChanges(token);
             return RedirectToAction("Index", "Authenticate", new { area = amr, ReturnUrl = returnUrl });
         }
 

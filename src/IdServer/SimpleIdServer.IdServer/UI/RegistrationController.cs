@@ -45,7 +45,7 @@ public class RegistrationController : BaseController
         {
             Secure = true
         });
-        await _distributedCache.SetStringAsync(registrationProgress.RegistrationProgressId, JsonSerializer.Serialize(registrationProgress));
+        await _distributedCache.SetStringAsync(registrationProgress.RegistrationProgressId, Newtonsoft.Json.JsonConvert.SerializeObject(registrationProgress));
         return RedirectToAction("Index", "Register", new { area = amr });
 	}
 }
