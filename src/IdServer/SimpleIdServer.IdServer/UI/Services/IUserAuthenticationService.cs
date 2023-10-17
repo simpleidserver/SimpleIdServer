@@ -36,8 +36,16 @@ public record CredentialsValidationResult
 
     public User AuthenticatedUser { get; private set; }
     public ValidationStatus Status { get; private set; }
+    public string ErrorCode { get; private set; }
+    public string ErrorMessage { get; private set; }
 
     public static CredentialsValidationResult Ok(User user) => new CredentialsValidationResult(user);
 
     public static CredentialsValidationResult Error(ValidationStatus status) => new CredentialsValidationResult(status);
+
+    public static CredentialsValidationResult Error(string errorCode, string errorMessage) => new CredentialsValidationResult(ValidationStatus.NOCONTENT)
+    {
+        ErrorCode = errorCode,
+        ErrorMessage = errorMessage
+    };
 }

@@ -11,7 +11,12 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.UI.Services;
 
-public class PasswordAuthenticationService : GenericAuthenticationService<AuthenticatePasswordViewModel>
+public interface IPasswordAuthenticationService : IUserAuthenticationService
+{
+
+}
+
+public class PasswordAuthenticationService : GenericAuthenticationService<AuthenticatePasswordViewModel>, IPasswordAuthenticationService
 {
     private readonly IEnumerable<IIdProviderAuthService> _authServices;
 

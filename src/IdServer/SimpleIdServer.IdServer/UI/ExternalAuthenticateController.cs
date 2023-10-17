@@ -46,7 +46,7 @@ namespace SimpleIdServer.IdServer.UI
             IAuthenticationSchemeProviderRepository authenticationSchemeProviderRepository,
             IAuthenticationHelper authenticationHelper,
             IRealmRepository realmRepository,
-            IBusControl busControl) : base(clientRepository, userRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, options)
+            IBusControl busControl) : base(clientRepository, userRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, options)
         {
             _logger = logger;
             _authenticationSchemeProvider = authenticationSchemeProvider;

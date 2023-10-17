@@ -48,7 +48,7 @@ namespace SimpleIdServer.IdServer.UI
             if (authenticatedUser == null)
             {
                 ModelState.AddModelError("unknown_user", "unknown_user");
-                return UserAuthenticationResult.View(View(viewModel));
+                return UserAuthenticationResult.Error(View(viewModel));
             }
 
             var activeOtp = authenticatedUser.ActiveOTP;
@@ -60,14 +60,19 @@ namespace SimpleIdServer.IdServer.UI
                     var otpCode = otpAuthenticator.GenerateOtp(activeOtp);
                     await notificationService.Send(string.Format(FormattedMessage, otpCode), authenticatedUser);
                     SetSuccessMessage("confirmationcode_sent");
-                    return UserAuthenticationResult.View(View(viewModel));
+                    return UserAuthenticationResult.Error(View(viewModel));
                 default:
                     viewModel.CheckConfirmationCode(ModelState);
-                    if (!ModelState.IsValid) return UserAuthenticationResult.View(View(viewModel));
+                    if (!ModelState.IsValid) return UserAuthenticationResult.Error(View(viewModel));
                     break;
             }
 
-            return new UserAuthenticationResult { AuthenticatedUser = authenticatedUser };
+            return UserAuthenticationResult.Ok(authenticatedUser);
+        }
+
+        protected override void EnrichViewModel(T viewModel)
+        {
+
         }
     }
 }

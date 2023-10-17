@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fido2NetLib;
 using Microsoft.Extensions.DependencyInjection;
+using SimpleIdServer.IdServer.Fido.Services;
 
 namespace SimpleIdServer.IdServer.Fido
 {
@@ -18,6 +19,8 @@ namespace SimpleIdServer.IdServer.Fido
             else idServerBuilder.Services.AddFido2(fidoAction);
             idServerBuilder.Services.AddTransient<IAuthenticationMethodService, WebauthnAuthenticationService>();
             idServerBuilder.Services.AddTransient<IAuthenticationMethodService, MobileAuthenticationService>();
+            idServerBuilder.Services.AddTransient<IMobileAuthenticationService, UserMobileAuthenticationService>();
+            idServerBuilder.Services.AddTransient<IWebauthnAuthenticationService, UserWebauthnAuthenticationService>();
             return idServerBuilder;
         }
     }

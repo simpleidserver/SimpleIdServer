@@ -26,7 +26,7 @@ namespace SimpleIdServer.IdServer.Email.UI
             IConfiguration configuration,
             IEnumerable<IUserNotificationService> notificationServices,
             IEnumerable<IOTPAuthenticator> otpAuthenticators,
-            IUserAuthenticationService userAuthenticationService,
+            IOTPAuthenticationService userAuthenticationService,
             IOptions<IdServerHostOptions> options,
             IAuthenticationSchemeProvider authenticationSchemeProvider,
             IDataProtectionProvider dataProtectionProvider,
@@ -52,6 +52,11 @@ namespace SimpleIdServer.IdServer.Email.UI
             if (amr == null || string.IsNullOrWhiteSpace(amr.Email)) return false;
             login = amr.Email;
             return true;
+        }
+
+        protected override void EnrichViewModel(AuthenticateEmailViewModel viewModel)
+        {
+
         }
 
         private IdServerEmailOptions GetOptions()

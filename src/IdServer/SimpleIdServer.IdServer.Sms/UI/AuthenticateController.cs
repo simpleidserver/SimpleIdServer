@@ -27,7 +27,7 @@ namespace SimpleIdServer.IdServer.Sms.UI
             IConfiguration configuration,
             IEnumerable<IUserNotificationService> notificationServices,
             IEnumerable<IOTPAuthenticator> otpAuthenticators,
-            IUserAuthenticationService userAuthenticationService,
+            IOTPAuthenticationService userAuthenticationService,
             IOptions<IdServerHostOptions> options,
             IAuthenticationSchemeProvider authenticationSchemeProvider,
             IDataProtectionProvider dataProtectionProvider,
@@ -46,6 +46,10 @@ namespace SimpleIdServer.IdServer.Sms.UI
         protected override string Amr => Constants.AMR;
 
         protected override string FormattedMessage => GetOptions()?.Message;
+
+        protected override void EnrichViewModel(AuthenticateSmsViewModel viewModel)
+        {
+        }
 
         protected override bool TryGetLogin(AmrAuthInfo amr, out string login)
         {

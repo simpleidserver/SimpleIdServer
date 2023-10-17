@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using SimpleIdServer.IdServer.Domains;
 
 namespace SimpleIdServer.IdServer.UI.ViewModels
 {
@@ -10,19 +9,13 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
         public string Action { get; set; }
         public long? OTPCode { get; set; }
 
-        public override void CheckRequiredFields(User user, ModelStateDictionary modelStateDictionary)
+        public override void CheckRequiredFields(ModelStateDictionary modelStateDictionary)
         {
             if (string.IsNullOrWhiteSpace(ReturnUrl))
                 modelStateDictionary.AddModelError("missing_return_url", "missing_return_url");
 
             if (string.IsNullOrWhiteSpace(Login))
                 modelStateDictionary.AddModelError("missing_email", "missing_email");
-
-            if (user.Email != Login)
-                modelStateDictionary.AddModelError("bad_email", "bad_email");
-
-            if (user.ActiveOTP == null)
-                modelStateDictionary.AddModelError("no_active_otp", "no_active_otp");
         }
 
 

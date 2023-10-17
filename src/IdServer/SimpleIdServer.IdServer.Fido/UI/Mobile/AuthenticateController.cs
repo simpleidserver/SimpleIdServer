@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Fido.Apis;
+using SimpleIdServer.IdServer.Fido.Services;
 using SimpleIdServer.IdServer.Fido.UI.ViewModels;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
@@ -32,7 +33,7 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
         public AuthenticateController(
             IConfiguration configuration, 
             IAuthenticationHelper authenticationHelper,
-            IUserAuthenticationService userAuthenticationService,
+            IMobileAuthenticationService userAuthenticationService,
             IDistributedCache distributedCache, 
             IOptions<IdServerHostOptions> options, 
             IAuthenticationSchemeProvider authenticationSchemeProvider, 
@@ -60,7 +61,12 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
             return true;
         }
 
-        protected void EnrichViewModel(AuthenticateMobileViewModel viewModel, User user)
+        protected override Task<UserAuthenticationResult> CustomAuthenticate(string prefix, string authenticatedUserId, AuthenticateMobileViewModel viewModel, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(UserAuthenticationResult.Ok());
+        }
+
+        protected override void EnrichViewModel(AuthenticateMobileViewModel viewModel)
         {
             var options = GetFidoOptions();
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
@@ -69,7 +75,7 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
             viewModel.IsDeveloperModeEnabled = options.IsDeveloperModeEnabled;
         }
 
-        protected override async Task<ValidationStatus> ValidateCredentials(AuthenticateMobileViewModel viewModel, User user, CancellationToken cancellationToken)
+        protected async Task<ValidationStatus> ValidateCredentials(AuthenticateMobileViewModel viewModel, User user, CancellationToken cancellationToken)
         {
             var session = await _distributedCache.GetStringAsync(viewModel.SessionId, cancellationToken);
             if (string.IsNullOrWhiteSpace(session))

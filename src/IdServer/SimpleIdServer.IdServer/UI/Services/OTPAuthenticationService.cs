@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Store;
@@ -12,7 +11,12 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.UI.Services;
 
-public class OTPAuthenticationService : GenericAuthenticationService<BaseOTPAuthenticateViewModel>
+public interface IOTPAuthenticationService : IUserAuthenticationService
+{
+
+}
+
+public class OTPAuthenticationService : GenericAuthenticationService<BaseOTPAuthenticateViewModel>, IOTPAuthenticationService
 {
     private readonly IEnumerable<IOTPAuthenticator> _otpAuthenticators;
 
@@ -41,6 +45,8 @@ public class OTPAuthenticationService : GenericAuthenticationService<BaseOTPAuth
 
     protected override Task<CredentialsValidationResult> Validate(string realm, User authenticatedUser, BaseOTPAuthenticateViewModel viewModel, CancellationToken cancellationToken)
     {
+        if (authenticatedUser.Email != viewModel.Login) return Task.FromResult(CredentialsValidationResult.Error("bad_email", "bad_email"));
+        if (authenticatedUser.ActiveOTP == null) return Task.FromResult(CredentialsValidationResult.Error("no_active_otp", "no_active_otp"));
         var activeOtp = authenticatedUser.ActiveOTP;
         var otpAuthenticator = _otpAuthenticators.Single(a => a.Alg == activeOtp.OTPAlg);
         if (!otpAuthenticator.Verify(viewModel.OTPCode.Value, activeOtp)) return Task.FromResult(CredentialsValidationResult.Error(ValidationStatus.INVALIDCREDENTIALS));

@@ -98,6 +98,7 @@ namespace SimpleIdServer.IdServer.UI
                     viewModel.IsLoginMissing = isLoginMissing;
                     viewModel.IsAuthInProgress = amrInfo != null && !string.IsNullOrWhiteSpace(amrInfo.Login);
                     viewModel.AmrAuthInfo = amrInfo;
+                    EnrichViewModel(viewModel);
                     return View(viewModel);
                 }
 
@@ -123,6 +124,8 @@ namespace SimpleIdServer.IdServer.UI
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
             var amrInfo = GetAmrInfo();
             await UpdateViewModel(viewModel);
+            viewModel.CheckRequiredFields(ModelState);
+            if (!ModelState.IsValid) return View(viewModel);
             var result = await CustomAuthenticate(prefix, amrInfo?.UserId, viewModel, token);
             if (result.ActionResult != null) return result.ActionResult;
             CredentialsValidationResult authenticationResult = null;
@@ -132,12 +135,14 @@ namespace SimpleIdServer.IdServer.UI
             {
                 switch(authenticationResult.Status)
                 {
-                    case Services.ValidationStatus.UNKNOWN_USER:
+                    case ValidationStatus.UNKNOWN_USER:
                         ModelState.AddModelError("unknown_user", "unknown_user");
                         return View(viewModel);
-                    case Services.ValidationStatus.NOCONTENT:
+                    case ValidationStatus.NOCONTENT:
+                        if(!string.IsNullOrWhiteSpace(authenticationResult.ErrorCode) && !string.IsNullOrWhiteSpace(authenticationResult.ErrorMessage)) ModelState.AddModelError(authenticationResult.ErrorCode, authenticationResult.ErrorMessage);
                         return View(viewModel);
-                    case Services.ValidationStatus.INVALIDCREDENTIALS:
+                    case ValidationStatus.INVALIDCREDENTIALS:
+                        ModelState.AddModelError("invalid_credential", "invalid_credential");
                         await Bus.Publish(new UserLoginFailureEvent
                         {
                             Realm = prefix,
@@ -152,6 +157,8 @@ namespace SimpleIdServer.IdServer.UI
         }
 
         protected abstract Task<UserAuthenticationResult> CustomAuthenticate(string prefix, string authenticatedUserId, T viewModel, CancellationToken cancellationToken);
+
+        protected abstract void EnrichViewModel(T viewModel);
 
         protected async Task UpdateViewModel(T viewModel)
         {
@@ -198,9 +205,20 @@ namespace SimpleIdServer.IdServer.UI
 
     public record UserAuthenticationResult
     {
+        private UserAuthenticationResult(IActionResult result)
+        {
+            ActionResult = result;
+        }
+
+        private UserAuthenticationResult(User authenticatedUser)
+        {
+            AuthenticatedUser = authenticatedUser;
+        }
+
         public IActionResult ActionResult { get; set; }
         public User AuthenticatedUser { get; set; }
 
-        public static UserAuthenticationResult View(IActionResult result) => new UserAuthenticationResult { ActionResult = result };
+        public static UserAuthenticationResult Ok(User authenticatedUser = null) => new UserAuthenticationResult(authenticatedUser);
+        public static UserAuthenticationResult Error(IActionResult result) => new UserAuthenticationResult(result);
     }
 }

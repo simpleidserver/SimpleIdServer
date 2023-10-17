@@ -24,7 +24,9 @@ using SimpleIdServer.IdServer.Provisioning.SCIM.Jobs;
 using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Startup.Configurations;
 using SimpleIdServer.IdServer.Startup.Converters;
+using SimpleIdServer.IdServer.Startup.Services;
 using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.WsFederation;
 using System;
 using System.Collections.Generic;
@@ -131,6 +133,9 @@ void ConfigureIdServer(IServiceCollection services)
     services.AddDIDKey();
     services.AddDIDEthr();
     ConfigureDistributedCache();
+    var pwdAuthService = services.First(s => s.ServiceType == typeof(IPasswordAuthenticationService));
+    services.Remove(pwdAuthService);
+    services.AddTransient<IPasswordAuthenticationService, CustomPasswordAuthenticationService>();
 }
 
 void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)

@@ -18,7 +18,7 @@ namespace SimpleIdServer.IdServer.UI
     [Area(Constants.Areas.Password)]
     public class AuthenticateController : BaseAuthenticationMethodController<AuthenticatePasswordViewModel>
     {
-        public AuthenticateController(IUserAuthenticationService userAuthenticationService, IAuthenticationSchemeProvider authenticationSchemeProvider, IOptions<IdServerHostOptions> options, IDataProtectionProvider dataProtectionProvider, IAuthenticationHelper authenticationHelper, IClientRepository clientRepository, IAmrHelper amrHelper, IUserRepository userRepository, IUserTransformer userTransformer, IBusControl busControl) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userTransformer, busControl)
+        public AuthenticateController(IPasswordAuthenticationService userAuthenticationService, IAuthenticationSchemeProvider authenticationSchemeProvider, IOptions<IdServerHostOptions> options, IDataProtectionProvider dataProtectionProvider, IAuthenticationHelper authenticationHelper, IClientRepository clientRepository, IAmrHelper amrHelper, IUserRepository userRepository, IUserTransformer userTransformer, IBusControl busControl) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userTransformer, busControl)
         {
         }
 
@@ -28,13 +28,18 @@ namespace SimpleIdServer.IdServer.UI
 
         protected override Task<UserAuthenticationResult> CustomAuthenticate(string prefix, string authenticatedUserId, AuthenticatePasswordViewModel viewModel, CancellationToken cancellationToken)
         {
-            return Task.FromResult(new UserAuthenticationResult());
+            return Task.FromResult(UserAuthenticationResult.Ok());
         }
 
         protected override bool TryGetLogin(AmrAuthInfo amrInfo, out string login)
         {
             login = amrInfo.Login;
             return true;
+        }
+
+        protected override void EnrichViewModel(AuthenticatePasswordViewModel viewModel)
+        {
+
         }
     }
 }

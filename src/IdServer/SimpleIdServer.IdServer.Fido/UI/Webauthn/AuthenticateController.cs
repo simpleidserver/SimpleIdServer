@@ -9,6 +9,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Fido.Apis;
+using SimpleIdServer.IdServer.Fido.Services;
 using SimpleIdServer.IdServer.Fido.UI.ViewModels;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
@@ -23,13 +24,12 @@ namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
     [Area(Constants.AMR)]
     public class AuthenticateController : BaseAuthenticationMethodController<AuthenticateWebauthnViewModel>
     {
-        private readonly IAuthenticationHelper _authenticationHelper;
         private readonly IDistributedCache _distributedCache;
 
         public AuthenticateController(IAuthenticationHelper authenticationHelper,
             IDistributedCache distributedCache,
             IAuthenticationSchemeProvider authenticationSchemeProvider,
-            IUserAuthenticationService userAuthenticationService,
+            IWebauthnAuthenticationService userAuthenticationService,
             IOptions<IdServerHostOptions> options,
             IDataProtectionProvider dataProtectionProvider,
             IClientRepository clientRepository,
@@ -38,7 +38,6 @@ namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
             IUserTransformer userTransformer,
             IBusControl busControl) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userTransformer, busControl)
         {
-            _authenticationHelper = authenticationHelper;
             _distributedCache = distributedCache;
         }
 
@@ -54,10 +53,15 @@ namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
             return true;
         }
 
-        protected void EnrichViewModel(AuthenticateWebauthnViewModel viewModel, User user)
+        protected override Task<UserAuthenticationResult> CustomAuthenticate(string prefix, string authenticatedUserId, AuthenticateWebauthnViewModel viewModel, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(UserAuthenticationResult.Ok());
+        }
+
+
+        protected override void EnrichViewModel(AuthenticateWebauthnViewModel viewModel)
         {
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
-            if (user != null && !user.GetStoredFidoCredentials().Any()) viewModel.IsFidoCredentialsMissing = true;
             viewModel.BeginLoginUrl = $"{issuer}/{viewModel.Realm}/{Constants.EndPoints.BeginLogin}";
             viewModel.EndLoginUrl = $"{issuer}/{viewModel.Realm}/{Constants.EndPoints.EndLogin}";
         }
