@@ -133,6 +133,11 @@ void ConfigureIdServer(IServiceCollection services)
     services.AddDIDKey();
     services.AddDIDEthr();
     ConfigureDistributedCache();
+    // ConfigureCustomAuthentication(services);
+}
+
+void ConfigureCustomAuthentication(IServiceCollection services)
+{
     var pwdAuthService = services.First(s => s.ServiceType == typeof(IPasswordAuthenticationService));
     services.Remove(pwdAuthService);
     services.AddTransient<IPasswordAuthenticationService, CustomPasswordAuthenticationService>();

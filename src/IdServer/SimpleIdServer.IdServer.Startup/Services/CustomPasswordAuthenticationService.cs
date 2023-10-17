@@ -19,7 +19,8 @@ public class CustomPasswordAuthenticationService : GenericAuthenticationService<
 
     public CustomPasswordAuthenticationService(IAuthenticationHelper authenticationHelper, IUserRepository userRepository) : base(authenticationHelper, userRepository)
     {
-        var user = UserBuilder.Create("test", "password").Build();
+        var user = UserBuilder.Create("provisionedUser", "password").Build();
+        user.Realms.Clear();
         user.Realms.Add(new RealmUser
         {
             RealmsName = IdServer.Constants.DefaultRealm
@@ -41,11 +42,12 @@ public class CustomPasswordAuthenticationService : GenericAuthenticationService<
         return await Validate(realm, authenticatedUser, viewModel, cancellationToken);
     }
 
-    protected override Task<CredentialsValidationResult> Validate(string realm, User authenticatedUser, AuthenticatePasswordViewModel viewModel, CancellationToken cancellationToken)
+    protected override async Task<CredentialsValidationResult> Validate(string realm, User authenticatedUser, AuthenticatePasswordViewModel viewModel, CancellationToken cancellationToken)
     {
         var credential = authenticatedUser.Credentials.FirstOrDefault(c => c.CredentialType == Constants.Areas.Password);
         var hash = PasswordHelper.ComputeHash(viewModel.Password);
-        if (credential == null || credential.Value != hash && credential.IsActive) return Task.FromResult(CredentialsValidationResult.Error(ValidationStatus.INVALIDCREDENTIALS));
-        return Task.FromResult(CredentialsValidationResult.Ok(authenticatedUser));
+        if (credential == null || credential.Value != hash && credential.IsActive) return CredentialsValidationResult.Error(ValidationStatus.INVALIDCREDENTIALS);
+        await Provision(authenticatedUser, cancellationToken);
+        return CredentialsValidationResult.Ok(authenticatedUser);
     }
 }

@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Sms.Services;
 using SimpleIdServer.IdServer.Sms.UI.ViewModels;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI;
@@ -27,7 +28,7 @@ namespace SimpleIdServer.IdServer.Sms.UI
             IConfiguration configuration,
             IEnumerable<IUserNotificationService> notificationServices,
             IEnumerable<IOTPAuthenticator> otpAuthenticators,
-            IOTPAuthenticationService userAuthenticationService,
+            IUserSmsAuthenticationService userAuthenticationService,
             IOptions<IdServerHostOptions> options,
             IAuthenticationSchemeProvider authenticationSchemeProvider,
             IDataProtectionProvider dataProtectionProvider,

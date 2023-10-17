@@ -22,6 +22,8 @@ public abstract class GenericAuthenticationService<TViewModel> : IUserAuthentica
         _userRepository = userRepository;
     }
 
+    protected IUserRepository UserRepository => _userRepository;
+
     public Task<User> GetUser(string authenticatedUserId, object viewModel, string realm, CancellationToken cancellationToken)
     {
         return GetUser(authenticatedUserId, (TViewModel)viewModel, realm, cancellationToken);
@@ -35,6 +37,14 @@ public abstract class GenericAuthenticationService<TViewModel> : IUserAuthentica
     public Task<CredentialsValidationResult> Validate(string realm, User authenticatedUser, object viewModel, CancellationToken cancellationToken)
     {
         return Validate(realm, authenticatedUser, (TViewModel)viewModel, cancellationToken);
+    }
+
+    protected async Task Provision(User user, CancellationToken cancellationToken)
+    {
+        var existingUser = await _userRepository.Query().AsNoTracking().FirstOrDefaultAsync(u => u.Name == user.Name);
+        if (existingUser != null) return;
+        _userRepository.Add(user);
+        await _userRepository.SaveChanges(cancellationToken);
     }
 
     protected abstract Task<User> GetUser(string authenticatedUserId, TViewModel viewModel, string realm, CancellationToken cancellationToken);

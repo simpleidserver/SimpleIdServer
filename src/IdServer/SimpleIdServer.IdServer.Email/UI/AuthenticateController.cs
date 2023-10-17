@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
+using SimpleIdServer.IdServer.Email.Services;
 using SimpleIdServer.IdServer.Email.UI.ViewModels;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
@@ -26,7 +27,7 @@ namespace SimpleIdServer.IdServer.Email.UI
             IConfiguration configuration,
             IEnumerable<IUserNotificationService> notificationServices,
             IEnumerable<IOTPAuthenticator> otpAuthenticators,
-            IOTPAuthenticationService userAuthenticationService,
+            IUserEmailAuthenticationService userAuthenticationService,
             IOptions<IdServerHostOptions> options,
             IAuthenticationSchemeProvider authenticationSchemeProvider,
             IDataProtectionProvider dataProtectionProvider,

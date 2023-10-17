@@ -11,29 +11,13 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.UI.Services;
 
-public interface IOTPAuthenticationService : IUserAuthenticationService
-{
-
-}
-
-public class OTPAuthenticationService : GenericAuthenticationService<BaseOTPAuthenticateViewModel>, IOTPAuthenticationService
+public abstract class OTPAuthenticationService : GenericAuthenticationService<BaseOTPAuthenticateViewModel>
 {
     private readonly IEnumerable<IOTPAuthenticator> _otpAuthenticators;
 
     public OTPAuthenticationService(IEnumerable<IOTPAuthenticator> otpAuthenticators, IAuthenticationHelper authenticationHelper, IUserRepository userRepository) : base(authenticationHelper, userRepository)
     {
         _otpAuthenticators = otpAuthenticators;
-    }
-
-    protected override async Task<User> GetUser(string authenticatedUserId, BaseOTPAuthenticateViewModel viewModel, string realm, CancellationToken cancellationToken)
-    {
-        User authenticatedUser = null;
-        if (string.IsNullOrWhiteSpace(authenticatedUserId))
-            authenticatedUser = await AuthenticateUser(viewModel.Login, realm, cancellationToken);
-        else
-            authenticatedUser = await FetchAuthenticatedUser(realm, authenticatedUserId, cancellationToken);
-
-        return authenticatedUser;
     }
 
     protected override async Task<CredentialsValidationResult> Validate(string realm, string authenticatedUserId, BaseOTPAuthenticateViewModel viewModel, CancellationToken cancellationToken)
