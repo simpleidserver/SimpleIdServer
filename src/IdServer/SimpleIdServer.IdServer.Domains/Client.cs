@@ -167,6 +167,16 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonPropertyName(OAuthClientParameters.UpdateDateTime)]
         public DateTime UpdateDateTime { get; set; }
         /// <summary>
+        /// Enable or disable token exchange.
+        /// </summary>
+        [JsonPropertyName(OAuthClientParameters.IsTokenExchangeEnabled)]
+        public bool IsTokenExchangeEnabled { get; set; }
+        /// <summary>
+        /// Type of token exchange (delegation or impersonation).
+        /// </summary>
+        [JsonPropertyName(OAuthClientParameters.TokenExchangeType)]
+        public TokenExchangeTypes? TokenExchangeType { get; set; }
+        /// <summary>
         /// Creation date time.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.CreateDateTime)]

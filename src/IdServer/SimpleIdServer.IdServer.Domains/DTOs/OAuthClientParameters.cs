@@ -72,5 +72,7 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
         public const string AuthorizationDataTypes = "authorization_data_types";
         public const string CredentialOfferEndpoint = "credential_offer_endpoint";
         public const string DPOPBoundAccessTokens = "dpop_bound_access_tokens";
+        public const string IsTokenExchangeEnabled = "is_token_exchange_enabled";
+        public const string TokenExchangeType = "token_exchange_type";
     }
 }

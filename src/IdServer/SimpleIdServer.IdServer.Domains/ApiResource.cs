@@ -6,9 +6,13 @@ namespace SimpleIdServer.IdServer.Domains
     {
         public string Id { get; set; }
         /// <summary>
-        /// Target service or resource to which access is being requested.
+        /// URL : Target service or resource to which access is being requested.
         /// </summary>
         public string Name { get; set; } = null!;
+        /// <summary>
+        /// Client identifier.
+        /// </summary>
+        public string Audience { get; set; } = null!;
         public string? Description { get; set; } = null;
         public DateTime CreateDateTime { get; set; }
         public DateTime UpdateDateTime { get; set; }

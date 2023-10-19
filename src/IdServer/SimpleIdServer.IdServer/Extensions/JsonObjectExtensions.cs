@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Web;
@@ -376,6 +377,62 @@ namespace System.Text.Json.Nodes
 
             return new ClientCredentials(splitted.First(), splitted.Last());
         }
+
+        #endregion
+
+        #region Token Exchange
+
+        /// <summary>
+        /// A security token that represents the identify of the party on behalf of whom the request is being made.
+        /// Typically, the subject of this token will be the subject of the security token issued in the response to this request.
+        /// </summary>
+        /// <param name="jObj"></param>
+        /// <returns></returns>
+        public static string GetSubjectToken(this JsonObject jObj) => jObj.GetStr(TokenRequestParameters.SubjectToken);
+
+        /// <summary>
+        /// An identifier, that indicates the type of the security token in the subject_token parameter.
+        /// </summary>
+        /// <param name="jObj"></param>
+        /// <returns></returns>
+        public static string GetSubjectTokenType(this JsonObject jObj) => jObj.GetStr(TokenRequestParameters.SubjectTokenType);
+
+        /// <summary>
+        /// An identifier, for the type of the requested security token.
+        /// </summary>
+        /// <param name="jObj"></param>
+        /// <returns></returns>
+        public static string GetRequestedTokenType(this JsonObject jObj) => jObj.GetStr(TokenRequestParameters.RequestedTokenType);
+
+        /// <summary>
+        /// A security token that represents the identity of the acting party.
+        /// It will be the party that is authorized to use the requested security token and act on behalf of the subject.
+        /// </summary>
+        /// <param name="jObj"></param>
+        /// <returns></returns>
+        public static string GetActorToken(this JsonObject jObj) => jObj.GetStr(TokenRequestParameters.ActorToken);
+
+        /// <summary>
+        /// An identifier, that indicates the type of the security token in the actor_token parameter.
+        /// </summary>
+        /// <param name="jObj"></param>
+        /// <returns></returns>
+        public static string GetActorTokenType(this JsonObject jObj) => jObj.GetStr(TokenRequestParameters.ActorTokenType);
+
+        /// <summary>
+        /// URI that indicates that target service or resource where the client intends to use the requested security token.
+        /// </summary>
+        /// <param name="jObj"></param>
+        /// <returns></returns>
+        public static IEnumerable<string> GetResources(this JsonObject jObj) => jObj.GetArray(TokenRequestParameters.Resource);
+
+        /// <summary>
+        /// Logical name of the target service where the client intends to use the requested security token.
+        /// Client identifier is example of thing that might be used as audience parameter.
+        /// </summary>
+        /// <param name="jObj"></param>
+        /// <returns></returns>
+        public static IEnumerable<string> GetAudiences(this JsonObject jObj) => jObj.GetArray(TokenRequestParameters.Audience);
 
         #endregion
 

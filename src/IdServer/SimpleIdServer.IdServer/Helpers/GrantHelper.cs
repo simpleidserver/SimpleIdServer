@@ -73,7 +73,7 @@ namespace SimpleIdServer.IdServer.Helpers
                 var apiResources = await _apiResourceRepository.Query().Include(r => r.Realms).Include(r => r.Scopes).Where(r => resources.Contains(r.Name) && r.Realms.Any(r => r.Name == realm)).ToListAsync(cancellationToken);
                 var unsupportedResources = resources.Where(r => !apiResources.Any(a => a.Name == r));
                 if (unsupportedResources.Any())
-                    throw new OAuthException(ErrorCodes.INVALID_TARGET, string.Format(ErrorMessages.UKNOWN_RESOURCE, string.Join(",", unsupportedResources)));
+                    throw new OAuthException(ErrorCodes.INVALID_TARGET, string.Format(ErrorMessages.UNKNOWN_RESOURCE, string.Join(",", unsupportedResources)));
                 var allApiResourceScopes = apiResources.SelectMany(c => c.Scopes).GroupBy(s => s.Name).Select(k => k.Key);
                 var supportedScopes = scopes.Where(s => apiResources.Any(r => r.Scopes.Any(sc => sc.Name == s)));
                 if (!supportedScopes.Any())

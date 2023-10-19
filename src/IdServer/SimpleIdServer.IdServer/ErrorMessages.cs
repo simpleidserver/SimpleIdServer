@@ -37,7 +37,9 @@ namespace SimpleIdServer.IdServer
         public const string UNAUTHORIZED_USER_ACCESS_GRANT = "the user {0} is not authorized to access to performance operations on the grant";
         public const string UNAUTHORIZED_CLIENT_ACCESS_GRANT = "the client {0} is not authorized to access to perform operations on the grant";
         public const string UNAUTHORIZED_ACCESS_PERMISSION_API = "you're not authorized to access to the permissions endpoint";
-        public const string UKNOWN_RESOURCE = "following resources {0} doesn't exist";
+        public const string UNKNOWN_SCOPE_RESOURCE_OR_AUDIENCE = "scopes {0} are not present in the resource / audience";
+        public const string UNKNOWN_RESOURCE = "following resources {0} doesn't exist";
+        public const string UNKNOWN_AUDIENCE = "following audiences {0} don't exist";
         public const string NO_CLIENT_SECRET = "no client secret";
         public const string NO_CONSENT = "no consent has been accepted";
         public const string NO_JWK_WITH_ALG_SIG = "no JWK with algorithm {0} has been found to sign the JWT";
@@ -143,6 +145,7 @@ namespace SimpleIdServer.IdServer
         public const string CLIENT_ID_CANNOT_BE_EXTRACTED_FROM_CLIENT_ASSERTION = "client_id cannot be extracted from client_assertion";
         public const string CLIENT_NOTIFICATION_TOKEN_MUST_NOT_EXCEED_1024 = "client_notification_token must not exceed 1024 characters";
         public const string CLIENT_NOTIFICATION_TOKEN_MUST_CONTAIN_AT_LEAST_128_BYTES = "client_notification_token must contains at least 128 bytes";
+        public const string CLIENT_TOKENEXCHANGE_NOT_ENABLED = "Token exchange is not enabled";
         public const string MISSING_PARAMETER = "missing parameter {0}";
         public const string MISSING_PARAMETERS = "missing parameters {0}";
         public const string MISSING_TOKEN = "missing token";
@@ -181,6 +184,9 @@ namespace SimpleIdServer.IdServer
         public const string UNSUPPORTED_AUTHORIZATION_ENCRYPTED_RESPONSE_ENC = "authorization_encrypted_response_enc is not supported";
         public const string UNSUPPORTED_CREDENTIAL_TYPE = "the credential type {0} is not supported";
         public const string UNSUPPORTED_AMRS = "the authentication method references {0} are not supported";
+        public const string UNSUPPORTED_TOKENTYPE = "the token type {0} is not supported";
+        public const string UNSUPPORTED_ACTORTYPE = "the actor type {0} is not supported";
+        public const string UNSUPPORTED_REQUESTED_TOKEN_TYPE = "the requested token type {0} is not supported";
         public const string REFRESH_TOKEN_NOT_ISSUED_BY_CLIENT = "refresh token has not been issued by the client";
         public const string NO_REGISTERED_REDIRECTURI = "no redirect uri has been registered";
         public const string NO_ESSENTIAL_ACR_IS_SUPPORTED = "no essential acr is supported";

@@ -23,5 +23,12 @@ namespace SimpleIdServer.IdServer.DTOs
         public const string Pct = "pct";
         public const string Rpt = "rpt";
         public const string DeviceCode = "device_code";
+        public const string SubjectToken = "subject_token";
+        public const string SubjectTokenType = "subject_token_type";
+        public const string Resource = "resource";
+        public const string Audience = "audience";
+        public const string ActorToken = "actor_token";
+        public const string ActorTokenType = "actor_token_type";
+        public const string RequestedTokenType = "requested_token_type";
     }
 }
