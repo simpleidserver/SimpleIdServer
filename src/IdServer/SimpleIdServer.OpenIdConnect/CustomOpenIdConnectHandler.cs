@@ -679,7 +679,7 @@ namespace SimpleIdServer.OpenIdConnect
                 ClientId = Options.ClientId,
                 EnableTelemetryParameters = !Options.DisableTelemetry,
                 IssuerAddress = _configuration?.AuthorizationEndpoint ?? string.Empty,
-                RedirectUri = BuildRedirectUri(Options.CallbackPath),
+                RedirectUri = properties.GetParameter<string>(OpenIdConnectParameterNames.RedirectUri) ?? BuildRedirectUri(Options.CallbackPath),
                 Resource = Options.Resource,
                 ResponseType = Options.ResponseType,
                 Prompt = properties.GetParameter<string>(OpenIdConnectParameterNames.Prompt) ?? Options.Prompt,

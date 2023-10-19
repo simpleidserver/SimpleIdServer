@@ -33,5 +33,11 @@ namespace SimpleIdServer.Mobile.Stores
             await _database.AddOTPCode(otpCode);
             OTPCodes.Add(otpCode);
         }
+
+        public async Task RemoveOTPCode(OTPCode otpCode)
+        {
+            await _database.RemoveOTPCode(otpCode);
+            OTPCodes.Remove(otpCode);
+        }
     }
 }

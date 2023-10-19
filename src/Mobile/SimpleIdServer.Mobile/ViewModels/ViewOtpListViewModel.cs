@@ -3,6 +3,7 @@ using SimpleIdServer.Mobile.Stores;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
 
 namespace SimpleIdServer.Mobile.ViewModels;
 
@@ -16,7 +17,16 @@ public class ViewOtpListViewModel : INotifyPropertyChanged
     public ViewOtpListViewModel(OtpListState otpListState)
     {
         _otpListState = otpListState;
+        RemoveSelectedOtpCommand = new Command(async () =>
+        {
+            await RemoveSelectedOtp();
+        }, () =>
+        {
+            return SelectedOTPCode != null;
+        });
     }
+
+    public ICommand RemoveSelectedOtpCommand { get; private set; }
 
     public ObservableCollection<OTPCode> OTPCodes
     {
@@ -38,6 +48,8 @@ public class ViewOtpListViewModel : INotifyPropertyChanged
             {
                 _selectedOTPCode = value;
                 OnPropertyChanged();
+                var cmd = (Command)RemoveSelectedOtpCommand;
+                cmd.ChangeCanExecute();
             }
         }
     }
@@ -59,6 +71,13 @@ public class ViewOtpListViewModel : INotifyPropertyChanged
     }
 
     public void OnPropertyChanged([CallerMemberName] string name = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+    private async Task RemoveSelectedOtp()
+    {
+        if (SelectedOTPCode == null) return;
+        await _otpListState.RemoveOTPCode(SelectedOTPCode);
+        SelectedOTPCode = null;
+    }
 
     public async Task Load()
     {

@@ -69,6 +69,12 @@ namespace SimpleIdServer.Mobile
             await _database.InsertAsync(otpCode);
         }
 
+        public async Task RemoveOTPCode(OTPCode otpCode)
+        {
+            await Init();
+            await _database.DeleteAsync(otpCode);
+        }
+
         public async Task UpdateCredentialRecord(CredentialRecord credentialRecord)
         {
             await Init();

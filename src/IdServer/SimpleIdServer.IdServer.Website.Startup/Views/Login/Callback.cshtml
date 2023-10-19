@@ -1,0 +1,31 @@
+﻿@model SimpleIdServer.IdServer.Website.ViewModels.CallbackViewModel
+
+<style>
+    table {
+        border-collapse: collapse;
+    }
+
+    table th, table td {
+        border: 1px solid black;
+    }
+</style>
+
+<h3>Claims</h3>
+
+<table>
+    <thead>
+        <tr>
+            <th>Key</th>
+            <th>Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var claim in Model.Claims)
+        {
+            <tr>
+                <td>@claim.Key</td>
+                <td>@claim.Value</td>
+            </tr>
+        }
+    </tbody>
+</table>

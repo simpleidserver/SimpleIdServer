@@ -12,6 +12,7 @@ using System.Text;
 using System.Text.Json;
 using System.Windows.Input;
 using ZXing.Net.Maui;
+
 namespace SimpleIdServer.Mobile.ViewModels;
 
 public class QRCodeScannerViewModel
@@ -19,21 +20,23 @@ public class QRCodeScannerViewModel
     private bool _isLoading = false;
     private readonly IPromptService _promptService;
     private readonly IOTPService _otpService;
+    private readonly INavigationService _navigationService;
     private readonly OtpListState _otpListState;
     private readonly CredentialListState _credentialListState;
     private readonly MobileOptions _options;
     private SemaphoreSlim _lck = new SemaphoreSlim(1, 1);
 
-    public QRCodeScannerViewModel(IPromptService promptService, IOTPService otpService, OtpListState otpListState, CredentialListState credentialListState, IOptions<MobileOptions> options)
+    public QRCodeScannerViewModel(IPromptService promptService, IOTPService otpService, INavigationService navigationService, OtpListState otpListState, CredentialListState credentialListState, IOptions<MobileOptions> options)
     {
         _promptService = promptService;
         _otpService = otpService;
         _options = options.Value;
         _otpListState = otpListState;
         _credentialListState = credentialListState;
+        _navigationService = navigationService;
         CloseCommand = new Command(async () =>
         {
-            await Shell.Current.GoToAsync("..");
+            await _navigationService.GoBack();
         });
         ScanQRCodeCommand = new Command<BarcodeDetectionEventArgs>(async (c) =>
         {
@@ -70,15 +73,7 @@ public class QRCodeScannerViewModel
         try
         {
             if (string.IsNullOrWhiteSpace(qrCodeValue)) return;
-            if (await RegisterOTPCode())
-            {
-                await _promptService.ShowAlert("Success", "One Time Password has been enrolled");
-                await App.Current.Dispatcher.DispatchAsync(async () =>
-                {
-                    await Shell.Current.GoToAsync("..");
-                });
-            }
-            else
+            if (!await RegisterOTPCode())
             {
                 var qrCodeResult = JsonSerializer.Deserialize<QRCodeResult>(qrCodeValue);
                 if (qrCodeResult.Action == "register") await Register(qrCodeResult);
@@ -103,6 +98,14 @@ public class QRCodeScannerViewModel
             var beginResult = await ReadRegisterQRCode(qrCodeResult);
             var attestationBuilder = new FIDOU2FAttestationBuilder();
             var rp = beginResult.CredentialCreateOptions.Rp.Id;
+            await _credentialListState.Load();
+            var existingCredential = _credentialListState.CredentialRecords.SingleOrDefault(r => r.Credential.Rp == rp && r.Credential.Login == beginResult.Login);
+            if(existingCredential != null)
+            {
+                await _promptService.ShowAlert("Error", "The Credential has already been enrolled");
+                return;
+            }
+
             var enrollResponse = attestationBuilder.BuildEnrollResponse(new EnrollParameter
             {
                 Challenge = beginResult.CredentialCreateOptions.Challenge,
@@ -113,10 +116,7 @@ public class QRCodeScannerViewModel
             var credentialRecord = new CredentialRecord(enrollResponse.CredentialId, enrollResponse.AttestationCertificate.AttestationCertificate, enrollResponse.AttestationCertificate.PrivateKey, endRegisterResult.SignCount, rp, beginResult.Login);
             await _credentialListState.AddCredentialRecord(credentialRecord);
             await _promptService.ShowAlert("Success", "Your mobile device has been enrolled");
-            await App.Current.Dispatcher.DispatchAsync(async () =>
-            {
-                await Shell.Current.GoToAsync("..");
-            });
+            await _navigationService.GoBack();
         }
 
         async Task<BeginU2FRegisterResult> ReadRegisterQRCode(QRCodeResult qrCodeResult)
@@ -192,7 +192,13 @@ public class QRCodeScannerViewModel
             var beginResult = await ReadAuthenticateQRCode(qrCodeResult);
             var attestationBuilder = new FIDOU2FAttestationBuilder();
             var allowCredentials = beginResult.Assertion.AllowCredentials;
-            var selectedCredential = credentialRecords.FirstOrDefault(c => allowCredentials.Any(ac => ac.Id.SequenceEqual(c.Credential.IdPayload)))?.Credential;
+            var selectedCredential = credentialRecords.SingleOrDefault(c => allowCredentials.Any(ac => ac.Id.SequenceEqual(c.Credential.IdPayload)))?.Credential;
+            if(selectedCredential == null)
+            {
+                await _promptService.ShowAlert("Error", "Impossible to perform the authentication because you don't have the credential");
+                return;
+            }
+
             var authResponse = attestationBuilder.BuildAuthResponse(new AuthenticationParameter
             {
                 Challenge = beginResult.Assertion.Challenge,
@@ -206,10 +212,7 @@ public class QRCodeScannerViewModel
             selectedCredential.SigCount++;
             await App.Database.UpdateCredentialRecord(selectedCredential);
             await _promptService.ShowAlert("Success", "You are authenticated");
-            await App.Current.Dispatcher.DispatchAsync(async () =>
-            {
-                await Shell.Current.GoToAsync("..");
-            });
+            await _navigationService.GoBack();
         }
 
         async Task<BeginU2FAuthenticateResult> ReadAuthenticateQRCode(QRCodeResult qrCodeResult)
@@ -271,16 +274,15 @@ public class QRCodeScannerViewModel
                 await _otpListState.Load();
                 var otpCodes = _otpListState.OTPCodes;
                 var existingOtpCode = otpCodes.FirstOrDefault(o => o.Id == otpCode.Id);
-                if (existingOtpCode != null)
+                if(existingOtpCode != null)
                 {
-                    existingOtpCode.Type = otpCode.Type;
-                    existingOtpCode.Secret = otpCode.Secret;
-                    existingOtpCode.Algorithm = otpCode.Algorithm;
-                    existingOtpCode.Counter = otpCode.Counter;
-                    existingOtpCode.Period = otpCode.Period;
-                    await _otpListState.UpdateOTPCode(existingOtpCode);
+                    await _promptService.ShowAlert("Error", "The One Time Password has already been enrolled");
+                    return true;
                 }
-                else await _otpListState.AddOTPCode(otpCode);
+
+                await _otpListState.AddOTPCode(otpCode);
+                await _promptService.ShowAlert("Success", "The One Time Password has been enrolled");
+                await _navigationService.GoBack();
                 return true;
             }
 

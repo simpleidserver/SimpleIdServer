@@ -12,6 +12,9 @@
              x:Class="SimpleIdServer.Mobile.ViewOtpListPage"
              Shell.TabBarIsVisible="false"
              Title="One time password">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Order="Primary" Text="Delete" Command="{Binding Path=RemoveSelectedOtpCommand}"></ToolbarItem>
+    </ContentPage.ToolbarItems>
     <Grid>
         <common:Loader IsVisible="{Binding Path=IsLoading}" ZIndex="2" />
         <Grid Margin="20">

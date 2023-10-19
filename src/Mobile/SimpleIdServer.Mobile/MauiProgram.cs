@@ -24,6 +24,7 @@ public static class MauiProgram
 			});
 		builder.Services.AddTransient<IPromptService, PromptService>();
         builder.Services.AddTransient<IOTPService, OTPService>();
+		builder.Services.AddTransient<INavigationService, NavigationService>();
 		builder.Services.AddSingleton(new OtpListState());
 		builder.Services.AddSingleton(new CredentialListState());
         builder.Services.AddTransient<EnrollPage>();

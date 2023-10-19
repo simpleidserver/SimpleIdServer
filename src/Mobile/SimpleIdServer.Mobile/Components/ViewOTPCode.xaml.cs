@@ -97,9 +97,22 @@ public partial class ViewOTPCode : ContentView, INotifyPropertyChanged
 	{
 		var viewModelOTPCode = bindable as ViewOTPCode;
 		var newOTPCode = newValue as OTPCode;
-        viewModelOTPCode.IsOTPCodeExists = true;
-        viewModelOTPCode.DisplayMessage = $"{newOTPCode.Issuer} : the token for {newOTPCode.Name} is ";
-		viewModelOTPCode.GenerateCode(newOTPCode);
+		if(newOTPCode == null)
+        {
+            viewModelOTPCode.IsOTPCodeExists = false;
+			viewModelOTPCode.DisplayMessage = null;
+            if (viewModelOTPCode._totpCancellationTokenSource != null)
+            {
+                viewModelOTPCode._totpCancellationTokenSource.Cancel();
+            }
+        }
+		else
+        {
+
+            viewModelOTPCode.IsOTPCodeExists = true;
+            viewModelOTPCode.DisplayMessage = $"{newOTPCode.Issuer} : the token for {newOTPCode.Name} is ";
+            viewModelOTPCode.GenerateCode(newOTPCode);
+        }
     }
 
 	private void GenerateCode(OTPCode otpCode)
