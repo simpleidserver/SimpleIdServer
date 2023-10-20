@@ -49,6 +49,13 @@ namespace SimpleIdServer.IdServer.Builders
 
         #region Grant-types
 
+        public ApiClientBuilder EnableExchangeTokenGrantType(TokenExchangeTypes exchangeType)
+        {
+            _client.GrantTypes.Add(TokenExchangeHandler.GRANT_TYPE);
+            _client.TokenExchangeType = exchangeType;
+            return this;
+        }
+
         /// <summary>
         /// Allows the client to use UMA grant-type.
         /// </summary>

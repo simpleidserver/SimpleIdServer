@@ -83,7 +83,7 @@ namespace SimpleIdServer.IdServer.UI
             async Task<ConsentsIndexViewModel> BuildConsentsFromGrant(JsonObject query, Client oauthClient, string grantId)
             {
                 var nameIdentifier = GetNameIdentifier();
-                var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.Consents).ThenInclude(c => c.Scopes).FirstAsync(c => c.Name == nameIdentifier && c.Realms.Any(r => r.RealmsName == prefix), cancellationToken);
+                var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.Consents).ThenInclude(c => c.Scopes).ThenInclude(c => c.AuthorizedResources).FirstAsync(c => c.Name == nameIdentifier && c.Realms.Any(r => r.RealmsName == prefix), cancellationToken);
                 var grant = user.Consents.First(c => c.Id == grantId);
                 var claimDescriptions = new List<string>();
                 if (grant.Claims != null && grant.Claims.Any())
@@ -136,7 +136,7 @@ namespace SimpleIdServer.IdServer.UI
             var claims = query.GetClaimsFromAuthorizationRequest().Select(c => c.Name);
             if (!string.IsNullOrWhiteSpace(grantId))
             {
-                var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.Consents).ThenInclude(c => c.Scopes).FirstAsync(c => c.Name == nameIdentifier && c.Realms.Any(r => r.RealmsName == prefix), cancellationToken);
+                var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.Consents).ThenInclude(c => c.Scopes).ThenInclude(c => c.AuthorizedResources).FirstAsync(c => c.Name == nameIdentifier && c.Realms.Any(r => r.RealmsName == prefix), cancellationToken);
                 var consent = user.Consents.Single(c => c.Id == grantId);
                 user.Consents.Remove(consent);
                 await _userRepository.SaveChanges(cancellationToken);

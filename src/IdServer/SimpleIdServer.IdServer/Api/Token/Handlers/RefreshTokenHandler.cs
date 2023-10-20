@@ -140,7 +140,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     var resources = GetResources(originalJwsPayload, jwsPayload);
                     var claims = GetClaims(originalJwsPayload, jwsPayload);
                     var authDetails = GetAuthorizationDetails(originalJwsPayload, jwsPayload);
-                    var extractionResult = await _audienceHelper.Extract(context.Realm ?? Constants.DefaultRealm, scopes, resources, authDetails, cancellationToken);
+                    var extractionResult = await _audienceHelper.Extract(context.Realm ?? Constants.DefaultRealm, scopes, resources, new List<string>(), authDetails, cancellationToken);
                     scopeLst = extractionResult.Scopes;
                     activity?.SetTag("scopes", string.Join(",", extractionResult.Scopes));
                     var result = BuildResult(context, extractionResult.Scopes);

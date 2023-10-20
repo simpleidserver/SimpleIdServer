@@ -12,7 +12,7 @@ namespace SimpleIdServer.IdServer.Domains
         /// <summary>
         /// Client identifier.
         /// </summary>
-        public string Audience { get; set; } = null!;
+        public string? Audience { get; set; } = null;
         public string? Description { get; set; } = null;
         public DateTime CreateDateTime { get; set; }
         public DateTime UpdateDateTime { get; set; }

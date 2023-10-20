@@ -6,15 +6,12 @@ using SimpleIdServer.IdServer.Domains;
 
 namespace SimpleIdServer.IdServer.Store.Configurations
 {
-    public class AuthorizedScopeConfiguration : IEntityTypeConfiguration<AuthorizedScope>
+    public class AuthorizedResourceConfiguration : IEntityTypeConfiguration<AuthorizedResource>
     {
-        public void Configure(EntityTypeBuilder<AuthorizedScope> builder)
+        public void Configure(EntityTypeBuilder<AuthorizedResource> builder)
         {
             builder.Property<int>("Id").ValueGeneratedOnAdd();
             builder.HasKey("Id");
-            builder.Ignore(a => a.Resources);
-            builder.Ignore(a => a.Audiences);
-            builder.HasMany(a => a.AuthorizedResources).WithOne().OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

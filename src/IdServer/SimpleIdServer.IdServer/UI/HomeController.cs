@@ -69,7 +69,7 @@ namespace SimpleIdServer.IdServer.UI
             prefix = prefix ?? Constants.DefaultRealm;
             var schemes = await _authenticationSchemeProvider.GetAllSchemesAsync();
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).Include(u => u.Consents).ThenInclude(c => c.Scopes).Include(u => u.ExternalAuthProviders).Include(u => u.Credentials).FirstOrDefaultAsync(u => u.Name == nameIdentifier, cancellationToken);
+            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).Include(u => u.Consents).ThenInclude(c => c.Scopes).ThenInclude(c => c.AuthorizedResources).Include(u => u.ExternalAuthProviders).Include(u => u.Credentials).FirstOrDefaultAsync(u => u.Name == nameIdentifier, cancellationToken);
             var consents = await GetConsents();
             var pendingRequests = await GetPendingRequest();
             var methodServices = _authenticationMethodServices.Select(a => new AuthenticationMethodViewModel

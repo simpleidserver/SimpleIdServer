@@ -32,7 +32,7 @@ namespace SimpleIdServer.IdServer.Api.Grants
             try
             {
                 var bearerToken = ExtractBearerToken();
-                var grant = await _grantRepository.Query().Include(g => g.Scopes).Include(g => g.User).FirstOrDefaultAsync(q => q.Id == id, cancellationToken);
+                var grant = await _grantRepository.Query().Include(g => g.Scopes).ThenInclude(s => s.AuthorizedResources).Include(g => g.User).FirstOrDefaultAsync(q => q.Id == id, cancellationToken);
                 if (grant == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_TARGET, string.Format(ErrorMessages.UNKNOWN_GRANT, id));
                 if (grant.Status == Domains.ConsentStatus.PENDING) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_TARGET, ErrorMessages.GRANT_IS_NOT_ACCEPTED);
                 var token = await _grantedTokenHelper.GetAccessToken(bearerToken, cancellationToken);

@@ -71,7 +71,11 @@ namespace SimpleIdServer.IdServer.Domains
             {
                 var newScopes = Scopes.Select(s => new AuthorizedScope
                 {
-                    Resources = s.Resources,
+                    AuthorizedResources = s.AuthorizedResources.Select(r => new AuthorizedResource
+                    {
+                        Audience = r.Audience,
+                        Resource = r.Resource
+                    }).ToList(),
                     Scope = s.Scope
                 }).ToList();
                 var unknownScopes = scopes.Where(s => !newScopes.Any(sc => sc.Scope == s.Scope));
@@ -81,11 +85,11 @@ namespace SimpleIdServer.IdServer.Domains
                 {
                     var newScope = scopes.FirstOrDefault(s => s.Scope == existingScope.Scope);
                     if (newScope == null) continue;
-                    var unknownResources = newScope.Resources.Where(r => !existingScope.Resources.Contains(r));
-                    var resources = existingScope.Resources;
+                    var unknownResources = newScope.AuthorizedResources.Where(r => !existingScope.AuthorizedResources.Any(ar => ar.Resource == r.Resource));
+                    var resources = existingScope.AuthorizedResources;
                     foreach (var unknownResource in unknownResources)
                         resources.Add(unknownResource);
-                    existingScope.Resources = resources;
+                    existingScope.AuthorizedResources = resources;
                 }
 
                 Scopes = newScopes;

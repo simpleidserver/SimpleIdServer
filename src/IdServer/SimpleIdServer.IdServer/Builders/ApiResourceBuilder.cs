@@ -22,6 +22,13 @@ namespace SimpleIdServer.IdServer.Builders
             return new ApiResourceBuilder(record);
         }
 
+        public static ApiResourceBuilder Create(string name, string audience, string description, params Scope[] scopes)
+        {
+            var record = new ApiResource { Id = Guid.NewGuid().ToString(), Name = name, Description = description, Scopes = scopes, Audience = audience };
+            record.Realms.Add(Constants.StandardRealms.Master);
+            return new ApiResourceBuilder(record);
+        }
+
         public ApiResource Build() => _apiResource;
     }
 }

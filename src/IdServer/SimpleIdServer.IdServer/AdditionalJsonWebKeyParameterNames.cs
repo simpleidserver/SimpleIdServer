@@ -8,5 +8,10 @@ namespace SimpleIdServer.IdServer
         /// https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-16.txt
         /// </summary>
         public const string Jkt = "jkt";
+        /// <summary>
+        /// The act (actor) claim provides a means within a JWT to express that delegation has occurred and identify the acting party to whom authority has been delegated.
+        /// Actor claim.
+        /// </summary>
+        public const string Act = "act";
     }
 }

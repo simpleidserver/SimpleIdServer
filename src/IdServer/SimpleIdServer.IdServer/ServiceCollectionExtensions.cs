@@ -44,6 +44,7 @@ using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
+using SimpleIdServer.IdServer.TokenTypes;
 using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.UI.Infrastructures;
 using SimpleIdServer.IdServer.UI.Services;
@@ -93,7 +94,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddRegisterApi()
                 .AddBCAuthorizeApi()
                 .AddDeviceAuthorizationApi()
-                .AddIdentityProvisioning();
+                .AddIdentityProvisioning()
+                .AddTokenTypes();
             services.AddAuthorization();
             services.Configure<AuthorizationOptions>(o =>
             {
@@ -223,6 +225,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IRevokeTokenValidator, RevokeTokenValidator>();
             services.AddTransient<IPasswordGrantTypeValidator, PasswordGrantTypeValidator>();
             services.AddTransient<IGrantedTokenHelper, GrantedTokenHelper>();
+            services.AddTransient<ITokenExchangeValidator, TokenExchangeValidator>();
+            services.AddTransient<IGrantTypeHandler, TokenExchangeHandler>();
             services.AddTransient<IGrantTypeHandler, ClientCredentialsHandler>();
             services.AddTransient<IGrantTypeHandler, RefreshTokenHandler>();
             services.AddTransient<IGrantTypeHandler, PasswordHandler>();
@@ -293,6 +297,13 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddIdentityProvisioning(this IServiceCollection services)
         {
             services.AddTransient<IImportRepresentationJob, ImportRepresentationJob>();
+            return services;
+        }
+
+        private static IServiceCollection AddTokenTypes(this IServiceCollection services)
+        {
+            services.AddTransient<ITokenTypeService, AccessTokenTypeService>();
+            services.AddTransient<ITokenTypeService, IdTokenTypeService>();
             return services;
         }
 

@@ -78,7 +78,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     var scopes = ScopeHelper.Validate(context.Request.RequestData.GetStr(TokenRequestParameters.Scope), oauthClient.Scopes.Select(s => s.Name));
                     var resources = context.Request.RequestData.GetResourcesFromAuthorizationRequest();
                     var authDetails = context.Request.RequestData.GetAuthorizationDetailsFromAuthorizationRequest();
-                    var extractionResult = await _audienceHelper.Extract(context.Realm ?? Constants.DefaultRealm, scopes, resources, authDetails, cancellationToken);
+                    var extractionResult = await _audienceHelper.Extract(context.Realm ?? Constants.DefaultRealm, scopes, resources, new List<string>(), authDetails, cancellationToken);
                     scopeLst = extractionResult.Scopes;
                     activity?.SetTag("scopes", string.Join(",", extractionResult.Scopes)); 
                     var userName = context.Request.RequestData.GetStr(TokenRequestParameters.Username);

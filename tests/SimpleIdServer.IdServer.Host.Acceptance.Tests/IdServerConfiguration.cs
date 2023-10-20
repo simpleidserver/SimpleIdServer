@@ -135,10 +135,10 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
 
         public static List<ApiResource> ApiResources = new List<ApiResource>
         {
-            ApiResourceBuilder.Create("https://cal.example.com", "description", AdminScope, CalendarScope).Build(),
-            ApiResourceBuilder.Create("https://contacts.example.com", "description", AdminScope, CalendarScope).Build(),
-            ApiResourceBuilder.Create("firstClient", "First API", FirstScope).Build(),
-            ApiResourceBuilder.Create("secondClient", "Second API", FirstScope).Build(),
+            ApiResourceBuilder.Create("https://cal.example.com",  "https://cal.example.com", "description", AdminScope, CalendarScope).Build(),
+            ApiResourceBuilder.Create("https://contacts.example.com", "https://contacts.example.com", "description", AdminScope, CalendarScope).Build(),
+            ApiResourceBuilder.Create("firstClient", "firstClient", "First API", FirstScope).Build(),
+            ApiResourceBuilder.Create("secondClient", "secondClient", "Second API", FirstScope).Build(),
         };
 
         public static List<Client> Clients = new List<Client>

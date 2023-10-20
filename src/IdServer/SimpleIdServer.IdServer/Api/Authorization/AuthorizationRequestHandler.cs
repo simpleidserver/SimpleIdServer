@@ -82,7 +82,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
         {
             var validationResult = await _validator.ValidateAuthorizationRequest(context, cancellationToken);
             var user = await _userRepository.Query()
-                .Include(u => u.Consents).ThenInclude(c => c.Scopes)
+                .Include(u => u.Consents).ThenInclude(c => c.Scopes).ThenInclude(c => c.AuthorizedResources)
                 .Include(u => u.Sessions)
                 .Include(u => u.Realms)
                 .Include(u => u.Groups)

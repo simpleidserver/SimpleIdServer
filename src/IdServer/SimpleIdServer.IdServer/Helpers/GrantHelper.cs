@@ -13,7 +13,7 @@ namespace SimpleIdServer.IdServer.Helpers
 {
     public interface IGrantHelper
     {
-        Task<GrantRequest> Extract(string realm, IEnumerable<string> scopes, IEnumerable<string> resources, ICollection<AuthorizationData> authorizationDetails, CancellationToken cancellationToken);
+        Task<GrantRequest> Extract(string realm, IEnumerable<string> scopes, IEnumerable<string> resources, IEnumerable<string> audiences, ICollection<AuthorizationData> authorizationDetails, CancellationToken cancellationToken);
     }
 
     public class GrantRequest
@@ -36,7 +36,7 @@ namespace SimpleIdServer.IdServer.Helpers
         {
             get
             {
-                return Authorizations.SelectMany(a => a.Resources).Distinct();
+                return Authorizations.SelectMany(a => a.Audiences).Distinct();
             }
         }
 
@@ -53,27 +53,30 @@ namespace SimpleIdServer.IdServer.Helpers
             _apiResourceRepository = apiResourceRepository;
         }
 
-        public async Task<GrantRequest> Extract(string realm, IEnumerable<string> scopes, IEnumerable<string> resources, ICollection<AuthorizationData> authorizationDetails, CancellationToken cancellationToken)
+        public async Task<GrantRequest> Extract(string realm, IEnumerable<string> scopes, IEnumerable<string> resources, IEnumerable<string> audiences, ICollection<AuthorizationData> authorizationDetails, CancellationToken cancellationToken)
         {
             var authResults = new List<AuthorizedScope>();
             if (resources.Any())
-                authResults.AddRange(await ProcessResourceParameter(resources, scopes, cancellationToken));
+                authResults.AddRange(await ProcessResourceParameter(resources, audiences, scopes, cancellationToken));
 
             var unknownScopes = scopes.Where(s => !authResults.Any(a => a.Scope == s));
             authResults.AddRange(await ProcessScopeParameter(scopes, cancellationToken));
-            var audiences = authResults.SelectMany(a => a.Resources).Distinct();
-            if(audiences.Any())
-                authorizationDetails = authorizationDetails.Where(d => d.Locations != null && d.Locations.Any(l => audiences.Contains(l))).ToList();
+            var resLst = authResults.SelectMany(a => a.Resources).Distinct();
+            if(resLst.Any())
+                authorizationDetails = authorizationDetails.Where(d => d.Locations != null && d.Locations.Any(l => resLst.Contains(l))).ToList();
 
             return new GrantRequest(authResults, authorizationDetails);
 
-            async Task<List<AuthorizedScope>> ProcessResourceParameter(IEnumerable<string> resources, IEnumerable<string> scopes, CancellationToken cancellationToken)
+            async Task<List<AuthorizedScope>> ProcessResourceParameter(IEnumerable<string> resources, IEnumerable<string> audiences, IEnumerable<string> scopes, CancellationToken cancellationToken)
             {
                 var authResults = new List<AuthorizedScope>();
-                var apiResources = await _apiResourceRepository.Query().Include(r => r.Realms).Include(r => r.Scopes).Where(r => resources.Contains(r.Name) && r.Realms.Any(r => r.Name == realm)).ToListAsync(cancellationToken);
+                var apiResources = await _apiResourceRepository.Query().Include(r => r.Realms).Include(r => r.Scopes).Where(r => (resources.Contains(r.Name) || audiences.Contains(r.Audience)) && r.Realms.Any(r => r.Name == realm)).ToListAsync(cancellationToken);
                 var unsupportedResources = resources.Where(r => !apiResources.Any(a => a.Name == r));
                 if (unsupportedResources.Any())
                     throw new OAuthException(ErrorCodes.INVALID_TARGET, string.Format(ErrorMessages.UNKNOWN_RESOURCE, string.Join(",", unsupportedResources)));
+                var unsupportedAudiences = audiences.Where(r => !apiResources.Any(a => a.Audience == r));
+                if (unsupportedAudiences.Any())
+                    throw new OAuthException(ErrorCodes.INVALID_TARGET, string.Format(ErrorMessages.UNKNOWN_AUDIENCE, string.Join(",", unsupportedAudiences)));
                 var allApiResourceScopes = apiResources.SelectMany(c => c.Scopes).GroupBy(s => s.Name).Select(k => k.Key);
                 var supportedScopes = scopes.Where(s => apiResources.Any(r => r.Scopes.Any(sc => sc.Name == s)));
                 if (!supportedScopes.Any())
@@ -83,7 +86,13 @@ namespace SimpleIdServer.IdServer.Helpers
                     result.Add(new AuthorizedScope
                     {
                         Scope = scope,
-                        Resources = apiResources.Where(r => r.Scopes.Any(s => s.Name == scope)).Select(r => r.Name).ToList()
+                        AuthorizedResources = apiResources.Where(r => r.Scopes.Any(s => s.Name == scope)).Select(r =>
+                            new AuthorizedResource
+                            {
+                                Audience = r.Audience,
+                                Resource = r.Name
+                            }
+                        ).ToList()
                     });
 
                 return result;
@@ -97,7 +106,13 @@ namespace SimpleIdServer.IdServer.Helpers
                     result.Add(new AuthorizedScope
                     {
                         Scope = scope,
-                        Resources = apiResources.Where(r => r.Scopes.Any(s => s.Name == scope)).Select(r => r.Name).ToList()
+                        AuthorizedResources = apiResources.Where(r => r.Scopes.Any(s => s.Name == scope)).Select(r =>
+                            new AuthorizedResource
+                            {
+                                Audience = r.Audience,
+                                Resource = r.Name
+                            }
+                        ).ToList()
                     });
 
                 return result;

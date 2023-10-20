@@ -69,7 +69,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             var realm = await GetRealm();
             using (var dbContext = _factory.CreateDbContext())
             {
-                var user = await dbContext.Users.Include(u => u.Realms).Include(u => u.OAuthUserClaims).Include(u => u.CredentialOffers).Include(u => u.Groups).Include(u => u.Consents).ThenInclude(c => c.Scopes).Include(u => u.Sessions).Include(u => u.Credentials).Include(u => u.ExternalAuthProviders).Include(u => u.CredentialOffers).AsNoTracking().SingleOrDefaultAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
+                var user = await dbContext.Users.Include(u => u.Realms).Include(u => u.OAuthUserClaims).Include(u => u.CredentialOffers).Include(u => u.Groups).Include(u => u.Consents).ThenInclude(c => c.Scopes).ThenInclude(c => c.AuthorizedResources).Include(u => u.Sessions).Include(u => u.Credentials).Include(u => u.ExternalAuthProviders).Include(u => u.CredentialOffers).AsNoTracking().SingleOrDefaultAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
                 if (user == null)
                 {
                     dispatcher.Dispatch(new GetUserFailureAction { ErrorMessage = string.Format(Global.UnknownUser, action.UserId) });

@@ -102,6 +102,7 @@ namespace SimpleIdServer.IdServer.Store
             builder.ApplyConfiguration(new ConfigurationDefinitionRecordValueConfiguration());
             builder.ApplyConfiguration(new ConfigurationKeyPairValueRecordConfiguration());
             builder.ApplyConfiguration(new RegistrationWorkflowConfiguration());
+            builder.ApplyConfiguration(new AuthorizedResourceConfiguration());
         }
     }
 }

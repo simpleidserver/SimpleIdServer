@@ -70,7 +70,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
             var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
             var authDetails = context.Request.RequestData.GetAuthorizationDetailsFromAuthorizationRequest();
             var resources = context.Request.RequestData.GetResourcesFromAuthorizationRequest();
-            var grantRequest = await _grantHelper.Extract(context.Realm ?? Constants.DefaultRealm, scopes, resources, authDetails, cancellationToken);
+            var grantRequest = await _grantHelper.Extract(context.Realm ?? Constants.DefaultRealm, scopes, resources, new List<string>(), authDetails, cancellationToken);
 
             if (!grantRequest.Scopes.Any() && !grantRequest.Audiences.Any() && !authDetails.Any())
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETERS, $"{AuthorizationRequestParameters.Scope},{AuthorizationRequestParameters.Resource},{AuthorizationRequestParameters.AuthorizationDetails}"));

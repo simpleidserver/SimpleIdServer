@@ -11,5 +11,6 @@ namespace SimpleIdServer.IdServer.DTOs
         public const string Scope = "scope";
         public const string IdToken = "id_token";
         public const string GrantId = "grant_id";
+        public const string IssuedTokenType = "issued_token_type";
     }
 }
