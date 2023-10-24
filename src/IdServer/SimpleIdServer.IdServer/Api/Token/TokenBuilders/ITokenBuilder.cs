@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.IdServer.Domains;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -22,6 +23,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
 
     public class BuildTokenParameter
     {
+        public ICollection<Claim> UserClaims { get; set; }
         public IEnumerable<string> Scopes { get; set; }
         public IEnumerable<string> Audiences { get; set; }
         public ICollection<AuthorizationData> AuthorizationDetails { get; set; }

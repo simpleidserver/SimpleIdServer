@@ -37,6 +37,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IGrantHelper _audienceHelper;
         private readonly IBusControl _busControl;
         private readonly IDPOPProofValidator _dpopProofValidator;
+        private readonly IUserClaimsService _userClaimsService;
         private readonly ILogger<AuthorizationCodeHandler> _logger;
 
         public AuthorizationCodeHandler(
@@ -50,7 +51,8 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IDPOPProofValidator dpopProofValidator,
             IOptions<IdServerHostOptions> options,
             IEnumerable<ITokenProfile> tokenProfiles,
-            ILogger<AuthorizationCodeHandler> logger) : base(clientAuthenticationHelper, tokenProfiles, options)
+            ILogger<AuthorizationCodeHandler> logger,
+            IUserClaimsService userClaimsService) : base(clientAuthenticationHelper, tokenProfiles, options)
         {
             _grantedTokenHelper = grantedTokenHelper;
             _authorizationCodeGrantTypeValidator = authorizationCodeGrantTypeValidator;
@@ -60,6 +62,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             _busControl = busControl;
             _dpopProofValidator = dpopProofValidator;
             _logger = logger;
+            _userClaimsService = userClaimsService;
         }
 
         public override string GrantType => GRANT_TYPE;
@@ -180,7 +183,9 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         {
             if (!previousQueryParameters.ContainsKey(JwtRegisteredClaimNames.Sub))
                 return;
-            handlerContext.SetUser(await _userRepository.Query().AsNoTracking().Include(u => u.OAuthUserClaims).Include(u => u.Groups).Include(u => u.Realms).FirstOrDefaultAsync(u => u.Name == previousQueryParameters[JwtRegisteredClaimNames.Sub].GetValue<string>() && u.Realms.Any(r => r.RealmsName == handlerContext.Realm), token));
+            var user = await _userRepository.Query().AsNoTracking().Include(u => u.Groups).Include(u => u.Realms).FirstOrDefaultAsync(u => u.Name == previousQueryParameters[JwtRegisteredClaimNames.Sub].GetValue<string>() && u.Realms.Any(r => r.RealmsName == handlerContext.Realm), token);
+            var userClaims = await _userClaimsService.Get(user.Id, handlerContext.Realm, token);
+            handlerContext.SetUser(user, userClaims);
         }
 
         void CheckDPOPJkt(HandlerContext context, AuthCode authCode)

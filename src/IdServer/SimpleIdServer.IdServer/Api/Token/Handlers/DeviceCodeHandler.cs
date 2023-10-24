@@ -15,7 +15,6 @@ using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,6 +30,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IAuthenticationHelper _authenticationHelper;
         private readonly IBusControl _busControl;
         private readonly IDPOPProofValidator _dpopProofValidator;
+        private readonly IUserClaimsService _userClaimsService;
 
         public DeviceCodeHandler(
             IClientAuthenticationHelper clientAuthenticationHelper,
@@ -42,7 +42,8 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IDeviceCodeGrantTypeValidator validator,
             IAuthenticationHelper authenticationHelper,
             IBusControl busControl,
-            IDPOPProofValidator dpopProofValidator) : base(clientAuthenticationHelper, tokenProfiles, options)
+            IDPOPProofValidator dpopProofValidator,
+            IUserClaimsService userClaimsService) : base(clientAuthenticationHelper, tokenProfiles, options)
         {
             _validator = validator;
             _busControl = busControl;
@@ -51,6 +52,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             _tokenBuilders = tokenBuilders;
             _authenticationHelper = authenticationHelper;
             _dpopProofValidator = dpopProofValidator;
+            _userClaimsService = userClaimsService;
         }
 
         public override string GrantType => GRANT_TYPE;
@@ -72,8 +74,9 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     var deviceAuthCode = await _validator.Validate(context, cancellationToken);
                     scopeLst = deviceAuthCode.Scopes;
                     activity?.SetTag("scopes", string.Join(",", deviceAuthCode.Scopes));
-                    var user = await _authenticationHelper.GetUserByLogin(_userRepository.Query().Include(u => u.Groups).Include(u => u.OAuthUserClaims).Include(u => u.Realms), deviceAuthCode.UserLogin, context.Realm, cancellationToken);
-                    context.SetUser(user);
+                    var user = await _authenticationHelper.GetUserByLogin(_userRepository.Query().Include(u => u.Groups).Include(u => u.Realms), deviceAuthCode.UserLogin, context.Realm, cancellationToken);
+                    var userClaims = await _userClaimsService.Get(user.Id, context.Realm, cancellationToken);
+                    context.SetUser(user, userClaims);
                     foreach (var tokenBuilder in _tokenBuilders)
                         await tokenBuilder.Build(new BuildTokenParameter { Scopes = deviceAuthCode.Scopes }, context, cancellationToken);
 

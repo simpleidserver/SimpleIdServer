@@ -3,16 +3,16 @@
 
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 
 namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
 {
     public interface IClaimsJwsPayloadEnricher
     {
-        void EnrichWithClaimsParameter(Dictionary<string, object> claims, IEnumerable<AuthorizedClaim> requestedClaims, User user = null, DateTime? authDateTime = null, AuthorizationClaimTypes claimType = AuthorizationClaimTypes.IdToken);
+        void EnrichWithClaimsParameter(Dictionary<string, object> claims, IEnumerable<AuthorizedClaim> requestedClaims, ICollection<Claim> userClaims = null, DateTime? authDateTime = null, AuthorizationClaimTypes claimType = AuthorizationClaimTypes.IdToken);
     }
 
     public class ClaimsJwsPayloadEnricher : IClaimsJwsPayloadEnricher
@@ -24,15 +24,15 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
 
         protected List<string> AllUserClaims { get; private set; }
 
-        public virtual void EnrichWithClaimsParameter(Dictionary<string, object> claims, IEnumerable<AuthorizedClaim> requestedClaims, User user = null, DateTime? authDateTime = null, AuthorizationClaimTypes claimType = AuthorizationClaimTypes.IdToken)
+        public virtual void EnrichWithClaimsParameter(Dictionary<string, object> claims, IEnumerable<AuthorizedClaim> requestedClaims, ICollection<Claim> userClaims= null, DateTime? authDateTime = null, AuthorizationClaimTypes claimType = AuthorizationClaimTypes.IdToken)
         {
             if (requestedClaims != null)
             {
                 foreach (var claim in requestedClaims.Where(c => c.Type == claimType))
                 {
-                    if (AllUserClaims.Contains(claim.Name) && user != null)
+                    if (AllUserClaims.Contains(claim.Name) && userClaims != null)
                     {
-                        var cl = user.Claims.FirstOrDefault(c => c.Type == claim.Name);
+                        var cl = userClaims.FirstOrDefault(c => c.Type == claim.Name);
                         if (cl != null) claims.AddOrReplace(cl.Type, cl.Value);
                     }
                     else

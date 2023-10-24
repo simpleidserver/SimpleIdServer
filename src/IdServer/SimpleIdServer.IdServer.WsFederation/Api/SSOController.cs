@@ -30,6 +30,7 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
         private readonly IUserRepository _userRepository;
         private readonly IDataProtector _dataProtector;
         private readonly IScopeClaimsExtractor _claimsExtractor;
+        private readonly IUserClaimsService _userClaimsService;
         private readonly IdServerHostOptions _options;
 
         public SSOController(IClientRepository clientRepository, 
@@ -37,13 +38,15 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
             IDataProtectionProvider dataProtectionProvider,
             IScopeClaimsExtractor claimsExtractor,
             IOptions<IdServerHostOptions> opts, 
-            IOptions<IdServerWsFederationOptions> options, 
+            IOptions<IdServerWsFederationOptions> options,
+            IUserClaimsService userClaimsService,
             IKeyStore keyStore) : base(options, keyStore)
         {
             _clientRepository = clientRepository;
             _userRepository = userRepository;
             _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
             _claimsExtractor = claimsExtractor;
+            _userClaimsService = userClaimsService;
             _options = opts.Value;
         }
 
@@ -73,7 +76,8 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
 
             var tokenType = GetTokenType(client);
             var nameIdentifier = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).Include(u => u.Groups).AsNoTracking().SingleOrDefaultAsync(u => u.Name == nameIdentifier, cancellationToken);
+            var user = await _userRepository.Query().Include(u => u.Groups).AsNoTracking().SingleOrDefaultAsync(u => u.Name == nameIdentifier, cancellationToken);
+            var userClaims = await _userClaimsService.Get(user.Id, realm, cancellationToken);
             var subject = await BuildSubject(realm);
             return BuildResponse(realm);
 
@@ -112,7 +116,7 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
             async Task<ClaimsIdentity> BuildSubject(string realm)
             {
                 var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, null, null, null, (X509Certificate2)null, null), realm ?? Constants.DefaultRealm);
-                context.SetUser(user);
+                context.SetUser(user, userClaims);
                 var claims = (await _claimsExtractor.ExtractClaims(context, client.Scopes, ScopeProtocols.SAML)).Select(c => new Claim(c.Key, c.Value.ToString())).ToList();
                 if (claims.Count(t => t.Type == ClaimTypes.NameIdentifier) == 0)
                     throw new OAuthException(ErrorCodes.INVALID_RP, ErrorMessages.NO_CLAIM);

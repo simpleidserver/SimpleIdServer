@@ -30,6 +30,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IBCAuthorizeRepository _bcAuthorizeRepository;
         private readonly IBusControl _busControl;
         private readonly IDPOPProofValidator _dpopProofValidator;
+        private readonly IUserClaimsService _userClaimsService;
 
         public CIBAHandler(
             ILogger<CIBAHandler> logger,
@@ -41,7 +42,8 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IOptions<IdServerHostOptions> options,
             IBCAuthorizeRepository bcAuthorizeRepository,
             IBusControl busControl,
-            IDPOPProofValidator dpopProofValidator) : base(clientAuthenticationHelper, tokensProfiles, options)
+            IDPOPProofValidator dpopProofValidator,
+            IUserClaimsService userClaimsService) : base(clientAuthenticationHelper, tokensProfiles, options)
         {
             _logger = logger;
             _userRepository = userRepository;
@@ -50,6 +52,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             _bcAuthorizeRepository = bcAuthorizeRepository;
             _busControl = busControl;
             _dpopProofValidator = dpopProofValidator;
+            _userClaimsService = userClaimsService;
         }
 
         public const string GRANT_TYPE = "urn:openid:params:grant-type:ciba";
@@ -71,8 +74,9 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     var authRequest = await _cibaGrantTypeValidator.Validate(context, cancellationToken);
                     scopeLst = authRequest.Scopes;
                     activity?.SetTag("scopes", string.Join(",", authRequest.Scopes));
-                    var user = await _userRepository.Query().Include(u => u.Groups).Include(u => u.OAuthUserClaims).Include(u => u.Realms).AsNoTracking().FirstOrDefaultAsync(u => u.Id == authRequest.UserId && u.Realms.Any(r => r.RealmsName == context.Realm), cancellationToken);
-                    context.SetUser(user);
+                    var user = await _userRepository.Query().Include(u => u.Groups).Include(u => u.Realms).AsNoTracking().FirstOrDefaultAsync(u => u.Id == authRequest.UserId && u.Realms.Any(r => r.RealmsName == context.Realm), cancellationToken);
+                    var userClaims = await _userClaimsService.Get(user.Id, context.Realm, cancellationToken);
+                    context.SetUser(user, userClaims);
                     foreach (var tokenBuilder in _tokenBuilders)
                         await tokenBuilder.Build(new BuildTokenParameter { Scopes = authRequest.Scopes, AuthorizationDetails = authRequest.AuthorizationDetails }, context, cancellationToken);
 

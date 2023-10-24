@@ -34,9 +34,10 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential
         private readonly IAuthenticationHelper _authenticationHelper;
         private readonly ICredentialTemplateClaimsExtractor _claimsExtractor;
         private readonly IEnumerable<ICredentialFormat> _formats;
+        private readonly IUserClaimsService _userClaimsService;
         private readonly ILogger<CredentialController> _logger;
 
-        public CredentialController(IEnumerable<ICredentialRequestParser> parsers, IEnumerable<IProofValidator> proofValidators, IGrantedTokenHelper grantedTokenHelper, IUserRepository userRepository, IAuthenticationHelper authenticationHelper, ICredentialTemplateClaimsExtractor claimsExtractor, IEnumerable<ICredentialFormat> formats, ILogger<CredentialController> logger)
+        public CredentialController(IEnumerable<ICredentialRequestParser> parsers, IEnumerable<IProofValidator> proofValidators, IGrantedTokenHelper grantedTokenHelper, IUserRepository userRepository, IAuthenticationHelper authenticationHelper, ICredentialTemplateClaimsExtractor claimsExtractor, IEnumerable<ICredentialFormat> formats, IUserClaimsService userClaimsService, ILogger<CredentialController> logger)
         {
             _parsers = parsers;
             _proofValidators = proofValidators;
@@ -45,6 +46,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential
             _authenticationHelper = authenticationHelper;
             _claimsExtractor = claimsExtractor;
             _formats = formats;
+            _userClaimsService = userClaimsService;
             _logger = logger;
         }
 
@@ -62,10 +64,11 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential
                     var token = await _grantedTokenHelper.GetAccessToken(accessToken, cancellationToken);
                     if (token == null) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, ErrorMessages.UNKNOWN_ACCESS_TOKEN);
                     var extractionResult = await ValidateRequest(request, token, cancellationToken);
-                    var user = await _authenticationHelper.GetUserByLogin(_userRepository.Query().Include(u => u.OAuthUserClaims).AsNoTracking(), token.Subject, prefix, cancellationToken);
+                    var user = await _authenticationHelper.GetUserByLogin(_userRepository.Query().AsNoTracking(), token.Subject, prefix, cancellationToken);
+                    var userClaims = await _userClaimsService.Get(user.Id, prefix, cancellationToken);
                     var validationResult = await CheckProof(request, user, cancellationToken);
                     context.SetClient(null);
-                    context.SetUser(user);
+                    context.SetUser(user, userClaims);
                     var extractedClaims = await _claimsExtractor.ExtractClaims(context, extractionResult.CredentialTemplate);
                     var format = _formats.Single(v => v.Format == request.Format);
                     var result = format.Transform(new CredentialFormatParameter(extractedClaims, user, validationResult.IdentityDocument, extractionResult.CredentialTemplate, context.GetIssuer(), validationResult.CNonce, validationResult.CNonceExpiresIn));

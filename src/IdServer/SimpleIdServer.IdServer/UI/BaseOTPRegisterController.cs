@@ -55,7 +55,7 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseRegisterControll
         {
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
             viewModel.NameIdentifier = nameIdentifier;
-            var authenticatedUser = await _userRepository.Query().AsNoTracking().Include(u => u.OAuthUserClaims).Include(u => u.Realms).SingleAsync(u => u.Name == nameIdentifier && u.Realms.Any(r => r.RealmsName == prefix));
+            var authenticatedUser = await _userRepository.Query().AsNoTracking().Include(u => u.Realms).SingleAsync(u => u.Name == nameIdentifier && u.Realms.Any(r => r.RealmsName == prefix));
             Enrich(viewModel, authenticatedUser);
         }
 

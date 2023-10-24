@@ -34,6 +34,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IAuthenticationHelper _userHelper;
         private readonly IBusControl _busControl;
         private readonly IDPOPProofValidator _dpopProofValidator;
+        private readonly IUserClaimsService _userClaimsService;
         private readonly IdServerHostOptions _options;
 
         public PasswordHandler(
@@ -46,6 +47,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IAuthenticationHelper userHelper,
             IBusControl busControl,
             IDPOPProofValidator dpopProofValidator,
+            IUserClaimsService userClaimsService,
             IOptions<IdServerHostOptions> options) : base(clientAuthenticationHelper, tokenProfiles, options)
         {
             _passwordGrantTypeValidator = passwordGrantTypeValidator;
@@ -55,6 +57,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             _userHelper = userHelper;
             _busControl = busControl;
             _dpopProofValidator = dpopProofValidator;
+            _userClaimsService = userClaimsService;
             _options = options.Value;
         }
 
@@ -86,11 +89,11 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     var user = await _userHelper.FilterUsersByLogin(_userRepository.Query()
                         .Include(u => u.Credentials)
                         .Include(u => u.Groups)
-                        .Include(u => u.OAuthUserClaims)
                         .Include(u => u.Realms)
                         .AsNoTracking(), userName, context.Realm).FirstOrDefaultAsync(u => u.Credentials.Any(c => c.CredentialType == UserCredential.PWD && c.Value == PasswordHelper.ComputeHash(password) && c.IsActive), cancellationToken);
                     if (user == null) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.BAD_USER_CREDENTIAL);
-                    context.SetUser(user);
+                    var userClaims = await _userClaimsService.Get(user.Id, context.Realm, cancellationToken);
+                    context.SetUser(user, userClaims);
                     var result = BuildResult(context, extractionResult.Scopes);
                     foreach (var tokenBuilder in _tokenBuilders)
                         await tokenBuilder.Build(new BuildTokenParameter { AuthorizationDetails = extractionResult.AuthorizationDetails, Scopes = extractionResult.Scopes, Audiences = extractionResult.Audiences }, context, cancellationToken);

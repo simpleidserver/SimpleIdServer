@@ -33,12 +33,14 @@ namespace SimpleIdServer.IdServer.Api.Authorization
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IAuthorizationRequestEnricher _authorizationRequestEnricher;
         private readonly IUserRepository _userRepository;
+        private readonly IUserClaimsService _userClaimsService;
         private readonly IdServerHostOptions _options;
 
         public AuthorizationRequestHandler(IAuthorizationRequestValidator validator,
             IEnumerable<ITokenProfile> tokenProfiles, 
             IAuthorizationRequestEnricher authorizationRequestEnricher,
             IUserRepository userRepository,
+            IUserClaimsService userClaimsService,
             IOptions<IdServerHostOptions> options)
         {
             _validator = validator;
@@ -46,6 +48,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             _authorizationRequestEnricher = authorizationRequestEnricher;
             _userRepository = userRepository;
             _options = options.Value;
+            _userClaimsService = userClaimsService;
         }
 
         public virtual async Task<AuthorizationResponse> Handle(HandlerContext context, CancellationToken token)
@@ -86,9 +89,9 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                 .Include(u => u.Sessions)
                 .Include(u => u.Realms)
                 .Include(u => u.Groups)
-                .Include(u => u.OAuthUserClaims)
                 .SingleOrDefaultAsync(u => u.Name == context.Request.UserSubject && u.Realms.Any(r => r.RealmsName == context.Realm), cancellationToken);
-            context.SetUser(user);
+            var userClaims = await _userClaimsService.Get(user.Id, context.Realm, cancellationToken);
+            context.SetUser(user, userClaims);
             var grantRequest = validationResult.GrantRequest;
             var responseTypeHandlers = validationResult.ResponseTypes;
             await _validator.ValidateAuthorizationRequestWhenUserIsAuthenticated(grantRequest, context, cancellationToken);

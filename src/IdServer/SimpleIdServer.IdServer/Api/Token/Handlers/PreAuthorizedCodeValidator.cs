@@ -37,13 +37,15 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IClientRepository _clientRepository;
         private readonly IGrantedTokenHelper _grantedTokenHelper;
         private readonly IUserRepository _userRepository;
+        private readonly IUserClaimsService _userClaimsService;
 
-        public PreAuthorizedCodeValidator(IClientAuthenticationHelper clientAuthenticationHelper, IClientRepository clientRepository, IGrantedTokenHelper grantedTokenHelper, IUserRepository userRepository)
+        public PreAuthorizedCodeValidator(IClientAuthenticationHelper clientAuthenticationHelper, IClientRepository clientRepository, IGrantedTokenHelper grantedTokenHelper, IUserRepository userRepository, IUserClaimsService userClaimsService)
         {
             _clientAuthenticationHelper = clientAuthenticationHelper;
             _clientRepository = clientRepository;
             _grantedTokenHelper = grantedTokenHelper;
             _userRepository = userRepository;
+            _userClaimsService = userClaimsService;
         }
 
         public async virtual Task<ValidationResult> Validate(HandlerContext context, CancellationToken cancellationToken)
@@ -61,7 +63,8 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             var preAuth = await _grantedTokenHelper.GetPreAuthCode(preAuthorizedCode, cancellationToken);
             if (preAuth == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_PREAUTHORIZEDCODE);
             var user = await _userRepository.Query().AsNoTracking().SingleAsync(u => u.Id == preAuth.UserId, cancellationToken);
-            context.SetUser(user);
+            var userClaims = await _userClaimsService.Get(user.Id, context.Realm, cancellationToken);
+            context.SetUser(user, userClaims);
             return new ValidationResult(client, user);
         }
     }

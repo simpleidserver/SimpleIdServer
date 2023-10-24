@@ -31,19 +31,22 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
         private readonly IBCNotificationService _bcNotificationService;
         private readonly IBCAuthorizeRepository _bcAuthorizeRepository;
         private readonly IAmrHelper _amrHelper;
+        private readonly IUserClaimsService _userClaimsService;
 
         public BCAuthorizeHandler(
             IClientAuthenticationHelper clientAuthenticationHelper,
             IBCAuthorizeRequestValidator bcAuthorizeRequestValidator,
             IBCNotificationService bcNotificationService,
             IBCAuthorizeRepository bcAuthorizeRepository,
-            IAmrHelper amrHelper)
+            IAmrHelper amrHelper,
+            IUserClaimsService userClaimsService)
         {
             _clientAuthenticationHelper = clientAuthenticationHelper;
             _bcAuthorizeRequestValidator = bcAuthorizeRequestValidator;
             _bcNotificationService = bcNotificationService;
             _bcAuthorizeRepository = bcAuthorizeRepository;
             _amrHelper = amrHelper;
+            _userClaimsService = userClaimsService;
         }
 
         public async Task<IActionResult> Create(HandlerContext context, CancellationToken cancellationToken)
@@ -53,7 +56,8 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
                 Client oauthClient = await _clientAuthenticationHelper.AuthenticateClient(context.Realm, context.Request.HttpHeader, context.Request.RequestData, context.Request.Certificate, context.GetIssuer(), cancellationToken, ErrorCodes.INVALID_REQUEST);
                 context.SetClient(oauthClient);
                 var user = await _bcAuthorizeRequestValidator.ValidateCreate(context, cancellationToken);
-                context.SetUser(user);
+                var userClaims = await _userClaimsService.Get(user.Id, context.Realm, cancellationToken);
+                context.SetUser(user, userClaims);
                 var requestedExpiry = context.Request.RequestData.GetRequestedExpiry() ?? context.Client.AuthReqIdExpirationTimeInSeconds;
                 var currentDateTime = DateTime.UtcNow;
                 var openidClient = oauthClient;

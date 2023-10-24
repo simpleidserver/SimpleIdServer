@@ -7,6 +7,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Middlewares;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json.Nodes;
 using System.Web;
@@ -170,6 +171,7 @@ namespace SimpleIdServer.IdServer.Api
         }
 
         public User User { get; private set; }
+        public ICollection<Claim> UserClaims { get; private set; }
         public Client Client { get; private set; }
         public JsonWebToken DPOPProof { get; private set; }
         public HandlerContextRequest Request { get; private set; }
@@ -206,7 +208,11 @@ namespace SimpleIdServer.IdServer.Api
 
         public void SetClient(Client client) => Client = client;
 
-        public void SetUser(User user) => User = user;
+        public void SetUser(User user, ICollection<Claim> userClaims)
+        {
+            User = user;
+            UserClaims = userClaims;
+        }
 
         public void SetResponse(HandlerContextResponse response) => Response = response;
 

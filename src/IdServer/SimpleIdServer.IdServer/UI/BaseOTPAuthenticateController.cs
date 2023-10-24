@@ -3,6 +3,7 @@
 using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Helpers;
@@ -44,7 +45,9 @@ namespace SimpleIdServer.IdServer.UI
 
         protected override async Task<UserAuthenticationResult> CustomAuthenticate(string prefix, string authenticatedUserId, T viewModel, CancellationToken cancellationToken)
         {
-            var authenticatedUser = await UserAuthenticationService.GetUser(authenticatedUserId, viewModel, prefix, cancellationToken);
+            var authenticatedUser = await UserRepository.Query().Include(u => u.Realms)
+                .Include(u => u.Credentials)
+                .FirstOrDefaultAsync(u => u.Realms.Any(r => r.RealmsName == prefix) && u.Id == authenticatedUserId, cancellationToken);
             if (authenticatedUser == null)
             {
                 ModelState.AddModelError("unknown_user", "unknown_user");

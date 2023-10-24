@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json.Nodes;
@@ -28,8 +29,9 @@ namespace SimpleIdServer.IdServer.Jobs
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
         private readonly IUserRepository _userRepository;
         private readonly IClientRepository _clientRepository;
+        private readonly IUserClaimsService _userClaimsService;
 
-        public BCNotificationJob(IBCAuthorizeRepository repository, ILogger<BCNotificationJob> logger, Infrastructures.IHttpClientFactory httpClientFactory, IEnumerable<ITokenBuilder> tokenBuilders, IUserRepository userRepository, IClientRepository clientRepository)
+        public BCNotificationJob(IBCAuthorizeRepository repository, ILogger<BCNotificationJob> logger, Infrastructures.IHttpClientFactory httpClientFactory, IEnumerable<ITokenBuilder> tokenBuilders, IUserRepository userRepository, IClientRepository clientRepository, IUserClaimsService userClaimsService)
         {
             _repository = repository;
             _logger = logger;
@@ -37,6 +39,7 @@ namespace SimpleIdServer.IdServer.Jobs
             _tokenBuilders = tokenBuilders;
             _userRepository = userRepository;
             _clientRepository = clientRepository;
+            _userClaimsService = userClaimsService;
         }
 
         public async Task Execute()
@@ -49,12 +52,19 @@ namespace SimpleIdServer.IdServer.Jobs
                 var realmBcAuthorizeLst = grp.Select(g => g);
                 var userIds = realmBcAuthorizeLst.Select(a => a.UserId).Distinct();
                 var clientIds = realmBcAuthorizeLst.Select(a => a.ClientId).Distinct();
-                var users = await _userRepository.Query().Include(u => u.Groups).Include(u => u.Realms).Include(u => u.OAuthUserClaims).AsNoTracking().Where(u => userIds.Contains(u.Id) && u.Realms.Any(r => r.RealmsName == grp.Key)).ToListAsync();
+                var users = await _userRepository.Query().Include(u => u.Groups).Include(u => u.Realms).AsNoTracking().Where(u => userIds.Contains(u.Id) && u.Realms.Any(r => r.RealmsName == grp.Key)).ToListAsync();
+                var userClaimsList = new Dictionary<string, ICollection<Claim>>();
+                foreach(var userId in userIds)
+                {
+                    var userClaims = await _userClaimsService.Get(userId, grp.Key, CancellationToken.None);
+                    userClaimsList.Add(userId, userClaims);
+                }
+
                 var clients = await _clientRepository.Query()
                     .Include(c => c.SerializedJsonWebKeys)
                     .Include(c => c.Realms)
                     .Include(c => c.Scopes).AsNoTracking().Where(c => clientIds.Contains(c.ClientId) && c.Realms.Any(r => r.Name == grp.Key)).ToListAsync();
-                var parameter = new NotificationParameter { Clients = clients, Users = users };
+                var parameter = new NotificationParameter { Clients = clients, Users = users, UserClaimsList = userClaimsList };
                 await Parallel.ForEachAsync(realmBcAuthorizeLst, async (bc, t) =>
                 {
                     var method = notificationMethods[bc.NotificationMode];
@@ -122,7 +132,9 @@ namespace SimpleIdServer.IdServer.Jobs
             async Task<Dictionary<string, string>> BuildParameters()
             {
                 var context = new HandlerContext(new HandlerContextRequest(null, null, new JsonObject(), null, null, (X509Certificate2)null, string.Empty), bcAuthorize.Realm);
-                context.SetUser(parameter.Users.First(u => u.Id == bcAuthorize.UserId));
+                ICollection<Claim> userClaims = new List<Claim>();
+                if (parameter.UserClaimsList.ContainsKey(bcAuthorize.UserId)) userClaims = parameter.UserClaimsList[bcAuthorize.UserId];
+                context.SetUser(parameter.Users.First(u => u.Id == bcAuthorize.UserId), userClaims);
                 context.SetClient(parameter.Clients.First(c => c.ClientId == bcAuthorize.ClientId && c.Realms.Any(r => r.Name == bcAuthorize.Realm)));
                 foreach (var tokenBuilder in _tokenBuilders)
                     await tokenBuilder.Build(new BuildTokenParameter { Scopes = bcAuthorize.Scopes, AuthorizationDetails = bcAuthorize.AuthorizationDetails }, context, CancellationToken.None);
@@ -140,6 +152,7 @@ namespace SimpleIdServer.IdServer.Jobs
         {
             public List<Client> Clients { get; set; }
             public List<User> Users { get; set; }
+            public Dictionary<string, List<Claim>> UserClaimsList { get; set; }
         }
     }
 }

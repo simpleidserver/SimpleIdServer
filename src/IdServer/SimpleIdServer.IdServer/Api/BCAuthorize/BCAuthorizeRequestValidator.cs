@@ -117,7 +117,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             var loginHint = context.Request.RequestData.GetLoginHintFromAuthorizationRequest();
             if (!string.IsNullOrEmpty(loginHint))
             {
-                var user = await _userRepository.Query().Include(u => u.Groups).Include(u => u.OAuthUserClaims).Include(u => u.Credentials).Include(u => u.Realms).AsNoTracking().FirstOrDefaultAsync(u => u.Name == loginHint && u.Realms.Any(r => r.RealmsName == context.Realm), cancellationToken);
+                var user = await _userRepository.Query().Include(u => u.Groups).Include(u => u.Credentials).Include(u => u.Realms).AsNoTracking().FirstOrDefaultAsync(u => u.Name == loginHint && u.Realms.Any(r => r.RealmsName == context.Realm), cancellationToken);
                 if (user == null)
                     throw new OAuthException(ErrorCodes.UNKNOWN_USER_ID, string.Format(ErrorMessages.UNKNOWN_USER, loginHint));
 
@@ -135,7 +135,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
                 throw new OAuthException(ErrorCodes.EXPIRED_LOGIN_HINT_TOKEN, ErrorMessages.LOGIN_HINT_TOKEN_IS_EXPIRED);
 
             var subject = jwsPayload.Subject;
-            var user = await _userRepository.Query().Include(u => u.Groups).Include(u => u.OAuthUserClaims).Include(u => u.Credentials).Include(u => u.Realms).AsNoTracking().FirstOrDefaultAsync(u => u.Name == subject && u.Realms.Any(r => r.RealmsName == realm), cancellationToken);
+            var user = await _userRepository.Query().Include(u => u.Groups).Include(u => u.Credentials).Include(u => u.Realms).AsNoTracking().FirstOrDefaultAsync(u => u.Name == subject && u.Realms.Any(r => r.RealmsName == realm), cancellationToken);
             if (user == null)
                 throw new OAuthException(ErrorCodes.UNKNOWN_USER_ID, string.Format(ErrorMessages.UNKNOWN_USER, subject));
 

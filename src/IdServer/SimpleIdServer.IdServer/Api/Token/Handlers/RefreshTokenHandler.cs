@@ -36,6 +36,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IGrantHelper _audienceHelper;
         private readonly IBusControl _busControl;
         private readonly IDPOPProofValidator _dpopProofValidator;
+        private readonly IUserClaimsService _userClaimsService;
         private readonly ILogger<RefreshTokenHandler> _logger;
 
         public RefreshTokenHandler(
@@ -48,6 +49,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IGrantHelper audienceHelper,
             IBusControl busControl,
             IDPOPProofValidator dpopProofValidator,
+            IUserClaimsService userClaimsService,
             IOptions<IdServerHostOptions> options,
             ILogger<RefreshTokenHandler> logger) : base(clientAuthenticationHelper, tokenProfiles, options)
         {
@@ -57,6 +59,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             _userRepository = userRepository;
             _busControl = busControl;
             _dpopProofValidator = dpopProofValidator;
+            _userClaimsService = userClaimsService;
             _audienceHelper = audienceHelper;
             _logger = logger;
         }
@@ -145,8 +148,9 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     activity?.SetTag("scopes", string.Join(",", extractionResult.Scopes));
                     var result = BuildResult(context, extractionResult.Scopes);
                     await Authenticate(jwsPayload, context, cancellationToken);
+                    var userClaims = await _userClaimsService.Get(context.User.Id, context.Realm, cancellationToken);
                     foreach (var tokenBuilder in _tokenBuilders)
-                        await tokenBuilder.Build(new BuildTokenParameter { AuthorizationDetails = extractionResult.AuthorizationDetails, Scopes = extractionResult.Scopes, Audiences = extractionResult.Audiences, Claims = claims, GrantId = tokenResult.GrantId }, context, cancellationToken);
+                        await tokenBuilder.Build(new BuildTokenParameter { UserClaims = userClaims, AuthorizationDetails = extractionResult.AuthorizationDetails, Scopes = extractionResult.Scopes, Audiences = extractionResult.Audiences, Claims = claims, GrantId = tokenResult.GrantId }, context, cancellationToken);
 
                     AddTokenProfile(context);
                     foreach (var kvp in context.Response.Parameters)
@@ -198,7 +202,9 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         {
             if (!previousQueryParameters.ContainsKey(JwtRegisteredClaimNames.Sub))
                 return;
-            handlerContext.SetUser(await _userRepository.Query().Include(u => u.Groups).Include(u => u.OAuthUserClaims).FirstOrDefaultAsync(u => u.Name == previousQueryParameters[JwtRegisteredClaimNames.Sub].GetValue<string>(), token));
+            var user = await _userRepository.Query().Include(u => u.Groups).FirstOrDefaultAsync(u => u.Name == previousQueryParameters[JwtRegisteredClaimNames.Sub].GetValue<string>(), token);
+            var userClaims = await _userClaimsService.Get(user.Id, handlerContext.Realm, token);
+            handlerContext.SetUser(user, userClaims);
         }
     }
 }
