@@ -91,6 +91,9 @@
 	  <Compile Update="Features\CredentialOfferErrors.feature.cs">
 	    <DependentUpon>CredentialOfferErrors.feature</DependentUpon>
 	  </Compile>
+	  <Compile Update="Features\GrantTypes\TokenExchangeGrantTypeErrors.feature.cs">
+	    <DependentUpon>TokenExchangeGrantTypeErrors.feature</DependentUpon>
+	  </Compile>
 	  <Compile Update="Features\GrantTypes\DeviceAuthorizationGrantTypeErrors.feature.cs">
 	    <DependentUpon>DeviceAuthorizationGrantTypeErrors.feature</DependentUpon>
 	  </Compile>
@@ -271,6 +274,10 @@
 	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
 	  </SpecFlowFeatureFiles>
 	  <SpecFlowFeatureFiles Update="Features\CredentialOfferErrors.feature">
+	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
+	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+	  </SpecFlowFeatureFiles>
+	  <SpecFlowFeatureFiles Update="Features\GrantTypes\TokenExchangeGrantTypeErrors.feature">
 	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
 	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
 	  </SpecFlowFeatureFiles>

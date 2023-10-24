@@ -229,8 +229,11 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 grantTypes.Add(UmaTicketHandler.GRANT_TYPE);
             if (act.IsDeviceGrantTypeEnabled)
                 grantTypes.Add(DeviceCodeHandler.GRANT_TYPE);
+            if (act.IsTokenExchangeEnabled)
+                grantTypes.Add(TokenExchangeHandler.GRANT_TYPE);
             client.GrantTypes = grantTypes;
             client.IsConsentDisabled = !act.IsConsentEnabled;
+            client.TokenExchangeType = act.TokenExchangeType;
             return state with
             {
                 Client = client

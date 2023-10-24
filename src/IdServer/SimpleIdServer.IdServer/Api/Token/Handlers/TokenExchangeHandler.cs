@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.Token.Helpers;
 using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
+using SimpleIdServer.IdServer.Domains.Extensions;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
@@ -15,6 +16,8 @@ using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -114,7 +117,7 @@ public class TokenExchangeHandler : BaseCredentialsHandler
         {
             var subject = validationResult.Actor?.Subject ?? context.Client.ClientId;
             object oldAct = null;
-            if (claims.ContainsKey(AdditionalJsonWebKeyParameterNames.Act)) oldAct = claims[AdditionalJsonWebKeyParameterNames.Act];
+            if (claims.ContainsKey(AdditionalJsonWebKeyParameterNames.Act)) oldAct = JsonNode.Parse(claims[AdditionalJsonWebKeyParameterNames.Act].ToString()).SerializeJson();
             var newAct = new Dictionary<string, object>
             {
                 { JwtRegisteredClaimNames.Sub, subject }

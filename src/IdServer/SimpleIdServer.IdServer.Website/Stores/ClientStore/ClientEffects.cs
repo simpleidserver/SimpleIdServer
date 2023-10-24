@@ -357,6 +357,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 client.FrontChannelLogoutUri = act.FrontChannelLogoutUri;
                 client.BackChannelLogoutUri = act.BackChannelLogoutUri;
                 client.BackChannelLogoutSessionRequired = act.BackChannelLogoutSessionRequired;
+                client.TokenExchangeType = act.TokenExchangeType;
                 var grantTypes = new List<string>();
                 if (act.IsClientCredentialsGrantTypeEnabled)
                     grantTypes.Add(ClientCredentialsHandler.GRANT_TYPE);
@@ -372,6 +373,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                     grantTypes.Add(UmaTicketHandler.GRANT_TYPE);
                 if (act.IsDeviceGrantTypeEnabled)
                     grantTypes.Add(DeviceCodeHandler.GRANT_TYPE);
+                if (act.IsTokenExchangeEnabled)
+                    grantTypes.Add(TokenExchangeHandler.GRANT_TYPE);
                 client.GrantTypes = grantTypes;
                 client.IsConsentDisabled = !act.IsConsentEnabled;
                 client.SetUseAcsArtifact(act.UseAcs);
@@ -394,7 +397,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                     IsCIBAGrantTypeEnabled = act.IsCIBAGrantTypeEnabled,
                     IsUMAGrantTypeEnabled = act.IsUMAGrantTypeEnabled,
                     IsConsentEnabled = act.IsConsentEnabled,
-                    IsDeviceGrantTypeEnabled = act.IsDeviceGrantTypeEnabled
+                    IsDeviceGrantTypeEnabled = act.IsDeviceGrantTypeEnabled,
+                    TokenExchangeType = act.TokenExchangeType,
+                    IsTokenExchangeEnabled = act.IsTokenExchangeEnabled
                 });
             }
         }
@@ -846,8 +851,10 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public bool IsUMAGrantTypeEnabled { get; set; }
         public bool IsConsentEnabled { get; set; }
         public bool IsDeviceGrantTypeEnabled { get; set; }
+        public bool IsTokenExchangeEnabled { get; set; }
         public bool UseAcs { get; set; }
         public string MetadataUrl { get; set; }
+        public TokenExchangeTypes? TokenExchangeType { get; set; }
     }
 
     public class UpdateClientDetailsSuccessAction
@@ -868,6 +875,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public bool IsUMAGrantTypeEnabled { get; set; }
         public bool IsConsentEnabled { get; set; }
         public bool IsDeviceGrantTypeEnabled { get; set; }
+        public TokenExchangeTypes? TokenExchangeType { get; set; }
+        public bool IsTokenExchangeEnabled { get; set; }
     }
 
     public class ToggleAllClientScopeSelectionAction

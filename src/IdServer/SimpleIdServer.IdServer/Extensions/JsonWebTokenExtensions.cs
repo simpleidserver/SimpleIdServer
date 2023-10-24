@@ -12,9 +12,21 @@ namespace Microsoft.IdentityModel.JsonWebTokens
         {
             if (jws.Claims == null) return null;
             var result = new JsonObject();
-            foreach(var claim in jws.Claims) { result.Add(claim.Type, claim.Value); }
+            foreach(var claim in jws.Claims) 
+            {
+                try
+                {
+                    result.Add(claim.Type, JsonNode.Parse(claim.Value));
+                }
+                catch
+                {
+                    result.Add(claim.Type, claim.Value);
+                }
+
+            }
             return result;
         }
+
 
         public static Dictionary<string, object> GetClaimsDic(this JsonWebToken jws)
         {

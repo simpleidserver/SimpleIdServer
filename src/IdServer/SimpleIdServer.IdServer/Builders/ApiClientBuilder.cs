@@ -53,6 +53,7 @@ namespace SimpleIdServer.IdServer.Builders
         {
             _client.GrantTypes.Add(TokenExchangeHandler.GRANT_TYPE);
             _client.TokenExchangeType = exchangeType;
+            _client.IsTokenExchangeEnabled = true;
             return this;
         }
 

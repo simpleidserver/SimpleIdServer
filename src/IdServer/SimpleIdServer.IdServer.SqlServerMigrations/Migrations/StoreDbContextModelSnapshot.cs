@@ -17,7 +17,7 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.11")
+                .HasAnnotation("ProductVersion", "7.0.12")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -286,6 +286,9 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("Audience")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreateDateTime")
                         .HasColumnType("datetime2");
 
@@ -481,6 +484,31 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.ToTable("AuthenticationSchemeProviderMapper");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthorizedResource", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Audience")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("AuthorizedScopeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Resource")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorizedScopeId");
+
+                    b.ToTable("AuthorizedResource");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthorizedScope", b =>
                 {
                     b.Property<int>("Id")
@@ -492,11 +520,6 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.Property<string>("ConsentId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Resources")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "resources");
 
                     b.Property<string>("Scope")
                         .IsRequired()
@@ -805,6 +828,10 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.Property<bool>("IsResourceParameterRequired")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsTokenExchangeEnabled")
+                        .HasColumnType("bit")
+                        .HasAnnotation("Relational:JsonPropertyName", "is_token_exchange_enabled");
+
                     b.Property<string>("JwksUri")
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "jwks_uri");
@@ -909,6 +936,10 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.Property<string>("TokenEndPointAuthMethod")
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "token_endpoint_auth_method");
+
+                    b.Property<int?>("TokenExchangeType")
+                        .HasColumnType("int")
+                        .HasAnnotation("Relational:JsonPropertyName", "token_exchange_type");
 
                     b.Property<double?>("TokenExpirationTimeInSeconds")
                         .HasColumnType("float")
@@ -2572,6 +2603,14 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.Navigation("IdProvider");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthorizedResource", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.AuthorizedScope", null)
+                        .WithMany("AuthorizedResources")
+                        .HasForeignKey("AuthorizedScopeId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthorizedScope", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.Consent", "Consent")
@@ -2931,6 +2970,11 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderDefinition", b =>
                 {
                     b.Navigation("AuthSchemeProviders");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthorizedScope", b =>
+                {
+                    b.Navigation("AuthorizedResources");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.BCAuthorize", b =>

@@ -28,7 +28,8 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             { "thirtyThreeClient", new SigningCredentials(new RsaSecurityKey(RSA.Create()) { KeyId = "keyId" }, SecurityAlgorithms.RsaSha256) },
             { "fortyTwoClient", new SigningCredentials(new RsaSecurityKey(RSA.Create()) { KeyId = "keyId" }, SecurityAlgorithms.RsaSha256) },
             { "fortyThreeClient", new SigningCredentials(new RsaSecurityKey(RSA.Create()) { KeyId = "keyId" }, SecurityAlgorithms.RsaSha256) },
-            { "fortyFourClient", new SigningCredentials(new RsaSecurityKey(RSA.Create()) { KeyId = "keyId" }, SecurityAlgorithms.RsaSha256)  }
+            { "fortyFourClient", new SigningCredentials(new RsaSecurityKey(RSA.Create()) { KeyId = "keyId" }, SecurityAlgorithms.RsaSha256)  },
+            { "sixtySixClient", new SigningCredentials(new RsaSecurityKey(RSA.Create()) { KeyId = "keyId" }, SecurityAlgorithms.RsaSha256)  }
         };
         public static Dictionary<string, EncryptingCredentials> ClientEncryptingCredentials = new Dictionary<string, EncryptingCredentials>
         {
@@ -206,6 +207,8 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildApiClient("sixtyThreeClient", "password").AddScope(FirstScope).UseDPOPProof().EnableRefreshTokenGrantType().Build(),
             ClientBuilder.BuildApiClient("sixtyFourClient", "password").AddScope(FirstScope).UseDPOPProof(true).EnableRefreshTokenGrantType().Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("sixtyFiveClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().UseDPOPProof(true).AddScope(SecondScope).Build(),
+            ClientBuilder.BuildApiClient("sixtySixClient", "password").EnableExchangeTokenGrantType(TokenExchangeTypes.IMPERSONATION).Build(),
+            ClientBuilder.BuildApiClient("sixtySevenClient", "password").EnableExchangeTokenGrantType(TokenExchangeTypes.DELEGATION).Build()
 
         };
 

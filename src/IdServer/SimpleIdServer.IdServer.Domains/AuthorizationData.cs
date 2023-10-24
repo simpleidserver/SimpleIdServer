@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.IdServer.Domains.DTOs;
+using SimpleIdServer.IdServer.Domains.Extensions;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
@@ -92,7 +93,7 @@ namespace SimpleIdServer.IdServer.Domains
                     try
                     {
                         var node = JsonNode.Parse(kvp.Value);
-                        result.Add(kvp.Key, SerializeJson(node));
+                        result.Add(kvp.Key, node.SerializeJson());
                     }
                     catch
                     {
@@ -100,30 +101,6 @@ namespace SimpleIdServer.IdServer.Domains
                     }
                 }
 
-            return result;
-        }
-
-        private object SerializeJson(JsonNode jsonNode)
-        {
-            if (jsonNode is JsonValue)
-                return jsonNode.GetValue<string>();
-
-            if (jsonNode is JsonObject)
-            {
-                var jsonObj = jsonNode as JsonObject;
-                var dic = new Dictionary<string, object>();
-                foreach (var key in jsonObj)
-                {
-                    dic.Add(key.Key, SerializeJson(key.Value));
-                }
-
-                return dic;
-            }
-
-            var jsonArr = jsonNode as JsonArray;
-            var result = new List<object>();
-            foreach (var record in jsonArr)
-                result.Add(SerializeJson(record));
             return result;
         }
     }

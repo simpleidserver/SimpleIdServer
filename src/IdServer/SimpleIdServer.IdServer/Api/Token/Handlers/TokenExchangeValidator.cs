@@ -4,7 +4,6 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
-using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.TokenTypes;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,16 +37,12 @@ public class TokenExchangeValidationResult
 public class TokenExchangeValidator : ITokenExchangeValidator
 {
     private readonly IEnumerable<ITokenTypeService> _tokenTypeParsers;
-    private readonly IApiResourceRepository _apiResourceRepository;
     private readonly IGrantHelper _grantHelper;
-    private readonly IScopeRepository _scopeRepository;
 
-    public TokenExchangeValidator(IEnumerable<ITokenTypeService> tokenTypeParsers, IApiResourceRepository apiResourceRepository, IGrantHelper grantHelper, IScopeRepository scopeRepository)
+    public TokenExchangeValidator(IEnumerable<ITokenTypeService> tokenTypeParsers, IGrantHelper grantHelper)
     {
         _tokenTypeParsers = tokenTypeParsers;
-        _apiResourceRepository = apiResourceRepository;
         _grantHelper = grantHelper;
-        _scopeRepository = scopeRepository;
     }
 
     public async Task<TokenExchangeValidationResult> Validate(string realm, HandlerContext context, CancellationToken cancellationToken)
@@ -61,7 +56,8 @@ public class TokenExchangeValidator : ITokenExchangeValidator
         if (tokenTypeParser == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_TOKENTYPE, subjectTokenType));
         var requestedTokenType = context.Request.RequestData.GetRequestedTokenType();
         if (!string.IsNullOrWhiteSpace(requestedTokenType) && !_tokenTypeParsers.Any(p => p.Name == requestedTokenType)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_REQUESTED_TOKEN_TYPE, requestedTokenType));
-        var subject = tokenTypeParser.Parse(context.Realm, subjectToken);
+        var tokenResult = tokenTypeParser.Parse(context.Realm, subjectToken);
+        if (string.IsNullOrWhiteSpace(tokenResult.Subject)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_SUBJECT_SUBJECTTOKEN);
         var actorToken = context.Request.RequestData.GetActorToken();
         var actorTokenType = context.Request.RequestData.GetActorTokenType();
         TokenResult actor = null;
@@ -72,11 +68,10 @@ public class TokenExchangeValidator : ITokenExchangeValidator
             if (!string.IsNullOrWhiteSpace(actorToken)) tokenTypeParser.Parse(context.Realm, actorToken);
         }
 
-
         var scopes = context.Request.RequestData.GetScopes();
         var resources = context.Request.RequestData.GetResources();
         var audiences = context.Request.RequestData.GetAudiences();
         var grantRequest = await _grantHelper.Extract(realm, scopes, resources, audiences, new List<AuthorizationData>(), cancellationToken);
-        return new TokenExchangeValidationResult(subject, actor, grantRequest, requestedTokenType ?? subjectTokenType);
+        return new TokenExchangeValidationResult(tokenResult, actor, grantRequest, requestedTokenType ?? subjectTokenType);
     }
 }

@@ -1856,6 +1856,249 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
+        [Xunit.SkippableFactAttribute(DisplayName="Use \'urn:ietf:params:oauth:grant-type:token-exchange\' grant_type and impersonatio" +
+            "n to get an access token")]
+        [Xunit.TraitAttribute("FeatureTitle", "HappyFlows")]
+        [Xunit.TraitAttribute("Description", "Use \'urn:ietf:params:oauth:grant-type:token-exchange\' grant_type and impersonatio" +
+            "n to get an access token")]
+        public void UseUrnIetfParamsOauthGrant_TypeToken_ExchangeGrant_TypeAndImpersonationToGetAnAccessToken()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Use \'urn:ietf:params:oauth:grant-type:token-exchange\' grant_type and impersonatio" +
+                    "n to get an access token", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 596
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table343 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table343.AddRow(new string[] {
+                            "client_id",
+                            "fortyFourClient"});
+#line 597
+ testRunner.Given("build access_token and sign with the key \'keyid\'", ((string)(null)), table343, "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table344 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table344.AddRow(new string[] {
+                            "grant_type",
+                            "urn:ietf:params:oauth:grant-type:token-exchange"});
+                table344.AddRow(new string[] {
+                            "client_id",
+                            "sixtySixClient"});
+                table344.AddRow(new string[] {
+                            "client_secret",
+                            "password"});
+                table344.AddRow(new string[] {
+                            "subject_token",
+                            "$access_token$"});
+                table344.AddRow(new string[] {
+                            "subject_token_type",
+                            "urn:ietf:params:oauth:token-type:access_token"});
+#line 601
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table344, "When ");
+#line hidden
+#line 608
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 610
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 611
+ testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 612
+ testRunner.And("JSON \'$.issued_token_type\'=\'urn:ietf:params:oauth:token-type:access_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 613
+ testRunner.And("access_token contains the claim \'client_id\'=\'fortyFourClient\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Use \'urn:ietf:params:oauth:grant-type:token-exchange\' grant_type and delegation t" +
+            "o get an access token")]
+        [Xunit.TraitAttribute("FeatureTitle", "HappyFlows")]
+        [Xunit.TraitAttribute("Description", "Use \'urn:ietf:params:oauth:grant-type:token-exchange\' grant_type and delegation t" +
+            "o get an access token")]
+        public void UseUrnIetfParamsOauthGrant_TypeToken_ExchangeGrant_TypeAndDelegationToGetAnAccessToken()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Use \'urn:ietf:params:oauth:grant-type:token-exchange\' grant_type and delegation t" +
+                    "o get an access token", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 615
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table345 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table345.AddRow(new string[] {
+                            "client_id",
+                            "fortyFourClient"});
+#line 616
+ testRunner.Given("build access_token and sign with the key \'keyid\'", ((string)(null)), table345, "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table346 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table346.AddRow(new string[] {
+                            "grant_type",
+                            "urn:ietf:params:oauth:grant-type:token-exchange"});
+                table346.AddRow(new string[] {
+                            "client_id",
+                            "sixtySevenClient"});
+                table346.AddRow(new string[] {
+                            "client_secret",
+                            "password"});
+                table346.AddRow(new string[] {
+                            "subject_token",
+                            "$access_token$"});
+                table346.AddRow(new string[] {
+                            "subject_token_type",
+                            "urn:ietf:params:oauth:token-type:access_token"});
+#line 620
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table346, "When ");
+#line hidden
+#line 627
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 629
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 630
+ testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 631
+ testRunner.And("JSON \'$.issued_token_type\'=\'urn:ietf:params:oauth:token-type:access_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 632
+ testRunner.And("access_token contains the claim \'client_id\'=\'fortyFourClient\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 633
+ testRunner.And("access_token contains act \'sixtySevenClient\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Use \'urn:ietf:params:oauth:grant-type:token-exchange\' grant_type and delegation t" +
+            "o get an access token with sub act")]
+        [Xunit.TraitAttribute("FeatureTitle", "HappyFlows")]
+        [Xunit.TraitAttribute("Description", "Use \'urn:ietf:params:oauth:grant-type:token-exchange\' grant_type and delegation t" +
+            "o get an access token with sub act")]
+        public void UseUrnIetfParamsOauthGrant_TypeToken_ExchangeGrant_TypeAndDelegationToGetAnAccessTokenWithSubAct()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Use \'urn:ietf:params:oauth:grant-type:token-exchange\' grant_type and delegation t" +
+                    "o get an access token with sub act", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 635
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table347 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table347.AddRow(new string[] {
+                            "client_id",
+                            "fortyFourClient"});
+#line 636
+ testRunner.Given("build access_token and sign with the key \'keyid\'", ((string)(null)), table347, "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table348 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table348.AddRow(new string[] {
+                            "grant_type",
+                            "urn:ietf:params:oauth:grant-type:token-exchange"});
+                table348.AddRow(new string[] {
+                            "client_id",
+                            "sixtySevenClient"});
+                table348.AddRow(new string[] {
+                            "client_secret",
+                            "password"});
+                table348.AddRow(new string[] {
+                            "subject_token",
+                            "$access_token$"});
+                table348.AddRow(new string[] {
+                            "subject_token_type",
+                            "urn:ietf:params:oauth:token-type:access_token"});
+#line 640
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table348, "When ");
+#line hidden
+#line 648
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 649
+ testRunner.And("extract parameter \'access_token\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table349 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table349.AddRow(new string[] {
+                            "grant_type",
+                            "urn:ietf:params:oauth:grant-type:token-exchange"});
+                table349.AddRow(new string[] {
+                            "client_id",
+                            "sixtySevenClient"});
+                table349.AddRow(new string[] {
+                            "client_secret",
+                            "password"});
+                table349.AddRow(new string[] {
+                            "subject_token",
+                            "$access_token$"});
+                table349.AddRow(new string[] {
+                            "subject_token_type",
+                            "urn:ietf:params:oauth:token-type:access_token"});
+#line 651
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table349, "And ");
+#line hidden
+#line 659
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 660
+ testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 661
+ testRunner.And("JSON \'$.issued_token_type\'=\'urn:ietf:params:oauth:token-type:access_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 662
+ testRunner.And("access_token contains the claim \'client_id\'=\'fortyFourClient\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 663
+ testRunner.And("access_token contains act \'sixtySevenClient\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 664
+ testRunner.And("access_token contains sub act \'sixtySevenClient\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
         [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
         [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
         public class FixtureData : System.IDisposable

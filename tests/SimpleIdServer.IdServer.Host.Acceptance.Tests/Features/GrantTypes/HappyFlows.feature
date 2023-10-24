@@ -592,3 +592,73 @@ Scenario: Use 'authorization_code' grant type to get an access token and use PAR
 	And JSON '$.token_type'='DPoP'
 	And JSON '$.expires_in'='1800'
 	And access_token contains jkt
+
+Scenario: Use 'urn:ietf:params:oauth:grant-type:token-exchange' grant_type and impersonation to get an access token
+	Given build access_token and sign with the key 'keyid'
+	| Key         | Value           |
+	| client_id   | fortyFourClient |
+
+	When execute HTTP POST request 'https://localhost:8080/token'
+	| Key                  | Value                                           |
+	| grant_type           | urn:ietf:params:oauth:grant-type:token-exchange |
+	| client_id            | sixtySixClient                                  |
+	| client_secret        | password                                        |
+	| subject_token        | $access_token$                                  |
+	| subject_token_type   | urn:ietf:params:oauth:token-type:access_token   |
+	And extract JSON from body
+
+	And extract JSON from body
+	Then HTTP status code equals to '200'
+	And JSON '$.issued_token_type'='urn:ietf:params:oauth:token-type:access_token'
+	And access_token contains the claim 'client_id'='fortyFourClient'
+
+Scenario: Use 'urn:ietf:params:oauth:grant-type:token-exchange' grant_type and delegation to get an access token
+	Given build access_token and sign with the key 'keyid'
+	| Key         | Value           |
+	| client_id   | fortyFourClient |
+
+	When execute HTTP POST request 'https://localhost:8080/token'
+	| Key                  | Value                                           |
+	| grant_type           | urn:ietf:params:oauth:grant-type:token-exchange |
+	| client_id            | sixtySevenClient                                |
+	| client_secret        | password                                        |
+	| subject_token        | $access_token$                                  |
+	| subject_token_type   | urn:ietf:params:oauth:token-type:access_token   |
+	And extract JSON from body
+
+	And extract JSON from body
+	Then HTTP status code equals to '200'
+	And JSON '$.issued_token_type'='urn:ietf:params:oauth:token-type:access_token'
+	And access_token contains the claim 'client_id'='fortyFourClient'
+	And access_token contains act 'sixtySevenClient'
+
+Scenario: Use 'urn:ietf:params:oauth:grant-type:token-exchange' grant_type and delegation to get an access token with sub act
+	Given build access_token and sign with the key 'keyid'
+	| Key         | Value           |
+	| client_id   | fortyFourClient |
+
+	When execute HTTP POST request 'https://localhost:8080/token'
+	| Key                  | Value                                           |
+	| grant_type           | urn:ietf:params:oauth:grant-type:token-exchange |
+	| client_id            | sixtySevenClient                                |
+	| client_secret        | password                                        |
+	| subject_token        | $access_token$                                  |
+	| subject_token_type   | urn:ietf:params:oauth:token-type:access_token   |
+
+	And extract JSON from body
+	And extract parameter 'access_token' from JSON body
+
+	And execute HTTP POST request 'https://localhost:8080/token'
+	| Key                  | Value                                           |
+	| grant_type           | urn:ietf:params:oauth:grant-type:token-exchange |
+	| client_id            | sixtySevenClient                                |
+	| client_secret        | password                                        |
+	| subject_token        | $access_token$                                  |
+	| subject_token_type   | urn:ietf:params:oauth:token-type:access_token   |
+
+	And extract JSON from body
+	Then HTTP status code equals to '200'
+	And JSON '$.issued_token_type'='urn:ietf:params:oauth:token-type:access_token'
+	And access_token contains the claim 'client_id'='fortyFourClient'
+	And access_token contains act 'sixtySevenClient'
+	And access_token contains sub act 'sixtySevenClient'

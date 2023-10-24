@@ -89,6 +89,11 @@
                                         <RadzenCheckBox Name="IsRefreshTokenGrantTypeEnabled" @bind-Value=updateClient.IsRefreshTokenGrantTypeEnabled></RadzenCheckBox>
                                         <RadzenLabel Text="Refresh token" Component="IsRefreshTokenGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
                                     </div>
+                                    <!-- Token exchange -->
+                                    <div>
+                                        <RadzenCheckBox Name="IsTokenExchangeEnabled" @bind-Value=updateClient.IsTokenExchangeEnabled></RadzenCheckBox>
+                                        <RadzenLabel Text="Token exchange" Component="IsTokenExchangeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
+                                    </div>
                                 }
 
                                 @if (Client.ClientType == ClientTypes.WEBSITE || Client.ClientType == ClientTypes.MOBILE || Client.ClientType == ClientTypes.EXTERNAL || Client.ClientType == ClientTypes.HIGHLYSECUREDWEBSITE || Client.ClientType == ClientTypes.GRANTMANAGEMENT)
@@ -133,7 +138,24 @@
                                     </div>
                                 }
                             </div>
-                        </div>                        
+                        </div>
+                    }
+
+                    @if (Client.ClientType == ClientTypes.MACHINE)
+                    {
+                        <div class="row">
+                            <div class="col-md-2">
+                                <RadzenLabel Text="Type of token exchange" Style="padding: 0px;" />
+                            </div>
+                            <div class="col">
+                                <RadzenDropDown Name="IdTokenSignedResponseAlg" Class="w-100"
+                                                Data=@AllTokenExchangeTypes
+                                                TextProperty="Description"
+                                                ValueProperty="Value"
+                                                TValue="TokenExchangeTypes?"
+                                                @bind-Value=@updateClient.TokenExchangeType />
+                            </div>
+                        </div>
                     }
 
                     @if (Client.ClientType == SimpleIdServer.IdServer.Saml.Idp.Constants.CLIENT_TYPE)
@@ -232,6 +254,18 @@
     [Parameter]
     public SimpleIdServer.IdServer.Domains.Client Client { get; set; }
 
+    List<TokenExchangeType> AllTokenExchangeTypes = new List<TokenExchangeType>
+    {
+        new TokenExchangeType { Value = TokenExchangeTypes.IMPERSONATION, Description = "Impersonation" },
+        new TokenExchangeType { Value = TokenExchangeTypes.DELEGATION, Description = "Delegation" }
+    };
+
+    record TokenExchangeType
+    {
+        public string Description { get; set; }
+        public TokenExchangeTypes Value { get; set;}
+    }
+
     record UpdateClient
     {
         public string ClientId { get; set; } = null!;
@@ -245,6 +279,7 @@
         public bool IsClientCredentialsGrantTypeEnabled { get; set; }
         public bool IsPasswordGrantTypeEnabled { get; set; }
         public bool IsRefreshTokenGrantTypeEnabled { get; set; }
+        public bool IsTokenExchangeEnabled { get; set; }
         public bool IsAuthorizationCodeGrantTypeEnabled { get; set; }
         public bool IsCIBAGrantTypeEnabled { get; set; }
         public bool IsUMAGrantTypeEnabled { get; set; }
@@ -252,6 +287,7 @@
         public bool IsDeviceGrantTypeEnabled { get; set; }
         public bool UseAcs { get; set; }
         public string MetadataUrl { get; set; }
+        public TokenExchangeTypes? TokenExchangeType { get; set;  }
     }
 
     UpdateClient updateClient = new UpdateClient();
@@ -285,7 +321,8 @@
             BackChannelLogoutSessionRequired = this.Client.BackChannelLogoutSessionRequired,
             IsConsentEnabled = !this.Client.IsConsentDisabled,
             UseAcs = this.Client.GetUseAcrsArtifact(),
-            MetadataUrl = this.Client.GetSaml2SpMetadataUrl()
+            MetadataUrl = this.Client.GetSaml2SpMetadataUrl(),
+            TokenExchangeType = this.Client.TokenExchangeType
         };
         if (this.Client.GrantTypes.Contains(ClientCredentialsHandler.GRANT_TYPE))
             updateClient.IsClientCredentialsGrantTypeEnabled = true;
@@ -301,6 +338,8 @@
             updateClient.IsUMAGrantTypeEnabled = true;
         if (this.Client.GrantTypes.Contains(DeviceCodeHandler.GRANT_TYPE))
             updateClient.IsDeviceGrantTypeEnabled = true;
+        if (this.Client.GrantTypes.Contains(TokenExchangeHandler.GRANT_TYPE))
+            updateClient.IsTokenExchangeEnabled = true;
     }
 
     void SubmitUpdateClient(UpdateClient client)
@@ -323,8 +362,10 @@
             IsUMAGrantTypeEnabled = client.IsUMAGrantTypeEnabled,
             IsConsentEnabled = client.IsConsentEnabled,
             IsDeviceGrantTypeEnabled = client.IsDeviceGrantTypeEnabled,
+            IsTokenExchangeEnabled = client.IsTokenExchangeEnabled,
             UseAcs = client.UseAcs,
-            MetadataUrl = client.MetadataUrl
+            MetadataUrl = client.MetadataUrl,
+            TokenExchangeType = client.TokenExchangeType
         });
     }
 

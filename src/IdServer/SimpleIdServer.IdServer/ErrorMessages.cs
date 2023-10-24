@@ -148,6 +148,7 @@ namespace SimpleIdServer.IdServer
         public const string CLIENT_TOKENEXCHANGE_NOT_ENABLED = "Token exchange is not enabled";
         public const string MISSING_PARAMETER = "missing parameter {0}";
         public const string MISSING_PARAMETERS = "missing parameters {0}";
+        public const string MISSING_SUBJECT_SUBJECTTOKEN = "the subject cannot be extracted from the subject_token";
         public const string MISSING_TOKEN = "missing token";
         public const string MISSING_RESPONSE_TYPES = "missing response types {0}";
         public const string MISSING_RESPONSE_TYPE = "valid response type must be passed for the grant type {0}";

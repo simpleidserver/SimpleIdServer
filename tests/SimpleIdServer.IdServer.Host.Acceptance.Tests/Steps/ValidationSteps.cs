@@ -113,6 +113,24 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             Assert.True(jwt.Claims.Any(c => c.Type == key && c.Value == value) == true);
         }
 
+        [Then("access_token contains act '(.*)'")]
+        public void ThenAccessTokenContainsAct(string actSub)
+        {
+            var jwt = GetAccessToken();
+            var json = jwt.GetClaimJson();
+            var subject = json["act"]["sub"];
+            Assert.Equal(actSub, subject.ToString());
+        }
+
+        [Then("access_token contains sub act '(.*)'")]
+        public void ThenAccessTokenContainsSubAct(string actSub)
+        {
+            var jwt = GetAccessToken();
+            var json = jwt.GetClaimJson();
+            var subAct = json["act"]["act"]["sub"];
+            Assert.Equal(actSub, subAct.ToString());
+        }
+
         [Then("access_token has permission to access to the resource id '(.*)'")]
         public void ThenAccessTokenHasPermissionToAccessToResourceId(string value)
         {

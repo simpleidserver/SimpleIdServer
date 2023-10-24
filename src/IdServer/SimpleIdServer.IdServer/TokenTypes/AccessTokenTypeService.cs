@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
@@ -34,10 +35,13 @@ public class AccessTokenTypeService : ITokenTypeService
     {
         var extractionResult = _jwtBuilder.ReadSelfIssuedJsonWebToken(realm, token);
         if (extractionResult.Error != null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, extractionResult.Error);
+        var claims = extractionResult.Jwt.GetClaimsDic();
+        var subject = string.Empty;
+        if (claims.ContainsKey(OpenIdConnectParameterNames.ClientId)) subject = claims[OpenIdConnectParameterNames.ClientId].ToString();
         return new TokenResult
         {
             Claims = extractionResult.Jwt.GetClaimsDic(),
-            Subject = extractionResult.Jwt.Subject
+            Subject = subject
         };
     }
 
