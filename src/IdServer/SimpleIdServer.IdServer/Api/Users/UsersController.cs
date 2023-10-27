@@ -111,7 +111,7 @@ namespace SimpleIdServer.IdServer.Api.Users
             async Task Validate()
             {
                 if (string.IsNullOrWhiteSpace(request.Name)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, UserNames.Name));
-                if (await _userRepository.Query().AsNoTracking().AnyAsync(u => u.Name == request.Name)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.USER_EXISTS, request.Name));
+                if ((await _userRepository.GetAll(us => us.AsNoTracking().Where(u => u.Name == request.Name).ToListAsync())).Any()) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.USER_EXISTS, request.Name));
             }
         }
 
@@ -131,7 +131,7 @@ namespace SimpleIdServer.IdServer.Api.Users
             {
                 prefix = prefix ?? Constants.DefaultRealm;
                 CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
-                var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).Include(u => u.Credentials).Include(u => u.Realms).AsNoTracking().FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.RealmsName == prefix), cancellationToken);
+                var user = await _userRepository.Get(us => us.Include(u => u.OAuthUserClaims).Include(u => u.Credentials).Include(u => u.Realms).AsNoTracking().FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.RealmsName == prefix), cancellationToken));
                 if (user == null) return new NotFoundResult();
                 return new OkObjectResult(user);
             }
@@ -160,7 +160,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                 {
                     prefix = prefix ?? Constants.DefaultRealm;
                     CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
-                    var user = await _userRepository.Query().Include(u => u.Realms).FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.RealmsName == prefix), cancellationToken);
+                    var user = await _userRepository.Get(us => us.Include(u => u.Realms).FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.RealmsName == prefix), cancellationToken));
                     if (user == null) return new NotFoundResult();
                     _userRepository.Remove(new List<User> { user });
                     await _userRepository.SaveChanges(cancellationToken);
@@ -203,7 +203,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                     prefix = prefix ?? Constants.DefaultRealm;
                     CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
                     Validate();
-                    var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.Credentials).FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.RealmsName == prefix), cancellationToken);
+                    var user = await _userRepository.Get(us => us.Include(u => u.Realms).Include(u => u.Credentials).FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.RealmsName == prefix), cancellationToken));
                     if (user == null) return new NotFoundResult();
                     Update(user);
                     await _userRepository.SaveChanges(cancellationToken);
@@ -274,7 +274,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                     prefix = prefix ?? Constants.DefaultRealm;
                     CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
                     Validate();
-                    var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.CredentialOffers).FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.RealmsName == prefix), cancellationToken);
+                    var user = await _userRepository.Get(us => us.Include(u => u.Realms).Include(u => u.CredentialOffers).FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.RealmsName == prefix), cancellationToken));
                     if (user == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_USER, id));
                     var generator = _generators.FirstOrDefault(g => g.Method == request.Method);
                     if (generator == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.INVALID_DECENTRALIZED_IDENTITY_METHOD, request.Method));

@@ -62,7 +62,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential
                     var token = await _grantedTokenHelper.GetAccessToken(accessToken, cancellationToken);
                     if (token == null) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, ErrorMessages.UNKNOWN_ACCESS_TOKEN);
                     var extractionResult = await ValidateRequest(request, token, cancellationToken);
-                    var user = await _authenticationHelper.GetUserByLogin(_userRepository.Query().Include(u => u.OAuthUserClaims).AsNoTracking(), token.Subject, prefix, cancellationToken);
+                    var user = await _authenticationHelper.GetUserByLogin(u => u.Include(u => u.OAuthUserClaims).AsNoTracking(), token.Subject, prefix, cancellationToken);
                     var validationResult = await CheckProof(request, user, cancellationToken);
                     context.SetClient(null);
                     context.SetUser(user);

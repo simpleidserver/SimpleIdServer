@@ -81,13 +81,13 @@ namespace SimpleIdServer.IdServer.Api.Authorization
         protected async Task<AuthorizationResponse> BuildResponse(HandlerContext context, CancellationToken cancellationToken)
         {
             var validationResult = await _validator.ValidateAuthorizationRequest(context, cancellationToken);
-            var user = await _userRepository.Query()
+            var user = await _userRepository.Get(u => u
                 .Include(u => u.Consents).ThenInclude(c => c.Scopes).ThenInclude(c => c.AuthorizedResources)
                 .Include(u => u.Sessions)
                 .Include(u => u.Realms)
                 .Include(u => u.Groups)
                 .Include(u => u.OAuthUserClaims)
-                .SingleOrDefaultAsync(u => u.Name == context.Request.UserSubject && u.Realms.Any(r => r.RealmsName == context.Realm), cancellationToken);
+                .SingleOrDefaultAsync(u => u.Name == context.Request.UserSubject && u.Realms.Any(r => r.RealmsName == context.Realm), cancellationToken));
             context.SetUser(user);
             var grantRequest = validationResult.GrantRequest;
             var responseTypeHandlers = validationResult.ResponseTypes;

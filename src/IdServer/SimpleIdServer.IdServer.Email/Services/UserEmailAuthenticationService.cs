@@ -26,13 +26,13 @@ public class UserEmailAuthenticationService : OTPAuthenticationService, IUserEma
     {
         User authenticatedUser = null;
         if (string.IsNullOrWhiteSpace(authenticatedUserId))
-            authenticatedUser = await UserRepository.Query()
+            authenticatedUser = await UserRepository.Get(u => u
                 .Include(u => u.Realms)
                 .Include(u => u.IdentityProvisioning).ThenInclude(i => i.Definition)
                 .Include(u => u.Groups)
                 .Include(c => c.OAuthUserClaims)
                 .Include(u => u.Credentials)
-                .FirstOrDefaultAsync(u => u.Realms.Any(r => r.RealmsName == realm) && u.Email == viewModel.Login, cancellationToken);
+                .FirstOrDefaultAsync(u => u.Realms.Any(r => r.RealmsName == realm) && u.Email == viewModel.Login, cancellationToken));
         else
             authenticatedUser = await FetchAuthenticatedUser(realm, authenticatedUserId, cancellationToken);
 

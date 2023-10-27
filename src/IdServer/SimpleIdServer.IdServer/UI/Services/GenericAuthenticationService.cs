@@ -41,7 +41,7 @@ public abstract class GenericAuthenticationService<TViewModel> : IUserAuthentica
 
     protected async Task Provision(User user, CancellationToken cancellationToken)
     {
-        var existingUser = await _userRepository.Query().AsNoTracking().FirstOrDefaultAsync(u => u.Name == user.Name);
+        var existingUser = await _userRepository.Get(us => us.AsNoTracking().FirstOrDefaultAsync(u => u.Name == user.Name));
         if (existingUser != null) return;
         _userRepository.Add(user);
         await _userRepository.SaveChanges(cancellationToken);
@@ -55,7 +55,7 @@ public abstract class GenericAuthenticationService<TViewModel> : IUserAuthentica
 
     protected async Task<User> AuthenticateUser(string login, string realm, CancellationToken cancellationToken)
     {
-        var user = await _authenticationHelper.GetUserByLogin(_userRepository.Query()
+        var user = await _authenticationHelper.GetUserByLogin(us => us
             .Include(u => u.Realms)
             .Include(u => u.IdentityProvisioning).ThenInclude(i => i.Definition)
             .Include(u => u.Groups)
@@ -67,12 +67,12 @@ public abstract class GenericAuthenticationService<TViewModel> : IUserAuthentica
     protected async Task<User> FetchAuthenticatedUser(string realm, string userId, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(userId)) return null;
-        return await _userRepository.Query()
+        return await _userRepository.Get(us => us
             .Include(u => u.Realms)
             .Include(u => u.IdentityProvisioning).ThenInclude(i => i.Definition)
             .Include(u => u.Groups)
             .Include(c => c.OAuthUserClaims)
             .Include(u => u.Credentials)
-            .FirstOrDefaultAsync(u => u.Realms.Any(r => r.RealmsName == realm) && u.Id == userId, cancellationToken);
+            .FirstOrDefaultAsync(u => u.Realms.Any(r => r.RealmsName == realm) && u.Id == userId, cancellationToken));
     }
 }

@@ -60,7 +60,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             if (client.UserPinRequired && string.IsNullOrWhiteSpace(userPin)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.UserPin));
             var preAuth = await _grantedTokenHelper.GetPreAuthCode(preAuthorizedCode, cancellationToken);
             if (preAuth == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_PREAUTHORIZEDCODE);
-            var user = await _userRepository.Query().AsNoTracking().SingleAsync(u => u.Id == preAuth.UserId, cancellationToken);
+            var user = await _userRepository.Get(u => u.AsNoTracking().SingleAsync(u => u.Id == preAuth.UserId, cancellationToken));
             context.SetUser(user);
             return new ValidationResult(client, user);
         }

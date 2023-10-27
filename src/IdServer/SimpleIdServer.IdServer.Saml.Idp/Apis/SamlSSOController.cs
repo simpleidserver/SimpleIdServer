@@ -228,7 +228,7 @@ namespace SimpleIdServer.IdServer.Saml2.Api
         private async Task<ClaimsIdentity> BuildSubject(Client client, string issuer, string realm, CancellationToken cancellationToken)
         {
             var nameIdentifier = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).Include(u => u.Groups).AsNoTracking().SingleOrDefaultAsync(u => u.Name == nameIdentifier, cancellationToken);
+            var user = await _userRepository.Get(u => u.Include(u => u.OAuthUserClaims).Include(u => u.Groups).AsNoTracking().SingleOrDefaultAsync(u => u.Name == nameIdentifier, cancellationToken));
             var context = new HandlerContext(new HandlerContextRequest(issuer, string.Empty, null, null, null, (X509Certificate2)null, null), realm);
             context.SetUser(user);
             var claims = (await _scopeClaimsExtractor.ExtractClaims(context, client.Scopes, ScopeProtocols.SAML)).Select(c => new Claim(c.Key, c.Value.ToString())).ToList();

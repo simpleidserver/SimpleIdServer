@@ -55,7 +55,7 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseRegisterControll
         {
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
             viewModel.NameIdentifier = nameIdentifier;
-            var authenticatedUser = await _userRepository.Query().AsNoTracking().Include(u => u.OAuthUserClaims).Include(u => u.Realms).SingleAsync(u => u.Name == nameIdentifier && u.Realms.Any(r => r.RealmsName == prefix));
+            var authenticatedUser = await _userRepository.Get(u => u.AsNoTracking().Include(u => u.OAuthUserClaims).Include(u => u.Realms).SingleAsync(u => u.Name == nameIdentifier && u.Realms.Any(r => r.RealmsName == prefix)));
             Enrich(viewModel, authenticatedUser);
         }
 
@@ -136,7 +136,7 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseRegisterControll
                 return View(viewModel);
             }
 
-            var authenticatedUser = await _userRepository.Query().Include(u => u.Realms).Include(c => c.OAuthUserClaims).Include(c => c.Credentials).FirstAsync(u => u.Realms.Any(r => r.RealmsName == prefix) && u.Name == nameIdentifier);
+            var authenticatedUser = await _userRepository.Get(u => u.Include(u => u.Realms).Include(c => c.OAuthUserClaims).Include(c => c.Credentials).FirstAsync(u => u.Realms.Any(r => r.RealmsName == prefix) && u.Name == nameIdentifier));
             BuildUser(authenticatedUser, viewModel);
             authenticatedUser.UpdateDateTime = DateTime.UtcNow;
             if (authenticatedUser.ActiveOTP == null)

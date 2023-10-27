@@ -180,7 +180,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         {
             if (!previousQueryParameters.ContainsKey(JwtRegisteredClaimNames.Sub))
                 return;
-            handlerContext.SetUser(await _userRepository.Query().AsNoTracking().Include(u => u.OAuthUserClaims).Include(u => u.Groups).Include(u => u.Realms).FirstOrDefaultAsync(u => u.Name == previousQueryParameters[JwtRegisteredClaimNames.Sub].GetValue<string>() && u.Realms.Any(r => r.RealmsName == handlerContext.Realm), token));
+            handlerContext.SetUser(await _userRepository.Get(u => u.AsNoTracking().Include(u => u.OAuthUserClaims).Include(u => u.Groups).Include(u => u.Realms).FirstOrDefaultAsync(u => u.Name == previousQueryParameters[JwtRegisteredClaimNames.Sub].GetValue<string>() && u.Realms.Any(r => r.RealmsName == handlerContext.Realm), token)));
         }
 
         void CheckDPOPJkt(HandlerContext context, AuthCode authCode)

@@ -76,7 +76,7 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
 
         async Task<IActionResult> CreateUser()
         {
-            var userExists = await UserRepository.Query().Include(u => u.Realms).AsNoTracking().AnyAsync(u => u.Name == viewModel.Login && u.Realms.Any(r => r.RealmsName == prefix));
+            var userExists = (await UserRepository.GetAll(us => us.Include(u => u.Realms).AsNoTracking().Where(u => u.Name == viewModel.Login && u.Realms.Any(r => r.RealmsName == prefix)).ToListAsync())).Any();
             if(userExists)
             {
                 ModelState.AddModelError("user_exists", "user_exists");
@@ -88,7 +88,7 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
 
         async Task<IActionResult> UpdateUser()
         {
-            var user = await UserRepository.Query().Include(u => u.Credentials).SingleAsync(u => u.Name == viewModel.Login);
+            var user = await UserRepository.Get(us => us.Include(u => u.Credentials).SingleAsync(u => u.Name == viewModel.Login));
             var passwordCredential = user.Credentials.FirstOrDefault(c => c.CredentialType == UserCredential.PWD);
             if (passwordCredential != null) passwordCredential.Value = PasswordHelper.ComputeHash(viewModel.Password);
             else user.Credentials.Add(new UserCredential

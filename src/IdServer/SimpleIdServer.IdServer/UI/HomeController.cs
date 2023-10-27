@@ -69,7 +69,7 @@ namespace SimpleIdServer.IdServer.UI
             prefix = prefix ?? Constants.DefaultRealm;
             var schemes = await _authenticationSchemeProvider.GetAllSchemesAsync();
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).Include(u => u.Consents).ThenInclude(c => c.Scopes).ThenInclude(c => c.AuthorizedResources).Include(u => u.ExternalAuthProviders).Include(u => u.Credentials).FirstOrDefaultAsync(u => u.Name == nameIdentifier, cancellationToken);
+            var user = await _userRepository.Get(us => us.Include(u => u.OAuthUserClaims).Include(u => u.Consents).ThenInclude(c => c.Scopes).ThenInclude(c => c.AuthorizedResources).Include(u => u.ExternalAuthProviders).Include(u => u.Credentials).FirstOrDefaultAsync(u => u.Name == nameIdentifier, cancellationToken));
             var consents = await GetConsents();
             var pendingRequests = await GetPendingRequest();
             var methodServices = _authenticationMethodServices.Select(a => new AuthenticationMethodViewModel
@@ -185,7 +185,7 @@ namespace SimpleIdServer.IdServer.UI
         {
             prefix = prefix ?? Constants.DefaultRealm;
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.Query().Include(u => u.Consents).Include(u => u.Realms).FirstAsync(c => c.Name == nameIdentifier && c.Realms.Any(r => r.RealmsName == prefix), cancellationToken);
+            var user = await _userRepository.Get(us => us.Include(u => u.Consents).Include(u => u.Realms).FirstAsync(c => c.Name == nameIdentifier && c.Realms.Any(r => r.RealmsName == prefix), cancellationToken));
             if (!_userHelper.HasOpenIDConsent(user, consentId))
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request" });
 
@@ -282,16 +282,16 @@ namespace SimpleIdServer.IdServer.UI
                     return RedirectToAction("Index", "Errors", new { code = ErrorCodes.INVALID_REQUEST, message = ErrorMessages.BAD_EXTERNAL_AUTHENTICATION_USER });
                 }
 
-                if (await _userRepository.Query().Include(u => u.ExternalAuthProviders).AnyAsync(u => u.ExternalAuthProviders.Any(p => p.Subject == sub && p.Scheme == scheme), cancellationToken))
+                if ((await _userRepository.GetAll(us => us.Include(u => u.ExternalAuthProviders).Where(u => u.ExternalAuthProviders.Any(p => p.Subject == sub && p.Scheme == scheme)).ToListAsync(cancellationToken))).Any())
                 {
                     _logger.LogError("a local account has already been linked to the external authentication provider {authProviderScheme}", scheme);
                     await HttpContext.SignOutAsync(Constants.DefaultExternalCookieAuthenticationScheme);
                     return RedirectToAction("Index", "Errors", new { code = ErrorCodes.INVALID_REQUEST, message = "a local account has already been linked to the external authentication provider" });
                 }
 
-                var user = await _userRepository.Query()
+                var user = await _userRepository.Get(us => us
                     .Include(u => u.ExternalAuthProviders)
-                    .FirstAsync(u => u.Name == nameIdentifier, cancellationToken);
+                    .FirstAsync(u => u.Name == nameIdentifier, cancellationToken));
                 if (!user.ExternalAuthProviders.Any(p => p.Subject == sub && p.Scheme == scheme))
                 {
                     user.AddExternalAuthProvider(scheme, sub);
@@ -313,9 +313,9 @@ namespace SimpleIdServer.IdServer.UI
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request", message = "Request cannot be empty" });
 
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.Query()
+            var user = await _userRepository.Get(us => us
                 .Include(u => u.ExternalAuthProviders)
-                .FirstAsync(u => u.Name == nameIdentifier, cancellationToken);
+                .FirstAsync(u => u.Name == nameIdentifier, cancellationToken));
             var externalAuthProvider = user.ExternalAuthProviders.SingleOrDefault(p => p.Subject == viewModel.Subject && p.Scheme == viewModel.Scheme);
             if(externalAuthProvider == null)
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request", message = "Cannot unlink an unknown profile" });
@@ -333,7 +333,7 @@ namespace SimpleIdServer.IdServer.UI
         public async Task<IActionResult> GetOTP(CancellationToken cancellationToken)
         {
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.Query().Include(u => u.Credentials).FirstOrDefaultAsync(u => u.Name == nameIdentifier, cancellationToken);
+            var user = await _userRepository.Get(us => us.Include(u => u.Credentials).FirstOrDefaultAsync(u => u.Name == nameIdentifier, cancellationToken));
             if (user.ActiveOTP == null) return new NoContentResult();
             var payload = _otpQRCodeGenerator.GenerateQRCode(user);
             return File(payload, "image/png");

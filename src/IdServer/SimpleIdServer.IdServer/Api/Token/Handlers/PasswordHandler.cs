@@ -83,7 +83,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     activity?.SetTag("scopes", string.Join(",", extractionResult.Scopes)); 
                     var userName = context.Request.RequestData.GetStr(TokenRequestParameters.Username);
                     var password = context.Request.RequestData.GetStr(TokenRequestParameters.Password);
-                    var user = await _userHelper.FilterUsersByLogin(_userRepository.Query()
+                    var user = await _userHelper.FilterUsersByLogin(u => u
                         .Include(u => u.Credentials)
                         .Include(u => u.Groups)
                         .Include(u => u.OAuthUserClaims)

@@ -55,12 +55,23 @@ public class RegisterController : BaseOTPRegisterController<IdServerSmsOptions>
         string nameIdentifier = string.Empty;
         if (User.Identity.IsAuthenticated) nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
 
-        var filtered = UserRepository.Query().Include(u => u.Realms).Include(u => u.OAuthUserClaims).AsNoTracking().Where(u => u.Realms.Any(r => r.RealmsName == prefix) && u.OAuthUserClaims.Any(c => c.Name == JwtRegisteredClaimNames.PhoneNumber && c.Value == value));
         if (!string.IsNullOrWhiteSpace(nameIdentifier))
         {
-            filtered = _authenticationHelper.FilterUsersByNotLogin(filtered, nameIdentifier, prefix);
+            var result = await _authenticationHelper.FilterUsersByNotLogin(u => u
+                .Include(u => u.Realms)
+                .Include(u => u.OAuthUserClaims)
+                .AsNoTracking()
+                .Where(u => u.Realms.Any(r => r.RealmsName == prefix) && u.OAuthUserClaims.Any(c => c.Name == JwtRegisteredClaimNames.PhoneNumber && c.Value == value)), nameIdentifier, prefix)
+                .AnyAsync();
+            return result;
         }
 
-        return await filtered.AnyAsync();
+        return (await UserRepository.GetAll(u => u
+            .Include(u => u.Realms)
+            .Include(u => u.OAuthUserClaims)
+            .AsNoTracking()
+            .Where(u => u.Realms.Any(r => r.RealmsName == prefix) && u.OAuthUserClaims.Any(c => c.Name == JwtRegisteredClaimNames.PhoneNumber && c.Value == value))
+            .ToListAsync()
+        )).Any();
     }
 }

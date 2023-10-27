@@ -7,6 +7,8 @@ namespace SimpleIdServer.IdServer.Store
 {
     public interface IUserRepository
     {
+        Task<User> Get(Func<IQueryable<User>, Task<User>> callback);
+        Task<IEnumerable<User>> GetAll(Func<IQueryable<User>, Task<List<User>>> callback);
         IQueryable<User> Query();
         void Update(User user);
         void Add(User user);
@@ -24,6 +26,18 @@ namespace SimpleIdServer.IdServer.Store
         public UserRepository(StoreDbContext dbContext)
         {
             _dbContext = dbContext;
+        }
+
+        public async virtual Task<User> Get(Func<IQueryable<User>, Task<User>> callback)
+        {
+            var user = await callback(_dbContext.Users);
+            return user;
+        }
+
+        public async virtual Task<IEnumerable<User>> GetAll(Func<IQueryable<User>, Task<List<User>>> callback)
+        {
+            var users = await callback(_dbContext.Users);
+            return users;
         }
 
         public IQueryable<User> Query() => _dbContext.Users;
@@ -61,6 +75,6 @@ namespace SimpleIdServer.IdServer.Store
             return _dbContext.BulkInsertOrUpdateAsync(userRealms, bulkConfig);
         }
 
-        public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
+        public virtual Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
     }
 }

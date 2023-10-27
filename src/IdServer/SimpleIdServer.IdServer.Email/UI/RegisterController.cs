@@ -44,12 +44,12 @@ public class RegisterController : BaseOTPRegisterController<IdServerEmailOptions
         string nameIdentifier = string.Empty;
         if(User.Identity.IsAuthenticated) nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
 
-        var filtered = UserRepository.Query().Include(u => u.Realms).AsNoTracking().Where(u => u.Realms.Any(r => r.RealmsName == prefix) && u.Email == value);
         if(!string.IsNullOrWhiteSpace(nameIdentifier))
         {
-            filtered = _authenticationHelper.FilterUsersByNotLogin(filtered, nameIdentifier, prefix);
+            var filtered = _authenticationHelper.FilterUsersByNotLogin(u => u.Include(u => u.Realms).AsNoTracking().Where(u => u.Realms.Any(r => r.RealmsName == prefix) && u.Email == value), nameIdentifier, prefix);
+            return await filtered.AnyAsync();
         }
 
-        return await filtered.AnyAsync();
+        return (await UserRepository.GetAll(us => us.Include(u => u.Realms).AsNoTracking().Where(u => u.Realms.Any(r => r.RealmsName == prefix) && u.Email == value).ToListAsync())).Any();
     }
 }
