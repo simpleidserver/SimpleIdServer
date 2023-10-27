@@ -47,7 +47,7 @@ public class UserMobileAuthenticationService : GenericAuthenticationService<Auth
             return CredentialsValidationResult.Error("session_not_validated", "session_not_validated");
         }
 
-        return CredentialsValidationResult.Ok(authenticatedUser);
+        return CredentialsValidationResult.Ok(authenticatedUser, claims);
     }
 
     private async Task<User> GetUser(string authenticatedUserId, AuthenticateMobileViewModel viewModel, string realm, CancellationToken cancellationToken)

@@ -24,9 +24,10 @@ public enum ValidationStatus
 
 public record CredentialsValidationResult
 {
-    private CredentialsValidationResult(User authenticatedUser)
+    private CredentialsValidationResult(User authenticatedUser, ICollection<Claim> claims)
     {
         AuthenticatedUser = authenticatedUser;
+        Claims = claims;
         Status = ValidationStatus.AUTHENTICATE;
     }
 
@@ -36,11 +37,12 @@ public record CredentialsValidationResult
     }
 
     public User AuthenticatedUser { get; private set; }
+    public ICollection<Claim> Claims { get; private set; }
     public ValidationStatus Status { get; private set; }
     public string ErrorCode { get; private set; }
     public string ErrorMessage { get; private set; }
 
-    public static CredentialsValidationResult Ok(User user) => new CredentialsValidationResult(user);
+    public static CredentialsValidationResult Ok(User user, ICollection<Claim> claims) => new CredentialsValidationResult(user, claims);
 
     public static CredentialsValidationResult Error(ValidationStatus status) => new CredentialsValidationResult(status);
 

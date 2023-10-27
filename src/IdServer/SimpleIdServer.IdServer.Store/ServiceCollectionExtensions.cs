@@ -57,6 +57,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IUserSessionResitory, UserSessionRepository>();
             services.AddTransient<IConfigurationDefinitionStore, ConfigurationDefinitionStore>();
             services.AddTransient<IRegistrationWorkflowRepository, RegistrationWorkflowRepository>();
+            services.AddTransient<IUserClaimRepository, UserClaimRepository>();
         }
     }
 }

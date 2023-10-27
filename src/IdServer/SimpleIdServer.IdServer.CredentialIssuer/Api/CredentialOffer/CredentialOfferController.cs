@@ -38,10 +38,11 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialOffer
         private readonly IEnumerable<IUserNotificationService> _notificationServices;
         private readonly IGrantedTokenHelper _grantedTokenHelper;
         private readonly IJwtBuilder _jwtBuilder;
+        private readonly IUserClaimsService _userClaimsService;
         private readonly UrlEncoder _urlEncoder;
         private readonly IdServerHostOptions _options;
 
-        public CredentialOfferController(ICredentialTemplateRepository credentialTemplateRepository, ICredentialOfferRepository credentialOfferRepository, IAuthenticationHelper authenticationHelper, IUserRepository userRepository, IClientRepository clientRepository, IEnumerable<IUserNotificationService> notificationServices, IGrantedTokenHelper grantedTokenHelper, IJwtBuilder jwtBuilder, UrlEncoder urlEncoder, IOptions<IdServerHostOptions> options)
+        public CredentialOfferController(ICredentialTemplateRepository credentialTemplateRepository, ICredentialOfferRepository credentialOfferRepository, IAuthenticationHelper authenticationHelper, IUserRepository userRepository, IClientRepository clientRepository, IEnumerable<IUserNotificationService> notificationServices, IGrantedTokenHelper grantedTokenHelper, IJwtBuilder jwtBuilder, IUserClaimsService userClaimsService, UrlEncoder urlEncoder, IOptions<IdServerHostOptions> options)
         {
             _credentialTemplateRepository = credentialTemplateRepository;
             _credentialOfferRepository = credentialOfferRepository;
@@ -51,6 +52,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialOffer
             _notificationServices = notificationServices;
             _grantedTokenHelper = grantedTokenHelper;
             _jwtBuilder = jwtBuilder;
+            _userClaimsService = userClaimsService;
             _urlEncoder = urlEncoder;
             _options = options.Value;
         }
@@ -215,7 +217,8 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialOffer
                     {
                         pin = Guid.NewGuid().ToString();
                         var notificationService = _notificationServices.First(n => (user.NotificationMode ?? IdServer.Constants.DefaultNotificationMode) == n.Name);
-                        await notificationService.Send(pin, user);
+                        var userClaims = await _userClaimsService.Get(user.Id, cancellationToken);
+                        await notificationService.Send(pin, user, userClaims);
                     }
 
                     var preAuthorizedCode = Guid.NewGuid().ToString();

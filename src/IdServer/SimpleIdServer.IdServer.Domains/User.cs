@@ -63,23 +63,6 @@ namespace SimpleIdServer.IdServer.Domains
         public string? Did { get; set; } = null;
         [JsonIgnore]
         public string? DidPrivateHex { get; set; } = null;
-        [JsonIgnore]
-        [Newtonsoft.Json.JsonIgnore]
-        public ICollection<Claim> Claims
-        {
-            get
-            {
-                var properties = OAuthUserClaims.Select(c => new Claim(c.Name, c.Value, c.Type)).ToList();
-                foreach (var kvp in _userClaims)
-                {
-                    var val = kvp.Value.Value(this);
-                    if (val == null) continue;
-                    properties.Add(new Claim(kvp.Key, val.ToString()));
-                }
-
-                return properties;
-            }
-        }
         public UserSession? GetActiveSession(string realm)
         {
             return Sessions.FirstOrDefault(s => s.State == UserSessionStates.Active && DateTime.UtcNow < s.ExpirationDateTime && s.Realm == realm);

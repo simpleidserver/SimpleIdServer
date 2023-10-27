@@ -37,9 +37,10 @@ namespace SimpleIdServer.IdServer.Saml2.Api
         private readonly IScopeClaimsExtractor _scopeClaimsExtractor;
         private readonly IDistributedCache _distributedCache;
         private readonly IUserRepository _userRepository;
+        private readonly IUserClaimsService _userClaimsService;
         private readonly ILogger<SamlSSOController> _logger;
 
-        public SamlSSOController(IClientRepository clientRepository, ISaml2ConfigurationFactory saml2ConfigurationFactory, IDataProtectionProvider dataProtectionProvider, IScopeClaimsExtractor scopeClaimsExtractor, IDistributedCache distributedCache, IUserRepository userRepository, ILogger<SamlSSOController> logger)
+        public SamlSSOController(IClientRepository clientRepository, ISaml2ConfigurationFactory saml2ConfigurationFactory, IDataProtectionProvider dataProtectionProvider, IScopeClaimsExtractor scopeClaimsExtractor, IDistributedCache distributedCache, IUserRepository userRepository, IUserClaimsService userClaimsService, ILogger<SamlSSOController> logger)
         {
             _clientRepository = clientRepository;
             _saml2ConfigurationFactory = saml2ConfigurationFactory;
@@ -47,6 +48,7 @@ namespace SimpleIdServer.IdServer.Saml2.Api
             _scopeClaimsExtractor = scopeClaimsExtractor;
             _distributedCache = distributedCache;
             _userRepository = userRepository;
+            _userClaimsService = userClaimsService;
             _logger = logger;
         }
 
@@ -228,9 +230,10 @@ namespace SimpleIdServer.IdServer.Saml2.Api
         private async Task<ClaimsIdentity> BuildSubject(Client client, string issuer, string realm, CancellationToken cancellationToken)
         {
             var nameIdentifier = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).Include(u => u.Groups).AsNoTracking().SingleOrDefaultAsync(u => u.Name == nameIdentifier, cancellationToken);
+            var user = await _userRepository.Query().Include(u => u.Groups).AsNoTracking().SingleOrDefaultAsync(u => u.Name == nameIdentifier, cancellationToken);
+            var userClaims = await _userClaimsService.Get(user.Id, cancellationToken);
             var context = new HandlerContext(new HandlerContextRequest(issuer, string.Empty, null, null, null, (X509Certificate2)null, null), realm);
-            context.SetUser(user);
+            context.SetUser(user, userClaims);
             var claims = (await _scopeClaimsExtractor.ExtractClaims(context, client.Scopes, ScopeProtocols.SAML)).Select(c => new Claim(c.Key, c.Value.ToString())).ToList();
             if (claims.Count(t => t.Type == ClaimTypes.NameIdentifier) == 0)
                 throw new OAuthException(string.Empty, "token cannot be generated if there is no claim, please specify one or more scope in the client");

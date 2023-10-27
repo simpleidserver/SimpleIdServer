@@ -64,7 +64,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
         {
             var notificationMode = handlerContext.User.NotificationMode ?? Constants.DefaultNotificationMode;
             var notificationService = _notificationServices.First(n => n.Name == notificationMode);
-            await notificationService.Send($"The Back Channel redirection URL is : {BuildUrl(handlerContext.UrlHelper, handlerContext.Request.IssuerName, message)}", handlerContext.User);
+            await notificationService.Send($"The Back Channel redirection URL is : {BuildUrl(handlerContext.UrlHelper, handlerContext.Request.IssuerName, message)}", handlerContext.User, handlerContext.UserClaims);
         }
 
         protected string BuildUrl(IUrlHelper urlHelper, string issuer, BCNotificationMessage message)

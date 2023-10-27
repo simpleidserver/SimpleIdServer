@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
@@ -20,20 +21,20 @@ public class RegisterController : BaseOTPRegisterController<IdServerEmailOptions
 {
     private readonly IAuthenticationHelper _authenticationHelper;
 
-    public RegisterController(IAuthenticationHelper authenticationHelper, IOptions<IdServerHostOptions> options, IDistributedCache distributedCache, IUserRepository userRepository, IEnumerable<IOTPAuthenticator> otpAuthenticators, IConfiguration configuration, IEmailUserNotificationService userNotificationService) : base(options, distributedCache, userRepository, otpAuthenticators, configuration, userNotificationService)
+    public RegisterController(IAuthenticationHelper authenticationHelper, IOptions<IdServerHostOptions> options, IDistributedCache distributedCache, IUserRepository userRepository, IEnumerable<IOTPAuthenticator> otpAuthenticators, IConfiguration configuration, IEmailUserNotificationService userNotificationService, IUserClaimsService userClaimsService) : base(options, distributedCache, userRepository, userClaimsService, otpAuthenticators, configuration, userNotificationService)
     {
         _authenticationHelper = authenticationHelper;
     }
 
     protected override string Amr => Constants.AMR;
 
-    protected override void Enrich(OTPRegisterViewModel viewModel, User user)
+    protected override void Enrich(OTPRegisterViewModel viewModel, User user, ICollection<UserClaim> userClaims)
     {
         viewModel.Value = user.Email;
         viewModel.IsVerified = user.EmailVerified;
     }
 
-    protected override void BuildUser(User user, OTPRegisterViewModel viewModel)
+    protected override void BuildUser(User user, ICollection<UserClaim> userClaims, OTPRegisterViewModel viewModel)
     {
         user.Email = viewModel.Value;
         user.EmailVerified = true;

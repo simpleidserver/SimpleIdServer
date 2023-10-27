@@ -48,7 +48,7 @@ namespace SimpleIdServer.IdServer.Fido.Services
                 return CredentialsValidationResult.Error("session_not_validated", "session_not_validated");
             }
 
-            return CredentialsValidationResult.Ok(authenticatedUser);
+            return CredentialsValidationResult.Ok(authenticatedUser, claims);
         }
 
         private async Task<User> GetUser(string authenticatedUserId, AuthenticateWebauthnViewModel viewModel, string realm, CancellationToken cancellationToken)

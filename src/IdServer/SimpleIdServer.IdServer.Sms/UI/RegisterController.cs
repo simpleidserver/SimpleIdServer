@@ -31,10 +31,10 @@ public class RegisterController : BaseOTPRegisterController<IdServerSmsOptions>
 
     protected override string Amr => Constants.AMR;
 
-    protected override void Enrich(OTPRegisterViewModel viewModel, User user)
+    protected override void Enrich(OTPRegisterViewModel viewModel, User user, ICollection<UserClaim> claims)
     {
-        var phoneNumber = user.OAuthUserClaims.FirstOrDefault(c => c.Name == JwtRegisteredClaimNames.PhoneNumber)?.Value;
-        var phoneNumberVerified = user.OAuthUserClaims.FirstOrDefault(c => c.Name == JwtRegisteredClaimNames.PhoneNumberVerified)?.Value;
+        var phoneNumber = claims.FirstOrDefault(c => c.Name == JwtRegisteredClaimNames.PhoneNumber)?.Value;
+        var phoneNumberVerified = claims.FirstOrDefault(c => c.Name == JwtRegisteredClaimNames.PhoneNumberVerified)?.Value;
         viewModel.Value = phoneNumber;
         if(!string.IsNullOrWhiteSpace(phoneNumberVerified) && bool.TryParse(phoneNumberVerified, out bool b))
             viewModel.IsVerified = user.EmailVerified;
@@ -55,13 +55,9 @@ public class RegisterController : BaseOTPRegisterController<IdServerSmsOptions>
     {
         string nameIdentifier = string.Empty;
         if (User.Identity.IsAuthenticated) nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-
-        var filtered = UserRepository.Query().Include(u => u.Realms).Include(u => u.OAuthUserClaims).AsNoTracking().Where(u => u.Realms.Any(r => r.RealmsName == prefix) && u.OAuthUserClaims.Any(c => c.Name == JwtRegisteredClaimNames.PhoneNumber && c.Value == value));
-        if (!string.IsNullOrWhiteSpace(nameIdentifier))
-        {
-            filtered = _authenticationHelper.FilterUsersByNotLogin(filtered, nameIdentifier, prefix);
-        }
-
-        return await filtered.AnyAsync();
+        var existingUserId = await UserClaimsService.GetUserId(prefix, JwtRegisteredClaimNames.PhoneNumber, value, CancellationToken.None);
+        if (string.IsNullOrWhiteSpace(existingUserId)) return false;
+        var existingUsers = await _authenticationHelper.FilterUsersByLogin(UserRepository.Query(), nameIdentifier, prefix).ToListAsync();
+        return !existingUsers.Any(u => u.Id == existingUserId);
     }
 }

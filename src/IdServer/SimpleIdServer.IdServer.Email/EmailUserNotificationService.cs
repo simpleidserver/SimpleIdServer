@@ -21,7 +21,7 @@ namespace SimpleIdServer.IdServer.Email
 
         public string Name => Constants.AMR;
 
-        public Task Send(string message, User user) => Send(message, user.Email);
+        public Task Send(string message, User user, ICollection<UserClaim> claims) => Send(message, user.Email);
 
         public Task Send(string message, string destination)
         {

@@ -26,14 +26,16 @@ namespace SimpleIdServer.IdServer.Api.Users
     public class UsersController : BaseController
     {
         private readonly IUserRepository _userRepository;
+        private readonly IUserClaimsService _userClaimsService;
         private readonly IRealmRepository _realmRepository;
         private readonly IBusControl _busControl;
         private readonly IJwtBuilder _jwtBuilder;
         private readonly IEnumerable<IDIDGenerator> _generators;
 
-        public UsersController(IUserRepository userRepository, IRealmRepository realmRepository, IBusControl busControl, IJwtBuilder jwtBuilder, IEnumerable<IDIDGenerator> generators)
+        public UsersController(IUserRepository userRepository, IUserClaimsService userClaimsService, IRealmRepository realmRepository, IBusControl busControl, IJwtBuilder jwtBuilder, IEnumerable<IDIDGenerator> generators)
         {
             _userRepository = userRepository;
+            _userClaimsService = userClaimsService;
             _realmRepository = realmRepository;
             _busControl = busControl;
             _jwtBuilder = jwtBuilder;
@@ -68,12 +70,6 @@ namespace SimpleIdServer.IdServer.Api.Users
                         Firstname = request.Firstname,
                         Lastname = request.Lastname,
                         Email = request.Email,
-                        OAuthUserClaims = request.Claims?.Select(c => new UserClaim
-                        {
-                            Id = Guid.NewGuid().ToString(),
-                            Name = c.Key,
-                            Value = c.Value
-                        }).ToList(),
                         UpdateDateTime = DateTime.UtcNow,
                         CreateDateTime = DateTime.UtcNow
                     };
@@ -82,6 +78,13 @@ namespace SimpleIdServer.IdServer.Api.Users
                         Realm = realm
                     });
                     _userRepository.Add(newUser);
+                    await _userClaimsService.Add(request.Claims?.Select(c => new UserClaim
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = c.Key,
+                        UserId = newUser.Id,
+                        Value = c.Value
+                    }), cancellationToken);
                     await _userRepository.SaveChanges(cancellationToken);
                     activity?.SetStatus(ActivityStatusCode.Ok, "Add user success");
                     await _busControl.Publish(new AddUserSuccessEvent
@@ -131,8 +134,9 @@ namespace SimpleIdServer.IdServer.Api.Users
             {
                 prefix = prefix ?? Constants.DefaultRealm;
                 CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
-                var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).Include(u => u.Credentials).Include(u => u.Realms).AsNoTracking().FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.RealmsName == prefix), cancellationToken);
+                var user = await _userRepository.Query().Include(u => u.Credentials).Include(u => u.Realms).AsNoTracking().FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.RealmsName == prefix), cancellationToken);
                 if (user == null) return new NotFoundResult();
+                user.OAuthUserClaims = await _userClaimsService.Get(user.Id, cancellationToken);
                 return new OkObjectResult(user);
             }
             catch (OAuthException ex)

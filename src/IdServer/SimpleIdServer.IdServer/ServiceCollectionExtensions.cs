@@ -178,6 +178,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthPKCEAuthenticationHandler>();
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientTlsClientAuthenticationHandler>();
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSelfSignedTlsClientAuthenticationHandler>();
+            services.AddTransient<IUserClaimsService, UserClaimsService>();
             return services;
         }
 

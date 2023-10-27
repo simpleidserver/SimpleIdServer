@@ -18,7 +18,6 @@ using SimpleIdServer.IdServer.UI.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -95,7 +94,7 @@ namespace SimpleIdServer.IdServer.UI
             }
         }
 
-        protected async Task<IActionResult> Authenticate(string realm, string returnUrl, string currentAmr, User user, CancellationToken token, bool rememberLogin = false)
+        protected async Task<IActionResult> Authenticate(string realm, string returnUrl, string currentAmr, User user, ICollection<Claim> claims, CancellationToken token, bool rememberLogin = false)
         {
             if (!IsProtected(returnUrl))
             {
@@ -117,16 +116,16 @@ namespace SimpleIdServer.IdServer.UI
 
             var allAmr = acr.AuthenticationMethodReferences;
             var login = _authenticationHelper.GetLogin(user);
-            HttpContext.Response.Cookies.Append(Constants.DefaultCurrentAmrCookieName, JsonSerializer.Serialize(new AmrAuthInfo(user.Id, login, user.Email, user.OAuthUserClaims.Select(c => new KeyValuePair<string, string>(c.Name, c.Value)).ToList(), allAmr, amr)));
+            HttpContext.Response.Cookies.Append(Constants.DefaultCurrentAmrCookieName, JsonSerializer.Serialize(new AmrAuthInfo(user.Id, login, user.Email, claims.Select(c => new KeyValuePair<string, string>(c.Type, c.Value)).ToList(), allAmr, amr)));
 	        await _userRepository.SaveChanges(token);
             return RedirectToAction("Index", "Authenticate", new { area = amr, ReturnUrl = returnUrl });
         }
 
-        protected async Task<IActionResult> Sign(string realm, string returnUrl, string currentAmr, User user, CancellationToken token, bool rememberLogin = false)
+        protected async Task<IActionResult> Sign(string realm, string returnUrl, string currentAmr, User user, ICollection<UserClaim> userClaims, CancellationToken token, bool rememberLogin = false)
         {
             await AddSession(realm, user, token);
             var offset = DateTimeOffset.UtcNow.AddSeconds(_options.CookieAuthExpirationTimeInSeconds);
-            var claims = _userTransformer.Transform(user);
+            var claims = _userTransformer.Transform(user, userClaims);
             var claimsIdentity = new ClaimsIdentity(claims, currentAmr);
             var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
             if (rememberLogin)

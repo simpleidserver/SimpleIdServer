@@ -14,6 +14,7 @@ public class UserRegistrationProgress
     public string Amr { get; set; }
     public string Realm { get; set; }
     public User User { get; set; } = null;
+    public ICollection<UserClaim> UserClaims { get; set; }
 
     public bool IsLastStep
     {

@@ -36,7 +36,7 @@ public abstract class OTPAuthenticationService : GenericAuthenticationService<Ba
         var activeOtp = authenticatedUser.ActiveOTP;
         var otpAuthenticator = _otpAuthenticators.Single(a => a.Alg == activeOtp.OTPAlg);
         if (!otpAuthenticator.Verify(viewModel.OTPCode.Value, activeOtp)) return Task.FromResult(CredentialsValidationResult.Error(ValidationStatus.INVALIDCREDENTIALS));
-        return Task.FromResult(CredentialsValidationResult.Ok(authenticatedUser));
+        return Task.FromResult(CredentialsValidationResult.Ok(authenticatedUser, claims));
     }
 
     protected virtual async Task<User> GetUser(string authenticatedUserId, BaseOTPAuthenticateViewModel viewModel, string realm, CancellationToken cancellationToken)

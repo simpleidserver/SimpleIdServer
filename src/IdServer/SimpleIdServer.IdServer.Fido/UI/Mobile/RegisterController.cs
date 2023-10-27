@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Fido.UI.ViewModels;
 using SimpleIdServer.IdServer.Options;
@@ -17,7 +18,7 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
     {
         private readonly IConfiguration _configuration;
 
-        public RegisterController(IOptions<IdServerHostOptions> options, IDistributedCache distributedCache, IUserRepository userRepository, IConfiguration configuration) : base(options, distributedCache, userRepository)
+        public RegisterController(IOptions<IdServerHostOptions> options, IDistributedCache distributedCache, IUserRepository userRepository, IConfiguration configuration, IUserClaimsService userClaimsService) : base(options, distributedCache, userRepository, userClaimsService)
         {
             _configuration = configuration;
         }
@@ -54,7 +55,7 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
             return View(viewModel);
         }
 
-        protected override void EnrichUser(User user, RegisterMobileViewModel viewModel)
+        protected override void EnrichUser(User user, ICollection<UserClaim> userClaims, RegisterMobileViewModel viewModel)
         {
         }
 

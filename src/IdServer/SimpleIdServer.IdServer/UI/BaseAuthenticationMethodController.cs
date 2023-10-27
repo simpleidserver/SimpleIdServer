@@ -55,6 +55,7 @@ namespace SimpleIdServer.IdServer.UI
         protected abstract string Amr { get; }
         protected abstract bool IsExternalIdProvidersDisplayed { get; }
         protected IUserAuthenticationService UserAuthenticationService => _authenticationService;
+        protected IUserClaimsService UserClaimsService => _userClaimsService;
 
         #region Get Authenticate View
 
@@ -164,7 +165,7 @@ namespace SimpleIdServer.IdServer.UI
                 }
             }
 
-            return await Authenticate(prefix, viewModel.ReturnUrl, Amr, authenticationResult.AuthenticatedUser, token, viewModel.RememberLogin);
+            return await Authenticate(prefix, viewModel.ReturnUrl, Amr, authenticationResult.AuthenticatedUser, authenticationResult.Claims, token, viewModel.RememberLogin);
         }
 
         protected abstract Task<UserAuthenticationResult> CustomAuthenticate(string prefix, string authenticatedUserId, T viewModel, CancellationToken cancellationToken);

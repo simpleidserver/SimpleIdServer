@@ -11,7 +11,6 @@ namespace SimpleIdServer.IdServer.Store.Configurations
         public void Configure(EntityTypeBuilder<User> builder)
         {
             builder.HasKey(u => u.Id);
-            builder.Ignore(u => u.Claims);
             builder.HasMany(u => u.Sessions).WithOne(u => u.User).OnDelete(DeleteBehavior.Cascade);
             builder.HasMany(u => u.OAuthUserClaims).WithOne(u => u.User).OnDelete(DeleteBehavior.Cascade);
             builder.HasMany(u => u.Credentials).WithOne(u => u.User).OnDelete(DeleteBehavior.Cascade);

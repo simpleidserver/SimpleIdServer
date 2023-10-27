@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
+using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
@@ -33,6 +34,7 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IAuthenticationSchemeProviderRepository _authenticationSchemeProviderRepository;
         private readonly IAuthenticationHelper _authenticationHelper;
         private readonly IRealmRepository _realmRepository;
+        private readonly IUserClaimsService _userClaimsService;
 
         public ExternalAuthenticateController(
             IOptions<IdServerHostOptions> options,
@@ -46,6 +48,7 @@ namespace SimpleIdServer.IdServer.UI
             IAuthenticationSchemeProviderRepository authenticationSchemeProviderRepository,
             IAuthenticationHelper authenticationHelper,
             IRealmRepository realmRepository,
+            IUserClaimsService userClaimsService,
             IBusControl busControl) : base(clientRepository, userRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, options)
         {
             _logger = logger;
@@ -54,6 +57,7 @@ namespace SimpleIdServer.IdServer.UI
             _authenticationSchemeProviderRepository = authenticationSchemeProviderRepository;
             _authenticationHelper = authenticationHelper;
             _realmRepository = realmRepository;
+            _userClaimsService = userClaimsService;
         }
 
         [HttpGet]
@@ -111,11 +115,11 @@ namespace SimpleIdServer.IdServer.UI
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.BAD_EXTERNAL_AUTHENTICATION_USER);
             }
 
+            var userClaims = new List<UserClaim>();
             var user = await UserRepository.Query()
                 .Include(u => u.Groups)
                 .Include(u => u.ExternalAuthProviders)
                 .Include(u => u.Sessions)
-                .Include(u => u.OAuthUserClaims)
                 .Include(u => u.Realms)
                 .FirstOrDefaultAsync(u => u.ExternalAuthProviders.Any(e => e.Scheme == scheme && e.Subject == sub) && u.Realms.Any(r => r.RealmsName == realm), cancellationToken);
             if (user == null)
@@ -125,8 +129,7 @@ namespace SimpleIdServer.IdServer.UI
                     .Include(u => u.ExternalAuthProviders)
                     .Include(u => u.Sessions)
                     .Include(u => u.Realms)
-                    .Include(u => u.Groups)
-                    .Include(u => u.OAuthUserClaims), sub, realm, cancellationToken);
+                    .Include(u => u.Groups), sub, realm, cancellationToken);
                 if(existingUser != null)
                 {
                     user = existingUser;
@@ -137,7 +140,9 @@ namespace SimpleIdServer.IdServer.UI
                 {
                     var r = await _realmRepository.Query().FirstAsync(r => r.Name == realm);
                     var idProvider = await _authenticationSchemeProviderRepository.Query().AsNoTracking().Include(p => p.Mappers).SingleAsync(p => p.Name == scheme, cancellationToken);
-                    user = _userTransformer.Transform(r, principal, idProvider);
+                    var transformationResult = _userTransformer.Transform(r, principal, idProvider);
+                    userClaims = transformationResult.Claims;
+                    user = transformationResult.User;
                     user.AddExternalAuthProvider(scheme, sub);
                     UserRepository.Add(user);
                     await UserRepository.SaveChanges(cancellationToken);

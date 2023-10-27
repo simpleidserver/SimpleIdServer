@@ -23,9 +23,9 @@ namespace SimpleIdServer.IdServer.Sms
 
         public string Name => Constants.AMR;
 
-        public Task Send(string message, User user)
+        public Task Send(string message, User user, ICollection<UserClaim> claims)
         {
-            var phoneNumber = user.OAuthUserClaims.First(c => c.Name == JwtRegisteredClaimNames.PhoneNumber).Value;
+            var phoneNumber = claims.First(c => c.Name == JwtRegisteredClaimNames.PhoneNumber).Value;
             return Send(message, phoneNumber);
         }
 

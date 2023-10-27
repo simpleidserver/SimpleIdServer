@@ -14,6 +14,7 @@ public interface IUserClaimsService
 {
     Task<List<UserClaim>> Get(string userId, CancellationToken cancellationToken);
     Task<string> GetUserId(string realm, string claimName, string claimValue, CancellationToken cancellationToken);
+    Task Add(IEnumerable<UserClaim> userClaims, CancellationToken cancellationToken);
 }
 
 public class UserClaimsService : IUserClaimsService
@@ -35,5 +36,11 @@ public class UserClaimsService : IUserClaimsService
     {
         var claim = await _userClaimRepository.Query().Include(c => c.User).ThenInclude(u => u.Realms).AsNoTracking().SingleOrDefaultAsync(c => c.Name == claimName && c.Value == claimValue && c.User.Realms.Any(r => r.RealmsName == realm), cancellationToken);
         return claim?.UserId;
+    }
+
+    public async Task Add(IEnumerable<UserClaim> userClaims, CancellationToken cancellationToken)
+    {
+        foreach (var userClaim in userClaims) _userClaimRepository.Add(userClaim);
+        await _userClaimRepository.SaveChanges(cancellationToken);
     }
 }

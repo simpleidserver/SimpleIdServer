@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Fido.UI.ViewModels;
 using SimpleIdServer.IdServer.Options;
@@ -17,7 +18,7 @@ namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
     [Area(Constants.AMR)]
     public class RegisterController : BaseRegisterController<RegisterWebauthnViewModel>
     {
-        public RegisterController(IOptions<IdServerHostOptions> options, IDistributedCache distributedCache, IUserRepository userRepository) : base(options, distributedCache, userRepository)
+        public RegisterController(IOptions<IdServerHostOptions> options, IDistributedCache distributedCache, IUserRepository userRepository, IUserClaimsService userClaimsService) : base(options, distributedCache, userRepository, userClaimsService)
         {
         }
 
@@ -52,6 +53,6 @@ namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
             });
         }
 
-        protected override void EnrichUser(User user, RegisterWebauthnViewModel viewModel) { }
+        protected override void EnrichUser(User user, ICollection<UserClaim> userClaims, RegisterWebauthnViewModel viewModel) { }
     }
 }

@@ -12,8 +12,20 @@ namespace SimpleIdServer.IdServer.UI.Services
 {
     public interface IUserTransformer
     {
-        User Transform(Domains.Realm realm, ClaimsPrincipal principal, AuthenticationSchemeProvider idProvider);
-        ICollection<Claim> Transform(User user);
+        UserTransformationResult Transform(Domains.Realm realm, ClaimsPrincipal principal, AuthenticationSchemeProvider idProvider);
+        ICollection<Claim> Transform(User user, ICollection<UserClaim> userClaims);
+    }
+
+    public record UserTransformationResult
+    {
+        public UserTransformationResult(User user, List<UserClaim> claims)
+        {
+            User = user;
+            Claims = claims;
+        }
+
+        public User User { get; private set; }
+        public List<UserClaim> Claims { get; private set; }
     }
 
     public class UserTransformer : IUserTransformer
@@ -25,8 +37,9 @@ namespace SimpleIdServer.IdServer.UI.Services
             { ClaimTypes.Gender, JwtRegisteredClaimNames.Gender }
         };
 
-        public User Transform(Domains.Realm realm, ClaimsPrincipal principal, AuthenticationSchemeProvider idProvider)
+        public UserTransformationResult Transform(Domains.Realm realm, ClaimsPrincipal principal, AuthenticationSchemeProvider idProvider)
         {
+            var userClaims = new List<UserClaim>();
             var user = new User
             {
                 Id = Guid.NewGuid().ToString(),
@@ -53,7 +66,7 @@ namespace SimpleIdServer.IdServer.UI.Services
                 }
             }
 
-            return user;
+            return new UserTransformationResult(user, userClaims);
 
             void ExractSubject()
             {
@@ -80,12 +93,17 @@ namespace SimpleIdServer.IdServer.UI.Services
             void ExtractAttribute(AuthenticationSchemeProviderMapper mapper)
             {
                 var claims = principal.Claims.Where(c => c.Type == mapper.SourceClaimName);
-                foreach(var claim in claims)
-                    user.AddClaim(mapper.TargetUserAttribute, claim.Value);
+                foreach (var claim in claims)
+                    userClaims.Add(new UserClaim
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = mapper.TargetUserAttribute,
+                        Value = claim.Value
+                    });
             }
         }
 
-        public ICollection<Claim> Transform(User user)
+        public ICollection<Claim> Transform(User user, ICollection<UserClaim> userClaims)
         {
             var result = new List<Claim>
             {
@@ -95,12 +113,12 @@ namespace SimpleIdServer.IdServer.UI.Services
                 result.Add(new Claim(ClaimTypes.Name, user.Firstname));
             if (!string.IsNullOrWhiteSpace(user.Lastname))
                 result.Add(new Claim(ClaimTypes.GivenName, user.Lastname));
-            foreach (var cl in user.Claims)
+            foreach (var cl in userClaims)
             {
-                var cm = CLAIM_MAPPINGS.FirstOrDefault(c => c.Value == cl.Type);
+                var cm = CLAIM_MAPPINGS.FirstOrDefault(c => c.Value == cl.Name);
                 if (!cm.Equals(default(KeyValuePair<string, string>)) && cm.Value != null)
                     result.Add(new Claim(cm.Key, cl.Value));
-                else result.Add(cl);
+                else result.Add(new Claim(cl.Name, cl.Value));
             }
 
             return result;

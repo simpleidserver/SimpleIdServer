@@ -4,12 +4,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
@@ -20,7 +22,7 @@ namespace SimpleIdServer.IdServer.UI;
 [Area(Constants.Areas.Password)]
 public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
 {
-    public RegisterController(IOptions<IdServerHostOptions> options, IDistributedCache distributedCache, IUserRepository userRepository) : base(options, distributedCache, userRepository)
+    public RegisterController(IOptions<IdServerHostOptions> options, IDistributedCache distributedCache, IUserRepository userRepository, IUserClaimsService userClaimsService) : base(options, distributedCache, userRepository, userClaimsService)
     {
     }
 
@@ -103,7 +105,7 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
         }
     }
 
-    protected override void EnrichUser(User user, PwdRegisterViewModel viewModel)
+    protected override void EnrichUser(User user, ICollection<UserClaim> userClaims, PwdRegisterViewModel viewModel)
     {
         user.Credentials.Add(new UserCredential
         {

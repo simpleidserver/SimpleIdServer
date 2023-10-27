@@ -50,7 +50,7 @@ public class PasswordAuthenticationService : GenericAuthenticationService<Authen
             if (credential == null || credential.Value != hash && credential.IsActive) return Task.FromResult(CredentialsValidationResult.Error(ValidationStatus.INVALIDCREDENTIALS));
         }
 
-        return Task.FromResult(CredentialsValidationResult.Ok(authenticatedUser));
+        return Task.FromResult(CredentialsValidationResult.Ok(authenticatedUser, claims));
     }
 
     private async Task<UserResult> GetUser(string authenticatedUserId, AuthenticatePasswordViewModel viewModel, string realm, CancellationToken cancellationToken)

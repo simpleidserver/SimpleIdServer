@@ -10,6 +10,7 @@ using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,16 +19,18 @@ namespace SimpleIdServer.IdServer.UI;
 
 public abstract class BaseRegisterController<TViewModel> : BaseController where TViewModel : IRegisterViewModel
 {
-    public BaseRegisterController(IOptions<IdServerHostOptions> options, IDistributedCache distributedCache, IUserRepository userRepository)
+    public BaseRegisterController(IOptions<IdServerHostOptions> options, IDistributedCache distributedCache, IUserRepository userRepository, IUserClaimsService userClaimsService)
     {
         Options = options.Value;
         DistributedCache = distributedCache;
         UserRepository = userRepository;
+        UserClaimsService = userClaimsService;
     }
 
     protected IdServerHostOptions Options { get; }
     protected IDistributedCache DistributedCache { get; }
     protected IUserRepository UserRepository { get; }
+    protected IUserClaimsService UserClaimsService { get; }
 
     protected async Task<UserRegistrationProgress> GetRegistrationProgress()
     {
@@ -48,7 +51,8 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
             CreateDateTime = DateTime.UtcNow,
             UpdateDateTime = DateTime.UtcNow
         };
-        EnrichUser(user, viewModel);
+        var userClaims = registrationProgress.UserClaims ?? new List<UserClaim>();
+        EnrichUser(user, userClaims, viewModel);
         var lastStep = registrationProgress.Steps.Last();
         if(lastStep == amr)
         {
@@ -57,6 +61,7 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
                 RealmsName = prefix
             });
             UserRepository.Add(user);
+            await UserClaimsService.Add(userClaims, CancellationToken.None);
             await UserRepository.SaveChanges(CancellationToken.None);
             viewModel.IsUpdated = true;
             return View(viewModel);
@@ -84,5 +89,5 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
         return RedirectToAction("Index", "Register", new { area = registrationProgress.Amr });
     }
 
-    protected abstract void EnrichUser(User user, TViewModel viewModel);
+    protected abstract void EnrichUser(User user, ICollection<UserClaim> claims, TViewModel viewModel);
 }
