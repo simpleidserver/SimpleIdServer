@@ -23,19 +23,22 @@ namespace SimpleIdServer.IdServer.UI;
 public abstract class BaseOTPRegisterController<TOptions> : BaseRegisterController<OTPRegisterViewModel> where TOptions : IOTPRegisterOptions
 {
     private readonly IUserRepository _userRepository;
+    private readonly IUserClaimsService _userClaimsService;
     private readonly IEnumerable<IOTPAuthenticator> _otpAuthenticators;
     private readonly IConfiguration _configuration;
     private readonly IUserNotificationService _userNotificationService;
 
-    public BaseOTPRegisterController(IOptions<IdServerHostOptions> options, IDistributedCache distributedCache, IUserRepository userRepository, IEnumerable<IOTPAuthenticator> otpAuthenticators, IConfiguration configuration, IUserNotificationService userNotificationService) : base(options, distributedCache, userRepository)
+    public BaseOTPRegisterController(IOptions<IdServerHostOptions> options, IDistributedCache distributedCache, IUserRepository userRepository, IUserClaimsService userClaimsService, IEnumerable<IOTPAuthenticator> otpAuthenticators, IConfiguration configuration, IUserNotificationService userNotificationService) : base(options, distributedCache, userRepository)
     {
         _userRepository = userRepository;
+        _userClaimsService = userClaimsService;
         _otpAuthenticators = otpAuthenticators;
         _configuration = configuration;
         _userNotificationService = userNotificationService;
     }
 
     protected abstract string Amr { get; }
+    protected IUserClaimsService UserClaimsService => _userClaimsService;
 
 
     [HttpGet]
@@ -55,7 +58,8 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseRegisterControll
         {
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
             viewModel.NameIdentifier = nameIdentifier;
-            var authenticatedUser = await _userRepository.Query().AsNoTracking().Include(u => u.Realms).SingleAsync(u => u.Name == nameIdentifier && u.Realms.Any(r => r.RealmsName == prefix));
+            var authenticatedUser = await _userRepository.Query().AsNoTracking()
+                .Include(u => u.Realms).SingleAsync(u => u.Name == nameIdentifier && u.Realms.Any(r => r.RealmsName == prefix));
             Enrich(viewModel, authenticatedUser);
         }
 
@@ -136,8 +140,9 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseRegisterControll
                 return View(viewModel);
             }
 
-            var authenticatedUser = await _userRepository.Query().Include(u => u.Realms).Include(c => c.OAuthUserClaims).Include(c => c.Credentials).FirstAsync(u => u.Realms.Any(r => r.RealmsName == prefix) && u.Name == nameIdentifier);
-            BuildUser(authenticatedUser, viewModel);
+            var authenticatedUser = await _userRepository.Query().Include(u => u.Realms).Include(c => c.Credentials).FirstAsync(u => u.Realms.Any(r => r.RealmsName == prefix) && u.Name == nameIdentifier);
+            var userClaims = await _userClaimsService.Get(authenticatedUser.Id, CancellationToken.None);
+            BuildUser(authenticatedUser, userClaims, viewModel);
             authenticatedUser.UpdateDateTime = DateTime.UtcNow;
             if (authenticatedUser.ActiveOTP == null)
                 authenticatedUser.GenerateTOTP();
@@ -163,7 +168,7 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseRegisterControll
 
     protected abstract Task<bool> IsUserExists(string value, string prefix);
 
-    protected abstract void BuildUser(User user, OTPRegisterViewModel viewModel);
+    protected abstract void BuildUser(User user, ICollection<UserClaim> claims, OTPRegisterViewModel viewModel);
 
     protected override void EnrichUser(User user, OTPRegisterViewModel viewModel)
     {

@@ -20,7 +20,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Net;
+using System.Security.Claims;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
@@ -148,9 +150,10 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     activity?.SetTag("scopes", string.Join(",", extractionResult.Scopes));
                     var result = BuildResult(context, extractionResult.Scopes);
                     await Authenticate(jwsPayload, context, cancellationToken);
-                    var userClaims = await _userClaimsService.Get(context.User.Id, context.Realm, cancellationToken);
+                    var userClaims = await _userClaimsService.Get(context.User.Id, cancellationToken);
+                    var cls = userClaims.Select(c => new Claim(c.Name, c.Value)).ToList();
                     foreach (var tokenBuilder in _tokenBuilders)
-                        await tokenBuilder.Build(new BuildTokenParameter { UserClaims = userClaims, AuthorizationDetails = extractionResult.AuthorizationDetails, Scopes = extractionResult.Scopes, Audiences = extractionResult.Audiences, Claims = claims, GrantId = tokenResult.GrantId }, context, cancellationToken);
+                        await tokenBuilder.Build(new BuildTokenParameter { UserClaims = cls, AuthorizationDetails = extractionResult.AuthorizationDetails, Scopes = extractionResult.Scopes, Audiences = extractionResult.Audiences, Claims = claims, GrantId = tokenResult.GrantId }, context, cancellationToken);
 
                     AddTokenProfile(context);
                     foreach (var kvp in context.Response.Parameters)
@@ -203,7 +206,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             if (!previousQueryParameters.ContainsKey(JwtRegisteredClaimNames.Sub))
                 return;
             var user = await _userRepository.Query().Include(u => u.Groups).FirstOrDefaultAsync(u => u.Name == previousQueryParameters[JwtRegisteredClaimNames.Sub].GetValue<string>(), token);
-            var userClaims = await _userClaimsService.Get(user.Id, handlerContext.Realm, token);
+            var userClaims = await _userClaimsService.Get(user.Id,  token);
             handlerContext.SetUser(user, userClaims);
         }
     }

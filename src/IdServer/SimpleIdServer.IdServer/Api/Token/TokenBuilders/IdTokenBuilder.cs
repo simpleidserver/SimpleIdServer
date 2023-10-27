@@ -105,7 +105,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
             foreach (var claim in claimsDic)
                 claims.Add(claim.Key, claim.Value);
 
-            _claimsJwsPayloadEnricher.EnrichWithClaimsParameter(claims, requestedClaims, currentContext.User, activeSession?.AuthenticationDateTime);
+            _claimsJwsPayloadEnricher.EnrichWithClaimsParameter(claims, requestedClaims, currentContext.Claims, activeSession?.AuthenticationDateTime);
             await _claimsEnricher.Enrich(currentContext.User, claims, openidClient, cancellationToken);
             var result = new SecurityTokenDescriptor
             {

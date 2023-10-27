@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
+using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.ExternalEvents;
@@ -33,6 +34,7 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IdServerHostOptions _options;
         private readonly IUserHelper _userHelper;
         private readonly IUserRepository _userRepository;
+        private readonly IUserClaimsService _userClaimsService;
         private readonly IClientRepository _clientRepository;
         private readonly IUmaPendingRequestRepository _pendingRequestRepository;
         private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
@@ -42,13 +44,14 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IEnumerable<IAuthenticationMethodService> _authenticationMethodServices;
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(IOptions<IdServerHostOptions> options, IUserHelper userHelper, IUserRepository userRepository, IClientRepository clientRepository, 
+        public HomeController(IOptions<IdServerHostOptions> options, IUserHelper userHelper, IUserRepository userRepository, IUserClaimsService userClaimsService, IClientRepository clientRepository, 
             IUmaPendingRequestRepository pendingRequestRepository, IAuthenticationSchemeProvider authenticationSchemeProvider,
             IOTPQRCodeGenerator otpQRCodeGenerator, ICredentialTemplateRepository credentialTemplateRepository, IBusControl busControl, IEnumerable<IAuthenticationMethodService> authenticationMethodServices, ILogger<HomeController> logger)
         {
             _options = options.Value;
             _userHelper = userHelper;
             _userRepository = userRepository;
+            _userClaimsService = userClaimsService;
             _clientRepository = clientRepository;
             _pendingRequestRepository = pendingRequestRepository;
             _authenticationSchemeProvider = authenticationSchemeProvider;
@@ -69,14 +72,21 @@ namespace SimpleIdServer.IdServer.UI
             prefix = prefix ?? Constants.DefaultRealm;
             var schemes = await _authenticationSchemeProvider.GetAllSchemesAsync();
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).Include(u => u.Consents).ThenInclude(c => c.Scopes).ThenInclude(c => c.AuthorizedResources).Include(u => u.ExternalAuthProviders).Include(u => u.Credentials).FirstOrDefaultAsync(u => u.Name == nameIdentifier, cancellationToken);
+            var user = await _userRepository.Query()
+                .Include(u => u.Consents)
+                .ThenInclude(c => c.Scopes)
+                .ThenInclude(c => c.AuthorizedResources)
+                .Include(u => u.ExternalAuthProviders)
+                .Include(u => u.Credentials)
+                .FirstAsync(u => u.Name == nameIdentifier, cancellationToken);
+            var userClaims = await _userClaimsService.Get(user.Id, cancellationToken);
             var consents = await GetConsents();
             var pendingRequests = await GetPendingRequest();
             var methodServices = _authenticationMethodServices.Select(a => new AuthenticationMethodViewModel
             {
                 Name = a.Name,
                 Amr = a.Amr,
-                IsCredentialExists = a.IsCredentialExists(user)
+                IsCredentialExists = a.IsCredentialExists(user, userClaims)
             });
             var externalIdProviders = ExternalProviderHelper.GetExternalAuthenticationSchemes(schemes);
             return View(new ProfileViewModel

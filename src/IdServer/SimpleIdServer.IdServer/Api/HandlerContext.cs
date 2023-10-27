@@ -171,7 +171,14 @@ namespace SimpleIdServer.IdServer.Api
         }
 
         public User User { get; private set; }
-        public ICollection<Claim> UserClaims { get; private set; }
+        public ICollection<UserClaim> UserClaims { get; private set; }
+        public ICollection<Claim> Claims
+        {
+            get
+            {
+                return UserClaims?.Select(c => new Claim(c.Name, c.Value))?.ToList();
+            }
+        }
         public Client Client { get; private set; }
         public JsonWebToken DPOPProof { get; private set; }
         public HandlerContextRequest Request { get; private set; }
@@ -208,7 +215,7 @@ namespace SimpleIdServer.IdServer.Api
 
         public void SetClient(Client client) => Client = client;
 
-        public void SetUser(User user, ICollection<Claim> userClaims)
+        public void SetUser(User user, ICollection<UserClaim> userClaims)
         {
             User = user;
             UserClaims = userClaims;

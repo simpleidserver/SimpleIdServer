@@ -10,6 +10,6 @@ namespace SimpleIdServer.IdServer.Sms
         public string Amr => Constants.AMR;
         public string Name => "Sms";
         public Type? OptionsType => typeof(IdServerSmsOptions);
-        public bool IsCredentialExists(User user) => user.OAuthUserClaims.Any(c => c.Type == JwtRegisteredClaimNames.PhoneNumber);
+        public bool IsCredentialExists(User user, List<UserClaim> claims) => claims.Any(c => c.Type == JwtRegisteredClaimNames.PhoneNumber);
     }
 }

@@ -56,7 +56,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
                 Client oauthClient = await _clientAuthenticationHelper.AuthenticateClient(context.Realm, context.Request.HttpHeader, context.Request.RequestData, context.Request.Certificate, context.GetIssuer(), cancellationToken, ErrorCodes.INVALID_REQUEST);
                 context.SetClient(oauthClient);
                 var user = await _bcAuthorizeRequestValidator.ValidateCreate(context, cancellationToken);
-                var userClaims = await _userClaimsService.Get(user.Id, context.Realm, cancellationToken);
+                var userClaims = await _userClaimsService.Get(user.Id, cancellationToken);
                 context.SetUser(user, userClaims);
                 var requestedExpiry = context.Request.RequestData.GetRequestedExpiry() ?? context.Client.AuthReqIdExpirationTimeInSeconds;
                 var currentDateTime = DateTime.UtcNow;

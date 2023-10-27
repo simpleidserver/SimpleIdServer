@@ -63,7 +63,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             var preAuth = await _grantedTokenHelper.GetPreAuthCode(preAuthorizedCode, cancellationToken);
             if (preAuth == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_PREAUTHORIZEDCODE);
             var user = await _userRepository.Query().AsNoTracking().SingleAsync(u => u.Id == preAuth.UserId, cancellationToken);
-            var userClaims = await _userClaimsService.Get(user.Id, context.Realm, cancellationToken);
+            var userClaims = await _userClaimsService.Get(user.Id, cancellationToken);
             context.SetUser(user, userClaims);
             return new ValidationResult(client, user);
         }

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
@@ -18,7 +19,7 @@ namespace SimpleIdServer.IdServer.UI
     [Area(Constants.Areas.Password)]
     public class AuthenticateController : BaseAuthenticationMethodController<AuthenticatePasswordViewModel>
     {
-        public AuthenticateController(IPasswordAuthenticationService userAuthenticationService, IAuthenticationSchemeProvider authenticationSchemeProvider, IOptions<IdServerHostOptions> options, IDataProtectionProvider dataProtectionProvider, IAuthenticationHelper authenticationHelper, IClientRepository clientRepository, IAmrHelper amrHelper, IUserRepository userRepository, IUserTransformer userTransformer, IBusControl busControl) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userTransformer, busControl)
+        public AuthenticateController(IPasswordAuthenticationService userAuthenticationService, IAuthenticationSchemeProvider authenticationSchemeProvider, IOptions<IdServerHostOptions> options, IDataProtectionProvider dataProtectionProvider, IAuthenticationHelper authenticationHelper, IClientRepository clientRepository, IAmrHelper amrHelper, IUserRepository userRepository, IUserTransformer userTransformer, IBusControl busControl, IUserClaimsService userClaimsService) : base(options, authenticationSchemeProvider, userAuthenticationService, userClaimsService, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userTransformer, busControl)
         {
         }
 

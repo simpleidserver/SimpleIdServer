@@ -129,7 +129,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
                     user = await _userRepository.Query().Include(u => u.Consents).ThenInclude(c => c.Scopes).ThenInclude(c => c.AuthorizedResources).Include(u => u.Groups).AsNoTracking().FirstOrDefaultAsync(u => u.Name == subject, cancellationToken);
                     if (user == null) return new UnauthorizedResult();
 
-                    var userClaims = await _userClaimsService.Get(user.Id, prefix, cancellationToken);
+                    var userClaims = await _userClaimsService.Get(user.Id, cancellationToken);
                     activity?.SetTag("user", user.Name);
                     var oauthClient = await _clientRepository.Query().Include(c => c.Realms).Include(c => c.SerializedJsonWebKeys).AsNoTracking().FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == prefix), cancellationToken);
                     if (oauthClient == null)
@@ -148,7 +148,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
                     context.SetUser(user, userClaims);
                     activity?.SetTag("scopes", string.Join(",", oauthScopes.Select(s => s.Name)));
                     var payload = await _claimsExtractor.ExtractClaims(context, oauthScopes, ScopeProtocols.OPENID);
-                    _claimsJwsPayloadEnricher.EnrichWithClaimsParameter(payload, claims, userClaims, authTime, AuthorizationClaimTypes.UserInfo);
+                    _claimsJwsPayloadEnricher.EnrichWithClaimsParameter(payload, claims, context.Claims, authTime, AuthorizationClaimTypes.UserInfo);
                     await _claimsEnricher.Enrich(user, payload, oauthClient, cancellationToken);
                     string contentType = "application/json";
                     var result = JsonSerializer.Serialize(payload);

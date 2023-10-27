@@ -92,7 +92,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                         .Include(u => u.Realms)
                         .AsNoTracking(), userName, context.Realm).FirstOrDefaultAsync(u => u.Credentials.Any(c => c.CredentialType == UserCredential.PWD && c.Value == PasswordHelper.ComputeHash(password) && c.IsActive), cancellationToken);
                     if (user == null) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.BAD_USER_CREDENTIAL);
-                    var userClaims = await _userClaimsService.Get(user.Id, context.Realm, cancellationToken);
+                    var userClaims = await _userClaimsService.Get(user.Id, cancellationToken);
                     context.SetUser(user, userClaims);
                     var result = BuildResult(context, extractionResult.Scopes);
                     foreach (var tokenBuilder in _tokenBuilders)

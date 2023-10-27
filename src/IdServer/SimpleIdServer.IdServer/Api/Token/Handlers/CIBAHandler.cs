@@ -75,7 +75,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     scopeLst = authRequest.Scopes;
                     activity?.SetTag("scopes", string.Join(",", authRequest.Scopes));
                     var user = await _userRepository.Query().Include(u => u.Groups).Include(u => u.Realms).AsNoTracking().FirstOrDefaultAsync(u => u.Id == authRequest.UserId && u.Realms.Any(r => r.RealmsName == context.Realm), cancellationToken);
-                    var userClaims = await _userClaimsService.Get(user.Id, context.Realm, cancellationToken);
+                    var userClaims = await _userClaimsService.Get(user.Id, cancellationToken);
                     context.SetUser(user, userClaims);
                     foreach (var tokenBuilder in _tokenBuilders)
                         await tokenBuilder.Build(new BuildTokenParameter { Scopes = authRequest.Scopes, AuthorizationDetails = authRequest.AuthorizationDetails }, context, cancellationToken);

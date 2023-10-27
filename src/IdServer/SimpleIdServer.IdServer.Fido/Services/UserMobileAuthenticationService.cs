@@ -7,6 +7,7 @@ using SimpleIdServer.IdServer.Fido.UI.ViewModels;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.Services;
+using System.Security.Claims;
 using System.Text.Json;
 
 namespace SimpleIdServer.IdServer.Fido.Services;
@@ -25,25 +26,14 @@ public class UserMobileAuthenticationService : GenericAuthenticationService<Auth
         _distributedCache = distributedCache;
     }
 
-    protected override async Task<User> GetUser(string authenticatedUserId, AuthenticateMobileViewModel viewModel, string realm, CancellationToken cancellationToken)
-    {
-        User authenticatedUser = null;
-        if (string.IsNullOrWhiteSpace(authenticatedUserId))
-            authenticatedUser = await AuthenticateUser(viewModel.Login, realm, cancellationToken);
-        else
-            authenticatedUser = await FetchAuthenticatedUser(realm, authenticatedUserId, cancellationToken);
-
-        return authenticatedUser;
-    }
-
     protected override async Task<CredentialsValidationResult> Validate(string realm, string authenticatedUserId, AuthenticateMobileViewModel viewModel, CancellationToken cancellationToken)
     {
         var authenticatedUser = await GetUser(authenticatedUserId, viewModel, realm, cancellationToken);
         if (authenticatedUser == null) return CredentialsValidationResult.Error(ValidationStatus.UNKNOWN_USER);
-        return await Validate(realm, authenticatedUser, viewModel, cancellationToken);
+        return await Validate(realm, authenticatedUser, null, viewModel, cancellationToken);
     }
 
-    protected override async Task<CredentialsValidationResult> Validate(string realm, User authenticatedUser, AuthenticateMobileViewModel viewModel, CancellationToken cancellationToken)
+    protected override async Task<CredentialsValidationResult> Validate(string realm, User authenticatedUser, ICollection<Claim> claims, AuthenticateMobileViewModel viewModel, CancellationToken cancellationToken)
     {
         var session = await _distributedCache.GetStringAsync(viewModel.SessionId, cancellationToken);
         if (string.IsNullOrWhiteSpace(session))
@@ -58,5 +48,16 @@ public class UserMobileAuthenticationService : GenericAuthenticationService<Auth
         }
 
         return CredentialsValidationResult.Ok(authenticatedUser);
+    }
+
+    private async Task<User> GetUser(string authenticatedUserId, AuthenticateMobileViewModel viewModel, string realm, CancellationToken cancellationToken)
+    {
+        User authenticatedUser = null;
+        if (string.IsNullOrWhiteSpace(authenticatedUserId))
+            authenticatedUser = await AuthenticateUser(viewModel.Login, realm, cancellationToken);
+        else
+            authenticatedUser = await FetchAuthenticatedUser(realm, authenticatedUserId, cancellationToken);
+
+        return authenticatedUser;
     }
 }

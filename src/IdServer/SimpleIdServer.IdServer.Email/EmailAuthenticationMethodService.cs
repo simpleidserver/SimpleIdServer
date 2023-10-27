@@ -9,6 +9,6 @@ namespace SimpleIdServer.IdServer.Email
         public string Amr => Constants.AMR;
         public string Name => "Email";
         public Type? OptionsType => typeof(IdServerEmailOptions);
-        public bool IsCredentialExists(User user) => !string.IsNullOrEmpty(user.Email);
+        public bool IsCredentialExists(User user, List<UserClaim> claims) => !string.IsNullOrEmpty(user.Email);
     }
 }

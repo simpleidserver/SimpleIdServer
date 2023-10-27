@@ -35,7 +35,8 @@ namespace SimpleIdServer.IdServer.UI
             IAmrHelper amrHelper,
             IUserRepository userRepository,
             IUserTransformer userTransformer,
-            IBusControl busControl) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userTransformer, busControl)
+            IBusControl busControl,
+            IUserClaimsService userClaimsService) : base(options, authenticationSchemeProvider, userAuthenticationService, userClaimsService, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userTransformer, busControl)
         {
             _notificationServices = notificationServices;
             _otpAuthenticators = otpAuthenticators;

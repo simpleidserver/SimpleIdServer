@@ -184,7 +184,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             if (!previousQueryParameters.ContainsKey(JwtRegisteredClaimNames.Sub))
                 return;
             var user = await _userRepository.Query().AsNoTracking().Include(u => u.Groups).Include(u => u.Realms).FirstOrDefaultAsync(u => u.Name == previousQueryParameters[JwtRegisteredClaimNames.Sub].GetValue<string>() && u.Realms.Any(r => r.RealmsName == handlerContext.Realm), token);
-            var userClaims = await _userClaimsService.Get(user.Id, handlerContext.Realm, token);
+            var userClaims = await _userClaimsService.Get(user.Id, token);
             handlerContext.SetUser(user, userClaims);
         }
 

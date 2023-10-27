@@ -3,6 +3,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.JsonWebTokens;
+using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Store;
@@ -19,21 +20,27 @@ public interface IUserSmsAuthenticationService : IUserAuthenticationService
 
 public class UserSmsAuthenticationService : OTPAuthenticationService, IUserSmsAuthenticationService
 {
-    public UserSmsAuthenticationService(IEnumerable<IOTPAuthenticator> otpAuthenticators, IAuthenticationHelper authenticationHelper, IUserRepository userRepository) : base(otpAuthenticators, authenticationHelper, userRepository)
+    private readonly IUserClaimsService _userClaimsService;
+
+    public UserSmsAuthenticationService(IUserClaimsService userClaimsService, IEnumerable<IOTPAuthenticator> otpAuthenticators, IAuthenticationHelper authenticationHelper, IUserRepository userRepository) : base(otpAuthenticators, authenticationHelper, userRepository)
     {
+        _userClaimsService = userClaimsService;
     }
 
     protected override async Task<User> GetUser(string authenticatedUserId, BaseOTPAuthenticateViewModel viewModel, string realm, CancellationToken cancellationToken)
     {
         User authenticatedUser = null;
         if (string.IsNullOrWhiteSpace(authenticatedUserId))
+        {
+            var userId = await _userClaimsService.GetUserId(realm, JwtRegisteredClaimNames.PhoneNumber, viewModel.Login, cancellationToken);
+            if (string.IsNullOrWhiteSpace(userId)) return null;
             authenticatedUser = await UserRepository.Query()
                 .Include(u => u.Realms)
                 .Include(u => u.IdentityProvisioning).ThenInclude(i => i.Definition)
                 .Include(u => u.Groups)
-                .Include(c => c.OAuthUserClaims)
                 .Include(u => u.Credentials)
-                .FirstOrDefaultAsync(u => u.Realms.Any(r => r.RealmsName == realm) && u.OAuthUserClaims.Any(c => c.Name == JwtRegisteredClaimNames.PhoneNumber && c.Value == viewModel.Login), cancellationToken);
+                .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        }
         else
             authenticatedUser = await FetchAuthenticatedUser(realm, authenticatedUserId, cancellationToken);
 

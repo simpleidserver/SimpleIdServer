@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.IdServer.Domains;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SimpleIdServer.IdServer
@@ -11,7 +12,7 @@ namespace SimpleIdServer.IdServer
         string Amr { get; }
         string Name { get; }
         Type? OptionsType { get; }
-        bool IsCredentialExists(User user);
+        bool IsCredentialExists(User user, List<UserClaim> claims);
 }
 
     public class PwdAuthenticationMethodService : IAuthenticationMethodService
@@ -19,6 +20,6 @@ namespace SimpleIdServer.IdServer
         public string Amr => Constants.Areas.Password;
         public string Name => "Password";
         public Type? OptionsType => null;
-        public bool IsCredentialExists(User user) => user.Credentials.Any(c => c.CredentialType == Constants.Areas.Password);
+        public bool IsCredentialExists(User user, List<UserClaim> claims) => user.Credentials.Any(c => c.CredentialType == Constants.Areas.Password);
     }
 }

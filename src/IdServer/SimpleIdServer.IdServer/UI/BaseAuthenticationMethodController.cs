@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
@@ -18,6 +19,7 @@ using SimpleIdServer.IdServer.UI.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -30,11 +32,13 @@ namespace SimpleIdServer.IdServer.UI
     {
         private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
         private readonly IUserAuthenticationService _authenticationService;
+        private readonly IUserClaimsService _userClaimsService;
 
         public BaseAuthenticationMethodController(
             IOptions<IdServerHostOptions> options,
             IAuthenticationSchemeProvider authenticationSchemeProvider,
             IUserAuthenticationService userAuthenticationService,
+            IUserClaimsService userClaimsService,
             IDataProtectionProvider dataProtectionProvider,
             IAuthenticationHelper authenticationHelper,
             IClientRepository clientRepository,
@@ -45,6 +49,7 @@ namespace SimpleIdServer.IdServer.UI
         {
             _authenticationSchemeProvider = authenticationSchemeProvider;
             _authenticationService = userAuthenticationService;
+            _userClaimsService = userClaimsService;
         }
 
         protected abstract string Amr { get; }
@@ -129,7 +134,13 @@ namespace SimpleIdServer.IdServer.UI
             var result = await CustomAuthenticate(prefix, amrInfo?.UserId, viewModel, token);
             if (result.ActionResult != null) return result.ActionResult;
             CredentialsValidationResult authenticationResult = null;
-            if (result.AuthenticatedUser != null) authenticationResult = await _authenticationService.Validate(prefix, result.AuthenticatedUser, viewModel, token);
+            if (result.AuthenticatedUser != null)
+            {
+                var userClaims = await _userClaimsService.Get(result.AuthenticatedUser.Id, token);
+                var claims = userClaims.Select(c => new Claim(c.Name, c.Value)).ToList();
+                authenticationResult = await _authenticationService.Validate(prefix, result.AuthenticatedUser, claims, viewModel, token);
+            }
+
             else authenticationResult = await _authenticationService.Validate(prefix, amrInfo?.UserId, viewModel, token);
             if (authenticationResult.Status != ValidationStatus.AUTHENTICATE)
             {

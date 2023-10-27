@@ -75,7 +75,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     scopeLst = deviceAuthCode.Scopes;
                     activity?.SetTag("scopes", string.Join(",", deviceAuthCode.Scopes));
                     var user = await _authenticationHelper.GetUserByLogin(_userRepository.Query().Include(u => u.Groups).Include(u => u.Realms), deviceAuthCode.UserLogin, context.Realm, cancellationToken);
-                    var userClaims = await _userClaimsService.Get(user.Id, context.Realm, cancellationToken);
+                    var userClaims = await _userClaimsService.Get(user.Id, cancellationToken);
                     context.SetUser(user, userClaims);
                     foreach (var tokenBuilder in _tokenBuilders)
                         await tokenBuilder.Build(new BuildTokenParameter { Scopes = deviceAuthCode.Scopes }, context, cancellationToken);

@@ -7,6 +7,7 @@ using SimpleIdServer.IdServer.Provisioning.LDAP.Jobs;
 using SimpleIdServer.IdServer.UI.Services;
 using System.DirectoryServices.Protocols;
 using System.Net;
+using System.Security.Claims;
 
 namespace SimpleIdServer.IdServer.Provisioning.LDAP
 {
@@ -23,9 +24,9 @@ namespace SimpleIdServer.IdServer.Provisioning.LDAP
 
         public string Name => LDAPRepresentationsExtractionJob.NAME;
 
-        public bool Authenticate(User user, IdentityProvisioning identityProvisioning, string password)
+        public bool Authenticate(User user, ICollection<Claim> claims, IdentityProvisioning identityProvisioning, string password)
         {
-            var distinguishedName = user.OAuthUserClaims.Single(c => c.Name == Constants.LDAPDistinguishedName).Value;
+            var distinguishedName = claims.Single(c => c.Type == Constants.LDAPDistinguishedName).Value;
             var section = _configuration.GetSection($"{identityProvisioning.Name}:{typeof(LDAPRepresentationsExtractionJobOptions).Name}");
             var options = section.Get<LDAPRepresentationsExtractionJobOptions>();
             var credentials = new NetworkCredential(distinguishedName, password);

@@ -30,7 +30,6 @@ public class UserEmailAuthenticationService : OTPAuthenticationService, IUserEma
                 .Include(u => u.Realms)
                 .Include(u => u.IdentityProvisioning).ThenInclude(i => i.Definition)
                 .Include(u => u.Groups)
-                .Include(c => c.OAuthUserClaims)
                 .Include(u => u.Credentials)
                 .FirstOrDefaultAsync(u => u.Realms.Any(r => r.RealmsName == realm) && u.Email == viewModel.Login, cancellationToken);
         else
