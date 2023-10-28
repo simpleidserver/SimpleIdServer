@@ -187,6 +187,15 @@ namespace SimpleIdServer.Scim.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à filter parameter must contains at least one valid expression.
+        /// </summary>
+        public static string FilterIsNotEmpty {
+            get {
+                return ResourceManager.GetString("FilterIsNotEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à greater than cannot be applied on &apos;{0}&apos; type.
         /// </summary>
         public static string GreaterThanNotSupported {

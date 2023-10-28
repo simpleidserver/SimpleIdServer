@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Scim.Commands;
@@ -84,6 +85,7 @@ namespace SimpleIdServer.Scim.Api
         [Authorize("QueryScimResource")]
         public virtual Task<IActionResult> Get([FromQuery] SearchSCIMResourceParameter searchRequest, CancellationToken cancellationToken)
         {
+            if (Request.Query != null && Request.Query.TryGetValue(SCIMConstants.StandardSCIMSearchAttributes.Filter, out StringValues str) && string.IsNullOrWhiteSpace(searchRequest.Filter)) searchRequest.Filter = string.Empty;
             return InternalSearch(searchRequest, cancellationToken);
         }
 

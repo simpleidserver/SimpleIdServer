@@ -159,6 +159,9 @@
   <data name="DuplicateReference" xml:space="preserve">
     <value>duplicate reference {0}</value>
   </data>
+  <data name="FilterIsNotEmpty" xml:space="preserve">
+    <value>filter parameter must contains at least one valid expression</value>
+  </data>
   <data name="GreaterThanNotSupported" xml:space="preserve">
     <value>greater than cannot be applied on '{0}' type</value>
   </data>

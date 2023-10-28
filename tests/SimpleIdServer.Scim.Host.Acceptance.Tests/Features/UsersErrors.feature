@@ -1,5 +1,26 @@
 ﻿Feature: UsersErrors
 	Check the errors returned by the /Users endpoint
+
+Scenario: Error is returned when filter is empty (HTTP GET)
+	When execute HTTP GET request 'http://localhost/Users?startIndex=1&filter='
+	
+	And extract JSON from body
+	Then HTTP status code equals to '400'
+	Then JSON 'status'='400'
+	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
+	Then JSON 'detail'='filter parameter must contains at least one valid expression'
+
+Scenario: Error is returned when filter is empty (HTTP POST)
+	When execute HTTP POST JSON request 'http://localhost/Users/.search'
+	| Key              | Value	|
+	| startIndex       | 1		|
+	| filter           | |
+
+	And extract JSON from body
+	Then HTTP status code equals to '400'
+	Then JSON 'status'='400'
+	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
+	Then JSON 'detail'='filter parameter must contains at least one valid expression'
 	
 Scenario: Error is returned when startIndex <= 0
 	When execute HTTP GET request 'http://localhost/Users?startIndex=0'

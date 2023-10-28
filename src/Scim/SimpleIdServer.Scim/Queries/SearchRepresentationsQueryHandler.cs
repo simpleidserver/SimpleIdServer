@@ -35,6 +35,7 @@ namespace SimpleIdServer.Scim.Queries
         public virtual async Task<GenericResult<SearchSCIMRepresentationsResponse>> Handle(SearchSCIMResourceParameter searchRequest, string resourceType, CancellationToken cancellationToken)
         {
             if (searchRequest == null) throw new SCIMBadSyntaxException(Global.HttpPostNotWellFormatted);
+            if (string.Empty == searchRequest.Filter) throw new SCIMBadSyntaxException(Global.FilterIsNotEmpty);
             if (searchRequest.Count > _options.MaxResults || searchRequest.Count == null) searchRequest.Count = _options.MaxResults;
             var schema = await _scimSchemaQueryRepository.FindRootSCIMSchemaByResourceType(resourceType);
             if (schema == null) throw new SCIMNotFoundException();
