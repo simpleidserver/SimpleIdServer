@@ -16,6 +16,7 @@ The following Grant Types are supported
 | urn:ietf:params:oauth:grant-type:device_code         | [https://www.ietf.org/rfc/rfc8628.html#section-3.4](https://www.ietf.org/rfc/rfc8628.html#section-3.4)     |
 | urn:ietf:params:oauth:grant-type:pre-authorized_code | [https://openid.net/specs/openid-4-verifiable-credential-issuance-1_0-10.html](https://openid.net/specs/openid-4-verifiable-credential-issuance-1_0-10.html)     |
 | urn:ietf:params:oauth:grant-type:uma-ticket          | [https://docs.kantarainitiative.org/uma/wg/rec-oauth-uma-grant-2.0.html](https://docs.kantarainitiative.org/uma/wg/rec-oauth-uma-grant-2.0.html)     |
+| urn:ietf:params:oauth:grant-type:token-exchange | [https://datatracker.ietf.org/doc/html/rfc8693](https://datatracker.ietf.org/doc/html/rfc8693) |
 
 ## Supported authentication methods
 

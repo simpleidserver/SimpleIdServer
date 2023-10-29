@@ -66,6 +66,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
                 {
                     Id = Guid.NewGuid().ToString(),
                     Name = action.Name,
+                    Audience = action.Audience,
                     Description = action.Description,
                     UpdateDateTime = DateTime.UtcNow,
                     CreateDateTime = DateTime.UtcNow
@@ -73,7 +74,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
                 apiResource.Realms.Add(activeRealm);
                 dbContext.ApiResources.Add(apiResource);
                 await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new AddApiResourceSuccessAction { Name = action.Name, Description = action.Description });
+                dispatcher.Dispatch(new AddApiResourceSuccessAction { Name = action.Name, Description = action.Description, Audience = action.Audience });
             }
         }
 
@@ -121,11 +122,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
     {
         public string Name { get; set; } = null!;
         public string? Description { get; set; } = null;
+        public string? Audience { get; set; } = null;
     }
 
     public class AddApiResourceSuccessAction
     {
         public string Name { get; set; } = null!;
+        public string? Audience { get; set; } = null;
         public string? Description { get; set; } = null;
     }
 

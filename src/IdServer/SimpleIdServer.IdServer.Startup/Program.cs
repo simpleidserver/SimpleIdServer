@@ -24,7 +24,6 @@ using SimpleIdServer.IdServer.Provisioning.SCIM.Jobs;
 using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Startup.Configurations;
 using SimpleIdServer.IdServer.Startup.Converters;
-using SimpleIdServer.IdServer.Startup.Services;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.WsFederation;

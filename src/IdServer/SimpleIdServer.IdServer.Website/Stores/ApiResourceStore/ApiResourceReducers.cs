@@ -31,7 +31,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
         public static SearchApiResourcesState ReduceAddApiResourceSuccessAction(SearchApiResourcesState state, AddApiResourceSuccessAction act)
         {
             var apiResources = state.ApiResources.ToList();
-            var newApiResource = new ApiResource { CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow, Name = act.Name, Description = act.Description };
+            var newApiResource = new ApiResource { CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow, Name = act.Name, Description = act.Description, Audience = act.Audience };
             apiResources.Add(new SelectableApiResource(newApiResource) { IsNew = true });
             return state with
             {

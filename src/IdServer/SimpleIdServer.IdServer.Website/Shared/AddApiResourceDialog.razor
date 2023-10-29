@@ -21,6 +21,11 @@
         <RadzenTextBox Name="Key" @bind-Value="@addApiResource.Name" Class="w-100"></RadzenTextBox>
         <RadzenRequiredValidator Component="Key" Text="Name id required"></RadzenRequiredValidator>
     </div>
+    <!-- Audience -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Audience</RadzenText>
+        <RadzenTextBox Name="Audience" @bind-Value="@addApiResource.Audience" Class="w-100"></RadzenTextBox>
+    </div>
     <!-- Description -->
     <div>
         <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Value</RadzenText>
@@ -46,11 +51,12 @@
     record AddApiResource
     {
         public string Name { get; set; } = null!;
-        public string Description { get; set; } = null;
+        public string? Audience { get; set; } = null;
+        public string? Description { get; set; } = null;
     }
 
     void SubmitAddApiResource(AddApiResource addApiResource)
     {
-        dispatcher.Dispatch(new AddApiResourceAction { Name = addApiResource.Name, Description = addApiResource.Description });
+        dispatcher.Dispatch(new AddApiResourceAction { Name = addApiResource.Name, Description = addApiResource.Description, Audience = addApiResource.Audience });
     }
 }

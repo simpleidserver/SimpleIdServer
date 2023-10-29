@@ -43,7 +43,8 @@
                 <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableApiResource" Property="Value.Name" Title="Name" Filterable="false" Sortable="false" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableApiResource" Property="Value.Name" Title="Resource" Filterable="false" Sortable="false" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableApiResource" Property="Value.Audience" Title="Audience" Filterable="false" Sortable="false" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableApiResource" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Update datetime" Width="80px" />
     </Columns>
 </RadzenDataGrid>

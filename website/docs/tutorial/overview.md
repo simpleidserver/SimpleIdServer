@@ -61,3 +61,11 @@ According to the [specification](https://openid.bitbucket.io/fapi/fapi-2_0-secur
         <p>Configure automatic provisioning with SCIM</p>
     </DocsCard>
 </DocsCards>
+
+## Delegation
+
+<DocsCards>
+    <DocsCard header="Delegation" href="delegation">
+        <p>Configure impersonation or delegation.</p>
+    </DocsCard>
+</DocsCards>
