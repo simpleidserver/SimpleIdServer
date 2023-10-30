@@ -5,30 +5,94 @@
              x:DataType="local:EnrollViewModel"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="SimpleIdServer.Mobile.EnrollPage">
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Text="One Time Password" Order="Secondary" Command="{Binding Path=ViewOTPCommand}" />
-        <ToolbarItem Text="Credentials" Order="Secondary" Command="{Binding Path=ViewCredentialListCommand}" />
-    </ContentPage.ToolbarItems>
-    <Grid Margin="20">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style TargetType="ContentView" x:Key="enrollImage">
+                <Setter Property="VisualStateManager.VisualStateGroups">
+                    <VisualStateGroupList>
+                        <VisualStateGroup>
+                            <VisualState x:Name="Portrait">
+                                <VisualState.StateTriggers>
+                                    <OrientationStateTrigger Orientation="Portrait"></OrientationStateTrigger>
+                                </VisualState.StateTriggers>
+                                <VisualState.Setters>
+                                    <Setter Property="MaximumHeightRequest" Value="250" />
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="Landscape">
+                                <VisualState.StateTriggers>
+                                    <OrientationStateTrigger Orientation="Landscape"></OrientationStateTrigger>
+                                </VisualState.StateTriggers>
+                                <VisualState.Setters>
+                                    <Setter Property="MaximumHeightRequest" Value="150" />
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateGroupList>
+                </Setter>
+            </Style>
+            <Style TargetType="Grid" x:Key="enrollGrid">
+                <Setter Property="VisualStateManager.VisualStateGroups">
+                    <VisualStateGroupList>
+                        <VisualStateGroup>
+                            <VisualState x:Name="Portrait">
+                                <VisualState.StateTriggers>
+                                    <OrientationStateTrigger Orientation="Portrait"></OrientationStateTrigger>
+                                </VisualState.StateTriggers>
+                                <VisualState.Setters>
+                                    <Setter Property="BackgroundColor" Value="#E1E1E1" />
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="Landscape">
+                                <VisualState.StateTriggers>
+                                    <OrientationStateTrigger Orientation="Landscape"></OrientationStateTrigger>
+                                </VisualState.StateTriggers>
+                                <VisualState.Setters>
+                                    <Setter Property="BackgroundColor" Value="Transparent" />
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateGroupList>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="auto" />
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="9*" />
         </Grid.RowDefinitions>
-        <StackLayout VerticalOptions="Center" Spacing="10" Grid.Row="0">
-            <Image
-                Grid.Row="0"
-                Source="credentialissuer.png"
-                HorizontalOptions="Center"
-                HeightRequest="400" />
-            <Label Text="Scan the QR Code to enroll your mobile device or to authenticate to the website."
-                Grid.Row="2"
-                HorizontalOptions="Center"/>
+        <!-- Display menu -->
+        <StackLayout Orientation="Horizontal" Spacing="10" Grid.Row="0" Padding="5">
+            <StackLayout Orientation="Vertical" HorizontalOptions="CenterAndExpand">
+                <StackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding Path=ViewOTPCommand}"></TapGestureRecognizer>
+                </StackLayout.GestureRecognizers>
+                <Image HorizontalOptions="CenterAndExpand" Source="otp.png" HeightRequest="40" />
+                <Label HorizontalOptions="CenterAndExpand" Text="One time password"></Label>
+            </StackLayout>
+            <StackLayout Orientation="Vertical" HorizontalOptions="CenterAndExpand">
+                <StackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding Path=ViewCredentialListCommand}"></TapGestureRecognizer>
+                </StackLayout.GestureRecognizers>
+                <Image HorizontalOptions="CenterAndExpand" Source="credentials.png" HeightRequest="40" />
+                <Label HorizontalOptions="CenterAndExpand" Text="Credentials"></Label>
+            </StackLayout>
         </StackLayout>
-        <StackLayout Spacing="10" Grid.Row="1">
-            <Button 
-                Text="Scan QR Code"
-                HorizontalOptions="Fill"
-                Command="{Binding Path=ScanQRCodeCommand}" />
-        </StackLayout>
+        <Grid Padding="10" Grid.Row="1" Style="{StaticResource enrollGrid}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="8*" />
+                <RowDefinition Height="2*" />
+            </Grid.RowDefinitions>
+            <StackLayout VerticalOptions="Center" Spacing="10" Grid.Row="0">
+                <ContentView Style="{StaticResource enrollImage}">
+                    <Image Source="credentialissuer.png" HorizontalOptions="Center" Aspect="AspectFit" />
+                </ContentView>
+                <Label Text="Scan the QR Code to enroll your mobile device or to authenticate to the website." HorizontalOptions="Center"/>
+            </StackLayout>
+            <StackLayout Grid.Row="1">
+                <Button Text="Scan QR Code" HorizontalOptions="Fill" Command="{Binding Path=ScanQRCodeCommand}" />
+            </StackLayout>
+        </Grid>
     </Grid>
 </ContentPage>

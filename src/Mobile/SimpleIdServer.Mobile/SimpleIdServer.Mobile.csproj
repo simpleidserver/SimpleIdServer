@@ -29,6 +29,11 @@
 	  <EmbedAssembliesIntoApk>False</EmbedAssembliesIntoApk>
 	  <AndroidCreatePackagePerAbi>True</AndroidCreatePackagePerAbi>
 	</PropertyGroup>
+	<PropertyGroup Condition="'$(TargetFramework)'=='net7.0-ios'">
+	  <CodesignKey>Apple Development: Created via API (Z8F6H2L9PN)</CodesignKey>
+	  <CodesignProvision>VS: WildCard Development</CodesignProvision>
+	  <IntermediateOutputPath>c:\HotRestartSid\</IntermediateOutputPath>
+	</PropertyGroup>
 
 	<ItemGroup>
 		<!-- App Icon -->
@@ -62,10 +67,11 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
+		<PackageReference Include="Xamarin.Build.Download" Version="0.11.4" />
 		<PackageReference Include="ZXing.Net.Maui.Comet" Version="0.3.0-preview.1" />
 		<PackageReference Include="ZXing.Net.Maui.Controls" Version="0.3.0-preview.1" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="5.2.*" />
-		<PackageReference Include="Plugin.Firebase" Version="2.0.5" />
+		<PackageReference Include="Plugin.Firebase" Version="2.0.6" />
 		<PackageReference Include="sqlite-net-sqlcipher" Version="1.8.116" />
 		<PackageReference Include="SQLitePCLRaw.core" Version="2.1.5" />
 		<PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.5" />
