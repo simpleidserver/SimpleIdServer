@@ -31,7 +31,7 @@ public class ShopsController : ControllerBase
         const string clientId = "firstDelegationAPi";
         const string clientSecret = "password";
         const string tokenUrl = "https://localhost:5001/master/token";
-        var subjectToken = Request.Headers["Authorization"].ElementAt(0).Split("Bearer")[1];
+        var subjectToken = Request.Headers["Authorization"].ElementAt(0).Split(" ")[1];
         using (var httpClient = new HttpClient())
         {
             var dic = new List<KeyValuePair<string, string>>
@@ -40,7 +40,8 @@ public class ShopsController : ControllerBase
                 new KeyValuePair<string, string>("client_id", clientId),
                 new KeyValuePair<string, string>("client_secret", clientSecret),
                 new KeyValuePair<string, string>("subject_token", subjectToken),
-                new KeyValuePair<string, string>("subject_token_type", "urn:ietf:params:oauth:token-type:access_token")
+                new KeyValuePair<string, string>("subject_token_type", "urn:ietf:params:oauth:token-type:access_token"),
+                new KeyValuePair<string, string>("scope", "shopApiOther")
             };
             var requestMessage = new HttpRequestMessage
             {

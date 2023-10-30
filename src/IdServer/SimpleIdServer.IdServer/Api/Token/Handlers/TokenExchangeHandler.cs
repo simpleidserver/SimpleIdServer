@@ -3,8 +3,10 @@
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Api.Token.Helpers;
 using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
+using SimpleIdServer.IdServer.Authenticate;
 using SimpleIdServer.IdServer.Domains.Extensions;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
@@ -108,12 +110,19 @@ public class TokenExchangeHandler : BaseCredentialsHandler
         var claims = validationResult.Subject.Claims;
         var expiresIn = context.Client.TokenExpirationTimeInSeconds ?? Options.DefaultTokenExpirationTimeInSeconds;
         var scopes = validationResult.GrantRequest.Scopes;
+        var audiences = validationResult.GrantRequest.Audiences;
         if (!claims.ContainsKey(TokenResponseParameters.ExpiresIn)) claims.Add(TokenResponseParameters.ExpiresIn, expiresIn);
         else claims[TokenResponseParameters.ExpiresIn] = expiresIn;
+
         if (scopes != null && scopes.Any() && !claims.ContainsKey(TokenResponseParameters.Scope)) claims.Add(TokenResponseParameters.Scope, string.Join(" ", scopes));
         else if (scopes != null && scopes.Any() && claims.ContainsKey(TokenResponseParameters.Scope)) claims[TokenResponseParameters.Scope] = string.Join(" ", scopes);
         else if ((scopes == null || !scopes.Any()) && claims.ContainsKey(TokenResponseParameters.Scope)) claims.Remove(TokenResponseParameters.Scope);
-        if(context.Client.TokenExchangeType == Domains.TokenExchangeTypes.DELEGATION)
+
+        if (audiences != null && audiences.Any() && !claims.ContainsKey(JwtRegisteredClaimNames.Aud)) claims.Add(JwtRegisteredClaimNames.Aud, audiences);
+        else if (audiences != null && audiences.Any() && claims.ContainsKey(JwtRegisteredClaimNames.Aud)) claims[JwtRegisteredClaimNames.Aud] = audiences;
+        else if ((audiences == null || !audiences.Any()) && claims.ContainsKey(JwtRegisteredClaimNames.Aud)) claims.Remove(JwtRegisteredClaimNames.Aud);
+
+        if (context.Client.TokenExchangeType == Domains.TokenExchangeTypes.DELEGATION)
         {
             var subject = validationResult.Actor?.Subject ?? context.Client.ClientId;
             object oldAct = null;

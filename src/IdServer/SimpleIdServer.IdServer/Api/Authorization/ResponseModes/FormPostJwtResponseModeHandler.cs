@@ -20,6 +20,9 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseModes
         public void Handle(HandlerContext context, RedirectURLAuthorizationResponse authorizationResponse, HttpContext httpContext)
         {
             var jwt = BuildJWT(authorizationResponse, context);
+            var prefix = context.Realm;
+            if (!string.IsNullOrWhiteSpace(prefix))
+                prefix = $"{prefix}/";
             var dic = new Dictionary<string, string>
             {
                 { AuthorizationResponseParameters.Response, jwt }
@@ -29,7 +32,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseModes
                 { AuthorizationResponseParameters.RedirectUrl, authorizationResponse.RedirectUrl }
             };
             var issuer = context.Request.IssuerName;
-            var redirectUrl = $"{issuer}/{Constants.EndPoints.Form}{queryBuilder.ToQueryString()}";
+            var redirectUrl = $"{issuer}/{prefix}{Constants.EndPoints.Form}{queryBuilder.ToQueryString()}";
             httpContext.Response.Redirect(redirectUrl);
         }
     }

@@ -19,8 +19,11 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseModes
             {
                 { "redirect_url", authorizationResponse.RedirectUrl }
             };
+            var prefix = context.Realm;
+            if (!string.IsNullOrWhiteSpace(prefix))
+                prefix = $"{prefix}/";
             var issuer = context.Request.IssuerName;
-            var redirectUrl = $"{issuer}/{Constants.EndPoints.Form}{queryBuilder.ToQueryString()}";
+            var redirectUrl = $"{issuer}/{prefix}{Constants.EndPoints.Form}{queryBuilder.ToQueryString()}";
             httpContext.Response.Redirect(redirectUrl);            
         }
     }

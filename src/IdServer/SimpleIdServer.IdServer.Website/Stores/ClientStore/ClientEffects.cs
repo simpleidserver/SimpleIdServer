@@ -374,7 +374,15 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 if (act.IsDeviceGrantTypeEnabled)
                     grantTypes.Add(DeviceCodeHandler.GRANT_TYPE);
                 if (act.IsTokenExchangeEnabled)
+                {
                     grantTypes.Add(TokenExchangeHandler.GRANT_TYPE);
+                    client.IsTokenExchangeEnabled = true;
+                }
+                else
+                {
+                    client.IsTokenExchangeEnabled = false;
+                }
+
                 client.GrantTypes = grantTypes;
                 client.IsConsentDisabled = !act.IsConsentEnabled;
                 client.SetUseAcsArtifact(act.UseAcs);
