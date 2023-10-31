@@ -17,7 +17,6 @@ public class CredentialListState
     public async Task Load()
     {
         var credentialsRecords = await _database.GetCredentialRecords();
-        CredentialRecords.Clear();
         foreach (var credentialRecord in credentialsRecords) CredentialRecords.Add(new SelectableCredentialRecord(credentialRecord));
     }
 

@@ -31,7 +31,7 @@
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(TargetFramework)'=='net7.0-ios'">
 	  <CodesignKey>Apple Development: Created via API (Z8F6H2L9PN)</CodesignKey>
-	  <CodesignProvision>VS: WildCard Development</CodesignProvision>
+	  <CodesignProvision>VS: com.simpleidserver.mobile Development</CodesignProvision>
 	  <IntermediateOutputPath>c:\HotRestartSid\</IntermediateOutputPath>
 	</PropertyGroup>
 

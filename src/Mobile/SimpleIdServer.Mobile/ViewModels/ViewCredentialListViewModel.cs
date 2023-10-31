@@ -55,10 +55,8 @@ public class ViewCredentialListViewModel : INotifyPropertyChanged
 
     public void OnPropertyChanged([CallerMemberName] string name = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
-    public async Task Load()
+    public void Load()
     {
-        IsLoading = true;
-        await _credentialListState.Load();
         IsLoading = false;
     }
 }

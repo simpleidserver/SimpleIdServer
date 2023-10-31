@@ -26,6 +26,7 @@
             <StackLayout Grid.Row="0" Style="{StaticResource modalToolbar}">
                 <ImageButton Command="{Binding Path=CloseCommand}" Style="{StaticResource modalToolbarClose}" />
                 <Label Style="{StaticResource modalToolbarTitle}">One Time Password</Label>
+                <ImageButton Command="{Binding Path=RemoveSelectedOtpCommand}" Style="{StaticResource removeBtn}"></ImageButton>
             </StackLayout>
             <!-- Display the selected OTP Code -->
             <components:ViewOTPCode Grid.Row="1" OTPCode="{Binding Path=SelectedOTPCode}" />

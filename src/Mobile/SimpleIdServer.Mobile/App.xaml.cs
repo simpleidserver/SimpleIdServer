@@ -1,8 +1,12 @@
-﻿namespace SimpleIdServer.Mobile;
+﻿using SimpleIdServer.Mobile.Stores;
+
+namespace SimpleIdServer.Mobile;
 
 public partial class App : Application
 {
-	public static MobileDatabase _database;
+    private readonly CredentialListState _credentialListState;
+	private readonly OtpListState _otpListState;
+    public static MobileDatabase _database;
 
 	public static MobileDatabase Database
 	{
@@ -14,10 +18,18 @@ public partial class App : Application
 		}
 	}
 
-	public App()
+	public App(CredentialListState credentialListState, OtpListState otpListState)
 	{
 		InitializeComponent();
+		_credentialListState = credentialListState;
+        _otpListState = otpListState;
+        MainPage = new AppShell();
+    }
 
-		MainPage = new AppShell();
+    protected override async void OnStart()
+    {
+        base.OnStart();
+		await _otpListState.Load();
+		await _credentialListState.Load();
     }
 }

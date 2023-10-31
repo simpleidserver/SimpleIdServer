@@ -100,7 +100,6 @@ public class QRCodeScannerViewModel
             var beginResult = await ReadRegisterQRCode(qrCodeResult);
             var attestationBuilder = new FIDOU2FAttestationBuilder();
             var rp = beginResult.CredentialCreateOptions.Rp.Id;
-            await _credentialListState.Load();
             var existingCredential = _credentialListState.CredentialRecords.SingleOrDefault(r => r.Credential.Rp == rp && r.Credential.Login == beginResult.Login);
             if(existingCredential != null)
             {
@@ -114,7 +113,12 @@ public class QRCodeScannerViewModel
                 Rp = rp,
                 Origin = qrCodeResult.GetOrigin()
             });
+#if IOS && HOTRESTART == true
+            await _promptService.ShowAlert("Error", "Host restart cannot be enabled");
+            return;
+#endif
             var endRegisterResult = await EndRegister(beginResult, enrollResponse);
+
             var credentialRecord = new CredentialRecord(enrollResponse.CredentialId, enrollResponse.AttestationCertificate.AttestationCertificate, enrollResponse.AttestationCertificate.PrivateKey, endRegisterResult.SignCount, rp, beginResult.Login);
             await _credentialListState.AddCredentialRecord(credentialRecord);
             await _promptService.ShowAlert("Success", "Your mobile device has been enrolled");
@@ -144,10 +148,6 @@ public class QRCodeScannerViewModel
 
         async Task<EndU2FRegisterResult> EndRegister(BeginU2FRegisterResult beginResult, EnrollResult enrollResponse)
         {
-#if IOS
-            var sharedInstance = Messaging.SharedInstance;
-            string sss = "";
-#endif
             var fcmToken = await CrossFirebaseCloudMessaging.Current.GetTokenAsync();
             var handler = new HttpClientHandler();
             if (_options.IgnoreHttps) handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) =>
@@ -193,7 +193,6 @@ public class QRCodeScannerViewModel
 
         async Task Authenticate(QRCodeResult qrCodeResult)
         {
-            await _credentialListState.Load();
             var credentialRecords = _credentialListState.CredentialRecords.ToList();
             var beginResult = await ReadAuthenticateQRCode(qrCodeResult);
             var attestationBuilder = new FIDOU2FAttestationBuilder();
@@ -277,7 +276,6 @@ public class QRCodeScannerViewModel
         {
             if (_otpService.TryParse(qrCodeValue, out OTPCode otpCode))
             {
-                await _otpListState.Load();
                 var otpCodes = _otpListState.OTPCodes;
                 var existingOtpCode = otpCodes.FirstOrDefault(o => o.Id == otpCode.Id);
                 if(existingOtpCode != null)

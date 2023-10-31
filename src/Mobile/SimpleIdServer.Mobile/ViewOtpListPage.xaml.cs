@@ -13,9 +13,9 @@ public partial class ViewOtpListPage : ContentPage
         InitializeComponent();
     }
 
-    protected override async void OnAppearing()
+    protected override void OnAppearing()
     {
         base.OnAppearing();
-        await _viewModel.Load();
+        _viewModel.Load();
     }
 }

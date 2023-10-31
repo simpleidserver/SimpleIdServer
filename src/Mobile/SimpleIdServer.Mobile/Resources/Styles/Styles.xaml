@@ -15,7 +15,7 @@
     </Style>
 
     <Style x:Key="modalToolbarClose" TargetType="ImageButton">
-        <Setter Property="Padding" Value="30"></Setter>
+        <Setter Property="Padding" Value="10"></Setter>
         <Setter Property="HorizontalOptions" Value="Center"></Setter>
         <Setter Property="VerticalOptions" Value="Center"></Setter>
         <Setter Property="Source" Value="minimize.png"></Setter>
@@ -26,6 +26,25 @@
         <Setter Property="VerticalOptions" Value="Center"></Setter>
         <Setter Property="HorizontalOptions" Value="CenterAndExpand"></Setter>
         <Setter Property="FontAttributes" Value="Bold"></Setter>
+    </Style>
+
+    <Style x:Key="removeBtn" TargetType="ImageButton">
+        <Setter Property="Padding" Value="10"></Setter>
+        <Setter Property="Source" Value="remove.png"></Setter>
+        <Setter Property="HorizontalOptions" Value="Center"></Setter>
+        <Setter Property="VerticalOptions" Value="Center"></Setter>
+        <Setter Property="VisualStateManager.VisualStateGroups">
+            <VisualStateGroupList>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal"></VisualState>
+                    <VisualState x:Name="Disabled">
+                        <VisualState.Setters>
+                            <Setter Property="Source" Value="removedisabled.png"></Setter>
+                        </VisualState.Setters>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateGroupList>
+        </Setter>
     </Style>
     
     <Style TargetType="ActivityIndicator">

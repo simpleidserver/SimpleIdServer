@@ -17,8 +17,7 @@ namespace SimpleIdServer.Mobile.Stores
         public async Task Load()
         {
             var otpCodes = await _database.GetOTPCodes();
-            OTPCodes.Clear();
-            foreach(var otpCode in otpCodes) OTPCodes.Add(otpCode);
+            foreach (var otpCode in otpCodes) OTPCodes.Add(otpCode);
         }
 
         public async Task UpdateOTPCode(OTPCode otpCode)

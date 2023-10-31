@@ -87,10 +87,8 @@ public class ViewOtpListViewModel : INotifyPropertyChanged
         SelectedOTPCode = null;
     }
 
-    public async Task Load()
+    public void Load()
     {
-        IsLoading = true;
-        await _otpListState.Load();
         IsLoading = false;
     }
 }
