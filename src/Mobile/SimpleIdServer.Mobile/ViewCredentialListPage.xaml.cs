@@ -10,9 +10,7 @@ public partial class ViewCredentialListPage : ContentPage
     {
         _viewModel = viewModel;
         BindingContext = _viewModel;
-#if ANDROID
         InitializeComponent();
-#endif
     }
 
     protected override async void OnAppearing()

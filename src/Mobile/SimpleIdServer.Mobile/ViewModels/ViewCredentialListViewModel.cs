@@ -1,4 +1,4 @@
-﻿using SimpleIdServer.Mobile.Models;
+﻿using SimpleIdServer.Mobile.Services;
 using SimpleIdServer.Mobile.Stores;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -11,10 +11,16 @@ public class ViewCredentialListViewModel : INotifyPropertyChanged
 {
     private bool _isLoading;
     private readonly CredentialListState _credentialListState;
+    private readonly INavigationService _navigationService;
 
-    public ViewCredentialListViewModel(CredentialListState credentialListState)
+    public ViewCredentialListViewModel(CredentialListState credentialListState, INavigationService navigationService)
     {
         _credentialListState = credentialListState;
+        _navigationService = navigationService;
+        CloseCommand = new Command(async () =>
+        {
+            await _navigationService.GoBack();
+        });
         RemoveSelectedCredentialsCommand = new Command(async () =>
         {
             await credentialListState.Remove();
@@ -32,6 +38,7 @@ public class ViewCredentialListViewModel : INotifyPropertyChanged
     }
 
     public ICommand RemoveSelectedCredentialsCommand { get; private set; }
+    public ICommand CloseCommand { get; private set; }
 
     public bool IsLoading
     {
@@ -50,6 +57,8 @@ public class ViewCredentialListViewModel : INotifyPropertyChanged
 
     public async Task Load()
     {
+        IsLoading = true;
         await _credentialListState.Load();
+        IsLoading = false;
     }
 }

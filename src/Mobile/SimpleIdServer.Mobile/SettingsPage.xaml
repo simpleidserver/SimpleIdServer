@@ -19,8 +19,8 @@
             <ColumnDefinition Width="3*" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <Label Text="Enable developer mode" VerticalOptions="Center"></Label>
-        <Switch IsToggled="{Binding Path=IsDeveloperModeEnabled}">
+        <Label Text="Enable developer mode" VerticalOptions="Center" Grid.Column="0"></Label>
+        <Switch IsToggled="{Binding Path=IsDeveloperModeEnabled}" Grid.Column="1">
             <Switch.Behaviors>
                 <toolkit:EventToCommandBehavior EventName="Toggled" Command="{Binding ToggleDeveloperModeComand}" EventArgsConverter="{StaticResource toggledEventArgsConverter}" />
             </Switch.Behaviors>

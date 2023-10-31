@@ -1,4 +1,5 @@
 ﻿using SimpleIdServer.Mobile.Models;
+using SimpleIdServer.Mobile.Services;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
@@ -7,20 +8,20 @@ namespace SimpleIdServer.Mobile.ViewModels;
 
 public class EnrollViewModel : INotifyPropertyChanged
 {
-    public EnrollViewModel(SettingsPageViewModel settings)
+    public EnrollViewModel(SettingsPageViewModel settings, INavigationService navigationService)
     {
         Settings = settings;
         ScanQRCodeCommand = new Command(async () =>
         {
-            await Shell.Current.GoToAsync("enrollscanqrcode");
+            await navigationService.DisplayModal<QRCodeScannerPage>();
         });
         ViewOTPCommand = new Command((async () =>
         {
-            await Shell.Current.GoToAsync("viewotplist");
+            await navigationService.DisplayModal<ViewOtpListPage>();
         }));
         ViewCredentialListCommand = new Command((async () =>
         {
-            await Shell.Current.GoToAsync("viewcredentiallist");
+            await navigationService.DisplayModal<ViewCredentialListPage>();
         }));
     }
 

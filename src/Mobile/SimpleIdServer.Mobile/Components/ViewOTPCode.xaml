@@ -14,13 +14,14 @@
     </ContentView.Resources>
     <ContentView.Content>
         <Grid BindingContext="{x:Reference this}">
-            <StackLayout IsVisible="{Binding Path=IsOTPCodeExists}">
-                <Label Text="{Binding Path=DisplayMessage}" FontSize="Large"></Label>
+            <StackLayout IsVisible="{Binding Path=IsOTPCodeExists}" Spacing="10" Padding="10">
+                <Label Text="{Binding Path=Issuer}" FontSize="Large"></Label>
+                <Label Text="{Binding Path=User}" FontSize="Large"></Label>
                 <Label Text="{Binding Path=Code}" FontSize="Large" FontAttributes="Bold"></Label>
                 <Label Text="{Binding Path=Description}" FontSize="Large"></Label>
                 <Button Text="Generate" Command="{Binding Path=GenerateHOTPCommand}"></Button>
             </StackLayout>
-            <StackLayout IsVisible="{Binding Path=IsOTPCodeExists, Converter={StaticResource InvertedBoolConverter}}">
+            <StackLayout IsVisible="{Binding Path=IsOTPCodeExists, Converter={StaticResource InvertedBoolConverter}}" Padding="10">
                 <Label Text="There is no OTP selected" FontSize="Large"></Label>
             </StackLayout>
         </Grid>

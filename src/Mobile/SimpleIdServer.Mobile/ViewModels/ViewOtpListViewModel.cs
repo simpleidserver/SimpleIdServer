@@ -1,4 +1,5 @@
 ﻿using SimpleIdServer.Mobile.Models;
+using SimpleIdServer.Mobile.Services;
 using SimpleIdServer.Mobile.Stores;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -10,13 +11,19 @@ namespace SimpleIdServer.Mobile.ViewModels;
 public class ViewOtpListViewModel : INotifyPropertyChanged
 {
     private readonly OtpListState _otpListState;
+    private readonly INavigationService _navigationService;
     private OTPCode _selectedOTPCode;
     private bool _isLoading;
     public event PropertyChangedEventHandler PropertyChanged;
 
-    public ViewOtpListViewModel(OtpListState otpListState)
+    public ViewOtpListViewModel(OtpListState otpListState,  INavigationService navigationService)
     {
         _otpListState = otpListState;
+        _navigationService = navigationService;
+        CloseCommand = new Command(async () =>
+        {
+            await _navigationService.GoBack();
+        });
         RemoveSelectedOtpCommand = new Command(async () =>
         {
             await RemoveSelectedOtp();
@@ -27,6 +34,7 @@ public class ViewOtpListViewModel : INotifyPropertyChanged
     }
 
     public ICommand RemoveSelectedOtpCommand { get; private set; }
+    public ICommand CloseCommand { get; private set; }
 
     public ObservableCollection<OTPCode> OTPCodes
     {

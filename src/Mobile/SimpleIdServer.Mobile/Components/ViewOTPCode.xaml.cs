@@ -9,7 +9,8 @@ namespace SimpleIdServer.Mobile.Components;
 public partial class ViewOTPCode : ContentView, INotifyPropertyChanged
 {
 	private CancellationTokenSource _totpCancellationTokenSource;
-	private string _displayMessage;
+    private string _issuer;
+    private string _user;
 	private string _code;
 	private string _description;
 	private bool _isOTPCodeExists = false;
@@ -33,17 +34,30 @@ public partial class ViewOTPCode : ContentView, INotifyPropertyChanged
 		set { SetValue(OTPCodeProperty, value); }
     }
 
-	public ICommand GenerateHOTPCommand { get; set; } 
+	public ICommand GenerateHOTPCommand { get; set; }
 
-    public string DisplayMessage
+    public string Issuer
+    {
+        get { return _issuer; }
+		set
+		{
+			if(_issuer != value)
+			{
+				_issuer = value;
+				base.OnPropertyChanged(nameof(Issuer));
+			}
+		}
+    }
+
+    public string User
 	{
-		get { return _displayMessage; }
+		get { return _user; }
 		set 
 		{
-			if(_displayMessage != value)
+			if(_user != value)
 			{
-				_displayMessage = value;
-				base.OnPropertyChanged(nameof(DisplayMessage));
+                _user = value;
+				base.OnPropertyChanged(nameof(User));
 			}
 		}
     }
@@ -100,7 +114,8 @@ public partial class ViewOTPCode : ContentView, INotifyPropertyChanged
 		if(newOTPCode == null)
         {
             viewModelOTPCode.IsOTPCodeExists = false;
-			viewModelOTPCode.DisplayMessage = null;
+			viewModelOTPCode.User = null;
+            viewModelOTPCode.Issuer = null;
             if (viewModelOTPCode._totpCancellationTokenSource != null)
             {
                 viewModelOTPCode._totpCancellationTokenSource.Cancel();
@@ -110,7 +125,8 @@ public partial class ViewOTPCode : ContentView, INotifyPropertyChanged
         {
 
             viewModelOTPCode.IsOTPCodeExists = true;
-            viewModelOTPCode.DisplayMessage = $"{newOTPCode.Issuer} : the token for {newOTPCode.Name} is ";
+			viewModelOTPCode.Issuer = $"Issuer : {newOTPCode.Issuer}";
+			viewModelOTPCode.User = $"User : {newOTPCode.Name}";
             viewModelOTPCode.GenerateCode(newOTPCode);
         }
     }

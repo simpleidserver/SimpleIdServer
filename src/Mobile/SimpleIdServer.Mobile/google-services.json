@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:357608317425:android:bee907626d0b71f8ca6450",
         "android_client_info": {
-          "package_name": "com.companyname.simpleidserver.mobileapp"
+          "package_name": "com.simpleidserver.mobile"
         }
       },
       "oauth_client": [

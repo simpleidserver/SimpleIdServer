@@ -12,6 +12,9 @@ using System.Text;
 using System.Text.Json;
 using System.Windows.Input;
 using ZXing.Net.Maui;
+#if IOS
+using Firebase.CloudMessaging;
+#endif
 
 namespace SimpleIdServer.Mobile.ViewModels;
 
@@ -82,7 +85,6 @@ public class QRCodeScannerViewModel
         }
         catch
         {
-            IsLoading = false;
             await _promptService.ShowAlert("Error", "An error occured while trying to parse the QR Code");
         }
         finally
@@ -142,6 +144,10 @@ public class QRCodeScannerViewModel
 
         async Task<EndU2FRegisterResult> EndRegister(BeginU2FRegisterResult beginResult, EnrollResult enrollResponse)
         {
+#if IOS
+            var sharedInstance = Messaging.SharedInstance;
+            string sss = "";
+#endif
             var fcmToken = await CrossFirebaseCloudMessaging.Current.GetTokenAsync();
             var handler = new HttpClientHandler();
             if (_options.IgnoreHttps) handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) =>

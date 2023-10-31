@@ -7,6 +7,26 @@
     <Style x:Key="lightBackground" TargetType="Grid">
         <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Gray100Brush}, Dark={StaticResource Gray100Brush}}"></Setter>
     </Style>
+
+    <Style x:Key="modalToolbar" TargetType="StackLayout">
+        <Setter Property="BackgroundColor" Value="{StaticResource Primary}"></Setter>
+        <Setter Property="Orientation" Value="Horizontal"></Setter>
+        <Setter Property="Padding" Value="5,10,5,10"></Setter>
+    </Style>
+
+    <Style x:Key="modalToolbarClose" TargetType="ImageButton">
+        <Setter Property="Padding" Value="30"></Setter>
+        <Setter Property="HorizontalOptions" Value="Center"></Setter>
+        <Setter Property="VerticalOptions" Value="Center"></Setter>
+        <Setter Property="Source" Value="minimize.png"></Setter>
+    </Style>
+
+    <Style x:Key="modalToolbarTitle" TargetType="Label">
+        <Setter Property="TextColor" Value="{StaticResource White}"></Setter>
+        <Setter Property="VerticalOptions" Value="Center"></Setter>
+        <Setter Property="HorizontalOptions" Value="CenterAndExpand"></Setter>
+        <Setter Property="FontAttributes" Value="Bold"></Setter>
+    </Style>
     
     <Style TargetType="ActivityIndicator">
         <Setter Property="Color" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
