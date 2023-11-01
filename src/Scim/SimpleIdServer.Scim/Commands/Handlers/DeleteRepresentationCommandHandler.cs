@@ -36,6 +36,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             if (schema == null) throw new SCIMSchemaNotFoundException();
             var representation = await _scimRepresentationCommandRepository.Get(request.Id);
             if (representation == null) throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, request.Id));
+            var result = representation.Clone() as SCIMRepresentation;
             var attributes = await _scimRepresentationCommandRepository.FindAttributes(representation.Id, CancellationToken.None);
             var pathOperations = attributes.Select(a => new SCIMPatchResult
             {
@@ -57,7 +58,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 await NotifyAllReferences(references).ConfigureAwait(false);
             }
 
-            return GenericResult<SCIMRepresentation>.Ok(representation);
+            return GenericResult<SCIMRepresentation>.Ok(result);
         }
     }
 }
