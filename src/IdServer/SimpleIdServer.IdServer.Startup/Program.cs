@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Microsoft.AspNetCore.Server.Kestrel.Https;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -22,10 +21,10 @@ using SimpleIdServer.IdServer.Provisioning.LDAP.Jobs;
 using SimpleIdServer.IdServer.Provisioning.SCIM;
 using SimpleIdServer.IdServer.Provisioning.SCIM.Jobs;
 using SimpleIdServer.IdServer.Sms;
+using SimpleIdServer.IdServer.Startup;
 using SimpleIdServer.IdServer.Startup.Configurations;
 using SimpleIdServer.IdServer.Startup.Converters;
 using SimpleIdServer.IdServer.Store;
-using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.WsFederation;
 using System;
 using System.Collections.Generic;
@@ -44,19 +43,19 @@ const string CreateTableFormat = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE 
 
 ServicePointManager.ServerCertificateValidationCallback += (o, c, ch, er) => true;
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration
+    .AddJsonFile("appsettings.json")
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+    .AddEnvironmentVariables();
+var identityServerConfiguration = builder.Configuration.Get<IdentityServerConfiguration>();
 builder.Services.Configure<KestrelServerOptions>(options =>
 {
     options.ConfigureHttpsDefaults(o =>
     {
         o.SslProtocols = System.Security.Authentication.SslProtocols.Tls12;
-        o.ClientCertificateMode = ClientCertificateMode.AllowCertificate;
+        if (identityServerConfiguration.ClientCertificateMode != null) o.ClientCertificateMode = identityServerConfiguration.ClientCertificateMode.Value;
     });
 });
-
-builder.Configuration
-    .AddJsonFile("appsettings.json")
-    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
-    .AddEnvironmentVariables();
 ConfigureCentralizedConfiguration(builder);
 builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
     .AllowAnyMethod()
@@ -65,7 +64,7 @@ builder.Services.AddRazorPages()
     .AddRazorRuntimeCompilation();
 ConfigureIdServer(builder.Services);
 var app = builder.Build();
-SeedData(app, builder.Configuration["SCIMBaseUrl"]);
+SeedData(app, identityServerConfiguration.SCIMBaseUrl);
 app.UseCors("AllowAll");
 app.UseSID()
 .UseWsFederation()
@@ -87,7 +86,7 @@ void ConfigureIdServer(IServiceCollection services)
         .AddSamlIdp()
         .AddFidoAuthentication(f =>
         {
-            var authority = builder.Configuration["Authority"];
+            var authority = identityServerConfiguration.Authority;
             var url = new Uri(authority);
             f.ServerName = "SimpleIdServer";
             f.ServerDomain = url.Host;
@@ -113,7 +112,7 @@ void ConfigureIdServer(IServiceCollection services)
             });
             a.AddOIDCAuthentication(opts =>
             {
-                opts.Authority = builder.Configuration["Authority"];
+                opts.Authority = identityServerConfiguration.Authority;
                 opts.ClientId = "website";
                 opts.ClientSecret = "password";
                 opts.ResponseType = "code";
@@ -128,7 +127,7 @@ void ConfigureIdServer(IServiceCollection services)
                 opts.Scope.Add("profile");
             });
         });
-    var isRealmEnabled = bool.Parse(builder.Configuration["IsRealmEnabled"]);
+    var isRealmEnabled = identityServerConfiguration.IsRealmEnabled;
     if (isRealmEnabled) idServerBuilder.UseRealm();
     services.AddDIDKey();
     services.AddDIDEthr();

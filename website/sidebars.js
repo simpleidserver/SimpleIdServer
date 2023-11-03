@@ -53,7 +53,8 @@ const sidebars = {
       items: [
         'advancedsettings/auditing',
         'advancedsettings/realm',
-        'advancedsettings/pki'
+        'advancedsettings/pki',
+        'advancedsettings/configuration'
       ]
     },
     {

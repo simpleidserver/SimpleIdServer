@@ -24,4 +24,3 @@ To disable the Realm, follow these steps:
 1. Open the [IdentityServer](../installation#create-identityserver-project) project and edit the `appsettings.json` file.
 2. Set the `IsRealmEnabled` property to `false` and save the file.
 3. Open the [IdentityServer website](../installation#create-identityserver-website-project) and edit the `appsettings.json` file.
-3. Set the `IsRealmEnabled` property to `false`, remove the master realm from the `DefaultSecurityOptions.Issuer` property, and save the file.
