@@ -3,6 +3,7 @@
 using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
 using System.Linq.Dynamic.Core;
@@ -12,11 +13,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
     public class GroupEffects
     {
         private readonly IDbContextFactory<StoreDbContext> _factory;
+        private readonly IdServerWebsiteOptions _options;
         private readonly ProtectedSessionStorage _sessionStorage;
 
-        public GroupEffects(IDbContextFactory<StoreDbContext> factory, ProtectedSessionStorage sessionStorage) 
+        public GroupEffects(IDbContextFactory<StoreDbContext> factory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage) 
         {
             _factory = factory;
+            _options = options.Value;
             _sessionStorage = sessionStorage;
         }
 
@@ -157,6 +160,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
 
         private async Task<string> GetRealm()
         {
+            if (!_options.IsReamEnabled) return SimpleIdServer.IdServer.Constants.DefaultRealm;
             var realm = await _sessionStorage.GetAsync<string>("realm");
             var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
             return realmStr;

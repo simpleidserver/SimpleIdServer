@@ -24,26 +24,31 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdServerConfigurationStore
         [EffectMethod]
         public async Task Handle(GetIdServerConfigurationAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = _httpClientFactory.Get();
-            var configuration = await httpClient.GetFromJsonAsync<IdServerConfigurationResult>($"{_options.IdServerBaseUrl}/{realm}/.well-known/idserver-configuration");
+            var configuration = await httpClient.GetFromJsonAsync<IdServerConfigurationResult>($"{baseUrl}/.well-known/idserver-configuration");
             dispatcher.Dispatch(new GetIdServerConfigurationSuccessAction(configuration));
         }
 
         [EffectMethod]
         public async Task Handle(GetOpenIdServerConfigurationAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = _httpClientFactory.Get();
-            var configuration = await httpClient.GetFromJsonAsync<OpenIdServerConfigurationResult>($"{_options.IdServerBaseUrl}/{realm}/.well-known/openid-configuration");
+            var configuration = await httpClient.GetFromJsonAsync<OpenIdServerConfigurationResult>($"{baseUrl}/.well-known/openid-configuration");
             dispatcher.Dispatch(new GetOpenIdServerConfigurationSuccessAction(configuration));
         }
 
-        private async Task<string> GetRealm()
+        private async Task<string> GetBaseUrl()
         {
-            var realm = await _sessionStorage.GetAsync<string>("realm");
-            var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
-            return realmStr;
+            if(_options.IsReamEnabled)
+            {
+                var realm = await _sessionStorage.GetAsync<string>("realm");
+                var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+                return $"{_options.IdServerBaseUrl}/{realmStr}";
+            }
+
+            return _options.IdServerBaseUrl;
         }
     }
 

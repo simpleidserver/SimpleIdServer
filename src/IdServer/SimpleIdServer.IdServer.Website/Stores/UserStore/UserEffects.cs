@@ -348,7 +348,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         [EffectMethod]
         public async Task Handle(ShareCredentialOfferAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             var request = new JsonObject
             {
@@ -357,7 +357,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             };
             var requestMessage = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{_websiteOptions.IdServerBaseUrl}/{realm}/credential_offer/share/{action.UserName}"),
+                RequestUri = new Uri($"{baseUrl}/credential_offer/share/{action.UserName}"),
                 Method = HttpMethod.Post,
                 Content = new StringContent(request.ToJsonString(), Encoding.UTF8, "application/json")
             };
@@ -388,7 +388,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         [EffectMethod]
         public async Task Handle(GenerateDIDEthrAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             var request = new JsonObject
             {
@@ -398,7 +398,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             };
             var requestMessage = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{_websiteOptions.IdServerBaseUrl}/{realm}/users/{action.UserId}/did"),
+                RequestUri = new Uri($"{baseUrl}/users/{action.UserId}/did"),
                 Method = HttpMethod.Post,
                 Content = new StringContent(request.ToJsonString(), Encoding.UTF8, "application/json")
             };
@@ -421,7 +421,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         [EffectMethod]
         public async Task Handle(GenerateDIDKeyAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             var request = new JsonObject
             {
@@ -429,7 +429,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             };
             var requestMessage = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{_websiteOptions.IdServerBaseUrl}/{realm}/users/{action.UserId}/did"),
+                RequestUri = new Uri($"{baseUrl}/users/{action.UserId}/did"),
                 Method = HttpMethod.Post,
                 Content = new StringContent(request.ToJsonString(), Encoding.UTF8, "application/json")
             };
@@ -448,8 +448,20 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             }
         }
 
+        private async Task<string> GetBaseUrl()
+        {
+            if(_websiteOptions.IsReamEnabled)
+            {
+                var realm = await GetRealm();
+                return $"{_websiteOptions.IdServerBaseUrl}/{realm}";
+            }
+
+            return $"{_websiteOptions.IdServerBaseUrl}";
+        }
+
         private async Task<string> GetRealm()
         {
+            if (!_websiteOptions.IsReamEnabled) return SimpleIdServer.IdServer.Constants.DefaultRealm;
             var realm = await _sessionStorage.GetAsync<string>("realm");
             var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
             return realmStr;

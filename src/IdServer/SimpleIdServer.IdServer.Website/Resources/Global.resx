@@ -423,4 +423,7 @@
   <data name="RegistrationWorkflowUpdated" xml:space="preserve">
     <value>Registration workflow '{0}' has been updated</value>
   </data>
+  <data name="CannotAddRealmBecauseOptionIsDisabled" xml:space="preserve">
+    <value>Realm cannot be added because the option is disabled</value>
+  </data>
 </root>

@@ -3,6 +3,7 @@
 using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Radzen;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
@@ -20,20 +21,22 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
     public class ClientEffects
     {
         private readonly IDbContextFactory<StoreDbContext> _factory;
+        private readonly IdServerWebsiteOptions _configuration;
         private readonly ProtectedSessionStorage _sessionStorage;
 
-        public ClientEffects(IDbContextFactory<StoreDbContext> factory, ProtectedSessionStorage sessionStorage)
+        public ClientEffects(IDbContextFactory<StoreDbContext> factory, IOptions<IdServerWebsiteOptions> configuration, ProtectedSessionStorage sessionStorage)
         {
             _factory = factory;
+            _configuration = configuration.Value;
             _sessionStorage = sessionStorage;
         }
 
         [EffectMethod]
         public async Task Handle(SearchClientsAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
             using (var dbContext = _factory.CreateDbContext())
             {
+                var realm = await GetRealm();
                 IQueryable<Client> query = dbContext.Clients.Include(c => c.Translations).Include(c => c.Realms).Include(c => c.Scopes).Where(c => c.Realms.Any(r => r.Name == realm)).AsNoTracking();
                 if (!string.IsNullOrWhiteSpace(action.Filter))
                     query = query.Where(SanitizeExpression(action.Filter));
@@ -687,6 +690,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
 
         private async Task<string> GetRealm()
         {
+            if (!_configuration.IsReamEnabled) return SimpleIdServer.IdServer.Constants.DefaultRealm;
             var realm = await _sessionStorage.GetAsync<string>("realm");
             var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
             return realmStr;

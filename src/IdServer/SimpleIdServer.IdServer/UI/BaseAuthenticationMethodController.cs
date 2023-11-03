@@ -82,7 +82,7 @@ namespace SimpleIdServer.IdServer.UI
                     var str = prefix ?? Constants.DefaultRealm; 
                     var client = await ClientRepository.Query().Include(c => c.Realms).Include(c => c.Translations).FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == str), cancellationToken);
                     var loginHint = query.GetLoginHintFromAuthorizationRequest();
-                    var amrInfo = await ResolveAmrInfo(query, prefix, client, cancellationToken);
+                    var amrInfo = await ResolveAmrInfo(query, str, client, cancellationToken);
                     bool isLoginMissing = amrInfo != null && !string.IsNullOrWhiteSpace(amrInfo.Login);
                     if (amrInfo != null && !string.IsNullOrWhiteSpace(amrInfo.Login) && TryGetLogin(amrInfo, out string login))
                     {

@@ -27,11 +27,11 @@ namespace SimpleIdServer.IdServer.Website.Stores.EthrNetworkStore
         [EffectMethod]
         public async Task Handle(SearchEthrNetworksAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             var requestMessage = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/networks"),
+                RequestUri = new Uri(baseUrl),
                 Method = HttpMethod.Get
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
@@ -46,7 +46,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.EthrNetworkStore
         [EffectMethod]
         public async Task Handle(AddEthrNetworkAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             var request = new JsonObject
             {
@@ -56,7 +56,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.EthrNetworkStore
             };
             var requestMessage = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/networks"),
+                RequestUri = new Uri(baseUrl),
                 Method = HttpMethod.Post,
                 Content = new StringContent(request.ToJsonString(), Encoding.UTF8, "application/json")
             };
@@ -77,13 +77,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.EthrNetworkStore
         [EffectMethod]
         public async Task Handle(RemoveSelectedEthrContractAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             foreach (var name in action.Names)
             {
                 var requestMessage = new HttpRequestMessage
                 {
-                    RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/networks/{name}"),
+                    RequestUri = new Uri($"{baseUrl}/{name}"),
                     Method = HttpMethod.Delete
                 };
                 await httpClient.SendAsync(requestMessage);
@@ -95,11 +95,11 @@ namespace SimpleIdServer.IdServer.Website.Stores.EthrNetworkStore
         [EffectMethod]
         public async Task Handle(DeployEthrContractAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             var requestMessage = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/networks/{action.Name}/deploy"),
+                RequestUri = new Uri($"{baseUrl}/{action.Name}/deploy"),
                 Method = HttpMethod.Get
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
@@ -116,11 +116,16 @@ namespace SimpleIdServer.IdServer.Website.Stores.EthrNetworkStore
             }
         }
 
-        private async Task<string> GetRealm()
+        private async Task<string> GetBaseUrl()
         {
-            var realm = await _sessionsStorage.GetAsync<string>("realm");
-            var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
-            return realmStr;
+            if(_options.IsReamEnabled)
+            {
+                var realm = await _sessionsStorage.GetAsync<string>("realm");
+                var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+                return $"{_options.IdServerBaseUrl}/{realmStr}/networks";
+            }
+
+            return $"{_options.IdServerBaseUrl}/networks";
         }
     }
 

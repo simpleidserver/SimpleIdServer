@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Website.Pages;
 using System.Linq.Dynamic.Core;
 
 namespace SimpleIdServer.IdServer.Website.Stores.ImportSummaryStore
@@ -50,18 +51,30 @@ namespace SimpleIdServer.IdServer.Website.Stores.ImportSummaryStore
         [EffectMethod]
         public async Task Handle(LaunchImportAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             var requestMessage = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/provisioning/import")
+                RequestUri = new Uri($"{baseUrl}/import")
             };
             await httpClient.SendAsync(requestMessage);
             dispatcher.Dispatch(new LaunchImportSuccessAction());
         }
 
+        private async Task<string> GetBaseUrl()
+        {
+            if(_options.IsReamEnabled)
+            {
+                var realm = await GetRealm();
+                return $"{_options.IdServerBaseUrl}/{realm}/provisioning";
+            }
+
+            return $"{_options.IdServerBaseUrl}/provisioning";
+        }
+
         private async Task<string> GetRealm()
         {
+            if (!_options.IsReamEnabled) return SimpleIdServer.IdServer.Constants.DefaultRealm;
             var realm = await _sessionStorage.GetAsync<string>("realm");
             var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
             return realmStr;

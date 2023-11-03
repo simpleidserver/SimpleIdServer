@@ -4,21 +4,23 @@
 using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Website.Resources;
-using SimpleIdServer.IdServer.Website.Stores.ConfigurationDefinitionStore;
 
 namespace SimpleIdServer.IdServer.Website.Stores.RealmStore
 {
     public class RealmEffects
     {
         private readonly IDbContextFactory<StoreDbContext> _factory;
+        private readonly IdServerWebsiteOptions _options;
         private readonly ProtectedSessionStorage _sessionStorage;
 
-        public RealmEffects(IDbContextFactory<StoreDbContext> factory, ProtectedSessionStorage  protectedSessionStorage)
+        public RealmEffects(IDbContextFactory<StoreDbContext> factory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage protectedSessionStorage)
         {
             _factory = factory;
+            _options = options.Value;
             _sessionStorage = protectedSessionStorage;
         }
 
@@ -28,7 +30,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.RealmStore
         {
             using (var dbContext = _factory.CreateDbContext())
             {
-                IEnumerable<Domains.Realm> realms = await dbContext.Realms.AsNoTracking().ToListAsync();
+                IQueryable<Domains.Realm> query = dbContext.Realms.AsNoTracking();
+                if (!_options.IsReamEnabled) query = query.Where(q => q.Name == SimpleIdServer.IdServer.Constants.DefaultRealm);
+                IEnumerable<Domains.Realm> realms = await query.ToListAsync();
                 dispatcher.Dispatch(new GetAllRealmSuccessAction { Realms = realms });
             }
         }
@@ -36,6 +40,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.RealmStore
         [EffectMethod]
         public async Task Handle(AddRealmAction action, IDispatcher dispatcher)
         {
+            if(!_options.IsReamEnabled)
+            {
+                dispatcher.Dispatch(new AddRealmFailureAction { ErrorMessage = Global.CannotAddRealmBecauseOptionIsDisabled });
+                return;
+            }
+
             using (var dbContext = _factory.CreateDbContext())
             {
                 if (await dbContext.Realms.AsNoTracking().AnyAsync(r => r.Name == action.Name))

@@ -26,12 +26,12 @@ public class AuthMethodEffects
     [EffectMethod]
     public async Task Handle(GetAllAuthMethodAction action, IDispatcher dispatcher)
 	{
-        var realm = await GetRealm();
+        var baseUrl = await GetBaseUrl();
         var httpClient = await _websiteHttpClientFactory.Build();
         var requestMessage = new HttpRequestMessage
         {
             Method = HttpMethod.Get,
-            RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/authmethods")
+            RequestUri = new Uri(baseUrl)
         };
         var httpResult = await httpClient.SendAsync(requestMessage);
         var json = await httpResult.Content.ReadAsStringAsync();
@@ -42,12 +42,12 @@ public class AuthMethodEffects
     [EffectMethod]
     public async Task Handle(GetAuthMethodAction action, IDispatcher dispatcher)
     {
-        var realm = await GetRealm();
+        var baseUrl = await GetBaseUrl();
         var httpClient = await _websiteHttpClientFactory.Build();
         var requestMessage = new HttpRequestMessage
         {
             Method = HttpMethod.Get,
-            RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/authmethods/{action.Amr}")
+            RequestUri = new Uri($"{baseUrl}/{action.Amr}")
         };
         var httpResult = await httpClient.SendAsync(requestMessage);
         var json = await httpResult.Content.ReadAsStringAsync();
@@ -67,7 +67,7 @@ public class AuthMethodEffects
     [EffectMethod]
     public async Task Handle(UpdateAuthMethodAction action, IDispatcher dispatcher)
     {
-        var realm = await GetRealm();
+        var baseUrl = await GetBaseUrl();
         var httpClient = await _websiteHttpClientFactory.Build();
         var requestContent = new UpdateAuthMethodConfigurationsRequest
         {
@@ -76,7 +76,7 @@ public class AuthMethodEffects
         var requestMessage = new HttpRequestMessage
         {
             Method = HttpMethod.Put,
-            RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/authmethods/{action.Amr}"),
+            RequestUri = new Uri($"{baseUrl}/{action.Amr}"),
             Content = new StringContent(JsonSerializer.Serialize(requestContent), System.Text.Encoding.UTF8, "application/json")
         };
         var httpResult = await httpClient.SendAsync(requestMessage);
@@ -93,11 +93,16 @@ public class AuthMethodEffects
         }
     }
 
-    private async Task<string> GetRealm()
+    private async Task<string> GetBaseUrl()
     {
-        var realm = await _sessionStorage.GetAsync<string>("realm");
-        var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
-        return realmStr;
+        if(_options.IsReamEnabled)
+        {
+            var realm = await _sessionStorage.GetAsync<string>("realm");
+            var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+            return $"{_options.IdServerBaseUrl}/{realmStr}/authmethods";
+        }
+
+        return $"{_options.IdServerBaseUrl}/authmethods";
     }
 }
 

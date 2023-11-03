@@ -168,6 +168,6 @@
 
     string GetDemoUrl(SelectableRegistrationWorkflow workflow)
     {
-        return $"{Options.Value.IdServerBaseUrl}/{realmsState.Value.ActiveRealm}/registration?workflowName={workflow.RegistrationWorkflow.Name}";
+        return Options.Value.IsReamEnabled ? $"{Options.Value.IdServerBaseUrl}/{realmsState.Value.ActiveRealm}/registration?workflowName={workflow.RegistrationWorkflow.Name}" : $"{Options.Value.IdServerBaseUrl}/registration?workflowName={workflow.RegistrationWorkflow.Name}";
     }
 }

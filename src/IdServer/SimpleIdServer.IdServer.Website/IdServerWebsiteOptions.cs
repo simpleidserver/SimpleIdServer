@@ -7,5 +7,6 @@ namespace SimpleIdServer.IdServer.Website
     {
         public string IdServerBaseUrl { get; set; } = "https://localhost:5001";
         public string SCIMUrl { get; set; } = "https://localhost:5003";
+        public bool IsReamEnabled { get; set; } = true;
     }
 }

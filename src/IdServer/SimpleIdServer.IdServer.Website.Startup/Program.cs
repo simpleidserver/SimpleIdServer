@@ -13,6 +13,7 @@ builder.Services.AddSIDWebsite(o =>
 {
     o.IdServerBaseUrl = builder.Configuration["IdServerBaseUrl"];
     o.SCIMUrl = builder.Configuration["ScimBaseUrl"];
+    o.IsReamEnabled = bool.Parse(builder.Configuration["IsRealmEnabled"]);
 }, o => ConfigureStorage(o));
 
 void ConfigureStorage(DbContextOptionsBuilder b)

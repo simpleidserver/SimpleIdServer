@@ -77,7 +77,7 @@ app.Run();
 
 void ConfigureIdServer(IServiceCollection services)
 {
-    services.AddSIDIdentityServer(dataProtectionBuilderCallback: ConfigureDataProtection)
+    var idServerBuilder = services.AddSIDIdentityServer(dataProtectionBuilderCallback: ConfigureDataProtection)
         .UseEFStore(o => ConfigureStorage(o))
         .AddCredentialIssuer()
         .UseInMemoryMassTransit()
@@ -96,7 +96,6 @@ void ConfigureIdServer(IServiceCollection services)
         .EnableConfigurableAuthentication()
         .AddSCIMProvisioning()
         .AddLDAPProvisioning()
-        .UseRealm()
         .AddAuthentication(callback: (a) =>
         {
             /*
@@ -129,6 +128,8 @@ void ConfigureIdServer(IServiceCollection services)
                 opts.Scope.Add("profile");
             });
         });
+    var isRealmEnabled = bool.Parse(builder.Configuration["IsRealmEnabled"]);
+    if (isRealmEnabled) idServerBuilder.UseRealm();
     services.AddDIDKey();
     services.AddDIDEthr();
     ConfigureDistributedCache();

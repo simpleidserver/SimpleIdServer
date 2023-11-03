@@ -28,11 +28,11 @@ namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
         [EffectMethod]
         public async Task Handle(GetAllAcrsAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             var requestMessage = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/acrs")
+                RequestUri = new Uri(baseUrl)
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
@@ -43,7 +43,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
         [EffectMethod]
         public async Task Handle(AddAcrAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             var requestJsonObj = new JsonObject
             {
@@ -55,7 +55,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
 
             var requestMessage = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/acrs"),
+                RequestUri = new Uri(baseUrl),
                 Method = HttpMethod.Post,
                 Content = new StringContent(requestJsonObj.ToJsonString(), Encoding.UTF8, "application/json")
             };
@@ -77,13 +77,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
         [EffectMethod]
         public async Task Handle(DeleteSelectedAcrsAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             foreach(var id in action.Ids)
             {
                 var requestMessage = new HttpRequestMessage
                 {
-                    RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/acrs/{id}"),
+                    RequestUri = new Uri($"{baseUrl}/{id}"),
                     Method = HttpMethod.Delete
                 };
                 await httpClient.SendAsync(requestMessage);
@@ -92,11 +92,16 @@ namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
             dispatcher.Dispatch(new DeleteSelectedAcrsSuccessAction { Ids = action.Ids });
         }
 
-        private async Task<string> GetRealm()
+        private async Task<string> GetBaseUrl()
         {
-            var realm = await _sessionStorage.GetAsync<string>("realm");
-            var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
-            return realmStr;
+            if(_options.IsReamEnabled)
+            {
+                var realm = await _sessionStorage.GetAsync<string>("realm");
+                var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+                return $"{_options.IdServerBaseUrl}/{realmStr}/acrs";
+            }
+
+            return $"{_options.IdServerBaseUrl}/acrs";
         }
     }
 

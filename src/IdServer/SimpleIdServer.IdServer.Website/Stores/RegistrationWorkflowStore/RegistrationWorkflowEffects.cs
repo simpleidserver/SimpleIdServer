@@ -27,12 +27,12 @@ public class RegistrationWorkflowEffects
     [EffectMethod]
     public async Task Handle(GetAllRegistrationWorkflowsAction action, IDispatcher dispatcher)
     {
-        var realm = await GetRealm();
+        var baseUrl = await GetBaseUrl();
         var httpClient = await _websiteHttpClientFactory.Build();
         var requestMessage = new HttpRequestMessage
         {
             Method = HttpMethod.Get,
-            RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/registrationworkflows")
+            RequestUri = new Uri(baseUrl)
         };
         var httpResult = await httpClient.SendAsync(requestMessage);
         var json = await httpResult.Content.ReadAsStringAsync();
@@ -43,12 +43,12 @@ public class RegistrationWorkflowEffects
     [EffectMethod]
     public async Task Handle(GetRegistrationWorkflowAction action, IDispatcher dispatcher)
     {
-        var realm = await GetRealm();
+        var baseUrl = await GetBaseUrl();
         var httpClient = await _websiteHttpClientFactory.Build();
         var requestMessage = new HttpRequestMessage
         {
             Method = HttpMethod.Get,
-            RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/registrationworkflows/{action.Id}")
+            RequestUri = new Uri($"{baseUrl}/{action.Id}")
         };
         var httpResult = await httpClient.SendAsync(requestMessage);
         var json = await httpResult.Content.ReadAsStringAsync();
@@ -68,14 +68,14 @@ public class RegistrationWorkflowEffects
     [EffectMethod]
     public async Task Handle(RemoveSelectedRegistrationWorkflowsAction action, IDispatcher dispatcher)
     {
-        var realm = await GetRealm();
+        var baseUrl = await GetBaseUrl();
         var httpClient = await _websiteHttpClientFactory.Build();
         foreach(var id in action.Ids)
         {
             var requestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Delete,
-                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/registrationworkflows/{id}")
+                RequestUri = new Uri($"{baseUrl}/{id}")
             };
             await httpClient.SendAsync(requestMessage);
         }
@@ -86,7 +86,7 @@ public class RegistrationWorkflowEffects
     [EffectMethod]
     public async Task Handle(UpdateRegistrationWorkflowAction action, IDispatcher dispatcher)
     {
-        var realm = await GetRealm();
+        var baseUrl = await GetBaseUrl();
         var httpClient = await _websiteHttpClientFactory.Build();
         var jsonRequest = JsonSerializer.Serialize(new RegistrationWorkflowResult
         {
@@ -96,7 +96,7 @@ public class RegistrationWorkflowEffects
         });
         var requestMessage = new HttpRequestMessage
         {
-            RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/registrationworkflows/{action.Id}"),
+            RequestUri = new Uri($"{baseUrl}/{action.Id}"),
             Method = HttpMethod.Put,
             Content = new StringContent(jsonRequest, Encoding.UTF8, "application/json")
         };
@@ -117,7 +117,7 @@ public class RegistrationWorkflowEffects
     [EffectMethod]
     public async Task Handle(AddRegistrationWorkflowAction action, IDispatcher dispatcher)
     {
-        var realm = await GetRealm();
+        var baseUrl = await GetBaseUrl();
         var httpClient = await _websiteHttpClientFactory.Build();
         var jsonRequest = JsonSerializer.Serialize(new RegistrationWorkflowResult
         {
@@ -127,7 +127,7 @@ public class RegistrationWorkflowEffects
         });
         var requestMessage = new HttpRequestMessage
         {
-            RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/registrationworkflows"),
+            RequestUri = new Uri(baseUrl),
             Method = HttpMethod.Post,
             Content = new StringContent(jsonRequest, Encoding.UTF8, "application/json")
         };
@@ -146,11 +146,16 @@ public class RegistrationWorkflowEffects
         }
     }
 
-    private async Task<string> GetRealm()
+    private async Task<string> GetBaseUrl()
     {
-        var realm = await _sessionStorage.GetAsync<string>("realm");
-        var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
-        return realmStr;
+        if(_options.IsReamEnabled)
+        {
+            var realm = await _sessionStorage.GetAsync<string>("realm");
+            var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+            return $"{_options.IdServerBaseUrl}/{realmStr}/registrationworkflows";
+        }
+
+        return $"{_options.IdServerBaseUrl}/registrationworkflows";
     }
 }
 

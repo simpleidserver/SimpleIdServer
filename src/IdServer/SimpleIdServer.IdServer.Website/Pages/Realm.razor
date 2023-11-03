@@ -20,10 +20,13 @@
     }
 </style>
 
-<div>
-    <RadzenButton Click=@((args) => AddRealm()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="Add Realm" />
-    <RadzenButton Click=@((args) => ChooseRealm()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="Choose Realm" />
-</div>
+@if(Options.Value.IsReamEnabled)
+{
+    <div>
+        <RadzenButton Click=@((args) => AddRealm()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="Add Realm" />
+        <RadzenButton Click=@((args) => ChooseRealm()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="Choose Realm" />
+    </div>    
+}
 
 <RadzenRow Gap="1rem" class="mt-2">
     <!-- Servers -->
@@ -100,10 +103,11 @@
 
 @code {
     string activeRealm;
-    string GetOpenIdConnectUrl() => $"{Options.Value.IdServerBaseUrl}/{realmsState.Value.ActiveRealm}/.well-known/openid-configuration";
-    string GetFederationMetadataUrl() => $"{Options.Value.IdServerBaseUrl}/{realmsState.Value.ActiveRealm}/FederationMetadata/2007-06/FederationMetadata.xml";
-    string GetSamlMetadataUrl() => $"{Options.Value.IdServerBaseUrl}/{realmsState.Value.ActiveRealm}/saml/metadata";
+    string GetOpenIdConnectUrl() => $"{GetBaseUrl()}/.well-known/openid-configuration";
+    string GetFederationMetadataUrl() => $"{GetBaseUrl()}/FederationMetadata/2007-06/FederationMetadata.xml";
+    string GetSamlMetadataUrl() => $"{GetBaseUrl()}/saml/metadata";
     string GetSCIMSchemasUrl() => $"{Options.Value.SCIMUrl}/Schemas";
+    string GetBaseUrl() => Options.Value.IsReamEnabled ? $"{Options.Value.IdServerBaseUrl}/{realmsState.Value.ActiveRealm}" : Options.Value.IdServerBaseUrl;
 
     void AddRealm()
     {

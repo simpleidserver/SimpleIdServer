@@ -88,6 +88,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Realm cannot be added because the option is disabled.
+        /// </summary>
+        public static string CannotAddRealmBecauseOptionIsDisabled {
+            get {
+                return ResourceManager.GetString("CannotAddRealmBecauseOptionIsDisabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à You don&apos;t have the permission to read the certificate store.
         /// </summary>
         public static string CannotReadCertificateStore {

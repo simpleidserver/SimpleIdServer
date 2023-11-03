@@ -24,11 +24,11 @@ public class ConfigurationDefinitionEffects
     [EffectMethod]
     public async Task Handle(GetAllConfigurationDefinitionsAction action, IDispatcher dispatcher)
     {
-        var realm = await GetRealm();
+        var baseUrl = await GetBaseUrl();
         var httpClient = await _websiteHttpClientFactory.Build();
         var requestMessage = new HttpRequestMessage
         {
-            RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/confdefs")
+            RequestUri = new Uri(baseUrl)
         };
         var httpResult = await httpClient.SendAsync(requestMessage);
         var json = await httpResult.Content.ReadAsStringAsync();
@@ -36,11 +36,16 @@ public class ConfigurationDefinitionEffects
         dispatcher.Dispatch(new GetAllConfigurationDefinitionsSuccessAction { Content = content });
     }
 
-    private async Task<string> GetRealm()
+    private async Task<string> GetBaseUrl()
     {
-        var realm = await _sessionStorage.GetAsync<string>("realm");
-        var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
-        return realmStr;
+        if(_options.IsReamEnabled)
+        {
+            var realm = await _sessionStorage.GetAsync<string>("realm");
+            var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+            return $"{_options.IdServerBaseUrl}/{realmStr}/confdefs";
+        }
+
+        return $"{_options.IdServerBaseUrl}/confdefs";
     }
 }
 

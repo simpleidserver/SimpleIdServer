@@ -31,7 +31,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         [EffectMethod]
         public async Task Handle(SearchIdProvidersAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             var searchRequest = new DTOs.SearchRequest
             {
@@ -43,7 +43,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
             var requestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/idproviders/.search"),
+                RequestUri = new Uri($"{baseUrl}/.search"),
                 Content = new StringContent(JsonSerializer.Serialize(searchRequest), Encoding.UTF8, "application/json")
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
@@ -57,14 +57,14 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         [EffectMethod]
         public async Task Handle(RemoveSelectedIdProvidersAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             foreach(var id in action.Ids)
             {
                 var requestMessage = new HttpRequestMessage
                 {
                     Method = HttpMethod.Delete,
-                    RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/idproviders/{id}")
+                    RequestUri = new Uri($"{baseUrl}/{id}")
                 };
                 await httpClient.SendAsync(requestMessage);
             }
@@ -75,12 +75,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         [EffectMethod]
         public async Task Handle(GetIdProviderAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             var requestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/idproviders/{action.Id}")
+                RequestUri = new Uri($"{baseUrl}/{action.Id}")
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
@@ -91,7 +91,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         [EffectMethod]
         public async Task Handle(AddIdProviderAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             var addRequest = new AddAuthenticationSchemeProviderRequest
             {
@@ -104,7 +104,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
             var requestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/idproviders"),
+                RequestUri = new Uri(baseUrl),
                 Content = new StringContent(JsonSerializer.Serialize(addRequest), Encoding.UTF8, "application/json")
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
@@ -124,7 +124,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         [EffectMethod]
         public async Task Handle(UpdateIdProviderDetailsAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             var addRequest = new UpdateAuthenticationSchemeProviderDetailsRequest
             {
@@ -134,7 +134,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
             var requestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Put,
-                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/idproviders/{action.Name}/details"),
+                RequestUri = new Uri($"{baseUrl}/{action.Name}/details"),
                 Content = new StringContent(JsonSerializer.Serialize(addRequest), Encoding.UTF8, "application/json")
             };
             await httpClient.SendAsync(requestMessage);
@@ -144,7 +144,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         [EffectMethod]
         public async Task Handle(UpdateAuthenticationSchemeProviderPropertiesAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             var addRequest = new UpdateAuthenticationSchemeProviderValuesRequest
             {
@@ -153,7 +153,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
             var requestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Put,
-                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/idproviders/{action.Name}/values"),
+                RequestUri = new Uri($"{baseUrl}/{action.Name}/values"),
                 Content = new StringContent(JsonSerializer.Serialize(addRequest), Encoding.UTF8, "application/json")
             };
             await httpClient.SendAsync(requestMessage);
@@ -163,7 +163,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         [EffectMethod]
         public async Task Handle(AddAuthenticationSchemeProviderMapperAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             var addRequest = new AddAuthenticationSchemeProviderMapperRequest
             {
@@ -176,7 +176,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
             var requestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/idproviders/{action.IdProviderName}/mappers"),
+                RequestUri = new Uri($"{baseUrl}/{action.IdProviderName}/mappers"),
                 Content = new StringContent(JsonSerializer.Serialize(addRequest), Encoding.UTF8, "application/json")
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
@@ -197,14 +197,14 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         [EffectMethod]
         public async Task Handle(RemoveSelectedAuthenticationSchemeProviderMappersAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             foreach(var id in action.MapperIds)
             {
                 var requestMessage = new HttpRequestMessage
                 {
                     Method = HttpMethod.Delete,
-                    RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/idproviders/{action.Name}/mappers/{id}")
+                    RequestUri = new Uri($"{baseUrl}/{action.Name}/mappers/{id}")
                 };
                 await httpClient.SendAsync(requestMessage);
             }
@@ -219,7 +219,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         [EffectMethod]
         public async Task Handle(UpdateAuthenticationSchemeProviderMapperAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             var addRequest = new UpdateAuthenticationSchemeProviderMapperRequest
             {
@@ -231,7 +231,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
             var requestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Put,
-                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/idproviders/{action.IdProviderName}/mappers/{action.Id}"),
+                RequestUri = new Uri($"{baseUrl}/{action.IdProviderName}/mappers/{action.Id}"),
                 Content = new StringContent(JsonSerializer.Serialize(addRequest), Encoding.UTF8, "application/json")
             };
             await httpClient.SendAsync(requestMessage);
@@ -256,11 +256,16 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
             }
         }
 
-        private async Task<string> GetRealm()
+        private async Task<string> GetBaseUrl()
         {
-            var realm = await _sessionStorage.GetAsync<string>("realm");
-            var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
-            return realmStr;
+            if(_options.IsReamEnabled)
+            {
+                var realm = await _sessionStorage.GetAsync<string>("realm");
+                var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+                return $"{_options.IdServerBaseUrl}/{realmStr}/idproviders";
+            }
+
+            return $"{_options.IdServerBaseUrl}/idproviders";
         }
     }
 

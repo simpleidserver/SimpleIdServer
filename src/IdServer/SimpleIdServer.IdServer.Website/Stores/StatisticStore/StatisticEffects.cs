@@ -3,8 +3,10 @@
 using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Events;
 using SimpleIdServer.IdServer.ExternalEvents;
+using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 
 namespace SimpleIdServer.IdServer.Website.Stores.StatisticStore
@@ -12,11 +14,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.StatisticStore
     public class StatisticEffects
     {
         private readonly IDbContextFactory<StoreDbContext> _factory;
+        private readonly IdServerWebsiteOptions _options;
         private readonly ProtectedSessionStorage _sessionStorage;
 
-        public StatisticEffects(IDbContextFactory<StoreDbContext> factory, ProtectedSessionStorage sessionStorage)
+        public StatisticEffects(IDbContextFactory<StoreDbContext> factory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
         {
             _factory= factory;
+            _options = options.Value;
             _sessionStorage= sessionStorage;
         }
 
@@ -37,6 +41,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.StatisticStore
 
         private async Task<string> GetRealm()
         {
+            if (!_options.IsReamEnabled) return SimpleIdServer.IdServer.Constants.DefaultRealm;
             var realm = await _sessionStorage.GetAsync<string>("realm");
             var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
             return realmStr;

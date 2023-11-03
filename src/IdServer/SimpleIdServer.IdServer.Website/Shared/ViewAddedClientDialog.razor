@@ -68,9 +68,10 @@
 }
 
 @code {
-    string GetOpenIdConnectUrl() => $"{Options.Value.IdServerBaseUrl}/{realmsState.Value.ActiveRealm}/.well-known/openid-configuration";
-    string GetFederationMetadataUrl() => $"{Options.Value.IdServerBaseUrl}/{realmsState.Value.ActiveRealm}/FederationMetadata/2007-06/FederationMetadata.xml";
-    string GetSamlMetadataUrl() => $"{Options.Value.IdServerBaseUrl}/{realmsState.Value.ActiveRealm}/saml/metadata";
+    string GetOpenIdConnectUrl() => $"{GetBaseUrl()}/.well-known/openid-configuration";
+    string GetFederationMetadataUrl() => $"{GetBaseUrl()}/FederationMetadata/2007-06/FederationMetadata.xml";
+    string GetSamlMetadataUrl() => $"{GetBaseUrl()}/saml/metadata";
+    string GetBaseUrl() => Options.Value.IsReamEnabled ? $"{Options.Value.IdServerBaseUrl}/{realmsState.Value.ActiveRealm}" : Options.Value.IdServerBaseUrl;
 
     [Parameter]
     public AddClientSuccessAction Client { get; set; }

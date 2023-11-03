@@ -1,10 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
+using MassTransit.Transports;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.Provisioning;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Website.Pages;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -27,7 +29,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         [EffectMethod]
         public async Task Handle(SearchIdentityProvisioningAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             var searchRequest = new DTOs.SearchRequest
             {
@@ -39,7 +41,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             var requestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/provisioning/.search"),
+                RequestUri = new Uri($"{baseUrl}/.search"),
                 Content = new StringContent(JsonSerializer.Serialize(searchRequest), Encoding.UTF8, "application/json")
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
@@ -53,14 +55,14 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         [EffectMethod]
         public async Task Handle(RemoveSelectedIdentityProvisioningAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             foreach (var id in action.Ids)
             {
                 var requestMessage = new HttpRequestMessage
                 {
                     Method = HttpMethod.Delete,
-                    RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/provisioning/{id}")
+                    RequestUri = new Uri($"{baseUrl}/{id}")
                 };
                 await httpClient.SendAsync(requestMessage);
             }
@@ -71,12 +73,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         [EffectMethod]
         public async Task Handle(GetIdentityProvisioningAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             var requestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/provisioning/{action.Id}")
+                RequestUri = new Uri($"{baseUrl}/{action.Id}")
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
@@ -87,11 +89,11 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         [EffectMethod]
         public async Task Handle(LaunchIdentityProvisioningAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             var requestMessage = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/provisioning/{action.Name}/{action.Id}/enqueue")
+                RequestUri = new Uri($"{baseUrl}/{action.Name}/{action.Id}/enqueue")
             };
             await httpClient.SendAsync(requestMessage);
             dispatcher.Dispatch(new LaunchIdentityProvisioningSuccessAction { Id = action.Id, Name = action.Name });
@@ -100,7 +102,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         [EffectMethod]
         public async Task Handle(UpdateIdProvisioningPropertiesAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             var addRequest = new UpdateIdentityProvisioningPropertiesRequest
             {
@@ -109,7 +111,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             var requestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Put,
-                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/provisioning/{action.Id}/values"),
+                RequestUri = new Uri($"{baseUrl}/{action.Id}/values"),
                 Content = new StringContent(JsonSerializer.Serialize(addRequest), Encoding.UTF8, "application/json")
             };
             await httpClient.SendAsync(requestMessage);
@@ -119,7 +121,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         [EffectMethod]
         public async Task Handle(UpdateIdProvisioningDetailsAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             var addRequest = new UpdateIdentityProvisioningDetailsRequest
             {
@@ -128,7 +130,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             var requestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Put,
-                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/provisioning/{action.Id}/details"),
+                RequestUri = new Uri($"{baseUrl}/{action.Id}/details"),
                 Content = new StringContent(JsonSerializer.Serialize(addRequest), Encoding.UTF8, "application/json")
             };
             await httpClient.SendAsync(requestMessage);
@@ -138,14 +140,14 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         [EffectMethod]
         public async Task Handle(RemoveSelectedIdentityProvisioningMappingRulesAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             foreach (var id in action.MappingRuleIds)
             {
                 var requestMessage = new HttpRequestMessage
                 {
                     Method = HttpMethod.Delete,
-                    RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/provisioning/{action.Id}/mappers/{id}")
+                    RequestUri = new Uri($"{baseUrl}/{action.Id}/mappers/{id}")
                 };
                 await httpClient.SendAsync(requestMessage);
             }
@@ -156,7 +158,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         [EffectMethod]
         public async Task Handle(AddIdentityProvisioningMappingRuleAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             var addRequest = new AddIdentityProvisioningMapperRequest
             {
@@ -169,7 +171,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             var requestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/provisioning/{action.Id}/mappers"),
+                RequestUri = new Uri($"{baseUrl}/{action.Id}/mappers"),
                 Content = new StringContent(JsonSerializer.Serialize(addRequest), Encoding.UTF8, "application/json")
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
@@ -181,12 +183,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         [EffectMethod]
         public async Task Handle(TestIdentityProvisioningAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             var requestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/provisioning/{action.Id}/test")
+                RequestUri = new Uri($"{baseUrl}/{action.Id}/test")
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
@@ -206,12 +208,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         [EffectMethod]
         public async Task Handle(GetIdentityProvisioningAllowedAttributesAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
+            var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             var requestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri($"{_options.IdServerBaseUrl}/{realm}/provisioning/{action.Id}/allowedattributes")
+                RequestUri = new Uri($"{baseUrl}/{action.Id}/allowedattributes")
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
@@ -228,11 +230,16 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             }
         }
 
-        private async Task<string> GetRealm()
+        private async Task<string> GetBaseUrl()
         {
-            var realm = await _sessionStorage.GetAsync<string>("realm");
-            var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
-            return realmStr;
+            if(_options.IsReamEnabled)
+            {
+                var realm = await _sessionStorage.GetAsync<string>("realm");
+                var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+                return realmStr;
+            }
+
+            return $"{_options.IdServerBaseUrl}/provisioning";
         }
     }
 
