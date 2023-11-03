@@ -14,3 +14,14 @@ To add a realm, follow these steps :
 4. Click `Save`. After saving the details, the user-agent will be redirected to the new realm.
 
 You can switch the active realm by clicking on `Active realm: active realm`.
+
+## Disable Realm
+
+By default, SimpleIdServer is configured to use the Realm. If you do not want to use it, you can disable it by updating the `appsettings.json` configuration files.
+
+To disable the Realm, follow these steps:
+
+1. Open the [IdentityServer](../installation#create-identityserver-project) project and edit the `appsettings.json` file.
+2. Set the `IsRealmEnabled` property to `false` and save the file.
+3. Open the [IdentityServer website](../installation#create-identityserver-website-project) and edit the `appsettings.json` file.
+3. Set the `IsRealmEnabled` property to `false`, remove the master realm from the `DefaultSecurityOptions.Issuer` property, and save the file.
