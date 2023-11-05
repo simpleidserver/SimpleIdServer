@@ -92,9 +92,10 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
                 user.UpdateEmail(action.Email);
                 user.UpdateName(action.Firstname);
                 user.UpdateLastname(action.Lastname);
+                user.NotificationMode = action.NotificationMode;
                 user.UpdateDateTime = DateTime.UtcNow;
                 await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new UpdateUserDetailsSuccessAction { Email = action.Email, Firstname = action.Firstname, Lastname = action.Lastname, UserId = action.UserId });
+                dispatcher.Dispatch(new UpdateUserDetailsSuccessAction { Email = action.Email, Firstname = action.Firstname, Lastname = action.Lastname, UserId = action.UserId, NotificationMode = action.NotificationMode });
             }
         }
 
@@ -515,6 +516,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         public string? Email { get; set; } = null;
         public string? Firstname { get; set; } = null;
         public string? Lastname { get; set; } = null;
+        public string? NotificationMode { get; set; } = null;
     }
 
     public class UpdateUserDetailsSuccessAction
@@ -523,6 +525,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         public string? Email { get; set; } = null;
         public string? Firstname { get; set; } = null;
         public string? Lastname { get; set; } = null;
+        public string? NotificationMode { get; set; } = null;
     }
 
     public class RevokeUserConsentAction

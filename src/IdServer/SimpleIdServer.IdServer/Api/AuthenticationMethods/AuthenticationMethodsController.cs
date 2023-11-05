@@ -32,6 +32,7 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationMethods
                 Id = a.Amr,
                 Name = a.Name,
                 OptionsName = a.OptionsType?.Name,
+                Capabilities = a.Capabilities,
                 Values = null
             });
             return new OkObjectResult(result);
@@ -86,7 +87,8 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationMethods
                     Id = amr,
                     Name = authMethod.Name,
                     OptionsName = authMethod.OptionsType.Name,
-                    Values = values
+                    Values = values,
+                    Capabilities = authMethod.Capabilities
                 };
                 return new OkObjectResult(result);
             }

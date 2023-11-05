@@ -28,23 +28,10 @@
         <Setter Property="FontAttributes" Value="Bold"></Setter>
     </Style>
 
-    <Style x:Key="removeBtn" TargetType="ImageButton">
-        <Setter Property="Padding" Value="10"></Setter>
-        <Setter Property="Source" Value="remove.png"></Setter>
+    <Style x:Key="removeBtn" TargetType="Label">
         <Setter Property="HorizontalOptions" Value="Center"></Setter>
         <Setter Property="VerticalOptions" Value="Center"></Setter>
-        <Setter Property="VisualStateManager.VisualStateGroups">
-            <VisualStateGroupList>
-                <VisualStateGroup x:Name="CommonStates">
-                    <VisualState x:Name="Normal"></VisualState>
-                    <VisualState x:Name="Disabled">
-                        <VisualState.Setters>
-                            <Setter Property="Source" Value="removedisabled.png"></Setter>
-                        </VisualState.Setters>
-                    </VisualState>
-                </VisualStateGroup>
-            </VisualStateGroupList>
-        </Setter>
+        <Setter Property="TextColor" Value="{StaticResource White}"></Setter>
     </Style>
     
     <Style TargetType="ActivityIndicator">

@@ -64,12 +64,13 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
         {
             var notificationMode = handlerContext.User.NotificationMode ?? Constants.DefaultNotificationMode;
             var notificationService = _notificationServices.First(n => n.Name == notificationMode);
-            await notificationService.Send($"The Back Channel redirection URL is : {BuildUrl(handlerContext.UrlHelper, handlerContext.Request.IssuerName, message)}", handlerContext.User);
+            var queries = message.Serialize(_urlEncoder);
+            var data = queries.ToDictionary(c => c.Key, c => c.Value);
+            await notificationService.Send("Consent", $"Accept or refuse the consent : {BuildUrl(handlerContext.UrlHelper, handlerContext.Request.IssuerName, queries)}", data, handlerContext.User);
         }
 
-        protected string BuildUrl(IUrlHelper urlHelper, string issuer, BCNotificationMessage message)
+        protected string BuildUrl(IUrlHelper urlHelper, string issuer, List<KeyValuePair<string, string>> queries)
         {
-            var queries = message.Serialize(_urlEncoder);
             var queryCollection = new QueryBuilder(queries);
             var returnUrl = $"{HandlerContext.GetIssuer(issuer)}/{Constants.EndPoints.BCCallback}{queryCollection.ToQueryString()}";
             return $"{issuer}{urlHelper.Action("Index", "BackChannelConsents", new

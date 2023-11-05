@@ -23,18 +23,18 @@ namespace SimpleIdServer.IdServer.Sms
 
         public string Name => Constants.AMR;
 
-        public Task Send(string message, User user)
+        public Task Send(string title, string body, Dictionary<string, string> data, User user)
         {
             var phoneNumber = user.OAuthUserClaims.First(c => c.Name == JwtRegisteredClaimNames.PhoneNumber).Value;
-            return Send(message, phoneNumber);
+            return Send(title, body, data, phoneNumber);
         }
 
-        public async Task Send(string message, string destination)
+        public async Task Send(string title, string body, Dictionary<string, string> data, string destination)
         {
             var smsHostOptions = GetOptions();
             TwilioClient.Init(smsHostOptions.AccountSid, smsHostOptions.AuthToken);
             await MessageResource.CreateAsync(
-                body: string.Format(smsHostOptions.Message, message),
+                body: body,
                 from: new PhoneNumber(smsHostOptions.FromPhoneNumber),
                 to: new PhoneNumber(destination));
         }

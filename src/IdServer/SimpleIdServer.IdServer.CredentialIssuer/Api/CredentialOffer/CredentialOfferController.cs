@@ -215,7 +215,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialOffer
                     {
                         pin = Guid.NewGuid().ToString();
                         var notificationService = _notificationServices.First(n => (user.NotificationMode ?? IdServer.Constants.DefaultNotificationMode) == n.Name);
-                        await notificationService.Send(pin, user);
+                        await notificationService.Send("PIN", $"The pin is {pin}", new Dictionary<string, string>(), user);
                     }
 
                     var preAuthorizedCode = Guid.NewGuid().ToString();

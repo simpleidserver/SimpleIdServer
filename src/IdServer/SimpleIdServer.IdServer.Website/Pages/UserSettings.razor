@@ -1,9 +1,11 @@
 ﻿@using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.UserStore;
+@using SimpleIdServer.IdServer.Website.Stores.AuthMethodsStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject IDispatcher dispatcher
 @inject IState<UserState> userState
 @inject IState<UpdateUserState> updateUserState
+@inject IState<AuthMethodsState> authMethodsState
 @inject NotificationService notificationService
 
 <RadzenTemplateForm Submit=@UpdateUserSettings TItem="UpdateUserSettingsParameter" Data=@updateUserSettings>
@@ -43,6 +45,16 @@
         <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Last name</RadzenText>
         <RadzenTextBox Name="Lastname" @bind-Value="@updateUserSettings.Lastname" Class="w-100"></RadzenTextBox>
     </div>
+    <!-- Notification Mode -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Notification mode</RadzenText>
+        <RadzenDropDown Class="w-100"
+            Data=@authMethodsState.Value.AuthenticationMethods.Where(m => m.Capabilities.HasFlag(AuthenticationMethodCapabilities.PUSHNOTIFICATION))
+            TextProperty="Name"
+            ValueProperty="Id"
+            TValue="string"
+            @bind-Value=@updateUserSettings.NotificationMode></RadzenDropDown>
+    </div>
     <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateUserState.Value.IsUpdating ? "Updating..." : "Update")" Disabled=@updateUserState.Value.IsUpdating />
 </RadzenTemplateForm>
 @code {
@@ -60,7 +72,21 @@
         public string? Email { get; set; } = null;
         public string? Firstname { get; set; } = null;
         public string? Lastname { get; set; } = null;
+        public string? NotificationMode { get; set; } = null;
     }
+
+    record NotificationMode
+    {
+        public string Name { get; set; }
+        public string DisplayName { get; set; }
+    }
+
+    ICollection<NotificationMode> NotificationModes = new List<NotificationMode>
+    {
+        new NotificationMode { DisplayName = "Email", Name = "email" },
+        new NotificationMode { DisplayName = "Sms", Name = "sms" },
+        new NotificationMode { DisplayName = "Firebase", Name = "firebase" }
+    };
 
     protected override void OnAfterRender(bool firstRender)
     {

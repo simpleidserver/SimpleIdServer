@@ -13,6 +13,7 @@ public class AndroidMessagingService : FirebaseMessagingService
     {
         base.OnMessageReceived(message);
         CrossFirebaseCloudMessaging.Current.OnNotificationReceived(message.ToFCMNotification());
+        // TODO : Display the correct page.
     }
 
     public override async void OnNewToken(string token)

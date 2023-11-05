@@ -83,6 +83,7 @@ void ConfigureIdServer(IServiceCollection services)
         .AddBackChannelAuthentication()
         .AddEmailAuthentication()
         .AddSmsAuthentication()
+        .AddFcmNotification()
         .AddSamlIdp()
         .AddFidoAuthentication(f =>
         {

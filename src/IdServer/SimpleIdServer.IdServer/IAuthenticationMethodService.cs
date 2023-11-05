@@ -11,14 +11,23 @@ namespace SimpleIdServer.IdServer
         string Amr { get; }
         string Name { get; }
         Type? OptionsType { get; }
+        AuthenticationMethodCapabilities Capabilities { get; }
         bool IsCredentialExists(User user);
-}
+    }
+
+    [Flags]
+    public enum AuthenticationMethodCapabilities
+    {
+        USERAUTHENTICATION = 1,
+        PUSHNOTIFICATION = 2
+    }
 
     public class PwdAuthenticationMethodService : IAuthenticationMethodService
     {
         public string Amr => Constants.Areas.Password;
         public string Name => "Password";
         public Type? OptionsType => null;
+        public AuthenticationMethodCapabilities Capabilities => AuthenticationMethodCapabilities.USERAUTHENTICATION;
         public bool IsCredentialExists(User user) => user.Credentials.Any(c => c.CredentialType == Constants.Areas.Password);
     }
 }

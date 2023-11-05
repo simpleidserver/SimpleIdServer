@@ -31,5 +31,6 @@ public partial class App : Application
         base.OnStart();
 		await _otpListState.Load();
 		await _credentialListState.Load();
+
     }
 }

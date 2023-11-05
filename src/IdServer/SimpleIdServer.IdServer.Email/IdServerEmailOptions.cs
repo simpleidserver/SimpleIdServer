@@ -17,8 +17,6 @@ namespace SimpleIdServer.IdServer.Email
         public string? SmtpUserName { get; set; } = null;
         [ConfigurationRecord("Password", null, order: 3, IsProtected = true)]
         public string? SmtpPassword { get; set; } = null;
-        [ConfigurationRecord("Subject of the message", null, order: 4)]
-        public string Subject { get; set; } = "Confirmation code";
         [ConfigurationRecord("Content of the message", null, order: 5)]
         public string HttpBody { get; set; } = "the confirmation code is {0}";
         [ConfigurationRecord("Email of the sender", null, order: 6)]

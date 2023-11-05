@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Website.Stores.GroupStore;
@@ -115,6 +114,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             selectedUser.Value.UpdateName(act.Firstname);
             selectedUser.Value.UpdateLastname(act.Lastname);
             selectedUser.Value.UpdateEmail(act.Email);
+            selectedUser.Value.NotificationMode = act.NotificationMode;
             selectedUser.Value.UpdateDateTime = DateTime.UtcNow;
             return state with
             {
@@ -149,6 +149,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             state.User.UpdateEmail(act.Email);
             state.User.UpdateName(act.Firstname);
             state.User.UpdateLastname(act.Lastname);
+            state.User.NotificationMode = act.NotificationMode;
             state.User.UpdateDateTime = DateTime.UtcNow;
             return state;
         }

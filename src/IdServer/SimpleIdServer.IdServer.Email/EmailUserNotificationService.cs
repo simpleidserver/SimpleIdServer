@@ -21,9 +21,9 @@ namespace SimpleIdServer.IdServer.Email
 
         public string Name => Constants.AMR;
 
-        public Task Send(string message, User user) => Send(message, user.Email);
+        public Task Send(string title, string body, Dictionary<string, string> data, User user) => Send(title, body, data, user.Email);
 
-        public Task Send(string message, string destination)
+        public Task Send(string title, string body, Dictionary<string, string> data, string destination)
         {
             var emailOptions = GetOptions();
             using (var smtpClient = new SmtpClient())
@@ -37,8 +37,8 @@ namespace SimpleIdServer.IdServer.Email
                 var mailMessage = new MailMessage
                 {
                     From = new MailAddress(emailOptions.FromEmail),
-                    Subject = emailOptions.Subject,
-                    Body = message,
+                    Subject = title,
+                    Body = body,
                     IsBodyHtml = true
                 };
 

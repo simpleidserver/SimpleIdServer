@@ -121,7 +121,7 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseRegisterControll
                 CredentialType = UserCredential.OTP,
                 IsActive = true
             });
-            await _userNotificationService.Send(string.Format(options.HttpBody, otpCode), viewModel.Value);
+            await _userNotificationService.Send("One Time Password", string.Format(options.HttpBody, otpCode), new Dictionary<string, string>(), viewModel.Value);
             viewModel.IsOTPCodeSent = true;
             return View(viewModel);
         }
