@@ -14,6 +14,7 @@ public partial class NotificationPage : ContentPage
         On<iOS>().SetModalPresentationStyle(UIModalPresentationStyle.PageSheet);
         BindingContext = viewModel;
         _viewModel = viewModel;
+        InitializeComponent();
     }
 
     public void Display(FCMNotification fcmNotification)

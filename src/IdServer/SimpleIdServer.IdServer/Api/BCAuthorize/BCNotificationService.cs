@@ -66,10 +66,12 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             var notificationService = _notificationServices.First(n => n.Name == notificationMode);
             var queries = message.Serialize(_urlEncoder);
             var data = queries.ToDictionary(c => c.Key, c => c.Value);
-            await notificationService.Send("Consent", $"Accept or refuse the consent : {BuildUrl(handlerContext.UrlHelper, handlerContext.Request.IssuerName, queries)}", data, handlerContext.User);
+            var backChannelUrl = BuildBackChannelUrl(handlerContext.Request.IssuerName);
+            data.Add("bc_channel", backChannelUrl);
+            await notificationService.Send("Consent", $"Accept or refuse the consent : {BuildBackChannelConsentUrl(handlerContext.UrlHelper, handlerContext.Request.IssuerName, queries)}", data, handlerContext.User);
         }
 
-        protected string BuildUrl(IUrlHelper urlHelper, string issuer, List<KeyValuePair<string, string>> queries)
+        protected string BuildBackChannelConsentUrl(IUrlHelper urlHelper, string issuer, List<KeyValuePair<string, string>> queries)
         {
             var queryCollection = new QueryBuilder(queries);
             var returnUrl = $"{HandlerContext.GetIssuer(issuer)}/{Constants.EndPoints.BCCallback}{queryCollection.ToQueryString()}";
@@ -78,5 +80,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
                 returnUrl = _dataProtector.Protect(returnUrl)
             })}";
         }
+
+        protected string BuildBackChannelUrl(string issuer) => $"{HandlerContext.GetIssuer(issuer)}/{Constants.EndPoints.BCCallback}";
     }
 }

@@ -41,19 +41,7 @@ Scenario: authorization request must exists
 Scenario: client must be the same
 	Given authenticate a user
 
-	When execute HTTP GET request 'http://localhost/authorization'
-	| Key           | Value                 |
-	| response_type | id_token              |
-	| client_id     | fourteenClient        |
-	| state         | state                 |
-	| response_mode | query                 |
-	| scope         | openid email role     |
-	| redirect_uri  | http://localhost:8080 |
-	| nonce         | nonce                 |
-	
-	And extract parameter 'id_token' from redirect url
-
-	And execute HTTP POST request 'https://localhost:8080/bc-authorize'
+	When execute HTTP POST request 'https://localhost:8080/bc-authorize'
 	| Key                       | Value            |
 	| client_id                 | fortyNineClient  |
 	| client_secret             | password         |
@@ -66,7 +54,6 @@ Scenario: client must be the same
 
 	And execute HTTP POST JSON request 'http://localhost/bc-callback'
 	| Key           | Value                  |
-	| Authorization | Bearer $id_token$      |
 	| auth_req_id   | $auth_req_id$          |
 
 	And execute HTTP POST request 'https://localhost:8080/token'
@@ -121,20 +108,8 @@ Scenario: authorization request must be confirmed
 
 Scenario: authorization request cannot be rejected
 	Given authenticate a user
-
-	When execute HTTP GET request 'http://localhost/authorization'
-	| Key           | Value                 |
-	| response_type | id_token              |
-	| client_id     | fourteenClient        |
-	| state         | state                 |
-	| response_mode | query                 |
-	| scope         | openid email role     |
-	| redirect_uri  | http://localhost:8080 |
-	| nonce         | nonce                 |
 	
-	And extract parameter 'id_token' from redirect url
-
-	And execute HTTP POST request 'https://localhost:8080/bc-authorize'
+	When execute HTTP POST request 'https://localhost:8080/bc-authorize'
 	| Key                       | Value            |
 	| client_id                 | fortyNineClient  |
 	| client_secret             | password         |
@@ -147,7 +122,6 @@ Scenario: authorization request cannot be rejected
 
 	And execute HTTP POST JSON request 'http://localhost/bc-callback'
 	| Key           | Value                  |
-	| Authorization | Bearer $id_token$      |
 	| auth_req_id   | $auth_req_id$          |
 	| action        | 1                      |
 

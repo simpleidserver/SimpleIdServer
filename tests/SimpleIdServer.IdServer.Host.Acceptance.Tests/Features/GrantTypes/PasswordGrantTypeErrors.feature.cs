@@ -98,14 +98,14 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table355 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table347 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table355.AddRow(new string[] {
+                table347.AddRow(new string[] {
                             "grant_type",
                             "password"});
 #line 5
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table355, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table347, "When ");
 #line hidden
 #line 9
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -141,17 +141,17 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table356 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table348 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table356.AddRow(new string[] {
+                table348.AddRow(new string[] {
                             "grant_type",
                             "password"});
-                table356.AddRow(new string[] {
+                table348.AddRow(new string[] {
                             "username",
                             "user"});
 #line 15
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table356, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table348, "When ");
 #line hidden
 #line 20
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -190,26 +190,26 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table357 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table349 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table357.AddRow(new string[] {
+                table349.AddRow(new string[] {
                             "grant_type",
                             "password"});
-                table357.AddRow(new string[] {
+                table349.AddRow(new string[] {
                             "username",
                             "user"});
-                table357.AddRow(new string[] {
+                table349.AddRow(new string[] {
                             "password",
                             "pwd"});
-                table357.AddRow(new string[] {
+                table349.AddRow(new string[] {
                             "client_id",
                             "firstClient"});
-                table357.AddRow(new string[] {
+                table349.AddRow(new string[] {
                             "client_secret",
                             "password"});
 #line 26
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table357, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table349, "When ");
 #line hidden
 #line 34
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -248,29 +248,29 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table358 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table350 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table358.AddRow(new string[] {
+                table350.AddRow(new string[] {
                             "grant_type",
                             "password"});
-                table358.AddRow(new string[] {
+                table350.AddRow(new string[] {
                             "username",
                             "user"});
-                table358.AddRow(new string[] {
+                table350.AddRow(new string[] {
                             "password",
                             "pwd"});
-                table358.AddRow(new string[] {
+                table350.AddRow(new string[] {
                             "client_id",
                             "secondClient"});
-                table358.AddRow(new string[] {
+                table350.AddRow(new string[] {
                             "client_secret",
                             "password"});
-                table358.AddRow(new string[] {
+                table350.AddRow(new string[] {
                             "scope",
                             "scope scope"});
 #line 40
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table358, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table350, "When ");
 #line hidden
 #line 49
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -309,29 +309,29 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table359 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table351 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table359.AddRow(new string[] {
+                table351.AddRow(new string[] {
                             "grant_type",
                             "password"});
-                table359.AddRow(new string[] {
+                table351.AddRow(new string[] {
                             "username",
                             "user"});
-                table359.AddRow(new string[] {
+                table351.AddRow(new string[] {
                             "password",
                             "pwd"});
-                table359.AddRow(new string[] {
+                table351.AddRow(new string[] {
                             "client_id",
                             "secondClient"});
-                table359.AddRow(new string[] {
+                table351.AddRow(new string[] {
                             "client_secret",
                             "password"});
-                table359.AddRow(new string[] {
+                table351.AddRow(new string[] {
                             "scope",
                             "scope"});
 #line 55
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table359, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table351, "When ");
 #line hidden
 #line 64
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -370,29 +370,29 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table360 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table352 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table360.AddRow(new string[] {
+                table352.AddRow(new string[] {
                             "grant_type",
                             "password"});
-                table360.AddRow(new string[] {
+                table352.AddRow(new string[] {
                             "username",
                             "badUser"});
-                table360.AddRow(new string[] {
+                table352.AddRow(new string[] {
                             "password",
                             "badPwd"});
-                table360.AddRow(new string[] {
+                table352.AddRow(new string[] {
                             "client_id",
                             "secondClient"});
-                table360.AddRow(new string[] {
+                table352.AddRow(new string[] {
                             "client_secret",
                             "password"});
-                table360.AddRow(new string[] {
+                table352.AddRow(new string[] {
                             "scope",
                             "firstScope"});
 #line 70
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table360, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table352, "When ");
 #line hidden
 #line 79
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -431,29 +431,29 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table361 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table353 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table361.AddRow(new string[] {
+                table353.AddRow(new string[] {
                             "grant_type",
                             "password"});
-                table361.AddRow(new string[] {
+                table353.AddRow(new string[] {
                             "username",
                             "user"});
-                table361.AddRow(new string[] {
+                table353.AddRow(new string[] {
                             "password",
                             "badPwd"});
-                table361.AddRow(new string[] {
+                table353.AddRow(new string[] {
                             "client_id",
                             "secondClient"});
-                table361.AddRow(new string[] {
+                table353.AddRow(new string[] {
                             "client_secret",
                             "password"});
-                table361.AddRow(new string[] {
+                table353.AddRow(new string[] {
                             "scope",
                             "firstScope"});
 #line 85
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table361, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table353, "When ");
 #line hidden
 #line 94
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

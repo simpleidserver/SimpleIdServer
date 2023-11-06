@@ -1,7 +1,10 @@
-﻿using Plugin.Firebase.CloudMessaging;
+﻿using Microsoft.Extensions.Options;
+using Plugin.Firebase.CloudMessaging;
 using SimpleIdServer.Mobile.Services;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows.Input;
 
@@ -10,25 +13,39 @@ namespace SimpleIdServer.Mobile.ViewModels;
 public class NotificationViewModel : INotifyPropertyChanged
 {
     private readonly INavigationService _navigationService;
+    private readonly IPromptService _promptService;
+    private readonly IUrlService _urlService;
+    private readonly MobileOptions _options;
     private NotificationTypes? _notificationType = null;
+    private IDictionary<string, string> _data = null;
     private bool _isLoading = false;
-    private string _authReqId = null;
     private string _displayMessage = null;
 
-    public NotificationViewModel(INavigationService navigationService)
+    public NotificationViewModel(INavigationService navigationService, IPromptService promptService, IUrlService urlService, IOptions<MobileOptions> options)
     {
         _navigationService = navigationService;
+        _promptService = promptService;
+        _urlService = urlService;
+        _options = options.Value;
         CloseCommand = new Command(async () =>
         {
             await _navigationService.GoBack();
         });
         RejectCommand = new Command(async () =>
         {
-
+            if (IsLoading) return;
+            await HandleConsent(false);
+        }, () =>
+        {
+            return !IsLoading;
         });
         AcceptCommand = new Command(async () =>
         {
-
+            if (IsLoading) return;
+            await HandleConsent(true);
+        }, () =>
+        {
+            return !IsLoading;
         });
     }
 
@@ -82,16 +99,54 @@ public class NotificationViewModel : INotifyPropertyChanged
     private async Task HandleConsent(bool isConfirmed)
     {
         if (_notificationType == null) return;
-        switch(_notificationType.Value)
+        IsLoading = true;
+        try
         {
-            case NotificationTypes.CIBA:
-                var parameter = new BCCallbackParameter
-                {
-                    Action = isConfirmed ? 0 : 1,
-                    AuthReqId = _authReqId
-                };
+            switch (_notificationType.Value)
+            {
+                case NotificationTypes.CIBA:
+                    await HandleCIBANotification();
+                    var verb = isConfirmed ? "confirmed" : "rejected";
+                    await _promptService.ShowAlert("Success", $"The consent is {verb}");
+                    await _navigationService.GoBack();
+                    break;
+            }
+        }
+        catch
+        {
+            var verb = isConfirmed ? "confirm" : "reject";
+            await _promptService.ShowAlert("Error", $"An error occured while trying to {verb} the consent");
+        }
+        finally
+        {
+            IsLoading = false;
+        }
 
-                break;
+        async Task HandleCIBANotification()
+        {
+            var authReqId = _data["auth_req_id"];
+            var bcChannelUrl = _data["bc_channel"];
+            var parameter = new BCCallbackParameter
+            {
+                Action = isConfirmed ? 0 : 1,
+                AuthReqId = authReqId
+            };
+            var handler = new HttpClientHandler();
+            if (_options.IgnoreHttps) handler.ServerCertificateCustomValidationCallback = (message, cert, chain, error) =>
+            {
+                return true;
+            };
+            using (var httpClient = new HttpClient(handler))
+            {
+                var requestMessage = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Post,
+                    RequestUri = new Uri(_urlService.GetUrl(bcChannelUrl)),
+                    Content = new StringContent(JsonSerializer.Serialize(parameter), Encoding.UTF8, "application/json")
+                };
+                var httpResult = await httpClient.SendAsync(requestMessage);
+                httpResult.EnsureSuccessStatusCode();
+            }
         }
     }
 
@@ -100,7 +155,7 @@ public class NotificationViewModel : INotifyPropertyChanged
         if (!notification.Data.ContainsKey("auth_req_id")) return false;
         var bindingMessage = notification.Data["binding_message"].ToString();
         DisplayMessage = bindingMessage;
-        _authReqId = notification.Data["auth_req_id"];
+        _data = notification.Data;
         _notificationType = NotificationTypes.CIBA;
         return true;
     }

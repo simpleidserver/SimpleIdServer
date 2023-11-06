@@ -89,8 +89,8 @@
 	  <Compile Update="Components\ViewOTPCode.xaml.cs">
 	    <DependentUpon>ViewOTPCode.xaml</DependentUpon>
 	  </Compile>
-	  <Compile Update="FCMNotificationPage.xaml.cs">
-	    <DependentUpon>FCMNotificationPage.xaml</DependentUpon>
+	  <Compile Update="NotificationPage.xaml.cs">
+	    <DependentUpon>NotificationPage.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="ViewCredentialListPage.xaml.cs">
 	    <DependentUpon>ViewCredentialListPage.xaml</DependentUpon>
@@ -116,7 +116,7 @@
 	  <MauiXaml Update="Components\ViewOTPCode.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="FCMNotificationPage.xaml">
+	  <MauiXaml Update="NotificationPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="ViewCredentialListPage.xaml">

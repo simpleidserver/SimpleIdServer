@@ -1,4 +1,5 @@
-﻿using SimpleIdServer.Mobile.Stores;
+﻿using SimpleIdServer.Mobile.Services;
+using SimpleIdServer.Mobile.Stores;
 
 namespace SimpleIdServer.Mobile;
 
@@ -6,6 +7,7 @@ public partial class App : Application
 {
     private readonly CredentialListState _credentialListState;
 	private readonly OtpListState _otpListState;
+	private readonly IServiceProvider _serviceProvider;
     public static MobileDatabase _database;
 
 	public static MobileDatabase Database
@@ -18,11 +20,14 @@ public partial class App : Application
 		}
 	}
 
-	public App(CredentialListState credentialListState, OtpListState otpListState)
+	public static INavigationService NavigationService { get; private set; }
+
+	public App(CredentialListState credentialListState, OtpListState otpListState, IServiceProvider serviceProvider)
 	{
 		InitializeComponent();
 		_credentialListState = credentialListState;
         _otpListState = otpListState;
+		_serviceProvider = serviceProvider;
         MainPage = new AppShell();
     }
 
@@ -31,6 +36,6 @@ public partial class App : Application
         base.OnStart();
 		await _otpListState.Load();
 		await _credentialListState.Load();
-
+        NavigationService = _serviceProvider.GetRequiredService<INavigationService>();
     }
 }

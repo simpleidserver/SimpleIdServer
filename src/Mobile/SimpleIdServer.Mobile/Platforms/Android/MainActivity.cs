@@ -4,6 +4,8 @@ using Android.Content.PM;
 using Android.OS;
 using Plugin.Firebase.CloudMessaging;
 using Plugin.Firebase.CloudMessaging.Platforms.Android.Extensions;
+using SimpleIdServer.Mobile.Platforms.Android.Extensions;
+using SimpleIdServer.Mobile.Services;
 
 namespace SimpleIdServer.Mobile;
 
@@ -39,18 +41,16 @@ public class MainActivity : MauiAppCompatActivity
         FirebaseCloudMessagingImplementation.ChannelId = channelId;
     }
 
-    private static void HandleIntent(Intent intent)
+    private async void HandleIntent(Intent intent)
     {
-        if(intent.HasExtra("intent_key_fcm_notification"))
+        var fcmNotification = intent.GetFCMNotification();
+        if(fcmNotification != null)
         {
-            var fcmNotification = intent.GetNotificationFromExtras("intent_key_fcm_notification");
+            await App.Current.Dispatcher.DispatchAsync(async () =>
+            {
+                var notificationPage = await App.NavigationService.DisplayModal<NotificationPage>();
+                notificationPage.Display(fcmNotification);
+            });
         }
-
-        if (intent.HasExtra("google.message_id"))
-        {
-            var fcmNotification = intent.GetNotificationFromExtras("google.message_id");
-        }
-
-        FirebaseCloudMessagingImplementation.OnNewIntent(intent);
     }
 }

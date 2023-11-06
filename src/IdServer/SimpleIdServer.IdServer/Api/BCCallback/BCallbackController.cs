@@ -32,10 +32,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
         {
             try
             {
-                var idToken = ExtractBearerToken();
-                var extractionResult = _jwtBuilder.ReadSelfIssuedJsonWebToken(prefix ?? Constants.DefaultRealm, idToken);
-                if (extractionResult.Error != null) return BuildError(System.Net.HttpStatusCode.Unauthorized, ErrorCodes.ACCESS_DENIED, extractionResult.Error);
-                var userSubject = extractionResult.Jwt.Subject;
+                prefix = prefix ?? Constants.DefaultRealm;
                 var bcAuthorize = await _bcAuthorizeRepository.Query().Include(a => a.Histories).FirstOrDefaultAsync(b => b.Id == parameter.AuthReqId, cancellationToken);
                 if (bcAuthorize == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_BC_AUTHORIZE, parameter.AuthReqId));
                 switch(parameter.ActionEnum)

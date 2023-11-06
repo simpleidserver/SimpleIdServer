@@ -31,6 +31,9 @@ public class FcmUserNotificationService : IUserNotificationService
     public async Task Send(string title, string body, Dictionary<string, string> data, string destination)
     {
         var options = GetOptions();
+        var field = typeof(FirebaseApp).GetField("Apps", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+        var dic = (Dictionary<string, FirebaseApp>)field.GetValue(null);
+        dic.Clear();
         FirebaseApp.Create(new AppOptions
         {
             Credential = string.IsNullOrWhiteSpace(options.ServiceAccountFilePath) ? GoogleCredential.GetApplicationDefault() : GoogleCredential.FromFile(options.ServiceAccountFilePath)

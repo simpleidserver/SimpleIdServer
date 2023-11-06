@@ -7,7 +7,7 @@
              xmlns:converters="clr-namespace:SimpleIdServer.Mobile.Converters"
              xmlns:common="clr-namespace:SimpleIdServer.Mobile.Common"
              xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.MAUI.Controls"
-             x:Class="SimpleIdServer.Mobile.FCMNotificationPage"
+             x:Class="SimpleIdServer.Mobile.NotificationPage"
              Shell.TabBarIsVisible="false"
              Title="Notification">
     <Grid>
@@ -15,18 +15,22 @@
         <Grid ZIndex="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="1*" />
-                <RowDefinition Height="5*" />
-                <RowDefinition Height="4*" />
+                <RowDefinition Height="7*" />
+                <RowDefinition Height="2*" />
             </Grid.RowDefinitions>
             <StackLayout Grid.Row="0" Style="{StaticResource modalToolbar}">
                 <ImageButton Command="{Binding Path=CloseCommand}" Style="{StaticResource modalToolbarClose}" />
                 <Label Style="{StaticResource modalToolbarTitle}">Consent</Label>
             </StackLayout>
-            <Label Grid.Row="1" Text="{Binding Path=DisplayMessage}" FontSize="Large"></Label>
-            <StackLayout Grid.Row="2" Orientation="Vertical">
-                <Button HorizontalOptions="Center" Text="Reject" Command="{Binding Path=RejectCommand}"></Button>
-                <Button HorizontalOptions="Center" Text="Accept" Command="{Binding Path=AcceptCommand}".></Button>
-            </StackLayout>
+            <Label Margin="20" Grid.Row="1" Text="{Binding Path=DisplayMessage}" FontSize="Large"></Label>
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="5*" />
+                    <ColumnDefinition Width="5*" />
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" VerticalOptions="Start" HorizontalOptions="Center" Text="Reject" Command="{Binding Path=RejectCommand}"></Button>
+                <Button Grid.Column="1" VerticalOptions="Start" HorizontalOptions="Center" Text="Accept" Command="{Binding Path=AcceptCommand}"></Button>
+            </Grid>
         </Grid>
     </Grid>
 </ContentPage>

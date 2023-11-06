@@ -25,9 +25,11 @@ public static class MauiProgram
 		builder.Services.AddTransient<IPromptService, PromptService>();
         builder.Services.AddTransient<IOTPService, OTPService>();
 		builder.Services.AddTransient<INavigationService, NavigationService>();
+		builder.Services.AddTransient<IUrlService, UrlService>();
 		builder.Services.AddSingleton(new OtpListState());
 		builder.Services.AddSingleton(new CredentialListState());
         builder.Services.AddTransient<EnrollPage>();
+		builder.Services.AddTransient<NotificationPage>();
 		builder.Services.AddTransient<SettingsPage>();
 		builder.Services.AddTransient<ViewOtpListPage>();
 		builder.Services.AddTransient<QRCodeScannerPage>();
@@ -37,6 +39,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<SettingsPageViewModel>();
 		builder.Services.AddTransient<ViewOtpListViewModel>();
 		builder.Services.AddTransient<ViewCredentialListViewModel>();
+		builder.Services.AddTransient<NotificationViewModel>();
         builder.Services.Configure<MobileOptions>(o =>
 		{
 			o.PushType = "firebase";

@@ -24,15 +24,17 @@ public class QRCodeScannerViewModel
     private readonly IPromptService _promptService;
     private readonly IOTPService _otpService;
     private readonly INavigationService _navigationService;
+    private readonly IUrlService _urlService;
     private readonly OtpListState _otpListState;
     private readonly CredentialListState _credentialListState;
     private readonly MobileOptions _options;
     private SemaphoreSlim _lck = new SemaphoreSlim(1, 1);
 
-    public QRCodeScannerViewModel(IPromptService promptService, IOTPService otpService, INavigationService navigationService, OtpListState otpListState, CredentialListState credentialListState, IOptions<MobileOptions> options)
+    public QRCodeScannerViewModel(IPromptService promptService, IOTPService otpService, INavigationService navigationService, IUrlService urlService, OtpListState otpListState, CredentialListState credentialListState, IOptions<MobileOptions> options)
     {
         _promptService = promptService;
         _otpService = otpService;
+        _urlService = urlService;
         _options = options.Value;
         _otpListState = otpListState;
         _credentialListState = credentialListState;
@@ -137,7 +139,7 @@ public class QRCodeScannerViewModel
                 var requestMessage = new HttpRequestMessage
                 {
                     Method = HttpMethod.Get,
-                    RequestUri = new Uri(SanitizeEndRegisterUrl(qrCodeResult.ReadQRCodeURL))
+                    RequestUri = new Uri(_urlService.GetUrl(qrCodeResult.ReadQRCodeURL))
                 };
                 var httpResponse = await httpClient.SendAsync(requestMessage);
                 httpResponse.EnsureSuccessStatusCode();
@@ -177,7 +179,7 @@ public class QRCodeScannerViewModel
                 var requestMessage = new HttpRequestMessage
                 {
                     Method = HttpMethod.Post,
-                    RequestUri = new Uri(SanitizeEndRegisterUrl(beginResult.EndRegisterUrl)),
+                    RequestUri = new Uri(_urlService.GetUrl(beginResult.EndRegisterUrl)),
                     Content = new StringContent(JsonSerializer.Serialize(dic), Encoding.UTF8, "application/json")
                 };
                 var httpResponse = await httpClient.SendAsync(requestMessage);
@@ -232,7 +234,7 @@ public class QRCodeScannerViewModel
                 var requestMessage = new HttpRequestMessage
                 {
                     Method = HttpMethod.Get,
-                    RequestUri = new Uri(SanitizeEndRegisterUrl(qrCodeResult.ReadQRCodeURL))
+                    RequestUri = new Uri(_urlService.GetUrl(qrCodeResult.ReadQRCodeURL))
                 };
                 var httpResponse = await httpClient.SendAsync(requestMessage);
                 httpResponse.EnsureSuccessStatusCode();
@@ -260,7 +262,7 @@ public class QRCodeScannerViewModel
                 var requestMessage = new HttpRequestMessage
                 {
                     Method = HttpMethod.Post,
-                    RequestUri = new Uri(SanitizeEndRegisterUrl(beginAuthenticate.EndLoginUrl)),
+                    RequestUri = new Uri(_urlService.GetUrl(beginAuthenticate.EndLoginUrl)),
                     Content = new StringContent(JsonSerializer.Serialize(endLoginRequest), Encoding.UTF8, "application/json")
                 };
                 var httpResponse = await httpClient.SendAsync(requestMessage);
@@ -294,8 +296,6 @@ public class QRCodeScannerViewModel
         }
 
         #endregion
-
-        string SanitizeEndRegisterUrl(string url) => _options.IsDev ? url.Replace("localhost", "192.168.50.250") : url;
     }
 
     public ICommand ScanQRCodeCommand { get; private set; }
