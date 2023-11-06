@@ -43,13 +43,12 @@ public class MainActivity : MauiAppCompatActivity
     {
         if(intent.HasExtra("intent_key_fcm_notification"))
         {
-            var tmp = intent.GetBundleExtra("intent_key_fcm_notification").ToFCMNotification();
-            // TODO : Display the correct page.
+            var fcmNotification = intent.GetNotificationFromExtras("intent_key_fcm_notification");
         }
 
         if (intent.HasExtra("google.message_id"))
         {
-            // TODO : Display the correct page.
+            var fcmNotification = intent.GetNotificationFromExtras("google.message_id");
         }
 
         FirebaseCloudMessagingImplementation.OnNewIntent(intent);

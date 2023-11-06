@@ -184,6 +184,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
                         PushType = request.DeviceData.PushType,
                         Version = request.DeviceData.Version
                     });
+                    result.NotificationMode = request.DeviceData.PushType;
                 }
 
                 return result;

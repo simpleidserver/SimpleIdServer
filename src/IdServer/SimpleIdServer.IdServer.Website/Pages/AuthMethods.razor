@@ -17,6 +17,9 @@
                         <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
                             <RadzenImage Path="@GetPicture(authMethod)" Style="width: 60px"></RadzenImage>
                             <RadzenText TextStyle="TextStyle.DisplayH6">@authMethod.Name</RadzenText>
+                            <div>
+                                <RadzenBadge BadgeStyle="BadgeStyle.Info" Variant="Variant.Outlined">Authentication</RadzenBadge>
+                            </div>
                         </RadzenStack>
                     </RadzenCard>
                 }
@@ -27,7 +30,17 @@
                             <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
                                 <RadzenImage Path="@GetPicture(authMethod)" Style="width: 60px"></RadzenImage>
                                 <RadzenText TextStyle="TextStyle.DisplayH6">@authMethod.Name</RadzenText>
-                                <!-- TODO : DISPLAY THE CAPABILITIES : PUSH OR AUTHENTICATION -->
+                                <div>                                    
+                                    @if (authMethod.Capabilities.HasFlag(AuthenticationMethodCapabilities.USERAUTHENTICATION))
+                                    {
+                                        <RadzenBadge BadgeStyle="BadgeStyle.Info" Variant="Variant.Outlined">Authentication</RadzenBadge>
+                                    }
+
+                                    @if (authMethod.Capabilities.HasFlag(AuthenticationMethodCapabilities.PUSHNOTIFICATION))
+                                    {
+                                        <RadzenBadge BadgeStyle="BadgeStyle.Info" Variant="Variant.Outlined">Push notification</RadzenBadge>
+                                    }
+                                </div>
                             </RadzenStack>
                         </RadzenCard>
                     </RadzenLink>
@@ -66,6 +79,8 @@
                 return result + "/fido.png";
             case "mobile":
                 return result + "/mobile.png";
+            case "firebase":
+                return result + "/firebase.png";
             default:
                 return result + "/pwd.png";
         }

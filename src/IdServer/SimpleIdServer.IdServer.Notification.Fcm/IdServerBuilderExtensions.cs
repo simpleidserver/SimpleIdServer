@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using FirebaseAdmin;
+using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Notification.Fcm;
 
@@ -17,6 +18,7 @@ public static class IdServerBuilderExtensions
     public static IdServerBuilder AddFcmNotification(this IdServerBuilder idServerBuilder)
     {
         idServerBuilder.Services.AddTransient<IUserNotificationService, FcmUserNotificationService>();
+        idServerBuilder.Services.AddTransient<IAuthenticationMethodService, FcmAuthenticationService>();
         return idServerBuilder;
     }
 }

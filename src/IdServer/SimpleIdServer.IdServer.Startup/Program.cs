@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using FirebaseAdmin.Messaging;
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
@@ -147,6 +148,7 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
         o.Add<IdServerEmailOptions>();
         o.Add<IdServerSmsOptions>();
         o.Add<FidoOptions>();
+        o.Add<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>();
         if(conf.Type == DistributedCacheTypes.REDIS)
         {
             o.UseRedisConnector(conf.ConnectionString);
@@ -325,7 +327,7 @@ void SeedData(WebApplication application, string scimBaseUrl)
                     CreateDateTime = DateTime.UtcNow
                 });
 
-            if(!dbContext.Definitions.Any())
+            if (!dbContext.Definitions.Any())
             {
                 dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<FacebookOptionsLite>());
                 dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<LDAPRepresentationsExtractionJobOptions>());
@@ -333,6 +335,7 @@ void SeedData(WebApplication application, string scimBaseUrl)
                 dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<IdServerEmailOptions>());
                 dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<IdServerSmsOptions>());
                 dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<FidoOptions>());
+                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>());
             }
 
             var dbConnection = dbContext.Database.GetDbConnection() as SqlConnection;

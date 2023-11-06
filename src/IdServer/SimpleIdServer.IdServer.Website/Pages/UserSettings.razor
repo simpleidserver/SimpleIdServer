@@ -75,19 +75,6 @@
         public string? NotificationMode { get; set; } = null;
     }
 
-    record NotificationMode
-    {
-        public string Name { get; set; }
-        public string DisplayName { get; set; }
-    }
-
-    ICollection<NotificationMode> NotificationModes = new List<NotificationMode>
-    {
-        new NotificationMode { DisplayName = "Email", Name = "email" },
-        new NotificationMode { DisplayName = "Sms", Name = "sms" },
-        new NotificationMode { DisplayName = "Firebase", Name = "firebase" }
-    };
-
     protected override void OnAfterRender(bool firstRender)
     {
         base.OnAfterRender(firstRender);
@@ -113,7 +100,8 @@
             UpdateDateTime = this.User.UpdateDateTime,
             Email = this.User.Email,
             Firstname = this.User.Name,
-            Lastname = this.User.Lastname
+            Lastname = this.User.Lastname,
+            NotificationMode = this.User.NotificationMode
         };
     }
 

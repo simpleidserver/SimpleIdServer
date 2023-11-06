@@ -23,8 +23,8 @@ public class FcmUserNotificationService : IUserNotificationService
 
     public async Task Send(string title, string body, Dictionary<string, string> data, User user)
     {
-        if (user.Devices == null || !user.Devices.Any(d => d.DeviceType == Constants.NotificationName)) throw new OAuthException(ErrorCodes.UNEXPECTED_ERROR, ErrorMessages.MISSING_REGISTERED_USER_DEVICE);
-        var userDevice = user.Devices.First(d => d.DeviceType == Constants.NotificationName);
+        if (user.Devices == null || !user.Devices.Any(d => d.PushType == Constants.NotificationName)) throw new OAuthException(ErrorCodes.UNEXPECTED_ERROR, ErrorMessages.MISSING_REGISTERED_USER_DEVICE);
+        var userDevice = user.Devices.First(d => d.PushType == Constants.NotificationName);
         await Send(title, body, data, userDevice.PushToken);
     }
 

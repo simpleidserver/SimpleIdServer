@@ -3,7 +3,7 @@
 public interface INavigationService
 {
     Task GoBack();
-    Task DisplayModal<T>() where T : ContentPage;
+    Task<T> DisplayModal<T>() where T : ContentPage;
 }
 
 public class NavigationService : INavigationService
@@ -25,9 +25,10 @@ public class NavigationService : INavigationService
         });
     }
 
-    public Task DisplayModal<T>() where T : ContentPage
+    public async Task<T> DisplayModal<T>() where T : ContentPage
     {
         var service = _serviceProvider.GetRequiredService<T>();
-        return _navigation.PushModalAsync(service);
+        await _navigation.PushModalAsync(service);
+        return service;
     }
 }
