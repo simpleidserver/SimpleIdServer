@@ -58,6 +58,8 @@ namespace SimpleIdServer.IdServer
             public const string FIDOAuthentication = "fido/u2f/authentication";
             public const string AuthMethods = "authmethods";
             public const string RegistrationWorkflows = "registrationworkflows";
+            public const string ApiResources = "apiresources";
+            public const string Scopes = "scopes";
         }
 
         public static List<string> AllStandardNotificationModes = new List<string>
@@ -571,6 +573,34 @@ namespace SimpleIdServer.IdServer
                 Id = Guid.NewGuid().ToString(),
                 Type = ScopeTypes.APIRESOURCE,
                 Name = "acrs",
+                Realms = new List<Domains.Realm>
+                {
+                    StandardRealms.Master
+                },
+                Protocol = ScopeProtocols.OAUTH,
+                IsExposedInConfigurationEdp = true,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
+            };
+            public static Scope ApiResources = new Scope
+            {
+                Id = Guid.NewGuid().ToString(),
+                Type = ScopeTypes.APIRESOURCE,
+                Name = "apiresources",
+                Realms = new List<Domains.Realm>
+                {
+                    StandardRealms.Master
+                },
+                Protocol = ScopeProtocols.OAUTH,
+                IsExposedInConfigurationEdp = true,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
+            };
+            public static Scope Scopes = new Scope
+            {
+                Id = Guid.NewGuid().ToString(),
+                Type = ScopeTypes.APIRESOURCE,
+                Name = "scopes",
                 Realms = new List<Domains.Realm>
                 {
                     StandardRealms.Master

@@ -312,6 +312,17 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RegistrationWorkflows + "/{id}",
                 defaults: new { controller = "RegistrationWorkflows", action = "Update" });
 
+            webApplication.MapControllerRoute("addApiResource",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.ApiResources,
+                defaults: new { controller = "ApiResources", action = "Add" });
+            webApplication.MapControllerRoute("searchApiResource",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.ApiResources + "/.search",
+                defaults: new { controller = "ApiResources", action = "Search" });
+
+            webApplication.MapControllerRoute("updateScopeResources",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes + "/{name}/resources",
+                defaults: new { controller = "Scopes", action = "UpdateResources" });
+
             webApplication.MapControllerRoute(
                 name: "defaultWithArea",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + "{area:exists}/{controller=Home}/{action=Index}/{id?}");

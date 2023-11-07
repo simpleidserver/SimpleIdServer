@@ -5,6 +5,7 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 import HomepageFeatures from '@site/src/components/HomepageFeatures';
 import HomepageInstallations from '@site/src/components/HomepageInstallations';
+import HomepageStandards from '@site/src/components/HomepageStandards';
 
 import styles from './index.module.css';
 import HomepagePhilosophy from '../components/HomepagePhilosophy';
@@ -20,13 +21,10 @@ function HomepageHeader() {
           <Link
             className="button button--secondary button--lg"
             to="https://website.simpleidserver.com">
-            Demo Administration Website
+            Demo
           </Link>
-          <Link 
-            className="button button--secondary button--lg"
-            to="https://appetize.io/app/s4nfjkzht6ypivfquiroblw77u?device=pixel4&osVersion=11.0&scale=75">
-              Demo Mobile Application
-          </Link>
+          <Link className="button button--secondary button--lg">Android</Link>
+          <Link className="button button--secondary button--lg">IOS</Link>
         </div>
       </div>
     </header>
@@ -41,9 +39,16 @@ export default function Home() {
       description="Description will go into a meta tag in <head />">
       <HomepageHeader />
       <main>
-        <HomepagePhilosophy />
-        <HomepageInstallations />
-        <HomepageFeatures />
+        <div style={{borderBottom: "1px solid #ebedf0"}}>
+          <HomepagePhilosophy />
+        </div>
+        <div style={{borderBottom: "1px solid #ebedf0"}}>
+          <HomepageInstallations />
+        </div>
+        <div style={{borderBottom: "1px solid #ebedf0"}}>
+          <HomepageFeatures />
+        </div>
+        <HomepageStandards />
       </main>
     </Layout>
   );

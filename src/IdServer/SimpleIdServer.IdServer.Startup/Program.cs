@@ -1,12 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using FirebaseAdmin.Messaging;
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -31,7 +31,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Security.Cryptography;
 
 const string CreateTableFormat = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DistributedCache' and xtype='U') " +
     "CREATE TABLE [dbo].[DistributedCache] (" +
@@ -215,9 +214,11 @@ void ConfigureStorage(DbContextOptionsBuilder b)
                 o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
             });
             break;
+        case StorageTypes.INMEMORY:
+            b.UseInMemoryDatabase(conf.ConnectionString);
+            break;
     }
 }
-
 
 void ConfigureDataProtection(IDataProtectionBuilder dataProtectionBuilder)
 {
@@ -230,7 +231,8 @@ void SeedData(WebApplication application, string scimBaseUrl)
     {
         using (var dbContext = scope.ServiceProvider.GetService<StoreDbContext>())
         {
-            dbContext.Database.Migrate();
+            var isInMemory = dbContext.Database.IsInMemory();
+            if (isInMemory) dbContext.Database.Migrate();
             if (!dbContext.Realms.Any())
                 dbContext.Realms.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Realms);
 
@@ -338,8 +340,15 @@ void SeedData(WebApplication application, string scimBaseUrl)
                 dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>());
             }
 
+            EnableIsolationLevel(dbContext);
+            dbContext.SaveChanges();
+        }
+
+        void EnableIsolationLevel(StoreDbContext dbContext)
+        {
+            if (dbContext.Database.IsInMemory()) return;
             var dbConnection = dbContext.Database.GetDbConnection() as SqlConnection;
-            if(dbConnection != null)
+            if (dbConnection != null)
             {
                 if (dbConnection.State != System.Data.ConnectionState.Open) dbConnection.Open();
                 var cmd = dbConnection.CreateCommand();
@@ -349,18 +358,6 @@ void SeedData(WebApplication application, string scimBaseUrl)
                 cmd.CommandText = CreateTableFormat;
                 cmd.ExecuteNonQuery();
             }
-
-            dbContext.SaveChanges();
         }
     }
 }
-
-static RsaSecurityKey BuildRsaSecurityKey(string keyid) => new RsaSecurityKey(RSA.Create())
-{
-    KeyId = keyid
-};
-
-static ECDsaSecurityKey BuildECDSaSecurityKey(ECCurve curve) => new ECDsaSecurityKey(ECDsa.Create(curve))
-{
-    KeyId = Guid.NewGuid().ToString()
-};

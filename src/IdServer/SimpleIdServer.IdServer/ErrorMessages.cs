@@ -272,5 +272,6 @@ namespace SimpleIdServer.IdServer
         public const string USER_NOT_AUTHENTICATED = "you're not authenticated";
         public const string INACTIVE_SESSION = "the session is not active";
         public const string REGISTRATION_WORFKLOW_EXISTS = "a registration worklow with the same name already exists";
+        public const string APIRESOURCE_ALREADY_EXISTS = "API resource {0} already exists";
     }
 }
