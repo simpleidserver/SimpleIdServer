@@ -8,6 +8,7 @@ namespace SimpleIdServer.IdServer.Store
     {
         IQueryable<CertificateAuthority> Query();
         void Delete(CertificateAuthority cas);
+        void Add(CertificateAuthority cas);
         void Delete(IEnumerable<CertificateAuthority> cas);
         Task<int> SaveChanges(CancellationToken cancellationToken);
     }
@@ -26,7 +27,9 @@ namespace SimpleIdServer.IdServer.Store
         public void Delete(CertificateAuthority ca) => _dbContext.CertificateAuthorities.Remove(ca);
 
         public void Delete(IEnumerable<CertificateAuthority> cas) => _dbContext.CertificateAuthorities.RemoveRange(cas);
+        public void Add(CertificateAuthority cas) => _dbContext.CertificateAuthorities.Add(cas);
 
         public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
+
     }
 }

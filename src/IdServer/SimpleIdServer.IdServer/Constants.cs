@@ -60,6 +60,8 @@ namespace SimpleIdServer.IdServer
             public const string RegistrationWorkflows = "registrationworkflows";
             public const string ApiResources = "apiresources";
             public const string Scopes = "scopes";
+            public const string Auditing = "auditing";
+            public const string CertificateAuthorities = "cas";
         }
 
         public static List<string> AllStandardNotificationModes = new List<string>
@@ -596,11 +598,39 @@ namespace SimpleIdServer.IdServer
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
+            public static Scope Auditing = new Scope
+            {
+                Id = Guid.NewGuid().ToString(),
+                Type = ScopeTypes.APIRESOURCE,
+                Name = "auditing",
+                Realms = new List<Domains.Realm>
+                {
+                    StandardRealms.Master
+                },
+                Protocol = ScopeProtocols.OAUTH,
+                IsExposedInConfigurationEdp = true,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
+            };
             public static Scope Scopes = new Scope
             {
                 Id = Guid.NewGuid().ToString(),
                 Type = ScopeTypes.APIRESOURCE,
                 Name = "scopes",
+                Realms = new List<Domains.Realm>
+                {
+                    StandardRealms.Master
+                },
+                Protocol = ScopeProtocols.OAUTH,
+                IsExposedInConfigurationEdp = true,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
+            };
+            public static Scope CertificateAuthorities = new Scope
+            {
+                Id = Guid.NewGuid().ToString(),
+                Type = ScopeTypes.APIRESOURCE,
+                Name = "certificateauthorities",
                 Realms = new List<Domains.Realm>
                 {
                     StandardRealms.Master

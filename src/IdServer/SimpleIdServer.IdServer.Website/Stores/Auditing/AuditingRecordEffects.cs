@@ -2,23 +2,22 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Store;
-using System.Linq.Dynamic.Core;
+using SimpleIdServer.IdServer.DTOs;
+using System.Text.Json;
 
 namespace SimpleIdServer.IdServer.Website.Stores.Auditing
 {
     public class AuditingRecordEffects
     {
-        private readonly IDbContextFactory<StoreDbContext> _factory;
+        private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly IdServerWebsiteOptions _options;
         private readonly ProtectedSessionStorage _sessionStorage;
 
-        public AuditingRecordEffects(IDbContextFactory<StoreDbContext> factory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage protectedSessionStorage)
+        public AuditingRecordEffects(IWebsiteHttpClientFactory websiteHttpClientFactory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage protectedSessionStorage)
         {
-            _factory = factory;
+            _websiteHttpClientFactory = websiteHttpClientFactory;
             _options = options.Value;
             _sessionStorage = protectedSessionStorage;
         }
@@ -26,33 +25,38 @@ namespace SimpleIdServer.IdServer.Website.Stores.Auditing
         [EffectMethod]
         public async Task Handle(SearchAuditingRecordsAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetBaseUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
             {
-                IQueryable<AuditEvent> query = dbContext.AuditEvents.AsNoTracking().Where(r => r.Realm == realm);
-                if (action.DisplayOnlyErrors)
-                    query = query.Where(r => r.IsError);
-
-                if (!string.IsNullOrWhiteSpace(action.Filter))
-                    query = query.Where(SanitizeExpression(action.Filter));
-
-                if (!string.IsNullOrWhiteSpace(action.OrderBy))
-                    query = query.OrderBy(SanitizeExpression(action.OrderBy));
-
-                var nb = query.Count();
-                var auditEvents = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
-                dispatcher.Dispatch(new SearchAuditingRecordsSuccessAction { AuditEvents = auditEvents, Count = nb });
-            }
+                RequestUri = new Uri($"{baseUrl}/.search"),
+                Method = HttpMethod.Post,
+                Content = new StringContent(JsonSerializer.Serialize(new SearchRequest
+                {
+                    Filter = SanitizeExpression(action.Filter),
+                    OrderBy = SanitizeExpression(action.OrderBy),
+                    Skip = action.Skip,
+                    Take = action.Take
+                }))
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var searchResult = JsonSerializer.Deserialize<SearchResult<AuditEvent>>(json);
+            dispatcher.Dispatch(new SearchAuditingRecordsSuccessAction { AuditEvents = searchResult.Content, Count = searchResult.Count });
 
             string SanitizeExpression(string expression) => expression.Replace("Value.", "");
         }
 
-        private async Task<string> GetRealm()
+        private async Task<string> GetBaseUrl()
         {
-            if (!_options.IsReamEnabled) return SimpleIdServer.IdServer.Constants.DefaultRealm;
-            var realm = await _sessionStorage.GetAsync<string>("realm");
-            var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
-            return realmStr;
+            if (_options.IsReamEnabled)
+            {
+                var realm = await _sessionStorage.GetAsync<string>("realm");
+                var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+                return $"{_options.IdServerBaseUrl}/{realmStr}/auditing";
+            }
+
+            return $"{_options.IdServerBaseUrl}/auditing";
         }
     }
 

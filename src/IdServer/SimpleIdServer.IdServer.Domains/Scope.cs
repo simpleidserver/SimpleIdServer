@@ -1,6 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using SimpleIdServer.IdServer.Domains.DTOs;
+using System.Text.Json.Serialization;
+
 namespace SimpleIdServer.IdServer.Domains
 {
     public class Scope : IEquatable<Scope>
@@ -15,22 +18,36 @@ namespace SimpleIdServer.IdServer.Domains
             Name = name;
         }
 
+        [JsonPropertyName(ScopeNames.Id)]
         public string Id { get; set; }
+        [JsonPropertyName(ScopeNames.Name)]
         public string Name { get; set; } = null!;
+        [JsonIgnore]
         public ScopeTypes Type { get; set; } = ScopeTypes.IDENTITY;
+        [JsonIgnore]
         public ScopeProtocols Protocol { get; set; } = ScopeProtocols.OPENID;
+        [JsonIgnore]
         public string? Description { get; set; } = null;
+        [JsonIgnore]
         public bool IsExposedInConfigurationEdp { get; set; }
+        [JsonIgnore]
         public DateTime CreateDateTime { get; set; }
+        [JsonIgnore]
         public DateTime UpdateDateTime { get; set; }
+        [JsonIgnore]
         /// <summary>
         /// Array of strings that specifies the claims.
         /// </summary>
         public ICollection<ScopeClaimMapper> ClaimMappers { get; set; }= new List<ScopeClaimMapper>();
+        [JsonIgnore]
         public ICollection<ApiResource> ApiResources { get; set; } = new List<ApiResource>();
+        [JsonIgnore]
         public ICollection<Consent> Consents { get; set; } = new List<Consent>();
+        [JsonIgnore]
         public ICollection<Client> Clients { get; set; } = new List<Client>();
+        [JsonIgnore]
         public ICollection<Realm> Realms { get; set; } = new List<Realm>();
+        [JsonIgnore]
         public ICollection<Group> Groups { get; set; } = new List<Group>();
 
         public static Scope Create(string scopeName)

@@ -4,23 +4,25 @@ using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using SimpleIdServer.IdServer.Builders;
+using SimpleIdServer.IdServer.Api.CertificateAuthorities;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.DTOs;
 using System.Linq.Dynamic.Core;
 using System.Security.Cryptography.X509Certificates;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
 {
     public class CertificateAuthorityEffects
     {
-        private readonly IDbContextFactory<StoreDbContext> _factory;
+        private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly IdServerWebsiteOptions _options;
         private readonly ProtectedSessionStorage _sessionStorage;
 
-        public CertificateAuthorityEffects(IDbContextFactory<StoreDbContext> factory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
+        public CertificateAuthorityEffects(IWebsiteHttpClientFactory websiteHttpClientFactory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
         {
-            _factory = factory;
+            _websiteHttpClientFactory = websiteHttpClientFactory;
             _options = options.Value;
             _sessionStorage = sessionStorage;
         }
@@ -28,98 +30,114 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
         [EffectMethod]
         public async Task Handle(SearchCertificateAuthoritiesAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
-            using(var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetBaseUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
             {
-                IQueryable<CertificateAuthority> query = dbContext.CertificateAuthorities.Include(c => c.Realms).Where(c => c.Realms.Any(r => r.Name == realm)).AsNoTracking();
-                if (!string.IsNullOrWhiteSpace(action.Filter))
-                    query = query.Where(SanitizeExpression(action.Filter));
-
-                if (!string.IsNullOrWhiteSpace(action.OrderBy))
-                    query = query.OrderBy(SanitizeExpression(action.OrderBy));
-
-                var nb = query.Count();
-                var clients = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
-                dispatcher.Dispatch(new SearchCertificateAuthoritiesSuccessAction { CertificateAuthorities = clients, Count = nb });
-            }
+                RequestUri = new Uri($"{baseUrl}/.search"),
+                Method = HttpMethod.Post,
+                Content = new StringContent(JsonSerializer.Serialize(new SearchRequest
+                {
+                    Filter = SanitizeExpression(action.Filter),
+                    OrderBy = SanitizeExpression(action.OrderBy),
+                    Skip = action.Skip,
+                    Take = action.Take
+                }))
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var searchResult = JsonSerializer.Deserialize<SearchResult<CertificateAuthority>>(json);
+            dispatcher.Dispatch(new SearchCertificateAuthoritiesSuccessAction { CertificateAuthorities = searchResult.Content, Count = searchResult.Count });
 
             string SanitizeExpression(string expression) => expression.Replace("Value.", "");
         }
 
         [EffectMethod]
-        public Task Handle(GenerateCertificateAuthorityAction action, IDispatcher dispatcher)
+        public async Task Handle(GenerateCertificateAuthorityAction action, IDispatcher dispatcher)
         {
-            var certificateAuthority = CertificateAuthorityBuilder.Create(action.SubjectName, numberOfDays: action.NumberOfDays).Build();
+            var baseUrl = await GetBaseUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{baseUrl}/generate"),
+                Method = HttpMethod.Post,
+                Content = new StringContent(JsonSerializer.Serialize(new GenerateCertificateAuthorityRequest
+                {
+                    NumberOfDays = action.NumberOfDays,
+                    SubjectName = action.SubjectName
+                }))
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var certificateAuthority = JsonSerializer.Deserialize<CertificateAuthority>(json);
             dispatcher.Dispatch(new GenerateCertificateAuthoritySuccessAction { CertificateAuthority = certificateAuthority });
-            return Task.CompletedTask;
         }
 
         [EffectMethod]
-        public Task Handle(ImportCertificateAuthorityAction action, IDispatcher dispatcher)
+        public async Task Handle(ImportCertificateAuthorityAction action, IDispatcher dispatcher)
         {
-            var store = new X509Store(action.StoreName, action.StoreLocation);
-            try
+            var baseUrl = await GetBaseUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
             {
-                store.Open(OpenFlags.ReadOnly);
-            }
-            catch
-            {
-                dispatcher.Dispatch(new GenerateCertificateAuthorityFailureAction { ErrorMessage = Resources.Global.CannotReadCertificateStore });
-                return Task.CompletedTask;
-            }
-
-            var certificate = store.Certificates.Find(action.FindType, action.FindValue, true).FirstOrDefault();
-            if(certificate == null)
-            {
-                dispatcher.Dispatch(new GenerateCertificateAuthorityFailureAction { ErrorMessage = Resources.Global.CertificateDoesntExist });
-                return Task.CompletedTask;
-            }
-
-            try
-            {
-                if (!certificate.HasPrivateKey || certificate.PrivateKey == null)
+                RequestUri = new Uri($"{baseUrl}/import"),
+                Method = HttpMethod.Post,
+                Content = new StringContent(JsonSerializer.Serialize(new ImportCertificateAuthorityAction
                 {
-                    dispatcher.Dispatch(new GenerateCertificateAuthorityFailureAction { ErrorMessage = Resources.Global.CertificateDoesntHavePrivateKey });
-                    return Task.CompletedTask;
-                }
+                    FindType = action.FindType,
+                    FindValue = action.FindValue,
+                    StoreLocation = action.StoreLocation,
+                    StoreName = action.StoreName
+                }))
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            try
+            {
+                httpResult.EnsureSuccessStatusCode();
+                var certificateAuthority = JsonSerializer.Deserialize<CertificateAuthority>(json);
+                dispatcher.Dispatch(new GenerateCertificateAuthoritySuccessAction { CertificateAuthority = certificateAuthority });
             }
             catch
             {
-                dispatcher.Dispatch(new GenerateCertificateAuthorityFailureAction { ErrorMessage = Resources.Global.CertificateDoesntHavePrivateKey });
-                return Task.CompletedTask;
+                var jsonObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new GenerateCertificateAuthorityFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
             }
-
-
-            var certificateAuthority = CertificateAuthorityBuilder.Import(certificate, action.StoreLocation, action.StoreName, action.FindType, action.FindValue).Build();
-            dispatcher.Dispatch(new GenerateCertificateAuthoritySuccessAction { CertificateAuthority = certificateAuthority });
-            return Task.CompletedTask;
         }
 
         [EffectMethod]
         public async Task Handle(SaveCertificateAuthorityAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetBaseUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
             {
-                var realm = await GetRealm();
-                var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
-                action.CertificateAuthority.Realms.Add(activeRealm);
-                dbContext.CertificateAuthorities.Add(action.CertificateAuthority);
-                await dbContext.SaveChangesAsync();
-            }
-
-            dispatcher.Dispatch(new SaveCertificateAuthoritySuccessAction { CertificateAuthority = action.CertificateAuthority });
+                RequestUri = new Uri(baseUrl),
+                Method = HttpMethod.Post,
+                Content = new StringContent(JsonSerializer.Serialize(action.CertificateAuthority))
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var certificateAuthority = JsonSerializer.Deserialize<CertificateAuthority>(json);
+            dispatcher.Dispatch(new SaveCertificateAuthoritySuccessAction { CertificateAuthority = certificateAuthority });
         }
 
         [EffectMethod]
         public async Task Handle(RemoveSelectedCertificateAuthoritiesAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetBaseUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            foreach (var id in action.Ids)
             {
-                var cas = await dbContext.CertificateAuthorities.Where(c => action.Ids.Contains(c.Id)).ToListAsync();
-                dbContext.CertificateAuthorities.RemoveRange(cas);
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new RemoveSelectedCertificateAuthoritiesSuccessAction { Ids = action.Ids });
-            }    
+                var requestMessage = new HttpRequestMessage
+                {
+                    RequestUri = new Uri($"{baseUrl}/{id}"),
+                    Method = HttpMethod.Delete
+                };
+                await httpClient.SendAsync(requestMessage);
+            }
+
+            dispatcher.Dispatch(new RemoveSelectedCertificateAuthoritiesSuccessAction { Ids = action.Ids });
         }
 
         [EffectMethod]
@@ -170,12 +188,16 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
             }
         }
 
-        private async Task<string> GetRealm()
+        private async Task<string> GetBaseUrl()
         {
-            if (!_options.IsReamEnabled) return SimpleIdServer.IdServer.Constants.DefaultRealm;
-            var realm = await _sessionStorage.GetAsync<string>("realm");
-            var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
-            return realmStr;
+            if (_options.IsReamEnabled)
+            {
+                var realm = await _sessionStorage.GetAsync<string>("realm");
+                var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+                return $"{_options.IdServerBaseUrl}/{realmStr}/cas";
+            }
+
+            return $"{_options.IdServerBaseUrl}/cas";
         }
     }
 

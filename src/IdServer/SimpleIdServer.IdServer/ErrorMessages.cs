@@ -12,6 +12,8 @@ namespace SimpleIdServer.IdServer
         public const string UNKNOWN_SCOPE = "unknown scope {0}";
         public const string UNKNOWN_CLIENT = "unknown client {0}";
         public const string UNKNOWN_USER = "unknown user {0}";
+        public const string UNKNOWN_CA = "unknown certificate authority {0}";
+        public const string UNKNOWN_CLIENT_CA = "unknown client certificate {0}";
         public const string UNKNOWN_AUTH_METHOD = "unknown authentication method : {0}";
         public const string UNKNOWN_TOKEN_TYPE_HINT = "unknown token type hint : {0}";
         public const string UNKNOWN_JSON_WEBKEY = "Json Web Key doesn't exist";
@@ -273,5 +275,8 @@ namespace SimpleIdServer.IdServer
         public const string INACTIVE_SESSION = "the session is not active";
         public const string REGISTRATION_WORFKLOW_EXISTS = "a registration worklow with the same name already exists";
         public const string APIRESOURCE_ALREADY_EXISTS = "API resource {0} already exists";
+        public const string CANNOT_READ_CERTIFICATE_STORE = "You don't have the permission to read the certificate store";
+        public const string CERTIFICATE_DOESNT_EXIST = "The certificate doesn't exist";
+        public const string CERTIFICATE_DOESNT_HAVE_PRIVATE_KEY = "The certificate doesn't contain private key";
     }
 }

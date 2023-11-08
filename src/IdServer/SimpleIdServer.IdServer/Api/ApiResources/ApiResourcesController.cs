@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Domains.DTOs;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
@@ -58,10 +59,10 @@ public class ApiResourcesController : BaseController
                 query = query.OrderBy(request.OrderBy);
             var nb = query.Count();
             var apiResources = await query.Skip(request.Skip.Value).Take(request.Take.Value).ToListAsync();
-            return new OkObjectResult(new SearchResult<ApiResourceResult>
+            return new OkObjectResult(new SearchResult<ApiResource>
             {
                 Count = nb,
-                Content = apiResources.Select(p => Build(p)).ToList()
+                Content = apiResources
             });
         }
         catch (OAuthException ex)
@@ -106,7 +107,7 @@ public class ApiResourcesController : BaseController
                 return new ContentResult
                 {
                     StatusCode = (int)HttpStatusCode.Created,
-                    Content = JsonSerializer.Serialize(Build(apiResource)).ToString(),
+                    Content = JsonSerializer.Serialize(apiResource).ToString(),
                     ContentType = "application/json"
                 };
             }
@@ -124,15 +125,4 @@ public class ApiResourcesController : BaseController
             }
         }
     }
-
-    private static ApiResourceResult Build(ApiResource apiResource) => new ApiResourceResult
-    {
-        Id = apiResource.Id,
-        Name = apiResource.Name,
-        Audience = apiResource.Audience,
-        Description = apiResource.Description,
-        CreateDateTime = apiResource.CreateDateTime,
-        UpdateDateTime = apiResource.UpdateDateTime,
-        Scopes = apiResource.Scopes.Select(s => s.Name).ToList()
-    };
 }

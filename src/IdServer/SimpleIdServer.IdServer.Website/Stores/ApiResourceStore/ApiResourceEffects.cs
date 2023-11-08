@@ -2,24 +2,27 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Api.ApiResources;
+using SimpleIdServer.IdServer.Api.Scopes;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Store;
-using SimpleIdServer.IdServer.Website.Resources;
+using SimpleIdServer.IdServer.DTOs;
 using System.Linq.Dynamic.Core;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
 {
     public class ApiResourceEffects
     {
-        private readonly IDbContextFactory<StoreDbContext> _factory;
+        private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly IdServerWebsiteOptions _options;
         private readonly ProtectedSessionStorage _sessionStorage;
 
-        public ApiResourceEffects(IDbContextFactory<StoreDbContext> factory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
+        public ApiResourceEffects(IWebsiteHttpClientFactory websiteHttpClientFactory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
         {
-            _factory = factory;
+            _websiteHttpClientFactory = websiteHttpClientFactory;
             _options = options.Value;
             _sessionStorage = sessionStorage;
         }
@@ -27,27 +30,28 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
         [EffectMethod]
         public async Task Handle(SearchApiResourcesAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetApiResourcesBaseUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
             {
-                IQueryable<ApiResource> query = dbContext.ApiResources.Include(r => r.Realms).AsNoTracking().Where(r => r.Realms.Any(r => r.Name == realm));
-                if (!string.IsNullOrWhiteSpace(action.Filter))
-                    query = query.Where(SanitizeExpression(action.Filter));
-
-                if (!string.IsNullOrWhiteSpace(action.OrderBy))
-                    query = query.OrderBy(SanitizeExpression(action.OrderBy));
-
-                var nb = query.Count();
-                var apiResources = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
-                var selectedResources = new List<string>();
-                if (!string.IsNullOrWhiteSpace(action.ScopeName))
+                RequestUri = new Uri($"{baseUrl}/.search"),
+                Method = HttpMethod.Post,
+                Content = new StringContent(JsonSerializer.Serialize(new SearchRequest
                 {
-                    var scope = await dbContext.Scopes.Include(s => s.Realms).Include(s => s.ApiResources).AsNoTracking().SingleAsync(s => s.Name == action.ScopeName && s.Realms.Any(r => r.Name == realm));
-                    selectedResources = scope.ApiResources.Select(r => r.Name).ToList();
-                }
+                    Filter = SanitizeExpression(action.Filter),
+                    OrderBy = SanitizeExpression(action.OrderBy),
+                    Skip = action.Skip,
+                    Take = action.Take
+                }))
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var searchResult = JsonSerializer.Deserialize<SearchResult<ApiResource>>(json);
+            var selectedResources = new List<string>();
+            if(!string.IsNullOrWhiteSpace(action.ScopeName))
+                selectedResources = searchResult.Content.Where(c => c.Scopes.Any(s => s.Name == action.ScopeName)).Select(r => r.Name).ToList();
 
-                dispatcher.Dispatch(new SearchApiResourcesSuccessAction { ApiResources = apiResources, SelectedApiResources = selectedResources, Count = nb });
-            }
+            dispatcher.Dispatch(new SearchApiResourcesSuccessAction { ApiResources = searchResult.Content, SelectedApiResources = selectedResources, Count = searchResult.Count });
 
             string SanitizeExpression(string expression) => expression.Replace("Value.", "");
         }
@@ -55,54 +59,67 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
         [EffectMethod]
         public async Task Handle(AddApiResourceAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetApiResourcesBaseUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var addRequest = new AddApiResourceRequest
             {
-                if (await dbContext.ApiResources.Include(r => r.Realms).AsNoTracking().AnyAsync(r => r.Name == action.Name && r.Realms.Any(r => r.Name == realm)))
-                {
-                    dispatcher.Dispatch(new AddApiResourceFailureAction { Name = action.Name, ErrorMessage = string.Format(Global.ApiResourceAlreadyExists, action.Name) });
-                    return;
-                }
-
-                var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
-                var apiResource = new ApiResource
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Name = action.Name,
-                    Audience = action.Audience,
-                    Description = action.Description,
-                    UpdateDateTime = DateTime.UtcNow,
-                    CreateDateTime = DateTime.UtcNow
-                };
-                apiResource.Realms.Add(activeRealm);
-                dbContext.ApiResources.Add(apiResource);
-                await dbContext.SaveChangesAsync(CancellationToken.None);
+                Audience = action.Audience,
+                Description = action.Description,
+                Name = action.Name
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(baseUrl),
+                Content = new StringContent(JsonSerializer.Serialize(addRequest), Encoding.UTF8, "application/json")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            try
+            {
+                httpResult.EnsureSuccessStatusCode();
                 dispatcher.Dispatch(new AddApiResourceSuccessAction { Name = action.Name, Description = action.Description, Audience = action.Audience });
+            }
+            catch
+            {
+                var jsonObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new AddApiResourceFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
             }
         }
 
         [EffectMethod]
         public async Task Handle(UpdateApiScopeResourcesAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetScopesBaseUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var addRequest = new UpdateScopeResourcesRequest
             {
-                var scope = await dbContext.Scopes.Include(r => r.Realms).Include(s => s.ApiResources).SingleAsync(s => s.Name == action.Name && s.Realms.Any(r => r.Name == realm), CancellationToken.None);
-                var apiResources = await dbContext.ApiResources.Where(s => action.Resources.Contains(s.Name)).ToListAsync(CancellationToken.None);
-                scope.ApiResources.Clear();
-                foreach (var apiResource in apiResources)
-                    scope.ApiResources.Add(apiResource);
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new UpdateApiScopeResourcesSuccessAction { Name = action.Name, Resources = action.Resources });
-            }
+                Resources = action.Resources
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Put,
+                RequestUri = new Uri($"{baseUrl}/{action.Name}/resources"),
+                Content = new StringContent(JsonSerializer.Serialize(addRequest), Encoding.UTF8, "application/json")
+            };
+            await httpClient.SendAsync(requestMessage);
+            dispatcher.Dispatch(new UpdateApiScopeResourcesSuccessAction { Name = action.Name, Resources = action.Resources });
         }
 
-        private async Task<string> GetRealm()
+        private Task<string> GetApiResourcesBaseUrl() => GetBaseUrl("apiresources");
+
+        private Task<string> GetScopesBaseUrl() => GetBaseUrl("scopes");
+
+        private async Task<string> GetBaseUrl(string subUrl)
         {
-            if (!_options.IsReamEnabled) return SimpleIdServer.IdServer.Constants.DefaultRealm;
-            var realm = await _sessionStorage.GetAsync<string>("realm");
-            var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
-            return realmStr;
+            if (_options.IsReamEnabled)
+            {
+                var realm = await _sessionStorage.GetAsync<string>("realm");
+                var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+                return $"{_options.IdServerBaseUrl}/{realmStr}/{subUrl}";
+            }
+
+            return $"{_options.IdServerBaseUrl}/{subUrl}";
         }
     }
 

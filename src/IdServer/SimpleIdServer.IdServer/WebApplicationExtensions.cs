@@ -319,9 +319,38 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.ApiResources + "/.search",
                 defaults: new { controller = "ApiResources", action = "Search" });
 
+            webApplication.MapControllerRoute("searchAuditing",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Auditing + "/.search",
+                defaults: new { controller = "Auditing", action = "Search" });
+
             webApplication.MapControllerRoute("updateScopeResources",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes + "/{name}/resources",
                 defaults: new { controller = "Scopes", action = "UpdateResources" });
+
+            webApplication.MapControllerRoute("searchCertificateAuthorities",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CertificateAuthorities + "/.search",
+                defaults: new { controller = "CertificateAuthorities", action = "Search" });
+            webApplication.MapControllerRoute("generateCertificateAuthorities",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CertificateAuthorities + "/generate",
+                defaults: new { controller = "CertificateAuthorities", action = "Generate" });
+            webApplication.MapControllerRoute("importCertificateAuthorities",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CertificateAuthorities + "/import",
+                defaults: new { controller = "CertificateAuthorities", action = "Import" });
+            webApplication.MapControllerRoute("addCertificateAuthorities",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CertificateAuthorities,
+                defaults: new { controller = "CertificateAuthorities", action = "Add" });
+            webApplication.MapControllerRoute("removeCertificateAuthorities",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CertificateAuthorities + "/{id}",
+                defaults: new { controller = "CertificateAuthorities", action = "Remove" });
+            webApplication.MapControllerRoute("getCertificateAuthorities",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CertificateAuthorities + "/{id}",
+                defaults: new { controller = "CertificateAuthorities", action = "Get" });
+            webApplication.MapControllerRoute("removeClientCertificate",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CertificateAuthorities + "/{id}/clientcertificates/{clientCertificateId}",
+                defaults: new { controller = "CertificateAuthorities", action = "RemoveClientCertificate" });
+            webApplication.MapControllerRoute("addClientCertificate",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CertificateAuthorities + "/{id}/clientcertificates",
+                defaults: new { controller = "CertificateAuthorities", action = "AddClientCertificate" });
 
             webApplication.MapControllerRoute(
                 name: "defaultWithArea",
