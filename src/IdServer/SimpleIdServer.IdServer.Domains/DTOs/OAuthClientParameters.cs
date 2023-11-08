@@ -4,7 +4,9 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
 {
     public class OAuthClientParameters
     {
+        public const string Id = "id";
         public const string ClientId = "client_id";
+        public const string ClientType = "client_type";
         public const string ClientSecret = "client_secret";
         public const string ClientIdIssuedAt = "client_id_issued_at";
         public const string ClientSecretExpiresAt = "client_secret_expires_at";
@@ -74,5 +76,11 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
         public const string DPOPBoundAccessTokens = "dpop_bound_access_tokens";
         public const string IsTokenExchangeEnabled = "is_token_exchange_enabled";
         public const string TokenExchangeType = "token_exchange_type";
+        public const string SerializedJsonWebKeys = "serialized_jwks";
+        public const string Parameters = "parameters";
+        public const string IsDPOPNonceRequired = "dpop_nonce_required";
+        public const string IsResourceParameterRequired = "is_resource_parameter_required";
+        public const string AuthReqIdExpirationTimeInSeconds = "auth_reqid_expirationtime";
+        public const string BCIntervalSeconds = "bc_interval";
     }
 }

@@ -16,7 +16,7 @@ public static class ClientExtensions
     {
         var parameters = client.Parameters;
         if (!parameters.ContainsKey(SAML2_SIG_CERTIFICATE_NAME)) return null;
-        var sigCertificateId = parameters[SAML2_SIG_CERTIFICATE_NAME];
+        var sigCertificateId = parameters[SAML2_SIG_CERTIFICATE_NAME].ToString();
         var jsonWebKey = client.JsonWebKeys.Single(j => j.KeyId == sigCertificateId);
         var x5c = jsonWebKey.X5c;
         var x5cBase64Str = x5c.First();
@@ -27,7 +27,7 @@ public static class ClientExtensions
     {
         var parameters = client.Parameters;
         if (!parameters.ContainsKey(SAML2_SIG_CERTIFICATE_NAME)) return null;
-        var sigCertificateId = parameters[SAML2_SIG_CERTIFICATE_NAME];
+        var sigCertificateId = parameters[SAML2_SIG_CERTIFICATE_NAME].ToString();
         var jsonWebKey = client.SerializedJsonWebKeys.Single(j => j.Kid == sigCertificateId);
         return jsonWebKey.SerializedJsonWebKey;
     }
@@ -51,7 +51,7 @@ public static class ClientExtensions
     {
         var parameters = client.Parameters;
         if (!parameters.ContainsKey(SAML2_SP_METADATA_NAME)) return null;
-        return parameters.Single(p => p.Key == SAML2_SP_METADATA_NAME).Value;
+        return parameters.Single(p => p.Key == SAML2_SP_METADATA_NAME).Value.ToString();
     }
 
     public static void SetSaml2SpMetadataUrl(this Client client, string saml2SpMetadataUrl)
@@ -77,7 +77,7 @@ public static class ClientExtensions
     {
         var parameters = client.Parameters;
         if (!parameters.ContainsKey(SAML2_USE_ACS_ARTIFACT_NAME)) return false;
-        if (bool.TryParse(parameters[SAML2_USE_ACS_ARTIFACT_NAME], out bool r)) return r;
+        if (bool.TryParse(parameters[SAML2_USE_ACS_ARTIFACT_NAME].ToString(), out bool r)) return r;
         return false;
     }
 }

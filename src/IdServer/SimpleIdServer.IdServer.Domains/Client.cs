@@ -12,7 +12,7 @@ namespace SimpleIdServer.IdServer.Domains
     [JsonConverter(typeof(TranslatableConverter<Client>))]
     public class Client : ITranslatable, IEquatable<Client>
     {
-        [JsonIgnore]
+        [JsonPropertyName(OAuthClientParameters.Id)]
         public string Id { get; set; }
         /// <summary>
         /// Client identifier.
@@ -213,6 +213,13 @@ namespace SimpleIdServer.IdServer.Domains
             get
             {
                 return string.Join(" ", Scopes.Select(s => s.Name));
+            }
+            set
+            {
+                Scopes = value == null ? new List<Scope>() : value.Split(" ").Select(v => new Scope
+                {
+                    Name = v
+                }).ToList();
             }
         }
         [JsonPropertyName(OAuthClientParameters.Jwks)]
@@ -459,12 +466,12 @@ namespace SimpleIdServer.IdServer.Domains
         /// <summary>
         /// 'resource' parameter can be required or not.
         /// </summary>
-        [JsonIgnore]
+        [JsonPropertyName(OAuthClientParameters.IsResourceParameterRequired)]
         public bool IsResourceParameterRequired { get; set; } = false;
         /// <summary>
         /// Expiration time in seconds of auth_req_id
         /// </summary>
-        [JsonIgnore]
+        [JsonPropertyName(OAuthClientParameters.AuthReqIdExpirationTimeInSeconds)]
         public int AuthReqIdExpirationTimeInSeconds { get; set; } = 120;
         /// <summary>
         /// Scopes used by the client to control its access.
@@ -474,27 +481,25 @@ namespace SimpleIdServer.IdServer.Domains
         /// <summary>
         /// Client’s JSON Web Key Set document value, which contains the client’s public keys.
         /// </summary>
-        [JsonIgnore]
+        [JsonPropertyName(OAuthClientParameters.SerializedJsonWebKeys)]
         public ICollection<ClientJsonWebKey> SerializedJsonWebKeys { get; set; } = new List<ClientJsonWebKey>();
-        [JsonIgnore]
+        [JsonPropertyName(OAuthClientParameters.ClientType)]
         public string? ClientType { get; set; } = null;
         /// <summary>
         /// Nonce is required in the DPoP proof.
         /// </summary>
-        [JsonIgnore]
+        [JsonPropertyName(OAuthClientParameters.IsDPOPNonceRequired)]
         public bool IsDPOPNonceRequired { get; set; } = false;
         /// <summary>
         /// Lifetime of a DPOP nonce.
         /// </summary>
         public double DPOPNonceLifetimeInSeconds { get; set; } = 5 * 60;
-        [JsonIgnore]
-        public ICollection<Translation> Translations { get; set; } = new List<Translation>();
-        [JsonIgnore]
-        public Dictionary<string, string> Parameters
+        [JsonPropertyName(OAuthClientParameters.Parameters)]
+        public JsonObject Parameters
         {
             get
             {
-                return SerializedParameters == null ? new Dictionary<string, string>() : JsonSerializer.Deserialize<Dictionary<string, string>>(SerializedParameters);
+                return SerializedParameters == null ? new JsonObject() : JsonObject.Parse(SerializedParameters).AsObject();
             }
             set
             {
@@ -511,7 +516,7 @@ namespace SimpleIdServer.IdServer.Domains
         /// <summary>
         /// A JSON number with a positive integer value indicating the minimum amount of time in seconds that the client MUST wait between polling requests to the token endpoint.
         /// </summary>
-        [JsonIgnore]
+        [JsonPropertyName(OAuthClientParameters.BCIntervalSeconds)]
         public int BCIntervalSeconds { get; set; } = 5;
         [JsonIgnore]
         public ICollection<Realm> Realms { get; set; } = new List<Realm>();
@@ -521,7 +526,7 @@ namespace SimpleIdServer.IdServer.Domains
         public double? GetDoubleParameter(string name)
         {
             if (!Parameters.ContainsKey(name)) return null;
-            if (double.TryParse(Parameters[name], out double res)) return res;
+            if (double.TryParse(Parameters[name].ToString(), out double res)) return res;
             return null;
         }
 
@@ -537,7 +542,7 @@ namespace SimpleIdServer.IdServer.Domains
             });
         }
 
-        public string GetStringParameter(string name) => Parameters[name];
+        public string GetStringParameter(string name) => Parameters[name].ToString();
 
         public void UpdateClientName(string clientName)
         {
@@ -549,7 +554,7 @@ namespace SimpleIdServer.IdServer.Domains
                 translation.Value = clientName;
         }
 
-        public IEnumerable<string> GetStringArrayParameter(string name) => Parameters[name].Split(',');
+        public IEnumerable<string> GetStringArrayParameter(string name) => Parameters[name].ToString().Split(',');
 
         private string? Translate(string key)
         {

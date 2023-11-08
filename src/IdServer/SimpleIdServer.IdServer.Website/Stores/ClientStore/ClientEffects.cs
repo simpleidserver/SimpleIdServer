@@ -10,22 +10,30 @@ using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Saml.Idp.Extensions;
 using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Website.Pages;
 using SimpleIdServer.IdServer.Website.Resources;
 using SimpleIdServer.IdServer.WsFederation;
 using System.Linq.Dynamic.Core;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
 {
     public class ClientEffects
     {
+        private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly IDbContextFactory<StoreDbContext> _factory;
         private readonly IdServerWebsiteOptions _configuration;
         private readonly ProtectedSessionStorage _sessionStorage;
 
-        public ClientEffects(IDbContextFactory<StoreDbContext> factory, IOptions<IdServerWebsiteOptions> configuration, ProtectedSessionStorage sessionStorage)
+        public ClientEffects(IWebsiteHttpClientFactory websiteHttpClientFactory, IDbContextFactory<StoreDbContext> factory, IOptions<IdServerWebsiteOptions> configuration, ProtectedSessionStorage sessionStorage)
         {
+            _websiteHttpClientFactory = websiteHttpClientFactory;
             _factory = factory;
             _configuration = configuration.Value;
             _sessionStorage = sessionStorage;
@@ -34,20 +42,24 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         [EffectMethod]
         public async Task Handle(SearchClientsAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetClientsUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
             {
-                var realm = await GetRealm();
-                IQueryable<Client> query = dbContext.Clients.Include(c => c.Translations).Include(c => c.Realms).Include(c => c.Scopes).Where(c => c.Realms.Any(r => r.Name == realm)).AsNoTracking();
-                if (!string.IsNullOrWhiteSpace(action.Filter))
-                    query = query.Where(SanitizeExpression(action.Filter));
-
-                if (!string.IsNullOrWhiteSpace(action.OrderBy))
-                    query = query.OrderBy(SanitizeExpression(action.OrderBy));
-
-                var nb = query.Count();
-                var clients = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
-                dispatcher.Dispatch(new SearchClientsSuccessAction { Clients = clients, Count = nb });
-            }
+                RequestUri = new Uri($"{baseUrl}/.search"),
+                Method = HttpMethod.Post,
+                Content = new StringContent(JsonSerializer.Serialize(new SearchRequest
+                {
+                    Filter = SanitizeExpression(action.Filter),
+                    OrderBy = SanitizeExpression(action.OrderBy),
+                    Skip = action.Skip,
+                    Take = action.Take
+                }))
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var searchResult = JsonSerializer.Deserialize<SearchResult<Domains.Client>>(json);
+            dispatcher.Dispatch(new SearchClientsSuccessAction { Clients = searchResult.Content, Count = searchResult.Count });
 
             string SanitizeExpression(string expression) => expression.Replace("Value.", "");
         }
@@ -55,265 +67,172 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         [EffectMethod]
         public async Task Handle(GetAllClientsAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetClientsUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
             {
-                IQueryable<Client> query = dbContext.Clients.Include(c => c.Translations).Include(c => c.Realms).Include(c => c.Scopes).Where(c => c.Realms.Any(r => r.Name == realm)).AsNoTracking();
-                var nb = query.Count();
-                var clients = await query.ToListAsync(CancellationToken.None);
-                dispatcher.Dispatch(new SearchClientsSuccessAction { Clients = clients, Count = nb });
-            }
+                RequestUri = new Uri(baseUrl),
+                Method = HttpMethod.Get
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var clients = JsonSerializer.Deserialize<IEnumerable<Domains.Client>>(json);
+            dispatcher.Dispatch(new SearchClientsSuccessAction { Clients = clients, Count = clients.Count() });
         }
 
         [EffectMethod]
         public async Task Handle(AddSpaClientAction action, IDispatcher dispatcher)
         {
-            if (!await ValidateAddClient(action.ClientId, action.RedirectionUrls, dispatcher)) return;
-            using (var dbContext = _factory.CreateDbContext())
-            {
-                var realm = await GetRealm();
-                var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
-                var scopes = await dbContext.Scopes.Include(s => s.Realms).Where(s => (s.Name == Constants.StandardScopes.OpenIdScope.Name || s.Name == Constants.StandardScopes.Profile.Name) && s.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
-                var newClientBuilder = ClientBuilder.BuildUserAgentClient(action.ClientId, Guid.NewGuid().ToString(), activeRealm, action.RedirectionUrls.ToArray())
-                    .AddScope(scopes.ToArray());
-                if (!string.IsNullOrWhiteSpace(action.ClientName))
-                    newClientBuilder.SetClientName(action.ClientName);
-                var newClient = newClientBuilder.Build();
-                dbContext.Clients.Add(newClient);
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.SPA });
-            }
+            var newClientBuilder = ClientBuilder.BuildUserAgentClient(action.ClientId, Guid.NewGuid().ToString(), null, action.RedirectionUrls.ToArray())
+                                .AddScope(new Domains.Scope { Name = Constants.StandardScopes.OpenIdScope.Name }, new Domains.Scope { Name = Constants.StandardScopes.Profile.Name });
+            if (!string.IsNullOrWhiteSpace(action.ClientName))
+                newClientBuilder.SetClientName(action.ClientName);
+            var newClient = newClientBuilder.Build();
+            await CreateClient(newClient, dispatcher, ClientTypes.SPA);
         }
 
         [EffectMethod]
         public async Task Handle(AddMachineClientApplicationAction action, IDispatcher dispatcher)
         {
-            if (!await ValidateAddClient(action.ClientId, new List<string>(), dispatcher)) return;
-            using (var dbContext = _factory.CreateDbContext())
-            {
-                var realm = await GetRealm();
-                var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
-                var newClientBuilder = ClientBuilder.BuildApiClient(action.ClientId, action.ClientSecret, activeRealm);
-                if (!string.IsNullOrWhiteSpace(action.ClientName))
-                    newClientBuilder.SetClientName(action.ClientName);
-                var newClient = newClientBuilder.Build();
-                dbContext.Clients.Add(newClient);
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.MACHINE });
-            }
+            var newClientBuilder = ClientBuilder.BuildApiClient(action.ClientId, action.ClientSecret, null);
+            if (!string.IsNullOrWhiteSpace(action.ClientName))
+                newClientBuilder.SetClientName(action.ClientName);
+            var newClient = newClientBuilder.Build();
+            await CreateClient(newClient, dispatcher, ClientTypes.MACHINE);
         }
 
         [EffectMethod]
         public async Task Handle(AddWebsiteApplicationAction action, IDispatcher dispatcher)
         {
-            if (!await ValidateAddClient(action.ClientId, new List<string>(), dispatcher)) return;
-            using (var dbContext = _factory.CreateDbContext())
-            {
-                var realm = await GetRealm();
-                var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
-                var scopes = await dbContext.Scopes.Include(s => s.Realms).Where(s => (s.Name == Constants.StandardScopes.OpenIdScope.Name || s.Name == Constants.StandardScopes.Profile.Name) && s.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
-                var newClientBuilder = ClientBuilder.BuildTraditionalWebsiteClient(action.ClientId, action.ClientSecret, activeRealm, action.RedirectionUrls.ToArray())
-                    .AddScope(scopes.ToArray());
-                if (!string.IsNullOrWhiteSpace(action.ClientName))
-                    newClientBuilder.SetClientName(action.ClientName);
-                var newClient = newClientBuilder.Build();
-                dbContext.Clients.Add(newClient);
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.WEBSITE });
-            }
+            var newClientBuilder = ClientBuilder.BuildTraditionalWebsiteClient(action.ClientId, action.ClientSecret, null, action.RedirectionUrls.ToArray())
+                    .AddScope(new Domains.Scope { Name = Constants.StandardScopes.OpenIdScope.Name }, new Domains.Scope { Name = Constants.StandardScopes.Profile.Name });
+            if (!string.IsNullOrWhiteSpace(action.ClientName))
+                newClientBuilder.SetClientName(action.ClientName);
+            var newClient = newClientBuilder.Build();
+            await CreateClient(newClient, dispatcher, ClientTypes.WEBSITE);
         }
 
         [EffectMethod]
         public async Task Handle(AddHighlySecuredWebsiteApplicationAction action, IDispatcher dispatcher)
         {
-            if (!await ValidateAddClient(action.ClientId, new List<string>(), dispatcher)) return;
-            using (var dbContext = _factory.CreateDbContext())
+            var newClientBuilder = ClientBuilder.BuildTraditionalWebsiteClient(action.ClientId, action.ClientSecret, null, action.RedirectionUrls.ToArray())
+                    .AddScope(new Domains.Scope { Name = Constants.StandardScopes.OpenIdScope.Name }, new Domains.Scope { Name = Constants.StandardScopes.Profile.Name });
+            if (!string.IsNullOrWhiteSpace(action.ClientName))
+                newClientBuilder.SetClientName(action.ClientName);
+
+            // FAPI2.0
+            string jsonWebKeyStr = null;
+            newClientBuilder.SetSigAuthorizationResponse(SecurityAlgorithms.EcdsaSha256);
+            newClientBuilder.SetIdTokenSignedResponseAlg(SecurityAlgorithms.EcdsaSha256);
+            newClientBuilder.SetRequestObjectSigning(SecurityAlgorithms.EcdsaSha256);
+            var ecdsaSig = ClientKeyGenerator.GenerateECDsaSignatureKey("keyId", SecurityAlgorithms.EcdsaSha256);
+            jsonWebKeyStr = ecdsaSig.SerializeJWKStr();
+            newClientBuilder.AddSigningKey(ecdsaSig, SecurityAlgorithms.EcdsaSha256, SecurityKeyTypes.ECDSA);
+            if (action.IsDPoP)
             {
-                var realm = await GetRealm();
-                var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
-                var scopes = await dbContext.Scopes.Include(s => s.Realms).Where(s => (s.Name == Constants.StandardScopes.OpenIdScope.Name || s.Name == Constants.StandardScopes.Profile.Name) && s.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
-                var newClientBuilder = ClientBuilder.BuildTraditionalWebsiteClient(action.ClientId, action.ClientSecret, activeRealm, action.RedirectionUrls.ToArray())
-                    .AddScope(scopes.ToArray());
-                if (!string.IsNullOrWhiteSpace(action.ClientName))
-                    newClientBuilder.SetClientName(action.ClientName);
-
-                // FAPI2.0
-                string jsonWebKeyStr = null;
-                newClientBuilder.SetSigAuthorizationResponse(SecurityAlgorithms.EcdsaSha256);
-                newClientBuilder.SetIdTokenSignedResponseAlg(SecurityAlgorithms.EcdsaSha256);
-                newClientBuilder.SetRequestObjectSigning(SecurityAlgorithms.EcdsaSha256);
-                var ecdsaSig = ClientKeyGenerator.GenerateECDsaSignatureKey("keyId", SecurityAlgorithms.EcdsaSha256);
-                jsonWebKeyStr = ecdsaSig.SerializeJWKStr();
-                newClientBuilder.AddSigningKey(ecdsaSig, SecurityAlgorithms.EcdsaSha256, SecurityKeyTypes.ECDSA);
-                if (action.IsDPoP)
-                {
-                    newClientBuilder.UseClientPrivateKeyJwtAuthentication();
-                    newClientBuilder.UseDPOPProof(false);
-                }
-                else
-                {
-                    newClientBuilder.UseClientTlsAuthentication(action.SubjectName);
-                }
-
-                var newClient = newClientBuilder.Build();
-                newClient.ClientType = ClientTypes.HIGHLYSECUREDWEBSITE;
-                dbContext.Clients.Add(newClient);
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.HIGHLYSECUREDWEBSITE, JsonWebKeyStr = jsonWebKeyStr });
+                newClientBuilder.UseClientPrivateKeyJwtAuthentication();
+                newClientBuilder.UseDPOPProof(false);
             }
+            else
+            {
+                newClientBuilder.UseClientTlsAuthentication(action.SubjectName);
+            }
+
+            var newClient = newClientBuilder.Build();
+            await CreateClient(client, dispatcher, ClientTypes.HIGHLYSECUREDWEBSITE);
         }
 
         [EffectMethod]
         public async Task Handle(AddHighlySecuredWebsiteApplicationWithGrantMgtSupportAction action, IDispatcher dispatcher)
         {
-            if (!await ValidateAddClient(action.ClientId, new List<string>(), dispatcher)) return;
-            using (var dbContext = _factory.CreateDbContext())
+            var newClientBuilder = ClientBuilder.BuildTraditionalWebsiteClient(action.ClientId, action.ClientSecret, null, action.RedirectionUrls.ToArray())
+                    .AddScope(new Domains.Scope { Name = Constants.StandardScopes.OpenIdScope.Name }, new Domains.Scope { Name = Constants.StandardScopes.Profile.Name });
+            if (!string.IsNullOrWhiteSpace(action.ClientName))
+                newClientBuilder.SetClientName(action.ClientName);
+
+            // FAPI2.0
+            string jsonWebKeyStr = null;
+            newClientBuilder.SetSigAuthorizationResponse(SecurityAlgorithms.EcdsaSha256);
+            newClientBuilder.SetIdTokenSignedResponseAlg(SecurityAlgorithms.EcdsaSha256);
+            newClientBuilder.SetRequestObjectSigning(SecurityAlgorithms.EcdsaSha256);
+            var ecdsaSig = ClientKeyGenerator.GenerateECDsaSignatureKey("keyId", SecurityAlgorithms.EcdsaSha256);
+            jsonWebKeyStr = ecdsaSig.SerializeJWKStr();
+            newClientBuilder.AddSigningKey(ecdsaSig, SecurityAlgorithms.EcdsaSha256, SecurityKeyTypes.ECDSA);
+            if (action.IsDPoP)
             {
-                var realm = await GetRealm();
-                var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
-                var scopes = await dbContext.Scopes.Include(s => s.Realms).Where(s => (s.Name == Constants.StandardScopes.OpenIdScope.Name || s.Name == Constants.StandardScopes.Profile.Name) && s.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
-                var newClientBuilder = ClientBuilder.BuildTraditionalWebsiteClient(action.ClientId, action.ClientSecret, activeRealm, action.RedirectionUrls.ToArray())
-                    .AddScope(scopes.ToArray());
-                if (!string.IsNullOrWhiteSpace(action.ClientName))
-                    newClientBuilder.SetClientName(action.ClientName);
-
-                // FAPI2.0
-                string jsonWebKeyStr = null;
-                newClientBuilder.SetSigAuthorizationResponse(SecurityAlgorithms.EcdsaSha256);
-                newClientBuilder.SetIdTokenSignedResponseAlg(SecurityAlgorithms.EcdsaSha256);
-                newClientBuilder.SetRequestObjectSigning(SecurityAlgorithms.EcdsaSha256);
-                var ecdsaSig = ClientKeyGenerator.GenerateECDsaSignatureKey("keyId", SecurityAlgorithms.EcdsaSha256);
-                jsonWebKeyStr = ecdsaSig.SerializeJWKStr();
-                newClientBuilder.AddSigningKey(ecdsaSig, SecurityAlgorithms.EcdsaSha256, SecurityKeyTypes.ECDSA);
-                if (action.IsDPoP)
-                {
-                    newClientBuilder.UseClientPrivateKeyJwtAuthentication();
-                    newClientBuilder.UseDPOPProof(false);
-                }
-                else
-                {
-                    newClientBuilder.UseClientTlsAuthentication(action.SubjectName);
-                }
-
-                // Grant management
-                scopes = await dbContext.Scopes.Include(s => s.Realms).Where(s => (s.Name == Constants.StandardScopes.GrantManagementQuery.Name || s.Name == Constants.StandardScopes.GrantManagementRevoke.Name) && s.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
-                newClientBuilder.AddScope(scopes.ToArray());
-                var authDataTypes = string.IsNullOrWhiteSpace(action.AuthDataTypes) || action.AuthDataTypes == null ? null : action.AuthDataTypes.Split(';');
-                if (authDataTypes != null)
-                    newClientBuilder.AddAuthDataTypes(authDataTypes);
-
-                var newClient = newClientBuilder.Build();
-                newClient.ClientType = ClientTypes.GRANTMANAGEMENT;
-                dbContext.Clients.Add(newClient);
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.GRANTMANAGEMENT, JsonWebKeyStr = jsonWebKeyStr });
+                newClientBuilder.UseClientPrivateKeyJwtAuthentication();
+                newClientBuilder.UseDPOPProof(false);
             }
+            else
+            {
+                newClientBuilder.UseClientTlsAuthentication(action.SubjectName);
+            }
+
+            // Grant management
+            newClientBuilder.AddScope(new Domains.Scope { Name = Constants.StandardScopes.GrantManagementQuery.Name }, new Domains.Scope { Name = Constants.StandardScopes.GrantManagementRevoke.Name });
+            var authDataTypes = string.IsNullOrWhiteSpace(action.AuthDataTypes) || action.AuthDataTypes == null ? null : action.AuthDataTypes.Split(';');
+            if (authDataTypes != null)
+                newClientBuilder.AddAuthDataTypes(authDataTypes);
+
+            var newClient = newClientBuilder.Build();
+            await CreateClient(newClient, dispatcher, ClientTypes.GRANTMANAGEMENT);
         }
 
         [EffectMethod]
         public async Task Handle(AddMobileApplicationAction action, IDispatcher dispatcher)
         {
-            if (!await ValidateAddClient(action.ClientId, new List<string>(), dispatcher)) return;
-            using (var dbContext = _factory.CreateDbContext())
-            {
-                var realm = await GetRealm();
-                var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
-                var scopes = await dbContext.Scopes.Include(s => s.Realms).Where(s => (s.Name == Constants.StandardScopes.OpenIdScope.Name || s.Name == Constants.StandardScopes.Profile.Name) && s.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
-                var newClientBuilder = ClientBuilder.BuildMobileApplication(action.ClientId, Guid.NewGuid().ToString(), activeRealm, action.RedirectionUrls.ToArray())
-                    .AddScope(scopes.ToArray());
-                if (!string.IsNullOrWhiteSpace(action.ClientName))
-                    newClientBuilder.SetClientName(action.ClientName);
-                var newClient = newClientBuilder.Build();
-                dbContext.Clients.Add(newClient);
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.MOBILE });
-            }
+            var newClientBuilder = ClientBuilder.BuildMobileApplication(action.ClientId, Guid.NewGuid().ToString(), null, action.RedirectionUrls.ToArray())
+                    .AddScope(new Domains.Scope { Name = Constants.StandardScopes.OpenIdScope.Name }, new Domains.Scope { Name = Constants.StandardScopes.Profile.Name });
+            if (!string.IsNullOrWhiteSpace(action.ClientName))
+                newClientBuilder.SetClientName(action.ClientName);
+            var newClient = newClientBuilder.Build();
+            await CreateClient(newClient, dispatcher, ClientTypes.MOBILE);
         }
 
         [EffectMethod]
         public async Task Handle(AddExternalDeviceApplicationAction action, IDispatcher dispatcher)
         {
-            if (!await ValidateAddClient(action.ClientId, new List<string>(), dispatcher)) return;
-            using (var dbContext = _factory.CreateDbContext())
-            {
-                var realm = await GetRealm();
-                var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
-                var scopes = await dbContext.Scopes.Include(s => s.Realms).Where(s => (s.Name == Constants.StandardScopes.OpenIdScope.Name || s.Name == Constants.StandardScopes.Profile.Name) && s.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
-                var newClientBuilder = ClientBuilder.BuildExternalAuthDeviceClient(action.ClientId, action.SubjectName, activeRealm)
-                    .AddScope(scopes.ToArray());
-                if (!string.IsNullOrWhiteSpace(action.ClientName))
-                    newClientBuilder.SetClientName(action.ClientName);
-                var newClient = newClientBuilder.Build();
-                dbContext.Clients.Add(newClient);
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.EXTERNAL });
-            }
+            var newClientBuilder = ClientBuilder.BuildExternalAuthDeviceClient(action.ClientId, action.SubjectName, null)
+                    .AddScope(new Domains.Scope { Name = Constants.StandardScopes.OpenIdScope.Name }, new Domains.Scope { Name = Constants.StandardScopes.Profile.Name });
+            if (!string.IsNullOrWhiteSpace(action.ClientName))
+                newClientBuilder.SetClientName(action.ClientName);
+            var newClient = newClientBuilder.Build();
+            await CreateClient(newClient, dispatcher, ClientTypes.EXTERNAL);
         }
 
         [EffectMethod]
         public async Task Handle(AddDeviceApplicationAction action, IDispatcher dispatcher)
         {
-            if (!await ValidateAddClient(action.ClientId, new List<string>(), dispatcher)) return;
-            using (var dbContext = _factory.CreateDbContext())
-            {
-                var realm = await GetRealm();
-                var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
-                var scopes = await dbContext.Scopes.Include(s => s.Realms).Where(s => (s.Name == Constants.StandardScopes.OpenIdScope.Name || s.Name == Constants.StandardScopes.Profile.Name) && s.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
-                var newClientBuilder = ClientBuilder.BuildDeviceClient(action.ClientId, action.ClientSecret, activeRealm)
-                    .AddScope(scopes.ToArray());
-                if (!string.IsNullOrWhiteSpace(action.ClientName))
-                    newClientBuilder.SetClientName(action.ClientName);
-                var newClient = newClientBuilder.Build();
-                dbContext.Clients.Add(newClient);
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.DEVICE });
-            }
+            var newClientBuilder = ClientBuilder.BuildDeviceClient(action.ClientId, action.ClientSecret, null)
+                    .AddScope(new Domains.Scope { Name = Constants.StandardScopes.OpenIdScope.Name }, new Domains.Scope { Name = Constants.StandardScopes.Profile.Name });
+            if (!string.IsNullOrWhiteSpace(action.ClientName))
+                newClientBuilder.SetClientName(action.ClientName);
+            var newClient = newClientBuilder.Build();
+            await CreateClient(newClient, dispatcher, ClientTypes.DEVICE);
         }
 
         [EffectMethod]
         public async Task Handle(AddWsFederationApplicationAction action, IDispatcher dispatcher)
         {
-            if (!await ValidateAddClient(action.ClientId, new List<string>(), dispatcher)) return;
-            using (var dbContext = _factory.CreateDbContext())
-            {
-                var realm = await GetRealm();
-                var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
-                var newClientBuilder = WsClientBuilder.BuildWsFederationClient(action.ClientId, activeRealm);
-                if (!string.IsNullOrWhiteSpace(action.ClientName))
-                    newClientBuilder.SetClientName(action.ClientName);
-                var newClient = newClientBuilder.Build();
-                var scopeNames = newClient.Scopes.Select(s => s.Name);
-                var scopes = await dbContext.Scopes.Where(s => scopeNames.Contains(s.Name)).ToListAsync(CancellationToken.None);
-                newClient.Scopes = scopes;
-                dbContext.Clients.Add(newClient);
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = WsFederationConstants.CLIENT_TYPE });
-            }
+            var newClientBuilder = WsClientBuilder.BuildWsFederationClient(action.ClientId, null);
+            if (!string.IsNullOrWhiteSpace(action.ClientName))
+                newClientBuilder.SetClientName(action.ClientName);
+            var newClient = newClientBuilder.Build();
+            await CreateClient(newClient, dispatcher, WsFederationConstants.CLIENT_TYPE);
         }
 
         [EffectMethod]
         public async Task Handle(AddSamlSpApplicationAction action, IDispatcher dispatcher)
         {
-            if (!await ValidateAddClient(action.ClientIdentifier, new List<string>(), dispatcher)) return;
-            using (var dbContext = _factory.CreateDbContext())
-            {
-                var certificate = KeyGenerator.GenerateSelfSignedCertificate();
-                var securityKey = new X509SecurityKey(certificate, Guid.NewGuid().ToString());
-                var realm = await GetRealm();
-                var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
-                var newClientBuilder = SamlSpClientBuilder.BuildSamlSpClient(action.ClientIdentifier, action.MetadataUrl, certificate, activeRealm);
-                if (!string.IsNullOrWhiteSpace(action.ClientName))
-                    newClientBuilder.SetClientName(action.ClientName);
-                newClientBuilder.SetUseAcsArtifact(action.UseAcs);
-                var newClient = newClientBuilder.Build();
-                var scopeNames = newClient.Scopes.Select(s => s.Name);
-                var scopes = await dbContext.Scopes.Where(s => scopeNames.Contains(s.Name)).ToListAsync(CancellationToken.None);
-                newClient.Scopes = scopes;
-                dbContext.Clients.Add(newClient);
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                var pemResult = PemConverter.ConvertFromSecurityKey(securityKey);
-                dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientIdentifier, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = SimpleIdServer.IdServer.Saml.Idp.Constants.CLIENT_TYPE, Pem = pemResult });
-            }
+            var certificate = KeyGenerator.GenerateSelfSignedCertificate();
+            var securityKey = new X509SecurityKey(certificate, Guid.NewGuid().ToString());
+            var newClientBuilder = SamlSpClientBuilder.BuildSamlSpClient(action.ClientIdentifier, action.MetadataUrl, certificate, null);
+            if (!string.IsNullOrWhiteSpace(action.ClientName))
+                newClientBuilder.SetClientName(action.ClientName);
+            newClientBuilder.SetUseAcsArtifact(action.UseAcs);
+            var newClient = newClientBuilder.Build();
+            var pemResult = PemConverter.ConvertFromSecurityKey(securityKey);
+            await CreateClient(newClient, dispatcher, Saml.Idp.Constants.CLIENT_TYPE, pemResult);
         }
 
         [EffectMethod]
@@ -645,6 +564,30 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             }
         }
 
+        private async Task CreateClient(Domains.Client client, IDispatcher dispatcher, string clientType, PemResult pemResult = null)
+        {
+            var baseUrl = await GetClientsUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri(baseUrl),
+                Method = HttpMethod.Post,
+                Content = new StringContent(JsonSerializer.Serialize(client), Encoding.UTF8, "application/json")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            try
+            {
+                httpResult.EnsureSuccessStatusCode();
+                dispatcher.Dispatch(new AddClientSuccessAction { ClientId = client.ClientId, ClientName = client.ClientName, Language = client.Translations.FirstOrDefault()?.Language, ClientType = clientType, Pem = pemResult });
+            }
+            catch
+            {
+                var jsonObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new AddClientFailureAction { ClientId = client.ClientId, ErrorMessage = jsonObj["error_description"].GetValue<string>() });
+            }
+        }
+
         private async Task<bool> ValidateAddClient(string clientId, IEnumerable<string> redirectionUrls, IDispatcher dispatcher)
         {
             var realm = await GetRealm();
@@ -688,6 +631,20 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             return errorMessage == null;
         }
 
+        private Task<string> GetClientsUrl() => GetBaseUrl("clients");
+
+        private async Task<string> GetBaseUrl(string subUrl)
+        {
+            if (_configuration.IsReamEnabled)
+            {
+                var realm = await _sessionStorage.GetAsync<string>("realm");
+                var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+                return $"{_configuration.IdServerBaseUrl}/{realmStr}/{subUrl}";
+            }
+
+            return $"{_configuration.IdServerBaseUrl}/{subUrl}";
+        }
+
         private async Task<string> GetRealm()
         {
             if (!_configuration.IsReamEnabled) return SimpleIdServer.IdServer.Constants.DefaultRealm;
@@ -711,7 +668,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
 
     public class SearchClientsSuccessAction
     {
-        public IEnumerable<Client> Clients { get; set; } = new List<Client>();
+        public IEnumerable<Domains.Client> Clients { get; set; } = new List<Domains.Client>();
         public int Count { get; set; }
     }
 

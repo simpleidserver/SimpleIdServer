@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.IdServer.Saml.Idp\SimpleIdServer.IdServer.Saml.Idp.csproj" />
     <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
   </ItemGroup>
 

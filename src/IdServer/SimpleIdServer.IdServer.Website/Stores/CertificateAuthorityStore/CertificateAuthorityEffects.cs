@@ -2,12 +2,10 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.CertificateAuthorities;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
-using System.Linq.Dynamic.Core;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -143,49 +141,53 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
         [EffectMethod]
         public async Task Handle(GetCertificateAuthorityAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetBaseUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
             {
-                var ca = await dbContext.CertificateAuthorities.Include(c => c.ClientCertificates).FirstOrDefaultAsync(a => a.Id == action.Id);
-                var store = new IdServer.Stores.CertificateAuthorityStore(null);
-                var certificate = store.Get(ca);
-                dispatcher.Dispatch(new GetCertificateAuthoritySuccessAction { CertificateAuthority = ca, Certificate = certificate });
-            }
+                RequestUri = new Uri($"{baseUrl}/{action.Id}"),
+                Method = HttpMethod.Get
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var certificateAuthority = JsonSerializer.Deserialize<CertificateAuthority>(json);
+            var store = new IdServer.Stores.CertificateAuthorityStore(null);
+            var certificate = store.Get(certificateAuthority);
+            dispatcher.Dispatch(new GetCertificateAuthoritySuccessAction { CertificateAuthority = certificateAuthority, Certificate = certificate });
         }
 
         [EffectMethod]
         public async Task Handle(RemoveSelectedClientCertificatesAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetBaseUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            foreach (var id in action.CertificateClientIds)
             {
-                var ca = await dbContext.CertificateAuthorities.Include(c => c.ClientCertificates).FirstAsync(c => c.Id == action.CertificateAuthorityId);
-                ca.ClientCertificates = ca.ClientCertificates.Where(c => !action.CertificateClientIds.Contains(c.Id)).ToList();
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new RemoveSelectedClientCertificatesSuccessAction { CertificateAuthorityId = action.CertificateAuthorityId, CertificateClientIds = action.CertificateClientIds });
+                var requestMessage = new HttpRequestMessage
+                {
+                    RequestUri = new Uri($"{baseUrl}/{action.CertificateAuthorityId}/clientcertificates/{id}"),
+                    Method = HttpMethod.Delete
+                };
+                await httpClient.SendAsync(requestMessage);
             }
+
+            dispatcher.Dispatch(new RemoveSelectedClientCertificatesSuccessAction { CertificateAuthorityId = action.CertificateAuthorityId, CertificateClientIds = action.CertificateClientIds });
         }
 
         [EffectMethod]
         public async Task Handle(AddClientCertificateAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetBaseUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
             {
-                var ca = await dbContext.CertificateAuthorities.Include(c => c.ClientCertificates).FirstAsync(c => c.Id == action.CertificateAuthorityId);
-                var store = new IdServer.Stores.CertificateAuthorityStore(null);
-                var certificate = store.Get(ca);
-                var pem = KeyGenerator.GenerateClientCertificate(certificate, action.SubjectName, action.NbDays);
-                var record = new ClientCertificate
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Name = action.SubjectName,
-                    PublicKey = pem.PublicKey,
-                    PrivateKey = pem.PrivateKey,
-                    StartDateTime = DateTime.UtcNow,
-                    EndDateTime = DateTime.UtcNow.AddDays(action.NbDays)
-                };
-                ca.ClientCertificates.Add(record);
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new AddClientCertificateSuccessAction { CertificateAuthorityId = action.CertificateAuthorityId, ClientCertificate = record });
-            }
+                RequestUri = new Uri($"{baseUrl}/{action.CertificateAuthorityId}/clientcertificates"),
+                Method = HttpMethod.Post
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var clientCertificate = JsonSerializer.Deserialize<ClientCertificate>(json);
+            dispatcher.Dispatch(new AddClientCertificateSuccessAction { CertificateAuthorityId = action.CertificateAuthorityId, ClientCertificate = clientCertificate });
         }
 
         private async Task<string> GetBaseUrl()
