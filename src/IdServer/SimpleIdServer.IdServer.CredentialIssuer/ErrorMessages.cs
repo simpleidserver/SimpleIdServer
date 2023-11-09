@@ -7,6 +7,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer
         public const string CREDENTIAL_REQUEST_INVALID = "the incoming request is invalid";
         public const string MISSING_PARAMETER = "the parameter {0} is missing";
         public const string MISSING_OPENID_CREDENTIAL_FORMAT = "the authorization_details must contain a format";
+        public const string EXISTING_CREDENTIAL_TEMPLATE = "Credential template with the type {0} already exists";
         public const string INVALID_ACCESS_TOKEN_SCOPE = "access token has an invalid scope";
         public const string INVALID_PROOF_SIG = "the proof signature is not correct";
         public const string INVALID_PROOF_JWT = "the proof is not a well formed JWT token";
@@ -16,6 +17,8 @@ namespace SimpleIdServer.IdServer.CredentialIssuer
         public const string UNKNOWN_ACCESS_TOKEN = "either the access token has been revoked or is invalid";
         public const string UNKNOWN_CREDENTIAL_OFFER = "the credential offer doesn't exist";
         public const string UNKNOWN_CREDENTIAL_TEMPLATE = "the credential template {0} doesn't exist";
+        public const string UNKNOWN_CREDENTIAL_DISPLAY_TEMPLATE = "the credential template display {0} doesn't exist";
+        public const string UNKNOWN_CREDENTIAL_DISPLAY_PARAMETER = "the credential template parameter {0} doesn't exist";
         public const string UNKNOWN_WALLET_CLIENT_ID = "the wallet {0} doesn't exist";
         public const string UNKNOWN_PROOF_TYPE = "the proof type {0} is unknown";
         public const string UNKNOWN_USER = "the user {0} doesn't exist";

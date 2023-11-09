@@ -13,7 +13,7 @@ namespace SimpleIdServer.Vc.Models
     [JsonConverter(typeof(BaseCredentialTemplateJsonConverter))]
     public class BaseCredentialTemplate
     {
-        [JsonIgnore]
+        [JsonPropertyName(CredentialTemplateNames.TechnicalId)]
         public string TechnicalId { get; set; } = null!;
         /// <summary>
         /// Identifying the respective object.
@@ -26,18 +26,18 @@ namespace SimpleIdServer.Vc.Models
         /// </summary>
         [JsonPropertyName(CredentialTemplateNames.Format)]
         public string Format { get; set; } = null!;
-        [JsonIgnore]
+        [JsonPropertyName(CredentialTemplateNames.CreateDateTime)]
         public DateTime CreateDateTime { get; set; }
-        [JsonIgnore]
+        [JsonPropertyName(CredentialTemplateNames.UpdateDateTime)]
         public DateTime UpdateDateTime { get; set; }
         /// <summary>
         /// Array of objects, where each object contains the display properties of the supported credential for a certain language.
         /// </summary>
         [JsonPropertyName(CredentialTemplateNames.Display)]
         public ICollection<CredentialTemplateDisplay> DisplayLst { get; set; } = new List<CredentialTemplateDisplay>();
-        [JsonIgnore]
+        [JsonPropertyName(CredentialTemplateNames.Parameters)]
         public ICollection<CredentialTemplateParameter> Parameters { get; set; } = new List<CredentialTemplateParameter>();
-
+        [JsonIgnore]
         public CredentialTemplateDisplay Display
         {
             get
@@ -47,6 +47,6 @@ namespace SimpleIdServer.Vc.Models
             }
         }
 
-        public string Serialize() => JsonSerializer.Serialize(this);
+        public virtual string Serialize() => JsonSerializer.Serialize(this);
     }
 }

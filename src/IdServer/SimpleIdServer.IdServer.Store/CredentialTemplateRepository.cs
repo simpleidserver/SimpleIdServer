@@ -7,6 +7,8 @@ namespace SimpleIdServer.IdServer.Store
     public interface ICredentialTemplateRepository
     {
         IQueryable<CredentialTemplate> Query();
+        void Add(CredentialTemplate credentialTemplate);
+        void Delete(CredentialTemplate credentialTemplate);
         void Delete(IEnumerable<CredentialTemplate> credentialTemplates);
         Task<int> SaveChanges(CancellationToken cancellationToken);
     }
@@ -20,6 +22,10 @@ namespace SimpleIdServer.IdServer.Store
             _dbContext = dbContext;
         }
         public IQueryable<CredentialTemplate> Query() => _dbContext.CredentialTemplates;
+
+        public void Add(CredentialTemplate credentialTemplate) => _dbContext.CredentialTemplates.Add(credentialTemplate);
+
+        public void Delete(CredentialTemplate credentialTemplate) => _dbContext.CredentialTemplates.Remove(credentialTemplate);
 
         public void Delete(IEnumerable<CredentialTemplate> credentialTemplates) => _dbContext.CredentialTemplates.RemoveRange(credentialTemplates);
 

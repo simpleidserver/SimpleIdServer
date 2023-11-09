@@ -1,9 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Vc.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -16,40 +16,36 @@ namespace SimpleIdServer.Vc.Models
         public override void Write(Utf8JsonWriter writer, BaseCredentialTemplate value, JsonSerializerOptions options)
         {
             writer.WriteStartObject();
-            var properties = value.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            var props = properties.Select(p =>
+            if (!string.IsNullOrWhiteSpace(value.Id)) writer.WriteString(CredentialTemplateNames.Id, value.Id);
+            if (!string.IsNullOrWhiteSpace(value.Format)) writer.WriteString(CredentialTemplateNames.Format, value.Format);
+            if (value.DisplayLst != null && value.DisplayLst.Any())
             {
-                var attr = p.GetCustomAttribute<JsonPropertyNameAttribute>();
-                return attr == null ? (p, null) : (p, attr.Name);
-            }).Where(kvp => kvp.Name != null);
-            foreach (var prop in props)
-            {
-                var propertyType = prop.p.PropertyType;
-                var obj = prop.p.GetValue(value);
-                if (obj == null) continue;
-                if (propertyType == typeof(string))
-                    writer.WriteString(prop.Item2, obj as string);
-                else if (propertyType == typeof(bool))
-                    writer.WriteBoolean(prop.Item2, (bool)obj);
-                else if (propertyType == typeof(double?) || propertyType == typeof(double))
-                    writer.WriteNumber(prop.Item2, (double)obj);
-                else if (propertyType == typeof(DateTime))
-                    writer.WriteString(prop.Item2, (DateTime)obj);
-                else if (propertyType == typeof(ICollection<CredentialTemplateDisplay>))
+                writer.WriteStartArray(CredentialTemplateNames.Display);
+                foreach (var display in value.DisplayLst)
                 {
-                    writer.WriteStartArray(prop.Item2);
-                    var displays = (IEnumerable<CredentialTemplateDisplay>)obj;
-                    foreach (var display in displays)
-                        writer.WriteRawValue(JsonSerializer.Serialize(display));
+                    writer.WriteStartObject();
+                    if (!string.IsNullOrWhiteSpace(display.Name)) writer.WriteString(CredentialTemplateDisplayNames.Name, display.Name);
+                    if (!string.IsNullOrWhiteSpace(display.Locale)) writer.WriteString(CredentialTemplateDisplayNames.Locale, display.Locale);
+                    if (!string.IsNullOrWhiteSpace(display.LogoUrl) && !string.IsNullOrWhiteSpace(display.LogoAltText))
+                    {
+                        writer.WriteStartObject(CredentialTemplateDisplayNames.Logo);
+                        writer.WriteString(CredentialTemplateDisplayNames.Url, display.LogoUrl);
+                        writer.WriteString(CredentialTemplateDisplayNames.AltText, display.LogoAltText);
+                        writer.WriteEndObject();
+                    }
 
-                    writer.WriteEndArray();
+                    if (!string.IsNullOrWhiteSpace(display.Description)) writer.WriteString(CredentialTemplateDisplayNames.Description, display.Description);
+                    if (!string.IsNullOrWhiteSpace(display.BackgroundColor)) writer.WriteString(CredentialTemplateDisplayNames.BackgroundColor, display.BackgroundColor);
+                    if (!string.IsNullOrWhiteSpace(display.TextColor)) writer.WriteString(CredentialTemplateDisplayNames.TextColor, display.TextColor);
+                    writer.WriteEndObject();
                 }
+
+                writer.WriteEndArray();
             }
 
             if (value.Parameters.Any() && value.Parameters != null)
             {
-                foreach (var grp in value.Parameters.GroupBy(kvp => kvp.Name))
-                    Write(grp.Select(kvp => kvp));
+                foreach (var grp in value.Parameters.GroupBy(kvp => kvp.Name)) Write(grp.Select(kvp => kvp));
             }
 
             writer.WriteEndObject();

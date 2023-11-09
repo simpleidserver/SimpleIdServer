@@ -41,6 +41,32 @@ namespace SimpleIdServer.IdServer.CredentialIssuer
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialOffer + "/{id}/qr",
                 defaults: new { controller = "CredentialOffer", action = "GetQRCode" });
 
+
+            webApplication.MapControllerRoute("searchCredentialTemplates",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialOffer + "/.search",
+                defaults: new { controller = "CredentialTemplates", action = "Search" });
+            webApplication.MapControllerRoute("removeCredentialTemplate",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialOffer,
+                defaults: new { controller = "CredentialTemplates", action = "Remove" });
+            webApplication.MapControllerRoute("addW3CCredentialTemplate",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialOffer + "/w3c",
+                defaults: new { controller = "CredentialTemplates", action = "AddW3CredentialTemplate" });
+            webApplication.MapControllerRoute("getCredentialTemplate",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialOffer + "/{id}",
+                defaults: new { controller = "CredentialTemplates", action = "Get" });
+            webApplication.MapControllerRoute("removeCredentialTemplateDisplay",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialOffer + "/displays/{displayId}",
+                defaults: new { controller = "CredentialTemplates", action = "RemoveDisplay" });
+            webApplication.MapControllerRoute("addCredentialTemplateDisplay",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialOffer + "/displays",
+                defaults: new { controller = "CredentialTemplates", action = "AddDisplay" });
+            webApplication.MapControllerRoute("removeCredentialTemplateParameter",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialOffer + "/parameters/{parameterId}",
+                defaults: new { controller = "CredentialTemplates", action = "RemoveParameter" });
+            webApplication.MapControllerRoute("updateCredentialTemplateParameters",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialOffer + "/parameters",
+                defaults: new { controller = "CredentialTemplates", action = "UpdateParameters" });
+
             return webApplication;
         }
     }

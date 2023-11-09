@@ -2,26 +2,25 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Store;
-using SimpleIdServer.IdServer.Website.Resources;
-using SimpleIdServer.Vc.Builders;
+using SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialTemplates;
+using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.Vc.Models;
-using System.Linq.Dynamic.Core;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.IdServer.Website.Stores.CredentialTemplateStore
 {
     public class CredentialTemplateEffects
     {
-        private readonly IDbContextFactory<StoreDbContext> _factory;
+        private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly IdServerWebsiteOptions _options;
         private readonly ProtectedSessionStorage _sessionStorage;
 
-        public CredentialTemplateEffects(IDbContextFactory<StoreDbContext> factory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
+        public CredentialTemplateEffects(IWebsiteHttpClientFactory websiteHttpClientFactory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
         {
-            _factory = factory;
+            _websiteHttpClientFactory = websiteHttpClientFactory;
             _options = options.Value;
             _sessionStorage = sessionStorage;
         }
@@ -29,20 +28,22 @@ namespace SimpleIdServer.IdServer.Website.Stores.CredentialTemplateStore
         [EffectMethod]
         public async Task Handle(SearchCredentialTemplatesAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetCredentialTemplatesUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
             {
-                IQueryable<CredentialTemplate> query = dbContext.CredentialTemplates.Include(c => c.Parameters).Include(c => c.Realms).Include(c => c.DisplayLst).Where(c => c.Realms.Any(r => r.Name == realm)).AsNoTracking();
-                if (!string.IsNullOrWhiteSpace(action.Filter))
-                    query = query.Where(SanitizeExpression(action.Filter));
-
-                if (!string.IsNullOrWhiteSpace(action.OrderBy))
-                    query = query.OrderBy(SanitizeExpression(action.OrderBy));
-
-                var nb = query.Count();
-                var clients = await query.ToListAsync(CancellationToken.None);
-                dispatcher.Dispatch(new SearchCredentialTemplatesSuccessAction { CredentialTemplates = clients, Count = nb });
-            }
+                RequestUri = new Uri($"{baseUrl}/.search"),
+                Method = HttpMethod.Post,
+                Content = new StringContent(JsonSerializer.Serialize(new SearchRequest
+                {
+                    Filter = SanitizeExpression(action.Filter),
+                    OrderBy = SanitizeExpression(action.OrderBy)
+                }))
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var searchResult = JsonSerializer.Deserialize<SearchResult<Domains.CredentialTemplate>>(json);
+            dispatcher.Dispatch(new SearchCredentialTemplatesSuccessAction { CredentialTemplates = searchResult.Content, Count = searchResult.Count });
 
             string SanitizeExpression(string expression) => expression.Replace("Value.", "");
         }
@@ -50,121 +51,189 @@ namespace SimpleIdServer.IdServer.Website.Stores.CredentialTemplateStore
         [EffectMethod]
         public async Task Handle(RemoveSelectedCredentialTemplatesAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetCredentialTemplatesUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            foreach(var id in action.CredentialTemplateIds)
             {
-                var records = await dbContext.CredentialTemplates.Where(c => action.CredentialTemplateIds.Contains(c.Id)).ToListAsync();
-                dbContext.CredentialTemplates.RemoveRange(records);
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new RemoveSelectedCredentialTemplatesSuccessAction { CredentialTemplateIds = action.CredentialTemplateIds });
+                var requestMessage = new HttpRequestMessage
+                {
+                    RequestUri = new Uri($"{baseUrl}/{id}"),
+                    Method = HttpMethod.Delete
+                };
+                await httpClient.SendAsync(requestMessage);
             }
+
+            dispatcher.Dispatch(new RemoveSelectedCredentialTemplatesSuccessAction { CredentialTemplateIds = action.CredentialTemplateIds });
         }
 
         [EffectMethod]
         public async Task Handle(AddW3CCredentialTemplateAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetCredentialTemplatesUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var request = new AddW3CCredentialTemplateRequest
             {
-                var exists = await dbContext.CredentialTemplates.Include(q => q.Parameters).AnyAsync(t => t.Format == Vc.Constants.CredentialTemplateProfiles.W3CVerifiableCredentials && t.Parameters.Any(p => p.Name == "type" && p.Value == action.Type));
-                if (exists)
-                {
-                    dispatcher.Dispatch(new AddCredentialTemplateErrorAction { ErrorMessage = Global.CredentialTemplateExists });
-                    return;
-                }
-
-                var realm = await GetRealm();
-                var existingRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
-                var w3CCredentialTemplate = W3CCredentialTemplateBuilder.New(action.Name, action.LogoUrl, action.Type).Build();
-                var credentialTemplate = new CredentialTemplate(w3CCredentialTemplate);
-                credentialTemplate.Realms.Add(existingRealm);
-                dbContext.CredentialTemplates.Add(credentialTemplate);
-                await dbContext.SaveChangesAsync(CancellationToken.None);
+                LogoUrl = action.LogoUrl,
+                Name = action.Name,
+                Type = action.Type
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{baseUrl}/w3c"),
+                Method = HttpMethod.Post,
+                Content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            try
+            {
+                httpResult.EnsureSuccessStatusCode();
+                var credentialTemplate = JsonSerializer.Deserialize<Domains.CredentialTemplate>(json);
                 dispatcher.Dispatch(new AddCredentialTemplateSuccessAction { Credential = credentialTemplate });
+            }
+            catch
+            {
+                var jObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new AddCredentialTemplateErrorAction { ErrorMessage = jObj["error_description"].GetValue<string>() });
             }
         }
 
         [EffectMethod]
         public async Task Handle(GetCredentialTemplateAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetCredentialTemplatesUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
             {
-                var credentialTemplate = await dbContext.CredentialTemplates.Include(c => c.DisplayLst).Include(c => c.Parameters).FirstAsync(c => c.TechnicalId == action.Id);
-                dispatcher.Dispatch(new GetCredentialTemplateSuccessAction { CredentialTemplate = credentialTemplate });
-            }
+                RequestUri = new Uri($"{baseUrl}/{action.Id}"),
+                Method = HttpMethod.Delete
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var credentialTemplate = JsonSerializer.Deserialize<Domains.CredentialTemplate>(json);
+            dispatcher.Dispatch(new GetCredentialTemplateSuccessAction { CredentialTemplate = credentialTemplate });
         }
 
         [EffectMethod]
         public async Task Handle(RemoveSelectedCredentialTemplateDisplayAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetCredentialTemplatesUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            foreach(var id in action.DisplayIds)
             {
-                var credentialTemplate = await dbContext.CredentialTemplates.Include(c => c.DisplayLst).FirstAsync(c => c.TechnicalId == action.Id);
-                credentialTemplate.DisplayLst = credentialTemplate.DisplayLst.Where(d => !action.DisplayIds.Contains(d.Id)).ToList();
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new RemoveSelectedCredentialTemplateDisplaySuccessAction { Id = action.Id, DisplayIds = action.DisplayIds });
+                var requestMessage = new HttpRequestMessage
+                {
+                    RequestUri = new Uri($"{baseUrl}/{action.Id}/displays/{id}"),
+                    Method = HttpMethod.Delete
+                };
+                await httpClient.SendAsync(requestMessage);
             }
+
+            dispatcher.Dispatch(new RemoveSelectedCredentialTemplateDisplaySuccessAction { Id = action.Id, DisplayIds = action.DisplayIds });
         }
 
         [EffectMethod]
         public async Task Handle(AddCredentialTemplateDisplayAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetCredentialTemplatesUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var req = new AddCredentialTemplateDisplayRequest
             {
-                var credentialTemplate = await dbContext.CredentialTemplates.Include(c => c.DisplayLst).FirstAsync(c => c.TechnicalId == action.CredentialTemplateId);
-                var display = new CredentialTemplateDisplay
-                {
-                    BackgroundColor = action.BackgroundColor,
-                    Description = action.Description,
-                    Id = Guid.NewGuid().ToString(),
-                    Locale = action.Locale,
-                    LogoUrl = action.LogoUrl,
-                    LogoAltText = action.LogoAltText,
-                    Name = action.Name,
-                    TextColor = action.TextColor
-                };
-                credentialTemplate.DisplayLst.Add(display);
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new AddCredentialTemplateDisplaySuccessAction { Display = display });
-            }
+                BackgroundColor = action.BackgroundColor,
+                Description = action.Description,
+                Locale = action.Locale,
+                LogoUrl = action.LogoUrl,
+                LogoAltText = action.LogoAltText,
+                Name = action.Name,
+                TextColor = action.TextColor
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{baseUrl}/{action.CredentialTemplateId}/displays"),
+                Method = HttpMethod.Post,
+                Content = new StringContent(JsonSerializer.Serialize(req), Encoding.UTF8, "application/json")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var display = JsonSerializer.Deserialize<Vc.Models.CredentialTemplateDisplay>(json);
+            dispatcher.Dispatch(new AddCredentialTemplateDisplaySuccessAction { Display = display });
         }
 
         [EffectMethod]
         public async Task Handle(RemoveSelectedCredentialSubjectsAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetCredentialTemplatesUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            foreach (var id in action.ParameterIds)
             {
-                var credentialTemplate = await dbContext.CredentialTemplates.Include(c => c.Parameters).FirstAsync(c => c.TechnicalId == action.TechnicalId);
-                credentialTemplate.Parameters = credentialTemplate.Parameters.Where(p => !action.ParameterIds.Contains(p.Id)).ToList();
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new RemoveSelectedCredentialSubjectsSuccessAction { ParameterIds = action.ParameterIds, TechnicalId = action.TechnicalId });
+                var requestMessage = new HttpRequestMessage
+                {
+                    RequestUri = new Uri($"{baseUrl}/{action.TechnicalId}/parameters/{id}"),
+                    Method = HttpMethod.Delete
+                };
+                await httpClient.SendAsync(requestMessage);
             }
+
+            dispatcher.Dispatch(new RemoveSelectedCredentialSubjectsSuccessAction { ParameterIds = action.ParameterIds, TechnicalId = action.TechnicalId });
         }
 
         [EffectMethod]
         public async Task Handle(UpdateW3CCredentialTemplateTypesAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetCredentialTemplatesUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var w3cCredentialTemplate = new W3CCredentialTemplate();
+            foreach (var type in action.ConcatenatedTypes.Split(';')) w3cCredentialTemplate.AddType(type);
+            var req = new UpdateCredentialTemplateParametersRequest
             {
-                var credentialTemplate = await dbContext.CredentialTemplates.Include(c => c.Parameters).FirstAsync(c => c.TechnicalId == action.TechnicalId);
-                var w3cCredentialTemplate = new W3CCredentialTemplate(credentialTemplate);
-                w3cCredentialTemplate.ReplaceTypes(action.ConcatenatedTypes.Split(';'));
-                credentialTemplate.Parameters = w3cCredentialTemplate.Parameters;
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new UpdateW3CCredentialTemplateTypesSuccessAction { ConcatenatedTypes = action.ConcatenatedTypes, TechnicalId = action.TechnicalId });
-            }
+                Parameters = w3cCredentialTemplate.Parameters.ToList()
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{baseUrl}/{action.TechnicalId}/parameters"),
+                Method = HttpMethod.Put,
+                Content = new StringContent(JsonSerializer.Serialize(req), Encoding.UTF8, "application/json")
+            };
+            await httpClient.SendAsync(requestMessage);
+            dispatcher.Dispatch(new UpdateW3CCredentialTemplateTypesSuccessAction { ConcatenatedTypes = action.ConcatenatedTypes, TechnicalId = action.TechnicalId });
         }
 
         [EffectMethod]
         public async Task Handle(AddW3CCredentialTemplateCredentialSubjectAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetCredentialTemplatesUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var w3cCredentialTemplate = new W3CCredentialTemplate();
+            var parameter = w3cCredentialTemplate.AddCredentialSubject(action.ClaimName, action.Subject);
+            var req = new UpdateCredentialTemplateParametersRequest
             {
-                var credentialTemplate = await dbContext.CredentialTemplates.Include(c => c.Parameters).FirstAsync(c => c.TechnicalId == action.TechnicalId);
-                var w3cCredentialTemplate = new W3CCredentialTemplate(credentialTemplate);
-                var parameter = w3cCredentialTemplate.AddCredentialSubject(action.ClaimName, action.Subject);
-                credentialTemplate.Parameters = w3cCredentialTemplate.Parameters;
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new AddW3CCredentialTemplateCredentialSubjectSuccessAction { TechnicalId = action.TechnicalId, ClaimName = action.ClaimName, Subject = action.Subject, ParameterId = parameter.Id });
+                Parameters =new List<CredentialTemplateParameter>
+                {
+                    parameter
+                }
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{baseUrl}/{action.TechnicalId}/parameters"),
+                Method = HttpMethod.Put,
+                Content = new StringContent(JsonSerializer.Serialize(req), Encoding.UTF8, "application/json")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var res = JsonSerializer.Deserialize<IEnumerable<CredentialTemplateParameter>>(json);
+            dispatcher.Dispatch(new AddW3CCredentialTemplateCredentialSubjectSuccessAction { TechnicalId = action.TechnicalId, ClaimName = action.ClaimName, Subject = action.Subject, ParameterId = res.ElementAt(0).Id });
+        }
+
+        private async Task<string> GetCredentialTemplatesUrl()
+        {
+            if (_options.IsReamEnabled)
+            {
+                var realm = await _sessionStorage.GetAsync<string>("realm");
+                var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+                return $"{_options.IdServerBaseUrl}/{realmStr}/credential_templates";
             }
+
+            return $"{_options.IdServerBaseUrl}/credential_templates";
         }
 
         private async Task<string> GetRealm()
@@ -184,7 +253,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.CredentialTemplateStore
 
     public class SearchCredentialTemplatesSuccessAction
     {
-        public IEnumerable<CredentialTemplate> CredentialTemplates { get; set; } = new List<CredentialTemplate>();
+        public IEnumerable<Domains.CredentialTemplate> CredentialTemplates { get; set; } = new List<Domains.CredentialTemplate>();
         public int Count { get; set; }
     }
 
@@ -218,7 +287,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.CredentialTemplateStore
 
     public class AddCredentialTemplateSuccessAction
     {
-        public CredentialTemplate Credential { get; set; }
+        public Domains.CredentialTemplate Credential { get; set; }
     }
 
     public class AddCredentialTemplateErrorAction
@@ -233,7 +302,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.CredentialTemplateStore
 
     public class GetCredentialTemplateSuccessAction
     {
-        public CredentialTemplate CredentialTemplate { get; set; }
+        public Domains.CredentialTemplate CredentialTemplate { get; set; }
     }
 
     public class ToggleAllCredentialTemplateDisplayAction
@@ -274,7 +343,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.CredentialTemplateStore
 
     public class AddCredentialTemplateDisplaySuccessAction
     {
-        public CredentialTemplateDisplay Display { get; set; }
+        public Vc.Models.CredentialTemplateDisplay Display { get; set; }
     }
 
     public class ToggleAllCredentialSubjectsAction

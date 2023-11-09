@@ -7,7 +7,7 @@ namespace SimpleIdServer.Vc.Models
 {
     public class CredentialTemplateDisplay
     {
-        [JsonIgnore]
+        [JsonPropertyName(CredentialTemplateDisplayNames.Id)]
         public string Id { get; set; } = null!;
         /// <summary>
         /// Display name for the credential.
@@ -23,12 +23,12 @@ namespace SimpleIdServer.Vc.Models
         /// <summary>
         /// URL where the wallet can obtain a logo of the credential from the credential issuer.
         /// </summary>
-        [JsonIgnore]
+        [JsonPropertyName(CredentialTemplateDisplayNames.LogoUrl)]
         public string? LogoUrl { get; set; } = null;
         /// <summary>
         /// Alternative text of a logo image.
         /// </summary>
-        [JsonIgnore]
+        [JsonPropertyName(CredentialTemplateDisplayNames.AltText)]
         public string? LogoAltText { get; set; } = null;
         /// <summary>
         /// Logo of the credential.

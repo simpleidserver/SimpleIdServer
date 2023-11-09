@@ -10,7 +10,7 @@ namespace SimpleIdServer.IdServer.WsFederation.Extensions
         public static bool IsWsFederationEnabled(this Client client)
         {
             bool result;
-            if (!client.Parameters.ContainsKey(WSFEDERATION_ENABLED_NAME) || !bool.TryParse(client.Parameters.First(p => p.Key == WSFEDERATION_ENABLED_NAME).Value, out result))
+            if (!client.Parameters.ContainsKey(WSFEDERATION_ENABLED_NAME) || !bool.TryParse(client.Parameters.First(p => p.Key == WSFEDERATION_ENABLED_NAME).Value?.ToString(), out result))
                 return false;
 
             return result;
@@ -29,7 +29,7 @@ namespace SimpleIdServer.IdServer.WsFederation.Extensions
         public static string? GetWsTokenType(this Client client)
         {
             if (!client.Parameters.ContainsKey(WSFEDERATION_TOKENTYPE)) return null;
-            return client.Parameters[WSFEDERATION_TOKENTYPE];
+            return client.Parameters[WSFEDERATION_TOKENTYPE]?.ToString();
         }
 
         public static void SetWsTokenType(this Client client, string tokenType)
