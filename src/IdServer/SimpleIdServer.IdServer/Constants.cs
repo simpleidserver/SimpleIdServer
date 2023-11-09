@@ -62,6 +62,7 @@ namespace SimpleIdServer.IdServer
             public const string Scopes = "scopes";
             public const string Auditing = "auditing";
             public const string CertificateAuthorities = "cas";
+            public const string Clients = "clients";
         }
 
         public static List<string> AllStandardNotificationModes = new List<string>

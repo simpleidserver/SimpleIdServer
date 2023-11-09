@@ -1,13 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.IdServer.Api.Clients;
-
 namespace SimpleIdServer.IdServer.ExternalEvents;
 
-public class ClientUpdatedFailureEvent : IExternalEvent
+public class AddClientRoleSuccessEvent : IExternalEvent
 {
-    public string EventName => nameof(ClientUpdatedFailureEvent);
+    public string EventName => nameof(AddClientRoleSuccessEvent);
     public string Realm { get; set; }
-    public string Id { get; set; }
-    public UpdateClientRequest Request { get; set; }
+    public string ClientId { get; set; }
+    public string Name { get; set; }
+    public string Description { get; set; }
 }

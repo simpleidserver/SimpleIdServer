@@ -10,5 +10,5 @@ public class ClientUpdatedSuccessEvent : IExternalEvent
     public string EventName => nameof(ClientUpdatedSuccessEvent);
     public string Realm { get; set; }
     public string Id { get; set; }
-    public UpdateClientRequest Client { get; set; }
+    public UpdateClientRequest Request { get; set; }
 }

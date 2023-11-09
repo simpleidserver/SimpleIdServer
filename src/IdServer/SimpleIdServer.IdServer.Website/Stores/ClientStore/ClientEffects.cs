@@ -2,39 +2,32 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Api.Clients;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
-using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Saml.Idp.Extensions;
-using SimpleIdServer.IdServer.Store;
-using SimpleIdServer.IdServer.Website.Pages;
 using SimpleIdServer.IdServer.WsFederation;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
 {
     public class ClientEffects
     {
         private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
-        private readonly IDbContextFactory<StoreDbContext> _factory;
         private readonly IdServerWebsiteOptions _configuration;
         private readonly ProtectedSessionStorage _sessionStorage;
 
-        public ClientEffects(IWebsiteHttpClientFactory websiteHttpClientFactory, IDbContextFactory<StoreDbContext> factory, IOptions<IdServerWebsiteOptions> configuration, ProtectedSessionStorage sessionStorage)
+        public ClientEffects(IWebsiteHttpClientFactory websiteHttpClientFactory, IOptions<IdServerWebsiteOptions> configuration, ProtectedSessionStorage sessionStorage)
         {
             _websiteHttpClientFactory = websiteHttpClientFactory;
-            _factory = factory;
             _configuration = configuration.Value;
             _sessionStorage = sessionStorage;
         }
@@ -399,7 +392,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             var httpClient = await _websiteHttpClientFactory.Build();
             var requestMessage = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{baseUrl}/{act.ClientId}/sigkey"),
+                RequestUri = new Uri($"{baseUrl}/{act.ClientId}/sigkey/generate"),
                 Method = HttpMethod.Post,
                 Content = new StringContent(JsonSerializer.Serialize(new GenerateSigKeyRequest
                 {
@@ -576,80 +569,93 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         [EffectMethod]
         public async Task Handle(UpdateClientCredentialsAction act, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetClientsUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var request = new UpdateClientCredentialsRequest
             {
-                var client = await dbContext.Clients.Include(c => c.Realms).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm));
-                client.TokenEndPointAuthMethod = act.AuthMethod;
-                if (client.TokenEndPointAuthMethod == OAuthClientSecretPostAuthenticationHandler.AUTH_METHOD || client.TokenEndPointAuthMethod == OAuthClientSecretBasicAuthenticationHandler.AUTH_METHOD)
-                    client.ClientSecret = act.ClientSecret;
-                else if (client.TokenEndPointAuthMethod == OAuthClientTlsClientAuthenticationHandler.AUTH_METHOD)
-                {
-                    client.TlsClientAuthSubjectDN = act.TlsClientAuthSubjectDN;
-                    client.TlsClientAuthSanDNS = act.TlsClientAuthSanDNS;
-                    client.TlsClientAuthSanEmail = act.TlsClientAuthSanEmail;
-                    client.TlsClientAuthSanIP = act.TlsClientAuthSanIP;
-                }
-
-                client.UpdateDateTime = DateTime.UtcNow;
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new UpdateClientCredentialsSuccessAction
-                {
-                    AuthMethod = act.AuthMethod,
-                    ClientId = act.ClientId,
-                    ClientSecret = act.ClientSecret,
-                    TlsClientAuthSubjectDN = act.TlsClientAuthSubjectDN,
-                    TlsClientAuthSanDNS = act.TlsClientAuthSanDNS,
-                    TlsClientAuthSanEmail = act.TlsClientAuthSanEmail,
-                    TlsClientAuthSanIP = act.TlsClientAuthSanIP
-                });
-            }
+                ClientSecret = act.ClientSecret,
+                TlsClientAuthSanDNS = act.TlsClientAuthSanDNS,
+                TlsClientAuthSanEmail = act.TlsClientAuthSanEmail,
+                TlsClientAuthSanIp = act.TlsClientAuthSanIP,
+                TlsClientAuthSubjectDN = act.TlsClientAuthSubjectDN,
+                TokenEndpointAuthMethod = act.AuthMethod
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{baseUrl}/{act.ClientId}/credentials"),
+                Method = HttpMethod.Put,
+                Content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json")
+            };
+            await httpClient.SendAsync(requestMessage);
+            dispatcher.Dispatch(new UpdateClientCredentialsSuccessAction
+            {
+                AuthMethod = act.AuthMethod,
+                ClientId = act.ClientId,
+                ClientSecret = act.ClientSecret,
+                TlsClientAuthSubjectDN = act.TlsClientAuthSubjectDN,
+                TlsClientAuthSanDNS = act.TlsClientAuthSanDNS,
+                TlsClientAuthSanEmail = act.TlsClientAuthSanEmail,
+                TlsClientAuthSanIP = act.TlsClientAuthSanIP
+            });
         }
 
         [EffectMethod]
         public async Task Handle(AddClientRoleAction act, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetClientsUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var request = new AddClientRoleRequest
             {
-                var r = await dbContext.Realms.SingleAsync(r => r.Name == realm);
-                var client = await dbContext.Clients.SingleAsync(c => c.ClientId == act.ClientId);
-                var scope = ScopeBuilder.CreateRoleScope(client, act.Name, act.Description, r).Build();
-                dbContext.Scopes.Add(scope);
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new AddClientRoleSuccessAction
-                {
-                    Scope = scope
-                });
-            }
+                Description = act.Description,
+                Name = act.Name
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{baseUrl}/{act.ClientId}/roles"),
+                Method = HttpMethod.Post,
+                Content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var newScope = JsonSerializer.Deserialize<Domains.Scope>(json);
+            dispatcher.Dispatch(new AddClientRoleSuccessAction
+            {
+                Scope = newScope
+            });
         }
 
         [EffectMethod]
         public async Task Handle(UpdateAdvancedClientSettingsAction act, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetClientsUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var request = new UpdateAdvancedClientSettingsRequest
             {
-                var client = await dbContext.Clients.Include(c => c.Realms).SingleAsync(c => c.ClientId == act.ClientId && c.Realms.Any(r => r.Name == realm));
-                client.IdTokenSignedResponseAlg = act.IdTokenSignedResponseAlg;
-                client.AuthorizationSignedResponseAlg = act.AuthorizationSignedResponseAlg;
-                client.AuthorizationDataTypes = string.IsNullOrWhiteSpace(act.AuthorizationDataTypes) ? new List<string>() : act.AuthorizationDataTypes.Split(';');
-                client.ResponseTypes = act.ResponseTypes?.ToList();
-                client.DPOPBoundAccessTokens = act.IsDPoPRequired;
-                client.DPOPNonceLifetimeInSeconds = act.DPOPNonceLifetimeInSeconds;
-                client.IsDPOPNonceRequired = act.IsDPoPNonceRequired;
-                await dbContext.SaveChangesAsync();
-                dispatcher.Dispatch(new UpdateAdvancedClientSettingsSuccessAction
-                {
-                    AuthorizationDataTypes = client.AuthorizationDataTypes,
-                    ResponseTypes = act.ResponseTypes,
-                    AuthorizationSignedResponseAlg = act.AuthorizationSignedResponseAlg,
-                    IdTokenSignedResponseAlg = act.IdTokenSignedResponseAlg,
-                    DPOPNonceLifetimeInSeconds = act.DPOPNonceLifetimeInSeconds,
-                    IsDPoPNonceRequired = act.IsDPoPNonceRequired,
-                    IsDPoPRequired = act.IsDPoPRequired
-                });
-            }
+                IdTokenSignedResponseAlg = act.IdTokenSignedResponseAlg,
+                AuthorizationSignedResponseAlg = act.AuthorizationSignedResponseAlg,
+                AuthorizationDataTypes = string.IsNullOrWhiteSpace(act.AuthorizationDataTypes) ? new List<string>() : act.AuthorizationDataTypes.Split(';'),
+                ResponseTypes = act.ResponseTypes?.ToList(), 
+                DPOPBoundAccessTokens = act.IsDPoPRequired,
+                DPOPNonceLifetimeInSeconds = act.DPOPNonceLifetimeInSeconds,
+                IsDPOPNonceRequired = act.IsDPoPNonceRequired
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{baseUrl}/{act.ClientId}/advanced"),
+                Method = HttpMethod.Put,
+                Content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json")
+            };
+            await httpClient.SendAsync(requestMessage);
+            dispatcher.Dispatch(new UpdateAdvancedClientSettingsSuccessAction
+            {
+                AuthorizationDataTypes = request.AuthorizationDataTypes,
+                ResponseTypes = act.ResponseTypes,
+                AuthorizationSignedResponseAlg = act.AuthorizationSignedResponseAlg,
+                IdTokenSignedResponseAlg = act.IdTokenSignedResponseAlg,
+                DPOPNonceLifetimeInSeconds = act.DPOPNonceLifetimeInSeconds,
+                IsDPoPNonceRequired = act.IsDPoPNonceRequired,
+                IsDPoPRequired = act.IsDPoPRequired
+            });
         }
 
         private async Task CreateClient(Domains.Client client, IDispatcher dispatcher, string clientType, PemResult pemResult = null, string jsonWebKey = null)
@@ -1089,7 +1095,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
 
     public class AddClientRoleSuccessAction
     {
-        public Scope Scope { get; set; }
+        public Domains.Scope Scope { get; set; }
     }
 
     public class ToggleClientRoleAction

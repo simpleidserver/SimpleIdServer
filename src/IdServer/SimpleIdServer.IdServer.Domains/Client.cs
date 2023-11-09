@@ -493,6 +493,7 @@ namespace SimpleIdServer.IdServer.Domains
         /// <summary>
         /// Lifetime of a DPOP nonce.
         /// </summary>
+        [JsonPropertyName(OAuthClientParameters.DPOPNonceLifetimeInSeconds)]
         public double DPOPNonceLifetimeInSeconds { get; set; } = 5 * 60;
         [JsonPropertyName(OAuthClientParameters.Parameters)]
         public JsonObject Parameters

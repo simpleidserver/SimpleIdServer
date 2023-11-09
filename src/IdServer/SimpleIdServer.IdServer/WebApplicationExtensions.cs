@@ -352,6 +352,55 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CertificateAuthorities + "/{id}/clientcertificates",
                 defaults: new { controller = "CertificateAuthorities", action = "AddClientCertificate" });
 
+            webApplication.MapControllerRoute("searchClients",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/.search",
+                defaults: new { controller = "Clients", action = "Search" });
+            webApplication.MapControllerRoute("getAllClients",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients,
+                defaults: new { controller = "Clients", action = "GetAll" });
+            webApplication.MapControllerRoute("addClient",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients,
+                defaults: new { controller = "Clients", action = "Add" });
+            webApplication.MapControllerRoute("getClient",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}",
+                defaults: new { controller = "Clients", action = "Get" });
+            webApplication.MapControllerRoute("deleteClient",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}",
+                defaults: new { controller = "Clients", action = "Delete" });
+            webApplication.MapControllerRoute("updateClient",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}",
+                defaults: new { controller = "Clients", action = "Update" });
+            webApplication.MapControllerRoute("updateAdvancedClientSettings",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}/advanced",
+                defaults: new { controller = "Clients", action = "UpdateAdvanced" });
+            webApplication.MapControllerRoute("removeClientScope",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}/scopes/{name}",
+                defaults: new { controller = "Clients", action = "RemoveScope" });
+            webApplication.MapControllerRoute("addClientScope",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}/scopes",
+                defaults: new { controller = "Clients", action = "AddScope" });
+            webApplication.MapControllerRoute("generateSigKey",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}/sigkey/generate",
+                defaults: new { controller = "Clients", action = "GenerateSigKey" });
+            webApplication.MapControllerRoute("generateEncKey",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}/enckey/generate",
+                defaults: new { controller = "Clients", action = "GenerateEncKey" });
+            webApplication.MapControllerRoute("addSigKey",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}/sigkey",
+                defaults: new { controller = "Clients", action = "AddSigKey" });
+            webApplication.MapControllerRoute("addEncKey",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}/enckey",
+                defaults: new { controller = "Clients", action = "AddEncKey" });
+            webApplication.MapControllerRoute("removeClientKey",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}/keys/{keyId}",
+                defaults: new { controller = "Clients", action = "RemoveKey" });
+            webApplication.MapControllerRoute("updateClientCredentials",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}/credentials",
+                defaults: new { controller = "Clients", action = "UpdateCredentials" });
+            webApplication.MapControllerRoute("addClientRole",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}/roles",
+                defaults: new { controller = "Clients", action = "AddRole" });
+
             webApplication.MapControllerRoute(
                 name: "defaultWithArea",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + "{area:exists}/{controller=Home}/{action=Index}/{id?}");
