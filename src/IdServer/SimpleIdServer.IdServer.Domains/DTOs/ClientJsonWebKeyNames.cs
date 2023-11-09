@@ -10,4 +10,6 @@ public static class ClientJsonWebKeyNames
     public const string Usage = "usage";
     public const string KeyType = "key_type";
     public const string SerializedJwk = "serialized_jwk";
+    public const string Enc = "enc";
+    public const string Content = "content";
 }

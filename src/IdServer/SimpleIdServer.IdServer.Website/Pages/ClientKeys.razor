@@ -167,7 +167,7 @@
 
     void UpdateJWKSUrl(UpdateJWKSUrlForm form)
     {
-        dispatcher.Dispatch(new UpdateJWKSUrlAction { ClientId = Client.ClientId, JWKSUrl = form.Url });
+        dispatcher.Dispatch(new UpdateJWKSUrlAction { ClientId = Client.ClientId, JWKSUrl = form.Url, Client = this.Client });
     }
 
     void HandleUseJWKSUrl(bool isEnabled)

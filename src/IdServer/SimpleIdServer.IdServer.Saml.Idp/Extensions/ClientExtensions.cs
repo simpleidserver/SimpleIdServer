@@ -8,9 +8,9 @@ namespace SimpleIdServer.IdServer.Saml.Idp.Extensions;
 
 public static class ClientExtensions
 {
-    private const string SAML2_SIG_CERTIFICATE_NAME = "SAML2_SIG_CERTIFICATE";
-    private const string SAML2_SP_METADATA_NAME = "SAML2_SP_METADATA";
-    private const string SAML2_USE_ACS_ARTIFACT_NAME = "SAML2_USE_ACS_ARTIFACT";
+    public const string SAML2_SIG_CERTIFICATE_NAME = "SAML2_SIG_CERTIFICATE";
+    public const string SAML2_SP_METADATA_NAME = "SAML2_SP_METADATA";
+    public const string SAML2_USE_ACS_ARTIFACT_NAME = "SAML2_USE_ACS_ARTIFACT";
 
     public static X509Certificate2? GetSaml2SigningCertificate(this Client client)
     {

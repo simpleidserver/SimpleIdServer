@@ -226,6 +226,7 @@ namespace SimpleIdServer.IdServer
         public const string CLIENT_ID_CANNOT_BE_EXTRACTED = "client identifier cannot be extracted from the initial request";
         public const string SCOPE_ALREADY_EXISTS = "scope '{0}' already exists";
         public const string USER_ALREADY_EXISTS = "user '{0}' already exists";
+        public const string SIGKEY_ALREADY_EXISTS = "signature key {0} already exists";
         public const string NOT_SAME_REDIRECT_URI = "not the same redirect_uri";
         public const string ONLY_PINGORPOLL_MODE_CAN_BE_USED = "only ping or poll mode can be used to get tokens";
         public const string ONE_HINT_MUST_BE_PASSED = "only one hint can be passed in the request";
