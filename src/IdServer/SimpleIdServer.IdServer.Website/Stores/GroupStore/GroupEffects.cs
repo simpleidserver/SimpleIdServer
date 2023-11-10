@@ -2,23 +2,25 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Api.Groups;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Store;
-using System.Linq.Dynamic.Core;
+using SimpleIdServer.IdServer.DTOs;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
 {
     public class GroupEffects
     {
-        private readonly IDbContextFactory<StoreDbContext> _factory;
+        private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly IdServerWebsiteOptions _options;
         private readonly ProtectedSessionStorage _sessionStorage;
 
-        public GroupEffects(IDbContextFactory<StoreDbContext> factory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage) 
+        public GroupEffects(IWebsiteHttpClientFactory websiteHttpClientFactory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage) 
         {
-            _factory = factory;
+            _websiteHttpClientFactory = websiteHttpClientFactory;
             _options = options.Value;
             _sessionStorage = sessionStorage;
         }
@@ -26,22 +28,25 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
         [EffectMethod]
         public async Task Handle(SearchGroupsAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetGroupsUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
             {
-                IQueryable<Group> query = dbContext.Groups.Include(c => c.Realms).Where(c => c.Realms.Any(r => r.Name == realm) && (!action.OnlyRoot || action.OnlyRoot && c.Name == c.FullPath)).AsNoTracking();
-                if (!string.IsNullOrWhiteSpace(action.Filter))
-                    query = query.Where(SanitizeExpression(action.Filter));
-
-                if (!string.IsNullOrWhiteSpace(action.OrderBy))
-                    query = query.OrderBy(SanitizeExpression(action.OrderBy));
-                else
-                    query = query.OrderBy(q => q.FullPath);
-
-                var nb = query.Count();
-                var groups = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
-                dispatcher.Dispatch(new SearchGroupsSuccessAction { Groups = groups, Count = nb });
-            }
+                RequestUri = new Uri($"{baseUrl}/.search"),
+                Method = HttpMethod.Post,
+                Content = new StringContent(JsonSerializer.Serialize(new SearchGroupsRequest
+                {
+                    Filter = SanitizeExpression(action.Filter),
+                    OrderBy = SanitizeExpression(action.OrderBy),
+                    Skip = action.Skip,
+                    Take = action.Take,
+                    OnlyRoot = action.OnlyRoot
+                }), Encoding.UTF8, "application/json")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var searchResult = JsonSerializer.Deserialize<SearchResult<Domains.Group>>(json);
+            dispatcher.Dispatch(new SearchGroupsSuccessAction { Groups = searchResult.Content, Count = searchResult.Count });
 
             string SanitizeExpression(string expression) => expression.Replace("Group.", "").Replace("Value", "");
         }
@@ -49,121 +54,132 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
         [EffectMethod]
         public async Task Handle(RemoveSelectedGroupsAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetGroupsUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            foreach(var fullPath in action.FullPathLst)
             {
-                var groups = new List<Group>();
-                foreach (var fullPath in action.FullPathLst)
-                    groups.AddRange(await dbContext.Groups.Where(g => g.FullPath.StartsWith(fullPath)).ToListAsync(CancellationToken.None));
-
-                dbContext.Groups.RemoveRange(groups);
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new RemoveSelectedGroupsSuccessAction { FullPathLst = action.FullPathLst });
+                var requestMessage = new HttpRequestMessage
+                {
+                    RequestUri = new Uri($"{baseUrl}/delete"),
+                    Method = HttpMethod.Post,
+                    Content = new StringContent(JsonSerializer.Serialize(new RemoveGroupRequest
+                    {
+                        FullPath = fullPath
+                    }), Encoding.UTF8, "application/json")
+                }; 
+                await httpClient.SendAsync(requestMessage);
             }
+
+            dispatcher.Dispatch(new RemoveSelectedGroupsSuccessAction { FullPathLst = action.FullPathLst });
         }
 
         [EffectMethod]
         public async Task Handle(AddGroupAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetGroupsUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
             {
-                var fullPath = action.Name;
-                if (!string.IsNullOrWhiteSpace(action.ParentId))
+                RequestUri = new Uri(baseUrl),
+                Method = HttpMethod.Post,
+                Content = new StringContent(JsonSerializer.Serialize(new AddGroupRequest
                 {
-                    var parent = await dbContext.Groups.SingleAsync(g => g.Id == action.ParentId);
-                    fullPath = $"{parent.FullPath}.{action.Name}";
-                }
-
-                var exists = await dbContext.Groups.AnyAsync(g => g.FullPath == fullPath, CancellationToken.None);
-                if (exists)
-                {
-                    dispatcher.Dispatch(new AddGroupFailureAction { ErrorMessage = string.Format(Resources.Global.GroupAlreadyExists, action.Name) });
-                    return;
-                }
-
-                var id = Guid.NewGuid().ToString();
-                var realm = await GetRealm();
-                var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
-                var grp = new Group
-                {
-                    Id = id,
-                    Name = action.Name,
-                    FullPath = fullPath,
-                    ParentGroupId = action.ParentId,
                     Description = action.Description,
-                    CreateDateTime = DateTime.UtcNow,
-                    UpdateDateTime = DateTime.UtcNow
-                };
-                grp.Realms.Add(activeRealm);
-                dbContext.Groups.Add(grp);
-                await dbContext.SaveChangesAsync(CancellationToken.None);
+                    Name = action.Name,
+                    ParentGroupId = action.ParentId
+                }), Encoding.UTF8, "application/json")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            try
+            {
+                httpResult.EnsureSuccessStatusCode();
+                var newGroup = JsonSerializer.Deserialize<Group>(json);
                 dispatcher.Dispatch(new AddGroupSuccessAction
                 {
                     Description = action.Description,
-                    Id = id,
+                    Id = newGroup.Id,
                     Name = action.Name,
                     ParentGroupId = action.ParentId
                 });
+            }
+            catch
+            {
+                var jsonObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new AddGroupFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
             }
         }
 
         [EffectMethod]
         public async Task Handle(GetGroupAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetGroupsUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
             {
-                var grp = await dbContext.Groups.Include(m => m.Children).Include(m => m.Roles).AsNoTracking().SingleOrDefaultAsync(g => g.Id == action.Id, CancellationToken.None);
-                if (grp == null)
-                {
-                    dispatcher.Dispatch(new GetGroupFailureAction { ErrorMessage = Resources.Global.UnknownGroup });
-                    return;
-                }
-
-                var rootGroup = grp;
-                var fullPath = grp.FullPath;
-                var splittedFullPath = fullPath.Split('.');
-                if (splittedFullPath.Count() > 1)
-                    rootGroup = await dbContext.Groups.Include(m => m.Children).AsNoTracking().SingleAsync(g => g.FullPath == splittedFullPath[0], CancellationToken.None);
-                dispatcher.Dispatch(new GetGroupSuccessAction { Group = grp, RootGroup = rootGroup });
-            }
+                RequestUri = new Uri($"{baseUrl}/{action.Id}"),
+                Method = HttpMethod.Get
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var getResult = JsonSerializer.Deserialize<GetGroupResult>(json);
+            dispatcher.Dispatch(new GetGroupSuccessAction { Group = getResult.Target, RootGroup = getResult.Root });
         }
 
         [EffectMethod]
         public async Task Handle(AddGroupRolesAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetGroupsUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var roles = new List<Domains.Scope>();
+            foreach(var scopeName in action.ScopeNames)
             {
-                var grp = await dbContext.Groups.Include(g => g.Roles).SingleAsync(g => g.Id == action.GroupId);
-                var roles = await dbContext.Scopes.Where(s => action.ScopeNames.Contains(s.Name)).ToListAsync();
-                foreach (var role in roles)
-                    grp.Roles.Add(role);
-
-                await dbContext.SaveChangesAsync();
-                dispatcher.Dispatch(new AddGroupRolesSuccessAction { Roles = roles });
+                var requestMessage = new HttpRequestMessage
+                {
+                    RequestUri = new Uri($"{baseUrl}/{action.GroupId}/roles"),
+                    Method = HttpMethod.Post,
+                    Content = new StringContent(JsonSerializer.Serialize(new AddGroupRoleRequest
+                    {
+                        Scope = scopeName
+                    }), Encoding.UTF8, "application/json")
+                };
+                var httpResult = await httpClient.SendAsync(requestMessage);
+                var json = await httpResult.Content.ReadAsStringAsync();
+                roles.Add(JsonSerializer.Deserialize<Domains.Scope>(json));
             }
+
+            dispatcher.Dispatch(new AddGroupRolesSuccessAction { Roles = roles });
         }
 
         [EffectMethod]
         public async Task Handle(RemoveSelectedGroupRolesAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetGroupsUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var roles = new List<Domains.Scope>();
+            foreach (var roleId in action.RoleIds)
             {
-                var grp = await dbContext.Groups.Include(m => m.Roles).SingleAsync(g => g.Id == action.Id, CancellationToken.None);
-                grp.Roles = grp.Roles.Where(r => !action.RoleIds.Contains(r.Id)).ToList();
-                await dbContext.SaveChangesAsync();
-                dispatcher.Dispatch(new RemoveSelectedGroupRolesSuccessAction
+                var requestMessage = new HttpRequestMessage
                 {
-                    Id = action.Id,
-                    RoleIds = action.RoleIds
-                });
+                    RequestUri = new Uri($"{baseUrl}/{action.Id}/roles/{roleId}"),
+                    Method = HttpMethod.Delete
+                };
+                await httpClient.SendAsync(requestMessage);
             }
+
+            dispatcher.Dispatch(new RemoveSelectedGroupRolesSuccessAction { Id = action.Id, RoleIds = action.RoleIds });
         }
 
-        private async Task<string> GetRealm()
+        private async Task<string> GetGroupsUrl()
         {
-            if (!_options.IsReamEnabled) return SimpleIdServer.IdServer.Constants.DefaultRealm;
-            var realm = await _sessionStorage.GetAsync<string>("realm");
-            var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
-            return realmStr;
+            if (_options.IsReamEnabled)
+            {
+                var realm = await _sessionStorage.GetAsync<string>("realm");
+                var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+                return $"{_options.IdServerBaseUrl}/{realmStr}/groups";
+            }
+
+            return $"{_options.IdServerBaseUrl}/groups";
         }
     }
 

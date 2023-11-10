@@ -683,15 +683,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         }
 
         [ReducerMethod]
-        public static UserCredentialOffersState ReduceRemoveSelectedUserCredentialOffersAction(UserCredentialOffersState state, RemoveSelectedUserCredentialOffersAction action)
-        {
-            return state with
-            {
-                IsLoading = true
-            };
-        }
-
-        [ReducerMethod]
         public static UserCredentialOffersState ReduceRemoveSelectedUserCredentialOffersSuccessAction(UserCredentialOffersState state, RemoveSelectedUserCredentialOffersSuccessAction action)
         {
             var credentialOffers = state.CredentialOffers.ToList();

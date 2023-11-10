@@ -8,7 +8,6 @@ using Radzen;
 using SimpleIdServer.IdServer.Api.Users;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
-using SimpleIdServer.IdServer.Website.Pages;
 using SimpleIdServer.IdServer.Website.Stores.Base;
 using System.Linq.Dynamic.Core;
 using System.Text;
@@ -67,7 +66,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var user = JsonSerializer.Deserialize<User>(json);
+            var user = JsonSerializer.Deserialize<Domains.User>(json);
             dispatcher.Dispatch(new GetUserSuccessAction { User = user });
         }
 

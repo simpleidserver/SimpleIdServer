@@ -2,11 +2,9 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.AuthenticationSchemeProviders;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Store;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -16,14 +14,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
     public class IdProviderEffects
     {
         private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
-        private readonly IDbContextFactory<StoreDbContext> _factory;
         private readonly IdServerWebsiteOptions _options;
         private readonly ProtectedSessionStorage _sessionStorage;
 
-        public IdProviderEffects(IWebsiteHttpClientFactory websiteHttpClientFactory, IDbContextFactory<StoreDbContext> factory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
+        public IdProviderEffects(IWebsiteHttpClientFactory websiteHttpClientFactory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
         {
             _websiteHttpClientFactory = websiteHttpClientFactory;
-            _factory = factory;
             _options = options.Value;
             _sessionStorage = sessionStorage;
         }
@@ -249,11 +245,17 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         [EffectMethod]
         public async Task Handle(GetIdProviderDefsAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetBaseUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
             {
-                var idProviderDefs = await dbContext.AuthenticationSchemeProviderDefinitions.AsNoTracking().ToListAsync();
-                dispatcher.Dispatch(new GetIdProviderDefsSuccessAction { AuthProviderDefinitions = idProviderDefs });
-            }
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"{baseUrl}/defs")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var idProviderDefs = JsonSerializer.Deserialize<IEnumerable<AuthenticationSchemeProviderDefinition>>(json);
+            dispatcher.Dispatch(new GetIdProviderDefsSuccessAction { AuthProviderDefinitions = idProviderDefs });
         }
 
         private async Task<string> GetBaseUrl()

@@ -4,7 +4,6 @@ using Fluxor;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Radzen;
@@ -16,7 +15,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddSIDWebsite(this IServiceCollection services, Action<IdServerWebsiteOptions>? callbackOptions = null, Action<DbContextOptionsBuilder>? action = null)
+        public static IServiceCollection AddSIDWebsite(this IServiceCollection services, Action<IdServerWebsiteOptions>? callbackOptions = null)
         {
             services.AddFluxor(o =>
             {
@@ -26,7 +25,6 @@ namespace Microsoft.Extensions.DependencyInjection
                     rdt.Name = "SimpleIdServer";
                 });
             });
-            services.AddStoreWithFactory(action);
             services.AddScoped<IOTPQRCodeGenerator, OTPQRCodeGenerator>();
             services.AddScoped<DialogService>();
             services.AddScoped<NotificationService>();

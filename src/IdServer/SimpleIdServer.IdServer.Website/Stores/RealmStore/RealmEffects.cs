@@ -3,23 +3,25 @@
 
 using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Api.Realms;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Website.Resources;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.IdServer.Website.Stores.RealmStore
 {
     public class RealmEffects
     {
-        private readonly IDbContextFactory<StoreDbContext> _factory;
+        private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly IdServerWebsiteOptions _options;
         private readonly ProtectedSessionStorage _sessionStorage;
 
-        public RealmEffects(IDbContextFactory<StoreDbContext> factory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage protectedSessionStorage)
+        public RealmEffects(IWebsiteHttpClientFactory websiteHttpClientFactory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage protectedSessionStorage)
         {
-            _factory = factory;
+            _websiteHttpClientFactory = websiteHttpClientFactory;
             _options = options.Value;
             _sessionStorage = protectedSessionStorage;
         }
@@ -28,13 +30,17 @@ namespace SimpleIdServer.IdServer.Website.Stores.RealmStore
         [EffectMethod]
         public async Task Handle(GetAllRealmAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = _factory.CreateDbContext())
+            var url = GetRealmsUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
             {
-                IQueryable<Domains.Realm> query = dbContext.Realms.AsNoTracking();
-                if (!_options.IsReamEnabled) query = query.Where(q => q.Name == SimpleIdServer.IdServer.Constants.DefaultRealm);
-                IEnumerable<Domains.Realm> realms = await query.ToListAsync();
-                dispatcher.Dispatch(new GetAllRealmSuccessAction { Realms = realms });
-            }
+                RequestUri = new Uri(url),
+                Method = HttpMethod.Get
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var realms = JsonSerializer.Deserialize<IEnumerable<Realm>>(json);
+            dispatcher.Dispatch(new GetAllRealmSuccessAction { Realms = realms });
         }
 
         [EffectMethod]
@@ -46,53 +52,39 @@ namespace SimpleIdServer.IdServer.Website.Stores.RealmStore
                 return;
             }
 
-            using (var dbContext = _factory.CreateDbContext())
+            var url = GetRealmsUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var req = new AddRealmRequest
             {
-                if (await dbContext.Realms.AsNoTracking().AnyAsync(r => r.Name == action.Name))
+                Name = action.Name,
+                Description = action.Description
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri(url),
+                Method = HttpMethod.Post,
+                Content = new StringContent(JsonSerializer.Serialize(req), Encoding.UTF8, "application/json")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            try
+            {
+                httpResult.EnsureSuccessStatusCode();
+                dispatcher.Dispatch(new AddRealmSuccessAction
                 {
-                    var act = new AddRealmFailureAction { ErrorMessage = string.Format(Global.RealmExists, action.Name) };
-                    dispatcher.Dispatch(act);
-                    return;
-                }
-
-                var realm = new Domains.Realm { Name = action.Name, Description = action.Description, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow };
-                dbContext.Realms.Add(realm);
-                var users = await dbContext.Users.Include(u => u.Realms).Where(u => WebsiteConfiguration.StandardUsers.Contains(u.Name)).ToListAsync();
-                var clients = await dbContext.Clients.Include(c => c.Realms).Where(c => WebsiteConfiguration.StandardClients.Contains(c.ClientId)).ToListAsync();
-                var scopes = await dbContext.Scopes.Include(s => s.Realms).Where(s => WebsiteConfiguration.StandardScopes.Contains(s.Name)).ToListAsync();
-                var keys = await dbContext.SerializedFileKeys.Include(s => s.Realms).Where(s => s.Realms.Any(r => r.Name == Constants.DefaultRealm)).ToListAsync();
-                var acrs = await dbContext.Acrs.Include(a => a.Realms).ToListAsync();
-                var certificateAuthorities = await dbContext.CertificateAuthorities.Include(s => s.Realms).Where(s => s.Realms.Any(r => r.Name == Constants.DefaultRealm)).ToListAsync();
-                foreach (var user in users)
-                    user.Realms.Add(new RealmUser { RealmsName = action.Name });
-
-                foreach (var client in clients)
-                    client.Realms.Add(realm);
-
-                foreach (var scope in scopes)
-                    scope.Realms.Add(realm);
-
-                foreach (var acr in acrs)
-                    acr.Realms.Add(realm);
-
-                foreach (var key in keys)
-                    key.Realms.Add(realm);
-
-                foreach (var certificateAuthority in certificateAuthorities)
-                    certificateAuthority.Realms.Add(realm);
-
-                await dbContext.SaveChangesAsync();
+                    Description = action.Description,
+                    Name = action.Name
+                });
+                dispatcher.Dispatch(new SelectRealmAction
+                {
+                    Realm = action.Name
+                });
             }
-
-            dispatcher.Dispatch(new AddRealmSuccessAction
+            catch
             {
-                Description = action.Description,
-                Name = action.Name
-            });
-            dispatcher.Dispatch(new SelectRealmAction
-            {
-                Realm = action.Name
-            });
+                var jsonObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new AddRealmFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
+            }
         }
 
         [EffectMethod]
@@ -109,6 +101,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.RealmStore
             var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
             dispatcher.Dispatch(new GetActiveSuccessRealmAction { Realm = realmStr });
         }
+
+        private string GetRealmsUrl() => $"{_options.IdServerBaseUrl}/realms";
     }
 
     public class GetActiveRealmAction

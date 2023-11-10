@@ -67,9 +67,27 @@ public class AuthenticationSchemeProvidersController : BaseController
 		{
 			return BuildError(ex);
 		}
-	}
+    }
 
-	[HttpDelete]
+    [HttpPost]
+    public async Task<IActionResult> GetDefinitions([FromRoute] string prefix)
+    {
+        prefix = prefix ?? Constants.DefaultRealm;
+        try
+        {
+            CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name, _jwtBuilder);
+            var result = await _authenticationSchemeProviderDefinitionRepository.Query()
+                .AsNoTracking()
+                .ToListAsync();
+            return new OkObjectResult(result);
+        }
+        catch (OAuthException ex)
+        {
+            return BuildError(ex);
+        }
+    }
+
+    [HttpDelete]
 	public async Task<IActionResult> Remove([FromRoute] string prefix, string id)
     {
         prefix = prefix ?? Constants.DefaultRealm;

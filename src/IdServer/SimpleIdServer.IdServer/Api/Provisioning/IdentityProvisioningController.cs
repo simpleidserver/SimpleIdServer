@@ -27,14 +27,16 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
     public class IdentityProvisioningController : BaseController
     {
         private readonly IIdentityProvisioningStore _identityProvisioningStore;
+        private readonly IImportSummaryStore _importSummaryStore;
         private readonly IServiceProvider _serviceProvider;
         private readonly IJwtBuilder _jwtBuilder;
         private readonly IConfiguration _configuration;
         private readonly IEnumerable<IProvisioningService> _provisioningServices;
 
-        public IdentityProvisioningController(IIdentityProvisioningStore identityProvisioningStore, IServiceProvider serviceProvider, IJwtBuilder jwtBuilder, IConfiguration configuration, IEnumerable<IProvisioningService> provisioningServices)
+        public IdentityProvisioningController(IIdentityProvisioningStore identityProvisioningStore, IImportSummaryStore importSummaryStore, IServiceProvider serviceProvider, IJwtBuilder jwtBuilder, IConfiguration configuration, IEnumerable<IProvisioningService> provisioningServices)
         {
             _identityProvisioningStore = identityProvisioningStore;
+            _importSummaryStore = importSummaryStore;
             _serviceProvider = serviceProvider;
             _jwtBuilder = jwtBuilder;
             _configuration = configuration;
@@ -64,6 +66,36 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
                 {
                     Count = nb,
                     Content = idProviders.Select(p => Build(p)).ToList()
+                });
+            }
+            catch (OAuthException ex)
+            {
+                return BuildError(ex);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SearchImport([FromRoute] string prefix, [FromBody] SearchRequest request)
+        {
+            prefix = prefix ?? Constants.DefaultRealm;
+            try
+            {
+                CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name, _jwtBuilder);
+                IQueryable<ImportSummary> query = _importSummaryStore.Query()
+                    .Where(p => p.RealmName == prefix)
+                    .AsNoTracking();
+                if (!string.IsNullOrWhiteSpace(request.Filter))
+                    query = query.Where(request.Filter);
+
+                if (!string.IsNullOrWhiteSpace(request.OrderBy))
+                    query = query.OrderBy(request.OrderBy);
+
+                var nb = query.Count();
+                var summaries = await query.Skip(request.Skip.Value).Take(request.Take.Value).ToListAsync();
+                return new OkObjectResult(new SearchResult<ImportSummary>
+                {
+                    Count = nb,
+                    Content = summaries.ToList()
                 });
             }
             catch (OAuthException ex)

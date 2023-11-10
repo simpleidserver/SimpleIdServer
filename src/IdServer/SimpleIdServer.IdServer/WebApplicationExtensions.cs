@@ -260,6 +260,9 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.MapControllerRoute("idProvisioningAllowedAttributes",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}/allowedattributes",
                 defaults: new { controller = "IdentityProvisioning", action = "GetAllowedAttributes" });
+            webApplication.MapControllerRoute("searchIdProvisioningImport",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/import/.search",
+                defaults: new { controller = "IdentityProvisioning", action = "SearchImport" });
 
 
             webApplication.MapControllerRoute("getAllNetworks",
@@ -293,6 +296,9 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.MapControllerRoute("searchIdProviders",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationSchemeProviders + "/.search",
                 defaults: new { controller = "AuthenticationSchemeProviders", action = "Search" });
+            webApplication.MapControllerRoute("searchIdProviders",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationSchemeProviders + "/defs",
+                defaults: new { controller = "AuthenticationSchemeProviders", action = "GetDefinitions" });
             webApplication.MapControllerRoute("removeIdProvider",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationSchemeProviders + "/{id}",
                 defaults: new { controller = "AuthenticationSchemeProviders", action = "Remove" });
@@ -359,6 +365,30 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Auditing + "/.search",
                 defaults: new { controller = "Auditing", action = "Search" });
 
+            webApplication.MapControllerRoute("searchScopes",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes + "/.search",
+                defaults: new { controller = "Scopes", action = "Search" });
+            webApplication.MapControllerRoute("getScope",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes + "/{id}",
+                defaults: new { controller = "Scopes", action = "Get" });
+            webApplication.MapControllerRoute("deleteScope",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes + "/{id}",
+                defaults: new { controller = "Scopes", action = "Delete" });
+            webApplication.MapControllerRoute("addScope",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes,
+                defaults: new { controller = "Scopes", action = "Add" });
+            webApplication.MapControllerRoute("updateScope",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes + "/{id}",
+                defaults: new { controller = "Scopes", action = "Update" });
+            webApplication.MapControllerRoute("addClaimMapper",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes + "/{id}/mappers",
+                defaults: new { controller = "Scopes", action = "AddClaimMapper" });
+            webApplication.MapControllerRoute("deleteClaimMapper",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes + "/{id}/mappers/{mapperId}",
+                defaults: new { controller = "Scopes", action = "RemoveClaimMapper" });
+            webApplication.MapControllerRoute("updateClaimMapper",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes + "/{id}/mappers/{mapperId}",
+                defaults: new { controller = "Scopes", action = "UpdateClaimMapper" });
             webApplication.MapControllerRoute("updateScopeResources",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes + "/{name}/resources",
                 defaults: new { controller = "Scopes", action = "UpdateResources" });
@@ -436,6 +466,32 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.MapControllerRoute("addClientRole",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}/roles",
                 defaults: new { controller = "Clients", action = "AddRole" });
+
+            webApplication.MapControllerRoute("searchGroups",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Groups + "/.search",
+                defaults: new { controller = "Groups", action = "Search" });
+            webApplication.MapControllerRoute("getGroup",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Groups + "/{id}",
+                defaults: new { controller = "Groups", action = "Get" });
+            webApplication.MapControllerRoute("deleteGroup",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Groups + "/delete",
+                defaults: new { controller = "Groups", action = "Delete" });
+            webApplication.MapControllerRoute("addGroup",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Groups,
+                defaults: new { controller = "Groups", action = "Add" });
+            webApplication.MapControllerRoute("addGroupRole",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Groups + "/{id}/roles",
+                defaults: new { controller = "Groups", action = "AddRole" });
+            webApplication.MapControllerRoute("removeGroupRole",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Groups + "{id}/roles/{roleId}",
+                defaults: new { controller = "Groups", action = "RemoveRole" });
+
+            webApplication.MapControllerRoute("getAllRealms",
+                pattern: Constants.EndPoints.Realms,
+                defaults: new { controller = "Realms", action = "GetAll" });
+            webApplication.MapControllerRoute("addRealm",
+                pattern: Constants.EndPoints.Realms,
+                defaults: new { controller = "Realms", action = "Add" });
 
             webApplication.MapControllerRoute(
                 name: "defaultWithArea",

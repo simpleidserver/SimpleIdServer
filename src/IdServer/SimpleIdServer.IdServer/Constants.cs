@@ -18,6 +18,24 @@ namespace SimpleIdServer.IdServer
             public const string Sig = "sig";
         }
 
+        public static List<string> RealmStandardUsers = new List<string>
+        {
+            "administrator"
+        };
+
+        public static List<string> RealmStandardClients = new List<string>
+        {
+            "website",
+            "urn:website"
+        };
+
+        public static List<string> RealmStandardScopes = new List<string>
+        {
+            StandardScopes.OpenIdScope.Name,
+            StandardScopes.Profile.Name,
+            StandardScopes.SAMLProfile.Name
+        };
+
         public static class EndPoints
         {
             public const string Token = "token";
@@ -63,6 +81,9 @@ namespace SimpleIdServer.IdServer
             public const string Auditing = "auditing";
             public const string CertificateAuthorities = "cas";
             public const string Clients = "clients";
+            public const string Statistics = "stats";
+            public const string Realms = "realms";
+            public const string Groups = "groups";
         }
 
         public static List<string> AllStandardNotificationModes = new List<string>
@@ -646,6 +667,34 @@ namespace SimpleIdServer.IdServer
                 Id = Guid.NewGuid().ToString(),
                 Type = ScopeTypes.APIRESOURCE,
                 Name = "clients",
+                Realms = new List<Domains.Realm>
+                {
+                    StandardRealms.Master
+                },
+                Protocol = ScopeProtocols.OAUTH,
+                IsExposedInConfigurationEdp = true,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
+            };
+            public static Scope Realms = new Scope
+            {
+                Id = Guid.NewGuid().ToString(),
+                Type = ScopeTypes.APIRESOURCE,
+                Name = "realms",
+                Realms = new List<Domains.Realm>
+                {
+                    StandardRealms.Master
+                },
+                Protocol = ScopeProtocols.OAUTH,
+                IsExposedInConfigurationEdp = true,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
+            };
+            public static Scope Groups = new Scope
+            {
+                Id = Guid.NewGuid().ToString(),
+                Type = ScopeTypes.APIRESOURCE,
+                Name = "groups",
                 Realms = new List<Domains.Realm>
                 {
                     StandardRealms.Master

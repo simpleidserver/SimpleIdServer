@@ -519,7 +519,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
 
         [EffectMethod]
         public async Task Handle(RemoveSelectedClientKeysAction act, IDispatcher dispatcher)
-        public async Task Handle(RemoveSelectedClientKeysAction act, IDispatcher dispatcher)
         {
             var baseUrl = await GetClientsUrl();
             var httpClient = await _websiteHttpClientFactory.Build();

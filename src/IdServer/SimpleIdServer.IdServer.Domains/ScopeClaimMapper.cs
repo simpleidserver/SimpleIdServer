@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.IdServer.Domains.DTOs;
 using System.Security.Claims;
+using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.IdServer.Domains
 {
@@ -9,29 +10,39 @@ namespace SimpleIdServer.IdServer.Domains
     {
         public ScopeClaimMapper() { }
 
+        [JsonPropertyName(ScopeClaimMapperNames.Id)]
         public string Id { get; set; } = null!;
+
+        [JsonPropertyName(ScopeClaimMapperNames.Name)]
         public string Name { get; set; } = null!;
+        [JsonPropertyName(ScopeClaimMapperNames.MapperType)]
         public MappingRuleTypes MapperType { get; set; }
         /// <summary>
         /// User's attribute name.
         /// </summary>
+        [JsonPropertyName(ScopeClaimMapperNames.SourceUserAttribute)]
         public string? SourceUserAttribute { get; set; } = null;
         /// <summary>
         /// User's property name.
         /// </summary>
+        [JsonPropertyName(ScopeClaimMapperNames.SourceUserProperty)]
         public string? SourceUserProperty { get; set; } = null;
         /// <summary>
         /// Name of the claim to insert in the token.
         /// </summary>
+        [JsonPropertyName(ScopeClaimMapperNames.TargetClaimPath)]
         public string? TargetClaimPath { get; set; } = null;
         /// <summary>
         /// SAML Attribute name.
         /// </summary>
+        [JsonPropertyName(ScopeClaimMapperNames.SAMLAttributeName)]
         public string? SAMLAttributeName { get; set; } = null;
         /// <summary>
         /// JSON type of the claim.
         /// </summary>
+        [JsonPropertyName(ScopeClaimMapperNames.TokenClaimJsonType)]
         public TokenClaimJsonTypes? TokenClaimJsonType { get; set; } = null;
+        [JsonPropertyName(ScopeClaimMapperNames.IsMultivalued)]
         public bool IsMultiValued { get; set; } = false;
 
         public Scope Scope { get; set; }

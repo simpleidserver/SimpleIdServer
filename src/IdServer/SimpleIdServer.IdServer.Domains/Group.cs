@@ -1,20 +1,35 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.IdServer.Domains.DTOs;
+using System.Text.Json.Serialization;
+
 namespace SimpleIdServer.IdServer.Domains
 {
     public class Group
     {
+        [JsonPropertyName(GroupNames.Id)]
         public string Id { get; set; } = null!;
+        [JsonPropertyName(GroupNames.Name)]
         public string Name { get; set; } = null!;
+        [JsonPropertyName(GroupNames.FullPath)]
         public string FullPath { get; set; } = null!;
+        [JsonPropertyName(GroupNames.Description)]
         public string? Description { get; set; } = null;
+        [JsonPropertyName(GroupNames.CreateDateTime)]
         public DateTime CreateDateTime { get; set; }
+        [JsonPropertyName(GroupNames.UpdateDateTime)]
         public DateTime UpdateDateTime { get; set; }
+        [JsonPropertyName(GroupNames.ParentGroupId)]
         public string? ParentGroupId { get; set; } = null;
+        [JsonIgnore]
         public Group? ParentGroup { get; set; } = null;
+        [JsonPropertyName(GroupNames.Children)]
         public ICollection<Group> Children { get; set; } = new List<Group>();
+        [JsonPropertyName(GroupNames.Roles)]
         public ICollection<Scope> Roles { get; set; } = new List<Scope>();
+        [JsonIgnore]
         public ICollection<User> Users { get; set; } = new List<User>();
+        [JsonIgnore]
         public ICollection<Realm> Realms { get; set; } = new List<Realm>();
 
         public List<string> ResolveAllPath()
@@ -24,6 +39,11 @@ namespace SimpleIdServer.IdServer.Domains
             if (splitted.Length == 1) return result;
             for (var i = 1; i < splitted.Length; i++) result.Add(string.Join('.', splitted.Take(i)));
             return result;
+        }
+
+        public object Split(char v)
+        {
+            throw new NotImplementedException();
         }
     }
 }

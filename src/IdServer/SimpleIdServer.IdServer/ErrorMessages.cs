@@ -1,6 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using Microsoft.Identity.Client;
+using NetTopologySuite.Triangulate.Polygon;
 
 namespace SimpleIdServer.IdServer
 {
@@ -10,6 +12,7 @@ namespace SimpleIdServer.IdServer
         public const string ACCESS_REVOKED_BY_RESOURCE_OWNER = "access has been revoked by the resource owner";
         public const string OPENID_SCOPE_MISSING = "openid scope is missing";
         public const string UNKNOWN_SCOPE = "unknown scope {0}";
+        public const string UNKNOWN_GROUP_ROLE = "unknown role {0}";
         public const string UNKNOWN_CLIENT = "unknown client {0}";
         public const string UNKNOWN_USER = "unknown user {0}";
         public const string UNKNOWN_USER_CONSENT = "unknown user's consent {0}";
@@ -18,8 +21,10 @@ namespace SimpleIdServer.IdServer
         public const string UNKNOWN_USER_CREDENTIAL = "unknown user's credential {0}";
         public const string UNKNOWN_USER_GROUP = "unknown user's group {0}";
         public const string UNKNOWN_CA = "unknown certificate authority {0}";
+        public const string UNKNOWN_SCOPE_CLAIM_MAPPER = "unknown scope claim mapper {0}";
         public const string UNKNOWN_CLIENT_CA = "unknown client certificate {0}";
         public const string UNKNOWN_AUTH_METHOD = "unknown authentication method : {0}";
+        public const string UNKNOWN_GROUP = "the group {0} doesn't exist";
         public const string UNKNOWN_TOKEN_TYPE_HINT = "unknown token type hint : {0}";
         public const string UNKNOWN_JSON_WEBKEY = "Json Web Key doesn't exist";
         public const string UNKNOWN_PERMISSIONS = "the permissions {0} don't exist";
@@ -284,5 +289,10 @@ namespace SimpleIdServer.IdServer
         public const string CANNOT_READ_CERTIFICATE_STORE = "You don't have the permission to read the certificate store";
         public const string CERTIFICATE_DOESNT_EXIST = "The certificate doesn't exist";
         public const string CERTIFICATE_DOESNT_HAVE_PRIVATE_KEY = "The certificate doesn't contain private key";
+        public const string SCOPE_CLAIM_MAPPER_NAME_MUSTBEUNIQUE = "Name must be unique";
+        public const string SCOPE_CLAIM_MAPPER_TOKENCLAIMNAME_MUSTBEUNIQUE = "Token claim name must be unique";
+        public const string SCOPE_CLAIM_MAPPER_SAML_ATTRIBUTE_NAME = "SAML Attribute name must be unique";
+        public const string REALM_EXISTS = "realm {0} already exists";
+        public const string GROUP_EXISTS = "group {0} already exists";
     }
 }
