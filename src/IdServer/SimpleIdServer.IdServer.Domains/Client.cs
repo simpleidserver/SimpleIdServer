@@ -476,7 +476,7 @@ namespace SimpleIdServer.IdServer.Domains
         /// <summary>
         /// Scopes used by the client to control its access.
         /// </summary>
-        [JsonIgnore]
+        [JsonPropertyName(OAuthClientParameters.Scopes)]
         public ICollection<Scope> Scopes { get; set; } = new List<Scope>();
         /// <summary>
         /// Client’s JSON Web Key Set document value, which contains the client’s public keys.

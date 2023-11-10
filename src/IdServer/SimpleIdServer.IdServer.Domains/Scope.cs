@@ -22,22 +22,22 @@ namespace SimpleIdServer.IdServer.Domains
         public string Id { get; set; }
         [JsonPropertyName(ScopeNames.Name)]
         public string Name { get; set; } = null!;
-        [JsonIgnore]
+        [JsonPropertyName(ScopeNames.Type)]
         public ScopeTypes Type { get; set; } = ScopeTypes.IDENTITY;
-        [JsonIgnore]
+        [JsonPropertyName(ScopeNames.Protocol)]
         public ScopeProtocols Protocol { get; set; } = ScopeProtocols.OPENID;
-        [JsonIgnore]
+        [JsonPropertyName(ScopeNames.Description)]
         public string? Description { get; set; } = null;
-        [JsonIgnore]
+        [JsonPropertyName(ScopeNames.IsExposedInConfigurationEdp)]
         public bool IsExposedInConfigurationEdp { get; set; }
-        [JsonIgnore]
+        [JsonPropertyName(ScopeNames.CreateDateTime)]
         public DateTime CreateDateTime { get; set; }
-        [JsonIgnore]
+        [JsonPropertyName(ScopeNames.UpdateDatetime)]
         public DateTime UpdateDateTime { get; set; }
-        [JsonIgnore]
         /// <summary>
         /// Array of strings that specifies the claims.
         /// </summary>
+        [JsonPropertyName(ScopeNames.Mappers)]
         public ICollection<ScopeClaimMapper> ClaimMappers { get; set; }= new List<ScopeClaimMapper>();
         [JsonIgnore]
         public ICollection<ApiResource> ApiResources { get; set; } = new List<ApiResource>();

@@ -106,13 +106,13 @@ namespace SimpleIdServer.IdServer.Domains
         public ICollection<RealmUser> Realms { get; set; } = new List<RealmUser>();
         [JsonIgnore]
         public ICollection<UserSession> Sessions { get; set; } = new List<UserSession>();
-        [JsonIgnore]
+        [JsonPropertyName(UserNames.Claims)]
         public ICollection<UserClaim> OAuthUserClaims { get; set; } = new List<UserClaim>();
         [JsonPropertyName(UserNames.Credentials)]
         public ICollection<UserCredential> Credentials { get; set; } = new List<UserCredential>();
-        [JsonIgnore]
+        [JsonPropertyName(UserNames.ExternalAuthProviders)]
         public ICollection<UserExternalAuthProvider> ExternalAuthProviders { get; set; } = new List<UserExternalAuthProvider>();
-        [JsonIgnore]
+        [JsonPropertyName(UserNames.Consents)]
         public ICollection<Consent> Consents { get; set; } = new List<Consent>();
         [JsonIgnore]
         public ICollection<UserDevice> Devices { get; set; } = new List<UserDevice>();

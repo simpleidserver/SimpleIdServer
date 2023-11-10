@@ -16,17 +16,17 @@ namespace SimpleIdServer.IdServer.Domains
 
         }
 
-        [JsonIgnore]
+        [JsonPropertyName(UserCredentialNames.Id)]
         public string Id { get; set; } = null!;
         [JsonPropertyName(UserCredentialNames.Type)]
         public string CredentialType { get; set; } = null!;
         [JsonPropertyName(UserCredentialNames.Value)]
         public string Value { get; set; } = null!;
-        [JsonIgnore]
+        [JsonPropertyName(UserCredentialNames.OTPAlg)]
         public OTPAlgs? OTPAlg { get; set; } = null;
-        [JsonIgnore]
+        [JsonPropertyName(UserCredentialNames.Active)]
         public bool IsActive { get; set; }
-        [JsonIgnore]
+        [JsonPropertyName(UserCredentialNames.OTPCounter)]
         public int OTPCounter { get; set; } = 0;
         [JsonIgnore]
         public User User { get; set; }

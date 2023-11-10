@@ -151,7 +151,8 @@ public class ClientsController : BaseController
             .Include(c => c.Translations)
             .Include(c => c.Scopes)
             .Include(c => c.SerializedJsonWebKeys)
-            .AsNoTracking().SingleOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == prefix));
+            .AsNoTracking()
+            .SingleOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == prefix));
         if (result == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CLIENT, id));
         return new OkObjectResult(result);
     }

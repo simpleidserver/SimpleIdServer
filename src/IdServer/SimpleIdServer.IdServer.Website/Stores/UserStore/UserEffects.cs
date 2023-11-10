@@ -2,63 +2,55 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using QRCoder;
 using Radzen;
+using SimpleIdServer.IdServer.Api.Users;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Store;
-using SimpleIdServer.IdServer.Website.Resources;
+using SimpleIdServer.IdServer.DTOs;
+using SimpleIdServer.IdServer.Website.Pages;
 using SimpleIdServer.IdServer.Website.Stores.Base;
 using System.Linq.Dynamic.Core;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.IdServer.Website.Stores.UserStore
 {
     public class UserEffects
     {
-        private readonly ILoggerFactory _loggerFactory;
-        private readonly IDbContextFactory<StoreDbContext> _factory;
         private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
+        private readonly IdServerWebsiteOptions _options;
         private readonly ProtectedSessionStorage _sessionStorage;
-        private readonly IdServerWebsiteOptions _websiteOptions;
-        private readonly DefaultSecurityOptions _securityOptions;
 
-        public UserEffects(
-            ILoggerFactory loggerFactory,
-            IDbContextFactory<StoreDbContext> factory,
-            IWebsiteHttpClientFactory websiteHttpClientFactory,
-            ProtectedSessionStorage sessionStorage,
-            IOptions<IdServerWebsiteOptions> websiteOptions,
-            DefaultSecurityOptions securityOptions)
+        public UserEffects(IWebsiteHttpClientFactory websiteHttpClientFactory, ProtectedSessionStorage sessionStorage, IOptions<IdServerWebsiteOptions> websiteOptions)
         {
-            _loggerFactory = loggerFactory;
-            _factory = factory;
             _websiteHttpClientFactory = websiteHttpClientFactory;
             _sessionStorage = sessionStorage;
-            _websiteOptions = websiteOptions.Value;
-            _securityOptions = securityOptions;
+            _options = websiteOptions.Value;
         }
 
         [EffectMethod]
         public async Task Handle(SearchUsersAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetUsersUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
             {
-                IQueryable<User> query = dbContext.Users.Include(u => u.Realms).Include(u => u.OAuthUserClaims).Where(u => u.Realms.Any(r => r.RealmsName == realm)).AsNoTracking();
-                if (!string.IsNullOrWhiteSpace(action.Filter))
-                    query = query.Where(SanitizeExpression(action.Filter));
-
-                if (!string.IsNullOrWhiteSpace(action.OrderBy))
-                    query = query.OrderBy(SanitizeExpression(action.OrderBy));
-
-                var count = query.Count();
-                var users = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
-                dispatcher.Dispatch(new SearchUsersSuccessAction { Users = users, Count = count });
-            }
+                RequestUri = new Uri($"{baseUrl}/.search"),
+                Method = HttpMethod.Post,
+                Content = new StringContent(JsonSerializer.Serialize(new SearchRequest
+                {
+                    Filter = SanitizeExpression(action.Filter),
+                    OrderBy = SanitizeExpression(action.OrderBy),
+                    Skip = action.Skip,
+                    Take = action.Take
+                }))
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var searchResult = JsonSerializer.Deserialize<SearchResult<Domains.User>>(json);
+            dispatcher.Dispatch(new SearchUsersSuccessAction { Users = searchResult.Content, Count = searchResult.Count });
 
             string SanitizeExpression(string expression) => expression.Replace("Value.", "");
         }
@@ -66,283 +58,293 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         [EffectMethod]
         public async Task Handle(GetUserAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetUsersUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
             {
-                var user = await dbContext.Users.Include(u => u.Realms).Include(u => u.OAuthUserClaims).Include(u => u.CredentialOffers).Include(u => u.Groups).Include(u => u.Consents).ThenInclude(c => c.Scopes).ThenInclude(c => c.AuthorizedResources).Include(u => u.Sessions).Include(u => u.Credentials).Include(u => u.ExternalAuthProviders).Include(u => u.CredentialOffers).AsNoTracking().SingleOrDefaultAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
-                if (user == null)
-                {
-                    dispatcher.Dispatch(new GetUserFailureAction { ErrorMessage = string.Format(Global.UnknownUser, action.UserId) });
-                    return;
-                }
-
-                user.Consents = user.Consents.Where(c => c.Realm == realm).ToList();
-                user.Sessions = user.Sessions.Where(c => c.Realm == realm).ToList();
-                dispatcher.Dispatch(new GetUserSuccessAction { User = user });
-            }
+                RequestUri = new Uri($"{baseUrl}/{action.UserId}"),
+                Method = HttpMethod.Get
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var user = JsonSerializer.Deserialize<User>(json);
+            dispatcher.Dispatch(new GetUserSuccessAction { User = user });
         }
 
         [EffectMethod]
         public async Task Handle(UpdateUserDetailsAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetUsersUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var req = new UpdateUserRequest
             {
-                var user = await dbContext.Users.Include(u => u.Realms).Include(u => u.OAuthUserClaims).SingleOrDefaultAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
-                user.UpdateEmail(action.Email);
-                user.UpdateName(action.Firstname);
-                user.UpdateLastname(action.Lastname);
-                user.NotificationMode = action.NotificationMode;
-                user.UpdateDateTime = DateTime.UtcNow;
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new UpdateUserDetailsSuccessAction { Email = action.Email, Firstname = action.Firstname, Lastname = action.Lastname, UserId = action.UserId, NotificationMode = action.NotificationMode });
-            }
+                Email = action.Email,
+                Lastname = action.Lastname,
+                Name = action.Firstname,
+                NotificationMode = action.NotificationMode
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{baseUrl}/{action.UserId}"),
+                Method = HttpMethod.Put,
+                Content = new StringContent(JsonSerializer.Serialize(req), Encoding.UTF8, "application/json")
+            };
+            await httpClient.SendAsync(requestMessage);
+            dispatcher.Dispatch(new UpdateUserDetailsSuccessAction { Email = action.Email, Firstname = action.Firstname, Lastname = action.Lastname, UserId = action.UserId, NotificationMode = action.NotificationMode });
         }
 
         [EffectMethod]
         public async Task Handle(RevokeUserConsentAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetUsersUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
             {
-                var user = await dbContext.Users.Include(u => u.Realms).Include(u => u.Consents).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
-                var consent = user.Consents.Single(c => c.Id == action.ConsentId);
-                user.Consents.Remove(consent);
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new RevokeUserConsentSuccessAction { ConsentId = action.ConsentId, UserId = action.UserId });
-            }
+                RequestUri = new Uri($"{baseUrl}/{action.UserId}/consents/{action.ConsentId}"),
+                Method = HttpMethod.Delete
+            };
+            await httpClient.SendAsync(requestMessage);
+            dispatcher.Dispatch(new RevokeUserConsentSuccessAction { ConsentId = action.ConsentId, UserId = action.UserId });
         }
 
         [EffectMethod]
         public async Task Handle(UnlinkExternalAuthProviderAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetUsersUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var req = new UnlinkExternalAuthProviderRequest
             {
-                var user = await dbContext.Users.Include(u => u.Realms).Include(u => u.ExternalAuthProviders).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
-                var externalAuthProvider = user.ExternalAuthProviders.Single(c => c.Scheme == action.Scheme && c.Subject == action.Subject);
-                user.ExternalAuthProviders.Remove(externalAuthProvider);
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new UnlinkExternalAuthProviderSuccessAction { Scheme = action.Scheme, Subject = action.Subject, UserId = action.UserId });
-            }
+                Scheme = action.Scheme,
+                Subject = action.Subject
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{baseUrl}/{action.UserId}/authproviders/unlink"),
+                Method = HttpMethod.Post,
+                Content = new StringContent(JsonSerializer.Serialize(req), Encoding.UTF8, "application/json")
+            };
+            await httpClient.SendAsync(requestMessage);
+            dispatcher.Dispatch(new UnlinkExternalAuthProviderSuccessAction { Scheme = action.Scheme, Subject = action.Subject, UserId = action.UserId });
         }
 
         [EffectMethod]
         public async Task Handle(RevokeUserSessionAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetUsersUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
             {
-                var user = await dbContext.Users.Include(u => u.Realms).Include(u => u.Sessions).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
-                var session = user.Sessions.Single(s => s.SessionId == action.SessionId);
-                session.State = UserSessionStates.Rejected;
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new RevokeUserSessionSuccessAction { SessionId = action.SessionId, UserId = action.UserId });
-            }
+                RequestUri = new Uri($"{baseUrl}/{action.UserId}/sessions/{action.SessionId}"),
+                Method = HttpMethod.Delete
+            };
+            await httpClient.SendAsync(requestMessage);
+            dispatcher.Dispatch(new RevokeUserSessionSuccessAction { SessionId = action.SessionId, UserId = action.UserId });
         }
 
         [EffectMethod]
         public async Task Handle(UpdateUserClaimsAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetUsersUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var fileteredClaims = action.Claims.Where(c => !string.IsNullOrWhiteSpace(c.Value) && !string.IsNullOrWhiteSpace(c.Name));
+            var req = new UpdateUserClaimsRequest
             {
-                var user = await dbContext.Users.Include(u => u.Realms).Include(u => u.OAuthUserClaims).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
-                user.OAuthUserClaims.Clear();
-                var fileteredClaims = action.Claims.Where(c => !string.IsNullOrWhiteSpace(c.Value) && !string.IsNullOrWhiteSpace(c.Name));
-                foreach (var cl in fileteredClaims)
-                    user.OAuthUserClaims.Add(new UserClaim { Id = Guid.NewGuid().ToString(), Name = cl.Name, Value = cl.Value });
-
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new UpdateUserClaimsSuccessAction { UserId = action.UserId, Claims = fileteredClaims.ToList() });
-            }
+                Claims = fileteredClaims
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{baseUrl}/{action.UserId}/claims"),
+                Method = HttpMethod.Put,
+                Content = new StringContent(JsonSerializer.Serialize(req), Encoding.UTF8, "application/json")
+            };
+            await httpClient.SendAsync(requestMessage);
+            dispatcher.Dispatch(new UpdateUserClaimsSuccessAction { Claims = fileteredClaims.ToList(), UserId = action.UserId });
         }
 
         [EffectMethod]
         public async Task Handle(AddUserCredentialAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetUsersUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var req = new AddUserCredentialRequest
             {
-                var user = await dbContext.Users.Include(u => u.Realms).Include(u => u.Credentials).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
-                if (action.IsDefault)
-                {
-                    foreach (var act in user.Credentials.Where(c => c.CredentialType == action.Credential.CredentialType))
-                        act.IsActive = false;
-                    action.Credential.IsActive = true;
-                }
-
-                user.Credentials.Add(action.Credential);
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new AddUserCredentialSuccessAction { Credential = action.Credential, IsDefault = action.IsDefault });
-            }
+                Credential = action.Credential,
+                Active = action.IsDefault
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{baseUrl}/{action.UserId}/credentials"),
+                Method = HttpMethod.Post,
+                Content = new StringContent(JsonSerializer.Serialize(req), Encoding.UTF8, "application/json")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var newCredential = JsonSerializer.Deserialize<UserCredential>(json);
+            dispatcher.Dispatch(new AddUserCredentialSuccessAction { Credential = newCredential, IsDefault = action.IsDefault });
         }
 
         [EffectMethod]
         public async Task Handle(UpdateUserCredentialAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetUsersUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var req = new UpdateUserCredentialRequest
             {
-                var user = await dbContext.Users.Include(u => u.Realms).Include(u => u.Credentials).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
-                var credential = user.Credentials.Single(c => c.Id == action.Credential.Id);
-                credential.Value = action.Credential.Value;
-                credential.OTPAlg = action.Credential.OTPAlg;
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new UpdateUserCredentialSuccessAction { Credential = action.Credential });
-            }
+                OTPAlg = action.Credential.OTPAlg,
+                Value = action.Credential.Value
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{baseUrl}/{action.UserId}/credentials/{action.Credential.Id}"),
+                Method = HttpMethod.Put,
+                Content = new StringContent(JsonSerializer.Serialize(req), Encoding.UTF8, "application/json")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var newCredential = JsonSerializer.Deserialize<UserCredential>(json);
+            dispatcher.Dispatch(new UpdateUserCredentialSuccessAction { Credential = action.Credential });
         }
 
         [EffectMethod]
         public async Task Handle(RemoveUserCredentialAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetUsersUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
             {
-                var user = await dbContext.Users.Include(u => u.Realms).Include(u => u.Credentials).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
-                var credential = user.Credentials.Single(c => c.Id == action.CredentialId);
-                user.Credentials.Remove(credential);
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new RemoveUserCredentialSuccessAction { CredentialId = action.CredentialId });
-            }
+                RequestUri = new Uri($"{baseUrl}/{action.UserId}/credentials/{action.CredentialId}"),
+                Method = HttpMethod.Delete
+            };
+            await httpClient.SendAsync(requestMessage);
+            dispatcher.Dispatch(new RemoveUserCredentialSuccessAction { CredentialId = action.CredentialId });
         }
 
         [EffectMethod]
         public async Task Handle(DefaultUserCredentialAction action, IDispatcher dispatcher)
         {
-            var realm = await GetRealm();
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetUsersUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
             {
-                var user = await dbContext.Users.Include(u => u.Realms).Include(u => u.Credentials).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.RealmsName == realm));
-                var credential = user.Credentials.Single(c => c.Id == action.CredentialId);
-                foreach (var cred in user.Credentials.Where(c => c.CredentialType == credential.CredentialType))
-                    cred.IsActive = false;
-                credential.IsActive = true;
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new DefaultUserCredentialSuccessAction { CredentialId = action.CredentialId, UserId = action.UserId });
-            }
+                RequestUri = new Uri($"{baseUrl}/{action.UserId}/credentials/{action.CredentialId}/default"),
+                Method = HttpMethod.Get
+            };
+            await httpClient.SendAsync(requestMessage);
+            dispatcher.Dispatch(new DefaultUserCredentialSuccessAction { CredentialId = action.CredentialId, UserId = action.UserId });
         }
 
         [EffectMethod]
         public async Task Handle(RemoveSelectedUserGroupAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetUsersUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            foreach(var groupId in action.GroupIds)
             {
-                var user = await dbContext.Users.Include(u => u.Groups).SingleAsync(u => u.Id == action.UserId);
-                user.Groups = user.Groups.Where(g => !action.GroupIds.Contains(g.Id)).ToList();
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new RemoveSelectedUserGroupSuccessAction { GroupIds = action.GroupIds, UserId = action.UserId });
+                var requestMessage = new HttpRequestMessage
+                {
+                    RequestUri = new Uri($"{baseUrl}/{action.UserId}/groups/{groupId}"),
+                    Method = HttpMethod.Delete
+                };
+                await httpClient.SendAsync(requestMessage);
             }
+
+            dispatcher.Dispatch(new RemoveSelectedUserGroupSuccessAction { GroupIds = action.GroupIds, UserId = action.UserId });
         }
 
         [EffectMethod]
         public async Task Handle(AssignUserGroupsAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetUsersUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var groups = new List<Domains.Group>();
+            foreach(var groupId in action.GroupIds)
             {
-                var realm = await GetRealm();
-                var activeRealm = await dbContext.Realms.FirstAsync(r => r.Name == realm);
-                var groups = await dbContext.Groups.Include(s => s.Realms).Where(s => action.GroupIds.Contains(s.Id) && s.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
-                var user = await dbContext.Users.Include(u => u.Groups).SingleAsync(u => u.Id == action.UserId);
-                foreach (var grp in groups)
-                    user.Groups.Add(grp);
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new AssignUserGroupsSuccessAction { Groups = groups, UserId = action.UserId });
+                var requestMessage = new HttpRequestMessage
+                {
+                    RequestUri = new Uri($"{baseUrl}/{action.UserId}/groups/{groupId}"),
+                    Method = HttpMethod.Post
+                };
+                var httpResult = await httpClient.SendAsync(requestMessage);
+                var json = await httpResult.Content.ReadAsStringAsync();
+                groups.Add(JsonSerializer.Deserialize<Domains.Group>(json));
             }
+
+            dispatcher.Dispatch(new AssignUserGroupsSuccessAction { Groups = groups, UserId = action.UserId });
         }
 
         [EffectMethod]
         public async Task Handle(ResolveUserRolesAction action, IDispatcher dispatcher)
         {
             if (!action.IsSelected) return;
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetUsersUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
             {
-                var user = await dbContext.Users.Include(u => u.Groups).AsNoTracking().SingleAsync(u => u.Id == action.UserId);
-                var grpPathLst = user.Groups.SelectMany(g => g.ResolveAllPath()).Distinct();
-                var allGroups = await dbContext.Groups.Include(g => g.Roles).AsNoTracking().Where(g => grpPathLst.Contains(g.FullPath)).ToListAsync();
-                var roles = allGroups.SelectMany(g => g.Roles).Select(r => r.Name).Distinct();
-                dispatcher.Dispatch(new ResolveUserRolesSuccessAction { Roles = roles, UserId = user.Id });
-            }
+                RequestUri = new Uri($"{baseUrl}/{action.UserId}/roles"),
+                Method = HttpMethod.Get
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var roles = JsonSerializer.Deserialize<IEnumerable<string>>(json);
+            dispatcher.Dispatch(new ResolveUserRolesSuccessAction { Roles = roles, UserId = action.UserId });
         }
 
         [EffectMethod]
         public async Task Handle(RemoveSelectedUsersAction action, IDispatcher dispatcher)
         {
-            using (var dbContext = _factory.CreateDbContext())
+            var baseUrl = await GetUsersUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            foreach(var userId in action.UserIds)
             {
-                var users = await dbContext.Users.Where(u => action.UserIds.Contains(u.Id)).ToListAsync();
-                dbContext.Users.RemoveRange(users);
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new RemoveSelectedUsersSuccessAction { UserIds = action.UserIds });
+                var requestMessage = new HttpRequestMessage
+                {
+                    RequestUri = new Uri($"{baseUrl}/{userId}"),
+                    Method = HttpMethod.Delete
+                };
+                await httpClient.SendAsync(requestMessage);
             }
+
+            dispatcher.Dispatch(new RemoveSelectedUsersSuccessAction { UserIds = action.UserIds });
         }
 
         [EffectMethod]
         public async Task Handle(AddUserAction action, IDispatcher dispatcher)
         {
-            ILogger logger = _loggerFactory.CreateLogger("Effect for AddUserAction");
-            logger.LogDebug("Attempting to create an user.");
-
-            if (string.IsNullOrEmpty(action.Name))
+            var baseUrl = await GetUsersUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var req = new RegisterUserRequest
             {
-                dispatcher.Dispatch(new AddUserFailureAction() { ErrorMessage = $"The field 'Name' is required." });
-                return;
-            }
-
-            using (var dbContext = _factory.CreateDbContext())
+                Claims = new Dictionary<string, string>(),
+                Email = action.Email,
+                Firstname = action.Firstname,
+                Lastname = action.Lastname,
+                Name = action.Name
+            };
+            var requestMessage = new HttpRequestMessage
             {
-                string nameLower = action.Name.ToLower();
-                bool userExists = dbContext.Users.Any(u => u.Name.ToLower() == nameLower);
-
-                if (userExists)
-                {
-                    string message = $"The user '{action.Name}' already exists.";
-                    dispatcher.Dispatch(new AddUserFailureAction() { ErrorMessage = message });
-                    logger.LogDebug(message);
-                    return;
-                }
-
-                string id = Guid.NewGuid().ToString();
-                string realm = await GetRealm();
-
-                var newUser = new User()
-                {
-                    Id = id,
-                    Name = action.Name,
-                    Firstname = action.Firstname,
-                    Lastname = action.Lastname,
-                    Email = action.Email,
-                    CreateDateTime = DateTime.UtcNow,
-                    UpdateDateTime = DateTime.UtcNow
-                };
-
-                newUser.Realms.Add(new RealmUser() { RealmsName = realm, UsersId = id });
-                dbContext.Users.Add(newUser);
-
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-
+                RequestUri = new Uri(baseUrl),
+                Method = HttpMethod.Post,
+                Content = new StringContent(JsonSerializer.Serialize(req), Encoding.UTF8, "application/json")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            try
+            {
+                httpResult.EnsureSuccessStatusCode();
+                var newUser = JsonSerializer.Deserialize<Domains.User>(json);
                 dispatcher.Dispatch(new AddUserSuccessAction()
                 {
-                    Id = id,
+                    Id = newUser.Id,
                     Email = action.Email,
                     Firstname = action.Firstname,
                     Lastname = action.Lastname,
                     Name = action.Name
                 });
-
-                logger.LogInformation($"The user '{action.Name}' was added succesfully.");
             }
-        }
-
-        [EffectMethod]
-        public async Task Handle(RemoveSelectedUserCredentialOffersAction action, IDispatcher dispatcher)
-        {
-            using (var dbContext = _factory.CreateDbContext())
+            catch
             {
-                var user = await dbContext.Users.Include(u => u.CredentialOffers).FirstOrDefaultAsync(u => u.Id == action.UserId);
-                user.CredentialOffers = user.CredentialOffers.Where(c => !action.CredentialOffersId.Contains(c.Id)).ToList();
-                await dbContext.SaveChangesAsync(CancellationToken.None);
-                dispatcher.Dispatch(new RemoveSelectedUserCredentialOffersSuccessAction { CredentialOffersId = action.CredentialOffersId });
+                var jObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new AddUserFailureAction { ErrorMessage = jObj["error_description"].GetValue<string>() });
             }
         }
 
@@ -449,20 +451,26 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             }
         }
 
+        private async Task<string> GetUsersUrl()
+        {
+            var baseUrl = await GetBaseUrl();
+            return $"{baseUrl}/users";
+        }
+
         private async Task<string> GetBaseUrl()
         {
-            if(_websiteOptions.IsReamEnabled)
+            if(_options.IsReamEnabled)
             {
                 var realm = await GetRealm();
-                return $"{_websiteOptions.IdServerBaseUrl}/{realm}";
+                return $"{_options.IdServerBaseUrl}/{realm}";
             }
 
-            return $"{_websiteOptions.IdServerBaseUrl}";
+            return $"{_options.IdServerBaseUrl}";
         }
 
         private async Task<string> GetRealm()
         {
-            if (!_websiteOptions.IsReamEnabled) return SimpleIdServer.IdServer.Constants.DefaultRealm;
+            if (!_options.IsReamEnabled) return SimpleIdServer.IdServer.Constants.DefaultRealm;
             var realm = await _sessionStorage.GetAsync<string>("realm");
             var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
             return realmStr;
@@ -479,7 +487,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
 
     public class SearchUsersSuccessAction
     {
-        public IEnumerable<User> Users { get; set; } = new List<User>();
+        public IEnumerable<Domains.User> Users { get; set; } = new List<Domains.User>();
         public int Count { get; set; }
     }
 
@@ -501,7 +509,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
 
     public class GetUserSuccessAction
     {
-        public User User { get; set; } = null!;
+        public Domains.User User { get; set; } = null!;
     }
 
     public class GetUserFailureAction
@@ -767,12 +775,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
     {
         public bool IsSelected { get; set; }
         public string CredentialOfferId { get; set; }
-        public string UserId { get; set; }
-    }
-
-    public class RemoveSelectedUserCredentialOffersAction
-    {
-        public ICollection<string> CredentialOffersId { get; set; }
         public string UserId { get; set; }
     }
 

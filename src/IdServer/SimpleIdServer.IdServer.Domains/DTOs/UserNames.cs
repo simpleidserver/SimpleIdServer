@@ -14,5 +14,9 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
         public const string CreateDateTime = "createDateTime";
         public const string UpdateDateTime = "updateDateTime";
         public const string Credentials = "credentials";
+        public const string NotificationMode = "notification_mode";
+        public const string Credential = "credential";
+        public const string ExternalAuthProviders = "external_auth_providers";
+        public const string Consents = "consents";
     }
 }

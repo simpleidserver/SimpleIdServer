@@ -83,5 +83,6 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
         public const string AuthReqIdExpirationTimeInSeconds = "auth_reqid_expirationtime";
         public const string BCIntervalSeconds = "bc_interval";
         public const string DPOPNonceLifetimeInSeconds = "dpop_lifetime";
+        public const string Scopes = "scopes";
     }
 }

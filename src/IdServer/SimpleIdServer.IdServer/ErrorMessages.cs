@@ -12,6 +12,11 @@ namespace SimpleIdServer.IdServer
         public const string UNKNOWN_SCOPE = "unknown scope {0}";
         public const string UNKNOWN_CLIENT = "unknown client {0}";
         public const string UNKNOWN_USER = "unknown user {0}";
+        public const string UNKNOWN_USER_CONSENT = "unknown user's consent {0}";
+        public const string UNKNOWN_USER_SESSION = "unknown user's session {0}";
+        public const string UNKNOWN_USER_EXTERNALAUTHPROVIDER = "unknown user's external authentication provider";
+        public const string UNKNOWN_USER_CREDENTIAL = "unknown user's credential {0}";
+        public const string UNKNOWN_USER_GROUP = "unknown user's group {0}";
         public const string UNKNOWN_CA = "unknown certificate authority {0}";
         public const string UNKNOWN_CLIENT_CA = "unknown client certificate {0}";
         public const string UNKNOWN_AUTH_METHOD = "unknown authentication method : {0}";

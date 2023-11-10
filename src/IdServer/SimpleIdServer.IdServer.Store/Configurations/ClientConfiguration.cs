@@ -39,6 +39,7 @@ namespace SimpleIdServer.IdServer.Store.Configurations
             builder.HasMany(c => c.Realms).WithMany(s => s.Clients);
             builder.Ignore(c => c.JsonWebKeys);
             builder.Ignore(c => c.Parameters);
+            builder.Ignore(c => c.Scope);
         }
     }
 }

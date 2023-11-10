@@ -47,7 +47,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                     OrderBy = SanitizeExpression(action.OrderBy),
                     Skip = action.Skip,
                     Take = action.Take
-                }))
+                }), Encoding.UTF8, "application/json")
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
@@ -518,6 +518,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         }
 
         [EffectMethod]
+        public async Task Handle(RemoveSelectedClientKeysAction act, IDispatcher dispatcher)
         public async Task Handle(RemoveSelectedClientKeysAction act, IDispatcher dispatcher)
         {
             var baseUrl = await GetClientsUrl();

@@ -57,7 +57,7 @@ namespace SimpleIdServer.IdServer.Startup
             SimpleIdServer.IdServer.Constants.StandardScopes.Scopes,
             SimpleIdServer.IdServer.Constants.StandardScopes.CertificateAuthorities,
             SimpleIdServer.IdServer.Constants.StandardScopes.Clients,
-            SimpleIdServer.IdServer.CredentialIssuer.Constants.StandardScopes.CredentialTemplates
+            SimpleIdServer.IdServer.CredentialIssuer.Constants.StandardScopes.CredentialTemplates,
         };
 
         public static ICollection<User> Users => new List<User>

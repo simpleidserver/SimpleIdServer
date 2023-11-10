@@ -7,5 +7,11 @@ public static class ScopeNames
 {
     public const string Id = "id";
     public const string Name = "name";
+    public const string Type = "type";
     public const string Description = "description";
+    public const string Protocol = "protocol";
+    public const string IsExposedInConfigurationEdp = "is_exposed";
+    public const string CreateDateTime = "create_datetime";
+    public const string UpdateDatetime = "update_datetime";
+    public const string Mappers = "mappers";
 }

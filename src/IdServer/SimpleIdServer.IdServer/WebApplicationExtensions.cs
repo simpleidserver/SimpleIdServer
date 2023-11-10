@@ -175,18 +175,54 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Form,
                 defaults: new { controller = "Form", action = "Index" });
 
-            webApplication.MapControllerRoute("addUser",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users,
-                defaults: new { controller = "Users", action = "Add" });
+            webApplication.MapControllerRoute("searchUsers",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/.search",
+                defaults: new { controller = "Users", action = "Search" });
             webApplication.MapControllerRoute("getUser",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}",
                 defaults: new { controller = "Users", action = "Get" });
+            webApplication.MapControllerRoute("resolveUserRoles",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/roles",
+                defaults: new { controller = "Users", action = "ResolveRoles" });
+            webApplication.MapControllerRoute("addUser",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users,
+                defaults: new { controller = "Users", action = "Add" });
+            webApplication.MapControllerRoute("updateUser",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}",
+                defaults: new { controller = "Users", action = "Update" });
             webApplication.MapControllerRoute("deleteUser",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}",
                 defaults: new { controller = "Users", action = "Delete" });
-            webApplication.MapControllerRoute("replaceCredential",
+            webApplication.MapControllerRoute("addUserCredential",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/credentials",
-                defaults: new { controller = "Users", action = "ReplaceCredential" });
+                defaults: new { controller = "Users", action = "AddCredential" });
+            webApplication.MapControllerRoute("updateUserCredential",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/credentials/{credentialId}",
+                defaults: new { controller = "Users", action = "UpdateCredential" });
+            webApplication.MapControllerRoute("deleteUserCredential",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/credentials/{credentialId}",
+                defaults: new { controller = "Users", action = "DeleteCredential" });
+            webApplication.MapControllerRoute("setDefaultUserCredential",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/credentials/{credentialId}/default",
+                defaults: new { controller = "Users", action = "DefaultCredential" });
+            webApplication.MapControllerRoute("updateUserClaims",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/claims",
+                defaults: new { controller = "Users", action = "UpdateClaims" });
+            webApplication.MapControllerRoute("addUserGroup",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/groups/{groupId}",
+                defaults: new { controller = "Users", action = "AddGroup" });
+            webApplication.MapControllerRoute("deleteUserGroup",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/groups/{groupId}",
+                defaults: new { controller = "Users", action = "RemoveGroup" });
+            webApplication.MapControllerRoute("revokeUserConsent",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/consents/{consentId}",
+                defaults: new { controller = "Users", action = "RevokeConsent" });
+            webApplication.MapControllerRoute("revokeUserSession",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/sessions/{sessionId}",
+                defaults: new { controller = "Users", action = "RevokeSession" });
+            webApplication.MapControllerRoute("unlinkUserExternalAuthProvider",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/authproviders/unlink",
+                defaults: new { controller = "Users", action = "UnlinkExternalAuthProvider" });
             webApplication.MapControllerRoute("generateDecentralizedIdentity",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/did",
                 defaults: new { controller = "Users", action = "GenerateDecentralizedIdentity" });
