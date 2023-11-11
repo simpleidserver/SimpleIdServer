@@ -45,6 +45,7 @@
 
     class UpdateScopeSettingsParameter
     {
+        public string Id { get; set; }
         public string Name { get; set; } = null!;
         public DateTime UpdateDateTime { get; set; }
         public string? Description { get; set; } = null;
@@ -70,6 +71,7 @@
         if (this.Scope == null) return;
         updateScopeSettings = new UpdateScopeSettingsParameter
         {
+            Id = this.Scope.Id,
             Name = this.Scope.Name,
             UpdateDateTime = this.Scope.CreateDateTime,
             Description = this.Scope.Description,
@@ -79,7 +81,7 @@
 
     void UpdateScopeSettings(UpdateScopeSettingsParameter parameter)
     {
-        var act = new UpdateScopeAction { Description = parameter.Description, IsExposedInConfigurationEdp = parameter.IsExposedInConfigrationEdp, ScopeName = parameter.Name };
+        var act = new UpdateScopeAction { Description = parameter.Description, IsExposedInConfigurationEdp = parameter.IsExposedInConfigrationEdp, ScopeId = parameter.Id };
         dispatcher.Dispatch(act);
     }
 }

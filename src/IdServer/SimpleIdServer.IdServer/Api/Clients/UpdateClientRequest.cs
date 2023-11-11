@@ -10,11 +10,11 @@ namespace SimpleIdServer.IdServer.Api.Clients;
 public class UpdateClientRequest
 {
     [JsonPropertyName(OAuthClientParameters.RedirectUris)]
-    public IEnumerable<string> RedirectionUrls { get; set; }
+    public ICollection<string> RedirectionUrls { get; set; }
     [JsonPropertyName(OAuthClientParameters.ClientName)]
     public string ClientName { get; set; }
     [JsonPropertyName(OAuthClientParameters.PostLogoutRedirectUris)]
-    public IEnumerable<string> PostLogoutRedirectUris { get; set; }
+    public ICollection<string> PostLogoutRedirectUris { get; set; }
     [JsonPropertyName(OAuthClientParameters.FrontChannelLogoutSessionRequired)]
     public bool FrontChannelLogoutSessionRequired { get; set; }
     [JsonPropertyName(OAuthClientParameters.FrontChannelLogoutUri)]
@@ -26,7 +26,7 @@ public class UpdateClientRequest
     [JsonPropertyName(OAuthClientParameters.TokenExchangeType)]
     public TokenExchangeTypes? TokenExchangeType { get; set; }
     [JsonPropertyName(OAuthClientParameters.GrantTypes)]
-    public IEnumerable<string> GrantTypes { get; set; }
+    public ICollection<string> GrantTypes { get; set; }
     [JsonPropertyName(OAuthClientParameters.IsTokenExchangeEnabled)]
     public bool IsTokenExchangeEnabled { get; set; }
     [JsonPropertyName(OAuthClientParameters.IsConsentDisabled)]

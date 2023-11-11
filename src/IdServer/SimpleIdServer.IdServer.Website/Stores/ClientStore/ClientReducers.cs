@@ -563,7 +563,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         {
             if (!act.IsRole) return state;
             var roles = state.Roles.ToList();
-            roles = roles.Where(r => !act.ScopeNames.Contains(r.Value.Name)).ToList();
+            roles = roles.Where(r => !act.ScopeIds.Contains(r.Value.Id)).ToList();
             return state with
             {
                 IsLoading = false,

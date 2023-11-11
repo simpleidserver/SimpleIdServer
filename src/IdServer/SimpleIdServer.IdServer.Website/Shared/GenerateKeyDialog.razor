@@ -223,7 +223,7 @@
                 <!-- Json Web Key -->
                 <div>
                     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Json Web Key (JWK)</RadzenText>
-                    <RadzenTextArea Class="w-100" Rows=10 Value=@generatedSigKey.JsonWebKey Disabled=true></RadzenTextArea>
+                    <RadzenTextArea Class="w-100" Rows=10 Value=@generatedEncKey.JsonWebKey Disabled=true></RadzenTextArea>
                 </div>
                 <RadzenButton Click="@(args => SaveEncKey())" class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Confirm" />                
             }

@@ -20,12 +20,12 @@
     <!-- Property -->
     <div>
         <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">User property</RadzenText>
-        <RadzenDropDown Name="UserPropertyName" Class="w-100"
+        <RadzenDropDown Name="SourceUserPropertyName" Class="w-100"
                         Data=@userProperties
                         TValue="String"
                         @bind-Value=@scopeMapperFom.SourceUserPropertyName />
         <p class="text-muted">Name of the property</p>
-        <RadzenRequiredValidator Component="                                                                                                                                                                                                                                                                                                                                                                                                       " Text="Property is required"></RadzenRequiredValidator>
+        <RadzenRequiredValidator Component="SourceUserPropertyName" Text="Property is required"></RadzenRequiredValidator>
     </div>
     <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateScopeMapperState.Value.IsUpdating ? "Saving..." : "Save")" Disabled="@(updateScopeMapperState.Value.IsUpdating)" />
 </RadzenTemplateForm>

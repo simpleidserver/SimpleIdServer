@@ -29,15 +29,17 @@ public class ClientsController : BaseController
 {
     private readonly IClientRepository _clientRepository;
     private readonly IScopeRepository _scopeRepository;
+    private readonly IRealmRepository _realmRepository;
     private readonly IRegisterClientRequestValidator _registerClientRequestValidator;
     private readonly IBusControl _busControl;
     private readonly IJwtBuilder _jwtBuilder;
     private readonly ILogger<ClientsController> _logger;
 
-    public ClientsController(IClientRepository clientRepository, IScopeRepository scopeRepository, IRegisterClientRequestValidator registerClientRequestValidator, IBusControl busControl, IJwtBuilder jwtBuilder, ILogger<ClientsController> logger)
+    public ClientsController(IClientRepository clientRepository, IScopeRepository scopeRepository, IRealmRepository realmRepository, IRegisterClientRequestValidator registerClientRequestValidator, IBusControl busControl, IJwtBuilder jwtBuilder, ILogger<ClientsController> logger)
     {
         _clientRepository = clientRepository;
         _scopeRepository = scopeRepository;
+        _realmRepository = realmRepository;
         _registerClientRequestValidator = registerClientRequestValidator;
         _busControl = busControl;
         _jwtBuilder = jwtBuilder;
@@ -60,8 +62,11 @@ public class ClientsController : BaseController
             if (!string.IsNullOrWhiteSpace(request.Filter))
                 query = query.Where(request.Filter);
 
-            if (!string.IsNullOrWhiteSpace(request.OrderBy))
+            if (!string.IsNullOrWhiteSpace(request.OrderBy)) 
                 query = query.OrderBy(request.OrderBy);
+            else 
+                query = query.OrderByDescending(r => r.UpdateDateTime);
+
             var nb = query.Count();
             var clients = await query.Skip(request.Skip.Value).Take(request.Take.Value).ToListAsync();
             return new OkObjectResult(new SearchResult<Client>
@@ -110,6 +115,9 @@ public class ClientsController : BaseController
             {
                 activity?.SetTag("realm", prefix);
                 CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name, _jwtBuilder);
+                request.Scopes = await GetScopes(prefix, request.Scope, CancellationToken.None);
+                var realm = await _realmRepository.Query().SingleAsync(r => r.Name == prefix);
+                request.Realms.Add(realm);
                 await _registerClientRequestValidator.Validate(prefix, request, CancellationToken.None);
                 _clientRepository.Add(request);
                 await _clientRepository.SaveChanges(CancellationToken.None);
@@ -139,22 +147,40 @@ public class ClientsController : BaseController
                 return BuildError(ex);
             }
         }
+
+        async Task<ICollection<Domains.Scope>> GetScopes(string realm, string scope, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrWhiteSpace(scope)) return new List<Domains.Scope>();
+            var scopeNames = scope.ToScopes();
+            return await _scopeRepository.Query()
+                .Include(s => s.Realms)
+                .Where(s => scopeNames.Contains(s.Name) && s.Realms.Any(r => r.Name == realm))
+                .ToListAsync(cancellationToken);
+        }
     }
 
     [HttpGet]
     public async Task<IActionResult> Get([FromRoute] string prefix, string id)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name, _jwtBuilder);
-        var result = await _clientRepository.Query()
-            .Include(c => c.Realms)
-            .Include(c => c.Translations)
-            .Include(c => c.Scopes)
-            .Include(c => c.SerializedJsonWebKeys)
-            .AsNoTracking()
-            .SingleOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == prefix));
-        if (result == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CLIENT, id));
-        return new OkObjectResult(result);
+        try
+        {
+            CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name, _jwtBuilder);
+            var result = await _clientRepository.Query()
+                .Include(c => c.Realms)
+                .Include(c => c.Translations)
+                .Include(c => c.Scopes)
+                .Include(c => c.SerializedJsonWebKeys)
+                .AsNoTracking()
+                .SingleOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == prefix));
+            if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CLIENT, id));
+            return new OkObjectResult(result);
+        }
+        catch(OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            return BuildError(ex);
+        }
     }
 
     [HttpDelete]
@@ -684,6 +710,8 @@ public class ClientsController : BaseController
                     CreateDateTime = DateTime.UtcNow,
                     UpdateDateTime = DateTime.UtcNow,
                 };
+                var realm = await _realmRepository.Query().SingleAsync(r => r.Name == prefix);
+                newScope.Realms.Add(realm);
                 result.Scopes.Add(newScope);
                 result.UpdateDateTime = DateTime.UtcNow;
                 await _clientRepository.SaveChanges(CancellationToken.None);

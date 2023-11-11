@@ -39,7 +39,7 @@ namespace SimpleIdServer.IdServer.Domains
         /// Array of redirection URIS for use in redirect-based flows.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.RedirectUris)]
-        public IEnumerable<string> RedirectionUrls { get; set; } = new List<string>();
+        public ICollection<string> RedirectionUrls { get; set; } = new List<string>();
         /// <summary>
         /// Requested authentication method for the token endpoint.
         /// </summary>
@@ -111,7 +111,7 @@ namespace SimpleIdServer.IdServer.Domains
         /// Array of strings representing ways to contact people responsible for this client, typically email addresses.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.Contacts)]
-        public IEnumerable<string> Contacts { get; set; } = new List<string>();
+        public ICollection<string> Contacts { get; set; } = new List<string>();
         /// <summary>
         /// A unique identifier string assigned by the client developer or software publisher used by registration endpoints to identify the client software to be dynamically registered.
         /// </summary>
@@ -265,7 +265,7 @@ namespace SimpleIdServer.IdServer.Domains
         /// Array of URLs supplied by the RP to which it MAY request that the End-User's User Agent be redirected using the post_logout_redirect_uri parameter after a logout has been performed.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.PostLogoutRedirectUris)]
-        public IEnumerable<string> PostLogoutRedirectUris { get; set; } = new List<string>();
+        public ICollection<string> PostLogoutRedirectUris { get; set; } = new List<string>();
         /// <summary>
         /// Preferred token profile.
         /// </summary>

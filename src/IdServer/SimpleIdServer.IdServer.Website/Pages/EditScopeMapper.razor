@@ -1,4 +1,4 @@
-﻿@page "/scopes/{id}/mappers/{name}"
+﻿@page "/scopes/{id}/mappers/{mapperId}"
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
@@ -66,15 +66,15 @@
     [Parameter]
     public string id { get; set; } = null!;
     [Parameter]
-    public string name { get; set; } = null!;
-    ScopeClaimMapper mapper => scopeState.Value.Scope?.ClaimMappers.SingleOrDefault(m => m.Name == name);
+    public string mapperId { get; set; } = null!;
+    ScopeClaimMapper mapper => scopeState.Value.Scope?.ClaimMappers.SingleOrDefault(m => m.Id == mapperId);
 
     protected override void OnAfterRender(bool firstRender)
     {
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
-            dispatcher.Dispatch(new GetScopeAction { ScopeName = id });
+            dispatcher.Dispatch(new GetScopeAction { ScopeId = id });
             SubscribeToAction<UpdateScopeClaimMapperSuccessAction>((act) =>
             {
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.ScopeClaimMapperUpdated });
@@ -94,7 +94,7 @@
 
     void UpdateScopeMapper(ScopeClaimMapper claimMapper)
     {
-        claimMapper.Id = Guid.NewGuid().ToString();
-        dispatcher.Dispatch(new UpdateScopeClaimMapperAction { ClaimMapper = claimMapper, ScopeName = id });
+        claimMapper.Id = mapperId;
+        dispatcher.Dispatch(new UpdateScopeClaimMapperAction { ClaimMapper = claimMapper, ScopeId = id });
     }
 }

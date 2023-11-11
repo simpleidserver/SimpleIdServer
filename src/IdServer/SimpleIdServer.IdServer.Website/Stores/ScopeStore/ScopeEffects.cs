@@ -66,17 +66,17 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
         {
             var baseUrl = await GetScopesUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
-            foreach(var name in action.ScopeNames)
+            foreach(var id in action.ScopeIds)
             {
                 var requestMessage = new HttpRequestMessage
                 {
-                    RequestUri = new Uri($"{baseUrl}/{name}"),
-                    Method = HttpMethod.Post
+                    RequestUri = new Uri($"{baseUrl}/{id}"),
+                    Method = HttpMethod.Delete
                 };
                 await httpClient.SendAsync(requestMessage);
             }
 
-            dispatcher.Dispatch(new RemoveSelectedScopesSuccessAction { ScopeNames = action.ScopeNames, IsRole = action.IsRole });
+            dispatcher.Dispatch(new RemoveSelectedScopesSuccessAction { ScopeIds = action.ScopeIds, IsRole = action.IsRole });
         }
 
         [EffectMethod]
@@ -106,7 +106,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
             {
                 httpResult.EnsureSuccessStatusCode();
                 var newScope = JsonSerializer.Deserialize<Domains.Scope>(json);
-                dispatcher.Dispatch(new AddScopeSuccessAction { Name = action.Name, Description = action.Description, IsExposedInConfigurationEdp = action.IsExposedInConfigurationEdp, Protocol = action.Protocol, Type = ScopeTypes.IDENTITY });
+                dispatcher.Dispatch(new AddScopeSuccessAction { Id = newScope.Id, Name = action.Name, Description = action.Description, IsExposedInConfigurationEdp = action.IsExposedInConfigurationEdp, Protocol = action.Protocol, Type = ScopeTypes.IDENTITY });
             }
             catch
             {
@@ -142,7 +142,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
             {
                 httpResult.EnsureSuccessStatusCode();
                 var newScope = JsonSerializer.Deserialize<Domains.Scope>(json);
-                dispatcher.Dispatch(new AddScopeSuccessAction { Name = action.Name, Description = action.Description, IsExposedInConfigurationEdp = action.IsExposedInConfigurationEdp, Protocol = ScopeProtocols.OAUTH, Type = ScopeTypes.APIRESOURCE });
+                dispatcher.Dispatch(new AddScopeSuccessAction { Id = newScope.Id, Name = action.Name, Description = action.Description, IsExposedInConfigurationEdp = action.IsExposedInConfigurationEdp, Protocol = ScopeProtocols.OAUTH, Type = ScopeTypes.APIRESOURCE });
             }
             catch
             {
@@ -158,7 +158,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
             var httpClient = await _websiteHttpClientFactory.Build();
             var requestMessage = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{baseUrl}/{action.ScopeName}"),
+                RequestUri = new Uri($"{baseUrl}/{action.ScopeId}"),
                 Method = HttpMethod.Get
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
@@ -172,7 +172,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
             catch
             {
                 var jObj = JsonObject.Parse(json);
-                dispatcher.Dispatch(new GetScopeFailureAction { ScopeName = action.ScopeName, ErrorMessage = jObj["error_description"].GetValue<string>() });
+                dispatcher.Dispatch(new GetScopeFailureAction { ScopeId = action.ScopeId, ErrorMessage = jObj["error_description"].GetValue<string>() });
             }
         }
 
@@ -188,12 +188,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
             };
             var requestMessage = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{baseUrl}/{action.ScopeName}"),
+                RequestUri = new Uri($"{baseUrl}/{action.ScopeId}"),
                 Method = HttpMethod.Put,
                 Content = new StringContent(JsonSerializer.Serialize(req), Encoding.UTF8, "application/json")
             };
              await httpClient.SendAsync(requestMessage);
-            dispatcher.Dispatch(new UpdateScopeSuccessAction { Description = action.Description, IsExposedInConfigurationEdp = action.IsExposedInConfigurationEdp, ScopeName = action.ScopeName });
+            dispatcher.Dispatch(new UpdateScopeSuccessAction { Description = action.Description, IsExposedInConfigurationEdp = action.IsExposedInConfigurationEdp, ScopeId = action.ScopeId });
         }
 
         [EffectMethod]
@@ -205,13 +205,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
             {
                 var requestMessage = new HttpRequestMessage
                 {
-                    RequestUri = new Uri($"{baseUrl}/{action.ScopeName}/mappers/{mapperId}"),
+                    RequestUri = new Uri($"{baseUrl}/{action.ScopeId}/mappers/{mapperId}"),
                     Method = HttpMethod.Delete
                 };
                 await httpClient.SendAsync(requestMessage);
             }
 
-            dispatcher.Dispatch(new RemoveSelectedScopeMappersSuccessAction { ScopeMapperIds = action.ScopeMapperIds, ScopeName = action.ScopeName });
+            dispatcher.Dispatch(new RemoveSelectedScopeMappersSuccessAction { ScopeMapperIds = action.ScopeMapperIds, ScopeId = action.ScopeId });
         }
 
         [EffectMethod]
@@ -221,7 +221,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
             var httpClient = await _websiteHttpClientFactory.Build();
             var requestMessage = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{baseUrl}/mappers"),
+                RequestUri = new Uri($"{baseUrl}/{action.ScopeId}/mappers"),
                 Method = HttpMethod.Post,
                 Content = new StringContent(JsonSerializer.Serialize(action.ClaimMapper), Encoding.UTF8, "application/json")
             };
@@ -231,7 +231,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
             {
                 httpResult.EnsureSuccessStatusCode();
                 var newScopeClaimMapper = JsonSerializer.Deserialize<Domains.ScopeClaimMapper>(json);
-                dispatcher.Dispatch(new AddScopeClaimMapperSuccessAction { ClaimMapper = newScopeClaimMapper, ScopeName = action.ScopeName });
+                dispatcher.Dispatch(new AddScopeClaimMapperSuccessAction { ClaimMapper = newScopeClaimMapper, ScopeId = action.ScopeId });
             }
             catch
             {
@@ -256,7 +256,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
             };
             var requestMessage = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{baseUrl}/mappers/{action.ClaimMapper.Id}"),
+                RequestUri = new Uri($"{baseUrl}/{action.ScopeId}/mappers/{action.ClaimMapper.Id}"),
                 Method = HttpMethod.Put,
                 Content = new StringContent(JsonSerializer.Serialize(req), Encoding.UTF8, "application/json")
             };
@@ -265,7 +265,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
             try
             {
                 httpResult.EnsureSuccessStatusCode();
-                dispatcher.Dispatch(new UpdateScopeClaimMapperSuccessAction { ClaimMapper = action.ClaimMapper, ScopeName = action.ScopeName });
+                dispatcher.Dispatch(new UpdateScopeClaimMapperSuccessAction { ClaimMapper = action.ClaimMapper, ScopeId = action.ScopeId });
             }
             catch
             {
@@ -316,13 +316,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
 
     public class RemoveSelectedScopesAction
     {
-        public ICollection<string> ScopeNames { get; set; } = new List<string>();
+        public ICollection<string> ScopeIds { get; set; } = new List<string>();
         public bool IsRole { get; set; }
     }
 
     public class RemoveSelectedScopesSuccessAction
     {
-        public ICollection<string> ScopeNames { get; set; } = new List<string>();
+        public ICollection<string> ScopeIds { get; set; } = new List<string>();
         public bool IsRole { get; set; }
     }
 
@@ -336,6 +336,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
 
     public class AddScopeSuccessAction
     {
+        public string Id { get; set; }
         public string Name { get; set; } = null!;
         public string? Description { get; set; } = null;
         public bool IsExposedInConfigurationEdp { get; set; }
@@ -351,7 +352,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
 
     public class GetScopeAction
     {
-        public string ScopeName { get; set; } = null!;
+        public string ScopeId { get; set; } = null!;
     }
 
     public class GetScopeSuccessAction
@@ -361,20 +362,20 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
 
     public class GetScopeFailureAction
     {
-        public string ScopeName { get; set; } = null!;
+        public string ScopeId { get; set; } = null!;
         public string ErrorMessage { get; set; } = null!;
     }
 
     public class UpdateScopeAction
     {
-        public string ScopeName { get; set; } = null!;
+        public string ScopeId { get; set; } = null!;
         public string? Description { get; set; } = null;
         public bool IsExposedInConfigurationEdp { get; set; } = false;
     }
 
     public class UpdateScopeSuccessAction
     {
-        public string ScopeName { get; set; } = null!;
+        public string ScopeId { get; set; } = null!;
         public string? Description { get; set; } = null;
         public bool IsExposedInConfigurationEdp { get; set; } = false;
     }
@@ -392,49 +393,49 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
 
     public class RemoveSelectedScopeMappersAction
     {
-        public string ScopeName { get; set; } = null!;
+        public string ScopeId { get; set; } = null!;
         public ICollection<string> ScopeMapperIds { get; set; } = new List<string>();
     }
 
     public class RemoveSelectedScopeMappersSuccessAction
     {
-        public string ScopeName { get; set; } = null!;
+        public string ScopeId { get; set; } = null!;
         public ICollection<string> ScopeMapperIds { get; set; } = new List<string>();
     }
 
     public class AddScopeClaimMapperAction
     {
-        public string ScopeName { get; set; } = null!;
+        public string ScopeId { get; set; } = null!;
         public ScopeClaimMapper ClaimMapper { get; set; } = null!;
     }
 
     public class AddScopeClaimMapperSuccessAction
     {
-        public string ScopeName { get; set; } = null!;
+        public string ScopeId { get; set; } = null!;
         public ScopeClaimMapper ClaimMapper { get; set; } = null!;
     }
 
     public class AddScopeClaimMapperFailureAction
     {
-        public string ScopeName { get; set; } = null!;
+        public string ScopeId { get; set; } = null!;
         public string ErrorMessage { get; set; } = null!;
     }
 
     public class UpdateScopeClaimMapperAction
     {
-        public string ScopeName { get; set; } = null!;
+        public string ScopeId { get; set; } = null!;
         public ScopeClaimMapper ClaimMapper { get; set; } = null!;
     }
 
     public class UpdateScopeClaimMapperSuccessAction
     {
-        public string ScopeName { get; set; } = null!;
+        public string ScopeId { get; set; } = null!;
         public ScopeClaimMapper ClaimMapper { get; set; } = null!;
     }
 
     public class UpdateScopeClaimMapperFailureAction
     {
-        public string ScopeName { get; set; } = null!;
+        public string ScopeId { get; set; } = null!;
         public string ErrorMessage { get; set; } = null!;
     }
 

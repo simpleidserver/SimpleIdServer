@@ -35,7 +35,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableScopeMapper" Title="Name" Filterable="false" Sortable="true" Width="80px" SortOrder="SortOrder.Ascending">
             <Template Context="data">
-                <RadzenLink Text="@data.Value.Name" Path="@($"/scopes/{Scope.Name}/mappers/" + data.Value.Name)" />
+                <RadzenLink Text="@data.Value.Name" Path="@($"/scopes/{Scope.Id}/mappers/" + data.Value.Id)" />
             </Template>        
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableScopeMapper" Title="Type" Filterable="false" Sortable="false" Width="80px">
@@ -113,7 +113,7 @@
                 if (isConfirmed == null || !isConfirmed.Value) return;
             }
 
-            var act = new RemoveSelectedScopeMappersAction { ScopeMapperIds = mapperIds, ScopeName = Scope.Name };
+            var act = new RemoveSelectedScopeMappersAction { ScopeMapperIds = mapperIds, ScopeId = Scope.Id };
             dispatcher.Dispatch(act);
             contextMenuService.Close();
         }

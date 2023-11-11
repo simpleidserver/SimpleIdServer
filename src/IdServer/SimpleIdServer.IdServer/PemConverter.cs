@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.IdServer
 {
@@ -67,5 +68,11 @@ namespace SimpleIdServer.IdServer
         public string PrivateKey { get; private set; }
 
         private string SanitizePem(string pem) => pem.Replace("\n", "\r\n");
+
+        public static PemResult Deserialize(string json)
+        {
+            var jObj = JsonObject.Parse(json);
+            return new PemResult(jObj["publicKey"].ToString(), jObj["privateKey"].ToString());
+        }
     }
 }

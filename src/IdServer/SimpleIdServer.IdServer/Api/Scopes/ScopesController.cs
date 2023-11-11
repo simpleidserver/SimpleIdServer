@@ -60,6 +60,8 @@ public class ScopesController : BaseController
 
             if (!string.IsNullOrWhiteSpace(request.OrderBy))
                 query = query.OrderBy(request.OrderBy);
+            else
+                query = query.OrderByDescending(s => s.UpdateDateTime);
 
             if (request.Protocols != null && request.Protocols.Any())
                 query = query.Where(q => request.Protocols.Contains(q.Protocol));
@@ -79,8 +81,8 @@ public class ScopesController : BaseController
         }
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Get([FromRoute] string prefix, [FromBody] string id)
+    [HttpGet]
+    public async Task<IActionResult> Get([FromRoute] string prefix, string id)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         try
@@ -132,7 +134,7 @@ public class ScopesController : BaseController
     }
 
     [HttpPost]
-    public async Task<IActionResult> Add([FromRoute] string prefix, [FromRoute] Scope scope)
+    public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] Scope scope)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         using (var activity = Tracing.IdServerActivitySource.StartActivity("Add scope"))
@@ -149,6 +151,7 @@ public class ScopesController : BaseController
                 var realm = await _realmRepository.Query().SingleAsync(r => r.Name == prefix);
                 scope.Id = Guid.NewGuid().ToString();
                 scope.Realms.Add(realm);
+                _scopeRepository.Add(scope);
                 await _scopeRepository.SaveChanges(CancellationToken.None);
                 activity?.SetStatus(ActivityStatusCode.Ok, "Scope is added");
                 return new ContentResult
@@ -287,9 +290,9 @@ public class ScopesController : BaseController
                 var scopeClaimMapper = scope.ClaimMappers.FirstOrDefault(m => m.Id == mapperId);
                 if (scopeClaimMapper == null)
                     throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_SCOPE_CLAIM_MAPPER, mapperId));
-                if (!string.IsNullOrWhiteSpace(request.TargetClaimPath) && scope.ClaimMappers.Any(m => m.TargetClaimPath == request.TargetClaimPath))
+                if (!string.IsNullOrWhiteSpace(request.TargetClaimPath) && scope.ClaimMappers.Any(m => m.TargetClaimPath == request.TargetClaimPath && m.Id != mapperId))
                     throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.SCOPE_CLAIM_MAPPER_TOKENCLAIMNAME_MUSTBEUNIQUE);
-                if (!string.IsNullOrWhiteSpace(request.SAMLAttributeName) && scope.ClaimMappers.Any(m => m.SAMLAttributeName == request.SAMLAttributeName))
+                if (!string.IsNullOrWhiteSpace(request.SAMLAttributeName) && scope.ClaimMappers.Any(m => m.SAMLAttributeName == request.SAMLAttributeName && m.Id != mapperId))
                     throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.SCOPE_CLAIM_MAPPER_SAML_ATTRIBUTE_NAME);
                 scopeClaimMapper.SourceUserAttribute = request.SourceUserAttribute;
                 scopeClaimMapper.SourceUserProperty = request.SourceUserProperty;

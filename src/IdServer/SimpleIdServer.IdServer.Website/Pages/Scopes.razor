@@ -48,7 +48,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableScope" Filterable="false" Sortable="false" Title="Name" Width="80px">
             <Template Context="data">
-                <RadzenLink Text="@data.Value.Name" Path="@($"/scopes/{data.Value.Name}/settings")" />
+                <RadzenLink Text="@data.Value.Name" Path="@($"/scopes/{data.Value.Id}/settings")" />
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableScope" Filterable="false" Sortable="false" Title="Type" Width="80px">
@@ -126,9 +126,9 @@
             new ContextMenuItem { Text = "Delete", Value = 1 }
         }, (a) => {
             if (a.Value.Equals(1)) {
-                var resourceNames = scopesState.Value.Scopes.Where(s => s.IsSelected).Select(s => s.Value.Name).ToList();
-                if (!resourceNames.Contains(scope.Value.Name)) resourceNames.Add(scope.Value.Name);
-                var act = new RemoveSelectedScopesAction { ScopeNames = resourceNames };
+                var scopeIds = scopesState.Value.Scopes.Where(s => s.IsSelected).Select(s => s.Value.Id).ToList();
+                if (!scopeIds.Contains(scope.Value.Id)) scopeIds.Add(scope.Value.Id);
+                var act = new RemoveSelectedScopesAction { ScopeIds = scopeIds };
                 dispatcher.Dispatch(act);
                 contextMenuService.Close();
             }

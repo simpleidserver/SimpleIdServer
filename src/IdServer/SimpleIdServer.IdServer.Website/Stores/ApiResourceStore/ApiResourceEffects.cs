@@ -42,7 +42,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
                     OrderBy = SanitizeExpression(action.OrderBy),
                     Skip = action.Skip,
                     Take = action.Take
-                }))
+                }), Encoding.UTF8, "application/json")
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();

@@ -96,6 +96,6 @@
     void AddScopeMapper(ScopeClaimMapper claimMapper)
     {
         claimMapper.Id = Guid.NewGuid().ToString();
-        dispatcher.Dispatch(new AddScopeClaimMapperAction { ClaimMapper = claimMapper, ScopeName = Scope.Name });
+        dispatcher.Dispatch(new AddScopeClaimMapperAction { ClaimMapper = claimMapper, ScopeId = Scope.Id });
     }
 }

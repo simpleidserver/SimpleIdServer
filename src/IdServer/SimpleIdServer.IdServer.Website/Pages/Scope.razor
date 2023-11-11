@@ -101,7 +101,7 @@
         if (string.IsNullOrWhiteSpace(id)) return;
         if (!string.IsNullOrWhiteSpace(action) && mappingActionNameToIndex.ContainsKey(action))
             selectedIndex = mappingActionNameToIndex[action].Item1;
-        dispatcher.Dispatch(new GetScopeAction { ScopeName = id });
+        dispatcher.Dispatch(new GetScopeAction { ScopeId = id });
     }
 
     void OnChange(int index)

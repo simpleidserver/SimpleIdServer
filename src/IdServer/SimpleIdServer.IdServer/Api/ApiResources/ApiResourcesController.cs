@@ -73,7 +73,7 @@ public class ApiResourcesController : BaseController
     }
 
     [HttpPost]
-    public async Task<IActionResult> Add([FromRoute] string prefix, AddApiResourceRequest request)
+    public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] AddApiResourceRequest request)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         using (var activity = Tracing.IdServerActivitySource.StartActivity("Add API resource"))
@@ -96,6 +96,7 @@ public class ApiResourcesController : BaseController
                     UpdateDateTime = DateTime.UtcNow
                 };
                 apiResource.Realms.Add(realm);
+                _apiResourceRepository.Add(apiResource);
                 await _apiResourceRepository.SaveChanges(CancellationToken.None);
                 activity?.SetStatus(ActivityStatusCode.Ok, $"API resource {request.Name} added");
                 await _busControl.Publish(new AddApiResourceSuccessEvent

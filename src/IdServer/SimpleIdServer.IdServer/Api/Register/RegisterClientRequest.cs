@@ -72,7 +72,7 @@ namespace SimpleIdServer.IdServer.Api.Register
         public string? TokenEncryptedResponseEnc { get; set; } = null;
         [BindProperty(Name = OAuthClientParameters.RedirectUris)]
         [JsonPropertyName(OAuthClientParameters.RedirectUris)]
-        public IEnumerable<string> RedirectUris { get; set; } = new List<string>();
+        public ICollection<string> RedirectUris { get; set; } = new List<string>();
         [BindProperty(Name = OAuthClientParameters.JwksUri)]
         [JsonPropertyName(OAuthClientParameters.JwksUri)]
         public string? JwksUri { get; set; }
@@ -114,10 +114,10 @@ namespace SimpleIdServer.IdServer.Api.Register
         public bool BackChannelLogoutSessionRequired { get; set; } = false;
         [BindProperty(Name = OAuthClientParameters.DefaultAcrValues)]
         [JsonPropertyName(OAuthClientParameters.DefaultAcrValues)]
-        public IEnumerable<string> DefaultAcrValues { get; set; } = new string[0];
+        public ICollection<string> DefaultAcrValues { get; set; } = new string[0];
         [BindProperty(Name = OAuthClientParameters.PostLogoutRedirectUris)]
         [JsonPropertyName(OAuthClientParameters.PostLogoutRedirectUris)]
-        public IEnumerable<string> PostLogoutRedirectUris { get; set; } = new string[0];
+        public ICollection<string> PostLogoutRedirectUris { get; set; } = new string[0];
         [BindProperty(Name = OAuthClientParameters.RequireAuthTime)]
         [JsonPropertyName(OAuthClientParameters.RequireAuthTime)]
         public bool RequireAuthTime { get; set; } = false;

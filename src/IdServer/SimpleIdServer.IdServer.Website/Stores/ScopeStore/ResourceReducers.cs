@@ -64,7 +64,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
             if (act.IsRole) return state;
             var scopes = state.Scopes?.ToList();
             if (scopes == null) return state;
-            scopes = scopes.Where(s => !act.ScopeNames.Contains(s.Value.Name)).ToList();
+            scopes = scopes.Where(s => !act.ScopeIds.Contains(s.Value.Id)).ToList();
             return state with
             {
                 Scopes = scopes,
@@ -78,6 +78,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
             var scopes = state.Scopes?.ToList();
             scopes.Add(new SelectableScope(new Domains.Scope
             {
+                Id = act.Id,
                 Name = act.Name,
                 Description = act.Description,
                 Protocol = act.Protocol,
@@ -88,7 +89,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
             })
             {
                 IsNew = true
-            });
+            });;
             return state with
             {
                 Scopes = scopes

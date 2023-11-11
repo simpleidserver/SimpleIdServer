@@ -63,6 +63,8 @@ namespace SimpleIdServer.IdServer.Api.Users
 
                 if (!string.IsNullOrWhiteSpace(request.OrderBy))
                     query = query.OrderBy(request.OrderBy);
+                else
+                    query = query.OrderByDescending(u => u.UpdateDateTime);
 
                 var count = query.Count();
                 var users = await query.Skip(request.Skip.Value).Take(request.Take.Value).ToListAsync(CancellationToken.None);

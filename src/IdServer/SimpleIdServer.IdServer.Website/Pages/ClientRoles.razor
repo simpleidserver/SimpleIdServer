@@ -78,9 +78,9 @@
     {
     if (a.Value.Equals(1))
     {
-        var scopeNames = clientRolesState.Value.Roles.Where(s => s.IsSelected).Select(s => s.Value.Name).ToList();
-        if (!scopeNames.Contains(role.Value.Name)) scopeNames.Add(role.Value.Name);
-        var act = new RemoveSelectedScopesAction { ScopeNames = scopeNames, IsRole = true };
+        var scopeIds = clientRolesState.Value.Roles.Where(s => s.IsSelected).Select(s => s.Value.Id).ToList();
+        if (!scopeIds.Contains(role.Value.Id)) scopeIds.Add(role.Value.Id);
+        var act = new RemoveSelectedScopesAction { ScopeIds = scopeIds, IsRole = true };
         dispatcher.Dispatch(act);
         contextMenuService.Close();
     }

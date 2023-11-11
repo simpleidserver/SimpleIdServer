@@ -406,7 +406,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             try
             {
                 httpResult.EnsureSuccessStatusCode();
-                var pemResult = JsonSerializer.Deserialize<PemResult>(json);
+                var pemResult = PemResult.Deserialize(json);
                 SigningCredentials sigCredentials = null;
                 switch (act.KeyType)
                 {
@@ -452,7 +452,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             try
             {
                 httpResult.EnsureSuccessStatusCode();
-                var pemResult = JsonSerializer.Deserialize<PemResult>(json);
+                var pemResult = PemResult.Deserialize(json);
                 EncryptingCredentials encCredentials = null;
                 switch (act.KeyType)
                 {
