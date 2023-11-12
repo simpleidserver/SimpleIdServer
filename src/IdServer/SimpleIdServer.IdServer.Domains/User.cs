@@ -7,7 +7,6 @@ using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.IdServer.Domains
 {
-    [JsonConverter(typeof(UserJsonConverter))]
     public class User : IEquatable<User>
     {
         private static Dictionary<string, KeyValuePair<Action<User, string>, Func<User, object>>> _userClaims = new Dictionary<string, KeyValuePair<Action<User, string>, Func<User, object>>>
@@ -47,21 +46,21 @@ namespace SimpleIdServer.IdServer.Domains
         [UserProperty(true)]
         [JsonPropertyName(UserNames.EmailVerified)]
         public bool EmailVerified { get; set; } = false;
-        [JsonIgnore]
+        [JsonPropertyName(UserNames.DeviceRegistrationToken)]
         public string? DeviceRegistrationToken { get; set; }
-        [JsonIgnore]
+        [JsonPropertyName(UserNames.Status)]
         public UserStatus Status { get; set; }
         [JsonPropertyName(UserNames.CreateDateTime)]
         public DateTime CreateDateTime { get; set; }
         [JsonPropertyName(UserNames.UpdateDateTime)]
         public DateTime UpdateDateTime { get; set; }
-        [JsonIgnore]
+        [JsonPropertyName(UserNames.Source)]
         public string? Source { get; set; } = null;
         [JsonIgnore]
         public string? IdentityProvisioningId { get; set; } = null;
-        [JsonIgnore]
+        [JsonPropertyName(UserNames.DID)]
         public string? Did { get; set; } = null;
-        [JsonIgnore]
+        [JsonPropertyName(UserNames.DIDPrivateHex)]
         public string? DidPrivateHex { get; set; } = null;
         [JsonIgnore]
         [Newtonsoft.Json.JsonIgnore]
@@ -100,11 +99,9 @@ namespace SimpleIdServer.IdServer.Domains
                 return Credentials.FirstOrDefault(c => c.CredentialType == UserCredential.PWD && c.IsActive);
             }
         }
-        [JsonIgnore]
+        [JsonPropertyName(UserNames.NotificationMode)]
         public string NotificationMode { get; set; } = "console";
-        [JsonIgnore]
-        public ICollection<RealmUser> Realms { get; set; } = new List<RealmUser>();
-        [JsonIgnore]
+        [JsonPropertyName(UserNames.Sessions)]
         public ICollection<UserSession> Sessions { get; set; } = new List<UserSession>();
         [JsonPropertyName(UserNames.Claims)]
         public ICollection<UserClaim> OAuthUserClaims { get; set; } = new List<UserClaim>();
@@ -114,10 +111,12 @@ namespace SimpleIdServer.IdServer.Domains
         public ICollection<UserExternalAuthProvider> ExternalAuthProviders { get; set; } = new List<UserExternalAuthProvider>();
         [JsonPropertyName(UserNames.Consents)]
         public ICollection<Consent> Consents { get; set; } = new List<Consent>();
-        [JsonIgnore]
+        [JsonPropertyName(UserNames.Devices)]
         public ICollection<UserDevice> Devices { get; set; } = new List<UserDevice>();
-        [JsonIgnore]
+        [JsonPropertyName(UserNames.Groups)]
         public ICollection<Group> Groups { get; set; } = new List<Group>();
+        [JsonIgnore]
+        public ICollection<RealmUser> Realms { get; set; } = new List<RealmUser>();
         [JsonIgnore]
         public IdentityProvisioning? IdentityProvisioning { get; set; } = null;
         [JsonIgnore]

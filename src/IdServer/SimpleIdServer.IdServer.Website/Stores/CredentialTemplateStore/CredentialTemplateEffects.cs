@@ -38,7 +38,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.CredentialTemplateStore
                 {
                     Filter = SanitizeExpression(action.Filter),
                     OrderBy = SanitizeExpression(action.OrderBy)
-                }))
+                }), Encoding.UTF8, "application/json")
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();

@@ -5,7 +5,6 @@ using Microsoft.IdentityModel.Tokens;
 using NUnit.Framework;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
-using System;
 using System.Text.Json;
 
 namespace SimpleIdServer.IdServer.Tests;
@@ -66,6 +65,7 @@ public class SerializeFixture
     [Test]
     public void When_Serialize_And_Deserialize_SamlClient_Then_Properties_AreCorrect()
     {
+        // ARRANGE
         var certificate = KeyGenerator.GenerateSelfSignedCertificate();
         var newClientBuilder = SamlSpClientBuilder.BuildSamlSpClient("clientid", "http://localhost", certificate, null)
             .SetClientName("clientname")

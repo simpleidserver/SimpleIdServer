@@ -53,7 +53,7 @@ public class ScopesController : BaseController
             CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name, _jwtBuilder);
             IQueryable<Scope> query = _scopeRepository.Query()
                 .Include(p => p.Realms)
-                .Where(p => p.Realms.Any(r => r.Name == prefix))
+                .Where(p => p.Realms.Any(r => r.Name == prefix) && ((request.IsRole && p.Type == ScopeTypes.ROLE) || (!request.IsRole && (p.Type == ScopeTypes.IDENTITY || p.Type == ScopeTypes.APIRESOURCE))))
                 .AsNoTracking();
             if (!string.IsNullOrWhiteSpace(request.Filter))
                 query = query.Where(request.Filter);

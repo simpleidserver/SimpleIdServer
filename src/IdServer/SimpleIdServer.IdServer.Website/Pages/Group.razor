@@ -10,7 +10,7 @@
 @inject NavigationManager navigationManager
 @inject NotificationService notificationService
 @inject IDispatcher dispatcher
-@inject IGroupRepository groupRepository
+@inject IGroupService groupService
 @inject IState<GroupState> groupState
 
     <RadzenBreadCrumb>
@@ -125,17 +125,18 @@
         groups = new List<SimpleIdServer.IdServer.Domains.Group>();
     }
 
-    void OnExpand(TreeExpandEventArgs args)
+    async Task OnExpand(TreeExpandEventArgs args)
     {
         var group = args.Value as SimpleIdServer.IdServer.Domains.Group;
         var children = group.Children;
         if (group.Children == null || !group.Children.Any())
         {
-            children = groupRepository.Query().Where(g => g.ParentGroupId == group.Id).AsNoTracking().ToList();
+            var getResult = await groupService.Get(group.Id);
+            children = getResult.Target.Children.ToList();
         }
 
-        args.Children.Template = treeTemplate;
         args.Children.Data = children;
+        args.Children.Template = treeTemplate;
         args.Children.TextProperty = "Name";
         args.Children.HasChildren = (g) => true;
     }

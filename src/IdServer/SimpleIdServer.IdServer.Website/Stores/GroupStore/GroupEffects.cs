@@ -1,18 +1,25 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.Groups;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
+using System;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
 {
-    public class GroupEffects
+    public interface IGroupService
+    {
+        Task<GetGroupResult> Get(string id);
+    }
+
+    public class GroupEffects : IGroupService
     {
         private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly IdServerWebsiteOptions _options;
@@ -23,6 +30,21 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
             _websiteHttpClientFactory = websiteHttpClientFactory;
             _options = options.Value;
             _sessionStorage = sessionStorage;
+        }
+
+        public async Task<GetGroupResult> Get(string id)
+        {
+            var baseUrl = await GetGroupsUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{baseUrl}/{id}"),
+                Method = HttpMethod.Get
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var getResult = JsonSerializer.Deserialize<GetGroupResult>(json);
+            return getResult;
         }
 
         [EffectMethod]
@@ -113,16 +135,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
         [EffectMethod]
         public async Task Handle(GetGroupAction action, IDispatcher dispatcher)
         {
-            var baseUrl = await GetGroupsUrl();
-            var httpClient = await _websiteHttpClientFactory.Build();
-            var requestMessage = new HttpRequestMessage
-            {
-                RequestUri = new Uri($"{baseUrl}/{action.Id}"),
-                Method = HttpMethod.Get
-            };
-            var httpResult = await httpClient.SendAsync(requestMessage);
-            var json = await httpResult.Content.ReadAsStringAsync();
-            var getResult = JsonSerializer.Deserialize<GetGroupResult>(json);
+            var getResult = await Get(action.Id);
             dispatcher.Dispatch(new GetGroupSuccessAction { Group = getResult.Target, RootGroup = getResult.Root });
         }
 

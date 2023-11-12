@@ -296,7 +296,7 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.MapControllerRoute("searchIdProviders",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationSchemeProviders + "/.search",
                 defaults: new { controller = "AuthenticationSchemeProviders", action = "Search" });
-            webApplication.MapControllerRoute("searchIdProviders",
+            webApplication.MapControllerRoute("getIdProviderDefinitions",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationSchemeProviders + "/defs",
                 defaults: new { controller = "AuthenticationSchemeProviders", action = "GetDefinitions" });
             webApplication.MapControllerRoute("removeIdProvider",
@@ -470,12 +470,12 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.MapControllerRoute("searchGroups",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Groups + "/.search",
                 defaults: new { controller = "Groups", action = "Search" });
-            webApplication.MapControllerRoute("getGroup",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Groups + "/{id}",
-                defaults: new { controller = "Groups", action = "Get" });
             webApplication.MapControllerRoute("deleteGroup",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Groups + "/delete",
                 defaults: new { controller = "Groups", action = "Delete" });
+            webApplication.MapControllerRoute("getGroup",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Groups + "/{id}",
+                defaults: new { controller = "Groups", action = "Get" });
             webApplication.MapControllerRoute("addGroup",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Groups,
                 defaults: new { controller = "Groups", action = "Add" });
@@ -483,7 +483,7 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Groups + "/{id}/roles",
                 defaults: new { controller = "Groups", action = "AddRole" });
             webApplication.MapControllerRoute("removeGroupRole",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Groups + "{id}/roles/{roleId}",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Groups + "/{id}/roles/{roleId}",
                 defaults: new { controller = "Groups", action = "RemoveRole" });
 
             webApplication.MapControllerRoute("getAllRealms",

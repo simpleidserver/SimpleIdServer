@@ -10,6 +10,7 @@ using Radzen;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.Website;
+using SimpleIdServer.IdServer.Website.Stores.GroupStore;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -26,6 +27,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 });
             });
             services.AddScoped<IOTPQRCodeGenerator, OTPQRCodeGenerator>();
+            services.AddScoped<IGroupService, GroupEffects>();
             services.AddScoped<DialogService>();
             services.AddScoped<NotificationService>();
             services.AddScoped<ContextMenuService>();

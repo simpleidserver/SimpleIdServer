@@ -120,7 +120,7 @@ public class TranslatableConverter<T> : JsonConverter<T> where T : class
                 var genericType = type.GenericTypeArguments[0];
                 var result = Activator.CreateInstance(typeof(List<>).MakeGenericType(genericType));
                 var addMethod = result.GetType().GetMethod("Add", BindingFlags.Instance | BindingFlags.Public);
-                foreach(var record in jsonArray)
+                foreach (var record in jsonArray)
                 {
                     addMethod.Invoke(result, new object[] { Extract(record, genericType) });
                 }

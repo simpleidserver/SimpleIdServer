@@ -30,11 +30,13 @@ namespace SimpleIdServer.IdServer.Api.Groups
         public GroupsController(
             IGroupRepository groupRepository,
             IScopeRepository scopeRepository,
+            IRealmRepository realmRepository,
             IJwtBuilder jwtBuilder, 
             ILogger<GroupsController> logger)
         {
             _groupRepository = groupRepository;
             _scopeRepository = scopeRepository;
+            _realmRepository = realmRepository;
             _jwtBuilder = jwtBuilder;
             _logger = logger;
         }
@@ -75,7 +77,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
             }
         }
 
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Get([FromRoute] string prefix, string id)
         {
             prefix = prefix ?? Constants.DefaultRealm;
@@ -85,11 +87,12 @@ namespace SimpleIdServer.IdServer.Api.Groups
                 var result = await _groupRepository.Query()
                     .Include(c => c.Realms)
                     .Include(c => c.Children)
+                    .Include(c => c.Roles)
                     .AsNoTracking()
                     .SingleAsync(g => g.Realms.Any(r => r.Name == prefix) && g.Id == id);
                 if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_GROUP, id));
                 var splittedFullPath = result.FullPath.Split('.');
-                Group rootGroup = null;
+               var rootGroup = result;
                 if (splittedFullPath.Count() > 1)
                     rootGroup = await _groupRepository.Query()
                         .Include(c => c.Realms)
@@ -108,6 +111,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
                 return BuildError(ex);
             }
         }
+
 
         #endregion
 
@@ -141,6 +145,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
             }
         }
 
+        [HttpPost]
         public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] AddGroupRequest request)
         {
             prefix = prefix ?? Constants.DefaultRealm;
@@ -151,7 +156,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
                     activity?.SetTag("realm", prefix);
                     CheckAccessToken(prefix, Constants.StandardScopes.Groups.Name, _jwtBuilder);
                     var fullPath = request.Name;
-                    if(!string.IsNullOrWhiteSpace(fullPath))
+                    if (!string.IsNullOrWhiteSpace(request.ParentGroupId))
                     {
                         var parent = await _groupRepository.Query().AsNoTracking().SingleAsync(g => g.Id == request.ParentGroupId);
                         fullPath = $"{parent.FullPath}.{request.Name}";

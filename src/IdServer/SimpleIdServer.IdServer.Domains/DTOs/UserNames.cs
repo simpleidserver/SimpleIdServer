@@ -18,5 +18,13 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
         public const string Credential = "credential";
         public const string ExternalAuthProviders = "external_auth_providers";
         public const string Consents = "consents";
+        public const string Groups = "groups";
+        public const string Devices = "devices";
+        public const string Sessions = "sessions";
+        public const string DeviceRegistrationToken = "device_registration_token";
+        public const string Status = "status";
+        public const string Source = "source";
+        public const string DID = "did";
+        public const string DIDPrivateHex = "did_private_key";
     }
 }

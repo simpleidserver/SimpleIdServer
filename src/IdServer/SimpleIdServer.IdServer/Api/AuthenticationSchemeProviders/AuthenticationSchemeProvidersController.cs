@@ -69,7 +69,7 @@ public class AuthenticationSchemeProvidersController : BaseController
 		}
     }
 
-    [HttpPost]
+    [HttpGet]
     public async Task<IActionResult> GetDefinitions([FromRoute] string prefix)
     {
         prefix = prefix ?? Constants.DefaultRealm;

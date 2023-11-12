@@ -99,7 +99,7 @@
             CreateDateTime = this.User.CreateDateTime,
             UpdateDateTime = this.User.UpdateDateTime,
             Email = this.User.Email,
-            Firstname = this.User.Name,
+            Firstname = this.User.Firstname,
             Lastname = this.User.Lastname,
             NotificationMode = this.User.NotificationMode
         };
@@ -107,7 +107,7 @@
 
     void UpdateUserSettings(UpdateUserSettingsParameter parameter)
     {
-        var act = new UpdateUserDetailsAction { Email = parameter.Email, Firstname = parameter.Firstname, Lastname = parameter.Lastname, UserId = this.User.Id };
+        var act = new UpdateUserDetailsAction { Email = parameter.Email, Firstname = parameter.Firstname, Lastname = parameter.Lastname, UserId = this.User.Id, NotificationMode = parameter.NotificationMode };
         dispatcher.Dispatch(act);
     }
 }

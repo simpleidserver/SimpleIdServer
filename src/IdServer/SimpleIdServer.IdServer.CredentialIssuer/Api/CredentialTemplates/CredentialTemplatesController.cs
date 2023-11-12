@@ -62,6 +62,8 @@ public class CredentialTemplatesController : BaseController
 
             if (!string.IsNullOrWhiteSpace(request.OrderBy))
                 query = query.OrderBy(request.OrderBy);
+            else
+                query = query.OrderByDescending(c => c.UpdateDateTime);
 
             var nb = query.Count();
             var result = await query.ToListAsync(CancellationToken.None);

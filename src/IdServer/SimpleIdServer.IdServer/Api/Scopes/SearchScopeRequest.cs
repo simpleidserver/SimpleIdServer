@@ -11,4 +11,6 @@ public class SearchScopeRequest : DTOs.SearchRequest
 {
     [JsonPropertyName(ScopeNames.Protocols)]
     public IEnumerable<ScopeProtocols> Protocols { get; set; }
+    [JsonPropertyName(ScopeNames.IsRole)]
+    public bool IsRole { get; set; }
 }

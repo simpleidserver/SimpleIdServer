@@ -95,6 +95,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                     .Include(u => u.Consents)
                     .Include(u => u.ExternalAuthProviders)
                     .Include(u => u.Realms)
+                    .Include(u => u.Sessions)
                     .AsNoTracking()
                     .FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.RealmsName == prefix), cancellationToken));
                 if (user == null) return new NotFoundResult();
@@ -224,7 +225,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                     user.UpdateEmail(request.Email);
                     user.UpdateName(request.Name);
                     user.UpdateLastname(request.Lastname);
-                    user.NotificationMode = request.NotificationMode;
+                    user.NotificationMode = request.NotificationMode ?? string.Empty;
                     user.UpdateDateTime = DateTime.UtcNow;
                     await _userRepository.SaveChanges(CancellationToken.None);
                     activity?.SetStatus(ActivityStatusCode.Ok, "User is updated");
@@ -284,7 +285,7 @@ namespace SimpleIdServer.IdServer.Api.Users
         #region Credentials
 
         [HttpPost]
-        public async Task<IActionResult> AddCredential([FromBody] string prefix, string id, [FromBody] AddUserCredentialRequest request)
+        public async Task<IActionResult> AddCredential([FromRoute] string prefix, string id, [FromBody] AddUserCredentialRequest request)
         {
             prefix = prefix ?? Constants.DefaultRealm;
             using (var activity = Tracing.IdServerActivitySource.StartActivity("Add user's credential"))
@@ -354,7 +355,12 @@ namespace SimpleIdServer.IdServer.Api.Users
                         Realm = prefix,
                         Name = user.Name
                     });
-                    return new NoContentResult();
+                    return new ContentResult
+                    {
+                        Content = JsonSerializer.Serialize(existingCredential),
+                        ContentType = "application/json",
+                        StatusCode = (int)HttpStatusCode.OK
+                    };
                 }
                 catch (OAuthException ex)
                 {

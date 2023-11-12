@@ -27,20 +27,16 @@ namespace SimpleIdServer.IdServer.Domains
             UpdateDateTime = DateTime.UtcNow;
         }
 
-        [JsonIgnore]
+        [JsonPropertyName(UserConsentNames.Id)]
         public string Id { get; set; } = null!;
-        [JsonIgnore]
+        [JsonPropertyName(UserConsentNames.ClientId)]
         public string ClientId { get; set; } = null!;
-        [JsonIgnore]
+        [JsonPropertyName(UserConsentNames.CreateDatetime)]
         public DateTime CreateDateTime { get; set; }
-        [JsonIgnore]
+        [JsonPropertyName(UserConsentNames.UpdateDatetime)]
         public DateTime UpdateDateTime { get; set; }
-        [JsonIgnore]
+        [JsonPropertyName(UserConsentNames.Status)]
         public ConsentStatus Status { get; set; } = ConsentStatus.PENDING;
-        [JsonIgnore]
-        public User User { get; set; }
-        [JsonIgnore]
-        public string Realm { get; set; }
         [JsonPropertyName(GrantParameters.Scopes)]
         public ICollection<AuthorizedScope> Scopes { get; set; } = new List<AuthorizedScope>();
         [JsonPropertyName(GrantParameters.Claims)]
@@ -60,6 +56,10 @@ namespace SimpleIdServer.IdServer.Domains
         }
         [JsonIgnore]
         public string? SerializedAuthorizationDetails { get; set; } = null;
+        [JsonIgnore]
+        public User User { get; set; }
+        [JsonIgnore]
+        public string Realm { get; set; }
 
         public void Merge(ICollection<string> claims, ICollection<AuthorizedScope> scopes, IEnumerable<AuthorizationData> authorizationDetails)
         {

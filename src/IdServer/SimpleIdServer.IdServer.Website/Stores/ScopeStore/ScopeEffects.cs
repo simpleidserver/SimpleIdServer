@@ -50,7 +50,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
                     OrderBy = SanitizeExpression(action.OrderBy),
                     Skip = action.Skip,
                     Take = action.Take,
-                    Protocols = types
+                    Protocols = types,
+                    IsRole = action.IsRole
+                    
                 }), Encoding.UTF8, "application/json")
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
