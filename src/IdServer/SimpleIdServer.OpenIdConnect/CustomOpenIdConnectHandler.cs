@@ -68,6 +68,171 @@ namespace SimpleIdServer.OpenIdConnect
         {
         }
 
+        public override Task<bool> HandleRequestAsync()
+        {
+            if (Options.RemoteSignOutPath.HasValue && Options.RemoteSignOutPath == Request.Path)
+            {
+                return HandleRemoteSignOutAsync();
+            }
+            else if (Options.SignedOutCallbackPath.HasValue && Options.SignedOutCallbackPath == Request.Path)
+            {
+                return HandleSignOutCallbackAsync();
+            }
+
+            return base.HandleRequestAsync();
+        }
+
+        /// <inheritdoc />
+        protected virtual async Task<bool> HandleRemoteSignOutAsync()
+        {
+            OpenIdConnectMessage? message = null;
+
+            if (HttpMethods.IsGet(Request.Method))
+            {
+                // ToArray handles the StringValues.IsNullOrEmpty case. We assume non-empty Value does not contain null elements.
+#pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
+                message = new OpenIdConnectMessage(Request.Query.Select(pair => new KeyValuePair<string, string[]>(pair.Key, pair.Value.ToArray())));
+#pragma warning restore CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
+            }
+
+            // assumption: if the ContentType is "application/x-www-form-urlencoded" it should be safe to read as it is small.
+            else if (HttpMethods.IsPost(Request.Method)
+              && !string.IsNullOrEmpty(Request.ContentType)
+              // May have media/type; charset=utf-8, allow partial match.
+              && Request.ContentType.StartsWith("application/x-www-form-urlencoded", StringComparison.OrdinalIgnoreCase)
+              && Request.Body.CanRead)
+            {
+                var form = await Request.ReadFormAsync(Context.RequestAborted);
+
+                // ToArray handles the StringValues.IsNullOrEmpty case. We assume non-empty Value does not contain null elements.
+#pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
+                message = new OpenIdConnectMessage(form.Select(pair => new KeyValuePair<string, string[]>(pair.Key, pair.Value.ToArray())));
+#pragma warning restore CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
+            }
+
+            var remoteSignOutContext = new RemoteSignOutContext(Context, Scheme, Options, message);
+            await Events.RemoteSignOut(remoteSignOutContext);
+
+            if (remoteSignOutContext.Result != null)
+            {
+                if (remoteSignOutContext.Result.Handled)
+                {
+                    Logger.RemoteSignOutHandledResponse();
+                    return true;
+                }
+                if (remoteSignOutContext.Result.Skipped)
+                {
+                    Logger.RemoteSignOutSkipped();
+                    return false;
+                }
+                if (remoteSignOutContext.Result.Failure != null)
+                {
+                    throw new InvalidOperationException("An error was returned from the RemoteSignOut event.", remoteSignOutContext.Result.Failure);
+                }
+            }
+
+            if (message == null)
+            {
+                return false;
+            }
+
+            // Try to extract the session identifier from the authentication ticket persisted by the sign-in handler.
+            // If the identifier cannot be found, bypass the session identifier checks: this may indicate that the
+            // authentication cookie was already cleared, that the session identifier was lost because of a lossy
+            // external/application cookie conversion or that the identity provider doesn't support sessions.
+            var principal = (await Context.AuthenticateAsync(Options.SignOutScheme))?.Principal;
+
+            var sid = principal?.FindFirst(Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames.Sid)?.Value;
+            if (!string.IsNullOrEmpty(sid))
+            {
+                // Ensure a 'sid' parameter was sent by the identity provider.
+                if (string.IsNullOrEmpty(message.Sid))
+                {
+                    Logger.RemoteSignOutSessionIdMissing();
+                    return true;
+                }
+                // Ensure the 'sid' parameter corresponds to the 'sid' stored in the authentication ticket.
+                if (!string.Equals(sid, message.Sid, StringComparison.Ordinal))
+                {
+                    Logger.RemoteSignOutSessionIdInvalid();
+                    return true;
+                }
+            }
+
+            var iss = principal?.FindFirst(Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames.Iss)?.Value;
+            if (!string.IsNullOrEmpty(iss))
+            {
+                // Ensure a 'iss' parameter was sent by the identity provider.
+                if (string.IsNullOrEmpty(message.Iss))
+                {
+                    Logger.RemoteSignOutIssuerMissing();
+                    return true;
+                }
+                // Ensure the 'iss' parameter corresponds to the 'iss' stored in the authentication ticket.
+                if (!string.Equals(iss, message.Iss, StringComparison.Ordinal))
+                {
+                    Logger.RemoteSignOutIssuerInvalid();
+                    return true;
+                }
+            }
+
+            Logger.RemoteSignOut();
+
+            // We've received a remote sign-out request
+            await Context.SignOutAsync(Options.SignOutScheme);
+            return true;
+        }
+
+        /// <summary>
+        /// Response to the callback from OpenId provider after session ended.
+        /// </summary>
+        /// <returns>A task executing the callback procedure</returns>
+        protected virtual async Task<bool> HandleSignOutCallbackAsync()
+        {
+            // ToArray handles the StringValues.IsNullOrEmpty case. We assume non-empty Value does not contain null elements.
+#pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
+            var message = new OpenIdConnectMessage(Request.Query.Select(pair => new KeyValuePair<string, string[]>(pair.Key, pair.Value.ToArray())));
+#pragma warning restore CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
+
+            AuthenticationProperties? properties = null;
+            if (!string.IsNullOrEmpty(message.State))
+            {
+                properties = Options.StateDataFormat.Unprotect(message.State);
+            }
+
+            var signOut = new RemoteSignOutContext(Context, Scheme, Options, message)
+            {
+                Properties = properties,
+            };
+
+            await Events.SignedOutCallbackRedirect(signOut);
+            if (signOut.Result != null)
+            {
+                if (signOut.Result.Handled)
+                {
+                    Logger.SignOutCallbackRedirectHandledResponse();
+                    return true;
+                }
+                if (signOut.Result.Skipped)
+                {
+                    Logger.SignOutCallbackRedirectSkipped();
+                    return false;
+                }
+                if (signOut.Result.Failure != null)
+                {
+                    throw new InvalidOperationException("An error was returned from the SignedOutCallbackRedirect event.", signOut.Result.Failure);
+                }
+            }
+
+            properties = signOut.Properties;
+            if (!string.IsNullOrEmpty(properties?.RedirectUri))
+            {
+                Response.Redirect(properties.RedirectUri);
+            }
+
+            return true;
+        }
+
         public async Task SignOutAsync(AuthenticationProperties properties)
         {
             var target = ResolveTarget(Options.ForwardSignOut);
