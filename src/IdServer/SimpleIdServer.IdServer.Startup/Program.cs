@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -57,6 +58,14 @@ builder.Services.Configure<KestrelServerOptions>(options =>
     });
 });
 ConfigureCentralizedConfiguration(builder);
+if(identityServerConfiguration.IsForwardedEnabled)
+{
+    builder.Services.Configure<ForwardedHeadersOptions>(options =>
+    {
+        options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    });
+}
+
 builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
     .AllowAnyMethod()
     .AllowAnyHeader()));
@@ -66,12 +75,17 @@ ConfigureIdServer(builder.Services);
 var app = builder.Build();
 SeedData(app, identityServerConfiguration.SCIMBaseUrl);
 app.UseCors("AllowAll");
+if(identityServerConfiguration.IsForwardedEnabled)
+{
+    app.UseForwardedHeaders();
+}
+
 app.UseSID()
-.UseWsFederation()
-.UseFIDO()
-.UseCredentialIssuer()
-.UseSamlIdp()
-.UseAutomaticConfiguration();
+    .UseWsFederation()
+    .UseFIDO()
+    .UseCredentialIssuer()
+    .UseSamlIdp()
+    .UseAutomaticConfiguration();
 app.Run();
 
 void ConfigureIdServer(IServiceCollection services)

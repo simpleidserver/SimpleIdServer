@@ -11,4 +11,5 @@ public class IdentityServerConfiguration
     public ClientCertificateMode? ClientCertificateMode { get; set; }
     public string Authority { get; set; }
     public string SCIMBaseUrl { get; set; }
+    public bool IsForwardedEnabled { get; set; }
 }
