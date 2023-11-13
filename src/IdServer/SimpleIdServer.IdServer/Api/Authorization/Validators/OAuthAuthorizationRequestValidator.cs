@@ -112,7 +112,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                 var redirectionUrls = await _clientHelper.GetRedirectionUrls(client, cancellationToken);
                 if (!string.IsNullOrWhiteSpace(redirectUri) && !redirectionUrls.Any(r =>
                 {
-                    var regex = new Regex(r);
+                    var regex = new Regex(r, (client.IsRedirectUrlCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase));
                     return regex.Match(redirectUri).Success;
                 })) throw new OAuthExceptionBadRequestURIException(redirectUri);
 

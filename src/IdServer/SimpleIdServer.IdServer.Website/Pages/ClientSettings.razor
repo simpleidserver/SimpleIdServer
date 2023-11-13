@@ -58,6 +58,16 @@
                             <RadzenTextBox Name="PostLogoutRedirectUris" @bind-Value="@updateClient.PostLogoutRedirectUris" Class="w-100"></RadzenTextBox>
                         </div>
                     </div>
+                    <!-- Redirect URL is case sensitive -->
+                    <div class="row mat-2">
+                        <div class="col-md-2">
+                            <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, "Redirect URL is case sensitive"))" />
+                            <RadzenLabel Text="Redirect URL is case sensitive" Style="padding: 0px;" />
+                        </div>
+                        <div class="col">
+                            <RadzenCheckBox Name="IsRedirectUrlCaseSensitive" @bind-Value="@updateClient.IsRedirectUrlCaseSensitive"></RadzenCheckBox>
+                        </div>
+                    </div>
                 </RadzenAccordionItem>
             }
 
@@ -286,6 +296,7 @@
         public bool IsConsentEnabled { get; set; }
         public bool IsDeviceGrantTypeEnabled { get; set; }
         public bool UseAcs { get; set; }
+        public bool IsRedirectUrlCaseSensitive { get; set; }
         public string MetadataUrl { get; set; }
         public TokenExchangeTypes? TokenExchangeType { get; set;  }
     }
@@ -322,6 +333,7 @@
             IsConsentEnabled = !this.Client.IsConsentDisabled,
             UseAcs = this.Client.GetUseAcrsArtifact(),
             MetadataUrl = this.Client.GetSaml2SpMetadataUrl(),
+            IsRedirectUrlCaseSensitive = this.Client.IsRedirectUrlCaseSensitive,
             TokenExchangeType = this.Client.TokenExchangeType
         };
         if (this.Client.GrantTypes.Contains(ClientCredentialsHandler.GRANT_TYPE))
@@ -363,6 +375,7 @@
             IsConsentEnabled = client.IsConsentEnabled,
             IsDeviceGrantTypeEnabled = client.IsDeviceGrantTypeEnabled,
             IsTokenExchangeEnabled = client.IsTokenExchangeEnabled,
+            IsRedirectUrlCaseSensitive = client.IsRedirectUrlCaseSensitive,
             UseAcs = client.UseAcs,
             MetadataUrl = client.MetadataUrl,
             TokenExchangeType = client.TokenExchangeType,

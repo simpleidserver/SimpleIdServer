@@ -35,4 +35,6 @@ public class UpdateClientRequest
     public Dictionary<string, string> Parameters { get; set; }
     [JsonPropertyName(OAuthClientParameters.JwksUri)]
     public string JwksUrl { get; set; }
+    [JsonPropertyName(OAuthClientParameters.IsRedirectUrlCaseSensitive)]
+    public bool IsRedirectUrlCaseSensitive { get; set; }
 }

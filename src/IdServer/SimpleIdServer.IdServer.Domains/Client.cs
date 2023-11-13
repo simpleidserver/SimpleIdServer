@@ -495,6 +495,8 @@ namespace SimpleIdServer.IdServer.Domains
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.DPOPNonceLifetimeInSeconds)]
         public double DPOPNonceLifetimeInSeconds { get; set; } = 5 * 60;
+        [JsonPropertyName(OAuthClientParameters.IsRedirectUrlCaseSensitive)]
+        public bool IsRedirectUrlCaseSensitive { get; set; } = false;
         [JsonPropertyName(OAuthClientParameters.Parameters)]
         public JsonObject Parameters
         {

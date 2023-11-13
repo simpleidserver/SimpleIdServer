@@ -214,6 +214,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             client.FrontChannelLogoutUri = act.FrontChannelLogoutUri;
             client.BackChannelLogoutUri = act.BackChannelLogoutUri;
             client.BackChannelLogoutSessionRequired = act.BackChannelLogoutSessionRequired;
+            client.IsRedirectUrlCaseSensitive = act.IsRedirectUrlCaseSensitive;
             var grantTypes = new List<string>();
             if (act.IsClientCredentialsGrantTypeEnabled)
                 grantTypes.Add(ClientCredentialsHandler.GRANT_TYPE);

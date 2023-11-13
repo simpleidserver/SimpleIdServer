@@ -309,6 +309,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 IsTokenExchangeEnabled = isTokenExchangeEnabled,
                 IsConsentDisabled = !act.IsConsentEnabled,
                 JwksUrl = act.JwksUrl,
+                IsRedirectUrlCaseSensitive = act.IsRedirectUrlCaseSensitive,
                 Parameters = new Dictionary<string, string>
                 {
                     { ClientExtensions.SAML2_USE_ACS_ARTIFACT_NAME, act.UseAcs.ToString() },
@@ -341,7 +342,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 IsConsentEnabled = act.IsConsentEnabled,
                 IsDeviceGrantTypeEnabled = act.IsDeviceGrantTypeEnabled,
                 TokenExchangeType = act.TokenExchangeType,
-                IsTokenExchangeEnabled = act.IsTokenExchangeEnabled
+                IsTokenExchangeEnabled = act.IsTokenExchangeEnabled,
+                IsRedirectUrlCaseSensitive = act.IsRedirectUrlCaseSensitive
             });
         }
 
@@ -876,6 +878,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public string MetadataUrl { get; set; }
         public string JwksUrl { get; set; }
         public TokenExchangeTypes? TokenExchangeType { get; set; }
+        public bool IsRedirectUrlCaseSensitive { get; set; }
     }
 
     public class UpdateClientDetailsSuccessAction
@@ -898,6 +901,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public bool IsDeviceGrantTypeEnabled { get; set; }
         public TokenExchangeTypes? TokenExchangeType { get; set; }
         public bool IsTokenExchangeEnabled { get; set; }
+        public bool IsRedirectUrlCaseSensitive { get; set; }
     }
 
     public class ToggleAllClientScopeSelectionAction

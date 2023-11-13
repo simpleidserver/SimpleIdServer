@@ -252,6 +252,7 @@ public class ClientsController : BaseController
             existingClient.IsTokenExchangeEnabled = newClient.IsTokenExchangeEnabled;
             existingClient.IsConsentDisabled = newClient.IsConsentDisabled;
             existingClient.JwksUri = newClient.JwksUrl;
+            existingClient.IsRedirectUrlCaseSensitive = newClient.IsRedirectUrlCaseSensitive;
             if (newClient.Parameters != null)
             {
                 foreach (var kvp in newClient.Parameters)

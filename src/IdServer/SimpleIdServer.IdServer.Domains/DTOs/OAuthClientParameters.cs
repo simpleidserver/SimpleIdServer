@@ -84,5 +84,6 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
         public const string BCIntervalSeconds = "bc_interval";
         public const string DPOPNonceLifetimeInSeconds = "dpop_lifetime";
         public const string Scopes = "scopes";
+        public const string IsRedirectUrlCaseSensitive = "is_redirect_url_casesensitive";
     }
 }
