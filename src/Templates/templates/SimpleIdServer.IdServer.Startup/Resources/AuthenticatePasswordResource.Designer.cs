@@ -70,6 +70,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Credential is invalid.
+        /// </summary>
+        public static string invalid_credential {
+            get {
+                return ResourceManager.GetString("invalid_credential", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Login is missing.
         /// </summary>
         public static string invalid_login {

@@ -9,6 +9,7 @@
 	  <PackageReference Include="SimpleIdServer.IdServer.CredentialIssuer" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Email" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Fido" Version="4.0.*-*" />
+	  <PackageReference Include="SimpleIdServer.IdServer.Notification.Fcm" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.PostgreMigrations" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Saml.Idp" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Sms" Version="4.0.*-*" />
@@ -37,6 +38,31 @@
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>
 	    <DependentUpon>AccountsResource.resx</DependentUpon>
+	  </Compile>
+	  <Compile Update="Resources\RegisterPwdResource.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>RegisterPwdResource.resx</DependentUpon>
+	  </Compile>
+	  <Compile Update="Resources\RegisterSmsResource.Designer.cs">
+	    <DependentUpon>RegisterSmsResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	  <Compile Update="Resources\RegisterEmailResource.Designer.cs">
+	    <DependentUpon>RegisterEmailResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	  <Compile Update="Resources\AuthenticateMobileResource.Designer.cs">
+	    <DependentUpon>AuthenticateMobileResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	  <Compile Update="Resources\AuthenticateWebauthnResource.Designer.cs">
+	    <DependentUpon>AuthenticateWebauthnResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
 	  </Compile>
 	  <Compile Update="Resources\DeviceCodeResource.Designer.cs">
 	    <DependentUpon>DeviceCodeResource.resx</DependentUpon>
@@ -108,6 +134,26 @@
 	  <EmbeddedResource Update="Resources\AccountsResource.resx">
 	    <Generator>PublicResXFileCodeGenerator</Generator>
 	    <LastGenOutput>AccountsResource.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Resources\RegisterPwdResource.resx">
+	    <Generator>PublicResXFileCodeGenerator</Generator>
+	    <LastGenOutput>RegisterPwdResource.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Resources\RegisterSmsResource.resx">
+	    <LastGenOutput>RegisterSmsResource.Designer.cs</LastGenOutput>
+	    <Generator>PublicResXFileCodeGenerator</Generator>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Resources\RegisterEmailResource.resx">
+	    <LastGenOutput>RegisterEmailResource.Designer.cs</LastGenOutput>
+	    <Generator>PublicResXFileCodeGenerator</Generator>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Resources\AuthenticateMobileResource.resx">
+	    <LastGenOutput>AuthenticateMobileResource.Designer.cs</LastGenOutput>
+	    <Generator>PublicResXFileCodeGenerator</Generator>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Resources\AuthenticateWebauthnResource.resx">
+	    <LastGenOutput>AuthenticateWebauthnResource.Designer.cs</LastGenOutput>
+	    <Generator>PublicResXFileCodeGenerator</Generator>
 	  </EmbeddedResource>
 	  <EmbeddedResource Update="Resources\DeviceCodeResource.resx">
 	    <LastGenOutput>DeviceCodeResource.Designer.cs</LastGenOutput>

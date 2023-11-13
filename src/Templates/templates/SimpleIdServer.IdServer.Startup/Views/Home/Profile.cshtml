@@ -242,7 +242,7 @@
                                 <p>@ProfileResource.update_your_credentials</p>
                                 foreach(var authenticationMethod in Model.AuthenticationMethods.Where(m => m.IsCredentialExists))
                                 {
-                                    <a class="btn btn-secondary me-1" href="@Url.Action("Index", "Register", new { area = authenticationMethod.Amr })">
+                                    <a class="btn btn-secondary me-1" href="@Url.Action("RegisterCredential", "Home", new { name = authenticationMethod.Amr })">
                                         @authenticationMethod.Name
                                     </a>
                                 }
@@ -258,7 +258,7 @@
                                 <p>@ProfileResource.enroll_credentials</p>
                                 foreach (var authenticationMethod in Model.AuthenticationMethods.Where(m => !m.IsCredentialExists))
                                 {
-                                    <a class="btn btn-secondary me-1" href="@Url.Action("Index", "Register", new { area = authenticationMethod.Amr })">
+                                    <a class="btn btn-secondary me-1" href="@Url.Action("RegisterCredential", "Home", new { name = authenticationMethod.Amr })">
                                         @authenticationMethod.Name
                                     </a>
                                 }

@@ -513,7 +513,7 @@ namespace SimpleIdServer.IdServer.Domains
         /// Default acr values.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.DefaultAcrValues)]
-        public IEnumerable<string> DefaultAcrValues { get; set; } = new List<string>();
+        public ICollection<string> DefaultAcrValues { get; set; } = new List<string>();
         /// <summary>
         /// A JSON number with a positive integer value indicating the minimum amount of time in seconds that the client MUST wait between polling requests to the token endpoint.
         /// </summary>

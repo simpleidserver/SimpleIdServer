@@ -19,23 +19,27 @@
 		  "type": "parameter",
 		  "defaultValue": "Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True",
 		  "replaces": "STORAGE-CONNECTIONSTRING",
-		  "isRequired": true,
+		  "isRequired": false,
 		  "description": "Connection string for the storage."
 	  },
 	  "distributedCacheConnectionString": {
 		  "type": "parameter",
 		  "defaultValue": "Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True",
 		  "replaces": "DISTRIBUTEDCACHE-CONNECTIONSTRING",
-		  "isRequired": true,
+		  "isRequired": false,
 		  "description": "Connection string for the distributed cache."
 	  },
 	  "storageType": {
 		  "type": "parameter",
-		  "defaultValue": "SQLSERVER",
+		  "defaultValue": "INMEMORY",
 		  "replaces": "STORAGE-TYPE",
 		  "isRequired": false,
 		  "description": "Type of storage",
 		  "choices": [
+			  {
+				  "choice": "INMEMORY",
+				  "description": "INMEMORY"
+			  },
 			  {
 				"choice": "SQLSERVER",
 				"description": "SQLSERVER"
@@ -48,7 +52,7 @@
 	  },
 	  "distributedCacheType": {
 		  "type": "parameter",
-		  "defaultValue": "SQLSERVER",
+		  "defaultValue": "INMEMORY",
 		  "replaces": "DISTRIBUTEDCACHE-TYPE",
 		  "isRequired": false,
 		  "description": "Type of distributed cache",

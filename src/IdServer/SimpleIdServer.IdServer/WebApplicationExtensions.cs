@@ -486,6 +486,10 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Groups + "/{id}/roles/{roleId}",
                 defaults: new { controller = "Groups", action = "RemoveRole" });
 
+            webApplication.MapControllerRoute("getStats",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Statistics,
+                defaults: new { controller = "Statistics", action = "Get" });
+
             webApplication.MapControllerRoute("getAllRealms",
                 pattern: Constants.EndPoints.Realms,
                 defaults: new { controller = "Realms", action = "GetAll" });

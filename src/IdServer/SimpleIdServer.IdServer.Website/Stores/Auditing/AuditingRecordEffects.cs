@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
+using System.Text;
 using System.Text.Json;
 
 namespace SimpleIdServer.IdServer.Website.Stores.Auditing
@@ -37,7 +38,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.Auditing
                     OrderBy = SanitizeExpression(action.OrderBy),
                     Skip = action.Skip,
                     Take = action.Take
-                }))
+                }), Encoding.UTF8, "application/json")
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();

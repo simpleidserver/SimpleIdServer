@@ -10,6 +10,6 @@ public class AddRealmRequest
 {
     [JsonPropertyName(RealmNames.Name)]
     public string Name { get; set; }
-    [JsonPropertyName(RealmNames.Name)]
+    [JsonPropertyName(RealmNames.Description)]
     public string Description { get; set; }
 }

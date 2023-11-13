@@ -149,11 +149,11 @@ dotnet new sln -n Quickstart
 
 ### Create IdentityServer project
 
-To create a web project named `IdServer` with the `SimpleIdServer.IdServer` package installed and Entity Framework (EF) configured to use SQLServer, execute the command line :
+To create a web project named `IdServer` with the `SimpleIdServer.IdServer` package installed, execute the command line :
 
 ```
 cd src
-dotnet new idserver -n IdServer --storageConnectionString "Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True" --distributedCacheConnectionString "Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True"
+dotnet new idserver -n IdServer
 ```
 
 The following files will be created within a new `src/IdServer` directory :
@@ -192,11 +192,11 @@ The IdentityServer UI uses Bootstrap 5.
 
 ### Create IdentityServer website project
 
-create a web project named `IdServerWebsite` with the `SimpleIdServer.IdServer.Website` package installed and Entity Framework (EF) configured to use SQLServer, execute the command line :
+create a web project named `IdServerWebsite` with the `SimpleIdServer.IdServer.Website` package installed, execute the command line :
 
 ```
 cd src
-dotnet new idserverwebsite -n IdServerWebsite --storageConnectionString "Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True"
+dotnet new idserverwebsite -n IdServerWebsite
 ```
 
 Run the `IdServerWebsite` project, it must listens on the url `https://localhost:5002`.

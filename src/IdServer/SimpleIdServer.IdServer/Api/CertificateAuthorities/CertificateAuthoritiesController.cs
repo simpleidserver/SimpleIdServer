@@ -57,6 +57,9 @@ public class CertificateAuthoritiesController : BaseController
 
             if (!string.IsNullOrWhiteSpace(request.OrderBy))
                 query = query.OrderBy(request.OrderBy);
+            else
+                query = query.OrderByDescending(c => c.UpdateDateTime);
+
             var nb = query.Count();
             var cas = await query.Skip(request.Skip.Value).Take(request.Take.Value).ToListAsync();
             return new OkObjectResult(new SearchResult<CertificateAuthority>
@@ -88,7 +91,7 @@ public class CertificateAuthoritiesController : BaseController
     }
 
     [HttpPost]
-    public IActionResult Import([FromBody] string prefix, [FromBody] ImportCertificateAuthorityRequest request)
+    public IActionResult Import([FromRoute] string prefix, [FromBody] ImportCertificateAuthorityRequest request)
     {
         CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name, _jwtBuilder);
         if (request == null) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
@@ -126,7 +129,7 @@ public class CertificateAuthoritiesController : BaseController
     }
 
     [HttpPost]
-    public async Task<IActionResult> Add([FromBody] string prefix, [FromBody] CertificateAuthority request)
+    public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] CertificateAuthority request)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         using (var activity = Tracing.IdServerActivitySource.StartActivity("Add certificate authority"))
@@ -156,6 +159,7 @@ public class CertificateAuthoritiesController : BaseController
                 var realm = await _realmRepository.Query().SingleAsync(r => r.Name == prefix);
                 record.Realms.Add(realm);
                 _certificateAuthorityRepository.Add(record);
+                await _certificateAuthorityRepository.SaveChanges(CancellationToken.None);
                 activity?.SetStatus(ActivityStatusCode.Ok, $"Certificate authority {request.SubjectName} added");
                 await _busControl.Publish(new AddCertificateAuthoritySuccessEvent
                 {
@@ -229,7 +233,7 @@ public class CertificateAuthoritiesController : BaseController
     }
 
     [HttpDelete]
-    public async Task<IActionResult> RemoveClientCertificate(string prefix, string id, string clientCertificateId)
+    public async Task<IActionResult> RemoveClientCertificate([FromRoute] string prefix, string id, string clientCertificateId)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         using (var activity = Tracing.IdServerActivitySource.StartActivity("Remove client certificate"))

@@ -24,13 +24,7 @@
     }
 </ul>
 
-@if (Model.IsFidoCredentialsMissing)
-{
-    <div class="alert alert-danger">
-        @AuthenticateWebauthnResource.missing_credential
-    </div>
-}
-else if (Model.IsLoginMissing)
+@if (Model.IsLoginMissing)
 {    
     <div class="alert alert-danger">
         @AuthenticateWebauthnResource.missing_login
@@ -58,7 +52,6 @@ else
             <input type="checkbox" asp-for="RememberLogin " />
             <label>@AuthenticateWebauthnResource.remember_login</label>
         </div>
-        <input asp-for="IsFidoCredentialsMissing" type="hidden" class="form-control" />
         <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
         <input asp-for="BeginLoginUrl" type="hidden" class="form-control" />
         <input asp-for="EndLoginUrl" type="hidden" class="form-control" />

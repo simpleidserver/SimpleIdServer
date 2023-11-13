@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Microsoft.AspNetCore.Server.Kestrel.Https;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -22,6 +22,7 @@ using SimpleIdServer.IdServer.Provisioning.LDAP.Jobs;
 using SimpleIdServer.IdServer.Provisioning.SCIM;
 using SimpleIdServer.IdServer.Provisioning.SCIM.Jobs;
 using SimpleIdServer.IdServer.Sms;
+using SimpleIdServer.IdServer.Startup;
 using SimpleIdServer.IdServer.Startup.Configurations;
 using SimpleIdServer.IdServer.Startup.Converters;
 using SimpleIdServer.IdServer.Store;
@@ -30,7 +31,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Security.Cryptography;
 
 const string CreateTableFormat = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DistributedCache' and xtype='U') " +
     "CREATE TABLE [dbo].[DistributedCache] (" +
@@ -43,19 +43,19 @@ const string CreateTableFormat = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE 
 
 ServicePointManager.ServerCertificateValidationCallback += (o, c, ch, er) => true;
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration
+    .AddJsonFile("appsettings.json")
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+    .AddEnvironmentVariables();
+var identityServerConfiguration = builder.Configuration.Get<IdentityServerConfiguration>();
 builder.Services.Configure<KestrelServerOptions>(options =>
 {
     options.ConfigureHttpsDefaults(o =>
     {
         o.SslProtocols = System.Security.Authentication.SslProtocols.Tls12;
-        o.ClientCertificateMode = ClientCertificateMode.AllowCertificate;
+        if (identityServerConfiguration.ClientCertificateMode != null) o.ClientCertificateMode = identityServerConfiguration.ClientCertificateMode.Value;
     });
 });
-
-builder.Configuration
-    .AddJsonFile("appsettings.json")
-    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
-    .AddEnvironmentVariables();
 ConfigureCentralizedConfiguration(builder);
 builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
     .AllowAnyMethod()
@@ -64,7 +64,7 @@ builder.Services.AddRazorPages()
     .AddRazorRuntimeCompilation();
 ConfigureIdServer(builder.Services);
 var app = builder.Build();
-SeedData(app, builder.Configuration["SCIMBaseUrl"]);
+SeedData(app, identityServerConfiguration.SCIMBaseUrl);
 app.UseCors("AllowAll");
 app.UseSID()
 .UseWsFederation()
@@ -76,17 +76,18 @@ app.Run();
 
 void ConfigureIdServer(IServiceCollection services)
 {
-    services.AddSIDIdentityServer(dataProtectionBuilderCallback: ConfigureDataProtection)
+    var idServerBuilder = services.AddSIDIdentityServer(dataProtectionBuilderCallback: ConfigureDataProtection)
         .UseEFStore(o => ConfigureStorage(o))
         .AddCredentialIssuer()
         .UseInMemoryMassTransit()
         .AddBackChannelAuthentication()
         .AddEmailAuthentication()
         .AddSmsAuthentication()
+        .AddFcmNotification()
         .AddSamlIdp()
         .AddFidoAuthentication(f =>
         {
-            var authority = builder.Configuration["Authority"];
+            var authority = identityServerConfiguration.Authority;
             var url = new Uri(authority);
             f.ServerName = "SimpleIdServer";
             f.ServerDomain = url.Host;
@@ -95,7 +96,6 @@ void ConfigureIdServer(IServiceCollection services)
         .EnableConfigurableAuthentication()
         .AddSCIMProvisioning()
         .AddLDAPProvisioning()
-        .UseRealm()
         .AddAuthentication(callback: (a) =>
         {
             /*
@@ -113,7 +113,7 @@ void ConfigureIdServer(IServiceCollection services)
             });
             a.AddOIDCAuthentication(opts =>
             {
-                opts.Authority = builder.Configuration["Authority"];
+                opts.Authority = identityServerConfiguration.Authority;
                 opts.ClientId = "website";
                 opts.ClientSecret = "password";
                 opts.ResponseType = "code";
@@ -128,6 +128,8 @@ void ConfigureIdServer(IServiceCollection services)
                 opts.Scope.Add("profile");
             });
         });
+    var isRealmEnabled = identityServerConfiguration.IsRealmEnabled;
+    if (isRealmEnabled) idServerBuilder.UseRealm();
     services.AddDIDKey();
     services.AddDIDEthr();
     ConfigureDistributedCache();
@@ -145,6 +147,7 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
         o.Add<IdServerEmailOptions>();
         o.Add<IdServerSmsOptions>();
         o.Add<FidoOptions>();
+        o.Add<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>();
         if(conf.Type == DistributedCacheTypes.REDIS)
         {
             o.UseRedisConnector(conf.ConnectionString);
@@ -211,9 +214,11 @@ void ConfigureStorage(DbContextOptionsBuilder b)
                 o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
             });
             break;
+        case StorageTypes.INMEMORY:
+            b.UseInMemoryDatabase(conf.ConnectionString);
+            break;
     }
 }
-
 
 void ConfigureDataProtection(IDataProtectionBuilder dataProtectionBuilder)
 {
@@ -226,7 +231,8 @@ void SeedData(WebApplication application, string scimBaseUrl)
     {
         using (var dbContext = scope.ServiceProvider.GetService<StoreDbContext>())
         {
-            dbContext.Database.Migrate();
+            var isInMemory = dbContext.Database.IsInMemory();
+            if (!isInMemory) dbContext.Database.Migrate();
             if (!dbContext.Realms.Any())
                 dbContext.Realms.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Realms);
 
@@ -323,7 +329,7 @@ void SeedData(WebApplication application, string scimBaseUrl)
                     CreateDateTime = DateTime.UtcNow
                 });
 
-            if(!dbContext.Definitions.Any())
+            if (!dbContext.Definitions.Any())
             {
                 dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<FacebookOptionsLite>());
                 dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<LDAPRepresentationsExtractionJobOptions>());
@@ -331,10 +337,18 @@ void SeedData(WebApplication application, string scimBaseUrl)
                 dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<IdServerEmailOptions>());
                 dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<IdServerSmsOptions>());
                 dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<FidoOptions>());
+                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>());
             }
 
+            EnableIsolationLevel(dbContext);
+            dbContext.SaveChanges();
+        }
+
+        void EnableIsolationLevel(StoreDbContext dbContext)
+        {
+            if (dbContext.Database.IsInMemory()) return;
             var dbConnection = dbContext.Database.GetDbConnection() as SqlConnection;
-            if(dbConnection != null)
+            if (dbConnection != null)
             {
                 if (dbConnection.State != System.Data.ConnectionState.Open) dbConnection.Open();
                 var cmd = dbConnection.CreateCommand();
@@ -344,18 +358,6 @@ void SeedData(WebApplication application, string scimBaseUrl)
                 cmd.CommandText = CreateTableFormat;
                 cmd.ExecuteNonQuery();
             }
-
-            dbContext.SaveChanges();
         }
     }
 }
-
-static RsaSecurityKey BuildRsaSecurityKey(string keyid) => new RsaSecurityKey(RSA.Create())
-{
-    KeyId = keyid
-};
-
-static ECDsaSecurityKey BuildECDSaSecurityKey(ECCurve curve) => new ECDsaSecurityKey(ECDsa.Create(curve))
-{
-    KeyId = Guid.NewGuid().ToString()
-};

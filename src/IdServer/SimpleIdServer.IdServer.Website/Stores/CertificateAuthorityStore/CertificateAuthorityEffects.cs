@@ -7,6 +7,7 @@ using SimpleIdServer.IdServer.Api.CertificateAuthorities;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -40,7 +41,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
                     OrderBy = SanitizeExpression(action.OrderBy),
                     Skip = action.Skip,
                     Take = action.Take
-                }))
+                }), Encoding.UTF8, "application/json")
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
@@ -63,7 +64,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
                 {
                     NumberOfDays = action.NumberOfDays,
                     SubjectName = action.SubjectName
-                }))
+                }), Encoding.UTF8, "application/json")
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
@@ -80,13 +81,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
             {
                 RequestUri = new Uri($"{baseUrl}/import"),
                 Method = HttpMethod.Post,
-                Content = new StringContent(JsonSerializer.Serialize(new ImportCertificateAuthorityAction
+                Content = new StringContent(JsonSerializer.Serialize(new ImportCertificateAuthorityRequest
                 {
                     FindType = action.FindType,
                     FindValue = action.FindValue,
                     StoreLocation = action.StoreLocation,
                     StoreName = action.StoreName
-                }))
+                }), Encoding.UTF8, "application/json")
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
@@ -112,7 +113,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
             {
                 RequestUri = new Uri(baseUrl),
                 Method = HttpMethod.Post,
-                Content = new StringContent(JsonSerializer.Serialize(action.CertificateAuthority))
+                Content = new StringContent(JsonSerializer.Serialize(action.CertificateAuthority), Encoding.UTF8, "application/json")
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
@@ -182,7 +183,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
             var requestMessage = new HttpRequestMessage
             {
                 RequestUri = new Uri($"{baseUrl}/{action.CertificateAuthorityId}/clientcertificates"),
-                Method = HttpMethod.Post
+                Method = HttpMethod.Post,
+                Content = new StringContent(JsonSerializer.Serialize(new AddClientCertificateRequest
+                {
+                    NbDays = action.NbDays,
+                    SubjectName = action.SubjectName
+                }), Encoding.UTF8, "application/json")
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();

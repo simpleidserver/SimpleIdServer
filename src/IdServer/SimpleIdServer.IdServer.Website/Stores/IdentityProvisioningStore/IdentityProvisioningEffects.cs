@@ -234,7 +234,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             {
                 var realm = await _sessionStorage.GetAsync<string>("realm");
                 var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
-                return realmStr;
+                return $"{_options.IdServerBaseUrl}/{realmStr}/provisioning";
             }
 
             return $"{_options.IdServerBaseUrl}/provisioning";

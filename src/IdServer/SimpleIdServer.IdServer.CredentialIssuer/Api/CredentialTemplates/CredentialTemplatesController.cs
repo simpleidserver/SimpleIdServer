@@ -258,6 +258,7 @@ public class CredentialTemplatesController : BaseController
                     Name = request.Name,
                     TextColor = request.TextColor
                 };
+                result.DisplayLst.Add(display);
                 await _credentialTemplateRepository.SaveChanges(CancellationToken.None);
                 activity?.SetStatus(ActivityStatusCode.Ok, $"Credential template display {display.Id} is added");
                 await _busControl.Publish(new CredentialTemplateDisplayAddedSuccessEvent
@@ -361,6 +362,8 @@ public class CredentialTemplatesController : BaseController
                             parameter.Id = Guid.NewGuid().ToString();
                             credentialTemplate.Parameters.Add(parameter);
                         }
+
+                        result.Add(parameter);
                     }
                 }
 

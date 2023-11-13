@@ -29,7 +29,7 @@ Scenario: access token must be passed (HTTP DELETE)
 	And JSON 'error_description'='missing token'
 
 Scenario: access token must be passed (HTTP PUT Credentials)
-	When execute HTTP PUT JSON request 'https://localhost:8080/users/id/credentials'
+	When execute HTTP PUT JSON request 'https://localhost:8080/users/id/credentials/cred'
 	| Key | Value |
 
 	And extract JSON from body
@@ -112,69 +112,6 @@ Scenario: remove an unknown user
 	
 	Then HTTP status code equals to '404'
 
-Scenario: credential type is required
-	When execute HTTP POST request 'http://localhost/token'
-	| Key           | Value              |
-	| client_id     | fiftySevenClient   |
-	| client_secret | password           |
-	| scope         | users              |
-	| grant_type    | client_credentials |	
-	
-	And extract JSON from body
-	And extract parameter 'access_token' from JSON body	
-	
-	When execute HTTP PUT JSON request 'https://localhost:8080/users/id/credentials'
-	| Key             | Value                 |
-	| Authorization   | Bearer $access_token$ |		
-
-	And extract JSON from body
-
-	Then JSON 'error'='invalid_request'
-	And JSON 'error_description'='missing parameter type'
-
-Scenario: credential value is required
-	When execute HTTP POST request 'http://localhost/token'
-	| Key           | Value              |
-	| client_id     | fiftySevenClient   |
-	| client_secret | password           |
-	| scope         | users              |
-	| grant_type    | client_credentials |	
-	
-	And extract JSON from body
-	And extract parameter 'access_token' from JSON body	
-	
-	When execute HTTP PUT JSON request 'https://localhost:8080/users/id/credentials'
-	| Key             | Value                 |
-	| Authorization   | Bearer $access_token$ |		
-	| type            | type                  |
-
-	And extract JSON from body
-
-	Then JSON 'error'='invalid_request'
-	And JSON 'error_description'='missing parameter value'
-
-Scenario: credential type must be supported
-	When execute HTTP POST request 'http://localhost/token'
-	| Key           | Value              |
-	| client_id     | fiftySevenClient   |
-	| client_secret | password           |
-	| scope         | users              |
-	| grant_type    | client_credentials |	
-	
-	And extract JSON from body
-	And extract parameter 'access_token' from JSON body	
-	
-	When execute HTTP PUT JSON request 'https://localhost:8080/users/id/credentials'
-	| Key             | Value                 |
-	| Authorization   | Bearer $access_token$ |		
-	| type            | type                  |
-	| value           | value                 |
-
-	And extract JSON from body
-
-	Then JSON 'error'='invalid_request'
-	And JSON 'error_description'='the credential type type is not supported'
-
 Scenario: cannot update credential when user doesn't exist
 	When execute HTTP POST request 'http://localhost/token'
 	| Key           | Value              |
@@ -186,7 +123,7 @@ Scenario: cannot update credential when user doesn't exist
 	And extract JSON from body
 	And extract parameter 'access_token' from JSON body	
 	
-	When execute HTTP PUT JSON request 'https://localhost:8080/users/id/credentials'
+	When execute HTTP PUT JSON request 'https://localhost:8080/users/id/credentials/cred'
 	| Key             | Value                 |
 	| Authorization   | Bearer $access_token$ |		
 	| type            | pwd                   |

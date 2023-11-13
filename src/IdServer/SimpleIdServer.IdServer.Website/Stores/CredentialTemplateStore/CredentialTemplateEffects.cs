@@ -106,7 +106,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.CredentialTemplateStore
             var requestMessage = new HttpRequestMessage
             {
                 RequestUri = new Uri($"{baseUrl}/{action.Id}"),
-                Method = HttpMethod.Delete
+                Method = HttpMethod.Get
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();

@@ -5,8 +5,6 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 import HomepageFeatures from '@site/src/components/HomepageFeatures';
 import HomepageInstallations from '@site/src/components/HomepageInstallations';
-import HomepageStandards from '@site/src/components/HomepageStandards';
-
 import styles from './index.module.css';
 import HomepagePhilosophy from '../components/HomepagePhilosophy';
 
@@ -23,8 +21,6 @@ function HomepageHeader() {
             to="https://website.simpleidserver.com">
             Demo
           </Link>
-          <Link className="button button--secondary button--lg">Android</Link>
-          <Link className="button button--secondary button--lg">IOS</Link>
         </div>
       </div>
     </header>
@@ -48,7 +44,6 @@ export default function Home() {
         <div style={{borderBottom: "1px solid #ebedf0"}}>
           <HomepageFeatures />
         </div>
-        <HomepageStandards />
       </main>
     </Layout>
   );
