@@ -54,10 +54,6 @@ namespace SimpleIdServer.IdServer.Options
         /// </summary>
         public bool MtlsEnabled { get; internal set; } = false;
         /// <summary>
-        /// JWK expiration time in seconds.
-        /// </summary>
-        public int JWKExpirationTimeInSeconds { get; set; } = 60 * 5;
-        /// <summary>
         /// Default Token Expiration Time in seconds.
         /// </summary>
         public double DefaultTokenExpirationTimeInSeconds { get; set; } = 60 * 30;

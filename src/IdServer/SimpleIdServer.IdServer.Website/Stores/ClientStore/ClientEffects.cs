@@ -639,7 +639,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 ResponseTypes = act.ResponseTypes?.ToList(), 
                 DPOPBoundAccessTokens = act.IsDPoPRequired,
                 DPOPNonceLifetimeInSeconds = act.DPOPNonceLifetimeInSeconds,
-                IsDPOPNonceRequired = act.IsDPoPNonceRequired
+                IsDPOPNonceRequired = act.IsDPoPNonceRequired,
+                TokenExpirationTimeInSeconds = act.TokenExpirationTimeInSeconds
             };
             var requestMessage = new HttpRequestMessage
             {
@@ -656,7 +657,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 IdTokenSignedResponseAlg = act.IdTokenSignedResponseAlg,
                 DPOPNonceLifetimeInSeconds = act.DPOPNonceLifetimeInSeconds,
                 IsDPoPNonceRequired = act.IsDPoPNonceRequired,
-                IsDPoPRequired = act.IsDPoPRequired
+                IsDPoPRequired = act.IsDPoPRequired,
+                TokenExpirationTimeInSeconds = act.TokenExpirationTimeInSeconds
             });
         }
 
@@ -1123,6 +1125,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public bool IsDPoPRequired { get; set; } = false;
         public bool IsDPoPNonceRequired { get; set; } = false;
         public double DPOPNonceLifetimeInSeconds { get; set; }
+        public double TokenExpirationTimeInSeconds { get; set; }
     }
 
     public class UpdateAdvancedClientSettingsSuccessAction
@@ -1134,6 +1137,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public bool IsDPoPRequired { get; set; } = false;
         public bool IsDPoPNonceRequired { get; set; } = false;
         public double DPOPNonceLifetimeInSeconds { get; set; }
+        public double TokenExpirationTimeInSeconds { get; set; }
     }
 
     public class GenerateClientSigKeyAction

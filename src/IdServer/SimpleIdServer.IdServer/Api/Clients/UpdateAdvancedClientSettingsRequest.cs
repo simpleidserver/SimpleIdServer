@@ -23,4 +23,6 @@ public class UpdateAdvancedClientSettingsRequest
     public double DPOPNonceLifetimeInSeconds { get; set; }
     [JsonPropertyName(OAuthClientParameters.IsDPOPNonceRequired)]
     public bool IsDPOPNonceRequired {  get; set; }
+    [JsonPropertyName(OAuthClientParameters.TokenExpirationTimeInSeconds)]
+    public double TokenExpirationTimeInSeconds { get; set; }
 }

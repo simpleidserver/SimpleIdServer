@@ -285,6 +285,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             client.DPOPBoundAccessTokens = act.IsDPoPRequired;
             client.IsDPOPNonceRequired = act.IsDPoPNonceRequired;
             client.DPOPNonceLifetimeInSeconds = act.DPOPNonceLifetimeInSeconds;
+            client.TokenExpirationTimeInSeconds = act.TokenExpirationTimeInSeconds;
             return state with
             {
                 Client = client

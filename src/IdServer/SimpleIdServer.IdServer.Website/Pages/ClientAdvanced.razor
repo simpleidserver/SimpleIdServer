@@ -63,6 +63,16 @@
                         <RadzenDropDown @bind-Value=@selectedResponseTypes Chips=true Data=@responseTypes Multiple=true AllowClear=true Placeholder="Select Response Types" class="w-100"></RadzenDropDown>
                     </div>
                 </div>
+                <!-- Token expiration time -->
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, "Set the token duration in seconds; by default, the value is 30 minutes."))" />
+                        <RadzenLabel Text="Token expiration time" Style="padding: 0px;" />
+                    </div>
+                    <div class="col">
+                        <RadzenNumeric Name="TokenExpirationTimeInSeconds" Class="w-100" @bind-Value=@updateAdvancedClient.TokenExpirationTimeInSeconds></RadzenNumeric>
+                    </div>
+                </div>
                 <!-- DPoP -->
                 <div class="row mt-1">
                     <div class="col-md-2">
@@ -90,7 +100,7 @@
                         <RadzenLabel Text="Lifetime of DPoP Nonce" Style="padding: 0px;" />
                     </div>
                     <div class="col">
-                        <RadzenNumeric @bind-Value=@updateAdvancedClient.DPOPNonceLifetimeInSeconds />
+                        <RadzenNumeric @bind-Value=@updateAdvancedClient.DPOPNonceLifetimeInSeconds Class="w-100" />
                     </div>
                 </div>
             </RadzenAccordionItem>
@@ -115,6 +125,7 @@
         public bool IsDPoPRequired { get; set; } = false;
         public bool IsDPoPNonceRequired { get; set; } = false;
         public double DPOPNonceLifetimeInSeconds { get; set; }
+        public double TokenExpirationTimeInSeconds { get; set; } = 60 * 30;
     }
 
     UpdateAdvancedClient updateAdvancedClient = new UpdateAdvancedClient();
@@ -151,6 +162,8 @@
             IsDPoPNonceRequired = Client.IsDPOPNonceRequired,
             DPOPNonceLifetimeInSeconds = Client.DPOPNonceLifetimeInSeconds
         };
+        if (Client.TokenExpirationTimeInSeconds != null) 
+            updateAdvancedClient.TokenExpirationTimeInSeconds = Client.TokenExpirationTimeInSeconds.Value;
         selectedResponseTypes = Client.ResponseTypes.Where(r => !string.IsNullOrWhiteSpace(r));
     }
 
@@ -165,7 +178,8 @@
             ClientId = Client.ClientId,
             DPOPNonceLifetimeInSeconds = client.DPOPNonceLifetimeInSeconds,
             IsDPoPNonceRequired = client.IsDPoPNonceRequired,
-            IsDPoPRequired = client.IsDPoPRequired
+            IsDPoPRequired = client.IsDPoPRequired,
+            TokenExpirationTimeInSeconds = client.TokenExpirationTimeInSeconds
         });
     }
 

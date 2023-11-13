@@ -313,6 +313,7 @@ public class ClientsController : BaseController
             existingClient.DPOPBoundAccessTokens = request.DPOPBoundAccessTokens;
             existingClient.DPOPNonceLifetimeInSeconds = request.DPOPNonceLifetimeInSeconds;
             existingClient.IsDPOPNonceRequired = request.IsDPOPNonceRequired;
+            existingClient.TokenExpirationTimeInSeconds = request.TokenExpirationTimeInSeconds;
         }
     }
 
