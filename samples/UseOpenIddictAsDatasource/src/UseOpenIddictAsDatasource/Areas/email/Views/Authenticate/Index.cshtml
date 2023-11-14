@@ -1,0 +1,107 @@
+﻿@using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Options;
+@using UseOpenIddictAsDatasource;
+@using UseOpenIddictAsDatasource.Resources;
+@model SimpleIdServer.IdServer.Email.UI.ViewModels.AuthenticateEmailViewModel
+@inject IOptions<IdServerHostOptions> configuration
+
+@{
+    ViewBag.Title = AuthenticateEmailResource.title;
+    Layout = "~/Views/Shared/_AuthenticateLayout.cshtml";
+}
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <ul class="list-group">
+        @foreach (var modelState in ViewData.ModelState.Values)
+        {
+            foreach (var error in modelState.Errors)
+            {
+                <li class="list-group-item list-group-item-danger">@AuthenticateEmailResource.ResourceManager.GetString(error.ErrorMessage)</li>
+            }
+        }
+    </ul>
+}
+
+@if(Model.IsLoginMissing)
+{
+    <div class="alert alert-danger">
+        @AuthenticateEmailResource.missing_email
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        @string.Format(AuthenticateEmailResource.code_validity, configuration.Value.TOTPStep)
+    </div>
+
+    <!-- Login form -->
+    @using (Html.BeginForm("Index", "Authenticate", new { area = SimpleIdServer.IdServer.Email.Constants.AMR, returnUrl = Model.ReturnUrl }, FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="ReturnUrl" />
+        <input type="hidden" name="Action" value="AUTHENTICATE" />
+        <!-- Email -->
+        <div class="input-group mb-3">
+            @if(Model.IsAuthInProgress)
+            {
+                <input asp-for="Login" placeholder="@AuthenticateEmailResource.email" type="text" class="form-control" disabled="disabled" />
+                <input asp-for="Login" placeholder="@AuthenticateEmailResource.email" type="hidden" class="form-control" />
+            }
+            else
+            {
+                <input asp-for="Login" placeholder="@AuthenticateEmailResource.email" type="text" class="form-control" />
+            }
+        </div>
+        <!-- Confirmation code -->
+        <div class="input-group mb-3">
+            <input asp-for="OTPCode" placeholder="@AuthenticateEmailResource.confirmationcode" type="password" class="form-control" />
+        </div>
+        <div>
+            <input type="checkbox" asp-for="RememberLogin " />
+            <label>@AuthenticateEmailResource.remember_login</label>
+        </div>
+        <input asp-for="IsLoginMissing" type="hidden" class="form-control" />
+        <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
+        <button type="submit" class="btn btn-primary">@AuthenticateEmailResource.authenticate</button>
+    }
+
+    <!-- Send confirmation code -->
+    <div class="mt-3">
+        @if (!string.IsNullOrWhiteSpace(ViewBag.SuccessMessage))
+        {
+            <div class="alert alert-success">@AuthenticateEmailResource.ResourceManager.GetString(ViewBag.SuccessMessage)</div>
+        }
+
+        @using (Html.BeginForm("Index", "Authenticate", new { area = "email", returnUrl = Model.ReturnUrl }, FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="ReturnUrl" />
+            <input type="hidden" name="Action" value="SENDCONFIRMATIONCODE" />
+            <div class="input-group mb-3">
+                @if(Model.IsAuthInProgress)
+                {
+                    <input asp-for="Login" placeholder="@AuthenticateEmailResource.email" type="text" class="form-control" disabled="disabled" />
+                    <input asp-for="Login" placeholder="@AuthenticateEmailResource.email" type="hidden" class="form-control" />
+                }
+                else
+                {
+                    <input asp-for="Login" placeholder="@AuthenticateEmailResource.email" type="text" class="form-control" />
+                }
+            </div>
+            <input asp-for="IsLoginMissing" type="hidden" class="form-control" />
+            <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
+            <button type="submit" class="btn btn-primary">@AuthenticateEmailResource.sendconfirmationcode</button>
+        }
+    </div>
+}
+
+@section SubScripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".login input[name='RememberLogin']").change(function (e) {
+                $(this).val($(this).is(':checked'));
+            });
+        });
+    </script>
+}

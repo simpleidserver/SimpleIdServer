@@ -1,0 +1,84 @@
+﻿@using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Options;
+@using UseOpenIddictAsDatasource;
+@using UseOpenIddictAsDatasource.Resources;
+@model SimpleIdServer.IdServer.UI.ViewModels.OTPRegisterViewModel;
+@inject IOptions<IdServerHostOptions> configuration
+
+@{
+    ViewBag.Title = RegisterEmailResource.title;
+    Layout = "~/Views/Shared/_RegisterLayout.cshtml";
+}
+
+@if(!Model.IsUpdated)
+{
+    <h5>@(User.Identity.IsAuthenticated ? RegisterEmailResource.update_email : RegisterEmailResource.register_email)</h5>
+
+    @if (Model.IsOTPCodeSent)
+    {
+        <div class="alert alert-success">@RegisterEmailResource.otpcode_sent</div>
+    }
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <ul class="list-group">
+            @foreach (var modelState in ViewData.ModelState.Values)
+            {
+                foreach (var error in modelState.Errors)
+                {
+                    <li class="list-group-item list-group-item-danger">@RegisterEmailResource.ResourceManager.GetString(error.ErrorMessage)</li>
+                }
+            }
+        </ul>        
+    }
+
+    <!-- Registration form -->
+    @using (Html.BeginForm("Index", "Register", new { area = SimpleIdServer.IdServer.Email.Constants.AMR }, FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="Action" value="REGISTER" />
+        <!-- Email -->
+        <div class="form-floating mb-3">
+            <input asp-for="Value" placeholder="@RegisterEmailResource.email" id="floatingEmail" type="text" class="form-control" />
+            <label for="floatingEmail">@RegisterEmailResource.email</label>
+        </div>
+        <!-- Confirmation code -->
+        <div class="form-floating mb-3">
+            <input asp-for="OTPCode" placeholder="@RegisterEmailResource.confirmationcode" id="floatingConfirmationCode" type="password" class="form-control" />
+            <label for="floatingConfirmationCode">@RegisterEmailResource.confirmationcode</label>
+        </div>
+        @if (User.Identity.IsAuthenticated)
+        {
+            <button type="submit" class="btn btn-primary">@RegisterEmailResource.update</button>
+        }
+        else
+        {
+            <button type="submit" class="btn btn-primary">@RegisterEmailResource.create</button>
+        }
+    }
+
+    <!-- Send confirmation code -->
+    <div class="mt-3">
+        @using (Html.BeginForm("Index", "Register", new { area = SimpleIdServer.IdServer.Email.Constants.AMR }, FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="Action" value="SENDCONFIRMATIONCODE" />
+            <div class="form-floating mb-3">
+                <input asp-for="Value" placeholder="@RegisterEmailResource.email" id="floatingConfirmationCodeEmail" type="text" class="form-control" />
+                <label for="floatingConfirmationCodeEmail">@RegisterEmailResource.email</label>
+            </div>
+            <button type="submit" class="btn btn-primary">@RegisterEmailResource.sendconfirmationcode</button>
+        }
+    </div>
+}
+else
+{
+    if (User.Identity.IsAuthenticated)
+    {
+        <div class="alert alert-success">@RegisterEmailResource.email_is_enrolled</div>
+    }
+    else
+    {
+        <div class="alert alert-success">@RegisterEmailResource.user_is_created</div>
+    }
+}
