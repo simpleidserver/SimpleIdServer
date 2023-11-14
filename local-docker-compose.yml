@@ -71,9 +71,7 @@ services:
       DefaultSecurityOptions__IgnoreCertificateError: "true"
       IdServerBaseUrl: "https://idserver.localhost.com"
       ScimBaseUrl: "https://scim.localhost.com"
-      StorageConfiguration__ConnectionString: "Data Source=db;Initial Catalog=IdServer;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"
     depends_on:
-      - db
       - idserver
       - scim
     networks:

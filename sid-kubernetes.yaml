@@ -173,7 +173,7 @@ spec:
       subdomain: localhost
       containers:
       - name: scim-deploy
-        image: simpleidserver/scim:4.0.4
+        image: simpleidserver/scim:4.0.5
         ports:
           - containerPort: 80
         env:
@@ -208,7 +208,7 @@ spec:
       subdomain: localhost
       containers:
       - name: idserver-deploy
-        image: simpleidserver/idserver:4.0.4
+        image: simpleidserver/idserver:4.0.5
         ports:
           - containerPort: 80
         env:
@@ -251,7 +251,7 @@ spec:
       subdomain: localhost
       containers:
       - name: website-deploy
-        image: simpleidserver/website:4.0.4
+        image: simpleidserver/website:4.0.5
         ports:
           - containerPort: 80
         env:
@@ -271,5 +271,3 @@ spec:
               value: "https://idserver.sid.svc.cluster.local"
             - name: "ScimBaseUrl"
               value: "https://scim.sid.svc.cluster.local"
-            - name: "StorageConfiguration__ConnectionString"
-              value: "Data Source=db-service,1433;Initial Catalog=IdServer;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"

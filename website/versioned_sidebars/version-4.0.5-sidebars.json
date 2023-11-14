@@ -1,0 +1,75 @@
+{
+  "docs": [
+    "overview",
+    "installation",
+    "glossary",
+    {
+      "type": "category",
+      "label": "Identity and Access Management",
+      "items": [
+        "iam/authmethods",
+        "iam/externalidproviders",
+        {
+          "type": "category",
+          "label": "Identity Provisioning",
+          "items": [
+            "iam/automaticidentityprovisioning",
+            "iam/manualidentityprovisioning"
+          ]
+        },
+        {
+          "type": "category",
+          "label": "Security protocols",
+          "items": [
+            "iam/openid",
+            "iam/saml2",
+            "iam/wsfederation"
+          ]
+        },
+        "iam/storage",
+        "iam/configuration",
+        "iam/caching"
+      ]
+    },
+    "scim20",
+    "mobileapplication",
+    {
+      "type": "category",
+      "label": "Advanced settings",
+      "items": [
+        "advancedsettings/auditing",
+        "advancedsettings/realm",
+        "advancedsettings/pki",
+        "advancedsettings/configuration"
+      ]
+    },
+    {
+      "type": "category",
+      "label": "Migrations",
+      "items": [
+        "migrations/403to404"
+      ]
+    }
+  ],
+  "tutorials": [
+    "tutorial/overview",
+    {
+      "type": "category",
+      "label": "Tutorial",
+      "items": [
+        "tutorial/spa",
+        "tutorial/regularweb",
+        "tutorial/protectapi",
+        "tutorial/m2m",
+        "tutorial/highlysecuredregularweb",
+        "tutorial/ciba",
+        "tutorial/grantmgt",
+        "tutorial/wsfederation",
+        "tutorial/saml",
+        "tutorial/ldap",
+        "tutorial/scim",
+        "tutorial/delegation"
+      ]
+    }
+  ]
+}

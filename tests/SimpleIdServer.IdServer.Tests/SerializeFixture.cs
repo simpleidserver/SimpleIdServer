@@ -63,6 +63,25 @@ public class SerializeFixture
     }
 
     [Test]
+    public void When_Serialize_And_Deserialize_MachineClient_Then_Properties_Are_Correct()
+    {
+        // ARRANGE
+        var newClientBuilder = ClientBuilder.BuildDeviceClient("clientid", "clientsecret", null)
+                    .AddScope(new Scope { Name = "openid" })
+                    .SetClientName("clientname");
+        var newClient = newClientBuilder.Build();
+        newClient.TokenExchangeType = TokenExchangeTypes.IMPERSONATION;
+        var json = JsonSerializer.Serialize(newClient);
+
+        // ACT
+        var deserializedClient = JsonSerializer.Deserialize<Client>(json);
+
+        // ASSERT
+        Assert.AreEqual(newClient.ClientId, deserializedClient.ClientId);
+        Assert.AreEqual(TokenExchangeTypes.IMPERSONATION, deserializedClient.TokenExchangeType);
+    }
+
+    [Test]
     public void When_Serialize_And_Deserialize_SamlClient_Then_Properties_AreCorrect()
     {
         // ARRANGE

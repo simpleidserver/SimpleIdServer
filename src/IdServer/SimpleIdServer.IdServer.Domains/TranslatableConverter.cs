@@ -58,6 +58,7 @@ public class TranslatableConverter<T> : JsonConverter<T> where T : class
         {
             var propertyType = prop.p.PropertyType;
             var obj = prop.p.GetValue(value);
+            Type? ut = null;
             if (obj == null) continue;
             if (propertyType == typeof(string))
                 writer.WriteString(prop.Item2, obj as string);
@@ -67,7 +68,9 @@ public class TranslatableConverter<T> : JsonConverter<T> where T : class
                 writer.WriteNumber(prop.Item2, (double)obj);
             else if (propertyType == typeof(DateTime))
                 writer.WriteString(prop.Item2, (DateTime)obj);
-            else if(propertyType.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() ==  typeof(IEnumerable<>)))
+            else if (TryGetEnumType(propertyType, out Type resultType))
+                writer.WriteString(prop.Item2, Enum.GetName(resultType, obj));
+            else if (propertyType.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>)))
             {
                 if (propertyType == typeof(JsonObject))
                 {
@@ -114,8 +117,11 @@ public class TranslatableConverter<T> : JsonConverter<T> where T : class
         switch (node)
         {
             case JsonValue jsonVal:
-                var getValueMethod = typeof(JsonValue).GetMethod("GetValue", BindingFlags.Instance | BindingFlags.Public).MakeGenericMethod(type);
-                return getValueMethod.Invoke(jsonVal, new object[] { });
+                Type resultType;
+                var isEnum = TryGetEnumType(type, out resultType);
+                var getValueMethod = typeof(JsonValue).GetMethod("GetValue", BindingFlags.Instance | BindingFlags.Public).MakeGenericMethod(isEnum ? typeof(string) : type);
+                var value = getValueMethod.Invoke(jsonVal, new object[] { });
+                return isEnum ? (value == null ? null : Enum.Parse(resultType, value?.ToString())) : value;
             case JsonArray jsonArray:
                 var genericType = type.GenericTypeArguments[0];
                 var result = Activator.CreateInstance(typeof(List<>).MakeGenericType(genericType));
@@ -131,5 +137,18 @@ public class TranslatableConverter<T> : JsonConverter<T> where T : class
         }
 
         return node;
+    }
+
+    private static bool TryGetEnumType(Type incomingType, out Type resultType)
+    {
+        resultType = null;
+        Type ut = null;
+        if (incomingType.IsEnum || ((ut = Nullable.GetUnderlyingType(incomingType)) != null && ut.IsEnum))
+        {
+            resultType = ut ?? incomingType;
+            return true;
+        }
+
+        return false;
     }
 }
