@@ -30,13 +30,20 @@ namespace SimpleIdServer.IdServer.Api.Authorization
         private readonly IResponseModeHandler _responseModeHandler;
         private readonly IDataProtector _dataProtector;
         private readonly IBusControl _busControl;
+        private readonly Helpers.IUrlHelper _urlHelper;
 
-        public AuthorizationController(IAuthorizationRequestHandler authorizationRequestHandler, IResponseModeHandler responseModeHandler, IDataProtectionProvider dataProtectionProvider, IBusControl busControl)
+        public AuthorizationController(
+            IAuthorizationRequestHandler authorizationRequestHandler, 
+            IResponseModeHandler responseModeHandler, 
+            IDataProtectionProvider dataProtectionProvider, 
+            IBusControl busControl,
+            Helpers.IUrlHelper urlHelper)
         {
             _authorizationRequestHandler = authorizationRequestHandler;
             _responseModeHandler = responseModeHandler;
             _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
             _busControl = busControl;
+            _urlHelper = urlHelper;
         }
 
         public async Task Get([FromRoute] string prefix, CancellationToken token)
@@ -48,7 +55,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                 var userSubject = claimName == null ? string.Empty : claimName.Value;
                 var referer = string.Empty;
                 if (Request.Headers.Referer.Any()) referer = Request.Headers.Referer.First();
-                var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, jObjBody, null, Request.Cookies, referer), prefix ?? Constants.DefaultRealm, new HandlerContextResponse(Response.Cookies));
+                var context = new HandlerContext(new HandlerContextRequest(_urlHelper.GetAbsoluteUriWithVirtualPath(Request), userSubject, jObjBody, null, Request.Cookies, referer), prefix ?? Constants.DefaultRealm, new HandlerContextResponse(Response.Cookies));
                 activity?.SetTag("realm", context.Realm);
                 try
                 {
@@ -104,7 +111,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
 
                     FormatRedirectUrl(parameters);
                     var queryCollection = new QueryBuilder(parameters);
-                    var issuer = Request.GetAbsoluteUriWithVirtualPath();
+                    var issuer = _urlHelper.GetAbsoluteUriWithVirtualPath(Request);
                     if (!string.IsNullOrWhiteSpace(prefix))
                         issuer = $"{issuer}/{prefix}";
                     var returnUrl = $"{issuer}/{Constants.EndPoints.Authorization}{queryCollection.ToQueryString()}";

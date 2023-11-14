@@ -16,11 +16,13 @@ namespace SimpleIdServer.IdServer.Api.Token
     {
         private readonly ITokenRequestHandler _tokenRequestHandler;
         private readonly IRevokeTokenRequestHandler _revokeTokenRequestHandler;
+        private readonly IdServer.Helpers.IUrlHelper _urlHelper;
 
-        public TokenController(ITokenRequestHandler tokenRequestHandler, IRevokeTokenRequestHandler revokeTokenRequestHandler)
+        public TokenController(ITokenRequestHandler tokenRequestHandler, IRevokeTokenRequestHandler revokeTokenRequestHandler, IdServer.Helpers.IUrlHelper urlHelper)
         {
             _tokenRequestHandler = tokenRequestHandler;
             _revokeTokenRequestHandler = revokeTokenRequestHandler;
+            _urlHelper = urlHelper;
         }
 
         [HttpPost]
@@ -33,7 +35,7 @@ namespace SimpleIdServer.IdServer.Api.Token
             var jObjHeader = Request.Headers.ToJsonObject();
             var jObjBody = Request.Form.ToJsonObject();
             var context = new HandlerContext(
-                new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, jObjBody, jObjHeader, Request.Cookies, clientCertificate, HttpContext.Request.Method), 
+                new HandlerContextRequest(_urlHelper.GetAbsoluteUriWithVirtualPath(Request), userSubject, jObjBody, jObjHeader, Request.Cookies, clientCertificate, HttpContext.Request.Method), 
                 prefix,
                 new HandlerContextResponse(HttpContext.Response));
             var result = await _tokenRequestHandler.Handle(context, token);
@@ -53,7 +55,7 @@ namespace SimpleIdServer.IdServer.Api.Token
                 var clientCertificate = await Request.HttpContext.Connection.GetClientCertificateAsync();
                 var jObjHeader = Request.Headers.ToJsonObject();
                 var jObjBody = Request.Form.ToJsonObject();
-                await _revokeTokenRequestHandler.Handle(prefix, jObjHeader, jObjBody, clientCertificate, Request.GetAbsoluteUriWithVirtualPath(), cancellationToken);
+                await _revokeTokenRequestHandler.Handle(prefix, jObjHeader, jObjBody, clientCertificate, _urlHelper.GetAbsoluteUriWithVirtualPath(Request), cancellationToken);
                 return new OkResult();
             }
             catch (OAuthException ex)

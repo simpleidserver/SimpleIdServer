@@ -12,14 +12,14 @@ namespace SimpleIdServer.IdServer.Api.UMAConfiguration
 {
     public class UMAConfigurationController : OAuthConfigurationController
     {
-        public UMAConfigurationController(IOAuthConfigurationRequestHandler configurationRequestHandler) : base(configurationRequestHandler)
+        public UMAConfigurationController(IOAuthConfigurationRequestHandler configurationRequestHandler, Helpers.IUrlHelper urlHelper) : base(configurationRequestHandler, urlHelper)
         {
         }
 
         [HttpGet]
         public override async Task<IActionResult> Get([FromRoute] string prefix, CancellationToken cancellationToken)
         {
-            var issuer = Request.GetAbsoluteUriWithVirtualPath();
+            var issuer = UrlHelper.GetAbsoluteUriWithVirtualPath(Request);
             var result = await Build(prefix, cancellationToken);
             if (!string.IsNullOrWhiteSpace(prefix))
                 prefix = $"{prefix}/";

@@ -19,17 +19,22 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialIssuer
     {
         private readonly CredentialIssuerOptions _options;
         private readonly ICredentialTemplateRepository _credentialTemplateRepository;
+        private readonly IdServer.Helpers.IUrlHelper _urlHelper;
 
-        public CredentialIssuerController(IOptions<CredentialIssuerOptions> options, ICredentialTemplateRepository credentialTemplateRepository)
+        public CredentialIssuerController(
+            IOptions<CredentialIssuerOptions> options, 
+            ICredentialTemplateRepository credentialTemplateRepository,
+            IdServer.Helpers.IUrlHelper urlHelper)
         {
             _options = options.Value;
             _credentialTemplateRepository = credentialTemplateRepository;
+            _urlHelper = urlHelper;
         }
 
         public async Task<IActionResult> Get([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             prefix = prefix ?? SimpleIdServer.IdServer.Constants.DefaultRealm;
-            var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath());
+            var issuer = HandlerContext.GetIssuer(_urlHelper.GetAbsoluteUriWithVirtualPath(Request));
             var credentialTemplates = await _credentialTemplateRepository.Query().Include(c => c.Realms).Include(c => c.Parameters).Include(c => c.DisplayLst).Where(c => c.Realms.Any(r => r.Name == prefix)).ToListAsync(cancellationToken);
             var result = new CredentialIssuerResult
             {

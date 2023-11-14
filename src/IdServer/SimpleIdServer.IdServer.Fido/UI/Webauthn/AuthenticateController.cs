@@ -25,6 +25,7 @@ namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
     public class AuthenticateController : BaseAuthenticationMethodController<AuthenticateWebauthnViewModel>
     {
         private readonly IDistributedCache _distributedCache;
+        private readonly Helpers.IUrlHelper _urlHelper;
 
         public AuthenticateController(IAuthenticationHelper authenticationHelper,
             IDistributedCache distributedCache,
@@ -36,9 +37,11 @@ namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
             IAmrHelper amrHelper,
             IUserRepository userRepository,
             IUserTransformer userTransformer,
-            IBusControl busControl) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userTransformer, busControl)
+            IBusControl busControl,
+            Helpers.IUrlHelper urlHelper) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userTransformer, busControl)
         {
             _distributedCache = distributedCache;
+            _urlHelper = urlHelper;
         }
 
         protected override string Amr => Constants.AMR;
@@ -61,7 +64,7 @@ namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
 
         protected override void EnrichViewModel(AuthenticateWebauthnViewModel viewModel)
         {
-            var issuer = Request.GetAbsoluteUriWithVirtualPath();
+            var issuer = _urlHelper.GetAbsoluteUriWithVirtualPath(Request);
             viewModel.BeginLoginUrl = $"{issuer}/{viewModel.Realm}/{Constants.EndPoints.BeginLogin}";
             viewModel.EndLoginUrl = $"{issuer}/{viewModel.Realm}/{Constants.EndPoints.EndLogin}";
         }

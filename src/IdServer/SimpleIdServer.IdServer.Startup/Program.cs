@@ -90,7 +90,13 @@ app.Run();
 
 void ConfigureIdServer(IServiceCollection services)
 {
-    var idServerBuilder = services.AddSIDIdentityServer(dataProtectionBuilderCallback: ConfigureDataProtection)
+    var idServerBuilder = services.AddSIDIdentityServer(cb =>
+    {
+        if(identityServerConfiguration.OverrideBaseUrl)
+        {
+            cb.BaseUrl = identityServerConfiguration.Authority;
+        }
+    },dataProtectionBuilderCallback: ConfigureDataProtection)
         .UseEFStore(o => ConfigureStorage(o))
         .AddCredentialIssuer()
         .UseInMemoryMassTransit()

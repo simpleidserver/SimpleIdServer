@@ -15,13 +15,21 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
 {
     public class MetadataController : BaseWsFederationController
     {
-        public MetadataController(IOptions<IdServerWsFederationOptions> options, IKeyStore keyStore) : base(options, keyStore) { }
+        private readonly Helpers.IUrlHelper _urlHelper;
+
+        public MetadataController(
+            IOptions<IdServerWsFederationOptions> options, 
+            IKeyStore keyStore,
+            Helpers.IUrlHelper urlHelper) : base(options, keyStore) 
+        { 
+            _urlHelper = urlHelper;
+        }
 
         [HttpGet]
         public async Task<IActionResult> Get([FromRoute] string prefix)
         {
             var sigKeys = KeyStore.GetAllSigningKeys(prefix ?? Constants.DefaultRealm);
-            var issuer = Request.GetAbsoluteUriWithVirtualPath();
+            var issuer = _urlHelper.GetAbsoluteUriWithVirtualPath(Request);
             var tokenEndpoint = $"{issuer}/{WsFederationConstants.EndPoints.SSO}";
             if (!string.IsNullOrWhiteSpace(prefix))
                 tokenEndpoint = $"{issuer}/{prefix}/{WsFederationConstants.EndPoints.SSO}";

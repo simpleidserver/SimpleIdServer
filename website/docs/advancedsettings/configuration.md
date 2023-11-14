@@ -14,6 +14,14 @@ The table below, list all the possible properties present in the `appsettings.js
     </thead>
     <tbody>
         <tr>
+            <td rowspan="2"><b>OverrideBaseUrl</b></td>
+            <td rowspan="2">When set to true, the base URL will be replaced by the authority.</td>
+            <td>true</td>
+        </tr>
+        <tr>
+            <td>false</td>
+        </tr>
+        <tr>
             <td rowspan="2"><b>IsForwardedEnabled</b></td>
             <td rowspan="2">Enable or disable the forwarded headers</td>
             <td>true</td>

@@ -16,10 +16,17 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
     public class RegisterController : BaseRegisterController<RegisterMobileViewModel>
     {
         private readonly IConfiguration _configuration;
+        private readonly Helpers.IUrlHelper _urlHelper;
 
-        public RegisterController(IOptions<IdServerHostOptions> options, IDistributedCache distributedCache, IUserRepository userRepository, IConfiguration configuration) : base(options, distributedCache, userRepository)
+        public RegisterController(
+            IOptions<IdServerHostOptions> options, 
+            IDistributedCache distributedCache, 
+            IUserRepository userRepository, 
+            IConfiguration configuration,
+            Helpers.IUrlHelper urlHelper) : base(options, distributedCache, userRepository)
         {
             _configuration = configuration;
+            _urlHelper = urlHelper;
         }
 
         [HttpGet]
@@ -42,7 +49,7 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
                 login = userRegistrationProgress.User?.Name;
             }
             else login = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var issuer = Request.GetAbsoluteUriWithVirtualPath();
+            var issuer = _urlHelper.GetAbsoluteUriWithVirtualPath(Request);
             if (!string.IsNullOrWhiteSpace(prefix))
                 prefix = $"{prefix}/";
             viewModel.Login = login;

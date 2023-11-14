@@ -36,6 +36,7 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IExtractRequestHelper _extractRequestHelper;
         private readonly ITokenRepository _tokenRepository;
         private readonly IBusControl _busControl;
+        private readonly Helpers.IUrlHelper _urlHelper;
 
         public ConsentsController(
             IUserRepository userRepository,
@@ -45,7 +46,8 @@ namespace SimpleIdServer.IdServer.UI
             IResponseModeHandler responseModeHandler,
             IExtractRequestHelper extractRequestHelper,
             ITokenRepository tokenRepository,
-            IBusControl busControl)
+            IBusControl busControl,
+            Helpers.IUrlHelper urlHelper)
         {
             _userRepository = userRepository;
             _clientRepository = clientRepository;
@@ -55,6 +57,7 @@ namespace SimpleIdServer.IdServer.UI
             _extractRequestHelper = extractRequestHelper;
             _tokenRepository = tokenRepository;
             _busControl = busControl;
+            _urlHelper = urlHelper;
         }
 
         public async Task<IActionResult> Index([FromRoute] string prefix, string returnUrl, bool isProtected = true, CancellationToken cancellationToken = default(CancellationToken))
@@ -102,7 +105,7 @@ namespace SimpleIdServer.IdServer.UI
             async Task<ConsentsIndexViewModel> BuildConsentsFromAuthRequest(JsonObject query, Client oauthClient)
             {
                 var authDetails = query.GetAuthorizationDetailsFromAuthorizationRequest();
-                query = await _extractRequestHelper.Extract(prefix, Request.GetAbsoluteUriWithVirtualPath(), query, oauthClient);
+                query = await _extractRequestHelper.Extract(prefix, _urlHelper.GetAbsoluteUriWithVirtualPath(Request), query, oauthClient);
                 var scopes = query.GetScopesFromAuthorizationRequest();
                 var claims = query.GetClaimsFromAuthorizationRequest();
                 var claimDescriptions = new List<string>();
@@ -129,7 +132,7 @@ namespace SimpleIdServer.IdServer.UI
             var query = unprotectedUrl.GetQueries().ToJsonObject();
             var clientId = query.GetClientIdFromAuthorizationRequest();
             var oauthClient = await _clientRepository.Query().Include(c => c.Realms).AsNoTracking().FirstAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == prefix), cancellationToken);
-            query = await _extractRequestHelper.Extract(prefix, Request.GetAbsoluteUriWithVirtualPath(), query, oauthClient);
+            query = await _extractRequestHelper.Extract(prefix, _urlHelper.GetAbsoluteUriWithVirtualPath(Request), query, oauthClient);
             var redirectUri = query.GetRedirectUriFromAuthorizationRequest();
             var grantId = query.GetGrantIdFromAuthorizationRequest();
             var scopes = query.GetScopesFromAuthorizationRequest();
@@ -165,7 +168,7 @@ namespace SimpleIdServer.IdServer.UI
                 Claims = claims
             });
             var redirectUrlAuthorizationResponse = new RedirectURLAuthorizationResponse(redirectUri, dic);
-            var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), null, query), prefix);
+            var context = new HandlerContext(new HandlerContextRequest(_urlHelper.GetAbsoluteUriWithVirtualPath(Request), null, query), prefix);
             _responseModeHandler.Handle(context, redirectUrlAuthorizationResponse, HttpContext);
         }
 
@@ -181,7 +184,7 @@ namespace SimpleIdServer.IdServer.UI
                 var grantId = query.GetGrantIdFromAuthorizationRequest();
                 var clientId = query.GetClientIdFromAuthorizationRequest();
                 var oauthClient = await _clientRepository.Query().Include(c => c.Translations).Include(c => c.Realms).Include(c => c.Scopes).Include(c => c.SerializedJsonWebKeys).AsNoTracking().FirstAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == prefix), cancellationToken);
-                query = await _extractRequestHelper.Extract(prefix, Request.GetAbsoluteUriWithVirtualPath(), query, oauthClient);
+                query = await _extractRequestHelper.Extract(prefix, _urlHelper.GetAbsoluteUriWithVirtualPath(Request), query, oauthClient);
                 var nameIdentifier = GetNameIdentifier();
                 var user = await _userRepository.Get(us => us.Include(u => u.Realms).Include(u => u.Consents).FirstAsync(c => c.Name == nameIdentifier && c.Realms.Any(r => r.RealmsName == prefix), cancellationToken));
                 if(!string.IsNullOrWhiteSpace(grantId))

@@ -34,17 +34,23 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IdServer.Infrastructures.IHttpClientFactory _httpClientFactory;
         private readonly IJwtBuilder _jwtBuilder;
         private readonly ILogger<BackChannelConsentsController> _logger;
+        private readonly Helpers.IUrlHelper _urlHelper;
 
         public BackChannelConsentsController(
             IDataProtectionProvider dataProtectionProvider, 
-            IClientRepository clientRepository, IdServer.Infrastructures.IHttpClientFactory httpClientFactory,
-            IJwtBuilder jwtBuilder, IAmrHelper amrHelper, ILogger<BackChannelConsentsController> logger)
+            IClientRepository clientRepository, 
+            IdServer.Infrastructures.IHttpClientFactory httpClientFactory,
+            IJwtBuilder jwtBuilder, 
+            IAmrHelper amrHelper, 
+            ILogger<BackChannelConsentsController> logger,
+            Helpers.IUrlHelper urlHelper)
         {
             _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
             _clientRepository = clientRepository;
             _httpClientFactory = httpClientFactory;
             _jwtBuilder = jwtBuilder;
             _logger = logger;
+            _urlHelper = urlHelper;
         }
 
         public async Task<IActionResult> Index([FromRoute] string prefix, string returnUrl, CancellationToken cancellationToken)
@@ -58,7 +64,7 @@ namespace SimpleIdServer.IdServer.UI
                 if (!User.Identity.IsAuthenticated)
                 {
                     var amr = queries["amr"].GetValue<string>();
-                    returnUrl = $"{Request.GetAbsoluteUriWithVirtualPath()}{Url.Action("Index", "BackChannelConsents")}?returnUrl={returnUrl}";
+                    returnUrl = $"{_urlHelper.GetAbsoluteUriWithVirtualPath(Request)}{Url.Action("Index", "BackChannelConsents")}?returnUrl={returnUrl}";
                     return RedirectToAction("Index", "Authenticate", new { area = amr, ReturnUrl = _dataProtector.Protect(returnUrl) });
                 }
 
@@ -86,9 +92,9 @@ namespace SimpleIdServer.IdServer.UI
             };
             try
             {
-                var issuer = $"{Request.GetAbsoluteUriWithVirtualPath()}/{Constants.EndPoints.BCCallback}";
+                var issuer = $"{_urlHelper.GetAbsoluteUriWithVirtualPath(Request)}/{Constants.EndPoints.BCCallback}";
                 if(!string.IsNullOrWhiteSpace(prefix))                
-                    issuer = $"{Request.GetAbsoluteUriWithVirtualPath()}/{prefix}/{Constants.EndPoints.BCCallback}";
+                    issuer = $"{_urlHelper.GetAbsoluteUriWithVirtualPath(Request)}/{prefix}/{Constants.EndPoints.BCCallback}";
 
                 var queries = ExtractQuery(confirmConsentsViewModel.ReturnUrl);
                 viewModel = await BuildViewModel(prefix, queries, viewModel.ReturnUrl, cancellationToken);

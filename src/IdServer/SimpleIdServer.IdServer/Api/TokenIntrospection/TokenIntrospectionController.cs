@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
-using SimpleIdServer.IdServer.Extensions;
 using System.Linq;
 using System.Text.Json.Nodes;
 using System.Threading;
@@ -16,10 +15,12 @@ namespace SimpleIdServer.IdServer.Api.TokenIntrospection
     public class TokenIntrospectionController : Controller
     {
         private readonly ITokenIntrospectionRequestHandler _requestHandler;
+        private readonly Helpers.IUrlHelper _urlHelper;
 
-        public TokenIntrospectionController(ITokenIntrospectionRequestHandler requestHandler)
+        public TokenIntrospectionController(ITokenIntrospectionRequestHandler requestHandler, Helpers.IUrlHelper urlHelper)
         {
             _requestHandler = requestHandler;
+            _urlHelper = urlHelper;
         }
 
         [HttpPost]
@@ -33,7 +34,7 @@ namespace SimpleIdServer.IdServer.Api.TokenIntrospection
             var jObjBody = Request.Form.ToJsonObject();
             try
             {
-                var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, jObjBody, jObjHeader, Request.Cookies, clientCertificate, HttpContext.Request.Method), prefix);
+                var context = new HandlerContext(new HandlerContextRequest(_urlHelper.GetAbsoluteUriWithVirtualPath(Request), userSubject, jObjBody, jObjHeader, Request.Cookies, clientCertificate, HttpContext.Request.Method), prefix);
                 return await _requestHandler.Handle(context, cancellationToken);
             }
             catch (OAuthUnauthorizedException ex)

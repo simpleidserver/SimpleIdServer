@@ -25,7 +25,13 @@ namespace SimpleIdServer.IdServer.Api.OpenIdConfiguration
         private readonly IAuthenticationContextClassReferenceRepository _authenticationContextClassReferenceRepository;
         private readonly IdServerHostOptions _options;
 
-        public OpenIdConfigurationController(IEnumerable<ISubjectTypeBuilder> subjectTypeBuilders, IScopeRepository scopeRepository, IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository, IOptions<IdServerHostOptions> options, IOAuthConfigurationRequestHandler configurationRequestHandler) : base(configurationRequestHandler)
+        public OpenIdConfigurationController(
+            IEnumerable<ISubjectTypeBuilder> subjectTypeBuilders, 
+            IScopeRepository scopeRepository, 
+            IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository, 
+            IOptions<IdServerHostOptions> options, 
+            IOAuthConfigurationRequestHandler configurationRequestHandler,
+            Helpers.IUrlHelper urlHelper) : base(configurationRequestHandler, urlHelper)
         {
             _subjectTypeBuilders = subjectTypeBuilders;
             _scopeRepository = scopeRepository;
@@ -36,7 +42,7 @@ namespace SimpleIdServer.IdServer.Api.OpenIdConfiguration
         [HttpGet]
         public override async Task<IActionResult> Get([FromRoute] string prefix, CancellationToken cancellationToken)
         {
-            var issuer = Request.GetAbsoluteUriWithVirtualPath();
+            var issuer = UrlHelper.GetAbsoluteUriWithVirtualPath(Request);
             var acrLst = await _authenticationContextClassReferenceRepository.Query().Include(a => a.Realms).AsNoTracking().Where(a => a.Realms.Any(r => r.Name == prefix)).ToListAsync(cancellationToken);
             var result = await Build(prefix, cancellationToken);
             var claims = await _scopeRepository.Query()

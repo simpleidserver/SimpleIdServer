@@ -31,15 +31,24 @@ namespace SimpleIdServer.IdServer.Api.PushedAuthorization
         private readonly IBusControl _busControl;
         private readonly IDistributedCache _distributedCache;
         private readonly IEnumerable<IOAuthClientAuthenticationHandler> _authenticationHandlers;
+        private readonly Helpers.IUrlHelper _urlHelper;
         private readonly IdServerHostOptions _options;
 
-        public PushedAuthorizationController(IAuthorizationRequestValidator validator, IAuthenticateClient authenticateClient, IBusControl busControl, IDistributedCache distributedCache, IEnumerable<IOAuthClientAuthenticationHandler> authenticationHandlers, IOptions<IdServerHostOptions> options)
+        public PushedAuthorizationController(
+            IAuthorizationRequestValidator validator, 
+            IAuthenticateClient authenticateClient, 
+            IBusControl busControl, 
+            IDistributedCache distributedCache, 
+            IEnumerable<IOAuthClientAuthenticationHandler> authenticationHandlers,
+            Helpers.IUrlHelper urlHelper,
+            IOptions<IdServerHostOptions> options)
         {
             _validator = validator;
             _authenticateClient = authenticateClient;
             _busControl = busControl;
             _distributedCache = distributedCache;
             _authenticationHandlers = authenticationHandlers;
+            _urlHelper = urlHelper;
             _options = options.Value;
         }
 
@@ -50,7 +59,7 @@ namespace SimpleIdServer.IdServer.Api.PushedAuthorization
             {
                 var jObjBody = Request.Form.ToJsonObject();
                 prefix = prefix ?? Constants.DefaultRealm;
-                var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), null, jObjBody, null, Request.Cookies), prefix, new HandlerContextResponse(Response.Cookies));
+                var context = new HandlerContext(new HandlerContextRequest(_urlHelper.GetAbsoluteUriWithVirtualPath(Request), null, jObjBody, null, Request.Cookies), prefix, new HandlerContextResponse(Response.Cookies));
                 activity?.SetTag("realm", context.Realm);
                 try
                 {

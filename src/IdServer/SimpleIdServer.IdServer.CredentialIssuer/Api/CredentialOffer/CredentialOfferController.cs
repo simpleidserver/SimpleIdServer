@@ -38,10 +38,22 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialOffer
         private readonly IEnumerable<IUserNotificationService> _notificationServices;
         private readonly IGrantedTokenHelper _grantedTokenHelper;
         private readonly IJwtBuilder _jwtBuilder;
+        private readonly IdServer.Helpers.IUrlHelper _urlHelper;
         private readonly UrlEncoder _urlEncoder;
         private readonly IdServerHostOptions _options;
 
-        public CredentialOfferController(ICredentialTemplateRepository credentialTemplateRepository, ICredentialOfferRepository credentialOfferRepository, IAuthenticationHelper authenticationHelper, IUserRepository userRepository, IClientRepository clientRepository, IEnumerable<IUserNotificationService> notificationServices, IGrantedTokenHelper grantedTokenHelper, IJwtBuilder jwtBuilder, UrlEncoder urlEncoder, IOptions<IdServerHostOptions> options)
+        public CredentialOfferController(
+            ICredentialTemplateRepository credentialTemplateRepository, 
+            ICredentialOfferRepository credentialOfferRepository, 
+            IAuthenticationHelper authenticationHelper, 
+            IUserRepository userRepository,
+            IClientRepository clientRepository,
+            IEnumerable<IUserNotificationService> notificationServices, 
+            IGrantedTokenHelper grantedTokenHelper, 
+            IJwtBuilder jwtBuilder,
+            IdServer.Helpers.IUrlHelper urlHelper,
+            UrlEncoder urlEncoder, 
+            IOptions<IdServerHostOptions> options)
         {
             _credentialTemplateRepository = credentialTemplateRepository;
             _credentialOfferRepository = credentialOfferRepository;
@@ -51,6 +63,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialOffer
             _notificationServices = notificationServices;
             _grantedTokenHelper = grantedTokenHelper;
             _jwtBuilder = jwtBuilder;
+            _urlHelper = urlHelper;
             _urlEncoder = urlEncoder;
             _options = options.Value;
         }
@@ -147,14 +160,14 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialOffer
             if (credentialOffer.Status == UserCredentialOfferStatus.INVALID) return CredentialOfferBuildResult.Invalid(ErrorCodes.INVALID_CREDOFFER, ErrorMessages.CREDOFFER_IS_INVALID);
             if (credentialOffer.ExpirationDateTime <= DateTime.UtcNow) return CredentialOfferBuildResult.Invalid(ErrorCodes.INVALID_CREDOFFER, ErrorMessages.CREDOFFER_IS_EXPIRED);
             var client = await _clientRepository.Query().Include(c => c.Realms).FirstAsync(c => c.ClientId == credentialOffer.ClientId && c.Realms.Any(r => r.Name == prefix), cancellationToken);
-            var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath());
+            var issuer = HandlerContext.GetIssuer(_urlHelper.GetAbsoluteUriWithVirtualPath(Request));
             return InternalGet(prefix, credentialOffer, client);
         }
 
         private CredentialOfferBuildResult InternalGet(string prefix, UserCredentialOffer credentialOffer, Client client)
         {
             prefix = prefix ?? SimpleIdServer.IdServer.Constants.DefaultRealm;
-            var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath());
+            var issuer = HandlerContext.GetIssuer(_urlHelper.GetAbsoluteUriWithVirtualPath(Request));
             var result = new CredentialOfferResult
             {
                 CredentialIssuer = issuer,

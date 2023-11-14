@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SimpleIdServer.IdServer.Extensions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,10 +15,14 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
     public class BCAuthorizeController : Controller
     {
         private readonly IBCAuthorizeHandler _bcAuthorizeHandler;
+        private readonly Helpers.IUrlHelper _urlHelper;
 
-        public BCAuthorizeController(IBCAuthorizeHandler bcAuthorizeHandler)
+        public BCAuthorizeController(
+            IBCAuthorizeHandler bcAuthorizeHandler, 
+            Helpers.IUrlHelper urlHelper)
         {
             _bcAuthorizeHandler = bcAuthorizeHandler;
+            _urlHelper = urlHelper;
         }
 
         [HttpPost]
@@ -28,7 +31,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             var jObjBody = Request.Form.ToJsonObject();
             var jObjHeader = Request.Headers.ToJsonObject();
             var clientCertificate = await Request.HttpContext.Connection.GetClientCertificateAsync();
-            var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, jObjBody, jObjHeader, null, clientCertificate, HttpContext.Request.Method), prefix ?? Constants.DefaultRealm);
+            var context = new HandlerContext(new HandlerContextRequest(_urlHelper.GetAbsoluteUriWithVirtualPath(Request), string.Empty, jObjBody, jObjHeader, null, clientCertificate, HttpContext.Request.Method), prefix ?? Constants.DefaultRealm);
             context.SetUrlHelper(Url);
             return await _bcAuthorizeHandler.Create(context, cancellationToken);
         }

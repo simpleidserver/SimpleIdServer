@@ -316,6 +316,7 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddLib(this IServiceCollection services)
         {
             services.AddTransient<IHttpClientFactory, HttpClientFactory>();
+            services.AddTransient<IUrlHelper, UrlHelper>();
             return services;
         }
         

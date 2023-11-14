@@ -38,8 +38,17 @@ namespace SimpleIdServer.IdServer.Saml2.Api
         private readonly IDistributedCache _distributedCache;
         private readonly IUserRepository _userRepository;
         private readonly ILogger<SamlSSOController> _logger;
+        private readonly IdServer.Helpers.IUrlHelper _urlHelper;
 
-        public SamlSSOController(IClientRepository clientRepository, ISaml2ConfigurationFactory saml2ConfigurationFactory, IDataProtectionProvider dataProtectionProvider, IScopeClaimsExtractor scopeClaimsExtractor, IDistributedCache distributedCache, IUserRepository userRepository, ILogger<SamlSSOController> logger)
+        public SamlSSOController(
+            IClientRepository clientRepository, 
+            ISaml2ConfigurationFactory saml2ConfigurationFactory, 
+            IDataProtectionProvider dataProtectionProvider, 
+            IScopeClaimsExtractor scopeClaimsExtractor, 
+            IDistributedCache distributedCache,
+            IUserRepository userRepository, 
+            ILogger<SamlSSOController> logger,
+            IdServer.Helpers.IUrlHelper urlHelper)
         {
             _clientRepository = clientRepository;
             _saml2ConfigurationFactory = saml2ConfigurationFactory;
@@ -48,13 +57,14 @@ namespace SimpleIdServer.IdServer.Saml2.Api
             _distributedCache = distributedCache;
             _userRepository = userRepository;
             _logger = logger;
+            _urlHelper = urlHelper;
         }
 
         [HttpGet]
         public async Task<IActionResult> LoginGet([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            var issuer = Request.GetAbsoluteUriWithVirtualPath();
+            var issuer = _urlHelper.GetAbsoluteUriWithVirtualPath(Request);
             var requestBinding = new Saml2RedirectBinding();
             var deserializedHttpRequest = Request.ToGenericHttpRequest();
             ClientResult clientResult = null;
@@ -118,7 +128,7 @@ namespace SimpleIdServer.IdServer.Saml2.Api
             var saml2ArtifactResolve = new Saml2ArtifactResolve(clientResult.SpSamlConfiguration);
             try
             {
-                var idpSamlConfiguration = _saml2ConfigurationFactory.BuildSamlIdpConfiguration(Request.GetAbsoluteUriWithVirtualPath(), Request.GetAbsoluteUriWithVirtualPath(), prefix);
+                var idpSamlConfiguration = _saml2ConfigurationFactory.BuildSamlIdpConfiguration(_urlHelper.GetAbsoluteUriWithVirtualPath(Request), _urlHelper.GetAbsoluteUriWithVirtualPath(Request), prefix);
                 soapEnvelope.Unbind(httpRequest, saml2ArtifactResolve);
                 var base64 = await _distributedCache.GetStringAsync(saml2ArtifactResolve.Artifact, cancellationToken);
                 if (string.IsNullOrWhiteSpace(base64)) throw new OAuthException(string.Empty, $"Saml2AuthnResponse not found by Artifact '{saml2ArtifactResolve.Artifact}' in the cache.");

@@ -32,8 +32,17 @@ namespace SimpleIdServer.IdServer.Fido.Apis
         private readonly IDistributedCache _distributedCache;
         private readonly IUserCredentialRepository _userCredentialRepository;
         private readonly IdServerHostOptions _idServerHostOptions;
+        private readonly Helpers.IUrlHelper _urlHelper;
 
-        public U2FRegisterController(IConfiguration configuration, IAuthenticationHelper authenticationHelper, IUserRepository userRepository, IFido2 fido2, IDistributedCache distributedCache, IUserCredentialRepository userCredentialRepository, IOptions<IdServerHostOptions> idServerHostOptions)
+        public U2FRegisterController(
+            IConfiguration configuration, 
+            IAuthenticationHelper authenticationHelper, 
+            IUserRepository userRepository, 
+            IFido2 fido2, 
+            IDistributedCache distributedCache, 
+            IUserCredentialRepository userCredentialRepository,
+            IOptions<IdServerHostOptions> idServerHostOptions,
+            Helpers.IUrlHelper urlHelper)
         {
             _configuration = configuration;
             _authenticationHelper = authenticationHelper;
@@ -42,6 +51,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             _distributedCache = distributedCache;
             _userCredentialRepository=  userCredentialRepository;
             _idServerHostOptions = idServerHostOptions.Value;
+            _urlHelper = urlHelper;
         }
 
         [HttpGet]
@@ -58,7 +68,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
         [HttpPost]
         public async Task<IActionResult> BeginQRCode([FromRoute] string prefix, [FromBody] BeginU2FRegisterRequest request, CancellationToken cancellationToken)
         {
-            var issuer = Request.GetAbsoluteUriWithVirtualPath();
+            var issuer = _urlHelper.GetAbsoluteUriWithVirtualPath(Request);
             prefix = prefix ?? IdServer.Constants.DefaultRealm;
             var kvp = await CommonBegin(prefix, request, cancellationToken);
             if (kvp.Item2 != null) return kvp.Item2;
@@ -81,7 +91,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
         [HttpGet]
         public async Task<IActionResult> ReadQRCode([FromRoute] string prefix, string sessionId, CancellationToken cancellationToken)
         {
-            var issuer = Request.GetAbsoluteUriWithVirtualPath();
+            var issuer = _urlHelper.GetAbsoluteUriWithVirtualPath(Request);
             prefix = prefix ?? IdServer.Constants.DefaultRealm;
             if (string.IsNullOrWhiteSpace(sessionId)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.MISSING_PARAMETER, nameof(sessionId)));
             var session = await _distributedCache.GetStringAsync(sessionId, cancellationToken);
@@ -225,7 +235,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             if(Request.Cookies.ContainsKey(cookieName)) cookieValue = Request.Cookies[cookieName];
             var fidoOptions = GetOptions();
             var isAuthenticated = User.Identity.IsAuthenticated;
-            var issuer = Request.GetAbsoluteUriWithVirtualPath();
+            var issuer = _urlHelper.GetAbsoluteUriWithVirtualPath(Request);
             prefix = prefix ?? IdServer.Constants.DefaultRealm;
             if (request == null) return (null, BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, IdServer.ErrorMessages.INVALID_INCOMING_REQUEST));
             var login = request.Login;
