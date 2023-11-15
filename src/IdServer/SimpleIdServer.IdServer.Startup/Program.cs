@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Community.Microsoft.Extensions.Caching.PostgreSql;
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
@@ -184,6 +185,9 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
                     case DistributedCacheTypes.SQLSERVER:
                         b.UseSqlServer(conf.ConnectionString);
                         break;
+                    case DistributedCacheTypes.POSTGRE:
+                        b.UseNpgsql(conf.ConnectionString);
+                        break;
                 }
             });
         }
@@ -209,6 +213,14 @@ void ConfigureDistributedCache()
             {
                 opts.Configuration = conf.ConnectionString;
                 opts.InstanceName = conf.InstanceName;
+            });
+            break;
+        case DistributedCacheTypes.POSTGRE:
+            builder.Services.AddDistributedPostgreSqlCache(opts =>
+            {
+                opts.ConnectionString = conf.ConnectionString;
+                opts.SchemaName = "public";
+                opts.TableName = "DistributedCache";
             });
             break;
     }

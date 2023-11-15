@@ -145,6 +145,11 @@
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.ClientAdvancedSettingsUpdated });
                 StateHasChanged();
             });
+            SubscribeToAction<UpdateAdvancedClientSettingsFailureAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
+                StateHasChanged();
+            });
             dispatcher.Dispatch(new GetOpenIdServerConfigurationAction());
         }
     }

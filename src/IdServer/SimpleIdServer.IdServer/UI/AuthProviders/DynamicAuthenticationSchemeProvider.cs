@@ -48,6 +48,7 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
         private readonly IServiceProvider _serviceProvider;
         private readonly IdServerHostOptions _options;
         private readonly IDataProtectionProvider _dataProtection;
+        private object _lck = new object();
         private readonly Dictionary<string, IDataProtector> _protections = new Dictionary<string, IDataProtector>();
         private IEnumerable<Domains.AuthenticationSchemeProvider> _cachedAuthenticationProviders;
         private DateTime? _nextExpirationTime;
@@ -120,36 +121,40 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
 
         private SIDAuthenticationScheme Convert(Domains.AuthenticationSchemeProvider provider)
         {
-            var handlerType = Type.GetType(provider.AuthSchemeProviderDefinition.HandlerFullQualifiedName);
-            var authenticationHandlerType = GetGenericType(handlerType, typeof(AuthenticationHandler<>));
-            if (authenticationHandlerType == null) return null;
-            var liteOptionType = Assembly.GetEntryAssembly().GetType(provider.AuthSchemeProviderDefinition.OptionsFullQualifiedName);
-            if (liteOptionType == null) return null;
+            lock(_lck)
+            {
+                var handlerType = Type.GetType(provider.AuthSchemeProviderDefinition.HandlerFullQualifiedName);
+                var authenticationHandlerType = GetGenericType(handlerType, typeof(AuthenticationHandler<>));
+                if (authenticationHandlerType == null) return null;
+                var liteOptionType = Assembly.GetEntryAssembly().GetType(provider.AuthSchemeProviderDefinition.OptionsFullQualifiedName);
+                if (liteOptionType == null) return null;
 
-            var optionType = authenticationHandlerType.GetGenericArguments().First();
-            var liteOptionInterface = typeof(IDynamicAuthenticationOptions<>).MakeGenericType(optionType);
-            var convert = liteOptionInterface.GetMethod("Convert");
-            var section = _configuration.GetSection($"{provider.Name}:{liteOptionType.Name}");
-            var liteOptions = section.Get(liteOptionType);
-            var options = convert.Invoke(liteOptions, new object[] { });
-            PostConfigureOptions(optionType, handlerType, options);
-            var optionsMonitorType = typeof(ConcreteOptionsMonitor<>).MakeGenericType(optionType);
-            var optionsMonitor = Activator.CreateInstance(optionsMonitorType, options);
-            return new SIDAuthenticationScheme(new AuthenticationScheme(provider.Name, provider.DisplayName, handlerType), optionsMonitor);
+                var optionType = authenticationHandlerType.GetGenericArguments().First();
+                var liteOptionInterface = typeof(IDynamicAuthenticationOptions<>).MakeGenericType(optionType);
+                var convert = liteOptionInterface.GetMethod("Convert");
+                var section = _configuration.GetSection($"{provider.Name}:{liteOptionType.Name}");
+                var liteOptions = section.Get(liteOptionType);
+                if (liteOptions == null) return null;
+                var options = convert.Invoke(liteOptions, new object[] { });
+                PostConfigureOptions(optionType, handlerType, options);
+                var optionsMonitorType = typeof(ConcreteOptionsMonitor<>).MakeGenericType(optionType);
+                var optionsMonitor = Activator.CreateInstance(optionsMonitorType, options);
+                return new SIDAuthenticationScheme(new AuthenticationScheme(provider.Name, provider.DisplayName, handlerType), optionsMonitor);
+            }
 
             void PostConfigureOptions(Type optionType, Type handlerType, object options)
             {
                 var signingSchemeProp = options.GetType().GetProperty("SignInScheme", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-                if(signingSchemeProp != null)
+                if (signingSchemeProp != null)
                     signingSchemeProp.SetValue(options, Constants.DefaultExternalCookieAuthenticationScheme);
                 var oauthOptions = options as OAuthOptions;
-                if(oauthOptions != null)
+                if (oauthOptions != null && handlerType.FullName == null)
                 {
                     if (!_protections.ContainsKey(handlerType.FullName))
                         _protections.Add(handlerType.FullName, _dataProtection.CreateProtector(handlerType.FullName));
                     oauthOptions.DataProtectionProvider = _dataProtection;
                     oauthOptions.StateDataFormat = new PropertiesDataFormat(_protections[handlerType.FullName]);
-                    if(oauthOptions.Backchannel == null)
+                    if (oauthOptions.Backchannel == null)
                     {
                         oauthOptions.Backchannel = new HttpClient(new HttpClientHandler());
                         oauthOptions.Backchannel.DefaultRequestHeaders.UserAgent.ParseAdd("Microsoft ASP.NET Core OAuth handler");

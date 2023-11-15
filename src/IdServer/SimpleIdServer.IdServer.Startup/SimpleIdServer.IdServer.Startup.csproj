@@ -29,6 +29,7 @@
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.*" />
 	  <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.*" />
 	  <PackageReference Include="Microsoft.Extensions.Caching.SqlServer" Version="7.0.*" />
+	  <PackageReference Include="Community.Microsoft.Extensions.Caching.PostgreSql" Version="4.0.4" />
 	  <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="7.0.*" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.*">
 		<PrivateAssets>all</PrivateAssets>

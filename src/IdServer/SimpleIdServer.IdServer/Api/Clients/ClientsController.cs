@@ -255,11 +255,14 @@ public class ClientsController : BaseController
             existingClient.IsRedirectUrlCaseSensitive = newClient.IsRedirectUrlCaseSensitive;
             if (newClient.Parameters != null)
             {
+                var existingClientParameters = existingClient.Parameters;
                 foreach (var kvp in newClient.Parameters)
                 {
-                    if (existingClient.Parameters.ContainsKey(kvp.Key)) existingClient.Parameters[kvp.Key] = kvp.Value;
-                    else existingClient.Parameters.Add(kvp.Key, kvp.Value);
+                    if (existingClientParameters.ContainsKey(kvp.Key)) existingClientParameters[kvp.Key] = kvp.Value;
+                    else existingClientParameters.Add(kvp.Key, kvp.Value);
                 }
+
+                existingClient.Parameters = existingClientParameters;
             }
         }
     }
@@ -280,6 +283,7 @@ public class ClientsController : BaseController
                     .SingleOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == prefix));
                 if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CLIENT, id));
                 Update(result, request);
+                await _registerClientRequestValidator.Validate(prefix, result, CancellationToken.None);
                 result.UpdateDateTime = DateTime.UtcNow;
                 await _clientRepository.SaveChanges(CancellationToken.None);
                 await _busControl.Publish(new ClientAdvancedSettingsUpdatedSuccessEvent

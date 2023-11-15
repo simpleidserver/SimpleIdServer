@@ -14,9 +14,11 @@ public static class ClientExtensions
 
     public static X509Certificate2? GetSaml2SigningCertificate(this Client client)
     {
+        if (client.Parameters == null) return null;
         var parameters = client.Parameters;
         if (!parameters.ContainsKey(SAML2_SIG_CERTIFICATE_NAME)) return null;
         var sigCertificateId = parameters[SAML2_SIG_CERTIFICATE_NAME].ToString();
+        if (sigCertificateId == null) return null;
         var jsonWebKey = client.JsonWebKeys.Single(j => j.KeyId == sigCertificateId);
         var x5c = jsonWebKey.X5c;
         var x5cBase64Str = x5c.First();
@@ -25,9 +27,11 @@ public static class ClientExtensions
 
     public static string GetSerializedSaml2SigningCertificate(this Client client)
     {
+        if (client.Parameters == null) return null;
         var parameters = client.Parameters;
         if (!parameters.ContainsKey(SAML2_SIG_CERTIFICATE_NAME)) return null;
         var sigCertificateId = parameters[SAML2_SIG_CERTIFICATE_NAME].ToString();
+        if (sigCertificateId == null) return null;
         var jsonWebKey = client.SerializedJsonWebKeys.Single(j => j.Kid == sigCertificateId);
         return jsonWebKey.SerializedJsonWebKey;
     }
@@ -49,9 +53,10 @@ public static class ClientExtensions
 
     public static string? GetSaml2SpMetadataUrl(this Client client)
     {
+        if (client.Parameters == null) return null;
         var parameters = client.Parameters;
         if (!parameters.ContainsKey(SAML2_SP_METADATA_NAME)) return null;
-        return parameters.Single(p => p.Key == SAML2_SP_METADATA_NAME).Value.ToString();
+        return parameters.Single(p => p.Key == SAML2_SP_METADATA_NAME).Value?.ToString();
     }
 
     public static void SetSaml2SpMetadataUrl(this Client client, string saml2SpMetadataUrl)
@@ -75,9 +80,12 @@ public static class ClientExtensions
 
     public static bool GetUseAcrsArtifact(this Client client)
     {
+        if (client.Parameters == null) return false;
         var parameters = client.Parameters;
         if (!parameters.ContainsKey(SAML2_USE_ACS_ARTIFACT_NAME)) return false;
-        if (bool.TryParse(parameters[SAML2_USE_ACS_ARTIFACT_NAME].ToString(), out bool r)) return r;
+        var val = parameters[SAML2_USE_ACS_ARTIFACT_NAME].ToString();
+        if (val == null) return false;
+        if (bool.TryParse(val, out bool r)) return r;
         return false;
     }
 }

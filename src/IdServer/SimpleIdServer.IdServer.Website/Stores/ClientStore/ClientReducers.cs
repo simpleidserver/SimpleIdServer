@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Saml.Idp.Extensions;
 using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
 using System.IdentityModel.Tokens.Jwt;
 
@@ -138,6 +139,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public static UpdateClientState ReduceUpdateClientDetailsSuccessAction(UpdateClientState state, UpdateClientDetailsSuccessAction act) => new(isUpdating: false);
 
         [ReducerMethod]
+        public static UpdateClientState ReduceUpdateClientDetailsFailureAction(UpdateClientState state, UpdateClientDetailsFailureAction act) => new(isUpdating: false);
+
+        [ReducerMethod]
+        public static UpdateClientState ReduceUpdateAdvancedClientSettingsFailureAction(UpdateClientState state, UpdateAdvancedClientSettingsFailureAction act) => new(isUpdating: false);
+
+        [ReducerMethod]
         public static UpdateClientState ReduceAddClientScopesAction(UpdateClientState state, AddClientScopesAction act) => new(isUpdating: true);
 
         [ReducerMethod]
@@ -235,6 +242,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             client.GrantTypes = grantTypes;
             client.IsConsentDisabled = !act.IsConsentEnabled;
             client.TokenExchangeType = act.TokenExchangeType;
+            client.SetSaml2SpMetadataUrl(act.MetadataUrl);
+            client.SetUseAcsArtifact(act.UseAcs);
             return state with
             {
                 Client = client

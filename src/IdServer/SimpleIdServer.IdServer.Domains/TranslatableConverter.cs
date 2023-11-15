@@ -26,7 +26,7 @@ public class TranslatableConverter<T> : JsonConverter<T> where T : class
             if (prop.p == null)
             {
                 var splitted = kvp.Key.Split("#");
-                if (splitted.Count() != 2) continue;
+                if (splitted.Count() != 2 || nodeVal == null) continue;
                 translateResult.Translations.Add(new Translation
                 {
                     Key = splitted[0],

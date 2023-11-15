@@ -322,29 +322,41 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 Method = HttpMethod.Put,
                 Content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json")
             };
-            await httpClient.SendAsync(requestMessage);
-            dispatcher.Dispatch(new UpdateClientDetailsSuccessAction
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            try
             {
-                ClientId = act.ClientId,
-                ClientName = act.ClientName,
-                RedirectionUrls = act.RedirectionUrls,
-                PostLogoutRedirectUris = act.PostLogoutRedirectUris,
-                FrontChannelLogoutSessionRequired = act.FrontChannelLogoutSessionRequired,
-                FrontChannelLogoutUri = act.FrontChannelLogoutUri,
-                BackChannelLogoutUri = act.BackChannelLogoutUri,
-                BackChannelLogoutSessionRequired = act.BackChannelLogoutSessionRequired,
-                IsClientCredentialsGrantTypeEnabled = act.IsClientCredentialsGrantTypeEnabled,
-                IsPasswordGrantTypeEnabled = act.IsPasswordGrantTypeEnabled,
-                IsRefreshTokenGrantTypeEnabled = act.IsRefreshTokenGrantTypeEnabled,
-                IsAuthorizationCodeGrantTypeEnabled = act.IsAuthorizationCodeGrantTypeEnabled,
-                IsCIBAGrantTypeEnabled = act.IsCIBAGrantTypeEnabled,
-                IsUMAGrantTypeEnabled = act.IsUMAGrantTypeEnabled,
-                IsConsentEnabled = act.IsConsentEnabled,
-                IsDeviceGrantTypeEnabled = act.IsDeviceGrantTypeEnabled,
-                TokenExchangeType = act.TokenExchangeType,
-                IsTokenExchangeEnabled = act.IsTokenExchangeEnabled,
-                IsRedirectUrlCaseSensitive = act.IsRedirectUrlCaseSensitive
-            });
+                httpResult.EnsureSuccessStatusCode();
+                dispatcher.Dispatch(new UpdateClientDetailsSuccessAction
+                {
+                    ClientId = act.ClientId,
+                    ClientName = act.ClientName,
+                    RedirectionUrls = act.RedirectionUrls,
+                    PostLogoutRedirectUris = act.PostLogoutRedirectUris,
+                    FrontChannelLogoutSessionRequired = act.FrontChannelLogoutSessionRequired,
+                    FrontChannelLogoutUri = act.FrontChannelLogoutUri,
+                    BackChannelLogoutUri = act.BackChannelLogoutUri,
+                    BackChannelLogoutSessionRequired = act.BackChannelLogoutSessionRequired,
+                    IsClientCredentialsGrantTypeEnabled = act.IsClientCredentialsGrantTypeEnabled,
+                    IsPasswordGrantTypeEnabled = act.IsPasswordGrantTypeEnabled,
+                    IsRefreshTokenGrantTypeEnabled = act.IsRefreshTokenGrantTypeEnabled,
+                    IsAuthorizationCodeGrantTypeEnabled = act.IsAuthorizationCodeGrantTypeEnabled,
+                    IsCIBAGrantTypeEnabled = act.IsCIBAGrantTypeEnabled,
+                    IsUMAGrantTypeEnabled = act.IsUMAGrantTypeEnabled,
+                    IsConsentEnabled = act.IsConsentEnabled,
+                    IsDeviceGrantTypeEnabled = act.IsDeviceGrantTypeEnabled,
+                    TokenExchangeType = act.TokenExchangeType,
+                    IsTokenExchangeEnabled = act.IsTokenExchangeEnabled,
+                    IsRedirectUrlCaseSensitive = act.IsRedirectUrlCaseSensitive,
+                    UseAcs = act.UseAcs,
+                    MetadataUrl = act.MetadataUrl
+                });
+            }
+            catch
+            {
+                var jsonObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new UpdateClientDetailsFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
+            }
         }
 
         [EffectMethod]
@@ -648,18 +660,28 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 Method = HttpMethod.Put,
                 Content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json")
             };
-            await httpClient.SendAsync(requestMessage);
-            dispatcher.Dispatch(new UpdateAdvancedClientSettingsSuccessAction
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            try
             {
-                AuthorizationDataTypes = request.AuthorizationDataTypes,
-                ResponseTypes = act.ResponseTypes,
-                AuthorizationSignedResponseAlg = act.AuthorizationSignedResponseAlg,
-                IdTokenSignedResponseAlg = act.IdTokenSignedResponseAlg,
-                DPOPNonceLifetimeInSeconds = act.DPOPNonceLifetimeInSeconds,
-                IsDPoPNonceRequired = act.IsDPoPNonceRequired,
-                IsDPoPRequired = act.IsDPoPRequired,
-                TokenExpirationTimeInSeconds = act.TokenExpirationTimeInSeconds
-            });
+                httpResult.EnsureSuccessStatusCode();
+                dispatcher.Dispatch(new UpdateAdvancedClientSettingsSuccessAction
+                {
+                    AuthorizationDataTypes = request.AuthorizationDataTypes,
+                    ResponseTypes = act.ResponseTypes,
+                    AuthorizationSignedResponseAlg = act.AuthorizationSignedResponseAlg,
+                    IdTokenSignedResponseAlg = act.IdTokenSignedResponseAlg,
+                    DPOPNonceLifetimeInSeconds = act.DPOPNonceLifetimeInSeconds,
+                    IsDPoPNonceRequired = act.IsDPoPNonceRequired,
+                    IsDPoPRequired = act.IsDPoPRequired,
+                    TokenExpirationTimeInSeconds = act.TokenExpirationTimeInSeconds
+                });
+            }
+            catch
+            {
+                var jsonObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new UpdateAdvancedClientSettingsFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
+            }
         }
 
         private async Task CreateClient(Domains.Client client, IDispatcher dispatcher, string clientType, PemResult pemResult = null, string jsonWebKey = null)
@@ -904,6 +926,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public TokenExchangeTypes? TokenExchangeType { get; set; }
         public bool IsTokenExchangeEnabled { get; set; }
         public bool IsRedirectUrlCaseSensitive { get; set; }
+        public bool UseAcs { get; set; }
+        public string MetadataUrl { get; set; }
+    }
+
+    public class UpdateClientDetailsFailureAction
+    {
+        public string ErrorMessage { get; set; }
     }
 
     public class ToggleAllClientScopeSelectionAction
@@ -1138,6 +1167,11 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public bool IsDPoPNonceRequired { get; set; } = false;
         public double DPOPNonceLifetimeInSeconds { get; set; }
         public double TokenExpirationTimeInSeconds { get; set; }
+    }
+
+    public class UpdateAdvancedClientSettingsFailureAction
+    {
+        public string ErrorMessage { get; set; }
     }
 
     public class GenerateClientSigKeyAction

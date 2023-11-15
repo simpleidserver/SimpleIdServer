@@ -68,6 +68,10 @@
 			  {
 				"choice": "REDIS",
 				"description": "REDIS"
+			  },
+			  {
+				"choice": "POSTGRE",
+				"description": "POSTGRE"
 			  }
 		  ]
 	  },
