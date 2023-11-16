@@ -66,6 +66,11 @@
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedClientCertificatesRemoved });
                 StateHasChanged();
             });
+            SubscribeToAction<AddClientCertificateFailureAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
+                StateHasChanged();
+            });
         }
     }
 

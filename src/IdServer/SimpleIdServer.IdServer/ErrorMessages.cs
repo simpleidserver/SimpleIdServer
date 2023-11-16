@@ -223,6 +223,8 @@ namespace SimpleIdServer.IdServer
         public const string CERTIFICATE_IS_REQUIRED = "certificate is required";
         public const string CERTIFICATE_IS_NOT_TRUSTED = "certificate is not trusted";
         public const string CERTIFICATE_IS_NOT_SELF_SIGNED = "the certificate is not self signed";
+        public const string CERTIFICATE_CANNOT_BE_GENERATED = "the certificate cannot be generated";
+        public const string CERTIFICATE_CLIENT_CANNOT_BE_GENERATED = "the client certificate cannot be generated";
         public const string REQUEST_OBJECT_IS_EXPIRED = "request object is expired";
         public const string REQUEST_OBJECT_BAD_AUDIENCE = "request object has bad audience";
         public const string REQUEST_DENIED = "The client is not authorized to have these permissions.";

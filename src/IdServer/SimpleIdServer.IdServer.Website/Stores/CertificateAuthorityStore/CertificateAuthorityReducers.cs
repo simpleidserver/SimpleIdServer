@@ -102,7 +102,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
             return state with
             {
                 IsUpdating = false,
-                CertificateAuthority = action.CertificateAuthority
+                CertificateAuthority = action.CertificateAuthority,
+                ErrorMessage = null
             };
         }
 
@@ -122,6 +123,15 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
             {
                 IsUpdating = false,
                 CertificateAuthority = null
+            };
+        }
+
+        [ReducerMethod]
+        public static UpdateCertificateAuthorityState ReduceSaveCertificateAuthorityFailureAction(UpdateCertificateAuthorityState state, SaveCertificateAuthorityFailureAction action)
+        {
+            return state with
+            {
+                IsUpdating = false
             };
         }
 
@@ -157,6 +167,16 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
 
         [ReducerMethod]
         public static UpdateCertificateAuthorityState ReduceAddClientCertificateSuccessAction(UpdateCertificateAuthorityState state, AddClientCertificateSuccessAction action)
+        {
+            return state with
+            {
+                IsUpdating = false
+            };
+        }
+
+
+        [ReducerMethod]
+        public static UpdateCertificateAuthorityState ReduceAddClientCertificateFailureAction(UpdateCertificateAuthorityState state, AddClientCertificateFailureAction action)
         {
             return state with
             {

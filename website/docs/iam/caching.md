@@ -21,3 +21,12 @@ To use SQL Server as a distributed caching, edit the `appsettings.json` file and
 | ------------------------------------------------ | --------- |
 | $.DistributedCacheConfiguration.ConnectionString |           |
 | $.DistributedCacheConfiguration.Type             | REDIS     |
+
+## Postgre
+
+To use Postgresql as a distributed caching, edit the `appsettings.json` file and modify the following values :
+
+| Json Path                                        | Value     |
+| ------------------------------------------------ | --------- |
+| $.DistributedCacheConfiguration.ConnectionString |           |
+| $.DistributedCacheConfiguration.Type             | POSTGRE   |

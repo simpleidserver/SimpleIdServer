@@ -22,11 +22,11 @@ To use SQLServer as a distributed configuration storage, edit the  `appsettings.
 | $.DistributedCacheConfiguration.Type             | SQLSERVER     |
 | $.DistributedCacheConfiguration.ConnectionString |               |
 
-## Postgresql
+## Postgre
 
 To use Postgresql as a distributed configuration storage, edit the  `appsettings.json` file and modify the following values :
 
 | Json Path                                        | Value         |
 | ------------------------------------------------ | ------------- |
-| $.DistributedCacheConfiguration.Type             | SQLSERVER     |
+| $.DistributedCacheConfiguration.Type             | POSTGRE       |
 | $.DistributedCacheConfiguration.ConnectionString |               |

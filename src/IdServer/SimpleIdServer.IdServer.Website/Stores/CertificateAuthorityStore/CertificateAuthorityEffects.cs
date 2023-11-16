@@ -68,8 +68,17 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var certificateAuthority = JsonSerializer.Deserialize<CertificateAuthority>(json);
-            dispatcher.Dispatch(new GenerateCertificateAuthoritySuccessAction { CertificateAuthority = certificateAuthority });
+            try
+            {
+                httpResult.EnsureSuccessStatusCode();
+                var certificateAuthority = JsonSerializer.Deserialize<CertificateAuthority>(json);
+                dispatcher.Dispatch(new GenerateCertificateAuthoritySuccessAction { CertificateAuthority = certificateAuthority });
+            }
+            catch
+            {
+                var jsonObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new GenerateCertificateAuthorityFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
+            }
         }
 
         [EffectMethod]
@@ -117,8 +126,17 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var certificateAuthority = JsonSerializer.Deserialize<CertificateAuthority>(json);
-            dispatcher.Dispatch(new SaveCertificateAuthoritySuccessAction { CertificateAuthority = certificateAuthority });
+            try
+            {
+                httpResult.EnsureSuccessStatusCode();
+                var certificateAuthority = JsonSerializer.Deserialize<CertificateAuthority>(json);
+                dispatcher.Dispatch(new SaveCertificateAuthoritySuccessAction { CertificateAuthority = certificateAuthority });
+            }
+            catch
+            {
+                var jsonObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new SaveCertificateAuthorityFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
+            }
         }
 
         [EffectMethod]
@@ -192,8 +210,17 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var clientCertificate = JsonSerializer.Deserialize<ClientCertificate>(json);
-            dispatcher.Dispatch(new AddClientCertificateSuccessAction { CertificateAuthorityId = action.CertificateAuthorityId, ClientCertificate = clientCertificate });
+            try
+            {
+                httpResult.EnsureSuccessStatusCode();
+                var clientCertificate = JsonSerializer.Deserialize<ClientCertificate>(json);
+                dispatcher.Dispatch(new AddClientCertificateSuccessAction { CertificateAuthorityId = action.CertificateAuthorityId, ClientCertificate = clientCertificate });
+            }
+            catch
+            {
+                var jsonObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new AddClientCertificateFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
+            }
         }
 
         private async Task<string> GetBaseUrl()
@@ -278,6 +305,11 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
         public CertificateAuthority CertificateAuthority { get; set; }
     }
 
+    public class SaveCertificateAuthorityFailureAction
+    {
+        public string ErrorMessage { get; set; }
+    }
+
     public class SelectCertificateAuthoritySourceAction
     {
         public CertificateAuthoritySources Source { get; set; }
@@ -328,5 +360,10 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
     {
         public string CertificateAuthorityId { get; set; }
         public ClientCertificate ClientCertificate { get; set; }
+    }
+
+    public class AddClientCertificateFailureAction
+    {
+        public string ErrorMessage { get; set; }
     }
 }

@@ -183,12 +183,22 @@
         base.OnAfterRender(firstRender);
         if(firstRender)
         {
+            SubscribeToAction<GenerateCertificateAuthorityFailureAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
+                StateHasChanged();
+            });
             SubscribeToAction<SaveCertificateAuthoritySuccessAction>((act) =>
             {
                 dialogService.Close();
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.CertificateAuthoritySaved });
                 StateHasChanged();
-            }); 
+            });
+            SubscribeToAction<SaveCertificateAuthorityFailureAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
+                StateHasChanged();
+            });
         }
     }
 

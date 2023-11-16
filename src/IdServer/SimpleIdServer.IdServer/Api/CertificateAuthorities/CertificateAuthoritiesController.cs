@@ -78,54 +78,79 @@ public class CertificateAuthoritiesController : BaseController
     [HttpPost]
     public IActionResult Generate([FromRoute] string prefix, [FromBody] GenerateCertificateAuthorityRequest request)
     {
-        CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name, _jwtBuilder);
-        if (request == null) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
-        if (string.IsNullOrWhiteSpace(request.SubjectName)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, CertificateAuthorityNames.SubjectName));
-        var certificateAuthority = CertificateAuthorityBuilder.Create(request.SubjectName, numberOfDays: request.NumberOfDays).Build();
-        return new ContentResult
+        try
         {
-            StatusCode = (int)HttpStatusCode.Created,
-            Content = JsonSerializer.Serialize(certificateAuthority).ToString(),
-            ContentType = "application/json"
-        };
+            CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name, _jwtBuilder);
+            if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
+            if (string.IsNullOrWhiteSpace(request.SubjectName)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, CertificateAuthorityNames.SubjectName));
+            CertificateAuthority certificateAuthority = null;
+            try
+            {
+                certificateAuthority = CertificateAuthorityBuilder.Create(request.SubjectName, numberOfDays: request.NumberOfDays).Build();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+                throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.CERTIFICATE_CANNOT_BE_GENERATED);
+            }
+            return new ContentResult
+            {
+                StatusCode = (int)HttpStatusCode.Created,
+                Content = JsonSerializer.Serialize(certificateAuthority).ToString(),
+                ContentType = "application/json"
+            };
+        }
+        catch(OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            return BuildError(ex);
+        }
     }
 
     [HttpPost]
     public IActionResult Import([FromRoute] string prefix, [FromBody] ImportCertificateAuthorityRequest request)
     {
-        CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name, _jwtBuilder);
-        if (request == null) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
-        if (string.IsNullOrWhiteSpace(request.FindValue)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, CertificateAuthorityNames.FindValue));
-        var store = new X509Store(request.StoreName, request.StoreLocation);
         try
         {
-            store.Open(OpenFlags.ReadOnly);
+            CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name, _jwtBuilder);
+            if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
+            if (string.IsNullOrWhiteSpace(request.FindValue)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, CertificateAuthorityNames.FindValue));
+            var store = new X509Store(request.StoreName, request.StoreLocation);
+            try
+            {
+                store.Open(OpenFlags.ReadOnly);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+                throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.CANNOT_READ_CERTIFICATE_STORE);
+            }
+
+            var certificate = store.Certificates.Find(request.FindType, request.FindValue, true).FirstOrDefault();
+            if (certificate == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.CERTIFICATE_DOESNT_EXIST);
+            try
+            {
+                if (!certificate.HasPrivateKey || certificate.PrivateKey == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.CERTIFICATE_DOESNT_HAVE_PRIVATE_KEY);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+                throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.CERTIFICATE_DOESNT_HAVE_PRIVATE_KEY);
+            }
+
+            var certificateAuthority = CertificateAuthorityBuilder.Import(certificate, request.StoreLocation, request.StoreName, request.FindType, request.FindValue).Build();
+            return new ContentResult
+            {
+                StatusCode = (int)HttpStatusCode.Created,
+                Content = JsonSerializer.Serialize(certificateAuthority).ToString(),
+                ContentType = "application/json"
+            };
         }
-        catch(Exception ex)
+        catch (OAuthException ex)
         {
             _logger.LogError(ex.ToString());
-            return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.CANNOT_READ_CERTIFICATE_STORE);
+            return BuildError(ex);
         }
-
-        var certificate = store.Certificates.Find(request.FindType, request.FindValue, true).FirstOrDefault();
-        if(certificate == null) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.CERTIFICATE_DOESNT_EXIST);
-        try
-        {
-            if (!certificate.HasPrivateKey || certificate.PrivateKey == null) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.CERTIFICATE_DOESNT_HAVE_PRIVATE_KEY);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.ToString());
-            return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.CERTIFICATE_DOESNT_HAVE_PRIVATE_KEY);
-        }
-
-        var certificateAuthority = CertificateAuthorityBuilder.Import(certificate, request.StoreLocation, request.StoreName, request.FindType, request.FindValue).Build();
-        return new ContentResult
-        {
-            StatusCode = (int)HttpStatusCode.Created,
-            Content = JsonSerializer.Serialize(certificateAuthority).ToString(),
-            ContentType = "application/json"
-        };
     }
 
     [HttpPost]
@@ -226,10 +251,18 @@ public class CertificateAuthoritiesController : BaseController
     [HttpGet]
     public async Task<IActionResult> Get([FromRoute] string prefix, string id)
     {
-        CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name, _jwtBuilder);
-        var ca = await _certificateAuthorityRepository.Query().Include(c => c.Realms).Include(c => c.ClientCertificates).AsNoTracking().SingleOrDefaultAsync(c => c.Id == id && c.Realms.Any(r => r.Name == prefix));
-        if (ca == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CA, id));
-        return new OkObjectResult(ca);
+        try
+        {
+            CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name, _jwtBuilder);
+            var ca = await _certificateAuthorityRepository.Query().Include(c => c.Realms).Include(c => c.ClientCertificates).AsNoTracking().SingleOrDefaultAsync(c => c.Id == id && c.Realms.Any(r => r.Name == prefix));
+            if (ca == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CA, id));
+            return new OkObjectResult(ca);
+        }
+        catch (OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            return BuildError(ex);
+        }
     }
 
     [HttpDelete]
@@ -289,7 +322,17 @@ public class CertificateAuthoritiesController : BaseController
                 if (ca == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CA, id));
                 var store = new Stores.CertificateAuthorityStore(null);
                 var certificate = store.Get(ca);
-                var pem = KeyGenerator.GenerateClientCertificate(certificate, request.SubjectName, request.NbDays);
+                PemResult pem = null;
+                try
+                {
+                    pem = KeyGenerator.GenerateClientCertificate(certificate, request.SubjectName, request.NbDays);
+                }
+                catch(Exception ex)
+                {
+                    _logger.LogError(ex.ToString());
+                    throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.CERTIFICATE_CLIENT_CANNOT_BE_GENERATED);
+                }
+
                 var record = new ClientCertificate
                 {
                     Id = Guid.NewGuid().ToString(),
