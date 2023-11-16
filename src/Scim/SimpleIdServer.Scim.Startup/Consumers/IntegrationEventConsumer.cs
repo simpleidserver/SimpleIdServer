@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Startup.Consumers
 {
-    public class IntegrationEventConsumer : IConsumer<RepresentationAddedEvent>, IConsumer<RepresentationRefAttributeAddedEvent>, IConsumer<RepresentationRefAttributeRemovedEvent>, IConsumer<RepresentationRefAttributeUpdatedEvent>
+    public class IntegrationEventConsumer : IConsumer<RepresentationAddedEvent>,
+        IConsumer<RepresentationRefAttributeAddedEvent>,
+        IConsumer<RepresentationRefAttributeRemovedEvent>,
+        IConsumer<RepresentationRefAttributeUpdatedEvent>,
+        IConsumer<RepresentationRemovedEvent>
     {
         public Task Consume(ConsumeContext<RepresentationRefAttributeAddedEvent> context)
         {
@@ -29,6 +33,12 @@ namespace SimpleIdServer.Scim.Startup.Consumers
         public Task Consume(ConsumeContext<RepresentationAddedEvent> context)
         {
             var json = JsonSerializer.Serialize(context.Message);
+            Debug.WriteLine(context.Message.Id);
+            return Task.CompletedTask;
+        }
+
+        public Task Consume(ConsumeContext<RepresentationRemovedEvent> context)
+        {
             Debug.WriteLine(context.Message.Id);
             return Task.CompletedTask;
         }

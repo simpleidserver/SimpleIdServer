@@ -10,6 +10,7 @@ namespace SimpleIdServer.Scim.Persistence
 {
     public interface ISCIMRepresentationCommandRepository : ICommandRepository<SCIMRepresentation>
     {
+        Task<SCIMRepresentation> GetWithAttributes(string id, CancellationToken token = default(CancellationToken));
         Task<List<SCIMRepresentation>> FindRepresentations(List<string> representationIds, string resourceType = null, CancellationToken cancellationToken = default(CancellationToken));
         Task<List<SCIMRepresentationAttribute>> FindGraphAttributes(string valueStr, string schemaAttributeId, string sourceRepresentationId = null, CancellationToken cancellationToken = default(CancellationToken));
         Task<List<SCIMRepresentationAttribute>> FindGraphAttributes(IEnumerable<string> representationIds, string valueStr, string schemaAttributeId, string sourceRepresentationId = null, CancellationToken cancellationToken = default(CancellationToken));

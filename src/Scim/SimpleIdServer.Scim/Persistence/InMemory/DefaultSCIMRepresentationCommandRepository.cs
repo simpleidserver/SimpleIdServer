@@ -26,6 +26,13 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             return Task.FromResult(Enrich(result));
         }
 
+        public Task<SCIMRepresentation> GetWithAttributes(string id, CancellationToken token)
+        {
+            var result = LstData.FirstOrDefault(r => r.Id == id);
+            if (result == null) return Task.FromResult((SCIMRepresentation)null);
+            return Task.FromResult(Enrich(result));
+        }
+
         public override Task<bool> Add(SCIMRepresentation data, CancellationToken token)
         {
             foreach (var attr in data.FlatAttributes) attr.RepresentationId = data.Id;
