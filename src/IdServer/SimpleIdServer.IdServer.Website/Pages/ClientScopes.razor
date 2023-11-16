@@ -40,7 +40,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableClientScope" Filterable="false" Sortable="true" Title="Name" Width="80px" SortOrder="SortOrder.Ascending">
             <Template Context="data">
-                <RadzenLink Text="@data.Value.Name" Path="@($"/scopes/{data.Value.Name}/settings")" />
+                <RadzenLink Text="@data.Value.Name" Path="@($"/scopes/{data.Value.Id}/settings")" />
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableClientScope" Filterable="false" Sortable="false" Title="Type" Width="80px">
