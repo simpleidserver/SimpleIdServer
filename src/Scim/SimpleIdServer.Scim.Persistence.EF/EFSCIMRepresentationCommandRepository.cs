@@ -30,14 +30,6 @@ namespace SimpleIdServer.Scim.Persistence.EF
             return await query.FirstOrDefaultAsync(r => r.Id == id, token);
         }
 
-        public async Task<SCIMRepresentation> GetWithAttributes(string id, CancellationToken token = default)
-        {
-            var query = _scimDbContext.SCIMRepresentationLst
-                .Include(r => r.Schemas).ThenInclude(s => s.Attributes)
-                .Include(r => r.FlatAttributes);
-            return await query.FirstOrDefaultAsync(r => r.Id == id, token);
-        }
-
         public Task<bool> Add(SCIMRepresentation data, CancellationToken token)
         {
             _scimDbContext.SCIMRepresentationLst.Add(data);

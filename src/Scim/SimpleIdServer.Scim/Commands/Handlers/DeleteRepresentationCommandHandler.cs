@@ -1,7 +1,6 @@
 // Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
-using Microsoft.Extensions.Options;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
@@ -35,10 +34,11 @@ namespace SimpleIdServer.Scim.Commands.Handlers
         {
             var schema = await _scimSchemaCommandRepository.FindRootSCIMSchemaByResourceType(request.ResourceType);
             if (schema == null) throw new SCIMSchemaNotFoundException();
-            var representation = await _scimRepresentationCommandRepository.GetWithAttributes(request.Id);
+            var representation = await _scimRepresentationCommandRepository.Get(request.Id);
             if (representation == null) throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, request.Id));
             var result = representation.Clone() as SCIMRepresentation;
             var attributes = await _scimRepresentationCommandRepository.FindAttributes(representation.Id, CancellationToken.None);
+            result.FlatAttributes = attributes.Select(a => (SCIMRepresentationAttribute)a.Clone()).ToList();
             var pathOperations = attributes.Select(a => new SCIMPatchResult
             {
                 Attr = a,

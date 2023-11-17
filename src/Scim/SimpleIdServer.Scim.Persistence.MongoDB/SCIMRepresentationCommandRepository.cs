@@ -31,9 +31,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             _options = options.Value;
         }
 
-        public Task<SCIMRepresentation> Get(string id, CancellationToken token = default) => GetWithAttributes(id, token);
-
-        public async Task<SCIMRepresentation> GetWithAttributes(string id, CancellationToken token = default)
+        public async Task<SCIMRepresentation> Get(string id, CancellationToken token = default)
         {
             var collection = _scimDbContext.SCIMRepresentationLst;
             var result = await collection.AsQueryable().Where(a => a.Id == id).ToMongoFirstAsync();
