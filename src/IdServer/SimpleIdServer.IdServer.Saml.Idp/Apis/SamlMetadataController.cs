@@ -16,22 +16,19 @@ namespace SimpleIdServer.IdServer.Saml.Idp.Apis
     {
         private readonly ISaml2ConfigurationFactory _saml2ConfigurationFactory;
         private readonly SamlIdpOptions _options;
-        private readonly IdServer.Helpers.IUrlHelper _urlHelper;
 
         public SamlMetadataController(
             ISaml2ConfigurationFactory saml2ConfigurationFactory, 
-            IOptions<SamlIdpOptions> options,
-            Helpers.IUrlHelper urlHelper)
+            IOptions<SamlIdpOptions> options)
         {
             _saml2ConfigurationFactory = saml2ConfigurationFactory;
             _options = options.Value;
-            _urlHelper = urlHelper;
         }
 
         public IActionResult Get([FromRoute] string prefix)
         {
             prefix = prefix ?? IdServer.Constants.DefaultRealm;
-            var issuer = _urlHelper.GetAbsoluteUriWithVirtualPath(Request);
+            var issuer = Request.GetAbsoluteUriWithVirtualPath();
             var configuration = _saml2ConfigurationFactory.BuildSamlIdpConfiguration(issuer, issuer, prefix);
             var entityDescriptor = new EntityDescriptor(configuration)
             {

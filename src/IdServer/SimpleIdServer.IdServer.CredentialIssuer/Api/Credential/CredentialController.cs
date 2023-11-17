@@ -34,7 +34,6 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential
         private readonly IAuthenticationHelper _authenticationHelper;
         private readonly ICredentialTemplateClaimsExtractor _claimsExtractor;
         private readonly IEnumerable<ICredentialFormat> _formats;
-        private readonly IdServer.Helpers.IUrlHelper _urlHelper;
         private readonly ILogger<CredentialController> _logger;
 
         public CredentialController(
@@ -45,7 +44,6 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential
             IAuthenticationHelper authenticationHelper,
             ICredentialTemplateClaimsExtractor claimsExtractor,
             IEnumerable<ICredentialFormat> formats,
-            IdServer.Helpers.IUrlHelper urlHelper,
             ILogger<CredentialController> logger)
         {
             _parsers = parsers;
@@ -55,7 +53,6 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential
             _authenticationHelper = authenticationHelper;
             _claimsExtractor = claimsExtractor;
             _formats = formats;
-            _urlHelper = urlHelper;
             _logger = logger;
         }
 
@@ -67,7 +64,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential
                 prefix = prefix ?? SimpleIdServer.IdServer.Constants.DefaultRealm;
                 try
                 {
-                    var context = new HandlerContext(new HandlerContextRequest(_urlHelper.GetAbsoluteUriWithVirtualPath(Request), null, null), prefix);
+                    var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), null, null), prefix);
                     activity?.SetTag("realm", context.Realm);
                     var accessToken = ExtractBearerToken();
                     var token = await _grantedTokenHelper.GetAccessToken(accessToken, cancellationToken);

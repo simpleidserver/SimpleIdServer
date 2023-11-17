@@ -30,14 +30,12 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
         private readonly IUserRepository _userRepository;
         private readonly IDataProtector _dataProtector;
         private readonly IScopeClaimsExtractor _claimsExtractor;
-        private readonly IdServer.Helpers.IUrlHelper _urlHelper;
         private readonly IdServerHostOptions _options;
 
         public SSOController(IClientRepository clientRepository, 
             IUserRepository userRepository,
             IDataProtectionProvider dataProtectionProvider,
             IScopeClaimsExtractor claimsExtractor,
-            IdServer.Helpers.IUrlHelper urlHelper,
             IOptions<IdServerHostOptions> opts, 
             IOptions<IdServerWsFederationOptions> options, 
             IKeyStore keyStore) : base(options, keyStore)
@@ -46,7 +44,6 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
             _userRepository = userRepository;
             _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
             _claimsExtractor = claimsExtractor;
-            _urlHelper = urlHelper;
             _options = opts.Value;
         }
 
@@ -69,7 +66,7 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
 
         private async Task<IActionResult> SignIn(string realm, WsFederationMessage message, CancellationToken cancellationToken)
         {
-            var issuer = _urlHelper.GetAbsoluteUriWithVirtualPath(Request);
+            var issuer = Request.GetAbsoluteUriWithVirtualPath();
             var client = await Validate();
             if (User == null || User.Identity == null || User.Identity.IsAuthenticated == false)
                 return RedirectToLoginPage();
@@ -114,7 +111,7 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
 
             async Task<ClaimsIdentity> BuildSubject(string realm)
             {
-                var context = new HandlerContext(new HandlerContextRequest(_urlHelper.GetAbsoluteUriWithVirtualPath(Request), string.Empty, null, null, null, (X509Certificate2)null, null), realm ?? Constants.DefaultRealm);
+                var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, null, null, null, (X509Certificate2)null, null), realm ?? Constants.DefaultRealm);
                 context.SetUser(user);
                 var claims = (await _claimsExtractor.ExtractClaims(context, client.Scopes, ScopeProtocols.SAML)).Select(c => new Claim(c.Key, c.Value.ToString())).ToList();
                 if (claims.Count(t => t.Type == ClaimTypes.NameIdentifier) == 0)

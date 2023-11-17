@@ -14,12 +14,12 @@ The table below, list all the possible properties present in the `appsettings.js
     </thead>
     <tbody>
         <tr>
-            <td rowspan="2"><b>OverrideBaseUrl</b></td>
-            <td rowspan="2">When set to true, the base URL will be replaced by the authority.</td>
-            <td>true</td>
+            <td rowspan="2"><b>ForceHttps</b></td>
+            <td rowspan="2">Force to use HTTPS</td>
+            <td>True</td>
         </tr>
         <tr>
-            <td>false</td>
+            <td>False</td>
         </tr>
         <tr>
             <td rowspan="2"><b>IsForwardedEnabled</b></td>

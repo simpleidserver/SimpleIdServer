@@ -41,7 +41,6 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IClientRepository _clientRepository;
         private readonly IJwtBuilder _jwtBuilder;
         private readonly IdServer.Infrastructures.IHttpClientFactory _httpClientFactory;
-        private readonly Helpers.IUrlHelper _urlHelper;
 
         public CheckSessionController(
             IOptions<IdServerHostOptions> options,
@@ -49,8 +48,7 @@ namespace SimpleIdServer.IdServer.UI
             IUserRepository userRepository,
             IClientRepository clientRepository,
             IJwtBuilder jwtBuilder,
-            IdServer.Infrastructures.IHttpClientFactory httpClientFactory,
-            Helpers.IUrlHelper urlHelper)
+            IdServer.Infrastructures.IHttpClientFactory httpClientFactory)
         {
             _options = options.Value;
             _busControl = busControl;
@@ -58,13 +56,12 @@ namespace SimpleIdServer.IdServer.UI
             _clientRepository = clientRepository;
             _jwtBuilder = jwtBuilder;
             _httpClientFactory = httpClientFactory;
-            _urlHelper = urlHelper;
         }
 
         [HttpGet]
         public IActionResult Index([FromRoute] string prefix)
         {
-            var issuer = _urlHelper.GetAbsoluteUriWithVirtualPath(Request);
+            var issuer = Request.GetAbsoluteUriWithVirtualPath();
             var newHtml = Html.Replace("{cookieName}", _options.GetSessionCookieName());
             newHtml = newHtml.Replace("{activeSessionUrl}", $"{issuer}/{prefix}/{Constants.EndPoints.ActiveSession}");
             return new ContentResult
@@ -185,7 +182,7 @@ namespace SimpleIdServer.IdServer.UI
                 jwsPayload.Add(JwtRegisteredClaimNames.Sid, sessionId);
             }
 
-            var issuer = HandlerContext.GetIssuer(_urlHelper.GetAbsoluteUriWithVirtualPath(Request));
+            var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath());
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Issuer = issuer,
@@ -225,7 +222,7 @@ namespace SimpleIdServer.IdServer.UI
             var url = client.FrontChannelLogoutUri;
             if (client.FrontChannelLogoutSessionRequired)
             {
-                var issuer = HandlerContext.GetIssuer(_urlHelper.GetAbsoluteUriWithVirtualPath(Request));
+                var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath());
                 url = QueryHelpers.AddQueryString(url, new Dictionary<string, string>
                 {
                     { JwtRegisteredClaimNames.Iss, issuer },
@@ -275,7 +272,7 @@ namespace SimpleIdServer.IdServer.UI
 
             string GetIssuer()
             {
-                var request = _urlHelper.GetAbsoluteUriWithVirtualPath(Request);
+                var request = Request.GetAbsoluteUriWithVirtualPath();
                 return HandlerContext.GetIssuer(request);
             }
         }

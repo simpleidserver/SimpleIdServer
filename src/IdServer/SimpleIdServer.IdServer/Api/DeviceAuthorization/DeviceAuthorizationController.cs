@@ -15,22 +15,19 @@ namespace SimpleIdServer.IdServer.Api.DeviceAuthorization
     {
         private readonly IDeviceAuthorizationRequestHandler _handler;
         private readonly IBusControl _busControl;
-        private readonly Helpers.IUrlHelper _urlHelper;
 
         public DeviceAuthorizationController(
             IDeviceAuthorizationRequestHandler handler, 
-            IBusControl busControl,
-            Helpers.IUrlHelper urlHelper)
+            IBusControl busControl)
         {
             _handler = handler;
             _busControl = busControl;
-            _urlHelper = urlHelper;
         }
 
         public async Task<IActionResult> Post([FromRoute] string prefix, CancellationToken token)
         {
             var jObjBody = Request.Form.ToJsonObject();
-            var context = new HandlerContext(new HandlerContextRequest(_urlHelper.GetAbsoluteUriWithVirtualPath(Request), string.Empty, jObjBody, null, Request.Cookies, string.Empty), prefix ?? Constants.DefaultRealm, new HandlerContextResponse(Response.Cookies));
+            var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, jObjBody, null, Request.Cookies, string.Empty), prefix ?? Constants.DefaultRealm, new HandlerContextResponse(Response.Cookies));
             context.SetUrlHelper(Url);
             using (var activity = Tracing.IdServerActivitySource.StartActivity("Get Device Authorization"))
             {

@@ -12,10 +12,17 @@ builder.Services.AddSIDWebsite(o =>
     o.SCIMUrl = builder.Configuration["ScimBaseUrl"];
     o.IsReamEnabled = bool.Parse(builder.Configuration["IsRealmEnabled"]);
 });
+bool forceHttps = false;
+var forceHttpsStr = builder.Configuration["forceHttps"];
+if (!string.IsNullOrWhiteSpace(forceHttpsStr) && bool.TryParse(forceHttpsStr, out bool r))
+    forceHttps = r;
 
 builder.Services.AddDefaultSecurity(builder.Configuration);
 
 var app = builder.Build();
+
+if (forceHttps)
+    app.SetHttpsScheme();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

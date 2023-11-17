@@ -214,10 +214,6 @@ namespace SimpleIdServer.IdServer.Options
         /// Lifetime of a DPoP in seconds.
         /// </summary>
         public double DPoPLifetimeSeconds { get; set; } = 5 * 60;
-        /// <summary>
-        /// Get or set the base url of the identity server.
-        /// </summary>
-        public string BaseUrl { get; set; }
 
         public int GetIntParameter(string name) => int.Parse(Parameters[name]);
 

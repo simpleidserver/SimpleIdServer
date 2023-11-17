@@ -13,21 +13,18 @@ namespace SimpleIdServer.IdServer.Api.Configuration
     public class IdServerConfigurationController : Controller
     {
         private readonly IEnumerable<IAuthenticationMethodService> _authMethodServices;
-        private readonly Helpers.IUrlHelper _urlHelper;
 
         public IdServerConfigurationController(
-            IEnumerable<IAuthenticationMethodService> authMethodServices,
-            Helpers.IUrlHelper urlHelper)
+            IEnumerable<IAuthenticationMethodService> authMethodServices)
         {
             _authMethodServices = authMethodServices;
-            _urlHelper = urlHelper;
         }
 
         [HttpGet]
         public IActionResult Get([FromRoute] string prefix)
         {
             var subUrl = string.Empty;
-            var issuer = _urlHelper.GetAbsoluteUriWithVirtualPath(Request);
+            var issuer = Request.GetAbsoluteUriWithVirtualPath();
             var issuerStr = issuer;
             if (!string.IsNullOrWhiteSpace(prefix))
             {

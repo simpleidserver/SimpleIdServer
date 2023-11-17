@@ -29,7 +29,6 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
         private readonly IConfiguration _configuration;
         private readonly IAuthenticationHelper _authenticationHelper;
         private readonly IDistributedCache _distributedCache;
-        private readonly Helpers.IUrlHelper _urlHelper;
 
         public AuthenticateController(
             IConfiguration configuration, 
@@ -43,13 +42,11 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
             IAmrHelper amrHelper, 
             IUserRepository userRepository,
             IUserTransformer userTransformer, 
-            IBusControl busControl,
-            Helpers.IUrlHelper urlHelper) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userTransformer, busControl)
+            IBusControl busControl) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userTransformer, busControl)
         {
             _configuration = configuration;
             _authenticationHelper = authenticationHelper;
             _distributedCache= distributedCache;
-            _urlHelper = urlHelper;
         }
 
         protected override string Amr => Constants.MobileAMR;
@@ -72,7 +69,7 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
         protected override void EnrichViewModel(AuthenticateMobileViewModel viewModel)
         {
             var options = GetFidoOptions();
-            var issuer = _urlHelper.GetAbsoluteUriWithVirtualPath(Request);
+            var issuer = Request.GetAbsoluteUriWithVirtualPath();
             viewModel.BeginLoginUrl = $"{issuer}/{viewModel.Realm}/{Constants.EndPoints.BeginQRCodeLogin}";
             viewModel.LoginStatusUrl = $"{issuer}/{viewModel.Realm}/{Constants.EndPoints.LoginStatus}";
             viewModel.IsDeveloperModeEnabled = options.IsDeveloperModeEnabled;

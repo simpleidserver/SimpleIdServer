@@ -1,8 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Community.Microsoft.Extensions.Caching.PostgreSql;
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -57,26 +59,49 @@ builder.Services.Configure<KestrelServerOptions>(options =>
     });
 });
 ConfigureCentralizedConfiguration(builder);
+if(identityServerConfiguration.IsForwardedEnabled)
+{
+    builder.Services.Configure<ForwardedHeadersOptions>(options =>
+    {
+        options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    });
+}
+
 builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
     .AllowAnyMethod()
     .AllowAnyHeader()));
 builder.Services.AddRazorPages()
     .AddRazorRuntimeCompilation();
 ConfigureIdServer(builder.Services);
+builder.Services.AddSwaggerGen();
 var app = builder.Build();
 SeedData(app, identityServerConfiguration.SCIMBaseUrl);
 app.UseCors("AllowAll");
-app.UseSID()
-.UseWsFederation()
-.UseFIDO()
-.UseCredentialIssuer()
-.UseSamlIdp()
-.UseAutomaticConfiguration();
+if(identityServerConfiguration.IsForwardedEnabled)
+{
+    app.UseForwardedHeaders();
+}
+
+app.UseSwagger();
+app.UseSwaggerUI();
+app
+    .UseSID()
+    .UseWsFederation()
+    .UseFIDO()
+    .UseCredentialIssuer()
+    .UseSamlIdp()
+    .UseAutomaticConfiguration();
 app.Run();
 
 void ConfigureIdServer(IServiceCollection services)
 {
-    var idServerBuilder = services.AddSIDIdentityServer(dataProtectionBuilderCallback: ConfigureDataProtection)
+    var idServerBuilder = services.AddSIDIdentityServer(cb =>
+    {
+        if(identityServerConfiguration.OverrideBaseUrl)
+        {
+            cb.BaseUrl = identityServerConfiguration.Authority;
+        }
+    },dataProtectionBuilderCallback: ConfigureDataProtection)
         .UseEFStore(o => ConfigureStorage(o))
         .AddCredentialIssuer()
         .UseInMemoryMassTransit()
@@ -164,6 +189,9 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
                     case DistributedCacheTypes.SQLSERVER:
                         b.UseSqlServer(conf.ConnectionString);
                         break;
+                    case DistributedCacheTypes.POSTGRE:
+                        b.UseNpgsql(conf.ConnectionString);
+                        break;
                 }
             });
         }
@@ -189,6 +217,14 @@ void ConfigureDistributedCache()
             {
                 opts.Configuration = conf.ConnectionString;
                 opts.InstanceName = conf.InstanceName;
+            });
+            break;
+        case DistributedCacheTypes.POSTGRE:
+            builder.Services.AddDistributedPostgreSqlCache(opts =>
+            {
+                opts.ConnectionString = conf.ConnectionString;
+                opts.SchemaName = "public";
+                opts.TableName = "DistributedCache";
             });
             break;
     }

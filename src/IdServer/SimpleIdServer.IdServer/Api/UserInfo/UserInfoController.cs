@@ -45,7 +45,6 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
         private readonly IScopeClaimsExtractor _claimsExtractor;
         private readonly ILogger<UserInfoController> _logger;
         private readonly IBusControl _busControl;
-        private readonly Helpers.IUrlHelper _urlHelper;
 
         public UserInfoController(
             IJwtBuilder jwtBuilder,
@@ -58,8 +57,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
             IClaimsJwsPayloadEnricher claimsJwsPayloadEnricher,
             IScopeClaimsExtractor claimsExtractor,
             ILogger<UserInfoController> logger,
-            IBusControl busControl,
-            Helpers.IUrlHelper urlHelper)
+            IBusControl busControl)
         {
             _jwtBuilder = jwtBuilder;
             _userHelper = userHelper;
@@ -72,7 +70,6 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
             _claimsExtractor = claimsExtractor;
             _logger = logger;
             _busControl = busControl;
-            _urlHelper = urlHelper;
         }
 
         [HttpGet]
@@ -143,7 +140,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
                         throw new OAuthException(ErrorCodes.INVALID_TOKEN, ErrorMessages.ACCESS_TOKEN_REJECTED);
 
                     var oauthScopes = await _scopeRepository.Query().Include(s => s.Realms).Include(s => s.ClaimMappers).AsNoTracking().Where(s => scopes.Contains(s.Name) && s.Realms.Any(r => r.Name == prefix)).ToListAsync(cancellationToken);
-                    var context = new HandlerContext(new HandlerContextRequest(_urlHelper.GetAbsoluteUriWithVirtualPath(Request), string.Empty, null, null, null, (X509Certificate2)null, HttpContext.Request.Method), prefix ?? Constants.DefaultRealm);
+                    var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, null, null, null, (X509Certificate2)null, HttpContext.Request.Method), prefix ?? Constants.DefaultRealm);
                     context.SetUser(user);
                     activity?.SetTag("scopes", string.Join(",", oauthScopes.Select(s => s.Name)));
                     var payload = await _claimsExtractor.ExtractClaims(context, oauthScopes, ScopeProtocols.OPENID);

@@ -27,7 +27,6 @@ namespace SimpleIdServer.IdServer.Fido.Apis
         private readonly IUserRepository _userRepository;
         private readonly IJwtBuilder _jwtBuilder;
         private readonly IDistributedCache _distributedCache;
-        private readonly Helpers.IUrlHelper _urlHelper;
         private IFido2 _fido2;
 
         public U2FLoginController(
@@ -36,7 +35,6 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             IUserRepository userRepository, 
             IJwtBuilder jwtBuilder, 
             IDistributedCache distributedCache,
-            Helpers.IUrlHelper urlHelper,
             IFido2 fido2)
         {
             _configuration = configuration;
@@ -44,7 +42,6 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             _userRepository = userRepository;
             _jwtBuilder = jwtBuilder;
             _distributedCache = distributedCache;
-            _urlHelper = urlHelper;
             _fido2 = fido2;
         }
 
@@ -62,7 +59,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
         [HttpPost]
         public async Task<IActionResult> BeginQRCode([FromRoute] string prefix, [FromBody] BeginU2FLoginRequest request, CancellationToken cancellationToken)
         {
-            var issuer = _urlHelper.GetAbsoluteUriWithVirtualPath(Request);
+            var issuer = Request.GetAbsoluteUriWithVirtualPath();
             prefix = prefix ?? IdServer.Constants.DefaultRealm;
             var kvp = await CommonBegin(prefix, request, cancellationToken);
             if (kvp.Item2 != null) return kvp.Item2;
@@ -84,7 +81,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
         [HttpGet]
         public async Task<IActionResult> ReadQRCode([FromRoute] string prefix, string sessionId, CancellationToken cancellationToken)
         {
-            var issuer = _urlHelper.GetAbsoluteUriWithVirtualPath(Request);
+            var issuer = Request.GetAbsoluteUriWithVirtualPath();
             prefix = prefix ?? IdServer.Constants.DefaultRealm;
             if (string.IsNullOrWhiteSpace(sessionId)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.MISSING_PARAMETER, nameof(sessionId)));
             var session = await _distributedCache.GetStringAsync(sessionId, cancellationToken);
@@ -152,7 +149,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
         protected async Task<(BeginU2FLoginResult, IActionResult)> CommonBegin(string prefix, BeginU2FLoginRequest request, CancellationToken cancellationToken)
         {
             var fidoOptions = GetOptions();
-            var issuer = _urlHelper.GetAbsoluteUriWithVirtualPath(Request);
+            var issuer = Request.GetAbsoluteUriWithVirtualPath();
             prefix = prefix ?? IdServer.Constants.DefaultRealm;
             if (request == null) return (null, BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, IdServer.ErrorMessages.INVALID_INCOMING_REQUEST));
             JsonWebToken jsonWebToken = null;

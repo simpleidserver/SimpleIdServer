@@ -73,6 +73,7 @@ builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAn
 builder.Services.AddRazorPages()
     .AddRazorRuntimeCompilation();
 ConfigureIdServer(builder.Services);
+builder.Services.AddSwaggerGen();
 var app = builder.Build();
 SeedData(app, identityServerConfiguration.SCIMBaseUrl);
 app.UseCors("AllowAll");
@@ -81,7 +82,10 @@ if(identityServerConfiguration.IsForwardedEnabled)
     app.UseForwardedHeaders();
 }
 
-app.UseSID()
+if (identityServerConfiguration.ForceHttps)
+    app.SetHttpsScheme();
+app
+    .UseSID()
     .UseWsFederation()
     .UseFIDO()
     .UseCredentialIssuer()
@@ -91,13 +95,7 @@ app.Run();
 
 void ConfigureIdServer(IServiceCollection services)
 {
-    var idServerBuilder = services.AddSIDIdentityServer(cb =>
-    {
-        if(identityServerConfiguration.OverrideBaseUrl)
-        {
-            cb.BaseUrl = identityServerConfiguration.Authority;
-        }
-    },dataProtectionBuilderCallback: ConfigureDataProtection)
+    var idServerBuilder = services.AddSIDIdentityServer(dataProtectionBuilderCallback: ConfigureDataProtection)
         .UseEFStore(o => ConfigureStorage(o))
         .AddCredentialIssuer()
         .UseInMemoryMassTransit()

@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SimpleIdServer.IdServer.DTOs;
 using System.Text.Json.Nodes;
@@ -14,15 +15,11 @@ namespace SimpleIdServer.IdServer.Api.Configuration
     public class OAuthConfigurationController : Controller
     {
         private readonly IOAuthConfigurationRequestHandler _configurationRequestHandler;
-        private readonly Helpers.IUrlHelper _urlHelper;
 
-        public OAuthConfigurationController(IOAuthConfigurationRequestHandler configurationRequestHandler, Helpers.IUrlHelper urlHelper)
+        public OAuthConfigurationController(IOAuthConfigurationRequestHandler configurationRequestHandler)
         {
             _configurationRequestHandler = configurationRequestHandler;
-            _urlHelper = urlHelper;
         }
-
-        protected Helpers.IUrlHelper UrlHelper => _urlHelper;
 
         [HttpGet]
         public virtual async Task<IActionResult> Get([FromRoute] string prefix, CancellationToken token)
@@ -33,7 +30,7 @@ namespace SimpleIdServer.IdServer.Api.Configuration
         protected async Task<JsonObject> Build(string prefix, CancellationToken cancellationToken)
         {
             var subUrl = string.Empty;
-            var issuer = _urlHelper.GetAbsoluteUriWithVirtualPath(Request);
+            var issuer = Request.GetAbsoluteUriWithVirtualPath();
             var issuerStr = issuer;
             if (!string.IsNullOrWhiteSpace(prefix))
             {

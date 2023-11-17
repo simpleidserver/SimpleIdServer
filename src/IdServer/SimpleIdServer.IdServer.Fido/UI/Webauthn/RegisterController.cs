@@ -17,21 +17,17 @@ namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
     [Area(Constants.AMR)]
     public class RegisterController : BaseRegisterController<RegisterWebauthnViewModel>
     {
-        private readonly Helpers.IUrlHelper _urlHelper;
-
         public RegisterController(
             IOptions<IdServerHostOptions> options, 
             IDistributedCache distributedCache, 
-            IUserRepository userRepository,
-            Helpers.IUrlHelper urlHelper) : base(options, distributedCache, userRepository)
+            IUserRepository userRepository) : base(options, distributedCache, userRepository)
         {
-            _urlHelper = urlHelper;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index([FromRoute] string prefix)
         {
-            var issuer = _urlHelper.GetAbsoluteUriWithVirtualPath(Request);
+            var issuer = Request.GetAbsoluteUriWithVirtualPath();
             if (!string.IsNullOrWhiteSpace(prefix))
                 prefix = $"{prefix}/";
             var viewModel = new RegisterWebauthnViewModel();

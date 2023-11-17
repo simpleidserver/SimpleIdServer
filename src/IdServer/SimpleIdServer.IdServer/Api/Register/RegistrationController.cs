@@ -35,7 +35,6 @@ namespace SimpleIdServer.IdServer.Api.Register
         private readonly IRealmRepository _realmRepository;
         private readonly IBusControl _busControl;
         private readonly IJwtBuilder _jwtBuilder;
-        private readonly Helpers.IUrlHelper _urlHelper;
         private readonly IdServerHostOptions _options;
 
         public RegistrationController(
@@ -45,8 +44,7 @@ namespace SimpleIdServer.IdServer.Api.Register
             IRealmRepository realmRepository, 
             IBusControl busControl, 
             IJwtBuilder jwtBuilder, 
-            IOptions<IdServerHostOptions> options, 
-            Helpers.IUrlHelper urlHelper)
+            IOptions<IdServerHostOptions> options)
         {
             _clientRepository = clientRepository;
             _scopeRepository = scopeRepository;
@@ -55,7 +53,6 @@ namespace SimpleIdServer.IdServer.Api.Register
             _busControl = busControl;
             _jwtBuilder = jwtBuilder;
             _options = options.Value;
-            _urlHelper = urlHelper;
         }
 
         /// <summary>
@@ -89,7 +86,7 @@ namespace SimpleIdServer.IdServer.Api.Register
                     return new ContentResult
                     {
                         StatusCode = (int)HttpStatusCode.Created,
-                        Content = client.Serialize(_urlHelper.GetAbsoluteUriWithVirtualPath(Request)).ToJsonString(),
+                        Content = client.Serialize(Request.GetAbsoluteUriWithVirtualPath()).ToJsonString(),
                         ContentType = "application/json"
                     };
                 }
@@ -171,7 +168,7 @@ namespace SimpleIdServer.IdServer.Api.Register
             prefix = prefix ?? Constants.DefaultRealm;
             var res = await GetClient(prefix, id, cancellationToken);
             if (res.HasError) return res.ErrorResult;
-            return new OkObjectResult(res.Client.Serialize(_urlHelper.GetAbsoluteUriWithVirtualPath(Request)));
+            return new OkObjectResult(res.Client.Serialize(Request.GetAbsoluteUriWithVirtualPath()));
         }
 
         /// <summary>
@@ -218,7 +215,7 @@ namespace SimpleIdServer.IdServer.Api.Register
                 request.Apply(res.Client, _options);
                 await _validator.Validate(prefix, res.Client, cancellationToken);
                 await _clientRepository.SaveChanges(cancellationToken);
-                return new OkObjectResult(res.Client.Serialize(_urlHelper.GetAbsoluteUriWithVirtualPath(Request)));
+                return new OkObjectResult(res.Client.Serialize(Request.GetAbsoluteUriWithVirtualPath()));
             }
             catch (OAuthException ex)
             {
