@@ -243,6 +243,13 @@ void ConfigureStorage(DbContextOptionsBuilder b)
                 o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
             });
             break;
+        case StorageTypes.MYSQL:
+            b.UseMySql(conf.ConnectionString, ServerVersion.AutoDetect(conf.ConnectionString), o =>
+            {
+                o.MigrationsAssembly("SimpleIdServer.IdServer.MySQLMigrations");
+                o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+            });
+            break;
         case StorageTypes.INMEMORY:
             b.UseInMemoryDatabase(conf.ConnectionString);
             break;

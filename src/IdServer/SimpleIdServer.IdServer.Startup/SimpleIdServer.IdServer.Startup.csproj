@@ -11,6 +11,7 @@
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.CredentialIssuer\SimpleIdServer.IdServer.CredentialIssuer.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Email\SimpleIdServer.IdServer.Email.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Fido\SimpleIdServer.IdServer.Fido.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.IdServer.MySQLMigrations\SimpleIdServer.IdServer.MySQLMigrations.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Notification.Fcm\SimpleIdServer.IdServer.Notification.Fcm.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.PostgreMigrations\SimpleIdServer.IdServer.PostgreMigrations.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Provisioning.LDAP\SimpleIdServer.IdServer.Provisioning.LDAP.csproj" />

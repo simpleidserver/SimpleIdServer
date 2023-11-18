@@ -47,6 +47,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.Postgre
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.SqlServerMigrations", "src\Scim\SimpleIdServer.Scim.SqlServerMigrations\SimpleIdServer.Scim.SqlServerMigrations.csproj", "{02AF94F7-ADB2-4966-8FF7-0D9AE90BE703}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.MySQLMigrations", "src\Scim\SimpleIdServer.Scim.MySQLMigrations\SimpleIdServer.Scim.MySQLMigrations.csproj", "{DE956F00-9A99-403F-B58B-21D0F6764AF9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -121,6 +123,10 @@ Global
 		{02AF94F7-ADB2-4966-8FF7-0D9AE90BE703}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{02AF94F7-ADB2-4966-8FF7-0D9AE90BE703}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{02AF94F7-ADB2-4966-8FF7-0D9AE90BE703}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE956F00-9A99-403F-B58B-21D0F6764AF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE956F00-9A99-403F-B58B-21D0F6764AF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE956F00-9A99-403F-B58B-21D0F6764AF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE956F00-9A99-403F-B58B-21D0F6764AF9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -144,6 +150,7 @@ Global
 		{5B2199C4-EEFC-46DB-970D-8254D5BA88B3} = {011E8E6E-5B36-4E0C-A4AE-FF7B11579380}
 		{7DBBF997-362E-441C-9D36-572A635FC35B} = {EBD2D625-0911-46C2-A899-836706A82BC0}
 		{02AF94F7-ADB2-4966-8FF7-0D9AE90BE703} = {EBD2D625-0911-46C2-A899-836706A82BC0}
+		{DE956F00-9A99-403F-B58B-21D0F6764AF9} = {EBD2D625-0911-46C2-A899-836706A82BC0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E7923ED0-C7DA-4D19-81E6-E3EEE579FE7A}

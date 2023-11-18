@@ -338,6 +338,14 @@ namespace SimpleIdServer.Scim.Startup
                             o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
                         });
                         break;
+                    case StorageTypes.MYSQL:
+                        options.UseMySql(conf.ConnectionString, ServerVersion.AutoDetect(conf.ConnectionString), o =>
+                        {
+                            o.MigrationsAssembly("SimpleIdServer.Scim.MySQLMigrations");
+                            o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+                            o.SchemaBehavior(Pomelo.EntityFrameworkCore.MySql.Infrastructure.MySqlSchemaBehavior.Ignore);
+                        });
+                        break;
                 }
             }, options =>
             {
