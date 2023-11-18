@@ -73,7 +73,6 @@ builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAn
 builder.Services.AddRazorPages()
     .AddRazorRuntimeCompilation();
 ConfigureIdServer(builder.Services);
-builder.Services.AddSwaggerGen();
 var app = builder.Build();
 SeedData(app, identityServerConfiguration.SCIMBaseUrl);
 app.UseCors("AllowAll");
