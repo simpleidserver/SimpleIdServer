@@ -310,6 +310,7 @@ public class ClientsController : BaseController
 
         void Update(Client existingClient, UpdateAdvancedClientSettingsRequest request)
         {
+            existingClient.TokenSignedResponseAlg = request.TokenSignedResponseAlg;
             existingClient.IdTokenSignedResponseAlg = request.IdTokenSignedResponseAlg;
             existingClient.AuthorizationSignedResponseAlg = request.AuthorizationSignedResponseAlg;
             existingClient.AuthorizationDataTypes = request.AuthorizationDataTypes;

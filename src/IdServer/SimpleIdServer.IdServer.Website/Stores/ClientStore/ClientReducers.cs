@@ -288,6 +288,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         {
             var client = state.Client;
             client.IdTokenSignedResponseAlg = act.IdTokenSignedResponseAlg;
+            client.TokenSignedResponseAlg = act.TokenSignedResponseAlg;
             client.AuthorizationSignedResponseAlg = act.AuthorizationSignedResponseAlg;
             client.AuthorizationDataTypes = act.AuthorizationDataTypes?.ToList();
             client.ResponseTypes = act.ResponseTypes?.ToList();
