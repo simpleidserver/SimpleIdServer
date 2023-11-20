@@ -16,8 +16,21 @@
     <RadzenAccordion Multiple=true>    
         <Items>
             <RadzenAccordionItem Text="OpenID configuration" Selected=true>
-                <!-- IdTokenSignedResponseAlg -->
+                <!-- TokenSignedResponseAlg -->
                 <div class="row">
+                    <div class="col-md-2">
+                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, "JWA algorithm used for signing access tokens"))" />
+                        <RadzenLabel Text="Token signature algorithm" Style="padding: 0px;" />
+                    </div>
+                    <div class="col">
+                        <RadzenDropDown Name="TokenSignedResponseAlg" Class="w-100"
+                                        Data=@SimpleIdServer.IdServer.Constants.AllSigningAlgs
+                                        TValue="string"
+                                        @bind-Value=@updateAdvancedClient.TokenSignedResponseAlg />
+                    </div>
+                </div>
+                <!-- IdTokenSignedResponseAlg -->
+                <div class="row mt-1">
                     <div class="col-md-2">
                         <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, "JWA algorithm used for signing ID tokens"))" />
                         <RadzenLabel Text="ID token signature algorithm" Style="padding: 0px;" />
@@ -119,6 +132,7 @@
 
     record UpdateAdvancedClient
     {
+        public string? TokenSignedResponseAlg { get; set; } = null;
         public string? IdTokenSignedResponseAlg { get; set; } = null;
         public string? AuthorizationSignedResponseAlg { get; set; } = null;
         public string? AuthorizationDataTypes { get; set; } = null;
@@ -160,6 +174,7 @@
         if (this.Client == null) return;
         updateAdvancedClient = new UpdateAdvancedClient
         {
+            TokenSignedResponseAlg = Client.TokenSignedResponseAlg,
             IdTokenSignedResponseAlg = Client.IdTokenSignedResponseAlg,
             AuthorizationSignedResponseAlg = Client.AuthorizationSignedResponseAlg,
             AuthorizationDataTypes = Client.AuthorizationDataTypes == null || !Client.AuthorizationDataTypes.Any() ? string.Empty : string.Join(";", Client.AuthorizationDataTypes),
@@ -178,6 +193,7 @@
         {
             AuthorizationDataTypes = client.AuthorizationDataTypes,
             AuthorizationSignedResponseAlg = client.AuthorizationSignedResponseAlg,
+            TokenSignedResponseAlg = client.TokenSignedResponseAlg,
             IdTokenSignedResponseAlg = client.IdTokenSignedResponseAlg,
             ResponseTypes = selectedResponseTypes,
             ClientId = Client.ClientId,

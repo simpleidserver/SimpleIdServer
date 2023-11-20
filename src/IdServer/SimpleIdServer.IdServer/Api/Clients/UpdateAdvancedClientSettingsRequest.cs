@@ -9,6 +9,8 @@ namespace SimpleIdServer.IdServer.Api.Clients;
 
 public class UpdateAdvancedClientSettingsRequest
 {
+    [JsonPropertyName(OAuthClientParameters.TokenSignedResponseAlg)]
+    public string TokenSignedResponseAlg { get; set; }
     [JsonPropertyName(OAuthClientParameters.IdTokenSignedResponseAlg)]
     public string IdTokenSignedResponseAlg { get; set; }
     [JsonPropertyName(OAuthClientParameters.AuthorizationSignedResponseAlg)]

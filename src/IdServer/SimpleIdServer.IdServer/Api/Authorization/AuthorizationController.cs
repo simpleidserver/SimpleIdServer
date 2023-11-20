@@ -40,6 +40,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             _authorizationRequestHandler = authorizationRequestHandler;
             _responseModeHandler = responseModeHandler;
             _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
+            _busControl = busControl;
         }
 
         public async Task Get([FromRoute] string prefix, CancellationToken token)

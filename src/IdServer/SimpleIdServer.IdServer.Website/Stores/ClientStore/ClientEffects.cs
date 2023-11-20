@@ -645,6 +645,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             var httpClient = await _websiteHttpClientFactory.Build();
             var request = new UpdateAdvancedClientSettingsRequest
             {
+                TokenSignedResponseAlg = act.TokenSignedResponseAlg,
                 IdTokenSignedResponseAlg = act.IdTokenSignedResponseAlg,
                 AuthorizationSignedResponseAlg = act.AuthorizationSignedResponseAlg,
                 AuthorizationDataTypes = string.IsNullOrWhiteSpace(act.AuthorizationDataTypes) ? new List<string>() : act.AuthorizationDataTypes.Split(';'),
@@ -667,6 +668,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 httpResult.EnsureSuccessStatusCode();
                 dispatcher.Dispatch(new UpdateAdvancedClientSettingsSuccessAction
                 {
+                    TokenSignedResponseAlg = request.TokenSignedResponseAlg,
                     AuthorizationDataTypes = request.AuthorizationDataTypes,
                     ResponseTypes = act.ResponseTypes,
                     AuthorizationSignedResponseAlg = act.AuthorizationSignedResponseAlg,
@@ -1147,6 +1149,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
     public class UpdateAdvancedClientSettingsAction
     {
         public string ClientId { get; set; } = null!;
+        public string? TokenSignedResponseAlg { get; set; }
         public string? IdTokenSignedResponseAlg { get; set; }
         public string? AuthorizationSignedResponseAlg { get; set; }
         public string? AuthorizationDataTypes { get; set; }
@@ -1167,6 +1170,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public bool IsDPoPNonceRequired { get; set; } = false;
         public double DPOPNonceLifetimeInSeconds { get; set; }
         public double TokenExpirationTimeInSeconds { get; set; }
+        public string? TokenSignedResponseAlg { get; set;  }
     }
 
     public class UpdateAdvancedClientSettingsFailureAction

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using static System.Net.WebRequestMethods;
 
@@ -20,6 +21,8 @@ builder.Services.AddAuthentication(options =>
         options.ClientId = "protectedServersideApp";
         options.ClientSecret = "password";
         options.GetClaimsFromUserInfoEndpoint = true;
+        options.Scope.Add("role");
+        options.ClaimActions.MapJsonKey("role", "role");
         options.SaveTokens = true;
     });
 
