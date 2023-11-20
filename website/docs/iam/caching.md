@@ -30,3 +30,12 @@ To use Postgresql as a distributed caching, edit the `appsettings.json` file and
 | ------------------------------------------------ | --------- |
 | $.DistributedCacheConfiguration.ConnectionString |           |
 | $.DistributedCacheConfiguration.Type             | POSTGRE   |
+
+## Mysql
+
+To use Mysql as a distributed caching, edit the `appsettings.json` file and modify the following values :
+
+| Json Path                                        | Value     |
+| ------------------------------------------------ | --------- |
+| $.DistributedCacheConfiguration.ConnectionString |           |
+| $.DistributedCacheConfiguration.Type             | MYSQL     |

@@ -30,3 +30,12 @@ To utilize Postgresql, edit the `appsettings.json` file and modify the following
 | --------------------------------------- | ------------- |
 | $.StorageConfiguration.ConnectionString |               |
 | $.StorageConfiguration.Type             | POSTGRE       |
+
+## MYSQL
+
+To utilize Mysql, edit the `appsettings.json` file and modify the following values :
+
+| Json Path                               | Value         |
+| --------------------------------------- | ------------- |
+| $.StorageConfiguration.ConnectionString |               |
+| $.StorageConfiguration.Type             | MYSQL         |

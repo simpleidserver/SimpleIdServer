@@ -30,3 +30,12 @@ To use Postgresql as a distributed configuration storage, edit the  `appsettings
 | ------------------------------------------------ | ------------- |
 | $.DistributedCacheConfiguration.Type             | POSTGRE       |
 | $.DistributedCacheConfiguration.ConnectionString |               |
+
+## Mysql
+
+To use Mysql as a distributed configuration storage, edit the  `appsettings.json` file and modify the following values :
+
+| Json Path                                        | Value         |
+| ------------------------------------------------ | ------------- |
+| $.DistributedCacheConfiguration.Type             | MYSQL         |
+| $.DistributedCacheConfiguration.ConnectionString |               |

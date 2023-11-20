@@ -185,6 +185,9 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
                     case DistributedCacheTypes.POSTGRE:
                         b.UseNpgsql(conf.ConnectionString);
                         break;
+                    case DistributedCacheTypes.MYSQL:
+                        b.UseMySql(conf.ConnectionString, ServerVersion.AutoDetect(conf.ConnectionString));
+                        break;
                 }
             });
         }
@@ -217,6 +220,13 @@ void ConfigureDistributedCache()
             {
                 opts.ConnectionString = conf.ConnectionString;
                 opts.SchemaName = "public";
+                opts.TableName = "DistributedCache";
+            });
+            break;
+        case DistributedCacheTypes.MYSQL:
+            builder.Services.AddDistributedMySqlCache(opts =>
+            {
+                opts.ConnectionString = conf.ConnectionString;
                 opts.TableName = "DistributedCache";
             });
             break;
