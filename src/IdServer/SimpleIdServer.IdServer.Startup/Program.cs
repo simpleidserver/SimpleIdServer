@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -28,11 +29,17 @@ using SimpleIdServer.IdServer.Startup;
 using SimpleIdServer.IdServer.Startup.Configurations;
 using SimpleIdServer.IdServer.Startup.Converters;
 using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Swagger;
 using SimpleIdServer.IdServer.WsFederation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+
+static bool DefaultDocInclusionPredicate(string documentName, ApiDescription apiDescription)
+{
+    return apiDescription.GroupName == null || apiDescription.GroupName == documentName;
+}
 
 const string CreateTableFormat = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DistributedCache' and xtype='U') " +
     "CREATE TABLE [dbo].[DistributedCache] (" +
@@ -59,7 +66,7 @@ builder.Services.Configure<KestrelServerOptions>(options =>
     });
 });
 ConfigureCentralizedConfiguration(builder);
-if(identityServerConfiguration.IsForwardedEnabled)
+if (identityServerConfiguration.IsForwardedEnabled)
 {
     builder.Services.Configure<ForwardedHeadersOptions>(options =>
     {
@@ -73,18 +80,30 @@ builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAn
 builder.Services.AddRazorPages()
     .AddRazorRuntimeCompilation();
 ConfigureIdServer(builder.Services);
+
+// HOW TO POPULATE THE CONTROLLERS : https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.Core/src/ApplicationParts/ApplicationPartManager.cs#L12
+// AddApiExplorer !!!
+// https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.ApiExplorer/src/ApiDescriptionGroupCollectionProvider.cs#L10 : Get API Descriptions.
+// https://github.com/dotnet/aspnetcore/blob/76b5785b4ca4d6107baad792e2fe4d7b6f938b9b/src/Mvc/Mvc.Core/src/Infrastructure/DefaultActionDescriptorCollectionProvider.cs : Returns all the controllers & actions.
+// https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.ApiExplorer/src/DefaultApiDescriptionProvider.cs#L536
+// IActionDescriptorProvider: https://github.com/dotnet/aspnetcore/blob/76b5785b4ca4d6107baad792e2fe4d7b6f938b9b/src/Mvc/Mvc.Core/src/ApplicationModels/ControllerActionDescriptorProvider.cs#L11
+// https://mariusgundersen.net/dynamic-endpoint-routing/ : use dynamic endpoint routing...
+
 var app = builder.Build();
 SeedData(app, identityServerConfiguration.SCIMBaseUrl);
 app.UseCors("AllowAll");
-if(identityServerConfiguration.IsForwardedEnabled)
+if (identityServerConfiguration.IsForwardedEnabled)
 {
     app.UseForwardedHeaders();
 }
 
 if (identityServerConfiguration.ForceHttps)
     app.SetHttpsScheme();
+
 app
     .UseSID()
+    .UseSIDSwagger()
+    .UseSIDSwaggerUI()
     .UseWsFederation()
     .UseFIDO()
     .UseCredentialIssuer()
@@ -96,6 +115,7 @@ void ConfigureIdServer(IServiceCollection services)
 {
     var idServerBuilder = services.AddSIDIdentityServer(dataProtectionBuilderCallback: ConfigureDataProtection)
         .UseEFStore(o => ConfigureStorage(o))
+        .AddSwagger()
         .AddCredentialIssuer()
         .UseInMemoryMassTransit()
         .AddBackChannelAuthentication()
@@ -166,7 +186,7 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
         o.Add<IdServerSmsOptions>();
         o.Add<FidoOptions>();
         o.Add<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>();
-        if(conf.Type == DistributedCacheTypes.REDIS)
+        if (conf.Type == DistributedCacheTypes.REDIS)
         {
             o.UseRedisConnector(conf.ConnectionString);
         }
@@ -198,7 +218,7 @@ void ConfigureDistributedCache()
 {
     var section = builder.Configuration.GetSection(nameof(DistributedCacheConfiguration));
     var conf = section.Get<DistributedCacheConfiguration>();
-    switch(conf.Type)
+    switch (conf.Type)
     {
         case DistributedCacheTypes.SQLSERVER:
             builder.Services.AddDistributedSqlServerCache(opts =>
@@ -237,7 +257,7 @@ void ConfigureStorage(DbContextOptionsBuilder b)
 {
     var section = builder.Configuration.GetSection(nameof(StorageConfiguration));
     var conf = section.Get<StorageConfiguration>();
-    switch(conf.Type) 
+    switch (conf.Type)
     {
         case StorageTypes.SQLSERVER:
             b.UseSqlServer(conf.ConnectionString, o =>
@@ -319,7 +339,7 @@ void SeedData(WebApplication application, string scimBaseUrl)
                 dbContext.SerializedFileKeys.Add(WsFederationKeyGenerator.GenerateWsFederationSigningCredentials(SimpleIdServer.IdServer.Constants.StandardRealms.Master));
             }
 
-            if(!dbContext.CertificateAuthorities.Any())
+            if (!dbContext.CertificateAuthorities.Any())
                 dbContext.CertificateAuthorities.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.CertificateAuthorities);
 
             if (!dbContext.Acrs.Any())

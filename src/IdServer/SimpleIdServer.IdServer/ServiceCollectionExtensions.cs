@@ -37,6 +37,7 @@ using SimpleIdServer.IdServer.ClaimsEnricher;
 using SimpleIdServer.IdServer.ClaimTokenFormats;
 using SimpleIdServer.IdServer.Extractors;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Infastructures;
 using SimpleIdServer.IdServer.Infrastructures;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Jwt;
@@ -74,6 +75,7 @@ namespace Microsoft.Extensions.DependencyInjection
             });
             Tracing.Init();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+            services.AddSingleton<ISidEndpointStore, SidEndpointStore>();
             services.AddControllersWithViews();
             var b = services.AddDataProtection();
             if (dataProtectionBuilderCallback != null) dataProtectionBuilderCallback(b);

@@ -105,6 +105,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.Not
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.MySQLMigrations", "src\IdServer\SimpleIdServer.IdServer.MySQLMigrations\SimpleIdServer.IdServer.MySQLMigrations.csproj", "{784CDB53-A42C-47E0-BFAD-7D68E56D71A3}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.Swagger", "src\IdServer\SimpleIdServer.IdServer.Swagger\SimpleIdServer.IdServer.Swagger.csproj", "{D717B7A2-96C5-4DAB-A7DC-C1443A4DA409}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -271,6 +273,10 @@ Global
 		{784CDB53-A42C-47E0-BFAD-7D68E56D71A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{784CDB53-A42C-47E0-BFAD-7D68E56D71A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{784CDB53-A42C-47E0-BFAD-7D68E56D71A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D717B7A2-96C5-4DAB-A7DC-C1443A4DA409}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D717B7A2-96C5-4DAB-A7DC-C1443A4DA409}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D717B7A2-96C5-4DAB-A7DC-C1443A4DA409}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D717B7A2-96C5-4DAB-A7DC-C1443A4DA409}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -323,6 +329,7 @@ Global
 		{3EA05774-266E-4C68-AE40-CE246F8EDD31} = {CA774DE9-8091-4298-BDB3-924561F36B75}
 		{C302A16E-7070-40C8-8296-E5437361A000} = {E5886E09-671E-4B3E-AA8F-824C39DF94E4}
 		{784CDB53-A42C-47E0-BFAD-7D68E56D71A3} = {DA65BA14-7FA4-4D99-A11D-C67F75F03771}
+		{D717B7A2-96C5-4DAB-A7DC-C1443A4DA409} = {4796A22B-91A9-42AF-87CA-F69392696B0A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FE1E2C8-475E-4592-8609-D331B1D01730}

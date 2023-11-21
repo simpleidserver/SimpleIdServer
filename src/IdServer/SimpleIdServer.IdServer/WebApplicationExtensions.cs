@@ -4,6 +4,7 @@ using Hangfire;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer;
+using SimpleIdServer.IdServer.Infastructures;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Middlewares;
 using SimpleIdServer.IdServer.Options;
@@ -25,7 +26,7 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.UseAuthentication();
             webApplication.UseAuthorization();
 
-            webApplication.MapControllerRoute("oauthConfiguration",
+            webApplication.SidMapControllerRoute("oauthConfiguration",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.OAuthConfiguration,
                 defaults: new { controller = "OAuthConfiguration", action = "Get" });
 
