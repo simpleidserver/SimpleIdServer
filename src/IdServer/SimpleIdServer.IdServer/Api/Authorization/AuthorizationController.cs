@@ -6,10 +6,12 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseModes;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
+using SimpleIdServer.IdServer.Options;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -30,17 +32,20 @@ namespace SimpleIdServer.IdServer.Api.Authorization
         private readonly IResponseModeHandler _responseModeHandler;
         private readonly IDataProtector _dataProtector;
         private readonly IBusControl _busControl;
+        private readonly IdServerHostOptions _options;
 
         public AuthorizationController(
             IAuthorizationRequestHandler authorizationRequestHandler, 
             IResponseModeHandler responseModeHandler, 
             IDataProtectionProvider dataProtectionProvider, 
-            IBusControl busControl)
+            IBusControl busControl,
+            IOptions<IdServerHostOptions> options)
         {
             _authorizationRequestHandler = authorizationRequestHandler;
             _responseModeHandler = responseModeHandler;
             _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
             _busControl = busControl;
+            _options = options.Value;
         }
 
         public async Task Get([FromRoute] string prefix, CancellationToken token)
@@ -52,7 +57,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                 var userSubject = claimName == null ? string.Empty : claimName.Value;
                 var referer = string.Empty;
                 if (Request.Headers.Referer.Any()) referer = Request.Headers.Referer.First();
-                var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, jObjBody, null, Request.Cookies, referer), prefix ?? Constants.DefaultRealm, new HandlerContextResponse(Response.Cookies));
+                var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, jObjBody, null, Request.Cookies, referer), prefix ?? Constants.DefaultRealm, _options, new HandlerContextResponse(Response.Cookies));
                 activity?.SetTag("realm", context.Realm);
                 try
                 {

@@ -2,8 +2,10 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Options;
 using System.Linq;
 using System.Security.Claims;
 using System.Text.Json.Nodes;
@@ -16,11 +18,13 @@ namespace SimpleIdServer.IdServer.Api.Token
     {
         private readonly ITokenRequestHandler _tokenRequestHandler;
         private readonly IRevokeTokenRequestHandler _revokeTokenRequestHandler;
+        private readonly IdServerHostOptions _options;
 
-        public TokenController(ITokenRequestHandler tokenRequestHandler, IRevokeTokenRequestHandler revokeTokenRequestHandler)
+        public TokenController(ITokenRequestHandler tokenRequestHandler, IRevokeTokenRequestHandler revokeTokenRequestHandler, IOptions<IdServerHostOptions> options)
         {
             _tokenRequestHandler = tokenRequestHandler;
             _revokeTokenRequestHandler = revokeTokenRequestHandler;
+            _options = options.Value;
         }
 
         [HttpPost]
@@ -35,6 +39,7 @@ namespace SimpleIdServer.IdServer.Api.Token
             var context = new HandlerContext(
                 new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, jObjBody, jObjHeader, Request.Cookies, clientCertificate, HttpContext.Request.Method), 
                 prefix,
+                _options,
                 new HandlerContextResponse(HttpContext.Response));
             var result = await _tokenRequestHandler.Handle(context, token);
 

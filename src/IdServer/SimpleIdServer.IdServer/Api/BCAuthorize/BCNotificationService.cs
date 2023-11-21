@@ -3,8 +3,10 @@
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
+using SimpleIdServer.IdServer.Options;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Encodings.Web;
@@ -52,12 +54,14 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
         private readonly IDataProtector _dataProtector;
         private readonly UrlEncoder _urlEncoder;
         private readonly IEnumerable<IUserNotificationService> _notificationServices;
+        private readonly IdServerHostOptions _options;
 
-        public BCNotificationService(IDataProtectionProvider dataProtectionProvider, UrlEncoder urlEncoder, IEnumerable<IUserNotificationService> notificationServices)
+        public BCNotificationService(IDataProtectionProvider dataProtectionProvider, UrlEncoder urlEncoder, IEnumerable<IUserNotificationService> notificationServices, IOptions<IdServerHostOptions> options)
         {
             _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
             _urlEncoder = urlEncoder;
             _notificationServices = notificationServices;
+            _options = options.Value;
         }
 
         public async Task Notify(HandlerContext handlerContext, BCNotificationMessage message, CancellationToken cancellationToken)
@@ -74,13 +78,13 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
         protected string BuildBackChannelConsentUrl(IUrlHelper urlHelper, string issuer, List<KeyValuePair<string, string>> queries)
         {
             var queryCollection = new QueryBuilder(queries);
-            var returnUrl = $"{HandlerContext.GetIssuer(issuer)}/{Constants.EndPoints.BCCallback}{queryCollection.ToQueryString()}";
+            var returnUrl = $"{HandlerContext.GetIssuer(issuer, _options.UseRealm)}/{Constants.EndPoints.BCCallback}{queryCollection.ToQueryString()}";
             return $"{issuer}{urlHelper.Action("Index", "BackChannelConsents", new
             {
                 returnUrl = _dataProtector.Protect(returnUrl)
             })}";
         }
 
-        protected string BuildBackChannelUrl(string issuer) => $"{HandlerContext.GetIssuer(issuer)}/{Constants.EndPoints.BCCallback}";
+        protected string BuildBackChannelUrl(string issuer) => $"{HandlerContext.GetIssuer(issuer, _options.UseRealm)}/{Constants.EndPoints.BCCallback}";
     }
 }

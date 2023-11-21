@@ -41,7 +41,7 @@ namespace SimpleIdServer.IdServer.Helpers
 
         public async Task<JsonObject> Extract(string realm, string issuerName, JsonObject jsonObject, Client oauthClient)
         {
-            var context = new HandlerContext(new HandlerContextRequest(issuerName, null, jsonObject), realm, new HandlerContextResponse());
+            var context = new HandlerContext(new HandlerContextRequest(issuerName, null, jsonObject), realm, _options, new HandlerContextResponse());
             context.SetClient(oauthClient);
             await Extract(context);
             return context.Request.RequestData;

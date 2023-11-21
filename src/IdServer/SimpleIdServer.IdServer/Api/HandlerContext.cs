@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Middlewares;
+using SimpleIdServer.IdServer.Options;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -157,20 +158,22 @@ namespace SimpleIdServer.IdServer.Api
 
     public class HandlerContext
     {
-        public HandlerContext(HandlerContextRequest request, string realm)
+        public HandlerContext(HandlerContextRequest request, string realm, IdServerHostOptions options)
         {
             Request = request;
             Realm = realm;
             Response = new HandlerContextResponse();
+            Options = options;
         }
 
-        public HandlerContext(HandlerContextRequest request, string realm, HandlerContextResponse response) : this(request, realm)
+        public HandlerContext(HandlerContextRequest request, string realm, IdServerHostOptions options, HandlerContextResponse response) : this(request, realm, options)
         {
             Response = response;
         }
 
         public User User { get; private set; }
         public Client Client { get; private set; }
+        public IdServerHostOptions Options { get; private set; }
         public JsonWebToken DPOPProof { get; private set; }
         public HandlerContextRequest Request { get; private set; }
         public string Realm { get; private set; }
@@ -181,7 +184,7 @@ namespace SimpleIdServer.IdServer.Api
         public string GetIssuer()
         {
             var result = Request.IssuerName;
-            return GetIssuer(result);
+            return GetIssuer(result, Options.UseRealm);
         }
 
         public bool IsComingFromConsentScreen()
@@ -190,10 +193,10 @@ namespace SimpleIdServer.IdServer.Api
             return Request.Referer == null ? false : Request.Referer.StartsWith(consentsUrl);
         }
 
-        public static string GetIssuer(string result)
+        public static string GetIssuer(string result, bool useRealm)
         {
             var realm = RealmContext.Instance().Realm;
-            if (!string.IsNullOrWhiteSpace(realm))
+            if (!string.IsNullOrWhiteSpace(realm) && useRealm)
             {
                 if (!result.EndsWith("/"))
                     result += "/";

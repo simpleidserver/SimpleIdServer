@@ -157,14 +157,14 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialOffer
             if (credentialOffer.Status == UserCredentialOfferStatus.INVALID) return CredentialOfferBuildResult.Invalid(ErrorCodes.INVALID_CREDOFFER, ErrorMessages.CREDOFFER_IS_INVALID);
             if (credentialOffer.ExpirationDateTime <= DateTime.UtcNow) return CredentialOfferBuildResult.Invalid(ErrorCodes.INVALID_CREDOFFER, ErrorMessages.CREDOFFER_IS_EXPIRED);
             var client = await _clientRepository.Query().Include(c => c.Realms).FirstAsync(c => c.ClientId == credentialOffer.ClientId && c.Realms.Any(r => r.Name == prefix), cancellationToken);
-            var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath());
+            var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
             return InternalGet(prefix, credentialOffer, client);
         }
 
         private CredentialOfferBuildResult InternalGet(string prefix, UserCredentialOffer credentialOffer, Client client)
         {
             prefix = prefix ?? SimpleIdServer.IdServer.Constants.DefaultRealm;
-            var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath());
+            var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
             var result = new CredentialOfferResult
             {
                 CredentialIssuer = issuer,

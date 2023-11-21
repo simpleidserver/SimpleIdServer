@@ -182,7 +182,7 @@ namespace SimpleIdServer.IdServer.UI
                 jwsPayload.Add(JwtRegisteredClaimNames.Sid, sessionId);
             }
 
-            var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath());
+            var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Issuer = issuer,
@@ -222,7 +222,7 @@ namespace SimpleIdServer.IdServer.UI
             var url = client.FrontChannelLogoutUri;
             if (client.FrontChannelLogoutSessionRequired)
             {
-                var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath());
+                var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
                 url = QueryHelpers.AddQueryString(url, new Dictionary<string, string>
                 {
                     { JwtRegisteredClaimNames.Iss, issuer },
@@ -273,7 +273,7 @@ namespace SimpleIdServer.IdServer.UI
             string GetIssuer()
             {
                 var request = Request.GetAbsoluteUriWithVirtualPath();
-                return HandlerContext.GetIssuer(request);
+                return HandlerContext.GetIssuer(request, _options.UseRealm);
             }
         }
 

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
@@ -17,6 +18,7 @@ using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Extractors;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
@@ -43,6 +45,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
         private readonly IClaimsEnricher _claimsEnricher;
         private readonly IClaimsJwsPayloadEnricher _claimsJwsPayloadEnricher;
         private readonly IScopeClaimsExtractor _claimsExtractor;
+        private readonly IdServerHostOptions _options;
         private readonly ILogger<UserInfoController> _logger;
         private readonly IBusControl _busControl;
 
@@ -56,6 +59,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
             IClaimsEnricher claimsEnricher,
             IClaimsJwsPayloadEnricher claimsJwsPayloadEnricher,
             IScopeClaimsExtractor claimsExtractor,
+            IOptions<IdServerHostOptions> options,
             ILogger<UserInfoController> logger,
             IBusControl busControl)
         {
@@ -68,6 +72,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
             _tokenRepository = tokenRepository;
             _claimsJwsPayloadEnricher = claimsJwsPayloadEnricher;
             _claimsExtractor = claimsExtractor;
+            _options = options.Value;
             _logger = logger;
             _busControl = busControl;
         }
@@ -140,7 +145,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
                         throw new OAuthException(ErrorCodes.INVALID_TOKEN, ErrorMessages.ACCESS_TOKEN_REJECTED);
 
                     var oauthScopes = await _scopeRepository.Query().Include(s => s.Realms).Include(s => s.ClaimMappers).AsNoTracking().Where(s => scopes.Contains(s.Name) && s.Realms.Any(r => r.Name == prefix)).ToListAsync(cancellationToken);
-                    var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, null, null, null, (X509Certificate2)null, HttpContext.Request.Method), prefix ?? Constants.DefaultRealm);
+                    var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, null, null, null, (X509Certificate2)null, HttpContext.Request.Method), prefix ?? Constants.DefaultRealm, _options);
                     context.SetUser(user);
                     activity?.SetTag("scopes", string.Join(",", oauthScopes.Select(s => s.Name)));
                     var payload = await _claimsExtractor.ExtractClaims(context, oauthScopes, ScopeProtocols.OPENID);

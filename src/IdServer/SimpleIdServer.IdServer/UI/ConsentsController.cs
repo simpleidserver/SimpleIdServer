@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Api.Authorization;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseModes;
@@ -13,6 +14,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System.Collections.Generic;
@@ -36,6 +38,7 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IExtractRequestHelper _extractRequestHelper;
         private readonly ITokenRepository _tokenRepository;
         private readonly IBusControl _busControl;
+        private readonly IdServerHostOptions _options;
 
         public ConsentsController(
             IUserRepository userRepository,
@@ -45,7 +48,8 @@ namespace SimpleIdServer.IdServer.UI
             IResponseModeHandler responseModeHandler,
             IExtractRequestHelper extractRequestHelper,
             ITokenRepository tokenRepository,
-            IBusControl busControl)
+            IBusControl busControl,
+            IOptions<IdServerHostOptions> options)
         {
             _userRepository = userRepository;
             _clientRepository = clientRepository;
@@ -55,6 +59,7 @@ namespace SimpleIdServer.IdServer.UI
             _extractRequestHelper = extractRequestHelper;
             _tokenRepository = tokenRepository;
             _busControl = busControl;
+            _options = options.Value;
         }
 
         public async Task<IActionResult> Index([FromRoute] string prefix, string returnUrl, bool isProtected = true, CancellationToken cancellationToken = default(CancellationToken))
@@ -165,7 +170,7 @@ namespace SimpleIdServer.IdServer.UI
                 Claims = claims
             });
             var redirectUrlAuthorizationResponse = new RedirectURLAuthorizationResponse(redirectUri, dic);
-            var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), null, query), prefix);
+            var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), null, query), prefix, _options);
             _responseModeHandler.Handle(context, redirectUrlAuthorizationResponse, HttpContext);
         }
 

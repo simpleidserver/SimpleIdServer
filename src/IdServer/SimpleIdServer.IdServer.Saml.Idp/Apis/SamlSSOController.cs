@@ -5,18 +5,21 @@ using ITfoxtec.Identity.Saml2;
 using ITfoxtec.Identity.Saml2.MvcCore;
 using ITfoxtec.Identity.Saml2.Schemas;
 using ITfoxtec.Identity.Saml2.Schemas.Metadata;
+using MassTransit.Configuration;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens.Saml2;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Extractors;
+using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Saml.Idp.DTOs;
 using SimpleIdServer.IdServer.Saml.Idp.Extensions;
 using SimpleIdServer.IdServer.Saml.Idp.Factories;
@@ -37,6 +40,7 @@ namespace SimpleIdServer.IdServer.Saml2.Api
         private readonly IScopeClaimsExtractor _scopeClaimsExtractor;
         private readonly IDistributedCache _distributedCache;
         private readonly IUserRepository _userRepository;
+        private readonly IdServerHostOptions _options;
         private readonly ILogger<SamlSSOController> _logger;
 
         public SamlSSOController(
@@ -45,7 +49,8 @@ namespace SimpleIdServer.IdServer.Saml2.Api
             IDataProtectionProvider dataProtectionProvider, 
             IScopeClaimsExtractor scopeClaimsExtractor, 
             IDistributedCache distributedCache,
-            IUserRepository userRepository, 
+            IUserRepository userRepository,
+            IOptions<IdServerHostOptions> options,
             ILogger<SamlSSOController> logger)
         {
             _clientRepository = clientRepository;
@@ -54,6 +59,7 @@ namespace SimpleIdServer.IdServer.Saml2.Api
             _scopeClaimsExtractor = scopeClaimsExtractor;
             _distributedCache = distributedCache;
             _userRepository = userRepository;
+            _options = options.Value;
             _logger = logger;
         }
 
@@ -236,7 +242,7 @@ namespace SimpleIdServer.IdServer.Saml2.Api
         {
             var nameIdentifier = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
             var user = await _userRepository.Get(u => u.Include(u => u.OAuthUserClaims).Include(u => u.Groups).AsNoTracking().SingleOrDefaultAsync(u => u.Name == nameIdentifier, cancellationToken));
-            var context = new HandlerContext(new HandlerContextRequest(issuer, string.Empty, null, null, null, (X509Certificate2)null, null), realm);
+            var context = new HandlerContext(new HandlerContextRequest(issuer, string.Empty, null, null, null, (X509Certificate2)null, null), realm, _options);
             context.SetUser(user);
             var claims = (await _scopeClaimsExtractor.ExtractClaims(context, client.Scopes, ScopeProtocols.SAML)).Select(c => new Claim(c.Key, c.Value.ToString())).ToList();
             if (claims.Count(t => t.Type == ClaimTypes.NameIdentifier) == 0)

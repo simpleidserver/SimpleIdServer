@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.CredentialIssuer.Api.Credential.Formats;
@@ -14,6 +15,7 @@ using SimpleIdServer.IdServer.CredentialIssuer.Parsers;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -34,6 +36,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential
         private readonly IAuthenticationHelper _authenticationHelper;
         private readonly ICredentialTemplateClaimsExtractor _claimsExtractor;
         private readonly IEnumerable<ICredentialFormat> _formats;
+        private readonly IdServerHostOptions _options;
         private readonly ILogger<CredentialController> _logger;
 
         public CredentialController(
@@ -44,6 +47,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential
             IAuthenticationHelper authenticationHelper,
             ICredentialTemplateClaimsExtractor claimsExtractor,
             IEnumerable<ICredentialFormat> formats,
+            IOptions<IdServerHostOptions> options,
             ILogger<CredentialController> logger)
         {
             _parsers = parsers;
@@ -53,6 +57,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential
             _authenticationHelper = authenticationHelper;
             _claimsExtractor = claimsExtractor;
             _formats = formats;
+            _options = options.Value;
             _logger = logger;
         }
 
@@ -64,7 +69,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential
                 prefix = prefix ?? SimpleIdServer.IdServer.Constants.DefaultRealm;
                 try
                 {
-                    var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), null, null), prefix);
+                    var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), null, null), prefix, _options);
                     activity?.SetTag("realm", context.Realm);
                     var accessToken = ExtractBearerToken();
                     var token = await _grantedTokenHelper.GetAccessToken(accessToken, cancellationToken);

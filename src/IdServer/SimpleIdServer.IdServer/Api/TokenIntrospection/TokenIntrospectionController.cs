@@ -3,8 +3,10 @@
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Options;
 using System.Linq;
 using System.Text.Json.Nodes;
 using System.Threading;
@@ -15,10 +17,12 @@ namespace SimpleIdServer.IdServer.Api.TokenIntrospection
     public class TokenIntrospectionController : Controller
     {
         private readonly ITokenIntrospectionRequestHandler _requestHandler;
+        private readonly IdServerHostOptions _options;
 
-        public TokenIntrospectionController(ITokenIntrospectionRequestHandler requestHandler)
+        public TokenIntrospectionController(ITokenIntrospectionRequestHandler requestHandler, IOptions<IdServerHostOptions> options)
         {
             _requestHandler = requestHandler;
+            _options = options.Value;
         }
 
         [HttpPost]
@@ -32,7 +36,7 @@ namespace SimpleIdServer.IdServer.Api.TokenIntrospection
             var jObjBody = Request.Form.ToJsonObject();
             try
             {
-                var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, jObjBody, jObjHeader, Request.Cookies, clientCertificate, HttpContext.Request.Method), prefix);
+                var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, jObjBody, jObjHeader, Request.Cookies, clientCertificate, HttpContext.Request.Method), prefix, _options);
                 return await _requestHandler.Handle(context, cancellationToken);
             }
             catch (OAuthUnauthorizedException ex)

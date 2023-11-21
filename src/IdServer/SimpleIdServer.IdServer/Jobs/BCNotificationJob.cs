@@ -3,10 +3,12 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Api.Token.TokenBuilders;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
+using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
@@ -28,8 +30,9 @@ namespace SimpleIdServer.IdServer.Jobs
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
         private readonly IUserRepository _userRepository;
         private readonly IClientRepository _clientRepository;
+        private readonly IdServerHostOptions _options;
 
-        public BCNotificationJob(IBCAuthorizeRepository repository, ILogger<BCNotificationJob> logger, Infrastructures.IHttpClientFactory httpClientFactory, IEnumerable<ITokenBuilder> tokenBuilders, IUserRepository userRepository, IClientRepository clientRepository)
+        public BCNotificationJob(IBCAuthorizeRepository repository, ILogger<BCNotificationJob> logger, Infrastructures.IHttpClientFactory httpClientFactory, IEnumerable<ITokenBuilder> tokenBuilders, IUserRepository userRepository, IClientRepository clientRepository, IOptions<IdServerHostOptions> options)
         {
             _repository = repository;
             _logger = logger;
@@ -37,6 +40,7 @@ namespace SimpleIdServer.IdServer.Jobs
             _tokenBuilders = tokenBuilders;
             _userRepository = userRepository;
             _clientRepository = clientRepository;
+            _options = options.Value;
         }
 
         public async Task Execute()
@@ -121,7 +125,7 @@ namespace SimpleIdServer.IdServer.Jobs
 
             async Task<Dictionary<string, string>> BuildParameters()
             {
-                var context = new HandlerContext(new HandlerContextRequest(null, null, new JsonObject(), null, null, (X509Certificate2)null, string.Empty), bcAuthorize.Realm);
+                var context = new HandlerContext(new HandlerContextRequest(null, null, new JsonObject(), null, null, (X509Certificate2)null, string.Empty), bcAuthorize.Realm, _options);
                 context.SetUser(parameter.Users.First(u => u.Id == bcAuthorize.UserId));
                 context.SetClient(parameter.Clients.First(c => c.ClientId == bcAuthorize.ClientId && c.Realms.Any(r => r.Name == bcAuthorize.Realm)));
                 foreach (var tokenBuilder in _tokenBuilders)

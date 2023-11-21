@@ -56,7 +56,7 @@ namespace SimpleIdServer.IdServer.Api.PushedAuthorization
             {
                 var jObjBody = Request.Form.ToJsonObject();
                 prefix = prefix ?? Constants.DefaultRealm;
-                var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), null, jObjBody, null, Request.Cookies), prefix, new HandlerContextResponse(Response.Cookies));
+                var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), null, jObjBody, null, Request.Cookies), prefix, _options, new HandlerContextResponse(Response.Cookies));
                 activity?.SetTag("realm", context.Realm);
                 try
                 {

@@ -3,8 +3,10 @@
 using MassTransit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
+using SimpleIdServer.IdServer.Options;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,19 +17,22 @@ namespace SimpleIdServer.IdServer.Api.DeviceAuthorization
     {
         private readonly IDeviceAuthorizationRequestHandler _handler;
         private readonly IBusControl _busControl;
+        private readonly IdServerHostOptions _options;
 
         public DeviceAuthorizationController(
             IDeviceAuthorizationRequestHandler handler, 
-            IBusControl busControl)
+            IBusControl busControl,
+            IOptions<IdServerHostOptions> options)
         {
             _handler = handler;
             _busControl = busControl;
+            _options = options.Value;
         }
 
         public async Task<IActionResult> Post([FromRoute] string prefix, CancellationToken token)
         {
             var jObjBody = Request.Form.ToJsonObject();
-            var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, jObjBody, null, Request.Cookies, string.Empty), prefix ?? Constants.DefaultRealm, new HandlerContextResponse(Response.Cookies));
+            var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, jObjBody, null, Request.Cookies, string.Empty), prefix ?? Constants.DefaultRealm, _options, new HandlerContextResponse(Response.Cookies));
             context.SetUrlHelper(Url);
             using (var activity = Tracing.IdServerActivitySource.StartActivity("Get Device Authorization"))
             {
