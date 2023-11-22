@@ -54,7 +54,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         }
 
         public override string GrantType => GRANT_TYPE;
-        public static string GRANT_TYPE = "urn:ietf:params:oauth:grant-type:pre-authorized_code";
+        public const string GRANT_TYPE = "urn:ietf:params:oauth:grant-type:pre-authorized_code";
 
         public override async Task<IActionResult> Handle(HandlerContext context, CancellationToken cancellationToken)
         {

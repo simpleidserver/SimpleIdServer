@@ -48,6 +48,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             _options = options.Value;
         }
 
+        [HttpGet]
         public async Task Get([FromRoute] string prefix, CancellationToken token)
         {
             using (var activity = Tracing.IdServerActivitySource.StartActivity("Get Authorization"))

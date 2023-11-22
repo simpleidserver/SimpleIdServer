@@ -2,6 +2,7 @@
 	<PropertyGroup>
 		<TargetFramework>net7.0</TargetFramework>
 		<Description>Identity server project with OPENID, OAUTH2.0, UMA2.0, CIBA and FAPI support.</Description>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	</PropertyGroup>
 	<ItemGroup>
 	  <Compile Remove="Services\**" />

@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Infastructures;
 using SimpleIdServer.IdServer.Options;
 
 namespace SimpleIdServer.IdServer.CredentialIssuer
@@ -14,56 +15,56 @@ namespace SimpleIdServer.IdServer.CredentialIssuer
             var opts = webApplication.Services.GetRequiredService<IOptions<IdServerHostOptions>>().Value;
             bool usePrefix = opts.UseRealm;
 
-            webApplication.MapControllerRoute("credentialIssuer",
+            webApplication.SidMapControllerRoute("credentialIssuer",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialIssuer,
                 defaults: new { controller = "CredentialIssuer", action = "Get" });
 
-            webApplication.MapControllerRoute("credential",
+            webApplication.SidMapControllerRoute("credential",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Credential,
                 defaults: new { controller = "Credential", action = "Get" });
 
-            webApplication.MapControllerRoute("shareCredentialOfferQR",
+            webApplication.SidMapControllerRoute("shareCredentialOfferQR",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialOffer + "/shareqr",
                 defaults: new { controller = "CredentialOffer", action = "ShareQR" });
-            webApplication.MapControllerRoute("clientShareCredentialOfferQR",
+            webApplication.SidMapControllerRoute("clientShareCredentialOfferQR",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialOffer + "/shareqr/{id}",
                 defaults: new { controller = "CredentialOffer", action = "ClientShareQR" });
-            webApplication.MapControllerRoute("shareCredentialOffer",
+            webApplication.SidMapControllerRoute("shareCredentialOffer",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialOffer + "/share",
                 defaults: new { controller = "CredentialOffer", action = "Share" });
-            webApplication.MapControllerRoute("clientShareCredentialOffer",
+            webApplication.SidMapControllerRoute("clientShareCredentialOffer",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialOffer + "/share/{id}",
                 defaults: new { controller = "CredentialOffer", action = "ClientShare" });
-            webApplication.MapControllerRoute("getCredentialOffer",
+            webApplication.SidMapControllerRoute("getCredentialOffer",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialOffer + "/{id}",
                 defaults: new { controller = "CredentialOffer", action = "Get" });
-            webApplication.MapControllerRoute("getCredentialOfferQRCode",
+            webApplication.SidMapControllerRoute("getCredentialOfferQRCode",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialOffer + "/{id}/qr",
                 defaults: new { controller = "CredentialOffer", action = "GetQRCode" });
 
 
-            webApplication.MapControllerRoute("searchCredentialTemplates",
+            webApplication.SidMapControllerRoute("searchCredentialTemplates",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialTemplates + "/.search",
                 defaults: new { controller = "CredentialTemplates", action = "Search" });
-            webApplication.MapControllerRoute("removeCredentialTemplate",
+            webApplication.SidMapControllerRoute("removeCredentialTemplate",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialTemplates + "/{id}",
                 defaults: new { controller = "CredentialTemplates", action = "Remove" });
-            webApplication.MapControllerRoute("addW3CCredentialTemplate",
+            webApplication.SidMapControllerRoute("addW3CCredentialTemplate",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialTemplates + "/w3c",
                 defaults: new { controller = "CredentialTemplates", action = "AddW3CredentialTemplate" });
-            webApplication.MapControllerRoute("getCredentialTemplate",
+            webApplication.SidMapControllerRoute("getCredentialTemplate",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialTemplates + "/{id}",
                 defaults: new { controller = "CredentialTemplates", action = "Get" });
-            webApplication.MapControllerRoute("removeCredentialTemplateDisplay",
+            webApplication.SidMapControllerRoute("removeCredentialTemplateDisplay",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialTemplates + "/{id}/displays/{displayId}",
                 defaults: new { controller = "CredentialTemplates", action = "RemoveDisplay" });
-            webApplication.MapControllerRoute("addCredentialTemplateDisplay",
+            webApplication.SidMapControllerRoute("addCredentialTemplateDisplay",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialTemplates + "/{id}/displays",
                 defaults: new { controller = "CredentialTemplates", action = "AddDisplay" });
-            webApplication.MapControllerRoute("removeCredentialTemplateParameter",
+            webApplication.SidMapControllerRoute("removeCredentialTemplateParameter",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialTemplates + "/{id}/parameters/{parameterId}",
                 defaults: new { controller = "CredentialTemplates", action = "RemoveParameter" });
-            webApplication.MapControllerRoute("updateCredentialTemplateParameters",
+            webApplication.SidMapControllerRoute("updateCredentialTemplateParameters",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CredentialTemplates + "/{id}/parameters",
                 defaults: new { controller = "CredentialTemplates", action = "UpdateParameters" });
 

@@ -25,6 +25,7 @@ namespace SimpleIdServer.IdServer.Saml.Idp.Apis
             _options = options.Value;
         }
 
+        [HttpGet]
         public IActionResult Get([FromRoute] string prefix)
         {
             prefix = prefix ?? IdServer.Constants.DefaultRealm;

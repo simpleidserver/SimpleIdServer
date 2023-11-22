@@ -52,6 +52,7 @@ using SimpleIdServer.IdServer.UI.Services;
 using System;
 using System.Linq;
 using System.Security.Claims;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Microsoft.Extensions.DependencyInjection

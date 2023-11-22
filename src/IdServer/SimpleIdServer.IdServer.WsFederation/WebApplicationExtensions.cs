@@ -3,6 +3,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Infastructures;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.WsFederation;
 
@@ -15,11 +16,11 @@ namespace Microsoft.AspNetCore.Builder
             var opts = webApplication.Services.GetRequiredService<IOptions<IdServerHostOptions>>().Value;
 
             var usePrefix = opts.UseRealm;
-            webApplication.MapControllerRoute("wsfederationMetadata",
+            webApplication.SidMapControllerRoute("wsfederationMetadata",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + WsFederationConstants.EndPoints.FederationMetadata,
                 defaults: new { controller = "Metadata", action = "Get" });
 
-            webApplication.MapControllerRoute("ssoLogin",
+            webApplication.SidMapControllerRoute("ssoLogin",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + WsFederationConstants.EndPoints.SSO,
                 defaults: new { controller = "SSO", action = "Login" });
 

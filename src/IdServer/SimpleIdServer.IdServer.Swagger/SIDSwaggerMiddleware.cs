@@ -56,7 +56,9 @@ public class SIDSwaggerMiddleware
                     basePath: basePath)
             };
 
-            swagger.Paths = TransformPaths(swagger.Paths, realm);
+            swagger.Paths = Transform(swagger.Paths, realm);
+            swagger.Components.SecuritySchemes = Transform(swagger.Components.SecuritySchemes, realm);
+
             foreach (var filter in _options.PreSerializeFilters)
             {
                 filter(swagger, httpContext.Request);
@@ -77,7 +79,7 @@ public class SIDSwaggerMiddleware
         }
     }
 
-    private OpenApiPaths TransformPaths(OpenApiPaths paths, string realm)
+    private OpenApiPaths Transform(OpenApiPaths paths, string realm)
     {
         if (!_idOptions.UseRealm) return paths;
         var result = new OpenApiPaths();
@@ -88,6 +90,19 @@ public class SIDSwaggerMiddleware
         }
 
         return result;
+    }
+
+    private IDictionary<string, OpenApiSecurityScheme> Transform(IDictionary<string, OpenApiSecurityScheme> securitySchemes, string realm)
+    {
+        var baseUrl = _idOptions.Authority;
+        if (_idOptions.UseRealm) baseUrl = $"{baseUrl}/{realm}";
+        foreach(var kvp in securitySchemes)
+        {
+            kvp.Value.Flows.AuthorizationCode.AuthorizationUrl = new Uri($"{baseUrl}/authorization");
+            kvp.Value.Flows.AuthorizationCode.TokenUrl = new Uri($"{baseUrl}/token");
+        }
+
+        return securitySchemes;
     }
 
     private bool RequestingSwaggerDocument(HttpRequest request, out string documentName, out string realm)

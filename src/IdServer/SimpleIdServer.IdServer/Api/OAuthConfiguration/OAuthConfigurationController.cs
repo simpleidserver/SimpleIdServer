@@ -21,6 +21,12 @@ namespace SimpleIdServer.IdServer.Api.Configuration
             _configurationRequestHandler = configurationRequestHandler;
         }
 
+        /// <summary>
+        /// Get authorization server metadata.
+        /// </summary>
+        /// <param name="prefix"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         [HttpGet]
         public virtual async Task<IActionResult> Get([FromRoute] string prefix, CancellationToken token)
         {

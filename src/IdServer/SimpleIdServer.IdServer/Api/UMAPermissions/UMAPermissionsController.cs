@@ -36,9 +36,6 @@ namespace SimpleIdServer.IdServer.Api.UMAPermissions
         }
 
         [HttpPost]
-        public Task<IActionResult> Add([FromRoute] string prefix, [FromBody] UMAPermissionRequest request, CancellationToken cancellationToken) => AddList(prefix, new List<UMAPermissionRequest> { request }, cancellationToken);
-
-        [HttpPost]
         public async Task<IActionResult> AddList([FromRoute] string prefix, [FromBody] IEnumerable<UMAPermissionRequest> requestLst, CancellationToken cancellationToken)
         {
             try

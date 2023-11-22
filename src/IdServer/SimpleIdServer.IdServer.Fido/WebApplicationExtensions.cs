@@ -4,6 +4,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Fido;
+using SimpleIdServer.IdServer.Infastructures;
 using SimpleIdServer.IdServer.Options;
 
 namespace Microsoft.AspNetCore.Builder
@@ -15,35 +16,35 @@ namespace Microsoft.AspNetCore.Builder
             var opts = webApplication.Services.GetRequiredService<IOptions<IdServerHostOptions>>().Value;
             var usePrefix = opts.UseRealm;
 
-            webApplication.MapControllerRoute("beginQRRegister",
+            webApplication.SidMapControllerRoute("beginQRRegister",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.BeginQRCodeRegister,
                 defaults: new { controller = "U2FRegister", action = "BeginQRCode" });
-            webApplication.MapControllerRoute("readRegisterQRCode",
+            webApplication.SidMapControllerRoute("readRegisterQRCode",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.ReadRegisterQRCode + "/{sessionId}",
                 defaults: new { controller = "U2FRegister", action = "ReadQRCode" });
-            webApplication.MapControllerRoute("U2FStatusRegistration",
+            webApplication.SidMapControllerRoute("U2FStatusRegistration",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RegisterStatus + "/{sessionId}",
                 defaults: new { controller = "U2FRegister", action = "GetStatus" });
-            webApplication.MapControllerRoute("beginRegister",
+            webApplication.SidMapControllerRoute("beginRegister",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.BeginRegister,
                 defaults: new { controller = "U2FRegister", action = "Begin" });
-            webApplication.MapControllerRoute("endRegister",
+            webApplication.SidMapControllerRoute("endRegister",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.EndRegister,
                 defaults: new { controller = "U2FRegister", action = "End" });
 
-            webApplication.MapControllerRoute("beginQRLogin",
+            webApplication.SidMapControllerRoute("beginQRLogin",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.BeginQRCodeLogin,
                 defaults: new { controller = "U2FLogin", action = "BeginQRCode" });
-            webApplication.MapControllerRoute("U2FStatusLogin",
+            webApplication.SidMapControllerRoute("U2FStatusLogin",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.LoginStatus + "/{sessionId}",
                 defaults: new { controller = "U2FLogin", action = "GetStatus" });
-            webApplication.MapControllerRoute("beginLogin",
+            webApplication.SidMapControllerRoute("beginLogin",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.BeginLogin,
                 defaults: new { controller = "U2FLogin", action = "Begin" });
-            webApplication.MapControllerRoute("endLogin",
+            webApplication.SidMapControllerRoute("endLogin",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.EndLogin,
                 defaults: new { controller = "U2FLogin", action = "End" });
-            webApplication.MapControllerRoute("readLoginQRCode",
+            webApplication.SidMapControllerRoute("readLoginQRCode",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.ReadLoginQRCode + "/{sessionId}",
                 defaults: new { controller = "U2FLogin", action = "ReadQRCode" });
 

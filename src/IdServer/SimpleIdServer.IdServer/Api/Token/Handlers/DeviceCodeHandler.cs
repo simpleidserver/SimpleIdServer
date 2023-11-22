@@ -15,7 +15,6 @@ using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -54,7 +53,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         }
 
         public override string GrantType => GRANT_TYPE;
-        public static string GRANT_TYPE = "urn:ietf:params:oauth:grant-type:device_code";
+        public const string GRANT_TYPE = "urn:ietf:params:oauth:grant-type:device_code";
 
         public override async Task<IActionResult> Handle(HandlerContext context, CancellationToken cancellationToken)
         {

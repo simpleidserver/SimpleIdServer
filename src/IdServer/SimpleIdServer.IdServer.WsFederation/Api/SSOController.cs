@@ -47,6 +47,7 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
             _options = opts.Value;
         }
 
+        [HttpGet]
         public async Task<IActionResult> Login([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             var queryStr = Request.QueryString.Value;

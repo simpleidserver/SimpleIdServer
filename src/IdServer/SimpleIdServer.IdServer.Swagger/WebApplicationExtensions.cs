@@ -32,6 +32,12 @@ public static class WebApplicationExtensions
         return app.UseSIDSwagger(options);
     }
 
+    public static WebApplication UseSIDSwaggerUI(this WebApplication app, SwaggerUIOptions options)
+    {
+        app.UseMiddleware<SidSwaggerUIMiddleware>(options);
+        return app;
+    }
+
     public static WebApplication UseSIDSwaggerUI(this WebApplication app, Action<SwaggerUIOptions> setupAction = null)
     {
         SwaggerUIOptions options;
@@ -48,12 +54,25 @@ public static class WebApplicationExtensions
             options.ConfigObject.Urls = new[] { new UrlDescriptor { Name = $"{hostingEnv.ApplicationName} v1", Url = "v1/swagger.json" } };
         }
 
+        if(string.IsNullOrWhiteSpace(options.OAuthConfigObject.ClientId))
+        {
+            options.OAuthClientId("swagger");
+        }
+
+        if(string.IsNullOrWhiteSpace(options.OAuthConfigObject.ClientSecret))
+        {
+            options.OAuthClientSecret("password");
+        }
+
         return app.UseSIDSwaggerUI(options);
     }
 
-    public static WebApplication UseSIDSwaggerUI(this WebApplication app, SwaggerUIOptions options)
+    public static WebApplication UseSIDRecord(this WebApplication app)
     {
-        app.UseMiddleware<SidSwaggerUIMiddleware>(options);
+        app.UseReDoc(c =>
+        {
+            c.RoutePrefix = "docs";
+        });
         return app;
     }
 }

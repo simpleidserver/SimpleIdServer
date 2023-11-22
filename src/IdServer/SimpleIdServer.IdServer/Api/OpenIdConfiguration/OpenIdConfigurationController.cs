@@ -38,6 +38,12 @@ namespace SimpleIdServer.IdServer.Api.OpenIdConfiguration
             _options = options.Value;
         }
 
+        /// <summary>
+        /// Get OpenID Provider Metadata.
+        /// </summary>
+        /// <param name="prefix"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [HttpGet]
         public override async Task<IActionResult> Get([FromRoute] string prefix, CancellationToken cancellationToken)
         {

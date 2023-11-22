@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +12,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using SimpleIdServer.Configuration;
 using SimpleIdServer.Configuration.Redis;
 using SimpleIdServer.IdServer;
@@ -30,16 +30,12 @@ using SimpleIdServer.IdServer.Startup.Configurations;
 using SimpleIdServer.IdServer.Startup.Converters;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Swagger;
+using SimpleIdServer.IdServer.TokenTypes;
 using SimpleIdServer.IdServer.WsFederation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-
-static bool DefaultDocInclusionPredicate(string documentName, ApiDescription apiDescription)
-{
-    return apiDescription.GroupName == null || apiDescription.GroupName == documentName;
-}
 
 const string CreateTableFormat = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DistributedCache' and xtype='U') " +
     "CREATE TABLE [dbo].[DistributedCache] (" +
@@ -81,14 +77,6 @@ builder.Services.AddRazorPages()
     .AddRazorRuntimeCompilation();
 ConfigureIdServer(builder.Services);
 
-// HOW TO POPULATE THE CONTROLLERS : https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.Core/src/ApplicationParts/ApplicationPartManager.cs#L12
-// AddApiExplorer !!!
-// https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.ApiExplorer/src/ApiDescriptionGroupCollectionProvider.cs#L10 : Get API Descriptions.
-// https://github.com/dotnet/aspnetcore/blob/76b5785b4ca4d6107baad792e2fe4d7b6f938b9b/src/Mvc/Mvc.Core/src/Infrastructure/DefaultActionDescriptorCollectionProvider.cs : Returns all the controllers & actions.
-// https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.ApiExplorer/src/DefaultApiDescriptionProvider.cs#L536
-// IActionDescriptorProvider: https://github.com/dotnet/aspnetcore/blob/76b5785b4ca4d6107baad792e2fe4d7b6f938b9b/src/Mvc/Mvc.Core/src/ApplicationModels/ControllerActionDescriptorProvider.cs#L11
-// https://mariusgundersen.net/dynamic-endpoint-routing/ : use dynamic endpoint routing...
-
 var app = builder.Build();
 SeedData(app, identityServerConfiguration.SCIMBaseUrl);
 app.UseCors("AllowAll");
@@ -104,6 +92,7 @@ app
     .UseSID()
     .UseSIDSwagger()
     .UseSIDSwaggerUI()
+    //.UseSIDRecord()
     .UseWsFederation()
     .UseFIDO()
     .UseCredentialIssuer()
@@ -113,9 +102,16 @@ app.Run();
 
 void ConfigureIdServer(IServiceCollection services)
 {
-    var idServerBuilder = services.AddSIDIdentityServer(dataProtectionBuilderCallback: ConfigureDataProtection)
+    var idServerBuilder = services.AddSIDIdentityServer(callback: cb =>
+        {
+            cb.Authority = identityServerConfiguration.Authority;
+        }, dataProtectionBuilderCallback: ConfigureDataProtection)
         .UseEFStore(o => ConfigureStorage(o))
-        .AddSwagger()
+        .AddSwagger(o =>
+        {
+            o.IncludeDocumentation<AccessTokenTypeService>();
+            o.AddOAuthSecurity();
+        })
         .AddCredentialIssuer()
         .UseInMemoryMassTransit()
         .AddBackChannelAuthentication()

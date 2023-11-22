@@ -18,6 +18,10 @@ namespace SimpleIdServer.IdServer.Options
     public class IdServerHostOptions
     {
         /// <summary>
+        /// Base URL of the identity server.
+        /// </summary>
+        public string Authority { get; set; }
+        /// <summary>
         /// OAUTH2.0 client's default scopes.
         /// </summary>
         public ICollection<string> DefaultScopes { get; set; } = new List<string>();

@@ -11,6 +11,7 @@ namespace SimpleIdServer.IdServer.UI
 {
     public class FormController : Controller
     {
+        [HttpGet]
         public IActionResult Index()
         {
             var queryCollection = Request.Query;

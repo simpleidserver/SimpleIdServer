@@ -32,6 +32,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialIssuer
             _credentialTemplateRepository = credentialTemplateRepository;
         }
 
+        [HttpGet]
         public async Task<IActionResult> Get([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             prefix = prefix ?? SimpleIdServer.IdServer.Constants.DefaultRealm;

@@ -30,70 +30,70 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.OAuthConfiguration,
                 defaults: new { controller = "OAuthConfiguration", action = "Get" });
 
-            webApplication.MapControllerRoute("openidConfiguration",
+            webApplication.SidMapControllerRoute("openidConfiguration",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.OpenIDConfiguration,
                 defaults: new { controller = "OpenIdConfiguration", action = "Get" });
 
-            webApplication.MapControllerRoute("idServerConfiguration",
+            webApplication.SidMapControllerRoute("idServerConfiguration",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdServerConfiguration,
                 defaults: new { controller = "IdServerConfiguration", action = "Get" });
 
-            webApplication.MapControllerRoute("jwks",
+            webApplication.SidMapControllerRoute("jwks",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Jwks,
                 defaults: new { controller = "Jwks", action = "Get" });
 
-            webApplication.MapControllerRoute("authorization",
+            webApplication.SidMapControllerRoute("authorization",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Authorization,
                 defaults: new { controller = "Authorization", action = "Get" });
 
-            webApplication.MapControllerRoute("token",
+            webApplication.SidMapControllerRoute("token",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Token,
                 defaults: new { controller = "Token", action = "Post" });
-            webApplication.MapControllerRoute("tokenRevoke",
+            webApplication.SidMapControllerRoute("tokenRevoke",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.TokenRevoke,
                 defaults: new { controller = "Token", action = "Revoke" });
 
-            webApplication.MapControllerRoute("publishedAuthorization",
+            webApplication.SidMapControllerRoute("publishedAuthorization",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.PushedAuthorizationRequest,
                 defaults: new { controller = "PushedAuthorization", action = "Post" });
 
-            webApplication.MapControllerRoute("tokenInfo",
+            webApplication.SidMapControllerRoute("tokenInfo",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.TokenInfo,
                 defaults: new { controller = "TokenIntrospection", action = "Introspect" });
 
-            webApplication.MapControllerRoute("registerClientAdd",
+            webApplication.SidMapControllerRoute("registerClientAdd",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Registration,
                 defaults: new { controller = "Registration", action = "Add" });
-            webApplication.MapControllerRoute("registerClientGet",
+            webApplication.SidMapControllerRoute("registerClientGet",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Registration + "/{id?}",
                 defaults: new { controller = "Registration", action = "Get" });
-            webApplication.MapControllerRoute("registerClientDelete",
+            webApplication.SidMapControllerRoute("registerClientDelete",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Registration + "/{id?}",
                 defaults: new { controller = "Registration", action = "Delete" });
-            webApplication.MapControllerRoute("registerClientUpdate",
+            webApplication.SidMapControllerRoute("registerClientUpdate",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Registration + "/{id?}",
                 defaults: new { controller = "Registration", action = "Update" });
 
-            webApplication.MapControllerRoute("userInfoGet",
+            webApplication.SidMapControllerRoute("userInfoGet",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UserInfo,
                 defaults: new { controller = "UserInfo", action = "Get" });
-            webApplication.MapControllerRoute("userInfoPost",
+            webApplication.SidMapControllerRoute("userInfoPost",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UserInfo,
                 defaults: new { controller = "UserInfo", action = "Post" });
 
             if (opts.MtlsEnabled)
             {
                 webApplication.UseMiddleware<MtlsAuthenticationMiddleware>();
-                webApplication.MapControllerRoute("tokenMtls",
+                webApplication.SidMapControllerRoute("tokenMtls",
                     pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.MtlsPrefix + "/" + Constants.EndPoints.Token,
                     defaults: new { controller = "Token", action = "Post" });
-                webApplication.MapControllerRoute("tokenRevokeMtls",
+                webApplication.SidMapControllerRoute("tokenRevokeMtls",
                     pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.MtlsPrefix + "/" + Constants.EndPoints.TokenRevoke,
                     defaults: new { controller = "Token", action = "Revoke" });
 
                 if(opts.IsBCEnabled)
                 {
-                    webApplication.MapControllerRoute("bcAuthorizeMtls",
+                    webApplication.SidMapControllerRoute("bcAuthorizeMtls",
                         pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.MtlsBCAuthorize,
                         defaults: new { controller = "BCAuthorize", action = "Post" });
                 }
@@ -104,397 +104,394 @@ namespace Microsoft.AspNetCore.Builder
                 var reccuringJobManager = webApplication.Services.GetRequiredService<IRecurringJobManager>();
                 // Occurs every 15 seconds.
                 reccuringJobManager.AddOrUpdate<BCNotificationJob>(nameof(BCNotificationJob), j => webApplication.Services.GetRequiredService<BCNotificationJob>().Execute(), "*/15 * * * * *");
-                webApplication.MapControllerRoute("bcAuthorize",
+                webApplication.SidMapControllerRoute("bcAuthorize",
                     pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.BCAuthorize,
                     defaults: new { controller = "BCAuthorize", action = "Post" });
 
-                webApplication.MapControllerRoute("bcCallback",
+                webApplication.SidMapControllerRoute("bcCallback",
                     pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.BCCallback,
                     defaults: new { controller = "BCCallback", action = "Post" });
             }
 
             if(opts.IsUMAEnabled)
             {
-                webApplication.MapControllerRoute("umaConfiguration",
+                webApplication.SidMapControllerRoute("umaConfiguration",
                     pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UMAConfiguration,
                     defaults: new { controller = "UMAConfiguration", action = "Get" });
 
-                webApplication.MapControllerRoute("umaPermissionsAddOne",
-                    pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UMAPermissions,
-                    defaults: new { controller = "UMAPermissions", action = "Add" });
-                webApplication.MapControllerRoute("umaPermissionsAddMultiple",
+                webApplication.SidMapControllerRoute("umaPermissionsAddMultiple",
                     pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UMAPermissions,
                     defaults: new { controller = "UMAPermissions", action = "AddList" });
 
-                webApplication.MapControllerRoute("umaResourcesGetAll",
+                webApplication.SidMapControllerRoute("umaResourcesGetAll",
                     pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UMAResources,
                     defaults: new { controller = "UMAResources", action = "Get" });
-                webApplication.MapControllerRoute("umaResourcesGetOne",
+                webApplication.SidMapControllerRoute("umaResourcesGetOne",
                     pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UMAResources + "/{id}",
                     defaults: new { controller = "UMAResources", action = "GetOne" });
-                webApplication.MapControllerRoute("umaResourcesAdd",
+                webApplication.SidMapControllerRoute("umaResourcesAdd",
                     pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UMAResources,
                     defaults: new { controller = "UMAResources", action = "Add" });
-                webApplication.MapControllerRoute("umaResourcesUpdate",
+                webApplication.SidMapControllerRoute("umaResourcesUpdate",
                     pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UMAResources + "/{id}",
                     defaults: new { controller = "UMAResources", action = "Update" });
-                webApplication.MapControllerRoute("umaResourcesDelete",
+                webApplication.SidMapControllerRoute("umaResourcesDelete",
                     pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UMAResources + "/{id}",
                     defaults: new { controller = "UMAResources", action = "Delete" });
-                webApplication.MapControllerRoute("umaResourcesAddPermissions",
+                webApplication.SidMapControllerRoute("umaResourcesAddPermissions",
                     pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UMAResources + "/{id}/permissions",
                     defaults: new { controller = "UMAResources", action = "AddPermissions" });
-                webApplication.MapControllerRoute("umaResourcesGetPermissions",
+                webApplication.SidMapControllerRoute("umaResourcesGetPermissions",
                     pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UMAResources + "/{id}/permissions",
                     defaults: new { controller = "UMAResources", action = "GetPermissions" });
-                webApplication.MapControllerRoute("umaResourcesDeletePermissions",
+                webApplication.SidMapControllerRoute("umaResourcesDeletePermissions",
                     pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UMAResources + "/{id}/permissions",
                     defaults: new { controller = "UMAResources", action = "DeletePermissions" });
             }
 
-            webApplication.MapControllerRoute("getGrant",
+            webApplication.SidMapControllerRoute("getGrant",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Grants + "/{id}",
                 defaults: new { controller = "Grants", action = "Get" });
-            webApplication.MapControllerRoute("revokeGrant",
+            webApplication.SidMapControllerRoute("revokeGrant",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Grants + "/{id}",
                 defaults: new { controller = "Grants", action = "Revoke" });
 
-            webApplication.MapControllerRoute("checkSession",
+            webApplication.SidMapControllerRoute("checkSession",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CheckSession,
                 defaults: new { controller = "CheckSession", action = "Index" });
-            webApplication.MapControllerRoute("endSession",
+            webApplication.SidMapControllerRoute("endSession",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.EndSession,
                 defaults: new { controller = "CheckSession", action = "EndSession" });
-            webApplication.MapControllerRoute("endSessionCallback",
+            webApplication.SidMapControllerRoute("endSessionCallback",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.EndSessionCallback,
                 defaults: new { controller = "CheckSession", action = "EndSessionCallback" });
-            webApplication.MapControllerRoute("activeSession",
+            webApplication.SidMapControllerRoute("activeSession",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.ActiveSession,
                 defaults: new { controller = "CheckSession", action = "IsActive" });
 
-            webApplication.MapControllerRoute("form",
+            webApplication.SidMapControllerRoute("form",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Form,
                 defaults: new { controller = "Form", action = "Index" });
 
-            webApplication.MapControllerRoute("searchUsers",
+            webApplication.SidMapControllerRoute("searchUsers",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/.search",
                 defaults: new { controller = "Users", action = "Search" });
-            webApplication.MapControllerRoute("getUser",
+            webApplication.SidMapControllerRoute("getUser",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}",
                 defaults: new { controller = "Users", action = "Get" });
-            webApplication.MapControllerRoute("resolveUserRoles",
+            webApplication.SidMapControllerRoute("resolveUserRoles",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/roles",
                 defaults: new { controller = "Users", action = "ResolveRoles" });
-            webApplication.MapControllerRoute("addUser",
+            webApplication.SidMapControllerRoute("addUser",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users,
                 defaults: new { controller = "Users", action = "Add" });
-            webApplication.MapControllerRoute("updateUser",
+            webApplication.SidMapControllerRoute("updateUser",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}",
                 defaults: new { controller = "Users", action = "Update" });
-            webApplication.MapControllerRoute("deleteUser",
+            webApplication.SidMapControllerRoute("deleteUser",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}",
                 defaults: new { controller = "Users", action = "Delete" });
-            webApplication.MapControllerRoute("addUserCredential",
+            webApplication.SidMapControllerRoute("addUserCredential",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/credentials",
                 defaults: new { controller = "Users", action = "AddCredential" });
-            webApplication.MapControllerRoute("updateUserCredential",
+            webApplication.SidMapControllerRoute("updateUserCredential",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/credentials/{credentialId}",
                 defaults: new { controller = "Users", action = "UpdateCredential" });
-            webApplication.MapControllerRoute("deleteUserCredential",
+            webApplication.SidMapControllerRoute("deleteUserCredential",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/credentials/{credentialId}",
                 defaults: new { controller = "Users", action = "DeleteCredential" });
-            webApplication.MapControllerRoute("setDefaultUserCredential",
+            webApplication.SidMapControllerRoute("setDefaultUserCredential",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/credentials/{credentialId}/default",
                 defaults: new { controller = "Users", action = "DefaultCredential" });
-            webApplication.MapControllerRoute("updateUserClaims",
+            webApplication.SidMapControllerRoute("updateUserClaims",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/claims",
                 defaults: new { controller = "Users", action = "UpdateClaims" });
-            webApplication.MapControllerRoute("addUserGroup",
+            webApplication.SidMapControllerRoute("addUserGroup",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/groups/{groupId}",
                 defaults: new { controller = "Users", action = "AddGroup" });
-            webApplication.MapControllerRoute("deleteUserGroup",
+            webApplication.SidMapControllerRoute("deleteUserGroup",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/groups/{groupId}",
                 defaults: new { controller = "Users", action = "RemoveGroup" });
-            webApplication.MapControllerRoute("revokeUserConsent",
+            webApplication.SidMapControllerRoute("revokeUserConsent",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/consents/{consentId}",
                 defaults: new { controller = "Users", action = "RevokeConsent" });
-            webApplication.MapControllerRoute("revokeUserSession",
+            webApplication.SidMapControllerRoute("revokeUserSession",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/sessions/{sessionId}",
                 defaults: new { controller = "Users", action = "RevokeSession" });
-            webApplication.MapControllerRoute("unlinkUserExternalAuthProvider",
+            webApplication.SidMapControllerRoute("unlinkUserExternalAuthProvider",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/authproviders/unlink",
                 defaults: new { controller = "Users", action = "UnlinkExternalAuthProvider" });
-            webApplication.MapControllerRoute("generateDecentralizedIdentity",
+            webApplication.SidMapControllerRoute("generateDecentralizedIdentity",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/did",
                 defaults: new { controller = "Users", action = "GenerateDecentralizedIdentity" });
 
-            webApplication.MapControllerRoute("searchIdProvisioning",
+            webApplication.SidMapControllerRoute("searchIdProvisioning",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/.search",
                 defaults: new { controller = "IdentityProvisioning", action = "Search" });
-            webApplication.MapControllerRoute("importRepresentations",
+            webApplication.SidMapControllerRoute("importRepresentations",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/import",
                 defaults: new { controller = "IdentityProvisioning", action = "Import" });
-            webApplication.MapControllerRoute("removeIdProvisioning",
+            webApplication.SidMapControllerRoute("removeIdProvisioning",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}",
                 defaults: new { controller = "IdentityProvisioning", action = "Remove" });
-            webApplication.MapControllerRoute("getIdProvisioning",
+            webApplication.SidMapControllerRoute("getIdProvisioning",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}",
                 defaults: new { controller = "IdentityProvisioning", action = "Get" });
-            webApplication.MapControllerRoute("updateIdProvisioningDetails",
+            webApplication.SidMapControllerRoute("updateIdProvisioningDetails",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}/details",
                 defaults: new { controller = "IdentityProvisioning", action = "UpdateDetails" });
-            webApplication.MapControllerRoute("updateIdProvisioningProperties",
+            webApplication.SidMapControllerRoute("updateIdProvisioningProperties",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}/values",
                 defaults: new { controller = "IdentityProvisioning", action = "UpdateProperties" });
-            webApplication.MapControllerRoute("removeIdProvisioningMapper",
+            webApplication.SidMapControllerRoute("removeIdProvisioningMapper",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}/mappers/{mapperId}",
                 defaults: new { controller = "IdentityProvisioning", action = "RemoveMapper" });
-            webApplication.MapControllerRoute("addIdProvisioningMapper",
+            webApplication.SidMapControllerRoute("addIdProvisioningMapper",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}/mappers",
                 defaults: new { controller = "IdentityProvisioning", action = "AddMapper" });
-            webApplication.MapControllerRoute("extractRepresentations",
+            webApplication.SidMapControllerRoute("extractRepresentations",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{name}/{id}/enqueue",
                 defaults: new { controller = "IdentityProvisioning", action = "Enqueue" });
-            webApplication.MapControllerRoute("idProvisioningTestConnection",
+            webApplication.SidMapControllerRoute("idProvisioningTestConnection",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}/test",
                 defaults: new { controller = "IdentityProvisioning", action = "TestConnection" });
-            webApplication.MapControllerRoute("idProvisioningAllowedAttributes",
+            webApplication.SidMapControllerRoute("idProvisioningAllowedAttributes",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}/allowedattributes",
                 defaults: new { controller = "IdentityProvisioning", action = "GetAllowedAttributes" });
-            webApplication.MapControllerRoute("searchIdProvisioningImport",
+            webApplication.SidMapControllerRoute("searchIdProvisioningImport",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/import/.search",
                 defaults: new { controller = "IdentityProvisioning", action = "SearchImport" });
 
 
-            webApplication.MapControllerRoute("getAllNetworks",
+            webApplication.SidMapControllerRoute("getAllNetworks",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Networks,
                 defaults: new { controller = "Networks", action = "GetAll" });
-            webApplication.MapControllerRoute("removeNetwork",
+            webApplication.SidMapControllerRoute("removeNetwork",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Networks + "/{name}",
                 defaults: new { controller = "Networks", action = "Remove" });
-            webApplication.MapControllerRoute("addNetwork",
+            webApplication.SidMapControllerRoute("addNetwork",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Networks,
                 defaults: new { controller = "Networks", action = "Add" });
-            webApplication.MapControllerRoute("deployContract",
+            webApplication.SidMapControllerRoute("deployContract",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Networks + "/{name}/deploy",
                 defaults: new { controller = "Networks", action = "Deploy" });
 
-            webApplication.MapControllerRoute("deviceAuthorization",
+            webApplication.SidMapControllerRoute("deviceAuthorization",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.DeviceAuthorization,
                 defaults: new { controller = "DeviceAuthorization", action = "Post" });
 
-            webApplication.MapControllerRoute("getAllAmrs",
+            webApplication.SidMapControllerRoute("getAllAmrs",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationClassReferences,
                 defaults: new { controller = "AuthenticationClassReferences", action = "GetAll" });
-            webApplication.MapControllerRoute("addAmr",
+            webApplication.SidMapControllerRoute("addAmr",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationClassReferences,
                 defaults: new { controller = "AuthenticationClassReferences", action = "Add" });
-            webApplication.MapControllerRoute("deleteAmr",
+            webApplication.SidMapControllerRoute("deleteAmr",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationClassReferences + "/{id}",
                 defaults: new { controller = "AuthenticationClassReferences", action = "Delete" });
 
 
-            webApplication.MapControllerRoute("searchIdProviders",
+            webApplication.SidMapControllerRoute("searchIdProviders",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationSchemeProviders + "/.search",
                 defaults: new { controller = "AuthenticationSchemeProviders", action = "Search" });
-            webApplication.MapControllerRoute("getIdProviderDefinitions",
+            webApplication.SidMapControllerRoute("getIdProviderDefinitions",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationSchemeProviders + "/defs",
                 defaults: new { controller = "AuthenticationSchemeProviders", action = "GetDefinitions" });
-            webApplication.MapControllerRoute("removeIdProvider",
+            webApplication.SidMapControllerRoute("removeIdProvider",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationSchemeProviders + "/{id}",
                 defaults: new { controller = "AuthenticationSchemeProviders", action = "Remove" });
-            webApplication.MapControllerRoute("getIdProvider",
+            webApplication.SidMapControllerRoute("getIdProvider",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationSchemeProviders + "/{id}",
                 defaults: new { controller = "AuthenticationSchemeProviders", action = "Get" });
-            webApplication.MapControllerRoute("addIdProvider",
+            webApplication.SidMapControllerRoute("addIdProvider",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationSchemeProviders,
                 defaults: new { controller = "AuthenticationSchemeProviders", action = "Add" });
-            webApplication.MapControllerRoute("updateIdProviderDetails",
+            webApplication.SidMapControllerRoute("updateIdProviderDetails",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationSchemeProviders + "/{id}/details",
                 defaults: new { controller = "AuthenticationSchemeProviders", action = "UpdateDetails" });
-            webApplication.MapControllerRoute("updateIdProviderValues",
+            webApplication.SidMapControllerRoute("updateIdProviderValues",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationSchemeProviders + "/{id}/values",
                 defaults: new { controller = "AuthenticationSchemeProviders", action = "UpdateValues" });
-            webApplication.MapControllerRoute("addIdProviderMapper",
+            webApplication.SidMapControllerRoute("addIdProviderMapper",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationSchemeProviders + "/{id}/mappers",
                 defaults: new { controller = "AuthenticationSchemeProviders", action = "AddMapper" });
-            webApplication.MapControllerRoute("removeIdProviderMapper",
+            webApplication.SidMapControllerRoute("removeIdProviderMapper",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationSchemeProviders + "/{id}/mappers/{mapperId}",
                 defaults: new { controller = "AuthenticationSchemeProviders", action = "RemoveMapper" });
-            webApplication.MapControllerRoute("updateIdProviderMapper",
+            webApplication.SidMapControllerRoute("updateIdProviderMapper",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationSchemeProviders + "/{id}/mappers/{mapperId}",
                 defaults: new { controller = "AuthenticationSchemeProviders", action = "UpdateMapper" });
 
-            webApplication.MapControllerRoute("getFidoConfiguration",
+            webApplication.SidMapControllerRoute("getFidoConfiguration",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.FidoConfiguration,
                 defaults: new { controller = "FidoConfiguration", action = "Index" });
 
-            webApplication.MapControllerRoute("getAllAuthMethods",
+            webApplication.SidMapControllerRoute("getAllAuthMethods",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthMethods,
                 defaults: new { controller = "AuthenticationMethods", action = "GetAll" });
-            webApplication.MapControllerRoute("updateAuthMethodConfigurations",
+            webApplication.SidMapControllerRoute("updateAuthMethodConfigurations",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthMethods + "/{amr}",
                 defaults: new { controller = "AuthenticationMethods", action = "Update" });
-            webApplication.MapControllerRoute("getAuthMethodConfigurations",
+            webApplication.SidMapControllerRoute("getAuthMethodConfigurations",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthMethods + "/{amr}",
                 defaults: new { controller = "AuthenticationMethods", action = "Get" });
 
-            webApplication.MapControllerRoute("getAllRegistrationWorkflows",
+            webApplication.SidMapControllerRoute("getAllRegistrationWorkflows",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RegistrationWorkflows,
                 defaults: new { controller = "RegistrationWorkflows", action = "GetAll" });
-            webApplication.MapControllerRoute("getRegistrationWorkflow",
+            webApplication.SidMapControllerRoute("getRegistrationWorkflow",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RegistrationWorkflows + "/{id}",
                 defaults: new { controller = "RegistrationWorkflows", action = "Get" });
-            webApplication.MapControllerRoute("deleteRegistrationWorkflow",
+            webApplication.SidMapControllerRoute("deleteRegistrationWorkflow",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RegistrationWorkflows + "/{id}",
                 defaults: new { controller = "RegistrationWorkflows", action = "Delete" });
-            webApplication.MapControllerRoute("addRegistrationWorkflow",
+            webApplication.SidMapControllerRoute("addRegistrationWorkflow",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RegistrationWorkflows,
                 defaults: new { controller = "RegistrationWorkflows", action = "Add" });
-            webApplication.MapControllerRoute("updateRegistrationWorkflow",
+            webApplication.SidMapControllerRoute("updateRegistrationWorkflow",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RegistrationWorkflows + "/{id}",
                 defaults: new { controller = "RegistrationWorkflows", action = "Update" });
 
-            webApplication.MapControllerRoute("addApiResource",
+            webApplication.SidMapControllerRoute("addApiResource",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.ApiResources,
                 defaults: new { controller = "ApiResources", action = "Add" });
-            webApplication.MapControllerRoute("searchApiResource",
+            webApplication.SidMapControllerRoute("searchApiResource",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.ApiResources + "/.search",
                 defaults: new { controller = "ApiResources", action = "Search" });
 
-            webApplication.MapControllerRoute("searchAuditing",
+            webApplication.SidMapControllerRoute("searchAuditing",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Auditing + "/.search",
                 defaults: new { controller = "Auditing", action = "Search" });
 
-            webApplication.MapControllerRoute("searchScopes",
+            webApplication.SidMapControllerRoute("searchScopes",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes + "/.search",
                 defaults: new { controller = "Scopes", action = "Search" });
-            webApplication.MapControllerRoute("getScope",
+            webApplication.SidMapControllerRoute("getScope",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes + "/{id}",
                 defaults: new { controller = "Scopes", action = "Get" });
-            webApplication.MapControllerRoute("deleteScope",
+            webApplication.SidMapControllerRoute("deleteScope",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes + "/{id}",
                 defaults: new { controller = "Scopes", action = "Delete" });
-            webApplication.MapControllerRoute("addScope",
+            webApplication.SidMapControllerRoute("addScope",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes,
                 defaults: new { controller = "Scopes", action = "Add" });
-            webApplication.MapControllerRoute("updateScope",
+            webApplication.SidMapControllerRoute("updateScope",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes + "/{id}",
                 defaults: new { controller = "Scopes", action = "Update" });
-            webApplication.MapControllerRoute("addClaimMapper",
+            webApplication.SidMapControllerRoute("addClaimMapper",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes + "/{id}/mappers",
                 defaults: new { controller = "Scopes", action = "AddClaimMapper" });
-            webApplication.MapControllerRoute("deleteClaimMapper",
+            webApplication.SidMapControllerRoute("deleteClaimMapper",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes + "/{id}/mappers/{mapperId}",
                 defaults: new { controller = "Scopes", action = "RemoveClaimMapper" });
-            webApplication.MapControllerRoute("updateClaimMapper",
+            webApplication.SidMapControllerRoute("updateClaimMapper",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes + "/{id}/mappers/{mapperId}",
                 defaults: new { controller = "Scopes", action = "UpdateClaimMapper" });
-            webApplication.MapControllerRoute("updateScopeResources",
+            webApplication.SidMapControllerRoute("updateScopeResources",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes + "/{name}/resources",
                 defaults: new { controller = "Scopes", action = "UpdateResources" });
 
-            webApplication.MapControllerRoute("searchCertificateAuthorities",
+            webApplication.SidMapControllerRoute("searchCertificateAuthorities",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CertificateAuthorities + "/.search",
                 defaults: new { controller = "CertificateAuthorities", action = "Search" });
-            webApplication.MapControllerRoute("generateCertificateAuthorities",
+            webApplication.SidMapControllerRoute("generateCertificateAuthorities",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CertificateAuthorities + "/generate",
                 defaults: new { controller = "CertificateAuthorities", action = "Generate" });
-            webApplication.MapControllerRoute("importCertificateAuthorities",
+            webApplication.SidMapControllerRoute("importCertificateAuthorities",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CertificateAuthorities + "/import",
                 defaults: new { controller = "CertificateAuthorities", action = "Import" });
-            webApplication.MapControllerRoute("addCertificateAuthorities",
+            webApplication.SidMapControllerRoute("addCertificateAuthorities",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CertificateAuthorities,
                 defaults: new { controller = "CertificateAuthorities", action = "Add" });
-            webApplication.MapControllerRoute("removeCertificateAuthorities",
+            webApplication.SidMapControllerRoute("removeCertificateAuthorities",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CertificateAuthorities + "/{id}",
                 defaults: new { controller = "CertificateAuthorities", action = "Remove" });
-            webApplication.MapControllerRoute("getCertificateAuthorities",
+            webApplication.SidMapControllerRoute("getCertificateAuthorities",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CertificateAuthorities + "/{id}",
                 defaults: new { controller = "CertificateAuthorities", action = "Get" });
-            webApplication.MapControllerRoute("removeClientCertificate",
+            webApplication.SidMapControllerRoute("removeClientCertificate",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CertificateAuthorities + "/{id}/clientcertificates/{clientCertificateId}",
                 defaults: new { controller = "CertificateAuthorities", action = "RemoveClientCertificate" });
-            webApplication.MapControllerRoute("addClientCertificate",
+            webApplication.SidMapControllerRoute("addClientCertificate",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CertificateAuthorities + "/{id}/clientcertificates",
                 defaults: new { controller = "CertificateAuthorities", action = "AddClientCertificate" });
 
-            webApplication.MapControllerRoute("searchClients",
+            webApplication.SidMapControllerRoute("searchClients",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/.search",
                 defaults: new { controller = "Clients", action = "Search" });
-            webApplication.MapControllerRoute("getAllClients",
+            webApplication.SidMapControllerRoute("getAllClients",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients,
                 defaults: new { controller = "Clients", action = "GetAll" });
-            webApplication.MapControllerRoute("addClient",
+            webApplication.SidMapControllerRoute("addClient",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients,
                 defaults: new { controller = "Clients", action = "Add" });
-            webApplication.MapControllerRoute("getClient",
+            webApplication.SidMapControllerRoute("getClient",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}",
                 defaults: new { controller = "Clients", action = "Get" });
-            webApplication.MapControllerRoute("deleteClient",
+            webApplication.SidMapControllerRoute("deleteClient",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}",
                 defaults: new { controller = "Clients", action = "Delete" });
-            webApplication.MapControllerRoute("updateClient",
+            webApplication.SidMapControllerRoute("updateClient",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}",
                 defaults: new { controller = "Clients", action = "Update" });
-            webApplication.MapControllerRoute("updateAdvancedClientSettings",
+            webApplication.SidMapControllerRoute("updateAdvancedClientSettings",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}/advanced",
                 defaults: new { controller = "Clients", action = "UpdateAdvanced" });
-            webApplication.MapControllerRoute("removeClientScope",
+            webApplication.SidMapControllerRoute("removeClientScope",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}/scopes/{name}",
                 defaults: new { controller = "Clients", action = "RemoveScope" });
-            webApplication.MapControllerRoute("addClientScope",
+            webApplication.SidMapControllerRoute("addClientScope",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}/scopes",
                 defaults: new { controller = "Clients", action = "AddScope" });
-            webApplication.MapControllerRoute("generateSigKey",
+            webApplication.SidMapControllerRoute("generateSigKey",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}/sigkey/generate",
                 defaults: new { controller = "Clients", action = "GenerateSigKey" });
-            webApplication.MapControllerRoute("generateEncKey",
+            webApplication.SidMapControllerRoute("generateEncKey",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}/enckey/generate",
                 defaults: new { controller = "Clients", action = "GenerateEncKey" });
-            webApplication.MapControllerRoute("addSigKey",
+            webApplication.SidMapControllerRoute("addSigKey",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}/sigkey",
                 defaults: new { controller = "Clients", action = "AddSigKey" });
-            webApplication.MapControllerRoute("addEncKey",
+            webApplication.SidMapControllerRoute("addEncKey",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}/enckey",
                 defaults: new { controller = "Clients", action = "AddEncKey" });
-            webApplication.MapControllerRoute("removeClientKey",
+            webApplication.SidMapControllerRoute("removeClientKey",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}/keys/{keyId}",
                 defaults: new { controller = "Clients", action = "RemoveKey" });
-            webApplication.MapControllerRoute("updateClientCredentials",
+            webApplication.SidMapControllerRoute("updateClientCredentials",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}/credentials",
                 defaults: new { controller = "Clients", action = "UpdateCredentials" });
-            webApplication.MapControllerRoute("addClientRole",
+            webApplication.SidMapControllerRoute("addClientRole",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}/roles",
                 defaults: new { controller = "Clients", action = "AddRole" });
 
-            webApplication.MapControllerRoute("searchGroups",
+            webApplication.SidMapControllerRoute("searchGroups",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Groups + "/.search",
                 defaults: new { controller = "Groups", action = "Search" });
-            webApplication.MapControllerRoute("deleteGroup",
+            webApplication.SidMapControllerRoute("deleteGroup",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Groups + "/delete",
                 defaults: new { controller = "Groups", action = "Delete" });
-            webApplication.MapControllerRoute("getGroup",
+            webApplication.SidMapControllerRoute("getGroup",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Groups + "/{id}",
                 defaults: new { controller = "Groups", action = "Get" });
-            webApplication.MapControllerRoute("addGroup",
+            webApplication.SidMapControllerRoute("addGroup",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Groups,
                 defaults: new { controller = "Groups", action = "Add" });
-            webApplication.MapControllerRoute("addGroupRole",
+            webApplication.SidMapControllerRoute("addGroupRole",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Groups + "/{id}/roles",
                 defaults: new { controller = "Groups", action = "AddRole" });
-            webApplication.MapControllerRoute("removeGroupRole",
+            webApplication.SidMapControllerRoute("removeGroupRole",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Groups + "/{id}/roles/{roleId}",
                 defaults: new { controller = "Groups", action = "RemoveRole" });
 
-            webApplication.MapControllerRoute("getStats",
+            webApplication.SidMapControllerRoute("getStats",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Statistics,
                 defaults: new { controller = "Statistics", action = "Get" });
 
-            webApplication.MapControllerRoute("getAllRealms",
+            webApplication.SidMapControllerRoute("getAllRealms",
                 pattern: Constants.EndPoints.Realms,
                 defaults: new { controller = "Realms", action = "GetAll" });
-            webApplication.MapControllerRoute("addRealm",
+            webApplication.SidMapControllerRoute("addRealm",
                 pattern: Constants.EndPoints.Realms,
                 defaults: new { controller = "Realms", action = "Add" });
 

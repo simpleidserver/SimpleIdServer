@@ -63,7 +63,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         }
 
         public override string GrantType => GRANT_TYPE;
-        public static string GRANT_TYPE = "authorization_code";
+        public const string GRANT_TYPE = "authorization_code";
 
         public override async Task<IActionResult> Handle(HandlerContext context, CancellationToken cancellationToken)
         {

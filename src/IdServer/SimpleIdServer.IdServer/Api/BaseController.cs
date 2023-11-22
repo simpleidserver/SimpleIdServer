@@ -17,7 +17,7 @@ namespace SimpleIdServer.IdServer.Api
         protected string ExtractBearerToken()
         {
             if (TryExtractBearerToken(out string result)) return result;
-            throw new OAuthException(ErrorCodes.ACCESS_DENIED, ErrorMessages.MISSING_TOKEN);
+            throw new OAuthException(HttpStatusCode.Unauthorized, ErrorCodes.ACCESS_DENIED, ErrorMessages.MISSING_TOKEN);
         }
 
         protected bool TryExtractBearerToken(out string bearerToken)
@@ -46,9 +46,9 @@ namespace SimpleIdServer.IdServer.Api
             var bearerToken = ExtractBearerToken();
             var extractionResult = jwtBuilder.ReadSelfIssuedJsonWebToken(realm, bearerToken);
             if (extractionResult.Error != null)
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, extractionResult.Error);
+                throw new OAuthException(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_REQUEST, extractionResult.Error);
             if (!extractionResult.Jwt.Claims.Any(c => c.Type == "scope" && c.Value == scope))
-                throw new OAuthException(ErrorCodes.REQUEST_DENIED, ErrorMessages.UNAUTHORIZED_ACCESS_PERMISSION_API);
+                throw new OAuthException(HttpStatusCode.Unauthorized, ErrorCodes.REQUEST_DENIED, ErrorMessages.UNAUTHORIZED_ACCESS_PERMISSION_API);
         }
 
         protected bool TryGetIdentityToken(string realm, IJwtBuilder jwtBuilder, out JsonWebToken jsonWebToken)

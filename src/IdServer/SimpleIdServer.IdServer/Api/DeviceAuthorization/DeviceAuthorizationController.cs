@@ -29,6 +29,7 @@ namespace SimpleIdServer.IdServer.Api.DeviceAuthorization
             _options = options.Value;
         }
 
+        [HttpPost]
         public async Task<IActionResult> Post([FromRoute] string prefix, CancellationToken token)
         {
             var jObjBody = Request.Form.ToJsonObject();
