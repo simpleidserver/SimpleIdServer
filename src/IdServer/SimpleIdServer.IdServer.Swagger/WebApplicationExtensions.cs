@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Swagger;
+using Swashbuckle.AspNetCore.ReDoc;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
@@ -67,12 +68,30 @@ public static class WebApplicationExtensions
         return app.UseSIDSwaggerUI(options);
     }
 
-    public static WebApplication UseSIDRecord(this WebApplication app)
+    public static WebApplication UseSIDReDoc(this WebApplication app, ReDocOptions options)
+    {        
+        app.UseMiddleware<SIDReDocMiddleware>(options);
+        return app;
+    }
+
+    public static WebApplication UseSIDReDoc(
+        this WebApplication app,
+        Action<ReDocOptions> setupAction = null)
     {
-        app.UseReDoc(c =>
+        ReDocOptions options;
+        using (var scope = app.Services.CreateScope())
         {
-            c.RoutePrefix = "docs";
-        });
+            options = scope.ServiceProvider.GetRequiredService<IOptionsSnapshot<ReDocOptions>>().Value;
+            setupAction?.Invoke(options);
+        }
+
+        // To simplify the common case, use a default that will work with the SwaggerMiddleware defaults
+        if (options.SpecUrl == null)
+        {
+            options.SpecUrl = "../swagger/v1/swagger.json";
+        }
+
+        app.UseSIDReDoc(options);
         return app;
     }
 }

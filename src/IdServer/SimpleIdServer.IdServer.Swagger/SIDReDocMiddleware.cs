@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -8,7 +9,7 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Options;
-using Swashbuckle.AspNetCore.SwaggerUI;
+using Swashbuckle.AspNetCore.ReDoc;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
@@ -17,27 +18,28 @@ using System.Text.RegularExpressions;
 
 namespace SimpleIdServer.IdServer.Swagger;
 
-public class SidSwaggerUIMiddleware
+public class SIDReDocMiddleware
 {
-    private const string EmbeddedFileNamespace = "Swashbuckle.AspNetCore.SwaggerUI.node_modules.swagger_ui_dist";
-    private readonly SwaggerUIOptions _options;
+    private const string EmbeddedFileNamespace = "Swashbuckle.AspNetCore.ReDoc.node_modules.redoc.bundles";
+    private readonly ReDocOptions _options;
+    private readonly IdServerHostOptions _idOptions;
     private readonly StaticFileMiddleware _staticFileMiddleware;
     private readonly JsonSerializerOptions _jsonSerializerOptions;
-    private readonly IdServerHostOptions _idOptions;
 
-    public SidSwaggerUIMiddleware(
+    public SIDReDocMiddleware(
         RequestDelegate next,
+        IOptions<IdServerHostOptions> idOptions,
         IWebHostEnvironment hostingEnv,
         ILoggerFactory loggerFactory,
-        SwaggerUIOptions options,
-        IOptions<IdServerHostOptions> idOptions)
+        ReDocOptions options)
     {
-        _options = options ?? new SwaggerUIOptions();
+        _options = options ?? new ReDocOptions();
         _idOptions = idOptions.Value;
 
         _staticFileMiddleware = CreateStaticFileMiddleware(next, hostingEnv, loggerFactory, options);
 
         _jsonSerializerOptions = new JsonSerializerOptions();
+
 #if NET6_0
             _jsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
 #else
@@ -58,7 +60,7 @@ public class SidSwaggerUIMiddleware
             // Use relative redirect to support proxy environments
             var relativeIndexUrl = string.IsNullOrEmpty(path) || path.EndsWith("/")
                 ? "index.html"
-                : $"{path}/index.html";
+                : $"{path.Split('/').Last()}/index.html";
 
             RespondWithRedirect(httpContext.Response, relativeIndexUrl);
             return;
@@ -77,16 +79,21 @@ public class SidSwaggerUIMiddleware
         RequestDelegate next,
         IWebHostEnvironment hostingEnv,
         ILoggerFactory loggerFactory,
-        SwaggerUIOptions options)
+        ReDocOptions options)
     {
         var staticFileOptions = new StaticFileOptions
         {
             RequestPath = string.IsNullOrEmpty(options.RoutePrefix) ? string.Empty : $"/{options.RoutePrefix}",
-            FileProvider = new EmbeddedFileProvider(typeof(SwaggerUIMiddleware).GetTypeInfo().Assembly, EmbeddedFileNamespace),
+            FileProvider = new EmbeddedFileProvider(typeof(ReDocMiddleware).GetTypeInfo().Assembly, EmbeddedFileNamespace),
         };
 
-
         return new StaticFileMiddleware(next, hostingEnv, Microsoft.Extensions.Options.Options.Create(staticFileOptions), loggerFactory);
+    }
+
+    private string GetRegex()
+    {
+        if (_idOptions.UseRealm) return @$"^\/(.)*\/{_options.RoutePrefix}\/?";
+        return @$"^\/{_options.RoutePrefix}\/?";
     }
 
     private void RespondWithRedirect(HttpResponse response, string location)
@@ -98,14 +105,12 @@ public class SidSwaggerUIMiddleware
     private async Task RespondWithIndexHtml(HttpResponse response)
     {
         response.StatusCode = 200;
-        response.ContentType = "text/html;charset=utf-8";
+        response.ContentType = "text/html";
 
         using (var stream = _options.IndexStream())
         {
-            using var reader = new StreamReader(stream);
-
             // Inject arguments before writing to response
-            var htmlBuilder = new StringBuilder(await reader.ReadToEndAsync());
+            var htmlBuilder = new StringBuilder(new StreamReader(stream).ReadToEnd());
             foreach (var entry in GetIndexArguments())
             {
                 htmlBuilder.Replace(entry.Key, entry.Value);
@@ -115,21 +120,14 @@ public class SidSwaggerUIMiddleware
         }
     }
 
-    private string GetRegex()
-    {
-        if (_idOptions.UseRealm) return @$"^\/(.)*\/{_options.RoutePrefix}\/?";
-        return @$"^\/{_options.RoutePrefix}\/?";
-    }
-
     private IDictionary<string, string> GetIndexArguments()
     {
         return new Dictionary<string, string>()
         {
             { "%(DocumentTitle)", _options.DocumentTitle },
             { "%(HeadContent)", FormatHeadContent() },
-            { "%(ConfigObject)", JsonSerializer.Serialize(_options.ConfigObject, _jsonSerializerOptions) },
-            { "%(OAuthConfigObject)", JsonSerializer.Serialize(_options.OAuthConfigObject, _jsonSerializerOptions) },
-            { "%(Interceptors)", JsonSerializer.Serialize(_options.Interceptors) },
+            { "%(SpecUrl)", _options.SpecUrl },
+            { "%(ConfigObject)", JsonSerializer.Serialize(_options.ConfigObject, _jsonSerializerOptions) }
         };
     }
 
@@ -137,9 +135,7 @@ public class SidSwaggerUIMiddleware
     {
         if (!_idOptions.UseRealm) return _options.HeadContent;
         var strBuilder = new StringBuilder(_options.HeadContent);
-        strBuilder.AppendLine($"<link href='../../{_options.RoutePrefix}/swagger-ui.css' rel='stylesheet' media='screen' type='text/css' />");
-        strBuilder.AppendLine($"<script src='../../{_options.RoutePrefix}/swagger-ui-bundle.js'></script>");
-        strBuilder.AppendLine($"<script src='../../{_options.RoutePrefix}/swagger-ui-standalone-preset.js'></script>");
+        strBuilder.AppendLine($"<script src='../../{_options.RoutePrefix}/redoc.standalone.js'></script>");
         return strBuilder.ToString();
     }
 }
