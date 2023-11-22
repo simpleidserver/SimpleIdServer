@@ -52,7 +52,6 @@ using SimpleIdServer.IdServer.UI.Services;
 using System;
 using System.Linq;
 using System.Security.Claims;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -66,7 +65,11 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        public static IdServerStoreChooser AddSIDIdentityServer(this IServiceCollection services, Action<IdServerHostOptions>? callback = null, Action<IDataProtectionBuilder>? dataProtectionBuilderCallback = null)
+        public static IdServerStoreChooser AddSIDIdentityServer(
+            this IServiceCollection services, 
+            Action<IdServerHostOptions>? callback = null, 
+            Action<CookieAuthenticationOptions>? cookie = null,
+            Action<IDataProtectionBuilder>? dataProtectionBuilderCallback = null)
         {
             if (callback != null) services.Configure(callback);
             else services.Configure<IdServerHostOptions>(o => { });
@@ -108,6 +111,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddIdServerCookie(CookieAuthenticationDefaults.AuthenticationScheme, null, opts =>
                 {
+                    if (cookie != null) cookie(opts);
                     opts.LoginPath = $"/{Constants.Areas.Password}/Authenticate";
                     opts.Events.OnSigningIn += (CookieSigningInContext ctx) =>
                     {

@@ -103,7 +103,13 @@ void ConfigureIdServer(IServiceCollection services)
 {
     var idServerBuilder = services.AddSIDIdentityServer(callback: cb =>
         {
+            if (!string.IsNullOrWhiteSpace(identityServerConfiguration.SessionCookieNamePrefix)) 
+                cb.SessionCookieName = identityServerConfiguration.SessionCookieNamePrefix;
             cb.Authority = identityServerConfiguration.Authority;
+        }, cookie: c =>
+        {
+            if(!string.IsNullOrWhiteSpace(identityServerConfiguration.AuthCookieNamePrefix)) 
+                c.Cookie.Name = identityServerConfiguration.AuthCookieNamePrefix;
         }, dataProtectionBuilderCallback: ConfigureDataProtection)
         .UseEFStore(o => ConfigureStorage(o))
         .AddSwagger(o =>

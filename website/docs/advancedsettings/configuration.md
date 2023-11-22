@@ -14,6 +14,16 @@ The table below, list all the possible properties present in the `appsettings.js
     </thead>
     <tbody>
         <tr>
+            <td><b>AuthCookieNamePrefix</b></td>
+            <td>Name of the authentication cookie/td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><b>SessionCookieNamePrefix</b></td>
+            <td>Name of the session cookie/td>
+            <td></td>
+        </tr>
+        <tr>
             <td rowspan="2"><b>ForceHttps</b></td>
             <td rowspan="2">Force to use HTTPS</td>
             <td>True</td>

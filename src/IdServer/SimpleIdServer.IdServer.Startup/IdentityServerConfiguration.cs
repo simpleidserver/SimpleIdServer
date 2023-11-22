@@ -6,6 +6,8 @@ namespace SimpleIdServer.IdServer.Startup;
 
 public class IdentityServerConfiguration
 {
+    public string AuthCookieNamePrefix { get; set; }
+    public string SessionCookieNamePrefix { get; set; }
     public bool IsRealmEnabled { get; set; }
     public bool IsClientCertificateEnabled { get; set; }
     public ClientCertificateMode? ClientCertificateMode { get; set; }
