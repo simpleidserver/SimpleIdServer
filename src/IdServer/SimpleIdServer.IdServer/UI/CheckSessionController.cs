@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -36,7 +35,6 @@ namespace SimpleIdServer.IdServer.UI
     public class CheckSessionController : BaseController
     {
         private readonly IdServerHostOptions _options;
-        private readonly IBusControl _busControl;
         private readonly IUserRepository _userRepository;
         private readonly IClientRepository _clientRepository;
         private readonly IJwtBuilder _jwtBuilder;
@@ -44,14 +42,12 @@ namespace SimpleIdServer.IdServer.UI
 
         public CheckSessionController(
             IOptions<IdServerHostOptions> options,
-            IBusControl busControl,
             IUserRepository userRepository,
             IClientRepository clientRepository,
             IJwtBuilder jwtBuilder,
             IdServer.Infrastructures.IHttpClientFactory httpClientFactory)
         {
             _options = options.Value;
-            _busControl = busControl;
             _userRepository = userRepository;
             _clientRepository = clientRepository;
             _jwtBuilder = jwtBuilder;
@@ -80,7 +76,7 @@ namespace SimpleIdServer.IdServer.UI
             var kvp = Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName());
             if (string.IsNullOrWhiteSpace(kvp.Value)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_SESSIONID);
             var userId = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.Get(u => u.Include(u => u.Sessions).Include(u => u.Realms).FirstOrDefaultAsync(u => u.Name == userId && u.Realms.Any(r => r.RealmsName == prefix), cancellationToken));
+            var user = await _userRepository.GetBySubject(userId, prefix, cancellationToken);
             if (user == null) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.UNKNOWN_USER, ErrorMessages.USER_NOT_AUTHENTICATED);
             var session = user.Sessions.First(s => s.SessionId == kvp.Value);
             if (!session.IsActive()) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INACTIVE_SESSION, ErrorMessages.INACTIVE_SESSION);
@@ -210,7 +206,7 @@ namespace SimpleIdServer.IdServer.UI
         protected async Task<string> GetSessionId(string realm, CancellationToken cancellationToken)
         {
             var userId = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.Get(us => us.Include(u => u.Groups).Include(u => u.Realms).Include(u => u.OAuthUserClaims).FirstOrDefaultAsync(u => u.Name == userId && u.Realms.Any(r => r.RealmsName == realm), cancellationToken));
+            var user = await _userRepository.GetBySubject(userId, realm, cancellationToken);
             return user.GetActiveSession(realm)?.SessionId;
         }
 

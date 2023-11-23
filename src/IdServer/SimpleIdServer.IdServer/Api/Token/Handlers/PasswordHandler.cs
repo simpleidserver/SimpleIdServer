@@ -2,19 +2,19 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.Token.Helpers;
 using SimpleIdServer.IdServer.Api.Token.TokenBuilders;
 using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
 using SimpleIdServer.IdServer.Api.Token.Validators;
-using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.UI.Services;
+using SimpleIdServer.IdServer.UI.ViewModels;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -34,6 +34,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IAuthenticationHelper _userHelper;
         private readonly IBusControl _busControl;
         private readonly IDPOPProofValidator _dpopProofValidator;
+        private readonly IPasswordAuthenticationService _passwordAuthenticationService;
         private readonly IdServerHostOptions _options;
 
         public PasswordHandler(
@@ -46,6 +47,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IAuthenticationHelper userHelper,
             IBusControl busControl,
             IDPOPProofValidator dpopProofValidator,
+            IPasswordAuthenticationService passwordAuthenticationService,
             IOptions<IdServerHostOptions> options) : base(clientAuthenticationHelper, tokenProfiles, options)
         {
             _passwordGrantTypeValidator = passwordGrantTypeValidator;
@@ -55,6 +57,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             _userHelper = userHelper;
             _busControl = busControl;
             _dpopProofValidator = dpopProofValidator;
+            _passwordAuthenticationService = passwordAuthenticationService;
             _options = options.Value;
         }
 
@@ -83,13 +86,13 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     activity?.SetTag("scopes", string.Join(",", extractionResult.Scopes)); 
                     var userName = context.Request.RequestData.GetStr(TokenRequestParameters.Username);
                     var password = context.Request.RequestData.GetStr(TokenRequestParameters.Password);
-                    var user = await _userHelper.FilterUsersByLogin(u => u
-                        .Include(u => u.Credentials)
-                        .Include(u => u.Groups)
-                        .Include(u => u.OAuthUserClaims)
-                        .Include(u => u.Realms)
-                        .AsNoTracking(), userName, context.Realm).FirstOrDefaultAsync(u => u.Credentials.Any(c => c.CredentialType == UserCredential.PWD && c.Value == PasswordHelper.ComputeHash(password) && c.IsActive), cancellationToken);
-                    if (user == null) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.BAD_USER_CREDENTIAL);
+                    var userAuthenticationResult = await _passwordAuthenticationService.Validate(context.Realm ?? Constants.DefaultRealm, string.Empty, new AuthenticatePasswordViewModel
+                    {
+                        Login = userName,
+                        Password = password
+                    }, cancellationToken);
+                    if (userAuthenticationResult.Status != ValidationStatus.AUTHENTICATE) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.BAD_USER_CREDENTIAL);
+                    var user = userAuthenticationResult.AuthenticatedUser;
                     context.SetUser(user);
                     var result = BuildResult(context, extractionResult.Scopes);
                     foreach (var tokenBuilder in _tokenBuilders)

@@ -1,12 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
-using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,9 +12,9 @@ namespace SimpleIdServer.IdServer.Helpers
     public interface IAuthenticationHelper
     {
         string GetLogin(User user);
-        Task<User> GetUserByLogin(Func<IQueryable<User>, IQueryable<User>> callback, string login, string realm, CancellationToken cancellationToken = default);
-        IQueryable<User> FilterUsersByLogin(Func<IQueryable<User>, IQueryable<User>> callback, string login, string realm);
-        IQueryable<User> FilterUsersByNotLogin(Func<IQueryable<User>, IQueryable<User>> callback, string login, string realm);
+        Task<User> GetUserByLogin(string login, string realm, CancellationToken cancellationToken = default);
+        Task<bool> AtLeastOneUserWithSameEmail(string login, string email, string realm, CancellationToken cancellationToken = default);
+        Task<bool> AtLeastOneUserWithSameClaim(string login, string name, string value, string realm, CancellationToken cancellationToken = default);
     }
 
     public class AuthenticationHelper : IAuthenticationHelper
@@ -31,27 +28,28 @@ namespace SimpleIdServer.IdServer.Helpers
             _userRepository = userRepository;
         }
 
-        public Task<User> GetUserByLogin(Func<IQueryable<User>, IQueryable<User>> callback, string login, string realm, CancellationToken cancellationToken = default)
-        {
-            var users = callback(_userRepository.Query());
-            if (_options.IsEmailUsedDuringAuthentication) return users.SingleOrDefaultAsync(u => u.Email == login && u.Realms.Any(r => r.RealmsName == realm), cancellationToken);
-            return users.SingleOrDefaultAsync(u => u.Name == login, cancellationToken);
-        }
-
-        public IQueryable<User> FilterUsersByLogin(Func<IQueryable<User>, IQueryable<User>> callback, string login, string realm)
-        {
-            var users = callback(_userRepository.Query());
-            if (_options.IsEmailUsedDuringAuthentication) return users.Where(u => u.Email == login && u.Realms.Any(r => r.RealmsName == realm));
-            return users.Where(u => u.Name == login && u.Realms.Any(r => r.RealmsName == realm));
-        }
-
-        public IQueryable<User> FilterUsersByNotLogin(Func<IQueryable<User>, IQueryable<User>> callback, string login, string realm)
-        {
-            var users = callback(_userRepository.Query());
-            if (_options.IsEmailUsedDuringAuthentication) return users.Where(u => u.Email != login && u.Realms.Any(r => r.RealmsName == realm));
-            return users.Where(u => u.Name != login && u.Realms.Any(r => r.RealmsName == realm));
-        }
-
         public string GetLogin(User user) => _options.IsEmailUsedDuringAuthentication ? user.Email : user.Name;
+
+        public async Task<User> GetUserByLogin(string login, string realm, CancellationToken cancellationToken = default)
+        {
+            if (_options.IsEmailUsedDuringAuthentication) return await _userRepository.GetByEmail(login, realm, cancellationToken);
+            return await _userRepository.GetBySubject(login, realm, cancellationToken);
+        }
+
+        public async Task<bool> AtLeastOneUserWithSameEmail(string login, string email, string realm, CancellationToken cancellationToken = default)
+        {
+            var existingUser = await _userRepository.GetByEmail(email, realm, cancellationToken);
+            if (existingUser == null) return false;
+            if (_options.IsEmailUsedDuringAuthentication) return existingUser.Email != login;
+            return existingUser.Name != login;
+        }
+
+        public async Task<bool> AtLeastOneUserWithSameClaim(string login, string name, string value, string realm, CancellationToken cancellationToken = default)
+        {
+            var existingUser = await _userRepository.GetByClaim(name, value, realm, cancellationToken);
+            if (existingUser == null) return false;
+            if (_options.IsEmailUsedDuringAuthentication) return existingUser.Email != login;
+            return existingUser.Name != login;
+        }
     }
 }

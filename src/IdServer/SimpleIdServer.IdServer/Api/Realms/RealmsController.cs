@@ -70,7 +70,7 @@ public class RealmsController : BaseController
     }
 
     [HttpPost]
-    public async Task<IActionResult> Add([FromBody] AddRealmRequest request)
+    public async Task<IActionResult> Add([FromBody] AddRealmRequest request, CancellationToken cancellationToken)
     {
         using (var activity = Tracing.IdServerActivitySource.StartActivity("Add realm"))
         {
@@ -82,7 +82,7 @@ public class RealmsController : BaseController
                     .AnyAsync(r => r.Name == request.Name);
                 if (realmExists) throw new OAuthException(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.REALM_EXISTS, request.Name));
                 var realm = new Realm { Name = request.Name, Description = request.Description, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow };
-                var users = await _userRepository.Query().Include(u => u.Realms).Where(u => Constants.RealmStandardUsers.Contains(u.Name)).ToListAsync();
+                var users = await _userRepository.GetUsersBySubjects(Constants.RealmStandardUsers, Constants.DefaultRealm, cancellationToken);
                 var clients = await _clientRepository.Query().Include(c => c.Realms).Where(c => Constants.RealmStandardClients.Contains(c.ClientId)).ToListAsync();
                 var scopes = await _scopeRepository.Query().Include(s => s.Realms).Where(s => Constants.RealmStandardScopes.Contains(s.Name)).ToListAsync();
                 var keys = await _fileSerializedKeyStore.Query().Include(s => s.Realms).Where(s => s.Realms.Any(r => r.Name == Constants.DefaultRealm)).ToListAsync();

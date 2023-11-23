@@ -116,7 +116,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             if (!TryGetIdentityToken(prefix, _jwtBuilder, out jsonWebToken))
                 if (string.IsNullOrWhiteSpace(request.Login)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.MISSING_PARAMETER, EndU2FRegisterRequestNames.Login));
             var login = jsonWebToken?.Subject ?? request.Login;
-            var authenticatedUser = await _authenticationHelper.GetUserByLogin(u => u.Include(u => u.Credentials), login, prefix, cancellationToken);
+            var authenticatedUser = await _authenticationHelper.GetUserByLogin(login, prefix, cancellationToken);
             if (authenticatedUser == null)
                 return BuildError(System.Net.HttpStatusCode.Unauthorized, ErrorCodes.ACCESS_DENIED, string.Format(IdServer.ErrorMessages.UNKNOWN_USER, login));
 
@@ -157,7 +157,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
                 if (string.IsNullOrWhiteSpace(request.Login)) return (null, BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.MISSING_PARAMETER, BeginU2FLoginRequestNames.Login)));
 
             var login = jsonWebToken?.Subject ?? request.Login;
-            var authenticatedUser = await _authenticationHelper.GetUserByLogin(u => u.Include(u => u.Credentials), login, prefix, cancellationToken);
+            var authenticatedUser = await _authenticationHelper.GetUserByLogin(login, prefix, cancellationToken);
             if (authenticatedUser == null)
                 return (null, BuildError(System.Net.HttpStatusCode.Unauthorized, ErrorCodes.ACCESS_DENIED, string.Format(IdServer.ErrorMessages.UNKNOWN_USER, login)));
 

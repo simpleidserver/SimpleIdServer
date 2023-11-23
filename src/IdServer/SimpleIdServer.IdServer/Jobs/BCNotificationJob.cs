@@ -53,7 +53,7 @@ namespace SimpleIdServer.IdServer.Jobs
                 var realmBcAuthorizeLst = grp.Select(g => g);
                 var userIds = realmBcAuthorizeLst.Select(a => a.UserId).Distinct();
                 var clientIds = realmBcAuthorizeLst.Select(a => a.ClientId).Distinct();
-                var users = await _userRepository.GetAll(u => u.Include(u => u.Groups).Include(u => u.Realms).Include(u => u.OAuthUserClaims).AsNoTracking().Where(u => userIds.Contains(u.Id) && u.Realms.Any(r => r.RealmsName == grp.Key)).ToListAsync());
+                var users = await _userRepository.GetUsersById(userIds, grp.Key, CancellationToken.None);
                 var clients = await _clientRepository.Query()
                     .Include(c => c.SerializedJsonWebKeys)
                     .Include(c => c.Realms)

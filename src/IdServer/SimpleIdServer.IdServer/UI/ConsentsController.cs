@@ -88,7 +88,7 @@ namespace SimpleIdServer.IdServer.UI
             async Task<ConsentsIndexViewModel> BuildConsentsFromGrant(JsonObject query, Client oauthClient, string grantId)
             {
                 var nameIdentifier = GetNameIdentifier();
-                var user = await _userRepository.Get(us => us.Include(u => u.Realms).Include(u => u.Consents).ThenInclude(c => c.Scopes).ThenInclude(c => c.AuthorizedResources).FirstAsync(c => c.Name == nameIdentifier && c.Realms.Any(r => r.RealmsName == prefix), cancellationToken));
+                var user = await _userRepository.GetBySubject(nameIdentifier, prefix, cancellationToken);
                 var grant = user.Consents.First(c => c.Id == grantId);
                 var claimDescriptions = new List<string>();
                 if (grant.Claims != null && grant.Claims.Any())
@@ -141,7 +141,7 @@ namespace SimpleIdServer.IdServer.UI
             var claims = query.GetClaimsFromAuthorizationRequest().Select(c => c.Name);
             if (!string.IsNullOrWhiteSpace(grantId))
             {
-                var user = await _userRepository.Get(us => us.Include(u => u.Realms).Include(u => u.Consents).ThenInclude(c => c.Scopes).ThenInclude(c => c.AuthorizedResources).FirstAsync(c => c.Name == nameIdentifier && c.Realms.Any(r => r.RealmsName == prefix), cancellationToken));
+                var user = await _userRepository.GetBySubject(nameIdentifier, prefix, cancellationToken);
                 var consent = user.Consents.Single(c => c.Id == grantId);
                 user.Consents.Remove(consent);
                 await _userRepository.SaveChanges(cancellationToken);
@@ -188,7 +188,7 @@ namespace SimpleIdServer.IdServer.UI
                 var oauthClient = await _clientRepository.Query().Include(c => c.Translations).Include(c => c.Realms).Include(c => c.Scopes).Include(c => c.SerializedJsonWebKeys).AsNoTracking().FirstAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == prefix), cancellationToken);
                 query = await _extractRequestHelper.Extract(prefix, Request.GetAbsoluteUriWithVirtualPath(), query, oauthClient);
                 var nameIdentifier = GetNameIdentifier();
-                var user = await _userRepository.Get(us => us.Include(u => u.Realms).Include(u => u.Consents).FirstAsync(c => c.Name == nameIdentifier && c.Realms.Any(r => r.RealmsName == prefix), cancellationToken));
+                var user = await _userRepository.GetBySubject(nameIdentifier, prefix, cancellationToken);
                 if(!string.IsNullOrWhiteSpace(grantId))
                 {
                     var consent = user.Consents.Single(c => c.Id == grantId);

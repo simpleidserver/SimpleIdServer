@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
@@ -27,13 +26,7 @@ public class UserSmsAuthenticationService : OTPAuthenticationService, IUserSmsAu
     {
         User authenticatedUser = null;
         if (string.IsNullOrWhiteSpace(authenticatedUserId))
-            authenticatedUser = await UserRepository.Get(u => u
-                .Include(u => u.Realms)
-                .Include(u => u.IdentityProvisioning).ThenInclude(i => i.Definition)
-                .Include(u => u.Groups)
-                .Include(c => c.OAuthUserClaims)
-                .Include(u => u.Credentials)
-                .FirstOrDefaultAsync(u => u.Realms.Any(r => r.RealmsName == realm) && u.OAuthUserClaims.Any(c => c.Name == JwtRegisteredClaimNames.PhoneNumber && c.Value == viewModel.Login), cancellationToken));
+            authenticatedUser = await UserRepository.GetByClaim(JwtRegisteredClaimNames.PhoneNumber, viewModel.Login, realm, cancellationToken);
         else
             authenticatedUser = await FetchAuthenticatedUser(realm, authenticatedUserId, cancellationToken);
 

@@ -7,6 +7,7 @@ using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.Api.Statistics;
@@ -17,7 +18,10 @@ public class StatisticsController : BaseController
     private readonly IClientRepository _clientRepository;
     private readonly IAuditEventRepository _auditEventRepository;
 
-    public StatisticsController(IUserRepository userRepository, IClientRepository clientRepository, IAuditEventRepository auditEventRepository)
+    public StatisticsController(
+        IUserRepository userRepository, 
+        IClientRepository clientRepository, 
+        IAuditEventRepository auditEventRepository)
     {
         _userRepository = userRepository;
         _clientRepository = clientRepository;
@@ -26,14 +30,11 @@ public class StatisticsController : BaseController
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get([FromRoute] string prefix)
+    public async Task<IActionResult> Get([FromRoute] string prefix, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         var currentDate = DateTime.UtcNow.Date;
-        var nbUsers = await _userRepository
-            .Query()
-            .Include(u => u.Realms)
-            .CountAsync(u => u.Realms.Any(r => r.RealmsName == prefix));
+        var nbUsers = await _userRepository.NbUsers(prefix, cancellationToken);
         var nbClients = await _clientRepository
         .Query()
         .Include(u => u.Realms)

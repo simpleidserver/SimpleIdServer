@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -43,13 +42,11 @@ public class RegisterController : BaseOTPRegisterController<IdServerEmailOptions
     {
         string nameIdentifier = string.Empty;
         if(User.Identity.IsAuthenticated) nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-
         if(!string.IsNullOrWhiteSpace(nameIdentifier))
         {
-            var filtered = _authenticationHelper.FilterUsersByNotLogin(u => u.Include(u => u.Realms).AsNoTracking().Where(u => u.Realms.Any(r => r.RealmsName == prefix) && u.Email == value), nameIdentifier, prefix);
-            return await filtered.AnyAsync();
+            return await _authenticationHelper.AtLeastOneUserWithSameEmail(nameIdentifier, value, prefix, CancellationToken.None);
         }
 
-        return (await UserRepository.GetAll(us => us.Include(u => u.Realms).AsNoTracking().Where(u => u.Realms.Any(r => r.RealmsName == prefix) && u.Email == value).ToListAsync())).Any();
+        return await UserRepository.IsEmailExists(value, prefix, CancellationToken.None);
     }
 }

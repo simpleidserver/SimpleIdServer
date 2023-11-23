@@ -1,11 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.ViewModels;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -39,14 +37,6 @@ public abstract class GenericAuthenticationService<TViewModel> : IUserAuthentica
         return Validate(realm, authenticatedUser, (TViewModel)viewModel, cancellationToken);
     }
 
-    protected async Task Provision(User user, CancellationToken cancellationToken)
-    {
-        var existingUser = await _userRepository.Get(us => us.AsNoTracking().FirstOrDefaultAsync(u => u.Name == user.Name));
-        if (existingUser != null) return;
-        _userRepository.Add(user);
-        await _userRepository.SaveChanges(cancellationToken);
-    }
-
     protected abstract Task<User> GetUser(string authenticatedUserId, TViewModel viewModel, string realm, CancellationToken cancellationToken);
 
     protected abstract Task<CredentialsValidationResult> Validate(string realm, string authenticatedUserId, TViewModel viewModel, CancellationToken cancellationToken);
@@ -55,24 +45,13 @@ public abstract class GenericAuthenticationService<TViewModel> : IUserAuthentica
 
     protected async Task<User> AuthenticateUser(string login, string realm, CancellationToken cancellationToken)
     {
-        var user = await _authenticationHelper.GetUserByLogin(us => us
-            .Include(u => u.Realms)
-            .Include(u => u.IdentityProvisioning).ThenInclude(i => i.Definition)
-            .Include(u => u.Groups)
-            .Include(c => c.OAuthUserClaims)
-            .Include(u => u.Credentials), login, realm, cancellationToken);
+        var user = await _authenticationHelper.GetUserByLogin(login, realm, cancellationToken);
         return user;
     }
 
     protected async Task<User> FetchAuthenticatedUser(string realm, string userId, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(userId)) return null;
-        return await _userRepository.Get(us => us
-            .Include(u => u.Realms)
-            .Include(u => u.IdentityProvisioning).ThenInclude(i => i.Definition)
-            .Include(u => u.Groups)
-            .Include(c => c.OAuthUserClaims)
-            .Include(u => u.Credentials)
-            .FirstOrDefaultAsync(u => u.Realms.Any(r => r.RealmsName == realm) && u.Id == userId, cancellationToken));
+        return await _userRepository.GetById(userId, realm, cancellationToken);
     }
 }

@@ -3,7 +3,6 @@
 
 using MassTransit.Testing;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -54,24 +53,11 @@ public class RegisterController : BaseOTPRegisterController<IdServerSmsOptions>
     {
         string nameIdentifier = string.Empty;
         if (User.Identity.IsAuthenticated) nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-
         if (!string.IsNullOrWhiteSpace(nameIdentifier))
         {
-            var result = await _authenticationHelper.FilterUsersByNotLogin(u => u
-                .Include(u => u.Realms)
-                .Include(u => u.OAuthUserClaims)
-                .AsNoTracking()
-                .Where(u => u.Realms.Any(r => r.RealmsName == prefix) && u.OAuthUserClaims.Any(c => c.Name == JwtRegisteredClaimNames.PhoneNumber && c.Value == value)), nameIdentifier, prefix)
-                .AnyAsync();
-            return result;
+            return await _authenticationHelper.AtLeastOneUserWithSameClaim(nameIdentifier, JwtRegisteredClaimNames.PhoneNumber, value, prefix, CancellationToken.None);
         }
 
-        return (await UserRepository.GetAll(u => u
-            .Include(u => u.Realms)
-            .Include(u => u.OAuthUserClaims)
-            .AsNoTracking()
-            .Where(u => u.Realms.Any(r => r.RealmsName == prefix) && u.OAuthUserClaims.Any(c => c.Name == JwtRegisteredClaimNames.PhoneNumber && c.Value == value))
-            .ToListAsync()
-        )).Any();
+        return await UserRepository.IsClaimExists(JwtRegisteredClaimNames.PhoneNumber, value, prefix, CancellationToken.None);
     }
 }

@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -75,7 +74,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential
                     var token = await _grantedTokenHelper.GetAccessToken(accessToken, cancellationToken);
                     if (token == null) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, ErrorMessages.UNKNOWN_ACCESS_TOKEN);
                     var extractionResult = await ValidateRequest(request, token, cancellationToken);
-                    var user = await _authenticationHelper.GetUserByLogin(u => u.Include(u => u.OAuthUserClaims).AsNoTracking(), token.Subject, prefix, cancellationToken);
+                    var user = await _authenticationHelper.GetUserByLogin(token.Subject, prefix, cancellationToken);
                     var validationResult = await CheckProof(request, user, cancellationToken);
                     context.SetClient(null);
                     context.SetUser(user);

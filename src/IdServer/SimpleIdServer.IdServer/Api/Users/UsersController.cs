@@ -16,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Net;
 using System.Text.Json;
 using System.Threading;
@@ -48,31 +47,14 @@ namespace SimpleIdServer.IdServer.Api.Users
         #region Querying
 
         [HttpPost]
-        public async Task<IActionResult> Search([FromRoute] string prefix, [FromBody] SearchRequest request)
+        public async Task<IActionResult> Search([FromRoute] string prefix, [FromBody] SearchRequest request, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
                 CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
-                var query = _userRepository.Query()
-                    .Include(u => u.Realms)
-                    .Include(u => u.OAuthUserClaims)
-                    .Where(u => u.Realms.Any(r => r.RealmsName == prefix)).AsNoTracking();
-                if (!string.IsNullOrWhiteSpace(request.Filter))
-                    query = query.Where(request.Filter);
-
-                if (!string.IsNullOrWhiteSpace(request.OrderBy))
-                    query = query.OrderBy(request.OrderBy);
-                else
-                    query = query.OrderByDescending(u => u.UpdateDateTime);
-
-                var count = query.Count();
-                var users = await query.Skip(request.Skip.Value).Take(request.Take.Value).ToListAsync(CancellationToken.None);
-                return new OkObjectResult(new SearchResult<User>
-                {
-                    Content = users,
-                    Count = count
-                });
+                var result = await _userRepository.Search(prefix, request, cancellationToken);
+                return new OkObjectResult(result);
             }
             catch (OAuthException ex)
             {
@@ -87,17 +69,7 @@ namespace SimpleIdServer.IdServer.Api.Users
             {
                 prefix = prefix ?? Constants.DefaultRealm;
                 CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
-                var user = await _userRepository.Get(us => us
-                    .Include(u => u.OAuthUserClaims)
-                    .Include(u => u.Credentials)
-                    .Include(u => u.CredentialOffers)
-                    .Include(u => u.Groups)
-                    .Include(u => u.Consents)
-                    .Include(u => u.ExternalAuthProviders)
-                    .Include(u => u.Realms)
-                    .Include(u => u.Sessions)
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.RealmsName == prefix), cancellationToken));
+                var user = await _userRepository.GetById(id, prefix, cancellationToken);
                 if (user == null) return new NotFoundResult();
                 return new OkObjectResult(user);
             }
@@ -115,11 +87,7 @@ namespace SimpleIdServer.IdServer.Api.Users
             {
                 prefix = prefix ?? Constants.DefaultRealm;
                 CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
-                var user = await _userRepository.Get(us => us
-                    .Include(u => u.Groups)
-                    .Include(u => u.Realms)
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.RealmsName == prefix), cancellationToken));
+                var user = await _userRepository.GetById(id, prefix, cancellationToken);
                 if (user == null) return new NotFoundResult();
                 var grpPathLst = user.Groups.SelectMany(g => g.ResolveAllPath()).Distinct();
                 var allGroups = await _groupRepository.Query()
@@ -202,12 +170,12 @@ namespace SimpleIdServer.IdServer.Api.Users
             async Task Validate()
             {
                 if (string.IsNullOrWhiteSpace(request.Name)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, UserNames.Name));
-                if ((await _userRepository.GetAll(us => us.AsNoTracking().Where(u => u.Name == request.Name).ToListAsync())).Any()) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.USER_EXISTS, request.Name));
+                if(await _userRepository.IsSubjectExists(request.Name, prefix, cancellationToken)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.USER_EXISTS, request.Name));
             }
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update([FromRoute] string prefix, string id, [FromBody] UpdateUserRequest request)
+        public async Task<IActionResult> Update([FromRoute] string prefix, string id, [FromBody] UpdateUserRequest request, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
             using (var activity = Tracing.IdServerActivitySource.StartActivity("Update user"))
@@ -216,18 +184,14 @@ namespace SimpleIdServer.IdServer.Api.Users
                 {
                     CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
                     if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
-                    var user = await _userRepository
-                        .Query()
-                        .Include(u => u.OAuthUserClaims)
-                        .Include(u => u.Realms)
-                        .SingleOrDefaultAsync(a => a.Id == id && a.Realms.Any(r => r.RealmsName == prefix));
+                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_USER, id));
                     user.UpdateEmail(request.Email);
                     user.UpdateName(request.Name);
                     user.UpdateLastname(request.Lastname);
                     user.NotificationMode = request.NotificationMode ?? string.Empty;
                     user.UpdateDateTime = DateTime.UtcNow;
-                    await _userRepository.SaveChanges(CancellationToken.None);
+                    await _userRepository.SaveChanges(cancellationToken);
                     activity?.SetStatus(ActivityStatusCode.Ok, "User is updated");
                     await _busControl.Publish(new UpdateUserSuccessEvent
                     {
@@ -259,7 +223,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                 {
                     prefix = prefix ?? Constants.DefaultRealm;
                     CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
-                    var user = await _userRepository.Get(us => us.Include(u => u.Realms).FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.RealmsName == prefix), cancellationToken));
+                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) return new NotFoundResult();
                     _userRepository.Remove(new List<User> { user });
                     await _userRepository.SaveChanges(cancellationToken);
@@ -285,7 +249,7 @@ namespace SimpleIdServer.IdServer.Api.Users
         #region Credentials
 
         [HttpPost]
-        public async Task<IActionResult> AddCredential([FromRoute] string prefix, string id, [FromBody] AddUserCredentialRequest request)
+        public async Task<IActionResult> AddCredential([FromRoute] string prefix, string id, [FromBody] AddUserCredentialRequest request, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
             using (var activity = Tracing.IdServerActivitySource.StartActivity("Add user's credential"))
@@ -294,11 +258,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                 {
                     CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
                     if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
-                    var user = await _userRepository
-                        .Query()
-                        .Include(u => u.Credentials)
-                        .Include(u => u.Realms)
-                        .SingleOrDefaultAsync(a => a.Id == id && a.Realms.Any(r => r.RealmsName == prefix));
+                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_USER, id));
                     if (request.Active)
                     {
@@ -310,7 +270,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                     request.Credential.Id = Guid.NewGuid().ToString();
                     user.Credentials.Add(request.Credential);
                     user.UpdateDateTime = DateTime.UtcNow;
-                    await _userRepository.SaveChanges(CancellationToken.None);
+                    await _userRepository.SaveChanges(cancellationToken);
                     activity?.SetStatus(ActivityStatusCode.Ok, "User's credential is added");
                     return new ContentResult
                     {
@@ -338,10 +298,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                     prefix = prefix ?? Constants.DefaultRealm;
                     CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
                     if (string.IsNullOrWhiteSpace(request.Value)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, UserCredentialNames.Value));
-                    var user = await _userRepository.Get(us => us
-                        .Include(u => u.Realms)
-                        .Include(u => u.Credentials)
-                        .FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.RealmsName == prefix), cancellationToken));
+                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) return new NotFoundResult();
                     var existingCredential = user.Credentials.SingleOrDefault(c => c.Id == credentialId);
                     if (existingCredential == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_USER_CREDENTIAL, credentialId));
@@ -371,7 +328,7 @@ namespace SimpleIdServer.IdServer.Api.Users
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteCredential([FromRoute] string prefix, string id, string credentialId)
+        public async Task<IActionResult> DeleteCredential([FromRoute] string prefix, string id, string credentialId, CancellationToken cancellationToken)
         {
             using (var activity = Tracing.IdServerActivitySource.StartActivity("Remove credential"))
             {
@@ -379,16 +336,13 @@ namespace SimpleIdServer.IdServer.Api.Users
                 {
                     prefix = prefix ?? Constants.DefaultRealm;
                     CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
-                    var user = await _userRepository.Get(us => us
-                        .Include(u => u.Realms)
-                        .Include(u => u.Credentials)
-                        .FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.RealmsName == prefix)));
+                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) return new NotFoundResult();
                     var existingCredential = user.Credentials.SingleOrDefault(c => c.Id == credentialId);
                     if (existingCredential == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_USER_CREDENTIAL, credentialId));
                     user.Credentials.Remove(existingCredential);
                     user.UpdateDateTime = DateTime.UtcNow;
-                    await _userRepository.SaveChanges(CancellationToken.None);
+                    await _userRepository.SaveChanges(cancellationToken);
                     activity?.SetStatus(ActivityStatusCode.Ok, "Credential is removed");
                     return new NoContentResult();
                 }
@@ -401,7 +355,7 @@ namespace SimpleIdServer.IdServer.Api.Users
         }
 
         [HttpGet]
-        public async Task<IActionResult> DefaultCredential([FromRoute] string prefix, string id, string credentialId)
+        public async Task<IActionResult> DefaultCredential([FromRoute] string prefix, string id, string credentialId, CancellationToken cancellationToken)
         {
             using (var activity = Tracing.IdServerActivitySource.StartActivity("Set default credential"))
             {
@@ -409,10 +363,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                 {
                     prefix = prefix ?? Constants.DefaultRealm;
                     CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
-                    var user = await _userRepository.Get(us => us
-                        .Include(u => u.Realms)
-                        .Include(u => u.Credentials)
-                        .FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.RealmsName == prefix)));
+                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) return new NotFoundResult();
                     var existingCredential = user.Credentials.SingleOrDefault(c => c.Id == credentialId);
                     if (existingCredential == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_USER_CREDENTIAL, credentialId));
@@ -420,7 +371,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                         existingCredential.IsActive = false;
                     existingCredential.IsActive = true;
                     user.UpdateDateTime = DateTime.UtcNow;
-                    await _userRepository.SaveChanges(CancellationToken.None);
+                    await _userRepository.SaveChanges(cancellationToken);
                     activity?.SetStatus(ActivityStatusCode.Ok, "Default credential is set");
                     return new NoContentResult();
                 }
@@ -446,10 +397,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                     prefix = prefix ?? Constants.DefaultRealm;
                     CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
                     Validate();
-                    var user = await _userRepository.Get(us => us
-                        .Include(u => u.Realms)
-                        .Include(u => u.OAuthUserClaims)
-                        .FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.RealmsName == prefix), cancellationToken));
+                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_USER, id));
                     Update(user, request);
                     await _userRepository.SaveChanges(cancellationToken);
@@ -491,7 +439,7 @@ namespace SimpleIdServer.IdServer.Api.Users
         #region Groups
 
         [HttpPost]
-        public async Task<IActionResult> AddGroup([FromRoute] string prefix, string id, string groupId)
+        public async Task<IActionResult> AddGroup([FromRoute] string prefix, string id, string groupId, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
             using (var activity = Tracing.IdServerActivitySource.StartActivity("Add user's group"))
@@ -499,11 +447,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                 try
                 {
                     CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
-                    var user = await _userRepository
-                        .Query()
-                        .Include(u => u.Groups)
-                        .Include(u => u.Realms)
-                        .SingleOrDefaultAsync(a => a.Id == id && a.Realms.Any(r => r.RealmsName == prefix));
+                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_USER, id));
                     var newGroup = await _groupRepository.Query()
                         .Include(g => g.Realms)
@@ -511,7 +455,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                     if (newGroup == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_USER_GROUP, groupId));
                     user.Groups.Add(newGroup);
                     user.UpdateDateTime = DateTime.UtcNow;
-                    await _userRepository.SaveChanges(CancellationToken.None);
+                    await _userRepository.SaveChanges(cancellationToken);
                     activity?.SetStatus(ActivityStatusCode.Ok, "User's group is added");
                     await _busControl.Publish(new AssignUserGroupSuccessEvent
                     {
@@ -540,7 +484,7 @@ namespace SimpleIdServer.IdServer.Api.Users
         }
 
         [HttpDelete]
-        public async Task<IActionResult> RemoveGroup([FromRoute] string prefix, string id, string groupId)
+        public async Task<IActionResult> RemoveGroup([FromRoute] string prefix, string id, string groupId, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
             using (var activity = Tracing.IdServerActivitySource.StartActivity("Remove user's group"))
@@ -548,17 +492,13 @@ namespace SimpleIdServer.IdServer.Api.Users
                 try
                 {
                     CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
-                    var user = await _userRepository
-                        .Query()
-                        .Include(u => u.Groups)
-                        .Include(u => u.Realms)
-                        .SingleOrDefaultAsync(a => a.Id == id && a.Realms.Any(r => r.RealmsName == prefix));
+                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_USER, id));
                     var assignedGroup = user.Groups.SingleOrDefault(g => g.Id == groupId);
                     if (assignedGroup == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_USER_GROUP, groupId));
                     user.Groups.Remove(assignedGroup);
                     user.UpdateDateTime = DateTime.UtcNow;
-                    await _userRepository.SaveChanges(CancellationToken.None);
+                    await _userRepository.SaveChanges(cancellationToken);
                     activity?.SetStatus(ActivityStatusCode.Ok, "User's group is removed");
                     await _busControl.Publish(new RemoveUserGroupSuccessEvent
                     {
@@ -586,7 +526,7 @@ namespace SimpleIdServer.IdServer.Api.Users
         #region Consents
 
         [HttpDelete]
-        public async Task<IActionResult> RevokeConsent([FromRoute] string prefix, string id, string consentId)
+        public async Task<IActionResult> RevokeConsent([FromRoute] string prefix, string id, string consentId, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
             using (var activity = Tracing.IdServerActivitySource.StartActivity("Revoke user's consent"))
@@ -594,17 +534,13 @@ namespace SimpleIdServer.IdServer.Api.Users
                 try
                 {
                     CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
-                    var user = await _userRepository
-                        .Query()
-                        .Include(u => u.Consents)
-                        .Include(u => u.Realms)
-                        .SingleOrDefaultAsync(a => a.Id == id && a.Realms.Any(r => r.RealmsName == prefix));
+                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_USER, id));
                     var consent = user.Consents.SingleOrDefault(c => c.Id == consentId);
                     if (consent == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_USER_CONSENT, consentId));
                     user.Consents.Remove(consent);
                     user.UpdateDateTime = DateTime.UtcNow;
-                    await _userRepository.SaveChanges(CancellationToken.None);
+                    await _userRepository.SaveChanges(cancellationToken);
                     activity?.SetStatus(ActivityStatusCode.Ok, "User's consent is revoked");
                     await _busControl.Publish(new RevokeUserConsentSuccessEvent
                     {
@@ -632,7 +568,7 @@ namespace SimpleIdServer.IdServer.Api.Users
         #region Sessions
 
         [HttpDelete]
-        public async Task<IActionResult> RevokeSession([FromRoute] string prefix, string id, string sessionId)
+        public async Task<IActionResult> RevokeSession([FromRoute] string prefix, string id, string sessionId, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
             using (var activity = Tracing.IdServerActivitySource.StartActivity("Revoke user's session"))
@@ -640,17 +576,13 @@ namespace SimpleIdServer.IdServer.Api.Users
                 try
                 {
                     CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
-                    var user = await _userRepository
-                        .Query()
-                        .Include(u => u.Sessions)
-                        .Include(u => u.Realms)
-                        .SingleOrDefaultAsync(a => a.Id == id && a.Realms.Any(r => r.RealmsName == prefix));
+                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_USER, id));
                     var session = user.Sessions.SingleOrDefault(c => c.SessionId == sessionId);
                     if (session == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_USER_SESSION, sessionId));
                     session.State = UserSessionStates.Rejected;
                     user.UpdateDateTime = DateTime.UtcNow;
-                    await _userRepository.SaveChanges(CancellationToken.None);
+                    await _userRepository.SaveChanges(cancellationToken);
                     activity?.SetStatus(ActivityStatusCode.Ok, "User's session is revoked");
                     await _busControl.Publish(new RevokeUserSessionSuccessEvent
                     {
@@ -678,7 +610,7 @@ namespace SimpleIdServer.IdServer.Api.Users
         #region External Auth Providers
 
         [HttpPost]
-        public async Task<IActionResult> UnlinkExternalAuthProvider([FromRoute] string prefix, string id, [FromBody] UnlinkExternalAuthProviderRequest request)
+        public async Task<IActionResult> UnlinkExternalAuthProvider([FromRoute] string prefix, string id, [FromBody] UnlinkExternalAuthProviderRequest request, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
             using (var activity = Tracing.IdServerActivitySource.StartActivity("Unlink user's external authentication provider"))
@@ -689,17 +621,13 @@ namespace SimpleIdServer.IdServer.Api.Users
                     if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
                     if (string.IsNullOrWhiteSpace(request.Scheme)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, UserExternalAuthProviderNames.Scheme));
                     if (string.IsNullOrWhiteSpace(request.Subject)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, UserExternalAuthProviderNames.Subject));
-                    var user = await _userRepository
-                        .Query()
-                        .Include(u => u.ExternalAuthProviders)
-                        .Include(u => u.Realms)
-                        .SingleOrDefaultAsync(a => a.Id == id && a.Realms.Any(r => r.RealmsName == prefix));
+                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_USER, id));
                     var externalAuthProvider = user.ExternalAuthProviders.SingleOrDefault(c => c.Subject == request.Subject && c.Scheme == request.Scheme);
                     if (externalAuthProvider == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.UNKNOWN_USER_EXTERNALAUTHPROVIDER);
                     user.ExternalAuthProviders.Remove(externalAuthProvider);
                     user.UpdateDateTime = DateTime.UtcNow;
-                    await _userRepository.SaveChanges(CancellationToken.None);
+                    await _userRepository.SaveChanges(cancellationToken);
                     activity?.SetStatus(ActivityStatusCode.Ok, "User's external authentication provider is unlinked");
                     await _busControl.Publish(new UnlinkUserExternalAuthProviderSuccessEvent
                     {
@@ -736,7 +664,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                     prefix = prefix ?? Constants.DefaultRealm;
                     CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
                     Validate();
-                    var user = await _userRepository.Get(us => us.Include(u => u.Realms).Include(u => u.CredentialOffers).FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.RealmsName == prefix), cancellationToken));
+                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_USER, id));
                     var generator = _generators.FirstOrDefault(g => g.Method == request.Method);
                     if (generator == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.INVALID_DECENTRALIZED_IDENTITY_METHOD, request.Method));

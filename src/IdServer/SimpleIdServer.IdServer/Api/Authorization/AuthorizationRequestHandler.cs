@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
 using SimpleIdServer.IdServer.Api.Authorization.Validators;
@@ -81,13 +80,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
         protected async Task<AuthorizationResponse> BuildResponse(HandlerContext context, CancellationToken cancellationToken)
         {
             var validationResult = await _validator.ValidateAuthorizationRequest(context, cancellationToken);
-            var user = await _userRepository.Get(u => u
-                .Include(u => u.Consents).ThenInclude(c => c.Scopes).ThenInclude(c => c.AuthorizedResources)
-                .Include(u => u.Sessions)
-                .Include(u => u.Realms)
-                .Include(u => u.Groups)
-                .Include(u => u.OAuthUserClaims)
-                .SingleOrDefaultAsync(u => u.Name == context.Request.UserSubject && u.Realms.Any(r => r.RealmsName == context.Realm), cancellationToken));
+            var user = await _userRepository.GetBySubject(context.Request.UserSubject, context.Realm, cancellationToken);
             context.SetUser(user);
             var grantRequest = validationResult.GrantRequest;
             var responseTypeHandlers = validationResult.ResponseTypes;

@@ -111,22 +111,11 @@ namespace SimpleIdServer.IdServer.UI
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.BAD_EXTERNAL_AUTHENTICATION_USER);
             }
 
-            var user = await UserRepository.Get(u => u
-                .Include(u => u.Groups)
-                .Include(u => u.ExternalAuthProviders)
-                .Include(u => u.Sessions)
-                .Include(u => u.OAuthUserClaims)
-                .Include(u => u.Realms)
-                .FirstOrDefaultAsync(u => u.ExternalAuthProviders.Any(e => e.Scheme == scheme && e.Subject == sub) && u.Realms.Any(r => r.RealmsName == realm), cancellationToken));
+            var user = await UserRepository.GetByExternalAuthProvider(scheme, sub, realm, cancellationToken);
             if (user == null)
             {
                 _logger.LogInformation($"Start to provision the user '{sub}'");
-                var existingUser = await _authenticationHelper.GetUserByLogin(u => u
-                    .Include(u => u.ExternalAuthProviders)
-                    .Include(u => u.Sessions)
-                    .Include(u => u.Realms)
-                    .Include(u => u.Groups)
-                    .Include(u => u.OAuthUserClaims), sub, realm, cancellationToken);
+                var existingUser = await _authenticationHelper.GetUserByLogin(sub, realm, cancellationToken);
                 if(existingUser != null)
                 {
                     user = existingUser;

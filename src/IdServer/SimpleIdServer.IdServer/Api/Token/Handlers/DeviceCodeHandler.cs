@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.Token.Helpers;
 using SimpleIdServer.IdServer.Api.Token.TokenBuilders;
@@ -71,7 +70,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     var deviceAuthCode = await _validator.Validate(context, cancellationToken);
                     scopeLst = deviceAuthCode.Scopes;
                     activity?.SetTag("scopes", string.Join(",", deviceAuthCode.Scopes));
-                    var user = await _authenticationHelper.GetUserByLogin(u => u.Include(u => u.Groups).Include(u => u.OAuthUserClaims).Include(u => u.Realms), deviceAuthCode.UserLogin, context.Realm, cancellationToken);
+                    var user = await _authenticationHelper.GetUserByLogin(deviceAuthCode.UserLogin, context.Realm, cancellationToken);
                     context.SetUser(user);
                     foreach (var tokenBuilder in _tokenBuilders)
                         await tokenBuilder.Build(new BuildTokenParameter { Scopes = deviceAuthCode.Scopes }, context, cancellationToken);

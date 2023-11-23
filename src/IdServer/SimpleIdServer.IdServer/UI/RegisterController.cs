@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
@@ -50,7 +49,7 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Index([FromRoute] string prefix, PwdRegisterViewModel viewModel)
+    public async Task<IActionResult> Index([FromRoute] string prefix, PwdRegisterViewModel viewModel, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.Prefix;
         var isAuthenticated = User.Identity.IsAuthenticated;
@@ -76,8 +75,8 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
 
         async Task<IActionResult> CreateUser()
         {
-            var userExists = (await UserRepository.GetAll(us => us.Include(u => u.Realms).AsNoTracking().Where(u => u.Name == viewModel.Login && u.Realms.Any(r => r.RealmsName == prefix)).ToListAsync())).Any();
-            if(userExists)
+            var isUserExists = await UserRepository.IsSubjectExists(viewModel.Login, prefix, cancellationToken);
+            if(isUserExists)
             {
                 ModelState.AddModelError("user_exists", "user_exists");
                 return View(viewModel);
@@ -88,7 +87,7 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
 
         async Task<IActionResult> UpdateUser()
         {
-            var user = await UserRepository.Get(us => us.Include(u => u.Credentials).SingleAsync(u => u.Name == viewModel.Login));
+            var user = await UserRepository.GetBySubject(viewModel.Login, prefix, cancellationToken);
             var passwordCredential = user.Credentials.FirstOrDefault(c => c.CredentialType == UserCredential.PWD);
             if (passwordCredential != null) passwordCredential.Value = PasswordHelper.ComputeHash(viewModel.Password);
             else user.Credentials.Add(new UserCredential
@@ -98,7 +97,7 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
                 CredentialType = UserCredential.PWD,
                 IsActive = true
             });
-            await UserRepository.SaveChanges(CancellationToken.None);
+            await UserRepository.SaveChanges(cancellationToken);
             return await base.UpdateUser(userRegistrationProgress, viewModel, Constants.Areas.Password);
         }
     }

@@ -131,7 +131,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             }
             else login = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
             if (string.IsNullOrWhiteSpace(request.Login)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.MISSING_PARAMETER, EndU2FRegisterRequestNames.Login));
-            var user = await _authenticationHelper.GetUserByLogin(u => u.Include(u => u.Credentials), login, prefix, cancellationToken);
+            var user = await _authenticationHelper.GetUserByLogin(login, prefix, cancellationToken);
             if (user != null && !isAuthenticated)
                 return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.USER_ALREADY_EXISTS, login));
             if (!isAuthenticated) user = BuildUser();
@@ -240,7 +240,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             if (string.IsNullOrWhiteSpace(login)) return (null, BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.MISSING_PARAMETER, BeginU2FRegisterRequestNames.Login)));
             if (string.IsNullOrWhiteSpace(request.DisplayName)) return (null, BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.MISSING_PARAMETER, BeginU2FRegisterRequestNames.DisplayName)));
             var existingKeys = new List<PublicKeyCredentialDescriptor>();
-            var user = await _authenticationHelper.GetUserByLogin(u => u.Include(u => u.Credentials), login, prefix, cancellationToken);
+            var user = await _authenticationHelper.GetUserByLogin(login, prefix, cancellationToken);
             if (user != null && !isAuthenticated)
                 return (null, BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.USER_ALREADY_EXISTS, login)));
 

@@ -200,7 +200,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialOffer
             if (credentialTemplate == null) return (BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_CREDENTIAL_TEMPLATE, request.CredentialTemplateId)), null);
             var client = await _clientRepository.Query().AsNoTracking().SingleOrDefaultAsync(c => c.ClientId == request.WalletClientId && c.ClientType == ClientTypes.WALLET, cancellationToken);
             if (client == null) return (BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_WALLET_CLIENT_ID, request.WalletClientId)), null);
-            var user = await _authenticationHelper.GetUserByLogin(u => u.AsNoTracking().Include(u => u.OAuthUserClaims), nameIdentifier, prefix, cancellationToken);
+            var user = await _authenticationHelper.GetUserByLogin(nameIdentifier, prefix, cancellationToken);
             if (user == null) return (BuildError(HttpStatusCode.Unauthorized, ErrorCodes.UNAUTHORIZED, string.Format(ErrorMessages.UNKNOWN_USER, nameIdentifier)), null);
             var cred = await _credentialOfferRepository.Query().AsNoTracking().FirstOrDefaultAsync(c => c.CredentialTemplateId == request.CredentialTemplateId && c.UserId == user.Id && c.ClientId == request.WalletClientId);
 
