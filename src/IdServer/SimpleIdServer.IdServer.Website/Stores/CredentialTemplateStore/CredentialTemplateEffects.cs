@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialTemplates;
 using SimpleIdServer.IdServer.DTOs;
+using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.Vc.Models;
 using System.Text;
 using System.Text.Json;

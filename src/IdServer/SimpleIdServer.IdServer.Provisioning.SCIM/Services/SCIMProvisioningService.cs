@@ -28,7 +28,7 @@ public class SCIMProvisioningService : IProvisioningService
         using (var scimClient = new SCIMClient(options.SCIMEdp))
         {
             var accessToken = await GetAccessToken(options);
-            var searchUsers = await scimClient.SearchUsers(new SearchRequest
+            var searchUsers = await scimClient.SearchUsers(new Scim.Client.SearchRequest
             {
                 Count = options.Count,
                 StartIndex = 1
@@ -42,7 +42,7 @@ public class SCIMProvisioningService : IProvisioningService
             var allPages = Enumerable.Range(2, nbPages - 1);
             foreach (var currentPage in allPages)
             {
-                var newSearchUsers = await scimClient.SearchUsers(new SearchRequest
+                var newSearchUsers = await scimClient.SearchUsers(new Scim.Client.SearchRequest
                 {
                     Count = count,
                     StartIndex = currentPage * count

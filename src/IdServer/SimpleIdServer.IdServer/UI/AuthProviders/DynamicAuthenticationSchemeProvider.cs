@@ -128,7 +128,6 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
                 if (authenticationHandlerType == null) return null;
                 var liteOptionType = Assembly.GetEntryAssembly().GetType(provider.AuthSchemeProviderDefinition.OptionsFullQualifiedName);
                 if (liteOptionType == null) return null;
-
                 var optionType = authenticationHandlerType.GetGenericArguments().First();
                 var liteOptionInterface = typeof(IDynamicAuthenticationOptions<>).MakeGenericType(optionType);
                 var convert = liteOptionInterface.GetMethod("Convert");
@@ -148,7 +147,7 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
                 if (signingSchemeProp != null)
                     signingSchemeProp.SetValue(options, Constants.DefaultExternalCookieAuthenticationScheme);
                 var oauthOptions = options as OAuthOptions;
-                if (oauthOptions != null && handlerType.FullName == null)
+                if (oauthOptions != null)
                 {
                     if (!_protections.ContainsKey(handlerType.FullName))
                         _protections.Add(handlerType.FullName, _dataProtection.CreateProtector(handlerType.FullName));

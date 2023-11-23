@@ -7,6 +7,7 @@ using SimpleIdServer.IdServer.Api.ApiResources;
 using SimpleIdServer.IdServer.Api.Scopes;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
+using SimpleIdServer.IdServer.Store;
 using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Text.Json;

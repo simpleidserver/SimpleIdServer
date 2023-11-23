@@ -10,6 +10,7 @@ using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Saml.Idp.Extensions;
+using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.WsFederation;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq.Dynamic.Core;

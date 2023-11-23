@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.CertificateAuthorities;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
+using SimpleIdServer.IdServer.Store;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;

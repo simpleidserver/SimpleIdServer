@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.AuthenticationSchemeProviders;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Store;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -29,7 +30,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         {
             var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
-            var searchRequest = new DTOs.SearchRequest
+            var searchRequest = new SearchRequest
             {
                 Filter = SanitizeExpression(action.Filter),
                 OrderBy = SanitizeExpression(action.OrderBy),
