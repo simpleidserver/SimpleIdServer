@@ -271,6 +271,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IKeyStore, InMemoryKeyStore>();
             services.AddTransient<IDeviceCodeGrantTypeValidator, DeviceCodeGrantTypeValidator>();
             services.AddTransient<IDPOPProofValidator, DPOPProofValidator>();
+            services.AddTransient<ISessionHelper, SessionHelper>();
             return services;
         }
 

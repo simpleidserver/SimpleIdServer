@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Radzen;
-using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.Website;
 using SimpleIdServer.IdServer.Website.Stores.GroupStore;
@@ -26,6 +25,7 @@ namespace Microsoft.Extensions.DependencyInjection
                     rdt.Name = "SimpleIdServer";
                 });
             });
+            services.AddTransient<SidCookieEventHandler>();
             services.AddScoped<IOTPQRCodeGenerator, OTPQRCodeGenerator>();
             services.AddScoped<IGroupService, GroupEffects>();
             services.AddScoped<DialogService>();
@@ -67,6 +67,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 options.Cookie.SameSite = SameSiteMode.None;
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 options.Cookie.HttpOnly = true;
+                options.EventsType = typeof(SidCookieEventHandler);
             })
             .AddCustomOpenIdConnect("oidc", config =>
             {

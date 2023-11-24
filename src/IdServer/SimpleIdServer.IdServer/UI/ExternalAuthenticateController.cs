@@ -97,7 +97,7 @@ namespace SimpleIdServer.IdServer.UI
             if (result.Properties.Items.ContainsKey(RETURN_URL_NAME))
                 return await Authenticate(prefix, result.Properties.Items[RETURN_URL_NAME], Constants.Areas.Password, user, cancellationToken, false);     
 
-            return await Sign(prefix, "~/", Constants.Areas.Password, user, cancellationToken, false);
+            return await Sign(prefix, "~/", Constants.Areas.Password, user, null, cancellationToken, false);
         }
 
         private async Task<User> JustInTimeProvision(string realm, AuthenticateResult authResult, CancellationToken cancellationToken)

@@ -3,8 +3,7 @@
 		<TargetFramework>net7.0</TargetFramework>
 	</PropertyGroup>
 	<ItemGroup>
-	  <PackageReference Include="MySql.Data" Version="8.2.0" />
-	  <PackageReference Include="MySql.EntityFrameworkCore" Version="7.0.10" />
+	  <PackageReference Include="MySql.EntityFrameworkCore" Version="7.0.*" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Store\SimpleIdServer.IdServer.Store.csproj" />

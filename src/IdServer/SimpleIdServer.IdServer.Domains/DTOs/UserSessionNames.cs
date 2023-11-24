@@ -10,4 +10,5 @@ public class UserSessionNames
     public const string ExpirationDateTime = "exp_datetime";
     public const string State = "state";
     public const string Realm = "realm";
+    public const string ClientIds = "client_ids";
 }

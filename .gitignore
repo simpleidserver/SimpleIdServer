@@ -215,3 +215,4 @@ wwwroot/
 # Ignore docfx
 
 docs/_site/
+/src/IdServer/SimpleIdServer.IdServer.MySQLMigrations/Migrations/StoreDbContextModelSnapshot.cs

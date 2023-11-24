@@ -447,6 +447,13 @@ namespace SimpleIdServer.IdServer.Builders
             return this;
         }
 
+        public TraditionalWebsiteClientBuilder SetBackChannelLogoutUrl(string logoutUrl)
+        {
+            _client.BackChannelLogoutUri = logoutUrl;
+            _client.BackChannelLogoutSessionRequired = true;
+            return this;
+        }
+
         #endregion
 
         #region DPOP

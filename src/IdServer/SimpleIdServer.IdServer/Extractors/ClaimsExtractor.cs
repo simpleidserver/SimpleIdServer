@@ -30,12 +30,15 @@ namespace SimpleIdServer.IdServer.Extractors
 
         public async Task<Dictionary<string, object>> ResolveGroupsAndExtract(HandlerContext context, IEnumerable<IClaimMappingRule> mappingRules)
         {
-            var grpPathLst = context.User.Groups.SelectMany(g => g.ResolveAllPath()).Distinct();
+            var newContext = new HandlerContext(context.Request, context.Realm, context.Options);
+            newContext.SetClient(context.Client);
+            newContext.SetUser((User)context.User.Clone());
+            var grpPathLst = newContext.User.Groups.SelectMany(g => g.ResolveAllPath()).Distinct();
             var allGroups = await _groupRepository.Query().Include(g => g.Roles).AsNoTracking().Where(g => grpPathLst.Contains(g.FullPath)).ToListAsync();
             var roles = allGroups.SelectMany(g => g.Roles).Select(r => r.Name).Distinct();
             foreach (var role in roles)
-                context.User.AddClaim(Constants.UserClaims.Role, role);
-            return Extract(context, mappingRules);
+                newContext.User.AddClaim(Constants.UserClaims.Role, role);
+            return Extract(newContext, mappingRules);
         }
 
         public Dictionary<string, object> Extract(HandlerContext context, IEnumerable<IClaimMappingRule> mappingRules)

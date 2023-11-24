@@ -96,6 +96,8 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                 await responseTypeHandler.Enrich(new EnrichParameter { AuthorizationDetails = grantRequest.AuthorizationDetails, Scopes = grantRequest.Scopes, Audiences = grantRequest.Audiences, GrantId = grant?.Id, Claims = context.Request.RequestData.GetClaimsFromAuthorizationRequest() }, context, cancellationToken);
 
             _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? _options.DefaultTokenProfile)).Enrich(context);
+            UpdateSession(context);
+            await _userRepository.SaveChanges(cancellationToken);
             return new RedirectURLAuthorizationResponse(redirectUri, context.Response.Parameters);
         }
 
@@ -110,7 +112,6 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             var grant = context.User.Consents.FirstOrDefault(g => g.Id == grantId);
             if (grant?.Status == ConsentStatus.ACCEPTED && context.IsComingFromConsentScreen())
             {
-                await _userRepository.SaveChanges(cancellationToken);
                 return grant;
             }
 
@@ -152,9 +153,20 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             }
 
             if(context.Client.IsConsentDisabled) grant.Accept();
-            await _userRepository.SaveChanges(cancellationToken);
             if(!context.Client.IsConsentDisabled) throw new OAuthUserConsentRequiredException(grant.Id);
             return grant;
+        }
+
+        protected void UpdateSession(HandlerContext context)
+        {
+            if (context.User == null) return;
+            var session = context.User.GetActiveSession(context.Realm);
+            var clientIds = session.ClientIds;
+            if (session != null && !clientIds.Contains(context.Client.ClientId))
+            {
+                clientIds.Add(context.Client.ClientId);
+                session.ClientIds = clientIds;
+            }
         }
 
         private string BuildSessionState(HandlerContext handlerContext)

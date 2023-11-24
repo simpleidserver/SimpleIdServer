@@ -18,6 +18,26 @@ namespace SimpleIdServer.IdServer.Domains
         public UserSessionStates State { get; set; }
         [JsonPropertyName(UserSessionNames.Realm)]
         public string Realm { get; set; }
+        [JsonPropertyName(UserSessionNames.ClientIds)]
+        public List<string> ClientIds
+        {
+            get
+            {
+                return SerializedClientIds.Split(",").ToList();
+            }
+            set
+            {
+                if(value == null)
+                {
+                    SerializedClientIds = string.Empty;
+                    return;
+                }
+
+                SerializedClientIds = string.Join(",", value);
+            }
+        }
+        [JsonIgnore]
+        public string SerializedClientIds { get; set; } = string.Empty;
         [JsonIgnore]
         public User User { get; set; }
 

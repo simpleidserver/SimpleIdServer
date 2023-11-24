@@ -26,6 +26,14 @@
                 ColumnWidth="300px">
         <Columns>
             <RadzenDataGridColumn TItem="UserSession" Property="AuthenticationDateTime" Title="Authentication time" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Width="80px" />
+            <RadzenDataGridColumn TItem="UserSession" Title="Clients" Filterable="false" Sortable="false" Width="80px">
+                <Template Context="data">
+                    @foreach(var clientId in data.ClientIds)
+                    {
+                        <RadzenLink Text="@clientId" Path="@($"/clients/{clientId}/settings")" />
+                    }
+                </Template>
+            </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="UserSession" Property="ExpirationDateTime" Title="Expiration time" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" />
             <RadzenDataGridColumn TItem="UserSession" Title="State" Filterable="false" Sortable="false" Width="80px">
                 <Template Context="data">

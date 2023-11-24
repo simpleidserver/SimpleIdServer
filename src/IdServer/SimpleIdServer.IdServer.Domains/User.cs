@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.IdServer.Domains
 {
-    public class User : IEquatable<User>
+    public class User : IEquatable<User>, ICloneable
     {
         private static Dictionary<string, KeyValuePair<Action<User, string>, Func<User, object>>> _userClaims = new Dictionary<string, KeyValuePair<Action<User, string>, Func<User, object>>>
         {
@@ -163,12 +163,15 @@ namespace SimpleIdServer.IdServer.Domains
             Consents.Remove(consent);
         }
 
-        public bool AddSession(string realm, DateTime expirationDateTime)
+        public bool AddSession(string realm, string clientId, DateTime expirationDateTime)
         {
             foreach (var session in Sessions.Where(s => s.Realm == realm))
                 session.State = UserSessionStates.Rejected;
 
-            Sessions.Add(new UserSession { SessionId = Guid.NewGuid().ToString(), AuthenticationDateTime = DateTime.UtcNow, ExpirationDateTime = expirationDateTime, State = UserSessionStates.Active, Realm = realm });
+            var clientIds = new List<string>();
+            if (!string.IsNullOrWhiteSpace(clientId))
+                clientIds.Add(clientId);
+            Sessions.Add(new UserSession { SessionId = Guid.NewGuid().ToString(), AuthenticationDateTime = DateTime.UtcNow, ExpirationDateTime = expirationDateTime, State = UserSessionStates.Active, Realm = realm, ClientIds = clientIds });
             return true;
         }
 
@@ -291,6 +294,39 @@ namespace SimpleIdServer.IdServer.Domains
         public override int GetHashCode()
         {
             return Id.GetHashCode();
+        }
+
+        public object Clone()
+        {
+            return new User
+            {
+                Name = Name,
+                Email = Email,
+                EmailVerified = EmailVerified,
+                Firstname = Firstname,
+                Lastname = Lastname,
+                CreateDateTime = CreateDateTime,
+                UpdateDateTime= UpdateDateTime,
+                Source = Source,
+                Id = Id,
+                OAuthUserClaims = OAuthUserClaims.Select(c => new UserClaim
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Type = c.Type,
+                    Value = c.Value                    
+                }).ToList(),
+                Groups = Groups.Select(g => new Group
+                {
+                    CreateDateTime = g.CreateDateTime,
+                    Name = g.Name,
+                    FullPath = g.FullPath,
+                    ParentGroupId = g.ParentGroupId,
+                    UpdateDateTime = g.UpdateDateTime,
+                    Description = g.Description,
+                    Id = g.Id
+                }).ToList()
+            };
         }
     }
 }

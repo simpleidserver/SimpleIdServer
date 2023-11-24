@@ -42,6 +42,15 @@
                     <RadzenTextBox Value=@GetOpenIdConnectUrl() Class="w-100"></RadzenTextBox>
                 </div>
             </div>
+            <!-- Id server swagger endpoint -->
+            <div class="row mt-2">
+                <div class="col-2">
+                    <RadzenLabel Text="IdServer swagger" Style="padding: 0px;"></RadzenLabel>
+                </div>
+                <div class="col">
+                    <RadzenTextBox Value=@GetIdServerSwaggerUrl() Class="w-100"></RadzenTextBox>
+                </div>
+            </div>
             <!-- WSFederation -->
             <div class="row mt-2">
                 <div class="col-2">
@@ -104,6 +113,7 @@
 @code {
     string activeRealm;
     string GetOpenIdConnectUrl() => $"{GetBaseUrl()}/.well-known/openid-configuration";
+    string GetIdServerSwaggerUrl() => $"{GetBaseUrl()}/swagger";
     string GetFederationMetadataUrl() => $"{GetBaseUrl()}/FederationMetadata/2007-06/FederationMetadata.xml";
     string GetSamlMetadataUrl() => $"{GetBaseUrl()}/saml/metadata";
     string GetSCIMSchemasUrl() => $"{Options.Value.SCIMUrl}/Schemas";

@@ -1,16 +1,20 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.Did;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Domains.DTOs;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
@@ -26,21 +30,37 @@ namespace SimpleIdServer.IdServer.Api.Users
     public class UsersController : BaseController
     {
         private readonly IUserRepository _userRepository;
+        private readonly IAuthenticationHelper _authenticationHelper;
         private readonly IRealmRepository _realmRepository;
         private readonly IGroupRepository _groupRepository;
         private readonly IBusControl _busControl;
         private readonly IJwtBuilder _jwtBuilder;
+        private readonly ISessionHelper _sessionHelper;
         private readonly ILogger<UsersController> _logger;
+        private readonly IdServerHostOptions _options;
         private readonly IEnumerable<IDIDGenerator> _generators;
 
-        public UsersController(IUserRepository userRepository, IRealmRepository realmRepository, IGroupRepository groupRepository, IBusControl busControl, IJwtBuilder jwtBuilder, ILogger<UsersController> logger, IEnumerable<IDIDGenerator> generators)
+        public UsersController(
+            IUserRepository userRepository,
+            IAuthenticationHelper authenticationHelper,
+            IRealmRepository realmRepository, 
+            IGroupRepository groupRepository,
+            IBusControl busControl, 
+            IJwtBuilder jwtBuilder,
+            ISessionHelper sessionHelper,
+            ILogger<UsersController> logger,
+            IOptions<IdServerHostOptions> options,
+            IEnumerable<IDIDGenerator> generators)
         {
             _userRepository = userRepository;
+            _authenticationHelper = authenticationHelper;
             _realmRepository = realmRepository;
             _groupRepository = groupRepository;
             _busControl = busControl;
             _jwtBuilder = jwtBuilder;
+            _sessionHelper = sessionHelper;
             _logger = logger;
+            _options = options.Value;
             _generators = generators;
         }
 
@@ -576,10 +596,12 @@ namespace SimpleIdServer.IdServer.Api.Users
                 try
                 {
                     CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
+                    var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
                     var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_USER, id));
                     var session = user.Sessions.SingleOrDefault(c => c.SessionId == sessionId);
                     if (session == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_USER_SESSION, sessionId));
+                    await _sessionHelper.Revoke(_authenticationHelper.GetLogin(user), session, issuer, cancellationToken);
                     session.State = UserSessionStates.Rejected;
                     user.UpdateDateTime = DateTime.UtcNow;
                     await _userRepository.SaveChanges(cancellationToken);

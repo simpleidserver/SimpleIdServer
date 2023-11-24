@@ -10,11 +10,11 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
-using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
@@ -23,7 +23,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Security.Claims;
 using System.Text.Json.Nodes;
 using System.Threading;
@@ -38,6 +37,8 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IUserRepository _userRepository;
         private readonly IClientRepository _clientRepository;
         private readonly IJwtBuilder _jwtBuilder;
+        private readonly ISessionHelper _sessionHelper;
+        private readonly IAuthenticationHelper _authenticationHelper;
         private readonly IdServer.Infrastructures.IHttpClientFactory _httpClientFactory;
 
         public CheckSessionController(
@@ -45,13 +46,17 @@ namespace SimpleIdServer.IdServer.UI
             IUserRepository userRepository,
             IClientRepository clientRepository,
             IJwtBuilder jwtBuilder,
-            IdServer.Infrastructures.IHttpClientFactory httpClientFactory)
+            IdServer.Infrastructures.IHttpClientFactory httpClientFactory,
+            ISessionHelper sessionHelper,
+            IAuthenticationHelper authenticationHelper)
         {
             _options = options.Value;
             _userRepository = userRepository;
             _clientRepository = clientRepository;
             _jwtBuilder = jwtBuilder;
             _httpClientFactory = httpClientFactory;
+            _sessionHelper = sessionHelper;
+            _authenticationHelper = authenticationHelper;
         }
 
         [HttpGet]
@@ -111,8 +116,10 @@ namespace SimpleIdServer.IdServer.UI
                     url = Request.GetEncodedPathAndQuery().Replace($"/{Constants.EndPoints.EndSession}", $"/{Constants.EndPoints.EndSessionCallback}");
                 }
 
-                var sessionId = await GetSessionId(prefix, cancellationToken);
-                var frontChannelLogout = BuildFrontChannelLogoutUrl(validationResult.Client, sessionId);
+                var subject = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                var authenticatedUser = await _authenticationHelper.GetUserByLogin(subject, prefix, cancellationToken);
+                var activeSession = authenticatedUser.GetActiveSession(prefix);
+                var frontChannelLogout = BuildFrontChannelLogoutUrl(validationResult.Client, activeSession?.SessionId);
                 if (!string.IsNullOrWhiteSpace(frontChannelLogout))
                 {
                     Response.SetNoCache();
@@ -133,15 +140,19 @@ namespace SimpleIdServer.IdServer.UI
         [HttpGet]
         public async Task<IActionResult> EndSessionCallback([FromRoute] string prefix, CancellationToken cancellationToken)
         {
+            prefix = prefix ?? Constants.DefaultRealm;
             var jObjBody = Request.Query.ToJObject();
             var idTokenHint = jObjBody.GetIdTokenHintFromRpInitiatedLogoutRequest();
             var postLogoutRedirectUri = jObjBody.GetPostLogoutRedirectUriFromRpInitiatedLogoutRequest();
             var state = jObjBody.GetStateFromRpInitiatedLogoutRequest();
             try
             {
-                var sessionId = await GetSessionId(prefix, cancellationToken);
                 var validationResult = await Validate(prefix, postLogoutRedirectUri, idTokenHint, cancellationToken);
-                await SendLogoutToken(validationResult.Client, prefix, sessionId, cancellationToken);
+                var subject = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                var authenticatedUser = await _authenticationHelper.GetUserByLogin(subject, prefix, cancellationToken);
+                var activeSession = authenticatedUser.GetActiveSession(prefix);
+                var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
+                await _sessionHelper.Revoke(subject, activeSession, issuer, cancellationToken);
                 Response.Cookies.Delete(_options.GetSessionCookieName());
                 await HttpContext.SignOutAsync();
                 if (!string.IsNullOrWhiteSpace(state))
@@ -155,59 +166,6 @@ namespace SimpleIdServer.IdServer.UI
             {
                 return BuildError(ex.Code, ex.Message);
             }
-        }
-
-        protected async Task SendLogoutToken(Client openIdClient, string realm, string sessionId, CancellationToken cancellationToken)
-        {
-            if (string.IsNullOrWhiteSpace(openIdClient.BackChannelLogoutUri))
-                return;
-
-            var currentDateTime = DateTime.UtcNow;
-            var events = new JsonObject
-            {
-                { "http://schemas.openid.net/event/backchannel-logout", new JsonObject() }
-            };
-            var jwsPayload = new Dictionary<string, object>
-            {
-                { JwtRegisteredClaimNames.Sub, User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value },
-                { JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString() },
-                { Constants.UserClaims.Events, events }
-            };
-            if (openIdClient.BackChannelLogoutSessionRequired)
-            {
-                jwsPayload.Add(JwtRegisteredClaimNames.Sid, sessionId);
-            }
-
-            var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Issuer = issuer,
-                Audience = openIdClient.ClientId,
-                IssuedAt = currentDateTime,
-                Claims = jwsPayload
-            };
-            var logoutToken = _jwtBuilder.Sign(realm, tokenDescriptor, openIdClient.TokenSignedResponseAlg);
-            using (var httpClient = _httpClientFactory.GetHttpClient())
-            {
-                var body = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
-                {
-                    new KeyValuePair<string, string>("logout_token", logoutToken)
-                });
-                var request = new HttpRequestMessage
-                {
-                    Method = HttpMethod.Post,
-                    Content = body,
-                    RequestUri = new Uri(openIdClient.BackChannelLogoutUri)
-                };
-                await httpClient.SendAsync(request);
-            }
-        }
-
-        protected async Task<string> GetSessionId(string realm, CancellationToken cancellationToken)
-        {
-            var userId = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.GetBySubject(userId, realm, cancellationToken);
-            return user.GetActiveSession(realm)?.SessionId;
         }
 
         protected string BuildFrontChannelLogoutUrl(Client client, string sessionId)

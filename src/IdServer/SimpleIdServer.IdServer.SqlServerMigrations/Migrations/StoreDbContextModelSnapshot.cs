@@ -17,7 +17,7 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.13")
+                .HasAnnotation("ProductVersion", "7.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -2331,6 +2331,10 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.Property<DateTime>("AuthenticationDateTime")
                         .HasColumnType("datetime2")
                         .HasAnnotation("Relational:JsonPropertyName", "auth_datetime");
+
+                    b.Property<string>("SerializedClientIds")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ExpirationDateTime")
                         .HasColumnType("datetime2")

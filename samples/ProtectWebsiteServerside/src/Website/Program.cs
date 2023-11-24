@@ -1,17 +1,20 @@
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Builder;
-using static System.Net.WebRequestMethods;
+using Website;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddTransient<CustomCookieEventHandler>();
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = "Cookies";
     options.DefaultChallengeScheme = "sid";
 })
-    .AddCookie("Cookies")
+    .AddCookie("Cookies", options =>
+    {
+        options.EventsType = typeof(CustomCookieEventHandler);
+    })
     .AddOpenIdConnect("sid", options =>
     {
         options.SignInScheme = "Cookies";

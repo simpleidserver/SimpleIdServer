@@ -98,7 +98,7 @@ namespace SimpleIdServer.IdServer.UI
         {
             if (!IsProtected(returnUrl))
             {
-                return await Sign(realm, returnUrl, currentAmr, user, token, rememberLogin);
+                return await Sign(realm, returnUrl, currentAmr, user, null, token, rememberLogin);
             }
 
             var unprotectedUrl = Unprotect(returnUrl);
@@ -111,7 +111,7 @@ namespace SimpleIdServer.IdServer.UI
             string amr;
             if (acr == null || string.IsNullOrWhiteSpace(amr = _amrHelper.FetchNextAmr(acr, currentAmr)))
             {
-                return await Sign(realm, unprotectedUrl, currentAmr, user, token, rememberLogin);
+                return await Sign(realm, unprotectedUrl, currentAmr, user, clientId, token, rememberLogin);
             }
 
             var allAmr = acr.AuthenticationMethodReferences;
@@ -121,9 +121,9 @@ namespace SimpleIdServer.IdServer.UI
             return RedirectToAction("Index", "Authenticate", new { area = amr, ReturnUrl = returnUrl });
         }
 
-        protected async Task<IActionResult> Sign(string realm, string returnUrl, string currentAmr, User user, CancellationToken token, bool rememberLogin = false)
+        protected async Task<IActionResult> Sign(string realm, string returnUrl, string currentAmr, User user, string clientId, CancellationToken token, bool rememberLogin = false)
         {
-            await AddSession(realm, user, token);
+            await AddSession(realm, user, clientId, token);
             var offset = DateTimeOffset.UtcNow.AddSeconds(_options.CookieAuthExpirationTimeInSeconds);
             var claims = _userTransformer.Transform(user);
             var claimsIdentity = new ClaimsIdentity(claims, currentAmr);
@@ -153,11 +153,11 @@ namespace SimpleIdServer.IdServer.UI
             return Redirect(returnUrl);
         }
 
-        protected async Task AddSession(string realm, User user, CancellationToken cancellationToken)
+        protected async Task AddSession(string realm, User user, string clientId, CancellationToken cancellationToken)
         {
             var currentDateTime = DateTime.UtcNow;
             var expirationDateTime = currentDateTime.AddSeconds(_options.CookieAuthExpirationTimeInSeconds);
-            user.AddSession(realm, expirationDateTime);
+            user.AddSession(realm, clientId, expirationDateTime);
             await _userRepository.SaveChanges(cancellationToken);
             Response.Cookies.Append(_options.GetSessionCookieName(), user.GetActiveSession(realm).SessionId, new CookieOptions
             {

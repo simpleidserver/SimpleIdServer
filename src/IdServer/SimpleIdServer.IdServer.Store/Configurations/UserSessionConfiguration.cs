@@ -11,6 +11,7 @@ namespace SimpleIdServer.IdServer.Store.Configurations
         public void Configure(EntityTypeBuilder<UserSession> builder)
         {
             builder.HasKey(s => s.SessionId);
+            builder.Ignore(s => s.ClientIds);
         }
     }
 }
