@@ -29,7 +29,6 @@ public abstract class OTPAuthenticationService : GenericAuthenticationService<Ba
 
     protected override Task<CredentialsValidationResult> Validate(string realm, User authenticatedUser, BaseOTPAuthenticateViewModel viewModel, CancellationToken cancellationToken)
     {
-        if (authenticatedUser.Email != viewModel.Login) return Task.FromResult(CredentialsValidationResult.Error("bad_email", "bad_email"));
         if (authenticatedUser.ActiveOTP == null) return Task.FromResult(CredentialsValidationResult.Error("no_active_otp", "no_active_otp"));
         var activeOtp = authenticatedUser.ActiveOTP;
         var otpAuthenticator = _otpAuthenticators.Single(a => a.Alg == activeOtp.OTPAlg);

@@ -119,9 +119,13 @@ namespace Microsoft.AspNetCore.Builder
                     pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UMAConfiguration,
                     defaults: new { controller = "UMAConfiguration", action = "Get" });
 
-                webApplication.SidMapControllerRoute("umaPermissionsAddMultiple",
+                webApplication.SidMapControllerRoute("umaPermissionsAdd",
                     pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UMAPermissions,
-                    defaults: new { controller = "UMAPermissions", action = "AddList" });
+                    defaults: new { controller = "UMAPermissions", action = "Add" });
+
+                webApplication.SidMapControllerRoute("umaPermissionsAddMultiple",
+                    pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UMAPermissions + "/bulk",
+                    defaults: new { controller = "UMAPermissions", action = "Bulk" });
 
                 webApplication.SidMapControllerRoute("umaResourcesGetAll",
                     pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UMAResources,

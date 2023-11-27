@@ -45,6 +45,7 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
         var user = registrationProgress.User ?? new Domains.User
         {
             Id = Guid.NewGuid().ToString(),
+            Name = Guid.NewGuid().ToString(),
             CreateDateTime = DateTime.UtcNow,
             UpdateDateTime = DateTime.UtcNow
         };
