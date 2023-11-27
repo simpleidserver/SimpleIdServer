@@ -176,9 +176,12 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             using (var scope = _factory.Services.CreateScope())
             {
                 var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+                var userSessionRepository = scope.ServiceProvider.GetRequiredService<IUserSessionResitory>();
                 var user = await userRepository.GetBySubject("user", Constants.DefaultRealm, CancellationToken.None);
-                user.GetActiveSession(Constants.DefaultRealm).AuthenticationDateTime = DateTime.UtcNow.AddSeconds(seconds);
-                await userRepository.SaveChanges(CancellationToken.None);
+                var sessions = await userSessionRepository.GetActive(user.Id, Constants.DefaultRealm, CancellationToken.None);
+                foreach(var session in sessions)
+                    session.AuthenticationDateTime = DateTime.UtcNow.AddSeconds(seconds);
+                await userSessionRepository.SaveChanges(CancellationToken.None);
             }
         }
 

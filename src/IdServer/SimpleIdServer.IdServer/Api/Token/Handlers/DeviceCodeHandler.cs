@@ -24,7 +24,6 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
     {
         private readonly IDeviceCodeGrantTypeValidator _validator;
         private readonly IDeviceAuthCodeRepository _deviceAuthCodeRepository;
-        private readonly IUserRepository _userRepository;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
         private readonly IAuthenticationHelper _authenticationHelper;
         private readonly IBusControl _busControl;
@@ -33,7 +32,6 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         public DeviceCodeHandler(
             IClientAuthenticationHelper clientAuthenticationHelper,
             IDeviceAuthCodeRepository deviceAuthCodeRepository,
-            IUserRepository userRepository,
             IEnumerable<ITokenBuilder> tokenBuilders,
             IEnumerable<ITokenProfile> tokenProfiles,
             IOptions<IdServerHostOptions> options,
@@ -45,7 +43,6 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             _validator = validator;
             _busControl = busControl;
             _deviceAuthCodeRepository = deviceAuthCodeRepository;
-            _userRepository = userRepository;
             _tokenBuilders = tokenBuilders;
             _authenticationHelper = authenticationHelper;
             _dpopProofValidator = dpopProofValidator;
@@ -71,7 +68,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     scopeLst = deviceAuthCode.Scopes;
                     activity?.SetTag("scopes", string.Join(",", deviceAuthCode.Scopes));
                     var user = await _authenticationHelper.GetUserByLogin(deviceAuthCode.UserLogin, context.Realm, cancellationToken);
-                    context.SetUser(user);
+                    context.SetUser(user, null);
                     foreach (var tokenBuilder in _tokenBuilders)
                         await tokenBuilder.Build(new BuildTokenParameter { Scopes = deviceAuthCode.Scopes }, context, cancellationToken);
 

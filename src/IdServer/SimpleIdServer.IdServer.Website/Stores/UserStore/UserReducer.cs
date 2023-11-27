@@ -124,6 +124,36 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
 
         #endregion
 
+        #region SearchUserSessionsState
+
+        [ReducerMethod]
+        public static SearchUserSessionsState ReduceSearchUserSessionsAction(SearchUserSessionsState state, SearchUserSessionsAction act) => new(isLoading: true, userSessions: new List<UserSession>());
+
+        [ReducerMethod]
+        public static SearchUserSessionsState ReduceSearchUserSessionsSuccessAction(SearchUserSessionsState state, SearchUserSessionsSuccessAction act)
+        {
+            return state with
+            {
+                IsLoading = false,
+                UserSessions = act.UserSessions,
+                Count = act.Count
+            };
+        }
+
+        [ReducerMethod]
+        public static SearchUserSessionsState ReduceRevokeUserSessionSuccessAction(SearchUserSessionsState state, RevokeUserSessionSuccessAction act)
+        {
+            var sessions = state.UserSessions;
+            var session = sessions.Single(s => s.SessionId == act.SessionId);
+            session.State = UserSessionStates.Rejected;
+            return state with
+            {
+                UserSessions = sessions
+            };
+        }
+
+        #endregion
+
         #region UserState
 
         [ReducerMethod]
@@ -172,14 +202,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         {
             var externalAuthProvider = state.User.ExternalAuthProviders.Single(c => c.Subject == act.Subject && c.Scheme == act.Scheme);
             state.User.ExternalAuthProviders.Remove(externalAuthProvider);
-            return state;
-        }
-
-        [ReducerMethod]
-        public static UserState ReduceRevokeUserSessionSuccessAction(UserState state, RevokeUserSessionSuccessAction act)
-        {
-            var session = state.User.Sessions.Single(s => s.SessionId == act.SessionId);
-            session.State = UserSessionStates.Rejected;
             return state;
         }
 
@@ -269,10 +291,10 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         public static UpdateUserState ReduceRevokeUserSessionSuccessAction(UpdateUserState state, RevokeUserSessionSuccessAction act) => new(false);
 
         [ReducerMethod]
-        public static UpdateUserState ReduceRevokeUserSessionAction(UpdateUserState state, UpdateUserClaimsAction act) => new(true);
+        public static UpdateUserState ReduceUpdateUserClaimsAction(UpdateUserState state, UpdateUserClaimsAction act) => new(true);
 
         [ReducerMethod]
-        public static UpdateUserState ReduceRevokeUserSessionSuccessAction(UpdateUserState state, UpdateUserClaimsSuccessAction act) => new(false);
+        public static UpdateUserState ReduceUpdateUserClaimsSuccessAction(UpdateUserState state, UpdateUserClaimsSuccessAction act) => new(false);
 
         [ReducerMethod]
         public static UpdateUserState ReduceAddUserCredentialAction(UpdateUserState state, AddUserCredentialAction act) => new(true);

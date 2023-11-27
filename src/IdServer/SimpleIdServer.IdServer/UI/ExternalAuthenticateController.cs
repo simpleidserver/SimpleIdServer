@@ -40,13 +40,14 @@ namespace SimpleIdServer.IdServer.UI
             IClientRepository clientRepository,
             IAmrHelper amrHelper,
             IUserRepository userRepository,
+            IUserSessionResitory userSessionRepository,
             ILogger<ExternalAuthenticateController> logger,
             IAuthenticationSchemeProvider authenticationSchemeProvider,
             IUserTransformer userTransformer,
             IAuthenticationSchemeProviderRepository authenticationSchemeProviderRepository,
             IAuthenticationHelper authenticationHelper,
             IRealmRepository realmRepository,
-            IBusControl busControl) : base(clientRepository, userRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, options)
+            IBusControl busControl) : base(clientRepository, userRepository, userSessionRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, options)
         {
             _logger = logger;
             _authenticationSchemeProvider = authenticationSchemeProvider;

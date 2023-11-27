@@ -51,7 +51,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
             if (handlerContext.User != null)
             {
                 jwsPayload.Claims.Add(JwtRegisteredClaimNames.Sub, handlerContext.User.Name);
-                var activeSession = handlerContext.User.GetActiveSession(handlerContext.Realm ?? Constants.DefaultRealm);
+                var activeSession = handlerContext.Session;
                 if (activeSession != null)
                     jwsPayload.Claims.Add(JwtRegisteredClaimNames.AuthTime, activeSession.AuthenticationDateTime.ConvertToUnixTimestamp());
             }

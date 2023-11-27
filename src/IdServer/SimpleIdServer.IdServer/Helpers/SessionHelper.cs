@@ -29,17 +29,20 @@ public class SessionHelper : ISessionHelper
     private readonly IdServer.Infrastructures.IHttpClientFactory _httpClientFactory;
     private readonly IJwtBuilder _jwtBuilder;
     private readonly IClientRepository _clientRepository;
+    private readonly IUserSessionResitory _userSessionRepository;
     private readonly IdServerHostOptions _options;
 
     public SessionHelper(
         IdServer.Infrastructures.IHttpClientFactory httpClientFactory,
         IJwtBuilder jwtBuilder,
         IClientRepository clientRepository,
+        IUserSessionResitory userSessionRepository,
         IOptions<IdServerHostOptions> options)
     {
         _httpClientFactory = httpClientFactory;
         _jwtBuilder = jwtBuilder;
         _clientRepository = clientRepository;
+        _userSessionRepository = userSessionRepository;
         _options = options.Value;
     }
 

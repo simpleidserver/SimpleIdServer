@@ -141,12 +141,6 @@ namespace SimpleIdServer.IdServer.Builders
             return this;
         }
 
-        public UserBuilder AddSession(string id, string realm, DateTime expirationTime)
-        {
-            _user.Sessions.Add(new UserSession { SessionId = id, AuthenticationDateTime = DateTime.UtcNow, ExpirationDateTime = expirationTime, State = UserSessionStates.Active, Realm = realm });
-            return this;
-        }
-
         public UserBuilder GenerateRandomHOTPKey()
         {
             _user.GenerateHOTP();

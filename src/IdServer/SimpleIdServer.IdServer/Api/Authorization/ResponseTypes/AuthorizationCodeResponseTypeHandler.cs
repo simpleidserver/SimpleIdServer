@@ -42,7 +42,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseTypes
 
         public async Task Enrich(EnrichParameter parameter, HandlerContext context, CancellationToken cancellationToken)
         {
-            var activeSession = context.User.GetActiveSession(context.Realm ?? Constants.DefaultRealm);
+            var activeSession = context.Session;
             var dic = new JsonObject
             {
                 [JwtRegisteredClaimNames.Sub] = context.User.Name
@@ -60,7 +60,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseTypes
 
             CheckPKCEParameters(context);
             var dpopJkt = context.Request.RequestData.GetDPOPJktFromAuthorizationRequest();
-            var authCode = await _grantedTokenHelper.AddAuthorizationCode(dic, parameter.GrantId, _options.AuthorizationCodeExpirationInSeconds, dpopJkt, cancellationToken);
+            var authCode = await _grantedTokenHelper.AddAuthorizationCode(dic, parameter.GrantId, _options.AuthorizationCodeExpirationInSeconds, dpopJkt, context.Session?.SessionId, cancellationToken);
             context.Response.Add(AuthorizationResponseParameters.Code, authCode);
             var isScopeContainsOfflineAccess = parameter.Scopes.Contains(Constants.StandardScopes.OfflineAccessScope.Name);
             if (isScopeContainsOfflineAccess)

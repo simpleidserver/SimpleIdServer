@@ -79,10 +79,6 @@ namespace SimpleIdServer.IdServer.Domains
                 return properties;
             }
         }
-        public UserSession? GetActiveSession(string realm)
-        {
-            return Sessions.FirstOrDefault(s => s.State == UserSessionStates.Active && DateTime.UtcNow < s.ExpirationDateTime && s.Realm == realm);
-        }
         [JsonIgnore]
         public UserCredential? ActiveOTP
         {
@@ -161,18 +157,6 @@ namespace SimpleIdServer.IdServer.Domains
         {
             var consent = Consents.Single(c => c.Id == consentId);
             Consents.Remove(consent);
-        }
-
-        public bool AddSession(string realm, string clientId, DateTime expirationDateTime)
-        {
-            foreach (var session in Sessions.Where(s => s.Realm == realm))
-                session.State = UserSessionStates.Rejected;
-
-            var clientIds = new List<string>();
-            if (!string.IsNullOrWhiteSpace(clientId))
-                clientIds.Add(clientId);
-            Sessions.Add(new UserSession { SessionId = Guid.NewGuid().ToString(), AuthenticationDateTime = DateTime.UtcNow, ExpirationDateTime = expirationDateTime, State = UserSessionStates.Active, Realm = realm, ClientIds = clientIds });
-            return true;
         }
 
         public void UpdateEmail(string value) => UpdateClaim(JwtRegisteredClaimNames.Email, value);

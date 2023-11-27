@@ -18,6 +18,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Extractors;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Saml.Idp.DTOs;
 using SimpleIdServer.IdServer.Saml.Idp.Extensions;
@@ -242,7 +243,7 @@ namespace SimpleIdServer.IdServer.Saml2.Api
             var nameIdentifier = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
             var user = await _userRepository.GetBySubject(nameIdentifier, realm ?? Constants.DefaultRealm, cancellationToken);
             var context = new HandlerContext(new HandlerContextRequest(issuer, string.Empty, null, null, null, (X509Certificate2)null, null), realm, _options);
-            context.SetUser(user);
+            context.SetUser(user, null);
             var claims = (await _scopeClaimsExtractor.ExtractClaims(context, client.Scopes, ScopeProtocols.SAML)).Select(c => new Claim(c.Key, c.Value.ToString())).ToList();
             if (claims.Count(t => t.Type == ClaimTypes.NameIdentifier) == 0)
                 throw new OAuthException(string.Empty, "token cannot be generated if there is no claim, please specify one or more scope in the client");

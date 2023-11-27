@@ -1835,6 +1835,9 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.Property<string>("OriginalData")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("SessionId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("TokenType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -2332,10 +2335,6 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .HasColumnType("datetime2")
                         .HasAnnotation("Relational:JsonPropertyName", "auth_datetime");
 
-                    b.Property<string>("SerializedClientIds")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("ExpirationDateTime")
                         .HasColumnType("datetime2")
                         .HasAnnotation("Relational:JsonPropertyName", "exp_datetime");
@@ -2344,6 +2343,10 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "realm");
+
+                    b.Property<string>("SerializedClientIds")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("State")
                         .HasColumnType("int")

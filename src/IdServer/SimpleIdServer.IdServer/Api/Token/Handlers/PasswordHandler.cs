@@ -12,7 +12,6 @@ using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System.Collections.Generic;
@@ -28,10 +27,8 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
     public class PasswordHandler : BaseCredentialsHandler
     {
         private readonly IPasswordGrantTypeValidator _passwordGrantTypeValidator;
-        private readonly IUserRepository _userRepository;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
         private readonly IGrantHelper _audienceHelper;
-        private readonly IAuthenticationHelper _userHelper;
         private readonly IBusControl _busControl;
         private readonly IDPOPProofValidator _dpopProofValidator;
         private readonly IPasswordAuthenticationService _passwordAuthenticationService;
@@ -39,22 +36,18 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
 
         public PasswordHandler(
             IPasswordGrantTypeValidator passwordGrantTypeValidator,
-            IUserRepository userRepository, 
             IEnumerable<ITokenProfile> tokenProfiles,
             IEnumerable<ITokenBuilder> tokenBuilders, 
             IClientAuthenticationHelper clientAuthenticationHelper,
             IGrantHelper audienceHelper,
-            IAuthenticationHelper userHelper,
             IBusControl busControl,
             IDPOPProofValidator dpopProofValidator,
             IPasswordAuthenticationService passwordAuthenticationService,
             IOptions<IdServerHostOptions> options) : base(clientAuthenticationHelper, tokenProfiles, options)
         {
             _passwordGrantTypeValidator = passwordGrantTypeValidator;
-            _userRepository = userRepository;
             _tokenBuilders = tokenBuilders;
             _audienceHelper = audienceHelper;
-            _userHelper = userHelper;
             _busControl = busControl;
             _dpopProofValidator = dpopProofValidator;
             _passwordAuthenticationService = passwordAuthenticationService;
@@ -93,7 +86,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     }, cancellationToken);
                     if (userAuthenticationResult.Status != ValidationStatus.AUTHENTICATE) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.BAD_USER_CREDENTIAL);
                     var user = userAuthenticationResult.AuthenticatedUser;
-                    context.SetUser(user);
+                    context.SetUser(user, null);
                     var result = BuildResult(context, extractionResult.Scopes);
                     foreach (var tokenBuilder in _tokenBuilders)
                         await tokenBuilder.Build(new BuildTokenParameter { AuthorizationDetails = extractionResult.AuthorizationDetails, Scopes = extractionResult.Scopes, Audiences = extractionResult.Audiences }, context, cancellationToken);

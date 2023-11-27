@@ -15,7 +15,6 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Store;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -31,7 +30,6 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential
         private readonly IEnumerable<ICredentialRequestParser> _parsers;
         private readonly IEnumerable<IProofValidator> _proofValidators;
         private readonly IGrantedTokenHelper _grantedTokenHelper;
-        private readonly IUserRepository _userRepository;
         private readonly IAuthenticationHelper _authenticationHelper;
         private readonly ICredentialTemplateClaimsExtractor _claimsExtractor;
         private readonly IEnumerable<ICredentialFormat> _formats;
@@ -42,7 +40,6 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential
             IEnumerable<ICredentialRequestParser> parsers, 
             IEnumerable<IProofValidator> proofValidators, 
             IGrantedTokenHelper grantedTokenHelper, 
-            IUserRepository userRepository, 
             IAuthenticationHelper authenticationHelper,
             ICredentialTemplateClaimsExtractor claimsExtractor,
             IEnumerable<ICredentialFormat> formats,
@@ -52,7 +49,6 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential
             _parsers = parsers;
             _proofValidators = proofValidators;
             _grantedTokenHelper = grantedTokenHelper;
-            _userRepository = userRepository;
             _authenticationHelper = authenticationHelper;
             _claimsExtractor = claimsExtractor;
             _formats = formats;
@@ -77,7 +73,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential
                     var user = await _authenticationHelper.GetUserByLogin(token.Subject, prefix, cancellationToken);
                     var validationResult = await CheckProof(request, user, cancellationToken);
                     context.SetClient(null);
-                    context.SetUser(user);
+                    context.SetUser(user, null);
                     var extractedClaims = await _claimsExtractor.ExtractClaims(context, extractionResult.CredentialTemplate);
                     var format = _formats.Single(v => v.Format == request.Format);
                     var result = format.Transform(new CredentialFormatParameter(extractedClaims, user, validationResult.IdentityDocument, extractionResult.CredentialTemplate, context.GetIssuer(), validationResult.CNonce, validationResult.CNonceExpiresIn));

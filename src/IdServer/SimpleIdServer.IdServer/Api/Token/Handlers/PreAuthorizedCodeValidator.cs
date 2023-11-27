@@ -38,7 +38,11 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IGrantedTokenHelper _grantedTokenHelper;
         private readonly IUserRepository _userRepository;
 
-        public PreAuthorizedCodeValidator(IClientAuthenticationHelper clientAuthenticationHelper, IClientRepository clientRepository, IGrantedTokenHelper grantedTokenHelper, IUserRepository userRepository)
+        public PreAuthorizedCodeValidator(
+            IClientAuthenticationHelper clientAuthenticationHelper, 
+            IClientRepository clientRepository, 
+            IGrantedTokenHelper grantedTokenHelper,
+            IUserRepository userRepository)
         {
             _clientAuthenticationHelper = clientAuthenticationHelper;
             _clientRepository = clientRepository;
@@ -61,7 +65,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             var preAuth = await _grantedTokenHelper.GetPreAuthCode(preAuthorizedCode, cancellationToken);
             if (preAuth == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_PREAUTHORIZEDCODE);
             var user = await _userRepository.GetById(preAuth.UserId, context.Realm, cancellationToken);
-            context.SetUser(user);
+            context.SetUser(user, null);
             return new ValidationResult(client, user);
         }
     }

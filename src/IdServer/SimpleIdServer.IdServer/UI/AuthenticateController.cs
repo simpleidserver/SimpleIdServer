@@ -18,7 +18,18 @@ namespace SimpleIdServer.IdServer.UI
     [Area(Constants.Areas.Password)]
     public class AuthenticateController : BaseAuthenticationMethodController<AuthenticatePasswordViewModel>
     {
-        public AuthenticateController(IPasswordAuthenticationService userAuthenticationService, IAuthenticationSchemeProvider authenticationSchemeProvider, IOptions<IdServerHostOptions> options, IDataProtectionProvider dataProtectionProvider, IAuthenticationHelper authenticationHelper, IClientRepository clientRepository, IAmrHelper amrHelper, IUserRepository userRepository, IUserTransformer userTransformer, IBusControl busControl) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userTransformer, busControl)
+        public AuthenticateController(
+            IPasswordAuthenticationService userAuthenticationService, 
+            IAuthenticationSchemeProvider authenticationSchemeProvider,
+            IOptions<IdServerHostOptions> options,
+            IDataProtectionProvider dataProtectionProvider,
+            IAuthenticationHelper authenticationHelper, 
+            IClientRepository clientRepository, 
+            IAmrHelper amrHelper, 
+            IUserRepository userRepository,
+            IUserSessionResitory userSessionRepository,
+            IUserTransformer userTransformer,
+            IBusControl busControl) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl)
         {
         }
 

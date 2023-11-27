@@ -208,7 +208,6 @@ namespace SimpleIdServer.IdServer.Store
                         .Include(u => u.IdentityProvisioning).ThenInclude(i => i.Definition)
                         .Include(u => u.Credentials)
                         .Include(u => u.ExternalAuthProviders)
-                        .Include(u => u.Sessions)
                         .Include(u => u.Groups)
                         .Include(u => u.Devices)
                         .Include(u => u.OAuthUserClaims)

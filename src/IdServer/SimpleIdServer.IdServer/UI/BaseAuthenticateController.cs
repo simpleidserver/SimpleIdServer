@@ -30,6 +30,7 @@ namespace SimpleIdServer.IdServer.UI
     {
         private readonly IClientRepository _clientRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IUserSessionResitory _userSessionRepository;
         private readonly IAmrHelper _amrHelper;
         private readonly IBusControl _busControl;
         private readonly IUserTransformer _userTransformer;
@@ -40,6 +41,7 @@ namespace SimpleIdServer.IdServer.UI
         public BaseAuthenticateController(
             IClientRepository clientRepository,
             IUserRepository userRepository,
+            IUserSessionResitory userSessionResitory,
             IAmrHelper amrHelper,
             IBusControl busControl,
             IUserTransformer userTransformer,
@@ -49,6 +51,7 @@ namespace SimpleIdServer.IdServer.UI
         {
             _clientRepository = clientRepository;
             _userRepository = userRepository;
+            _userSessionRepository = userSessionResitory;
             _amrHelper = amrHelper;
             _busControl = busControl;
             _userTransformer = userTransformer;
@@ -157,9 +160,20 @@ namespace SimpleIdServer.IdServer.UI
         {
             var currentDateTime = DateTime.UtcNow;
             var expirationDateTime = currentDateTime.AddSeconds(_options.CookieAuthExpirationTimeInSeconds);
-            user.AddSession(realm, clientId, expirationDateTime);
+            var session = new UserSession
+            {
+                SessionId = Guid.NewGuid().ToString(),
+                AuthenticationDateTime = DateTime.UtcNow,
+                ExpirationDateTime = expirationDateTime,
+                State = UserSessionStates.Active,
+                Realm = realm,
+                UserId = user.Id,
+                ClientIds = new List<string> { }
+            };
+            _userSessionRepository.Add(session);
+            await _userSessionRepository.SaveChanges(cancellationToken);
             await _userRepository.SaveChanges(cancellationToken);
-            Response.Cookies.Append(_options.GetSessionCookieName(), user.GetActiveSession(realm).SessionId, new CookieOptions
+            Response.Cookies.Append(_options.GetSessionCookieName(), session.SessionId, new CookieOptions
             {
                 Secure = true,
                 HttpOnly = false,

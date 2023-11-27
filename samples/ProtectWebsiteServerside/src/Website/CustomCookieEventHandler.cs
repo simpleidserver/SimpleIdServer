@@ -18,9 +18,8 @@ namespace Website
         {
             if (context.Principal.Identity.IsAuthenticated)
             {
-                var subject = context.Principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
                 var sessionId = context.Principal.FindFirst(JwtRegisteredClaimNames.Sid)?.Value;
-                var str = await _distributedCache.GetStringAsync($"{subject}_{sessionId}");
+                var str = await _distributedCache.GetStringAsync(sessionId);
                 if(!string.IsNullOrWhiteSpace(str))
                 {
                     context.RejectPrincipal();

@@ -16,7 +16,12 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Token
     {
         private readonly IAuthorizationDetailsValidator _authorizationDetailsValidator;
 
-        public CredIssuerPreAuthorizedCodeValidator(IAuthorizationDetailsValidator authorizationDetailsValidator, IClientAuthenticationHelper clientAuthenticationHelper, IClientRepository clientRepository, IGrantedTokenHelper grantedTokenHelper, IUserRepository userRepository) : base(clientAuthenticationHelper, clientRepository, grantedTokenHelper, userRepository)
+        public CredIssuerPreAuthorizedCodeValidator(
+            IAuthorizationDetailsValidator authorizationDetailsValidator, 
+            IClientAuthenticationHelper clientAuthenticationHelper, 
+            IClientRepository clientRepository, 
+            IGrantedTokenHelper grantedTokenHelper, 
+            IUserRepository userRepository) : base(clientAuthenticationHelper, clientRepository, grantedTokenHelper, userRepository)
         {
             _authorizationDetailsValidator = authorizationDetailsValidator;
         }

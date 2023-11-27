@@ -40,6 +40,8 @@ namespace SimpleIdServer.IdServer.Domains
         public string SerializedClientIds { get; set; } = string.Empty;
         [JsonIgnore]
         public User User { get; set; }
+        [JsonIgnore]
+        public string UserId { get; set; } = null!;
 
         public bool IsActive() => State == UserSessionStates.Active && DateTime.UtcNow <= ExpirationDateTime;
 
@@ -50,7 +52,10 @@ namespace SimpleIdServer.IdServer.Domains
                 SessionId = SessionId,
                 AuthenticationDateTime = AuthenticationDateTime,
                 ExpirationDateTime = ExpirationDateTime,
-                State = State
+                State = State,
+                Realm = Realm,
+                SerializedClientIds = SerializedClientIds,
+                UserId = UserId
             };
         }
     }

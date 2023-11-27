@@ -56,6 +56,31 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         }
 
         [EffectMethod]
+        public async Task Handle(SearchUserSessionsAction action, IDispatcher dispatcher)
+        {
+            var baseUrl = await GetUsersUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{baseUrl}/{action.UserId}/sessions/.search"),
+                Method = HttpMethod.Post,
+                Content = new StringContent(JsonSerializer.Serialize(new SearchRequest
+                {
+                    Filter = SanitizeExpression(action.Filter),
+                    OrderBy = SanitizeExpression(action.OrderBy),
+                    Skip = action.Skip,
+                    Take = action.Take
+                }), Encoding.UTF8, "application/json")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var searchResult = JsonSerializer.Deserialize<SearchResult<Domains.UserSession>>(json);
+            dispatcher.Dispatch(new SearchUserSessionsSuccessAction { UserSessions = searchResult.Content, Count = searchResult.Count });
+
+            string SanitizeExpression(string expression) => expression.Replace("Value.", "");
+        }
+
+        [EffectMethod]
         public async Task Handle(GetUserAction action, IDispatcher dispatcher)
         {
             var baseUrl = await GetUsersUrl();
@@ -488,6 +513,21 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
     public class SearchUsersSuccessAction
     {
         public IEnumerable<Domains.User> Users { get; set; } = new List<Domains.User>();
+        public int Count { get; set; }
+    }
+
+    public class SearchUserSessionsAction
+    {
+        public string? Filter { get; set; } = null;
+        public string? OrderBy { get; set; } = null;
+        public int? Skip { get; set; } = null;
+        public int? Take { get; set; } = null;
+        public string UserId { get; set; }
+    }
+
+    public class SearchUserSessionsSuccessAction
+    {
+        public IEnumerable<Domains.UserSession> UserSessions { get; set; } = new List<Domains.UserSession>();
         public int Count { get; set; }
     }
 

@@ -32,7 +32,14 @@ namespace SimpleIdServer.IdServer.Jobs
         private readonly IClientRepository _clientRepository;
         private readonly IdServerHostOptions _options;
 
-        public BCNotificationJob(IBCAuthorizeRepository repository, ILogger<BCNotificationJob> logger, Infrastructures.IHttpClientFactory httpClientFactory, IEnumerable<ITokenBuilder> tokenBuilders, IUserRepository userRepository, IClientRepository clientRepository, IOptions<IdServerHostOptions> options)
+        public BCNotificationJob(
+            IBCAuthorizeRepository repository, 
+            ILogger<BCNotificationJob> logger,
+            Infrastructures.IHttpClientFactory httpClientFactory, 
+            IEnumerable<ITokenBuilder> tokenBuilders, 
+            IUserRepository userRepository,
+            IClientRepository clientRepository, 
+            IOptions<IdServerHostOptions> options)
         {
             _repository = repository;
             _logger = logger;
@@ -126,7 +133,7 @@ namespace SimpleIdServer.IdServer.Jobs
             async Task<Dictionary<string, string>> BuildParameters()
             {
                 var context = new HandlerContext(new HandlerContextRequest(null, null, new JsonObject(), null, null, (X509Certificate2)null, string.Empty), bcAuthorize.Realm, _options);
-                context.SetUser(parameter.Users.First(u => u.Id == bcAuthorize.UserId));
+                context.SetUser(parameter.Users.First(u => u.Id == bcAuthorize.UserId), null);
                 context.SetClient(parameter.Clients.First(c => c.ClientId == bcAuthorize.ClientId && c.Realms.Any(r => r.Name == bcAuthorize.Realm)));
                 foreach (var tokenBuilder in _tokenBuilders)
                     await tokenBuilder.Build(new BuildTokenParameter { Scopes = bcAuthorize.Scopes, AuthorizationDetails = bcAuthorize.AuthorizationDetails }, context, CancellationToken.None);

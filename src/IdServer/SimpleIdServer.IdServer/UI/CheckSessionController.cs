@@ -35,26 +35,26 @@ namespace SimpleIdServer.IdServer.UI
     {
         private readonly IdServerHostOptions _options;
         private readonly IUserRepository _userRepository;
+        private readonly IUserSessionResitory _userSessionRepository;
         private readonly IClientRepository _clientRepository;
         private readonly IJwtBuilder _jwtBuilder;
         private readonly ISessionHelper _sessionHelper;
         private readonly IAuthenticationHelper _authenticationHelper;
-        private readonly IdServer.Infrastructures.IHttpClientFactory _httpClientFactory;
 
         public CheckSessionController(
             IOptions<IdServerHostOptions> options,
             IUserRepository userRepository,
+            IUserSessionResitory userSessionRepository,
             IClientRepository clientRepository,
             IJwtBuilder jwtBuilder,
-            IdServer.Infrastructures.IHttpClientFactory httpClientFactory,
             ISessionHelper sessionHelper,
             IAuthenticationHelper authenticationHelper)
         {
             _options = options.Value;
             _userRepository = userRepository;
+            _userSessionRepository = userSessionRepository;
             _clientRepository = clientRepository;
             _jwtBuilder = jwtBuilder;
-            _httpClientFactory = httpClientFactory;
             _sessionHelper = sessionHelper;
             _authenticationHelper = authenticationHelper;
         }
@@ -83,8 +83,8 @@ namespace SimpleIdServer.IdServer.UI
             var userId = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
             var user = await _userRepository.GetBySubject(userId, prefix, cancellationToken);
             if (user == null) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.UNKNOWN_USER, ErrorMessages.USER_NOT_AUTHENTICATED);
-            var session = user.Sessions.First(s => s.SessionId == kvp.Value);
-            if (!session.IsActive()) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INACTIVE_SESSION, ErrorMessages.INACTIVE_SESSION);
+            var session = await _userSessionRepository.GetById(kvp.Value, prefix, cancellationToken);
+            if (session == null || !session.IsActive()) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INACTIVE_SESSION, ErrorMessages.INACTIVE_SESSION);
             return NoContent();
         }
 
@@ -117,9 +117,9 @@ namespace SimpleIdServer.IdServer.UI
                 }
 
                 var subject = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                var kvp = Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName());
                 var authenticatedUser = await _authenticationHelper.GetUserByLogin(subject, prefix, cancellationToken);
-                var activeSession = authenticatedUser.GetActiveSession(prefix);
-                var frontChannelLogout = BuildFrontChannelLogoutUrl(validationResult.Client, activeSession?.SessionId);
+                var frontChannelLogout = BuildFrontChannelLogoutUrl(validationResult.Client, kvp.Value);
                 if (!string.IsNullOrWhiteSpace(frontChannelLogout))
                 {
                     Response.SetNoCache();
@@ -150,9 +150,22 @@ namespace SimpleIdServer.IdServer.UI
                 var validationResult = await Validate(prefix, postLogoutRedirectUri, idTokenHint, cancellationToken);
                 var subject = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
                 var authenticatedUser = await _authenticationHelper.GetUserByLogin(subject, prefix, cancellationToken);
-                var activeSession = authenticatedUser.GetActiveSession(prefix);
+                var kvp = Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName());
+                UserSession activeSession = null;
+                if(!string.IsNullOrWhiteSpace(kvp.Value))
+                {
+                    activeSession = await _userSessionRepository.GetById(kvp.Value, prefix, cancellationToken);
+                    if (activeSession != null && !activeSession.IsActive()) activeSession = null;
+                }
+
                 var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
                 await _sessionHelper.Revoke(subject, activeSession, issuer, cancellationToken);
+                if(activeSession != null)
+                {
+                    activeSession.State = UserSessionStates.Rejected;
+                    await _userSessionRepository.SaveChanges(cancellationToken);
+                }
+
                 Response.Cookies.Delete(_options.GetSessionCookieName());
                 await HttpContext.SignOutAsync();
                 if (!string.IsNullOrWhiteSpace(state))

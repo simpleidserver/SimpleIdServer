@@ -30,6 +30,7 @@ namespace SimpleIdServer.IdServer.Api.Users
     public class UsersController : BaseController
     {
         private readonly IUserRepository _userRepository;
+        private readonly IUserSessionResitory _userSessionRepository;
         private readonly IAuthenticationHelper _authenticationHelper;
         private readonly IRealmRepository _realmRepository;
         private readonly IGroupRepository _groupRepository;
@@ -42,6 +43,7 @@ namespace SimpleIdServer.IdServer.Api.Users
 
         public UsersController(
             IUserRepository userRepository,
+            IUserSessionResitory userSessionRepository,
             IAuthenticationHelper authenticationHelper,
             IRealmRepository realmRepository, 
             IGroupRepository groupRepository,
@@ -53,6 +55,7 @@ namespace SimpleIdServer.IdServer.Api.Users
             IEnumerable<IDIDGenerator> generators)
         {
             _userRepository = userRepository;
+            _userSessionRepository = userSessionRepository;
             _authenticationHelper = authenticationHelper;
             _realmRepository = realmRepository;
             _groupRepository = groupRepository;
@@ -74,6 +77,22 @@ namespace SimpleIdServer.IdServer.Api.Users
             {
                 CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
                 var result = await _userRepository.Search(prefix, request, cancellationToken);
+                return new OkObjectResult(result);
+            }
+            catch (OAuthException ex)
+            {
+                return BuildError(ex);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SearchSessions([FromRoute] string prefix, string id, [FromBody] SearchRequest request, CancellationToken cancellationToken)
+        {
+            prefix = prefix ?? Constants.DefaultRealm;
+            try
+            {
+                CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
+                var result = await _userSessionRepository.Search(id, prefix, request, cancellationToken);
                 return new OkObjectResult(result);
             }
             catch (OAuthException ex)
@@ -599,7 +618,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                     var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
                     var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_USER, id));
-                    var session = user.Sessions.SingleOrDefault(c => c.SessionId == sessionId);
+                    var session = await _userSessionRepository.GetById(sessionId, prefix, cancellationToken);
                     if (session == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_USER_SESSION, sessionId));
                     await _sessionHelper.Revoke(_authenticationHelper.GetLogin(user), session, issuer, cancellationToken);
                     session.State = UserSessionStates.Rejected;

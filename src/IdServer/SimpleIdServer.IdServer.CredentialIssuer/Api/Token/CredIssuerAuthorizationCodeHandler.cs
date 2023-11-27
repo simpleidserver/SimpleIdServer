@@ -27,7 +27,21 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Token
         private readonly CredentialIssuerOptions _options;
         private readonly ICredIssuerTokenHelper _tokenHelper;
 
-        public CredIssuerAuthorizationCodeHandler(IOptions<CredentialIssuerOptions> opts, ICredIssuerTokenHelper tokenHelper, IGrantedTokenHelper grantedTokenHelper, IAuthorizationCodeGrantTypeValidator authorizationCodeGrantTypeValidator, IEnumerable<ITokenBuilder> tokenBuilders, IUserRepository usrRepository, IClientAuthenticationHelper clientAuthenticationHelper, IGrantHelper audienceHelper, IBusControl busControl, IDPOPProofValidator dpopProofValidator, IOptions<IdServerHostOptions> options, IEnumerable<ITokenProfile> tokenProfiles, ILogger<AuthorizationCodeHandler> logger) : base(grantedTokenHelper, authorizationCodeGrantTypeValidator, tokenBuilders, usrRepository, clientAuthenticationHelper, audienceHelper, busControl, dpopProofValidator, options, tokenProfiles, logger)
+        public CredIssuerAuthorizationCodeHandler(
+            IOptions<CredentialIssuerOptions> opts, 
+            ICredIssuerTokenHelper tokenHelper, 
+            IGrantedTokenHelper grantedTokenHelper, 
+            IAuthorizationCodeGrantTypeValidator authorizationCodeGrantTypeValidator, 
+            IEnumerable<ITokenBuilder> tokenBuilders, 
+            IUserRepository usrRepository, 
+            IUserSessionResitory userSessionRepository,
+            IClientAuthenticationHelper clientAuthenticationHelper, 
+            IGrantHelper audienceHelper, 
+            IBusControl busControl, 
+            IDPOPProofValidator dpopProofValidator, 
+            IOptions<IdServerHostOptions> options, 
+            IEnumerable<ITokenProfile> tokenProfiles, 
+            ILogger<AuthorizationCodeHandler> logger) : base(grantedTokenHelper, authorizationCodeGrantTypeValidator, tokenBuilders, usrRepository, userSessionRepository, clientAuthenticationHelper, audienceHelper, busControl, dpopProofValidator, options, tokenProfiles, logger)
         {
             _options = opts.Value;
             _tokenHelper = tokenHelper;

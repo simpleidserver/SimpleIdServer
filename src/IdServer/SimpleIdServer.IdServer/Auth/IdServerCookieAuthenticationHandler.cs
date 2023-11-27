@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Middlewares;
@@ -16,6 +15,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.Auth
@@ -208,7 +208,7 @@ namespace SimpleIdServer.IdServer.Auth
             {
                 var realm = RealmContext.Instance().Realm;
                 realm = realm ?? Constants.DefaultRealm;
-                var userSession = await _userSessionResitory.Query().FirstOrDefaultAsync(u => u.SessionId == sessionId && u.Realm == realm);
+                var userSession = await _userSessionResitory.GetById(sessionId, realm, CancellationToken.None);
                 if(userSession == null || !userSession.IsActive()) return AuthenticateResults.ExpiredTicket;
             }
 

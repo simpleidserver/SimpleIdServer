@@ -22,7 +22,7 @@ namespace Website.Controllers
             var jwt = handler.ReadJsonWebToken(request.LogoutToken);
             var subject = jwt.Claims.First(c => c.Type == System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub).Value;
             var sessionId = jwt.Claims.First(c => c.Type == System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sid).Value;
-            await _distributedCache.SetStringAsync($"{subject}_{sessionId}", "disconnected");
+            await _distributedCache.SetStringAsync(sessionId, "disconnected");
             return Ok();
         }
     }

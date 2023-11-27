@@ -14,6 +14,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Extractors;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Stores;
@@ -36,6 +37,7 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
             IUserRepository userRepository,
             IDataProtectionProvider dataProtectionProvider,
             IScopeClaimsExtractor claimsExtractor,
+            ISessionHelper sessionHelper,
             IOptions<IdServerHostOptions> opts, 
             IOptions<IdServerWsFederationOptions> options, 
             IKeyStore keyStore) : base(options, keyStore)
@@ -113,7 +115,7 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
             async Task<ClaimsIdentity> BuildSubject(string realm)
             {
                 var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, null, null, null, (X509Certificate2)null, null), realm ?? Constants.DefaultRealm, _options);
-                context.SetUser(user);
+                context.SetUser(user, null);
                 var claims = (await _claimsExtractor.ExtractClaims(context, client.Scopes, ScopeProtocols.SAML)).Select(c => new Claim(c.Key, c.Value.ToString())).ToList();
                 if (claims.Count(t => t.Type == ClaimTypes.NameIdentifier) == 0)
                     throw new OAuthException(ErrorCodes.INVALID_RP, ErrorMessages.NO_CLAIM);

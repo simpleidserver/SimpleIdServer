@@ -172,6 +172,7 @@ namespace SimpleIdServer.IdServer.Api
         }
 
         public User User { get; private set; }
+        public UserSession Session { get; private set; }
         public Client Client { get; private set; }
         public IdServerHostOptions Options { get; private set; }
         public JsonWebToken DPOPProof { get; private set; }
@@ -209,7 +210,11 @@ namespace SimpleIdServer.IdServer.Api
 
         public void SetClient(Client client) => Client = client;
 
-        public void SetUser(User user) => User = user;
+        public void SetUser(User user, UserSession session)
+        {
+            User = user;
+            Session = session;
+        }
 
         public void SetResponse(HandlerContextResponse response) => Response = response;
 

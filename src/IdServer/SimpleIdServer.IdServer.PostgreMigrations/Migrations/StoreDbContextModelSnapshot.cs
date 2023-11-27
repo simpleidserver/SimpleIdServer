@@ -1835,6 +1835,9 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.Property<string>("OriginalData")
                         .HasColumnType("text");
 
+                    b.Property<string>("SessionId")
+                        .HasColumnType("text");
+
                     b.Property<string>("TokenType")
                         .IsRequired()
                         .HasColumnType("text");
@@ -2332,10 +2335,6 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasAnnotation("Relational:JsonPropertyName", "auth_datetime");
 
-                    b.Property<string>("SerializedClientIds")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<DateTime>("ExpirationDateTime")
                         .HasColumnType("timestamp with time zone")
                         .HasAnnotation("Relational:JsonPropertyName", "exp_datetime");
@@ -2344,6 +2343,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "realm");
+
+                    b.Property<string>("SerializedClientIds")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<int>("State")
                         .HasColumnType("integer")

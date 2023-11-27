@@ -20,15 +20,13 @@ public class SidCookieEventHandler : CookieAuthenticationEvents
     {
         if (context.Principal.Identity.IsAuthenticated)
         {
-            var subject = context.Principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
             var sessionId = context.Principal.FindFirst(JwtRegisteredClaimNames.Sid)?.Value;
-            var cacheKey = $"{subject}_{sessionId}";
-            var cacheValue = await _distributedCache.GetStringAsync(cacheKey);
+            var cacheValue = await _distributedCache.GetStringAsync(sessionId);
             if (!string.IsNullOrWhiteSpace(cacheValue))
             {
                 context.RejectPrincipal();
                 await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-                await _distributedCache.RemoveAsync(cacheKey);
+                await _distributedCache.RemoveAsync(sessionId);
             }
         }
     }

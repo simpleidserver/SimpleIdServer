@@ -107,11 +107,17 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                 .AddClaim("degreeType", "BachelorDegree")
                 .AddClaim("degreeName", "Bachelor of Science and Arts")
                 .SetDID(DidKey, PrivateKey)
-                .AddSession("sessionId", SimpleIdServer.IdServer.Constants.DefaultRealm, DateTime.UtcNow.AddDays(2)).Build();
+                .Build();
+        private static UserSession UserSession = new UserSession { SessionId = "sessionId", AuthenticationDateTime = DateTime.UtcNow, ExpirationDateTime = DateTime.UtcNow.AddDays(2), State = UserSessionStates.Active, Realm = SimpleIdServer.IdServer.Constants.DefaultRealm, UserId = User.Id };
 
         public static List<Group> Groups => new List<Group>
         {
             AdminGroup
+        };
+
+        public static List<UserSession> Sessions = new List<UserSession>
+        {
+            UserSession
         };
 
         public static List<Scope> Scopes => new List<Scope>

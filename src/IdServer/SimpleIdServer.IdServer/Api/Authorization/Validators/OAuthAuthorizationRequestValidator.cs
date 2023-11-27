@@ -172,7 +172,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                 throw new OAuthLoginRequiredException(await GetFirstAmr(context.Realm, acrValues, claims, openidClient, cancellationToken));
             }
 
-            var activeSession = context.User.GetActiveSession(context.Realm ?? Constants.DefaultRealm);
+            var activeSession = context.Session;
             if (activeSession == null)
                 throw new OAuthLoginRequiredException(await GetFirstAmr(context.Realm, acrValues, claims, openidClient, cancellationToken), true);
 

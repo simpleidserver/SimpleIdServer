@@ -26,6 +26,7 @@ builder.Services.AddSIDIdentityServer(o =>
         o.AddInMemoryApiResources(IdServerConfiguration.ApiResources);
         o.AddInMemoryUMAResources(IdServerConfiguration.UmaResources);
         o.AddInMemoryGroups(IdServerConfiguration.Groups);
+        o.AddInMemoryUserSessions(IdServerConfiguration.Sessions);
         o.AddInMemoryCredentialTemplates(IdServerConfiguration.CredTemplates);
         o.AddInMemoryDeviceCodes(IdServerConfiguration.DeviceAuthCodes);
         o.AddInMemoryKeys(SimpleIdServer.IdServer.Constants.StandardRealms.Master, new List<SigningCredentials>

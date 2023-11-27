@@ -170,6 +170,18 @@ namespace SimpleIdServer.IdServer
             return this;
         }
 
+        public IdServerInMemoryStoreBuilder AddInMemoryUserSessions(ICollection<UserSession> sessions)
+        {
+            var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
+            if (!storeDbContext.UserSession.Any())
+            {
+                storeDbContext.UserSession.AddRange(sessions);
+                storeDbContext.SaveChanges();
+            }
+
+            return this;
+        }
+
         public IdServerInMemoryStoreBuilder AddInMemoryCredentialOffers(ICollection<UserCredentialOffer> offers)
         {
             var storeDbContext = _serviceProvider.GetService<StoreDbContext>();

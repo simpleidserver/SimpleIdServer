@@ -32,18 +32,21 @@ namespace SimpleIdServer.IdServer.Api.Authorization
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IAuthorizationRequestEnricher _authorizationRequestEnricher;
         private readonly IUserRepository _userRepository;
+        private readonly IUserSessionResitory _userSessionRepository;
         private readonly IdServerHostOptions _options;
 
         public AuthorizationRequestHandler(IAuthorizationRequestValidator validator,
             IEnumerable<ITokenProfile> tokenProfiles, 
             IAuthorizationRequestEnricher authorizationRequestEnricher,
             IUserRepository userRepository,
+            IUserSessionResitory userSessionResitory,
             IOptions<IdServerHostOptions> options)
         {
             _validator = validator;
             _tokenProfiles = tokenProfiles;
             _authorizationRequestEnricher = authorizationRequestEnricher;
             _userRepository = userRepository;
+            _userSessionRepository = userSessionResitory;
             _options = options.Value;
         }
 
@@ -81,7 +84,8 @@ namespace SimpleIdServer.IdServer.Api.Authorization
         {
             var validationResult = await _validator.ValidateAuthorizationRequest(context, cancellationToken);
             var user = await _userRepository.GetBySubject(context.Request.UserSubject, context.Realm, cancellationToken);
-            context.SetUser(user);
+            var activeSession = await GetActiveSession(context, cancellationToken);
+            context.SetUser(user, activeSession);
             var grantRequest = validationResult.GrantRequest;
             var responseTypeHandlers = validationResult.ResponseTypes;
             await _validator.ValidateAuthorizationRequestWhenUserIsAuthenticated(grantRequest, context, cancellationToken);
@@ -98,7 +102,17 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? _options.DefaultTokenProfile)).Enrich(context);
             UpdateSession(context);
             await _userRepository.SaveChanges(cancellationToken);
+            await _userSessionRepository.SaveChanges(cancellationToken);
             return new RedirectURLAuthorizationResponse(redirectUri, context.Response.Parameters);
+        }
+
+        protected async Task<UserSession> GetActiveSession(HandlerContext context, CancellationToken cancellationToken)
+        {
+            var kvp = context.Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName());
+            if (string.IsNullOrWhiteSpace(kvp.Value)) return null;
+            var userSession = await _userSessionRepository.GetById(kvp.Value, context.Realm, cancellationToken);
+            if (userSession == null) return null;
+            return userSession.IsActive() ? userSession : null;
         }
 
         protected async Task<Consent> ExecuteGrantManagementAction(GrantRequest extractionResult, HandlerContext context, CancellationToken cancellationToken)
@@ -160,7 +174,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
         protected void UpdateSession(HandlerContext context)
         {
             if (context.User == null) return;
-            var session = context.User.GetActiveSession(context.Realm);
+            var session = context.Session;
             var clientIds = session.ClientIds;
             if (session != null && !clientIds.Contains(context.Client.ClientId))
             {
@@ -171,7 +185,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
 
         private string BuildSessionState(HandlerContext handlerContext)
         {
-            var session = handlerContext.User.GetActiveSession(handlerContext.Realm ?? Constants.DefaultRealm);
+            var session = handlerContext.Session;
             if (session == null)
                 return null;
 

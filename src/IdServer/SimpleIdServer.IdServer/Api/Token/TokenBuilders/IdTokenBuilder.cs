@@ -79,7 +79,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
             if (currentContext.Response.TryGet(AuthorizationResponseParameters.Code, out code))
                 claims.Add(JwtRegisteredClaimNames.CHash, ComputeHash(code));
 
-            var activeSession = currentContext.User.GetActiveSession(currentContext.Realm ?? Constants.DefaultRealm);
+            var activeSession = currentContext.Session;
             if (maxAge != null && activeSession != null)
                 claims.Add(JwtRegisteredClaimNames.AuthTime, activeSession.AuthenticationDateTime.ConvertToUnixTimestamp());
 

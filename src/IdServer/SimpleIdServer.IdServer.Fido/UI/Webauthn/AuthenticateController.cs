@@ -35,8 +35,9 @@ namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
             IClientRepository clientRepository,
             IAmrHelper amrHelper,
             IUserRepository userRepository,
+            IUserSessionResitory userSessionRepository,
             IUserTransformer userTransformer,
-            IBusControl busControl) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userTransformer, busControl)
+            IBusControl busControl) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl)
         {
             _distributedCache = distributedCache;
         }

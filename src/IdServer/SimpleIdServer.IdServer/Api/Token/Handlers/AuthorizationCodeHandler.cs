@@ -10,6 +10,7 @@ using SimpleIdServer.IdServer.Api.Token.Helpers;
 using SimpleIdServer.IdServer.Api.Token.TokenBuilders;
 using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
 using SimpleIdServer.IdServer.Api.Token.Validators;
+using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
@@ -33,6 +34,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IAuthorizationCodeGrantTypeValidator _authorizationCodeGrantTypeValidator;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
         private readonly IUserRepository _userRepository;
+        private readonly IUserSessionResitory _userSessionRepository;
         private readonly IGrantHelper _audienceHelper;
         private readonly IBusControl _busControl;
         private readonly IDPOPProofValidator _dpopProofValidator;
@@ -43,6 +45,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IAuthorizationCodeGrantTypeValidator authorizationCodeGrantTypeValidator, 
             IEnumerable<ITokenBuilder> tokenBuilders,
             IUserRepository usrRepository,
+            IUserSessionResitory userSessionRepository,
             IClientAuthenticationHelper clientAuthenticationHelper,
             IGrantHelper audienceHelper,
             IBusControl busControl,
@@ -55,6 +58,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             _authorizationCodeGrantTypeValidator = authorizationCodeGrantTypeValidator;
             _tokenBuilders = tokenBuilders;
             _userRepository = usrRepository;
+            _userSessionRepository = userSessionRepository;
             _audienceHelper = audienceHelper;
             _busControl = busControl;
             _dpopProofValidator = dpopProofValidator;
@@ -111,7 +115,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     scopeLst = extractionResult.Scopes;
                     activity?.SetTag("scopes", string.Join(",", extractionResult.Scopes)); 
                     var result = BuildResult(context, extractionResult.Scopes);
-                    await Authenticate(previousRequest, context, cancellationToken);
+                    await Authenticate(previousRequest, context, authCode, cancellationToken);
                     context.SetOriginalRequest(previousRequest);
                     var parameters = new BuildTokenParameter { AuthorizationDetails = extractionResult.AuthorizationDetails, Scopes = extractionResult.Scopes, Audiences = extractionResult.Audiences, Claims = claims, GrantId = authCode.GrantId };
                     foreach (var tokenBuilder in _tokenBuilders)
@@ -175,12 +179,19 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             return Task.CompletedTask;
         }
 
-        async Task Authenticate(JsonObject previousQueryParameters, HandlerContext handlerContext, CancellationToken token)
+        async Task Authenticate(JsonObject previousQueryParameters, HandlerContext handlerContext, AuthCode authCode, CancellationToken token)
         {
             if (!previousQueryParameters.ContainsKey(JwtRegisteredClaimNames.Sub))
                 return;
-            var user = await _userRepository.GetBySubject(previousQueryParameters[JwtRegisteredClaimNames.Sub].GetValue<string>(), handlerContext.Realm, token);            
-            handlerContext.SetUser(user);
+            var user = await _userRepository.GetBySubject(previousQueryParameters[JwtRegisteredClaimNames.Sub].GetValue<string>(), handlerContext.Realm, token);
+            UserSession session = null;
+            if(!string.IsNullOrWhiteSpace(authCode.SessionId))
+            {
+                session = await _userSessionRepository.GetById(authCode.SessionId, handlerContext.Realm, token);
+                if (session != null && !session.IsActive()) session = null;
+            }
+
+            handlerContext.SetUser(user, session);
         }
 
         void CheckDPOPJkt(HandlerContext context, AuthCode authCode)

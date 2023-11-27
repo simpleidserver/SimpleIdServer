@@ -2,7 +2,7 @@
 @using SimpleIdServer.IdServer.Website.Stores.UserStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject IDispatcher dispatcher
-@inject IState<UserState> userState
+@inject IState<SearchUserSessionsState> userSessionsState
 @inject IState<UpdateUserState> updateUserState
 @inject ContextMenuService contextMenuService
 @inject NotificationService notificationService
@@ -20,12 +20,15 @@
                 PagerHorizontalAlign="HorizontalAlign.Left"
                 ShowPagingSummary="true"
                 IsLoading="@updateUserState.Value.IsUpdating"
-                Count="@User.Sessions.Count"
-                Data="@User.Sessions"
+                Count="@userSessionsState.Value.Count"
+                Data="@userSessionsState.Value.UserSessions"
+                LoadData="@LoadData"
+                RowRender="@RowRender"
                 TItem="UserSession"
                 ColumnWidth="300px">
         <Columns>
             <RadzenDataGridColumn TItem="UserSession" Property="AuthenticationDateTime" Title="Authentication time" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Width="80px" />
+            <RadzenDataGridColumn TItem="UserSession" Property="SessionId" Title="Identifier" Filterable="false" Sortable="false" Width="80px" />
             <RadzenDataGridColumn TItem="UserSession" Title="Clients" Filterable="false" Sortable="false" Width="80px">
                 <Template Context="data">
                     @foreach(var clientId in data.ClientIds)
@@ -93,5 +96,18 @@
                 contextMenuService.Close();
             }
         });
+    }
+
+    void LoadData(LoadDataArgs args)
+    {
+        var act = new SearchUserSessionsAction { Filter = args.Filter, OrderBy = args.OrderBy, Skip = args.Skip, Take = args.Top, UserId = User.Id };
+        dispatcher.Dispatch(act);
+    }
+
+    void RowRender(RowRenderEventArgs<UserSession> row)
+    {
+        const string className = "class";
+        if (row.Attributes.ContainsKey(className))
+            row.Attributes.Remove(className);
     }
 }

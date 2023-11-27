@@ -6,6 +6,7 @@ namespace SimpleIdServer.IdServer.Domains
     public class Token
     {
         public string Id { get; set; } = null!;
+        public string? SessionId { get; set; } = null;
         public string ClientId { get; set; } = null!;
         public string TokenType { get; set; } = null!;
         public bool IsRegistrationAccessToken { get; set; }

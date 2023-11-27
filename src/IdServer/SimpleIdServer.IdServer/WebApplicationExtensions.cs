@@ -180,6 +180,9 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("searchUsers",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/.search",
                 defaults: new { controller = "Users", action = "Search" });
+            webApplication.SidMapControllerRoute("searchUserSessions",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/sessions/.search",
+                defaults: new { controller = "Users", action = "SearchSessions" });
             webApplication.SidMapControllerRoute("getUser",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}",
                 defaults: new { controller = "Users", action = "Get" });

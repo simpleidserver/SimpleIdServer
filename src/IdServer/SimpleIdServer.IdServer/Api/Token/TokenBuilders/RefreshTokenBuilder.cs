@@ -46,7 +46,17 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
             if(handlerContext.DPOPProof != null)
                 jkt = handlerContext.DPOPProof.PublicKey().CreateThumbprint();
 
-            var refreshToken = await GrantedTokenHelper.AddRefreshToken(handlerContext.Client.ClientId, authorizationCode, parameter.GrantId, dic, handlerContext.OriginalRequest, handlerContext.Client.RefreshTokenExpirationTimeInSeconds ?? _options.DefaultRefreshTokenExpirationTimeInSeconds, jkt, cancellationToken);
+            var sessionId = handlerContext.Session?.SessionId;
+            var refreshToken = await GrantedTokenHelper.AddRefreshToken(
+                handlerContext.Client.ClientId, 
+                authorizationCode, 
+                parameter.GrantId, 
+                dic,
+                handlerContext.OriginalRequest, 
+                handlerContext.Client.RefreshTokenExpirationTimeInSeconds ?? _options.DefaultRefreshTokenExpirationTimeInSeconds, 
+                jkt,
+                sessionId,
+                cancellationToken);
             handlerContext.Response.Add(TokenResponseParameters.RefreshToken, refreshToken);
         }
     }
