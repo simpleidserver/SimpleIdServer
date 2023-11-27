@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
@@ -197,7 +198,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             };
             foreach(var kvp in headers)
                 httpRequestMessage.Headers.Add(kvp.Key, kvp.Value);
-
+            httpRequestMessage.Headers.Add("Cookie", $"{CookieAuthenticationDefaults.CookiePrefix}Session=sessionId");
             var httpResponseMessage = await _factory.CreateClient().SendAsync(httpRequestMessage).ConfigureAwait(false);
             _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
         }
