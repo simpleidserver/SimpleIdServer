@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
+using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.ExternalEvents;
@@ -40,11 +41,23 @@ namespace SimpleIdServer.IdServer.UI
         private readonly ICredentialTemplateRepository _credentialTemplateRepository;
         private readonly IBusControl _busControl;
         private readonly IEnumerable<IAuthenticationMethodService> _authenticationMethodServices;
+        private readonly ISessionHelper _sessionHelper;
+        private readonly IUserSessionResitory _userSessionRepository;
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(IOptions<IdServerHostOptions> options, IUserHelper userHelper, IUserRepository userRepository, IClientRepository clientRepository, 
-            IUmaPendingRequestRepository pendingRequestRepository, IAuthenticationSchemeProvider authenticationSchemeProvider,
-            IOTPQRCodeGenerator otpQRCodeGenerator, ICredentialTemplateRepository credentialTemplateRepository, IBusControl busControl, IEnumerable<IAuthenticationMethodService> authenticationMethodServices, ILogger<HomeController> logger)
+        public HomeController(IOptions<IdServerHostOptions> options,
+            IUserHelper userHelper,
+            IUserRepository userRepository,
+            IClientRepository clientRepository,
+            IUmaPendingRequestRepository pendingRequestRepository,
+            IAuthenticationSchemeProvider authenticationSchemeProvider,
+            IOTPQRCodeGenerator otpQRCodeGenerator,
+            ICredentialTemplateRepository credentialTemplateRepository,
+            IBusControl busControl,
+            IEnumerable<IAuthenticationMethodService> authenticationMethodServices,
+            ISessionHelper sessionHelper,
+            IUserSessionResitory userSessionRepository,
+            ILogger<HomeController> logger)
         {
             _options = options.Value;
             _userHelper = userHelper;
@@ -56,6 +69,8 @@ namespace SimpleIdServer.IdServer.UI
             _credentialTemplateRepository = credentialTemplateRepository;
             _busControl = busControl;
             _authenticationMethodServices = authenticationMethodServices;
+            _sessionHelper = sessionHelper;
+            _userSessionRepository = userSessionRepository;
             _logger = logger;
         }
 
@@ -394,12 +409,27 @@ namespace SimpleIdServer.IdServer.UI
         }
 
         [HttpGet]
-        public async Task<IActionResult> Disconnect([FromRoute] string prefix)
+        public async Task<IActionResult> Disconnect([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
+            var sessionCookieName = _options.GetSessionCookieName();
             if (User.Identity == null || !User.Identity.IsAuthenticated) return RedirectToAction("Index");
+            var subject = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            Response.Cookies.Delete(_options.GetSessionCookieName());
+            var kvp = Request.Cookies.SingleOrDefault(c => c.Key == sessionCookieName);
+            if(!string.IsNullOrWhiteSpace(kvp.Key))
+            {
+                var activeSession = await _userSessionRepository.GetById(kvp.Value, prefix, cancellationToken);
+                if(activeSession != null && activeSession.IsActive())
+                {
+                    var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
+                    await _sessionHelper.Revoke(subject, activeSession, issuer, cancellationToken);
+                    activeSession.State = UserSessionStates.Rejected;
+                    await _userSessionRepository.SaveChanges(cancellationToken);
+                }
+            }
+
+            Response.Cookies.Delete(sessionCookieName);
             await HttpContext.SignOutAsync();
             await _busControl.Publish(new UserLogoutSuccessEvent
             {
