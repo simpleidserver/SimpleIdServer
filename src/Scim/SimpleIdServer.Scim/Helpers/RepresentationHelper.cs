@@ -44,11 +44,13 @@ namespace SimpleIdServer.Scim.Helpers
         public async Task<SCIMRepresentationPatchResult> Apply(SCIMRepresentation representation, IEnumerable<PatchOperationParameter> patchLst, IEnumerable<SCIMAttributeMapping> attributeMappings, bool ignoreUnsupportedCanonicalValues, CancellationToken cancellationToken)
         {
             var attrSelectors = attributeMappings.Select(a => a.SourceAttributeSelector).Distinct();
+            var sanitizedPatchOperations = SanitizePatchOperations(representation, patchLst);
             var result = new SCIMRepresentationPatchResult();
-            foreach (var patch in patchLst)
+            foreach (var rec in sanitizedPatchOperations)
             {
                 SCIMAttributeExpression scimExpr = null;
-                var scimFilter = SCIMFilterParser.Parse(patch.Path, representation.Schemas);
+                var patch = rec.Item1;
+                var scimFilter = rec.Item2;
                 var schemaAttributes = representation.Schemas.SelectMany(_ => _.Attributes);
                 List<SCIMRepresentationAttribute> filteredAttributes = null, hierarchicalNewAttributes = null, hierarchicalFilteredAttributes = null;
                 string fullPath = null;
@@ -200,6 +202,85 @@ namespace SimpleIdServer.Scim.Helpers
             }
 
             return result;
+        }
+
+        private List<(PatchOperationParameter, SCIMExpression)> SanitizePatchOperations(SCIMRepresentation representation, IEnumerable<PatchOperationParameter> patchLst)
+        {
+            int i = 0;
+            var lst = patchLst.Select(p =>
+            {
+                SCIMAttributeExpression scimExpr = null;
+                SCIMSchemaAttribute scimExprSchemaAttr = null;
+                var scimFilter = SCIMFilterParser.Parse(p.Path, representation.Schemas);
+                if (scimFilter != null)
+                {
+                    scimExpr = scimFilter as SCIMAttributeExpression;
+                    scimExprSchemaAttr = scimExpr.GetLastChild().SchemaAttribute;
+                }
+
+                i++;
+                return (
+                    index: i, 
+                    operation : p, 
+                    filter : scimFilter, 
+                    fullPath: p.Path, 
+                    multiValued: (scimExprSchemaAttr?.MultiValued).GetValueOrDefault(),
+                    type: (scimExprSchemaAttr?.Type).GetValueOrDefault());
+            });
+            var result = new List<(PatchOperationParameter, SCIMExpression, int)>();
+            foreach(var grp in lst.GroupBy(k => k.fullPath))
+            {
+                var orderedElts = grp.OrderBy(i => i.index);
+                var lastElt = grp.OrderByDescending(r => r.index).First();
+                if (lastElt.multiValued || lastElt.filter == null)
+                {
+                    result.AddRange(orderedElts.Select(r => (r.operation, r.filter, r.index)));
+                    continue;
+                }
+
+                if(lastElt.type == SCIMSchemaAttributeTypes.COMPLEX && orderedElts.Count() > 1)
+                {
+                    var mergedResult = MergePatchOperationValues(orderedElts.Select(e => e.operation));
+                    lastElt.operation.Value = mergedResult;
+                    result.Add((lastElt.operation, lastElt.filter, lastElt.index));
+                }
+                else
+                {
+                    result.Add((lastElt.operation, lastElt.filter, lastElt.index));
+                }
+            }
+
+            return result.OrderBy(r => r.Item3).Select(r => (r.Item1, r.Item2)).ToList();
+        }
+
+        private JObject MergePatchOperationValues(IEnumerable<PatchOperationParameter> parameters)
+        {
+            var mergedResult = new JObject();
+            foreach (var operation in parameters)
+            {
+                var operationValueJson = operation.Value as JObject;
+                if (operationValueJson == null) continue;
+                foreach(var kvp in operationValueJson)
+                {
+                    var json = kvp.Value.ToString();
+                    JToken node = null;
+                    switch(kvp.Value.Type)
+                    {
+                        case JTokenType.Object:
+                        case JTokenType.Array:
+                            node = JToken.Parse(json);
+                            break;
+                        default:
+                            node = json;
+                            break;
+                    }
+
+                    if (!operationValueJson.ContainsKey(kvp.Key)) mergedResult.Add(kvp.Key, node);
+                    else mergedResult[kvp.Key] = node;
+                }
+            }
+
+            return mergedResult;
         }
 
         private async Task OverrideRootAttributes(SCIMRepresentationPatchResult result, List<SCIMRepresentationAttribute> hierarchicalNewAttributes, SCIMRepresentation representation, CancellationToken cancellationToken)

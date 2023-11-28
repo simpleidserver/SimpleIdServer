@@ -1140,3 +1140,79 @@ Scenario: Check property name are not case sensitive
 	Then JSON 'name.formatted'='formatted'
 	Then JSON 'name.familyName'='familyName'
 	Then JSON 'employeeNumber'='Number'
+
+Scenario: When userName is updated two times in the same operation, check the userName is equals to the value of second operation
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key                                                        | Value                                                                                                          |
+	| schemas                                                    | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName                                                   | bjen                                                                                                           |
+	| ExternalId                                                 | externalid                                                                                                     |
+	| name                                                       | { "formatted" : "formatted", "FAMILYNAME": "familyName", "givenName": "givenName" }                            |
+	| urn:ietf:params:scim:schemas:extension:enterprise:2.0:User | { "employeeNumber" : "number" }                                                                                |
+	| eidCertificate                                             | aGVsbG8=                                                                                                       |
+	| immutable                                                  | immutable																									  |
+	
+	And extract JSON from body
+	And extract 'id' from JSON body
+	
+	And execute HTTP PATCH JSON request 'http://localhost/Users/$id$'
+	| Key        | Value                                                                                                                              |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]						                                                          |
+	| Operations | [ { "op": "replace", "path": "userName", "value" : "newName" }, { "op": "replace", "path": "userName", "value" : "newName2" } ]    |
+	
+	And execute HTTP GET request 'http://localhost/Users/$id$'
+	And extract JSON from body
+
+	Then HTTP status code equals to '200'
+	Then JSON 'userName'='newName2'	
+
+Scenario: When userName is removed and updated in the same operation, check the userName is equals to the value of the second operation
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key                                                        | Value                                                                                                          |
+	| schemas                                                    | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName                                                   | bjen                                                                                                           |
+	| ExternalId                                                 | externalid                                                                                                     |
+	| name                                                       | { "formatted" : "formatted", "FAMILYNAME": "familyName", "givenName": "givenName" }                            |
+	| urn:ietf:params:scim:schemas:extension:enterprise:2.0:User | { "employeeNumber" : "number" }                                                                                |
+	| eidCertificate                                             | aGVsbG8=                                                                                                       |
+	| immutable                                                  | immutable																									  |
+	
+	And extract JSON from body
+	And extract 'id' from JSON body
+	
+	And execute HTTP PATCH JSON request 'http://localhost/Users/$id$'
+	| Key        | Value                                                                                                        |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]						                                    |
+	| Operations | [ { "op": "remove", "path": "userName" }, { "op": "replace", "path": "userName", "value" : "newName2" } ]    |
+	
+	And execute HTTP GET request 'http://localhost/Users/$id$'
+	And extract JSON from body
+
+	Then HTTP status code equals to '200'
+	Then JSON 'userName'='newName2'	
+
+Scenario: When name is updated two times in the same operation, check the name is correct
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key                                                        | Value                                                                                                          |
+	| schemas                                                    | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName                                                   | bjen                                                                                                           |
+	| ExternalId                                                 | externalid                                                                                                     |
+	| name                                                       | { "formatted" : "formatted", "FAMILYNAME": "familyName", "givenName": "givenName" }                            |
+	| urn:ietf:params:scim:schemas:extension:enterprise:2.0:User | { "employeeNumber" : "number" }                                                                                |
+	| eidCertificate                                             | aGVsbG8=                                                                                                       |
+	| immutable                                                  | immutable																									  |
+	
+	And extract JSON from body
+	And extract 'id' from JSON body
+	
+	And execute HTTP PATCH JSON request 'http://localhost/Users/$id$'
+	| Key        | Value                                                                                                                                                                 |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]						                                                                                             |
+	| Operations | [ { "op": "replace", "path": "name", "value" : { "formatted" : "newFormatted" } }, { "op": "replace", "path": "name", "value" : {  "givenName": "givenName2" } } ]    |
+	
+	And execute HTTP GET request 'http://localhost/Users/$id$'
+	And extract JSON from body
+
+	Then HTTP status code equals to '200'
+	Then JSON 'name.formatted'='newFormatted'
+	Then JSON 'name.givenName'='givenName2'
