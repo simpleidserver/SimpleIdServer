@@ -9,13 +9,13 @@ namespace SimpleIdServer.IdServer.Domains
         public string? SessionId { get; set; } = null;
         public string ClientId { get; set; } = null!;
         public string TokenType { get; set; } = null!;
-        public bool IsRegistrationAccessToken { get; set; }
+        public AccessTokenTypes? AccessTokenType { get; set; } = null;
         public string? Data { get; set; } = null;
         public string? OriginalData { get; set; } = null;
         public string? AuthorizationCode { get; set; } = null;
         public string? GrantId { get; set; } = null;
+        public string? Jkt { get; set; } = null;
         public DateTime? ExpirationTime { get; set; }
         public DateTime CreateDateTime { get; set; }
-        public string? Jkt { get; set; } = null;
     }
 }

@@ -242,6 +242,7 @@ public class ClientsController : BaseController
         {
             existingClient.RedirectionUrls = newClient.RedirectionUrls;
             existingClient.UpdateClientName(newClient.ClientName);
+            existingClient.AccessTokenType = newClient.AccessTokenType;
             existingClient.PostLogoutRedirectUris = newClient.PostLogoutRedirectUris;
             existingClient.FrontChannelLogoutSessionRequired = newClient.FrontChannelLogoutSessionRequired;
             existingClient.FrontChannelLogoutUri = newClient.FrontChannelLogoutUri;

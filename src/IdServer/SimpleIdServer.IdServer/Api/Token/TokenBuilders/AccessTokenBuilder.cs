@@ -96,9 +96,19 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
             if (!handlerContext.Response.TryGet(AuthorizationResponseParameters.Code, out authorizationCode))
                 authorizationCode = handlerContext.Request.RequestData.GetAuthorizationCode();
 
+            var id = Guid.NewGuid().ToString();
             var accessToken = await _jwtBuilder.BuildAccessToken(realm, handlerContext.Client, securityTokenDescriptor, cancellationToken);
-            await _grantedTokenHelper.AddAccessToken(accessToken, handlerContext.Client.ClientId, authorizationCode, grantId, cancellationToken);
-            handlerContext.Response.Add(TokenResponseParameters.AccessToken, accessToken);
+            if (handlerContext.Client.AccessTokenType == AccessTokenTypes.Jwt)
+            {
+                await _grantedTokenHelper.AddJwtAccessToken(accessToken, handlerContext.Client.ClientId, authorizationCode, grantId, cancellationToken);
+                id = accessToken;
+            }
+            else
+            {
+                await _grantedTokenHelper.AddReferenceAccessToken(id, accessToken, handlerContext.Client.ClientId, authorizationCode, grantId, cancellationToken);
+            }
+
+            handlerContext.Response.Add(TokenResponseParameters.AccessToken, id);
         }
 
         private static string Hash(byte[] payload)

@@ -728,6 +728,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "id");
 
+                    b.Property<int>("AccessTokenType")
+                        .HasColumnType("integer")
+                        .HasAnnotation("Relational:JsonPropertyName", "access_token_type");
+
                     b.Property<string>("ApplicationType")
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "application_type");
@@ -1804,6 +1808,9 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PkID"));
 
+                    b.Property<int?>("AccessTokenType")
+                        .HasColumnType("integer");
+
                     b.Property<string>("AuthorizationCode")
                         .HasColumnType("text");
 
@@ -1825,9 +1832,6 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
 
                     b.Property<string>("Id")
                         .HasColumnType("text");
-
-                    b.Property<bool>("IsRegistrationAccessToken")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("Jkt")
                         .HasColumnType("text");

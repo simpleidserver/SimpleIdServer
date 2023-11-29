@@ -521,6 +521,11 @@ namespace SimpleIdServer.IdServer.Domains
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.BCIntervalSeconds)]
         public int BCIntervalSeconds { get; set; } = 5;
+        /// <summary>
+        /// Set the type of access token.
+        /// </summary>
+        [JsonPropertyName(OAuthClientParameters.AccessTokenType)]
+        public AccessTokenTypes AccessTokenType { get; set; } = AccessTokenTypes.Jwt;
         [JsonIgnore]
         public ICollection<Realm> Realms { get; set; } = new List<Realm>();
         [JsonIgnore]

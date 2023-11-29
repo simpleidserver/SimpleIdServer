@@ -37,4 +37,6 @@ public class UpdateClientRequest
     public string JwksUrl { get; set; }
     [JsonPropertyName(OAuthClientParameters.IsRedirectUrlCaseSensitive)]
     public bool IsRedirectUrlCaseSensitive { get; set; }
+    [JsonPropertyName(OAuthClientParameters.AccessTokenType)]
+    public AccessTokenTypes AccessTokenType { get; set; }
 }

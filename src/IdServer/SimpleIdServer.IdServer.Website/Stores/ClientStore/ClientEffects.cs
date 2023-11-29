@@ -311,6 +311,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 IsConsentDisabled = !act.IsConsentEnabled,
                 JwksUrl = act.JwksUrl,
                 IsRedirectUrlCaseSensitive = act.IsRedirectUrlCaseSensitive,
+                AccessTokenType = act.AccessTokenType,
                 Parameters = new Dictionary<string, string>
                 {
                     { ClientExtensions.SAML2_USE_ACS_ARTIFACT_NAME, act.UseAcs.ToString() },
@@ -350,7 +351,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                     IsTokenExchangeEnabled = act.IsTokenExchangeEnabled,
                     IsRedirectUrlCaseSensitive = act.IsRedirectUrlCaseSensitive,
                     UseAcs = act.UseAcs,
-                    MetadataUrl = act.MetadataUrl
+                    MetadataUrl = act.MetadataUrl,
+                    AccessTokenType = act.AccessTokenType
                 });
             }
             catch
@@ -906,6 +908,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public string JwksUrl { get; set; }
         public TokenExchangeTypes? TokenExchangeType { get; set; }
         public bool IsRedirectUrlCaseSensitive { get; set; }
+        public AccessTokenTypes AccessTokenType { get; set; }
     }
 
     public class UpdateClientDetailsSuccessAction
@@ -931,6 +934,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public bool IsRedirectUrlCaseSensitive { get; set; }
         public bool UseAcs { get; set; }
         public string MetadataUrl { get; set; }
+        public AccessTokenTypes AccessTokenType { get; set; }
     }
 
     public class UpdateClientDetailsFailureAction

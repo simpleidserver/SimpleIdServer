@@ -34,6 +34,20 @@
                         <RadzenTextBox Name="ClientId" @bind-Value="@updateClient.ClientName" Class="w-100"></RadzenTextBox>
                     </div>
                 </div>
+                <!-- Access Token Type -->
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <RadzenLabel Text="Access Token Type" Style="padding: 0px;" />
+                    </div>
+                    <div class="col">
+                        <RadzenDropDown Name="AccessTokenType" Class="w-100"
+                                        Data=@AllAccessTokenTypes
+                                        TextProperty="Description"
+                                        ValueProperty="Value"
+                                        TValue="AccessTokenTypes"
+                                        @bind-Value=@updateClient.AccessTokenType />
+                    </div>
+                </div>
             </RadzenAccordionItem>
             @if (Client.ClientType == ClientTypes.SPA || Client.ClientType == ClientTypes.WEBSITE || Client.ClientType == ClientTypes.EXTERNAL || Client.ClientType == ClientTypes.MOBILE || Client.ClientType == ClientTypes.HIGHLYSECUREDWEBSITE || Client.ClientType == ClientTypes.GRANTMANAGEMENT)
             {
@@ -270,6 +284,18 @@
         new TokenExchangeType { Value = TokenExchangeTypes.DELEGATION, Description = "Delegation" }
     };
 
+    List<AccessTokenTypesDesc> AllAccessTokenTypes = new List<AccessTokenTypesDesc>
+    {
+        new AccessTokenTypesDesc { Description = "Json Web Token (JWT)", Value = AccessTokenTypes.Jwt },
+        new AccessTokenTypesDesc { Description = "Reference", Value = AccessTokenTypes.Reference }
+    };
+
+    record AccessTokenTypesDesc
+    {
+        public string Description {get; set;}
+        public AccessTokenTypes Value { get; set; }
+    }
+
     record TokenExchangeType
     {
         public string Description { get; set; }
@@ -299,6 +325,7 @@
         public bool IsRedirectUrlCaseSensitive { get; set; }
         public string MetadataUrl { get; set; }
         public TokenExchangeTypes? TokenExchangeType { get; set;  }
+        public AccessTokenTypes AccessTokenType { get; set;  }
     }
 
     UpdateClient updateClient = new UpdateClient();
@@ -339,7 +366,8 @@
             UseAcs = this.Client.GetUseAcrsArtifact(),
             MetadataUrl = this.Client.GetSaml2SpMetadataUrl(),
             IsRedirectUrlCaseSensitive = this.Client.IsRedirectUrlCaseSensitive,
-            TokenExchangeType = this.Client.TokenExchangeType
+            TokenExchangeType = this.Client.TokenExchangeType,
+            AccessTokenType = this.Client.AccessTokenType
         };
         if (this.Client.GrantTypes.Contains(ClientCredentialsHandler.GRANT_TYPE))
             updateClient.IsClientCredentialsGrantTypeEnabled = true;
@@ -384,7 +412,8 @@
             UseAcs = client.UseAcs,
             MetadataUrl = client.MetadataUrl,
             TokenExchangeType = client.TokenExchangeType,
-            JwksUrl = this.Client.JwksUri
+            JwksUrl = this.Client.JwksUri,
+            AccessTokenType = client.AccessTokenType
         });
     }
 

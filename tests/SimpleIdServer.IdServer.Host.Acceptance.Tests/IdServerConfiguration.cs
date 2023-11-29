@@ -214,8 +214,8 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildApiClient("sixtyFourClient", "password").AddScope(FirstScope).UseDPOPProof(true).EnableRefreshTokenGrantType().Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("sixtyFiveClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().UseDPOPProof(true).AddScope(SecondScope).Build(),
             ClientBuilder.BuildApiClient("sixtySixClient", "password").EnableExchangeTokenGrantType(TokenExchangeTypes.IMPERSONATION).Build(),
-            ClientBuilder.BuildApiClient("sixtySevenClient", "password").EnableExchangeTokenGrantType(TokenExchangeTypes.DELEGATION).Build()
-
+            ClientBuilder.BuildApiClient("sixtySevenClient", "password").EnableExchangeTokenGrantType(TokenExchangeTypes.DELEGATION).Build(),
+            ClientBuilder.BuildApiClient("sixtyEightClient", "password").AddScope(FirstScope).SetAccessTokenType(AccessTokenTypes.Reference).Build()
         };
 
         public static List<DeviceAuthCode> DeviceAuthCodes = new List<DeviceAuthCode>

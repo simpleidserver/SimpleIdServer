@@ -29,7 +29,8 @@ namespace SimpleIdServer.IdServer.Helpers
         Task<bool> RemoveTokens(IEnumerable<Token> tokens, CancellationToken cancellationToken);
         SecurityTokenDescriptor BuildAccessToken(string clientId,IEnumerable<string> audiences, IEnumerable<string> scopes, ICollection<AuthorizationData> authorizationDetails, string issuerName);
         SecurityTokenDescriptor BuildAccessToken(string clientId,IEnumerable<string> audiences, IEnumerable<string> scopes, ICollection<AuthorizationData> authorizationDetails, string issuerName, double validityPeriodsInSeconds);
-        Task<bool> AddAccessToken(string token, string clientId, string authorizationCode, string grantId, CancellationToken cancellationToken);
+        Task<bool> AddJwtAccessToken(string token, string clientId, string authorizationCode, string grantId, CancellationToken cancellationToken);
+        Task<bool> AddReferenceAccessToken(string id, string token, string clientId, string authorizationCode, string grantId, CancellationToken cancellationToken);
         Task<JsonWebToken> GetAccessToken(string accessToken, CancellationToken cancellationToken);
         Task<bool> TryRemoveAccessToken(string accessToken, string clientId, CancellationToken cancellationToken);
         Task<string> AddRefreshToken(string clientId, string authorizationCode, string grantId, JsonObject currentRequest, JsonObject originalRequest, double validityPeriodsInSeconds, string jkt, string sessionId, CancellationToken cancellationToken);
@@ -124,7 +125,7 @@ namespace SimpleIdServer.IdServer.Helpers
             return descriptor;
         }
 
-        public async Task<bool> AddAccessToken(string token, string clientId, string authorizationCode, string grantId, CancellationToken cancellationToken)
+        public async Task<bool> AddJwtAccessToken(string token, string clientId, string authorizationCode, string grantId, CancellationToken cancellationToken)
         {
             _tokenRepository.Add(new Token
             {
@@ -132,8 +133,26 @@ namespace SimpleIdServer.IdServer.Helpers
                 ClientId = clientId,
                 CreateDateTime = DateTime.UtcNow,
                 TokenType = DTOs.TokenResponseParameters.AccessToken,
+                AccessTokenType = AccessTokenTypes.Jwt,
                 AuthorizationCode = authorizationCode,
                 GrantId = grantId
+            });
+            await _tokenRepository.SaveChanges(cancellationToken);
+            return true;
+        }
+
+        public async Task<bool> AddReferenceAccessToken(string id, string token, string clientId, string authorizationCode, string grantId, CancellationToken cancellationToken)
+        {
+            _tokenRepository.Add(new Token
+            {
+                Id = id,
+                ClientId = clientId,
+                CreateDateTime = DateTime.UtcNow,
+                TokenType = DTOs.TokenResponseParameters.AccessToken,
+                AccessTokenType = AccessTokenTypes.Reference,
+                AuthorizationCode = authorizationCode,
+                GrantId = grantId,
+                Data = token
             });
             await _tokenRepository.SaveChanges(cancellationToken);
             return true;
@@ -144,7 +163,8 @@ namespace SimpleIdServer.IdServer.Helpers
             var result = await _tokenRepository.Query().FirstOrDefaultAsync(t => t.Id == accessToken, cancellationToken);
             if (result == null) return null;
             var handler = new JsonWebTokenHandler();
-            return handler.ReadJsonWebToken(result.Id);
+            if(result.AccessTokenType == AccessTokenTypes.Jwt) return handler.ReadJsonWebToken(result.Id);
+            return handler.ReadJsonWebToken(result.Data);
         }
 
         public async Task<bool> TryRemoveAccessToken(string accessToken, string clientId, CancellationToken cancellationToken)

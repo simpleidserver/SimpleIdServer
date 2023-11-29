@@ -244,6 +244,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             client.TokenExchangeType = act.TokenExchangeType;
             client.SetSaml2SpMetadataUrl(act.MetadataUrl);
             client.SetUseAcsArtifact(act.UseAcs);
+            client.AccessTokenType = act.AccessTokenType;
             return state with
             {
                 Client = client

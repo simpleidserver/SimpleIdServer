@@ -187,6 +187,18 @@ namespace SimpleIdServer.IdServer.Builders
         #region Others
 
         /// <summary>
+        /// Set the access token type (jwt or reference).
+        /// Default value is jwt.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public ApiClientBuilder SetAccessTokenType(AccessTokenTypes type)
+        {
+            _client.AccessTokenType = type;
+            return this;
+        }
+
+        /// <summary>
         /// Set the token expiration time in seconds.
         /// </summary>
         /// <param name="tokenExpirationTimeInSeconds"></param>

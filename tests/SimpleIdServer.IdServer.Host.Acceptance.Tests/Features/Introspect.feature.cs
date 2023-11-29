@@ -372,6 +372,76 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
+        [Xunit.SkippableFactAttribute(DisplayName="Introspect a reference access token")]
+        [Xunit.TraitAttribute("FeatureTitle", "Introspect")]
+        [Xunit.TraitAttribute("Description", "Introspect a reference access token")]
+        public void IntrospectAReferenceAccessToken()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Introspect a reference access token", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 95
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table442 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table442.AddRow(new string[] {
+                            "client_id",
+                            "sixtyEightClient"});
+                table442.AddRow(new string[] {
+                            "client_secret",
+                            "password"});
+                table442.AddRow(new string[] {
+                            "scope",
+                            "firstScope"});
+                table442.AddRow(new string[] {
+                            "grant_type",
+                            "client_credentials"});
+#line 96
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table442, "When ");
+#line hidden
+#line 103
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 104
+ testRunner.And("extract parameter \'$.access_token\' from JSON body into \'accessToken\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table443 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table443.AddRow(new string[] {
+                            "client_id",
+                            "sixtyEightClient"});
+                table443.AddRow(new string[] {
+                            "client_secret",
+                            "password"});
+                table443.AddRow(new string[] {
+                            "token",
+                            "$accessToken$"});
+#line 106
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token_info\'", ((string)(null)), table443, "And ");
+#line hidden
+#line 112
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 114
+ testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 115
+ testRunner.And("JSON \'$.active\'=\'true\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
         [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
         [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
         public class FixtureData : System.IDisposable

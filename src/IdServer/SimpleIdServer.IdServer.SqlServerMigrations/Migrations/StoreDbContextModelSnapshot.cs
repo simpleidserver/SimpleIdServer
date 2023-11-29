@@ -728,6 +728,10 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .HasColumnType("nvarchar(450)")
                         .HasAnnotation("Relational:JsonPropertyName", "id");
 
+                    b.Property<int>("AccessTokenType")
+                        .HasColumnType("int")
+                        .HasAnnotation("Relational:JsonPropertyName", "access_token_type");
+
                     b.Property<string>("ApplicationType")
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "application_type");
@@ -1804,6 +1808,9 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PkID"));
 
+                    b.Property<int?>("AccessTokenType")
+                        .HasColumnType("int");
+
                     b.Property<string>("AuthorizationCode")
                         .HasColumnType("nvarchar(max)");
 
@@ -1825,9 +1832,6 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
 
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsRegistrationAccessToken")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Jkt")
                         .HasColumnType("nvarchar(max)");

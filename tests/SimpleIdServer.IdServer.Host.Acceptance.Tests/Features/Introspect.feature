@@ -91,3 +91,27 @@ Scenario: JKT is returned
 	And JSON '$.scope'='firstScope'
 	And JSON '$.iss'='https://localhost:8080'
 	And JSON exists '$.cnf.jkt'
+
+Scenario: Introspect a reference access token
+	When execute HTTP POST request 'https://localhost:8080/token'
+	| Key           | Value              |
+	| client_id     | sixtyEightClient	 |
+	| client_secret | password           |
+	| scope         | firstScope	     |
+	| grant_type    | client_credentials |
+	
+	And extract JSON from body
+	And extract parameter '$.access_token' from JSON body into 'accessToken'
+
+	And execute HTTP POST request 'https://localhost:8080/token_info'
+	| Key           | Value               |
+	| client_id     | sixtyEightClient    |
+	| client_secret | password            |
+	| token         | $accessToken$       |
+	
+	And extract JSON from body
+
+	Then HTTP status code equals to '200'
+	And JSON '$.active'='true'
+	And JSON '$.client_id'='sixtyEightClient'
+	And JSON '$.scope'='firstScope'
