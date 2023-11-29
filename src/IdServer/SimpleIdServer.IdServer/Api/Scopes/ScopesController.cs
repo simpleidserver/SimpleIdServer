@@ -300,6 +300,7 @@ public class ScopesController : BaseController
                 scopeClaimMapper.SAMLAttributeName = request.SAMLAttributeName;
                 scopeClaimMapper.TokenClaimJsonType = request.TokenClaimJsonType;
                 scopeClaimMapper.IsMultiValued = request.IsMultiValued;
+                scopeClaimMapper.IncludeInAccessToken = request.IncludeInAccessToken;
                 scope.UpdateDateTime = DateTime.UtcNow;
                 await _scopeRepository.SaveChanges(CancellationToken.None);
                 activity?.SetStatus(ActivityStatusCode.Ok, "Claim mapping rule is added");

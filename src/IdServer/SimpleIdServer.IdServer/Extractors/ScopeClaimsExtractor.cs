@@ -24,9 +24,13 @@ namespace SimpleIdServer.IdServer.Extractors
 
         public Task<Dictionary<string, object>> ExtractClaims(HandlerContext context, IEnumerable<Scope> scopes, ScopeProtocols protocol)
         {
-            var claimMappers = scopes.Where(s => s.Protocol == protocol).SelectMany(s => s.ClaimMappers);
+            var claimMappers = scopes
+                .Where(s => (s.Protocol == ScopeProtocols.OPENID && protocol == ScopeProtocols.OAUTH) || s.Protocol == protocol)
+                .SelectMany(s => s.ClaimMappers)
+                .Where(s => protocol != ScopeProtocols.OAUTH || (protocol == ScopeProtocols.OAUTH && s.IncludeInAccessToken));
             foreach (var mapper in claimMappers)
-                mapper.TargetClaimPath = protocol == ScopeProtocols.OPENID ? mapper.TargetClaimPath : mapper.SAMLAttributeName;
+                mapper.TargetClaimPath = protocol == ScopeProtocols.SAML ? mapper.SAMLAttributeName: mapper.TargetClaimPath;
+
             return _claimsExtractor.ResolveGroupsAndExtract(context, claimMappers);
         }
     }

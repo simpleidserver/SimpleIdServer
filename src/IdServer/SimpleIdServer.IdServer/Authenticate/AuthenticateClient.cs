@@ -49,7 +49,7 @@ namespace SimpleIdServer.IdServer.Authenticate
 
             var client = await _clientRepository.Query()
                 .Include(c => c.SerializedJsonWebKeys)
-                .Include(c => c.Scopes)
+                .Include(c => c.Scopes).ThenInclude(s => s.ClaimMappers)
                 .Include(c=> c.Realms)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == authenticateInstruction.Realm), cancellationToken);

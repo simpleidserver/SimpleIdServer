@@ -20,5 +20,6 @@ public class UpdateScopeClaimRequest
     public TokenClaimJsonTypes? TokenClaimJsonType { get; set; } = null;
     [JsonPropertyName(ScopeClaimMapperNames.IsMultivalued)]
     public bool IsMultiValued { get; set; } = false;
-
+    [JsonPropertyName(ScopeClaimMapperNames.IncludeInAccessToken)]
+    public bool IncludeInAccessToken { get; set; } = false;
 }

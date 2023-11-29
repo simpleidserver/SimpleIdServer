@@ -656,6 +656,91 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
+        [Xunit.SkippableFactAttribute(DisplayName="access token contains the role")]
+        [Xunit.TraitAttribute("FeatureTitle", "AuthorizationCodeGrantType")]
+        [Xunit.TraitAttribute("Description", "access token contains the role")]
+        public void AccessTokenContainsTheRole()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("access token contains the role", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 190
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 191
+ testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table250 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table250.AddRow(new string[] {
+                            "response_type",
+                            "code"});
+                table250.AddRow(new string[] {
+                            "client_id",
+                            "sixtyNineClient"});
+                table250.AddRow(new string[] {
+                            "state",
+                            "state"});
+                table250.AddRow(new string[] {
+                            "redirect_uri",
+                            "http://localhost:8080"});
+                table250.AddRow(new string[] {
+                            "response_mode",
+                            "query"});
+                table250.AddRow(new string[] {
+                            "scope",
+                            "role"});
+#line 192
+ testRunner.When("execute HTTP GET request \'https://localhost:8080/authorization\'", ((string)(null)), table250, "When ");
+#line hidden
+#line 201
+ testRunner.And("extract parameter \'code\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 202
+ testRunner.And("extract parameter \'state\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table251 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table251.AddRow(new string[] {
+                            "client_id",
+                            "sixtyNineClient"});
+                table251.AddRow(new string[] {
+                            "client_secret",
+                            "password"});
+                table251.AddRow(new string[] {
+                            "grant_type",
+                            "authorization_code"});
+                table251.AddRow(new string[] {
+                            "code",
+                            "$code$"});
+                table251.AddRow(new string[] {
+                            "redirect_uri",
+                            "http://localhost:8080"});
+#line 204
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table251, "And ");
+#line hidden
+#line 212
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 214
+ testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 215
+ testRunner.And("access_token contains \'role\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
         [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
         [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
         public class FixtureData : System.IDisposable

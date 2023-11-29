@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.DPoP;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
+using SimpleIdServer.IdServer.Extractors;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
@@ -24,12 +25,18 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
     {
         private readonly IGrantedTokenHelper _grantedTokenHelper;
         private readonly IJwtBuilder _jwtBuilder;
+        private readonly IScopeClaimsExtractor _scopeClaimsExtractor;
         private readonly IdServerHostOptions _options;
 
-        public AccessTokenBuilder(IGrantedTokenHelper grantedTokenHelper, IJwtBuilder jwtBuilder, IOptions<IdServerHostOptions> options)
+        public AccessTokenBuilder(
+            IGrantedTokenHelper grantedTokenHelper, 
+            IJwtBuilder jwtBuilder,
+            IScopeClaimsExtractor scopeClaimsExtractor,
+            IOptions<IdServerHostOptions> options)
         {
             _grantedTokenHelper = grantedTokenHelper;
             _jwtBuilder = jwtBuilder;
+            _scopeClaimsExtractor = scopeClaimsExtractor;
             _options = options.Value;
         }
 
@@ -38,7 +45,12 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
         public async virtual Task Build(BuildTokenParameter parameter, HandlerContext handlerContext, CancellationToken cancellationToken, bool useOriginalRequest = false)
         {
             var tokenDescriptor = BuildOpenIdPayload(parameter.Scopes, parameter.Audiences, parameter.Claims, parameter.AuthorizationDetails, handlerContext);
-            if(parameter.AdditionalClaims != null)
+            var scopes = handlerContext.Client.Scopes.Where(s => parameter.Scopes.Contains(s.Name));
+            var claimsDic = await _scopeClaimsExtractor.ExtractClaims(handlerContext, scopes, ScopeProtocols.OAUTH);
+            foreach (var claim in claimsDic)
+                tokenDescriptor.Claims.Add(claim.Key, claim.Value);
+
+            if (parameter.AdditionalClaims != null)
                 foreach(var claim in parameter.AdditionalClaims)
                     tokenDescriptor.Claims.Add(claim.Key, claim.Value);
 

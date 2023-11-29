@@ -1699,6 +1699,10 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         .HasColumnType("tinyint(1)")
                         .HasAnnotation("Relational:JsonPropertyName", "is_multivalued");
 
+                    b.Property<bool>("IncludeInAccessToken")
+                        .HasColumnType("tinyint(1)")
+                        .HasAnnotation("Relational:JsonPropertyName", "include_in_accesstoken");
+
                     b.Property<int>("MapperType")
                         .HasColumnType("int")
                         .HasAnnotation("Relational:JsonPropertyName", "mapper_type");

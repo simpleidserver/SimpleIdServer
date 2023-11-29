@@ -33,6 +33,11 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonPropertyName(ScopeClaimMapperNames.TargetClaimPath)]
         public string? TargetClaimPath { get; set; } = null;
         /// <summary>
+        /// Include the claims into the access token.
+        /// </summary>
+        [JsonPropertyName(ScopeClaimMapperNames.IncludeInAccessToken)]
+        public bool IncludeInAccessToken { get; set; } = false;
+        /// <summary>
         /// SAML Attribute name.
         /// </summary>
         [JsonPropertyName(ScopeClaimMapperNames.SAMLAttributeName)]

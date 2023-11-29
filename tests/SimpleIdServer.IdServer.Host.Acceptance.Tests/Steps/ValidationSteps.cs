@@ -84,6 +84,13 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             Assert.Contains(value, jwt.Audiences);
         }
 
+        [Then("access_token contains '(.*)'")]
+        public void ThenAccessTokenContainsClaim(string value)
+        {
+            var jwt = GetAccessToken();
+            Assert.True(jwt.Claims.Any(c => c.Type == value));
+        }
+
         [Then("access_token scope contains '(.*)'")]
         public void ThenAccessTokenScopeContains(string value)
         {

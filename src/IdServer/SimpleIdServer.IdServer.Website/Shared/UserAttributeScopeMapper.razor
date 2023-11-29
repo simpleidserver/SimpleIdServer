@@ -28,6 +28,11 @@
         <RadzenSwitch @bind-Value=@scopeMapperFom.Multivalued Name="Multivalued" TValue="bool" />
         <RadzenLabel Text="Multivalued" Component="Multivalued" Style="margin-left: 8px; vertical-align: middle;" />
     </div>
+    <!-- Include the claims into the access token -->
+    <div class="mt-1">
+        <RadzenSwitch @bind-Value=@scopeMapperFom.IncludeInAccessToken Name="IncludeInAccessToken" TValue="bool" />
+        <RadzenLabel Text="Include in access token" Component="IncludeInAccessToken" Style="margin-left: 8px; vertical-align: middle;" />
+    </div>
     <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateScopeMapperState.Value.IsUpdating ? "Saving..." : "Save")" Disabled="@(updateScopeMapperState.Value.IsUpdating)" />
 </RadzenTemplateForm>
 @code {

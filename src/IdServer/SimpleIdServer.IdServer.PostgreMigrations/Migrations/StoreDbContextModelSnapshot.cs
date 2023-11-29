@@ -1711,6 +1711,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "id");
 
+                    b.Property<bool>("IncludeInAccessToken")
+                        .HasColumnType("boolean")
+                        .HasAnnotation("Relational:JsonPropertyName", "include_in_accesstoken");
+
                     b.Property<bool>("IsMultiValued")
                         .HasColumnType("boolean")
                         .HasAnnotation("Relational:JsonPropertyName", "is_multivalued");

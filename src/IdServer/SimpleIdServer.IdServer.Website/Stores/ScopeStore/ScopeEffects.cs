@@ -254,7 +254,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
                 TargetClaimPath = action.ClaimMapper.TargetClaimPath,
                 SAMLAttributeName = action.ClaimMapper.SAMLAttributeName,
                 TokenClaimJsonType = action.ClaimMapper.TokenClaimJsonType,
-                IsMultiValued = action.ClaimMapper.IsMultiValued
+                IsMultiValued = action.ClaimMapper.IsMultiValued,
+                IncludeInAccessToken = action.ClaimMapper.IncludeInAccessToken
             };
             var requestMessage = new HttpRequestMessage
             {

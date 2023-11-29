@@ -186,3 +186,30 @@ Scenario: access token contains authorization_details with openid_credential
 	And extract payload from JWT '$access_token$'
 
 	Then JWT has authorization_details type 'openid_credential'
+
+Scenario: access token contains the role
+	Given authenticate a user
+	When execute HTTP GET request 'https://localhost:8080/authorization'
+	| Key           | Value                 |
+	| response_type | code                  |
+	| client_id     | sixtyNineClient       |
+	| state         | state                 |
+	| redirect_uri  | http://localhost:8080 |
+	| response_mode | query                 |
+	| scope         | role      			|
+
+	And extract parameter 'code' from redirect url
+	And extract parameter 'state' from redirect url
+	
+	And execute HTTP POST request 'https://localhost:8080/token'
+	| Key           | Value        			|
+	| client_id     | sixtyNineClient		|
+	| client_secret | password     			|
+	| grant_type    | authorization_code	|
+	| code			| $code$				|	
+	| redirect_uri  | http://localhost:8080	|	
+
+	And extract JSON from body
+
+	Then HTTP status code equals to '200'
+	And access_token contains 'role'

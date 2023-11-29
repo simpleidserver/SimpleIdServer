@@ -7,6 +7,7 @@ namespace SimpleIdServer.IdServer.Website.Models
         public string Name { get; set; } = null!;
         public string? TokenClaimName { get; set; } = null;
         public string? SAMLAttributeName { get; set; } = null;
+        public bool IncludeInAccessToken { get; set; }
         public TokenClaimJsonTypes ClaimJsonType { get; set; } = TokenClaimJsonTypes.STRING;
 
         public void Update(ScopeClaimMapper mapper)
@@ -14,7 +15,8 @@ namespace SimpleIdServer.IdServer.Website.Models
             Name = mapper.Name;
             TokenClaimName = mapper.TargetClaimPath;
             SAMLAttributeName = mapper.SAMLAttributeName;
-            if(mapper.TokenClaimJsonType != null)
+            IncludeInAccessToken = mapper.IncludeInAccessToken;
+            if (mapper.TokenClaimJsonType != null)
                 ClaimJsonType = mapper.TokenClaimJsonType.Value;
         }
 
@@ -25,7 +27,8 @@ namespace SimpleIdServer.IdServer.Website.Models
                 Name = Name,
                 TargetClaimPath = TokenClaimName,
                 SAMLAttributeName = SAMLAttributeName,
-                TokenClaimJsonType = ClaimJsonType
+                TokenClaimJsonType = ClaimJsonType,
+                IncludeInAccessToken = IncludeInAccessToken
             };
         }
     }

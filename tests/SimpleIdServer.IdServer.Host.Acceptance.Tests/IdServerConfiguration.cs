@@ -16,6 +16,14 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
 {
     public class IdServerConfiguration
     {
+        public static Scope GetRoleScope()
+        {
+            var result = Constants.StandardScopes.Role;
+            var claimMapper = result.ClaimMappers.ElementAt(0);
+            claimMapper.IncludeInAccessToken = true;
+            return result;
+        }
+
         public const string DidKey = "did:key:z6Mknh2Rpuqp9gRZThCJtUMEUaA5oivMD5AFic3Fz3uftAhX";
         public const string PrivateKey = "c1d5ca0e0c8c72825838b79b0fcd6cc7a035f852fe95f7c1b6db4feaf9806068";
 
@@ -128,7 +136,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             CalendarScope,
             Constants.StandardScopes.OpenIdScope,
             Constants.StandardScopes.Profile,
-            Constants.StandardScopes.Role,
+            GetRoleScope(),
             Constants.StandardScopes.Email,
             Constants.StandardScopes.OfflineAccessScope,
             Constants.StandardScopes.GrantManagementQuery,
@@ -215,7 +223,8 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildTraditionalWebsiteClient("sixtyFiveClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().UseDPOPProof(true).AddScope(SecondScope).Build(),
             ClientBuilder.BuildApiClient("sixtySixClient", "password").EnableExchangeTokenGrantType(TokenExchangeTypes.IMPERSONATION).Build(),
             ClientBuilder.BuildApiClient("sixtySevenClient", "password").EnableExchangeTokenGrantType(TokenExchangeTypes.DELEGATION).Build(),
-            ClientBuilder.BuildApiClient("sixtyEightClient", "password").AddScope(FirstScope).SetAccessTokenType(AccessTokenTypes.Reference).Build()
+            ClientBuilder.BuildApiClient("sixtyEightClient", "password").AddScope(FirstScope).SetAccessTokenType(AccessTokenTypes.Reference).Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("sixtyNineClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().DisableConsent().AddScope(GetRoleScope()).Build(),
         };
 
         public static List<DeviceAuthCode> DeviceAuthCodes = new List<DeviceAuthCode>

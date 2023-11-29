@@ -1,6 +1,13 @@
-﻿<ul>
+﻿@model Website.ViewModels.ClaimsViewModel
+
+<ul>
     @foreach (var claim in User.Claims)
     {
         <li>@claim.Type : @claim.Value</li>
     }
 </ul>
+
+<div>
+    <h3>Access token</h3>
+    <p>@Model.AccessToken</p>
+</div>
