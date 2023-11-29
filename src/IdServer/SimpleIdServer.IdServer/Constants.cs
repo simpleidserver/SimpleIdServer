@@ -84,6 +84,7 @@ namespace SimpleIdServer.IdServer
             public const string Statistics = "stats";
             public const string Realms = "realms";
             public const string Groups = "groups";
+            public const string Themes = "themes";
         }
 
         public static List<string> AllStandardNotificationModes = new List<string>

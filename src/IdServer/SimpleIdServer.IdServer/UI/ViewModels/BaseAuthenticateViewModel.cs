@@ -7,6 +7,7 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
 {
     public abstract class BaseAuthenticateViewModel
     {
+        public bool IsFake { get; set; }
         public string ReturnUrl { get; set; }
         public string Login { get; set; }
         public string ClientName { get; set; }

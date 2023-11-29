@@ -495,6 +495,10 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Statistics,
                 defaults: new { controller = "Statistics", action = "Get" });
 
+            webApplication.SidMapControllerRoute("getTheme",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Themes + "/{id}",
+                defaults: new { controller = "Themes", action = "Get" });
+
             webApplication.SidMapControllerRoute("getAllRealms",
                 pattern: Constants.EndPoints.Realms,
                 defaults: new { controller = "Realms", action = "GetAll" });

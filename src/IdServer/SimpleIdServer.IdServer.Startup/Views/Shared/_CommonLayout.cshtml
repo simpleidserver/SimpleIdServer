@@ -1,6 +1,16 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.AspNetCore.Http;
+@using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Api;
+@using SimpleIdServer.IdServer.Options;
 @using SimpleIdServer.IdServer.Startup.Resources
 @using System.Globalization
+@inject IOptions<IdServerHostOptions> options;
+
+@{
+    var issuer = HandlerContext.GetIssuer(Context.Request.GetAbsoluteUriWithVirtualPath(), options.Value.UseRealm);
+    var themeUrl = $"{issuer}/themes/orange";
+}
 
 <!DOCTYPE html>
 <html>
@@ -9,7 +19,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SimpleIdServer - @ViewBag.Title</title>
     <link rel="stylesheet" href="@Url.Content("~/lib/bootstrap/css/bootstrap.css")" />
-    <link rel="stylesheet" href="@Url.Content("~/styles/theme.css")" />
+    <link rel="stylesheet" href="@themeUrl" />
     <link rel="stylesheet" href="@Url.Content("~/styles/authenticate.css")" />
     <link rel="stylesheet" href="@Url.Content("~/styles/consent.css")" />
     <link rel="stylesheet" href="@Url.Content("~/styles/profile.css")" />

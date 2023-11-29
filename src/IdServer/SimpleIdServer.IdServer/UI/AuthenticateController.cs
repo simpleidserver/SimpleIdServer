@@ -33,6 +33,14 @@ namespace SimpleIdServer.IdServer.UI
         {
         }
 
+        public IActionResult Fake([FromRoute] string prefix)
+        {
+            return View("Index", new AuthenticatePasswordViewModel
+            {
+                IsFake = true
+            });
+        }
+
         protected override string Amr => Constants.Areas.Password;
 
         protected override bool IsExternalIdProvidersDisplayed => true;
