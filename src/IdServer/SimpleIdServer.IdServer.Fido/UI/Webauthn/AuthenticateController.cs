@@ -12,6 +12,7 @@ using SimpleIdServer.IdServer.Fido.Apis;
 using SimpleIdServer.IdServer.Fido.Services;
 using SimpleIdServer.IdServer.Fido.UI.ViewModels;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI;
@@ -32,12 +33,14 @@ namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
             IWebauthnAuthenticationService userAuthenticationService,
             IOptions<IdServerHostOptions> options,
             IDataProtectionProvider dataProtectionProvider,
+            ITokenRepository tokenRepository,
+            IJwtBuilder jwtBuilder,
             IClientRepository clientRepository,
             IAmrHelper amrHelper,
             IUserRepository userRepository,
             IUserSessionResitory userSessionRepository,
             IUserTransformer userTransformer,
-            IBusControl busControl) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl)
+            IBusControl busControl) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl)
         {
             _distributedCache = distributedCache;
         }

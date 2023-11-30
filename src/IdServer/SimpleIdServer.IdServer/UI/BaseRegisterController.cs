@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.ViewModels;
@@ -18,7 +19,12 @@ namespace SimpleIdServer.IdServer.UI;
 
 public abstract class BaseRegisterController<TViewModel> : BaseController where TViewModel : IRegisterViewModel
 {
-    public BaseRegisterController(IOptions<IdServerHostOptions> options, IDistributedCache distributedCache, IUserRepository userRepository)
+    public BaseRegisterController(
+        IOptions<IdServerHostOptions> options, 
+        IDistributedCache distributedCache,
+        IUserRepository userRepository,
+        ITokenRepository tokenRepository,
+        IJwtBuilder jwtBuilder) : base(tokenRepository, jwtBuilder)
     {
         Options = options.Value;
         DistributedCache = distributedCache;

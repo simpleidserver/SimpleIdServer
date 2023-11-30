@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.AuthProviders;
@@ -36,13 +37,15 @@ namespace SimpleIdServer.IdServer.UI
             IAuthenticationSchemeProvider authenticationSchemeProvider,
             IUserAuthenticationService userAuthenticationService,
             IDataProtectionProvider dataProtectionProvider,
+            ITokenRepository tokenRepository,
+            IJwtBuilder jwtBuilder,
             IAuthenticationHelper authenticationHelper,
             IClientRepository clientRepository,
             IAmrHelper amrHelper,
             IUserRepository userRepository,
             IUserSessionResitory userSessionRepository,
             IUserTransformer userTransformer,
-            IBusControl busControl) : base(clientRepository, userRepository, userSessionRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, options)
+            IBusControl busControl) : base(clientRepository, userRepository, userSessionRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, tokenRepository, jwtBuilder, options)
         {
             _authenticationSchemeProvider = authenticationSchemeProvider;
             _authenticationService = userAuthenticationService;

@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
+using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Store;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,7 +24,9 @@ namespace SimpleIdServer.IdServer.Api.DeviceAuthorization
         public DeviceAuthorizationController(
             IDeviceAuthorizationRequestHandler handler, 
             IBusControl busControl,
-            IOptions<IdServerHostOptions> options)
+            IJwtBuilder jwtBuilder,
+            ITokenRepository tokenRepository,
+            IOptions<IdServerHostOptions> options) : base(tokenRepository, jwtBuilder)
         {
             _handler = handler;
             _busControl = busControl;

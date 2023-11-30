@@ -16,13 +16,14 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
 {
     public class BCCallbackController : BaseController
     {
-        private readonly IJwtBuilder _jwtBuilder;
         private readonly IBCAuthorizeRepository _bcAuthorizeRepository;
         private readonly IRecurringJobManager _recurringJobManager;
 
-        public BCCallbackController(IJwtBuilder jwtBuilder, IBCAuthorizeRepository bCAuthorizeRepository, IRecurringJobManager recurringJobManager)
+        public BCCallbackController(ITokenRepository tokenRepository,
+            IJwtBuilder jwtBuilder, 
+            IBCAuthorizeRepository bCAuthorizeRepository, 
+            IRecurringJobManager recurringJobManager) : base(tokenRepository, jwtBuilder)
         {
-            _jwtBuilder = jwtBuilder;
             _bcAuthorizeRepository = bCAuthorizeRepository;
             _recurringJobManager = recurringJobManager;
         }

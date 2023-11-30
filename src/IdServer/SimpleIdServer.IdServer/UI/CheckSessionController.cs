@@ -37,7 +37,6 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IUserRepository _userRepository;
         private readonly IUserSessionResitory _userSessionRepository;
         private readonly IClientRepository _clientRepository;
-        private readonly IJwtBuilder _jwtBuilder;
         private readonly ISessionHelper _sessionHelper;
         private readonly IAuthenticationHelper _authenticationHelper;
 
@@ -46,15 +45,15 @@ namespace SimpleIdServer.IdServer.UI
             IUserRepository userRepository,
             IUserSessionResitory userSessionRepository,
             IClientRepository clientRepository,
-            IJwtBuilder jwtBuilder,
             ISessionHelper sessionHelper,
-            IAuthenticationHelper authenticationHelper)
+            IAuthenticationHelper authenticationHelper,
+            ITokenRepository tokenRepository,
+            IJwtBuilder jwtBuilder) : base(tokenRepository, jwtBuilder)
         {
             _options = options.Value;
             _userRepository = userRepository;
             _userSessionRepository = userSessionRepository;
             _clientRepository = clientRepository;
-            _jwtBuilder = jwtBuilder;
             _sessionHelper = sessionHelper;
             _authenticationHelper = authenticationHelper;
         }
@@ -250,7 +249,7 @@ namespace SimpleIdServer.IdServer.UI
             if (!handler.CanReadToken(idTokenHint))
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_IDTOKENHINT);
 
-            var validationResult = _jwtBuilder.ReadSelfIssuedJsonWebToken(realm, idTokenHint);
+            var validationResult = JwtBuilder.ReadSelfIssuedJsonWebToken(realm, idTokenHint);
             if(validationResult.Error != null)
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_IDTOKENHINT);
             return validationResult;

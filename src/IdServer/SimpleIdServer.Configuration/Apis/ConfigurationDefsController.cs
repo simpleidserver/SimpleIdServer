@@ -15,19 +15,20 @@ namespace SimpleIdServer.Configuration.Apis;
 public class ConfigurationDefsController : BaseController
 {
 	private readonly IConfigurationDefinitionStore _configurationDefinitionStore;
-	private readonly IJwtBuilder _jwtBuilder;
 
-	public ConfigurationDefsController(IConfigurationDefinitionStore configurationDefinitionStore, IJwtBuilder jwtBuilder)
+	public ConfigurationDefsController(
+        IConfigurationDefinitionStore configurationDefinitionStore, 
+        ITokenRepository tokenRepository, 
+        IJwtBuilder jwtBuilder) : base(tokenRepository, jwtBuilder)
 	{
         _configurationDefinitionStore = configurationDefinitionStore;
-		_jwtBuilder = jwtBuilder;
 	}
 
 	[HttpGet]
 	public async Task<IActionResult> GetAll([FromRoute] string prefix)
     {
         prefix = prefix ?? IdServer.Constants.DefaultRealm;
-        CheckAccessToken(prefix, Constants.ConfigurationsScope.Name, _jwtBuilder);
+        await CheckAccessToken(prefix, Constants.ConfigurationsScope.Name);
         var confDefs = await _configurationDefinitionStore.Query()
             .Include(c => c.Records).ThenInclude(r => r.Values).ThenInclude(r => r.Translations)
             .Include(c => c.Records).ThenInclude(r => r.Translations)

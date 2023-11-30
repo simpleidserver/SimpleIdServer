@@ -4,7 +4,6 @@ using Fido2NetLib;
 using Fido2NetLib.Objects;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -25,7 +24,6 @@ namespace SimpleIdServer.IdServer.Fido.Apis
         private readonly IConfiguration _configuration;
         private readonly IAuthenticationHelper _authenticationHelper;
         private readonly IUserRepository _userRepository;
-        private readonly IJwtBuilder _jwtBuilder;
         private readonly IDistributedCache _distributedCache;
         private IFido2 _fido2;
 
@@ -33,14 +31,14 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             IConfiguration configuration, 
             IAuthenticationHelper authenticationHelper, 
             IUserRepository userRepository, 
+            ITokenRepository tokenRepository,
             IJwtBuilder jwtBuilder, 
             IDistributedCache distributedCache,
-            IFido2 fido2)
+            IFido2 fido2) : base(tokenRepository, jwtBuilder)
         {
             _configuration = configuration;
             _authenticationHelper = authenticationHelper;
             _userRepository = userRepository;
-            _jwtBuilder = jwtBuilder;
             _distributedCache = distributedCache;
             _fido2 = fido2;
         }
@@ -113,7 +111,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             var session = await _distributedCache.GetStringAsync(request.SessionId, cancellationToken);
             if (string.IsNullOrWhiteSpace(session)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.SESSION_CANNOT_BE_EXTRACTED);
             JsonWebToken jsonWebToken = null;
-            if (!TryGetIdentityToken(prefix, _jwtBuilder, out jsonWebToken))
+            if (!TryGetIdentityToken(prefix, out jsonWebToken))
                 if (string.IsNullOrWhiteSpace(request.Login)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.MISSING_PARAMETER, EndU2FRegisterRequestNames.Login));
             var login = jsonWebToken?.Subject ?? request.Login;
             var authenticatedUser = await _authenticationHelper.GetUserByLogin(login, prefix, cancellationToken);
@@ -153,7 +151,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             prefix = prefix ?? IdServer.Constants.DefaultRealm;
             if (request == null) return (null, BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, IdServer.ErrorMessages.INVALID_INCOMING_REQUEST));
             JsonWebToken jsonWebToken = null;
-            if (!TryGetIdentityToken(prefix, _jwtBuilder, out jsonWebToken))
+            if (!TryGetIdentityToken(prefix, out jsonWebToken))
                 if (string.IsNullOrWhiteSpace(request.Login)) return (null, BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.MISSING_PARAMETER, BeginU2FLoginRequestNames.Login)));
 
             var login = jsonWebToken?.Subject ?? request.Login;

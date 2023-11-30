@@ -32,17 +32,23 @@ public class ClientsController : BaseController
     private readonly IRealmRepository _realmRepository;
     private readonly IRegisterClientRequestValidator _registerClientRequestValidator;
     private readonly IBusControl _busControl;
-    private readonly IJwtBuilder _jwtBuilder;
     private readonly ILogger<ClientsController> _logger;
 
-    public ClientsController(IClientRepository clientRepository, IScopeRepository scopeRepository, IRealmRepository realmRepository, IRegisterClientRequestValidator registerClientRequestValidator, IBusControl busControl, IJwtBuilder jwtBuilder, ILogger<ClientsController> logger)
+    public ClientsController(
+        IClientRepository clientRepository, 
+        IScopeRepository scopeRepository, 
+        IRealmRepository realmRepository, 
+        IRegisterClientRequestValidator registerClientRequestValidator, 
+        IBusControl busControl, 
+        ITokenRepository tokenRepository,
+        IJwtBuilder jwtBuilder, 
+        ILogger<ClientsController> logger) : base(tokenRepository, jwtBuilder)
     {
         _clientRepository = clientRepository;
         _scopeRepository = scopeRepository;
         _realmRepository = realmRepository;
         _registerClientRequestValidator = registerClientRequestValidator;
         _busControl = busControl;
-        _jwtBuilder = jwtBuilder;
         _logger = logger;
     }
 
@@ -52,7 +58,7 @@ public class ClientsController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name, _jwtBuilder);
+            await CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name);
             IQueryable<Client> query = _clientRepository.Query()
                 .Include(c => c.Translations)
                 .Include(p => p.Realms)
@@ -88,7 +94,7 @@ public class ClientsController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name, _jwtBuilder);
+            await CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name);
             IQueryable<Client> query = _clientRepository.Query()
                 .Include(c => c.Translations)
                 .Include(p => p.Realms)
@@ -114,7 +120,7 @@ public class ClientsController : BaseController
             try
             {
                 activity?.SetTag("realm", prefix);
-                CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name);
                 request.Scopes = await GetScopes(prefix, request.Scope, CancellationToken.None);
                 var realm = await _realmRepository.Query().SingleAsync(r => r.Name == prefix);
                 request.Realms.Add(realm);
@@ -165,7 +171,7 @@ public class ClientsController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name, _jwtBuilder);
+            await CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name);
             var result = await _clientRepository.Query()
                 .Include(c => c.Realms)
                 .Include(c => c.Translations)
@@ -187,7 +193,7 @@ public class ClientsController : BaseController
     public async Task<IActionResult> Delete([FromRoute] string prefix, string id)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name, _jwtBuilder);
+        await CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name);
         var result = await _clientRepository.Query()
             .Include(c => c.Realms)
             .SingleOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == prefix));
@@ -206,7 +212,7 @@ public class ClientsController : BaseController
             try
             {
                 activity?.SetTag("realm", prefix);
-                CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name);
                 var result = await _clientRepository.Query()
                     .Include(c => c.Realms)
                     .Include(c => c.Translations)
@@ -277,7 +283,7 @@ public class ClientsController : BaseController
             try
             {
                 activity?.SetTag("realm", prefix);
-                CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name);
                 var result = await _clientRepository.Query()
                     .Include(c => c.Realms)
                     .Include(c => c.Translations)
@@ -332,7 +338,7 @@ public class ClientsController : BaseController
             try
             {
                 activity?.SetTag("realm", prefix);
-                CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name);
                 var result = await _clientRepository.Query()
                     .Include(c => c.Realms)
                     .Include(c => c.Scopes)
@@ -377,7 +383,7 @@ public class ClientsController : BaseController
                 activity?.SetTag("realm", prefix);
                 if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_REQUEST_PARAMETER);
                 if (string.IsNullOrWhiteSpace(request.Name)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, nameof(ScopeNames.Name)));
-                CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name);
                 var result = await _clientRepository.Query()
                     .Include(c => c.Realms)
                     .Include(c => c.Scopes)
@@ -420,7 +426,7 @@ public class ClientsController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name, _jwtBuilder);
+            await CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name);
             var client = await _clientRepository.Query()
                 .Include(c => c.Realms)
                 .Include(c => c.SerializedJsonWebKeys)
@@ -458,7 +464,7 @@ public class ClientsController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name, _jwtBuilder);
+            await CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name);
             var client = await _clientRepository.Query()
                 .Include(c => c.Realms)
                 .Include(c => c.SerializedJsonWebKeys)
@@ -497,7 +503,7 @@ public class ClientsController : BaseController
             try
             {
                 activity?.SetTag("realm", prefix);
-                CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name);
                 var result = await _clientRepository.Query()
                     .Include(c => c.Realms)
                     .Include(c => c.SerializedJsonWebKeys)
@@ -551,7 +557,7 @@ public class ClientsController : BaseController
             try
             {
                 activity?.SetTag("realm", prefix);
-                CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name);
                 var result = await _clientRepository.Query()
                     .Include(c => c.Realms)
                     .Include(c => c.SerializedJsonWebKeys)
@@ -605,7 +611,7 @@ public class ClientsController : BaseController
             try
             {
                 activity?.SetTag("realm", prefix);
-                CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name);
                 var result = await _clientRepository.Query()
                     .Include(c => c.Realms)
                     .Include(c => c.SerializedJsonWebKeys)
@@ -648,7 +654,7 @@ public class ClientsController : BaseController
             try
             {
                 activity?.SetTag("realm", prefix);
-                CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name);
                 var result = await _clientRepository.Query()
                     .Include(c => c.Realms)
                     .SingleOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == prefix));
@@ -703,7 +709,7 @@ public class ClientsController : BaseController
             try
             {
                 activity?.SetTag("realm", prefix);
-                CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name);
                 var result = await _clientRepository.Query()
                     .Include(c => c.Scopes)
                     .SingleOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == prefix));

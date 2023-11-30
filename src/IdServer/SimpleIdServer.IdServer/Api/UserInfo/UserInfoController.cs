@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Runtime.InteropServices.JavaScript;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
@@ -34,14 +35,13 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.Api.UserInfo
 {
-    public class UserInfoController : Controller
+    public class UserInfoController : BaseController
     {
         private readonly IJwtBuilder _jwtBuilder;
         private readonly IUserHelper _userHelper;
         private readonly IScopeRepository _scopeRepository;
         private readonly IUserRepository _userRepository;
         private readonly IClientRepository _clientRepository;
-        private readonly ITokenRepository _tokenRepository;
         private readonly IClaimsEnricher _claimsEnricher;
         private readonly IClaimsJwsPayloadEnricher _claimsJwsPayloadEnricher;
         private readonly IScopeClaimsExtractor _claimsExtractor;
@@ -50,18 +50,18 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
         private readonly IBusControl _busControl;
 
         public UserInfoController(
+            ITokenRepository tokenRepository,
             IJwtBuilder jwtBuilder,
             IUserHelper userHelper,
             IScopeRepository scopeRepository,
             IUserRepository userRepository,
             IClientRepository clientRepository,
-            ITokenRepository tokenRepository,
             IClaimsEnricher claimsEnricher,
             IClaimsJwsPayloadEnricher claimsJwsPayloadEnricher,
             IScopeClaimsExtractor claimsExtractor,
             IOptions<IdServerHostOptions> options,
             ILogger<UserInfoController> logger,
-            IBusControl busControl)
+            IBusControl busControl) : base(tokenRepository, jwtBuilder)
         {
             _jwtBuilder = jwtBuilder;
             _userHelper = userHelper;
@@ -69,7 +69,6 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
             _userRepository = userRepository;
             _clientRepository = clientRepository;
             _claimsEnricher = claimsEnricher;
-            _tokenRepository = tokenRepository;
             _claimsJwsPayloadEnricher = claimsJwsPayloadEnricher;
             _claimsExtractor = claimsExtractor;
             _options = options.Value;
@@ -115,10 +114,21 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
                 {
                     prefix = prefix ?? Constants.DefaultRealm;
                     activity?.SetTag("realm", prefix);
-                    var accessToken = ExtractAccessToken(content);
-                    var jwsPayload = Extract(prefix, accessToken);
-                    if (jwsPayload == null) throw new OAuthException(ErrorCodes.INVALID_TOKEN, ErrorMessages.BAD_TOKEN);
+                    var accessToken = string.Empty;
+                    if(content != null)
+                    {
+                        if (content.ContainsKey(TokenResponseParameters.AccessToken))
+                        {
+                            var at = content.GetStr(TokenResponseParameters.AccessToken);
+                            if (at != null && !string.IsNullOrWhiteSpace(at.ToString())) accessToken = at.ToString();
+                        }
 
+                        if (string.IsNullOrWhiteSpace(accessToken)) throw new OAuthException(HttpStatusCode.Unauthorized, ErrorCodes.ACCESS_DENIED, ErrorMessages.MISSING_TOKEN);
+                    }
+
+                    var kvp = await CheckAccessToken(prefix, accessToken: accessToken);
+                    var jwsPayload = kvp.Item1;
+                    var token = kvp.Item2;
                     var subject = jwsPayload.Subject;
                     scopes = jwsPayload.Claims.Where(c => c.Type == OpenIdConnectParameterNames.Scope).Select(c => c.Value);
                     var audiences = jwsPayload.Audiences;
@@ -138,10 +148,6 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
                     activity?.SetTag("client_id", oauthClient.ClientId);
                     if (!oauthClient.IsConsentDisabled && _userHelper.GetConsent(user, prefix, oauthClient.ClientId, scopes, claims, null, AuthorizationClaimTypes.UserInfo) == null)
                         throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.NO_CONSENT);
-
-                    var token = await _tokenRepository.Query().AsNoTracking().FirstOrDefaultAsync(t => t.Id == accessToken);
-                    if (token == null)
-                        throw new OAuthException(ErrorCodes.INVALID_TOKEN, ErrorMessages.ACCESS_TOKEN_REJECTED);
 
                     var oauthScopes = await _scopeRepository.Query().Include(s => s.Realms).Include(s => s.ClaimMappers).AsNoTracking().Where(s => scopes.Contains(s.Name) && s.Realms.Any(r => r.Name == prefix)).ToListAsync(cancellationToken);
                     var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, null, null, null, (X509Certificate2)null, HttpContext.Request.Method), prefix ?? Constants.DefaultRealm, _options);
@@ -214,37 +220,6 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
 
                 return new AuthorizedClaim[0];
             }
-        }
-
-        private JsonWebToken Extract(string realm, string accessToken)
-        {
-            var result = _jwtBuilder.ReadSelfIssuedJsonWebToken(realm, accessToken);
-            if (result.Error != null) return null;
-            return result.Jwt;
-        }
-
-        private string ExtractAccessToken(JsonObject jsonObject)
-        {
-            if (Request.Headers.ContainsKey(Constants.AuthorizationHeaderName))
-            {
-                foreach (var authorizationValue in Request.Headers[Constants.AuthorizationHeaderName])
-                {
-                    var at = authorizationValue.ExtractAuthorizationValue(new string[] { AutenticationSchemes.Bearer });
-                    if (!string.IsNullOrWhiteSpace(at))
-                    {
-                        return at;
-                    }
-                }
-            }
-
-            if (jsonObject != null && jsonObject.ContainsKey(TokenResponseParameters.AccessToken))
-            {
-                var at = jsonObject.GetStr(TokenResponseParameters.AccessToken);
-                if (at != null && !string.IsNullOrWhiteSpace(at.ToString()))
-                    return at.ToString();
-            }
-
-            throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_TOKEN);
         }
     }
 }

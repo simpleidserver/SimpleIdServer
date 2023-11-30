@@ -14,6 +14,7 @@ using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Fido.DTOs;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI;
@@ -40,7 +41,9 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             IFido2 fido2, 
             IDistributedCache distributedCache, 
             IUserCredentialRepository userCredentialRepository,
-            IOptions<IdServerHostOptions> idServerHostOptions)
+            ITokenRepository tokenRepository,
+            IJwtBuilder jwtBuilder,
+            IOptions<IdServerHostOptions> idServerHostOptions) : base(tokenRepository, jwtBuilder)
         {
             _configuration = configuration;
             _authenticationHelper = authenticationHelper;

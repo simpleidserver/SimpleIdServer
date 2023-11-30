@@ -195,3 +195,42 @@ Scenario: Essential claims 'name' and 'email' are returned by the userinfo endpo
 	Then JSON 'sub'='user'
 	Then JSON 'email'='email@outlook.fr'
 
+
+Scenario: Claims are returned in JSON format (HTTP GET & Reference Access token)
+	Given authenticate a user
+	When execute HTTP GET request 'http://localhost/authorization'
+	| Key           | Value                            |
+	| response_type | code                             |
+	| client_id     | seventyClient                    |
+	| state         | state                            |
+	| response_mode | query                            |
+	| scope         | openid email role                |
+	| redirect_uri  | http://localhost:8080            |
+	| nonce         | nonce                            |
+	| display       | popup                            |
+
+	And extract parameter 'code' from redirect url
+	
+	And execute HTTP POST request 'https://localhost:8080/token'
+	| Key           | Value        			|
+	| client_id     | seventyClient         |
+	| client_secret | password     			|
+	| grant_type    | authorization_code	|
+	| code			| $code$				|	
+	| redirect_uri  | http://localhost:8080	|	
+
+	And extract JSON from body
+	And extract parameter 'access_token' from JSON body
+
+	And execute HTTP GET request 'http://localhost/userinfo'
+	| Key           | Value                 |
+	| Authorization | Bearer $access_token$ |
+
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	Then HTTP header has 'Content-Type'='application/json'
+	Then JSON 'sub'='user'
+	Then JSON '$.role[0]'='role1'
+	Then JSON '$.role[1]'='role2'
+	Then JSON 'email'='email@outlook.fr'

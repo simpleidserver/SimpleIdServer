@@ -7,7 +7,7 @@ Scenario: access token is required (HTTP GET)
 	
 	And extract JSON from body
 	
-	Then JSON 'error'='invalid_request'
+	Then JSON 'error'='access_denied'
 	Then JSON 'error_description'='missing token'
 
 Scenario: access token is required (HTTP POST)
@@ -16,7 +16,7 @@ Scenario: access token is required (HTTP POST)
 	
 	And extract JSON from body
 	
-	Then JSON 'error'='invalid_request'
+	Then JSON 'error'='access_denied'
 	Then JSON 'error_description'='missing token'
 
 Scenario: content-Type cannot be equals to 'application/json'
@@ -34,8 +34,8 @@ Scenario: access token must be valid
 	| Authorization | Bearer rnd rnd |
 	
 	And extract JSON from body
-	
-	Then JSON 'error'='invalid_request'
+		
+	Then JSON 'error'='access_denied'
 	Then JSON 'error_description'='missing token'
 
 Scenario: access token must be a JWT
@@ -46,7 +46,7 @@ Scenario: access token must be a JWT
 	And extract JSON from body
 	
 	Then JSON 'error'='invalid_token'
-	Then JSON 'error_description'='bad token'
+	Then JSON 'error_description'='either the access token has been revoked or is invalid'
 
 Scenario: user must exists
 	Given build access_token and sign with the key 'keyid'
@@ -129,4 +129,4 @@ Scenario: rejected access token cannot be used
 	And extract JSON from body
 	
 	Then JSON 'error'='invalid_token'
-	Then JSON 'error_description'='access token has been rejected'
+	Then JSON 'error_description'='either the access token has been revoked or is invalid'

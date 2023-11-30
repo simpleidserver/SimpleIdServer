@@ -23,15 +23,19 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationClassReferences
     {
         private readonly IAuthenticationContextClassReferenceRepository _authenticationContextClassReferenceRepository;
         private readonly IRealmRepository _realmRepository;
-        private readonly IJwtBuilder _jwtBuilder;
         private readonly IEnumerable<IAuthenticationMethodService> _authMethodServices;
         private readonly ILogger<AuthenticationClassReferencesController> _logger;
 
-        public AuthenticationClassReferencesController(IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository, IRealmRepository realmRepository, IJwtBuilder jwtBuilder, IEnumerable<IAuthenticationMethodService> authMethodServices, ILogger<AuthenticationClassReferencesController> logger)
+        public AuthenticationClassReferencesController(
+            IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository, 
+            IRealmRepository realmRepository, 
+            ITokenRepository tokenRepository,
+            IJwtBuilder jwtBuilder, 
+            IEnumerable<IAuthenticationMethodService> authMethodServices, 
+            ILogger<AuthenticationClassReferencesController> logger) : base(tokenRepository, jwtBuilder)
         {
             _authenticationContextClassReferenceRepository = authenticationContextClassReferenceRepository;
             _realmRepository = realmRepository;
-            _jwtBuilder = jwtBuilder;
             _authMethodServices = authMethodServices;
             _logger = logger;
         }
@@ -42,7 +46,7 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationClassReferences
             try
             {
                 prefix = prefix ?? Constants.DefaultRealm;
-                CheckAccessToken(prefix, Constants.StandardScopes.Acrs.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Acrs.Name);
                 var result = await _authenticationContextClassReferenceRepository.Query().Include(a => a.Realms).Where(a => a.Realms.Any(r => r.Name == prefix)).AsNoTracking().OrderBy(a => a.Name).ToListAsync(cancellationToken);
                 return new OkObjectResult(result);
             }
@@ -61,7 +65,7 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationClassReferences
                 try
                 {
                     prefix = prefix ?? Constants.DefaultRealm;
-                    CheckAccessToken(prefix, Constants.StandardScopes.Acrs.Name, _jwtBuilder);
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Acrs.Name);
                     await Validate();
                     var realm = await _realmRepository.Query().SingleAsync(r => r.Name == prefix, cancellationToken);
                     var record = new AuthenticationContextClassReference
@@ -111,7 +115,7 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationClassReferences
             using (var activity = Tracing.IdServerActivitySource.StartActivity("Remove Authentication Class Reference"))
             {
                 prefix = prefix ?? Constants.DefaultRealm;
-                CheckAccessToken(prefix, Constants.StandardScopes.Acrs.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Acrs.Name);
                 var acr = await _authenticationContextClassReferenceRepository.Query().Include(a => a.Realms).SingleOrDefaultAsync(a => a.Realms.Any(r => r.Name == prefix) && a.Id == id, cancellationToken);
                 if (acr == null)
                 {

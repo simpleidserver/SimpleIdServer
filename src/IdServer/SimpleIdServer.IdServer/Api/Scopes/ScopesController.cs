@@ -32,7 +32,14 @@ public class ScopesController : BaseController
     private readonly IJwtBuilder _jwtBuilder;
     private readonly ILogger<ApiResourcesController> _logger;
 
-    public ScopesController(IScopeRepository scopeRepository, IRealmRepository realmRepository, IApiResourceRepository apiResourceRepository, IBusControl busControl, IJwtBuilder jwtBuilder, ILogger<ApiResourcesController> logger)
+    public ScopesController(
+        IScopeRepository scopeRepository, 
+        IRealmRepository realmRepository, 
+        IApiResourceRepository apiResourceRepository, 
+        IBusControl busControl, 
+        ITokenRepository tokenRepository,
+        IJwtBuilder jwtBuilder, 
+        ILogger<ApiResourcesController> logger) : base(tokenRepository, jwtBuilder)
     {
         _scopeRepository = scopeRepository;
         _realmRepository = realmRepository;
@@ -50,7 +57,7 @@ public class ScopesController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name, _jwtBuilder);
+            await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
             IQueryable<Scope> query = _scopeRepository.Query()
                 .Include(p => p.Realms)
                 .Where(p => p.Realms.Any(r => r.Name == prefix) && ((request.IsRole && p.Type == ScopeTypes.ROLE) || (!request.IsRole && (p.Type == ScopeTypes.IDENTITY || p.Type == ScopeTypes.APIRESOURCE))))
@@ -87,7 +94,7 @@ public class ScopesController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name, _jwtBuilder);
+            await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
             var scope = await _scopeRepository.Query()
                 .Include(p => p.Realms)
                 .Include(p => p.ClaimMappers)
@@ -115,7 +122,7 @@ public class ScopesController : BaseController
         {
             try
             {
-                CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
                 var scope = await _scopeRepository.Query()
                     .Include(u => u.Realms)
                     .FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.Name == prefix));
@@ -142,7 +149,7 @@ public class ScopesController : BaseController
             try
             {
                 prefix = prefix ?? Constants.DefaultRealm;
-                CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
                 var existingScope = await _scopeRepository.Query()
                     .Include(s => s.Realms)
                     .AsNoTracking()
@@ -178,7 +185,7 @@ public class ScopesController : BaseController
         {
             try
             {
-                CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
                 var scope = await _scopeRepository.Query()
                     .Include(u => u.Realms)
                     .FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.Name == prefix));
@@ -210,7 +217,7 @@ public class ScopesController : BaseController
         {
             try
             {
-                CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
                 var scope = await _scopeRepository.Query()
                     .Include(u => u.ClaimMappers)
                     .Include(u => u.Realms)
@@ -251,7 +258,7 @@ public class ScopesController : BaseController
         {
             try
             {
-                CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
                 var scope = await _scopeRepository.Query()
                     .Include(u => u.Realms)
                     .Include(u => u.ClaimMappers)
@@ -281,7 +288,7 @@ public class ScopesController : BaseController
         {
             try
             {
-                CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
                 var scope = await _scopeRepository.Query()
                     .Include(u => u.ClaimMappers)
                     .Include(u => u.Realms)
@@ -333,7 +340,7 @@ public class ScopesController : BaseController
             {
                 activity?.SetTag("realm", prefix);
                 activity?.SetTag("scope", name);
-                CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
                 if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
                 if (request.Resources == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, ScopeNames.Resources));
                 var existingScope = await _scopeRepository.Query().Include(s => s.Realms).Include(s => s.ApiResources).FirstOrDefaultAsync(s => s.Name == name && s.Realms.Any(r => r.Name == prefix));

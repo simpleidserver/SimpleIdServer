@@ -33,11 +33,9 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialOffer
         private readonly ICredentialTemplateRepository _credentialTemplateRepository;
         private readonly ICredentialOfferRepository _credentialOfferRepository;
         private readonly IAuthenticationHelper _authenticationHelper;
-        private readonly IUserRepository _userRepository;
         private readonly IClientRepository _clientRepository;
         private readonly IEnumerable<IUserNotificationService> _notificationServices;
         private readonly IGrantedTokenHelper _grantedTokenHelper;
-        private readonly IJwtBuilder _jwtBuilder;
         private readonly UrlEncoder _urlEncoder;
         private readonly IdServerHostOptions _options;
 
@@ -45,22 +43,20 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialOffer
             ICredentialTemplateRepository credentialTemplateRepository, 
             ICredentialOfferRepository credentialOfferRepository, 
             IAuthenticationHelper authenticationHelper, 
-            IUserRepository userRepository,
             IClientRepository clientRepository,
             IEnumerable<IUserNotificationService> notificationServices, 
             IGrantedTokenHelper grantedTokenHelper, 
+            ITokenRepository tokenRepository,
             IJwtBuilder jwtBuilder,
             UrlEncoder urlEncoder, 
-            IOptions<IdServerHostOptions> options)
+            IOptions<IdServerHostOptions> options) : base(tokenRepository, jwtBuilder)
         {
             _credentialTemplateRepository = credentialTemplateRepository;
             _credentialOfferRepository = credentialOfferRepository;
             _authenticationHelper = authenticationHelper;
-            _userRepository = userRepository;
             _clientRepository = clientRepository;
             _notificationServices = notificationServices;
             _grantedTokenHelper = grantedTokenHelper;
-            _jwtBuilder = jwtBuilder;
             _urlEncoder = urlEncoder;
             _options = options.Value;
         }
@@ -71,7 +67,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialOffer
             prefix = prefix ?? SimpleIdServer.IdServer.Constants.DefaultRealm;
             try
             {
-                CheckAccessToken(prefix, IdServer.Constants.StandardScopes.CredentialOffer.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, IdServer.Constants.StandardScopes.CredentialOffer.Name);
                 var kvp = await InternalShare(prefix, id, request, cancellationToken);
                 if (kvp.Item1 != null) return kvp.Item1;
                 return GetQRCode(kvp.Item2);
@@ -88,7 +84,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialOffer
             prefix = prefix ?? SimpleIdServer.IdServer.Constants.DefaultRealm;
             try
             {
-                CheckAccessToken(prefix, IdServer.Constants.StandardScopes.CredentialOffer.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, IdServer.Constants.StandardScopes.CredentialOffer.Name);
                 var kvp = await InternalShare(prefix, id, request, cancellationToken);
                 if (kvp.Item1 != null) return kvp.Item1;
                 return Redirect(kvp.Item2.Url);

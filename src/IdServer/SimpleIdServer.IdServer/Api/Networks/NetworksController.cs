@@ -21,13 +21,14 @@ namespace SimpleIdServer.IdServer.Api.Networks
 {
     public class NetworksController : BaseController
     {
-        private readonly IJwtBuilder _jwtBuilder;
         private readonly IIdentityDocumentConfigurationStore _store;
         private readonly IEnumerable<IContractDeploy> _contractDeploys;
 
-        public NetworksController(IJwtBuilder jwtBuilder, IIdentityDocumentConfigurationStore store, IEnumerable<IContractDeploy> contractDeploys)
+        public NetworksController(ITokenRepository tokenRepository,
+            IJwtBuilder jwtBuilder, 
+            IIdentityDocumentConfigurationStore store, 
+            IEnumerable<IContractDeploy> contractDeploys) : base(tokenRepository, jwtBuilder)
         {
-            _jwtBuilder = jwtBuilder;
             _store = store;
             _contractDeploys = contractDeploys;
         }
@@ -46,7 +47,7 @@ namespace SimpleIdServer.IdServer.Api.Networks
             try
             {
                 prefix = prefix ?? Constants.DefaultRealm;
-                CheckAccessToken(prefix, Constants.StandardScopes.Networks.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Networks.Name);
                 var didConfigurations = await _store.Query().OrderByDescending(c => c.UpdateDateTime).ToListAsync(cancellationToken);
                 return new OkObjectResult(didConfigurations);
             }
@@ -71,7 +72,7 @@ namespace SimpleIdServer.IdServer.Api.Networks
             try
             {
                 prefix = prefix ?? Constants.DefaultRealm;
-                CheckAccessToken(prefix, Constants.StandardScopes.Networks.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Networks.Name);
                 var didConfiguration = await _store.Query().SingleAsync(s => s.Name == name, cancellationToken);
                 if (didConfiguration == null) return this.BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_NETWORK, name));
                 _store.Remove(didConfiguration);
@@ -102,7 +103,7 @@ namespace SimpleIdServer.IdServer.Api.Networks
                 try
                 {
                     prefix = prefix ?? Constants.DefaultRealm;
-                    CheckAccessToken(prefix, Constants.StandardScopes.Networks.Name, _jwtBuilder);
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Networks.Name);
                     Validate();
                     if (await _store.Query().AnyAsync(s => s.Name == request.Name, cancellationToken)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_NETWORK_NAME);
                     var networkConfiguration = new NetworkConfiguration
@@ -156,7 +157,7 @@ namespace SimpleIdServer.IdServer.Api.Networks
                 try
                 {
                     prefix = prefix ?? Constants.DefaultRealm;
-                    CheckAccessToken(prefix, Constants.StandardScopes.Networks.Name, _jwtBuilder);
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Networks.Name);
                     var network = await _store.Query().FirstOrDefaultAsync(s => s.Name == name, cancellationToken);
                     if (network == null) return this.BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_NETWORK, name));
                     if (!string.IsNullOrWhiteSpace(network.ContractAdr)) return this.BuildError(HttpStatusCode.InternalServerError, ErrorCodes.INVALID_NETWORK, ErrorMessages.CONTRACT_ALREADY_DEPLOYED);

@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Store;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.Api.AuthenticationMethods
 {
@@ -15,13 +17,15 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationMethods
     {
         private readonly IEnumerable<IAuthenticationMethodService> _authMethods;
         private readonly IConfiguration _configuration;
-        private readonly IJwtBuilder _jwtBuilder;
 
-        public AuthenticationMethodsController(IEnumerable<IAuthenticationMethodService> authMethods, IConfiguration configuration, IJwtBuilder jwtBuilder)
+        public AuthenticationMethodsController(
+            IEnumerable<IAuthenticationMethodService> authMethods, 
+            IConfiguration configuration, 
+            ITokenRepository tokenRepository,
+            IJwtBuilder jwtBuilder) : base(tokenRepository, jwtBuilder)
         {
             _authMethods = authMethods;
             _configuration = configuration;
-            _jwtBuilder = jwtBuilder;
         }
 
         [HttpGet]
@@ -39,12 +43,12 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationMethods
         }
 
         [HttpPut]
-        public IActionResult Update([FromRoute] string prefix, string amr, [FromBody] UpdateAuthMethodConfigurationsRequest request)
+        public async Task<IActionResult> Update([FromRoute] string prefix, string amr, [FromBody] UpdateAuthMethodConfigurationsRequest request)
         {
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationMethods.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationMethods.Name);
                 var authMethod = _authMethods.SingleOrDefault(m => m.Amr == amr);
                 if (authMethod == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.UNKNOWN_ACR, string.Format(string.Format(ErrorMessages.AUTHENTICATION_METHOD_NOT_FOUND, amr)));
                 if (authMethod.OptionsType == null) return NoContent();
@@ -59,12 +63,12 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationMethods
         }
 
         [HttpGet]
-        public IActionResult Get([FromRoute] string prefix, string amr)
+        public async Task<IActionResult> Get([FromRoute] string prefix, string amr)
         {
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationMethods.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationMethods.Name);
                 var authMethod = _authMethods.SingleOrDefault(m => m.Amr == amr);
                 if (authMethod == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.UNKNOWN_ACR, string.Format(string.Format(ErrorMessages.AUTHENTICATION_METHOD_NOT_FOUND, amr)));
                 if (authMethod.OptionsType == null) return NoContent();

@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.Services;
@@ -45,9 +46,11 @@ namespace SimpleIdServer.IdServer.UI
             IAuthenticationSchemeProvider authenticationSchemeProvider,
             IUserTransformer userTransformer,
             IAuthenticationSchemeProviderRepository authenticationSchemeProviderRepository,
+            ITokenRepository tokenRepository,
+            IJwtBuilder jwtBuilder,
             IAuthenticationHelper authenticationHelper,
             IRealmRepository realmRepository,
-            IBusControl busControl) : base(clientRepository, userRepository, userSessionRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, options)
+            IBusControl busControl) : base(clientRepository, userRepository, userSessionRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, tokenRepository, jwtBuilder, options)
         {
             _logger = logger;
             _authenticationSchemeProvider = authenticationSchemeProvider;
