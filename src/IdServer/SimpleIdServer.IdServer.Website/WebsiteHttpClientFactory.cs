@@ -61,8 +61,13 @@ namespace SimpleIdServer.IdServer.Website
             var httpResult = await _httpClient.SendAsync(httpRequest);
             var json = await httpResult.Content.ReadAsStringAsync();
             var accessToken = JsonObject.Parse(json)["access_token"].GetValue<string>();
-            var jsonWebToken = _jsonWebTokenHandler.ReadJsonWebToken(accessToken);
-            _accessToken = new GetAccessTokenResult(accessToken, jsonWebToken);
+            JsonWebToken jwt = null;
+            if(_jsonWebTokenHandler.CanReadToken(accessToken))
+            {
+                jwt = _jsonWebTokenHandler.ReadJsonWebToken(accessToken);
+            }
+
+            _accessToken = new GetAccessTokenResult(accessToken, jwt);
             return _accessToken;
         }
 
@@ -76,7 +81,7 @@ namespace SimpleIdServer.IdServer.Website
 
             public string AccessToken { get; private set; }
             public JsonWebToken Jwt { get; private set; }
-            public bool IsValid => Jwt.ValidTo >= DateTime.UtcNow;
+            public bool IsValid => Jwt != null && Jwt.ValidTo >= DateTime.UtcNow;
         }
     }
 }
