@@ -22,13 +22,15 @@ namespace SimpleIdServer.IdServer.Api.RegistrationWorkflows;
 public class RegistrationWorkflowsController : BaseController
 {
 	private readonly IRegistrationWorkflowRepository _registrationWorkflowRepository;
-    private readonly IJwtBuilder _jwtBuilder;
     private readonly IEnumerable<IAuthenticationMethodService> _authenticationMethodServices;
 
-    public RegistrationWorkflowsController(IRegistrationWorkflowRepository registrationWorkflowRepository, IJwtBuilder jwtBuilder, IEnumerable<IAuthenticationMethodService> authenticationMethodServices)
+    public RegistrationWorkflowsController(
+        IRegistrationWorkflowRepository registrationWorkflowRepository, 
+        ITokenRepository tokenRepository,
+        IJwtBuilder jwtBuilder, 
+        IEnumerable<IAuthenticationMethodService> authenticationMethodServices) : base(tokenRepository, jwtBuilder)
 	{
 		_registrationWorkflowRepository = registrationWorkflowRepository;
-		_jwtBuilder = jwtBuilder;
         _authenticationMethodServices = authenticationMethodServices;
 	}
 
@@ -55,7 +57,7 @@ public class RegistrationWorkflowsController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
 		try
         {
-            CheckAccessToken(prefix, Constants.StandardScopes.RegistrationWorkflows.Name, _jwtBuilder);
+            await CheckAccessToken(prefix, Constants.StandardScopes.RegistrationWorkflows.Name);
             var registrationWorkflow = await _registrationWorkflowRepository.Query().FirstOrDefaultAsync(r => r.RealmName == prefix && r.Id == id);
             if (registrationWorkflow == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, ErrorMessages.UNKNOWN_REGISTRATION_WORKFLOW);
             _registrationWorkflowRepository.Delete(registrationWorkflow);
@@ -74,7 +76,7 @@ public class RegistrationWorkflowsController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            CheckAccessToken(prefix, Constants.StandardScopes.RegistrationWorkflows.Name, _jwtBuilder);
+            await CheckAccessToken(prefix, Constants.StandardScopes.RegistrationWorkflows.Name);
             if (string.IsNullOrWhiteSpace(request.Name)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, RegistrationWorkflowNames.Name));
             if (request.Steps == null || !request.Steps.Any()) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, RegistrationWorkflowNames.Steps));
             var existingAmrs = _authenticationMethodServices.Select(a => a.Amr);
@@ -121,7 +123,7 @@ public class RegistrationWorkflowsController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            CheckAccessToken(prefix, Constants.StandardScopes.RegistrationWorkflows.Name, _jwtBuilder);
+            await CheckAccessToken(prefix, Constants.StandardScopes.RegistrationWorkflows.Name);
             if (string.IsNullOrWhiteSpace(request.Name)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, RegistrationWorkflowNames.Name));
             if (request.Steps == null || !request.Steps.Any()) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, RegistrationWorkflowNames.Steps));
             var existingAmrs = _authenticationMethodServices.Select(a => a.Amr);

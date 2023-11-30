@@ -29,16 +29,21 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
         private readonly IIdentityProvisioningStore _identityProvisioningStore;
         private readonly IImportSummaryStore _importSummaryStore;
         private readonly IServiceProvider _serviceProvider;
-        private readonly IJwtBuilder _jwtBuilder;
         private readonly IConfiguration _configuration;
         private readonly IEnumerable<IProvisioningService> _provisioningServices;
 
-        public IdentityProvisioningController(IIdentityProvisioningStore identityProvisioningStore, IImportSummaryStore importSummaryStore, IServiceProvider serviceProvider, IJwtBuilder jwtBuilder, IConfiguration configuration, IEnumerable<IProvisioningService> provisioningServices)
+        public IdentityProvisioningController(
+            IIdentityProvisioningStore identityProvisioningStore, 
+            IImportSummaryStore importSummaryStore, 
+            IServiceProvider serviceProvider, 
+            ITokenRepository tokenRepository, 
+            IJwtBuilder jwtBuilder, 
+            IConfiguration configuration, 
+            IEnumerable<IProvisioningService> provisioningServices) : base(tokenRepository, jwtBuilder)
         {
             _identityProvisioningStore = identityProvisioningStore;
             _importSummaryStore = importSummaryStore;
             _serviceProvider = serviceProvider;
-            _jwtBuilder = jwtBuilder;
             _configuration = configuration;
             _provisioningServices = provisioningServices;
         }
@@ -49,7 +54,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
                 IQueryable<IdentityProvisioning> query = _identityProvisioningStore.Query()
                     .Include(p => p.Realms)
                     .Where(p => p.Realms.Any(r => r.Name == prefix))
@@ -80,7 +85,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
                 IQueryable<ImportSummary> query = _importSummaryStore.Query()
                     .Where(p => p.RealmName == prefix)
                     .AsNoTracking();
@@ -110,7 +115,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
                 var result = await _identityProvisioningStore.Query()
                     .Include(p => p.Realms)
                     .Where(p => p.Realms.Any(r => r.Name == prefix))
@@ -132,7 +137,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
                 var result = await _identityProvisioningStore.Query()
                     .Include(p => p.Realms)
                     .Include(p => p.Histories)
@@ -160,7 +165,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
                 var result = await _identityProvisioningStore.Query()
                     .Include(p => p.Realms)
                     .Where(p => p.Realms.Any(r => r.Name == prefix))
@@ -182,7 +187,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
                 var result = await _identityProvisioningStore.Query()
                     .Include(p => p.Realms)
                     .Include(p => p.Definition)
@@ -206,7 +211,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
                 var result = await _identityProvisioningStore.Query()
                     .Include(p => p.Realms)
                     .Include(p => p.Definition).ThenInclude(d => d.MappingRules)
@@ -232,7 +237,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
                 var result = await _identityProvisioningStore.Query()
                     .Include(p => p.Realms)
                     .Include(p => p.Definition).ThenInclude(d => d.MappingRules)
@@ -270,7 +275,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
                 var result = await _identityProvisioningStore.Query()
                     .Include(p => p.Realms)
                     .Include(p => p.Definition).ThenInclude(p => p.MappingRules)
@@ -323,7 +328,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
                 var result = await _identityProvisioningStore.Query()
                     .Include(p => p.Realms)
                     .Include(p => p.Definition).ThenInclude(p => p.MappingRules)
@@ -348,10 +353,10 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
         }
 
         [HttpGet]
-        public IActionResult Enqueue([FromRoute] string prefix, string name, string id)
+        public async Task<IActionResult> Enqueue([FromRoute] string prefix, string name, string id)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name, _jwtBuilder);
+            await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
             var jobs = _serviceProvider.GetRequiredService<IEnumerable<IRepresentationExtractionJob>>();
             var job = jobs.SingleOrDefault(j => j.Name == name);
             BackgroundJob.Enqueue(() => job.Execute(id, prefix));
@@ -359,10 +364,10 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
         }
 
         [HttpGet]
-        public IActionResult Import([FromRoute] string prefix)
+        public async Task<IActionResult> Import([FromRoute] string prefix)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name, _jwtBuilder);
+            await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
             string id = Guid.NewGuid().ToString();
             BackgroundJob.Enqueue<IImportRepresentationJob>((j) => j.Execute(prefix, id));
             return new ContentResult

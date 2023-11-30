@@ -10,6 +10,7 @@ using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Email.Services;
 using SimpleIdServer.IdServer.Email.UI.ViewModels;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI;
@@ -31,13 +32,15 @@ namespace SimpleIdServer.IdServer.Email.UI
             IOptions<IdServerHostOptions> options,
             IAuthenticationSchemeProvider authenticationSchemeProvider,
             IDataProtectionProvider dataProtectionProvider,
+            ITokenRepository tokenRepository,
+            IJwtBuilder jwtBuilder,
             IAuthenticationHelper authenticationHelper,
             IClientRepository clientRepository, 
             IAmrHelper amrHelper,
             IUserRepository userRepository, 
             IUserSessionResitory userSessionRepository,
             IUserTransformer userTransformer, 
-            IBusControl busControl) : base(notificationServices, otpAuthenticators, userAuthenticationService, authenticationSchemeProvider, options, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl)
+            IBusControl busControl) : base(notificationServices, otpAuthenticators, userAuthenticationService, authenticationSchemeProvider, options, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, tokenRepository, jwtBuilder, busControl)
         {
             _configuration = configuration;
         }

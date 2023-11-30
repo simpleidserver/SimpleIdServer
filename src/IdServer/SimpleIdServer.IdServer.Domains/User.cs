@@ -27,6 +27,7 @@ namespace SimpleIdServer.IdServer.Domains
         }
 
         [JsonPropertyName(UserNames.Id)]
+        [UserProperty(true)]
         public string Id { get; set; } = null!;
         [JsonPropertyName(UserNames.Name)]
         [UserProperty(true)]

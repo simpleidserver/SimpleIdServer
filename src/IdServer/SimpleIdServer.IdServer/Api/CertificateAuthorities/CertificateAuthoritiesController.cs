@@ -28,15 +28,18 @@ public class CertificateAuthoritiesController : BaseController
 {
     private readonly ICertificateAuthorityRepository _certificateAuthorityRepository;
     private readonly IRealmRepository _realmRepository;
-    private readonly IJwtBuilder _jwtBuilder;
     private readonly IBusControl _busControl;
     private readonly ILogger<CertificateAuthoritiesController> _logger;
 
-    public CertificateAuthoritiesController(ICertificateAuthorityRepository certificateAuthorityRepository, IRealmRepository realmRepository, IJwtBuilder jwtBuilder, IBusControl busControl, ILogger<CertificateAuthoritiesController> logger)
+    public CertificateAuthoritiesController(
+        ICertificateAuthorityRepository certificateAuthorityRepository, 
+        IRealmRepository realmRepository, 
+        ITokenRepository tokenRepository,
+        IJwtBuilder jwtBuilder, 
+        IBusControl busControl, ILogger<CertificateAuthoritiesController> logger) : base(tokenRepository, jwtBuilder)
     {
         _certificateAuthorityRepository = certificateAuthorityRepository;
         _realmRepository = realmRepository;
-        _jwtBuilder = jwtBuilder;
         _busControl = busControl;
         _logger = logger;
     }
@@ -47,7 +50,7 @@ public class CertificateAuthoritiesController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name, _jwtBuilder);
+            await CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name);
             IQueryable<CertificateAuthority> query = _certificateAuthorityRepository.Query()
                 .Include(p => p.Realms)
                 .Where(p => p.Realms.Any(r => r.Name == prefix))
@@ -76,11 +79,11 @@ public class CertificateAuthoritiesController : BaseController
     }
 
     [HttpPost]
-    public IActionResult Generate([FromRoute] string prefix, [FromBody] GenerateCertificateAuthorityRequest request)
+    public async Task<IActionResult> Generate([FromRoute] string prefix, [FromBody] GenerateCertificateAuthorityRequest request)
     {
         try
         {
-            CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name, _jwtBuilder);
+            await CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name);
             if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
             if (string.IsNullOrWhiteSpace(request.SubjectName)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, CertificateAuthorityNames.SubjectName));
             CertificateAuthority certificateAuthority = null;
@@ -108,11 +111,11 @@ public class CertificateAuthoritiesController : BaseController
     }
 
     [HttpPost]
-    public IActionResult Import([FromRoute] string prefix, [FromBody] ImportCertificateAuthorityRequest request)
+    public async Task<IActionResult> Import([FromRoute] string prefix, [FromBody] ImportCertificateAuthorityRequest request)
     {
         try
         {
-            CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name, _jwtBuilder);
+            await CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name);
             if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
             if (string.IsNullOrWhiteSpace(request.FindValue)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, CertificateAuthorityNames.FindValue));
             var store = new X509Store(request.StoreName, request.StoreLocation);
@@ -162,7 +165,7 @@ public class CertificateAuthoritiesController : BaseController
             try
             {
                 activity?.SetTag("realm", prefix);
-                CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name);
                 if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
                 activity?.SetTag("subjectName", request.SubjectName);
                 var id = Guid.NewGuid().ToString();
@@ -221,7 +224,7 @@ public class CertificateAuthoritiesController : BaseController
             try
             {
                 activity?.SetTag("realm", prefix);
-                CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name);
                 var ca = await _certificateAuthorityRepository.Query().Include(c => c.Realms).SingleOrDefaultAsync(c => c.Id == id && c.Realms.Any(r => r.Name == prefix));
                 if (ca == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CA, id));
                 _certificateAuthorityRepository.Delete(ca);
@@ -253,7 +256,7 @@ public class CertificateAuthoritiesController : BaseController
     {
         try
         {
-            CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name, _jwtBuilder);
+            await CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name);
             var ca = await _certificateAuthorityRepository.Query().Include(c => c.Realms).Include(c => c.ClientCertificates).AsNoTracking().SingleOrDefaultAsync(c => c.Id == id && c.Realms.Any(r => r.Name == prefix));
             if (ca == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CA, id));
             return new OkObjectResult(ca);
@@ -274,7 +277,7 @@ public class CertificateAuthoritiesController : BaseController
             try
             {
                 activity?.SetTag("realm", prefix);
-                CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name);
                 var ca = await _certificateAuthorityRepository.Query().Include(c => c.Realms).Include(c => c.ClientCertificates).SingleOrDefaultAsync(c => c.Id == id && c.Realms.Any(r => r.Name == prefix));
                 if (ca == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CA, id));
                 var clientCertificate = ca.ClientCertificates.SingleOrDefault(c => c.Id == clientCertificateId);
@@ -314,7 +317,7 @@ public class CertificateAuthoritiesController : BaseController
             try
             {
                 activity?.SetTag("realm", prefix);
-                CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name);
                 if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
                 if (string.IsNullOrWhiteSpace(request.SubjectName)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, ClientCertificateNames.SubjectName));
                 activity?.SetTag("subjectName", request.SubjectName);

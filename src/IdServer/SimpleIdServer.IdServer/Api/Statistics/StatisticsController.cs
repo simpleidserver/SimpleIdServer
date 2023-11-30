@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Events;
 using SimpleIdServer.IdServer.ExternalEvents;
+using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Linq;
@@ -21,7 +22,9 @@ public class StatisticsController : BaseController
     public StatisticsController(
         IUserRepository userRepository, 
         IClientRepository clientRepository, 
-        IAuditEventRepository auditEventRepository)
+        IAuditEventRepository auditEventRepository,
+        ITokenRepository tokenRepository,
+        IJwtBuilder jwtBuilder) : base(tokenRepository, jwtBuilder)
     {
         _userRepository = userRepository;
         _clientRepository = clientRepository;

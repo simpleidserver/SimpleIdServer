@@ -112,6 +112,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                     }
                 })
                 .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "sixtyFiveClient", "secondScope")
+                .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "seventyClient", "openid", "profile", "role", "email")
                 .AddClaim("degreeType", "BachelorDegree")
                 .AddClaim("degreeName", "Bachelor of Science and Arts")
                 .SetDID(DidKey, PrivateKey)
@@ -225,6 +226,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildApiClient("sixtySevenClient", "password").EnableExchangeTokenGrantType(TokenExchangeTypes.DELEGATION).Build(),
             ClientBuilder.BuildApiClient("sixtyEightClient", "password").AddScope(FirstScope).SetAccessTokenType(AccessTokenTypes.Reference).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("sixtyNineClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().DisableConsent().AddScope(GetRoleScope()).Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("seventyClient", "password", null, "http://localhost:8080").SetAccessTokenType(AccessTokenTypes.Reference).UseClientSecretPostAuthentication().AddScope(StandardScopes.OpenIdScope, StandardScopes.Role, StandardScopes.Profile, StandardScopes.Email).Build(),
         };
 
         public static List<DeviceAuthCode> DeviceAuthCodes = new List<DeviceAuthCode>

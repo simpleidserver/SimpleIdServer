@@ -22,13 +22,15 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
     {
         public const string UserAccessPolicyUri = "user_access_policy_uri";
         private readonly IUmaResourceRepository _umaResourceRepository;
-        private readonly IJwtBuilder _jwtBuilder;
         private readonly ILogger<UMAResourcesController> _logger;
 
-        public UMAResourcesController(IUmaResourceRepository umaResourceRepository, IJwtBuilder jwtBuilder, ILogger<UMAResourcesController> logger)
+        public UMAResourcesController(
+            IUmaResourceRepository umaResourceRepository, 
+            ITokenRepository tokenRepository, 
+            IJwtBuilder jwtBuilder, 
+            ILogger<UMAResourcesController> logger) : base(tokenRepository, jwtBuilder)
         {
             _umaResourceRepository = umaResourceRepository;
-            _jwtBuilder = jwtBuilder;
             _logger = logger;
         }
 
@@ -38,7 +40,7 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
             try
             {
                 prefix = prefix ?? Constants.DefaultRealm;
-                CheckHasPAT(prefix, _jwtBuilder);
+                await CheckHasPAT(prefix);
                 var result = await _umaResourceRepository.Query().AsNoTracking().ToListAsync(cancellationToken);
                 return new OkObjectResult(result.Select(r => r.Id));
             }
@@ -55,7 +57,7 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
             try
             {
                 prefix = prefix ?? Constants.DefaultRealm;
-                CheckHasPAT(prefix, _jwtBuilder);
+                await CheckHasPAT(prefix);
                 var result = await _umaResourceRepository.Query().Include(r => r.Translations).AsNoTracking().SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
                 if (result == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, ErrorMessages.UNKNOWN_UMA_RESOURCE);
                 return new OkObjectResult(result);
@@ -73,7 +75,7 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
             try
             {
                 prefix = prefix ?? Constants.DefaultRealm;
-                CheckHasPAT(prefix, _jwtBuilder);
+                await CheckHasPAT(prefix);
                 Validate(request);
                 if(string.IsNullOrWhiteSpace(request.Subject))
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, UMAResourceNames.Subject));
@@ -111,7 +113,7 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
         {
             try
             {
-                CheckHasPAT(prefix ?? Constants.DefaultRealm, _jwtBuilder);
+                await CheckHasPAT(prefix ?? Constants.DefaultRealm);
                 Validate(request);
                 var currentUmaResource = await _umaResourceRepository.Query().SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
                 if (currentUmaResource == null)
@@ -147,7 +149,7 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
         {
             try
             {
-                CheckHasPAT(prefix ?? Constants.DefaultRealm, _jwtBuilder);
+                await CheckHasPAT(prefix ?? Constants.DefaultRealm);
                 var currentUmaResource = await _umaResourceRepository.Query().SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
                 if (currentUmaResource == null)
                     return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, ErrorMessages.UNKNOWN_UMA_RESOURCE);
@@ -168,7 +170,7 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
         {
             try
             {
-                CheckHasPAT(prefix ?? Constants.DefaultRealm, _jwtBuilder);
+                await CheckHasPAT(prefix ?? Constants.DefaultRealm);
                 var currentUmaResource = await _umaResourceRepository.Query().Include(r => r.Permissions).ThenInclude(p => p.Claims).SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
                 if (currentUmaResource == null)
                     return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, ErrorMessages.UNKNOWN_UMA_RESOURCE);
@@ -213,7 +215,7 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
         {
             try
             {
-                CheckHasPAT(prefix ?? Constants.DefaultRealm, _jwtBuilder);
+                await CheckHasPAT(prefix ?? Constants.DefaultRealm);
                 var currentUmaResource = await _umaResourceRepository.Query().Include(r => r.Permissions).ThenInclude(p => p.Claims).AsNoTracking().SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
                 if (currentUmaResource == null)
                     return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, ErrorMessages.UNKNOWN_UMA_RESOURCE);
@@ -231,7 +233,7 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
         {
             try
             {
-                CheckHasPAT(prefix ?? Constants.DefaultRealm, _jwtBuilder);
+                await CheckHasPAT(prefix ?? Constants.DefaultRealm);
                 var currentUmaResource = await _umaResourceRepository.Query().Include(r => r.Permissions).ThenInclude(p => p.Claims).SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
                 if (currentUmaResource == null)
                     return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, ErrorMessages.UNKNOWN_UMA_RESOURCE);

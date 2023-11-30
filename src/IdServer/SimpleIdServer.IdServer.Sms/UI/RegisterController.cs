@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI;
@@ -22,7 +23,16 @@ public class RegisterController : BaseOTPRegisterController<IdServerSmsOptions>
 {
     private readonly IAuthenticationHelper _authenticationHelper;
 
-    public RegisterController(IAuthenticationHelper authenticationHelper, IOptions<IdServerHostOptions> options, IDistributedCache distributedCache, IUserRepository userRepository, IEnumerable<IOTPAuthenticator> otpAuthenticators, IConfiguration configuration, ISmsUserNotificationService userNotificationService) : base(options, distributedCache, userRepository, otpAuthenticators, configuration, userNotificationService)
+    public RegisterController(
+        IAuthenticationHelper authenticationHelper,
+        IOptions<IdServerHostOptions> options,
+        IDistributedCache distributedCache,
+        IUserRepository userRepository,
+        IEnumerable<IOTPAuthenticator> otpAuthenticators,
+        IConfiguration configuration,
+        ISmsUserNotificationService userNotificationService,
+        ITokenRepository tokenRepository,
+        IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, otpAuthenticators, configuration, userNotificationService, tokenRepository, jwtBuilder)
     {
         _authenticationHelper = authenticationHelper;
     }

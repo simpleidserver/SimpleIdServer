@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Fido.UI.ViewModels;
+using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI;
@@ -21,7 +22,9 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
             IOptions<IdServerHostOptions> options, 
             IDistributedCache distributedCache, 
             IUserRepository userRepository, 
-            IConfiguration configuration) : base(options, distributedCache, userRepository)
+            IConfiguration configuration,
+            ITokenRepository tokenRepository,
+            IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, tokenRepository, jwtBuilder)
         {
             _configuration = configuration;
         }

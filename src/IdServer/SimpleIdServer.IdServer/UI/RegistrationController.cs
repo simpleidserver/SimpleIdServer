@@ -7,11 +7,11 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.UI;
@@ -22,7 +22,12 @@ public class RegistrationController : BaseController
 	private readonly IDistributedCache _distributedCache;
 	private readonly IdServerHostOptions _options;
 
-	public RegistrationController(IRegistrationWorkflowRepository registrationWorkflowRepository, IDistributedCache distributedCache, IOptions<IdServerHostOptions> options)
+	public RegistrationController(
+		IRegistrationWorkflowRepository registrationWorkflowRepository, 
+		IDistributedCache distributedCache, 
+		ITokenRepository tokenRepository,
+		IJwtBuilder jwtBuilder,
+		IOptions<IdServerHostOptions> options) : base(tokenRepository, jwtBuilder)
 	{
 		_registrationWorkflowRepository = registrationWorkflowRepository;
 		_distributedCache = distributedCache;

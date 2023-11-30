@@ -34,7 +34,6 @@ namespace SimpleIdServer.IdServer.Api.Register
         private readonly IRegisterClientRequestValidator _validator;
         private readonly IRealmRepository _realmRepository;
         private readonly IBusControl _busControl;
-        private readonly IJwtBuilder _jwtBuilder;
         private readonly IdServerHostOptions _options;
 
         public RegistrationController(
@@ -43,15 +42,15 @@ namespace SimpleIdServer.IdServer.Api.Register
             IRegisterClientRequestValidator validator, 
             IRealmRepository realmRepository, 
             IBusControl busControl, 
+            ITokenRepository tokenRepository,
             IJwtBuilder jwtBuilder, 
-            IOptions<IdServerHostOptions> options)
+            IOptions<IdServerHostOptions> options) : base(tokenRepository, jwtBuilder)
         {
             _clientRepository = clientRepository;
             _scopeRepository = scopeRepository;
             _validator = validator;
             _realmRepository = realmRepository;
             _busControl = busControl;
-            _jwtBuilder = jwtBuilder;
             _options = options.Value;
         }
 
@@ -72,7 +71,7 @@ namespace SimpleIdServer.IdServer.Api.Register
             {
                 try
                 {
-                    CheckAccessToken(prefix, Constants.StandardScopes.Register.Name, _jwtBuilder);
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Register.Name);
                     var client = await Build(request, cancellationToken);
                     await _validator.Validate(prefix, client, cancellationToken);
                     _clientRepository.Add(client);

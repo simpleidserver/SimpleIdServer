@@ -24,20 +24,19 @@ namespace SimpleIdServer.IdServer.Api.Groups
         private readonly IGroupRepository _groupRepository;
         private readonly IScopeRepository _scopeRepository;
         private readonly IRealmRepository _realmRepository;
-        private readonly IJwtBuilder _jwtBuilder;
         private readonly ILogger<GroupsController> _logger;
 
         public GroupsController(
             IGroupRepository groupRepository,
             IScopeRepository scopeRepository,
             IRealmRepository realmRepository,
+            ITokenRepository tokenRepository,
             IJwtBuilder jwtBuilder, 
-            ILogger<GroupsController> logger)
+            ILogger<GroupsController> logger) : base(tokenRepository, jwtBuilder)
         {
             _groupRepository = groupRepository;
             _scopeRepository = scopeRepository;
             _realmRepository = realmRepository;
-            _jwtBuilder = jwtBuilder;
             _logger = logger;
         }
 
@@ -49,7 +48,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Groups.Name);
                 IQueryable<Group> query = _groupRepository.Query()
                     .Include(c => c.Realms)
                     .Where(c => c.Realms.Any(r => r.Name == prefix) && (!request.OnlyRoot || request.OnlyRoot && c.Name == c.FullPath))
@@ -83,7 +82,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Groups.Name);
                 var result = await _groupRepository.Query()
                     .Include(c => c.Realms)
                     .Include(c => c.Children)
@@ -126,7 +125,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
                 try
                 {
                     activity?.SetTag("realm", prefix);
-                    CheckAccessToken(prefix, Constants.StandardScopes.Groups.Name, _jwtBuilder);
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Groups.Name);
                     var result = await _groupRepository.Query()
                         .Include(c => c.Realms)
                         .Where(g => g.FullPath.StartsWith(request.FullPath) && g.Realms.Any(r => r.Name == prefix))
@@ -154,7 +153,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
                 try
                 {
                     activity?.SetTag("realm", prefix);
-                    CheckAccessToken(prefix, Constants.StandardScopes.Groups.Name, _jwtBuilder);
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Groups.Name);
                     var fullPath = request.Name;
                     if (!string.IsNullOrWhiteSpace(request.ParentGroupId))
                     {
@@ -211,7 +210,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
                 try
                 {
                     activity?.SetTag("realm", prefix);
-                    CheckAccessToken(prefix, Constants.StandardScopes.Groups.Name, _jwtBuilder);
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Groups.Name);
                     var result = await _groupRepository.Query()
                         .Include(c => c.Realms)
                         .Include(c => c.Roles)
@@ -250,7 +249,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
                 try
                 {
                     activity?.SetTag("realm", prefix);
-                    CheckAccessToken(prefix, Constants.StandardScopes.Groups.Name, _jwtBuilder);
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Groups.Name);
                     var result = await _groupRepository.Query()
                         .Include(c => c.Realms)
                         .Include(c => c.Roles)

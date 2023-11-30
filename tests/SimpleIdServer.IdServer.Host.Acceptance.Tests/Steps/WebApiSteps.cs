@@ -148,23 +148,32 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
         }
 
         [Given("build access_token and sign with the key '(.*)'")]
-        public void GivenBuildAccessToken(string keyId, Table table)
+        public async Task GivenBuildAccessToken(string keyId, Table table)
         {
             using (var scope = _factory.Services.CreateScope())
             {
                 var keyStore = scope.ServiceProvider.GetRequiredService<IKeyStore>();
+                var tokenRepository = scope.ServiceProvider.GetRequiredService<ITokenRepository>();
                 var signKey = keyStore.GetAllSigningKeys("master").First(k => k.Key.KeyId == keyId);
                 var handler = new JsonWebTokenHandler();
                 var claims = new Dictionary<string, object>();
                 foreach (var row in table.Rows)
                     claims.Add(row["Key"].ToString(), row["Value"].ToString());
-
                 var descritor = new SecurityTokenDescriptor
                 {
                     Claims = claims,
                     SigningCredentials = signKey
                 };
                 var request = handler.CreateToken(descritor);
+                var record = new Domains.Token
+                {
+                    Id = request,
+                    ClientId = "clientId",
+                    TokenType = DTOs.TokenResponseParameters.AccessToken,
+                    ExpirationTime = DateTime.UtcNow.AddDays(2)
+                };
+                tokenRepository.Add(record);
+                await tokenRepository.SaveChanges(CancellationToken.None);
                 _scenarioContext.Set(request, "access_token");
             }
         }

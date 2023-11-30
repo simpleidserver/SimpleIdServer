@@ -35,7 +35,6 @@ namespace SimpleIdServer.IdServer.Api.Users
         private readonly IRealmRepository _realmRepository;
         private readonly IGroupRepository _groupRepository;
         private readonly IBusControl _busControl;
-        private readonly IJwtBuilder _jwtBuilder;
         private readonly ISessionHelper _sessionHelper;
         private readonly ILogger<UsersController> _logger;
         private readonly IdServerHostOptions _options;
@@ -45,14 +44,15 @@ namespace SimpleIdServer.IdServer.Api.Users
             IUserRepository userRepository,
             IUserSessionResitory userSessionRepository,
             IAuthenticationHelper authenticationHelper,
-            IRealmRepository realmRepository, 
+            IRealmRepository realmRepository,
             IGroupRepository groupRepository,
-            IBusControl busControl, 
+            IBusControl busControl,
+            ITokenRepository tokenRepository,
             IJwtBuilder jwtBuilder,
             ISessionHelper sessionHelper,
             ILogger<UsersController> logger,
             IOptions<IdServerHostOptions> options,
-            IEnumerable<IDIDGenerator> generators)
+            IEnumerable<IDIDGenerator> generators) : base(tokenRepository, jwtBuilder)
         {
             _userRepository = userRepository;
             _userSessionRepository = userSessionRepository;
@@ -60,7 +60,6 @@ namespace SimpleIdServer.IdServer.Api.Users
             _realmRepository = realmRepository;
             _groupRepository = groupRepository;
             _busControl = busControl;
-            _jwtBuilder = jwtBuilder;
             _sessionHelper = sessionHelper;
             _logger = logger;
             _options = options.Value;
@@ -75,7 +74,7 @@ namespace SimpleIdServer.IdServer.Api.Users
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
                 var result = await _userRepository.Search(prefix, request, cancellationToken);
                 return new OkObjectResult(result);
             }
@@ -91,7 +90,7 @@ namespace SimpleIdServer.IdServer.Api.Users
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
                 var result = await _userSessionRepository.Search(id, prefix, request, cancellationToken);
                 return new OkObjectResult(result);
             }
@@ -107,7 +106,7 @@ namespace SimpleIdServer.IdServer.Api.Users
             try
             {
                 prefix = prefix ?? Constants.DefaultRealm;
-                CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
                 var user = await _userRepository.GetById(id, prefix, cancellationToken);
                 if (user == null) return new NotFoundResult();
                 return new OkObjectResult(user);
@@ -125,7 +124,7 @@ namespace SimpleIdServer.IdServer.Api.Users
             try
             {
                 prefix = prefix ?? Constants.DefaultRealm;
-                CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
                 var user = await _userRepository.GetById(id, prefix, cancellationToken);
                 if (user == null) return new NotFoundResult();
                 var grpPathLst = user.Groups.SelectMany(g => g.ResolveAllPath()).Distinct();
@@ -156,7 +155,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                 try
                 {
                     prefix = prefix ?? Constants.DefaultRealm;
-                    CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
                     var realm = await _realmRepository.Query().FirstAsync(r => r.Name == prefix, cancellationToken);
                     await Validate();
                     var newUser = new User
@@ -221,7 +220,7 @@ namespace SimpleIdServer.IdServer.Api.Users
             {
                 try
                 {
-                    CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
                     if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
                     var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_USER, id));
@@ -261,7 +260,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                 try
                 {
                     prefix = prefix ?? Constants.DefaultRealm;
-                    CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
                     var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) return new NotFoundResult();
                     _userRepository.Remove(new List<User> { user });
@@ -295,7 +294,7 @@ namespace SimpleIdServer.IdServer.Api.Users
             {
                 try
                 {
-                    CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
                     if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
                     var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_USER, id));
@@ -335,7 +334,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                 try
                 {
                     prefix = prefix ?? Constants.DefaultRealm;
-                    CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
                     if (string.IsNullOrWhiteSpace(request.Value)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, UserCredentialNames.Value));
                     var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) return new NotFoundResult();
@@ -374,7 +373,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                 try
                 {
                     prefix = prefix ?? Constants.DefaultRealm;
-                    CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
                     var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) return new NotFoundResult();
                     var existingCredential = user.Credentials.SingleOrDefault(c => c.Id == credentialId);
@@ -401,7 +400,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                 try
                 {
                     prefix = prefix ?? Constants.DefaultRealm;
-                    CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
                     var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) return new NotFoundResult();
                     var existingCredential = user.Credentials.SingleOrDefault(c => c.Id == credentialId);
@@ -434,7 +433,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                 try
                 {
                     prefix = prefix ?? Constants.DefaultRealm;
-                    CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
                     Validate();
                     var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_USER, id));
@@ -485,7 +484,7 @@ namespace SimpleIdServer.IdServer.Api.Users
             {
                 try
                 {
-                    CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
                     var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_USER, id));
                     var newGroup = await _groupRepository.Query()
@@ -530,7 +529,7 @@ namespace SimpleIdServer.IdServer.Api.Users
             {
                 try
                 {
-                    CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
                     var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_USER, id));
                     var assignedGroup = user.Groups.SingleOrDefault(g => g.Id == groupId);
@@ -572,7 +571,7 @@ namespace SimpleIdServer.IdServer.Api.Users
             {
                 try
                 {
-                    CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
                     var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_USER, id));
                     var consent = user.Consents.SingleOrDefault(c => c.Id == consentId);
@@ -614,7 +613,7 @@ namespace SimpleIdServer.IdServer.Api.Users
             {
                 try
                 {
-                    CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
                     var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
                     var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_USER, id));
@@ -658,7 +657,7 @@ namespace SimpleIdServer.IdServer.Api.Users
             {
                 try
                 {
-                    CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
                     if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
                     if (string.IsNullOrWhiteSpace(request.Scheme)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, UserExternalAuthProviderNames.Scheme));
                     if (string.IsNullOrWhiteSpace(request.Subject)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, UserExternalAuthProviderNames.Subject));
@@ -703,7 +702,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                 try
                 {
                     prefix = prefix ?? Constants.DefaultRealm;
-                    CheckAccessToken(prefix, Constants.StandardScopes.Users.Name, _jwtBuilder);
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
                     Validate();
                     var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_USER, id));

@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.ViewModels;
@@ -27,7 +28,15 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseRegisterControll
     private readonly IConfiguration _configuration;
     private readonly IUserNotificationService _userNotificationService;
 
-    public BaseOTPRegisterController(IOptions<IdServerHostOptions> options, IDistributedCache distributedCache, IUserRepository userRepository, IEnumerable<IOTPAuthenticator> otpAuthenticators, IConfiguration configuration, IUserNotificationService userNotificationService) : base(options, distributedCache, userRepository)
+    public BaseOTPRegisterController(
+        IOptions<IdServerHostOptions> options, 
+        IDistributedCache distributedCache, 
+        IUserRepository userRepository, 
+        IEnumerable<IOTPAuthenticator> otpAuthenticators, 
+        IConfiguration configuration, 
+        IUserNotificationService userNotificationService,
+        ITokenRepository tokenRepository,
+        IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, tokenRepository, jwtBuilder)
     {
         _userRepository = userRepository;
         _otpAuthenticators = otpAuthenticators;

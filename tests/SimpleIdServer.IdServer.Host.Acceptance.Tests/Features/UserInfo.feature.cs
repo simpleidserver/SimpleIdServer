@@ -653,6 +653,121 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
+        [Xunit.SkippableFactAttribute(DisplayName="Claims are returned in JSON format (HTTP GET & Reference Access token)")]
+        [Xunit.TraitAttribute("FeatureTitle", "UserInfo")]
+        [Xunit.TraitAttribute("Description", "Claims are returned in JSON format (HTTP GET & Reference Access token)")]
+        public void ClaimsAreReturnedInJSONFormatHTTPGETReferenceAccessToken()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Claims are returned in JSON format (HTTP GET & Reference Access token)", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 199
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 200
+ testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table591 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table591.AddRow(new string[] {
+                            "response_type",
+                            "code"});
+                table591.AddRow(new string[] {
+                            "client_id",
+                            "seventyClient"});
+                table591.AddRow(new string[] {
+                            "state",
+                            "state"});
+                table591.AddRow(new string[] {
+                            "response_mode",
+                            "query"});
+                table591.AddRow(new string[] {
+                            "scope",
+                            "openid email role"});
+                table591.AddRow(new string[] {
+                            "redirect_uri",
+                            "http://localhost:8080"});
+                table591.AddRow(new string[] {
+                            "nonce",
+                            "nonce"});
+                table591.AddRow(new string[] {
+                            "display",
+                            "popup"});
+#line 201
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table591, "When ");
+#line hidden
+#line 212
+ testRunner.And("extract parameter \'code\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table592 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table592.AddRow(new string[] {
+                            "client_id",
+                            "seventyClient"});
+                table592.AddRow(new string[] {
+                            "client_secret",
+                            "password"});
+                table592.AddRow(new string[] {
+                            "grant_type",
+                            "authorization_code"});
+                table592.AddRow(new string[] {
+                            "code",
+                            "$code$"});
+                table592.AddRow(new string[] {
+                            "redirect_uri",
+                            "http://localhost:8080"});
+#line 214
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table592, "And ");
+#line hidden
+#line 222
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 223
+ testRunner.And("extract parameter \'access_token\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table593 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table593.AddRow(new string[] {
+                            "Authorization",
+                            "Bearer $access_token$"});
+#line 225
+ testRunner.And("execute HTTP GET request \'http://localhost/userinfo\'", ((string)(null)), table593, "And ");
+#line hidden
+#line 229
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 231
+ testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 232
+ testRunner.Then("HTTP header has \'Content-Type\'=\'application/json\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 233
+ testRunner.Then("JSON \'sub\'=\'user\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 234
+ testRunner.Then("JSON \'$.role[0]\'=\'role1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 235
+ testRunner.Then("JSON \'$.role[1]\'=\'role2\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 236
+ testRunner.Then("JSON \'email\'=\'email@outlook.fr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
         [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
         [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
         public class FixtureData : System.IDisposable

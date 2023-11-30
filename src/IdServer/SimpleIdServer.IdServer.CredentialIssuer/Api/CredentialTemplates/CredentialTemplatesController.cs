@@ -31,15 +31,19 @@ public class CredentialTemplatesController : BaseController
     private readonly ICredentialTemplateRepository _credentialTemplateRepository;
     private readonly IRealmRepository _realmRepository;
     private readonly IBusControl _busControl;
-    private readonly IJwtBuilder _jwtBuilder;
     private readonly ILogger<CredentialTemplatesController> _logger;
 
-    public CredentialTemplatesController(ICredentialTemplateRepository credentialTemplateRepository, IRealmRepository realmRepository, IBusControl busControl, IJwtBuilder jwtBuilder, ILogger<CredentialTemplatesController> logger)
+    public CredentialTemplatesController(
+        ICredentialTemplateRepository credentialTemplateRepository, 
+        IRealmRepository realmRepository, 
+        IBusControl busControl,
+        ITokenRepository tokenRepository,
+        IJwtBuilder jwtBuilder, 
+        ILogger<CredentialTemplatesController> logger) : base(tokenRepository, jwtBuilder)
     {
         _credentialTemplateRepository = credentialTemplateRepository;
         _realmRepository = realmRepository;
         _busControl = busControl;
-        _jwtBuilder = jwtBuilder;
         _logger = logger;
     }
 
@@ -49,7 +53,7 @@ public class CredentialTemplatesController : BaseController
         prefix = prefix ?? IdServer.Constants.DefaultRealm;
         try
         {
-            CheckAccessToken(prefix, Constants.StandardScopes.CredentialTemplates.Name, _jwtBuilder);
+            await CheckAccessToken(prefix, Constants.StandardScopes.CredentialTemplates.Name);
             var query = _credentialTemplateRepository
                 .Query()
                 .Include(c => c.Parameters)
@@ -89,7 +93,7 @@ public class CredentialTemplatesController : BaseController
             try
             {
                 activity?.SetTag("realm", prefix);
-                CheckAccessToken(prefix, Constants.StandardScopes.CredentialTemplates.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.CredentialTemplates.Name);
                 var result = await _credentialTemplateRepository
                     .Query()
                     .Include(c => c.Realms)
@@ -122,7 +126,7 @@ public class CredentialTemplatesController : BaseController
                 if (string.IsNullOrWhiteSpace(request.Name)) throw new OAuthException(System.Net.HttpStatusCode.BadRequest, IdServer.ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.MISSING_PARAMETER, CredentialTemplateNames.Name));
                 if (string.IsNullOrWhiteSpace(request.Name)) throw new OAuthException(System.Net.HttpStatusCode.BadRequest, IdServer.ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.MISSING_PARAMETER, CredentialTemplateNames.Name));
                 if (string.IsNullOrWhiteSpace(request.Type)) throw new OAuthException(System.Net.HttpStatusCode.BadRequest, IdServer.ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.MISSING_PARAMETER, CredentialTemplateNames.Type));
-                CheckAccessToken(prefix, Constants.StandardScopes.CredentialTemplates.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.CredentialTemplates.Name);
                 var existingCredentialTemplate = await _credentialTemplateRepository.Query()
                     .Include(c => c.Parameters)
                     .AnyAsync(t => t.Format == Vc.Constants.CredentialTemplateProfiles.W3CVerifiableCredentials && t.Parameters.Any(p => p.Name == "type" && p.Value == request.Type));
@@ -170,7 +174,7 @@ public class CredentialTemplatesController : BaseController
         prefix = prefix ?? IdServer.Constants.DefaultRealm;
         try
         {
-            CheckAccessToken(prefix, Constants.StandardScopes.CredentialTemplates.Name, _jwtBuilder);
+            await CheckAccessToken(prefix, Constants.StandardScopes.CredentialTemplates.Name);
             var result = await _credentialTemplateRepository
                 .Query()
                 .Include(c => c.Realms)
@@ -196,7 +200,7 @@ public class CredentialTemplatesController : BaseController
             try
             {
                 activity?.SetTag("realm", prefix);
-                CheckAccessToken(prefix, Constants.StandardScopes.CredentialTemplates.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.CredentialTemplates.Name);
                 var result = await _credentialTemplateRepository
                     .Query()
                     .Include(c => c.DisplayLst)
@@ -240,7 +244,7 @@ public class CredentialTemplatesController : BaseController
             try
             {
                 activity?.SetTag("realm", prefix);
-                CheckAccessToken(prefix, Constants.StandardScopes.CredentialTemplates.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.CredentialTemplates.Name);
                 var result = await _credentialTemplateRepository
                     .Query()
                     .Include(c => c.DisplayLst)
@@ -296,7 +300,7 @@ public class CredentialTemplatesController : BaseController
             try
             {
                 activity?.SetTag("realm", prefix);
-                CheckAccessToken(prefix, Constants.StandardScopes.CredentialTemplates.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.CredentialTemplates.Name);
                 var result = await _credentialTemplateRepository
                     .Query()
                     .Include(c => c.Parameters)
@@ -338,7 +342,7 @@ public class CredentialTemplatesController : BaseController
             try
             {
                 activity?.SetTag("realm", prefix);
-                CheckAccessToken(prefix, Constants.StandardScopes.CredentialTemplates.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.CredentialTemplates.Name);
                 var credentialTemplate = await _credentialTemplateRepository
                     .Query()
                     .Include(c => c.Parameters)

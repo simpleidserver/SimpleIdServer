@@ -11,6 +11,7 @@ using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Events;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.Services;
@@ -47,7 +48,9 @@ namespace SimpleIdServer.IdServer.UI
             IUserTransformer userTransformer,
             IDataProtectionProvider dataProtectionProvider,
             IAuthenticationHelper authenticationHelper,
-            IOptions<IdServerHostOptions> options)
+            ITokenRepository tokenRepository,
+            IJwtBuilder jwtBuilder,
+            IOptions<IdServerHostOptions> options) : base(tokenRepository, jwtBuilder)
         {
             _clientRepository = clientRepository;
             _userRepository = userRepository;

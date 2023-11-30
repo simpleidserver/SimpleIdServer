@@ -17,5 +17,9 @@ namespace SimpleIdServer.IdServer.Domains
         public string? Jkt { get; set; } = null;
         public DateTime? ExpirationTime { get; set; }
         public DateTime CreateDateTime { get; set; }
+        public bool IsExpired()
+        {
+            return DateTime.UtcNow > ExpirationTime;
+        }
     }
 }

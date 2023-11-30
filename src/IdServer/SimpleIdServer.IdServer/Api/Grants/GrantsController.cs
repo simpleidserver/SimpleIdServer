@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Store;
 using System.Linq;
 using System.Net;
@@ -19,7 +20,11 @@ namespace SimpleIdServer.IdServer.Api.Grants
         private readonly IGrantRepository _grantRepository;
         private readonly IGrantedTokenHelper _grantedTokenHelper;
 
-        public GrantsController(ITokenRepository tokenRepository, IGrantRepository grantRepository, IGrantedTokenHelper grantedTokenHelper)
+        public GrantsController(
+            ITokenRepository tokenRepository,
+            IGrantRepository grantRepository, 
+            IGrantedTokenHelper grantedTokenHelper,
+            IJwtBuilder jwtBuilder) : base(tokenRepository, jwtBuilder)
         {
             _tokenRepository = tokenRepository;
             _grantRepository = grantRepository;

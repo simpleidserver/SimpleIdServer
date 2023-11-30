@@ -1,19 +1,33 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Store;
 using System;
 using System.Linq;
 using System.Net;
 using System.Text.Json.Nodes;
+using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.Api
 {
     public class BaseController : Controller
     {
+        private readonly ITokenRepository _tokenRepository;
+        private readonly IJwtBuilder _jwtBuilder;
+
+        public BaseController(ITokenRepository tokenRepository, IJwtBuilder jwtBuilder)
+        {
+            _tokenRepository = tokenRepository;
+            _jwtBuilder = jwtBuilder;
+        }
+
+        protected IJwtBuilder JwtBuilder => _jwtBuilder;
+
         protected string ExtractBearerToken()
         {
             if (TryExtractBearerToken(out string result)) return result;
@@ -39,25 +53,40 @@ namespace SimpleIdServer.IdServer.Api
             return false;
         }
 
-        protected void CheckHasPAT(string realm, IJwtBuilder jwtBuilder) => CheckAccessToken(realm, Constants.StandardScopes.UmaProtection.Name, jwtBuilder);
+        protected Task<(JsonWebToken, Domains.Token)> CheckHasPAT(string realm) => CheckAccessToken(realm, Constants.StandardScopes.UmaProtection.Name);
 
-        protected void CheckAccessToken(string realm, string scope, IJwtBuilder jwtBuilder)
+        protected async Task<(JsonWebToken, Domains.Token)> CheckAccessToken(string realm, string scope = null, string accessToken = null)
         {
-            var bearerToken = ExtractBearerToken();
-            var extractionResult = jwtBuilder.ReadSelfIssuedJsonWebToken(realm, bearerToken);
-            if (extractionResult.Error != null)
-                throw new OAuthException(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_REQUEST, extractionResult.Error);
-            if (!extractionResult.Jwt.Claims.Any(c => c.Type == "scope" && c.Value == scope))
-                throw new OAuthException(HttpStatusCode.Unauthorized, ErrorCodes.REQUEST_DENIED, ErrorMessages.UNAUTHORIZED_ACCESS_PERMISSION_API);
+            if(string.IsNullOrWhiteSpace(accessToken))
+                accessToken = ExtractBearerToken();
+
+            var handler = new JsonWebTokenHandler();
+            JsonWebToken jwt = null;
+            if(handler.CanReadToken(accessToken))
+            {
+                var extractionResult = _jwtBuilder.ReadSelfIssuedJsonWebToken(realm, accessToken);
+                if (extractionResult.Error != null)
+                    throw new OAuthException(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_REQUEST, extractionResult.Error);
+                if(!string.IsNullOrWhiteSpace(scope) && !extractionResult.Jwt.Claims.Any(c => c.Type == "scope" && c.Value == scope))
+                {
+                    throw new OAuthException(HttpStatusCode.Unauthorized, ErrorCodes.REQUEST_DENIED, ErrorMessages.UNAUTHORIZED_ACCESS_PERMISSION_API);
+                }
+
+                jwt = extractionResult.Jwt;
+            }
+
+            var token = await _tokenRepository.Query().FirstOrDefaultAsync(t => t.Id == accessToken);
+            if (token == null || token.IsExpired()) throw new OAuthException(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, ErrorMessages.UNKNOWN_ACCESS_TOKEN);
+            return (jwt ?? handler.ReadJsonWebToken(token.Data), token);
         }
 
-        protected bool TryGetIdentityToken(string realm, IJwtBuilder jwtBuilder, out JsonWebToken jsonWebToken)
+        protected bool TryGetIdentityToken(string realm, out JsonWebToken jsonWebToken)
         {
             jsonWebToken = null;
             string bearerToken;
             if (TryExtractBearerToken(out bearerToken)) return false;
             if (string.IsNullOrWhiteSpace(bearerToken)) return false;
-            var extractionResult = jwtBuilder.ReadSelfIssuedJsonWebToken(realm, bearerToken);
+            var extractionResult = _jwtBuilder.ReadSelfIssuedJsonWebToken(realm, bearerToken);
             if (extractionResult.Error != null)
                 return false;
             jsonWebToken = extractionResult.Jwt;

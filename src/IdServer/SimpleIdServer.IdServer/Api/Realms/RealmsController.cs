@@ -27,8 +27,6 @@ public class RealmsController : BaseController
     private readonly IScopeRepository _scopeRepository;
     private readonly IFileSerializedKeyStore _fileSerializedKeyStore;
     private readonly IAuthenticationContextClassReferenceRepository _authenticationContextClassReferenceRepository;
-    private readonly ICertificateAuthorityRepository _certificateAuthorityRepository;
-    private readonly IJwtBuilder _jwtBuilder;
     private readonly ILogger<RealmsController> _logger;
 
     public RealmsController(
@@ -38,9 +36,9 @@ public class RealmsController : BaseController
         IScopeRepository scopeRepository,
         IFileSerializedKeyStore fileSerializedKeyStore,
         IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository,
-        ICertificateAuthorityRepository certificateAuthorityRepository,
+        ITokenRepository tokenRepository,
         IJwtBuilder jwtBuilder,
-        ILogger<RealmsController> logger)
+        ILogger<RealmsController> logger) : base(tokenRepository, jwtBuilder)
     {
         _realmRepository = realmRepository;
         _userRepository = userRepository;
@@ -48,8 +46,6 @@ public class RealmsController : BaseController
         _scopeRepository = scopeRepository;
         _fileSerializedKeyStore = fileSerializedKeyStore;
         _authenticationContextClassReferenceRepository = authenticationContextClassReferenceRepository;
-        _certificateAuthorityRepository = certificateAuthorityRepository;
-        _jwtBuilder = jwtBuilder;
         _logger = logger;
     }
 
@@ -58,7 +54,7 @@ public class RealmsController : BaseController
     {
         try
         {
-            CheckAccessToken(Constants.DefaultRealm, Constants.StandardScopes.Realms.Name, _jwtBuilder);
+            await CheckAccessToken(Constants.DefaultRealm, Constants.StandardScopes.Realms.Name);
             var realms = await _realmRepository.Query().AsNoTracking().ToListAsync();
             return new OkObjectResult(realms);
         }
@@ -76,7 +72,7 @@ public class RealmsController : BaseController
         {
             try
             {
-                CheckAccessToken(Constants.DefaultRealm, Constants.StandardScopes.Realms.Name, _jwtBuilder);
+                await CheckAccessToken(Constants.DefaultRealm, Constants.StandardScopes.Realms.Name);
                 var realmExists = await _realmRepository.Query()
                     .AsNoTracking()
                     .AnyAsync(r => r.Name == request.Name);

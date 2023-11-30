@@ -14,7 +14,9 @@ using SimpleIdServer.IdServer.CredentialIssuer.Parsers;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Store;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -43,8 +45,10 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential
             IAuthenticationHelper authenticationHelper,
             ICredentialTemplateClaimsExtractor claimsExtractor,
             IEnumerable<ICredentialFormat> formats,
+            ITokenRepository tokenRepository,
+            IJwtBuilder jwtBuilder,
             IOptions<IdServerHostOptions> options,
-            ILogger<CredentialController> logger)
+            ILogger<CredentialController> logger) : base(tokenRepository, jwtBuilder)
         {
             _parsers = parsers;
             _proofValidators = proofValidators;

@@ -15,19 +15,20 @@ namespace SimpleIdServer.IdServer.Api.Auditing
 {
     public class AuditingController : BaseController
     {
-        private readonly IJwtBuilder _jwtBuilder;
         private readonly IAuditEventRepository _repository;
 
-        public AuditingController(IJwtBuilder jwtBuilder, IAuditEventRepository repository)
+        public AuditingController(
+            ITokenRepository tokenRepository,
+            IJwtBuilder jwtBuilder, 
+            IAuditEventRepository repository) : base(tokenRepository, jwtBuilder)
         {
-            _jwtBuilder = jwtBuilder;
             _repository = repository;
         }
 
         [HttpPost]
         public async Task<IActionResult> Search([FromRoute] string prefix, [FromBody] SearchAuditingRequest request)
         {
-            CheckAccessToken(prefix, Constants.StandardScopes.Auditing.Name, _jwtBuilder);
+            await CheckAccessToken(prefix, Constants.StandardScopes.Auditing.Name);
             prefix = prefix ?? Constants.DefaultRealm;
             IQueryable<AuditEvent> query = _repository.Query().AsNoTracking().Where(r => r.Realm == prefix);
             if (request.DisplayOnlyErrors)

@@ -26,15 +26,19 @@ public class AuthenticationSchemeProvidersController : BaseController
 	private readonly IAuthenticationSchemeProviderRepository _authenticationSchemeProviderRepository;
 	private readonly IAuthenticationSchemeProviderDefinitionRepository _authenticationSchemeProviderDefinitionRepository;
 	private readonly IRealmRepository _realmRepository;
-	private readonly IJwtBuilder _jwtBuilder;
 	private readonly IConfiguration _configuration;
 
-	public AuthenticationSchemeProvidersController(IAuthenticationSchemeProviderRepository authenticationSchemeProviderRepository, IAuthenticationSchemeProviderDefinitionRepository authenticationSchemeProviderDefinitionRepository, IRealmRepository realmRepository, IJwtBuilder jwtBuilder, IConfiguration configuration)
+	public AuthenticationSchemeProvidersController(
+        IAuthenticationSchemeProviderRepository authenticationSchemeProviderRepository, 
+        IAuthenticationSchemeProviderDefinitionRepository authenticationSchemeProviderDefinitionRepository, 
+        IRealmRepository realmRepository,
+        ITokenRepository tokenRepository,
+        IJwtBuilder jwtBuilder, 
+        IConfiguration configuration) : base(tokenRepository, jwtBuilder)
 	{
 		_authenticationSchemeProviderRepository = authenticationSchemeProviderRepository;
 		_authenticationSchemeProviderDefinitionRepository = authenticationSchemeProviderDefinitionRepository;
 		_realmRepository = realmRepository;
-		_jwtBuilder = jwtBuilder;
 		_configuration = configuration;
 	}
 
@@ -44,7 +48,7 @@ public class AuthenticationSchemeProvidersController : BaseController
 		prefix = prefix ?? Constants.DefaultRealm;
 		try
 		{
-            CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name, _jwtBuilder);
+            await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name);
             IQueryable<AuthenticationSchemeProvider> query = _authenticationSchemeProviderRepository.Query()
 				.Include(p => p.Realms)
 				.Where(p => p.Realms.Any(r => r.Name == prefix))
@@ -75,7 +79,7 @@ public class AuthenticationSchemeProvidersController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name, _jwtBuilder);
+            await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name);
             var result = await _authenticationSchemeProviderDefinitionRepository.Query()
                 .AsNoTracking()
                 .ToListAsync();
@@ -93,7 +97,7 @@ public class AuthenticationSchemeProvidersController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name, _jwtBuilder);
+            await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name);
 			var result = await _authenticationSchemeProviderRepository.Query()
 				.Include(p => p.Realms)
 				.Where(p => p.Realms.Any(r => r.Name == prefix))
@@ -115,7 +119,7 @@ public class AuthenticationSchemeProvidersController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name, _jwtBuilder);
+            await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name);
             var result = await _authenticationSchemeProviderRepository.Query()
                 .Include(p => p.Realms)
                 .Include(p => p.AuthSchemeProviderDefinition)
@@ -142,7 +146,7 @@ public class AuthenticationSchemeProvidersController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name, _jwtBuilder);
+            await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name);
 			var instance = await _authenticationSchemeProviderRepository
                 .Query()
 				.Include(r => r.Realms)
@@ -180,7 +184,7 @@ public class AuthenticationSchemeProvidersController : BaseController
 		prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name, _jwtBuilder);
+            await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name);
             var instance = await _authenticationSchemeProviderRepository
                 .Query()
                 .Include(r => r.Realms)
@@ -204,7 +208,7 @@ public class AuthenticationSchemeProvidersController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name, _jwtBuilder);
+            await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name);
             var instance = await _authenticationSchemeProviderRepository
                 .Query()
                 .Include(r => r.AuthSchemeProviderDefinition)
@@ -228,7 +232,7 @@ public class AuthenticationSchemeProvidersController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name, _jwtBuilder);
+            await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name);
             var instance = await _authenticationSchemeProviderRepository
                 .Query()
                 .Include(r => r.Realms)
@@ -266,7 +270,7 @@ public class AuthenticationSchemeProvidersController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name, _jwtBuilder);
+            await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name);
             var result = await _authenticationSchemeProviderRepository.Query()
                 .Include(p => p.Realms)
                 .Include(p => p.Mappers)
@@ -289,7 +293,7 @@ public class AuthenticationSchemeProvidersController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name, _jwtBuilder);
+            await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name);
             var instance = await _authenticationSchemeProviderRepository
                 .Query()
                 .Include(r => r.Realms)

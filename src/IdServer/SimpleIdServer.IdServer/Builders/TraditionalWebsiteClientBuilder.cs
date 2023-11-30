@@ -474,6 +474,17 @@ namespace SimpleIdServer.IdServer.Builders
         #region Other parameters
 
         /// <summary>
+        /// Set the access token type.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder SetAccessTokenType(AccessTokenTypes type)
+        {
+            _client.AccessTokenType = type;
+            return this;
+        }
+
+        /// <summary>
         /// Set the sector_identifier_uri.
         /// </summary>
         /// <param name="uri"></param>

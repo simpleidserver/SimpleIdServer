@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.Services;
@@ -35,7 +36,9 @@ namespace SimpleIdServer.IdServer.UI
             IUserRepository userRepository,
             IUserSessionResitory userSessionRepository,
             IUserTransformer userTransformer,
-            IBusControl busControl) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl)
+            ITokenRepository tokenRepository,
+            IJwtBuilder jwtBuilder,
+            IBusControl busControl) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl)
         {
             _notificationServices = notificationServices;
             _otpAuthenticators = otpAuthenticators;

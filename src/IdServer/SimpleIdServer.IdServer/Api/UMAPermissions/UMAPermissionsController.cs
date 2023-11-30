@@ -22,14 +22,17 @@ namespace SimpleIdServer.IdServer.Api.UMAPermissions
 {
     public class UMAPermissionsController : BaseController
     {
-        private readonly IJwtBuilder _jwtBuilder;
         private readonly IUmaResourceRepository _umaResourceRepository;
         private readonly IUmaPermissionTicketHelper _umaPermissionTicketHelper;
         private readonly ILogger<UMAPermissionsController> _logger;
 
-        public UMAPermissionsController(IJwtBuilder jwtBuilder, IUmaResourceRepository umaResourceRepository, IUmaPermissionTicketHelper umaPermissionTicketHelper, ILogger<UMAPermissionsController> logger)
+        public UMAPermissionsController(
+            ITokenRepository tokenRepository,
+            IJwtBuilder jwtBuilder, 
+            IUmaResourceRepository umaResourceRepository, 
+            IUmaPermissionTicketHelper umaPermissionTicketHelper, 
+            ILogger<UMAPermissionsController> logger) : base(tokenRepository, jwtBuilder)
         {
-            _jwtBuilder = jwtBuilder;
             _umaResourceRepository = umaResourceRepository;
             _umaPermissionTicketHelper = umaPermissionTicketHelper;
             _logger = logger;
@@ -44,7 +47,7 @@ namespace SimpleIdServer.IdServer.Api.UMAPermissions
         {
             try
             {
-                CheckHasPAT(prefix ?? Constants.DefaultRealm, _jwtBuilder);
+                await CheckHasPAT(prefix ?? Constants.DefaultRealm);
                 var permissionTicket = BuildPermissionTicket(requestLst);
                 await Validate(permissionTicket, cancellationToken);
                 await _umaPermissionTicketHelper.SetTicket(permissionTicket, cancellationToken);

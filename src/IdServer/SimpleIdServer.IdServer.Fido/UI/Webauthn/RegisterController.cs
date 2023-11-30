@@ -7,6 +7,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Fido.UI.ViewModels;
+using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI;
@@ -20,7 +21,9 @@ namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
         public RegisterController(
             IOptions<IdServerHostOptions> options, 
             IDistributedCache distributedCache, 
-            IUserRepository userRepository) : base(options, distributedCache, userRepository)
+            IUserRepository userRepository,
+            ITokenRepository tokenRepository,
+            IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, tokenRepository, jwtBuilder)
         {
         }
 

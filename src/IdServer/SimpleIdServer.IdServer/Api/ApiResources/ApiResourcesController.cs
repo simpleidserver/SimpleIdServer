@@ -31,7 +31,13 @@ public class ApiResourcesController : BaseController
     private readonly IJwtBuilder _jwtBuilder;
     private readonly ILogger<ApiResourcesController> _logger;
 
-    public ApiResourcesController(IApiResourceRepository apiResourceRepository, IRealmRepository realmRepository, IBusControl busControl, IJwtBuilder jwtBuilder, ILogger<ApiResourcesController> logger)
+    public ApiResourcesController(
+        IApiResourceRepository apiResourceRepository, 
+        IRealmRepository realmRepository, 
+        IBusControl busControl, 
+        ITokenRepository tokenRepository,
+        IJwtBuilder jwtBuilder, 
+        ILogger<ApiResourcesController> logger) : base(tokenRepository, jwtBuilder)
     {
         _apiResourceRepository = apiResourceRepository;
         _realmRepository = realmRepository;
@@ -46,7 +52,7 @@ public class ApiResourcesController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            CheckAccessToken(prefix, Constants.StandardScopes.ApiResources.Name, _jwtBuilder);
+            await CheckAccessToken(prefix, Constants.StandardScopes.ApiResources.Name);
             IQueryable<ApiResource> query = _apiResourceRepository.Query()
                 .Include(p => p.Realms)
                 .Include(p => p.Scopes)
@@ -81,7 +87,7 @@ public class ApiResourcesController : BaseController
             try
             {
                 activity?.SetTag("realm", prefix);
-                CheckAccessToken(prefix, Constants.StandardScopes.ApiResources.Name, _jwtBuilder);
+                await CheckAccessToken(prefix, Constants.StandardScopes.ApiResources.Name);
                 if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
                 if (string.IsNullOrWhiteSpace(request.Name)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, ApiResourceNames.Name));
                 if (await _apiResourceRepository.Query().Include(r => r.Realms).AsNoTracking().AnyAsync(r => r.Name == request.Name && r.Realms.Any(r => r.Name == prefix))) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.APIRESOURCE_ALREADY_EXISTS, request.Name));
