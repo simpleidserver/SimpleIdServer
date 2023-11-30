@@ -37,6 +37,42 @@ namespace SimpleIdServer.IdServer.UI
 
         protected override bool IsExternalIdProvidersDisplayed => true;
 
+        #region Send password reset link
+
+        [HttpGet]
+        public IActionResult SendPasswordReset([FromRoute] string prefix)
+        {
+            // If the user is authenticated then display a message.
+            // If the user is not authenticated the display an another message.
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult SendPasswordReset([FromRoute] string prefix, SendPasswordResetViewModel viewModel)
+        {
+            return null;
+        }
+
+        #endregion
+
+        #region Reset the password
+
+        [HttpGet]
+        public IActionResult Reset([FromRoute] string prefix, string resetCode)
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Reset([FromRoute] string prefix, ResetPasswordViewModel viewModel)
+        {
+            return null;
+        }
+
+        #endregion
+
         protected override Task<UserAuthenticationResult> CustomAuthenticate(string prefix, string authenticatedUserId, AuthenticatePasswordViewModel viewModel, CancellationToken cancellationToken)
         {
             return Task.FromResult(UserAuthenticationResult.Ok());
