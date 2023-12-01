@@ -426,4 +426,7 @@
   <data name="CannotAddRealmBecauseOptionIsDisabled" xml:space="preserve">
     <value>Realm cannot be added because the option is disabled</value>
   </data>
+  <data name="ScopeResourcesRemoved" xml:space="preserve">
+    <value>Scope resources have been removed</value>
+  </data>
 </root>

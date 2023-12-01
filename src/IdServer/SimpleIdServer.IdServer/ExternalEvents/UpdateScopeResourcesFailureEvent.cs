@@ -8,6 +8,6 @@ public class UpdateScopeResourcesFailureEvent : IExternalEvent
 {
     public string EventName => nameof(UpdateScopeResourcesFailureEvent);
     public string Realm { get; set; }
-    public string Name { get; set; }
+    public string Id { get; set; }
     public List<string> Resources { get; set; }
 }

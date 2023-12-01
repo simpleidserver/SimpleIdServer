@@ -79,13 +79,32 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
             try
             {
                 httpResult.EnsureSuccessStatusCode();
-                dispatcher.Dispatch(new AddApiResourceSuccessAction { Name = action.Name, Description = action.Description, Audience = action.Audience });
+                var newApiResource = JsonSerializer.Deserialize<Domains.ApiResource>(json);
+                dispatcher.Dispatch(new AddApiResourceSuccessAction { Id = newApiResource.Id, Name = action.Name, Description = action.Description, Audience = action.Audience });
             }
             catch
             {
                 var jsonObj = JsonObject.Parse(json);
                 dispatcher.Dispatch(new AddApiResourceFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
             }
+        }
+
+        [EffectMethod]
+        public async Task Handle(RemoveSelectedApiResourcesAction action, IDispatcher dispatcher)
+        {
+            var baseUrl = await GetApiResourcesBaseUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            foreach (var resourceId in action.ResourceIds)
+            {
+                var requestMessage = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Delete,
+                    RequestUri = new Uri($"{baseUrl}/{resourceId}"),
+                };
+                await httpClient.SendAsync(requestMessage);
+            }
+
+            dispatcher.Dispatch(new RemoveSelectedApiResourcesSuccessAction { ResourceIds = action.ResourceIds });
         }
 
         [EffectMethod]
@@ -149,6 +168,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
 
     public class AddApiResourceSuccessAction
     {
+        public string Id { get; set; }
         public string Name { get; set; } = null!;
         public string? Audience { get; set; } = null;
         public string? Description { get; set; } = null;
@@ -181,5 +201,15 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
     {
         public string Name { get; set; } = null!;
         public IEnumerable<string> Resources { get; set; } = new List<string>();
+    }
+
+    public class RemoveSelectedApiResourcesAction
+    {
+        public IEnumerable<string> ResourceIds { get; set; }
+    }
+
+    public class RemoveSelectedApiResourcesSuccessAction
+    {
+        public IEnumerable<string> ResourceIds { get; set; }
     }
 }

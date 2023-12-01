@@ -109,7 +109,12 @@
 
     void UpdateClientScopes()
     {
-        var act = new AddClientScopesAction { ClientId = Client.ClientId, ScopeNames = clientScopesState.Value.EditableScopes.Where(s => !s.IsPresent && s.IsSelected).Select(s => s.Value.Name) };
+        var selectedScopes = clientScopesState.Value.EditableScopes.Where(s => !s.IsPresent && s.IsSelected).Select(s => s.Value);
+        var act = new AddClientScopesAction 
+        { 
+            ClientId = Client.ClientId,
+            Scopes = selectedScopes
+        };
         dispatcher.Dispatch(act);
     }
 }

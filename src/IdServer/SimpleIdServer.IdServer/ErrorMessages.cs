@@ -52,6 +52,7 @@ namespace SimpleIdServer.IdServer
         public const string UNKNOWN_SCOPE_RESOURCE_OR_AUDIENCE = "scopes {0} are not present in the resource / audience";
         public const string UNKNOWN_RESOURCE = "following resources {0} doesn't exist";
         public const string UNKNOWN_AUDIENCE = "following audiences {0} don't exist";
+        public const string UNKNOWN_API_RESOURCE = "the API resource {0} doesn't exist";
         public const string NO_CLIENT_SECRET = "no client secret";
         public const string NO_CONSENT = "no consent has been accepted";
         public const string NO_JWK_WITH_ALG_SIG = "no JWK with algorithm {0} has been found to sign the JWT";

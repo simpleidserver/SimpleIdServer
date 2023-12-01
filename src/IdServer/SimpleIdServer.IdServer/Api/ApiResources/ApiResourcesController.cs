@@ -132,4 +132,32 @@ public class ApiResourcesController : BaseController
             }
         }
     }
+
+    [HttpDelete]
+    public async Task<IActionResult> Delete([FromRoute] string prefix, string id, CancellationToken cancellationToken)
+    {
+        prefix = prefix ?? Constants.DefaultRealm;
+        using (var activity = Tracing.IdServerActivitySource.StartActivity($"Remove API resource {id}"))
+        {
+            try
+            {
+                activity?.SetTag("realm", prefix);
+                await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
+                var apiResource = await _apiResourceRepository.Query()
+                    .Include(s => s.Realms)
+                    .SingleOrDefaultAsync(s => s.Id == id && s.Realms.Any(r => r.Name == prefix), cancellationToken);
+                if (apiResource == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_API_RESOURCE, id));
+                activity?.SetStatus(ActivityStatusCode.Ok, $"API resource {id} is removed");
+                _apiResourceRepository.Delete(apiResource);
+                await _apiResourceRepository.SaveChanges(cancellationToken);
+                return new NoContentResult();
+            }
+            catch (OAuthException ex)
+            {
+                _logger.LogError(ex.ToString());
+                activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+                return BuildError(ex);
+            }
+        }
+    }
 }

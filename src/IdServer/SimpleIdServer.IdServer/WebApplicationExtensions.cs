@@ -365,6 +365,9 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("searchApiResource",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.ApiResources + "/.search",
                 defaults: new { controller = "ApiResources", action = "Search" });
+            webApplication.SidMapControllerRoute("deleteApiResource",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.ApiResources + "/{id}",
+                defaults: new { controller = "ApiResources", action = "Delete" });
 
             webApplication.SidMapControllerRoute("searchAuditing",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Auditing + "/.search",
@@ -395,7 +398,7 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes + "/{id}/mappers/{mapperId}",
                 defaults: new { controller = "Scopes", action = "UpdateClaimMapper" });
             webApplication.SidMapControllerRoute("updateScopeResources",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes + "/{name}/resources",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes + "/{id}/resources",
                 defaults: new { controller = "Scopes", action = "UpdateResources" });
 
             webApplication.SidMapControllerRoute("searchCertificateAuthorities",

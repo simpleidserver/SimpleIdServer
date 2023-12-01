@@ -331,31 +331,34 @@ public class ScopesController : BaseController
     #region Resources
 
     [HttpPut]
-    public async Task<IActionResult> UpdateResources([FromRoute] string prefix, string name, [FromBody] UpdateScopeResourcesRequest request)
+    public async Task<IActionResult> UpdateResources([FromRoute] string prefix, string id, [FromBody] UpdateScopeResourcesRequest request)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.IdServerActivitySource.StartActivity($"Update API resources of the scope {name}"))
+        using (var activity = Tracing.IdServerActivitySource.StartActivity($"Update API resources of the scope {id}"))
         {
             try
             {
                 activity?.SetTag("realm", prefix);
-                activity?.SetTag("scope", name);
+                activity?.SetTag("scope", id);
                 await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
                 if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
                 if (request.Resources == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, ScopeNames.Resources));
-                var existingScope = await _scopeRepository.Query().Include(s => s.Realms).Include(s => s.ApiResources).FirstOrDefaultAsync(s => s.Name == name && s.Realms.Any(r => r.Name == prefix));
-                if (existingScope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_SCOPE, name));
+                var existingScope = await _scopeRepository.Query()
+                    .Include(s => s.Realms)
+                    .Include(s => s.ApiResources)
+                    .FirstOrDefaultAsync(s => s.Id == id && s.Realms.Any(r => r.Name == prefix));
+                if (existingScope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_SCOPE, id));
                 var existingApiResources = await _apiResourceRepository.Query().Include(r => r.Realms).Where(r => request.Resources.Contains(r.Name) && r.Realms.Any(re => re.Name == prefix)).ToListAsync();
                 var unknownApiResources = request.Resources.Where(r => !existingApiResources.Any(er => er.Name == r));
                 if (unknownApiResources.Any()) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_RESOURCE, string.Join(",", unknownApiResources)));
                 existingScope.ApiResources.Clear();
                 foreach (var apiResource in existingApiResources) existingScope.ApiResources.Add(apiResource);
                 await _scopeRepository.SaveChanges(CancellationToken.None);
-                activity?.SetStatus(ActivityStatusCode.Ok, $"API resources have been updated for the scope {name}");
+                activity?.SetStatus(ActivityStatusCode.Ok, $"API resources have been updated for the scope {id}");
                 await _busControl.Publish(new UpdateScopeResourcesSuccessEvent
                 {
                     Realm = prefix,
-                    Name = name,
+                    Name = existingScope.Name,
                     Resources = request.Resources.ToList()
                 });
                 return new NoContentResult();
@@ -367,7 +370,7 @@ public class ScopesController : BaseController
                 await _busControl.Publish(new UpdateScopeResourcesFailureEvent
                 {
                     Realm = prefix,
-                    Name = name,
+                    Id = id,
                     Resources = request.Resources?.ToList()
                 });
                 return BuildError(ex);

@@ -46,6 +46,11 @@
         <RadzenDataGridColumn TItem="SelectableApiResource" Property="Value.Name" Title="Resource" Filterable="false" Sortable="false" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableApiResource" Property="Value.Audience" Title="Audience" Filterable="false" Sortable="false" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableApiResource" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Update datetime" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableApiResource" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <Template Context="data">
+                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+            </Template>
+        </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
 
@@ -64,6 +69,11 @@
             SubscribeToAction<UpdateApiScopeResourcesSuccessAction>((act) =>
             {
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.ScopeResourcesUpdated });
+                StateHasChanged();
+            });
+            SubscribeToAction<RemoveSelectedApiResourcesSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.ScopeResourcesRemoved });
                 StateHasChanged();
             });
             grid.Reload();
@@ -93,6 +103,24 @@
             row.Attributes.Remove(className);
     }
 
+    void ShowMoreContextMenu(SelectableApiResource resource, MouseEventArgs args)
+    {
+        contextMenuService.Open(args, new List<ContextMenuItem>
+        {
+            new ContextMenuItem { Text = "Delete", Value = 1 }
+        }, (a) =>
+    {
+        if (a.Value.Equals(1))
+        {
+            var resourceIds = searchApiResourcesState.Value.ApiResources.Where(s => s.IsSelected).Select(s => s.Value.Id).ToList();
+            if (!resourceIds.Contains(resource.Value.Id)) resourceIds.Add(resource.Value.Id);
+            var act = new RemoveSelectedApiResourcesAction { ResourceIds = resourceIds };
+            dispatcher.Dispatch(act);
+            contextMenuService.Close();
+        }
+    });
+    }
+
     void LoadData(LoadDataArgs args)
     {
         var act = new SearchApiResourcesAction { Filter = args.Filter, OrderBy = args.OrderBy, Skip = args.Skip, Take = args.Top, ScopeName = Scope.Name };
@@ -110,7 +138,7 @@
         });
     }
 
-    async void UpdateResource()
+    void UpdateResource()
     {
         var selectedApiResources = searchApiResourcesState.Value.ApiResources.Where(r => r.IsSelected).Select(r => r.Value.Name);
         dispatcher.Dispatch(new UpdateApiScopeResourcesAction { Name = Scope.Name, Resources = selectedApiResources });
