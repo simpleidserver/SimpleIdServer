@@ -9,5 +9,7 @@ public interface IOTPRegisterOptions
     public OTPAlgs OTPAlg { get; }
     public string OTPValue { get; set; }
     public int OTPCounter { get; set; }
+    public int TOTPStep { get; set; }
+    public int HOTPWindow { get; set; }
     public string HttpBody { get; }
 }

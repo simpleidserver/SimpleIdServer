@@ -43,6 +43,8 @@ namespace SimpleIdServer.IdServer.Helpers
         Task AddPreAuthCode(string preAuthorizationCode, string pin, string clientId, string userId, double validityPeriodsInSeconds, CancellationToken cancellationToken);
         Task<PreAuthCode> GetPreAuthCode(string preAuthorizationCode, CancellationToken cancellationToken);
         Task RemovePreAuthCode(string preAuthorizationCode, CancellationToken cancellationToken);
+        Task AddResetPasswordLink(string otpCode, string login, string realm, double expirationTimeInSeconds, CancellationToken cancellationToken);
+        Task<ResetPasswordLink> GetResetPasswordLink(string otpCode, CancellationToken cancellationToken);
     }
 
     public class AuthCode
@@ -316,6 +318,27 @@ namespace SimpleIdServer.IdServer.Helpers
         public async Task<DeviceAuthCode> UpdateAuthDeviceCode(DeviceAuthCode authCode)
         {
             return null;
+        }
+
+        #endregion
+
+        #region Reset Link
+
+        public async Task AddResetPasswordLink(string otpCode, string login, string realm, double expirationTimeInSeconds, CancellationToken cancellationToken)
+        {
+            var resetPasswordLink = new ResetPasswordLink(otpCode, login, realm);
+            var json = JsonSerializer.Serialize(resetPasswordLink);
+            await _distributedCache.SetAsync(otpCode, Encoding.UTF8.GetBytes(json), new DistributedCacheEntryOptions
+            {
+                SlidingExpiration = TimeSpan.FromSeconds(expirationTimeInSeconds)
+            }, cancellationToken);
+        }
+
+        public async Task<ResetPasswordLink> GetResetPasswordLink(string otpCode, CancellationToken cancellationToken)
+        {
+            var payload = await _distributedCache.GetAsync(otpCode, cancellationToken);
+            if (payload == null) return null;
+            return JsonSerializer.Deserialize<ResetPasswordLink>(Encoding.UTF8.GetString(payload));
         }
 
         #endregion

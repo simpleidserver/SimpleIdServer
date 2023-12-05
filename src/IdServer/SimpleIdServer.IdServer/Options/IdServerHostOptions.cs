@@ -66,21 +66,6 @@ namespace SimpleIdServer.IdServer.Options
         /// </summary>
         public double DefaultRefreshTokenExpirationTimeInSeconds { get; set; } = 60 * 30;
         /// <summary>
-        /// HOTP Window.
-        /// </summary>
-        public int HOTPWindow { get; set; } = 5;
-        /// <summary>
-        /// Calculate time windows.
-        /// Defines a period that a TOTP code will be valid for in seconds.
-        /// The default value is 30.
-        /// </summary>
-        public int TOTPStep { get; set; } = 30;
-        /// <summary>
-        /// Default OTP algorithm.
-        /// Default value is TOPT.
-        /// </summary>
-        public OTPAlgs OTPAlg { get; set; } = OTPAlgs.TOTP;
-        /// <summary>
         /// Default OTP issuer.
         /// </summary>
         public string OTPIssuer { get; set; } = "SimpleIdServer";

@@ -28,6 +28,10 @@ namespace SimpleIdServer.IdServer.Domains
         public bool IsActive { get; set; }
         [JsonPropertyName(UserCredentialNames.OTPCounter)]
         public int OTPCounter { get; set; } = 0;
+        [JsonPropertyName(UserCredentialNames.TOTPStep)]
+        public int TOTPStep { get; set; } = 30;
+        [JsonPropertyName(UserCredentialNames.HOTPWindow)]
+        public int HOTPWindow { get; set; } = 5;
         [JsonIgnore]
         public User User { get; set; }
         [JsonIgnore]

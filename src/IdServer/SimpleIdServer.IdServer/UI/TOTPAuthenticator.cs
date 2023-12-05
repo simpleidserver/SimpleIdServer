@@ -1,31 +1,22 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Options;
 using System;
 
 namespace SimpleIdServer.IdServer.UI
 {
     public class TOTPAuthenticator : OTPAuthenticator, IOTPAuthenticator
     {
-        private readonly IdServerHostOptions _options;
-
-        public TOTPAuthenticator(IOptions<IdServerHostOptions> options)
-        {
-            _options = options.Value;
-        }
-
         public OTPAlgs Alg => OTPAlgs.TOTP;
 
         public long GenerateOtp(UserCredential credential)
         {
-            return GenerateOtp(credential.OTPKey, CalculateTimeStep(DateTime.UtcNow));
+            return GenerateOtp(credential.OTPKey, CalculateTimeStep(DateTime.UtcNow, credential));
         }
 
         public long GenerateOtp(UserCredential credential, DateTime date)
         {
-            return GenerateOtp(credential.OTPKey, CalculateTimeStep(date));
+            return GenerateOtp(credential.OTPKey, CalculateTimeStep(date, credential));
         }
 
         public bool Verify(long otp, UserCredential credential)
@@ -34,17 +25,17 @@ namespace SimpleIdServer.IdServer.UI
             var key = credential.OTPKey;
             for (long offset = -1; offset <= 1; offset++)
             {
-                var step = CalculateTimeStep(currentDateTime) + offset;
+                var step = CalculateTimeStep(currentDateTime, credential) + offset;
                 if (GenerateOtp(key, step) == otp) return true;
             }
 
             return false;
         }
 
-        private long CalculateTimeStep(DateTime dateTime)
+        private long CalculateTimeStep(DateTime dateTime, UserCredential credential)
         {
             var unixTimestamp = dateTime.ConvertToUnixTimestamp();
-            var window = (long)unixTimestamp / (long)_options.TOTPStep;
+            var window = (long)unixTimestamp / (long)credential.TOTPStep;
             return window ;
         }
     }

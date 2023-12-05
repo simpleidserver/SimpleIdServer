@@ -3,13 +3,10 @@
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace SimpleIdServer.IdServer.UI.Services;
+namespace SimpleIdServer.IdServer.Pwd.Services;
 
 public interface IPasswordAuthenticationService : IUserAuthenticationService
 {
@@ -24,6 +21,8 @@ public class PasswordAuthenticationService : GenericAuthenticationService<Authen
     {
         _authServices = authServices;
     }
+
+    public override string Amr => Constants.Areas.Password;
 
     protected override async Task<User> GetUser(string authenticatedUserId, AuthenticatePasswordViewModel viewModel, string realm, CancellationToken cancellationToken)
     {

@@ -24,6 +24,10 @@ namespace SimpleIdServer.IdServer.Sms
         public string OTPValue { get; set; } = null;
         [ConfigurationRecord("OTP Counter", null, order: 6, isOTPValue: true, displayCondition: "OTPType=HOTP")]
         public int OTPCounter { get; set; } = 10;
+        [ConfigurationRecord("TOTP Step", null, order: 7, isOTPValue: true, displayCondition: "OTPType=TOTP")]
+        public int TOTPStep { get; set; } = 30;
+        [ConfigurationRecord("HOTP Window", null, order: 8, isOTPValue: true, displayCondition: "OTPType=HOTP")]
+        public int HOTPWindow { get; set; } = 5;
         public OTPAlgs OTPAlg => (OTPAlgs)OTPType;
         public string HttpBody => Message;
     }

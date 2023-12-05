@@ -25,6 +25,8 @@ namespace SimpleIdServer.IdServer.Fido.Services
             _distributedCache = distributedCache;
         }
 
+        public override string Amr => Constants.AMR;
+
         protected override async Task<User> GetUser(string authenticatedUserId, AuthenticateWebauthnViewModel viewModel, string realm, CancellationToken cancellationToken)
         {
             User authenticatedUser = null;

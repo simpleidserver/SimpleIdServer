@@ -1,0 +1,60 @@
+﻿@using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Options;
+@using SimpleIdServer.IdServer.Startup.Resources;
+@model SimpleIdServer.IdServer.Pwd.UI.ViewModels.ConfirmResetPasswordViewModel;
+@inject IOptions<IdServerHostOptions> configuration
+
+@{
+    ViewBag.Title = ConfirmResetPasswordResource.title;
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+            
+<div class="loginContainer">
+    <div class="card login">
+        <div class="card-body">
+            @if(Model.IsPasswordUpdated)
+            {
+                <div>@ConfirmResetPasswordResource.password_updated</div>
+            }
+            else
+            {
+                <!-- Errors -->
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <ul class="list-group">
+                        @foreach (var modelState in ViewData.ModelState.Values)
+                        {
+                            foreach (var error in modelState.Errors)
+                            {
+                                <li class="list-group-item list-group-item-danger">@ResetPasswordResource.ResourceManager.GetString(error.ErrorMessage)</li>
+                            }
+                        }
+                    </ul>
+                }
+
+                <!-- Reset form  -->
+                @using (Html.BeginForm("Confirm", "ResetPassword", new { area = SimpleIdServer.IdServer.Constants.Areas.Password }, FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    <!-- Login -->
+                    <div class="input-group mb-3">
+                        <input asp-for="Destination" placeholder="@ConfirmResetPasswordResource.login" type="text" class="form-control" />
+                    </div>
+                    <!-- Code -->
+                    <div class="input-group mb-3">
+                        <input asp-for="Code" placeholder="@ConfirmResetPasswordResource.code" type="number" class="form-control" />
+                    </div>
+                    <!-- Password -->
+                    <div class="input-group mb-3">
+                        <input asp-for="Password" placeholder="@ConfirmResetPasswordResource.password" type="password" class="form-control" />
+                    </div>
+                    <!-- Repeat password -->
+                    <div class="input-group mb-3">
+                        <input asp-for="Password" placeholder="@ConfirmResetPasswordResource.repeat_password" type="password" class="form-control" />
+                    </div>
+                    <button type="submit" class="btn btn-primary card-link">@ConfirmResetPasswordResource.update</button>
+                }
+            }
+        </div>
+    </div>
+</div>

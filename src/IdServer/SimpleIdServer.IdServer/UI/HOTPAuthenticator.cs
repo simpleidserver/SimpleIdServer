@@ -8,13 +8,6 @@ namespace SimpleIdServer.IdServer.UI
 {
     public class HOTPAuthenticator : OTPAuthenticator, IOTPAuthenticator
     {
-        private readonly IdServerHostOptions _options;
-
-        public HOTPAuthenticator(IOptions<IdServerHostOptions> options)
-        {
-            _options = options.Value;
-        }
-
         public OTPAlgs Alg => OTPAlgs.HOTP;
 
         public long GenerateOtp(UserCredential credential)
@@ -27,12 +20,12 @@ namespace SimpleIdServer.IdServer.UI
         public bool Verify(long otp, UserCredential credential)
         {
             var key = credential.OTPKey;
-            for(long i = credential.OTPCounter - _options.HOTPWindow; i <= credential.OTPCounter; i++)
+            for(long i = credential.OTPCounter - credential.HOTPWindow; i <= credential.OTPCounter; i++)
             {
                 if (GenerateOtp(key, i) == otp) return true;
             }
 
-            for(long i = credential.OTPCounter + 1; i <= credential.OTPCounter + _options.HOTPWindow; i++)
+            for(long i = credential.OTPCounter + 1; i <= credential.OTPCounter + credential.HOTPWindow; i++)
             {
                 if(GenerateOtp(key, i) == otp)
                 {

@@ -16,6 +16,7 @@
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.PostgreMigrations\SimpleIdServer.IdServer.PostgreMigrations.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Provisioning.LDAP\SimpleIdServer.IdServer.Provisioning.LDAP.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Provisioning.SCIM\SimpleIdServer.IdServer.Provisioning.SCIM.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.IdServer.Pwd\SimpleIdServer.IdServer.Pwd.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Saml.Idp\SimpleIdServer.IdServer.Saml.Idp.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Sms\SimpleIdServer.IdServer.Sms.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.SqlServerMigrations\SimpleIdServer.IdServer.SqlServerMigrations.csproj" />
@@ -44,6 +45,11 @@
 			<DesignTime>True</DesignTime>
 			<AutoGen>True</AutoGen>
 			<DependentUpon>AccountsResource.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Resources\ConfirmResetPasswordResource.Designer.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>ConfirmResetPasswordResource.resx</DependentUpon>
 		</Compile>
 		<Compile Update="Resources\RegisterPwdResource.Designer.cs">
 			<DesignTime>True</DesignTime>
@@ -100,6 +106,11 @@
 			<DesignTime>True</DesignTime>
 			<AutoGen>True</AutoGen>
 		</Compile>
+		<Compile Update="Resources\ResetPasswordResource.Designer.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>ResetPasswordResource.resx</DependentUpon>
+		</Compile>
 		<Compile Update="Resources\ScopesResource.Designer.cs">
 			<DependentUpon>ScopesResource.resx</DependentUpon>
 			<DesignTime>True</DesignTime>
@@ -140,6 +151,10 @@
 		<EmbeddedResource Update="Resources\AccountsResource.resx">
 			<Generator>PublicResXFileCodeGenerator</Generator>
 			<LastGenOutput>AccountsResource.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\ConfirmResetPasswordResource.resx">
+		  <Generator>PublicResXFileCodeGenerator</Generator>
+		  <LastGenOutput>ConfirmResetPasswordResource.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
 		<EmbeddedResource Update="Resources\RegisterPwdResource.resx">
 			<Generator>PublicResXFileCodeGenerator</Generator>
@@ -184,6 +199,10 @@
 		<EmbeddedResource Update="Resources\CredentialsResource.resx">
 			<LastGenOutput>CredentialsResource.Designer.cs</LastGenOutput>
 			<Generator>PublicResXFileCodeGenerator</Generator>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\ResetPasswordResource.resx">
+		  <Generator>PublicResXFileCodeGenerator</Generator>
+		  <LastGenOutput>ResetPasswordResource.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
 		<EmbeddedResource Update="Resources\ScopesResource.resx">
 			<LastGenOutput>ScopesResource.Designer.cs</LastGenOutput>

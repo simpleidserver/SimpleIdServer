@@ -31,7 +31,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IGrantHelper _audienceHelper;
         private readonly IBusControl _busControl;
         private readonly IDPOPProofValidator _dpopProofValidator;
-        private readonly IPasswordAuthenticationService _passwordAuthenticationService;
+        private readonly IEnumerable<IUserAuthenticationService> _userAuthenticationServices;
         private readonly IdServerHostOptions _options;
 
         public PasswordHandler(
@@ -42,16 +42,16 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IGrantHelper audienceHelper,
             IBusControl busControl,
             IDPOPProofValidator dpopProofValidator,
-            IPasswordAuthenticationService passwordAuthenticationService,
-            IOptions<IdServerHostOptions> options) : base(clientAuthenticationHelper, tokenProfiles, options)
+            IOptions<IdServerHostOptions> options,
+            IEnumerable<IUserAuthenticationService> userAuthenticationServices) : base(clientAuthenticationHelper, tokenProfiles, options)
         {
             _passwordGrantTypeValidator = passwordGrantTypeValidator;
             _tokenBuilders = tokenBuilders;
             _audienceHelper = audienceHelper;
             _busControl = busControl;
             _dpopProofValidator = dpopProofValidator;
-            _passwordAuthenticationService = passwordAuthenticationService;
             _options = options.Value;
+            _userAuthenticationServices = userAuthenticationServices;
         }
 
         public const string GRANT_TYPE = "password";
@@ -79,7 +79,8 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     activity?.SetTag("scopes", string.Join(",", extractionResult.Scopes)); 
                     var userName = context.Request.RequestData.GetStr(TokenRequestParameters.Username);
                     var password = context.Request.RequestData.GetStr(TokenRequestParameters.Password);
-                    var userAuthenticationResult = await _passwordAuthenticationService.Validate(context.Realm ?? Constants.DefaultRealm, string.Empty, new AuthenticatePasswordViewModel
+                    var authenticationService = _userAuthenticationServices.Single(s => s.Amr == Constants.Areas.Password);
+                    var userAuthenticationResult = await authenticationService.Validate(context.Realm ?? Constants.DefaultRealm, string.Empty, new AuthenticatePasswordViewModel
                     {
                         Login = userName,
                         Password = password

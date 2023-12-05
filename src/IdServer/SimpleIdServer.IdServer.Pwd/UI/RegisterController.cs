@@ -7,15 +7,12 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Pwd.UI.ViewModels;
 using SimpleIdServer.IdServer.Store;
-using SimpleIdServer.IdServer.UI.ViewModels;
-using System;
-using System.Linq;
+using SimpleIdServer.IdServer.UI;
 using System.Security.Claims;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace SimpleIdServer.IdServer.UI;
+namespace SimpleIdServer.IdServer.Pwd;
 
 [Area(Constants.Areas.Password)]
 public class RegisterController : BaseRegisterController<PwdRegisterViewModel>

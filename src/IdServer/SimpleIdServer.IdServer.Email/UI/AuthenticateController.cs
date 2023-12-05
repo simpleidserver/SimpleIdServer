@@ -61,7 +61,7 @@ namespace SimpleIdServer.IdServer.Email.UI
 
         protected override void EnrichViewModel(AuthenticateEmailViewModel viewModel)
         {
-
+            viewModel.TOTPStep = GetOptions().TOTPStep;
         }
 
         private IdServerEmailOptions GetOptions()

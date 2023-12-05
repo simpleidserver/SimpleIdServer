@@ -22,6 +22,8 @@ public class UserSmsAuthenticationService : OTPAuthenticationService, IUserSmsAu
     {
     }
 
+    public override string Amr => Constants.AMR;
+
     protected override async Task<User> GetUser(string authenticatedUserId, BaseOTPAuthenticateViewModel viewModel, string realm, CancellationToken cancellationToken)
     {
         User authenticatedUser = null;

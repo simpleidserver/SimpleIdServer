@@ -8,6 +8,7 @@ namespace SimpleIdServer.IdServer.UI.Services;
 
 public interface IUserAuthenticationService
 {
+    string Amr { get; }
     Task<User> GetUser(string authenticatedUserId, object viewModel, string realm, CancellationToken cancellationToken);
     Task<CredentialsValidationResult> Validate(string realm, string authenticatedUserId, object viewModel, CancellationToken cancellationToken);
     Task<CredentialsValidationResult> Validate(string realm, User authenticatedUser, object viewModel, CancellationToken cancellationToken);

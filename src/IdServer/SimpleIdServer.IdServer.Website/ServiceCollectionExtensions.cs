@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -10,6 +11,7 @@ using Radzen;
 using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.Website;
 using SimpleIdServer.IdServer.Website.Stores.GroupStore;
+using System.Security.Claims;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -94,6 +96,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 config.GetClaimsFromUserInfoEndpoint = true;
                 config.RequireHttpsMetadata = false;
                 config.MapInboundClaims = false;
+                // config.ClaimActions.MapAll();
+                config.ClaimActions.MapJsonKey(ClaimTypes.Role, "role");
                 config.TokenValidationParameters = new TokenValidationParameters
                 {
                     NameClaimType = "name",

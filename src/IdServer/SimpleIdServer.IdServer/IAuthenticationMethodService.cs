@@ -21,13 +21,4 @@ namespace SimpleIdServer.IdServer
         USERAUTHENTICATION = 1,
         PUSHNOTIFICATION = 2
     }
-
-    public class PwdAuthenticationMethodService : IAuthenticationMethodService
-    {
-        public string Amr => Constants.Areas.Password;
-        public string Name => "Password";
-        public Type? OptionsType => null;
-        public AuthenticationMethodCapabilities Capabilities => AuthenticationMethodCapabilities.USERAUTHENTICATION;
-        public bool IsCredentialExists(User user) => user.Credentials.Any(c => c.CredentialType == Constants.Areas.Password);
-    }
 }

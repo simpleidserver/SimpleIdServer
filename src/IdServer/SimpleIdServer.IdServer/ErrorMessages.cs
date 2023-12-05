@@ -159,6 +159,7 @@ namespace SimpleIdServer.IdServer
         public const string CLIENT_NOTIFICATION_TOKEN_MUST_CONTAIN_AT_LEAST_128_BYTES = "client_notification_token must contains at least 128 bytes";
         public const string CLIENT_TOKENEXCHANGE_NOT_ENABLED = "Token exchange is not enabled";
         public const string MISSING_PARAMETER = "missing parameter {0}";
+        public const string MISSING_DESTINATION = "the destination is empty";
         public const string MISSING_REGISTERED_USER_DEVICE = "the user doesn't have a registered mobile device";
         public const string MISSING_PARAMETERS = "missing parameters {0}";
         public const string MISSING_SUBJECT_SUBJECTTOKEN = "the subject cannot be extracted from the subject_token";

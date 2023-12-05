@@ -25,6 +25,8 @@ public class UserMobileAuthenticationService : GenericAuthenticationService<Auth
         _distributedCache = distributedCache;
     }
 
+    public override string Amr => Constants.AMR;
+
     protected override async Task<User> GetUser(string authenticatedUserId, AuthenticateMobileViewModel viewModel, string realm, CancellationToken cancellationToken)
     {
         User authenticatedUser = null;

@@ -6,8 +6,8 @@
 		<Description>Add sms authentication.</Description>
 	</PropertyGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\SimpleIdServer.Configuration\SimpleIdServer.Configuration.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.Configuration\SimpleIdServer.Configuration.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Twilio" Version="6.2.1" />

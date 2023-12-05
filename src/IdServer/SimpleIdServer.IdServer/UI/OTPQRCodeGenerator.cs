@@ -29,10 +29,10 @@ namespace SimpleIdServer.IdServer.UI
         {
             var alg = Enum.GetName(typeof(OTPAlgs), credential.OTPAlg).ToLowerInvariant();
             var url = $"otpauth://{alg}/{_options.OTPIssuer}:{user.Name}?secret={credential.Value}&issuer={_options.OTPIssuer}&algorithm=SHA1";
-            if (_options.OTPAlg == OTPAlgs.HOTP)
+            if (credential.OTPAlg == OTPAlgs.HOTP)
                 url = $"{url}&counter={credential.OTPCounter}";
-            if (_options.OTPAlg == OTPAlgs.TOTP)
-                url = $"{url}&period={_options.TOTPStep}";
+            if (credential.OTPAlg == OTPAlgs.TOTP)
+                url = $"{url}&period={credential.TOTPStep}";
             var result = GetQRCode();
             return result;
 

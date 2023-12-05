@@ -22,6 +22,8 @@ public abstract class GenericAuthenticationService<TViewModel> : IUserAuthentica
 
     protected IUserRepository UserRepository => _userRepository;
 
+    public abstract string Amr { get; }
+
     public Task<User> GetUser(string authenticatedUserId, object viewModel, string realm, CancellationToken cancellationToken)
     {
         return GetUser(authenticatedUserId, (TViewModel)viewModel, realm, cancellationToken);

@@ -9,8 +9,8 @@
 	  <None Remove="Apis\U2FRegisterController.cs~RF23df1b.TMP" />
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\SimpleIdServer.Configuration\SimpleIdServer.Configuration.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.Configuration\SimpleIdServer.Configuration.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Fido2.AspNet" Version="4.0.0-beta3" />

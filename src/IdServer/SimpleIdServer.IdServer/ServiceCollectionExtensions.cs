@@ -342,8 +342,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<ISessionManager, SessionManager>();
             // services.AddTransient<IAuthenticationSchemeProvider, DynamicAuthenticationSchemeProvider>();
             services.AddTransient<IUserTransformer, UserTransformer>();
-            services.AddTransient<IAuthenticationMethodService, PwdAuthenticationMethodService>();
-            services.AddTransient<IPasswordAuthenticationService, PasswordAuthenticationService>();
             return services;
         }
 

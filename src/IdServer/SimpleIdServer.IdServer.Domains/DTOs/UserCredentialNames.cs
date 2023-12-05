@@ -10,5 +10,7 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
         public const string Active = "active";
         public const string OTPAlg = "otp_alg";
         public const string OTPCounter = "otp_counter";
+        public const string TOTPStep = "totp_step";
+        public const string HOTPWindow = "hotp_window";
     }
 }
