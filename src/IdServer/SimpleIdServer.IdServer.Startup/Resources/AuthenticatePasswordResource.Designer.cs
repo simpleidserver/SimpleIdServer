@@ -151,6 +151,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Forget my password.
+        /// </summary>
+        public static string reset_pwd {
+            get {
+                return ResourceManager.GetString("reset_pwd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Submit.
         /// </summary>
         public static string submit {

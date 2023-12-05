@@ -7,7 +7,7 @@ namespace SimpleIdServer.IdServer.Pwd.UI.ViewModels;
 
 public class ResetPasswordViewModel
 {
-    public string NotificationMode { get; set; }
+    public string? NotificationMode { get; set; } = null;
     public string Login { get; set; }
     public string Value { get; set; }
     public bool IsResetLinkedSent { get; set; } = false;

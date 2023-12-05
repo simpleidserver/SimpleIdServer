@@ -7,7 +7,7 @@ namespace SimpleIdServer.IdServer.Pwd.UI.ViewModels
 {
     public class ConfirmResetPasswordViewModel
     {
-        public string Destination { get; set; }
+        public string? Destination { get; set; }
         public long? Code { get; set; }
         public string Password { get; set; }
         public string ConfirmationPassword { get; set; }

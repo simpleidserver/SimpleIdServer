@@ -17,7 +17,8 @@ namespace SimpleIdServer.IdServer.Sms.Services
             IConfiguration configuration, 
             IEnumerable<IOTPAuthenticator> otpAuthenticators, 
             IUserNotificationService notificationService, 
-            IAuthenticationHelper authenticationHelper) : base(configuration, otpAuthenticators, notificationService, authenticationHelper)
+            IGrantedTokenHelper grantedTokenHelper,
+            IAuthenticationHelper authenticationHelper) : base(configuration, otpAuthenticators, notificationService, grantedTokenHelper, authenticationHelper)
         {
         }
 

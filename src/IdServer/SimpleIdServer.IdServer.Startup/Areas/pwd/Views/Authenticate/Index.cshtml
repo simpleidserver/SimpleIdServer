@@ -63,6 +63,13 @@ else
         <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
         <button type="submit" class="btn btn-primary">@AuthenticatePasswordResource.submit</button>
     }
+    @if(Model.CanResetPassword)
+    {
+        <div class="divider">
+            <p class="fw-bold text">OR</p>
+        </div>
+        <a href="@Url.Action("Index", "Reset", new { area = SimpleIdServer.IdServer.Constants.Areas.Password })">@AuthenticatePasswordResource.reset_pwd</a>
+    }
 }
 
 @section SubScripts {

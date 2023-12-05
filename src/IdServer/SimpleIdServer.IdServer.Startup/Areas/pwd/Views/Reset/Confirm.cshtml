@@ -14,7 +14,7 @@
         <div class="card-body">
             @if(Model.IsPasswordUpdated)
             {
-                <div>@ConfirmResetPasswordResource.password_updated</div>
+                <div class="alert alert-success">@ConfirmResetPasswordResource.password_updated</div>
             }
             else
             {
@@ -33,16 +33,16 @@
                 }
 
                 <!-- Reset form  -->
-                @using (Html.BeginForm("Confirm", "ResetPassword", new { area = SimpleIdServer.IdServer.Constants.Areas.Password }, FormMethod.Post))
+                @using (Html.BeginForm("Confirm", "Reset", new { area = SimpleIdServer.IdServer.Constants.Areas.Password }, FormMethod.Post))
                 {
                     @Html.AntiForgeryToken()
                     <!-- Login -->
                     <div class="input-group mb-3">
-                        <input asp-for="Destination" placeholder="@ConfirmResetPasswordResource.login" type="text" class="form-control" />
+                        <input asp-for="Destination" placeholder="@ConfirmResetPasswordResource.login" type="text" class="form-control" disabled="true" />
                     </div>
                     <!-- Code -->
                     <div class="input-group mb-3">
-                        <input asp-for="Code" placeholder="@ConfirmResetPasswordResource.code" type="number" class="form-control" />
+                        <input asp-for="Code" placeholder="@ConfirmResetPasswordResource.code" type="number" class="form-control" disabled="true" />
                     </div>
                     <!-- Password -->
                     <div class="input-group mb-3">
@@ -50,7 +50,7 @@
                     </div>
                     <!-- Repeat password -->
                     <div class="input-group mb-3">
-                        <input asp-for="Password" placeholder="@ConfirmResetPasswordResource.repeat_password" type="password" class="form-control" />
+                        <input asp-for="ConfirmationPassword" placeholder="@ConfirmResetPasswordResource.repeat_password" type="password" class="form-control" />
                     </div>
                     <button type="submit" class="btn btn-primary card-link">@ConfirmResetPasswordResource.update</button>
                 }

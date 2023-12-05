@@ -23,6 +23,7 @@ using SimpleIdServer.IdServer.Provisioning.LDAP;
 using SimpleIdServer.IdServer.Provisioning.LDAP.Jobs;
 using SimpleIdServer.IdServer.Provisioning.SCIM;
 using SimpleIdServer.IdServer.Provisioning.SCIM.Jobs;
+using SimpleIdServer.IdServer.Pwd;
 using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Startup;
 using SimpleIdServer.IdServer.Startup.Configurations;
@@ -120,6 +121,7 @@ void ConfigureIdServer(IServiceCollection services)
         .AddCredentialIssuer()
         .UseInMemoryMassTransit()
         .AddBackChannelAuthentication()
+        .AddPwdAuthentication()
         .AddEmailAuthentication()
         .AddSmsAuthentication()
         .AddFcmNotification()
@@ -185,6 +187,7 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
         o.Add<SCIMRepresentationsExtractionJobOptions>();
         o.Add<IdServerEmailOptions>();
         o.Add<IdServerSmsOptions>();
+        o.Add<IdServerPasswordOptions>();
         o.Add<FidoOptions>();
         o.Add<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>();
         if (conf.Type == DistributedCacheTypes.REDIS)
@@ -403,6 +406,7 @@ void SeedData(WebApplication application, string scimBaseUrl)
                 dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<SCIMRepresentationsExtractionJobOptions>());
                 dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<IdServerEmailOptions>());
                 dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<IdServerSmsOptions>());
+                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<IdServerPasswordOptions>());
                 dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<FidoOptions>());
                 dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>());
             }

@@ -59,11 +59,13 @@ public abstract class BaseOTPResetPasswordService : IResetPasswordService
         IConfiguration configuration,
         IEnumerable<IOTPAuthenticator> otpAuthenticators,
         IUserNotificationService notificationService,
+        IGrantedTokenHelper grantedTokenHelper,
         IAuthenticationHelper authenticationHelper)
     {
         Configuration =  configuration;
         _otpAuthenticators = otpAuthenticators;
         _notificationService = notificationService;
+        _grantedTokenHelper = grantedTokenHelper;
         _authenticationHelper = authenticationHelper;
     }
 
@@ -92,10 +94,12 @@ public abstract class BaseOTPResetPasswordService : IResetPasswordService
         var link = parameter.Link;
         link = $"{link}?code={otp}";
         var message = string.Format(parameter.Body, link);
+        /*
         await _notificationService.Send(parameter.Title,
             message,
             new Dictionary<string, string>(),
             destination);
+        */
         var expirationTimeInSeconds = GetExpirationTimeInSeconds(userCredential, otpOptions, parameter);
         await _grantedTokenHelper.AddResetPasswordLink(otp.ToString(), login, parameter.Realm, expirationTimeInSeconds, cancellationToken);
     }

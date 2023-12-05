@@ -26,4 +26,9 @@ public class IdServerPasswordOptions
     /// </summary>
     [ConfigurationRecord("Expiration time", null, order: 3)]
     public int ResetPasswordLinkExpirationInSeconds { get; set; }
+    /// <summary>
+    /// Can reset the password.
+    /// </summary>
+    [ConfigurationRecord("Can reset the password", null, order: 4)]
+    public bool CanResetPassword { get; set; }
 }

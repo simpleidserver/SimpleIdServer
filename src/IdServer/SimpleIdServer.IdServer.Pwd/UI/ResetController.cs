@@ -11,6 +11,7 @@ using SimpleIdServer.IdServer.Pwd.UI.ViewModels;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.Services;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 
 namespace SimpleIdServer.IdServer.Pwd.UI;
 
@@ -100,8 +101,9 @@ public class ResetController : BaseController
         {
             area = Constants.Areas.Password
         });
+        var issuer = Request.GetAbsoluteUriWithVirtualPath();
         var parameter = new ResetPasswordParameter(
-            url, 
+            $"{issuer}{url}", 
             user, 
             prefix, 
             options.ResetPasswordBody, 

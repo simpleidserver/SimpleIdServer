@@ -14,7 +14,7 @@
         <div class="card-body">
             @if(Model.IsResetLinkedSent)
             {
-                <div>@string.Format(ResetPasswordResource.reset_link_sent, Model.NotificationMode)</div>
+                <div class="alert alert-success">@string.Format(ResetPasswordResource.reset_link_sent, Model.NotificationMode)</div>
             }
             else
             {
@@ -38,12 +38,17 @@
                 </div>
 
                 <!-- Reset form  -->
-                @using (Html.BeginForm("Index", "ResetPassword", new { area = SimpleIdServer.IdServer.Constants.Areas.Password }, FormMethod.Post))
+                @using (Html.BeginForm("Index", "Reset", new { area = SimpleIdServer.IdServer.Constants.Areas.Password }, FormMethod.Post))
                 {
                     @Html.AntiForgeryToken()
+                    <input asp-for="NotificationMode" type="hidden" />
                     <!-- Login -->
                     <div class="input-group mb-3">
                         <input asp-for="Login" placeholder="@ResetPasswordResource.login" type="text" class="form-control" />
+                    </div>
+                    <!-- Destination -->
+                    <div class="input-group mb-3">
+                        <input asp-for="Value" placeholder="@Model.NotificationMode" type="text" class="form-control" />
                     </div>
                     <button type="submit" class="btn btn-primary card-link">@ResetPasswordResource.send_link</button>
                 }

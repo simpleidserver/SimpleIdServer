@@ -15,7 +15,8 @@ namespace SimpleIdServer.IdServer.Email.Services
             IConfiguration configuration,
             IEnumerable<IOTPAuthenticator> otpAuthenticators,
             IEmailUserNotificationService userNotificationService,
-            IAuthenticationHelper authenticationHelper) : base(configuration, otpAuthenticators, userNotificationService, authenticationHelper)
+            IGrantedTokenHelper grantedTokenHelper,
+            IAuthenticationHelper authenticationHelper) : base(configuration, otpAuthenticators, userNotificationService, grantedTokenHelper, authenticationHelper)
         {
         }
 
