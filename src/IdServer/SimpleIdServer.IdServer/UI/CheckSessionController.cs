@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using Hangfire;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -15,6 +16,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
@@ -37,16 +39,16 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IUserRepository _userRepository;
         private readonly IUserSessionResitory _userSessionRepository;
         private readonly IClientRepository _clientRepository;
-        private readonly ISessionHelper _sessionHelper;
         private readonly IAuthenticationHelper _authenticationHelper;
+        private readonly IRecurringJobManager _recurringJobManager;
 
         public CheckSessionController(
             IOptions<IdServerHostOptions> options,
             IUserRepository userRepository,
             IUserSessionResitory userSessionRepository,
             IClientRepository clientRepository,
-            ISessionHelper sessionHelper,
             IAuthenticationHelper authenticationHelper,
+            IRecurringJobManager reccuringJobManager,
             ITokenRepository tokenRepository,
             IJwtBuilder jwtBuilder) : base(tokenRepository, jwtBuilder)
         {
@@ -54,8 +56,8 @@ namespace SimpleIdServer.IdServer.UI
             _userRepository = userRepository;
             _userSessionRepository = userSessionRepository;
             _clientRepository = clientRepository;
-            _sessionHelper = sessionHelper;
             _authenticationHelper = authenticationHelper;
+            _recurringJobManager = reccuringJobManager;
         }
 
         [HttpGet]
@@ -87,7 +89,6 @@ namespace SimpleIdServer.IdServer.UI
             return NoContent();
         }
 
-        [Authorize(Constants.Policies.Authenticated)]
         [HttpGet]
         public async Task<IActionResult> EndSession([FromRoute] string prefix, CancellationToken cancellationToken)
         {
@@ -95,6 +96,7 @@ namespace SimpleIdServer.IdServer.UI
             var jObjBody = Request.Query.ToJObject();
             var idTokenHint = jObjBody.GetIdTokenHintFromRpInitiatedLogoutRequest();
             var postLogoutRedirectUri = jObjBody.GetPostLogoutRedirectUriFromRpInitiatedLogoutRequest();
+            var state = jObjBody.GetStateFromRpInitiatedLogoutRequest();
             try
             {
                 if (string.IsNullOrWhiteSpace(postLogoutRedirectUri))
@@ -109,7 +111,18 @@ namespace SimpleIdServer.IdServer.UI
                     };
                 }
 
+                if (!User.Identity.IsAuthenticated)
+                {
+                    if (!string.IsNullOrWhiteSpace(state))
+                    {
+                        postLogoutRedirectUri = $"{postLogoutRedirectUri}?{RPInitiatedLogoutRequest.State}={HttpUtility.UrlEncode(state)}";
+                    }
+
+                    return Redirect(postLogoutRedirectUri);
+                }
+
                 var validationResult = await Validate(prefix, postLogoutRedirectUri, idTokenHint, cancellationToken);
+
                 if (Request.QueryString.HasValue)
                 {
                     url = Request.GetEncodedPathAndQuery().Replace($"/{Constants.EndPoints.EndSession}", $"/{Constants.EndPoints.EndSessionCallback}");
@@ -148,21 +161,23 @@ namespace SimpleIdServer.IdServer.UI
             {
                 var validationResult = await Validate(prefix, postLogoutRedirectUri, idTokenHint, cancellationToken);
                 var subject = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-                var authenticatedUser = await _authenticationHelper.GetUserByLogin(subject, prefix, cancellationToken);
                 var kvp = Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName());
-                UserSession activeSession = null;
-                if(!string.IsNullOrWhiteSpace(kvp.Value))
+                if(string.IsNullOrWhiteSpace(kvp.Value))
                 {
-                    activeSession = await _userSessionRepository.GetById(kvp.Value, prefix, cancellationToken);
-                    if (activeSession != null && !activeSession.IsActive()) activeSession = null;
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.NO_SESSION_ID);
                 }
 
-                var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
-                await _sessionHelper.Revoke(subject, activeSession, issuer, cancellationToken);
-                if(activeSession != null)
+                var activeSession = await _userSessionRepository.GetById(kvp.Value, prefix, cancellationToken);
+                if(activeSession == null)
+                {
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_USER_SESSION, kvp.Value));
+                }
+
+                if(!activeSession.IsClientsNotified)
                 {
                     activeSession.State = UserSessionStates.Rejected;
                     await _userSessionRepository.SaveChanges(cancellationToken);
+                    _recurringJobManager.Trigger(nameof(UserSessionJob));
                 }
 
                 Response.Cookies.Delete(_options.GetSessionCookieName());

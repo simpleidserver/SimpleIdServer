@@ -156,7 +156,7 @@ namespace SimpleIdServer.IdServer.Options
         /// <summary>
         /// Cookie auth expiration time in seconds.
         /// </summary>
-        public int CookieAuthExpirationTimeInSeconds { get; set; } = 5 * 60;
+        public int CookieAuthExpirationTimeInSeconds { get; set; } = 15; // 5 * 60;
         /// <summary>
         /// NAME of the cookie used to store the session id.
         /// </summary>

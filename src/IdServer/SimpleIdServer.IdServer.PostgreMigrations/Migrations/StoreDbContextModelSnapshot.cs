@@ -2347,6 +2347,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasAnnotation("Relational:JsonPropertyName", "exp_datetime");
 
+                    b.Property<bool>("IsClientsNotified")
+                        .HasColumnType("boolean")
+                        .HasAnnotation("Relational:JsonPropertyName", "is_clients_notified");
+
                     b.Property<string>("Realm")
                         .IsRequired()
                         .HasColumnType("text")

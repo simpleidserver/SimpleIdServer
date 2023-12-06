@@ -272,6 +272,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IDeviceCodeGrantTypeValidator, DeviceCodeGrantTypeValidator>();
             services.AddTransient<IDPOPProofValidator, DPOPProofValidator>();
             services.AddTransient<ISessionHelper, SessionHelper>();
+            services.AddTransient<UserSessionJob>();
             return services;
         }
 

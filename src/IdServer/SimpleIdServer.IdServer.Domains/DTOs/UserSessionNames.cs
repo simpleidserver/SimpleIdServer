@@ -11,4 +11,5 @@ public class UserSessionNames
     public const string State = "state";
     public const string Realm = "realm";
     public const string ClientIds = "client_ids";
+    public const string IsClientsNotified = "is_clients_notified";
 }

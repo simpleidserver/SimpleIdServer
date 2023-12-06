@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Hangfire;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -10,11 +11,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
-using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.AuthProviders;
@@ -41,8 +42,8 @@ namespace SimpleIdServer.IdServer.UI
         private readonly ICredentialTemplateRepository _credentialTemplateRepository;
         private readonly IBusControl _busControl;
         private readonly IEnumerable<IAuthenticationMethodService> _authenticationMethodServices;
-        private readonly ISessionHelper _sessionHelper;
         private readonly IUserSessionResitory _userSessionRepository;
+        private readonly IRecurringJobManager _recurringJobManager;
         private readonly ILogger<HomeController> _logger;
 
         public HomeController(IOptions<IdServerHostOptions> options,
@@ -55,8 +56,8 @@ namespace SimpleIdServer.IdServer.UI
             ICredentialTemplateRepository credentialTemplateRepository,
             IBusControl busControl,
             IEnumerable<IAuthenticationMethodService> authenticationMethodServices,
-            ISessionHelper sessionHelper,
             IUserSessionResitory userSessionRepository,
+            IRecurringJobManager recurringJobManager,
             ILogger<HomeController> logger)
         {
             _options = options.Value;
@@ -69,8 +70,8 @@ namespace SimpleIdServer.IdServer.UI
             _credentialTemplateRepository = credentialTemplateRepository;
             _busControl = busControl;
             _authenticationMethodServices = authenticationMethodServices;
-            _sessionHelper = sessionHelper;
             _userSessionRepository = userSessionRepository;
+            _recurringJobManager = recurringJobManager;
             _logger = logger;
         }
 
@@ -420,12 +421,11 @@ namespace SimpleIdServer.IdServer.UI
             if(!string.IsNullOrWhiteSpace(kvp.Key))
             {
                 var activeSession = await _userSessionRepository.GetById(kvp.Value, prefix, cancellationToken);
-                if(activeSession != null && activeSession.IsActive())
+                if(activeSession != null && !activeSession.IsClientsNotified)
                 {
-                    var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
-                    await _sessionHelper.Revoke(subject, activeSession, issuer, cancellationToken);
                     activeSession.State = UserSessionStates.Rejected;
                     await _userSessionRepository.SaveChanges(cancellationToken);
+                    _recurringJobManager.Trigger(nameof(UserSessionJob));
                 }
             }
 

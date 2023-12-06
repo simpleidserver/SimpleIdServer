@@ -10,6 +10,7 @@ namespace SimpleIdServer.IdServer.Store
 {
     public interface IUserSessionResitory
     {
+        Task<IEnumerable<UserSession>> GetInactiveAndNotNotified(CancellationToken cancellationToken);
         Task<IEnumerable<UserSession>> GetActive(string userId, string realm, CancellationToken cancellationToken);
         Task<UserSession> GetById(string sessionId, string realm, CancellationToken cancellationToken);
         Task<SearchResult<UserSession>> Search(string userId, string realm, SearchRequest request, CancellationToken cancellationToken);
@@ -25,6 +26,16 @@ namespace SimpleIdServer.IdServer.Store
         public UserSessionRepository(StoreDbContext dbContext)
         {
             _dbContext = dbContext;
+        }
+
+        public async Task<IEnumerable<UserSession>> GetInactiveAndNotNotified(CancellationToken cancellationToken)
+        {
+            var currentDateTime = DateTime.UtcNow;
+            var result = await _dbContext.UserSession
+                .Include(s => s.User)
+                .Where(s => (s.State == UserSessionStates.Rejected || s.ExpirationDateTime < currentDateTime) && s.IsClientsNotified == false)
+                .ToListAsync(cancellationToken);
+            return result;
         }
 
         public async Task<IEnumerable<UserSession>> GetActive(string userId, string realm, CancellationToken cancellationToken)

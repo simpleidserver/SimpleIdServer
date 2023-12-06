@@ -81,6 +81,10 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UserInfo,
                 defaults: new { controller = "UserInfo", action = "Post" });
 
+            var reccuringJobManager = webApplication.Services.GetRequiredService<IRecurringJobManager>();
+            // Occurs every 10 seconds.
+            reccuringJobManager.AddOrUpdate<UserSessionJob>(nameof(UserSessionJob), j => webApplication.Services.GetRequiredService<UserSessionJob>().Execute(), "*/10 * * * * *");
+
             if (opts.MtlsEnabled)
             {
                 webApplication.UseMiddleware<MtlsAuthenticationMiddleware>();
@@ -101,7 +105,6 @@ namespace Microsoft.AspNetCore.Builder
 
             if(opts.IsBCEnabled)
             {
-                var reccuringJobManager = webApplication.Services.GetRequiredService<IRecurringJobManager>();
                 // Occurs every 15 seconds.
                 reccuringJobManager.AddOrUpdate<BCNotificationJob>(nameof(BCNotificationJob), j => webApplication.Services.GetRequiredService<BCNotificationJob>().Execute(), "*/15 * * * * *");
                 webApplication.SidMapControllerRoute("bcAuthorize",

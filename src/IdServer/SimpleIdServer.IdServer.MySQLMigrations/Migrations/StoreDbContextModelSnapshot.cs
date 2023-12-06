@@ -2315,6 +2315,10 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         .HasColumnType("datetime(6)")
                         .HasAnnotation("Relational:JsonPropertyName", "auth_datetime");
 
+                    b.Property<bool>("IsClientsNotified")
+                        .HasColumnType("tinyint(1)")
+                        .HasAnnotation("Relational:JsonPropertyName", "is_clients_notified");
+
                     b.Property<string>("SerializedClientIds")
                         .IsRequired()
                         .HasColumnType("longtext");

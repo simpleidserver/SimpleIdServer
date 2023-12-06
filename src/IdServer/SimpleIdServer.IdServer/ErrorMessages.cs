@@ -58,6 +58,7 @@ namespace SimpleIdServer.IdServer
         public const string NO_JWK_WITH_ALG_SIG = "no JWK with algorithm {0} has been found to sign the JWT";
         public const string NO_JWK_FOUND_TO_DECRYPT = "no JWK with identifier {0} has been found to decrypt the JWT";
         public const string NO_JWK_FOUND_TO_CHECK_SIG = "no JWK with identifier {0} has been found to check the signature of the JWT";
+        public const string NO_SESSION_ID = "the incoming request doesn't contain a session_id";
         public const string DUPLICATE_SCOPES = "duplicate scopes : {0}";
         public const string UNAUTHORIZED_TO_SCOPES = "unauthorized to scopes : {0}";
         public const string INVALID_CLAIMS = "claims {0} are invalid";
