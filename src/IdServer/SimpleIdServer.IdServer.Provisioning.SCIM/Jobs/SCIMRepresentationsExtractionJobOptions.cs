@@ -15,7 +15,7 @@ namespace SimpleIdServer.IdServer.Provisioning.SCIM.Jobs
         public string ApiKey { get; set; }
         [ConfigurationRecord("ClientId", "Client Identifier", order: 3, displayCondition: "AuthenticationType=CLIENT_SECRET_POST")]
         public string ClientId { get; set; }
-        [ConfigurationRecord("ClientSecret", "Client Secret", order: 4, isProtected: true, displayCondition:"AuthenticationType=CLIENT_SECRET_POST")]
+        [ConfigurationRecord("ClientSecret", "Client Secret", 4, "AuthenticationType=CLIENT_SECRET_POST", CustomConfigurationRecordType.PASSWORD)]
         public string ClientSecret { get; set; }
         [ConfigurationRecord("Count", "Maximum number of records returned by the SCIM endpoint", order: 5)]
         public int Count { get; set; }

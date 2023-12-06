@@ -96,7 +96,6 @@ namespace Microsoft.Extensions.DependencyInjection
                 config.GetClaimsFromUserInfoEndpoint = true;
                 config.RequireHttpsMetadata = false;
                 config.MapInboundClaims = false;
-                // config.ClaimActions.MapAll();
                 config.ClaimActions.MapJsonKey(ClaimTypes.Role, "role");
                 config.TokenValidationParameters = new TokenValidationParameters
                 {

@@ -8,8 +8,8 @@ namespace SimpleIdServer.IdServer.Pwd.UI.ViewModels;
 public class ResetPasswordViewModel
 {
     public string? NotificationMode { get; set; } = null;
-    public string Login { get; set; }
-    public string Value { get; set; }
+    public string? Login { get; set; } = null;
+    public string? Value { get; set; } = null;
     public bool IsResetLinkedSent { get; set; } = false;
 
     public void Validate(ModelStateDictionary modelState)

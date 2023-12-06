@@ -70,11 +70,65 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Confirmation password is required.
+        /// </summary>
+        public static string confirmation_password {
+            get {
+                return ResourceManager.GetString("confirmation_password", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The validation code is invalid or has expired.
+        /// </summary>
+        public static string invalid_link {
+            get {
+                return ResourceManager.GetString("invalid_link", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The validation code is invalid or has expired.
+        /// </summary>
+        public static string invalid_otpcode {
+            get {
+                return ResourceManager.GetString("invalid_otpcode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Login.
         /// </summary>
         public static string login {
             get {
                 return ResourceManager.GetString("login", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Validation code is required.
+        /// </summary>
+        public static string missing_code {
+            get {
+                return ResourceManager.GetString("missing_code", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Destination is required.
+        /// </summary>
+        public static string missing_destination {
+            get {
+                return ResourceManager.GetString("missing_destination", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Password is required.
+        /// </summary>
+        public static string missing_password {
+            get {
+                return ResourceManager.GetString("missing_password", resourceCulture);
             }
         }
         
@@ -111,6 +165,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static string title {
             get {
                 return ResourceManager.GetString("title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Both passwords don&apos;t match.
+        /// </summary>
+        public static string unmatch_password {
+            get {
+                return ResourceManager.GetString("unmatch_password", resourceCulture);
             }
         }
         

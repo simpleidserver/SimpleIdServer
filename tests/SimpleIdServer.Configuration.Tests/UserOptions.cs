@@ -14,7 +14,7 @@ public class UserOptions
     public bool IsActive { get; set; }
     [ConfigurationRecord("Age", "Age", order: 4)]
     public int Age { get; set; }
-    [ConfigurationRecord("Password", "Password", order: 5, isProtected: true)]
+    [ConfigurationRecord("Password", "Password", 5, null, CustomConfigurationRecordType.PASSWORD)]
     public string Password { get; set; }
     [ConfigurationRecord("BirthDate", "BirthDate", order: 6)]
     public DateTime BirthDateTime { get; set; }

@@ -9,7 +9,7 @@ public class IdServerPasswordOptions
     /// <summary>
     /// Notification service used to send the RESET link, for example email.
     /// </summary>
-    [ConfigurationRecord("Notification mode", null, order: 0)]
+    [ConfigurationRecord("Notification mode", "Notification mode used to send the reset link", 0, null, CustomConfigurationRecordType.NOTIFICATIONMODE)]
     public string NotificationMode { get; set; }
     /// <summary>
     /// Title of the message.
@@ -24,7 +24,7 @@ public class IdServerPasswordOptions
     /// <summary>
     /// Expiration time in seconds of the reset password link.
     /// </summary>
-    [ConfigurationRecord("Expiration time", null, order: 3)]
+    [ConfigurationRecord("Expiration time", "Expiration time in seconds of the reset link", order: 3)]
     public int ResetPasswordLinkExpirationInSeconds { get; set; }
     /// <summary>
     /// Can reset the password.

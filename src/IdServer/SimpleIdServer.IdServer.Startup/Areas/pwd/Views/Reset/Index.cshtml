@@ -18,10 +18,11 @@
             }
             else
             {
+                <h5>@ResetPasswordResource.title</h5>
                 <!-- Errors -->
                 @if (!ViewData.ModelState.IsValid)
                 {
-                    <ul class="list-group">
+                    <ul class="list-group mb-3">
                         @foreach (var modelState in ViewData.ModelState.Values)
                         {
                             foreach (var error in modelState.Errors)
@@ -43,12 +44,14 @@
                     @Html.AntiForgeryToken()
                     <input asp-for="NotificationMode" type="hidden" />
                     <!-- Login -->
-                    <div class="input-group mb-3">
-                        <input asp-for="Login" placeholder="@ResetPasswordResource.login" type="text" class="form-control" />
+                    <div class="form-floating mb-3">
+                        <input asp-for="Login" placeholder="@ResetPasswordResource.login" id="floatingLogin" type="text" class="form-control" />
+                        <label for="floatingLogin">@ResetPasswordResource.login</label>
                     </div>
                     <!-- Destination -->
-                    <div class="input-group mb-3">
-                        <input asp-for="Value" placeholder="@Model.NotificationMode" type="text" class="form-control" />
+                    <div class="form-floating mb-3">
+                        <input asp-for="Value" placeholder="@Model.NotificationMode" id="floatingDestination" type="text" class="form-control" />
+                        <label for="floatingDestination">@Model.NotificationMode</label>
                     </div>
                     <button type="submit" class="btn btn-primary card-link">@ResetPasswordResource.send_link</button>
                 }

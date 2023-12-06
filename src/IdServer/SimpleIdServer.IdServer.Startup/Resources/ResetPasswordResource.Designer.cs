@@ -61,11 +61,47 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The destination doesn&apos;t match with yours.
+        /// </summary>
+        public static string invalid_destination {
+            get {
+                return ResourceManager.GetString("invalid_destination", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Login.
         /// </summary>
         public static string login {
             get {
                 return ResourceManager.GetString("login", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The destination is not configured in your account.
+        /// </summary>
+        public static string missing_destination {
+            get {
+                return ResourceManager.GetString("missing_destination", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Login is required.
+        /// </summary>
+        public static string missing_login {
+            get {
+                return ResourceManager.GetString("missing_login", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Destination is required.
+        /// </summary>
+        public static string missing_value {
+            get {
+                return ResourceManager.GetString("missing_value", resourceCulture);
             }
         }
         
@@ -93,6 +129,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static string title {
             get {
                 return ResourceManager.GetString("title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The login is invalid.
+        /// </summary>
+        public static string unknown_user {
+            get {
+                return ResourceManager.GetString("unknown_user", resourceCulture);
             }
         }
     }

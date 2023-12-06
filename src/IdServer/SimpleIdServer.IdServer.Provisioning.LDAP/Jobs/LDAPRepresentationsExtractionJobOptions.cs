@@ -13,7 +13,7 @@ public class LDAPRepresentationsExtractionJobOptions
     public int Port { get; set; } = 389;
     [ConfigurationRecord("Bind DN", "DN of the LDAP admin, which will be used by IdServer to access LDAP Server", order: 2)]
     public string BindDN { get; set; }
-    [ConfigurationRecord("Bind Credentials", "Password of LDAP admin.", order: 3, isProtected: true)]
+    [ConfigurationRecord("Bind Credentials", "Password of LDAP admin.", 3, null, CustomConfigurationRecordType.PASSWORD)]
     public string BindCredentials { get; set; }
     [ConfigurationRecord("Users DN", "Full DN of LDAP tree where your users are.", order: 4)]
     public string UsersDN { get; set; }

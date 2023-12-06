@@ -78,5 +78,6 @@ public enum ConfigurationDefinitionRecordTypes
     NUMBER = 4,
     PASSWORD = 5,
     DATETIME = 6,
-    OTPVALUE = 7
+    OTPVALUE = 7,
+    NOTIFICATIONMODE = 8
 }

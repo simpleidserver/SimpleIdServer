@@ -16,20 +16,28 @@ public class ConfigurationRecordAttribute : Attribute
 		Order = order;
 	}
 
-	public ConfigurationRecordAttribute(string displayName, string description = null, int order = 0, bool isProtected = false, string displayCondition = null, bool isOTPValue = false) : this(displayName, description, order)
+	public ConfigurationRecordAttribute(string displayName, string description = null, int order = 0, string displayCondition = null) : this(displayName, description, order)
 	{
-		IsProtected = isProtected;
         DisplayCondition = displayCondition;
-		IsOTPValue = isOTPValue;
-
     }
 
-	public string DisplayName { get; set; } = null!;
+    public ConfigurationRecordAttribute(string displayName, string description, int order, string displayCondition, CustomConfigurationRecordType customType) : this(displayName, description, order, displayCondition)
+    {
+        CustomType = customType;
+    }
+
+    public string DisplayName { get; set; } = null!;
 	public string? Description { get; set; } = null;
-	public bool IsProtected { get; set; } = false;
 	public int Order { get; set; } = 0;
 	public string DisplayCondition { get; set; }
-	public bool IsOTPValue { get; set; } = false;
+	public CustomConfigurationRecordType? CustomType { get; set; } = null;
 
     public Dictionary<string, string>? Values { get; set; } = null;
+}
+
+public enum CustomConfigurationRecordType
+{
+	OTPVALUE = 0,
+	PASSWORD = 1,
+	NOTIFICATIONMODE = 2
 }

@@ -20,13 +20,13 @@ namespace SimpleIdServer.IdServer.Sms
         public string Message { get; set; } = "the confirmation code is {0}";
         [ConfigurationRecord("OTP Algorithm", null, order: 4)]
         public OTPTypes OTPType { get; set; } = OTPTypes.TOTP;
-        [ConfigurationRecord("OTP Value", null, order: 5, isOTPValue: true)]
+        [ConfigurationRecord("OTP Value", null, 5, null, CustomConfigurationRecordType.OTPVALUE)]
         public string OTPValue { get; set; } = null;
-        [ConfigurationRecord("OTP Counter", null, order: 6, isOTPValue: true, displayCondition: "OTPType=HOTP")]
+        [ConfigurationRecord("OTP Counter", null, 6, "OTPType=HOTP", CustomConfigurationRecordType.OTPVALUE)]
         public int OTPCounter { get; set; } = 10;
-        [ConfigurationRecord("TOTP Step", null, order: 7, isOTPValue: true, displayCondition: "OTPType=TOTP")]
+        [ConfigurationRecord("TOTP Step", null, 7, "OTPType=TOTP", CustomConfigurationRecordType.OTPVALUE)]
         public int TOTPStep { get; set; } = 30;
-        [ConfigurationRecord("HOTP Window", null, order: 8, isOTPValue: true, displayCondition: "OTPType=HOTP")]
+        [ConfigurationRecord("HOTP Window", null, 8, "OTPType=HOTP", customType: CustomConfigurationRecordType.OTPVALUE)]
         public int HOTPWindow { get; set; } = 5;
         public OTPAlgs OTPAlg => (OTPAlgs)OTPType;
         public string HttpBody => Message;

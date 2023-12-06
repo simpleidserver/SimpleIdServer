@@ -2,16 +2,18 @@
 @using Fluxor.Blazor.Web.Components;
 @using SimpleIdServer.Configuration.DTOs;
 @using SimpleIdServer.Configuration;
+@using SimpleIdServer.IdServer.Website.Stores.AuthMethodsStore;
 @using SimpleIdServer.IdServer.Website.Stores.ConfigurationDefinitionStore;
 @using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
 @inject IState<ConfigurationDefinitionsState> configurationDefsState;
+@inject IState<AuthMethodsState> authMethodsState;
 
 @if(Properties != null)
 {
     <RadzenStack>
         @foreach (var property in Properties.OrderBy(p => p.Order))
         {
-            @if(property.Type != ConfigurationDefinitionRecordTypes.CHECKBOX && property.Type != ConfigurationDefinitionRecordTypes.OTPVALUE)
+            @if(property.Type != ConfigurationDefinitionRecordTypes.CHECKBOX && property.Type != ConfigurationDefinitionRecordTypes.OTPVALUE && property.Type != ConfigurationDefinitionRecordTypes.NOTIFICATIONMODE)
             {
                 <RadzenFormField Text="@property.DisplayName" Variant=Variant.Outlined>
                     <ChildContent>
@@ -52,7 +54,21 @@
                     <RadzenColumn><RadzenButton Click="@((args) => GenerateOTPValue(property))" ButtonStyle="ButtonStyle.Secondary" Text="Generate OTP Value"></RadzenButton></RadzenColumn>
                 </RadzenRow>            
             }
-            else
+            else if(property.Type == ConfigurationDefinitionRecordTypes.NOTIFICATIONMODE)
+            {
+                <RadzenFormField Text="@property.DisplayName" Variant=Variant.Outlined>
+                    <ChildContent>                        
+                        <RadzenDropDown @bind-Value="@property.Value" 
+                            Data="@authMethodsState.Value.AuthenticationMethods.Where(m => m.Capabilities.HasFlag(AuthenticationMethodCapabilities.PUSHNOTIFICATION))"  
+                            TextProperty="Name" 
+                            ValueProperty="Id" />
+                    </ChildContent>
+                    <Helper>
+                        <RadzenText TextStyle="TextStyle.Caption">@property.Description</RadzenText>
+                    </Helper>
+                </RadzenFormField>
+            }
+            else if(property.Type == ConfigurationDefinitionRecordTypes.CHECKBOX)
             {
                 <div>
                     <div>

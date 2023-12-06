@@ -15,7 +15,7 @@ namespace SimpleIdServer.IdServer.Email
         public string SmtpHost { get; set; } = "smtp.gmail.com";
         [ConfigurationRecord("Email", null, order: 2)]
         public string? SmtpUserName { get; set; } = null;
-        [ConfigurationRecord("Password", null, order: 3, IsProtected = true)]
+        [ConfigurationRecord("Password", null, 3, null, CustomConfigurationRecordType.PASSWORD)]
         public string? SmtpPassword { get; set; } = null;
         [ConfigurationRecord("Content of the message", null, order: 5)]
         public string HttpBody { get; set; } = "the confirmation code is {0}";
@@ -25,13 +25,13 @@ namespace SimpleIdServer.IdServer.Email
         public bool SmtpEnableSsl { get; set; } = true;
         [ConfigurationRecord("OTP Algorithm", null, order: 8)]
         public OTPTypes OTPType { get; set; } = OTPTypes.TOTP;
-        [ConfigurationRecord("OTP Value", null, order: 9, isOTPValue: true)]
+        [ConfigurationRecord("OTP Value", null, 9, null, CustomConfigurationRecordType.OTPVALUE)]
         public string OTPValue { get; set; } = null;
-        [ConfigurationRecord("OTP Counter", null, order: 10, isOTPValue: true, displayCondition: "OTPType=HOTP")]
+        [ConfigurationRecord("OTP Counter", null, 10, "OTPType=HOTP")]
         public int OTPCounter { get; set; } = 10;
-        [ConfigurationRecord("TOTP Step", null, order: 11, isOTPValue: true, displayCondition: "OTPType=TOTP")]
+        [ConfigurationRecord("TOTP Step", null, 11, "OTPType=TOTP")]
         public int TOTPStep { get; set; } = 30;
-        [ConfigurationRecord("HOTP Window", null, order: 12, isOTPValue: true, displayCondition: "OTPType=HOTP")]
+        [ConfigurationRecord("HOTP Window", null, 12, "OTPType=HOTP")]
         public int HOTPWindow { get; set; } = 5;
         public OTPAlgs OTPAlg => (OTPAlgs)OTPType;
     }

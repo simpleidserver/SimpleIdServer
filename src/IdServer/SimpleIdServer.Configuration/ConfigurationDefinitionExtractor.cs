@@ -32,15 +32,21 @@ public class ConfigurationDefinitionExtractor
         result.SetDisplayName(configurationRecordAttr.DisplayName, language);
         result.DisplayCondition = configurationRecordAttr.DisplayCondition;
         result.Order = configurationRecordAttr.Order;
-        if (configurationRecordAttr.IsProtected)
+        if(configurationRecordAttr.CustomType != null)
         {
-            result.Type = ConfigurationDefinitionRecordTypes.PASSWORD;
-            return true;
-        }
+            switch (configurationRecordAttr.CustomType)
+            {
+                case CustomConfigurationRecordType.OTPVALUE:
+                    result.Type = ConfigurationDefinitionRecordTypes.OTPVALUE; 
+                    break;
+                case CustomConfigurationRecordType.PASSWORD:
+                    result.Type = ConfigurationDefinitionRecordTypes.PASSWORD;
+                    break;
+                case CustomConfigurationRecordType.NOTIFICATIONMODE:
+                    result.Type = ConfigurationDefinitionRecordTypes.NOTIFICATIONMODE;
+                    break;
+            }
 
-        if(configurationRecordAttr.IsOTPValue)
-        {
-            result.Type = ConfigurationDefinitionRecordTypes.OTPVALUE;
             return true;
         }
 
