@@ -10,6 +10,8 @@ public class UpdateUserRequest
 {
     [JsonPropertyName(UserNames.Email)]
     public string Email { get; set; }
+    [JsonPropertyName(UserNames.EmailVerified)]
+    public bool EmailVerified { get; set; }
     [JsonPropertyName(UserNames.Name)]
     public string Name { get; set; }
     [JsonPropertyName(UserNames.Lastname)]

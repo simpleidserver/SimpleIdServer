@@ -29,6 +29,11 @@ namespace SimpleIdServer.IdServer.Api.Users
         [JsonPropertyName(UserNames.Email)]
         public string? Email { get; set; } = null;
         /// <summary>
+        /// Is email verified.
+        /// </summary>
+        [JsonPropertyName(UserNames.EmailVerified)]
+        public bool EmailVerified { get; set; }
+        /// <summary>
         /// Claims.
         /// </summary>
         [JsonPropertyName(UserNames.Claims)]

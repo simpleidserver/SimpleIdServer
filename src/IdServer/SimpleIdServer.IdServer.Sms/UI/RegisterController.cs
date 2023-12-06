@@ -44,8 +44,8 @@ public class RegisterController : BaseOTPRegisterController<IdServerSmsOptions>
         var phoneNumber = user.OAuthUserClaims.FirstOrDefault(c => c.Name == JwtRegisteredClaimNames.PhoneNumber)?.Value;
         var phoneNumberVerified = user.OAuthUserClaims.FirstOrDefault(c => c.Name == JwtRegisteredClaimNames.PhoneNumberVerified)?.Value;
         viewModel.Value = phoneNumber;
-        if(!string.IsNullOrWhiteSpace(phoneNumberVerified) && bool.TryParse(phoneNumberVerified, out bool b))
-            viewModel.IsVerified = user.EmailVerified;
+        if (!string.IsNullOrWhiteSpace(phoneNumberVerified) && bool.TryParse(phoneNumberVerified, out bool b))
+            viewModel.IsVerified = b;
     }
 
     protected override void BuildUser(User user, OTPRegisterViewModel viewModel)

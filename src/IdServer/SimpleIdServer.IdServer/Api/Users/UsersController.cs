@@ -167,6 +167,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                         Firstname = request.Firstname,
                         Lastname = request.Lastname,
                         Email = request.Email,
+                        EmailVerified = request.EmailVerified,
                         OAuthUserClaims = request.Claims?.Select(c => new UserClaim
                         {
                             Id = Guid.NewGuid().ToString(),
@@ -229,6 +230,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                     user.UpdateEmail(request.Email);
                     user.UpdateName(request.Name);
                     user.UpdateLastname(request.Lastname);
+                    user.EmailVerified = request.EmailVerified;
                     user.NotificationMode = request.NotificationMode ?? string.Empty;
                     user.UpdateDateTime = DateTime.UtcNow;
                     await _userRepository.SaveChanges(cancellationToken);
