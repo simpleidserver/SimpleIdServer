@@ -7,6 +7,6 @@
     <ProjectReference Include="..\SimpleIdServer.Scim\SimpleIdServer.Scim.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.3.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.5.0" />
   </ItemGroup>
 </Project>
