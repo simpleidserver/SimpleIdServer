@@ -81,6 +81,10 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UserInfo,
                 defaults: new { controller = "UserInfo", action = "Post" });
 
+            var reccuringJobManager = webApplication.Services.GetRequiredService<IRecurringJobManager>();
+            // Occurs every 10 seconds.
+            reccuringJobManager.AddOrUpdate<UserSessionJob>(nameof(UserSessionJob), j => webApplication.Services.GetRequiredService<UserSessionJob>().Execute(), "*/10 * * * * *");
+
             if (opts.MtlsEnabled)
             {
                 webApplication.UseMiddleware<MtlsAuthenticationMiddleware>();
@@ -101,7 +105,6 @@ namespace Microsoft.AspNetCore.Builder
 
             if(opts.IsBCEnabled)
             {
-                var reccuringJobManager = webApplication.Services.GetRequiredService<IRecurringJobManager>();
                 // Occurs every 15 seconds.
                 reccuringJobManager.AddOrUpdate<BCNotificationJob>(nameof(BCNotificationJob), j => webApplication.Services.GetRequiredService<BCNotificationJob>().Execute(), "*/15 * * * * *");
                 webApplication.SidMapControllerRoute("bcAuthorize",
@@ -365,6 +368,9 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("searchApiResource",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.ApiResources + "/.search",
                 defaults: new { controller = "ApiResources", action = "Search" });
+            webApplication.SidMapControllerRoute("deleteApiResource",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.ApiResources + "/{id}",
+                defaults: new { controller = "ApiResources", action = "Delete" });
 
             webApplication.SidMapControllerRoute("searchAuditing",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Auditing + "/.search",
@@ -395,7 +401,7 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes + "/{id}/mappers/{mapperId}",
                 defaults: new { controller = "Scopes", action = "UpdateClaimMapper" });
             webApplication.SidMapControllerRoute("updateScopeResources",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes + "/{name}/resources",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes + "/{id}/resources",
                 defaults: new { controller = "Scopes", action = "UpdateResources" });
 
             webApplication.SidMapControllerRoute("searchCertificateAuthorities",

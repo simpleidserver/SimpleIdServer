@@ -55,7 +55,7 @@ namespace SimpleIdServer.IdServer.Api.TokenIntrospection
                     var accessToken = await _grantedTokenHelper.GetAccessToken(token, cancellationToken);
                     var accessTokenClientId = string.Empty;
                     if (accessToken != null && accessToken.TryGetClaim(OpenIdConnectParameterNames.ClientId, out Claim value)) accessTokenClientId = value.Value;
-                    if (accessToken == null || accessToken.ValidTo <= DateTime.UtcNow || accessTokenClientId != client.ClientId)
+                    if (accessToken == null || accessToken.ValidTo <= DateTime.UtcNow)
                     {
                         var obj = new JsonObject
                         {

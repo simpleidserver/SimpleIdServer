@@ -36,6 +36,8 @@ namespace SimpleIdServer.IdServer.Domains
                 SerializedClientIds = string.Join(",", value);
             }
         }
+        [JsonPropertyName(UserSessionNames.IsClientsNotified)]
+        public bool IsClientsNotified { get; set; } = false;
         [JsonIgnore]
         public string SerializedClientIds { get; set; } = string.Empty;
         [JsonIgnore]

@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Hangfire;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,7 @@ using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
@@ -35,7 +37,7 @@ namespace SimpleIdServer.IdServer.Api.Users
         private readonly IRealmRepository _realmRepository;
         private readonly IGroupRepository _groupRepository;
         private readonly IBusControl _busControl;
-        private readonly ISessionHelper _sessionHelper;
+        private readonly IRecurringJobManager _recurringJobManager;
         private readonly ILogger<UsersController> _logger;
         private readonly IdServerHostOptions _options;
         private readonly IEnumerable<IDIDGenerator> _generators;
@@ -49,7 +51,7 @@ namespace SimpleIdServer.IdServer.Api.Users
             IBusControl busControl,
             ITokenRepository tokenRepository,
             IJwtBuilder jwtBuilder,
-            ISessionHelper sessionHelper,
+            IRecurringJobManager recurringJobManager,
             ILogger<UsersController> logger,
             IOptions<IdServerHostOptions> options,
             IEnumerable<IDIDGenerator> generators) : base(tokenRepository, jwtBuilder)
@@ -60,7 +62,7 @@ namespace SimpleIdServer.IdServer.Api.Users
             _realmRepository = realmRepository;
             _groupRepository = groupRepository;
             _busControl = busControl;
-            _sessionHelper = sessionHelper;
+            _recurringJobManager = recurringJobManager;
             _logger = logger;
             _options = options.Value;
             _generators = generators;
@@ -165,6 +167,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                         Firstname = request.Firstname,
                         Lastname = request.Lastname,
                         Email = request.Email,
+                        EmailVerified = request.EmailVerified,
                         OAuthUserClaims = request.Claims?.Select(c => new UserClaim
                         {
                             Id = Guid.NewGuid().ToString(),
@@ -227,6 +230,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                     user.UpdateEmail(request.Email);
                     user.UpdateName(request.Name);
                     user.UpdateLastname(request.Lastname);
+                    user.EmailVerified = request.EmailVerified;
                     user.NotificationMode = request.NotificationMode ?? string.Empty;
                     user.UpdateDateTime = DateTime.UtcNow;
                     await _userRepository.SaveChanges(cancellationToken);
@@ -619,10 +623,10 @@ namespace SimpleIdServer.IdServer.Api.Users
                     if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_USER, id));
                     var session = await _userSessionRepository.GetById(sessionId, prefix, cancellationToken);
                     if (session == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_USER_SESSION, sessionId));
-                    await _sessionHelper.Revoke(_authenticationHelper.GetLogin(user), session, issuer, cancellationToken);
                     session.State = UserSessionStates.Rejected;
                     user.UpdateDateTime = DateTime.UtcNow;
                     await _userRepository.SaveChanges(cancellationToken);
+                    _recurringJobManager.Trigger(nameof(UserSessionJob));
                     activity?.SetStatus(ActivityStatusCode.Ok, "User's session is revoked");
                     await _busControl.Publish(new RevokeUserSessionSuccessEvent
                     {

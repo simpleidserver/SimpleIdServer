@@ -70,7 +70,6 @@ namespace SimpleIdServer.IdServer.Startup
 
         public static ICollection<Client> Clients => new List<Client>
         {
-            ClientBuilder.BuildTraditionalWebsiteClient("website", "password", null, "https://localhost:5001/signin-oidc", "https://localhost.com:5001/signin-oidc", "https://idserver.localhost.com/signin-oidc", "http://idserver.localhost.com/signin-oidc", "https://idserver.sid.svc.cluster.local/signin-oidc").AddAuthDataTypes("photo").SetClientName("Website").SetClientLogoUri("https://cdn.logo.com/hotlink-ok/logo-social.png").AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope, SimpleIdServer.IdServer.Constants.StandardScopes.Profile).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("SIDS-manager", "password", null, "https://localhost:5002/*", "https://website.simpleidserver.com/*", "https://website.localhost.com/*", "http://website.localhost.com/*", "https://website.sid.svc.cluster.local/*").EnableClientGrantType().SetRequestObjectEncryption().AddPostLogoutUri("https://localhost:5002/signout-callback-oidc").AddPostLogoutUri("https://website.sid.svc.cluster.local/signout-callback-oidc")
                 .AddPostLogoutUri("https://website.simpleidserver.com/signout-callback-oidc")
                 .AddAuthDataTypes("photo")
@@ -97,7 +96,7 @@ namespace SimpleIdServer.IdServer.Startup
                     SimpleIdServer.IdServer.CredentialIssuer.Constants.StandardScopes.CredentialTemplates,
                     SimpleIdServer.IdServer.Constants.StandardScopes.Realms, 
                     SimpleIdServer.IdServer.Constants.StandardScopes.Groups).Build(),
-            ClientBuilder.BuildTraditionalWebsiteClient("swagger", "password", null, "https://localhost:5001/swagger/oauth2-redirect.html", "https://localhost:5001/(.*)/swagger/oauth2-redirect.html").AddScope(
+            ClientBuilder.BuildTraditionalWebsiteClient("swagger", "password", null, "https://localhost:5001/swagger/oauth2-redirect.html", "https://localhost:5001/(.*)/swagger/oauth2-redirect.html", "http://localhost").AddScope(
                 SimpleIdServer.IdServer.Constants.StandardScopes.Provisioning, 
                 SimpleIdServer.IdServer.Constants.StandardScopes.Users, 
                 SimpleIdServer.IdServer.Constants.StandardScopes.Networks,
@@ -112,6 +111,24 @@ namespace SimpleIdServer.IdServer.Startup
                 SimpleIdServer.IdServer.Constants.StandardScopes.Scopes, 
                 SimpleIdServer.IdServer.Constants.StandardScopes.CertificateAuthorities,
                 SimpleIdServer.IdServer.Constants.StandardScopes.Clients, 
+                SimpleIdServer.IdServer.CredentialIssuer.Constants.StandardScopes.CredentialTemplates,
+                SimpleIdServer.IdServer.Constants.StandardScopes.Realms,
+                SimpleIdServer.IdServer.Constants.StandardScopes.Groups).Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("postman", "password", null, "http://localhost").AddScope(
+                SimpleIdServer.IdServer.Constants.StandardScopes.Provisioning,
+                SimpleIdServer.IdServer.Constants.StandardScopes.Users,
+                SimpleIdServer.IdServer.Constants.StandardScopes.Networks,
+                SimpleIdServer.IdServer.Constants.StandardScopes.CredentialOffer,
+                SimpleIdServer.IdServer.Constants.StandardScopes.Acrs,
+                SimpleIdServer.Configuration.Constants.ConfigurationsScope,
+                SimpleIdServer.IdServer.Constants.StandardScopes.AuthenticationSchemeProviders,
+                SimpleIdServer.IdServer.Constants.StandardScopes.AuthenticationMethods,
+                SimpleIdServer.IdServer.Constants.StandardScopes.RegistrationWorkflows,
+                SimpleIdServer.IdServer.Constants.StandardScopes.ApiResources,
+                SimpleIdServer.IdServer.Constants.StandardScopes.Auditing,
+                SimpleIdServer.IdServer.Constants.StandardScopes.Scopes,
+                SimpleIdServer.IdServer.Constants.StandardScopes.CertificateAuthorities,
+                SimpleIdServer.IdServer.Constants.StandardScopes.Clients,
                 SimpleIdServer.IdServer.CredentialIssuer.Constants.StandardScopes.CredentialTemplates,
                 SimpleIdServer.IdServer.Constants.StandardScopes.Realms,
                 SimpleIdServer.IdServer.Constants.StandardScopes.Groups).Build(),

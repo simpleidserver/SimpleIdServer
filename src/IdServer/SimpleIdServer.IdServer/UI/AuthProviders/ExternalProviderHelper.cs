@@ -9,6 +9,6 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
 {
     public static class ExternalProviderHelper
     {
-        public static IEnumerable<AuthenticationScheme> GetExternalAuthenticationSchemes(IEnumerable<AuthenticationScheme> authenticationSchemes) => authenticationSchemes.Where(s => !string.IsNullOrWhiteSpace(s.DisplayName) && Constants.DefaultOIDCAuthenticationScheme != s.Name);
+        public static IEnumerable<AuthenticationScheme> GetExternalAuthenticationSchemes(IEnumerable<AuthenticationScheme> authenticationSchemes) => authenticationSchemes.Where(s => !string.IsNullOrWhiteSpace(s.DisplayName));
     }
 }

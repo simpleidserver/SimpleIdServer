@@ -52,11 +52,13 @@ namespace SimpleIdServer.IdServer
         public const string UNKNOWN_SCOPE_RESOURCE_OR_AUDIENCE = "scopes {0} are not present in the resource / audience";
         public const string UNKNOWN_RESOURCE = "following resources {0} doesn't exist";
         public const string UNKNOWN_AUDIENCE = "following audiences {0} don't exist";
+        public const string UNKNOWN_API_RESOURCE = "the API resource {0} doesn't exist";
         public const string NO_CLIENT_SECRET = "no client secret";
         public const string NO_CONSENT = "no consent has been accepted";
         public const string NO_JWK_WITH_ALG_SIG = "no JWK with algorithm {0} has been found to sign the JWT";
         public const string NO_JWK_FOUND_TO_DECRYPT = "no JWK with identifier {0} has been found to decrypt the JWT";
         public const string NO_JWK_FOUND_TO_CHECK_SIG = "no JWK with identifier {0} has been found to check the signature of the JWT";
+        public const string NO_SESSION_ID = "the incoming request doesn't contain a session_id";
         public const string DUPLICATE_SCOPES = "duplicate scopes : {0}";
         public const string UNAUTHORIZED_TO_SCOPES = "unauthorized to scopes : {0}";
         public const string INVALID_CLAIMS = "claims {0} are invalid";

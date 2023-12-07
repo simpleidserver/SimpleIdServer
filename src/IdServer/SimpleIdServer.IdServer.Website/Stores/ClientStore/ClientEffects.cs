@@ -385,7 +385,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         {
             var baseUrl = await GetClientsUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
-            foreach (var scopeName in act.ScopeNames)
+            foreach (var scope in act.Scopes)
             {
                 var requestMessage = new HttpRequestMessage
                 {
@@ -393,13 +393,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                     Method = HttpMethod.Post,
                     Content = new StringContent(JsonSerializer.Serialize(new AddClientScopeRequest
                     {
-                        Name = scopeName
+                        Name = scope.Name
                     }), Encoding.UTF8, "application/json")
                 };
                 await httpClient.SendAsync(requestMessage);
             }
 
-            dispatcher.Dispatch(new AddClientScopesSuccessAction { ClientId = act.ClientId, Scopes = act.ScopeNames.Select(s => new Domains.Scope { Name = s }).ToList() });
+            dispatcher.Dispatch(new AddClientScopesSuccessAction { ClientId = act.ClientId, Scopes = act.Scopes });
         }
 
         [EffectMethod]
@@ -980,7 +980,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
     public class AddClientScopesAction
     {
         public string ClientId { get; set; } = null!;
-        public IEnumerable<string> ScopeNames { get; set; } = new List<string>();
+        public IEnumerable<Domains.Scope> Scopes { get; set; } = new List<Domains.Scope>();
     }
 
     public class AddClientScopesSuccessAction

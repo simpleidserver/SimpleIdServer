@@ -112,12 +112,14 @@ namespace SimpleIdServer.IdServer.UI
             var acrValues = query.GetAcrValuesFromAuthorizationRequest();
             var clientId = query.GetClientIdFromAuthorizationRequest();
             var requestedClaims = query.GetClaimsFromAuthorizationRequest();
-            var client = await _clientRepository.Query().Include(c => c.Realms).FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == realm), token);
+            var client = await _clientRepository.Query()
+                .Include(c => c.Realms)
+                .FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == realm), token);
             var acr = await _amrHelper.FetchDefaultAcr(realm, acrValues, requestedClaims, client, token);
             string amr;
             if (acr == null || string.IsNullOrWhiteSpace(amr = _amrHelper.FetchNextAmr(acr, currentAmr)))
             {
-                return await Sign(realm, unprotectedUrl, currentAmr, user, clientId, token, rememberLogin);
+                return await Sign(realm, unprotectedUrl, currentAmr, user, client, token, rememberLogin);
             }
 
             var allAmr = acr.AuthenticationMethodReferences;
@@ -127,10 +129,11 @@ namespace SimpleIdServer.IdServer.UI
             return RedirectToAction("Index", "Authenticate", new { area = amr, ReturnUrl = returnUrl });
         }
 
-        protected async Task<IActionResult> Sign(string realm, string returnUrl, string currentAmr, User user, string clientId, CancellationToken token, bool rememberLogin = false)
+        protected async Task<IActionResult> Sign(string realm, string returnUrl, string currentAmr, User user, Client client, CancellationToken token, bool rememberLogin = false)
         {
-            await AddSession(realm, user, clientId, token);
-            var offset = DateTimeOffset.UtcNow.AddSeconds(_options.CookieAuthExpirationTimeInSeconds);
+            var expirationTimeInSeconds = GetCookieExpirationTimeInSeconds(client);
+            await AddSession(realm, user, client, token);
+            var offset = DateTimeOffset.UtcNow.AddSeconds(expirationTimeInSeconds);
             var claims = _userTransformer.Transform(user);
             var claimsIdentity = new ClaimsIdentity(claims, currentAmr);
             var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
@@ -138,14 +141,15 @@ namespace SimpleIdServer.IdServer.UI
             {
                 await HttpContext.SignInAsync(claimsPrincipal, new AuthenticationProperties
                 {
-                    IsPersistent = true
+                    IsPersistent = true,
+                    ExpiresUtc = offset
                 });
             }
             else
             {
                 await HttpContext.SignInAsync(claimsPrincipal, new AuthenticationProperties
                 {
-                    IsPersistent = true,
+                    IsPersistent = false,
                     ExpiresUtc = offset
                 });
             }
@@ -159,10 +163,11 @@ namespace SimpleIdServer.IdServer.UI
             return Redirect(returnUrl);
         }
 
-        protected async Task AddSession(string realm, User user, string clientId, CancellationToken cancellationToken)
+        protected async Task AddSession(string realm, User user, Client client, CancellationToken cancellationToken)
         {
             var currentDateTime = DateTime.UtcNow;
-            var expirationDateTime = currentDateTime.AddSeconds(_options.CookieAuthExpirationTimeInSeconds);
+            var expirationTimeInSeconds = GetCookieExpirationTimeInSeconds(client);
+            var expirationDateTime = currentDateTime.AddSeconds(expirationTimeInSeconds);
             var session = new UserSession
             {
                 SessionId = Guid.NewGuid().ToString(),
@@ -182,6 +187,13 @@ namespace SimpleIdServer.IdServer.UI
                 HttpOnly = false,
                 SameSite = SameSiteMode.None
             });
+        }
+
+        private double GetCookieExpirationTimeInSeconds(Client client)
+        {
+            var expirationTimeInSeconds = client == null || client.TokenExpirationTimeInSeconds == null ?
+               _options.DefaultTokenExpirationTimeInSeconds : client.TokenExpirationTimeInSeconds.Value;
+            return expirationTimeInSeconds;
         }
     }
 }

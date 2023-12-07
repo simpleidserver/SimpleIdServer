@@ -292,32 +292,11 @@ namespace SimpleIdServer.IdServer.Helpers
 
         #endregion
 
-        #region Device Code
+        #region User code
 
-        public async Task AddAuthDeviceCode(string deviceCode, string userCode, string clientId, IEnumerable<string> scopes, double validityPeriodsInSeconds, CancellationToken cancellationToken)
+        public async Task AddUserCode(string userId, string realm, string code, double expirationTimeInSeconds, CancellationToken cancellationToken)
         {
-            var devCode = new DeviceAuthCode { DeviceCode = deviceCode, UserCode = userCode, ClientId = clientId, Scopes = scopes };
-            var json = JsonSerializer.Serialize(devCode);
-            await _distributedCache.SetAsync(deviceCode, Encoding.UTF8.GetBytes(json), new DistributedCacheEntryOptions
-            {
-                SlidingExpiration = TimeSpan.FromSeconds(validityPeriodsInSeconds)
-            }, cancellationToken);
-            await _distributedCache.SetAsync(userCode, Encoding.UTF8.GetBytes(json), new DistributedCacheEntryOptions
-            {
-                SlidingExpiration = TimeSpan.FromSeconds(validityPeriodsInSeconds)
-            }, cancellationToken);
-        }
 
-        public async Task<DeviceAuthCode> GetAuthDeviceCode(string code, CancellationToken cancellationToken)
-        {
-            var cachedToken = await _distributedCache.GetAsync(code, cancellationToken);
-            if (cachedToken == null) return null;
-            return JsonSerializer.Deserialize<DeviceAuthCode>(Encoding.UTF8.GetString(cachedToken));
-        }
-
-        public async Task<DeviceAuthCode> UpdateAuthDeviceCode(DeviceAuthCode authCode)
-        {
-            return null;
         }
 
         #endregion

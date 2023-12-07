@@ -11,7 +11,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.Configuration;
 using SimpleIdServer.Configuration.Redis;
 using SimpleIdServer.IdServer;
@@ -139,34 +138,10 @@ void ConfigureIdServer(IServiceCollection services)
         .AddLDAPProvisioning()
         .AddAuthentication(callback: (a) =>
         {
-            /*
-            a.AddWsAuthentication(o =>
-            {
-                o.MetadataAddress = "http://localhost:5001";
-                o.Wtrealm = "urn:website";
-                o.RequireHttpsMetadata = false;
-            });
-            */
             a.AddMutualAuthentication(m =>
             {
                 m.AllowedCertificateTypes = CertificateTypes.All;
                 m.RevocationMode = System.Security.Cryptography.X509Certificates.X509RevocationMode.NoCheck;
-            });
-            a.AddOIDCAuthentication(opts =>
-            {
-                opts.Authority = identityServerConfiguration.Authority;
-                opts.ClientId = "website";
-                opts.ClientSecret = "password";
-                opts.ResponseType = "code";
-                opts.ResponseMode = "query";
-                opts.SaveTokens = true;
-                opts.GetClaimsFromUserInfoEndpoint = true;
-                opts.RequireHttpsMetadata = false;
-                opts.TokenValidationParameters = new TokenValidationParameters
-                {
-                    NameClaimType = "name"
-                };
-                opts.Scope.Add("profile");
             });
         });
     var isRealmEnabled = identityServerConfiguration.IsRealmEnabled;
