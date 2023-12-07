@@ -5,8 +5,10 @@ using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using SimpleIdServer.IdServer;
+using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Consumers;
 using SimpleIdServer.IdServer.Jobs;
+using SimpleIdServer.IdServer.Notifications;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.UI.AuthProviders;
 using System;
@@ -66,6 +68,17 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 o.IsBCEnabled = true;
             });
+            return this;
+        }
+
+        #endregion
+
+        #region Console notification
+
+        public IdServerBuilder AddConsoleNotification()
+        {
+            _serviceCollection.AddTransient<IAuthenticationMethodService, ConsoleAuthenticationService>();
+            _serviceCollection.AddTransient<IUserNotificationService, ConsoleNotificationService>();
             return this;
         }
 
