@@ -154,10 +154,6 @@ namespace SimpleIdServer.IdServer.Options
         /// </summary>
         public int MaxBindingMessageSize { get; set; } = 150;
         /// <summary>
-        /// Cookie auth expiration time in seconds.
-        /// </summary>
-        public int CookieAuthExpirationTimeInSeconds { get; set; } = 15; // 5 * 60;
-        /// <summary>
         /// NAME of the cookie used to store the session id.
         /// </summary>
         public string SessionCookieName { get; set; } = CookieAuthenticationDefaults.CookiePrefix + "Session";

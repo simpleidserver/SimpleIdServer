@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
+using MassTransit.Configuration;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -207,9 +208,24 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             {
                 session = await _userSessionRepository.GetById(tokenResult.SessionId, handlerContext.Realm ?? Constants.DefaultRealm, token);
                 if (session != null && !session.IsActive()) session = null;
+                else
+                {
+                    var currentDateTime = DateTime.UtcNow;
+                    var expirationTimeInSeconds = GetExpirationTimeInSeconds(handlerContext.Client);
+                    var expirationDateTime = currentDateTime.AddSeconds(expirationTimeInSeconds);
+                    session.ExpirationDateTime = expirationDateTime;
+                    await _userSessionRepository.SaveChanges(token);
+                }
             }
 
             handlerContext.SetUser(result, session);
+        }
+
+        double GetExpirationTimeInSeconds(Client client)
+        {
+            var expirationTimeInSeconds = client == null || client.TokenExpirationTimeInSeconds == null ?
+               Options.DefaultTokenExpirationTimeInSeconds : client.TokenExpirationTimeInSeconds.Value;
+            return expirationTimeInSeconds;
         }
     }
 }
