@@ -22,11 +22,11 @@ namespace SimpleIdServer.IdServer.Sms
         public OTPTypes OTPType { get; set; } = OTPTypes.TOTP;
         [ConfigurationRecord("OTP Value", null, 5, null, CustomConfigurationRecordType.OTPVALUE)]
         public string OTPValue { get; set; } = null;
-        [ConfigurationRecord("OTP Counter", null, 6, "OTPType=HOTP", CustomConfigurationRecordType.OTPVALUE)]
+        [ConfigurationRecord("OTP Counter", null, 6, "OTPType=HOTP")]
         public int OTPCounter { get; set; } = 10;
-        [ConfigurationRecord("TOTP Step", null, 7, "OTPType=TOTP", CustomConfigurationRecordType.OTPVALUE)]
+        [ConfigurationRecord("TOTP Step", null, 7, "OTPType=TOTP")]
         public int TOTPStep { get; set; } = 30;
-        [ConfigurationRecord("HOTP Window", null, 8, "OTPType=HOTP", customType: CustomConfigurationRecordType.OTPVALUE)]
+        [ConfigurationRecord("HOTP Window", null, 8, "OTPType=HOTP")]
         public int HOTPWindow { get; set; } = 5;
         public OTPAlgs OTPAlg => (OTPAlgs)OTPType;
         public string HttpBody => Message;
