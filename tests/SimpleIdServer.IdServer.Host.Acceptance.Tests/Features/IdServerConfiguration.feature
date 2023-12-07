@@ -7,4 +7,4 @@ Scenario: Get the configuration
 	And extract JSON from body
 
 	Then HTTP status code equals to '200'
-	And JSON '$.amrs[0]'='pwd'
+	And JSON '$.amrs[0]'='console'

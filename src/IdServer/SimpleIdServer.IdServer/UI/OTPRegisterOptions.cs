@@ -4,6 +4,9 @@ using SimpleIdServer.IdServer.Domains;
 
 namespace SimpleIdServer.IdServer.UI;
 
+/// <summary>
+/// OTP Values are used for password reset or during registration.
+/// </summary>
 public interface IOTPRegisterOptions
 {
     public OTPAlgs OTPAlg { get; }

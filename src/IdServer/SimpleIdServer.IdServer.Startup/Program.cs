@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SimpleIdServer.Configuration;
 using SimpleIdServer.Configuration.Redis;
 using SimpleIdServer.IdServer;
+using SimpleIdServer.IdServer.Console;
 using SimpleIdServer.IdServer.CredentialIssuer;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Email;
@@ -117,6 +118,7 @@ void ConfigureIdServer(IServiceCollection services)
             o.IncludeDocumentation<AccessTokenTypeService>();
             o.AddOAuthSecurity();
         })
+        .AddConsoleNotification()
         .AddCredentialIssuer()
         .UseInMemoryMassTransit()
         .AddBackChannelAuthentication()
@@ -164,6 +166,7 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
         o.Add<IdServerSmsOptions>();
         o.Add<IdServerPasswordOptions>();
         o.Add<FidoOptions>();
+        o.Add<IdServerConsoleOptions>();
         o.Add<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>();
         if (conf.Type == DistributedCacheTypes.REDIS)
         {
@@ -383,6 +386,7 @@ void SeedData(WebApplication application, string scimBaseUrl)
                 dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<IdServerSmsOptions>());
                 dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<IdServerPasswordOptions>());
                 dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<FidoOptions>());
+                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<IdServerConsoleOptions>());
                 dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>());
             }
 

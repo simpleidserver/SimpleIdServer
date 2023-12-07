@@ -1,17 +1,16 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.IdServer.Domains;
-using System;
 
-namespace SimpleIdServer.IdServer.Notifications;
+namespace SimpleIdServer.IdServer.Console;
 
 public class ConsoleAuthenticationService : IAuthenticationMethodService
 {
-    public string Amr => "console";
+    public string Amr => Constants.AMR;
 
     public string Name => "Console";
 
-    public Type OptionsType => null;
+    public Type OptionsType => typeof(IdServerConsoleOptions);
 
     public AuthenticationMethodCapabilities Capabilities => AuthenticationMethodCapabilities.PUSHNOTIFICATION;
 

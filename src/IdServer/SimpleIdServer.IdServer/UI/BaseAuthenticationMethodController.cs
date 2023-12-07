@@ -79,6 +79,7 @@ namespace SimpleIdServer.IdServer.UI
                     AuthenticationScheme = e.Name,
                     DisplayName = e.DisplayName
                 }).ToList();
+                EnrichViewModel(viewModel);
                 if (IsProtected(returnUrl))
                 {
                     var query = ExtractQuery(returnUrl);
@@ -102,7 +103,6 @@ namespace SimpleIdServer.IdServer.UI
                     viewModel.IsLoginMissing = isLoginMissing;
                     viewModel.IsAuthInProgress = amrInfo != null && !string.IsNullOrWhiteSpace(amrInfo.Login);
                     viewModel.AmrAuthInfo = amrInfo;
-                    EnrichViewModel(viewModel);
                     return View(viewModel);
                 }
 

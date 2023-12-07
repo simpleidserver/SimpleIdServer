@@ -10,7 +10,7 @@
     <RadzenRow>
         @foreach(var authMethod in authMethodsState.Value.AuthenticationMethods)
         {
-            <RadzenColumn Size="4">             
+            <RadzenColumn Size="12" SizeMD="4">             
                 <RadzenLink Path="@(GetAuthMethodUrl(authMethod))">
                     <RadzenCard Variant="Variant.Filled">
                         <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
@@ -66,6 +66,8 @@
                 return result + "/mobile.png";
             case "firebase":
                 return result + "/firebase.png";
+            case "console":
+                return result + "/MachineClient.png";
             default:
                 return result + "/pwd.png";
         }

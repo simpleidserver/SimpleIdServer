@@ -2175,6 +2175,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "type");
 
+                    b.Property<int>("HOTPWindow")
+                        .HasColumnType("integer")
+                        .HasAnnotation("Relational:JsonPropertyName", "hotp_window");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean")
                         .HasAnnotation("Relational:JsonPropertyName", "active");
@@ -2186,6 +2190,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.Property<int>("OTPCounter")
                         .HasColumnType("integer")
                         .HasAnnotation("Relational:JsonPropertyName", "otp_counter");
+
+                    b.Property<int>("TOTPStep")
+                        .HasColumnType("integer")
+                        .HasAnnotation("Relational:JsonPropertyName", "totp_step");
 
                     b.Property<string>("UserId")
                         .IsRequired()

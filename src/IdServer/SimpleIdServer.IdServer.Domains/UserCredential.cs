@@ -22,6 +22,7 @@ namespace SimpleIdServer.IdServer.Domains
         public string CredentialType { get; set; } = null!;
         [JsonPropertyName(UserCredentialNames.Value)]
         public string Value { get; set; } = null!;
+        // OTP values are used for authentication.
         [JsonPropertyName(UserCredentialNames.OTPAlg)]
         public OTPAlgs? OTPAlg { get; set; } = null;
         [JsonPropertyName(UserCredentialNames.Active)]

@@ -2,15 +2,18 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using cl = System.Console;
 
-namespace SimpleIdServer.IdServer.Notifications;
+namespace SimpleIdServer.IdServer.Console;
 
-public class ConsoleNotificationService : IUserNotificationService
+public interface IUserConsoleNotificationService : IUserNotificationService
 {
-    public string Name => Constants.DefaultNotificationMode;
+
+}
+
+public class ConsoleNotificationService : IUserConsoleNotificationService
+{
+    public string Name => Constants.AMR;
 
     public Task Send(string title, string body, Dictionary<string, string> data, User user)
     {
@@ -19,10 +22,10 @@ public class ConsoleNotificationService : IUserNotificationService
 
     public Task Send(string title, string body, Dictionary<string, string> data, string destination)
     {
-        var before = Console.ForegroundColor;
-        Console.ForegroundColor = System.ConsoleColor.Green;
-        Console.WriteLine($"Title : {title}, Body : {body}");
-        Console.ForegroundColor = before;
+        var before = cl.ForegroundColor;
+        cl.ForegroundColor = ConsoleColor.Green;
+        cl.WriteLine($"Title : {title}, Body : {body}");
+        cl.ForegroundColor = before;
         return Task.CompletedTask;
     }
 }

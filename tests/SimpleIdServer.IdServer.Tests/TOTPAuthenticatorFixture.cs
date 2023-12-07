@@ -25,8 +25,7 @@ namespace SimpleIdServer.IdServer.Tests
                 Value = secret.ConvertFromBase32()
             });
             var options = new IdServerHostOptions();
-            var opts = Microsoft.Extensions.Options.Options.Create(options);
-            var authenticator = new TOTPAuthenticator(opts);
+            var authenticator = new TOTPAuthenticator();
             var date = DateTime.Parse("12-07-21 20:07:56");
 
             // ARRANGE

@@ -61,6 +61,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à An unexpected exception occurred while trying to send the verification code.
+        /// </summary>
+        public static string cannot_send_otpcode {
+            get {
+                return ResourceManager.GetString("cannot_send_otpcode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à The destination doesn&apos;t match with yours.
         /// </summary>
         public static string invalid_destination {

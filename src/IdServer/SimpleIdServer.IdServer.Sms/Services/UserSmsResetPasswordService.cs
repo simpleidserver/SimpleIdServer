@@ -15,8 +15,8 @@ namespace SimpleIdServer.IdServer.Sms.Services
     {
         public UserSmsResetPasswordService(
             IConfiguration configuration, 
-            IEnumerable<IOTPAuthenticator> otpAuthenticators, 
-            IUserNotificationService notificationService, 
+            IEnumerable<IOTPAuthenticator> otpAuthenticators,
+            ISmsUserNotificationService notificationService, 
             IGrantedTokenHelper grantedTokenHelper,
             IAuthenticationHelper authenticationHelper) : base(configuration, otpAuthenticators, notificationService, grantedTokenHelper, authenticationHelper)
         {

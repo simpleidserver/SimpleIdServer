@@ -4,6 +4,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Sms.Services;
+using SimpleIdServer.IdServer.UI.Services;
 
 namespace SimpleIdServer.IdServer.Sms
 {
@@ -21,6 +22,7 @@ namespace SimpleIdServer.IdServer.Sms
             idServerBuilder.Services.AddTransient<ISmsUserNotificationService, SmsUserNotificationService>();
             idServerBuilder.Services.AddTransient<IAuthenticationMethodService, SmsAuthenticationMethodService>();
             idServerBuilder.Services.AddTransient<IUserSmsAuthenticationService, UserSmsAuthenticationService>();
+            idServerBuilder.Services.AddTransient<IResetPasswordService, UserSmsResetPasswordService>();
             return idServerBuilder;
         }
     }

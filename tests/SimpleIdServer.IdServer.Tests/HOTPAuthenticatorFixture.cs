@@ -32,8 +32,7 @@ namespace SimpleIdServer.IdServer.Tests
                 OTPCounter= counter
             });
             var options = new IdServerHostOptions();
-            var opts = Microsoft.Extensions.Options.Options.Create(options);
-            var authenticator = new HOTPAuthenticator(opts);
+            var authenticator = new HOTPAuthenticator();
 
             // ARRANGE
             var otp = authenticator.GenerateOtp(user.Credentials.Last());

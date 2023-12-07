@@ -46,6 +46,8 @@ builder.Services.AddSIDIdentityServer(o =>
         });
     })
     .UseInMemoryMassTransit()
+    .AddConsoleNotification()
+    .AddPwdAuthentication()
     .AddCredentialIssuer()
     .AddBackChannelAuthentication()
     .AddAuthentication(o =>

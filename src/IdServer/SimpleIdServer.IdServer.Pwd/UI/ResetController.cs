@@ -4,6 +4,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
@@ -23,6 +24,7 @@ public class ResetController : BaseController
     private readonly IConfiguration _configuration;
     private readonly IGrantedTokenHelper _grantedTokenHelper;
     private readonly IUserRepository _userRepository;
+    private readonly ILogger<ResetController> _logger;
 
     public ResetController(
         ITokenRepository tokenRepository, 
@@ -31,13 +33,15 @@ public class ResetController : BaseController
         IAuthenticationHelper authenticationHelper,
         IConfiguration configuration,
         IGrantedTokenHelper grantedTokenHelper,
-        IUserRepository userRepository) : base(tokenRepository, jwtBuilder)
+        IUserRepository userRepository,
+        ILogger<ResetController> logger) : base(tokenRepository, jwtBuilder)
     {
         _resetPasswordServices = resetPasswordServices;
         _authenticationHelper = authenticationHelper;
         _configuration = configuration;
         _grantedTokenHelper = grantedTokenHelper;
         _userRepository = userRepository;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -109,7 +113,17 @@ public class ResetController : BaseController
             options.ResetPasswordBody, 
             options.ResetPasswordTitle, 
             options.ResetPasswordLinkExpirationInSeconds);
-        await service.SendResetLink(parameter, cancellationToken);
+        try
+        {
+            await service.SendResetLink(parameter, cancellationToken);
+        }
+        catch(Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+            ModelState.AddModelError("cannot_send_otpcode", "cannot_send_otpcode");
+            return View(viewModel);
+        }
+
         viewModel.IsResetLinkedSent = true;
         return View(viewModel);
 

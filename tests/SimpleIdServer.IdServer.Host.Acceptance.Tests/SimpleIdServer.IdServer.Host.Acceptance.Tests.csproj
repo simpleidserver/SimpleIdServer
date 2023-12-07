@@ -65,7 +65,9 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj" />
+	  <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.IdServer.Console\SimpleIdServer.IdServer.Console.csproj" />
 	  <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.IdServer.CredentialIssuer\SimpleIdServer.IdServer.CredentialIssuer.csproj" />
+	  <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.IdServer.Pwd\SimpleIdServer.IdServer.Pwd.csproj" />
 	  <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Tests\SimpleIdServer.IdServer.Tests.csproj" />
 	</ItemGroup>
