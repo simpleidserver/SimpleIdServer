@@ -23,29 +23,6 @@ namespace SimpleIdServer.IdServer
             _authBuilder = authBuilder;
         }
 
-        public AuthBuilder AddOIDCAuthentication(Action<OpenIdConnectOptions> callback)
-        {
-            _authBuilder.AddOpenIdConnect(Constants.DefaultOIDCAuthenticationScheme, (opts) =>
-            {
-                opts.Events = new OpenIdConnectEvents
-                {
-                    OnSignedOutCallbackRedirect = ctx =>
-                    {
-                        return Task.CompletedTask;
-                    },
-                    OnRedirectToIdentityProvider = context =>
-                    {
-                        if (context.Properties.Items.TryGetValue("prompt", out string prompt))
-                            context.ProtocolMessage.Prompt = prompt;
-                        return Task.CompletedTask;
-                    }
-                };
-                if (callback != null) callback(opts);
-            });
-            _services.AddSingleton<IPostConfigureOptions<OpenIdConnectOptions>, ConfigureOpenIdOptions>();
-            return this;
-        }
-
         public AuthBuilder AddMutualAuthentication(Action<CertificateAuthenticationOptions> callback = null)
         {
             _services.Configure<IdServerHostOptions>(o =>

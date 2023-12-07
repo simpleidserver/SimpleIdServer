@@ -377,39 +377,6 @@ namespace SimpleIdServer.IdServer.UI
         }
 
         [HttpGet]
-        public IActionResult Authenticate()
-        {
-            var returnUrl = Url.Action(nameof(Index));
-            var items = new Dictionary<string, string>
-            {
-                { "scheme", Constants.DefaultOIDCAuthenticationScheme },
-                { "returnUrl", returnUrl }
-            };
-            var props = new AuthenticationProperties(items)
-            {
-                RedirectUri = returnUrl
-            };
-            return Challenge(props, Constants.DefaultOIDCAuthenticationScheme);
-        }
-
-        [HttpGet]
-        public IActionResult ChooseSession()
-        {
-            var returnUrl = Url.Action(nameof(Index));
-            var items = new Dictionary<string, string>
-            {
-                { "scheme", Constants.DefaultOIDCAuthenticationScheme },
-                { "returnUrl", returnUrl },
-                { "prompt", PromptParameters.SelectAccount }
-            };
-            var props = new AuthenticationProperties(items)
-            {
-                RedirectUri = returnUrl
-            };
-            return Challenge(props, Constants.DefaultOIDCAuthenticationScheme);
-        }
-
-        [HttpGet]
         public async Task<IActionResult> Disconnect([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;

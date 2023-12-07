@@ -141,14 +141,15 @@ namespace SimpleIdServer.IdServer.UI
             {
                 await HttpContext.SignInAsync(claimsPrincipal, new AuthenticationProperties
                 {
-                    IsPersistent = true
+                    IsPersistent = true,
+                    ExpiresUtc = offset
                 });
             }
             else
             {
                 await HttpContext.SignInAsync(claimsPrincipal, new AuthenticationProperties
                 {
-                    IsPersistent = true,
+                    IsPersistent = false,
                     ExpiresUtc = offset
                 });
             }
