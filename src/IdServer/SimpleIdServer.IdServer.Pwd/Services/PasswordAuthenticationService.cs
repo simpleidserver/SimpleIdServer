@@ -51,9 +51,9 @@ public class PasswordAuthenticationService : GenericAuthenticationService<Authen
         }
         else
         {
-            var credential = authenticatedUser.Credentials.FirstOrDefault(c => c.CredentialType == Constants.Areas.Password);
+            var credential = authenticatedUser.Credentials.FirstOrDefault(c => c.CredentialType == Constants.Areas.Password && c.IsActive);
             var hash = PasswordHelper.ComputeHash(viewModel.Password);
-            if (credential == null || credential.Value != hash && credential.IsActive) return Task.FromResult(CredentialsValidationResult.Error(ValidationStatus.INVALIDCREDENTIALS));
+            if (credential == null || credential.Value != hash) return Task.FromResult(CredentialsValidationResult.Error(ValidationStatus.INVALIDCREDENTIALS));
         }
 
         return Task.FromResult(CredentialsValidationResult.Ok(authenticatedUser));

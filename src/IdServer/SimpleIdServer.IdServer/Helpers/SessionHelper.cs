@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Domains;
@@ -30,17 +31,20 @@ public class SessionHelper : ISessionHelper
     private readonly IJwtBuilder _jwtBuilder;
     private readonly IClientRepository _clientRepository;
     private readonly IdServerHostOptions _options;
+    private readonly ILogger<SessionHelper> _logger;
 
     public SessionHelper(
         IdServer.Infrastructures.IHttpClientFactory httpClientFactory,
         IJwtBuilder jwtBuilder,
         IClientRepository clientRepository,
-        IOptions<IdServerHostOptions> options)
+        IOptions<IdServerHostOptions> options,
+        ILogger<SessionHelper> logger)
     {
         _httpClientFactory = httpClientFactory;
         _jwtBuilder = jwtBuilder;
         _clientRepository = clientRepository;
         _options = options.Value;
+        _logger = logger;
     }
 
     public async Task Revoke(string subject, UserSession session, string issuer, CancellationToken cancellationToken)
@@ -90,7 +94,14 @@ public class SessionHelper : ISessionHelper
                     Content = body,
                     RequestUri = new Uri(client.BackChannelLogoutUri)
                 };
-                await httpClient.SendAsync(request);
+                try
+                {
+                    await httpClient.SendAsync(request);
+                }
+                catch(Exception ex)
+                {
+                    _logger.LogError(ex.ToString());
+                }
             }
         }
     }
