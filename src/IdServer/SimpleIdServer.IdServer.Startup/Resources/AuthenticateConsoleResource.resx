@@ -117,7 +117,37 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="authenticate" xml:space="preserve">
+    <value>Authenticate</value>
+  </data>
+  <data name="code_validity" xml:space="preserve">
+    <value>Code has a validity of {0} seconds</value>
+  </data>
+  <data name="confirmationcode" xml:space="preserve">
+    <value>Confirmation code</value>
+  </data>
+  <data name="confirmationcode_sent" xml:space="preserve">
+    <value>Confirmation code has been sent</value>
+  </data>
+  <data name="invalid_confirmationcode" xml:space="preserve">
+    <value>Confirmation code is invalid</value>
+  </data>
+  <data name="login" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="missing_confirmationcode" xml:space="preserve">
+    <value>Confirmation code is missing</value>
+  </data>
+  <data name="no_active_otp" xml:space="preserve">
+    <value>There is no OTP configured</value>
+  </data>
+  <data name="remember_login" xml:space="preserve">
+    <value>Remember my login</value>
+  </data>
+  <data name="sendconfirmationcode" xml:space="preserve">
+    <value>Send confirmation code</value>
+  </data>
   <data name="title" xml:space="preserve">
-    <value />
+    <value>Authenticate</value>
   </data>
 </root>

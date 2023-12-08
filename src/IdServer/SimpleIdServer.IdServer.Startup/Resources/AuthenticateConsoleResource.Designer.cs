@@ -61,7 +61,97 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à .
+        ///   Recherche une chaîne localisée semblable à Authenticate.
+        /// </summary>
+        public static string authenticate {
+            get {
+                return ResourceManager.GetString("authenticate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Code has a validity of {0} seconds.
+        /// </summary>
+        public static string code_validity {
+            get {
+                return ResourceManager.GetString("code_validity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Confirmation code.
+        /// </summary>
+        public static string confirmationcode {
+            get {
+                return ResourceManager.GetString("confirmationcode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Confirmation code has been sent.
+        /// </summary>
+        public static string confirmationcode_sent {
+            get {
+                return ResourceManager.GetString("confirmationcode_sent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Confirmation code is invalid.
+        /// </summary>
+        public static string invalid_confirmationcode {
+            get {
+                return ResourceManager.GetString("invalid_confirmationcode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Login.
+        /// </summary>
+        public static string login {
+            get {
+                return ResourceManager.GetString("login", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Confirmation code is missing.
+        /// </summary>
+        public static string missing_confirmationcode {
+            get {
+                return ResourceManager.GetString("missing_confirmationcode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à There is no OTP configured.
+        /// </summary>
+        public static string no_active_otp {
+            get {
+                return ResourceManager.GetString("no_active_otp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Remember my login.
+        /// </summary>
+        public static string remember_login {
+            get {
+                return ResourceManager.GetString("remember_login", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Send confirmation code.
+        /// </summary>
+        public static string sendconfirmationcode {
+            get {
+                return ResourceManager.GetString("sendconfirmationcode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Authenticate.
         /// </summary>
         public static string title {
             get {

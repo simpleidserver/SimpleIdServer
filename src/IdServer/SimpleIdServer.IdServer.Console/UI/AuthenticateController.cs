@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
+using SimpleIdServer.IdServer.Console.Services;
 using SimpleIdServer.IdServer.Console.UI.ViewModels;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
@@ -28,7 +29,7 @@ public class AuthenticateController : BaseOTPAuthenticateController<Authenticate
         IConfiguration configuration,
         IEnumerable<IUserNotificationService> notificationServices, 
         IEnumerable<IOTPAuthenticator> otpAuthenticators,
-        IUserAuthenticationService userAuthenticationService, 
+        IUserConsoleAuthenticationService userAuthenticationService, 
         IAuthenticationSchemeProvider authenticationSchemeProvider, 
         IOptions<IdServerHostOptions> options,
         IDataProtectionProvider dataProtectionProvider, 

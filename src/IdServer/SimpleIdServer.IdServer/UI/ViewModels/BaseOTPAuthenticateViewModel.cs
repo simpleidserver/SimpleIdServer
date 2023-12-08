@@ -8,7 +8,7 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
     {
         public string Action { get; set; }
         public long? OTPCode { get; set; }
-        public int TOTPStep { get; set; }
+        public int? TOTPStep { get; set; }
 
         public override void CheckRequiredFields(ModelStateDictionary modelStateDictionary)
         {

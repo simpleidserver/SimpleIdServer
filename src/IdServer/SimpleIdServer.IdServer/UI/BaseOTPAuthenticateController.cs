@@ -64,6 +64,7 @@ namespace SimpleIdServer.IdServer.UI
                     var otpCode = otpAuthenticator.GenerateOtp(activeOtp);
                     await notificationService.Send("One Time Password", string.Format(FormattedMessage, otpCode), new Dictionary<string, string>(), authenticatedUser);
                     SetSuccessMessage("confirmationcode_sent");
+                    if(activeOtp.OTPAlg == Domains.OTPAlgs.TOTP) viewModel.TOTPStep = activeOtp.TOTPStep;
                     return UserAuthenticationResult.Error(View(viewModel));
                 default:
                     viewModel.CheckConfirmationCode(ModelState);
