@@ -15,7 +15,10 @@ public abstract class OTPAuthenticationService : GenericAuthenticationService<Ba
 {
     private readonly IEnumerable<IOTPAuthenticator> _otpAuthenticators;
 
-    public OTPAuthenticationService(IEnumerable<IOTPAuthenticator> otpAuthenticators, IAuthenticationHelper authenticationHelper, IUserRepository userRepository) : base(authenticationHelper, userRepository)
+    public OTPAuthenticationService
+        (IEnumerable<IOTPAuthenticator> otpAuthenticators, 
+        IAuthenticationHelper authenticationHelper, 
+        IUserRepository userRepository) : base(authenticationHelper, userRepository)
     {
         _otpAuthenticators = otpAuthenticators;
     }

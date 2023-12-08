@@ -13,10 +13,12 @@ public static class IdServerBuilderExtensions
 {
     public static IdServerBuilder AddConsoleNotification(this  IdServerBuilder builder)
     {
+        builder.Services.AddTransient<IUserAuthenticationService, UserConsoleAuthenticationService>();
+        builder.Services.AddTransient<IUserConsoleAuthenticationService, UserConsoleAuthenticationService>();
         builder.Services.AddTransient<IResetPasswordService, UserConsolePasswordResetService>();
-        builder.Services.AddTransient<IUserNotificationService, ConsoleNotificationService>();
         builder.Services.AddTransient<IAuthenticationMethodService, ConsoleAuthenticationService>();
         builder.Services.AddTransient<IUserConsoleNotificationService, ConsoleNotificationService>();
+        builder.Services.AddTransient<IUserNotificationService, ConsoleNotificationService>();
         return builder;
     }
 }

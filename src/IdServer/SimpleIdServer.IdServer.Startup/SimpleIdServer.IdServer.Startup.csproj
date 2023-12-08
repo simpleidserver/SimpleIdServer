@@ -47,6 +47,11 @@
 			<AutoGen>True</AutoGen>
 			<DependentUpon>AccountsResource.resx</DependentUpon>
 		</Compile>
+		<Compile Update="Resources\AuthenticateConsoleResource.Designer.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>AuthenticateConsoleResource.resx</DependentUpon>
+		</Compile>
 		<Compile Update="Resources\ConfirmResetPasswordResource.Designer.cs">
 		  <DesignTime>True</DesignTime>
 		  <AutoGen>True</AutoGen>
@@ -152,6 +157,10 @@
 		<EmbeddedResource Update="Resources\AccountsResource.resx">
 			<Generator>PublicResXFileCodeGenerator</Generator>
 			<LastGenOutput>AccountsResource.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\AuthenticateConsoleResource.resx">
+		  <Generator>PublicResXFileCodeGenerator</Generator>
+		  <LastGenOutput>AuthenticateConsoleResource.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
 		<EmbeddedResource Update="Resources\ConfirmResetPasswordResource.resx">
 		  <Generator>PublicResXFileCodeGenerator</Generator>

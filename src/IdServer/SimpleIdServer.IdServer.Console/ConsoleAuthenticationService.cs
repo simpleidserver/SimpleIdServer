@@ -12,7 +12,7 @@ public class ConsoleAuthenticationService : IAuthenticationMethodService
 
     public Type OptionsType => typeof(IdServerConsoleOptions);
 
-    public AuthenticationMethodCapabilities Capabilities => AuthenticationMethodCapabilities.PUSHNOTIFICATION;
+    public AuthenticationMethodCapabilities Capabilities => AuthenticationMethodCapabilities.PUSHNOTIFICATION | AuthenticationMethodCapabilities.USERAUTHENTICATION;
 
     public bool IsCredentialExists(User user) => true;
 }
