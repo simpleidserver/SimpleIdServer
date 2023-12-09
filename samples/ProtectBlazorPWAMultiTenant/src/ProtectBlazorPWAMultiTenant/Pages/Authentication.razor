@@ -1,0 +1,15 @@
+﻿@page "/authentication/{action}"
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Microsoft.Extensions.Configuration
+
+@inject NavigationManager UriHelper
+@inject IConfiguration Config
+
+<RemoteAuthenticatorView Action="@Action">
+</RemoteAuthenticatorView>
+
+@code {
+    [Parameter]
+    public string Action { get; set; }
+    // https://github.com/dotnet/aspnetcore/blob/main/src/Components/WebAssembly/WebAssembly.Authentication/src/RemoteAuthenticatorViewCore.cs
+}

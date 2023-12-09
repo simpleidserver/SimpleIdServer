@@ -1,0 +1,28 @@
+﻿@using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+@inject NavigationManager UriHelper
+@inject SignOutSessionStateManager SignOutManager
+@inject Tenant tenant
+
+<AuthorizeView>
+    <Authorized>
+        Hello, @context.User.Identity.Name!
+        <a href="#" @onclick="Logout" @onclick:preventDefault="true">Log out</a>
+    </Authorized>
+    <NotAuthorized>
+        <a href="#" @onclick="@Login" @onclick:preventDefault="true">Log in</a>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private async Task Logout(MouseEventArgs args)
+    {
+        
+        await SignOutManager.SetSignOutState();
+        UriHelper.NavigateTo($"{tenant.Identifier}/authentication/logout");
+    }
+
+    private async Task Login(MouseEventArgs args)
+    {
+        UriHelper.NavigateTo($"{tenant.Identifier}/authentication/login");
+    }
+}

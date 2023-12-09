@@ -1,0 +1,16 @@
+﻿@page "/"
+@using BlazorTenant;
+@inject Tenant tenant
+
+<PageTitle>Index</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<SurveyPrompt Title="How is Blazor working for you?" />
+
+@foreach (var prop in tenant.Parameters)
+{
+    <p><b>@prop.Key:</b> @prop.Value</p>
+}
