@@ -15,7 +15,15 @@
 const sidebars = {
   docs: [
     'overview',
-    'installation',
+    {
+      type: 'category',
+      label: 'Installation',
+      items: [
+        'installation/quickstart',
+        'installation/dotnettemplate',
+        'installation/hosting'
+      ]
+    },
     'glossary',
     {
       type: 'category',

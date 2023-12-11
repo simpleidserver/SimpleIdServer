@@ -15,12 +15,12 @@ The table below, list all the possible properties present in the `appsettings.js
     <tbody>
         <tr>
             <td><b>AuthCookieNamePrefix</b></td>
-            <td>Name of the authentication cookie/td>
+            <td>Name of the authentication cookie</td>
             <td></td>
         </tr>
         <tr>
             <td><b>SessionCookieNamePrefix</b></td>
-            <td>Name of the session cookie/td>
+            <td>Name of the session cookie</td>
             <td></td>
         </tr>
         <tr>
