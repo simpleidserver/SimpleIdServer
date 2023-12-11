@@ -12,6 +12,7 @@ namespace SimpleIdServer.Scim.Startup.Configurations
     {
         SQLSERVER = 0,
         POSTGRE = 1,
-        MONGODB = 2
+        MONGODB = 2,
+        MYSQL = 3
     }
 }

@@ -73,22 +73,6 @@ void RunSqlServerIdServer(IServiceCollection services)
                 m.AllowedCertificateTypes = CertificateTypes.All;
                 m.RevocationMode = System.Security.Cryptography.X509Certificates.X509RevocationMode.NoCheck;
             });
-            a.AddOIDCAuthentication(opts =>
-            {
-                opts.Authority = "https://localhost.com:5001";
-                opts.ClientId = "website";
-                opts.ClientSecret = "password";
-                opts.ResponseType = "code";
-                opts.ResponseMode = "query";
-                opts.SaveTokens = true;
-                opts.GetClaimsFromUserInfoEndpoint = true;
-                opts.RequireHttpsMetadata = false;
-                opts.TokenValidationParameters = new TokenValidationParameters
-                {
-                    NameClaimType = "name"
-                };
-                opts.Scope.Add("profile");
-            });
         });
 }
 

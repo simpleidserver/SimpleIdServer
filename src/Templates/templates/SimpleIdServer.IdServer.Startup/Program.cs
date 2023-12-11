@@ -11,10 +11,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.Configuration;
 using SimpleIdServer.Configuration.Redis;
 using SimpleIdServer.IdServer;
+using SimpleIdServer.IdServer.Console;
 using SimpleIdServer.IdServer.CredentialIssuer;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Email;
@@ -23,11 +23,14 @@ using SimpleIdServer.IdServer.Provisioning.LDAP;
 using SimpleIdServer.IdServer.Provisioning.LDAP.Jobs;
 using SimpleIdServer.IdServer.Provisioning.SCIM;
 using SimpleIdServer.IdServer.Provisioning.SCIM.Jobs;
+using SimpleIdServer.IdServer.Pwd;
 using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Startup;
 using SimpleIdServer.IdServer.Startup.Configurations;
 using SimpleIdServer.IdServer.Startup.Converters;
 using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Swagger;
+using SimpleIdServer.IdServer.TokenTypes;
 using SimpleIdServer.IdServer.WsFederation;
 using System;
 using System.Collections.Generic;
@@ -59,7 +62,7 @@ builder.Services.Configure<KestrelServerOptions>(options =>
     });
 });
 ConfigureCentralizedConfiguration(builder);
-if(identityServerConfiguration.IsForwardedEnabled)
+if (identityServerConfiguration.IsForwardedEnabled)
 {
     builder.Services.Configure<ForwardedHeadersOptions>(options =>
     {
@@ -73,19 +76,23 @@ builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAn
 builder.Services.AddRazorPages()
     .AddRazorRuntimeCompilation();
 ConfigureIdServer(builder.Services);
-builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
 SeedData(app, identityServerConfiguration.SCIMBaseUrl);
 app.UseCors("AllowAll");
-if(identityServerConfiguration.IsForwardedEnabled)
+if (identityServerConfiguration.IsForwardedEnabled)
 {
     app.UseForwardedHeaders();
 }
 
-app.UseSwagger();
-app.UseSwaggerUI();
+if (identityServerConfiguration.ForceHttps)
+    app.SetHttpsScheme();
+
 app
     .UseSID()
+    .UseSIDSwagger()
+    .UseSIDSwaggerUI()
+    // .UseSIDReDoc()
     .UseWsFederation()
     .UseFIDO()
     .UseCredentialIssuer()
@@ -95,17 +102,27 @@ app.Run();
 
 void ConfigureIdServer(IServiceCollection services)
 {
-    var idServerBuilder = services.AddSIDIdentityServer(cb =>
-    {
-        if(identityServerConfiguration.OverrideBaseUrl)
+    var idServerBuilder = services.AddSIDIdentityServer(callback: cb =>
         {
-            cb.BaseUrl = identityServerConfiguration.Authority;
-        }
-    },dataProtectionBuilderCallback: ConfigureDataProtection)
+            if (!string.IsNullOrWhiteSpace(identityServerConfiguration.SessionCookieNamePrefix)) 
+                cb.SessionCookieName = identityServerConfiguration.SessionCookieNamePrefix;
+            cb.Authority = identityServerConfiguration.Authority;
+        }, cookie: c =>
+        {
+            if(!string.IsNullOrWhiteSpace(identityServerConfiguration.AuthCookieNamePrefix)) 
+                c.Cookie.Name = identityServerConfiguration.AuthCookieNamePrefix;
+        }, dataProtectionBuilderCallback: ConfigureDataProtection)
         .UseEFStore(o => ConfigureStorage(o))
+        .AddSwagger(o =>
+        {
+            o.IncludeDocumentation<AccessTokenTypeService>();
+            o.AddOAuthSecurity();
+        })
+        .AddConsoleNotification()
         .AddCredentialIssuer()
         .UseInMemoryMassTransit()
         .AddBackChannelAuthentication()
+        .AddPwdAuthentication()
         .AddEmailAuthentication()
         .AddSmsAuthentication()
         .AddFcmNotification()
@@ -123,34 +140,10 @@ void ConfigureIdServer(IServiceCollection services)
         .AddLDAPProvisioning()
         .AddAuthentication(callback: (a) =>
         {
-            /*
-            a.AddWsAuthentication(o =>
-            {
-                o.MetadataAddress = "http://localhost:5001";
-                o.Wtrealm = "urn:website";
-                o.RequireHttpsMetadata = false;
-            });
-            */
             a.AddMutualAuthentication(m =>
             {
                 m.AllowedCertificateTypes = CertificateTypes.All;
                 m.RevocationMode = System.Security.Cryptography.X509Certificates.X509RevocationMode.NoCheck;
-            });
-            a.AddOIDCAuthentication(opts =>
-            {
-                opts.Authority = identityServerConfiguration.Authority;
-                opts.ClientId = "website";
-                opts.ClientSecret = "password";
-                opts.ResponseType = "code";
-                opts.ResponseMode = "query";
-                opts.SaveTokens = true;
-                opts.GetClaimsFromUserInfoEndpoint = true;
-                opts.RequireHttpsMetadata = false;
-                opts.TokenValidationParameters = new TokenValidationParameters
-                {
-                    NameClaimType = "name"
-                };
-                opts.Scope.Add("profile");
             });
         });
     var isRealmEnabled = identityServerConfiguration.IsRealmEnabled;
@@ -171,9 +164,11 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
         o.Add<SCIMRepresentationsExtractionJobOptions>();
         o.Add<IdServerEmailOptions>();
         o.Add<IdServerSmsOptions>();
+        o.Add<IdServerPasswordOptions>();
         o.Add<FidoOptions>();
+        o.Add<IdServerConsoleOptions>();
         o.Add<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>();
-        if(conf.Type == DistributedCacheTypes.REDIS)
+        if (conf.Type == DistributedCacheTypes.REDIS)
         {
             o.UseRedisConnector(conf.ConnectionString);
         }
@@ -192,6 +187,9 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
                     case DistributedCacheTypes.POSTGRE:
                         b.UseNpgsql(conf.ConnectionString);
                         break;
+                    case DistributedCacheTypes.MYSQL:
+                        b.UseMySql(conf.ConnectionString, ServerVersion.AutoDetect(conf.ConnectionString));
+                        break;
                 }
             });
         }
@@ -202,7 +200,7 @@ void ConfigureDistributedCache()
 {
     var section = builder.Configuration.GetSection(nameof(DistributedCacheConfiguration));
     var conf = section.Get<DistributedCacheConfiguration>();
-    switch(conf.Type)
+    switch (conf.Type)
     {
         case DistributedCacheTypes.SQLSERVER:
             builder.Services.AddDistributedSqlServerCache(opts =>
@@ -227,6 +225,13 @@ void ConfigureDistributedCache()
                 opts.TableName = "DistributedCache";
             });
             break;
+        case DistributedCacheTypes.MYSQL:
+            builder.Services.AddDistributedMySqlCache(opts =>
+            {
+                opts.ConnectionString = conf.ConnectionString;
+                opts.TableName = "DistributedCache";
+            });
+            break;
     }
 }
 
@@ -234,7 +239,7 @@ void ConfigureStorage(DbContextOptionsBuilder b)
 {
     var section = builder.Configuration.GetSection(nameof(StorageConfiguration));
     var conf = section.Get<StorageConfiguration>();
-    switch(conf.Type) 
+    switch (conf.Type)
     {
         case StorageTypes.SQLSERVER:
             b.UseSqlServer(conf.ConnectionString, o =>
@@ -247,6 +252,13 @@ void ConfigureStorage(DbContextOptionsBuilder b)
             b.UseNpgsql(conf.ConnectionString, o =>
             {
                 o.MigrationsAssembly("SimpleIdServer.IdServer.PostgreMigrations");
+                o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+            });
+            break;
+        case StorageTypes.MYSQL:
+            b.UseMySql(conf.ConnectionString, ServerVersion.AutoDetect(conf.ConnectionString), o =>
+            {
+                o.MigrationsAssembly("SimpleIdServer.IdServer.MySQLMigrations");
                 o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
             });
             break;
@@ -309,7 +321,7 @@ void SeedData(WebApplication application, string scimBaseUrl)
                 dbContext.SerializedFileKeys.Add(WsFederationKeyGenerator.GenerateWsFederationSigningCredentials(SimpleIdServer.IdServer.Constants.StandardRealms.Master));
             }
 
-            if(!dbContext.CertificateAuthorities.Any())
+            if (!dbContext.CertificateAuthorities.Any())
                 dbContext.CertificateAuthorities.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.CertificateAuthorities);
 
             if (!dbContext.Acrs.Any())
@@ -372,7 +384,9 @@ void SeedData(WebApplication application, string scimBaseUrl)
                 dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<SCIMRepresentationsExtractionJobOptions>());
                 dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<IdServerEmailOptions>());
                 dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<IdServerSmsOptions>());
+                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<IdServerPasswordOptions>());
                 dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<FidoOptions>());
+                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<IdServerConsoleOptions>());
                 dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>());
             }
 

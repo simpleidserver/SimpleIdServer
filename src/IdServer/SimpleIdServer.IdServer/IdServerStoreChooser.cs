@@ -110,6 +110,30 @@ namespace SimpleIdServer.IdServer
             return this;
         }
 
+        public IdServerInMemoryStoreBuilder AddInMemorySerializedFileKeys(ICollection<SerializedFileKey> keys)
+        {
+            var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
+            if (!storeDbContext.SerializedFileKeys.Any())
+            {
+                storeDbContext.SerializedFileKeys.AddRange(keys);
+                storeDbContext.SaveChanges();
+            }
+
+            return this;
+        }
+
+        public IdServerInMemoryStoreBuilder AddInMemoryCAs(ICollection<CertificateAuthority> cas)
+        {
+            var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
+            if (!storeDbContext.CertificateAuthorities.Any())
+            {
+                storeDbContext.CertificateAuthorities.AddRange(cas);
+                storeDbContext.SaveChanges();
+            }
+
+            return this;
+        }
+
         public IdServerInMemoryStoreBuilder AddInMemoryUsers(ICollection<User> users)
         {
             var storeDbContext = _serviceProvider.GetService<StoreDbContext>();

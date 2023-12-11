@@ -22,14 +22,14 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class AuthenticatePasswordResource {
+    public class ConfirmResetPasswordResource {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal AuthenticatePasswordResource() {
+        internal ConfirmResetPasswordResource() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.IdServer.Startup.Resources.AuthenticatePasswordResource", typeof(AuthenticatePasswordResource).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.IdServer.Startup.Resources.ConfirmResetPasswordResource", typeof(ConfirmResetPasswordResource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,29 +61,38 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à External authentication.
+        ///   Recherche une chaîne localisée semblable à Code.
         /// </summary>
-        public static string external_authenticate {
+        public static string code {
             get {
-                return ResourceManager.GetString("external_authenticate", resourceCulture);
+                return ResourceManager.GetString("code", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Credential is invalid.
+        ///   Recherche une chaîne localisée semblable à Confirmation password is required.
         /// </summary>
-        public static string invalid_credential {
+        public static string confirmation_password {
             get {
-                return ResourceManager.GetString("invalid_credential", resourceCulture);
+                return ResourceManager.GetString("confirmation_password", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Login is missing.
+        ///   Recherche une chaîne localisée semblable à The validation code is invalid or has expired.
         /// </summary>
-        public static string invalid_login {
+        public static string invalid_link {
             get {
-                return ResourceManager.GetString("invalid_login", resourceCulture);
+                return ResourceManager.GetString("invalid_link", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The validation code is invalid or has expired.
+        /// </summary>
+        public static string invalid_otpcode {
+            get {
+                return ResourceManager.GetString("invalid_otpcode", resourceCulture);
             }
         }
         
@@ -97,29 +106,29 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Login is missing.
+        ///   Recherche une chaîne localisée semblable à Validation code is required.
         /// </summary>
-        public static string missing_login {
+        public static string missing_code {
             get {
-                return ResourceManager.GetString("missing_login", resourceCulture);
+                return ResourceManager.GetString("missing_code", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Password is missing.
+        ///   Recherche une chaîne localisée semblable à Destination is required.
+        /// </summary>
+        public static string missing_destination {
+            get {
+                return ResourceManager.GetString("missing_destination", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Password is required.
         /// </summary>
         public static string missing_password {
             get {
                 return ResourceManager.GetString("missing_password", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à Return url is missing.
-        /// </summary>
-        public static string missing_return_url {
-            get {
-                return ResourceManager.GetString("missing_return_url", resourceCulture);
             }
         }
         
@@ -133,43 +142,25 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Policy.
+        ///   Recherche une chaîne localisée semblable à Your password has been updated.
         /// </summary>
-        public static string policy {
+        public static string password_updated {
             get {
-                return ResourceManager.GetString("policy", resourceCulture);
+                return ResourceManager.GetString("password_updated", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Remember me.
+        ///   Recherche une chaîne localisée semblable à Repeat the password.
         /// </summary>
-        public static string remember_login {
+        public static string repeat_password {
             get {
-                return ResourceManager.GetString("remember_login", resourceCulture);
+                return ResourceManager.GetString("repeat_password", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Forget my password.
-        /// </summary>
-        public static string reset_pwd {
-            get {
-                return ResourceManager.GetString("reset_pwd", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à Submit.
-        /// </summary>
-        public static string submit {
-            get {
-                return ResourceManager.GetString("submit", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à Authenticate.
+        ///   Recherche une chaîne localisée semblable à Reset your password.
         /// </summary>
         public static string title {
             get {
@@ -178,20 +169,20 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Terms of service.
+        ///   Recherche une chaîne localisée semblable à Both passwords don&apos;t match.
         /// </summary>
-        public static string tos {
+        public static string unmatch_password {
             get {
-                return ResourceManager.GetString("tos", resourceCulture);
+                return ResourceManager.GetString("unmatch_password", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à The user doesn&apos;t exist.
+        ///   Recherche une chaîne localisée semblable à Update.
         /// </summary>
-        public static string unknown_user {
+        public static string update {
             get {
-                return ResourceManager.GetString("unknown_user", resourceCulture);
+                return ResourceManager.GetString("update", resourceCulture);
             }
         }
     }

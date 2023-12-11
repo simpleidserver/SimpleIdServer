@@ -22,14 +22,14 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class AuthenticatePasswordResource {
+    public class AuthenticateConsoleResource {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal AuthenticatePasswordResource() {
+        internal AuthenticateConsoleResource() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.IdServer.Startup.Resources.AuthenticatePasswordResource", typeof(AuthenticatePasswordResource).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.IdServer.Startup.Resources.AuthenticateConsoleResource", typeof(AuthenticateConsoleResource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,29 +61,47 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à External authentication.
+        ///   Recherche une chaîne localisée semblable à Authenticate.
         /// </summary>
-        public static string external_authenticate {
+        public static string authenticate {
             get {
-                return ResourceManager.GetString("external_authenticate", resourceCulture);
+                return ResourceManager.GetString("authenticate", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Credential is invalid.
+        ///   Recherche une chaîne localisée semblable à Code has a validity of {0} seconds.
         /// </summary>
-        public static string invalid_credential {
+        public static string code_validity {
             get {
-                return ResourceManager.GetString("invalid_credential", resourceCulture);
+                return ResourceManager.GetString("code_validity", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Login is missing.
+        ///   Recherche une chaîne localisée semblable à Confirmation code.
         /// </summary>
-        public static string invalid_login {
+        public static string confirmationcode {
             get {
-                return ResourceManager.GetString("invalid_login", resourceCulture);
+                return ResourceManager.GetString("confirmationcode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Confirmation code has been sent.
+        /// </summary>
+        public static string confirmationcode_sent {
+            get {
+                return ResourceManager.GetString("confirmationcode_sent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Confirmation code is invalid.
+        /// </summary>
+        public static string invalid_confirmationcode {
+            get {
+                return ResourceManager.GetString("invalid_confirmationcode", resourceCulture);
             }
         }
         
@@ -97,52 +115,25 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Login is missing.
+        ///   Recherche une chaîne localisée semblable à Confirmation code is missing.
         /// </summary>
-        public static string missing_login {
+        public static string missing_confirmationcode {
             get {
-                return ResourceManager.GetString("missing_login", resourceCulture);
+                return ResourceManager.GetString("missing_confirmationcode", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Password is missing.
+        ///   Recherche une chaîne localisée semblable à There is no OTP configured.
         /// </summary>
-        public static string missing_password {
+        public static string no_active_otp {
             get {
-                return ResourceManager.GetString("missing_password", resourceCulture);
+                return ResourceManager.GetString("no_active_otp", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Return url is missing.
-        /// </summary>
-        public static string missing_return_url {
-            get {
-                return ResourceManager.GetString("missing_return_url", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à Password.
-        /// </summary>
-        public static string password {
-            get {
-                return ResourceManager.GetString("password", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à Policy.
-        /// </summary>
-        public static string policy {
-            get {
-                return ResourceManager.GetString("policy", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à Remember me.
+        ///   Recherche une chaîne localisée semblable à Remember my login.
         /// </summary>
         public static string remember_login {
             get {
@@ -151,20 +142,11 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Forget my password.
+        ///   Recherche une chaîne localisée semblable à Send confirmation code.
         /// </summary>
-        public static string reset_pwd {
+        public static string sendconfirmationcode {
             get {
-                return ResourceManager.GetString("reset_pwd", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à Submit.
-        /// </summary>
-        public static string submit {
-            get {
-                return ResourceManager.GetString("submit", resourceCulture);
+                return ResourceManager.GetString("sendconfirmationcode", resourceCulture);
             }
         }
         
@@ -174,24 +156,6 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static string title {
             get {
                 return ResourceManager.GetString("title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à Terms of service.
-        /// </summary>
-        public static string tos {
-            get {
-                return ResourceManager.GetString("tos", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à The user doesn&apos;t exist.
-        /// </summary>
-        public static string unknown_user {
-            get {
-                return ResourceManager.GetString("unknown_user", resourceCulture);
             }
         }
     }

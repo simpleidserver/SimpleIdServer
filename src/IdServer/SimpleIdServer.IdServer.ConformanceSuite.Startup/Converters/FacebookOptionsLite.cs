@@ -9,7 +9,7 @@ namespace SimpleIdServer.IdServer.ConformanceSuite.Startup.Converters
     {
         [SimpleIdServer.Configuration.ConfigurationRecord("AppId", "Application identifier", 0)]
         public string AppId { get; set; }
-        [SimpleIdServer.Configuration.ConfigurationRecord("AppSecret", "Application secret", 1, IsProtected = true)]
+        [SimpleIdServer.Configuration.ConfigurationRecord("AppSecret", "Application secret", 1, null, Configuration.CustomConfigurationRecordType.PASSWORD)]
         public string AppSecret { get; set; }
 
         public FacebookOptions Convert() => new FacebookOptions

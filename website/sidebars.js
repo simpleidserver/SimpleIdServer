@@ -71,6 +71,14 @@ const sidebars = {
       items: [
         'migrations/403to404'
       ]
+    },
+    {
+      type:'category',
+      label: 'Developer (Nuget Packages)',
+      items: [
+        'developer/idserver',
+        'developer/adminwebsite'
+      ]
     }
   ],
   tutorials: [
