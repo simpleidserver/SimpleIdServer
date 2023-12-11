@@ -176,3 +176,29 @@ server {
 ```
 
 For more information about NGINX, you can refer to the official website: https://www.nginx.com/blog/using-free-ssltls-certificates-from-lets-encrypt-with-nginx/
+
+## IIS
+
+The zip file downloaded from [here](./quickstart.md#copy-and-paste), contains all of SimpleIdServer's services. 
+
+They are ready to be run on IIS, and each of them has a `web.config` filer with a reference to the executable service to run.
+
+To deploy the application under IIS, follow these steps:
+1. Add a new application pool named `SimpleIdServer`.
+2. Enable the`Load User Profile` and check if the identity specified for the application pool is a member of the `Cryptographic perators` groups. his setting is required; otherwise, you'll encounter cryptographic exceptions such as:
+
+```
+Microsoft.AspNetCore.Server.IIS.Core.IISHttpServer[2]
+Connection ID "17942340921349636565", Request ID "800001d7-0001-f900-b63f-84710c7967bb": An unhandled exception was thrown by the application.
+System.Security.Cryptography.CryptographicException: The system cannot find the file specified.
+at System.Security.Cryptography.CngKey.Import(ReadOnlySpan1 keyBlob, String curveName, CngKeyBlobFormat format, CngProvider provider) at System.Security.Cryptography.CngPkcs8.ImportPkcs8(ReadOnlySpan1 keyBlob)
+```
+
+3. Add a new `SimpleIdServer` site, select your application pool, and specify the directory of your service.
+
+
+:::info
+
+If the application is deployed on Azure, add the application setting `WEBSITE_LOAD_PROFILE` and set its value to `1`.
+
+:::
