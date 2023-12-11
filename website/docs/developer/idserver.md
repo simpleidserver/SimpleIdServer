@@ -199,4 +199,45 @@ dotnet run --urls https://*:5001
 
 ## Custom EF Storage
 
-TODO
+The DOTNET TEMPLATE supports the following storage options:
+* POSTGRESQL
+* SQLSERVER
+* MYSQL
+
+Other databases can be supported; the requirement is to check if Entity Framework supports the database. 
+You can find the list of supported databases https://learn.microsoft.com/en-us/ef/
+
+If you want to support SQLITE, execute the steps below:
+
+1. Open a command prompt, navigate to the `Identity Server` project, install `Microsoft.EntityFrameworkCore.Sqlite` and `Microsoft.EntityFrameworkCore.Design` Nuget packages.
+
+```
+dotnet add package Microsoft.EntityFrameworkCore.Sqlite
+dotnet add package Microsoft.EntityFrameworkCore.Design
+```
+
+2. Edit the `Program.cs` file and configure the SQLITE storage.
+
+```
+.UseEFStore(c =>
+{
+    c.UseSqlite("sid.db", o =>
+    {
+        o.MigrationsAssembly("IdentityService");
+    });
+})
+```
+
+3. Create the migration script
+
+```
+dotnet ef migrations add InitialCreate
+```
+
+4. Apply the migration script
+
+```
+dotnet ef database update
+```
+
+The IdentityServer solution is now configured to use the SQLITE database.
