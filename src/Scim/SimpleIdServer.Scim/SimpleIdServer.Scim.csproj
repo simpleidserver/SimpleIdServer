@@ -7,7 +7,7 @@
   <ItemGroup>
     <PackageReference Include="MassTransit" Version="8.*" />
 	<PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.1.0" />
-	<PackageReference Include="Microsoft.AspNetCore.Routing.Abstractions" Version="2.2.0" />
+	<PackageReference Include="Microsoft.AspNetCore.Routing.Abstractions" Version="2.1.1" />
 	<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="6.0.0" />
   </ItemGroup>
   <ItemGroup>
