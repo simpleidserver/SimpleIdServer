@@ -15,6 +15,7 @@
 	<PackageReference Include="SimpleIdServer.Scim.Persistence.MongoDB" Version="4.0.*-*" />
 	<PackageReference Include="SimpleIdServer.Scim.PostgreMigrations" Version="4.0.*-*" />
 	<PackageReference Include="SimpleIdServer.Scim.SqlServerMigrations" Version="4.0.*-*" />
+	<PackageReference Include="SimpleIdServer.Scim.MySQLMigrations" Version="4.0.*-*" />
 	<PackageReference Include="SimpleIdServer.Scim.SwashbuckleV6" Version="4.0.*-*" />
 	<PackageReference Include="SimpleIdServer.Scim" Version="4.0.*-*" />
 	<PackageReference Include="SimpleIdServer.Scim.Persistence.EF" Version="4.0.*-*" />

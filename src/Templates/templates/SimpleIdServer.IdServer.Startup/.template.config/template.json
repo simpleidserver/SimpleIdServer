@@ -37,8 +37,8 @@
 		  "description": "Type of storage",
 		  "choices": [
 			  {
-				  "choice": "INMEMORY",
-				  "description": "INMEMORY"
+				"choice": "INMEMORY",
+				"description": "INMEMORY"
 			  },
 			  {
 				"choice": "SQLSERVER",
@@ -47,6 +47,10 @@
 			  {
 				"choice": "POSTGRE",
 				"description": "POSTGRE"
+			  },
+			  {
+				"choice": "MYSQL",
+				"description": "MYSQL"
 			  }
 		  ]
 	  },
@@ -72,6 +76,10 @@
 			  {
 				"choice": "POSTGRE",
 				"description": "POSTGRE"
+			  },
+			  {
+				"choice": "MYSQL",
+				"description": "MYSQL"
 			  }
 		  ]
 	  },

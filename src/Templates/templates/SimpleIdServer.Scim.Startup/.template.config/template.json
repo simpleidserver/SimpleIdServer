@@ -37,6 +37,10 @@
 			  {
 				"choice": "MONGODB",
 				"description": "MONGODB"
+			  },
+			  {
+				"choice": "MYSQL",
+				"description": "MYSQL"
 			  }
 		  ]
 	  }
