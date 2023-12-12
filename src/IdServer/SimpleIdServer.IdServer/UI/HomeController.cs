@@ -76,99 +76,21 @@ namespace SimpleIdServer.IdServer.UI
         }
 
         [HttpGet]
-        public IActionResult Index() => View();
+        public virtual IActionResult Index() => View();
 
         [HttpGet]
         [Authorize(Constants.Policies.Authenticated)]
-        public async Task<IActionResult> Profile([FromRoute] string prefix, CancellationToken cancellationToken)
+        public async virtual Task<IActionResult> Profile([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            var schemes = await _authenticationSchemeProvider.GetAllSchemesAsync();
-            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.GetBySubject(nameIdentifier, prefix, cancellationToken);
-            var consents = await GetConsents();
-            var pendingRequests = await GetPendingRequest();
-            var methodServices = _authenticationMethodServices.Select(a => new AuthenticationMethodViewModel
-            {
-                Name = a.Name,
-                Amr = a.Amr,
-                IsCredentialExists = a.IsCredentialExists(user)
-            });
-            var externalIdProviders = ExternalProviderHelper.GetExternalAuthenticationSchemes(schemes);
-            return View(new ProfileViewModel
-            {
-                Name = user.Name,
-                HasOtpKey = user.ActiveOTP != null,
-                Consents = consents,
-                PendingRequests = pendingRequests,
-                AuthenticationMethods = methodServices,
-                Profiles = GetProfiles(),
-                ExternalIdProviders = externalIdProviders.Select(e => new ExternalIdProvider
-                {
-                    AuthenticationScheme = e.Name,
-                    DisplayName = e.DisplayName
-                })
-            });
-
-            async Task<List<ConsentViewModel>> GetConsents()
-            {
-                var consents = new List<ConsentViewModel>();
-                var filteredConsents = user.Consents.Where(c => c.Realm == prefix);
-                var clientIds = filteredConsents.Select(c => c.ClientId);
-                var oauthClients = await _clientRepository.Query().Include(c => c.Translations).Include(r => r.Realms).AsNoTracking().Where(c => clientIds.Contains(c.ClientId) && c.Realms.Any(r => r.Name == prefix)).ToListAsync(cancellationToken);
-                foreach (var consent in filteredConsents)
-                {
-                    var oauthClient = oauthClients.Single(c => c.ClientId == consent.ClientId);
-                    consents.Add(new ConsentViewModel(
-                        consent.Id,
-                        oauthClient.ClientName,
-                        oauthClient.ClientUri,
-                        consent.Scopes.Select(s => s.Scope),
-                        consent.Claims,
-                        consent.AuthorizationDetails.Select(s => s.Type)));
-                }
-
-                return consents;
-            }
-
-            async Task<List<PendingRequestViewModel>> GetPendingRequest()
-            {
-                var pendingRequestLst = await _pendingRequestRepository.Query().Include(p => p.Resource).ThenInclude(p => p.Translations).Where(r => (r.Owner == nameIdentifier || r.Requester == nameIdentifier) && r.Realm == prefix).ToListAsync(cancellationToken);
-                var result = new List<PendingRequestViewModel>();
-                foreach(var pendingRequest in pendingRequestLst)
-                {
-                    result.Add(new PendingRequestViewModel
-                    {
-                        TicketId = pendingRequest.TicketId,
-                        CreateDateTime = pendingRequest.CreateDateTime,
-                        Requester = pendingRequest.Requester,
-                        ResourceDescription = pendingRequest.Resource.Description,
-                        ResourceName = pendingRequest.Resource.Name,
-                        Scopes = pendingRequest.Scopes,
-                        Owner = pendingRequest.Owner,
-                        Status = pendingRequest.Status
-                    });
-                }
-
-                return result;
-            }
-
-            IEnumerable<ExternalAuthProviderViewModel> GetProfiles()
-            {
-                return user.ExternalAuthProviders.Select(a => new ExternalAuthProviderViewModel
-                {
-                    CreateDateTime = a.CreateDateTime,
-                    Scheme = a.Scheme,
-                    Subject = a.Subject
-                });
-            }
-
-
+            var viewModel = new ProfileViewModel();
+            await Build(prefix, viewModel, cancellationToken);
+            return View(viewModel);
         }
 
         [HttpGet]
         [Authorize(Constants.Policies.Authenticated)]
-        public async Task<IActionResult> Credentials([FromRoute] string prefix, CancellationToken cancellationToken)
+        public async virtual Task<IActionResult> Credentials([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
             var credentials = await GetCredentialTemplates();
@@ -197,7 +119,7 @@ namespace SimpleIdServer.IdServer.UI
 
         [HttpGet]
         [Authorize(Constants.Policies.Authenticated)]
-        public async Task<IActionResult> RejectConsent([FromRoute] string prefix, string consentId, CancellationToken cancellationToken)
+        public async virtual Task<IActionResult> RejectConsent([FromRoute] string prefix, string consentId, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
@@ -212,7 +134,7 @@ namespace SimpleIdServer.IdServer.UI
 
         [HttpGet]
         [Authorize(Constants.Policies.Authenticated)]
-        public async Task<IActionResult> RejectUmaPendingRequest(string ticketId, CancellationToken cancellationToken)
+        public async virtual Task<IActionResult> RejectUmaPendingRequest(string ticketId, CancellationToken cancellationToken)
         {
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
             var pendingRequest = await _pendingRequestRepository.Query().FirstOrDefaultAsync(p => p.TicketId == ticketId, cancellationToken);
@@ -232,7 +154,7 @@ namespace SimpleIdServer.IdServer.UI
 
         [HttpGet]
         [Authorize(Constants.Policies.Authenticated)]
-        public async Task<IActionResult> ConfirmUmaPendingRequest(string ticketId, CancellationToken cancellationToken)
+        public async virtual Task<IActionResult> ConfirmUmaPendingRequest(string ticketId, CancellationToken cancellationToken)
         {
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
             var pendingRequest = await _pendingRequestRepository.Query().FirstOrDefaultAsync(p => p.TicketId == ticketId, cancellationToken);
@@ -254,7 +176,7 @@ namespace SimpleIdServer.IdServer.UI
 
         [HttpGet]
         [Authorize(Constants.Policies.Authenticated)]
-        public IActionResult Link(string scheme)
+        public virtual IActionResult Link(string scheme)
         {
             if(string.IsNullOrWhiteSpace(scheme))
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request", message = "Authentication Scheme is missing" });
@@ -272,7 +194,7 @@ namespace SimpleIdServer.IdServer.UI
 
         [HttpGet]
         [Authorize(Constants.Policies.Authenticated)]
-        public async Task<IActionResult> LinkCallback([FromRoute] string prefix, CancellationToken cancellationToken)
+        public async virtual Task<IActionResult> LinkCallback([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
@@ -323,7 +245,7 @@ namespace SimpleIdServer.IdServer.UI
         [HttpPost]
         [Authorize(Constants.Policies.Authenticated)]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Unlink([FromRoute] string prefix, UnlinkProfileViewModel viewModel, CancellationToken cancellationToken)
+        public async virtual Task<IActionResult> Unlink([FromRoute] string prefix, UnlinkProfileViewModel viewModel, CancellationToken cancellationToken)
         {
             if (viewModel == null)
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request", message = "Request cannot be empty" });
@@ -345,7 +267,7 @@ namespace SimpleIdServer.IdServer.UI
 
         [HttpGet]
         [Authorize(Constants.Policies.Authenticated)]
-        public async Task<IActionResult> GetOTP([FromRoute] string prefix, CancellationToken cancellationToken)
+        public async virtual Task<IActionResult> GetOTP([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
@@ -357,7 +279,7 @@ namespace SimpleIdServer.IdServer.UI
 
         [HttpGet]
         [Authorize(Constants.Policies.Authenticated)]
-        public IActionResult RegisterCredential([FromRoute] string prefix, string name)
+        public virtual IActionResult RegisterCredential([FromRoute] string prefix, string name)
         {
             prefix = prefix ?? Constants.DefaultRealm;
             var cookieName = _options.GetRegistrationCookieName();
@@ -377,7 +299,7 @@ namespace SimpleIdServer.IdServer.UI
         }
 
         [HttpGet]
-        public async Task<IActionResult> Disconnect([FromRoute] string prefix, CancellationToken cancellationToken)
+        public virtual async Task<IActionResult> Disconnect([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
             var sessionCookieName = _options.GetSessionCookieName();
@@ -404,6 +326,86 @@ namespace SimpleIdServer.IdServer.UI
                 Realm = prefix
             });
             return RedirectToAction("Index");
+        }
+
+        protected async Task Build(string prefix, ProfileViewModel viewModel, CancellationToken cancellationToken)
+        {
+            var schemes = await _authenticationSchemeProvider.GetAllSchemesAsync();
+            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            var user = await _userRepository.GetBySubject(nameIdentifier, prefix, cancellationToken);
+            var consents = await GetConsents();
+            var pendingRequests = await GetPendingRequest();
+            var methodServices = _authenticationMethodServices.Select(a => new AuthenticationMethodViewModel
+            {
+                Name = a.Name,
+                Amr = a.Amr,
+                IsCredentialExists = a.IsCredentialExists(user)
+            });
+            var externalIdProviders = ExternalProviderHelper.GetExternalAuthenticationSchemes(schemes);
+            viewModel.Name = user.Name;
+            viewModel.HasOtpKey = user.ActiveOTP != null;
+            viewModel.Consents = consents;
+            viewModel.PendingRequests = pendingRequests;
+            viewModel.AuthenticationMethods = methodServices;
+            viewModel.Profiles = GetProfiles();
+            viewModel.ExternalIdProviders = externalIdProviders.Select(e => new ExternalIdProvider
+            {
+                AuthenticationScheme = e.Name,
+                DisplayName = e.DisplayName
+            });
+
+            async Task<List<ConsentViewModel>> GetConsents()
+            {
+                var consents = new List<ConsentViewModel>();
+                var filteredConsents = user.Consents.Where(c => c.Realm == prefix);
+                var clientIds = filteredConsents.Select(c => c.ClientId);
+                var oauthClients = await _clientRepository.Query().Include(c => c.Translations).Include(r => r.Realms).AsNoTracking().Where(c => clientIds.Contains(c.ClientId) && c.Realms.Any(r => r.Name == prefix)).ToListAsync(cancellationToken);
+                foreach (var consent in filteredConsents)
+                {
+                    var oauthClient = oauthClients.Single(c => c.ClientId == consent.ClientId);
+                    consents.Add(new ConsentViewModel(
+                        consent.Id,
+                        oauthClient.ClientName,
+                        oauthClient.ClientUri,
+                        consent.Scopes.Select(s => s.Scope),
+                        consent.Claims,
+                        consent.AuthorizationDetails.Select(s => s.Type)));
+                }
+
+                return consents;
+            }
+
+            async Task<List<PendingRequestViewModel>> GetPendingRequest()
+            {
+                var pendingRequestLst = await _pendingRequestRepository.Query().Include(p => p.Resource).ThenInclude(p => p.Translations).Where(r => (r.Owner == nameIdentifier || r.Requester == nameIdentifier) && r.Realm == prefix).ToListAsync(cancellationToken);
+                var result = new List<PendingRequestViewModel>();
+                foreach (var pendingRequest in pendingRequestLst)
+                {
+                    result.Add(new PendingRequestViewModel
+                    {
+                        TicketId = pendingRequest.TicketId,
+                        CreateDateTime = pendingRequest.CreateDateTime,
+                        Requester = pendingRequest.Requester,
+                        ResourceDescription = pendingRequest.Resource.Description,
+                        ResourceName = pendingRequest.Resource.Name,
+                        Scopes = pendingRequest.Scopes,
+                        Owner = pendingRequest.Owner,
+                        Status = pendingRequest.Status
+                    });
+                }
+
+                return result;
+            }
+
+            IEnumerable<ExternalAuthProviderViewModel> GetProfiles()
+            {
+                return user.ExternalAuthProviders.Select(a => new ExternalAuthProviderViewModel
+                {
+                    CreateDateTime = a.CreateDateTime,
+                    Scheme = a.Scheme,
+                    Subject = a.Subject
+                });
+            }
         }
 
         private static string ReplaceUILocale(string culture, string returnUrl)
