@@ -152,6 +152,19 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             };
         }
 
+        [ReducerMethod]
+        public static SearchUserSessionsState ReduceRevokeUserSessionsSuccessAction(SearchUserSessionsState state, RevokeUserSessionsSuccessAction act)
+        {
+            var sessions = state.UserSessions;
+            foreach(var session in sessions.Where(s => s.IsActive()))
+                session.State = UserSessionStates.Rejected;
+
+            return state with
+            {
+                UserSessions = sessions
+            };
+        }
+
         #endregion
 
         #region UserState
@@ -288,7 +301,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         public static UpdateUserState ReduceRevokeUserSessionAction(UpdateUserState state, RevokeUserSessionAction act) => new(true);
 
         [ReducerMethod]
+        public static UpdateUserState ReduceRevokeUserSessionsAction(UpdateUserState state, RevokeUserSessionsAction act) => new(true);
+
+        [ReducerMethod]
         public static UpdateUserState ReduceRevokeUserSessionSuccessAction(UpdateUserState state, RevokeUserSessionSuccessAction act) => new(false);
+
+        [ReducerMethod]
+        public static UpdateUserState ReduceRevokeUserSessionsSuccessAction(UpdateUserState state, RevokeUserSessionsSuccessAction act) => new(false);
 
         [ReducerMethod]
         public static UpdateUserState ReduceUpdateUserClaimsAction(UpdateUserState state, UpdateUserClaimsAction act) => new(true);

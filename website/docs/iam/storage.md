@@ -8,6 +8,7 @@ For each type of storage, there is a corresponding NuGet package containing all 
 | ---------  | -------------------------------------------------------------------------------------------------------------------------- |
 | SQL Server | [SimpleIdServer.IdServer.SqlServerMigrations](https://www.nuget.org/packages/SimpleIdServer.IdServer.SqlServerMigrations)  |
 | PostGreSQL | [SimpleIdServer.IdServer.PostgreMigrations](https://www.nuget.org/packages/SimpleIdServer.IdServer.PostgreMigrations)                                                                              |
+| MySQL      | [SimpleIdServer.IdServer.PostgreMigrations](https://www.nuget.org/packages/SimpleIdServer.IdServer.MySQLMigrations)                                                                              |
 
 If your preferred storage option is not listed, please [contact-us](../contactus). We will make every effort to accommodate your requirements.
 

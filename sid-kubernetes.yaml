@@ -173,7 +173,7 @@ spec:
       subdomain: localhost
       containers:
       - name: scim-deploy
-        image: simpleidserver/scim:4.0.5
+        image: simpleidserver/scim:4.0.6
         ports:
           - containerPort: 80
         env:
@@ -208,7 +208,7 @@ spec:
       subdomain: localhost
       containers:
       - name: idserver-deploy
-        image: simpleidserver/idserver:4.0.5
+        image: simpleidserver/idserver:4.0.6
         ports:
           - containerPort: 80
         env:
@@ -251,7 +251,7 @@ spec:
       subdomain: localhost
       containers:
       - name: website-deploy
-        image: simpleidserver/website:4.0.5
+        image: simpleidserver/website:4.0.6
         ports:
           - containerPort: 80
         env:

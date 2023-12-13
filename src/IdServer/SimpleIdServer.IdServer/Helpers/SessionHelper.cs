@@ -1,13 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -22,39 +20,31 @@ namespace SimpleIdServer.IdServer.Helpers;
 
 public interface ISessionHelper
 {
-    Task Revoke(string subject, UserSession session, string issuer, CancellationToken cancellationToken);
+    Task Revoke(string subject, IEnumerable<SigningCredentials> signingCredentials, UserSession session, IEnumerable<Client> clients, string issuer, CancellationToken cancellationToken);
 }
 
 public class SessionHelper : ISessionHelper
 {
     private readonly IdServer.Infrastructures.IHttpClientFactory _httpClientFactory;
     private readonly IJwtBuilder _jwtBuilder;
-    private readonly IClientRepository _clientRepository;
     private readonly IdServerHostOptions _options;
     private readonly ILogger<SessionHelper> _logger;
 
     public SessionHelper(
         IdServer.Infrastructures.IHttpClientFactory httpClientFactory,
         IJwtBuilder jwtBuilder,
-        IClientRepository clientRepository,
         IOptions<IdServerHostOptions> options,
         ILogger<SessionHelper> logger)
     {
         _httpClientFactory = httpClientFactory;
         _jwtBuilder = jwtBuilder;
-        _clientRepository = clientRepository;
         _options = options.Value;
         _logger = logger;
     }
 
-    public async Task Revoke(string subject, UserSession session, string issuer, CancellationToken cancellationToken)
+    public async Task Revoke(string subject, IEnumerable<SigningCredentials> signingCredentials, UserSession session, IEnumerable<Client> clients, string issuer, CancellationToken cancellationToken)
     {
-        if (session == null) return;
-        var targetedClients = await _clientRepository.Query()
-            .AsNoTracking()
-            .Where(c => session.ClientIds.Contains(c.ClientId) && c.Realms.Any(r => r.Name == session.Realm) && !string.IsNullOrWhiteSpace(c.BackChannelLogoutUri))
-            .ToListAsync(cancellationToken);
-        if (!targetedClients.Any()) return;
+        if (!clients.Any()) return;
         var currentDateTime = DateTime.UtcNow;
         var events = new JsonObject
         {
@@ -62,7 +52,7 @@ public class SessionHelper : ISessionHelper
         };
         using (var httpClient = _httpClientFactory.GetHttpClient())
         {
-            foreach(var client in targetedClients)
+            foreach(var client in clients)
             {
                 var jwsPayload = new Dictionary<string, object>
                 {
@@ -83,7 +73,7 @@ public class SessionHelper : ISessionHelper
                     Claims = jwsPayload
                 };
                 var signedResponseAlg = client.TokenSignedResponseAlg ?? _options.DefaultTokenSignedResponseAlg;
-                var logoutToken = _jwtBuilder.Sign(session.Realm, tokenDescriptor, signedResponseAlg);
+                var logoutToken = _jwtBuilder.Sign(signingCredentials, session.Realm, tokenDescriptor, signedResponseAlg);
                 var body = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
                 {
                     new KeyValuePair<string, string>("logout_token", logoutToken)

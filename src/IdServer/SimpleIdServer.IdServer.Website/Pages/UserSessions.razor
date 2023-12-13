@@ -11,6 +11,7 @@
 
 @if(User != null)
 {
+    <RadzenButton class="mb-1" Click="@(args => RevokeSessions())" Icon="delete" Text="Revoke sessions" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
     <RadzenDataGrid AllowFiltering="true"
                 AllowColumnResize="true"
                 AllowAlternatingRows="false"
@@ -89,13 +90,13 @@
         {
             new ContextMenuItem { Text = "Reject", Value = 1 }
         }, (a) => {
-            if (a.Value.Equals(1))
-            {
-                var act = new RevokeUserSessionAction { UserId = User.Id, SessionId = session.SessionId };
-                dispatcher.Dispatch(act);
-                contextMenuService.Close();
-            }
-        });
+        if (a.Value.Equals(1))
+        {
+            var act = new RevokeUserSessionAction { UserId = User.Id, SessionId = session.SessionId };
+            dispatcher.Dispatch(act);
+            contextMenuService.Close();
+        }
+    });
     }
 
     void LoadData(LoadDataArgs args)
@@ -109,5 +110,11 @@
         const string className = "class";
         if (row.Attributes.ContainsKey(className))
             row.Attributes.Remove(className);
+    }
+
+    void RevokeSessions()
+    {
+        var act = new RevokeUserSessionsAction { UserId = User.Id };
+        dispatcher.Dispatch(act);
     }
 }

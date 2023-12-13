@@ -7,6 +7,7 @@ import HomepageFeatures from '@site/src/components/HomepageFeatures';
 import HomepageInstallations from '@site/src/components/HomepageInstallations';
 import styles from './index.module.css';
 import HomepagePhilosophy from '../components/HomepagePhilosophy';
+import HomepageOpenStandards from '../components/HomepageOpenStandards';
 
 function HomepageHeader() {
   const {siteConfig} = useDocusaurusContext();
@@ -43,6 +44,9 @@ export default function Home() {
         </div>
         <div style={{borderBottom: "1px solid #ebedf0"}}>
           <HomepageFeatures />
+        </div>
+        <div style={{borderBottom: "1px solid #ebedf0"}}>
+          <HomepageOpenStandards />
         </div>
       </main>
     </Layout>

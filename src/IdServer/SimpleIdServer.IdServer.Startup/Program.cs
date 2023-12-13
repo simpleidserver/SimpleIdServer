@@ -37,14 +37,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 
-const string CreateTableFormat = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DistributedCache' and xtype='U') " +
+const string SQLServerCreateTableFormat = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DistributedCache' and xtype='U') " +
     "CREATE TABLE [dbo].[DistributedCache] (" +
     "Id nvarchar(449) COLLATE SQL_Latin1_General_CP1_CS_AS NOT NULL, " +
     "Value varbinary(MAX) NOT NULL, " +
     "ExpiresAtTime datetimeoffset NOT NULL, " +
     "SlidingExpirationInSeconds bigint NULL," +
     "AbsoluteExpiration datetimeoffset NULL, " +
-    "PRIMARY KEY (Id))";
+    "PRIMARY KEY (Id))"; 
+
+const string MYSQLCreateTableFormat =
+            "CREATE TABLE IF NOT EXISTS DistributedCache (" +
+                "`Id` varchar(449) CHARACTER SET ascii COLLATE ascii_bin NOT NULL," +
+                "`AbsoluteExpiration` datetime(6) DEFAULT NULL," +
+                "`ExpiresAtTime` datetime(6) NOT NULL," +
+                "`SlidingExpirationInSeconds` bigint(20) DEFAULT NULL," +
+                "`Value` longblob NOT NULL," +
+                "PRIMARY KEY(`Id`)," +
+                "KEY `Index_ExpiresAtTime` (`ExpiresAtTime`)" +
+            ")";
 
 ServicePointManager.ServerCertificateValidationCallback += (o, c, ch, er) => true;
 var builder = WebApplication.CreateBuilder(args);
@@ -229,6 +240,7 @@ void ConfigureDistributedCache()
             builder.Services.AddDistributedMySqlCache(opts =>
             {
                 opts.ConnectionString = conf.ConnectionString;
+                opts.SchemaName = "idserver";
                 opts.TableName = "DistributedCache";
             });
             break;
@@ -397,16 +409,28 @@ void SeedData(WebApplication application, string scimBaseUrl)
         void EnableIsolationLevel(StoreDbContext dbContext)
         {
             if (dbContext.Database.IsInMemory()) return;
-            var dbConnection = dbContext.Database.GetDbConnection() as SqlConnection;
-            if (dbConnection != null)
+            var dbConnection = dbContext.Database.GetDbConnection();
+            var sqlConnection = dbConnection as SqlConnection;
+            if (sqlConnection != null)
             {
-                if (dbConnection.State != System.Data.ConnectionState.Open) dbConnection.Open();
-                var cmd = dbConnection.CreateCommand();
+                if (sqlConnection.State != System.Data.ConnectionState.Open) sqlConnection.Open();
+                var cmd = sqlConnection.CreateCommand();
                 cmd.CommandText = "ALTER DATABASE IdServer SET ALLOW_SNAPSHOT_ISOLATION ON";
                 cmd.ExecuteNonQuery();
-                cmd = dbConnection.CreateCommand();
-                cmd.CommandText = CreateTableFormat;
+                cmd = sqlConnection.CreateCommand();
+                cmd.CommandText = SQLServerCreateTableFormat;
                 cmd.ExecuteNonQuery();
+                return;
+            }
+
+            var mysqlConnection = dbConnection as MySqlConnector.MySqlConnection;
+            if(mysqlConnection != null)
+            {
+                if (mysqlConnection.State != System.Data.ConnectionState.Open) mysqlConnection.Open();
+                var cmd = mysqlConnection.CreateCommand();
+                cmd.CommandText = MYSQLCreateTableFormat;
+                cmd.ExecuteNonQuery();
+                return;
             }
         }
     }

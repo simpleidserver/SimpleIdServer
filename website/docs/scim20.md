@@ -45,6 +45,16 @@ The following storage options are supported. Each NuGet package contains migrati
             <td>$.StorageConfiguration.Type</td>
             <td>MONGODB</td>
         </tr>
+        <tr>
+            <td rowspan="2"><b>MYSQL</b></td>
+            <td rowspan="2"><a href="https://www.nuget.org/packages/SimpleIdServer.Scim.MySQLMigrations" target="_blank">SimpleIdServer.Scim.MySQLMigrations</a></td>
+            <td>$.StorageConfiguration.ConnectionString</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>$.StorageConfiguration.Type</td>
+            <td>MYSQL</td>
+        </tr>
     </tbody>
 </table>
 

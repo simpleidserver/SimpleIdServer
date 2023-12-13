@@ -205,6 +205,7 @@ task pack -depends release, compile, buildTemplate {
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.SwashbuckleV6\SimpleIdServer.Scim.SwashbuckleV6.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.SqlServerMigrations\SimpleIdServer.Scim.SqlServerMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.PostgreMigrations\SimpleIdServer.Scim.PostgreMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.MySQLMigrations\SimpleIdServer.Scim.MySQLMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Templates\SimpleIdServer.Templates.csproj -c $config --no-build $versionSuffix --output $result_dir }
 }
 

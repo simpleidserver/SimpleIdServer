@@ -6,6 +6,9 @@
 	<ItemGroup>
 	  <PackageReference Include="SimpleIdServer.Did.Ethr" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.Did.Key" Version="4.0.*-*" />
+	  <PackageReference Include="SimpleIdServer.IdServer.Swagger" Version="4.0.*-*" />
+	  <PackageReference Include="SimpleIdServer.IdServer.Pwd" Version="4.0.*-*" />
+	  <PackageReference Include="SimpleIdServer.IdServer.Console" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.CredentialIssuer" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Email" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Fido" Version="4.0.*-*" />
@@ -13,6 +16,7 @@
 	  <PackageReference Include="SimpleIdServer.IdServer.PostgreMigrations" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Saml.Idp" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Sms" Version="4.0.*-*" />
+	  <PackageReference Include="SimpleIdServer.IdServer.MySQLMigrations" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.SqlServerMigrations" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.WsFederation" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer" Version="4.0.*-*" />
