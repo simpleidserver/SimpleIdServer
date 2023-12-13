@@ -167,6 +167,20 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         }
 
         [EffectMethod]
+        public async Task Handle(RevokeUserSessionsAction action, IDispatcher dispatcher)
+        {
+            var baseUrl = await GetUsersUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{baseUrl}/{action.UserId}/sessions"),
+                Method = HttpMethod.Delete
+            };
+            await httpClient.SendAsync(requestMessage);
+            dispatcher.Dispatch(new RevokeUserSessionsSuccessAction { UserId = action.UserId });
+        }
+
+        [EffectMethod]
         public async Task Handle(UpdateUserClaimsAction action, IDispatcher dispatcher)
         {
             var baseUrl = await GetUsersUrl();
@@ -881,5 +895,15 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
     public class GenerateDIDKeyFailureAction
     {
         public string ErrorMessage { get; set; }
+    }
+
+    public class RevokeUserSessionsAction
+    {
+        public string UserId { get; set; }
+    }
+
+    public class RevokeUserSessionsSuccessAction
+    {
+        public string UserId { get; set; }
     }
 }

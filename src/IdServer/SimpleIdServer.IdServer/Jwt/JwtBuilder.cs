@@ -8,6 +8,7 @@ using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Stores;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -20,6 +21,7 @@ namespace SimpleIdServer.IdServer.Jwt
         Task<string> BuildAccessToken(string realm, Client client, SecurityTokenDescriptor securityTokenDescriptor, CancellationToken cancellationToken);
         Task<string> BuildClientToken(string realm, Client client, SecurityTokenDescriptor securityTokenDescriptor, string sigAlg, string encAlg, string enc, CancellationToken cancellationToken);
         string Sign(string realm, SecurityTokenDescriptor securityTokenDescriptor, string jwsAlg);
+        string Sign(IEnumerable<SigningCredentials> sigCredentials, string realm, SecurityTokenDescriptor securityTokenDescriptor, string jwsAlg);
         string Encrypt(string realm, string jws, string jweAlg, string jweEnc);
         string Encrypt(string jws, EncryptingCredentials encryptionKey);
         string Encrypt(string jws, string jweEnc, JsonWebKey jsonWebKey);
@@ -69,11 +71,16 @@ namespace SimpleIdServer.IdServer.Jwt
 
         public string Sign(string realm, SecurityTokenDescriptor securityTokenDescriptor, string jwsAlg)
         {
+            var signingKeys = _keyStore.GetAllSigningKeys(realm);
+            return Sign(signingKeys, realm, securityTokenDescriptor, jwsAlg);
+        }
+
+        public string Sign(IEnumerable<SigningCredentials> sigCredentials, string realm, SecurityTokenDescriptor securityTokenDescriptor, string jwsAlg)
+        {
             var handler = new JsonWebTokenHandler();
             if (jwsAlg == SecurityAlgorithms.None) return handler.CreateToken(securityTokenDescriptor);
-            var signingKeys = _keyStore.GetAllSigningKeys(realm);
-            var signingKey = signingKeys.FirstOrDefault(s => s.Algorithm == jwsAlg);
-            if(signingKey == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.NO_JWK_WITH_ALG_SIG, jwsAlg));
+            var signingKey = sigCredentials.FirstOrDefault(s => s.Algorithm == jwsAlg);
+            if (signingKey == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.NO_JWK_WITH_ALG_SIG, jwsAlg));
             securityTokenDescriptor.SigningCredentials = signingKey;
             return handler.CreateToken(securityTokenDescriptor);
         }

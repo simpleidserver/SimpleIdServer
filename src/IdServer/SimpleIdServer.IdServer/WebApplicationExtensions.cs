@@ -228,6 +228,9 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("revokeUserSession",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/sessions/{sessionId}",
                 defaults: new { controller = "Users", action = "RevokeSession" });
+            webApplication.SidMapControllerRoute("revokeUserSessions",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/sessions",
+                defaults: new { controller = "Users", action = "RevokeSessions" });
             webApplication.SidMapControllerRoute("unlinkUserExternalAuthProvider",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/authproviders/unlink",
                 defaults: new { controller = "Users", action = "UnlinkExternalAuthProvider" });

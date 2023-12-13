@@ -3,9 +3,9 @@
 
 namespace SimpleIdServer.IdServer.ExternalEvents;
 
-public class RevokeUserSessionSuccessEvent : IExternalEvent
+public class RevokeUserSessionsSuccessEvent : IExternalEvent
 {
-    public string EventName => nameof(RevokeUserSessionSuccessEvent);
+    public string EventName => nameof(RevokeUserSessionsSuccessEvent);
     public string Realm { get; set; }
     public string Id { get; set; }
 }
