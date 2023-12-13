@@ -281,7 +281,7 @@ The access contains the following claims :
 | Claim     | Description                       | Value                   |
 | --------- | --------------------------------- | ----------------------- |
 | sub       | subject of the authenticated user | administrator           |
-| act       | Contains the chain of delegation  | {act : sub : shopApi }` |
+| act       | Contains the chain of delegation  | \{act : sub : shopApi \} |
 | scope     | List of scopes                    | shopApiOther            |
 | aud       | Audience                          | shopApiOther            |
 | client_id | Client identifier                 | delegationWebsite       |
