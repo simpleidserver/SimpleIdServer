@@ -18,14 +18,6 @@ artifacts:
 - path: build\results\*.zip
   name: Installers
 deploy:
-- provider: NuGet
-  name: production
-  artifact: /.*\.nupkg/
-  api_key:
-    secure: S253U+HpnBjRC0DuuvCHr98UHy0Z/+RuSM1Ql2UqqEpnQ5ew2SjpOwn66kwUHeeN
-  on:
-    branch: master
-    appveyor_repo_tag: true
 - provider: GitHub
   auth_token:
     secure: FJAvb5bFQzM98phfQ2/dLL7I10Hvof/fdHorRLuDId8PyjAxcdkfWYf5fZ0/0g+e
