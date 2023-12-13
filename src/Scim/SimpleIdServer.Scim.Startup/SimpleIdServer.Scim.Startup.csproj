@@ -1,26 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-  <PropertyGroup>
-	<TargetFramework>net7.0</TargetFramework>
-    <OutputType>Exe</OutputType>
-    <UserSecretsId>92c92b21-9f78-4587-8bf0-62d2c5122c17</UserSecretsId>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.14" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="7.0.0" />
-	<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.*" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.14" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.0 " />
-	<PackageReference Include="AspNetCore.Authentication.ApiKey" Version="7.0.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SimpleIdServer.Scim.MySQLMigrations\SimpleIdServer.Scim.MySQLMigrations.csproj" />
-    <ProjectReference Include="..\SimpleIdServer.Scim.Persistence.MongoDB\SimpleIdServer.Scim.Persistence.MongoDB.csproj" />
-    <ProjectReference Include="..\SimpleIdServer.Scim.PostgreMigrations\SimpleIdServer.Scim.PostgreMigrations.csproj" />
-    <ProjectReference Include="..\SimpleIdServer.Scim.SqlServerMigrations\SimpleIdServer.Scim.SqlServerMigrations.csproj" />
-    <ProjectReference Include="..\SimpleIdServer.Scim.SwashbuckleV6\SimpleIdServer.Scim.SwashbuckleV6.csproj" />
-    <ProjectReference Include="..\SimpleIdServer.Scim\SimpleIdServer.Scim.csproj" />
-    <ProjectReference Include="..\SimpleIdServer.Scim.Persistence.EF\SimpleIdServer.Scim.Persistence.EF.csproj" />
-  </ItemGroup>
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<OutputType>Exe</OutputType>
+		<UserSecretsId>92c92b21-9f78-4587-8bf0-62d2c5122c17</UserSecretsId>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="5.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.3" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.*" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.3" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.0 " />
+		<PackageReference Include="AspNetCore.Authentication.ApiKey" Version="7.0.0" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\SimpleIdServer.Scim.Persistence.MongoDB\SimpleIdServer.Scim.Persistence.MongoDB.csproj" />
+		<ProjectReference Include="..\SimpleIdServer.Scim.PostgreMigrations\SimpleIdServer.Scim.PostgreMigrations.csproj" />
+		<ProjectReference Include="..\SimpleIdServer.Scim.SqlServerMigrations\SimpleIdServer.Scim.SqlServerMigrations.csproj" />
+		<ProjectReference Include="..\SimpleIdServer.Scim.SwashbuckleV6\SimpleIdServer.Scim.SwashbuckleV6.csproj" />
+		<ProjectReference Include="..\SimpleIdServer.Scim\SimpleIdServer.Scim.csproj" />
+		<ProjectReference Include="..\SimpleIdServer.Scim.Persistence.EF\SimpleIdServer.Scim.Persistence.EF.csproj" />
+	</ItemGroup>
 </Project>

@@ -1,70 +1,70 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <IsPackable>false</IsPackable>
-  </PropertyGroup>
-  <ItemGroup> 
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
-	<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.14" />
-	<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.14" />
-    <PackageReference Include="SpecFlow" Version="3.7.13" />
-    <PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.7.13" />
-    <PackageReference Include="SpecFlow.xUnit" Version="3.7.13" />
-    <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
-    <PackageReference Include="Moq" Version="4.16.1" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\Scim\SimpleIdServer.Scim\SimpleIdServer.Scim.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Features\Schemas.feature.cs">
-      <DependentUpon>Schemas.feature</DependentUpon>
-    </Compile>
-    <Compile Update="Features\BulkErrors.feature.cs">
-      <DependentUpon>BulkErrors.feature</DependentUpon>
-    </Compile>
-    <Compile Update="Features\ServiceProviderConfig.feature.cs">
-      <DependentUpon>ServiceProviderConfig.feature</DependentUpon>
-    </Compile>
-    <Compile Update="Features\Bulk.feature.cs">
-      <DependentUpon>Bulk.feature</DependentUpon>
-    </Compile>
-    <Compile Update="Features\Groups.feature.cs">
-      <DependentUpon>Groups.feature</DependentUpon>
-    </Compile>
-    <Compile Update="Features\Users.feature.cs">
-      <DependentUpon>Users.feature</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <SpecFlowFeatureFiles Update="Features\ResourceTypes.feature">
-      <Visible>$(UsingMicrosoftNETSdk)</Visible>
-      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-    </SpecFlowFeatureFiles>
-    <SpecFlowFeatureFiles Update="Features\Schemas.feature">
-      <Visible>$(UsingMicrosoftNETSdk)</Visible>
-      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-    </SpecFlowFeatureFiles>
-    <SpecFlowFeatureFiles Update="Features\BulkErrors.feature">
-      <Visible>$(UsingMicrosoftNETSdk)</Visible>
-      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-    </SpecFlowFeatureFiles>
-    <SpecFlowFeatureFiles Update="Features\ServiceProviderConfig.feature">
-      <Visible>$(UsingMicrosoftNETSdk)</Visible>
-      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-    </SpecFlowFeatureFiles>
-    <SpecFlowFeatureFiles Update="Features\Bulk.feature">
-      <Visible>$(UsingMicrosoftNETSdk)</Visible>
-      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-    </SpecFlowFeatureFiles>
-    <SpecFlowFeatureFiles Update="Features\Groups.feature">
-      <Visible>$(UsingMicrosoftNETSdk)</Visible>
-      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-    </SpecFlowFeatureFiles>
-    <SpecFlowFeatureFiles Update="Features\Users.feature">
-      <Visible>$(UsingMicrosoftNETSdk)</Visible>
-      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-    </SpecFlowFeatureFiles>
-  </ItemGroup>
+	<PropertyGroup>
+		<TargetFramework>net5.0</TargetFramework>
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="5.0.3" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.3" />
+		<PackageReference Include="SpecFlow" Version="3.7.13" />
+		<PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.7.13" />
+		<PackageReference Include="SpecFlow.xUnit" Version="3.7.13" />
+		<PackageReference Include="xunit" Version="2.4.1" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
+		<PackageReference Include="Moq" Version="4.16.1" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\src\Scim\SimpleIdServer.Scim\SimpleIdServer.Scim.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Update="Features\Schemas.feature.cs">
+			<DependentUpon>Schemas.feature</DependentUpon>
+		</Compile>
+		<Compile Update="Features\BulkErrors.feature.cs">
+			<DependentUpon>BulkErrors.feature</DependentUpon>
+		</Compile>
+		<Compile Update="Features\ServiceProviderConfig.feature.cs">
+			<DependentUpon>ServiceProviderConfig.feature</DependentUpon>
+		</Compile>
+		<Compile Update="Features\Bulk.feature.cs">
+			<DependentUpon>Bulk.feature</DependentUpon>
+		</Compile>
+		<Compile Update="Features\Groups.feature.cs">
+			<DependentUpon>Groups.feature</DependentUpon>
+		</Compile>
+		<Compile Update="Features\Users.feature.cs">
+			<DependentUpon>Users.feature</DependentUpon>
+		</Compile>
+	</ItemGroup>
+	<ItemGroup>
+		<SpecFlowFeatureFiles Update="Features\ResourceTypes.feature">
+			<Visible>$(UsingMicrosoftNETSdk)</Visible>
+			<CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+		</SpecFlowFeatureFiles>
+		<SpecFlowFeatureFiles Update="Features\Schemas.feature">
+			<Visible>$(UsingMicrosoftNETSdk)</Visible>
+			<CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+		</SpecFlowFeatureFiles>
+		<SpecFlowFeatureFiles Update="Features\BulkErrors.feature">
+			<Visible>$(UsingMicrosoftNETSdk)</Visible>
+			<CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+		</SpecFlowFeatureFiles>
+		<SpecFlowFeatureFiles Update="Features\ServiceProviderConfig.feature">
+			<Visible>$(UsingMicrosoftNETSdk)</Visible>
+			<CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+		</SpecFlowFeatureFiles>
+		<SpecFlowFeatureFiles Update="Features\Bulk.feature">
+			<Visible>$(UsingMicrosoftNETSdk)</Visible>
+			<CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+		</SpecFlowFeatureFiles>
+		<SpecFlowFeatureFiles Update="Features\Groups.feature">
+			<Visible>$(UsingMicrosoftNETSdk)</Visible>
+			<CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+		</SpecFlowFeatureFiles>
+		<SpecFlowFeatureFiles Update="Features\Users.feature">
+			<Visible>$(UsingMicrosoftNETSdk)</Visible>
+			<CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+		</SpecFlowFeatureFiles>
+	</ItemGroup>
 </Project>

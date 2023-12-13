@@ -38,7 +38,12 @@ namespace SimpleIdServer.Scim.Api
         private readonly ISCIMAttributeMappingQueryRepository _scimAttributeMappingQueryRepository;
         private readonly ISCIMSchemaQueryRepository _scimSchemaQueryRepository;
 
-        public BulkController(IOptionsMonitor<SCIMHostOptions> options, ILogger<BulkController> logger, IServiceScopeFactory serviceScopeFactory, ISCIMAttributeMappingQueryRepository scimAttributeMappingQueryRepository, ISCIMSchemaQueryRepository scimSchemaQueryRepository)
+        public BulkController(
+            IOptionsMonitor<SCIMHostOptions> options, 
+            ILogger<BulkController> logger, 
+            IServiceScopeFactory serviceScopeFactory, 
+            ISCIMAttributeMappingQueryRepository scimAttributeMappingQueryRepository, 
+            ISCIMSchemaQueryRepository scimSchemaQueryRepository)
         {
             _options = options.CurrentValue;
             _logger = logger;
