@@ -3,7 +3,7 @@
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
 
-namespace SimpleIdServer.DID.Tests
+namespace SimpleIdServer.Did.Ethr.Tests
 {
     public class MockIdentityConfigurationStore : IIdentityDocumentConfigurationStore
     {

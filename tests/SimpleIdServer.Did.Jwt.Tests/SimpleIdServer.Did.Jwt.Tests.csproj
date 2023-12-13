@@ -1,0 +1,56 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="files\ed25519-publicKeyBase64.json" />
+    <None Remove="files\ed256-publicKeyHex.json" />
+    <None Remove="files\es256k-publicKeyJwk.json" />
+    <None Remove="secp256k1-publicKeyJwk.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="files\ed25519-publicKeyBase64.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="files\ed256-publicKeyHex.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="files\es256k-publicKeyJwk.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0" />
+    <PackageReference Include="NUnit" Version="3.13.3" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
+    <PackageReference Include="NUnit.Analyzers" Version="3.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.Did.Jwt\SimpleIdServer.Did.Jwt.csproj" />
+    <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="files\did-key-z6MkemXVAYXaxbZoJhn1iRuhjQNLJQQYjuxEpc4eN9oQBhEa.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="files\did-key-zQ3shcFhrFGtxgnmPZKBPJfPRpJtVUz6ZLs8iLBqAmtv6zyxB.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

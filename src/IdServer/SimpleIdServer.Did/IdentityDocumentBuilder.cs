@@ -24,9 +24,14 @@ namespace SimpleIdServer.Did
 
         public static IdentityDocumentBuilder New(IdentityDocument identityDocument) => new IdentityDocumentBuilder(identityDocument);
 
-        public IdentityDocumentBuilder AddContext(string context)
+        public IdentityDocumentBuilder AddContext(params string[] contextLst)
         {
-            _identityDocument.Context.Add(context);
+
+            return this;
+        }
+
+        public IdentityDocumentBuilder AddContext(Action<ContextBuilder> callback)
+        {
             return this;
         }
 
@@ -70,7 +75,11 @@ namespace SimpleIdServer.Did
             return this;
         }
 
-        public IdentityDocument Build() => _identityDocument;
+        public IdentityDocument Build()
+        {
+            // Always add https://www.w3.org/ns/did/v1 in the @context
+            return _identityDocument;
+        }
 
         protected static IdentityDocument BuildDefaultDocument(string did)
         {

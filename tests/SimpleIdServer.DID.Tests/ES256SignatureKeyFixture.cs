@@ -1,8 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Nethereum.Hex.HexConvertors.Extensions;
 using NUnit.Framework;
 using SimpleIdServer.Did.Crypto;
+using SimpleIdServer.Did.Extensions;
 
 namespace SimpleIdServer.DID.Tests
 {

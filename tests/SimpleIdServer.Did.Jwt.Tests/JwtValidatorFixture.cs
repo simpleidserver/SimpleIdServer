@@ -1,11 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using NUnit.Framework;
-using SimpleIdServer.Did.Jwt;
 using SimpleIdServer.Did.Models;
 using System.Text.Json;
 
-namespace SimpleIdServer.DID.Tests
+namespace SimpleIdServer.Did.Jwt.Tests
 {
     public class JwtValidatorFixture
     {

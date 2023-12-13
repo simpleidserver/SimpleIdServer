@@ -2,12 +2,10 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.IdentityModel.Tokens;
 using NUnit.Framework;
-using SimpleIdServer.Did;
 using SimpleIdServer.Did.Extensions;
-using SimpleIdServer.Did.Jwt;
 using SimpleIdServer.Did.Key;
 
-namespace SimpleIdServer.DID.Tests
+namespace SimpleIdServer.Did.Jwt.Tests
 {
     public class DidJwtBuilderFixture
     {

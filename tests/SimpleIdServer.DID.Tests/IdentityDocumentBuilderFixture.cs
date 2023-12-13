@@ -11,6 +11,7 @@ namespace SimpleIdServer.DID.Tests
         public void When_Build_IdentityDocument_Then_JSONIsCorrect()
         {
             var identityDocument = IdentityDocumentBuilder.New("did", "publicadr")
+                .SetContext()
                 .AddVerificationMethod(SignatureKeyBuilder.NewES256K(), SimpleIdServer.Did.Constants.VerificationMethodTypes.EcdsaSecp256k1VerificationKey2019)
                 .Build();
             var json = identityDocument.Serialize();

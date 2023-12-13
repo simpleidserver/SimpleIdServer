@@ -2,11 +2,9 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
-using SimpleIdServer.Did;
-using SimpleIdServer.Did.Ethr;
 using SimpleIdServer.Did.Ethr.Services;
 
-namespace SimpleIdServer.DID.Tests
+namespace SimpleIdServer.Did.Ethr.Tests
 {
     public class IdentityDocumentEthrFixture
     {

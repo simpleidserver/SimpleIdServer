@@ -4,7 +4,7 @@ using NUnit.Framework;
 using System.Text.Json.Nodes;
 using DidKeyIdentityDocumentExtractor = SimpleIdServer.Did.Key.IdentityDocumentExtractor;
 
-namespace SimpleIdServer.DID.Tests
+namespace SimpleIdServer.Did.Key.Tests
 {
     public class IdentityDocumentExtractorFixture
     {
