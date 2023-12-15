@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -20,6 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.Did\SimpleIdServer.Did.csproj" />
+    <ProjectReference Include="..\..\src\Did\SimpleIdServer.Did\SimpleIdServer.Did.csproj" />
   </ItemGroup>
 </Project>

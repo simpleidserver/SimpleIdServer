@@ -41,8 +41,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.Did.Jwt\SimpleIdServer.Did.Jwt.csproj" />
-    <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj" />
+    <ProjectReference Include="..\..\src\Did\SimpleIdServer.Did.Jwt\SimpleIdServer.Did.Jwt.csproj" />
+    <ProjectReference Include="..\..\src\Did\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj" />
   </ItemGroup>
 
   <ItemGroup>

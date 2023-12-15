@@ -37,7 +37,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.Did.Ethr\SimpleIdServer.Did.Ethr.csproj" />
+    <ProjectReference Include="..\..\src\Did\SimpleIdServer.Did.Ethr\SimpleIdServer.Did.Ethr.csproj" />
   </ItemGroup>
 
   <ItemGroup>
