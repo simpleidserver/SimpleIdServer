@@ -32,7 +32,7 @@ namespace SimpleIdServer.Did.Models
                 {
                     case JsonTokenType.PropertyName:
                         propertyName = reader.GetString();
-                        if(propertyName == "publicKeyJwk") result.PublicKeyJwk = new JsonObject();
+                        // if(propertyName == "publicKeyJwk") result.PublicKeyJwk = new JsonObject();
                         break;
                     case JsonTokenType.StartObject:
                         isWritingPublicKeyJwk = propertyName == "publicKeyJwk";
@@ -40,7 +40,7 @@ namespace SimpleIdServer.Did.Models
                     case JsonTokenType.String:
                         if(isWritingPublicKeyJwk)
                         {
-                            result.PublicKeyJwk.Add(propertyName, reader.GetString());
+                           // result.PublicKeyJwk.Add(propertyName, reader.GetString());
                         }
                         else
                         {

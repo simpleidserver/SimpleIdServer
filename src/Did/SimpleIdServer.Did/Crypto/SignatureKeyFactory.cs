@@ -21,7 +21,8 @@ namespace SimpleIdServer.Did.Crypto
                 case Constants.SupportedSignatureKeyAlgs.ES256K:
                     // return new ES256KSignatureKey(publicKey, privateKey);
                 case Constants.SupportedSignatureKeyAlgs.Ed25519:
-                    return new Ed25519SignatureKey(publicKey, privateKey);
+                    // return new Ed25519SignatureKey(publicKey, privateKey);
+                    return null;
                 case Constants.SupportedSignatureKeyAlgs.ES256:
                     // return new ES256SignatureKey(publicKey, privateKey);
                 default:
@@ -40,6 +41,7 @@ namespace SimpleIdServer.Did.Crypto
                 return decoded.Skip(2).ToArray();
             }
 
+            /*
             if (validationMethod.PublicKeyJwk != null && validationMethod.PublicKeyJwk.ContainsKey("crv") && validationMethod.PublicKeyJwk.ContainsKey("x") && validationMethod.PublicKeyJwk.ContainsKey("y"))
             {
                 var crv = validationMethod.PublicKeyJwk["crv"].GetValue<string>();
@@ -51,6 +53,7 @@ namespace SimpleIdServer.Did.Crypto
                 var y = new Org.BouncyCastle.Math.BigInteger(1, Base64UrlEncoder.DecodeBytes(encodedY));
                 return namedCurve.Curve.CreatePoint(x, y).GetEncoded();
             }
+            */
 
             return null;
         }

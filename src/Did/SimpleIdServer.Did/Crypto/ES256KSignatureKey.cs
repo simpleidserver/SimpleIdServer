@@ -6,7 +6,6 @@ using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
-using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.Did.Crypto;
 
@@ -53,16 +52,14 @@ public class ES256KSignatureKey : ISignatureKey
     public byte[] GetPublicKey(bool compressed = false)
         => _publicKeyParameters.Q.GetEncoded();
 
-    public JsonObject GetPublicKeyJwk()
+    public JsonWebKey GetPublicKeyJwk()
     {
-        
-        return new JsonObject
-        {
-            { "kty", "EC" },
-            { "crv", _curveName },
-            { "x", Base64UrlEncoder.Encode(_publicKeyParameters.Q.XCoord.GetEncoded()) },
-            { "y", Base64UrlEncoder.Encode(_publicKeyParameters.Q.YCoord.GetEncoded()) }
-        };
+        var result = new JsonWebKey();
+        result.Kty = "EC";
+        result.Crv = _curveName;
+        result.X = Base64UrlEncoder.Encode(_publicKeyParameters.Q.XCoord.GetEncoded());
+        result.Y = Base64UrlEncoder.Encode(_publicKeyParameters.Q.YCoord.GetEncoded());
+        return result;
     }
 
     public string Sign(string content)

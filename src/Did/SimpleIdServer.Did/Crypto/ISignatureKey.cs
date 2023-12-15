@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.Did.Models;
-using System.Text.Json.Nodes;
+using Microsoft.IdentityModel.Tokens;
 
 namespace SimpleIdServer.Did.Crypto
 {
@@ -14,6 +13,6 @@ namespace SimpleIdServer.Did.Crypto
         string Sign(byte[] content);
         byte[] PrivateKey { get; }
         byte[] GetPublicKey(bool compressed = false);
-        JsonObject GetPublicKeyJwk();
+        JsonWebKey GetPublicKeyJwk();
     }
 }

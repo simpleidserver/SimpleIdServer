@@ -3,7 +3,6 @@
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Security.Cryptography;
-using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.Did.Crypto
 {
@@ -25,16 +24,15 @@ namespace SimpleIdServer.Did.Crypto
         public byte[] GetPublicKey(bool compressed = false)
             => _key.ExportSubjectPublicKeyInfo();
 
-        public JsonObject GetPublicKeyJwk()
+        public JsonWebKey GetPublicKeyJwk()
         {
             var parameters = _key.ExportExplicitParameters(false);
-            return new JsonObject
-            {
-                { "kty", "EC" },
-                { "crv", CurveName },
-                { "x", Base64UrlEncoder.Encode(parameters.Q.X) },
-                { "y", Base64UrlEncoder.Encode(parameters.Q.Y) }
-            };
+            var result = new JsonWebKey();
+            result.Kty = "EC";
+            result.Crv = CurveName;
+            result.X = Base64UrlEncoder.Encode(parameters.Q.X);
+            result.Y = Base64UrlEncoder.Encode(parameters.Q.Y);
+            return result;
         }
 
         public bool Check(string content, string signature) => Check(System.Text.Encoding.UTF8.GetBytes(content), Base64UrlEncoder.DecodeBytes(signature));

@@ -78,6 +78,9 @@ namespace SimpleIdServer.Did
         public IdentityDocumentBuilder AddJsonWebKeyVerificationMethod(ISignatureKey signatureKey, string controller)
             => AddVerificationMethod(signatureKey, controller, JWKVerificationMethodBuilder.JSON_LD_CONTEXT);
 
+        public IdentityDocumentBuilder AddPublicKeyMultibaseVerificationMethod(ISignatureKey signatureKey, string controller)
+            => AddVerificationMethod(signatureKey, controller, PublicKeyMultibaseVerificationMethodBuilder.JSON_LD_CONTEXT);
+
         public IdentityDocumentBuilder AddVerificationMethod(ISignatureKey signatureKey, string publicKeyFormat, KeyPurposes purpose = KeyPurposes.VerificationKey)
         {
             /// did:example:123#public-key-0 (UNIQUE VERIFICATION METHOD IN A DID DOCUMENT).

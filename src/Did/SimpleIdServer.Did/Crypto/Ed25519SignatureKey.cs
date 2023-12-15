@@ -1,13 +1,13 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.IdentityModel.Tokens;
+using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Crypto.Signers;
+using Org.BouncyCastle.Security;
 using SimpleIdServer.Did.Extensions;
 using SimpleIdServer.Did.Models;
 using System;
-using System.Linq;
-using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.Did.Crypto
 {
@@ -16,23 +16,21 @@ namespace SimpleIdServer.Did.Crypto
         private Ed25519PublicKeyParameters _publicKey;
         private Ed25519PrivateKeyParameters _privateKey;
 
-        public Ed25519SignatureKey(byte[] publicKey, byte[] privateKey)
+        private Ed25519SignatureKey(Ed25519PublicKeyParameters publicKey, Ed25519PrivateKeyParameters privateKey)
         {
-            if (publicKey != null)
-            {
-                if (publicKey.Length != 32) throw new InvalidOperationException("Public key must have 32 bytes");
-                _publicKey = new Ed25519PublicKeyParameters(publicKey);
-            }
-
-            if (privateKey != null)
-            {
-                if (privateKey.Length != 64 && privateKey.Length != 32) throw new InvalidOperationException("Private key must have 64 or 32 bytes");
-                _privateKey = new Ed25519PrivateKeyParameters(privateKey.Take(32).ToArray());
-                if (privateKey.Length == 64) _publicKey = new Ed25519PublicKeyParameters(privateKey.Skip(32).ToArray());
-            }
+            _publicKey = publicKey;
+            _privateKey = privateKey;
         }
 
         public string Name => Constants.SupportedSignatureKeyAlgs.Ed25519;
+
+        public static Ed25519SignatureKey New()
+        {
+            var gen = new Ed25519KeyPairGenerator();
+            gen.Init(new Ed25519KeyGenerationParameters(new SecureRandom()));
+            var keyPair = gen.GenerateKeyPair();
+            return new Ed25519SignatureKey((Ed25519PublicKeyParameters)keyPair.Public, (Ed25519PrivateKeyParameters)keyPair.Private);
+        }
 
         public byte[] PrivateKey
         {
@@ -49,14 +47,13 @@ namespace SimpleIdServer.Did.Crypto
             return _publicKey.GetEncoded();
         }
 
-        public JsonObject GetPublicKeyJwk()
+        public JsonWebKey GetPublicKeyJwk()
         {
-            return new JsonObject
-            {
-                { "kty", "OKP" },
-                { "crv", "Ed25519" },
-                { "x", Base64UrlEncoder.Encode(_publicKey.GetEncoded()) }
-            };
+            var result = new JsonWebKey();
+            result.Kty = "OKP";
+            result.Crv = "Ed25519";
+            result.X = Base64UrlEncoder.Encode(_publicKey.GetEncoded());
+            return result;
         }
 
         public bool Check(string content, string signature) => Check(System.Text.Encoding.UTF8.GetBytes(content), Base64UrlEncoder.DecodeBytes(signature));

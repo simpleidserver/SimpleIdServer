@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.IdentityModel.Tokens;
 using NUnit.Framework;
 using SimpleIdServer.Did;
 using SimpleIdServer.Did.Crypto;
@@ -12,13 +11,7 @@ namespace SimpleIdServer.DID.Tests
         [Test]
         public void When_Build_IdentityDocument_Then_JSONIsCorrect()
         {
-            var es384 = ES384SignatureKey.New();
-            var jwk = es384.GetPublicKeyJwk();
-
-            const string json = "{ \"kty\": \"EC\",\"crv\": \"P-384\", \"x\": \"GnLl6mDti7a2VUIZP5w6pcRX8q5nvEIgB3Q_5RI2p9F_QVsaAlDN7IG68Jn0dS_F\", \"y\": \"jq4QoAHKiIzezDp88s_cxSPXtuXYFliuCGndgU4Qp8l91xzD1spCmFIzQgVjqvcP\" }";
-            var jsonWebKey = JsonWebKey.Create(json);
-
-            // ES256K
+            // X25519
             var identityDocument = IdentityDocumentBuilder.New("didSubject", "publicadr")
                 .AddContext("https://w3id.org/security/suites/ed25519-2020/v1")
                 .AddContext(c =>
@@ -28,12 +21,14 @@ namespace SimpleIdServer.DID.Tests
                 })
                 .AddAlsoKnownAs("didSubject")
                 .AddController("didController")
+                // .AddJsonWebKeyVerificationMethod(Ed25519SignatureKey.New(), "controller")
                 .AddJsonWebKeyVerificationMethod(ES256KSignatureKey.New(), "controller")
                 .AddJsonWebKeyVerificationMethod(ES256SignatureKey.New(), "controller")
                 .AddJsonWebKeyVerificationMethod(ES384SignatureKey.New(), "controller")
-                // .AddJsonWebKeyVerificationMethod(SignatureKeyBuilder.NewES(), "controller")
+                .AddJsonWebKeyVerificationMethod(RSA2048SignatureKey.New(), "controller")
+                .AddPublicKeyMultibaseVerificationMethod(ES256KSignatureKey.New(), "controller")
                 .Build();
-            // var json = identityDocument.Serialize();
+            var json = identityDocument.Serialize();
             Assert.NotNull(json);
         }
     }

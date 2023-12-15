@@ -16,10 +16,11 @@ public class JWKVerificationMethodBuilder : IVerificationMethodBuilder
 
     public IdentityDocumentVerificationMethod Build(IdentityDocument idDocument, ISignatureKey signatureKey)
     {
+        var publicJWK = signatureKey.GetPublicKeyJwk();
         return new IdentityDocumentVerificationMethod
         {
-            Id = $"{idDocument.Id}#{signatureKey.GetPublicKey().ToHex()}",
-            PublicKeyJwk = signatureKey.GetPublicKeyJwk()
+            Id = $"{idDocument.Id}#{publicJWK.ComputeJwkThumbprint().ToHex()}",
+            PublicKeyJwk = publicJWK
         };
     }
 }

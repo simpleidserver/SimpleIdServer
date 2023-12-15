@@ -50,7 +50,8 @@ namespace SimpleIdServer.Did
             var sk = new byte[32];
             ((Ed25519PrivateKeyParameters)keyPair.Private).Encode(sk, 0);
             var pk = ((Ed25519PublicKeyParameters)keyPair.Public).GetEncoded();
-            return new Ed25519SignatureKey(pk, sk);
+            // return new Ed25519SignatureKey(pk, sk);
+            return null;
         }
     }
 }
