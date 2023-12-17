@@ -3,6 +3,7 @@
 using NUnit.Framework;
 using SimpleIdServer.Did;
 using SimpleIdServer.Did.Crypto;
+using SimpleIdServer.Did.Models;
 
 namespace SimpleIdServer.DID.Tests
 {
@@ -11,8 +12,7 @@ namespace SimpleIdServer.DID.Tests
         [Test]
         public void When_Build_IdentityDocument_Then_JSONIsCorrect()
         {
-            // X25519
-            var identityDocument = IdentityDocumentBuilder.New("didSubject", "publicadr")
+            var identityDocument = IdentityDocumentBuilder.New("did")
                 .AddContext("https://w3id.org/security/suites/ed25519-2020/v1")
                 .AddContext(c =>
                 {
@@ -22,14 +22,53 @@ namespace SimpleIdServer.DID.Tests
                 .AddAlsoKnownAs("didSubject")
                 .AddController("didController")
                 // .AddJsonWebKeyVerificationMethod(Ed25519SignatureKey.New(), "controller")
-                .AddJsonWebKeyVerificationMethod(ES256KSignatureKey.New(), "controller")
-                .AddJsonWebKeyVerificationMethod(ES256SignatureKey.New(), "controller")
-                .AddJsonWebKeyVerificationMethod(ES384SignatureKey.New(), "controller")
-                .AddJsonWebKeyVerificationMethod(RSA2048SignatureKey.New(), "controller")
-                .AddPublicKeyMultibaseVerificationMethod(ES256KSignatureKey.New(), "controller")
+                .AddJsonWebKeyVerificationMethod(ES256KSignatureKey.New(), "controller", IdentityDocumentVerificationMethodUsages.AUTHENTICATION)
+                .AddJsonWebKeyVerificationMethod(ES256SignatureKey.New(), "controller", IdentityDocumentVerificationMethodUsages.AUTHENTICATION)
+                .AddJsonWebKeyVerificationMethod(ES384SignatureKey.New(), "controller", IdentityDocumentVerificationMethodUsages.AUTHENTICATION)
+                .AddJsonWebKeyVerificationMethod(RSA2048SignatureKey.New(), "controller", IdentityDocumentVerificationMethodUsages.AUTHENTICATION)
+                .AddPublicKeyMultibaseVerificationMethod(ES256KSignatureKey.New(), "controller", IdentityDocumentVerificationMethodUsages.AUTHENTICATION)
+                .AddJsonWebKeyAssertionMethod(ES256KSignatureKey.New(), "controller")
                 .Build();
+
+
+            // Authentication.
+            // Entity associated with the value of the controller, need to authenticate with its own DID Document and associated authentication.
+            // Example : Parent creates and maintains control of a DID for a child
+            // A corporation creates and maintains control of a DID for a subsidiary
+            // Manfuacturer creates and maintans control of a DID for a product.
+
             var json = identityDocument.Serialize();
             Assert.NotNull(json);
+        }
+
+        [Test]
+        public void When_Deserialize_IdentityDocument()
+        {
+            // 1. Deserialize identity document.
+            // 2. Resolve identity document.
+            // 3. Check proof : https://openid.github.io/OpenID4VCI/openid-4-verifiable-credential-issuance-wg-draft.html#name-verifying-key-proof
+        }
+
+        [Test]
+        public void When_Resolve_IdentityDocument()
+        {
+
+        }
+
+        [Test]
+        public void When_Manage_Update_Controller()
+        {
+            // https://nuts-node.readthedocs.io/en/latest/pages/technology/did.html#controller
+            // https://nuts-foundation.gitbook.io/v1/rfc/rfc006-distributed-registry
+            // Changes to DID documents are only accepted when the network transaction is signed with a controller's authentication key.
+            // Il faut créer deux DID différents !!!!
+
+            // https://github.com/uport-project/ethr-did-registry/blob/master/contracts/EthereumDIDRegistry.sol
+            // Un seul owner pour le smart contract !
+            // https://etherscan.io/address/0xdca7ef03e98e0dc2b855be647c39abe984fcf21b#code
+
+            // https://learn.mattr.global/tutorials/dids/did-ion
+            // Vérifier si il existe plusieurs controller.
         }
     }
 }

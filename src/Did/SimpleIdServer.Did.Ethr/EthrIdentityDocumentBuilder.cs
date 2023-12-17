@@ -14,7 +14,7 @@ namespace SimpleIdServer.Did
         public static EthrIdentityDocumentBuilder NewEthr(string did)
         {
             var parsed = IdentityDocumentIdentifierParser.InternalParse(did);
-            var identityDocument = BuildDefaultDocument(did);
+            IdentityDocument identityDocument = null;
             // identityDocument.AddContext(Ethr.Constants.StandardSepc256K1RecoveryContext);
             identityDocument.AddVerificationMethod(new IdentityDocumentVerificationMethod
             {

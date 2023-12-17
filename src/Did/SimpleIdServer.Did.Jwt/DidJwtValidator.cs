@@ -23,7 +23,7 @@ namespace SimpleIdServer.Did.Jwt
             if (!Constants.SupportedPublicKeyTypes.ContainsKey(alg)) throw new InvalidOperationException($"Alg {alg} is not supported");
             var keyTypes = Constants.SupportedPublicKeyTypes[alg];
             var ids = document.Authentication;
-            if (keyPurpose == KeyPurposes.VerificationKey) ids = document.AssertionMethod;
+            // if (keyPurpose == KeyPurposes.VerificationKey) ids = document.AssertionMethod;
             if (!ids.Any()) throw new InvalidOperationException($"There is no key to used for the proof type {keyPurpose}");
             var authenticators = document.VerificationMethod.Where(m => keyTypes.Contains(m.Type));
             if (!authenticators.Any()) throw new InvalidOperationException($"DID Document does not have public keyh for {alg}");

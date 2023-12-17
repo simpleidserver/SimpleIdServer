@@ -14,8 +14,8 @@ namespace SimpleIdServer.Did.Jwt.Tests
         {
             var generateKey = SignatureKeyBuilder.NewES256K();
             var hex = generateKey.PrivateKey.ToHex();
-            var identityDocument = IdentityDocumentBuilder.New("did", "publicadr")
-                .AddVerificationMethod(generateKey, SimpleIdServer.Did.Constants.VerificationMethodTypes.EcdsaSecp256k1VerificationKey2019)
+            var identityDocument = IdentityDocumentBuilder.New("did")
+                // .AddVerificationMethod(generateKey, SimpleIdServer.Did.Constants.VerificationMethodTypes.EcdsaSecp256k1VerificationKey2019)
                 .Build();
             var securityTokenDescriptor = new SecurityTokenDescriptor
             {

@@ -14,7 +14,7 @@ namespace SimpleIdServer.Did.Key
         public static KeyIdentityDocumentBuilder NewKey(string did)
         {
             var parsed = IdentityDocumentIdentifierParser.InternalParse(did);
-            var identityDocument = BuildDefaultDocument(did);
+            IdentityDocument identityDocument = null;
             return new KeyIdentityDocumentBuilder(identityDocument);
         }
 
@@ -37,7 +37,7 @@ namespace SimpleIdServer.Did.Key
                 identityVerificationMethod.PublicKeyJwk = signatureKey.GetPublicKeyJwk();
 
             IdentityDocument.VerificationMethod.Add(identityVerificationMethod);
-            AddVerificationMethod(identityVerificationMethod, purpose);
+            // AddVerificationMethod(identityVerificationMethod, purpose);
             return this;
         }
     }

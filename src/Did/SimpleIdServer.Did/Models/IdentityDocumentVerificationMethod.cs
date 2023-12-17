@@ -72,6 +72,8 @@ namespace SimpleIdServer.Did.Models
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Value { get; set; } = null;
         [JsonIgnore]
+        public IdentityDocumentVerificationMethodUsages Usage { get; set; }
+        [JsonIgnore]
         public Dictionary<string, string> AdditionalParameters = new Dictionary<string, string>();
 
         public string GetAlg() => GetAlg(Type);
