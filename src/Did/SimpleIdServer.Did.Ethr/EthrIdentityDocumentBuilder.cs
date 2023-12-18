@@ -5,18 +5,18 @@ using SimpleIdServer.Did.Models;
 
 namespace SimpleIdServer.Did
 {
-    public class EthrIdentityDocumentBuilder : IdentityDocumentBuilder
+    public class EthrIdentityDocumentBuilder : DidDocumentBuilder
     {
-        protected EthrIdentityDocumentBuilder(IdentityDocument identityDocument) : base(identityDocument)
+        protected EthrIdentityDocumentBuilder(DidDocument identityDocument) : base(identityDocument)
         {
         }
 
         public static EthrIdentityDocumentBuilder NewEthr(string did)
         {
             var parsed = IdentityDocumentIdentifierParser.InternalParse(did);
-            IdentityDocument identityDocument = null;
+            DidDocument identityDocument = null;
             // identityDocument.AddContext(Ethr.Constants.StandardSepc256K1RecoveryContext);
-            identityDocument.AddVerificationMethod(new IdentityDocumentVerificationMethod
+            identityDocument.AddVerificationMethod(new DidDocumentVerificationMethod
             {
                 Id = $"{did}#controller",
                 Type = Constants.VerificationMethodTypes.EcdsaSecp256k1RecoveryMethod2020,
@@ -28,7 +28,7 @@ namespace SimpleIdServer.Did
             if (parsed.PublicKey != null)
             {
                 var newId = $"{did}#controllerKey";
-                identityDocument.AddVerificationMethod(new IdentityDocumentVerificationMethod
+                identityDocument.AddVerificationMethod(new DidDocumentVerificationMethod
                 {
                     Id = newId,
                     Type = Constants.VerificationMethodTypes.EcdsaSecp256k1VerificationKey2019,

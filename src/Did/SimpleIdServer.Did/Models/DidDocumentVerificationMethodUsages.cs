@@ -5,7 +5,7 @@ using System;
 namespace SimpleIdServer.Did.Models;
 
 [Flags]
-public enum IdentityDocumentVerificationMethodUsages
+public enum DidDocumentVerificationMethodUsages
 {
     AUTHENTICATION = 0,
     ASSERTION_METHOD = 1,

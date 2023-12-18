@@ -11,9 +11,9 @@ namespace SimpleIdServer.Did.Jwt
 {
     public static class DidJwtBuilder
     {
-        public static string GenerateToken(SecurityTokenDescriptor securityTokenDescriptor, IdentityDocument identityDocument, string privateKeyHex, string verificationMethodId = null) => GenerateToken(securityTokenDescriptor, identityDocument, privateKeyHex.HexToByteArray(), verificationMethodId);
+        public static string GenerateToken(SecurityTokenDescriptor securityTokenDescriptor, DidDocument identityDocument, string privateKeyHex, string verificationMethodId = null) => GenerateToken(securityTokenDescriptor, identityDocument, privateKeyHex.HexToByteArray(), verificationMethodId);
 
-        public static string GenerateToken(SecurityTokenDescriptor securityTokenDescriptor, IdentityDocument identityDocument, byte[] privateKeyPayload, string verificationMethodId =null)
+        public static string GenerateToken(SecurityTokenDescriptor securityTokenDescriptor, DidDocument identityDocument, byte[] privateKeyPayload, string verificationMethodId =null)
         {
             var verificationMethod = identityDocument.VerificationMethod.First();
             if (!string.IsNullOrEmpty(verificationMethodId)) verificationMethod = identityDocument.VerificationMethod.First(m => m.Id == verificationMethodId);

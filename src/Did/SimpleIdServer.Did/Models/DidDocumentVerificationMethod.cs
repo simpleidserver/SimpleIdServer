@@ -10,7 +10,7 @@ using static SimpleIdServer.Did.Constants;
 namespace SimpleIdServer.Did.Models
 {
     // [JsonConverter(typeof(IdentityDocumentVerificationMethodConverter))]
-    public class IdentityDocumentVerificationMethod
+    public class DidDocumentVerificationMethod
     {
         [JsonPropertyName("id")]
         public string Id { get; set; }
@@ -72,16 +72,8 @@ namespace SimpleIdServer.Did.Models
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Value { get; set; } = null;
         [JsonIgnore]
-        public IdentityDocumentVerificationMethodUsages Usage { get; set; }
+        public DidDocumentVerificationMethodUsages Usage { get; set; }
         [JsonIgnore]
         public Dictionary<string, string> AdditionalParameters = new Dictionary<string, string>();
-
-        public string GetAlg() => GetAlg(Type);
-
-        public static string GetAlg(string type) => type.Replace(LegacyAttributeTypes.SignatureAuthentication2018, string.Empty)
-            .Replace(LegacyAttributeTypes.VerificationKey2018, string.Empty)
-            .Replace(LegacyAttributeTypes.VerificationKey2019, string.Empty)
-            .Replace(LegacyAttributeTypes.VerificationKey2020, string.Empty)
-            .Replace(LegacyAttributeTypes.KeyAgreementKey2019, string.Empty);
     }
 }

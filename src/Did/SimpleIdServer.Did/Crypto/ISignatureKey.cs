@@ -7,12 +7,14 @@ namespace SimpleIdServer.Did.Crypto
     public interface ISignatureKey
     {
         string Name { get; }
+        byte[] PrivateKey { get; }
+        void Import(byte[] publicKey);
+        void Import(JsonWebKey publicKey);
         bool Check(string content, string signature);
         bool Check(byte[] content, byte[] signature);
         string Sign(string content);
         string Sign(byte[] content);
-        byte[] PrivateKey { get; }
         byte[] GetPublicKey(bool compressed = false);
-        JsonWebKey GetPublicKeyJwk();
+        JsonWebKey GetPublicJwk();
     }
 }

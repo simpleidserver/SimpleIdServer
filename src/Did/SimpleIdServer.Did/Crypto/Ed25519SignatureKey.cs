@@ -5,9 +5,8 @@ using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Crypto.Signers;
 using Org.BouncyCastle.Security;
-using SimpleIdServer.Did.Extensions;
-using SimpleIdServer.Did.Models;
 using System;
+using System.Linq;
 
 namespace SimpleIdServer.Did.Crypto
 {
@@ -16,21 +15,19 @@ namespace SimpleIdServer.Did.Crypto
         private Ed25519PublicKeyParameters _publicKey;
         private Ed25519PrivateKeyParameters _privateKey;
 
-        private Ed25519SignatureKey(Ed25519PublicKeyParameters publicKey, Ed25519PrivateKeyParameters privateKey)
+        private Ed25519SignatureKey() { }
+
+        private Ed25519SignatureKey(Ed25519PublicKeyParameters publicKey)
         {
             _publicKey = publicKey;
+        }
+
+        private Ed25519SignatureKey(Ed25519PublicKeyParameters publicKey, Ed25519PrivateKeyParameters privateKey) : this(publicKey)
+        {
             _privateKey = privateKey;
         }
 
         public string Name => Constants.SupportedSignatureKeyAlgs.Ed25519;
-
-        public static Ed25519SignatureKey New()
-        {
-            var gen = new Ed25519KeyPairGenerator();
-            gen.Init(new Ed25519KeyGenerationParameters(new SecureRandom()));
-            var keyPair = gen.GenerateKeyPair();
-            return new Ed25519SignatureKey((Ed25519PublicKeyParameters)keyPair.Public, (Ed25519PrivateKeyParameters)keyPair.Private);
-        }
 
         public byte[] PrivateKey
         {
@@ -41,22 +38,33 @@ namespace SimpleIdServer.Did.Crypto
             }
         }
 
-        public byte[] GetPublicKey(bool compressed = false)
+        public static Ed25519SignatureKey From(byte[] publicKey)
+            => new Ed25519SignatureKey(new Ed25519PublicKeyParameters(publicKey.ToArray()));
+
+        public static Ed25519SignatureKey Generate()
         {
-            if (_publicKey == null) return null;
-            return _publicKey.GetEncoded();
+            var gen = new Ed25519KeyPairGenerator();
+            gen.Init(new Ed25519KeyGenerationParameters(new SecureRandom()));
+            var keyPair = gen.GenerateKeyPair();
+            return new Ed25519SignatureKey((Ed25519PublicKeyParameters)keyPair.Public, (Ed25519PrivateKeyParameters)keyPair.Private);
         }
 
-        public JsonWebKey GetPublicKeyJwk()
+        public static Ed25519SignatureKey New()
+            => new Ed25519SignatureKey();
+
+        public void Import(byte[] publicKey)
+            => _publicKey = new Ed25519PublicKeyParameters(publicKey);
+
+        public void Import(JsonWebKey publicKey)
         {
-            var result = new JsonWebKey();
-            result.Kty = "OKP";
-            result.Crv = "Ed25519";
-            result.X = Base64UrlEncoder.Encode(_publicKey.GetEncoded());
-            return result;
+            if (publicKey == null) throw new ArgumentNullException(nameof(publicKey));
+            if (publicKey.X == null) throw new InvalidOperationException("There is no public key");
+            var payload = Base64UrlEncoder.DecodeBytes(publicKey.X);
+            _publicKey = new Ed25519PublicKeyParameters(payload);
         }
 
-        public bool Check(string content, string signature) => Check(System.Text.Encoding.UTF8.GetBytes(content), Base64UrlEncoder.DecodeBytes(signature));
+        public bool Check(string content, string signature) 
+            => Check(System.Text.Encoding.UTF8.GetBytes(content), Base64UrlEncoder.DecodeBytes(signature));
 
         public bool Check(byte[] payload, byte[] signaturePayload)
         {
@@ -67,7 +75,8 @@ namespace SimpleIdServer.Did.Crypto
             return verifier.VerifySignature(signaturePayload);
         }
 
-        public string Sign(string content) => Sign(System.Text.Encoding.UTF8.GetBytes(content));
+        public string Sign(string content) 
+            => Sign(System.Text.Encoding.UTF8.GetBytes(content));
 
         public string Sign(byte[] payload)
         {
@@ -78,12 +87,21 @@ namespace SimpleIdServer.Did.Crypto
             return Base64UrlEncoder.Encode(signer.GenerateSignature());
         }
 
-        public IdentityDocumentVerificationMethod ExtractVerificationMethodWithPublicKey()
+        public byte[] GetPublicKey(bool compressed = false)
         {
-            return new IdentityDocumentVerificationMethod
+            if (_publicKey == null) return null;
+            return _publicKey.GetEncoded();
+        }
+
+        public JsonWebKey GetPublicJwk()
+        {
+            var result = new JsonWebKey
             {
-                PublicKeyHex = _publicKey.GetEncoded().ToHex()
+                Kty = "OKP",
+                Crv = Name,
+                X = Base64UrlEncoder.Encode(_publicKey.GetEncoded())
             };
+            return result;
         }
     }
 }

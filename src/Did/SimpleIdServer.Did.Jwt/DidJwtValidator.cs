@@ -10,14 +10,14 @@ namespace SimpleIdServer.Did.Jwt
 {
     public static class DidJwtValidator
     {
-        public static bool Validate(string json, IdentityDocument document, KeyPurposes keyPurpose = KeyPurposes.SigAuthentication)
+        public static bool Validate(string json, DidDocument document, KeyPurposes keyPurpose = KeyPurposes.SigAuthentication)
         {
             var handler = new JsonWebTokenHandler();
             var jwt = handler.ReadJsonWebToken(json);
             return Validate(jwt, document, keyPurpose);
         }
 
-        public static bool Validate(JsonWebToken jwt, IdentityDocument document, KeyPurposes keyPurpose = KeyPurposes.SigAuthentication)
+        public static bool Validate(JsonWebToken jwt, DidDocument document, KeyPurposes keyPurpose = KeyPurposes.SigAuthentication)
         {
             var alg = jwt.Alg;
             if (!Constants.SupportedPublicKeyTypes.ContainsKey(alg)) throw new InvalidOperationException($"Alg {alg} is not supported");
@@ -32,7 +32,7 @@ namespace SimpleIdServer.Did.Jwt
             return false;
         }
 
-        private static bool Check(JsonWebToken jwt, IdentityDocumentVerificationMethod method, string alg)
+        private static bool Check(JsonWebToken jwt, DidDocumentVerificationMethod method, string alg)
         {
             var content = $"{jwt.EncodedHeader}.{jwt.EncodedPayload}";
             var signature = jwt.EncodedSignature;

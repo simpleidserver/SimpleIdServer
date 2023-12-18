@@ -21,7 +21,7 @@ namespace SimpleIdServer.Did.Ethr.Tests
 
         public async Task When_AddIdentityDocument_Then_NoException()
         {
-            var identityDocument = IdentityDocumentBuilder.New($"did:ethr:{network}:{publicKey}")
+            var identityDocument = DidDocumentBuilder.New($"did:ethr:{network}:{publicKey}")
                 .AddServiceEndpoint("github", "https://shorturl.at/eiDKO")
                 // .AddVerificationMethod(SignatureKeyBuilder.NewES256K(), SimpleIdServer.Did.Constants.VerificationMethodTypes.Secp256k1VerificationKey2018)
                 .Build();

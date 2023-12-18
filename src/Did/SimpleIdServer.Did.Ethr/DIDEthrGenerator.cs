@@ -32,7 +32,7 @@ namespace SimpleIdServer.Did.Ethr
             var network = await _identityDocumentConfigurationStore.Get(parameters[networkName], cancellationToken);
             var key = SignatureKeyBuilder.NewES256K();
             var did = $"did:{Constants.Type}:{networkName}:{publicKey}";
-            var identityDocument = IdentityDocumentBuilder.New(did)
+            var identityDocument = DidDocumentBuilder.New(did)
                 // .AddVerificationMethod(key, Did.Constants.VerificationMethodTypes.Secp256k1VerificationKey2018)
                 .Build();
             var sync = new IdentityDocumentSynchronizer(_didRegistryServiceFactory);

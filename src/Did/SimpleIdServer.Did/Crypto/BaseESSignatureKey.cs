@@ -21,18 +21,14 @@ namespace SimpleIdServer.Did.Crypto
         public byte[] PrivateKey 
             =>  _key.ExportECPrivateKey();
 
-        public byte[] GetPublicKey(bool compressed = false)
-            => _key.ExportSubjectPublicKeyInfo();
-
-        public JsonWebKey GetPublicKeyJwk()
+        public void Import(byte[] publicKey)
         {
-            var parameters = _key.ExportExplicitParameters(false);
-            var result = new JsonWebKey();
-            result.Kty = "EC";
-            result.Crv = CurveName;
-            result.X = Base64UrlEncoder.Encode(parameters.Q.X);
-            result.Y = Base64UrlEncoder.Encode(parameters.Q.Y);
-            return result;
+            throw new NotImplementedException();
+        }
+
+        public void Import(JsonWebKey jwk)
+        {
+            throw new NotImplementedException();
         }
 
         public bool Check(string content, string signature) => Check(System.Text.Encoding.UTF8.GetBytes(content), Base64UrlEncoder.DecodeBytes(signature));
@@ -50,6 +46,20 @@ namespace SimpleIdServer.Did.Crypto
         public string Sign(byte[] content)
         {
             throw new NotImplementedException();
+        }
+
+        public byte[] GetPublicKey(bool compressed = false)
+            => _key.ExportSubjectPublicKeyInfo();
+
+        public JsonWebKey GetPublicJwk()
+        {
+            var parameters = _key.ExportExplicitParameters(false);
+            var result = new JsonWebKey();
+            result.Kty = "EC";
+            result.Crv = CurveName;
+            result.X = Base64UrlEncoder.Encode(parameters.Q.X);
+            result.Y = Base64UrlEncoder.Encode(parameters.Q.Y);
+            return result;
         }
     }
 }

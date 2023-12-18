@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.Did.Models
 {
-    public class IdentityDocumentService
+    public class DidDocumentService
     {
         [JsonPropertyName("id")]
         public string Id { get; set; }

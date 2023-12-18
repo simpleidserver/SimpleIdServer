@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.Did.Events;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
@@ -9,7 +8,7 @@ using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.Did.Models
 {
-    public class IdentityDocument
+    public class DidDocument
     {
         [JsonPropertyName("@context")]
         public JsonNode Context { get; set; }
@@ -35,7 +34,7 @@ namespace SimpleIdServer.Did.Models
         /// </summary>
         [JsonPropertyName("verificationMethod")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public ICollection<IdentityDocumentVerificationMethod> VerificationMethod { get; set; } = new List<IdentityDocumentVerificationMethod>();
+        public ICollection<DidDocumentVerificationMethod> VerificationMethod { get; set; } = new List<DidDocumentVerificationMethod>();
         /// <summary>
         /// Used to specify how the DID subject is expected to be authenticated.
         /// Each verification method MAY be embedded or referenced, for purposes sur as logging into a website.
@@ -75,25 +74,19 @@ namespace SimpleIdServer.Did.Models
         /// </summary>
         [JsonPropertyName("service")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public ICollection<IdentityDocumentService> Service { get; set; } = null;
-        [JsonIgnore]
-        public ICollection<IEvent> Events { get; set; } = new List<IEvent>();
+        public ICollection<DidDocumentService> Service { get; set; } = null;
 
-        public KeyPurposes GetKeyPurpose(IdentityDocumentVerificationMethod verificationMethod)
+        public KeyPurposes GetKeyPurpose(DidDocumentVerificationMethod verificationMethod)
         {
             // if (Authentication != null && Authentication.Any(a => verificationMethod.Id == a)) return KeyPurposes.SigAuthentication;
             // if (AssertionMethod != null && AssertionMethod.Any(m => verificationMethod.Id == m)) return KeyPurposes.VerificationKey;
             throw new InvalidOperationException("enc is not supported");
         }
 
-        public void AddVerificationMethod(IdentityDocumentVerificationMethod verificationMethod, bool isStandard = true)
+        public void AddVerificationMethod(DidDocumentVerificationMethod verificationMethod, bool isStandard = true)
         {
-            if (VerificationMethod == null) VerificationMethod = new List<IdentityDocumentVerificationMethod>();
+            if (VerificationMethod == null) VerificationMethod = new List<DidDocumentVerificationMethod>();
             VerificationMethod.Add(verificationMethod);
-            if (!isStandard) Events.Add(new VerificationMethodAdded
-            {
-                VerificationMethod = verificationMethod
-            });
         }
 
         public void AddAuthentication(string authentication)
@@ -108,16 +101,10 @@ namespace SimpleIdServer.Did.Models
             // AssertionMethod.Add(assertionMethod);
         }
 
-        public void AddService(IdentityDocumentService service, bool isStandard = true)
+        public void AddService(DidDocumentService service, bool isStandard = true)
         {
-            if (Service == null) Service = new List<IdentityDocumentService>();
+            if (Service == null) Service = new List<DidDocumentService>();
             Service.Add(service);
-            if (!isStandard) Events.Add(new ServiceAdded
-            {
-                Id = service.Id,
-                ServiceEndpoint = service.ServiceEndpoint,
-                Type = service.Type
-            });
         }
 
         public string Serialize() => JsonSerializer.Serialize(this);

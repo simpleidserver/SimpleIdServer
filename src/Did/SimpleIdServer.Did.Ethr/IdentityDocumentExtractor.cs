@@ -32,7 +32,7 @@ namespace SimpleIdServer.Did.Ethr
 
         public string Type => Constants.Type;
 
-        public async Task<IdentityDocument> Extract(string id, CancellationToken cancellationToken)
+        public async Task<DidDocument> Extract(string id, CancellationToken cancellationToken)
         {
             var di = IdentityDocumentIdentifierParser.InternalParse(id);
             var networkConf = await _store.Get(di.Source, cancellationToken);
@@ -89,21 +89,21 @@ namespace SimpleIdServer.Did.Ethr
                 };
             }
 
-            IdentityDocument Build()
+            DidDocument Build()
             {
                 var origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
                 var diff = DateTime.UtcNow - origin;
                 var controllerKey = di.Address;
                 var now = new BigInteger(Math.Floor(diff.TotalSeconds));
-                var result = new IdentityDocument
+                var result = new DidDocument
                 {
                     // Context = new List<string> { "https://www.w3.org/ns/did/v1", "https://w3id.org/security/suites/secp256k1recovery-2020/v2" },
                     Id = id
                 };
                 int delegateCount = 0;
                 int serviceCount = 0;
-                var pks = new Dictionary<string, IdentityDocumentVerificationMethod>();
-                var service = new Dictionary<string, IdentityDocumentService>();
+                var pks = new Dictionary<string, DidDocumentVerificationMethod>();
+                var service = new Dictionary<string, DidDocumentService>();
                 var auth = new Dictionary<string, string>();
                 var assertion = new Dictionary<string, string>();
                 var authentication = new List<string> { $"{id}#controller" };
@@ -126,7 +126,7 @@ namespace SimpleIdServer.Did.Ethr
                             {
                                 case "pub":
                                     delegateCount++;
-                                    var pk = new IdentityDocumentVerificationMethod
+                                    var pk = new DidDocumentVerificationMethod
                                     {
                                         Id = $"{id}#delegate-{delegateCount}",
                                         Type = $"{algorithm}{type}",
@@ -155,7 +155,7 @@ namespace SimpleIdServer.Did.Ethr
                                 case "svc":
                                     serviceCount++;
                                     var endpoint = System.Text.Encoding.UTF8.GetString(Strip0X(evt.Value).HexToByteArray());
-                                    service.Add(eventIndex, new IdentityDocumentService
+                                    service.Add(eventIndex, new DidDocumentService
                                     {
                                         Id = $"{id}#service-{serviceCount}",
                                         Type = algorithm,
@@ -167,9 +167,9 @@ namespace SimpleIdServer.Did.Ethr
                     }
                 }
 
-                var publicKeys = new List<IdentityDocumentVerificationMethod>
+                var publicKeys = new List<DidDocumentVerificationMethod>
                 {
-                    new IdentityDocumentVerificationMethod
+                    new DidDocumentVerificationMethod
                     {
                         Id = $"{id}#controller",
                         Type = Did.Constants.VerificationMethodTypes.EcdsaSecp256k1RecoveryMethod2020,
@@ -179,7 +179,7 @@ namespace SimpleIdServer.Did.Ethr
                 };
                 if(controllerKey == di.Address)
                 {
-                    publicKeys.Add(new IdentityDocumentVerificationMethod
+                    publicKeys.Add(new DidDocumentVerificationMethod
                     {
                         Id = $"{id}#controllerKey",
                         Type = Did.Constants.VerificationMethodTypes.EcdsaSecp256k1VerificationKey2019,

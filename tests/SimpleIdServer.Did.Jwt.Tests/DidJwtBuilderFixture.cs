@@ -14,7 +14,7 @@ namespace SimpleIdServer.Did.Jwt.Tests
         {
             var generateKey = SignatureKeyBuilder.NewES256K();
             var hex = generateKey.PrivateKey.ToHex();
-            var identityDocument = IdentityDocumentBuilder.New("did")
+            var identityDocument = DidDocumentBuilder.New("did")
                 // .AddVerificationMethod(generateKey, SimpleIdServer.Did.Constants.VerificationMethodTypes.EcdsaSecp256k1VerificationKey2019)
                 .Build();
             var securityTokenDescriptor = new SecurityTokenDescriptor
@@ -38,7 +38,7 @@ namespace SimpleIdServer.Did.Jwt.Tests
             var hex = generateKey.PrivateKey.ToHex();
             var identityDocument = KeyIdentityDocumentBuilder.NewKey(generateKey)
                 .AddVerificationMethod(generateKey, Did.Constants.VerificationMethodTypes.Ed25519VerificationKey2020)
-                .Build();
+                .Format();
             var securityTokenDescriptor = new SecurityTokenDescriptor
             {
                 Claims = new Dictionary<string, object>

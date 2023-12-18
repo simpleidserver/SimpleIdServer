@@ -21,7 +21,7 @@ namespace SimpleIdServer.Did.Ethr
             _factory = factory;
         }
 
-        public async Task Sync(IdentityDocument document, string address, string privateKey, string contractAdr)
+        public async Task Sync(DidDocument document, string address, string privateKey, string contractAdr)
         {
             var parsedId = IdentityDocumentIdentifierParser.InternalParse(document.Id);
             var service = _factory.Build(privateKey, contractAdr, parsedId.Source);
@@ -32,7 +32,7 @@ namespace SimpleIdServer.Did.Ethr
             }
         }
 
-        public async Task Sync(IdentityDocument document, string address, NetworkConfiguration networkConfiguration)
+        public async Task Sync(DidDocument document, string address, NetworkConfiguration networkConfiguration)
         {
             var service = _factory.Build(networkConfiguration.PrivateAccountKey, networkConfiguration.ContractAdr, networkConfiguration);
             var changedAttributes = ExtractChangedAttributes(document, address);
@@ -42,7 +42,7 @@ namespace SimpleIdServer.Did.Ethr
             }
         }
 
-        private ICollection<SetAttributeFunction> ExtractChangedAttributes(IdentityDocument document, string address)
+        private ICollection<SetAttributeFunction> ExtractChangedAttributes(DidDocument document, string address)
         {
             var result = new List<SetAttributeFunction>();
             var serviceAddedLst = document.Events.Where(e => e.Name == ServiceAdded.DEFAULT_NAME).Cast<ServiceAdded>();
@@ -67,7 +67,7 @@ namespace SimpleIdServer.Did.Ethr
                 var publicKey = SignatureKeyFactory.ExtractPublicKey(verificationMethod);
                 var hex = $"0x{publicKey.ToHex()}";
                 var value = hex.HexToByteArray();
-                var name = $"did/pub/{IdentityDocumentVerificationMethod.GetAlg(GetLegacyType(verificationMethod))}/{Constants.KeyPurposeNames[type]}/hex";
+                var name = $"did/pub/{DidDocumentVerificationMethod.GetAlg(GetLegacyType(verificationMethod))}/{Constants.KeyPurposeNames[type]}/hex";
                 result.Add(new SetAttributeFunction
                 {
                     Identity = address,
@@ -78,7 +78,7 @@ namespace SimpleIdServer.Did.Ethr
 
             return result;
 
-            string GetLegacyType(IdentityDocumentVerificationMethod verificationMethod)
+            string GetLegacyType(DidDocumentVerificationMethod verificationMethod)
             {
                 if (!Constants.LegacyAlgos.Values.Contains(verificationMethod.Type)) return verificationMethod.Type;
                 return Constants.LegacyAlgos.First(kvp => kvp.Value == verificationMethod.Type).Key;

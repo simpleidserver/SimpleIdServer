@@ -7,12 +7,12 @@ using SimpleIdServer.Did.Models;
 
 namespace SimpleIdServer.DID.Tests
 {
-    public class IdentityDocumentBuilderFixture
+    public class DidDocumentBuilderFixture
     {
         [Test]
         public void When_Build_IdentityDocument_Then_JSONIsCorrect()
         {
-            var identityDocument = IdentityDocumentBuilder.New("did")
+            var identityDocument = DidDocumentBuilder.New("did")
                 .AddContext("https://w3id.org/security/suites/ed25519-2020/v1")
                 .AddContext(c =>
                 {
@@ -22,11 +22,11 @@ namespace SimpleIdServer.DID.Tests
                 .AddAlsoKnownAs("didSubject")
                 .AddController("didController")
                 // .AddJsonWebKeyVerificationMethod(Ed25519SignatureKey.New(), "controller")
-                .AddJsonWebKeyVerificationMethod(ES256KSignatureKey.New(), "controller", IdentityDocumentVerificationMethodUsages.AUTHENTICATION)
-                .AddJsonWebKeyVerificationMethod(ES256SignatureKey.New(), "controller", IdentityDocumentVerificationMethodUsages.AUTHENTICATION)
-                .AddJsonWebKeyVerificationMethod(ES384SignatureKey.New(), "controller", IdentityDocumentVerificationMethodUsages.AUTHENTICATION)
-                .AddJsonWebKeyVerificationMethod(RSA2048SignatureKey.New(), "controller", IdentityDocumentVerificationMethodUsages.AUTHENTICATION)
-                .AddPublicKeyMultibaseVerificationMethod(ES256KSignatureKey.New(), "controller", IdentityDocumentVerificationMethodUsages.AUTHENTICATION)
+                .AddJsonWebKeyVerificationMethod(ES256KSignatureKey.New(), "controller", DidDocumentVerificationMethodUsages.AUTHENTICATION)
+                .AddJsonWebKeyVerificationMethod(ES256SignatureKey.New(), "controller", DidDocumentVerificationMethodUsages.AUTHENTICATION)
+                .AddJsonWebKeyVerificationMethod(ES384SignatureKey.New(), "controller", DidDocumentVerificationMethodUsages.AUTHENTICATION)
+                // .AddJsonWebKeyVerificationMethod(RSA2048SignatureKey.New(), "controller", DidDocumentVerificationMethodUsages.AUTHENTICATION)
+                .AddPublicKeyMultibaseVerificationMethod(ES256KSignatureKey.New(), "controller", DidDocumentVerificationMethodUsages.AUTHENTICATION)
                 .AddJsonWebKeyAssertionMethod(ES256KSignatureKey.New(), "controller")
                 .Build();
 
@@ -45,7 +45,7 @@ namespace SimpleIdServer.DID.Tests
         public void When_Deserialize_IdentityDocument()
         {
             // 1. Deserialize identity document.
-            // 2. Resolve identity document.
+            // 2. Resolve identity document : pour le KEY : OK
             // 3. Check proof : https://openid.github.io/OpenID4VCI/openid-4-verifiable-credential-issuance-wg-draft.html#name-verifying-key-proof
         }
 
