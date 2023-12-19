@@ -52,7 +52,7 @@ namespace SimpleIdServer.Did.Crypto
         public static Ed25519SignatureKey New()
             => new Ed25519SignatureKey();
 
-        public void Import(byte[] publicKey)
+        public void Import(byte[] publicKey, byte[] privateKey)
             => _publicKey = new Ed25519PublicKeyParameters(publicKey);
 
         public void Import(JsonWebKey publicKey)

@@ -8,7 +8,7 @@ namespace SimpleIdServer.Did.Crypto
     {
         string Name { get; }
         byte[] PrivateKey { get; }
-        void Import(byte[] publicKey);
+        void Import(byte[] publicKey, byte[] privateKey);
         void Import(JsonWebKey publicKey);
         bool Check(string content, string signature);
         bool Check(byte[] content, byte[] signature);

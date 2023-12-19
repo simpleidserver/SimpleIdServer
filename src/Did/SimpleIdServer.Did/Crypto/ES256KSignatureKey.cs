@@ -4,12 +4,13 @@
 using Microsoft.IdentityModel.Tokens;
 using Org.BouncyCastle.Asn1.Sec;
 using Org.BouncyCastle.Asn1.X9;
+using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Crypto.Signers;
 using Org.BouncyCastle.Security;
 using System;
 using System.Collections.Generic;
-using System.Security.Cryptography;
 using Enc = System.Text.Encoding;
 
 namespace SimpleIdServer.Did.Crypto;
@@ -22,7 +23,7 @@ public class ES256KSignatureKey : ISignatureKey
     private const string _curveName = "secp256k1";
     private ECPublicKeyParameters _publicKeyParameters;
     private ECPrivateKeyParameters _privateKeyParameters;
-
+    
     private ES256KSignatureKey() { }
 
     private ES256KSignatureKey(ECPublicKeyParameters publicKeyParameters)
@@ -58,17 +59,10 @@ public class ES256KSignatureKey : ISignatureKey
     public static ES256KSignatureKey New()
         => new ES256KSignatureKey();
 
-    public static ES256KSignatureKey From(byte[] publicKey)
+    public static ES256KSignatureKey From(byte[] publicKey, byte[] privateKey)
     {
         var result = new ES256KSignatureKey();
-        result.Import(publicKey);
-        return result;
-    }
-
-    public static ES256KSignatureKey FromPrivateKey(byte[] privateKey)
-    {
-        var result = new ES256KSignatureKey();
-        result.ImportPrivateKey(privateKey);
+        result.Import(publicKey, privateKey);
         return result;
     }
 
@@ -79,21 +73,26 @@ public class ES256KSignatureKey : ISignatureKey
         return result;
     }
 
-    public void Import(byte[] publicKey)
+    public void Import(byte[] publicKey, byte[] privateKey)
     {
         var curve = SecNamedCurves.GetByName(_curveName);
         var domainParameters = new ECDomainParameters(curve.Curve, curve.G, curve.N, curve.H, curve.GetSeed());
-        var q = curve.Curve.DecodePoint(publicKey);
-        _publicKeyParameters = new ECPublicKeyParameters(q, domainParameters);
+        if (publicKey != null)
+        {
+            var q = curve.Curve.DecodePoint(publicKey);
+            _publicKeyParameters = new ECPublicKeyParameters(q, domainParameters);
+        }
+
+        if(privateKey != null)
+        {
+            _privateKeyParameters = new ECPrivateKeyParameters(
+                new Org.BouncyCastle.Math.BigInteger(1, privateKey),
+                domainParameters);
+        }
     }
 
     public void ImportPrivateKey(byte[] privateKey)
     {
-        var curve = SecNamedCurves.GetByName(_curveName);
-        var domainParameters = new ECDomainParameters(curve.Curve, curve.G, curve.N, curve.H, curve.GetSeed());
-        _privateKeyParameters = new ECPrivateKeyParameters(
-            new Org.BouncyCastle.Math.BigInteger(1, privateKey),
-            domainParameters);
     }
 
     public void Import(JsonWebKey jwk)
@@ -126,15 +125,17 @@ public class ES256KSignatureKey : ISignatureKey
 
     public string Sign(byte[] content)
     {
+        // Use deterministic ECDSA https://datatracker.ietf.org/doc/html/rfc6979
         if (content == null) throw new ArgumentNullException(nameof(content));
-        var hash = Hash(content);
-        var signer = new DeterministicECDSA();
-        signer.SetPrivateKey(_privateKeyParameters);
-        var sig = ECDSASignature.FromDER(signer.SignHash(hash));
+        byte[] messageHash = Hash(content);
+        ECDsaSigner signer = new ECDsaSigner(new HMacDsaKCalculator(new Sha256Digest()));
+        signer.Init(true, _privateKeyParameters);
+        var signature = signer.GenerateSignature(messageHash);
         var lst = new List<byte>();
-        lst.AddRange(sig.R.ToByteArrayUnsigned());
-        lst.AddRange(sig.S.ToByteArrayUnsigned());
+        lst.AddRange(signature[0].ToByteArrayUnsigned());
+        lst.AddRange(signature[1].ToByteArrayUnsigned());
         return Base64UrlEncoder.Encode(lst.ToArray());
+
     }
 
     public byte[] GetPublicKey(bool compressed = false)
@@ -154,10 +155,17 @@ public class ES256KSignatureKey : ISignatureKey
 
     private static byte[] Hash(byte[] payload)
     {
+        var h13 = new Sha256Digest();
+        h13.BlockUpdate(payload, 0, payload.Length);
+        var messageHash = new byte[h13.GetDigestSize()];
+        h13.DoFinal(messageHash, 0);
+        return messageHash;
+        /*
         byte[] result = null;
         using (var sha256 = SHA256.Create())
             result = sha256.ComputeHash(payload);
 
         return result;
+        */
     }
 }

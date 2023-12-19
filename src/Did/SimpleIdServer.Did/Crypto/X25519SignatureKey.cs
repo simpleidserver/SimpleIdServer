@@ -14,7 +14,7 @@ public class X25519SignatureKey : ISignatureKey
 
     public byte[] PrivateKey => throw new System.NotImplementedException();
 
-    public void Import(byte[] publicKey)
+    public void Import(byte[] publicKey, byte[] privateKey)
     {
         throw new NotImplementedException();
     }

@@ -14,5 +14,5 @@ public class Es256KVerificationMethod : IVerificationMethod
     public int KeySize => 33;
 
     public ISignatureKey Build(byte[] payload) 
-        => ES256KSignatureKey.From(payload);
+        => ES256KSignatureKey.From(payload, null);
 }
