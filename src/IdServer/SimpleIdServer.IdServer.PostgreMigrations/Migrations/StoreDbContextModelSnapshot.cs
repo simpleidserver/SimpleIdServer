@@ -901,6 +901,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "preferred_token_profile");
 
+                    b.Property<bool>("RedirectToRevokeSessionUI")
+                        .HasColumnType("boolean")
+                        .HasAnnotation("Relational:JsonPropertyName", "redirect_revoke_session_ui");
+
                     b.Property<string>("RedirectionUrls")
                         .IsRequired()
                         .HasColumnType("text")

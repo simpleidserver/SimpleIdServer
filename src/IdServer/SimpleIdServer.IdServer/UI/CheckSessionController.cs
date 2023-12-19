@@ -122,7 +122,6 @@ namespace SimpleIdServer.IdServer.UI
                 }
 
                 var validationResult = await Validate(prefix, postLogoutRedirectUri, idTokenHint, cancellationToken);
-
                 if (Request.QueryString.HasValue)
                 {
                     url = Request.GetEncodedPathAndQuery().Replace($"/{Constants.EndPoints.EndSession}", $"/{Constants.EndPoints.EndSessionCallback}");
@@ -140,7 +139,8 @@ namespace SimpleIdServer.IdServer.UI
                 return View(new RevokeSessionViewModel(
                     url,
                     validationResult.Payload,
-                    frontChannelLogout));
+                    frontChannelLogout,
+                    validationResult.Client.RedirectToRevokeSessionUI));
             }
             catch (OAuthException ex)
             {

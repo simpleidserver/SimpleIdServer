@@ -901,6 +901,10 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "preferred_token_profile");
 
+                    b.Property<bool>("RedirectToRevokeSessionUI")
+                        .HasColumnType("bit")
+                        .HasAnnotation("Relational:JsonPropertyName", "redirect_revoke_session_ui");
+
                     b.Property<string>("RedirectionUrls")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")

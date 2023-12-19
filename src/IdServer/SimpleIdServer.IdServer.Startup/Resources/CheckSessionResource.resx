@@ -120,4 +120,7 @@
   <data name="revoke_session_title" xml:space="preserve">
     <value>Revoke session</value>
   </data>
+  <data name="session_being_revoked" xml:space="preserve">
+    <value>The session is being revoked; you will be redirected to the website in {0} seconds.</value>
+  </data>
 </root>

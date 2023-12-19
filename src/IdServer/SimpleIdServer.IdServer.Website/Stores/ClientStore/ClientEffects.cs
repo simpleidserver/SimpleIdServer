@@ -312,6 +312,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 JwksUrl = act.JwksUrl,
                 IsRedirectUrlCaseSensitive = act.IsRedirectUrlCaseSensitive,
                 AccessTokenType = act.AccessTokenType,
+                RedirectToRevokeSessionUI = act.RedirectToRevokeSessionUI,
                 Parameters = new Dictionary<string, string>
                 {
                     { ClientExtensions.SAML2_USE_ACS_ARTIFACT_NAME, act.UseAcs.ToString() },
@@ -352,6 +353,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                     IsRedirectUrlCaseSensitive = act.IsRedirectUrlCaseSensitive,
                     UseAcs = act.UseAcs,
                     MetadataUrl = act.MetadataUrl,
+                    RedirectToRevokeSessionUI = act.RedirectToRevokeSessionUI,
                     AccessTokenType = act.AccessTokenType
                 });
             }
@@ -909,6 +911,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public TokenExchangeTypes? TokenExchangeType { get; set; }
         public bool IsRedirectUrlCaseSensitive { get; set; }
         public AccessTokenTypes AccessTokenType { get; set; }
+        public bool RedirectToRevokeSessionUI { get; set; }
     }
 
     public class UpdateClientDetailsSuccessAction
@@ -935,6 +938,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public bool UseAcs { get; set; }
         public string MetadataUrl { get; set; }
         public AccessTokenTypes AccessTokenType { get; set; }
+        public bool RedirectToRevokeSessionUI { get; set; }
     }
 
     public class UpdateClientDetailsFailureAction

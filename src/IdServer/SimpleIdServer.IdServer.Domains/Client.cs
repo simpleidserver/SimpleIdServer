@@ -267,6 +267,11 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonPropertyName(OAuthClientParameters.PostLogoutRedirectUris)]
         public ICollection<string> PostLogoutRedirectUris { get; set; } = new List<string>();
         /// <summary>
+        /// Redirect the user-agent to the revoke session UI.
+        /// </summary>
+        [JsonPropertyName(OAuthClientParameters.RedirectToRevokeSessionUI)]
+        public bool RedirectToRevokeSessionUI { get; set; } = true;
+        /// <summary>
         /// Preferred token profile.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.PreferredTokenProfile)]
