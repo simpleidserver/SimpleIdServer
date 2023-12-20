@@ -171,6 +171,7 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
     builder.AddAutomaticConfiguration(o =>
     {
         o.Add<FacebookOptionsLite>();
+        o.Add<GoogleOptionsLite>();
         o.Add<LDAPRepresentationsExtractionJobOptions>();
         o.Add<SCIMRepresentationsExtractionJobOptions>();
         o.Add<IdServerEmailOptions>();
@@ -389,19 +390,16 @@ void SeedData(WebApplication application, string scimBaseUrl)
                     CreateDateTime = DateTime.UtcNow
                 });
 
-            if (!dbContext.Definitions.Any())
-            {
-                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<FacebookOptionsLite>());
-                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<LDAPRepresentationsExtractionJobOptions>());
-                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<SCIMRepresentationsExtractionJobOptions>());
-                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<IdServerEmailOptions>());
-                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<IdServerSmsOptions>());
-                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<IdServerPasswordOptions>());
-                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<FidoOptions>());
-                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<IdServerConsoleOptions>());
-                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>());
-            }
-
+            AddMissingConfigurationDefinition<FacebookOptionsLite>(dbContext);
+            AddMissingConfigurationDefinition<LDAPRepresentationsExtractionJobOptions>(dbContext);
+            AddMissingConfigurationDefinition<SCIMRepresentationsExtractionJobOptions>(dbContext);
+            AddMissingConfigurationDefinition<IdServerEmailOptions>(dbContext);
+            AddMissingConfigurationDefinition<IdServerSmsOptions>(dbContext);
+            AddMissingConfigurationDefinition<IdServerPasswordOptions>(dbContext);
+            AddMissingConfigurationDefinition<FidoOptions>(dbContext);
+            AddMissingConfigurationDefinition<IdServerConsoleOptions>(dbContext);
+            AddMissingConfigurationDefinition<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>(dbContext);
+            AddMissingConfigurationDefinition<GoogleOptionsLite>(dbContext);
             EnableIsolationLevel(dbContext);
             dbContext.SaveChanges();
         }
@@ -415,7 +413,7 @@ void SeedData(WebApplication application, string scimBaseUrl)
             {
                 if (sqlConnection.State != System.Data.ConnectionState.Open) sqlConnection.Open();
                 var cmd = sqlConnection.CreateCommand();
-                cmd.CommandText = "ALTER DATABASE IdServer SET ALLOW_SNAPSHOT_ISOLATION ON";
+                cmd.CommandText = "ALTER DATABASE CURRENT SET ALLOW_SNAPSHOT_ISOLATION ON";
                 cmd.ExecuteNonQuery();
                 cmd = sqlConnection.CreateCommand();
                 cmd.CommandText = SQLServerCreateTableFormat;
@@ -431,6 +429,15 @@ void SeedData(WebApplication application, string scimBaseUrl)
                 cmd.CommandText = MYSQLCreateTableFormat;
                 cmd.ExecuteNonQuery();
                 return;
+            }
+        }
+
+        void AddMissingConfigurationDefinition<T>(StoreDbContext dbContext)
+        {
+            var name = typeof(T).Name;
+            if(!dbContext.Definitions.Any(d => d.Id == name))
+            {
+                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<T>());
             }
         }
     }
