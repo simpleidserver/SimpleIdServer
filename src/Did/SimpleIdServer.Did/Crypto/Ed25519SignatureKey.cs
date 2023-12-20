@@ -1,10 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.IdentityModel.Tokens;
+using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Crypto.Signers;
 using Org.BouncyCastle.Security;
+using SimpleIdServer.Did.Extensions;
 using System;
 using System.Linq;
 
@@ -38,8 +40,12 @@ namespace SimpleIdServer.Did.Crypto
             }
         }
 
-        public static Ed25519SignatureKey From(byte[] publicKey)
-            => new Ed25519SignatureKey(new Ed25519PublicKeyParameters(publicKey.ToArray()));
+        public static Ed25519SignatureKey From(byte[] publicKey, byte[] privateKey)
+        {
+            var result = new Ed25519SignatureKey();
+            result.Import(publicKey, privateKey);
+            return result;
+        }
 
         public static Ed25519SignatureKey Generate()
         {
@@ -49,11 +55,21 @@ namespace SimpleIdServer.Did.Crypto
             return new Ed25519SignatureKey((Ed25519PublicKeyParameters)keyPair.Public, (Ed25519PrivateKeyParameters)keyPair.Private);
         }
 
-        public static Ed25519SignatureKey New()
-            => new Ed25519SignatureKey();
-
         public void Import(byte[] publicKey, byte[] privateKey)
-            => _publicKey = new Ed25519PublicKeyParameters(publicKey);
+        {
+            if(publicKey != null)
+            {
+                if (publicKey.Length != 32) throw new InvalidOperationException("Public key must have 32 bytes");
+                _publicKey = new Ed25519PublicKeyParameters(publicKey);
+            }
+
+            if(privateKey != null)
+            {
+                if (privateKey.Length != 64 && privateKey.Length != 32) throw new InvalidOperationException("Private key must have 64 or 32 bytes");
+                _privateKey = new Ed25519PrivateKeyParameters(privateKey.Take(32).ToArray());
+                if (privateKey.Length == 64) _publicKey = new Ed25519PublicKeyParameters(privateKey.Skip(32).ToArray());
+            }
+        }
 
         public void Import(JsonWebKey publicKey)
         {

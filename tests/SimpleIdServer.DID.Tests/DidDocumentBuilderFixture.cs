@@ -22,12 +22,12 @@ namespace SimpleIdServer.DID.Tests
                 .AddAlsoKnownAs("didSubject")
                 .AddController("didController")
                 // .AddJsonWebKeyVerificationMethod(Ed25519SignatureKey.New(), "controller")
-                .AddJsonWebKeyVerificationMethod(ES256KSignatureKey.New(), "controller", DidDocumentVerificationMethodUsages.AUTHENTICATION)
-                .AddJsonWebKeyVerificationMethod(ES256SignatureKey.New(), "controller", DidDocumentVerificationMethodUsages.AUTHENTICATION)
-                .AddJsonWebKeyVerificationMethod(ES384SignatureKey.New(), "controller", DidDocumentVerificationMethodUsages.AUTHENTICATION)
+                .AddJsonWebKeyVerificationMethod(ES256KSignatureKey.Generate(), "controller", DidDocumentVerificationMethodUsages.AUTHENTICATION)
+                .AddJsonWebKeyVerificationMethod(ES256SignatureKey.Generate(), "controller", DidDocumentVerificationMethodUsages.AUTHENTICATION)
+                .AddJsonWebKeyVerificationMethod(ES384SignatureKey.Generate(), "controller", DidDocumentVerificationMethodUsages.AUTHENTICATION)
                 // .AddJsonWebKeyVerificationMethod(RSA2048SignatureKey.New(), "controller", DidDocumentVerificationMethodUsages.AUTHENTICATION)
-                .AddPublicKeyMultibaseVerificationMethod(ES256KSignatureKey.New(), "controller", DidDocumentVerificationMethodUsages.AUTHENTICATION)
-                .AddJsonWebKeyAssertionMethod(ES256KSignatureKey.New(), "controller")
+                .AddPublicKeyMultibaseVerificationMethod(ES256KSignatureKey.Generate(), "controller", DidDocumentVerificationMethodUsages.AUTHENTICATION)
+                .AddJsonWebKeyAssertionMethod(ES256KSignatureKey.Generate(), "controller")
                 .Build();
 
 

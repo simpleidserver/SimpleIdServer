@@ -1,12 +1,14 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using System.Security.Cryptography;
+
+using Microsoft.IdentityModel.Tokens;
+using Org.BouncyCastle.Asn1.Sec;
 
 namespace SimpleIdServer.Did.Crypto;
 
 public class ES384SignatureKey : BaseESSignatureKey
 {
-    private ES384SignatureKey(ECDsa key) : base(key)
+    private ES384SignatureKey() : base(SecNamedCurves.GetByName("secp384r1"))
     {
     }
 
@@ -14,9 +16,24 @@ public class ES384SignatureKey : BaseESSignatureKey
 
     protected override string CurveName => "P-384";
 
-    public static ES384SignatureKey New()
+    public static ES384SignatureKey Generate()
     {
-        var key = ECDsa.Create(ECCurve.NamedCurves.nistP384);
-        return new ES384SignatureKey(key);
+        var result = new ES384SignatureKey();
+        result.Random();
+        return result;
+    }
+
+    public static ES384SignatureKey From(byte[] publicKey, byte[] privateKey)
+    {
+        var result = new ES384SignatureKey();
+        result.Import(publicKey, privateKey);
+        return result;
+    }
+
+    public static ES384SignatureKey From(JsonWebKey jwk)
+    {
+        var result = new ES384SignatureKey();
+        result.Import(jwk);
+        return result;
     }
 }

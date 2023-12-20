@@ -14,5 +14,5 @@ public class Ed25519VerificationMethod : IVerificationMethod
     public int KeySize => 32;
 
     public ISignatureKey Build(byte[] payload) 
-        => Ed25519SignatureKey.From(payload);
+        => Ed25519SignatureKey.From(payload, null);
 }

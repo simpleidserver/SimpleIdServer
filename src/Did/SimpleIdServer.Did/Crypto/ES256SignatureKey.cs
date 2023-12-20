@@ -1,17 +1,14 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-using System.Security.Cryptography;
+using Microsoft.IdentityModel.Tokens;
+using Org.BouncyCastle.Asn1.Sec;
 
 namespace SimpleIdServer.Did.Crypto;
 
 public class ES256SignatureKey : BaseESSignatureKey
 {
-    private ES256SignatureKey() { }
-
-    private ES256SignatureKey(ECDsa key) : base(key)
-    {
-    }
+    private ES256SignatureKey() : base(SecNamedCurves.GetByName("secp256r1")) { }
 
     public override string Name => Constants.SupportedSignatureKeyAlgs.ES256;
 
@@ -19,8 +16,9 @@ public class ES256SignatureKey : BaseESSignatureKey
 
     public static ES256SignatureKey Generate()
     {
-        var key = ECDsa.Create(ECCurve.NamedCurves.nistP256);
-        return new ES256SignatureKey(key);
+        var result = new ES256SignatureKey();
+        result.Random();
+        return result;
     }
 
     public static ES256SignatureKey From(byte[] publicKey, byte[] privateKey)
@@ -30,8 +28,10 @@ public class ES256SignatureKey : BaseESSignatureKey
         return result;
     }
 
-    public static ES256SignatureKey New()
+    public static ES256SignatureKey From(JsonWebKey jwk)
     {
-        return new ES256SignatureKey();
+        var result = new ES256SignatureKey();
+        result.Import(jwk);
+        return result;
     }
 }

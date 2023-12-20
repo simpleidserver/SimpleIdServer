@@ -22,5 +22,23 @@ namespace SimpleIdServer.DID.Tests
             // ASSERT
             Assert.That("vOTe64WujVUjEiQrAlwaPJtNADx4usSlCfe8OXHS6Np1BqJdqdJX912pVwVlAjmbqR_TMVE5i5TWB_GJVgrHgg", Is.EqualTo(sig));
         }
+
+        [Test]
+        public void When_GenerateES256_Serialize_And_Deserialize_Then_NoInformationIsLost()
+        {
+            // ARRANGE
+            var key = ES256SignatureKey.Generate();
+            var jwk = key.GetPublicJwk();
+            var newKey = ES256SignatureKey.From(jwk);
+
+            // ACT
+            var newJwk = newKey.GetPublicJwk();
+
+            // ASSERT
+            Assert.That(jwk.Kty, Is.EqualTo(newJwk.Kty));
+            Assert.That(jwk.Crv, Is.EqualTo(newJwk.Crv));
+            Assert.That(jwk.X, Is.EqualTo(newJwk.X));
+            Assert.That(jwk.Y, Is.EqualTo(newJwk.Y));
+        }
     }
 }
