@@ -72,7 +72,7 @@ namespace SimpleIdServer.Did.Models
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Value { get; set; } = null;
         [JsonIgnore]
-        public DidDocumentVerificationMethodUsages Usage { get; set; }
+        public VerificationMethodUsages Usage { get; set; }
         [JsonIgnore]
         public Dictionary<string, string> AdditionalParameters = new Dictionary<string, string>();
     }

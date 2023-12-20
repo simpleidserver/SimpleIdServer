@@ -5,21 +5,22 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace SimpleIdServer.Did.Crypto.Multicodec;
 
-public class Ed25519VerificationMethod : IVerificationMethod
+public class X25519VerificationMethod : IVerificationMethod
 {
     public string MulticodecHexValue => MULTICODES_HEX_VALUE;
 
-    public const string MULTICODES_HEX_VALUE = "0xed";
 
-    public string Kty => Constants.StandardKty.OKP;
-
-    public string CrvOrSize => Constants.StandardCrvOrSize.Ed25519;
+    public const string MULTICODES_HEX_VALUE = "0xec";
 
     public int KeySize => 32;
 
-    public IAsymmetricKey Build(byte[] payload) 
-        => Ed25519SignatureKey.From(payload, null);
+    public string Kty => Constants.StandardKty.OKP;
+
+    public string CrvOrSize => Constants.StandardCrvOrSize.X25519;
+
+    public IAsymmetricKey Build(byte[] payload)
+        => X25519AgreementKey.From(payload, null);
 
     public IAsymmetricKey Build(JsonWebKey jwk)
-        => Ed25519SignatureKey.From(jwk);
+        => X25519AgreementKey.From(jwk);
 }

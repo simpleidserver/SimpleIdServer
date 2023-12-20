@@ -11,11 +11,9 @@ namespace SimpleIdServer.Did.Crypto;
 /// </summary>
 public class ES256KSignatureKey : BaseESSignatureKey
 {
-    private ES256KSignatureKey() : base(SecNamedCurves.GetByName("secp256k1")) { }
+    private ES256KSignatureKey() : base(SecNamedCurves.GetByName(Constants.StandardCrvOrSize.SECP256k1)) { }
 
-    public override string Name => Constants.SupportedSignatureKeyAlgs.ES256K;
-
-    protected override string CurveName => "secp256k1";
+    public override string CrvOrSize => Constants.StandardCrvOrSize.SECP256k1;
 
     public static ES256KSignatureKey Generate()
     {

@@ -12,9 +12,7 @@ public class ES384SignatureKey : BaseESSignatureKey
     {
     }
 
-    public override string Name => Constants.SupportedSignatureKeyAlgs.ES384;
-
-    protected override string CurveName => "P-384";
+    public override string CrvOrSize => Constants.StandardCrvOrSize.P384;
 
     public static ES384SignatureKey Generate()
     {

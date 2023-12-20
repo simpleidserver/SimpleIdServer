@@ -9,9 +9,10 @@ namespace SimpleIdServer.Did.Crypto.Multicodec;
 
 public interface IMulticodecSerializer
 {
-    ISignatureKey Deserialize(byte[] payload);
+    IAsymmetricKey Deserialize(string value);
+    IAsymmetricKey Deserialize(byte[] payload);
     byte[] GetPublicKey(string multicodecValue);
-    string Serialize(ISignatureKey signatureKey);
+    string Serialize(IAsymmetricKey signatureKey);
 }
 
 /// <summary>
@@ -27,13 +28,21 @@ public class MulticodecSerializer : IMulticodecSerializer
         _verificationMethods = verificationMethods;
     }
 
-    public ISignatureKey Deserialize(byte[] payload)
+    public IAsymmetricKey Deserialize(string value)
+    {
+        value = value.TrimStart('z');
+        var payload = Encoding.Base58Encoding.Decode(value);
+        return Deserialize(payload);
+    }
+
+    public IAsymmetricKey Deserialize(byte[] payload)
     {
         if (payload == null)throw new ArgumentNullException(nameof(payload));
         var hex = payload.ToHex(true);
         var verificationMethod = _verificationMethods.SingleOrDefault(m => hex.StartsWith(m.MulticodecHexValue));
         if (verificationMethod == null) throw new InvalidOperationException("Either the multicodec is invalid or the verification method is not supported");
-        var publicKey = payload.Skip(2).ToArray();
+        var multicodecHeaderPayload = verificationMethod.MulticodecHexValue.HexToByteArray();
+        var publicKey = payload.Skip(multicodecHeaderPayload.Length).ToArray();
         return verificationMethod.Build(publicKey);
     }
 
@@ -44,9 +53,9 @@ public class MulticodecSerializer : IMulticodecSerializer
         return payload.Skip(2).ToArray();
     }
 
-    public string Serialize(ISignatureKey signatureKey)
+    public string Serialize(IAsymmetricKey signatureKey)
     {
-        var verificationMethod = _verificationMethods.Single(m => m.Name == signatureKey.Name);
+        var verificationMethod = _verificationMethods.Single(m => m.Kty == signatureKey.Kty && m.CrvOrSize == signatureKey.CrvOrSize);
         var publicKey = verificationMethod.MulticodecHexValue.HexToByteArray().ToList();
         publicKey.AddRange(signatureKey.GetPublicKey());
         var result = $"z{Encoding.Base58Encoding.Encode(publicKey.ToArray())}";

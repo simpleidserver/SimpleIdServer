@@ -1,4 +1,6 @@
-﻿using SimpleIdServer.Did.Crypto;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Crypto.Multicodec;
 using SimpleIdServer.Did.Models;
 using System.Linq;
@@ -6,7 +8,7 @@ using System.Linq;
 namespace SimpleIdServer.Did.Builders;
 
 /// <summary>
-/// https://www.w3.org/community/reports/credentials/CG-FINAL-di-eddsa-2020-20220724/#bib-rfc8032
+/// https://www.w3.org/community/reports/credentials/CG-FINAL-di-eddsa-2020-20220724/
 /// </summary>
 public class PublicKeyMultibaseVerificationMethodFormatter : IVerificationMethodFormatter
 {
@@ -22,7 +24,7 @@ public class PublicKeyMultibaseVerificationMethodFormatter : IVerificationMethod
 
     public string Type => "Ed25519VerificationKey2020";
 
-    public DidDocumentVerificationMethod Format(DidDocument idDocument, ISignatureKey signatureKey)
+    public DidDocumentVerificationMethod Format(DidDocument idDocument, IAsymmetricKey signatureKey)
     {
         return new DidDocumentVerificationMethod
         {
@@ -31,9 +33,6 @@ public class PublicKeyMultibaseVerificationMethodFormatter : IVerificationMethod
         };
     }
 
-    public ISignatureKey Extract(DidDocumentVerificationMethod didDocumentVerificationMethod)
-    {
-        // return _serializer.GetPublicKey(didDocumentVerificationMethod.PublicKeyMultibase);
-        return null;
-    }
+    public IAsymmetricKey Extract(DidDocumentVerificationMethod didDocumentVerificationMethod)
+        => _serializer.Deserialize(didDocumentVerificationMethod.PublicKeyMultibase);
 }

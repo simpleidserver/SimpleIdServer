@@ -10,9 +10,7 @@ public class ES256SignatureKey : BaseESSignatureKey
 {
     private ES256SignatureKey() : base(SecNamedCurves.GetByName("secp256r1")) { }
 
-    public override string Name => Constants.SupportedSignatureKeyAlgs.ES256;
-
-    protected override string CurveName => "P-256";
+    public override string CrvOrSize => Constants.StandardCrvOrSize.P256;
 
     public static ES256SignatureKey Generate()
     {

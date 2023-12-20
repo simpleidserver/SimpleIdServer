@@ -3,7 +3,7 @@
 
 using SimpleIdServer.Did.Builders;
 using SimpleIdServer.Did.Crypto;
-using SimpleIdServer.Did.Crypto.Multicodec;
+using SimpleIdServer.Did.Formatters;
 using SimpleIdServer.Did.Models;
 using System;
 using System.Collections.Generic;
@@ -19,20 +19,12 @@ namespace SimpleIdServer.Did
         private readonly List<string> _contextUrls = new List<string>();
         private readonly List<JsonObject> _context = new List<JsonObject>();
         private readonly List<string> _controllers = new List<string>();
-        private readonly Dictionary<DidDocumentVerificationMethodUsages, List<DidDocumentVerificationMethod>> _innerVerificationMethods = new Dictionary<DidDocumentVerificationMethodUsages, List<DidDocumentVerificationMethod>>(); 
+        private readonly List<DidDocumentVerificationMethod> _innerVerificationMethods = new List<DidDocumentVerificationMethod>(); 
         private readonly DidDocument _identityDocument;
         private readonly IEnumerable<IVerificationMethodFormatter> _verificationMethodBuilders = new List<IVerificationMethodFormatter>
         {
-            new JWKVerificationMethodFormatter(),
-            new PublicKeyMultibaseVerificationMethodFormatter(
-                new MulticodecSerializer(
-                    new IVerificationMethod[] 
-                    { 
-                        new Ed25519VerificationMethod(),
-                        new Es256KVerificationMethod()
-                    }
-                )
-            )
+            FormatterFactory.BuildJWKVerificationMethod(),
+            FormatterFactory.BuildPublicKeyMultibase()
         };
 
         protected DidDocumentBuilder(DidDocument identityDocument) 
@@ -95,41 +87,11 @@ namespace SimpleIdServer.Did
 
         #region Verification method
 
-        public DidDocumentBuilder AddJsonWebKeyVerificationMethod(ISignatureKey signatureKey, string controller, DidDocumentVerificationMethodUsages usage)
-            => AddVerificationMethod(signatureKey, controller, JWKVerificationMethodFormatter.JSON_LD_CONTEXT, usage);
+        public DidDocumentBuilder AddJsonWebKeyVerificationMethod(IAsymmetricKey asymmKey, string controller, VerificationMethodUsages usage, bool isReference = true)
+            => AddVerificationMethod(asymmKey, controller, JWKVerificationMethodFormatter.JSON_LD_CONTEXT, usage, isReference);
 
-        public DidDocumentBuilder AddPublicKeyMultibaseVerificationMethod(ISignatureKey signatureKey, string controller, DidDocumentVerificationMethodUsages usage)
-            => AddVerificationMethod(signatureKey, controller, PublicKeyMultibaseVerificationMethodFormatter.JSON_LD_CONTEXT, usage);
-
-        public DidDocumentBuilder AddJsonWebKeyAuthentication(ISignatureKey signatureKey, string controller)
-            => AddInnerVerificationMethod(signatureKey, controller, JWKVerificationMethodFormatter.JSON_LD_CONTEXT, DidDocumentVerificationMethodUsages.AUTHENTICATION);
-
-        public DidDocumentBuilder AddPublicKeyMultibaseAuthentication(ISignatureKey signatureKey, string controller)
-            => AddInnerVerificationMethod(signatureKey, controller, PublicKeyMultibaseVerificationMethodFormatter.JSON_LD_CONTEXT, DidDocumentVerificationMethodUsages.AUTHENTICATION);
-
-        public DidDocumentBuilder AddJsonWebKeyAssertionMethod(ISignatureKey signatureKey, string controller)
-            => AddInnerVerificationMethod(signatureKey, controller, JWKVerificationMethodFormatter.JSON_LD_CONTEXT, DidDocumentVerificationMethodUsages.ASSERTION_METHOD);
-
-        public DidDocumentBuilder AddPublicKeyMultibaseAssertionMethod(ISignatureKey signatureKey, string controller)
-            => AddInnerVerificationMethod(signatureKey, controller, PublicKeyMultibaseVerificationMethodFormatter.JSON_LD_CONTEXT, DidDocumentVerificationMethodUsages.ASSERTION_METHOD);
-
-        public DidDocumentBuilder AddJsonWebKeyAgreement(ISignatureKey signatureKey, string controller)
-            => AddInnerVerificationMethod(signatureKey, controller, JWKVerificationMethodFormatter.JSON_LD_CONTEXT, DidDocumentVerificationMethodUsages.KEY_AGREEMENT);
-
-        public DidDocumentBuilder AddPublicKeyMultibaseAgreement(ISignatureKey signatureKey, string controller)
-            => AddInnerVerificationMethod(signatureKey, controller, PublicKeyMultibaseVerificationMethodFormatter.JSON_LD_CONTEXT, DidDocumentVerificationMethodUsages.KEY_AGREEMENT);
-
-        public DidDocumentBuilder AddJsonWebKeyCapabilityInvocation(ISignatureKey signatureKey, string controller)
-            => AddInnerVerificationMethod(signatureKey, controller, JWKVerificationMethodFormatter.JSON_LD_CONTEXT, DidDocumentVerificationMethodUsages.CAPABILITY_INVOCATION);
-
-        public DidDocumentBuilder AddPublicKeyMultibaseCapabilityInvocation(ISignatureKey signatureKey, string controller)
-            => AddInnerVerificationMethod(signatureKey, controller, PublicKeyMultibaseVerificationMethodFormatter.JSON_LD_CONTEXT, DidDocumentVerificationMethodUsages.CAPABILITY_INVOCATION);
-
-        public DidDocumentBuilder AddJsonWebKeyCapabilityDelegation(ISignatureKey signatureKey, string controller)
-            => AddInnerVerificationMethod(signatureKey, controller, JWKVerificationMethodFormatter.JSON_LD_CONTEXT, DidDocumentVerificationMethodUsages.CAPABILITY_DELEGATION);
-
-        public DidDocumentBuilder AddPublicKeyMultibaseCapabilityDelegation(ISignatureKey signatureKey, string controller)
-            => AddInnerVerificationMethod(signatureKey, controller, PublicKeyMultibaseVerificationMethodFormatter.JSON_LD_CONTEXT, DidDocumentVerificationMethodUsages.CAPABILITY_DELEGATION);
+        public DidDocumentBuilder AddPublicKeyMultibaseVerificationMethod(IAsymmetricKey asymmKey, string controller, VerificationMethodUsages usage, bool isReference = true)
+            => AddVerificationMethod(asymmKey, controller, PublicKeyMultibaseVerificationMethodFormatter.JSON_LD_CONTEXT, usage, isReference);
 
         #endregion
 
@@ -152,11 +114,11 @@ namespace SimpleIdServer.Did
         {
             _identityDocument.Context = BuildContext();
             _identityDocument.Controller = BuildController();
-            _identityDocument.Authentication = BuildEmbeddedVerificationMethods(DidDocumentVerificationMethodUsages.AUTHENTICATION);
-            _identityDocument.AssertionMethod = BuildEmbeddedVerificationMethods(DidDocumentVerificationMethodUsages.ASSERTION_METHOD);
-            _identityDocument.KeyAgreement = BuildEmbeddedVerificationMethods(DidDocumentVerificationMethodUsages.KEY_AGREEMENT);
-            _identityDocument.CapabilityInvocation = BuildEmbeddedVerificationMethods(DidDocumentVerificationMethodUsages.CAPABILITY_INVOCATION);
-            _identityDocument.CapabilityDelegation = BuildEmbeddedVerificationMethods(DidDocumentVerificationMethodUsages.CAPABILITY_DELEGATION);
+            _identityDocument.Authentication = BuildEmbeddedVerificationMethods(VerificationMethodUsages.AUTHENTICATION);
+            _identityDocument.AssertionMethod = BuildEmbeddedVerificationMethods(VerificationMethodUsages.ASSERTION_METHOD);
+            _identityDocument.KeyAgreement = BuildEmbeddedVerificationMethods(VerificationMethodUsages.KEY_AGREEMENT);
+            _identityDocument.CapabilityInvocation = BuildEmbeddedVerificationMethods(VerificationMethodUsages.CAPABILITY_INVOCATION);
+            _identityDocument.CapabilityDelegation = BuildEmbeddedVerificationMethods(VerificationMethodUsages.CAPABILITY_DELEGATION);
             return _identityDocument;
         }
 
@@ -197,27 +159,26 @@ namespace SimpleIdServer.Did
             return result;
         }
 
-        private DidDocumentBuilder AddVerificationMethod(ISignatureKey signatureKey, string controller, string ldContext, DidDocumentVerificationMethodUsages usage)
+        private DidDocumentBuilder AddVerificationMethod(IAsymmetricKey asymmKey, string controller, string ldContext, VerificationMethodUsages usage, bool isReference)
         {
-            var verificationMethod = BuildVerificationMethod(signatureKey, controller, ldContext);
+            var isSigKey = (asymmKey as ISignatureKey) != null;
+            if (usage.HasFlag(VerificationMethodUsages.KEY_AGREEMENT) && isSigKey) throw new ArgumentException("Signature key cannot be used in a Key Agreement");
+            if (!isSigKey && !usage.HasFlag(VerificationMethodUsages.KEY_AGREEMENT)) throw new ArgumentException("Key can only be used in a Key Agreement");
+            var verificationMethod = BuildVerificationMethod(asymmKey, controller, ldContext);
             verificationMethod.Usage = usage;
-            _identityDocument.AddVerificationMethod(verificationMethod);
-            return this;
-        }
-
-        private DidDocumentBuilder AddInnerVerificationMethod(ISignatureKey signatureKey, string controller, string ldContext, DidDocumentVerificationMethodUsages usage)
-        {
-            if(!_innerVerificationMethods.ContainsKey(usage))
+            if (isReference)
             {
-                _innerVerificationMethods.Add(usage, new List<DidDocumentVerificationMethod>());
+                _identityDocument.AddVerificationMethod(verificationMethod);
+            }
+            else
+            {
+                _innerVerificationMethods.Add(verificationMethod);
             }
 
-            var verificationMethod = BuildVerificationMethod(signatureKey, controller, ldContext);
-            _innerVerificationMethods[usage].Add(verificationMethod);
             return this;
         }
 
-        private DidDocumentVerificationMethod BuildVerificationMethod(ISignatureKey signatureKey, string controller, string ldContext)
+        private DidDocumentVerificationMethod BuildVerificationMethod(IAsymmetricKey signatureKey, string controller, string ldContext)
         {
             var builder = _verificationMethodBuilders.Single(v => v.JSONLDContext == ldContext);
             var verificationMethod = builder.Format(_identityDocument, signatureKey);
@@ -227,18 +188,17 @@ namespace SimpleIdServer.Did
             return verificationMethod;
         }
 
-        private JsonArray BuildEmbeddedVerificationMethods(DidDocumentVerificationMethodUsages usage)
+        private JsonArray BuildEmbeddedVerificationMethods(VerificationMethodUsages usage)
         {
             var referencedVerificationMethods = _identityDocument.VerificationMethod.Where(m => m.Usage.HasFlag(usage));
-            var kvp = _innerVerificationMethods.SingleOrDefault(kvp => kvp.Key == usage);
-            if (!referencedVerificationMethods.Any() && kvp.Value == null)
+            var innerVerificationMethods = _innerVerificationMethods.Where(v => v.Usage.HasFlag(usage));
+            if (!referencedVerificationMethods.Any() && !innerVerificationMethods.Any())
                 return null;
             var result = new JsonArray();
             foreach (var referencedVerificationMethod in referencedVerificationMethods)
                 result.Add(referencedVerificationMethod.Id);
-            if(kvp.Value != null)
-                foreach(var innerVerificationMethod in kvp.Value)
-                    result.Add(JsonObject.Parse(JsonSerializer.Serialize(innerVerificationMethod)));
+            foreach(var innerVerificationMethod in innerVerificationMethods)
+                result.Add(JsonObject.Parse(JsonSerializer.Serialize(innerVerificationMethod)));
             return result;
         }
     }

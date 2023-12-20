@@ -1,12 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.IdentityModel.Tokens;
-using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Crypto.Signers;
 using Org.BouncyCastle.Security;
-using SimpleIdServer.Did.Extensions;
 using System;
 using System.Linq;
 
@@ -29,7 +27,9 @@ namespace SimpleIdServer.Did.Crypto
             _privateKey = privateKey;
         }
 
-        public string Name => Constants.SupportedSignatureKeyAlgs.Ed25519;
+        public string Kty => Constants.StandardKty.OKP;
+
+        public string CrvOrSize => Constants.StandardCrvOrSize.Ed25519;
 
         public byte[] PrivateKey
         {
@@ -44,6 +44,13 @@ namespace SimpleIdServer.Did.Crypto
         {
             var result = new Ed25519SignatureKey();
             result.Import(publicKey, privateKey);
+            return result;
+        }
+
+        public static Ed25519SignatureKey From(JsonWebKey jwk)
+        {
+            var result = new Ed25519SignatureKey();
+            result.Import(jwk);
             return result;
         }
 
@@ -113,8 +120,8 @@ namespace SimpleIdServer.Did.Crypto
         {
             var result = new JsonWebKey
             {
-                Kty = "OKP",
-                Crv = Name,
+                Kty = Kty,
+                Crv = CrvOrSize,
                 X = Base64UrlEncoder.Encode(_publicKey.GetEncoded())
             };
             return result;

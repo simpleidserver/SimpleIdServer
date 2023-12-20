@@ -5,11 +5,11 @@ using System;
 namespace SimpleIdServer.Did.Models;
 
 [Flags]
-public enum DidDocumentVerificationMethodUsages
+public enum VerificationMethodUsages
 {
-    AUTHENTICATION = 0,
-    ASSERTION_METHOD = 1,
-    KEY_AGREEMENT = 2,
-    CAPABILITY_INVOCATION = 3,
-    CAPABILITY_DELEGATION = 4
+    AUTHENTICATION = 1,
+    ASSERTION_METHOD = 2,
+    KEY_AGREEMENT = 4,
+    CAPABILITY_INVOCATION = 8,
+    CAPABILITY_DELEGATION = 16
 }

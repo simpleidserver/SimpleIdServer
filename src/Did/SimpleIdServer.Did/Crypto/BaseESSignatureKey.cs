@@ -24,8 +24,9 @@ public abstract class BaseESSignatureKey : ISignatureKey
         _curve = curve;
     }
 
-    public abstract string Name { get; }
-    protected abstract string CurveName { get; }
+    public string Kty => Constants.StandardKty.EC;
+
+    public abstract string CrvOrSize { get; }
 
     public byte[] PrivateKey
     {
@@ -42,7 +43,7 @@ public abstract class BaseESSignatureKey : ISignatureKey
         if(publicKey != null)
         {
             var q = _curve.Curve.DecodePoint(publicKey);
-            _publicKey = new ECPublicKeyParameters("EC", q, domainParameters);
+            _publicKey = new ECPublicKeyParameters(Kty, q, domainParameters);
         }
 
         if (privateKey != null)
@@ -104,8 +105,8 @@ public abstract class BaseESSignatureKey : ISignatureKey
         q = q.Normalize();
         var result = new JsonWebKey
         {
-            Kty = "EC",
-            Crv = CurveName,
+            Kty = Kty,
+            Crv = CrvOrSize,
             X = Base64UrlEncoder.Encode(q.XCoord.GetEncoded()),
             Y = Base64UrlEncoder.Encode(q.YCoord.GetEncoded())
         };

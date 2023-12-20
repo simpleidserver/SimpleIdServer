@@ -4,17 +4,14 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace SimpleIdServer.Did.Crypto
 {
-    public interface ISignatureKey
+    /// <summary>
+    /// Explanation about JOSE : https://www.iana.org/assignments/jose/jose.xhtml
+    /// </summary>
+    public interface ISignatureKey : IAsymmetricKey
     {
-        string Name { get; }
-        byte[] PrivateKey { get; }
-        void Import(byte[] publicKey, byte[] privateKey);
-        void Import(JsonWebKey publicKey);
         bool Check(string content, string signature);
         bool Check(byte[] content, byte[] signature);
         string Sign(string content);
         string Sign(byte[] content);
-        byte[] GetPublicKey(bool compressed = false);
-        JsonWebKey GetPublicJwk();
     }
 }

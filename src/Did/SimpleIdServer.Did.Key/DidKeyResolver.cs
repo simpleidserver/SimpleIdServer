@@ -28,7 +28,14 @@ public class DidKeyResolver : IDidResolver
     {
         options = options ?? new DidKeyOptions();
         return new DidKeyResolver(
-            new MulticodecSerializer(new IVerificationMethod[] { new Ed25519VerificationMethod() }),
+            new MulticodecSerializer(new IVerificationMethod[] 
+            { 
+                new Ed25519VerificationMethod(),
+                new Es256KVerificationMethod(),
+                new Es256VerificationMethod(), 
+                new Es384VerificationMethod(), 
+                new X25519VerificationMethod()
+            }),
             options);
     }
 
@@ -49,8 +56,8 @@ public class DidKeyResolver : IDidResolver
             builder.AddPublicKeyMultibaseVerificationMethod(
                 verificationMethod,
                 did,
-                DidDocumentVerificationMethodUsages.AUTHENTICATION | DidDocumentVerificationMethodUsages.ASSERTION_METHOD |
-                DidDocumentVerificationMethodUsages.CAPABILITY_INVOCATION | DidDocumentVerificationMethodUsages.CAPABILITY_DELEGATION);
+                VerificationMethodUsages.AUTHENTICATION | VerificationMethodUsages.ASSERTION_METHOD |
+                VerificationMethodUsages.CAPABILITY_INVOCATION | VerificationMethodUsages.CAPABILITY_DELEGATION);
         return builder.Build();
     }
 }
