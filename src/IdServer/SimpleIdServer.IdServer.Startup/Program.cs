@@ -312,6 +312,14 @@ void SeedData(WebApplication application, string scimBaseUrl)
             if (!dbContext.UmaResources.Any())
                 dbContext.UmaResources.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Resources);
 
+            foreach(var providerDefinition in SimpleIdServer.IdServer.Startup.IdServerConfiguration.ProviderDefinitions)
+            {
+                if (!dbContext.AuthenticationSchemeProviderDefinitions.Any(d => d.Name == providerDefinition.Name))
+                {
+                    dbContext.AuthenticationSchemeProviderDefinitions.Add(providerDefinition);
+                }
+            }
+
             if (!dbContext.AuthenticationSchemeProviderDefinitions.Any())
                 dbContext.AuthenticationSchemeProviderDefinitions.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.ProviderDefinitions);
 

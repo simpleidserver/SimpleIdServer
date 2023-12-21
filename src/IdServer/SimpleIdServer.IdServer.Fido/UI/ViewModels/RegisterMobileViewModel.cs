@@ -16,5 +16,6 @@ namespace SimpleIdServer.IdServer.Fido.UI.ViewModels
         public string Amr { get; set; }
         public List<string> Steps { get; set; }
         public string SessionId { get; set; }
+        public string? RedirectUrl { get; set; }
     }
 }

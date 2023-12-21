@@ -17,6 +17,7 @@ public class OTPRegisterViewModel : IRegisterViewModel
     public bool IsNotAllowed { get; set; }
     public string Amr { get; set; }
     public List<string> Steps { get; set; }
+    public string? RedirectUrl { get; set; }
 
     public void Validate(ModelStateDictionary modelState)
     {

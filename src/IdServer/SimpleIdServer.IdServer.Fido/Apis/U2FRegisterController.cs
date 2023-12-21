@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using QRCoder;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
@@ -60,7 +61,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             if (string.IsNullOrWhiteSpace(sessionId)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.MISSING_PARAMETER, nameof(sessionId)));
             var session = await _distributedCache.GetStringAsync(sessionId, cancellationToken);
             if (string.IsNullOrWhiteSpace(session)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.SESSION_CANNOT_BE_EXTRACTED);
-            var sessionRecord = JsonSerializer.Deserialize<RegistrationSessionRecord>(session);
+            var sessionRecord = System.Text.Json.JsonSerializer.Deserialize<RegistrationSessionRecord>(session);
             if (!sessionRecord.IsValidated) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.REGISTRATION_NOT_CONFIRMED);
             return NoContent();
         }
@@ -73,7 +74,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             var kvp = await CommonBegin(prefix, request, cancellationToken);
             if (kvp.Item2 != null) return kvp.Item2;
             var qrGenerator = new QRCodeGenerator();
-            var json = JsonSerializer.Serialize(new QRCodeResult
+            var json = System.Text.Json.JsonSerializer.Serialize(new QRCodeResult
             {
                 Action = "register",
                 SessionId = kvp.Item1.SessionId,
@@ -96,7 +97,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             if (string.IsNullOrWhiteSpace(sessionId)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.MISSING_PARAMETER, nameof(sessionId)));
             var session = await _distributedCache.GetStringAsync(sessionId, cancellationToken);
             if (string.IsNullOrWhiteSpace(session)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.SESSION_CANNOT_BE_EXTRACTED);
-            var sessionRecord = JsonSerializer.Deserialize<RegistrationSessionRecord>(session);
+            var sessionRecord = System.Text.Json.JsonSerializer.Deserialize<RegistrationSessionRecord>(session);
             return new OkObjectResult(new BeginU2FRegisterResult
             {
                 CredentialCreateOptions = sessionRecord.Options,
@@ -124,7 +125,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             if (request.AuthenticatorAttestationRawResponse == null) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.MISSING_PARAMETER, EndU2FRegisterRequestNames.AuthenticatorAttestationRawResponse));
             var session = await _distributedCache.GetStringAsync(request.SessionId, cancellationToken);
             if (string.IsNullOrWhiteSpace(session)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.SESSION_CANNOT_BE_EXTRACTED);
-            var sessionRecord = JsonSerializer.Deserialize<RegistrationSessionRecord>(session);
+            var sessionRecord = System.Text.Json.JsonSerializer.Deserialize<RegistrationSessionRecord>(session);
             var login = request.Login;
             var registrationProgress = await GetRegistrationProgress(sessionRecord);
             bool isAuthenticated = User.Identity.IsAuthenticated;
@@ -147,7 +148,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
 
             user.AddFidoCredential(success.Result);
             sessionRecord.IsValidated = true;
-            await _distributedCache.SetStringAsync(request.SessionId, JsonSerializer.Serialize(sessionRecord), new DistributedCacheEntryOptions
+            await _distributedCache.SetStringAsync(request.SessionId, System.Text.Json.JsonSerializer.Serialize(sessionRecord), new DistributedCacheEntryOptions
             {
                 SlidingExpiration = fidoOptions.U2FExpirationTimeInSeconds
             }, cancellationToken);
@@ -266,7 +267,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             var options = _fido2.RequestNewCredential(fidoUser, existingKeys, authenticatorSelection, AttestationConveyancePreference.None, exts);
             var sessionId = Guid.NewGuid().ToString();
             var sessionRecord = new RegistrationSessionRecord(options, request.Login, cookieValue);
-            await _distributedCache.SetStringAsync(sessionId, JsonSerializer.Serialize(sessionRecord), new DistributedCacheEntryOptions
+            await _distributedCache.SetStringAsync(sessionId, System.Text.Json.JsonSerializer.Serialize(sessionRecord), new DistributedCacheEntryOptions
             {
                 SlidingExpiration = fidoOptions.U2FExpirationTimeInSeconds
             }, cancellationToken);
@@ -334,7 +335,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             else cookieValue = Request.Cookies[cookieName];
             var json = await _distributedCache.GetStringAsync(cookieValue);
             if (string.IsNullOrWhiteSpace(json)) return null;
-            var registrationProgress = JsonSerializer.Deserialize<UserRegistrationProgress>(json);
+            var registrationProgress = JsonConvert.DeserializeObject<UserRegistrationProgress>(json);
             return registrationProgress;
         }
     }

@@ -10,4 +10,5 @@ public interface IRegisterViewModel
     bool IsUpdated { get; set; }
     string Amr { get; set; }
     List<string> Steps { get; set; }
+    public string? RedirectUrl { get; set; }
 }

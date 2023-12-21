@@ -7,13 +7,14 @@ namespace SimpleIdServer.IdServer.Pwd.UI.ViewModels;
 
 public class PwdRegisterViewModel : IRegisterViewModel
 {
-    public string Login { get; set; }
+    public string? Login { get; set; }
     public string Password { get; set; }
     public string ConfirmedPassword { get; set; }
     public bool IsUpdated { get; set; }
     public bool IsNotAllowed { get; set; }
     public string? Amr { get; set; }
     public List<string>? Steps { get; set; }
+    public string? RedirectUrl { get; set; }
 
     public void Validate(ModelStateDictionary modelState)
     {

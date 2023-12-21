@@ -145,8 +145,9 @@ public class AuthenticationSchemeProvidersController : BaseController
     {
         prefix = prefix ?? Constants.DefaultRealm;
         try
-        {
+        {            
             await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name);
+            Validate();
 			var instance = await _authenticationSchemeProviderRepository
                 .Query()
 				.Include(r => r.Realms)
@@ -175,6 +176,12 @@ public class AuthenticationSchemeProvidersController : BaseController
         catch (OAuthException ex)
         {
             return BuildError(ex);
+        }
+
+        void Validate()
+        {
+            if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_REQUEST_PARAMETER);
+            if (string.IsNullOrWhiteSpace(request.Name)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, nameof(AuthenticationSchemeProviderNames.Name)));
         }
     }
 

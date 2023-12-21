@@ -132,7 +132,7 @@ namespace SimpleIdServer.IdServer.UI
         protected async Task<IActionResult> Sign(string realm, string returnUrl, string currentAmr, User user, Client client, CancellationToken token, bool rememberLogin = false)
         {
             var expirationTimeInSeconds = GetCookieExpirationTimeInSeconds(client);
-            await AddSession(realm, user, client, token);
+            await AddSession(realm, user, client, token, rememberLogin);
             var offset = DateTimeOffset.UtcNow.AddSeconds(expirationTimeInSeconds);
             var claims = _userTransformer.Transform(user);
             var claimsIdentity = new ClaimsIdentity(claims, currentAmr);
@@ -163,7 +163,7 @@ namespace SimpleIdServer.IdServer.UI
             return Redirect(returnUrl);
         }
 
-        protected async Task AddSession(string realm, User user, Client client, CancellationToken cancellationToken)
+        protected async Task AddSession(string realm, User user, Client client, CancellationToken cancellationToken, bool rememberLogin = false)
         {
             var currentDateTime = DateTime.UtcNow;
             var expirationTimeInSeconds = GetCookieExpirationTimeInSeconds(client);
@@ -181,12 +181,18 @@ namespace SimpleIdServer.IdServer.UI
             _userSessionRepository.Add(session);
             await _userSessionRepository.SaveChanges(cancellationToken);
             await _userRepository.SaveChanges(cancellationToken);
-            Response.Cookies.Append(_options.GetSessionCookieName(), session.SessionId, new CookieOptions
+            var cookieOptions = new CookieOptions
             {
                 Secure = true,
                 HttpOnly = false,
                 SameSite = SameSiteMode.None
-            });
+            };
+            if(rememberLogin)
+            {
+                cookieOptions.MaxAge = TimeSpan.FromSeconds(expirationTimeInSeconds);
+            }
+
+            Response.Cookies.Append(_options.GetSessionCookieName(), session.SessionId, cookieOptions);
         }
 
         private double GetCookieExpirationTimeInSeconds(Client client)

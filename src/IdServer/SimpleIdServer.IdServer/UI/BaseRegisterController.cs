@@ -66,6 +66,7 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
             UserRepository.Add(user);
             await UserRepository.SaveChanges(CancellationToken.None);
             viewModel.IsUpdated = true;
+            viewModel.RedirectUrl = registrationProgress.RedirectUrl;
             return View(viewModel);
         }
 
@@ -82,6 +83,7 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
         if (lastStep == amr || registrationProgress == null)
         {
             viewModel.IsUpdated = true;
+            viewModel.RedirectUrl = registrationProgress.RedirectUrl;
             return View(viewModel);
         }
 

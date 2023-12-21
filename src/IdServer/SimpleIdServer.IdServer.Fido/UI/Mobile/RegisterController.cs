@@ -58,6 +58,7 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
             viewModel.IsDeveloperModeEnabled = fidoOptions.IsDeveloperModeEnabled;
             viewModel.Amr = userRegistrationProgress?.Amr;
             viewModel.Steps = userRegistrationProgress?.Steps;
+            viewModel.RedirectUrl = userRegistrationProgress?.RedirectUrl;
             return View(viewModel);
         }
 
