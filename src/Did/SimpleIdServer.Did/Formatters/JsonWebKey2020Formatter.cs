@@ -14,12 +14,12 @@ namespace SimpleIdServer.Did.Builders;
 /// <summary>
 /// Documentation : https://www.w3.org/community/reports/credentials/CG-FINAL-lds-jws2020-20220721/
 /// </summary>
-public class JWKVerificationMethodFormatter : IVerificationMethodFormatter
+public class JsonWebKey2020Formatter : IVerificationMethodFormatter
 {
     private readonly IEnumerable<IVerificationMethod> _verificationMethods;
     public const string JSON_LD_CONTEXT = "https://w3id.org/security/suites/jws-2020/v1";
 
-    public JWKVerificationMethodFormatter(IEnumerable<IVerificationMethod> verificationMethods)
+    public JsonWebKey2020Formatter(IEnumerable<IVerificationMethod> verificationMethods)
     {
         _verificationMethods = verificationMethods;
     }

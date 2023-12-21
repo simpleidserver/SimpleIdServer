@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Did.Builders;
 using SimpleIdServer.Did.Crypto;
+using SimpleIdServer.Did.Crypto.Multicodec;
 using SimpleIdServer.Did.Models;
 
 namespace SimpleIdServer.Did.Formatters;
@@ -11,17 +12,28 @@ namespace SimpleIdServer.Did.Formatters;
 /// </summary>
 public class X25519KeyAgreementFormatter : IVerificationMethodFormatter
 {
-    public string JSONLDContext => throw new System.NotImplementedException();
+    public const string JSON_LD_CONTEXT = "https://w3id.org/security/suites/x25519-2019/v1";
+    private readonly IMulticodecSerializer _serializer;
 
-    public string Type => throw new System.NotImplementedException();
+    public X25519KeyAgreementFormatter(IMulticodecSerializer serializer)
+    {
+        _serializer = serializer;
+    }
+
+    public string JSONLDContext => JSON_LD_CONTEXT;
+
+    public string Type => "X25519KeyAgreementKey2019";
 
     public IAsymmetricKey Extract(DidDocumentVerificationMethod didDocumentVerificationMethod)
-    {
-        throw new System.NotImplementedException();
-    }
+        => _serializer.Deserialize(didDocumentVerificationMethod.PublicKeyMultibase);
 
     public DidDocumentVerificationMethod Format(DidDocument idDocument, IAsymmetricKey signatureKey)
     {
-        throw new System.NotImplementedException();
+        var publicKey = _serializer.Serialize(signatureKey);
+        return new DidDocumentVerificationMethod
+        {
+            Id = $"{idDocument.Id}#{publicKey}",
+            PublicKeyMultibase = publicKey
+        };
     }
 }

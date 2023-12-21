@@ -10,12 +10,12 @@ namespace SimpleIdServer.Did.Builders;
 /// <summary>
 /// https://www.w3.org/community/reports/credentials/CG-FINAL-di-eddsa-2020-20220724/
 /// </summary>
-public class PublicKeyMultibaseVerificationMethodFormatter : IVerificationMethodFormatter
+public class Ed25519VerificationKey2020Formatter : IVerificationMethodFormatter
 {
     public const string JSON_LD_CONTEXT = "https://w3id.org/security/suites/ed25519-2020/v1";
     private readonly IMulticodecSerializer _serializer;
 
-    public PublicKeyMultibaseVerificationMethodFormatter(IMulticodecSerializer serializer)
+    public Ed25519VerificationKey2020Formatter(IMulticodecSerializer serializer)
     {
         _serializer = serializer;
     }

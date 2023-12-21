@@ -7,7 +7,9 @@ namespace SimpleIdServer.Did.Crypto.Multicodec;
 
 public class Es256KVerificationMethod : IVerificationMethod
 {
-    public string MulticodecHexValue => MULTICODES_HEX_VALUE;
+    public string MulticodecPublicKeyHexValue => MULTICODES_HEX_VALUE;
+
+    public string MulticodecPrivateKeyHexValue => string.Empty;
 
     public const string MULTICODES_HEX_VALUE = "0xe7";
 

@@ -7,10 +7,12 @@ namespace SimpleIdServer.Did.Crypto.Multicodec;
 
 public class X25519VerificationMethod : IVerificationMethod
 {
-    public string MulticodecHexValue => MULTICODES_HEX_VALUE;
+    public string MulticodecPublicKeyHexValue => MULTICODEC_HEX_VALUE;
+
+    public string MulticodecPrivateKeyHexValue => string.Empty;
 
 
-    public const string MULTICODES_HEX_VALUE = "0xec";
+    public const string MULTICODEC_HEX_VALUE = "0xec";
 
     public int KeySize => 32;
 

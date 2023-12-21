@@ -7,7 +7,8 @@ namespace SimpleIdServer.Did.Crypto.Multicodec;
 
 public interface IVerificationMethod
 {
-    string MulticodecHexValue { get; }
+    string MulticodecPublicKeyHexValue { get; }
+    string MulticodecPrivateKeyHexValue {  get; }
     int KeySize { get; }
     string Kty { get; }
     string CrvOrSize { get; }

@@ -32,8 +32,8 @@ public class DidKeyDocumentDeploy
         if (document.VerificationMethod == null || !document.VerificationMethod.Any()) 
             throw new InvalidOperationException("At least one verification method must be present");
         var formatter = _formatters.Single(f => 
-            (_options.IsMultibaseVerificationMethod && f.JSONLDContext == PublicKeyMultibaseVerificationMethodFormatter.JSON_LD_CONTEXT) ||
-            (_options.IsMultibaseVerificationMethod == false && f.JSONLDContext == JWKVerificationMethodFormatter.JSON_LD_CONTEXT));
+            (_options.IsMultibaseVerificationMethod && f.JSONLDContext == Ed25519VerificationKey2020Formatter.JSON_LD_CONTEXT) ||
+            (_options.IsMultibaseVerificationMethod == false && f.JSONLDContext == JsonWebKey2020Formatter.JSON_LD_CONTEXT));
         var publicKey = formatter.GetPublicKey(document.VerificationMethod.First());
 
         return null;

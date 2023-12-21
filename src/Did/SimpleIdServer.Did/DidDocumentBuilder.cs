@@ -23,8 +23,9 @@ namespace SimpleIdServer.Did
         private readonly DidDocument _identityDocument;
         private readonly IEnumerable<IVerificationMethodFormatter> _verificationMethodBuilders = new List<IVerificationMethodFormatter>
         {
-            FormatterFactory.BuildJWKVerificationMethod(),
-            FormatterFactory.BuildPublicKeyMultibase()
+            FormatterFactory.BuildJsonWebKey2020Formatter(),
+            FormatterFactory.BuildEd25519VerificationKey2020Formatter(),
+            FormatterFactory.BuildX25519KeyAgreementFormatter()
         };
 
         protected DidDocumentBuilder(DidDocument identityDocument) 
@@ -88,10 +89,13 @@ namespace SimpleIdServer.Did
         #region Verification method
 
         public DidDocumentBuilder AddJsonWebKeyVerificationMethod(IAsymmetricKey asymmKey, string controller, VerificationMethodUsages usage, bool isReference = true)
-            => AddVerificationMethod(asymmKey, controller, JWKVerificationMethodFormatter.JSON_LD_CONTEXT, usage, isReference);
+            => AddVerificationMethod(asymmKey, controller, JsonWebKey2020Formatter.JSON_LD_CONTEXT, usage, isReference);
 
-        public DidDocumentBuilder AddPublicKeyMultibaseVerificationMethod(IAsymmetricKey asymmKey, string controller, VerificationMethodUsages usage, bool isReference = true)
-            => AddVerificationMethod(asymmKey, controller, PublicKeyMultibaseVerificationMethodFormatter.JSON_LD_CONTEXT, usage, isReference);
+        public DidDocumentBuilder AddEd25519VerificationKey2020VerificationMethod(IAsymmetricKey asymmKey, string controller, VerificationMethodUsages usage, bool isReference = true)
+            => AddVerificationMethod(asymmKey, controller, Ed25519VerificationKey2020Formatter.JSON_LD_CONTEXT, usage, isReference);
+
+        public DidDocumentBuilder AddX25519KeyAgreementVerificationMethod(IAsymmetricKey asymmKey, string controller, bool isReference = true)
+            => AddVerificationMethod(asymmKey, controller, X25519KeyAgreementFormatter.JSON_LD_CONTEXT, VerificationMethodUsages.KEY_AGREEMENT, isReference);
 
         #endregion
 

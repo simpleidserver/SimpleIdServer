@@ -7,9 +7,13 @@ namespace SimpleIdServer.Did.Crypto.Multicodec;
 
 public class Ed25519VerificationMethod : IVerificationMethod
 {
-    public string MulticodecHexValue => MULTICODES_HEX_VALUE;
+    public string MulticodecPublicKeyHexValue => MULTICODEC_HEX_PUBLIC_VALUE;
 
-    public const string MULTICODES_HEX_VALUE = "0xed";
+    public string MulticodecPrivateKeyHexValue => MULTICODEC_HEX_VALUE_PRIVATE_KEY;
+
+    public const string MULTICODEC_HEX_PUBLIC_VALUE = "0xed01";
+
+    public const string MULTICODEC_HEX_VALUE_PRIVATE_KEY = "0x8026";
 
     public string Kty => Constants.StandardKty.OKP;
 

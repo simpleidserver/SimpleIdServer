@@ -12,7 +12,7 @@ namespace SimpleIdServer.DID.Tests
     public class DidDocumentBuilderFixture
     {
         [Test]
-        public void When_Build_IdentityDocument_With_MultibaseEncodedVerificationMethods_Then_DocumentIsCorrect()
+        public void When_Build_IdentityDocument_With_Ed25519VerificationKey2020VerificationMethods_Then_DocumentIsCorrect()
         {
             // https://www.w3.org/TR/did-spec-registries/#verification-method-types
             // ARRANGE
@@ -21,15 +21,14 @@ namespace SimpleIdServer.DID.Tests
             var es256 = ES256SignatureKey.Generate();
             var es384 = ES384SignatureKey.Generate();
             var x25519 = X25519AgreementKey.Generate();
-            var publicKeyMultibaseFormatter = FormatterFactory.BuildPublicKeyMultibase();
+            var publicKeyMultibaseFormatter = FormatterFactory.BuildEd25519VerificationKey2020Formatter();
             var identityDocument = DidDocumentBuilder.New("did")
                 .AddAlsoKnownAs("didSubject")
                 .AddController("didController")
-                .AddPublicKeyMultibaseVerificationMethod(ed25119Sig, "controller", VerificationMethodUsages.AUTHENTICATION)
-                .AddPublicKeyMultibaseVerificationMethod(es256K, "controller", VerificationMethodUsages.AUTHENTICATION)
-                .AddPublicKeyMultibaseVerificationMethod(es256, "controller", VerificationMethodUsages.AUTHENTICATION)
-                .AddPublicKeyMultibaseVerificationMethod(es384, "controller", VerificationMethodUsages.AUTHENTICATION)
-                .AddPublicKeyMultibaseVerificationMethod(x25519, "controller", VerificationMethodUsages.KEY_AGREEMENT)
+                .AddEd25519VerificationKey2020VerificationMethod(ed25119Sig, "controller", VerificationMethodUsages.AUTHENTICATION)
+                .AddEd25519VerificationKey2020VerificationMethod(es256K, "controller", VerificationMethodUsages.AUTHENTICATION)
+                .AddEd25519VerificationKey2020VerificationMethod(es256, "controller", VerificationMethodUsages.AUTHENTICATION)
+                .AddEd25519VerificationKey2020VerificationMethod(es384, "controller", VerificationMethodUsages.AUTHENTICATION)
                 .Build();
 
             // ACT
@@ -63,8 +62,7 @@ namespace SimpleIdServer.DID.Tests
             var es256K = ES256KSignatureKey.Generate();
             var es256 = ES256SignatureKey.Generate();
             var es384 = ES384SignatureKey.Generate();
-            var x25519 = X25519AgreementKey.Generate();
-            var jwkFormatter = FormatterFactory.BuildJWKVerificationMethod();
+            var jwkFormatter = FormatterFactory.BuildJsonWebKey2020Formatter();
             var identityDocument = DidDocumentBuilder.New("did")
                 .AddAlsoKnownAs("didSubject")
                 .AddController("didController")
@@ -72,7 +70,6 @@ namespace SimpleIdServer.DID.Tests
                 .AddJsonWebKeyVerificationMethod(es256K, "controller", VerificationMethodUsages.AUTHENTICATION)
                 .AddJsonWebKeyVerificationMethod(es256, "controller", VerificationMethodUsages.AUTHENTICATION)
                 .AddJsonWebKeyVerificationMethod(es384, "controller", VerificationMethodUsages.AUTHENTICATION)
-                .AddJsonWebKeyVerificationMethod(x25519, "controller", VerificationMethodUsages.KEY_AGREEMENT)
                 .Build();
 
             // ACT
@@ -94,7 +91,32 @@ namespace SimpleIdServer.DID.Tests
             Assert.True(jwkFormatter.Extract(identityDocument.VerificationMethod.ElementAt(1)).GetPublicKey().SequenceEqual(es256K.GetPublicKey()));
             Assert.True(jwkFormatter.Extract(identityDocument.VerificationMethod.ElementAt(2)).GetPublicKey().SequenceEqual(es256.GetPublicKey()));
             Assert.True(jwkFormatter.Extract(identityDocument.VerificationMethod.ElementAt(3)).GetPublicKey().SequenceEqual(es384.GetPublicKey()));
-            Assert.True(jwkFormatter.Extract(identityDocument.VerificationMethod.ElementAt(4)).GetPublicKey().SequenceEqual(x25519.GetPublicKey()));
+        }
+
+        [Test]
+        public void When_BuildIdentityDocument_With_X25519KeyAgreementVerificationMethods_Then_Document_Is_Correct()
+        {
+            // ARRANGE
+            var x25519 = X25519AgreementKey.Generate();
+            var keyAgreementFormatter = FormatterFactory.BuildX25519KeyAgreementFormatter();
+            var identityDocument = DidDocumentBuilder.New("did")
+                .AddAlsoKnownAs("didSubject")
+                .AddController("didController")
+                .AddX25519KeyAgreementVerificationMethod(x25519, "controller")
+                .Build();
+
+            // ACT
+            var json = identityDocument.Serialize();
+            var contextLst = JsonObject.Parse(json)["@context"] as JsonArray;
+
+            Assert.IsNotNull(json);
+            Assert.That(identityDocument.Id, Is.EqualTo("did"));
+            Assert.That(contextLst.ElementAt(0).ToString(), Is.EqualTo("https://www.w3.org/ns/did/v1"));
+            Assert.That(contextLst.ElementAt(1).ToString(), Is.EqualTo("https://w3id.org/security/suites/x25519-2019/v1"));
+            Assert.That(identityDocument.AlsoKnownAs.First(), Is.EqualTo("didSubject"));
+            Assert.That(identityDocument.Controller.ToString(), Is.EqualTo("didController"));
+            Assert.That(identityDocument.VerificationMethod.ElementAt(0).Type, Is.EqualTo("X25519KeyAgreementKey2019"));
+            Assert.True(keyAgreementFormatter.Extract(identityDocument.VerificationMethod.ElementAt(0)).GetPublicKey().SequenceEqual(x25519.GetPublicKey()));
         }
     }
 }

@@ -12,6 +12,7 @@ public interface IMulticodecSerializer
     IAsymmetricKey Deserialize(string value);
     IAsymmetricKey Deserialize(byte[] payload);
     byte[] GetPublicKey(string multicodecValue);
+    byte[] GetPrivateKey(string multicodecValue);
     string Serialize(IAsymmetricKey signatureKey);
 }
 
@@ -21,6 +22,7 @@ public interface IMulticodecSerializer
 /// </summary>
 public class MulticodecSerializer : IMulticodecSerializer
 {
+    private static char specialChar = 'z';
     private readonly IEnumerable<IVerificationMethod> _verificationMethods;
 
     public MulticodecSerializer(IEnumerable<IVerificationMethod> verificationMethods)
@@ -30,7 +32,7 @@ public class MulticodecSerializer : IMulticodecSerializer
 
     public IAsymmetricKey Deserialize(string value)
     {
-        value = value.TrimStart('z');
+        value = value.TrimStart(specialChar);
         var payload = Encoding.Base58Encoding.Decode(value);
         return Deserialize(payload);
     }
@@ -39,24 +41,41 @@ public class MulticodecSerializer : IMulticodecSerializer
     {
         if (payload == null)throw new ArgumentNullException(nameof(payload));
         var hex = payload.ToHex(true);
-        var verificationMethod = _verificationMethods.SingleOrDefault(m => hex.StartsWith(m.MulticodecHexValue));
+        var verificationMethod = _verificationMethods.SingleOrDefault(m => hex.StartsWith(m.MulticodecPublicKeyHexValue));
         if (verificationMethod == null) throw new InvalidOperationException("Either the multicodec is invalid or the verification method is not supported");
-        var multicodecHeaderPayload = verificationMethod.MulticodecHexValue.HexToByteArray();
+        var multicodecHeaderPayload = verificationMethod.MulticodecPublicKeyHexValue.HexToByteArray();
         var publicKey = payload.Skip(multicodecHeaderPayload.Length).ToArray();
         return verificationMethod.Build(publicKey);
     }
 
     public byte[] GetPublicKey(string multicodecValue)
     {
-        string value = new string(multicodecValue.Skip('z').ToArray());
+        string value = multicodecValue.TrimStart(specialChar);
         var payload = Encoding.Base58Encoding.Decode(value);
-        return payload.Skip(2).ToArray();
+        var hex = payload.ToHex(true);
+        var verificationMethod = _verificationMethods.SingleOrDefault(m => hex.StartsWith(m.MulticodecPublicKeyHexValue));
+        if (verificationMethod == null) throw new InvalidOperationException("Either the multicodec is invalid or the verification method is not supported");
+        var multicodecHeaderPayload = verificationMethod.MulticodecPublicKeyHexValue.HexToByteArray();
+        var publicKey = payload.Skip(multicodecHeaderPayload.Length).ToArray();
+        return publicKey;
+    }
+
+    public byte[] GetPrivateKey(string multicodecValue)
+    {
+        string value = multicodecValue.TrimStart(specialChar);
+        var payload = Encoding.Base58Encoding.Decode(value);
+        var hex = payload.ToHex(true);
+        var verificationMethod = _verificationMethods.SingleOrDefault(m => !string.IsNullOrWhiteSpace(m.MulticodecPrivateKeyHexValue) && hex.StartsWith(m.MulticodecPrivateKeyHexValue));
+        if (verificationMethod == null) throw new InvalidOperationException("Either the multicodec is invalid or the verification method is not supported");
+        var multicodecHeaderPayload = verificationMethod.MulticodecPrivateKeyHexValue.HexToByteArray();
+        var publicKey = payload.Skip(multicodecHeaderPayload.Length).ToArray();
+        return publicKey;
     }
 
     public string Serialize(IAsymmetricKey signatureKey)
     {
         var verificationMethod = _verificationMethods.Single(m => m.Kty == signatureKey.Kty && m.CrvOrSize == signatureKey.CrvOrSize);
-        var publicKey = verificationMethod.MulticodecHexValue.HexToByteArray().ToList();
+        var publicKey = verificationMethod.MulticodecPublicKeyHexValue.HexToByteArray().ToList();
         publicKey.AddRange(signatureKey.GetPublicKey());
         var result = $"z{Encoding.Base58Encoding.Encode(publicKey.ToArray())}";
         return result;

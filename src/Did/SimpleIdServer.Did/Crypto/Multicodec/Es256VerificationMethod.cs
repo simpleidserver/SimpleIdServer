@@ -7,9 +7,11 @@ namespace SimpleIdServer.Did.Crypto.Multicodec;
 
 public class Es256VerificationMethod : IVerificationMethod
 {
-    public string MulticodecHexValue => MULTICODES_HEX_VALUE;
+    public string MulticodecPublicKeyHexValue => MULTICODEC_HEX_VALUE;
 
-    public const string MULTICODES_HEX_VALUE = "0x1200";
+    public string MulticodecPrivateKeyHexValue => string.Empty;
+
+    public const string MULTICODEC_HEX_VALUE = "0x1200";
 
     public int KeySize => 33;
 

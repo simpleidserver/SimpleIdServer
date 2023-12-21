@@ -7,9 +7,12 @@ namespace SimpleIdServer.Did.Crypto.Multicodec;
 
 public class Es384VerificationMethod : IVerificationMethod
 {
-    public string MulticodecHexValue => MULTICODES_HEX_VALUE;
+    public string MulticodecPublicKeyHexValue => MULTICODEC_HEX_VALUE;
 
-    public const string MULTICODES_HEX_VALUE = "0x1201";
+    public string MulticodecPrivateKeyHexValue => string.Empty;
+
+
+    public const string MULTICODEC_HEX_VALUE = "0x1201";
 
     public int KeySize => 49;
 
