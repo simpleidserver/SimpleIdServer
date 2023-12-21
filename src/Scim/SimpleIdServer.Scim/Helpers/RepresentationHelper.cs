@@ -81,7 +81,7 @@ namespace SimpleIdServer.Scim.Helpers
                             lst.Add(record);
                         }
 
-                        hierarchicalNewAttributes = SCIMRepresentation.BuildHierarchicalAttributes(lst);
+                        hierarchicalNewAttributes = lst;
                     }
                 }
 

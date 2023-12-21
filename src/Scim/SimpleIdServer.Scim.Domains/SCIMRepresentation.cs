@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 
 namespace SimpleIdServer.Scim.Domains
@@ -403,15 +404,25 @@ namespace SimpleIdServer.Scim.Domains
                 parentsDictionary[parentIdKey].Add(scimRepresentationAttribute);
             }
 
-            foreach (var node in treeNodes.Where(node => parentsDictionary.ContainsKey(node.Id)))
+            foreach(var node in treeNodes)
             {
-                node.CachedChildren = parentsDictionary[node.Id];
-                node.Children = parentsDictionary[node.Id];
+                if(parentsDictionary.ContainsKey(node.Id))
+                {
+                    node.CachedChildren = parentsDictionary[node.Id];
+                    node.Children = parentsDictionary[node.Id];
+                }
+                else
+                {
+                    var lst = new List<SCIMRepresentationAttribute>();
+                    node.CachedChildren = lst;
+                    node.Children = lst;
+                }
             }
-
             var attrWithNoParentLst = attributes.Where(a => a.ParentAttributeId == rootId || !attributes.Any(c => c.Id == a.ParentAttributeId)).ToList();
-            foreach(var attrWithNoParent in attrWithNoParentLst)
+            foreach (var attrWithNoParent in attrWithNoParentLst)
+            {
                 attrWithNoParent.ComputeValueIndex();
+            }
 
             return attrWithNoParentLst;
         }
