@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Did.Encoding;
 using SimpleIdServer.Did.Extensions;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,6 @@ public interface IMulticodecSerializer
 /// </summary>
 public class MulticodecSerializer : IMulticodecSerializer
 {
-    private static char specialChar = 'z';
     private readonly IEnumerable<IVerificationMethod> _verificationMethods;
 
     public MulticodecSerializer(IEnumerable<IVerificationMethod> verificationMethods)
@@ -32,8 +32,7 @@ public class MulticodecSerializer : IMulticodecSerializer
 
     public IAsymmetricKey Deserialize(string value)
     {
-        value = value.TrimStart(specialChar);
-        var payload = Encoding.Base58Encoding.Decode(value);
+        var payload = MultibaseEncoding.Decode(value);
         return Deserialize(payload);
     }
 
@@ -50,8 +49,7 @@ public class MulticodecSerializer : IMulticodecSerializer
 
     public byte[] GetPublicKey(string multicodecValue)
     {
-        string value = multicodecValue.TrimStart(specialChar);
-        var payload = Encoding.Base58Encoding.Decode(value);
+        var payload = MultibaseEncoding.Decode(multicodecValue);
         var hex = payload.ToHex(true);
         var verificationMethod = _verificationMethods.SingleOrDefault(m => hex.StartsWith(m.MulticodecPublicKeyHexValue));
         if (verificationMethod == null) throw new InvalidOperationException("Either the multicodec is invalid or the verification method is not supported");
@@ -62,8 +60,7 @@ public class MulticodecSerializer : IMulticodecSerializer
 
     public byte[] GetPrivateKey(string multicodecValue)
     {
-        string value = multicodecValue.TrimStart(specialChar);
-        var payload = Encoding.Base58Encoding.Decode(value);
+        var payload = MultibaseEncoding.Decode(multicodecValue);
         var hex = payload.ToHex(true);
         var verificationMethod = _verificationMethods.SingleOrDefault(m => !string.IsNullOrWhiteSpace(m.MulticodecPrivateKeyHexValue) && hex.StartsWith(m.MulticodecPrivateKeyHexValue));
         if (verificationMethod == null) throw new InvalidOperationException("Either the multicodec is invalid or the verification method is not supported");
@@ -77,7 +74,6 @@ public class MulticodecSerializer : IMulticodecSerializer
         var verificationMethod = _verificationMethods.Single(m => m.Kty == signatureKey.Kty && m.CrvOrSize == signatureKey.CrvOrSize);
         var publicKey = verificationMethod.MulticodecPublicKeyHexValue.HexToByteArray().ToList();
         publicKey.AddRange(signatureKey.GetPublicKey());
-        var result = $"z{Encoding.Base58Encoding.Encode(publicKey.ToArray())}";
-        return result;
+        return MultibaseEncoding.Encode(publicKey.ToArray());
     }
 }

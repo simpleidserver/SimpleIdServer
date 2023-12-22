@@ -13,6 +13,7 @@ namespace SimpleIdServer.Did.Builders;
 public class Ed25519VerificationKey2020Formatter : IVerificationMethodFormatter
 {
     public const string JSON_LD_CONTEXT = "https://w3id.org/security/suites/ed25519-2020/v1";
+    public const string TYPE = "Ed25519VerificationKey2020";
     private readonly IMulticodecSerializer _serializer;
 
     public Ed25519VerificationKey2020Formatter(IMulticodecSerializer serializer)
@@ -22,7 +23,7 @@ public class Ed25519VerificationKey2020Formatter : IVerificationMethodFormatter
 
     public string JSONLDContext => JSON_LD_CONTEXT;
 
-    public string Type => "Ed25519VerificationKey2020";
+    public string Type => TYPE;
 
     public DidDocumentVerificationMethod Format(DidDocument idDocument, IAsymmetricKey signatureKey)
     {
