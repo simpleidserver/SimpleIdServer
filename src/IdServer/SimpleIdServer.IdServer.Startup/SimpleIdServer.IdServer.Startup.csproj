@@ -20,6 +20,7 @@
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Pwd\SimpleIdServer.IdServer.Pwd.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Saml.Idp\SimpleIdServer.IdServer.Saml.Idp.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Sms\SimpleIdServer.IdServer.Sms.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.IdServer.SqliteMigrations\SimpleIdServer.IdServer.SqliteMigrations.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.SqlServerMigrations\SimpleIdServer.IdServer.SqlServerMigrations.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Swagger\SimpleIdServer.IdServer.Swagger.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.WsFederation\SimpleIdServer.IdServer.WsFederation.csproj" />
@@ -36,6 +37,7 @@
 	  <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.*" />
 	  <PackageReference Include="Microsoft.Extensions.Caching.SqlServer" Version="7.0.*" />
 	  <PackageReference Include="Community.Microsoft.Extensions.Caching.PostgreSql" Version="4.0.4" />
+	  <PackageReference Include="NeoSmart.Caching.Sqlite.AspNetCore" Version="7.0.2" />
 	  <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="7.0.*" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.*">
 		<PrivateAssets>all</PrivateAssets>

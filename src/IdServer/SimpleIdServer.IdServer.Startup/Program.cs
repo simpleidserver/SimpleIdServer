@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NeoSmart.Caching.Sqlite.AspNetCore;
 using SimpleIdServer.Configuration;
 using SimpleIdServer.Configuration.Redis;
 using SimpleIdServer.IdServer;
@@ -202,6 +203,9 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
                     case DistributedCacheTypes.MYSQL:
                         b.UseMySql(conf.ConnectionString, ServerVersion.AutoDetect(conf.ConnectionString));
                         break;
+                    case DistributedCacheTypes.SQLITE:
+                        b.UseSqlite(conf.ConnectionString);
+                        break;
                 }
             });
         }
@@ -245,6 +249,13 @@ void ConfigureDistributedCache()
                 opts.TableName = "DistributedCache";
             });
             break;
+        case DistributedCacheTypes.SQLITE:
+            // Note : we cannot use the same database, because the library Neosmart, checks if the database contains only two tables and one index.
+            builder.Services.AddSqliteCache(options =>
+            {
+                options.CachePath = "SidCache.db";
+            });
+            break;
     }
 }
 
@@ -278,6 +289,13 @@ void ConfigureStorage(DbContextOptionsBuilder b)
         case StorageTypes.INMEMORY:
             b.UseInMemoryDatabase(conf.ConnectionString);
             break;
+        case StorageTypes.SQLITE:
+            b.UseSqlite(conf.ConnectionString, o =>
+            {
+                o.MigrationsAssembly("SimpleIdServer.IdServer.SqliteMigrations");
+                o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+            });
+            break;
     }
 }
 
@@ -293,7 +311,7 @@ void SeedData(WebApplication application, string scimBaseUrl)
         using (var dbContext = scope.ServiceProvider.GetService<StoreDbContext>())
         {
             var isInMemory = dbContext.Database.IsInMemory();
-            if (!isInMemory) dbContext.Database.Migrate();
+            // if (!isInMemory) dbContext.Database.Migrate();
             if (!dbContext.Realms.Any())
                 dbContext.Realms.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Realms);
 

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using SimpleIdServer.IdServer.Website.ViewModels;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.IdServer.Website.Controllers;
 
@@ -94,7 +95,14 @@ public class LoginController : Controller
             request.Headers.Add("Authorization", $"Bearer {token.AccessToken}");
             var httpResult = await httpClient.SendAsync(request);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+            var jObj = JsonObject.Parse(json).AsObject();
+            var result = new Dictionary<string, string>();
+            foreach(var record in jObj)
+            {
+                if (record.Value == null) continue;
+                result.Add(record.Key, record.Value.ToString());
+            }
+
             return result;
         }
     }
