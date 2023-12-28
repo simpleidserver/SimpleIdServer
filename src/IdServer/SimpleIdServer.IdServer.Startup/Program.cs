@@ -311,7 +311,7 @@ void SeedData(WebApplication application, string scimBaseUrl)
         using (var dbContext = scope.ServiceProvider.GetService<StoreDbContext>())
         {
             var isInMemory = dbContext.Database.IsInMemory();
-            // if (!isInMemory) dbContext.Database.Migrate();
+            if (!isInMemory) dbContext.Database.Migrate();
             if (!dbContext.Realms.Any())
                 dbContext.Realms.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Realms);
 
