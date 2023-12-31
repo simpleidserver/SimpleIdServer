@@ -31,14 +31,7 @@ public class Language
     }
 
     [JsonPropertyName(LanguageNames.Description)]
-    public string Description
-    {
-        get
-        {
-            var description = Descriptions.SingleOrDefault(d => d.Key == TranslationKey && d.Language == Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName);
-            return description?.Value;
-        }
-    }
+    public string? Description { get; set; } = null;
 
     [JsonIgnore]
     public ICollection<Translation> Descriptions { get; set; } = new List<Translation>();

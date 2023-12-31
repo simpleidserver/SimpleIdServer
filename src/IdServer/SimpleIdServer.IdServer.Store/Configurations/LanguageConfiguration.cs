@@ -11,8 +11,8 @@ public class LanguageConfiguration : IEntityTypeConfiguration<Language>
     public void Configure(EntityTypeBuilder<Language> builder)
     {
         builder.HasKey(a => a.Code);
-        builder.Ignore(a => a.Descriptions);
         builder.Ignore(a => a.TranslationKey);
+        builder.Ignore(a => a.Description);
         builder.Ignore(a => a.Descriptions);
     }
 }
