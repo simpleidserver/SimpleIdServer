@@ -1,8 +1,11 @@
 ﻿@using SimpleIdServer.IdServer.Website.Stores.AuthMethodsStore;
 @using SimpleIdServer.IdServer.Website.Stores.ConfigurationDefinitionStore;
+@using SimpleIdServer.IdServer.Website.Stores.LanguageStore;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorLayout
 @inject IState<RealmsState> state
+@inject IState<LanguagesState> languagesState
+@inject IState<CurrentLanguageState> currentLanguageState
 @inject ContextMenuService contextMenuService
 @inject IDispatcher dispatcher
 @inject DialogService dialogService
@@ -27,7 +30,19 @@
             <div class="p-2">
                 <RadzenText Style="margin: 0; color: white;" Text="SimpleIdServer" TextStyle="TextStyle.DisplayH6" />
             </div>
-            <div class="ml-auto p-2">
+            <div class="ml-auto"></div>
+            <div class="p-2">
+                @if(!languagesState.Value.IsLoading)
+                {
+                    <RadzenDropDown Name="UserPropertyName" Class="w-100"
+                                    Data=@languagesState.Value.Languages
+                                    TValue="string"
+                                    Change="@OnChangeLanguage"
+                                    @bind-Value=@currentLanguageState.Value.CurrentLanguage
+                                    TextProperty="Description" ValueProperty="Code" />
+                }
+            </div>
+            <div class="p-2">
                 <RadzenLink Text="Sign out" Icon="logout" Path="/logout" />
             </div>
         </div>
@@ -119,5 +134,11 @@
         dispatcher.Dispatch(new GetActiveRealmAction());
         dispatcher.Dispatch(new GetAllRealmAction());
         dispatcher.Dispatch(new GetAllAuthMethodAction());
+        dispatcher.Dispatch(new GetLanguagesAction());
+    }
+
+    private void OnChangeLanguage(object language)
+    {
+        
     }
 }

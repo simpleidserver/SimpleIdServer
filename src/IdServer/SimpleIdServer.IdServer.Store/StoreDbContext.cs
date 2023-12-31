@@ -45,10 +45,12 @@ namespace SimpleIdServer.IdServer.Store
         public DbSet<ConfigurationDefinition> Definitions { get; set; }
         public DbSet<ConfigurationKeyPairValueRecord> ConfigurationKeyPairValueRecords { get; set; }
         public DbSet<RegistrationWorkflow> RegistrationWorkflows { get; set; }
+        public DbSet<Language> Languages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            builder.ApplyConfiguration(new LanguageConfiguration());
             builder.ApplyConfiguration(new ClientConfiguration());
             builder.ApplyConfiguration(new ConsentConfiguration());
             builder.ApplyConfiguration(new ScopeClaimConfiguration());

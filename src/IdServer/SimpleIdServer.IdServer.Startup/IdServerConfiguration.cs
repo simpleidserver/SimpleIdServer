@@ -160,6 +160,11 @@ namespace SimpleIdServer.IdServer.Startup
             Google
         };
 
+        public static ICollection<Language> Languages => new List<Language>
+        {
+            LanguageBuilder.Build(Language.Default).AddDescription("English").Build()
+        };
+
         public static ICollection<AuthenticationSchemeProvider> Providers => new List<AuthenticationSchemeProvider>
         {
            AuthenticationSchemeProviderBuilder.Create(Facebook, "Facebook", "Facebook", "Facebook").Build(),

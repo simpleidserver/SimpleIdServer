@@ -1,6 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Fluxor;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.JsonWebTokens;
+using SimpleIdServer.IdServer.Website.Stores.LanguageStore;
 using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.IdServer.Website
@@ -16,11 +19,13 @@ namespace SimpleIdServer.IdServer.Website
         private readonly DefaultSecurityOptions _securityOptions;
         private readonly HttpClient _httpClient;
         private readonly JsonWebTokenHandler _jsonWebTokenHandler;
+        private readonly IServiceProvider _serviceProvider;
         private GetAccessTokenResult _accessToken;
 
-        public WebsiteHttpClientFactory(DefaultSecurityOptions securityOptions)
+        public WebsiteHttpClientFactory(DefaultSecurityOptions securityOptions, IServiceProvider serviceProvider)
         {
             _securityOptions = securityOptions;
+            _serviceProvider = serviceProvider;
             var handler = new HttpClientHandler
             {
                 ServerCertificateCustomValidationCallback = (httpRequestMessage, cert, cetChain, policyErrors) =>
@@ -36,6 +41,12 @@ namespace SimpleIdServer.IdServer.Website
         {
             var token = await GetAccessToken();
             _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token.AccessToken);
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var currentLanguageState = scope.ServiceProvider.GetRequiredService<IState<CurrentLanguageState>>();
+                _httpClient.DefaultRequestHeaders.Add("Accept-Language", currentLanguageState.Value.CurrentLanguage);
+            }
+
             return _httpClient;   
         }
 

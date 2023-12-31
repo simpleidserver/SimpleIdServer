@@ -82,6 +82,7 @@ if (identityServerConfiguration.IsForwardedEnabled)
     });
 }
 
+
 builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
     .AllowAnyMethod()
     .AllowAnyHeader()));
@@ -329,6 +330,12 @@ void SeedData(WebApplication application, string scimBaseUrl)
 
             if (!dbContext.UmaResources.Any())
                 dbContext.UmaResources.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Resources);
+
+            if(!dbContext.Languages.Any())
+            {
+                dbContext.Languages.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Languages);
+                dbContext.Translations.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Languages.SelectMany(l => l.Descriptions));
+            }
 
             foreach(var providerDefinition in SimpleIdServer.IdServer.Startup.IdServerConfiguration.ProviderDefinitions)
             {

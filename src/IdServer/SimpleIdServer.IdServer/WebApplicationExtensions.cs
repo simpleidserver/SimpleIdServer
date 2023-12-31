@@ -85,6 +85,7 @@ namespace Microsoft.AspNetCore.Builder
             // Occurs every 10 seconds.
             reccuringJobManager.AddOrUpdate<UserSessionJob>(nameof(UserSessionJob), j => webApplication.Services.GetRequiredService<UserSessionJob>().Execute(), "*/10 * * * * *");
 
+            webApplication.UseMiddleware<AcceptLanguageMiddleware>();
             if (opts.MtlsEnabled)
             {
                 webApplication.UseMiddleware<MtlsAuthenticationMiddleware>();
@@ -510,6 +511,10 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("addRealm",
                 pattern: Constants.EndPoints.Realms,
                 defaults: new { controller = "Realms", action = "Add" });
+
+            webApplication.SidMapControllerRoute("getAllLanguages",
+                pattern: Constants.EndPoints.Languages,
+                defaults: new { controller = "Languages", action = "GetAll" });
 
             webApplication.MapControllerRoute(
                 name: "defaultWithArea",

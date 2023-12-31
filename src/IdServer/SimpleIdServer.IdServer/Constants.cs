@@ -84,6 +84,7 @@ namespace SimpleIdServer.IdServer
             public const string Statistics = "stats";
             public const string Realms = "realms";
             public const string Groups = "groups";
+            public const string Languages = "languages";
         }
 
         public static List<string> AllStandardNotificationModes = new List<string>
@@ -776,5 +777,6 @@ namespace SimpleIdServer.IdServer
         public const string DefaultRealmCookieName = "CurrentRealm";
         public const string DefaultCurrentAmrCookieName = "currentAmr";
         public const string Prefix = "prefix";
+        public const string DefaultLanguage = "en";
     }
 }
