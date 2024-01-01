@@ -83,7 +83,7 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
         if (lastStep == amr || registrationProgress == null)
         {
             viewModel.IsUpdated = true;
-            viewModel.RedirectUrl = registrationProgress.RedirectUrl;
+            viewModel.RedirectUrl = registrationProgress?.RedirectUrl;
             return View(viewModel);
         }
 
