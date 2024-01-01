@@ -572,8 +572,6 @@ namespace SimpleIdServer.IdServer.Domains
         private string? Translate(string key)
         {
             var translation = Translations.FirstOrDefault(t => t.Key == key && t.Language == Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName);
-            if (translation != null) return translation.Value;
-            translation = Translations.FirstOrDefault(t => t.Key == key && t.Language == Language.Default);
             return translation?.Value;
         }
 

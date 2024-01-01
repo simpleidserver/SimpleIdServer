@@ -16,12 +16,4 @@ public static class LanguageReducers
         => new LanguagesState(act.Languages, false);
 
     #endregion
-
-    #region CurrentLanguageState
-
-    [ReducerMethod]
-    public static CurrentLanguageState ReduceSetDefaultLanguageSuccessAction(CurrentLanguageState state, SetDefaultLanguageSuccessAction act)
-        => new CurrentLanguageState { CurrentLanguage = act.Language };
-
-    #endregion
 }

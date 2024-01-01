@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using NUnit.Framework;
 using SimpleIdServer.IdServer.Domains;
+using System.Globalization;
 
 namespace SimpleIdServer.Configuration.Tests;
 
@@ -10,6 +11,7 @@ public class ConfigurationDefinitionExtractorFixture
     [Test]
     public void When_Extract_UserOptions_To_ConfigurationDefinition_Then_ExtractionIsCorrect()
     {
+        CultureInfo.CurrentCulture = new CultureInfo("en");
         // ACT
         var configurationDefinition = ConfigurationDefinitionExtractor.Extract<UserOptions>();
 

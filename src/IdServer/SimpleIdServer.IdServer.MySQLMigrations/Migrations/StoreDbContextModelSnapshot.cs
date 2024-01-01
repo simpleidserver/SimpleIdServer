@@ -2966,6 +2966,25 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Language", b =>
+            {
+                b.Property<string>("Code")
+                    .HasColumnType("varchar(255)")
+                    .HasAnnotation("Relational:JsonPropertyName", "code");
+
+                b.Property<DateTime>("CreateDateTime")
+                    .HasColumnType("datetime(6)")
+                    .HasAnnotation("Relational:JsonPropertyName", "create_datetime");
+
+                b.Property<DateTime>("UpdateDateTime")
+                    .HasColumnType("datetime(6)")
+                    .HasAnnotation("Relational:JsonPropertyName", "update_datetime");
+
+                b.HasKey("Code");
+
+                b.ToTable("Languages");
+            });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UMAPendingRequest", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.UMAResource", "Resource")

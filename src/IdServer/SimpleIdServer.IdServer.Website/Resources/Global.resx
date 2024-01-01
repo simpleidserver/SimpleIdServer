@@ -429,4 +429,7 @@
   <data name="ScopeResourcesRemoved" xml:space="preserve">
     <value>Scope resources have been removed</value>
   </data>
+  <data name="Manage" xml:space="preserve">
+    <value>Manage</value>
+  </data>
 </root>

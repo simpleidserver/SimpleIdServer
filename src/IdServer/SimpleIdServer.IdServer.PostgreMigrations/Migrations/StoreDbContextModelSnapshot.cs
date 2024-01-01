@@ -1565,6 +1565,25 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.ToTable("ImportSummaries");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Language", b =>
+                {
+                    b.Property<string>("Code")
+                        .HasColumnType("text")
+                        .HasAnnotation("Relational:JsonPropertyName", "code");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasAnnotation("Relational:JsonPropertyName", "create_datetime");
+
+                    b.Property<DateTime>("UpdateDateTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasAnnotation("Relational:JsonPropertyName", "update_datetime");
+
+                    b.HasKey("Code");
+
+                    b.ToTable("Languages");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.NetworkConfiguration", b =>
                 {
                     b.Property<string>("Name")

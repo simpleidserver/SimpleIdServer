@@ -18,6 +18,7 @@ if (!string.IsNullOrWhiteSpace(forceHttpsStr) && bool.TryParse(forceHttpsStr, ou
     forceHttps = r;
 
 builder.Services.AddDefaultSecurity(builder.Configuration);
+builder.Services.AddLocalization();
 
 var app = builder.Build();
 
@@ -31,6 +32,12 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseStaticFiles();
+app.UseRequestLocalization(e =>
+{
+    e.SetDefaultCulture("en");
+    e.AddSupportedCultures("en");
+    e.AddSupportedUICultures("en");
+});
 app.UseRouting();
 app.UseCookiePolicy();
 app.UseAuthentication();
