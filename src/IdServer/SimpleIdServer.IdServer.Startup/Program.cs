@@ -15,6 +15,7 @@ using NeoSmart.Caching.Sqlite.AspNetCore;
 using SimpleIdServer.Configuration;
 using SimpleIdServer.Configuration.Redis;
 using SimpleIdServer.IdServer;
+using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Console;
 using SimpleIdServer.IdServer.CredentialIssuer;
 using SimpleIdServer.IdServer.Domains;
@@ -26,12 +27,15 @@ using SimpleIdServer.IdServer.Provisioning.SCIM;
 using SimpleIdServer.IdServer.Provisioning.SCIM.Jobs;
 using SimpleIdServer.IdServer.Pwd;
 using SimpleIdServer.IdServer.Sms;
+using SimpleIdServer.IdServer.Sms.Services;
 using SimpleIdServer.IdServer.Startup;
 using SimpleIdServer.IdServer.Startup.Configurations;
 using SimpleIdServer.IdServer.Startup.Converters;
+using SimpleIdServer.IdServer.Startup.SMSAuthentication;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Swagger;
 using SimpleIdServer.IdServer.TokenTypes;
+using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.WsFederation;
 using System;
 using System.Collections.Generic;
@@ -137,7 +141,7 @@ void ConfigureIdServer(IServiceCollection services)
         .AddBackChannelAuthentication()
         .AddPwdAuthentication()
         .AddEmailAuthentication()
-        .AddSmsAuthentication()
+         //.AddSmsAuthentication()
         .AddFcmNotification()
         .AddSamlIdp()
         .AddFidoAuthentication(f =>
@@ -163,7 +167,17 @@ void ConfigureIdServer(IServiceCollection services)
     if (isRealmEnabled) idServerBuilder.UseRealm();
     services.AddDIDKey();
     services.AddDIDEthr();
+    AddAliSmsAuthentication(services);
     ConfigureDistributedCache();
+}
+
+void AddAliSmsAuthentication(IServiceCollection services)
+{
+    services.AddTransient<IUserNotificationService, AliSmsUserNotificationService>();
+    services.AddTransient<ISmsUserNotificationService, AliSmsUserNotificationService>();
+    services.AddTransient<IAuthenticationMethodService, AliSmsAuthenticationMethodService>();
+    services.AddTransient<IUserSmsAuthenticationService, UserSmsAuthenticationService>();
+    services.AddTransient<IResetPasswordService, UserSmsResetPasswordService>();
 }
 
 void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
@@ -181,6 +195,7 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
         o.Add<IdServerPasswordOptions>();
         o.Add<FidoOptions>();
         o.Add<IdServerConsoleOptions>();
+        o.Add<AliSmsOptions>();
         o.Add<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>();
         if (conf.Type == DistributedCacheTypes.REDIS)
         {
@@ -427,12 +442,13 @@ void SeedData(WebApplication application, string scimBaseUrl)
             AddMissingConfigurationDefinition<LDAPRepresentationsExtractionJobOptions>(dbContext);
             AddMissingConfigurationDefinition<SCIMRepresentationsExtractionJobOptions>(dbContext);
             AddMissingConfigurationDefinition<IdServerEmailOptions>(dbContext);
-            AddMissingConfigurationDefinition<IdServerSmsOptions>(dbContext);
+            // AddMissingConfigurationDefinition<IdServerSmsOptions>(dbContext);
             AddMissingConfigurationDefinition<IdServerPasswordOptions>(dbContext);
             AddMissingConfigurationDefinition<FidoOptions>(dbContext);
             AddMissingConfigurationDefinition<IdServerConsoleOptions>(dbContext);
             AddMissingConfigurationDefinition<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>(dbContext);
             AddMissingConfigurationDefinition<GoogleOptionsLite>(dbContext);
+            AddMissingConfigurationDefinition<AliSmsOptions>(dbContext);
             EnableIsolationLevel(dbContext);
             dbContext.SaveChanges();
         }
