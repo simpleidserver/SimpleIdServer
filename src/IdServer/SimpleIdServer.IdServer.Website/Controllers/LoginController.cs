@@ -4,6 +4,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using SimpleIdServer.IdServer.Website.ViewModels;
 using System.Text.Json;
@@ -14,10 +15,14 @@ namespace SimpleIdServer.IdServer.Website.Controllers;
 public class LoginController : Controller
 {
     private readonly DefaultSecurityOptions _defaultSecurityOptions;
+    private readonly ILogger<LoginController> _logger;
 
-    public LoginController(DefaultSecurityOptions defaultSecurityOptions)
+    public LoginController(
+        DefaultSecurityOptions defaultSecurityOptions,
+        ILogger<LoginController> logger)
     {
         _defaultSecurityOptions = defaultSecurityOptions;
+        _logger = logger;
     }
 
     [Route("login")]
@@ -37,7 +42,8 @@ public class LoginController : Controller
 
     [Route("callback")]
     public async Task<IActionResult> Callback()
-    {        
+    {
+        _logger.LogInformation("Execute callback");
         var tokenEndpoint = $"{_defaultSecurityOptions.Issuer}/token";
         var userInfoEndpoint = $"{_defaultSecurityOptions.Issuer}/userinfo";
         var authorizationResponse = await ExtractAuthorizationResponse();
