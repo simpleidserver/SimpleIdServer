@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -296,6 +297,8 @@ void ConfigureStorage(DbContextOptionsBuilder b)
                 o.MigrationsAssembly("SimpleIdServer.IdServer.SqliteMigrations");
                 o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
             });
+            // SQLITE creates an ambient transaction.
+            b.ConfigureWarnings(x => x.Ignore(RelationalEventId.AmbientTransactionWarning));
             break;
     }
 }

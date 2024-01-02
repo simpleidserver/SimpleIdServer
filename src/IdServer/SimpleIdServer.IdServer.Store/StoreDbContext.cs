@@ -13,6 +13,7 @@ namespace SimpleIdServer.IdServer.Store
 
         public DbSet<Client> Clients { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<RealmUser> RealmUser { get; set; }
         public DbSet<Scope> Scopes { get; set; }
         public DbSet<Translation> Translations { get; set; }
         public DbSet<Token> Tokens { get; set; }

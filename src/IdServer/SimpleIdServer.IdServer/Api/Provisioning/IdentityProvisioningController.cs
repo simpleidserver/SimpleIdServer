@@ -286,7 +286,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
                 var type = Type.GetType(result.Definition.OptionsFullQualifiedName);
                 var section = _configuration.GetSection($"{result.Name}:{result.Definition.OptionsName}");
                 var options = section.Get(type);
-                var extractionResult = await provisioningService.Extract(options, result.Definition).FirstOrDefault();
+                var extractionResult = await provisioningService.ExtractTestData(options, result.Definition);
                 var extractionResultLst = new List<IdentityProvisioningExtractionResult>();
                 if(extractionResult != null)
                 {

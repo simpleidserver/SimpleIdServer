@@ -41,6 +41,27 @@ public class LDAPProvisioningService : IProvisioningService
         }
     }
 
+    public async Task<ExtractedResult> ExtractTestData(object obj, IdentityProvisioningDefinition definition)
+    {
+        var options = obj as LDAPRepresentationsExtractionJobOptions;
+        var pr = new PageResultRequestControl(options.BatchSize);
+        var request = new SearchRequest(options.UsersDN, $"(&{string.Join(string.Empty, options.UserObjectClasses.Split(',').Select(o => $"(objectClass={o})"))})", SearchScope.Subtree);
+        request.Controls.Add(pr);
+        var credentials = new NetworkCredential(options.BindDN, options.BindCredentials);
+        int currentPage = 0;
+        using (var connection = new LdapConnection(new LdapDirectoryIdentifier(options.Server, options.Port), credentials, AuthType.Basic))
+        {
+            connection.SessionOptions.ProtocolVersion = 3;
+            connection.Bind();
+            var response = (SearchResponse)connection.SendRequest(request);
+            if (!response.Controls.Any()) return new ExtractedResult();
+            var pageResponse = (PageResultResponseControl)response.Controls[0];
+            var extractionResultLst = ExtractUsers(response.Entries, options, definition);
+            var record = new ExtractedResult { CurrentPage = currentPage, Users = extractionResultLst };
+            return record;
+        }
+    }
+
     public Task<IEnumerable<string>> GetAllowedAttributes(object obj)
     {
         var result = new List<string>();
