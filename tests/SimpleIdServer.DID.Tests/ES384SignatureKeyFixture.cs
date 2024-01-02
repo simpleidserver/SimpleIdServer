@@ -13,7 +13,7 @@ public class ES384SignatureKeyFixture
         // ARRANGE
         var key = ES384SignatureKey.Generate();
         var jwk = key.GetPublicJwk();
-        var newKey = ES384SignatureKey.From(jwk);
+        var newKey = ES384SignatureKey.From(jwk, null);
 
         // ACT
         var newJwk = newKey.GetPublicJwk();

@@ -28,7 +28,7 @@ public class JsonWebKey2020Formatter : IVerificationMethodFormatter
 
     public string Type => "JsonWebKey2020";
 
-    public DidDocumentVerificationMethod Format(DidDocument idDocument, IAsymmetricKey signatureKey)
+    public DidDocumentVerificationMethod Format(DidDocument idDocument, IAsymmetricKey signatureKey, bool includePrivateKey)
     {
         var publicJWK = signatureKey.GetPublicJwk();
         var id = string.Empty;
@@ -41,11 +41,17 @@ public class JsonWebKey2020Formatter : IVerificationMethodFormatter
             id = $"{idDocument.Id}#{publicJWK.ComputeJwkThumbprint().ToHex()}";
         }
 
-        return new DidDocumentVerificationMethod
+        var result = new DidDocumentVerificationMethod
         {
             Id = id,
             PublicKeyJwk = publicJWK
         };
+        if(includePrivateKey)
+        {
+            result.PrivateKeyJwk = signatureKey.GetPrivateJwk();
+        }
+
+        return result;
     }
 
     public IAsymmetricKey Extract(DidDocumentVerificationMethod didDocumentVerificationMethod)
@@ -53,7 +59,7 @@ public class JsonWebKey2020Formatter : IVerificationMethodFormatter
         return _verificationMethods.Single(v =>
             v.Kty == didDocumentVerificationMethod.PublicKeyJwk.Kty &&
             v.CrvOrSize == didDocumentVerificationMethod.PublicKeyJwk.Crv)
-            .Build(didDocumentVerificationMethod.PublicKeyJwk);
+            .Build(didDocumentVerificationMethod.PublicKeyJwk, didDocumentVerificationMethod.PrivateKeyJwk);
 
     }
 

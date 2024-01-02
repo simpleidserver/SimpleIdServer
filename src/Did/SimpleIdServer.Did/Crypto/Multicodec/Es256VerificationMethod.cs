@@ -9,9 +9,11 @@ public class Es256VerificationMethod : IVerificationMethod
 {
     public string MulticodecPublicKeyHexValue => MULTICODEC_HEX_VALUE;
 
-    public string MulticodecPrivateKeyHexValue => string.Empty;
+    public string MulticodecPrivateKeyHexValue => MULTICODEC_HEX_VALUE_PRIVATE_KEY;
 
     public const string MULTICODEC_HEX_VALUE = "0x1200";
+
+    public const string MULTICODEC_HEX_VALUE_PRIVATE_KEY = "0x1306";
 
     public int KeySize => 33;
 
@@ -19,9 +21,9 @@ public class Es256VerificationMethod : IVerificationMethod
 
     public string CrvOrSize => Constants.StandardCrvOrSize.P256;
 
-    public IAsymmetricKey Build(byte[] payload)
-        => ES256SignatureKey.From(payload, null);
+    public IAsymmetricKey Build(byte[] publicKey, byte[] privateKey)
+        => ES256SignatureKey.From(publicKey, privateKey);
 
-    public IAsymmetricKey Build(JsonWebKey jwk)
-        => ES256SignatureKey.From(jwk);
+    public IAsymmetricKey Build(JsonWebKey publicJwk, JsonWebKey privateJwk)
+        => ES256SignatureKey.From(publicJwk, privateJwk);
 }

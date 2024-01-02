@@ -7,12 +7,10 @@ using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
 using System;
 using System.Collections.Generic;
-using System.Security.Cryptography;
-using Enc = System.Text.Encoding;
 
 namespace SimpleIdServer.Did.Crypto;
 
-public abstract class BaseESSignatureKey : ISignatureKey
+public abstract class BaseESSignatureKey : IAsymmetricKey
 {
     private X9ECParameters _curve;
     private ECPublicKeyParameters _publicKey;
@@ -27,15 +25,6 @@ public abstract class BaseESSignatureKey : ISignatureKey
     public string Kty => Constants.StandardKty.EC;
 
     public abstract string CrvOrSize { get; }
-
-    public byte[] PrivateKey
-    {
-        get
-        {
-            if (_privateKey == null) return null;
-            return _privateKey.D.ToByteArrayUnsigned();
-        }
-    }
 
     public void Import(byte[] publicKey, byte[] privateKey)
     {
@@ -52,43 +41,44 @@ public abstract class BaseESSignatureKey : ISignatureKey
                 domainParameters);
     }
 
-    public void Import(JsonWebKey jwk)
+    public void Import(JsonWebKey publicJwk, JsonWebKey privateJwk)
     {
-        if (jwk == null) throw new ArgumentNullException(nameof(jwk));
-        if (jwk.X == null || jwk.Y == null) throw new InvalidOperationException("There is no public key");
-        var x = Base64UrlEncoder.DecodeBytes(jwk.X);
-        var y = Base64UrlEncoder.DecodeBytes(jwk.Y);
+        if (publicJwk == null) throw new ArgumentNullException(nameof(publicJwk));
+        if (publicJwk.X == null || publicJwk.Y == null) throw new InvalidOperationException("There is no public key");
+        var x = Base64UrlEncoder.DecodeBytes(publicJwk.X);
+        var y = Base64UrlEncoder.DecodeBytes(publicJwk.Y);
         var ecPoint = _curve.Curve.CreatePoint(
             new Org.BouncyCastle.Math.BigInteger(1, x),
             new Org.BouncyCastle.Math.BigInteger(1, y));
+        var domainParameters = new ECDomainParameters(_curve.Curve, _curve.G, _curve.N, _curve.H);
         _publicKey = new ECPublicKeyParameters(
             ecPoint,
-            new ECDomainParameters(_curve.Curve, _curve.G, _curve.N, _curve.H));
+            domainParameters);
+        if(privateJwk != null)
+        {
+            var d = Base64UrlEncoder.DecodeBytes(privateJwk.D);
+            _privateKey = new ECPrivateKeyParameters(
+                new Org.BouncyCastle.Math.BigInteger(1, d),
+                domainParameters);
+        }
     }
-
-    public bool Check(string content, string signature) 
-        => Check(System.Text.Encoding.UTF8.GetBytes(content), Base64UrlEncoder.DecodeBytes(signature));
 
     public bool Check(byte[] content, byte[] signature)
     {
         throw new NotImplementedException();
     }
 
-    public string Sign(string content)
-        => Sign(Enc.UTF8.GetBytes(content));
-
-    public string Sign(byte[] content)
+    public byte[] Sign(byte[] content)
     {
         if (content == null) throw new ArgumentNullException(nameof(content));
         if (_privateKey == null) throw new InvalidOperationException("There is no private key");
-        var hash = Hash(content);
         var signer = new DeterministicECDSA();
         signer.SetPrivateKey(_privateKey);
-        var sig = ECDSASignature.FromDER(signer.SignHash(hash));
+        var sig = ECDSASignature.FromDER(signer.SignHash(content));
         var lst = new List<byte>();
         lst.AddRange(sig.R.ToByteArrayUnsigned());
         lst.AddRange(sig.S.ToByteArrayUnsigned());
-        return Base64UrlEncoder.Encode(lst.ToArray());
+        return lst.ToArray();
     }
 
     public byte[] GetPublicKey(bool compressed = false)
@@ -97,6 +87,12 @@ public abstract class BaseESSignatureKey : ISignatureKey
         q = q.Normalize();
         var publicKey = _curve.Curve.CreatePoint(q.XCoord.ToBigInteger(), q.YCoord.ToBigInteger()).GetEncoded(compressed);
         return publicKey;
+    }
+
+    public byte[] GetPrivateKey()
+    {
+        var privateKey = _privateKey.D.ToByteArrayUnsigned();
+        return privateKey;
     }
 
     public JsonWebKey GetPublicJwk()
@@ -113,6 +109,14 @@ public abstract class BaseESSignatureKey : ISignatureKey
         return result;
     }
 
+    public JsonWebKey GetPrivateJwk()
+    {
+        var d = _privateKey.D;
+        var result = GetPublicJwk();
+        result.D = Base64UrlEncoder.Encode(d.ToByteArrayUnsigned());
+        return result;
+    }
+
     protected void Random()
     {
         var random = new SecureRandom();
@@ -122,14 +126,5 @@ public abstract class BaseESSignatureKey : ISignatureKey
         var keyPair = generator.GenerateKeyPair();
         _publicKey = keyPair.Public as ECPublicKeyParameters;
         _privateKey = keyPair.Private as ECPrivateKeyParameters;
-    }
-
-    private static byte[] Hash(byte[] payload)
-    {
-        byte[] result = null;
-        using (var sha256 = SHA256.Create())
-            result = sha256.ComputeHash(payload);
-
-        return result;
     }
 }

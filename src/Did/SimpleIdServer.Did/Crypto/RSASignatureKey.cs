@@ -5,13 +5,11 @@ using System;
 
 namespace SimpleIdServer.Did.Crypto
 {
-    public class RSASignatureKey : ISignatureKey
+    public class RSASignatureKey : IAsymmetricKey
     {
         public string Kty => Constants.StandardKty.RSA;
 
         public string CrvOrSize => Constants.StandardCrvOrSize.RSA2048;
-
-        public byte[] PrivateKey => throw new NotImplementedException();
 
         public bool Check(string content, string signature)
         {
@@ -28,7 +26,17 @@ namespace SimpleIdServer.Did.Crypto
             throw new NotImplementedException();
         }
 
+        public JsonWebKey GetPrivateJwk()
+        {
+            throw new NotImplementedException();
+        }
+
         public byte[] GetPublicKey(bool compressed = false)
+        {
+            throw new NotImplementedException();
+        }
+
+        public byte[] GetPrivateKey()
         {
             throw new NotImplementedException();
         }
@@ -38,7 +46,7 @@ namespace SimpleIdServer.Did.Crypto
             throw new NotImplementedException();
         }
 
-        public void Import(JsonWebKey publicKey)
+        public void Import(JsonWebKey publicJwk, JsonWebKey privateJwk)
         {
             throw new NotImplementedException();
         }
@@ -49,6 +57,11 @@ namespace SimpleIdServer.Did.Crypto
         }
 
         public string Sign(byte[] content)
+        {
+            throw new NotImplementedException();
+        }
+
+        byte[] IAsymmetricKey.Sign(byte[] content)
         {
             throw new NotImplementedException();
         }

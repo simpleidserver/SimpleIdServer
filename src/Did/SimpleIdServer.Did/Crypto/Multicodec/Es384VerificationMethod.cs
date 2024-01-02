@@ -9,10 +9,12 @@ public class Es384VerificationMethod : IVerificationMethod
 {
     public string MulticodecPublicKeyHexValue => MULTICODEC_HEX_VALUE;
 
-    public string MulticodecPrivateKeyHexValue => string.Empty;
+    public string MulticodecPrivateKeyHexValue => MULTICODEC_HEX_VALUE_PRIVATE_KEY;
 
 
     public const string MULTICODEC_HEX_VALUE = "0x1201";
+
+    public const string MULTICODEC_HEX_VALUE_PRIVATE_KEY = "0x1307";
 
     public int KeySize => 49;
 
@@ -20,9 +22,9 @@ public class Es384VerificationMethod : IVerificationMethod
 
     public string CrvOrSize => Constants.StandardCrvOrSize.P384;
 
-    public IAsymmetricKey Build(byte[] payload)
-        => ES384SignatureKey.From(payload, null);
+    public IAsymmetricKey Build(byte[] publicKey, byte[] privateKey)
+        => ES384SignatureKey.From(publicKey, privateKey);
 
-    public IAsymmetricKey Build(JsonWebKey jwk)
-        => ES384SignatureKey.From(jwk);
+    public IAsymmetricKey Build(JsonWebKey publicJwk, JsonWebKey privateJwk)
+        => ES384SignatureKey.From(publicJwk, privateJwk);
 }

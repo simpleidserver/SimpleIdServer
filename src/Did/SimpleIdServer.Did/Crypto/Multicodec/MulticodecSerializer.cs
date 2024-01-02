@@ -10,11 +10,10 @@ namespace SimpleIdServer.Did.Crypto.Multicodec;
 
 public interface IMulticodecSerializer
 {
-    IAsymmetricKey Deserialize(string value);
-    IAsymmetricKey Deserialize(byte[] payload);
-    byte[] GetPublicKey(string multicodecValue);
-    byte[] GetPrivateKey(string multicodecValue);
-    string Serialize(IAsymmetricKey signatureKey);
+    IAsymmetricKey Deserialize(string publicKey, string privateKey);
+    IAsymmetricKey Deserialize(byte[] publicKeyPayload, byte[] privateKeyPayload);
+    string SerializePublicKey(IAsymmetricKey signatureKey);
+    string SerializePrivateKey(IAsymmetricKey signatureKey);
 }
 
 /// <summary>
@@ -30,50 +29,46 @@ public class MulticodecSerializer : IMulticodecSerializer
         _verificationMethods = verificationMethods;
     }
 
-    public IAsymmetricKey Deserialize(string value)
+    public IAsymmetricKey Deserialize(string publicKey, string privateKey)
     {
-        var payload = MultibaseEncoding.Decode(value);
-        return Deserialize(payload);
+        var publicKeyPayload = MultibaseEncoding.Decode(publicKey);
+        var privateKeyPayload = MultibaseEncoding.Decode(privateKey);
+        return Deserialize(publicKeyPayload, privateKeyPayload);
     }
 
-    public IAsymmetricKey Deserialize(byte[] payload)
+    public IAsymmetricKey Deserialize(byte[] publicKeyPayload, byte[] privateKeyPayload)
     {
-        if (payload == null)throw new ArgumentNullException(nameof(payload));
-        var hex = payload.ToHex(true);
+        if (publicKeyPayload == null)throw new ArgumentNullException(nameof(publicKeyPayload));
+        var hex = publicKeyPayload.ToHex(true);
         var verificationMethod = _verificationMethods.SingleOrDefault(m => hex.StartsWith(m.MulticodecPublicKeyHexValue));
-        if (verificationMethod == null) throw new InvalidOperationException("Either the multicodec is invalid or the verification method is not supported");
+        if (verificationMethod == null) throw new InvalidOperationException("Public key; Either the multicodec is invalid or the verification method is not supported");
+        byte[] privateKey = null;
+        if(privateKeyPayload != null)
+        {
+            var hexPrivateKey = privateKeyPayload.ToHex(true);
+            if(!hexPrivateKey.StartsWith(verificationMethod.MulticodecPrivateKeyHexValue)) throw new InvalidOperationException("Private key; Either the multicodec is invalid or the verification method is not supported");
+            var privateKeyMulticodecHeaderPayload = verificationMethod.MulticodecPrivateKeyHexValue.HexToByteArray();
+            privateKey = privateKeyPayload.Skip(privateKeyMulticodecHeaderPayload.Length).ToArray();
+        }
+
         var multicodecHeaderPayload = verificationMethod.MulticodecPublicKeyHexValue.HexToByteArray();
-        var publicKey = payload.Skip(multicodecHeaderPayload.Length).ToArray();
-        return verificationMethod.Build(publicKey);
+        var publicKey = publicKeyPayload.Skip(multicodecHeaderPayload.Length).ToArray();
+        return verificationMethod.Build(publicKey, privateKey);
     }
 
-    public byte[] GetPublicKey(string multicodecValue)
-    {
-        var payload = MultibaseEncoding.Decode(multicodecValue);
-        var hex = payload.ToHex(true);
-        var verificationMethod = _verificationMethods.SingleOrDefault(m => hex.StartsWith(m.MulticodecPublicKeyHexValue));
-        if (verificationMethod == null) throw new InvalidOperationException("Either the multicodec is invalid or the verification method is not supported");
-        var multicodecHeaderPayload = verificationMethod.MulticodecPublicKeyHexValue.HexToByteArray();
-        var publicKey = payload.Skip(multicodecHeaderPayload.Length).ToArray();
-        return publicKey;
-    }
-
-    public byte[] GetPrivateKey(string multicodecValue)
-    {
-        var payload = MultibaseEncoding.Decode(multicodecValue);
-        var hex = payload.ToHex(true);
-        var verificationMethod = _verificationMethods.SingleOrDefault(m => !string.IsNullOrWhiteSpace(m.MulticodecPrivateKeyHexValue) && hex.StartsWith(m.MulticodecPrivateKeyHexValue));
-        if (verificationMethod == null) throw new InvalidOperationException("Either the multicodec is invalid or the verification method is not supported");
-        var multicodecHeaderPayload = verificationMethod.MulticodecPrivateKeyHexValue.HexToByteArray();
-        var publicKey = payload.Skip(multicodecHeaderPayload.Length).ToArray();
-        return publicKey;
-    }
-
-    public string Serialize(IAsymmetricKey signatureKey)
+    public string SerializePublicKey(IAsymmetricKey signatureKey)
     {
         var verificationMethod = _verificationMethods.Single(m => m.Kty == signatureKey.Kty && m.CrvOrSize == signatureKey.CrvOrSize);
         var publicKey = verificationMethod.MulticodecPublicKeyHexValue.HexToByteArray().ToList();
         publicKey.AddRange(signatureKey.GetPublicKey());
         return MultibaseEncoding.Encode(publicKey.ToArray());
+    }
+
+    public string SerializePrivateKey(IAsymmetricKey signatureKey)
+    {
+        var verificationMethod = _verificationMethods.Single(m => m.Kty == signatureKey.Kty && m.CrvOrSize == signatureKey.CrvOrSize);
+        var privateKey = verificationMethod.MulticodecPrivateKeyHexValue.HexToByteArray().ToList();
+        privateKey.AddRange(signatureKey.GetPrivateKey());
+        return MultibaseEncoding.Encode(privateKey.ToArray());
     }
 }

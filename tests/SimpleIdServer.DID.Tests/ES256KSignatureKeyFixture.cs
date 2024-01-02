@@ -29,7 +29,7 @@ public class ES256KSignatureKeyFixture
         // ARRANGE
         var key = ES256KSignatureKey.Generate();
         var jwk = key.GetPublicJwk();
-        var newKey = ES256KSignatureKey.From(jwk);
+        var newKey = ES256KSignatureKey.From(jwk, null);
 
         // ACT
         var newJwk = newKey.GetPublicJwk();

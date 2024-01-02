@@ -19,7 +19,8 @@ namespace SimpleIdServer.Did
         private readonly List<string> _contextUrls = new List<string>();
         private readonly List<JsonObject> _context = new List<JsonObject>();
         private readonly List<string> _controllers = new List<string>();
-        private readonly List<DidDocumentVerificationMethod> _innerVerificationMethods = new List<DidDocumentVerificationMethod>(); 
+        private readonly List<DidDocumentVerificationMethod> _innerVerificationMethods = new List<DidDocumentVerificationMethod>();
+        private readonly bool _includePrivateKey = false;
         private readonly DidDocument _identityDocument;
         private readonly IEnumerable<IVerificationMethodFormatter> _verificationMethodBuilders = new List<IVerificationMethodFormatter>
         {
@@ -28,25 +29,27 @@ namespace SimpleIdServer.Did
             FormatterFactory.BuildX25519KeyAgreementFormatter()
         };
 
-        protected DidDocumentBuilder(DidDocument identityDocument) 
+        protected DidDocumentBuilder(DidDocument identityDocument, bool includePrivateKey) 
         {
             _identityDocument = identityDocument;
+            _includePrivateKey = includePrivateKey;
         }
 
         protected DidDocumentBuilder(DidDocument identityDocument,
-            IEnumerable<IVerificationMethodFormatter> verificationMethodBuilders) : this(identityDocument)
+            bool includePrivateKey,
+            IEnumerable<IVerificationMethodFormatter> verificationMethodBuilders) : this(identityDocument, includePrivateKey)
         {
             _verificationMethodBuilders = verificationMethodBuilders;
         }
 
         protected DidDocument IdentityDocument => _identityDocument;
 
-        public static DidDocumentBuilder New(string id) => new DidDocumentBuilder(new DidDocument
+        public static DidDocumentBuilder New(string id, bool includePrivateKey = false) => new DidDocumentBuilder(new DidDocument
         {
             Id = id
-        });
+        }, includePrivateKey);
 
-        public static DidDocumentBuilder New(DidDocument identityDocument) => new DidDocumentBuilder(identityDocument);
+        public static DidDocumentBuilder New(DidDocument identityDocument, bool includePrivateKey = false) => new DidDocumentBuilder(identityDocument, includePrivateKey);
 
         #region JSON-LD Context
 
@@ -165,9 +168,8 @@ namespace SimpleIdServer.Did
 
         private DidDocumentBuilder AddVerificationMethod(IAsymmetricKey asymmKey, string controller, string ldContext, VerificationMethodUsages usage, bool isReference)
         {
-            var isSigKey = (asymmKey as ISignatureKey) != null;
-            if (usage.HasFlag(VerificationMethodUsages.KEY_AGREEMENT) && isSigKey) throw new ArgumentException("Signature key cannot be used in a Key Agreement");
-            if (!isSigKey && !usage.HasFlag(VerificationMethodUsages.KEY_AGREEMENT)) throw new ArgumentException("Key can only be used in a Key Agreement");
+            var isKeyAgreement = (asymmKey as IAgreementKey) != null;
+            if (usage.HasFlag(VerificationMethodUsages.KEY_AGREEMENT) && !isKeyAgreement) throw new ArgumentException("Signature key cannot be used in a Key Agreement");
             var verificationMethod = BuildVerificationMethod(asymmKey, controller, ldContext);
             verificationMethod.Usage = usage;
             if (isReference)
@@ -185,7 +187,7 @@ namespace SimpleIdServer.Did
         private DidDocumentVerificationMethod BuildVerificationMethod(IAsymmetricKey signatureKey, string controller, string ldContext)
         {
             var builder = _verificationMethodBuilders.Single(v => v.JSONLDContext == ldContext);
-            var verificationMethod = builder.Format(_identityDocument, signatureKey);
+            var verificationMethod = builder.Format(_identityDocument, signatureKey, _includePrivateKey);
             verificationMethod.Type = builder.Type;
             verificationMethod.Controller = controller;
             AddContext(builder.JSONLDContext);

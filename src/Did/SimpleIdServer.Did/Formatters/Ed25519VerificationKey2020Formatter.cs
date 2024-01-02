@@ -25,15 +25,22 @@ public class Ed25519VerificationKey2020Formatter : IVerificationMethodFormatter
 
     public string Type => TYPE;
 
-    public DidDocumentVerificationMethod Format(DidDocument idDocument, IAsymmetricKey signatureKey)
+    public DidDocumentVerificationMethod Format(DidDocument idDocument, IAsymmetricKey signatureKey, bool includePrivateKey)
     {
-        return new DidDocumentVerificationMethod
+        var publicKey = _serializer.SerializePublicKey(signatureKey);
+        var result = new DidDocumentVerificationMethod
         {
             Id = $"{idDocument.Id}#keys-{(idDocument.VerificationMethod.Where(m => m.Type == Type).Count() + 1)}",
-            PublicKeyMultibase = _serializer.Serialize(signatureKey)
+            PublicKeyMultibase = publicKey
         };
+        if(includePrivateKey)
+        {
+            result.SecretKeyMultibase = _serializer.SerializePrivateKey(signatureKey);
+        }
+
+        return result;
     }
 
     public IAsymmetricKey Extract(DidDocumentVerificationMethod didDocumentVerificationMethod)
-        => _serializer.Deserialize(didDocumentVerificationMethod.PublicKeyMultibase);
+        => _serializer.Deserialize(didDocumentVerificationMethod.PublicKeyMultibase, didDocumentVerificationMethod.SecretKeyMultibase);
 }

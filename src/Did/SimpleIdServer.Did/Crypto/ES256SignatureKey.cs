@@ -26,10 +26,10 @@ public class ES256SignatureKey : BaseESSignatureKey
         return result;
     }
 
-    public static ES256SignatureKey From(JsonWebKey jwk)
+    public static ES256SignatureKey From(JsonWebKey publicJwk, JsonWebKey privateJwk)
     {
         var result = new ES256SignatureKey();
-        result.Import(jwk);
+        result.Import(publicJwk, privateJwk);
         return result;
     }
 }

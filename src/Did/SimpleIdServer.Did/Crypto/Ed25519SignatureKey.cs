@@ -13,7 +13,7 @@ namespace SimpleIdServer.Did.Crypto;
 /// <summary>
 /// Documentation : https://www.w3.org/community/reports/credentials/CG-FINAL-di-eddsa-2020-20220724/
 /// </summary>
-public class Ed25519SignatureKey : ISignatureKey
+public class Ed25519SignatureKey : IAsymmetricKey
 {
     private Ed25519PublicKeyParameters _publicKey;
     private Ed25519PrivateKeyParameters _privateKey;
@@ -34,15 +34,6 @@ public class Ed25519SignatureKey : ISignatureKey
 
     public string CrvOrSize => Constants.StandardCrvOrSize.Ed25519;
 
-    public byte[] PrivateKey
-    {
-        get
-        {
-            if (_privateKey == null) return null;
-            return _privateKey.GetEncoded();
-        }
-    }
-
     public static Ed25519SignatureKey From(byte[] publicKey, byte[] privateKey)
     {
         var result = new Ed25519SignatureKey();
@@ -50,10 +41,10 @@ public class Ed25519SignatureKey : ISignatureKey
         return result;
     }
 
-    public static Ed25519SignatureKey From(JsonWebKey jwk)
+    public static Ed25519SignatureKey From(JsonWebKey publicJwk, JsonWebKey privateJwk)
     {
         var result = new Ed25519SignatureKey();
-        result.Import(jwk);
+        result.Import(publicJwk, privateJwk);
         return result;
     }
 
@@ -81,16 +72,18 @@ public class Ed25519SignatureKey : ISignatureKey
         }
     }
 
-    public void Import(JsonWebKey publicKey)
+    public void Import(JsonWebKey publicJwk, JsonWebKey privateJwk)
     {
-        if (publicKey == null) throw new ArgumentNullException(nameof(publicKey));
-        if (publicKey.X == null) throw new InvalidOperationException("There is no public key");
-        var payload = Base64UrlEncoder.DecodeBytes(publicKey.X);
+        if (publicJwk == null) throw new ArgumentNullException(nameof(publicJwk));
+        if (publicJwk.X == null) throw new InvalidOperationException("There is no public key");
+        var payload = Base64UrlEncoder.DecodeBytes(publicJwk.X);
         _publicKey = new Ed25519PublicKeyParameters(payload);
+        if(privateJwk != null)
+        {
+            var d = Base64UrlEncoder.DecodeBytes(privateJwk.D);
+            _privateKey = new Ed25519PrivateKeyParameters(d);
+        }
     }
-
-    public bool Check(string content, string signature) 
-        => Check(System.Text.Encoding.UTF8.GetBytes(content), Base64UrlEncoder.DecodeBytes(signature));
 
     public bool Check(byte[] payload, byte[] signaturePayload)
     {
@@ -101,16 +94,13 @@ public class Ed25519SignatureKey : ISignatureKey
         return verifier.VerifySignature(signaturePayload);
     }
 
-    public string Sign(string content) 
-        => Sign(System.Text.Encoding.UTF8.GetBytes(content));
-
-    public string Sign(byte[] payload)
+    public byte[] Sign(byte[] payload)
     {
         if (_privateKey == null) throw new InvalidOperationException("There is no private key");
         var signer = new Ed25519Signer();
         signer.Init(true, _privateKey);
         signer.BlockUpdate(payload, 0, payload.Length);
-        return Base64UrlEncoder.Encode(signer.GenerateSignature());
+        return signer.GenerateSignature();
     }
 
     public byte[] GetPublicKey(bool compressed = false)
@@ -118,6 +108,9 @@ public class Ed25519SignatureKey : ISignatureKey
         if (_publicKey == null) return null;
         return _publicKey.GetEncoded();
     }
+
+    public byte[] GetPrivateKey() 
+        => _privateKey.GetEncoded();
 
     public JsonWebKey GetPublicJwk()
     {
@@ -127,6 +120,13 @@ public class Ed25519SignatureKey : ISignatureKey
             Crv = CrvOrSize,
             X = Base64UrlEncoder.Encode(_publicKey.GetEncoded())
         };
+        return result;
+    }
+
+    public JsonWebKey GetPrivateJwk()
+    {
+        var result = GetPublicJwk();
+        result.D = Base64UrlEncoder.Encode(_privateKey.GetEncoded());
         return result;
     }
 }

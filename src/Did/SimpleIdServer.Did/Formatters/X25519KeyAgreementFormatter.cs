@@ -25,15 +25,21 @@ public class X25519KeyAgreementFormatter : IVerificationMethodFormatter
     public string Type => "X25519KeyAgreementKey2019";
 
     public IAsymmetricKey Extract(DidDocumentVerificationMethod didDocumentVerificationMethod)
-        => _serializer.Deserialize(didDocumentVerificationMethod.PublicKeyMultibase);
+        => _serializer.Deserialize(didDocumentVerificationMethod.PublicKeyMultibase, didDocumentVerificationMethod.SecretKeyMultibase);
 
-    public DidDocumentVerificationMethod Format(DidDocument idDocument, IAsymmetricKey signatureKey)
+    public DidDocumentVerificationMethod Format(DidDocument idDocument, IAsymmetricKey signatureKey, bool includePrivateKey)
     {
-        var publicKey = _serializer.Serialize(signatureKey);
-        return new DidDocumentVerificationMethod
+        var publicKey = _serializer.SerializePublicKey(signatureKey);
+        var result = new DidDocumentVerificationMethod
         {
             Id = $"{idDocument.Id}#{publicKey}",
             PublicKeyMultibase = publicKey
         };
+        if(includePrivateKey)
+        {
+            result.SecretKeyMultibase = _serializer.SerializePrivateKey(signatureKey);
+        }
+
+        return result;
     }
 }

@@ -13,6 +13,6 @@ public interface IVerificationMethodFormatter
 {
     string JSONLDContext { get; }
     string Type { get; }
-    DidDocumentVerificationMethod Format(DidDocument idDocument, IAsymmetricKey signatureKey);
+    DidDocumentVerificationMethod Format(DidDocument idDocument, IAsymmetricKey signatureKey, bool includePrivateKey);
     IAsymmetricKey Extract(DidDocumentVerificationMethod didDocumentVerificationMethod);
 }

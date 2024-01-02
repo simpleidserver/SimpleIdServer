@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
-using static SimpleIdServer.Did.Constants;
 
 namespace SimpleIdServer.Did.Models
 {
@@ -46,11 +45,37 @@ namespace SimpleIdServer.Did.Models
         }
 
         /// <summary>
+        /// JSON Web Key.
+        /// MUST NOT contain "d" or any other members of the private information.
+        /// </summary>
+        [JsonIgnore]
+        public JsonWebKey PrivateKeyJwk { get; set; } = null;
+        [JsonPropertyName("privateKeyJwk")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public JsonObject SerializedPrivateKeyJwk
+        {
+            get
+            {
+                if (PrivateKeyJwk == null) return null;
+                var json = JsonExtensions.SerializeToJson(PrivateKeyJwk);
+                return JsonObject.Parse(json).AsObject();
+            }
+        }
+
+        /// <summary>
         /// MULTIBASE encoded public key.
         /// </summary>
         [JsonPropertyName("publicKeyMultibase")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string PublicKeyMultibase { get; set; } = null;
+
+
+        /// <summary>
+        /// MULTIBASE encoded private key.
+        /// </summary>
+        [JsonPropertyName("secretKeyMultibase")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string SecretKeyMultibase { get; set; } = null;
 
 
         [JsonPropertyName("blockchainAccountId")]

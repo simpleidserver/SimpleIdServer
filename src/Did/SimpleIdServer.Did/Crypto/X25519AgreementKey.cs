@@ -20,15 +20,6 @@ public class X25519AgreementKey : IAgreementKey
 
     public string CrvOrSize => Constants.StandardCrvOrSize.X25519;
 
-    public byte[] PrivateKey
-    {
-        get
-        {
-            if (_privateKey == null) return null;
-            return _privateKey.GetEncoded();
-        }
-    }
-
     public static X25519AgreementKey From(byte[] publicKey, byte[] privateKey)
     {
         var result = new X25519AgreementKey();
@@ -36,10 +27,10 @@ public class X25519AgreementKey : IAgreementKey
         return result;
     }
 
-    public static X25519AgreementKey From(JsonWebKey jwk)
+    public static X25519AgreementKey From(JsonWebKey publicJwk, JsonWebKey privateJwk)
     {
         var result = new X25519AgreementKey();
-        result.Import(jwk);
+        result.Import(publicJwk, privateJwk);
         return result;
     }
 
@@ -63,12 +54,17 @@ public class X25519AgreementKey : IAgreementKey
         }
     }
 
-    public void Import(JsonWebKey jwk)
+    public void Import(JsonWebKey publicJwk, JsonWebKey privateJwk)
     {
-        if(jwk == null) throw new ArgumentNullException(nameof(jwk));
-        if (jwk.X == null) throw new ArgumentNullException("there is no public key");
-        var payload = Base64UrlEncoder.DecodeBytes(jwk.X);
+        if(publicJwk == null) throw new ArgumentNullException(nameof(publicJwk));
+        if (publicJwk.X == null) throw new ArgumentNullException("there is no public key");
+        var payload = Base64UrlEncoder.DecodeBytes(publicJwk.X);
         _publicKey = new X25519PublicKeyParameters(payload);
+        if (privateJwk != null)
+        {
+            payload = Base64UrlEncoder.DecodeBytes(privateJwk.D);
+            _privateKey = new X25519PrivateKeyParameters(payload);
+        }
     }
 
     public void Random()
@@ -84,6 +80,9 @@ public class X25519AgreementKey : IAgreementKey
     public byte[] GetPublicKey(bool compressed = false)
         => _publicKey.GetEncoded();
 
+    public byte[] GetPrivateKey()
+        => _privateKey.GetEncoded();
+
     public JsonWebKey GetPublicJwk()
     {
         var result = new JsonWebKey
@@ -93,5 +92,27 @@ public class X25519AgreementKey : IAgreementKey
             X = Base64UrlEncoder.Encode(_publicKey.GetEncoded())
         };
         return result;
+    }
+
+    public JsonWebKey GetPrivateJwk()
+    {
+        var result = GetPublicJwk();
+        result.D = Base64UrlEncoder.Encode(_privateKey.GetEncoded());
+        return result;
+    }
+
+    public byte[] Sign()
+    {
+        return null;
+    }
+
+    public byte[] Sign(byte[] content)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool Check(byte[] content, byte[] signature)
+    {
+        throw new NotImplementedException();
     }
 }

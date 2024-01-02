@@ -12,6 +12,6 @@ public interface IVerificationMethod
     int KeySize { get; }
     string Kty { get; }
     string CrvOrSize { get; }
-    IAsymmetricKey Build(byte[] payload);
-    IAsymmetricKey Build(JsonWebKey jwk);
+    IAsymmetricKey Build(byte[] publicKey, byte[] privateKey);
+    IAsymmetricKey Build(JsonWebKey publicJwk, JsonWebKey privateJwk);
 }

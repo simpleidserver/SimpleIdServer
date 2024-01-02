@@ -10,6 +10,10 @@ namespace SimpleIdServer.Vc.Canonize;
 
 public class RdfCanonize : ICanonize
 {
+    public string Name => NAME;
+
+    public const string NAME = "RDF";
+
     public string Transform(string input)
     {
         if (string.IsNullOrWhiteSpace(input)) throw new ArgumentNullException(nameof(input));

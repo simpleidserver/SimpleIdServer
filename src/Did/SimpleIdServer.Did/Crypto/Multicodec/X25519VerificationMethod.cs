@@ -9,10 +9,12 @@ public class X25519VerificationMethod : IVerificationMethod
 {
     public string MulticodecPublicKeyHexValue => MULTICODEC_HEX_VALUE;
 
-    public string MulticodecPrivateKeyHexValue => string.Empty;
+    public string MulticodecPrivateKeyHexValue => MULTICODEC_HEX_VALUE_PRIVATE_KEY;
 
 
     public const string MULTICODEC_HEX_VALUE = "0xec";
+
+    public const string MULTICODEC_HEX_VALUE_PRIVATE_KEY = "0x1302";
 
     public int KeySize => 32;
 
@@ -20,9 +22,9 @@ public class X25519VerificationMethod : IVerificationMethod
 
     public string CrvOrSize => Constants.StandardCrvOrSize.X25519;
 
-    public IAsymmetricKey Build(byte[] payload)
-        => X25519AgreementKey.From(payload, null);
+    public IAsymmetricKey Build(byte[] publicKey, byte[] privateKey)
+        => X25519AgreementKey.From(publicKey, privateKey);
 
-    public IAsymmetricKey Build(JsonWebKey jwk)
-        => X25519AgreementKey.From(jwk);
+    public IAsymmetricKey Build(JsonWebKey publicJwk, JsonWebKey privateJwk)
+        => X25519AgreementKey.From(publicJwk, privateJwk);
 }

@@ -21,9 +21,9 @@ public class Ed25519VerificationMethod : IVerificationMethod
 
     public int KeySize => 32;
 
-    public IAsymmetricKey Build(byte[] payload) 
-        => Ed25519SignatureKey.From(payload, null);
+    public IAsymmetricKey Build(byte[] publicKey, byte[] privateKey) 
+        => Ed25519SignatureKey.From(publicKey, privateKey);
 
-    public IAsymmetricKey Build(JsonWebKey jwk)
-        => Ed25519SignatureKey.From(jwk);
+    public IAsymmetricKey Build(JsonWebKey publicJwk, JsonWebKey privateJwk)
+        => Ed25519SignatureKey.From(publicJwk, privateJwk);
 }

@@ -28,10 +28,10 @@ public class ES384SignatureKey : BaseESSignatureKey
         return result;
     }
 
-    public static ES384SignatureKey From(JsonWebKey jwk)
+    public static ES384SignatureKey From(JsonWebKey publicJwk, JsonWebKey privateJwk)
     {
         var result = new ES384SignatureKey();
-        result.Import(jwk);
+        result.Import(publicJwk, privateJwk);
         return result;
     }
 }

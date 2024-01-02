@@ -25,6 +25,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.Vc.Jwt\SimpleIdServer.Vc.Jwt.csproj" />
+    <ProjectReference Include="..\..\src\Did\SimpleIdServer.Vc\SimpleIdServer.Vc.csproj" />
   </ItemGroup>
 </Project>

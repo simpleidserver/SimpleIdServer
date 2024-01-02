@@ -17,12 +17,12 @@ public class SignatureKeyFactory : ISignatureKeyFactory
 {
     private readonly IEnumerable<IVerificationMethodFormatter> _formatters;
 
-    public SignatureKeyFactory(IEnumerable<ISignatureKey> signatureKeys)
+    public SignatureKeyFactory()
     {
         
     }
 
-    public ISignatureKey Extract(
+    public object Extract(
         DidDocumentVerificationMethod verificationMethod, 
         bool isMultibaseVerificationMethod)
     {

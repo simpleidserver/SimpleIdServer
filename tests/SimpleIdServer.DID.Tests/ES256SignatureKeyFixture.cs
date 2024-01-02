@@ -29,7 +29,7 @@ namespace SimpleIdServer.DID.Tests
             // ARRANGE
             var key = ES256SignatureKey.Generate();
             var jwk = key.GetPublicJwk();
-            var newKey = ES256SignatureKey.From(jwk);
+            var newKey = ES256SignatureKey.From(jwk, null);
 
             // ACT
             var newJwk = newKey.GetPublicJwk();

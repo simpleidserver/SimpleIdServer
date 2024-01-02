@@ -13,7 +13,7 @@ public class X25519AgreementKeyFixture
         // ARRANGE
         var key = X25519AgreementKey.Generate();
         var jwk = key.GetPublicJwk();
-        var newKey = X25519AgreementKey.From(jwk);
+        var newKey = X25519AgreementKey.From(jwk, null);
 
         // ACT
         var newJwk = newKey.GetPublicJwk();

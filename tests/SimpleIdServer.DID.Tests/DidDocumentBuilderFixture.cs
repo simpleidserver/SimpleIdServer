@@ -118,5 +118,24 @@ namespace SimpleIdServer.DID.Tests
             Assert.That(identityDocument.VerificationMethod.ElementAt(0).Type, Is.EqualTo("X25519KeyAgreementKey2019"));
             Assert.True(keyAgreementFormatter.Extract(identityDocument.VerificationMethod.ElementAt(0)).GetPublicKey().SequenceEqual(x25519.GetPublicKey()));
         }
+
+        [Test]
+        public void When_BuildIdentityDocument_And_ExtractPrivateKey_In_MulticodecFormat_Then_PrivateKeyExists()
+        {
+            // ARRANGE
+            var ed25119Sig = Ed25519SignatureKey.Generate();
+            var identityDocument = DidDocumentBuilder.New("did", true)
+                .AddAlsoKnownAs("didSubject")
+                .AddController("didController")
+                .AddEd25519VerificationKey2020VerificationMethod(ed25119Sig, "controller", VerificationMethodUsages.AUTHENTICATION)
+                .Build();
+
+            // ACT
+            var json = identityDocument.Serialize();
+
+            // ASSERT
+            Assert.That(identityDocument.VerificationMethod.ElementAt(0).Type, Is.EqualTo("Ed25519VerificationKey2020"));
+            Assert.IsNotNull(identityDocument.VerificationMethod.ElementAt(0).SecretKeyMultibase);
+        }
     }
 }
