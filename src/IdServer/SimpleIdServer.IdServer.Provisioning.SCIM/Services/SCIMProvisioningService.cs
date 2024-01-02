@@ -34,12 +34,12 @@ public class SCIMProvisioningService : IProvisioningService
                 StartIndex = 1
             }, accessToken, CancellationToken.None);
             var filterUsers = await FilterUsers(searchUsers.Item1);
-            var result = ExtractUsers(filterUsers, 1, definition);
+            var result = ExtractUsers(filterUsers, 0, definition);
             yield return result;
             var totalResults = searchUsers.Item1.TotalResults;
             var count = searchUsers.Item1.ItemsPerPage;
-            var nbPages = ((int)Math.Ceiling((double)totalResults / count));
-            var allPages = Enumerable.Range(2, nbPages - 1);
+            var nbPages = ((int)Math.Ceiling((double)totalResults / count)) - 1;
+            var allPages = Enumerable.Range(1, nbPages);
             foreach (var currentPage in allPages)
             {
                 var newSearchUsers = await scimClient.SearchUsers(new Scim.Client.SearchRequest
@@ -51,6 +51,22 @@ public class SCIMProvisioningService : IProvisioningService
                 result = ExtractUsers(newFilterUsers, 1, definition);
                 yield return result;
             }
+        }
+    }
+
+    public async Task<ExtractedResult> ExtractTestData(object obj, IdentityProvisioningDefinition definition)
+    {
+        var options = obj as SCIMRepresentationsExtractionJobOptions;
+        using (var scimClient = new SCIMClient(options.SCIMEdp))
+        {
+            var accessToken = await GetAccessToken(options);
+            var searchUsers = await scimClient.SearchUsers(new Scim.Client.SearchRequest
+            {
+                Count = options.Count,
+                StartIndex = 1
+            }, accessToken, CancellationToken.None);
+            var result = ExtractUsers(searchUsers.Item1.Resources, 1, definition);
+            return result;
         }
     }
 

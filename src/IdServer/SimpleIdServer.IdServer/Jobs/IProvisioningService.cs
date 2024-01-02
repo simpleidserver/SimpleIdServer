@@ -10,5 +10,6 @@ public interface IProvisioningService
 {
     string Name { get; }
     IAsyncEnumerable<ExtractedResult> Extract(object options, IdentityProvisioningDefinition definition);
+    Task<ExtractedResult> ExtractTestData(object obj, IdentityProvisioningDefinition definition);
     Task<IEnumerable<string>> GetAllowedAttributes(object options);
 }

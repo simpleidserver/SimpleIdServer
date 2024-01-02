@@ -186,10 +186,18 @@ namespace SimpleIdServer.IdServer.Store
                 return;
             }
 
-            var claimIds = userClaims.Select(u => u.Id).ToList();
-            var existingClaims = await _dbContext.UserClaims.Where(u => claimIds.Contains(u.Id)).ToListAsync();
-            _dbContext.UserClaims.RemoveRange(existingClaims);
-            _dbContext.UserClaims.AddRange(userClaims);
+            var userIds = userClaims.Select(u => u.UserId).ToList();
+            var existingUsers = await _dbContext.Users
+                .Include(u => u.OAuthUserClaims)
+                .Where(u => userIds.Contains(u.Id))
+                .ToListAsync();
+            foreach(var existingUser in existingUsers)
+            {
+                var newClaims = existingUser.OAuthUserClaims.Where(uc => !userClaims.Any(c => c.Name == uc.Name)).ToList();
+                newClaims.AddRange(userClaims);
+                existingUser.OAuthUserClaims = newClaims;
+            }
+
             await _dbContext.SaveChangesAsync();
         }
 
@@ -224,9 +232,14 @@ namespace SimpleIdServer.IdServer.Store
             }
 
             var userIds = userRealms.Select(r => r.UsersId).ToList();
-            var existingRealms = await _dbContext.RealmUser.Where(u => userIds.Contains(u.UsersId)).ToListAsync();
-            _dbContext.RealmUser.RemoveRange(existingRealms);
-            _dbContext.RealmUser.AddRange(userRealms);
+            var existingUsers = await _dbContext.Users
+                .Include(u => u.Realms)
+                .Where(u => userIds.Contains(u.Id)).ToListAsync();
+            foreach(var existingUser in existingUsers)
+            {
+                existingUser.Realms = userRealms.Where(r => r.UsersId == existingUser.Id).ToList();
+            }
+
             await _dbContext.SaveChangesAsync();
         }
 
