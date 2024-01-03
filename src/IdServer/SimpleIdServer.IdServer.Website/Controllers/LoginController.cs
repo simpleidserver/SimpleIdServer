@@ -75,7 +75,7 @@ public class LoginController : Controller
     private async Task<OpenIdConnectMessage> GetToken(OpenIdConnectMessage authorizationResponse, string tokenEndpoint)
     {
         var redirectUri = GetRedirectUri();
-        using (var httpClient = new HttpClient())
+        using (var httpClient = BuildHttpClient())
         {
             var tokenEndpointRequest = new OpenIdConnectMessage
             {
@@ -95,7 +95,7 @@ public class LoginController : Controller
 
     private async Task<Dictionary<string, string>> GetUserInfo(OpenIdConnectMessage token, string userInfoEndpoint)
     {
-        using(var httpClient = new HttpClient())
+        using(var httpClient = BuildHttpClient())
         {
             var request = new HttpRequestMessage { Method = HttpMethod.Get, RequestUri = new Uri(userInfoEndpoint) };
             request.Headers.Add("Authorization", $"Bearer {token.AccessToken}");
@@ -111,6 +111,19 @@ public class LoginController : Controller
 
             return result;
         }
+    }
+
+    private HttpClient BuildHttpClient()
+    {
+        if (!_defaultSecurityOptions.IgnoreCertificateError) return new HttpClient();
+        var handler = new HttpClientHandler
+        {
+            ServerCertificateCustomValidationCallback = (httpRequestMessage, cert, cetChain, policyErrors) =>
+            {
+                return true;
+            }
+        };
+        return new HttpClient(handler);
     }
 
     private string GetRedirectUri()

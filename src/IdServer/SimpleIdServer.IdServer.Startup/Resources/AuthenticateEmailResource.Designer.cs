@@ -223,6 +223,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The given email does not correspond to any user.
+        /// </summary>
+        public static string unknown_user {
+            get {
+                return ResourceManager.GetString("unknown_user", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à User with the same name already exists.
         /// </summary>
         public static string user_exists {
