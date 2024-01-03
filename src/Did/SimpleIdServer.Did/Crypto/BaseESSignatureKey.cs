@@ -4,6 +4,8 @@ using Microsoft.IdentityModel.Tokens;
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Crypto.Signers;
+using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Security;
 using System;
 using System.Collections.Generic;
@@ -65,7 +67,13 @@ public abstract class BaseESSignatureKey : IAsymmetricKey
 
     public bool Check(byte[] content, byte[] signature)
     {
-        throw new NotImplementedException();
+        if (content == null) throw new ArgumentNullException(nameof(content));
+        if (signature == null) throw new ArgumentNullException(nameof(signature));
+        if (_publicKey == null) throw new InvalidOperationException("There is no public key");
+        var sig = ExtractSignature(signature);
+        var signer = new ECDsaSigner();
+        signer.Init(false, _publicKey);
+        return signer.VerifySignature(content, sig.R, sig.S);
     }
 
     public byte[] Sign(byte[] content)
@@ -114,6 +122,25 @@ public abstract class BaseESSignatureKey : IAsymmetricKey
         var d = _privateKey.D;
         var result = GetPublicJwk();
         result.D = Base64UrlEncoder.Encode(d.ToByteArrayUnsigned());
+        return result;
+    }
+
+    private static ECDSASignature ExtractSignature(byte[] payload)
+    {
+        byte? v = null;
+        if (payload.Length > 64)
+        {
+            v = payload[64];
+            if (v == 0 || v == 1)
+                v = (byte)(v + 27);
+        }
+
+        var r = new byte[32];
+        Array.Copy(payload, r, 32);
+        var s = new byte[32];
+        Array.Copy(payload, 32, s, 0, 32);
+        var result = new ECDSASignature(new BigInteger(1, r), new BigInteger(1, s));
+        if (v != null) result.V = new byte[] { v.Value };
         return result;
     }
 

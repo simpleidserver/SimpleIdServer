@@ -17,7 +17,7 @@ public class Ed25519SignatureKeyFixture
         var key = Ed25519SignatureKey.From(null, privateKey.HexToByteArray());
 
         // ACT
-        var sig = key.Sign(plaintext);
+        var sig = key.Sign(System.Text.Encoding.UTF8.GetBytes(plaintext));
 
         // ASSERT
         Assert.That("1y_N9v6xI4DyG9vIuloivxm91EV96nDM3HXBUI4P2Owk0IxazqX63rQ5jlBih6tP_4H5QhkHHqbree7ExmTBCw", Is.EqualTo(sig));

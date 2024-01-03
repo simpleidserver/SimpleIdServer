@@ -27,7 +27,8 @@ public class DataIntegrityProof
     /// </summary>
     [JsonPropertyName("proofPurpose")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string ProofPurpose { get; set; }
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public ProofPurposeTypes? ProofPurpose { get; set; }
     /// <summary>
     /// The means and information needed to verify the proof MUST be specified as a string that maps to a URL.
     /// An example of a verification method is a link to a public key.
@@ -78,4 +79,7 @@ public class DataIntegrityProof
     [JsonPropertyName("nonce")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string Nonce { get; set; }
+    [JsonPropertyName("jws")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string Jws { get; set; }
 }

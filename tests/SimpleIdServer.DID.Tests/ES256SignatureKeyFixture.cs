@@ -17,7 +17,7 @@ namespace SimpleIdServer.DID.Tests
             var key = ES256SignatureKey.From(null, privateKey.HexToByteArray());
 
             // ACT
-            var sig = key.Sign(plaintext);
+            var sig = key.Sign(System.Text.Encoding.UTF8.GetBytes(plaintext));
 
             // ASSERT
             Assert.That("vOTe64WujVUjEiQrAlwaPJtNADx4usSlCfe8OXHS6Np1BqJdqdJX912pVwVlAjmbqR_TMVE5i5TWB_GJVgrHgg", Is.EqualTo(sig));

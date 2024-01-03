@@ -26,7 +26,9 @@ public class JsonWebKey2020Formatter : IVerificationMethodFormatter
 
     public string JSONLDContext => JSON_LD_CONTEXT;
 
-    public string Type => "JsonWebKey2020";
+    public string Type => TYPE;
+
+    public const string TYPE = "JsonWebKey2020";
 
     public DidDocumentVerificationMethod Format(DidDocument idDocument, IAsymmetricKey signatureKey, bool includePrivateKey)
     {

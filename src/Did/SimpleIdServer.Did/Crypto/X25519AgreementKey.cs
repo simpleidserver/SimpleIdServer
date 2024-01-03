@@ -108,11 +108,11 @@ public class X25519AgreementKey : IAgreementKey
 
     public byte[] Sign(byte[] content)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException("Cannot be used for signing");
     }
 
     public bool Check(byte[] content, byte[] signature)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException("Cannot be used for signing");
     }
 }

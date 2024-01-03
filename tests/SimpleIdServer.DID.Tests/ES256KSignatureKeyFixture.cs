@@ -17,7 +17,7 @@ public class ES256KSignatureKeyFixture
         var key = ES256KSignatureKey.From(null, privateKey.HexToByteArray());
 
         // ACT
-        var sig = key.Sign(plaintext);
+        var sig = key.Sign(System.Text.Encoding.UTF8.GetBytes(plaintext));
 
         // ASSERT
         Assert.That("jsvdLwqr-O206hkegoq6pbo7LJjCaflEKHCvfohBP9XJ4C7mG2TPL9YjyKEpYSXqqkUrfRoCxQecHR11Uh7POw", Is.EqualTo(sig));
