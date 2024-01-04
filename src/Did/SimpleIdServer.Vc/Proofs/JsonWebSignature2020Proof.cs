@@ -27,16 +27,12 @@ public class JsonWebSignature2020Proof : ISignatureProof
 
     public string HashingMethod => SHA256Hash.NAME;
 
-    public DataIntegrityProof ComputeProof(byte[] payload, IAsymmetricKey asymmetricKey)
+    public void ComputeProof(DataIntegrityProof proof, byte[] payload, IAsymmetricKey asymmetricKey)
     {
         var signature = asymmetricKey.Sign(payload);
         var jwtHeader = BuildJwtHeader(asymmetricKey);
         var jwtSignature = BuildJwtSignature(signature);
-        var result = new DataIntegrityProof
-        {
-            Jws = $"{jwtHeader}..{jwtSignature}"
-        };
-        return result;
+        proof.Jws = $"{jwtHeader}..{jwtSignature}";
     }
 
     public byte[] GetSignature(DataIntegrityProof proof)

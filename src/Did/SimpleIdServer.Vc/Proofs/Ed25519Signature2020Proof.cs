@@ -25,14 +25,10 @@ public class Ed25519Signature2020Proof : ISignatureProof
 
     public string HashingMethod => SHA256Hash.NAME;
 
-    public DataIntegrityProof ComputeProof(byte[] payload, IAsymmetricKey asymmetricKey)
+    public void ComputeProof(DataIntegrityProof proof, byte[] payload, IAsymmetricKey asymmetricKey)
     {
         var signature = asymmetricKey.Sign(payload);
-        var result = new DataIntegrityProof
-        {
-            ProofValue = MultibaseEncoding.Encode(signature)
-        };
-        return result;
+        proof.ProofValue = MultibaseEncoding.Encode(signature);
     }
 
     public byte[] GetSignature(DataIntegrityProof proof)

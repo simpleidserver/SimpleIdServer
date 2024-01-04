@@ -1,6 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.Did.Encoding;
+using Newtonsoft.Json.Converters;
 using SimpleIdServer.Did.Extensions;
 using SimpleIdServer.Did.Formatters;
 using SimpleIdServer.Did.Models;
@@ -10,10 +10,12 @@ using SimpleIdServer.Vc.Models;
 using SimpleIdServer.Vc.Proofs;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.Vc;
 
@@ -62,16 +64,20 @@ public class SecuredVerifiableCredential
         if (verificationMethod == null) throw new ArgumentException($"The verification method {verificationMethodId} doesn't exist");
         var proof = _proofs.SingleOrDefault(p => p.VerificationMethod == verificationMethod.Type);
         if (proof == null) throw new InvalidOperationException($"Impossible to produce a proof for the verification method {verificationMethod.Type}");
-        var hashPayload = GetHashedDocument(jObj, proof);
+        var dataIntegrityProof = new DataIntegrityProof
+        {
+            Type = proof.Type,
+            Created = DateTime.UtcNow,
+            ProofPurpose = purpose,
+            VerificationMethod = verificationMethod.Id
+        };
+        var hashPayload = HashDocument(jObj, proof);
+        var hashProof = HashProof(dataIntegrityProof, proof, jObj);
         // 3. Signature
         var formatter = _formatterFactory.ResolveFormatter(verificationMethod);
         var asymKey = formatter.Extract(verificationMethod);
-        var dataIntegrityProof = proof.ComputeProof(hashPayload, asymKey);
-        dataIntegrityProof.Type = proof.Type;
-        dataIntegrityProof.Created = DateTime.UtcNow;
-        dataIntegrityProof.ProofPurpose = purpose;
-        dataIntegrityProof.VerificationMethod = verificationMethod.Id;
-        jObj.Add("proof", JsonObject.Parse(JsonSerializer.Serialize(dataIntegrityProof)));
+        proof.ComputeProof(dataIntegrityProof, hashPayload, asymKey);
+        jObj.Add("proof", JsonObject.Parse(JsonSerializer.Serialize(dataIntegrityProof, typeof(DataIntegrityProof), GetJsonOptions())));
         return jObj.ToString();
     }
 
@@ -87,7 +93,7 @@ public class SecuredVerifiableCredential
         var verificationMethod = didDocument.VerificationMethod.SingleOrDefault(m => m.Id == dataIntegrityProof.VerificationMethod);
         if (verificationMethod == null) throw new InvalidOperationException($"The verification method {dataIntegrityProof.VerificationMethod} doesn't exist in the DID Document");
         var proof = _proofs.SingleOrDefault(p => p.VerificationMethod == verificationMethod.Type);
-        var hashPayload = GetHashedDocument(jObj, proof);
+        var hashPayload = HashDocument(jObj, proof);
         // 3. Check signature.
         var formatter = _formatterFactory.ResolveFormatter(verificationMethod);
         var signature = proof.GetSignature(dataIntegrityProof);
@@ -95,10 +101,29 @@ public class SecuredVerifiableCredential
         return asymKey.Check(hashPayload, signature);
     }
 
-    private byte[] GetHashedDocument(JsonObject jObj, ISignatureProof proof)
+    private byte[] HashDocument(JsonObject jObj, ISignatureProof proof)
     {
         if (jObj.ContainsKey("proof")) jObj.Remove("proof");
         var json = jObj.ToString();
+        return Hash(json, proof);
+    }
+
+    private byte[] HashProof(DataIntegrityProof dataIntegrityProof, ISignatureProof proof, JsonObject jObj)
+    {
+        var json = JsonSerializer.Serialize(dataIntegrityProof, typeof(DataIntegrityProof), GetJsonOptions());
+        if (jObj.ContainsKey("@context"))
+        {
+            var j = JsonObject.Parse(json).AsObject();
+            var context = jObj["@context"].ToJsonString();
+            j.Add("@context", JsonNode.Parse(context));
+            json = j.ToJsonString();
+        }
+
+        return Hash(json, proof);
+    }
+
+    private byte[] Hash(string json, ISignatureProof proof)
+    {
         // 1. Transform.
         var canonizeMethod = _canonizeMethods.Single(m => m.Name == proof.TransformationMethod);
         var canonized = canonizeMethod.Transform(json);
@@ -108,5 +133,26 @@ public class SecuredVerifiableCredential
         var hashPayload = hashingMethod.Hash(payload);
         var hex = hashPayload.ToHex();
         return hashPayload;
+    }
+    
+    private JsonSerializerOptions GetJsonOptions()
+    {
+        var options = new JsonSerializerOptions();
+        options.Converters.Add(new IsoDateTimeJsonConverter());
+        return options;
+    }
+}
+
+public class IsoDateTimeJsonConverter : JsonConverter<DateTime>
+{
+    public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        Debug.Assert(typeToConvert == typeof(DateTime));
+        return DateTime.Parse(reader.GetString() ?? string.Empty);
+    }
+
+    public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'"));
     }
 }

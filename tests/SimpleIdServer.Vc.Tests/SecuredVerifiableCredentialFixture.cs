@@ -5,12 +5,13 @@ using NUnit.Framework;
 using SimpleIdServer.Did;
 using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Crypto.Multicodec;
-using SimpleIdServer.Did.Extensions;
 using SimpleIdServer.Did.Models;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json.Nodes;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using VDS.RDF.Parsing;
+using VDS.RDF.Writing;
+using VDS.RDF;
+using Newtonsoft.Json.Linq;
+using JsonLD.Core;
 
 namespace SimpleIdServer.Vc.Tests;
 
@@ -92,15 +93,12 @@ public class SecuredVerifiableCredentialFixture
     [Test]
     public void When_Secure_WithES256_And_Ed25519VerificationKey2020_And_StaticPrivateKey_Then_Proof_Is_Valid()
     {
-        var test = "<did:example:abcdefgh> <https://www.w3.org/ns/credentials/examples#alumniOf> \"The School of Examples\" .\r\n<urn:uuid:58172aac-d8ba-11ed-83dd-0b3aef56cc33> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://www.w3.org/2018/credentials#VerifiableCredential> .\r\n<urn:uuid:58172aac-d8ba-11ed-83dd-0b3aef56cc33> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://www.w3.org/ns/credentials/examples#AlumniCredential> .\r\n<urn:uuid:58172aac-d8ba-11ed-83dd-0b3aef56cc33> <https://schema.org/description> \"A minimum viable example of an Alumni Credential.\" .\r\n<urn:uuid:58172aac-d8ba-11ed-83dd-0b3aef56cc33> <https://schema.org/name> \"Alumni Credential\" .\r\n<urn:uuid:58172aac-d8ba-11ed-83dd-0b3aef56cc33> <https://www.w3.org/2018/credentials#credentialSubject> <did:example:abcdefgh> .\r\n<urn:uuid:58172aac-d8ba-11ed-83dd-0b3aef56cc33> <https://www.w3.org/2018/credentials#issuer> <https://vc.example/issuers/5678> .\r\n<urn:uuid:58172aac-d8ba-11ed-83dd-0b3aef56cc33> <https://www.w3.org/2018/credentials#validFrom> \"2023-01-01T00:00:00Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> .";
-        byte[] payload = null;
-        using (var sha256 = SHA256.Create())
-        {
-            payload = sha256.ComputeHash(Encoding.UTF8.GetBytes(test));
-        }
+        string test = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "files", "unsignedCredential.json"));
+        var document = JObject.Parse(test);
+        var rdf = JsonLdProcessor.ToRDF(document);
 
-        var hh = payload.ToHex();
-
+        var ss = TransformRdf(test);
+        
         // Test vector : https://w3c.github.io/vc-di-eddsa/#representation-ed25519signature2020
         // ARRANGE
         string json = "{\r\n    \"@context\": [\r\n        \"https://www.w3.org/ns/credentials/v2\",\r\n        \"https://www.w3.org/ns/credentials/examples/v2\"\r\n    ],\r\n    \"id\": \"urn:uuid:58172aac-d8ba-11ed-83dd-0b3aef56cc33\",\r\n    \"type\": [\"VerifiableCredential\", \"AlumniCredential\"],\r\n    \"name\": \"Alumni Credential\",\r\n    \"description\": \"A minimum viable example of an Alumni Credential.\",\r\n    \"issuer\": \"https://vc.example/issuers/5678\",\r\n    \"validFrom\": \"2023-01-01T00:00:00Z\",\r\n    \"credentialSubject\": {\r\n        \"id\": \"did:example:abcdefgh\",\r\n        \"alumniOf\": \"The School of Examples\"\r\n    }\r\n}";
@@ -176,4 +174,17 @@ public class SecuredVerifiableCredentialFixture
     }
 
     #endregion
+
+    public string TransformRdf(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) throw new ArgumentNullException(nameof(input));
+        var store = new TripleStore();
+        var parser = new JsonLdParser();
+        parser.Load(store, new StringReader(input));
+        var nquadsWriter = new NQuadsWriter();
+        var sw = new System.IO.StringWriter();
+        nquadsWriter.Save(store, sw);
+        var result = sw.ToString();
+        return result;
+    }
 }

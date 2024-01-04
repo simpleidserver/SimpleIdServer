@@ -42,6 +42,7 @@ public class RdfCanonize : ICanonize
         };
         for (var i = 0; i < splitted.Length - 1; i++)
             newResult.Add(splitted[i]);
-        return string.Join(" ", newResult);
+        var res = string.Join("\n", newResult);
+        return res + "\n";
     }
 }

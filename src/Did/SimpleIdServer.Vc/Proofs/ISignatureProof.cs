@@ -11,6 +11,6 @@ public interface ISignatureProof
     string VerificationMethod { get; }
     string TransformationMethod { get; }
     string HashingMethod { get; }
-    DataIntegrityProof ComputeProof(byte[] payload, IAsymmetricKey asymmetricKey);
+    void ComputeProof(DataIntegrityProof proof, byte[] payload, IAsymmetricKey asymmetricKey);
     byte[] GetSignature(DataIntegrityProof proof);
 }

@@ -21,14 +21,10 @@ public class DataIntegrityProof
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string Type { get; set; }
     /// <summary>
-    /// The reason the proof was created MUST be specified as a string that maps to a URL.
-    /// assertionMethod : using cryptographic material typically used to create a Verifiable Credential.
-    /// authentication : login process.
+    /// The date and time the proof was created.
     /// </summary>
-    [JsonPropertyName("proofPurpose")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public ProofPurposeTypes? ProofPurpose { get; set; }
+    [JsonPropertyName("created")]
+    public DateTime? Created { get; set; }
     /// <summary>
     /// The means and information needed to verify the proof MUST be specified as a string that maps to a URL.
     /// An example of a verification method is a link to a public key.
@@ -37,10 +33,14 @@ public class DataIntegrityProof
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string VerificationMethod { get; set; }
     /// <summary>
-    /// The date and time the proof was created.
+    /// The reason the proof was created MUST be specified as a string that maps to a URL.
+    /// assertionMethod : using cryptographic material typically used to create a Verifiable Credential.
+    /// authentication : login process.
     /// </summary>
-    [JsonPropertyName("created")]
-    public DateTime? Created { get; set; }
+    [JsonPropertyName("proofPurpose")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public ProofPurposeTypes? ProofPurpose { get; set; }
     /// <summary>
     /// When the proof expires.
     /// </summary>

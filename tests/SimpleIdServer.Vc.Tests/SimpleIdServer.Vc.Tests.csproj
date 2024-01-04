@@ -12,9 +12,16 @@
     <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
     <PackageReference Include="NUnit.Analyzers" Version="3.3.0" />
+	  <PackageReference Include="json-ld.net" Version="1.0.7" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Did\SimpleIdServer.Vc\SimpleIdServer.Vc.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="files\unsignedCredential.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>
