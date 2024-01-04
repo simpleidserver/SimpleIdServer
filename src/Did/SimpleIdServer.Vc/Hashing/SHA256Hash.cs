@@ -8,9 +8,7 @@ namespace SimpleIdServer.Vc.Hashing;
 
 public class SHA256Hash : IHashing
 {
-    public string Name => NAME;
-
-    public const string NAME = "SHA256";
+    public HashAlgorithmName Name => HashAlgorithmName.SHA256;
 
     public byte[] Hash(byte[] data)
     {

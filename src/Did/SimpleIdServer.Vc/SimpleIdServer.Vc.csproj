@@ -4,9 +4,7 @@
 		<Description>Library used to generate Verifiable Credentials.</Description>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="dotNetRdf" Version="3.1.1" />
-	</ItemGroup>
-	<ItemGroup>
+	  <ProjectReference Include="..\..\..\json-ld.net\src\json-ld.net\json-ld.net.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.Did\SimpleIdServer.Did.csproj" />
 	</ItemGroup>
 </Project>

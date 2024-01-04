@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Cryptography;
 
 namespace SimpleIdServer.Did.Crypto;
 
@@ -14,6 +15,6 @@ public interface IAsymmetricKey
     byte[] GetPrivateKey();
     JsonWebKey GetPublicJwk();
     JsonWebKey GetPrivateJwk();
-    byte[] Sign(byte[] content);
-    bool Check(byte[] content, byte[] signature);
+    byte[] SignHash(byte[] content, HashAlgorithmName alg);
+    bool CheckHash(byte[] content, byte[] signature, HashAlgorithmName alg);
 }

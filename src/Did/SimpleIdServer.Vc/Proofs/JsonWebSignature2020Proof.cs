@@ -4,9 +4,9 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.Did.Builders;
 using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Vc.Canonize;
-using SimpleIdServer.Vc.Hashing;
 using SimpleIdServer.Vc.Models;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Nodes;
 
@@ -25,11 +25,11 @@ public class JsonWebSignature2020Proof : ISignatureProof
 
     public string TransformationMethod => RdfCanonize.NAME;
 
-    public string HashingMethod => SHA256Hash.NAME;
+    public HashAlgorithmName HashingMethod => HashAlgorithmName.SHA256;
 
-    public void ComputeProof(DataIntegrityProof proof, byte[] payload, IAsymmetricKey asymmetricKey)
+    public void ComputeProof(DataIntegrityProof proof, byte[] payload, IAsymmetricKey asymmetricKey, HashAlgorithmName alg)
     {
-        var signature = asymmetricKey.Sign(payload);
+        var signature = asymmetricKey.SignHash(payload, alg);
         var jwtHeader = BuildJwtHeader(asymmetricKey);
         var jwtSignature = BuildJwtSignature(signature);
         proof.Jws = $"{jwtHeader}..{jwtSignature}";

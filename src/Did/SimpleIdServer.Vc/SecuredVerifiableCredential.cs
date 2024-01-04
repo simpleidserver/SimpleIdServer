@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Newtonsoft.Json.Converters;
 using SimpleIdServer.Did.Extensions;
 using SimpleIdServer.Did.Formatters;
 using SimpleIdServer.Did.Models;
@@ -53,7 +52,12 @@ public class SecuredVerifiableCredential
         }, new FormatterFactory());
     }
 
-    public string Secure(string json, DidDocument didDocument, string verificationMethodId, ProofPurposeTypes purpose = ProofPurposeTypes.assertionMethod)
+    public string Secure(
+        string json, 
+        DidDocument didDocument, 
+        string verificationMethodId, 
+        ProofPurposeTypes purpose = ProofPurposeTypes.assertionMethod, 
+        DateTime? creationDateTime = null)
     {
         if (string.IsNullOrWhiteSpace(json)) throw new ArgumentNullException(nameof(json));
         if (didDocument == null) throw new ArgumentNullException(nameof(didDocument));
@@ -64,19 +68,23 @@ public class SecuredVerifiableCredential
         if (verificationMethod == null) throw new ArgumentException($"The verification method {verificationMethodId} doesn't exist");
         var proof = _proofs.SingleOrDefault(p => p.VerificationMethod == verificationMethod.Type);
         if (proof == null) throw new InvalidOperationException($"Impossible to produce a proof for the verification method {verificationMethod.Type}");
+        var created = creationDateTime ?? DateTime.UtcNow;
         var dataIntegrityProof = new DataIntegrityProof
         {
             Type = proof.Type,
-            Created = DateTime.UtcNow,
+            Created = created,
             ProofPurpose = purpose,
             VerificationMethod = verificationMethod.Id
         };
         var hashPayload = HashDocument(jObj, proof);
         var hashProof = HashProof(dataIntegrityProof, proof, jObj);
+        var result = new List<byte>();
+        result.AddRange(hashProof);
+        result.AddRange(hashPayload);
         // 3. Signature
         var formatter = _formatterFactory.ResolveFormatter(verificationMethod);
         var asymKey = formatter.Extract(verificationMethod);
-        proof.ComputeProof(dataIntegrityProof, hashPayload, asymKey);
+        proof.ComputeProof(dataIntegrityProof, result.ToArray(), asymKey, proof.HashingMethod);
         jObj.Add("proof", JsonObject.Parse(JsonSerializer.Serialize(dataIntegrityProof, typeof(DataIntegrityProof), GetJsonOptions())));
         return jObj.ToString();
     }
@@ -90,15 +98,22 @@ public class SecuredVerifiableCredential
         if (!jObj.ContainsKey("proof")) throw new InvalidOperationException("The JSON doesn't contain a proof");
         var proofJson = jObj["proof"].AsObject().ToString();
         var dataIntegrityProof = JsonSerializer.Deserialize<DataIntegrityProof>(proofJson);
+        var emptyDataIntegrityProof = JsonSerializer.Deserialize<DataIntegrityProof>(proofJson);
+        emptyDataIntegrityProof.ProofValue = null;
+        emptyDataIntegrityProof.Jws = null;
         var verificationMethod = didDocument.VerificationMethod.SingleOrDefault(m => m.Id == dataIntegrityProof.VerificationMethod);
         if (verificationMethod == null) throw new InvalidOperationException($"The verification method {dataIntegrityProof.VerificationMethod} doesn't exist in the DID Document");
         var proof = _proofs.SingleOrDefault(p => p.VerificationMethod == verificationMethod.Type);
         var hashPayload = HashDocument(jObj, proof);
-        // 3. Check signature.
+        var hashProof = HashProof(emptyDataIntegrityProof, proof, jObj);
+        var result = new List<byte>();
+        result.AddRange(hashProof);
+        result.AddRange(hashPayload);
+        // 3. CheckHash signature.
         var formatter = _formatterFactory.ResolveFormatter(verificationMethod);
         var signature = proof.GetSignature(dataIntegrityProof);
         var asymKey = formatter.Extract(verificationMethod);
-        return asymKey.Check(hashPayload, signature);
+        return asymKey.CheckHash(result.ToArray(), signature, proof.HashingMethod);
     }
 
     private byte[] HashDocument(JsonObject jObj, ISignatureProof proof)
@@ -131,7 +146,6 @@ public class SecuredVerifiableCredential
         // 2. Hash.
         var hashingMethod = _hashingMethods.Single(m => m.Name == proof.HashingMethod);
         var hashPayload = hashingMethod.Hash(payload);
-        var hex = hashPayload.ToHex();
         return hashPayload;
     }
     

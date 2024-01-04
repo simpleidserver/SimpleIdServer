@@ -5,8 +5,8 @@ using SimpleIdServer.Did.Builders;
 using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Encoding;
 using SimpleIdServer.Vc.Canonize;
-using SimpleIdServer.Vc.Hashing;
 using SimpleIdServer.Vc.Models;
+using System.Security.Cryptography;
 
 namespace SimpleIdServer.Vc.Proofs;
 
@@ -23,11 +23,11 @@ public class Ed25519Signature2020Proof : ISignatureProof
 
     public string TransformationMethod => RdfCanonize.NAME;
 
-    public string HashingMethod => SHA256Hash.NAME;
+    public HashAlgorithmName HashingMethod => HashAlgorithmName.SHA256;
 
-    public void ComputeProof(DataIntegrityProof proof, byte[] payload, IAsymmetricKey asymmetricKey)
+    public void ComputeProof(DataIntegrityProof proof, byte[] payload, IAsymmetricKey asymmetricKey, HashAlgorithmName alg)
     {
-        var signature = asymmetricKey.Sign(payload);
+        var signature = asymmetricKey.SignHash(payload, alg);
         proof.ProofValue = MultibaseEncoding.Encode(signature);
     }
 

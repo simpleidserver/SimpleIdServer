@@ -13,7 +13,8 @@ public class MulticodecSerializerFactory
                         new Es256KVerificationMethod(),
                         new Es256VerificationMethod(),
                         new Es384VerificationMethod(),
-                        new X25519VerificationMethod()
+                        new X25519VerificationMethod(),
+                        new RSAVerificationMethod()
                     }
                 );
 }

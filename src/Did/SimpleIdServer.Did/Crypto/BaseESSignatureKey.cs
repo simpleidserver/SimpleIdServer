@@ -9,6 +9,7 @@ using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Security;
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 
 namespace SimpleIdServer.Did.Crypto;
 
@@ -65,7 +66,7 @@ public abstract class BaseESSignatureKey : IAsymmetricKey
         }
     }
 
-    public bool Check(byte[] content, byte[] signature)
+    public bool CheckHash(byte[] content, byte[] signature, HashAlgorithmName alg)
     {
         if (content == null) throw new ArgumentNullException(nameof(content));
         if (signature == null) throw new ArgumentNullException(nameof(signature));
@@ -76,7 +77,7 @@ public abstract class BaseESSignatureKey : IAsymmetricKey
         return signer.VerifySignature(content, sig.R, sig.S);
     }
 
-    public byte[] Sign(byte[] content)
+    public byte[] SignHash(byte[] content, HashAlgorithmName alg)
     {
         if (content == null) throw new ArgumentNullException(nameof(content));
         if (_privateKey == null) throw new InvalidOperationException("There is no private key");

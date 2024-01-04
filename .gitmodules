@@ -1,0 +1,3 @@
+[submodule "json-ld.net"]
+	path = json-ld.net
+	url = https://github.com/simpleidserver/json-ld.net.git

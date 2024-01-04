@@ -31,6 +31,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Vc", "src\Di
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Vc.Tests", "tests\SimpleIdServer.Vc.Tests\SimpleIdServer.Vc.Tests.csproj", "{B66FC104-F99F-49C3-B7CA-2334B46CD324}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "json-ld.net", "json-ld.net\src\json-ld.net\json-ld.net.csproj", "{B40BF1D2-04FF-4A6D-A89E-4F1CC0266994}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -85,6 +87,10 @@ Global
 		{B66FC104-F99F-49C3-B7CA-2334B46CD324}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B66FC104-F99F-49C3-B7CA-2334B46CD324}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B66FC104-F99F-49C3-B7CA-2334B46CD324}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B40BF1D2-04FF-4A6D-A89E-4F1CC0266994}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B40BF1D2-04FF-4A6D-A89E-4F1CC0266994}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B40BF1D2-04FF-4A6D-A89E-4F1CC0266994}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B40BF1D2-04FF-4A6D-A89E-4F1CC0266994}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -102,6 +108,7 @@ Global
 		{073557C4-65C2-47BE-A4F2-8497ADE2F575} = {108FC95D-8229-4971-8EA9-8DE14B4C6A1A}
 		{089FEE22-28D6-417B-8D03-B806A3398674} = {108FC95D-8229-4971-8EA9-8DE14B4C6A1A}
 		{B66FC104-F99F-49C3-B7CA-2334B46CD324} = {E2BDE2AE-38B3-4237-85C2-906713705003}
+		{B40BF1D2-04FF-4A6D-A89E-4F1CC0266994} = {108FC95D-8229-4971-8EA9-8DE14B4C6A1A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {235D56B0-9D3F-4B57-86F8-74B512C8D736}

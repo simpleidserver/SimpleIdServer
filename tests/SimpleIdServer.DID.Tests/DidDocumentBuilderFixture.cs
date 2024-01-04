@@ -20,7 +20,6 @@ namespace SimpleIdServer.DID.Tests
             var es256K = ES256KSignatureKey.Generate();
             var es256 = ES256SignatureKey.Generate();
             var es384 = ES384SignatureKey.Generate();
-            var x25519 = X25519AgreementKey.Generate();
             var publicKeyMultibaseFormatter = FormatterFactory.BuildEd25519VerificationKey2020Formatter();
             var identityDocument = DidDocumentBuilder.New("did")
                 .AddAlsoKnownAs("didSubject")
@@ -46,12 +45,10 @@ namespace SimpleIdServer.DID.Tests
             Assert.That(identityDocument.VerificationMethod.ElementAt(1).Type, Is.EqualTo("Ed25519VerificationKey2020"));
             Assert.That(identityDocument.VerificationMethod.ElementAt(2).Type, Is.EqualTo("Ed25519VerificationKey2020"));
             Assert.That(identityDocument.VerificationMethod.ElementAt(3).Type, Is.EqualTo("Ed25519VerificationKey2020"));
-            Assert.That(identityDocument.VerificationMethod.ElementAt(4).Type, Is.EqualTo("Ed25519VerificationKey2020"));
             Assert.True(publicKeyMultibaseFormatter.Extract(identityDocument.VerificationMethod.ElementAt(0)).GetPublicKey().SequenceEqual(ed25119Sig.GetPublicKey()));
             Assert.True(publicKeyMultibaseFormatter.Extract(identityDocument.VerificationMethod.ElementAt(1)).GetPublicKey().SequenceEqual(es256K.GetPublicKey()));
             Assert.True(publicKeyMultibaseFormatter.Extract(identityDocument.VerificationMethod.ElementAt(2)).GetPublicKey().SequenceEqual(es256.GetPublicKey()));
             Assert.True(publicKeyMultibaseFormatter.Extract(identityDocument.VerificationMethod.ElementAt(3)).GetPublicKey().SequenceEqual(es384.GetPublicKey()));
-            Assert.True(publicKeyMultibaseFormatter.Extract(identityDocument.VerificationMethod.ElementAt(4)).GetPublicKey().SequenceEqual(x25519.GetPublicKey()));
         }
 
         [Test]
@@ -86,7 +83,6 @@ namespace SimpleIdServer.DID.Tests
             Assert.That(identityDocument.VerificationMethod.ElementAt(1).Type, Is.EqualTo("JsonWebKey2020"));
             Assert.That(identityDocument.VerificationMethod.ElementAt(2).Type, Is.EqualTo("JsonWebKey2020"));
             Assert.That(identityDocument.VerificationMethod.ElementAt(3).Type, Is.EqualTo("JsonWebKey2020"));
-            Assert.That(identityDocument.VerificationMethod.ElementAt(4).Type, Is.EqualTo("JsonWebKey2020"));
             Assert.True(jwkFormatter.Extract(identityDocument.VerificationMethod.ElementAt(0)).GetPublicKey().SequenceEqual(ed25119Sig.GetPublicKey()));
             Assert.True(jwkFormatter.Extract(identityDocument.VerificationMethod.ElementAt(1)).GetPublicKey().SequenceEqual(es256K.GetPublicKey()));
             Assert.True(jwkFormatter.Extract(identityDocument.VerificationMethod.ElementAt(2)).GetPublicKey().SequenceEqual(es256.GetPublicKey()));

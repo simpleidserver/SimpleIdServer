@@ -51,7 +51,8 @@ public class FormatterFactory : IFormatterFactory
                         new Es256KVerificationMethod(),
                         new Es256VerificationMethod(),
                         new Es384VerificationMethod(),
-                        new X25519VerificationMethod()
+                        new X25519VerificationMethod(),
+                        new RSAVerificationMethod()
                     });
 
     public static IVerificationMethodFormatter BuildX25519KeyAgreementFormatter()

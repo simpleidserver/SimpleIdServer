@@ -2,68 +2,129 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Security.Cryptography;
 
 namespace SimpleIdServer.Did.Crypto
 {
     public class RSASignatureKey : IAsymmetricKey
     {
+        private RSA _rsa;
+
+        private RSASignatureKey() 
+        {
+            _rsa = RSA.Create(2048);
+        }
+
         public string Kty => Constants.StandardKty.RSA;
 
         public string CrvOrSize => Constants.StandardCrvOrSize.RSA2048;
 
-        public bool Check(string content, string signature)
+        public static RSASignatureKey Generate()
         {
-            throw new NotImplementedException();
+            return new RSASignatureKey();
         }
 
-        public bool Check(byte[] content, byte[] signature)
+        public static RSASignatureKey From(byte[] publicKey, byte[] privateKey)
         {
-            throw new NotImplementedException();
+            var result = new RSASignatureKey();
+            result.Import(publicKey, privateKey);
+            return result;
+        }
+
+        public static RSASignatureKey From(JsonWebKey publicJwk, JsonWebKey privateJwk)
+        {
+            var result = new RSASignatureKey();
+            result.Import(publicJwk, privateJwk);
+            return result;
         }
 
         public JsonWebKey GetPublicJwk()
         {
-            throw new NotImplementedException();
+            var parameters = _rsa.ExportParameters(false);
+            var result = new JsonWebKey
+            {
+                N = Base64UrlEncoder.Encode(parameters.Modulus),
+                E = Base64UrlEncoder.Encode(parameters.Exponent)
+            };
+            return result;
         }
 
         public JsonWebKey GetPrivateJwk()
         {
-            throw new NotImplementedException();
+            var parameters = _rsa.ExportParameters(true);
+            var result = new JsonWebKey
+            {
+                P = Base64UrlEncoder.Encode(parameters.P),
+                Q = Base64UrlEncoder.Encode(parameters.Q),
+                D = Base64UrlEncoder.Encode(parameters.D),
+                DQ = Base64UrlEncoder.Encode(parameters.DQ),
+                DP = Base64UrlEncoder.Encode(parameters.DP),
+                QI = Base64UrlEncoder.Encode(parameters.InverseQ)
+            };
+            return result;
         }
 
         public byte[] GetPublicKey(bool compressed = false)
         {
-            throw new NotImplementedException();
+            return _rsa.ExportRSAPublicKey();
         }
 
         public byte[] GetPrivateKey()
         {
-            throw new NotImplementedException();
+            return _rsa.ExportRSAPrivateKey();
         }
 
         public void Import(byte[] publicKey, byte[] privateKey)
         {
-            throw new NotImplementedException();
+            if(publicKey != null)
+            {
+                _rsa.ImportRSAPublicKey(publicKey, out int nb);
+            }
+
+            if(privateKey != null)
+            {
+                _rsa.ImportRSAPrivateKey(privateKey, out int nb);
+            }
         }
 
         public void Import(JsonWebKey publicJwk, JsonWebKey privateJwk)
         {
-            throw new NotImplementedException();
+            if (publicJwk == null) throw new ArgumentNullException(nameof(publicJwk));
+            if (publicJwk.N == null ||
+                publicJwk.E == null) throw new ArgumentException("There is no public key");
+            var rsaParameters = new RSAParameters
+            {
+                Modulus = Base64UrlEncoder.DecodeBytes(publicJwk.N),
+                Exponent = Base64UrlEncoder.DecodeBytes(publicJwk.E)
+            };
+            if(privateJwk != null)
+            {
+                if (privateJwk.P == null ||
+                    privateJwk.Q == null ||
+                    privateJwk.D == null ||
+                    privateJwk.DQ == null ||
+                    privateJwk.DP == null ||
+                    privateJwk.QI == null)
+                    throw new ArgumentException("There is no private key");
+                rsaParameters.P = Base64UrlEncoder.DecodeBytes(privateJwk.P);
+                rsaParameters.Q = Base64UrlEncoder.DecodeBytes(privateJwk.Q);
+                rsaParameters.D = Base64UrlEncoder.DecodeBytes(privateJwk.D);
+                rsaParameters.DQ = Base64UrlEncoder.DecodeBytes(privateJwk.DQ);
+                rsaParameters.DP = Base64UrlEncoder.DecodeBytes(privateJwk.DP);
+                rsaParameters.InverseQ = Base64UrlEncoder.DecodeBytes(privateJwk.QI);
+            }
+
+            _rsa.ImportParameters(rsaParameters);
         }
 
-        public string Sign(string content)
+        public bool CheckHash(byte[] payload, byte[] signaturePayload, HashAlgorithmName alg)
         {
-            throw new NotImplementedException();
+            return _rsa.VerifyHash(payload, signaturePayload, alg, RSASignaturePadding.Pkcs1);
         }
 
-        public string Sign(byte[] content)
+        public byte[] SignHash(byte[] content, HashAlgorithmName alg)
         {
-            throw new NotImplementedException();
-        }
-
-        byte[] IAsymmetricKey.Sign(byte[] content)
-        {
-            throw new NotImplementedException();
+            return _rsa.SignHash(content, alg, RSASignaturePadding.Pkcs1);
         }
     }
 }

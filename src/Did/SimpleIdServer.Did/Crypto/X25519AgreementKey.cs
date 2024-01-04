@@ -5,6 +5,7 @@ using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
 using System;
+using System.Security.Cryptography;
 
 namespace SimpleIdServer.Did.Crypto;
 
@@ -106,12 +107,12 @@ public class X25519AgreementKey : IAgreementKey
         return null;
     }
 
-    public byte[] Sign(byte[] content)
+    public byte[] SignHash(byte[] content, HashAlgorithmName alg)
     {
         throw new NotSupportedException("Cannot be used for signing");
     }
 
-    public bool Check(byte[] content, byte[] signature)
+    public bool CheckHash(byte[] content, byte[] signature, HashAlgorithmName alg)
     {
         throw new NotSupportedException("Cannot be used for signing");
     }

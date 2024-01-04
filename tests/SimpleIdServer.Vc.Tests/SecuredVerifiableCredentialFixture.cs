@@ -7,11 +7,6 @@ using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Crypto.Multicodec;
 using SimpleIdServer.Did.Models;
 using System.Text.Json.Nodes;
-using VDS.RDF.Parsing;
-using VDS.RDF.Writing;
-using VDS.RDF;
-using Newtonsoft.Json.Linq;
-using JsonLD.Core;
 
 namespace SimpleIdServer.Vc.Tests;
 
@@ -93,12 +88,6 @@ public class SecuredVerifiableCredentialFixture
     [Test]
     public void When_Secure_WithES256_And_Ed25519VerificationKey2020_And_StaticPrivateKey_Then_Proof_Is_Valid()
     {
-        string test = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "files", "unsignedCredential.json"));
-        var document = JObject.Parse(test);
-        var rdf = JsonLdProcessor.ToRDF(document);
-
-        var ss = TransformRdf(test);
-        
         // Test vector : https://w3c.github.io/vc-di-eddsa/#representation-ed25519signature2020
         // ARRANGE
         string json = "{\r\n    \"@context\": [\r\n        \"https://www.w3.org/ns/credentials/v2\",\r\n        \"https://www.w3.org/ns/credentials/examples/v2\"\r\n    ],\r\n    \"id\": \"urn:uuid:58172aac-d8ba-11ed-83dd-0b3aef56cc33\",\r\n    \"type\": [\"VerifiableCredential\", \"AlumniCredential\"],\r\n    \"name\": \"Alumni Credential\",\r\n    \"description\": \"A minimum viable example of an Alumni Credential.\",\r\n    \"issuer\": \"https://vc.example/issuers/5678\",\r\n    \"validFrom\": \"2023-01-01T00:00:00Z\",\r\n    \"credentialSubject\": {\r\n        \"id\": \"did:example:abcdefgh\",\r\n        \"alumniOf\": \"The School of Examples\"\r\n    }\r\n}";
@@ -109,19 +98,21 @@ public class SecuredVerifiableCredentialFixture
         var identityDocument = DidDocumentBuilder.New("did", true)
             .AddAlsoKnownAs("didSubject")
             .AddController("didController")
-            .AddEd25519VerificationKey2020VerificationMethod(asymKey, "controller", VerificationMethodUsages.AUTHENTICATION)
+            .AddEd25519VerificationKey2020VerificationMethod(asymKey, "controller", VerificationMethodUsages.AUTHENTICATION, id: "https://vc.example/issuers/5678#z6MkrJVnaZkeFzdQyMZu1cgjg7k1pZZ6pvBQ7XJPt4swbTQ2")
             .Build();
         var vc = SecuredVerifiableCredential.New();
 
         // ACT
-        var securedJson = vc.Secure(json, identityDocument, identityDocument.VerificationMethod.First().Id);
+        var securedJson = vc.Secure(json, identityDocument, identityDocument.VerificationMethod.First().Id, creationDateTime: DateTime.Parse("2023-02-24T23:36:38Z", null, System.Globalization.DateTimeStyles.RoundtripKind));
         var isSignatureValid = vc.Check(securedJson, identityDocument);
 
         // ASSERT
         Assert.IsNotNull(securedJson);
+        Assert.IsTrue(isSignatureValid);
         var jObj = JsonObject.Parse(securedJson).AsObject();
         Assert.True(jObj.ContainsKey("proof"));
-        Assert.True(isSignatureValid);
+        var proofValue = jObj["proof"]["proofValue"].ToString();
+        Assert.AreEqual("z2PC6JBDG1otY3PfnxGnvHCuh8tEqPPNpDggvsnzjr2yKxszQg5bJXsQhV1ZUTG6KBNGdvWVzVqFxtLagbdoRUjf6", proofValue);
     }
 
     #endregion
@@ -174,17 +165,4 @@ public class SecuredVerifiableCredentialFixture
     }
 
     #endregion
-
-    public string TransformRdf(string input)
-    {
-        if (string.IsNullOrWhiteSpace(input)) throw new ArgumentNullException(nameof(input));
-        var store = new TripleStore();
-        var parser = new JsonLdParser();
-        parser.Load(store, new StringReader(input));
-        var nquadsWriter = new NQuadsWriter();
-        var sw = new System.IO.StringWriter();
-        nquadsWriter.Save(store, sw);
-        var result = sw.ToString();
-        return result;
-    }
 }

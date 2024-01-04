@@ -16,7 +16,7 @@ public class MultibaseEncoding
 
     public static byte[] Decode(string input) 
     {
-        if (input == null) throw new ArgumentNullException(nameof(input));
+        if (input == null) return null;
         var value = input.TrimStart(specialChar);
         return Encoding.Base58Encoding.Decode(value);
     }

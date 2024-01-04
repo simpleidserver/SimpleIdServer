@@ -91,14 +91,14 @@ namespace SimpleIdServer.Did
 
         #region Verification method
 
-        public DidDocumentBuilder AddJsonWebKeyVerificationMethod(IAsymmetricKey asymmKey, string controller, VerificationMethodUsages usage, bool isReference = true)
-            => AddVerificationMethod(asymmKey, controller, JsonWebKey2020Formatter.JSON_LD_CONTEXT, usage, isReference);
+        public DidDocumentBuilder AddJsonWebKeyVerificationMethod(IAsymmetricKey asymmKey, string controller, VerificationMethodUsages usage, bool isReference = true, string id = null)
+            => AddVerificationMethod(asymmKey, controller, JsonWebKey2020Formatter.JSON_LD_CONTEXT, usage, isReference, id);
 
-        public DidDocumentBuilder AddEd25519VerificationKey2020VerificationMethod(IAsymmetricKey asymmKey, string controller, VerificationMethodUsages usage, bool isReference = true)
-            => AddVerificationMethod(asymmKey, controller, Ed25519VerificationKey2020Formatter.JSON_LD_CONTEXT, usage, isReference);
+        public DidDocumentBuilder AddEd25519VerificationKey2020VerificationMethod(IAsymmetricKey asymmKey, string controller, VerificationMethodUsages usage, bool isReference = true, string id = null)
+            => AddVerificationMethod(asymmKey, controller, Ed25519VerificationKey2020Formatter.JSON_LD_CONTEXT, usage, isReference, id);
 
-        public DidDocumentBuilder AddX25519KeyAgreementVerificationMethod(IAsymmetricKey asymmKey, string controller, bool isReference = true)
-            => AddVerificationMethod(asymmKey, controller, X25519KeyAgreementFormatter.JSON_LD_CONTEXT, VerificationMethodUsages.KEY_AGREEMENT, isReference);
+        public DidDocumentBuilder AddX25519KeyAgreementVerificationMethod(IAsymmetricKey asymmKey, string controller, bool isReference = true, string id = null)
+            => AddVerificationMethod(asymmKey, controller, X25519KeyAgreementFormatter.JSON_LD_CONTEXT, VerificationMethodUsages.KEY_AGREEMENT, isReference, id);
 
         #endregion
 
@@ -166,11 +166,11 @@ namespace SimpleIdServer.Did
             return result;
         }
 
-        private DidDocumentBuilder AddVerificationMethod(IAsymmetricKey asymmKey, string controller, string ldContext, VerificationMethodUsages usage, bool isReference)
+        private DidDocumentBuilder AddVerificationMethod(IAsymmetricKey asymmKey, string controller, string ldContext, VerificationMethodUsages usage, bool isReference, string id)
         {
             var isKeyAgreement = (asymmKey as IAgreementKey) != null;
             if (usage.HasFlag(VerificationMethodUsages.KEY_AGREEMENT) && !isKeyAgreement) throw new ArgumentException("Signature key cannot be used in a Key Agreement");
-            var verificationMethod = BuildVerificationMethod(asymmKey, controller, ldContext);
+            var verificationMethod = BuildVerificationMethod(asymmKey, controller, ldContext, id);
             verificationMethod.Usage = usage;
             if (isReference)
             {
@@ -184,12 +184,14 @@ namespace SimpleIdServer.Did
             return this;
         }
 
-        private DidDocumentVerificationMethod BuildVerificationMethod(IAsymmetricKey signatureKey, string controller, string ldContext)
+        private DidDocumentVerificationMethod BuildVerificationMethod(IAsymmetricKey signatureKey, string controller, string ldContext, string id)
         {
             var builder = _verificationMethodBuilders.Single(v => v.JSONLDContext == ldContext);
             var verificationMethod = builder.Format(_identityDocument, signatureKey, _includePrivateKey);
             verificationMethod.Type = builder.Type;
             verificationMethod.Controller = controller;
+            if (!string.IsNullOrWhiteSpace(id))
+                verificationMethod.Id = id;
             AddContext(builder.JSONLDContext);
             return verificationMethod;
         }
