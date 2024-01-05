@@ -99,7 +99,7 @@ namespace SimpleIdServer.IdServer.Startup
                     SimpleIdServer.IdServer.CredentialIssuer.Constants.StandardScopes.CredentialTemplates,
                     SimpleIdServer.IdServer.Constants.StandardScopes.Realms, 
                     SimpleIdServer.IdServer.Constants.StandardScopes.Groups).Build(),
-            ClientBuilder.BuildTraditionalWebsiteClient("swagger", "password", null, "https://localhost:5001/swagger/oauth2-redirect.html", "https://localhost:5001/(.*)/swagger/oauth2-redirect.html", "http://localhost").AddScope(
+            ClientBuilder.BuildTraditionalWebsiteClient("swaggerClient", "password", null, "https://localhost:5001/swagger/oauth2-redirect.html", "https://localhost:5001/(.*)/swagger/oauth2-redirect.html", "http://localhost").AddScope(
                 SimpleIdServer.IdServer.Constants.StandardScopes.Provisioning, 
                 SimpleIdServer.IdServer.Constants.StandardScopes.Users, 
                 SimpleIdServer.IdServer.Constants.StandardScopes.Networks,

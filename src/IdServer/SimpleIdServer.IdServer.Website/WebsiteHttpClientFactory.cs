@@ -39,8 +39,12 @@ namespace SimpleIdServer.IdServer.Website
             var token = await GetAccessToken();
             _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token.AccessToken);
             var acceptLanguage = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
-            _httpClient.DefaultRequestHeaders.AcceptLanguage.Clear();
-            _httpClient.DefaultRequestHeaders.Add("Accept-Language", acceptLanguage);
+            if(_httpClient.DefaultRequestHeaders.Contains("Language"))
+            {
+                _httpClient.DefaultRequestHeaders.Remove("Language");
+            }
+
+            _httpClient.DefaultRequestHeaders.Add("Language", acceptLanguage);
             return _httpClient;   
         }
 

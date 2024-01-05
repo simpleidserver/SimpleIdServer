@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -113,6 +112,10 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseRegisterControll
             return View(viewModel);
         }
 
+        var key = enteredOtpCode.ToString();
+        var value = await DistributedCache.GetStringAsync(key);
+        await DistributedCache.RemoveAsync(key);
+        viewModel.Value = value;
         if (User.Identity.IsAuthenticated)
         {
             return await UpdateAuthenticatedUser();
@@ -131,6 +134,10 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseRegisterControll
                 IsActive = true
             });
             await _userNotificationService.Send("One Time Password", string.Format(options.HttpBody, otpCode), new Dictionary<string, string>(), viewModel.Value);
+            await DistributedCache.SetStringAsync(otpCode.ToString(), viewModel.Value, new DistributedCacheEntryOptions
+            {
+                SlidingExpiration = TimeSpan.FromHours(2)
+            });
             viewModel.IsOTPCodeSent = true;
             return View(viewModel);
         }
@@ -163,6 +170,7 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseRegisterControll
                 ModelState.AddModelError("value_exists", "value_exists");
                 return View(viewModel);
             }
+
 
             return await base.CreateUser(userRegistrationProgress, viewModel, prefix, Amr);
         }

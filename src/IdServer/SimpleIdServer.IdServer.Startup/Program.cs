@@ -89,6 +89,7 @@ builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAn
     .AllowAnyHeader()));
 builder.Services.AddRazorPages()
     .AddRazorRuntimeCompilation();
+builder.Services.AddLocalization();
 ConfigureIdServer(builder.Services);
 
 var app = builder.Build();
@@ -102,6 +103,13 @@ if (identityServerConfiguration.IsForwardedEnabled)
 if (identityServerConfiguration.ForceHttps)
     app.SetHttpsScheme();
 
+app.UseRequestLocalization(e =>
+{
+    e.SetDefaultCulture("en");
+    e.AddSupportedCultures("en");
+    e.AddSupportedUICultures("en");
+});
+
 app
     .UseSID()
     .UseSIDSwagger()
@@ -112,6 +120,7 @@ app
     .UseCredentialIssuer()
     .UseSamlIdp()
     .UseAutomaticConfiguration();
+
 app.Run();
 
 void ConfigureIdServer(IServiceCollection services)

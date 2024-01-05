@@ -18,6 +18,7 @@ namespace Microsoft.AspNetCore.Builder
             var opts = webApplication.Services.GetRequiredService<IOptions<IdServerHostOptions>>().Value;
             var usePrefix = opts.UseRealm;
             if(usePrefix) webApplication.UseMiddleware<RealmMiddleware>();
+            webApplication.UseMiddleware<LanguageMiddleware>();
             webApplication.UseCookiePolicy(new CookiePolicyOptions
             {
                 Secure = Http.CookieSecurePolicy.Always
@@ -85,7 +86,6 @@ namespace Microsoft.AspNetCore.Builder
             // Occurs every 10 seconds.
             reccuringJobManager.AddOrUpdate<UserSessionJob>(nameof(UserSessionJob), j => webApplication.Services.GetRequiredService<UserSessionJob>().Execute(), "*/10 * * * * *");
 
-            webApplication.UseMiddleware<AcceptLanguageMiddleware>();
             if (opts.MtlsEnabled)
             {
                 webApplication.UseMiddleware<MtlsAuthenticationMiddleware>();
