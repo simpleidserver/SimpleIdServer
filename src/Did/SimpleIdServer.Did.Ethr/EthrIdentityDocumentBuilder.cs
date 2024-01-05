@@ -3,6 +3,7 @@
 using SimpleIdServer.Did.Ethr;
 using SimpleIdServer.Did.Models;
 
+/*
 namespace SimpleIdServer.Did
 {
     public class EthrIdentityDocumentBuilder : DidDocumentBuilder
@@ -43,3 +44,4 @@ namespace SimpleIdServer.Did
         }
     }
 }
+*/

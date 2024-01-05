@@ -4,6 +4,7 @@ using SimpleIdServer.Did.Ethr.Services;
 using SimpleIdServer.Did.Models;
 using System.Threading.Tasks;
 
+/*
 namespace SimpleIdServer.Did.Ethr
 {
     public class EthrContractDeploy : IContractDeploy
@@ -28,3 +29,4 @@ namespace SimpleIdServer.Did.Ethr
         }
     }
 }
+*/

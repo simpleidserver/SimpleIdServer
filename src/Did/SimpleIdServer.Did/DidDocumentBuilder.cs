@@ -190,6 +190,7 @@ namespace SimpleIdServer.Did
             var verificationMethod = builder.Format(_identityDocument, signatureKey, _includePrivateKey);
             verificationMethod.Type = builder.Type;
             verificationMethod.Controller = controller;
+            verificationMethod.Formatter = builder;
             if (!string.IsNullOrWhiteSpace(id))
                 verificationMethod.Id = id;
             AddContext(builder.JSONLDContext);

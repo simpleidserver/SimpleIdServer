@@ -39,6 +39,7 @@ public class DidKeyResolver : IDidResolver
         var multibaseValue = decentralizedIdentifier.Identifier;
         var verificationMethod = _serializer.Deserialize(multibaseValue, null);
         var builder = DidDocumentBuilder.New(did);
+        var verificationMethodId = $"{did}#{multibaseValue}";
         switch(_options.PublicKeyFormat)
         {
             case Ed25519VerificationKey2020Formatter.TYPE:
@@ -46,17 +47,32 @@ public class DidKeyResolver : IDidResolver
                     verificationMethod,
                     did,
                     VerificationMethodUsages.AUTHENTICATION | VerificationMethodUsages.ASSERTION_METHOD |
-                    VerificationMethodUsages.CAPABILITY_INVOCATION | VerificationMethodUsages.CAPABILITY_DELEGATION);
+                    VerificationMethodUsages.CAPABILITY_INVOCATION | VerificationMethodUsages.CAPABILITY_DELEGATION,
+                    id: verificationMethodId);
                     break;
             case JsonWebKey2020Formatter.TYPE:
                 builder.AddJsonWebKeyVerificationMethod(
                     verificationMethod,
                     did,
                     VerificationMethodUsages.AUTHENTICATION | VerificationMethodUsages.ASSERTION_METHOD |
-                    VerificationMethodUsages.CAPABILITY_INVOCATION | VerificationMethodUsages.CAPABILITY_DELEGATION);
+                    VerificationMethodUsages.CAPABILITY_INVOCATION | VerificationMethodUsages.CAPABILITY_DELEGATION,
+                    id: verificationMethodId);
                 break;
             default:
                 throw new InvalidOperationException($"The key format {_options.PublicKeyFormat} is not supported");
+        }
+
+        if(_options.EnableEncryptionKeyDerivation)
+        {
+            throw new NotSupportedException("This feature is not yet supported");
+            /*
+            var publicKey = verificationMethod.GetPublicKey();
+            var method = new X25519VerificationMethod();
+            var key = method.Build(publicKey, null);
+            builder.AddX25519KeyAgreementVerificationMethod(key,
+                did,
+                isReference: false);
+            */
         }
 
         return builder.Build();

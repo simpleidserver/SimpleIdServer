@@ -4,13 +4,12 @@ using Microsoft.Extensions.Options;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.Web3;
 using Nethereum.Web3.Accounts;
-using SimpleIdServer.Did.Models;
-using SimpleIdServer.Did.Store;
-using System.Linq;
+// using SimpleIdServer.Did.Store;
 using System.Threading;
 
 namespace SimpleIdServer.Did.Ethr.Services
 {
+    /*
     public interface IDIDRegistryServiceFactory
     {
         EthereumDIDRegistryService Build(string privateKey, string contractAdr, string network = Constants.DefaultSource);
@@ -42,4 +41,5 @@ namespace SimpleIdServer.Did.Ethr.Services
             return new EthereumDIDRegistryService(web3, contractAdr);
         }
     }
+    */
 }

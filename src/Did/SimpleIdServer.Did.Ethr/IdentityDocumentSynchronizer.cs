@@ -4,12 +4,12 @@ using Nethereum.ABI.Encoders;
 using Nethereum.Hex.HexConvertors.Extensions;
 using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Ethr.Services;
-using SimpleIdServer.Did.Events;
 using SimpleIdServer.Did.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+/*
 namespace SimpleIdServer.Did.Ethr
 {
     public class IdentityDocumentSynchronizer
@@ -86,3 +86,4 @@ namespace SimpleIdServer.Did.Ethr
         }
     }
 }
+*/

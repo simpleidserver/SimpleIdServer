@@ -1,6 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.Did.Builders;
+using SimpleIdServer.Did.Crypto;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text.Json.Nodes;
@@ -100,5 +102,13 @@ namespace SimpleIdServer.Did.Models
         public VerificationMethodUsages Usage { get; set; }
         [JsonIgnore]
         public Dictionary<string, string> AdditionalParameters = new Dictionary<string, string>();
+        [JsonIgnore]
+        public IVerificationMethodFormatter Formatter { get; set; }
+
+        public IAsymmetricKey GetKey()
+        {
+            if (Formatter == null) return null;
+            return Formatter.Extract(this);
+        }
     }
 }

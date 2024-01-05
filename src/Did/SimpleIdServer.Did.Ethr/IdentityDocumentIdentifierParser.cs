@@ -1,13 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Nethereum.Hex.HexConvertors.Extensions;
-using Nethereum.Signer;
-using SimpleIdServer.Did.Models;
-using System;
-using System.Linq;
 
 namespace SimpleIdServer.Did.Ethr
 {
+    /*
     public class IdentityDocumentIdentifierParser : IIdentityDocumentIdentifierParser
     {
         public string Type => Constants.Type;
@@ -33,4 +29,5 @@ namespace SimpleIdServer.Did.Ethr
             return result;
         }
     }
+    */
 }

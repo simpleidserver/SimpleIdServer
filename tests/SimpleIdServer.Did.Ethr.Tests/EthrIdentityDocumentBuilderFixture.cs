@@ -5,6 +5,7 @@ using NUnit.Framework;
 using SimpleIdServer.Did.Models;
 using System.Text.Json;
 
+/*
 namespace SimpleIdServer.Did.Ethr.Tests
 {
     public class EthrIdentityDocumentBuilderFixture
@@ -30,3 +31,4 @@ namespace SimpleIdServer.Did.Ethr.Tests
         }
     }
 }
+*/

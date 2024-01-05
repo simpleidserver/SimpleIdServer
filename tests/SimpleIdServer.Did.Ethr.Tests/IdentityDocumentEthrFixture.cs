@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using SimpleIdServer.Did.Ethr.Services;
 
+/*
 namespace SimpleIdServer.Did.Ethr.Tests
 {
     public class IdentityDocumentEthrFixture
@@ -40,3 +41,4 @@ namespace SimpleIdServer.Did.Ethr.Tests
         }
     }
 }
+*/

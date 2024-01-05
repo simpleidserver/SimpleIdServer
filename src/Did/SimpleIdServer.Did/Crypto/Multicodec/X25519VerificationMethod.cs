@@ -12,7 +12,7 @@ public class X25519VerificationMethod : IVerificationMethod
     public string MulticodecPrivateKeyHexValue => MULTICODEC_HEX_VALUE_PRIVATE_KEY;
 
 
-    public const string MULTICODEC_HEX_VALUE = "0xec";
+    public const string MULTICODEC_HEX_VALUE = "0xec01";
 
     public const string MULTICODEC_HEX_VALUE_PRIVATE_KEY = "0x1302";
 

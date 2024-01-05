@@ -6,12 +6,13 @@ using Nethereum.Hex.HexTypes;
 using Nethereum.Web3;
 using Nethereum.Web3.Accounts;
 using SimpleIdServer.Did.Models;
-using SimpleIdServer.Did.Store;
+// using SimpleIdServer.Did.Store;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Did.Ethr.Services
 {
+    /*
     public class SmartContractService
     {
         private readonly IIdentityDocumentConfigurationStore _configurationStore;
@@ -56,4 +57,5 @@ namespace SimpleIdServer.Did.Ethr.Services
             return Task.FromResult(service);
         }
     }
+    */
 }

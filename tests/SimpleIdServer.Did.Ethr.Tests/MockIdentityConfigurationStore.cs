@@ -1,8 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Did.Models;
-using SimpleIdServer.Did.Store;
+// using SimpleIdServer.Did.Store;
 
+/*
 namespace SimpleIdServer.Did.Ethr.Tests
 {
     public class MockIdentityConfigurationStore : IIdentityDocumentConfigurationStore
@@ -20,3 +21,4 @@ namespace SimpleIdServer.Did.Ethr.Tests
         public Task<int> SaveChanges(CancellationToken cancellationToken) => Task.FromResult(1);
     }
 }
+*/

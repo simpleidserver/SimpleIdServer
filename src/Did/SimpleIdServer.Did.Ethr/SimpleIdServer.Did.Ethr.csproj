@@ -4,10 +4,9 @@
 		<Description>Library used to manipulate DID Document of type ethr.</Description>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Nethereum.Web3" Version="4.14.0" />
+		<PackageReference Include="Nethereum.Web3" Version="4.18.0" />
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\SimpleIdServer.Did.Store\SimpleIdServer.Did.Store.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.Did\SimpleIdServer.Did.csproj" />
 	</ItemGroup>
 </Project>
