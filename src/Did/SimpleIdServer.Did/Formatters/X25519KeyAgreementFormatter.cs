@@ -22,7 +22,9 @@ public class X25519KeyAgreementFormatter : IVerificationMethodFormatter
 
     public string JSONLDContext => JSON_LD_CONTEXT;
 
-    public string Type => "X25519KeyAgreementKey2019";
+    public string Type => Type;
+
+    public const string TYPE = "X25519KeyAgreementKey2019";
 
     public IAsymmetricKey Extract(DidDocumentVerificationMethod didDocumentVerificationMethod)
         => _serializer.Deserialize(didDocumentVerificationMethod.PublicKeyMultibase, didDocumentVerificationMethod.SecretKeyMultibase);
