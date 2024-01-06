@@ -67,6 +67,18 @@ builder.Configuration
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
     .AddEnvironmentVariables();
 var identityServerConfiguration = builder.Configuration.Get<IdentityServerConfiguration>();
+
+builder.Services.Configure<IISOptions>(iis =>
+{
+    iis.AuthenticationDisplayName = "Windows";
+    iis.AutomaticAuthentication = false;
+});
+builder.Services.Configure<IISServerOptions>(iis =>
+{
+    iis.AuthenticationDisplayName = "Windows";
+    iis.AutomaticAuthentication = false;
+});
+
 builder.Services.Configure<KestrelServerOptions>(options =>
 {
     options.ConfigureHttpsDefaults(o =>
@@ -164,10 +176,6 @@ void ConfigureIdServer(IServiceCollection services)
         .AddLDAPProvisioning()
         .AddAuthentication(callback: (a) =>
         {
-            a.Builder.AddNegotiate(NegotiateDefaults.AuthenticationScheme, "Windows", o => 
-            {
-                
-            });
             a.AddMutualAuthentication(m =>
             {
                 m.AllowedCertificateTypes = CertificateTypes.All;

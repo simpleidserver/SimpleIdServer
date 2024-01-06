@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -17,6 +18,7 @@ using System.Security.Claims;
 namespace SimpleIdServer.IdServer.Pwd.UI;
 
 [Area(Constants.Areas.Password)]
+[AllowAnonymous]
 public class ResetController : BaseController
 {
     private readonly IEnumerable<IResetPasswordService> _resetPasswordServices;

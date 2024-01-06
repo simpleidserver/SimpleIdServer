@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Hangfire;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Api.BCCallback;
@@ -12,54 +13,54 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.IdServer.Api.BCAuthorize
+namespace SimpleIdServer.IdServer.Api.BCAuthorize;
+
+[AllowAnonymous]
+public class BCCallbackController : BaseController
 {
-    public class BCCallbackController : BaseController
+    private readonly IBCAuthorizeRepository _bcAuthorizeRepository;
+    private readonly IRecurringJobManager _recurringJobManager;
+
+    public BCCallbackController(ITokenRepository tokenRepository,
+        IJwtBuilder jwtBuilder, 
+        IBCAuthorizeRepository bCAuthorizeRepository, 
+        IRecurringJobManager recurringJobManager) : base(tokenRepository, jwtBuilder)
     {
-        private readonly IBCAuthorizeRepository _bcAuthorizeRepository;
-        private readonly IRecurringJobManager _recurringJobManager;
+        _bcAuthorizeRepository = bCAuthorizeRepository;
+        _recurringJobManager = recurringJobManager;
+    }
 
-        public BCCallbackController(ITokenRepository tokenRepository,
-            IJwtBuilder jwtBuilder, 
-            IBCAuthorizeRepository bCAuthorizeRepository, 
-            IRecurringJobManager recurringJobManager) : base(tokenRepository, jwtBuilder)
+    [HttpPost]
+    public async Task<IActionResult> Post([FromRoute] string prefix, [FromBody] BCCallbackParameter parameter, CancellationToken cancellationToken)
+    {
+        try
         {
-            _bcAuthorizeRepository = bCAuthorizeRepository;
-            _recurringJobManager = recurringJobManager;
+            prefix = prefix ?? Constants.DefaultRealm;
+            var bcAuthorize = await _bcAuthorizeRepository.Query().Include(a => a.Histories).FirstOrDefaultAsync(b => b.Id == parameter.AuthReqId, cancellationToken);
+            if (bcAuthorize == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_BC_AUTHORIZE, parameter.AuthReqId));
+            switch(parameter.ActionEnum)
+            {
+                case BCCallbackActions.CONFIRM:
+                    {
+                        if (bcAuthorize.LastStatus != Domains.BCAuthorizeStatus.Pending) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.BC_AUTHORIZE_NOT_PENDING);
+                        bcAuthorize.Confirm();
+                    }
+                    break;
+                case BCCallbackActions.REJECT:
+                    {
+                        if (bcAuthorize.LastStatus != Domains.BCAuthorizeStatus.Pending) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.BC_AUTHORIZE_NOT_PENDING);
+                        bcAuthorize.Reject();
+                    }
+                    break;
+            }
+
+            await _bcAuthorizeRepository.SaveChanges(cancellationToken);
+            _recurringJobManager.Trigger(nameof(BCNotificationJob));
+            return new NoContentResult();
         }
-
-        [HttpPost]
-        public async Task<IActionResult> Post([FromRoute] string prefix, [FromBody] BCCallbackParameter parameter, CancellationToken cancellationToken)
+        catch (OAuthException ex)
         {
-            try
-            {
-                prefix = prefix ?? Constants.DefaultRealm;
-                var bcAuthorize = await _bcAuthorizeRepository.Query().Include(a => a.Histories).FirstOrDefaultAsync(b => b.Id == parameter.AuthReqId, cancellationToken);
-                if (bcAuthorize == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_BC_AUTHORIZE, parameter.AuthReqId));
-                switch(parameter.ActionEnum)
-                {
-                    case BCCallbackActions.CONFIRM:
-                        {
-                            if (bcAuthorize.LastStatus != Domains.BCAuthorizeStatus.Pending) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.BC_AUTHORIZE_NOT_PENDING);
-                            bcAuthorize.Confirm();
-                        }
-                        break;
-                    case BCCallbackActions.REJECT:
-                        {
-                            if (bcAuthorize.LastStatus != Domains.BCAuthorizeStatus.Pending) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.BC_AUTHORIZE_NOT_PENDING);
-                            bcAuthorize.Reject();
-                        }
-                        break;
-                }
-
-                await _bcAuthorizeRepository.SaveChanges(cancellationToken);
-                _recurringJobManager.Trigger(nameof(BCNotificationJob));
-                return new NoContentResult();
-            }
-            catch (OAuthException ex)
-            {
-                return BuildError(ex);
-            }
+            return BuildError(ex);
         }
     }
 }

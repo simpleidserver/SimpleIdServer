@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -15,6 +16,7 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.Api.DeviceAuthorization
 {
+    [AllowAnonymous]
     public class DeviceAuthorizationController : BaseController
     {
         private readonly IDeviceAuthorizationRequestHandler _handler;

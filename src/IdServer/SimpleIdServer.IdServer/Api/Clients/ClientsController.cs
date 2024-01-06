@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -25,6 +26,7 @@ using ScopeNames = SimpleIdServer.IdServer.Domains.DTOs.ScopeNames;
 
 namespace SimpleIdServer.IdServer.Api.Clients;
 
+[AllowAnonymous]
 public class ClientsController : BaseController
 {
     private readonly IClientRepository _clientRepository;

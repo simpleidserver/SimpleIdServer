@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
@@ -15,6 +16,7 @@ using System.Security.Claims;
 namespace SimpleIdServer.IdServer.Pwd;
 
 [Area(Constants.Areas.Password)]
+[AllowAnonymous]
 public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
 {
     public RegisterController(

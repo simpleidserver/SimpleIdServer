@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -26,6 +27,7 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialTemplates;
 
+[AllowAnonymous]
 public class CredentialTemplatesController : BaseController
 {
     private readonly ICredentialTemplateRepository _credentialTemplateRepository;
