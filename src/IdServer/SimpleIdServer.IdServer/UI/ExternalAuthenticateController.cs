@@ -61,10 +61,23 @@ namespace SimpleIdServer.IdServer.UI
         }
 
         [HttpGet]
-        public IActionResult Login(string scheme, string returnUrl)
+        public async Task<IActionResult> Login([FromRoute] string prefix, string scheme, string returnUrl, CancellationToken cancellationToken)
         {
+            prefix = prefix ?? Constants.DefaultRealm;
             if (string.IsNullOrWhiteSpace(scheme))
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, nameof(scheme)));
+
+            var result = await HttpContext.AuthenticateAsync(scheme);
+            if(result is {  Succeeded : true})
+            {
+                /*
+                var user = await JustInTimeProvision(prefix, scheme, result, cancellationToken);
+                if (result.Properties.Items.ContainsKey(RETURN_URL_NAME))
+                    return await Authenticate(prefix, result.Properties.Items[RETURN_URL_NAME], Constants.Areas.Password, user, cancellationToken, false);
+                return await Sign(prefix, "~/", Constants.Areas.Password, user, null, cancellationToken, false);
+                */
+                return new OkObjectResult(result.Principal.Claims.Select(c => c.Type + "/" + c.Value));
+            }
 
             var items = new Dictionary<string, string>
             {
@@ -96,7 +109,8 @@ namespace SimpleIdServer.IdServer.UI
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.BAD_EXTERNAL_AUTHENTICATION);
             }
 
-            var user = await JustInTimeProvision(prefix, result, cancellationToken);
+            var scheme = result.Properties.Items[SCHEME_NAME];
+            var user = await JustInTimeProvision(prefix, scheme, result, cancellationToken);
             await HttpContext.SignOutAsync(Constants.DefaultExternalCookieAuthenticationScheme);
             if (result.Properties.Items.ContainsKey(RETURN_URL_NAME))
                 return await Authenticate(prefix, result.Properties.Items[RETURN_URL_NAME], Constants.Areas.Password, user, cancellationToken, false);     
@@ -104,15 +118,28 @@ namespace SimpleIdServer.IdServer.UI
             return await Sign(prefix, "~/", Constants.Areas.Password, user, null, cancellationToken, false);
         }
 
-        private async Task<User> JustInTimeProvision(string realm, AuthenticateResult authResult, CancellationToken cancellationToken)
+        private async Task<User> JustInTimeProvision(string realm, string scheme, AuthenticateResult authResult, CancellationToken cancellationToken)
         {
-            var scheme = authResult.Properties.Items[SCHEME_NAME];
             var principal = authResult.Principal;
+            var idProvider = await _authenticationSchemeProviderRepository
+                .Query()
+                .AsNoTracking()
+                .Include(p => p.Mappers)
+                .SingleOrDefaultAsync(p => p.Name == scheme, cancellationToken);
+            if(idProvider == null)
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_SCHEME_PROVIDER, scheme));
+            }
+
             var sub = GetClaim(principal, JwtRegisteredClaimNames.Sub) ?? GetClaim(principal, ClaimTypes.NameIdentifier);
             if (string.IsNullOrWhiteSpace(sub))
             {
-                _logger.LogError("There is not valid subject");
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.BAD_EXTERNAL_AUTHENTICATION_USER);
+                sub = GetClaim(principal, idProvider.SubClaimName);
+                if(string.IsNullOrWhiteSpace(sub))
+                {
+                    _logger.LogError("There is not valid subject");
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.BAD_EXTERNAL_AUTHENTICATION_USER);
+                }
             }
 
             var user = await UserRepository.GetByExternalAuthProvider(scheme, sub, realm, cancellationToken);
@@ -129,7 +156,6 @@ namespace SimpleIdServer.IdServer.UI
                 else
                 {
                     var r = await _realmRepository.Query().FirstAsync(r => r.Name == realm);
-                    var idProvider = await _authenticationSchemeProviderRepository.Query().AsNoTracking().Include(p => p.Mappers).SingleAsync(p => p.Name == scheme, cancellationToken);
                     user = _userTransformer.Transform(r, principal, idProvider);
                     user.AddExternalAuthProvider(scheme, sub);
                     UserRepository.Add(user);

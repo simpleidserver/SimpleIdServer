@@ -199,6 +199,7 @@ namespace SimpleIdServer.IdServer
         public const string UNSUPPORTED_AUTHORIZATION_SIGNED_RESPONSE_ALG = "authorization_signed_response_alg is not supported";
         public const string UNSUPPORTED_AUTHORIZATION_ENCRYPTED_RESPONSE_ALG = "authorization_encrypted_response_alg is not supported";
         public const string UNSUPPORTED_AUTHORIZATION_ENCRYPTED_RESPONSE_ENC = "authorization_encrypted_response_enc is not supported";
+        public const string UNSUPPORTED_SCHEME_PROVIDER = "the scheme provider {0} is not supported";
         public const string UNSUPPORTED_CREDENTIAL_TYPE = "the credential type {0} is not supported";
         public const string UNSUPPORTED_AMRS = "the authentication method references {0} are not supported";
         public const string UNSUPPORTED_TOKENTYPE = "the token type {0} is not supported";

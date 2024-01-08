@@ -29,9 +29,9 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public IdServerBuilder EnableConfigurableAuthentication()
         {
-            _serviceCollection.AddTransient<IAuthenticationSchemeProvider, DynamicAuthenticationSchemeProvider>();
-            _serviceCollection.AddTransient<ISIDAuthenticationSchemeProvider, DynamicAuthenticationSchemeProvider>();
-            _serviceCollection.AddTransient<IAuthenticationHandlerProvider, DynamicAuthenticationHandlerProvider>();
+            _serviceCollection.AddSingleton<IAuthenticationSchemeProvider, DynamicAuthenticationSchemeProvider>();
+            _serviceCollection.AddSingleton<ISIDAuthenticationSchemeProvider>(x => x.GetService<IAuthenticationSchemeProvider>() as ISIDAuthenticationSchemeProvider);
+            _serviceCollection.AddScoped<IAuthenticationHandlerProvider, DynamicAuthenticationHandlerProvider>();
             return this;
         }
 

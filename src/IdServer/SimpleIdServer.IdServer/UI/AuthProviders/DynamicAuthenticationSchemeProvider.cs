@@ -133,7 +133,8 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
                 var convert = liteOptionInterface.GetMethod("Convert");
                 var section = _configuration.GetSection($"{provider.Name}:{liteOptionType.Name}");
                 var liteOptions = section.Get(liteOptionType);
-                if (liteOptions == null) return null;
+                if (liteOptions == null)
+                    liteOptions = Activator.CreateInstance(liteOptionType);
                 var options = convert.Invoke(liteOptions, new object[] { });
                 PostConfigureOptions(optionType, handlerType, options);
                 var optionsMonitorType = typeof(ConcreteOptionsMonitor<>).MakeGenericType(optionType);

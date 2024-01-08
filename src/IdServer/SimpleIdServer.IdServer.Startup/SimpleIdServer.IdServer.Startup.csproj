@@ -30,6 +30,7 @@
 	  <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.1" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="7.0.1" />
 	  <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="7.0.1" />
+	  <PackageReference Include="Microsoft.AspNetCore.Authentication.Negotiate" Version="7.0.1" />
 	  <PackageReference Include="Pomelo.Extensions.Caching.MySql" Version="2.1.4" />
 	  <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="7.0.*" />

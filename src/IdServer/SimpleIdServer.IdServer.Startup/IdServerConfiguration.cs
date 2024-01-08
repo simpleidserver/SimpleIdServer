@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authentication.Facebook;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Builders;
@@ -19,7 +20,7 @@ namespace SimpleIdServer.IdServer.Startup
     {
         private static AuthenticationSchemeProviderDefinition Facebook = AuthenticationSchemeProviderDefinitionBuilder.Create("facebook", "Facebook", typeof(FacebookHandler), typeof(FacebookOptionsLite)).Build();
         private static AuthenticationSchemeProviderDefinition Google = AuthenticationSchemeProviderDefinitionBuilder.Create("google", "Google", typeof(GoogleHandler), typeof(GoogleOptionsLite)).Build();
-
+        private static AuthenticationSchemeProviderDefinition Negotiate = AuthenticationSchemeProviderDefinitionBuilder.Create("negotiate", "Negotiate", typeof(NegotiateHandler), typeof(NegotiateOptionsLite)).Build();
 
         private static IdentityProvisioningDefinition Scim = IdentityProvisioningDefinitionBuilder.Create<SCIMRepresentationsExtractionJobOptions>(SimpleIdServer.IdServer.Provisioning.SCIM.Jobs.SCIMRepresentationsExtractionJob.NAME, "SCIM")
             .AddUserSubjectMappingRule("$.userName")
@@ -157,7 +158,8 @@ namespace SimpleIdServer.IdServer.Startup
         public static ICollection<AuthenticationSchemeProviderDefinition> ProviderDefinitions => new List<AuthenticationSchemeProviderDefinition>
         {
             Facebook,
-            Google
+            Google,
+            Negotiate
         };
 
         public static ICollection<Language> Languages => new List<Language>
@@ -168,7 +170,8 @@ namespace SimpleIdServer.IdServer.Startup
         public static ICollection<AuthenticationSchemeProvider> Providers => new List<AuthenticationSchemeProvider>
         {
            AuthenticationSchemeProviderBuilder.Create(Facebook, "Facebook", "Facebook", "Facebook").Build(),
-           AuthenticationSchemeProviderBuilder.Create(Google, "Google", "Google", "Google").Build()
+           AuthenticationSchemeProviderBuilder.Create(Google, "Google", "Google", "Google").Build(),
+           AuthenticationSchemeProviderBuilder.Create(Negotiate, "Negotiate", "Negotiate", "Negotiate").Build()
         };
 
         public static ICollection<SimpleIdServer.IdServer.Domains.Realm> Realms = new List<SimpleIdServer.IdServer.Domains.Realm>

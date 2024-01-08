@@ -7,6 +7,7 @@ namespace SimpleIdServer.IdServer.Domains
     {
         public string Id { get; set; } = null!;
         public string Name { get; set; } = null!;
+        public string SubClaimName { get; set; } = null!;
         public string? DisplayName { get; set; }
         public string? Description { get; set; }
         public DateTime CreateDateTime { get; set; }

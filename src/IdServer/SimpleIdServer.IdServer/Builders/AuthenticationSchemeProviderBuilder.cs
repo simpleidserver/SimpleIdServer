@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Domains;
 using System;
 using System.Collections.Generic;
@@ -15,12 +16,13 @@ namespace SimpleIdServer.IdServer.Builders
             _provider = provider;
         }
 
-        public static AuthenticationSchemeProviderBuilder Create(AuthenticationSchemeProviderDefinition definition, string name, string displayName, string description)
+        public static AuthenticationSchemeProviderBuilder Create(AuthenticationSchemeProviderDefinition definition, string name, string displayName, string description, string subClaimName = null)
         {
             return new AuthenticationSchemeProviderBuilder(new AuthenticationSchemeProvider
             {
                 Id = Guid.NewGuid().ToString(),
                 Name = name,
+                SubClaimName = subClaimName ?? JwtRegisteredClaimNames.Sub,
                 DisplayName = displayName,
                 Description = description,
                 CreateDateTime = DateTime.UtcNow,
