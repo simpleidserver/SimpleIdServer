@@ -27,9 +27,11 @@ namespace SimpleIdServer.IdServer.UI.Services
 
         public User Transform(Domains.Realm realm, ClaimsPrincipal principal, AuthenticationSchemeProvider idProvider)
         {
+            var sub = ResolveSubject(idProvider, principal);
             var user = new User
             {
                 Id = Guid.NewGuid().ToString(),
+                Name = sub,
                 UpdateDateTime = DateTime.UtcNow,
                 CreateDateTime = DateTime.UtcNow
             };
@@ -41,26 +43,19 @@ namespace SimpleIdServer.IdServer.UI.Services
             {
                 switch(mapper.MapperType)
                 {
-                    case MappingRuleTypes.SUBJECT:
-                        ExractSubject();
-                        break;
                     case MappingRuleTypes.USERATTRIBUTE:
                         ExtractAttribute(mapper);
                         break;
                     case MappingRuleTypes.USERPROPERTY:
                         ExtractProperty(mapper);
                         break;
+                    case MappingRuleTypes.IDENTIFIER:
+                        ExtractIdentifier(mapper); 
+                        break;
                 }
             }
 
             return user;
-
-            void ExractSubject()
-            {
-                var sub = principal.Claims.SingleOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-                if (sub == null) return;
-                user.Name = sub.Value;
-            }
 
             void ExtractProperty(AuthenticationSchemeProviderMapper mapper)
             {
@@ -83,6 +78,13 @@ namespace SimpleIdServer.IdServer.UI.Services
                 foreach(var claim in claims)
                     user.AddClaim(mapper.TargetUserAttribute, claim.Value);
             }
+
+            void ExtractIdentifier(AuthenticationSchemeProviderMapper mapper)
+            {
+                var claim = principal.Claims.SingleOrDefault(c => c.Type == mapper.SourceClaimName);
+                if (claim == null) return;
+                user.Id = claim.Value;
+            }
         }
 
         public ICollection<Claim> Transform(User user)
@@ -104,6 +106,28 @@ namespace SimpleIdServer.IdServer.UI.Services
             }
 
             return result;
+        }
+
+        public static string ResolveSubject(AuthenticationSchemeProvider provider, ClaimsPrincipal principal)
+        {
+            var sub = GetClaim(principal, JwtRegisteredClaimNames.Sub) ?? GetClaim(principal, ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(sub))
+            {
+                var subMapper = provider.Mappers.SingleOrDefault(m => m.MapperType == MappingRuleTypes.SUBJECT);
+                if (subMapper == null) return null;
+                sub = GetClaim(principal, subMapper.SourceClaimName);
+                if(string.IsNullOrWhiteSpace(sub)) return null;
+            }
+
+            return sub;
+        }
+
+        public static string GetClaim(ClaimsPrincipal principal, string claimType)
+        {
+            var claim = principal.Claims.FirstOrDefault(c => c.Type == claimType);
+            if (claim == null || string.IsNullOrWhiteSpace(claim.Value))
+                return null;
+            return claim.Value;
         }
     }
 }

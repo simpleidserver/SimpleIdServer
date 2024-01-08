@@ -16,13 +16,12 @@ namespace SimpleIdServer.IdServer.Builders
             _provider = provider;
         }
 
-        public static AuthenticationSchemeProviderBuilder Create(AuthenticationSchemeProviderDefinition definition, string name, string displayName, string description, string subClaimName = null)
+        public static AuthenticationSchemeProviderBuilder Create(AuthenticationSchemeProviderDefinition definition, string name, string displayName, string description)
         {
             return new AuthenticationSchemeProviderBuilder(new AuthenticationSchemeProvider
             {
                 Id = Guid.NewGuid().ToString(),
                 Name = name,
-                SubClaimName = subClaimName ?? JwtRegisteredClaimNames.Sub,
                 DisplayName = displayName,
                 Description = description,
                 CreateDateTime = DateTime.UtcNow,
@@ -34,6 +33,12 @@ namespace SimpleIdServer.IdServer.Builders
                     Constants.StandardRealms.Master
                 }
             });
+        }
+
+        public AuthenticationSchemeProviderBuilder SetMappers(ICollection<AuthenticationSchemeProviderMapper> mappers)
+        {
+            _provider.Mappers = mappers;
+            return this;
         }
 
         public AuthenticationSchemeProvider Build() => _provider;

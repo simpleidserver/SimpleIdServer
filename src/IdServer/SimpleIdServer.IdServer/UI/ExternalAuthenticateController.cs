@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
@@ -16,9 +15,8 @@ using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.Services;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -70,13 +68,10 @@ namespace SimpleIdServer.IdServer.UI
             var result = await HttpContext.AuthenticateAsync(scheme);
             if(result is {  Succeeded : true})
             {
-                /*
                 var user = await JustInTimeProvision(prefix, scheme, result, cancellationToken);
-                if (result.Properties.Items.ContainsKey(RETURN_URL_NAME))
-                    return await Authenticate(prefix, result.Properties.Items[RETURN_URL_NAME], Constants.Areas.Password, user, cancellationToken, false);
+                if (!string.IsNullOrWhiteSpace(returnUrl))
+                    return await Authenticate(prefix, returnUrl, Constants.Areas.Password, user, cancellationToken, false);
                 return await Sign(prefix, "~/", Constants.Areas.Password, user, null, cancellationToken, false);
-                */
-                return new OkObjectResult(result.Principal.Claims.Select(c => c.Type + "/" + c.Value));
             }
 
             var items = new Dictionary<string, string>
@@ -131,15 +126,12 @@ namespace SimpleIdServer.IdServer.UI
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_SCHEME_PROVIDER, scheme));
             }
 
-            var sub = GetClaim(principal, JwtRegisteredClaimNames.Sub) ?? GetClaim(principal, ClaimTypes.NameIdentifier);
+
+            var sub = UserTransformer.ResolveSubject(idProvider, principal);
             if (string.IsNullOrWhiteSpace(sub))
             {
-                sub = GetClaim(principal, idProvider.SubClaimName);
-                if(string.IsNullOrWhiteSpace(sub))
-                {
-                    _logger.LogError("There is not valid subject");
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.BAD_EXTERNAL_AUTHENTICATION_USER);
-                }
+                _logger.LogError("There is not valid subject");
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.BAD_EXTERNAL_AUTHENTICATION_USER);
             }
 
             var user = await UserRepository.GetByExternalAuthProvider(scheme, sub, realm, cancellationToken);
@@ -155,6 +147,7 @@ namespace SimpleIdServer.IdServer.UI
                 }
                 else
                 {
+                    
                     var r = await _realmRepository.Query().FirstAsync(r => r.Name == realm);
                     user = _userTransformer.Transform(r, principal, idProvider);
                     user.AddExternalAuthProvider(scheme, sub);
@@ -166,14 +159,6 @@ namespace SimpleIdServer.IdServer.UI
             }
 
             return user;
-        }
-
-        public static string GetClaim(ClaimsPrincipal principal, string claimType)
-        {
-            var claim = principal.Claims.FirstOrDefault(c => c.Type == claimType);
-            if (claim == null || string.IsNullOrWhiteSpace(claim.Value))
-                return null;
-            return claim.Value;
         }
     }
 }

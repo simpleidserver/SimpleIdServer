@@ -439,6 +439,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The identity provisioning mapping rule has been updated.
+        /// </summary>
+        public static string IdProvisioningMapperUpdated {
+            get {
+                return ResourceManager.GetString("IdProvisioningMapperUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Mapping rule has been added.
         /// </summary>
         public static string IdProvisioningMappingRuleAdded {
@@ -498,6 +507,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string NameIsRequired {
             get {
                 return ResourceManager.GetString("NameIsRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à There is no property.
+        /// </summary>
+        public static string NoProperties {
+            get {
+                return ResourceManager.GetString("NoProperties", resourceCulture);
             }
         }
         

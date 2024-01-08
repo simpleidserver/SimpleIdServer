@@ -13,6 +13,7 @@ namespace SimpleIdServer.IdServer.Domains
     {
         USERATTRIBUTE = 0,
         USERPROPERTY = 1,
-        SUBJECT = 2
+        SUBJECT = 2,
+        IDENTIFIER = 3
     }
 }

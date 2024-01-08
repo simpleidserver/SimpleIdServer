@@ -171,7 +171,9 @@ namespace SimpleIdServer.IdServer.Startup
         {
            AuthenticationSchemeProviderBuilder.Create(Facebook, "Facebook", "Facebook", "Facebook").Build(),
            AuthenticationSchemeProviderBuilder.Create(Google, "Google", "Google", "Google").Build(),
-           AuthenticationSchemeProviderBuilder.Create(Negotiate, "Negotiate", "Negotiate", "Negotiate").Build()
+           AuthenticationSchemeProviderBuilder.Create(Negotiate, "Negotiate", "Negotiate", "Negotiate")
+            .SetMappers(SimpleIdServer.IdServer.Constants.GetNegotiateIdProviderMappers())
+            .Build()
         };
 
         public static ICollection<SimpleIdServer.IdServer.Domains.Realm> Realms = new List<SimpleIdServer.IdServer.Domains.Realm>

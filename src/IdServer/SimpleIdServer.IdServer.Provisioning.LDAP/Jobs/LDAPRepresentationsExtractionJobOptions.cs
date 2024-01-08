@@ -19,7 +19,7 @@ public class LDAPRepresentationsExtractionJobOptions
     public string UsersDN { get; set; }
     [ConfigurationRecord("User object classes", "All values of LDAP objectClass attribute for users in LDAP, divided by commas.", order: 5)]
     public string UserObjectClasses { get; set; } = "person,organizationalPerson";
-    [ConfigurationRecord("UUID LDAP Attribute", "Name of the LDAP attribute, which is used as a unique object identifier (UUID) for objects in LDAP.", order: 6)]
+    [ConfigurationRecord("UUID LDAP Attribute", "Name of the LDAP attribute, which is used as a unique object identifier (UUID) for objects in LDAP, objectSID for active directory", order: 6)]
     public string UUIDLDAPAttribute { get; set; } = "entryUUID";
     [ConfigurationRecord("Modification Date Attribute", "Name of the LDAP Attribute, which is used as the modification date for objects in LDAP", order: 7)]
     public string ModificationDateAttribute { get; set; } = "modificationDate";

@@ -219,6 +219,25 @@ namespace SimpleIdServer.IdServer
             public static ScopeClaimMapper SAMLName = ScopeClaimMapper.CreateSAMLPropertyClaim("name", ClaimTypes.Name, nameof(User.Firstname));
         }
 
+        public static ICollection<AuthenticationSchemeProviderMapper> GetNegotiateIdProviderMappers() => new List<AuthenticationSchemeProviderMapper>
+        {
+            new AuthenticationSchemeProviderMapper
+            {
+                Id = Guid.NewGuid().ToString(),
+                MapperType = MappingRuleTypes.IDENTIFIER,
+                Name = "Identifier",
+                SourceClaimName = ClaimTypes.PrimarySid
+            },
+            new AuthenticationSchemeProviderMapper
+            {
+                Id = Guid.NewGuid().ToString(),
+                MapperType = MappingRuleTypes.SUBJECT,
+                Name = "Name",
+                SourceClaimName = ClaimTypes.Name,
+                TargetUserProperty = nameof(User.Name)
+            }
+        };
+
         public static ICollection<AuthenticationSchemeProviderMapper> GetDefaultIdProviderMappers() =>new List<AuthenticationSchemeProviderMapper>
         {
             new AuthenticationSchemeProviderMapper

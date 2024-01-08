@@ -1,0 +1,89 @@
+﻿@page "/identityprovisioning/{id}/mappingrules/{mapperId}"
+@using SimpleIdServer.IdServer.Api.Provisioning;
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore;
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
+@using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
+@using SimpleIdServer.IdServer.Website.Stores.UserStore;
+@using System.Reflection;
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject IState<IdentityProvisioningMappingRuleState> identityProvisioningMappingRuleState;
+@inject IState<UpdateIdentityProvisioningState> updateIdentityProvisioningState;
+@layout MainLayout
+@inject ContextMenuService contextMenuService
+@inject DialogService dialogService
+@inject NavigationManager navigationManager
+@inject IDispatcher dispatcher
+@inject IState<ScopeState> scopeState
+@inject NotificationService notificationService
+
+<RadzenBreadCrumb>
+    <RadzenBreadCrumbItem Path="/identityprovisioning" Text="Identity Provisioning" />
+    <RadzenBreadCrumbItem Path=@("/identityprovisioning/" + id + "/mappingrules") Text="Identity Provisioning details" />
+    <RadzenBreadCrumbItem Text="Mapper details" />
+</RadzenBreadCrumb>
+
+<RadzenCardLoader class="m-3" Variant=Variant.Filled IsLoading=@identityProvisioningMappingRuleState.Value.IsLoading>
+    <EditIdProvisioningRule Id="@id" IsUpdating="@updateIdentityProvisioningState.Value.IsUpdating" MappingRule="@identityProvisioningMappingRuleState.Value.Mapping" Saved="@SubmitUpdateIdentityProvisioningMappingRule"></EditIdProvisioningRule>
+</RadzenCardLoader>
+
+
+@code {
+    [Parameter]
+    public string id { get; set; } = null!;
+    [Parameter]
+    public string mapperId { get; set; } = null!;
+    IdentityProvisioningMappingRuleResult mappingRule = null;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            dispatcher.Dispatch(new GetScopeAction { ScopeId = id });
+            SubscribeToAction<GetIdentityPriovisioningMappingRuleFailureAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
+                StateHasChanged();
+            });
+            SubscribeToAction<UpdateIdentityProvisioningMappingRuleSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.IdProvisioningMapperUpdated });
+                StateHasChanged();
+            });
+            SubscribeToAction<UpdateIdentityProvisioningMappingRuleFailureAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
+                StateHasChanged();
+            });
+            SubscribeToAction<SelectRealmSuccessAction>((act) =>
+            {
+                navigationManager.NavigateTo("/identityprovisioning");
+            });
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(mapperId)) return;
+        dispatcher.Dispatch(new GetIdentityProvisioningMappingRuleAction
+        {
+            Id = id,
+            MappingRuleId = mapperId
+        });
+    }
+
+    void SubmitUpdateIdentityProvisioningMappingRule(IdentityProvisioningMappingRuleResult form)
+    {
+        dispatcher.Dispatch(new UpdateIdentityProvisioningMappingRuleAction
+        {
+            Id = id,
+            MappingRuleId = mapperId,
+            TargetUserProperty = form.TargetUserProperty,
+            From = form.From,
+            TargetUserAttribute = form.TargetUserAttribute,
+            HasMultipleAttribute = form.HasMultipleAttribute
+        });
+    }
+}

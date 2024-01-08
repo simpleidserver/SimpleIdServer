@@ -432,4 +432,10 @@
   <data name="Manage" xml:space="preserve">
     <value>Manage</value>
   </data>
+  <data name="IdProvisioningMapperUpdated" xml:space="preserve">
+    <value>The identity provisioning mapping rule has been updated</value>
+  </data>
+  <data name="NoProperties" xml:space="preserve">
+    <value>There is no property</value>
+  </data>
 </root>

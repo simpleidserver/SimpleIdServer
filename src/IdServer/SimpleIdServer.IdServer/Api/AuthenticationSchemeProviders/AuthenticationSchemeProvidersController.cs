@@ -249,7 +249,7 @@ public class AuthenticationSchemeProvidersController : BaseController
             instance.UpdateDateTime = DateTime.UtcNow;
             var record = new AuthenticationSchemeProviderMapper
             {
-                Id = id,
+                Id = Guid.NewGuid().ToString(),
                 MapperType = request.MapperType,
                 Name = request.Name,
                 SourceClaimName = request.SourceClaimName,

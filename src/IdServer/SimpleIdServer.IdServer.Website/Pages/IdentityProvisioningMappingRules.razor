@@ -33,7 +33,11 @@
                 <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableIdentityProvisioningMappingRule" Property="Value.From" Filterable="false" Sortable="false" Title="From" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableIdentityProvisioningMappingRule" Filterable="false" Sortable="false" Title="From" Width="80px">
+            <Template Context="data">
+                <RadzenLink Text="@data.Value.From" Path="@($"/identityprovisioning/{IdProvisioning?.Id}/mappingrules/{data.Value.Id}")" />
+            </Template>
+        </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableIdentityProvisioningMappingRule" Filterable="false" Sortable="false" Title="Type" Width="80px">
             <Template Context="data">
                 <RadzenBadge IsPill=true Text="@Enum.GetName(typeof(MappingRuleTypes), data.Value.MapperType)" BadgeStyle="BadgeStyle.Primary"></RadzenBadge>

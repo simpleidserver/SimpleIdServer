@@ -98,6 +98,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
                 DisplayName = action.DisplayName,
                 Values = action.Properties
             };
+
             var requestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,

@@ -260,6 +260,12 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("removeIdProvisioningMapper",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}/mappers/{mapperId}",
                 defaults: new { controller = "IdentityProvisioning", action = "RemoveMapper" });
+            webApplication.SidMapControllerRoute("updateIdProvisioningMapper",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}/mappers/{mapperId}",
+                defaults: new { controller = "IdentityProvisioning", action = "UpdateMapper" });
+            webApplication.SidMapControllerRoute("getIdProvisioningMapper",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}/mappers/{mapperId}",
+                defaults: new { controller = "IdentityProvisioning", action = "GetMapper" });
             webApplication.SidMapControllerRoute("addIdProvisioningMapper",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}/mappers",
                 defaults: new { controller = "IdentityProvisioning", action = "AddMapper" });

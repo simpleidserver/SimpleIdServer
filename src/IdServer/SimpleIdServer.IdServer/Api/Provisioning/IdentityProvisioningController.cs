@@ -269,6 +269,58 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             }
         }
 
+        [HttpPut]
+        public async Task<IActionResult> UpdateMapper([FromRoute] string prefix, string id, string mapperId, [FromBody] UpdateIdentityProvisioningMapperRequest request, CancellationToken cancellationToken)
+        {
+            prefix = prefix ?? Constants.DefaultRealm;
+            try
+            {
+                await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
+                var result = await _identityProvisioningStore.Query()
+                    .Include(p => p.Realms)
+                    .Include(p => p.Definition).ThenInclude(d => d.MappingRules)
+                    .Where(p => p.Realms.Any(r => r.Name == prefix))
+                    .SingleOrDefaultAsync(p => p.Id == id, cancellationToken);
+                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_IDPROVISIONING, id));
+                var mapperRule = result.Definition.MappingRules.SingleOrDefault(r => r.Id == mapperId);
+                if (mapperRule == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_IDPROVISIONING_MAPPINGRULE, id));
+                result.UpdateDateTime = DateTime.UtcNow;
+                mapperRule.From = request.From;
+                mapperRule.TargetUserAttribute = request.TargetUserAttribute;
+                mapperRule.TargetUserProperty = request.TargetUserProperty;
+                mapperRule.HasMultipleAttribute = request.HasMultipleAttribute;
+                await _identityProvisioningStore.SaveChanges(cancellationToken);
+                return NoContent();
+            }
+            catch (OAuthException ex)
+            {
+                return BuildError(ex);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetMapper([FromRoute] string prefix, string id, string mapperId, CancellationToken cancellationToken)
+        {
+            prefix = prefix ?? Constants.DefaultRealm;
+            try
+            {
+                await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
+                var result = await _identityProvisioningStore.Query()
+                    .Include(p => p.Realms)
+                    .Include(p => p.Definition).ThenInclude(d => d.MappingRules)
+                    .Where(p => p.Realms.Any(r => r.Name == prefix))
+                    .SingleOrDefaultAsync(p => p.Id == id, cancellationToken);
+                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_IDPROVISIONING, id));
+                var mapperRule = result.Definition.MappingRules.SingleOrDefault(r => r.Id == mapperId);
+                if (mapperRule == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_IDPROVISIONING_MAPPINGRULE, id));
+                return new OkObjectResult(Build(mapperRule));
+            }
+            catch (OAuthException ex)
+            {
+                return BuildError(ex);
+            }
+        }
+
         [HttpGet]
         public async Task<IActionResult> TestConnection([FromRoute] string prefix, string id)
         {
@@ -437,7 +489,8 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
                 Id = mappingRule.Id,
                 MapperType = mappingRule.MapperType,
                 TargetUserAttribute = mappingRule.TargetUserAttribute,
-                TargetUserProperty = mappingRule.TargetUserProperty
+                TargetUserProperty = mappingRule.TargetUserProperty,
+                HasMultipleAttribute = mappingRule.HasMultipleAttribute
             };
         }
     }

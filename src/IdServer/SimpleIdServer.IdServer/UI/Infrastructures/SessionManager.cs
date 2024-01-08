@@ -33,7 +33,7 @@ namespace SimpleIdServer.IdServer.UI.Infrastructures
 
         public AuthenticationTicket FetchTicket(HttpContext context, string name)
         {
-            var cookie = context.Request.Cookies.FirstOrDefault(c => c.Key.StartsWith($"{COOKIE_NAME}-{name}"));
+            var cookie = context.Request.Cookies.FirstOrDefault(c => c.Key.StartsWith($"{COOKIE_NAME}-{name.SanitizeNameIdentifier()}"));
             if (cookie.Equals(default(KeyValuePair<string, string>))) return null;
 
             return _ticketDataFormat.Unprotect(cookie.Value);

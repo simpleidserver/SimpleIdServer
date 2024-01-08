@@ -19,6 +19,7 @@ using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.AuthProviders;
+using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -213,7 +214,7 @@ namespace SimpleIdServer.IdServer.UI
             {
                 var scheme = authResult.Properties.Items[ExternalAuthenticateController.SCHEME_NAME];
                 var principal = authResult.Principal;
-                var sub = ExternalAuthenticateController.GetClaim(principal, JwtRegisteredClaimNames.Sub) ?? ExternalAuthenticateController.GetClaim(principal, ClaimTypes.NameIdentifier);
+                var sub = UserTransformer.GetClaim(principal, JwtRegisteredClaimNames.Sub) ?? UserTransformer.GetClaim(principal, ClaimTypes.NameIdentifier);
                 if (string.IsNullOrWhiteSpace(sub))
                 {
                     _logger.LogError("no subject can be extracted from the external authentication provider {authProviderScheme}", scheme);

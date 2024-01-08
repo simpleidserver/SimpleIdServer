@@ -18,7 +18,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             IsLoading = isLoading;
         }
 
-        public IEnumerable<SelectableIdentityProvisioningMappingRule>? MappingRules { get; set; } = null;
+        public IEnumerable<SelectableIdentityProvisioningMappingRule>? MappingRules { get; set; } = new List<SelectableIdentityProvisioningMappingRule>();
         public int Count { get; set; } = 0;
         public bool IsLoading { get; set; } = true;
     }

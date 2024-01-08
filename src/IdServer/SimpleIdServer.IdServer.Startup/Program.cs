@@ -445,6 +445,7 @@ void SeedData(WebApplication application, string scimBaseUrl)
             AddMissingConfigurationDefinition<IdServerConsoleOptions>(dbContext);
             AddMissingConfigurationDefinition<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>(dbContext);
             AddMissingConfigurationDefinition<GoogleOptionsLite>(dbContext);
+            AddMissingConfigurationDefinition<NegotiateOptionsLite>(dbContext);
             EnableIsolationLevel(dbContext);
             dbContext.SaveChanges();
         }

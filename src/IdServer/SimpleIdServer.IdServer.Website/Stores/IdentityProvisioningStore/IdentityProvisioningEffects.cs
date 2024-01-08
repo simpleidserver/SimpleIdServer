@@ -179,6 +179,64 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             dispatcher.Dispatch(new AddIdentityProvisioningMappingRuleSuccessAction { NewId = newMapper.Id, Id = action.Id, MappingRule = action.MappingRule, From = action.From, TargetUserAttribute = action.TargetUserAttribute, TargetUserProperty = action.TargetUserProperty });
         }
 
+
+        [EffectMethod]
+        public async Task Handle(GetIdentityProvisioningMappingRuleAction action, IDispatcher dispatcher)
+        {
+            var baseUrl = await GetBaseUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"{baseUrl}/{action.Id}/mappers/{action.MappingRuleId}")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            try
+            {
+                httpResult.EnsureSuccessStatusCode();
+                var mappingRule = JsonSerializer.Deserialize<IdentityProvisioningMappingRuleResult>(json);
+                dispatcher.Dispatch(new GetIdentityPriovisioningMappingRuleSuccessAction { MappingRule = mappingRule });
+            }
+            catch
+            {
+                var jsonObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new GetIdentityPriovisioningMappingRuleFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
+            }
+        }
+
+        [EffectMethod]
+        public async Task Handle(UpdateIdentityProvisioningMappingRuleAction action, IDispatcher dispatcher)
+        {
+            var baseUrl = await GetBaseUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var request = new UpdateIdentityProvisioningMapperRequest
+            {
+                From = action.From,
+                HasMultipleAttribute = action.HasMultipleAttribute,
+                TargetUserAttribute = action.TargetUserAttribute,
+                TargetUserProperty = action.TargetUserProperty
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Put,
+                RequestUri = new Uri($"{baseUrl}/{action.Id}/mappers/{action.MappingRuleId}"),
+                Content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            try
+            {
+                httpResult.EnsureSuccessStatusCode();
+                dispatcher.Dispatch(new UpdateIdentityProvisioningMappingRuleSuccessAction { Id = action.Id, From = action.From, HasMultipleAttribute = action.HasMultipleAttribute, TargetUserAttribute = action.TargetUserAttribute, MappingRuleId = action.MappingRuleId, TargetUserProperty = action.TargetUserProperty });
+            }
+            catch
+            {
+                var jsonObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new UpdateIdentityProvisioningMappingRuleFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
+            }
+        }
+
         [EffectMethod]
         public async Task Handle(TestIdentityProvisioningAction action, IDispatcher dispatcher)
         {
@@ -397,6 +455,48 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
     }
 
     public class GetIdentityProvisioningAllowedAttributesFailureAction
+    {
+        public string ErrorMessage { get; set; }
+    }
+
+    public class GetIdentityProvisioningMappingRuleAction
+    {
+        public string Id { get; set; }
+        public string MappingRuleId { get; set; }
+    }
+
+    public class GetIdentityPriovisioningMappingRuleSuccessAction
+    {
+        public string Id { get; set; }
+        public IdentityProvisioningMappingRuleResult MappingRule { get; set; }
+    }
+
+    public class GetIdentityPriovisioningMappingRuleFailureAction
+    {
+        public string ErrorMessage { get; set; }
+    }
+
+    public class UpdateIdentityProvisioningMappingRuleAction
+    {
+        public string Id { get; set; }
+        public string MappingRuleId { get; set; }
+        public string From { get; set; } = null!;
+        public string? TargetUserAttribute { get; set; } = null;
+        public string? TargetUserProperty { get; set; } = null;
+        public bool HasMultipleAttribute { get; set; }
+    }
+
+    public class UpdateIdentityProvisioningMappingRuleSuccessAction
+    {
+        public string Id { get; set; }
+        public string MappingRuleId { get; set; }
+        public string From { get; set; } = null!;
+        public string? TargetUserAttribute { get; set; } = null;
+        public string? TargetUserProperty { get; set; } = null;
+        public bool HasMultipleAttribute { get; set; }
+    }
+
+    public class UpdateIdentityProvisioningMappingRuleFailureAction
     {
         public string ErrorMessage { get; set; }
     }
