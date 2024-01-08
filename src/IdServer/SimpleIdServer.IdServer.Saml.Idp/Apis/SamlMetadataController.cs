@@ -4,63 +4,62 @@ using ITfoxtec.Identity.Saml2;
 using ITfoxtec.Identity.Saml2.MvcCore;
 using ITfoxtec.Identity.Saml2.Schemas;
 using ITfoxtec.Identity.Saml2.Schemas.Metadata;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Saml.Idp.Factories;
 using System.Security.Cryptography.X509Certificates;
 
-namespace SimpleIdServer.IdServer.Saml.Idp.Apis;
-
-[AllowAnonymous]
-public class SamlMetadataController : Controller
+namespace SimpleIdServer.IdServer.Saml.Idp.Apis
 {
-    private readonly ISaml2ConfigurationFactory _saml2ConfigurationFactory;
-    private readonly SamlIdpOptions _options;
-
-    public SamlMetadataController(
-        ISaml2ConfigurationFactory saml2ConfigurationFactory, 
-        IOptions<SamlIdpOptions> options)
+    public class SamlMetadataController : Controller
     {
-        _saml2ConfigurationFactory = saml2ConfigurationFactory;
-        _options = options.Value;
-    }
+        private readonly ISaml2ConfigurationFactory _saml2ConfigurationFactory;
+        private readonly SamlIdpOptions _options;
 
-    [HttpGet]
-    public IActionResult Get([FromRoute] string prefix)
-    {
-        prefix = prefix ?? IdServer.Constants.DefaultRealm;
-        var issuer = Request.GetAbsoluteUriWithVirtualPath();
-        var configuration = _saml2ConfigurationFactory.BuildSamlIdpConfiguration(issuer, issuer, prefix);
-        var entityDescriptor = new EntityDescriptor(configuration)
+        public SamlMetadataController(
+            ISaml2ConfigurationFactory saml2ConfigurationFactory, 
+            IOptions<SamlIdpOptions> options)
         {
-            ValidUntil = 365
-        };
-        entityDescriptor.IdPSsoDescriptor = new IdPSsoDescriptor
+            _saml2ConfigurationFactory = saml2ConfigurationFactory;
+            _options = options.Value;
+        }
+
+        [HttpGet]
+        public IActionResult Get([FromRoute] string prefix)
         {
-            WantAuthnRequestsSigned = configuration.SignAuthnRequest,
-            SigningCertificates = new X509Certificate2[]
+            prefix = prefix ?? IdServer.Constants.DefaultRealm;
+            var issuer = Request.GetAbsoluteUriWithVirtualPath();
+            var configuration = _saml2ConfigurationFactory.BuildSamlIdpConfiguration(issuer, issuer, prefix);
+            var entityDescriptor = new EntityDescriptor(configuration)
             {
-                configuration.SigningCertificate
-            },
-            SingleSignOnServices = new SingleSignOnService[]
+                ValidUntil = 365
+            };
+            entityDescriptor.IdPSsoDescriptor = new IdPSsoDescriptor
             {
-                new SingleSignOnService { Binding = ProtocolBindings.HttpRedirect, Location = new Uri($"{issuer}/{prefix}/{Constants.RouteNames.SingleSignOnHttpRedirect}") }
-            },
-            SingleLogoutServices = new SingleLogoutService[]
-            {
-                new SingleLogoutService { Binding = ProtocolBindings.HttpPost, Location = new Uri($"{issuer}/{prefix}/{Constants.RouteNames.SingleSignLogout}") }
-            },
-            ArtifactResolutionServices = new ArtifactResolutionService[]
-            {
-                new ArtifactResolutionService { Binding = ProtocolBindings.ArtifactSoap, Index = 1, Location = new Uri($"{issuer}/{prefix}/{Constants.RouteNames.SingleSignOnArtifact}") }
-            },
-            NameIDFormats = new Uri[] { NameIdentifierFormats.Persistent }
-        };
-        entityDescriptor.ContactPersons = _options.ContactPersons;
-        var metadata = new Saml2Metadata(entityDescriptor);
-        var m = metadata.CreateMetadata();
-        return new Saml2Metadata(entityDescriptor).CreateMetadata().ToActionResult();
+                WantAuthnRequestsSigned = configuration.SignAuthnRequest,
+                SigningCertificates = new X509Certificate2[]
+                {
+                    configuration.SigningCertificate
+                },
+                SingleSignOnServices = new SingleSignOnService[]
+                {
+                    new SingleSignOnService { Binding = ProtocolBindings.HttpRedirect, Location = new Uri($"{issuer}/{prefix}/{Constants.RouteNames.SingleSignOnHttpRedirect}") }
+                },
+                SingleLogoutServices = new SingleLogoutService[]
+                {
+                    new SingleLogoutService { Binding = ProtocolBindings.HttpPost, Location = new Uri($"{issuer}/{prefix}/{Constants.RouteNames.SingleSignLogout}") }
+                },
+                ArtifactResolutionServices = new ArtifactResolutionService[]
+                {
+                    new ArtifactResolutionService { Binding = ProtocolBindings.ArtifactSoap, Index = 1, Location = new Uri($"{issuer}/{prefix}/{Constants.RouteNames.SingleSignOnArtifact}") }
+                },
+                NameIDFormats = new Uri[] { NameIdentifierFormats.Persistent }
+            };
+            entityDescriptor.ContactPersons = _options.ContactPersons;
+            var metadata = new Saml2Metadata(entityDescriptor);
+            var m = metadata.CreateMetadata();
+            return new Saml2Metadata(entityDescriptor).CreateMetadata().ToActionResult();
+        }
     }
 }

@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Hangfire;
 using MassTransit.Testing;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -25,7 +24,6 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.Api.Provisioning
 {
-    [AllowAnonymous]
     public class IdentityProvisioningController : BaseController
     {
         private readonly IIdentityProvisioningStore _identityProvisioningStore;

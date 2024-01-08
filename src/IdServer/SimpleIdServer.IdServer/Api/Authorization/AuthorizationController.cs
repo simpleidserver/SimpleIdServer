@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -27,7 +26,6 @@ using System.Web;
 
 namespace SimpleIdServer.IdServer.Api.Authorization;
 
-[AllowAnonymous]
 public class AuthorizationController : Controller
 {
     private readonly IAuthorizationRequestHandler _authorizationRequestHandler;

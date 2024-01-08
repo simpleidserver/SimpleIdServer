@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -62,7 +61,6 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential
         }
 
         [HttpPost]
-        [AllowAnonymous]
         public async Task<IActionResult> Get([FromRoute] string prefix, [FromBody] CredentialRequest request, CancellationToken cancellationToken)
         {
             using (var activity = Tracing.IdServerActivitySource.StartActivity("Get Credential"))

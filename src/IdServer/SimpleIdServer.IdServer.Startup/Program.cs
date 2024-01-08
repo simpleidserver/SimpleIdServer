@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Community.Microsoft.Extensions.Caching.PostgreSql;
 using Microsoft.AspNetCore.Authentication.Certificate;
-using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -67,18 +66,6 @@ builder.Configuration
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
     .AddEnvironmentVariables();
 var identityServerConfiguration = builder.Configuration.Get<IdentityServerConfiguration>();
-
-builder.Services.Configure<IISOptions>(iis =>
-{
-    iis.AuthenticationDisplayName = "Windows";
-    iis.AutomaticAuthentication = false;
-});
-builder.Services.Configure<IISServerOptions>(iis =>
-{
-    iis.AuthenticationDisplayName = "Windows";
-    iis.AutomaticAuthentication = false;
-});
-
 builder.Services.Configure<KestrelServerOptions>(options =>
 {
     options.ConfigureHttpsDefaults(o =>
@@ -87,7 +74,6 @@ builder.Services.Configure<KestrelServerOptions>(options =>
         if (identityServerConfiguration.ClientCertificateMode != null) o.ClientCertificateMode = identityServerConfiguration.ClientCertificateMode.Value;
     });
 });
-
 ConfigureCentralizedConfiguration(builder);
 if (identityServerConfiguration.IsForwardedEnabled)
 {
@@ -96,6 +82,7 @@ if (identityServerConfiguration.IsForwardedEnabled)
         options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
     });
 }
+
 
 builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
     .AllowAnyMethod()

@@ -3,7 +3,6 @@
 
 using MassTransit;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -23,86 +22,86 @@ using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System.Text.Json;
 
-namespace SimpleIdServer.IdServer.Fido.UI.Mobile;
-
-[Area(Constants.MobileAMR)]
-[AllowAnonymous]
-public class AuthenticateController : BaseAuthenticationMethodController<AuthenticateMobileViewModel>
+namespace SimpleIdServer.IdServer.Fido.UI.Mobile
 {
-    private readonly IConfiguration _configuration;
-    private readonly IAuthenticationHelper _authenticationHelper;
-    private readonly IDistributedCache _distributedCache;
-
-    public AuthenticateController(
-        IConfiguration configuration, 
-        IAuthenticationHelper authenticationHelper,
-        IMobileAuthenticationService userAuthenticationService,
-        IDistributedCache distributedCache, 
-        IOptions<IdServerHostOptions> options, 
-        IAuthenticationSchemeProvider authenticationSchemeProvider, 
-        IDataProtectionProvider dataProtectionProvider,
-        ITokenRepository tokenRepository,
-        IJwtBuilder jwtBuilder,
-        IClientRepository clientRepository, 
-        IAmrHelper amrHelper, 
-        IUserRepository userRepository,
-        IUserSessionResitory userSessionRepository,
-        IUserTransformer userTransformer, 
-        IBusControl busControl) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl)
+    [Area(Constants.MobileAMR)]
+    public class AuthenticateController : BaseAuthenticationMethodController<AuthenticateMobileViewModel>
     {
-        _configuration = configuration;
-        _authenticationHelper = authenticationHelper;
-        _distributedCache= distributedCache;
-    }
+        private readonly IConfiguration _configuration;
+        private readonly IAuthenticationHelper _authenticationHelper;
+        private readonly IDistributedCache _distributedCache;
 
-    protected override string Amr => Constants.MobileAMR;
-
-    protected override bool IsExternalIdProvidersDisplayed => false;
-
-    protected override bool TryGetLogin(AmrAuthInfo amr, out string login)
-    {
-        login = null;
-        if (amr == null || string.IsNullOrWhiteSpace(amr.Login)) return false;
-        login = amr.Login;
-        return true;
-    }
-
-    protected override Task<UserAuthenticationResult> CustomAuthenticate(string prefix, string authenticatedUserId, AuthenticateMobileViewModel viewModel, CancellationToken cancellationToken)
-    {
-        return Task.FromResult(UserAuthenticationResult.Ok());
-    }
-
-    protected override void EnrichViewModel(AuthenticateMobileViewModel viewModel)
-    {
-        var options = GetFidoOptions();
-        var issuer = Request.GetAbsoluteUriWithVirtualPath();
-        viewModel.BeginLoginUrl = $"{issuer}/{viewModel.Realm}/{Constants.EndPoints.BeginQRCodeLogin}";
-        viewModel.LoginStatusUrl = $"{issuer}/{viewModel.Realm}/{Constants.EndPoints.LoginStatus}";
-        viewModel.IsDeveloperModeEnabled = options.IsDeveloperModeEnabled;
-    }
-
-    protected async Task<ValidationStatus> ValidateCredentials(AuthenticateMobileViewModel viewModel, User user, CancellationToken cancellationToken)
-    {
-        var session = await _distributedCache.GetStringAsync(viewModel.SessionId, cancellationToken);
-        if (string.IsNullOrWhiteSpace(session))
+        public AuthenticateController(
+            IConfiguration configuration, 
+            IAuthenticationHelper authenticationHelper,
+            IMobileAuthenticationService userAuthenticationService,
+            IDistributedCache distributedCache, 
+            IOptions<IdServerHostOptions> options, 
+            IAuthenticationSchemeProvider authenticationSchemeProvider, 
+            IDataProtectionProvider dataProtectionProvider,
+            ITokenRepository tokenRepository,
+            IJwtBuilder jwtBuilder,
+            IClientRepository clientRepository, 
+            IAmrHelper amrHelper, 
+            IUserRepository userRepository,
+            IUserSessionResitory userSessionRepository,
+            IUserTransformer userTransformer, 
+            IBusControl busControl) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl)
         {
-            ModelState.AddModelError("unknown_session", "unknown_session");
-            return ValidationStatus.NOCONTENT;
+            _configuration = configuration;
+            _authenticationHelper = authenticationHelper;
+            _distributedCache= distributedCache;
         }
 
-        var sessionRecord = JsonSerializer.Deserialize<AuthenticationSessionRecord>(session);
-        if (!sessionRecord.IsValidated)
+        protected override string Amr => Constants.MobileAMR;
+
+        protected override bool IsExternalIdProvidersDisplayed => false;
+
+        protected override bool TryGetLogin(AmrAuthInfo amr, out string login)
         {
-            ModelState.AddModelError("session_not_validated", "session_not_validated");
-            return ValidationStatus.NOCONTENT;
+            login = null;
+            if (amr == null || string.IsNullOrWhiteSpace(amr.Login)) return false;
+            login = amr.Login;
+            return true;
         }
 
-        return ValidationStatus.AUTHENTICATE;
-    }
+        protected override Task<UserAuthenticationResult> CustomAuthenticate(string prefix, string authenticatedUserId, AuthenticateMobileViewModel viewModel, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(UserAuthenticationResult.Ok());
+        }
 
-    private FidoOptions GetFidoOptions()
-    {
-        var section = _configuration.GetSection(typeof(FidoOptions).Name);
-        return section.Get<FidoOptions>();
+        protected override void EnrichViewModel(AuthenticateMobileViewModel viewModel)
+        {
+            var options = GetFidoOptions();
+            var issuer = Request.GetAbsoluteUriWithVirtualPath();
+            viewModel.BeginLoginUrl = $"{issuer}/{viewModel.Realm}/{Constants.EndPoints.BeginQRCodeLogin}";
+            viewModel.LoginStatusUrl = $"{issuer}/{viewModel.Realm}/{Constants.EndPoints.LoginStatus}";
+            viewModel.IsDeveloperModeEnabled = options.IsDeveloperModeEnabled;
+        }
+
+        protected async Task<ValidationStatus> ValidateCredentials(AuthenticateMobileViewModel viewModel, User user, CancellationToken cancellationToken)
+        {
+            var session = await _distributedCache.GetStringAsync(viewModel.SessionId, cancellationToken);
+            if (string.IsNullOrWhiteSpace(session))
+            {
+                ModelState.AddModelError("unknown_session", "unknown_session");
+                return ValidationStatus.NOCONTENT;
+            }
+
+            var sessionRecord = JsonSerializer.Deserialize<AuthenticationSessionRecord>(session);
+            if (!sessionRecord.IsValidated)
+            {
+                ModelState.AddModelError("session_not_validated", "session_not_validated");
+                return ValidationStatus.NOCONTENT;
+            }
+
+            return ValidationStatus.AUTHENTICATE;
+        }
+
+        private FidoOptions GetFidoOptions()
+        {
+            var section = _configuration.GetSection(typeof(FidoOptions).Name);
+            return section.Get<FidoOptions>();
+        }
     }
 }

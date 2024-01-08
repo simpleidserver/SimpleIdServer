@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -58,7 +57,6 @@ namespace SimpleIdServer.IdServer.UI
 
         #region Get Authenticate View
 
-        [AllowAnonymous]
         public async Task<IActionResult> Index([FromRoute] string prefix, string returnUrl, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(returnUrl))
@@ -122,7 +120,6 @@ namespace SimpleIdServer.IdServer.UI
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [AllowAnonymous]
         public async virtual Task<IActionResult> Index([FromRoute] string prefix, T viewModel, CancellationToken token)
         {
             viewModel.Realm = prefix;

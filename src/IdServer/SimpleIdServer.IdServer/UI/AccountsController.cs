@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using SimpleIdServer.IdServer.UI.Infrastructures;
@@ -12,47 +11,47 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.IdServer.UI;
-
-[AllowAnonymous]
-public class AccountsController : Controller
+namespace SimpleIdServer.IdServer.UI
 {
-    private readonly ISessionManager _sessionManager;
-    private readonly IDataProtector _dataProtector;
-
-    public AccountsController(ISessionManager sessionManager, IDataProtectionProvider dataProtectionProvider)
+    public class AccountsController : Controller
     {
-        _sessionManager = sessionManager;
-        _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
-    }
+        private readonly ISessionManager _sessionManager;
+        private readonly IDataProtector _dataProtector;
 
-    public IActionResult Index(string returnUrl)
-    {
-        var sessions = _sessionManager.FetchTickets(HttpContext);
-        var accounts = sessions.Select(sess => new AccountViewModel(sess.Principal.Claims.First(cl => cl.Type == ClaimTypes.NameIdentifier).Value, sess.Properties.ExpiresUtc, sess.Properties.IssuedUtc));
-        accounts = accounts.Where(a => a.ExpiresUct >= DateTime.UtcNow);
-        return View(new AccountsIndexViewModel(returnUrl, accounts));
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Index(ChooseSessionViewModel chooseSessionViewModel)
-    {
-        try
+        public AccountsController(ISessionManager sessionManager, IDataProtectionProvider dataProtectionProvider)
         {
-            var unprotectedUrl = _dataProtector.Unprotect(chooseSessionViewModel.ReturnUrl);
-            var ticket = _sessionManager.FetchTicket(HttpContext, chooseSessionViewModel.AccountName);
-            if (ticket == null)
-            {
-                return new UnauthorizedResult();
-            }
-
-            await HttpContext.SignInAsync(ticket.Principal, new AuthenticationProperties());
-            return Redirect(unprotectedUrl);
+            _sessionManager = sessionManager;
+            _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
         }
-        catch (CryptographicException)
+
+        public IActionResult Index(string returnUrl)
         {
-            return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}" });
+            var sessions = _sessionManager.FetchTickets(HttpContext);
+            var accounts = sessions.Select(sess => new AccountViewModel(sess.Principal.Claims.First(cl => cl.Type == ClaimTypes.NameIdentifier).Value, sess.Properties.ExpiresUtc, sess.Properties.IssuedUtc));
+            accounts = accounts.Where(a => a.ExpiresUct >= DateTime.UtcNow);
+            return View(new AccountsIndexViewModel(returnUrl, accounts));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Index(ChooseSessionViewModel chooseSessionViewModel)
+        {
+            try
+            {
+                var unprotectedUrl = _dataProtector.Unprotect(chooseSessionViewModel.ReturnUrl);
+                var ticket = _sessionManager.FetchTicket(HttpContext, chooseSessionViewModel.AccountName);
+                if (ticket == null)
+                {
+                    return new UnauthorizedResult();
+                }
+
+                await HttpContext.SignInAsync(ticket.Principal, new AuthenticationProperties());
+                return Redirect(unprotectedUrl);
+            }
+            catch (CryptographicException)
+            {
+                return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}" });
+            }
         }
     }
 }

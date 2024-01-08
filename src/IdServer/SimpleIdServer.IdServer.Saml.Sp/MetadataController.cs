@@ -4,7 +4,6 @@ using ITfoxtec.Identity.Saml2;
 using ITfoxtec.Identity.Saml2.MvcCore;
 using ITfoxtec.Identity.Saml2.Schemas;
 using ITfoxtec.Identity.Saml2.Schemas.Metadata;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Security.Cryptography.X509Certificates;
@@ -12,7 +11,6 @@ using System.Security.Cryptography.X509Certificates;
 namespace SimpleIdServer.IdServer.Saml.Sp;
 
 [Route("Metadata")]
-[AllowAnonymous]
 public class MetadataController : Controller
 {
     private readonly SamlSpOptions _options;

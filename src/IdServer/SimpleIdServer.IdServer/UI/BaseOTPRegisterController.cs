@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
@@ -48,7 +47,6 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseRegisterControll
 
 
     [HttpGet]
-    [AllowAnonymous]
     public async Task<IActionResult> Index([FromRoute] string prefix)
     {
         prefix = prefix ?? SimpleIdServer.IdServer.Constants.Prefix;
@@ -76,7 +74,6 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseRegisterControll
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [AllowAnonymous]
     public async Task<IActionResult> Index([FromRoute] string prefix, OTPRegisterViewModel viewModel)
     {
         prefix = prefix ?? Constants.Prefix;

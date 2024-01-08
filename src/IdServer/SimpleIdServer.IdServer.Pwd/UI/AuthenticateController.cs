@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -19,7 +18,6 @@ using SimpleIdServer.IdServer.UI.ViewModels;
 namespace SimpleIdServer.IdServer.UI;
 
 [Area(Constants.Areas.Password)]
-[AllowAnonymous]
 public class AuthenticateController : BaseAuthenticationMethodController<AuthenticatePasswordViewModel>
 {
     private readonly IConfiguration _configuration;

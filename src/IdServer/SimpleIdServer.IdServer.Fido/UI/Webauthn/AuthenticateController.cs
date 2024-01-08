@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,73 +20,73 @@ using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System.Text.Json;
 
-namespace SimpleIdServer.IdServer.Fido.UI.Webauthn;
-
-[Area(Constants.AMR)]
-[AllowAnonymous]
-public class AuthenticateController : BaseAuthenticationMethodController<AuthenticateWebauthnViewModel>
+namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
 {
-    private readonly IDistributedCache _distributedCache;
-
-    public AuthenticateController(IAuthenticationHelper authenticationHelper,
-        IDistributedCache distributedCache,
-        IAuthenticationSchemeProvider authenticationSchemeProvider,
-        IWebauthnAuthenticationService userAuthenticationService,
-        IOptions<IdServerHostOptions> options,
-        IDataProtectionProvider dataProtectionProvider,
-        ITokenRepository tokenRepository,
-        IJwtBuilder jwtBuilder,
-        IClientRepository clientRepository,
-        IAmrHelper amrHelper,
-        IUserRepository userRepository,
-        IUserSessionResitory userSessionRepository,
-        IUserTransformer userTransformer,
-        IBusControl busControl) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl)
+    [Area(Constants.AMR)]
+    public class AuthenticateController : BaseAuthenticationMethodController<AuthenticateWebauthnViewModel>
     {
-        _distributedCache = distributedCache;
-    }
+        private readonly IDistributedCache _distributedCache;
 
-    protected override string Amr => Constants.AMR;
-
-    protected override bool IsExternalIdProvidersDisplayed => false;
-
-    protected override bool TryGetLogin(AmrAuthInfo amr, out string login)
-    {
-        login = null;
-        if (amr == null || string.IsNullOrWhiteSpace(amr.Login)) return false;
-        login = amr.Login;
-        return true;
-    }
-
-    protected override Task<UserAuthenticationResult> CustomAuthenticate(string prefix, string authenticatedUserId, AuthenticateWebauthnViewModel viewModel, CancellationToken cancellationToken)
-    {
-        return Task.FromResult(UserAuthenticationResult.Ok());
-    }
-
-
-    protected override void EnrichViewModel(AuthenticateWebauthnViewModel viewModel)
-    {
-        var issuer = Request.GetAbsoluteUriWithVirtualPath();
-        viewModel.BeginLoginUrl = $"{issuer}/{viewModel.Realm}/{Constants.EndPoints.BeginLogin}";
-        viewModel.EndLoginUrl = $"{issuer}/{viewModel.Realm}/{Constants.EndPoints.EndLogin}";
-    }
-
-    protected async Task<ValidationStatus> ValidateCredentials(AuthenticateWebauthnViewModel viewModel, User user, CancellationToken cancellationToken)
-    {
-        var session = await _distributedCache.GetStringAsync(viewModel.SessionId, cancellationToken);
-        if (string.IsNullOrWhiteSpace(session))
+        public AuthenticateController(IAuthenticationHelper authenticationHelper,
+            IDistributedCache distributedCache,
+            IAuthenticationSchemeProvider authenticationSchemeProvider,
+            IWebauthnAuthenticationService userAuthenticationService,
+            IOptions<IdServerHostOptions> options,
+            IDataProtectionProvider dataProtectionProvider,
+            ITokenRepository tokenRepository,
+            IJwtBuilder jwtBuilder,
+            IClientRepository clientRepository,
+            IAmrHelper amrHelper,
+            IUserRepository userRepository,
+            IUserSessionResitory userSessionRepository,
+            IUserTransformer userTransformer,
+            IBusControl busControl) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl)
         {
-            ModelState.AddModelError("unknown_session", "unknown_session");
-            return ValidationStatus.NOCONTENT;
+            _distributedCache = distributedCache;
         }
 
-        var sessionRecord = JsonSerializer.Deserialize<AuthenticationSessionRecord>(session);
-        if(!sessionRecord.IsValidated)
+        protected override string Amr => Constants.AMR;
+
+        protected override bool IsExternalIdProvidersDisplayed => false;
+
+        protected override bool TryGetLogin(AmrAuthInfo amr, out string login)
         {
-            ModelState.AddModelError("session_not_validated", "session_not_validated");
-            return ValidationStatus.NOCONTENT;
+            login = null;
+            if (amr == null || string.IsNullOrWhiteSpace(amr.Login)) return false;
+            login = amr.Login;
+            return true;
         }
 
-        return ValidationStatus.AUTHENTICATE;
+        protected override Task<UserAuthenticationResult> CustomAuthenticate(string prefix, string authenticatedUserId, AuthenticateWebauthnViewModel viewModel, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(UserAuthenticationResult.Ok());
+        }
+
+
+        protected override void EnrichViewModel(AuthenticateWebauthnViewModel viewModel)
+        {
+            var issuer = Request.GetAbsoluteUriWithVirtualPath();
+            viewModel.BeginLoginUrl = $"{issuer}/{viewModel.Realm}/{Constants.EndPoints.BeginLogin}";
+            viewModel.EndLoginUrl = $"{issuer}/{viewModel.Realm}/{Constants.EndPoints.EndLogin}";
+        }
+
+        protected async Task<ValidationStatus> ValidateCredentials(AuthenticateWebauthnViewModel viewModel, User user, CancellationToken cancellationToken)
+        {
+            var session = await _distributedCache.GetStringAsync(viewModel.SessionId, cancellationToken);
+            if (string.IsNullOrWhiteSpace(session))
+            {
+                ModelState.AddModelError("unknown_session", "unknown_session");
+                return ValidationStatus.NOCONTENT;
+            }
+
+            var sessionRecord = JsonSerializer.Deserialize<AuthenticationSessionRecord>(session);
+            if(!sessionRecord.IsValidated)
+            {
+                ModelState.AddModelError("session_not_validated", "session_not_validated");
+                return ValidationStatus.NOCONTENT;
+            }
+
+            return ValidationStatus.AUTHENTICATE;
+        }
     }
 }

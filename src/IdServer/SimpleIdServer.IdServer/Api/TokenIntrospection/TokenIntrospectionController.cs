@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -15,7 +14,6 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.Api.TokenIntrospection
 {
-    [AllowAnonymous]
     public class TokenIntrospectionController : Controller
     {
         private readonly ITokenIntrospectionRequestHandler _requestHandler;

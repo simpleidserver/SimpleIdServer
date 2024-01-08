@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
@@ -14,52 +13,52 @@ using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI;
 using System.Security.Claims;
 
-namespace SimpleIdServer.IdServer.Fido.UI.Webauthn;
-
-[Area(Constants.AMR)]
-[AllowAnonymous]
-public class RegisterController : BaseRegisterController<RegisterWebauthnViewModel>
+namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
 {
-    public RegisterController(
-        IOptions<IdServerHostOptions> options, 
-        IDistributedCache distributedCache, 
-        IUserRepository userRepository,
-        ITokenRepository tokenRepository,
-        IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, tokenRepository, jwtBuilder)
+    [Area(Constants.AMR)]
+    public class RegisterController : BaseRegisterController<RegisterWebauthnViewModel>
     {
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> Index([FromRoute] string prefix)
-    {
-        var issuer = Request.GetAbsoluteUriWithVirtualPath();
-        if (!string.IsNullOrWhiteSpace(prefix))
-            prefix = $"{prefix}/";
-        var viewModel = new RegisterWebauthnViewModel();
-        var isAuthenticated = User.Identity.IsAuthenticated;
-        var userRegistrationProgress = await GetRegistrationProgress();
-        if (userRegistrationProgress == null && !isAuthenticated)
+        public RegisterController(
+            IOptions<IdServerHostOptions> options, 
+            IDistributedCache distributedCache, 
+            IUserRepository userRepository,
+            ITokenRepository tokenRepository,
+            IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, tokenRepository, jwtBuilder)
         {
-            viewModel.IsNotAllowed = true;
-            return View(viewModel);
         }
 
-        var login = string.Empty;
-        if (!isAuthenticated)
+        [HttpGet]
+        public async Task<IActionResult> Index([FromRoute] string prefix)
         {
-            login = userRegistrationProgress.User?.Name;
-        }
-        else login = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-        return View(new RegisterWebauthnViewModel
-        {
-            Login = login,
-            BeginRegisterUrl = $"{issuer}/{prefix}{Constants.EndPoints.BeginRegister}",
-            EndRegisterUrl = $"{issuer}/{prefix}{Constants.EndPoints.EndRegister}",
-            Amr = userRegistrationProgress?.Amr,
-            Steps = userRegistrationProgress?.Steps,
-            RedirectUrl = userRegistrationProgress?.RedirectUrl,
-        });
-    }
+            var issuer = Request.GetAbsoluteUriWithVirtualPath();
+            if (!string.IsNullOrWhiteSpace(prefix))
+                prefix = $"{prefix}/";
+            var viewModel = new RegisterWebauthnViewModel();
+            var isAuthenticated = User.Identity.IsAuthenticated;
+            var userRegistrationProgress = await GetRegistrationProgress();
+            if (userRegistrationProgress == null && !isAuthenticated)
+            {
+                viewModel.IsNotAllowed = true;
+                return View(viewModel);
+            }
 
-    protected override void EnrichUser(User user, RegisterWebauthnViewModel viewModel) { }
+            var login = string.Empty;
+            if (!isAuthenticated)
+            {
+                login = userRegistrationProgress.User?.Name;
+            }
+            else login = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            return View(new RegisterWebauthnViewModel
+            {
+                Login = login,
+                BeginRegisterUrl = $"{issuer}/{prefix}{Constants.EndPoints.BeginRegister}",
+                EndRegisterUrl = $"{issuer}/{prefix}{Constants.EndPoints.EndRegister}",
+                Amr = userRegistrationProgress?.Amr,
+                Steps = userRegistrationProgress?.Steps,
+                RedirectUrl = userRegistrationProgress?.RedirectUrl,
+            });
+        }
+
+        protected override void EnrichUser(User user, RegisterWebauthnViewModel viewModel) { }
+    }
 }

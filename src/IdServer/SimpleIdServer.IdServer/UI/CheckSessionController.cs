@@ -61,7 +61,6 @@ namespace SimpleIdServer.IdServer.UI
         }
 
         [HttpGet]
-        [AllowAnonymous]
         public IActionResult Index([FromRoute] string prefix)
         {
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
@@ -76,7 +75,6 @@ namespace SimpleIdServer.IdServer.UI
         }
 
         [HttpGet]
-        [AllowAnonymous]
         public async Task<IActionResult> IsActive([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
@@ -92,7 +90,6 @@ namespace SimpleIdServer.IdServer.UI
         }
 
         [HttpGet]
-        [AllowAnonymous]
         public async Task<IActionResult> EndSession([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             var url = Constants.EndPoints.EndSessionCallback;

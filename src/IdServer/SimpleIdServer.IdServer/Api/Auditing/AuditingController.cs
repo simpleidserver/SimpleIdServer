@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
@@ -12,42 +11,42 @@ using System.Linq.Dynamic.Core;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.IdServer.Api.Auditing;
-
-[AllowAnonymous]
-public class AuditingController : BaseController
+namespace SimpleIdServer.IdServer.Api.Auditing
 {
-    private readonly IAuditEventRepository _repository;
-
-    public AuditingController(
-        ITokenRepository tokenRepository,
-        IJwtBuilder jwtBuilder, 
-        IAuditEventRepository repository) : base(tokenRepository, jwtBuilder)
+    public class AuditingController : BaseController
     {
-        _repository = repository;
-    }
+        private readonly IAuditEventRepository _repository;
 
-    [HttpPost]
-    public async Task<IActionResult> Search([FromRoute] string prefix, [FromBody] SearchAuditingRequest request)
-    {
-        await CheckAccessToken(prefix, Constants.StandardScopes.Auditing.Name);
-        prefix = prefix ?? Constants.DefaultRealm;
-        IQueryable<AuditEvent> query = _repository.Query().AsNoTracking().Where(r => r.Realm == prefix);
-        if (request.DisplayOnlyErrors)
-            query = query.Where(r => r.IsError);
-
-        if (!string.IsNullOrWhiteSpace(request.Filter))
-            query = query.Where(request.Filter);
-
-        if (!string.IsNullOrWhiteSpace(request.OrderBy))
-            query = query.OrderBy(request.OrderBy);
-
-        var nb = query.Count();
-        var result = await query.Skip(request.Skip.Value).Take(request.Take.Value).ToListAsync(CancellationToken.None);
-        return new OkObjectResult(new SearchResult<AuditEvent>
+        public AuditingController(
+            ITokenRepository tokenRepository,
+            IJwtBuilder jwtBuilder, 
+            IAuditEventRepository repository) : base(tokenRepository, jwtBuilder)
         {
-            Content = result,
-            Count = nb
-        });
+            _repository = repository;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Search([FromRoute] string prefix, [FromBody] SearchAuditingRequest request)
+        {
+            await CheckAccessToken(prefix, Constants.StandardScopes.Auditing.Name);
+            prefix = prefix ?? Constants.DefaultRealm;
+            IQueryable<AuditEvent> query = _repository.Query().AsNoTracking().Where(r => r.Realm == prefix);
+            if (request.DisplayOnlyErrors)
+                query = query.Where(r => r.IsError);
+
+            if (!string.IsNullOrWhiteSpace(request.Filter))
+                query = query.Where(request.Filter);
+
+            if (!string.IsNullOrWhiteSpace(request.OrderBy))
+                query = query.OrderBy(request.OrderBy);
+
+            var nb = query.Count();
+            var result = await query.Skip(request.Skip.Value).Take(request.Take.Value).ToListAsync(CancellationToken.None);
+            return new OkObjectResult(new SearchResult<AuditEvent>
+            {
+                Content = result,
+                Count = nb
+            });
+        }
     }
 }

@@ -77,16 +77,6 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
             return rules;
         }
 
-        public override bool TryAddScheme(AuthenticationScheme scheme)
-        {
-            return base.TryAddScheme(scheme);
-        }
-
-        public override void RemoveScheme(string name)
-        {
-            base.RemoveScheme(name);
-        }
-
         public override Task<IEnumerable<AuthenticationScheme>> GetRequestHandlerSchemesAsync() => GetAllSchemesAsync();
 
         public override async Task<AuthenticationScheme> GetSchemeAsync(string name) => (await GetSIDSchemeAsync(name)).AuthScheme;
