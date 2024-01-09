@@ -18,3 +18,8 @@ public class ExtractedUserResult
     public string Version { get; set; }
     public List<string> Values { get; set; }
 }
+
+public class ExtractedGroupResult
+{
+    public string Id { get; set; }
+}

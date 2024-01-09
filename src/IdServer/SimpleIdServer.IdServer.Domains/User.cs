@@ -168,7 +168,6 @@ namespace SimpleIdServer.IdServer.Domains
 
         public void UpdateClaim(string key, string value)
         {
-            if (string.IsNullOrWhiteSpace(value)) return;
             if (_userClaims.ContainsKey(key))
             {
                 _userClaims[key].Key(this, value);

@@ -532,6 +532,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             return state with
             {
                 UserCredentials = credentials,
+                Count = credentials.Count()
             };
         }
 
@@ -559,6 +560,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             return state with
             {
                 UserCredentials = credentials,
+                Count = credentials.Count()
             };
         }
 
