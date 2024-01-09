@@ -8,18 +8,22 @@ namespace SimpleIdServer.IdServer.Jobs;
 
 public class ExtractedResult
 {
-    public List<ExtractedUserResult> Users { get; set; } = new List<ExtractedUserResult>();
+    public List<ExtractedUser> Users { get; set; } = new List<ExtractedUser>();
+    public List<ExtractedGroup> Groups { get; set; } = new List<ExtractedGroup>();
     public int CurrentPage { get; set; }
 }
 
-public class ExtractedUserResult
+public class ExtractedUser
 {
     public string Id { get; set; }
     public string Version { get; set; }
     public List<string> Values { get; set; }
 }
 
-public class ExtractedGroupResult
+public class ExtractedGroup
 {
     public string Id { get; set; }
+    public string Version { get; set; }
+    public List<string> Values { get; set; }
+    public string UserId { get; set; }
 }

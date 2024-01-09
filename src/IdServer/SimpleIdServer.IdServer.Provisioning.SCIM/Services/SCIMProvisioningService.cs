@@ -11,7 +11,7 @@ using System.Text.Json;
 
 namespace SimpleIdServer.IdServer.Provisioning.SCIM.Services;
 
-public class SCIMProvisioningService : IProvisioningService
+public class SCIMProvisioningService : IUserProvisioningService
 {
     private readonly IExtractedRepresentationRepository _extractedRepresentationRepository;
 
@@ -28,13 +28,15 @@ public class SCIMProvisioningService : IProvisioningService
         using (var scimClient = new SCIMClient(options.SCIMEdp))
         {
             var accessToken = await GetAccessToken(options);
+            // User must contains the list of group.
+            // Mapping must be specific to a group or user.
             var searchUsers = await scimClient.SearchUsers(new Scim.Client.SearchRequest
             {
                 Count = options.Count,
                 StartIndex = 1
             }, accessToken, CancellationToken.None);
             var filterUsers = await FilterUsers(searchUsers.Item1);
-            var result = ExtractUsers(filterUsers, 0, definition);
+            var result = await Extract(filterUsers, 0, definition, scimClient, options, CancellationToken.None);
             yield return result;
             var totalResults = searchUsers.Item1.TotalResults;
             var count = searchUsers.Item1.ItemsPerPage;
@@ -48,7 +50,7 @@ public class SCIMProvisioningService : IProvisioningService
                     StartIndex = currentPage * count
                 }, accessToken, CancellationToken.None);
                 var newFilterUsers = FilterUsers(newSearchUsers.Item1).Result;
-                result = ExtractUsers(newFilterUsers, 1, definition);
+                result = await Extract(newFilterUsers, 1, definition, scimClient, options, CancellationToken.None);
                 yield return result;
             }
         }
@@ -65,7 +67,7 @@ public class SCIMProvisioningService : IProvisioningService
                 Count = options.Count,
                 StartIndex = 1
             }, accessToken, CancellationToken.None);
-            var result = ExtractUsers(searchUsers.Item1.Resources, 1, definition);
+            var result = await Extract(searchUsers.Item1.Resources, 1, definition, scimClient, options, CancellationToken.None);
             return result;
         }
     }
@@ -82,15 +84,64 @@ public class SCIMProvisioningService : IProvisioningService
         }
     }
 
-    private ExtractedResult ExtractUsers(IEnumerable<RepresentationResult> resources, int currentPage, IdentityProvisioningDefinition definition)
+    private async Task<ExtractedResult> Extract(IEnumerable<RepresentationResult> resources, int currentPage, IdentityProvisioningDefinition definition, SCIMClient client, SCIMRepresentationsExtractionJobOptions options, CancellationToken cancellationToken)
     {
         var result = new ExtractedResult();
-        foreach (var resource in resources) result.Users.Add(ExtractUser(resource, definition));
+        foreach (var resource in resources)
+        {
+            var user = ExtractUser(resource, definition);
+            result.Users.Add(user);
+            result.Groups.AddRange(await ExtractGroups(user.Id, resource, client, options, definition, cancellationToken));
+        }
+
         result.CurrentPage = currentPage;
         return result;
     }
 
-    private ExtractedUserResult ExtractUser(RepresentationResult resource, IdentityProvisioningDefinition definition)
+    private async Task<List<ExtractedGroup>> ExtractGroups(string userId, RepresentationResult user, SCIMClient client, SCIMRepresentationsExtractionJobOptions options, IdentityProvisioningDefinition definition, CancellationToken cancellationToken)
+    {
+        var result = new List<ExtractedGroup>();
+        var jsonDoc = JsonDocument.Parse(user.AdditionalData.ToJsonString());
+        var memberIdsElt = jsonDoc.SelectToken("$.members[].id");
+        if (memberIdsElt == null) return result;
+        var groupIds = memberIdsElt.Value.Deserialize<List<string>>();
+        if (groupIds == null) return result;
+        var accessToken = await GetAccessToken(options);
+        foreach(var groupId in groupIds)
+        {
+            var group = await client.GetGroup(groupId, accessToken, cancellationToken);
+            result.Add(ExtractGroup(userId, group, definition));
+        }
+
+        return result;
+    }
+
+    private ExtractedUser ExtractUser(RepresentationResult resource, IdentityProvisioningDefinition definition)
+    {
+        var jsonDoc = JsonDocument.Parse(resource.AdditionalData.ToJsonString());
+        var values = ExtractRepresentation(resource, definition);
+        return new ExtractedUser
+        {
+            Id = resource.Id,
+            Version = resource.Meta.Version.ToString(),
+            Values = values
+        };
+    }
+
+    private ExtractedGroup ExtractGroup(string userId, RepresentationResult resource, IdentityProvisioningDefinition definition)
+    {
+        var jsonDoc = JsonDocument.Parse(resource.AdditionalData.ToJsonString());
+        var values = ExtractRepresentation(resource, definition);
+        return new ExtractedGroup
+        {
+            Id = resource.Id,
+            Version = resource.Meta.Version.ToString(),
+            Values = values,
+            UserId = userId
+        };
+    }
+
+    private List<string> ExtractRepresentation(RepresentationResult resource, IdentityProvisioningDefinition definition)
     {
         var jsonDoc = JsonDocument.Parse(resource.AdditionalData.ToJsonString());
         var values = new List<string>();
@@ -105,14 +156,14 @@ public class SCIMProvisioningService : IProvisioningService
             }
 
             var firstToken = tokens.First();
-            if(firstToken.ValueKind == JsonValueKind.Object)
+            if (firstToken.ValueKind == JsonValueKind.Object)
             {
                 invalidMappingRules.Add($"mapping rule '{mappingRule.From}' tried to fetch a complex element");
                 continue;
             }
 
             var lstValues = tokens.Select(t => t.GetString());
-            if(!mappingRule.HasMultipleAttribute && lstValues.Count() > 1 && mappingRule.MapperType == MappingRuleTypes.USERATTRIBUTE)
+            if (!mappingRule.HasMultipleAttribute && lstValues.Count() > 1 && mappingRule.MapperType == MappingRuleTypes.USERATTRIBUTE)
             {
                 invalidMappingRules.Add($"mapping rule '{mappingRule.From}' is not configured to fetch more than one attribute");
                 continue;
@@ -126,13 +177,9 @@ public class SCIMProvisioningService : IProvisioningService
             }
         }
 
+
         if (invalidMappingRules.Any()) throw new InvalidOperationException(string.Join(",", invalidMappingRules.Distinct()));
-        return new ExtractedUserResult
-        {
-            Id = resource.Id,
-            Version = resource.Meta.Version.ToString(),
-            Values = values
-        };
+        return values;
     }
 
     private async Task<IEnumerable<RepresentationResult>> FilterUsers(SearchResult<RepresentationResult> searchResult)

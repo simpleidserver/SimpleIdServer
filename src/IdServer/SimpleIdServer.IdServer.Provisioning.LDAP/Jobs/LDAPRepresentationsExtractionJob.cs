@@ -22,7 +22,7 @@ namespace SimpleIdServer.IdServer.Provisioning.LDAP.Jobs
 
         public override string Name => NAME;
 
-        protected override async IAsyncEnumerable<List<ExtractedRepresentation>> FetchUsers(LDAPRepresentationsExtractionJobOptions options, string destinationFolder, IdentityProvisioning identityProvisioning)
+        protected override async IAsyncEnumerable<List<Domains.ExtractedRepresentation>> FetchUsers(LDAPRepresentationsExtractionJobOptions options, string destinationFolder, IdentityProvisioning identityProvisioning)
         {
             await foreach (var extractedResult in _provisioningService.Extract(options, identityProvisioning.Definition))
             {
@@ -31,16 +31,16 @@ namespace SimpleIdServer.IdServer.Provisioning.LDAP.Jobs
             }
         }
 
-        private List<ExtractedRepresentation> WriteFile(ExtractedResult extractedResult, string destinationFolder, IdentityProvisioningDefinition definition)
+        private List<Domains.ExtractedRepresentation> WriteFile(ExtractedResult extractedResult, string destinationFolder, IdentityProvisioningDefinition definition)
         {
-            var result = new List<ExtractedRepresentation>();
+            var result = new List<Domains.ExtractedRepresentation>();
             using (var fs = File.CreateText(Path.Combine(destinationFolder, $"{extractedResult.CurrentPage}.csv")))
             {
                 fs.WriteLine(BuildFileColumns(definition));
                 foreach (var user in extractedResult.Users)
                 {
                     fs.WriteLine($"{user.Id}{Constants.IdProviderSeparator}{user.Version}{Constants.IdProviderSeparator}{string.Join(Constants.IdProviderSeparator, user.Values)}");
-                    result.Add(new ExtractedRepresentation
+                    result.Add(new Domains.ExtractedRepresentation
                     {
                         ExternalId = user.Id,
                         Version = user.Version

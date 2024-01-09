@@ -12,7 +12,7 @@ public static class IdServerBuilderExtensions
     public static IdServerBuilder AddSCIMProvisioning(this IdServerBuilder builder)
     {
         builder.Services.AddTransient<IRepresentationExtractionJob, SCIMRepresentationsExtractionJob>();
-        builder.Services.AddTransient<IProvisioningService, SCIMProvisioningService>();
+        builder.Services.AddTransient<IUserProvisioningService, SCIMProvisioningService>();
         return builder;
     }
 }

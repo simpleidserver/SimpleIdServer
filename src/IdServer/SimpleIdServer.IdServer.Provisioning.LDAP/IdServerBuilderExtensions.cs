@@ -14,7 +14,7 @@ public static class IdServerBuilderExtensions
     {
         builder.Services.AddTransient<IRepresentationExtractionJob, LDAPRepresentationsExtractionJob>();
         builder.Services.AddTransient<IIdProviderAuthService, LDAPAuthenticationService>();
-        builder.Services.AddTransient<IProvisioningService, LDAPProvisioningService>();
+        builder.Services.AddTransient<IUserProvisioningService, LDAPUserProvisioningService>();
         return builder;
     }
 }

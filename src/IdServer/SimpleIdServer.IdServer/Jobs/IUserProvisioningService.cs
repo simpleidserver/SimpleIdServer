@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.Jobs;
 
-public interface IProvisioningService
+public interface IUserProvisioningService
 {
     string Name { get; }
     IAsyncEnumerable<ExtractedResult> Extract(object options, IdentityProvisioningDefinition definition);

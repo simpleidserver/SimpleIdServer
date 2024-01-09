@@ -30,7 +30,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
         private readonly IImportSummaryStore _importSummaryStore;
         private readonly IServiceProvider _serviceProvider;
         private readonly IConfiguration _configuration;
-        private readonly IEnumerable<IProvisioningService> _provisioningServices;
+        private readonly IEnumerable<IUserProvisioningService> _provisioningServices;
 
         public IdentityProvisioningController(
             IIdentityProvisioningStore identityProvisioningStore, 
@@ -39,7 +39,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             ITokenRepository tokenRepository, 
             IJwtBuilder jwtBuilder, 
             IConfiguration configuration, 
-            IEnumerable<IProvisioningService> provisioningServices) : base(tokenRepository, jwtBuilder)
+            IEnumerable<IUserProvisioningService> provisioningServices) : base(tokenRepository, jwtBuilder)
         {
             _identityProvisioningStore = identityProvisioningStore;
             _importSummaryStore = importSummaryStore;

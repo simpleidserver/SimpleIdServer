@@ -115,7 +115,7 @@ namespace SimpleIdServer.IdServer.Jobs
             }
         }
 
-        protected abstract IAsyncEnumerable<List<ExtractedRepresentation>> FetchUsers(T options, string destinationFolder, IdentityProvisioning identityProvisioning);
+        protected abstract IAsyncEnumerable<List<Domains.ExtractedRepresentation>> FetchUsers(T options, string destinationFolder, IdentityProvisioning identityProvisioning);
 
         protected string BuildFileColumns(IdentityProvisioningDefinition definition) => $"Id;Version;{string.Join(";", definition.MappingRules.Select(r => r.Id))}";
     }

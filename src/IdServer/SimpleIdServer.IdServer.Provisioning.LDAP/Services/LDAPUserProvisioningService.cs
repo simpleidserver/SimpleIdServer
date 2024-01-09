@@ -5,12 +5,13 @@ using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Provisioning.LDAP.Jobs;
 using System.DirectoryServices.Protocols;
 using System.Net;
+using System.Security.Principal;
 using System.Text;
 using System.Text.Json;
 
 namespace SimpleIdServer.IdServer.Provisioning.LDAP.Services;
 
-public class LDAPProvisioningService : IProvisioningService
+public class LDAPUserProvisioningService : IUserProvisioningService
 {
     public string Name => LDAPRepresentationsExtractionJob.NAME;
 
@@ -31,8 +32,7 @@ public class LDAPProvisioningService : IProvisioningService
                 var response = (SearchResponse)connection.SendRequest(request);
                 if (!response.Controls.Any()) break;
                 var pageResponse = (PageResultResponseControl)response.Controls[0];
-                var extractionResultLst = ExtractUsers(response.Entries, options, definition);
-                var record = new ExtractedResult { CurrentPage = currentPage, Users = extractionResultLst };
+                var record = Extract(response.Entries, options, definition, currentPage, connection);
                 pr.Cookie = pageResponse.Cookie;
                 yield return record;
                 if (!pageResponse.Cookie.Any()) break;
@@ -56,8 +56,7 @@ public class LDAPProvisioningService : IProvisioningService
             var response = (SearchResponse)connection.SendRequest(request);
             if (!response.Controls.Any()) return new ExtractedResult();
             var pageResponse = (PageResultResponseControl)response.Controls[0];
-            var extractionResultLst = ExtractUsers(response.Entries, options, definition);
-            var record = new ExtractedResult { CurrentPage = currentPage, Users = extractionResultLst };
+            var record = Extract(response.Entries, options, definition, currentPage, connection);
             return record;
         }
     }
@@ -92,18 +91,78 @@ public class LDAPProvisioningService : IProvisioningService
         return Task.FromResult((IEnumerable<string>)result.Distinct().OrderBy(r => r).ToList());
     }
 
-    private List<ExtractedUserResult> ExtractUsers(SearchResultEntryCollection entries, LDAPRepresentationsExtractionJobOptions options, IdentityProvisioningDefinition definition)
+    private ExtractedResult Extract(SearchResultEntryCollection entries, LDAPRepresentationsExtractionJobOptions options, IdentityProvisioningDefinition definition, int currentPage, LdapConnection ldapConnection)
     {
-        var result = new List<ExtractedUserResult>();
+        var users = new List<ExtractedUser>();
+        var groups = new List<ExtractedGroup>();
         foreach(SearchResultEntry entry in entries)
         {
-            var userId = GetUserId(entry, options);
+            var userId = GetRepresentationId(entry, options);
             var version = GetVersion(entry, options);
-            result.Add(new ExtractedUserResult
+            users.Add(new ExtractedUser
             {
                 Id = userId,
                 Values = ExtractUser(entry, definition),
                 Version = version
+            });
+            groups.AddRange(ResolveUserGroups(userId, entry, options, ldapConnection, definition));
+        }
+
+        return new ExtractedResult { Users = users, CurrentPage = currentPage, Groups = groups };
+    }
+
+    private List<ExtractedGroup> ResolveUserGroups(string userId, SearchResultEntry userEntry, LDAPRepresentationsExtractionJobOptions options, LdapConnection connection, IdentityProvisioningDefinition definition)
+    {
+        var result = new List<ExtractedGroup>();
+        if(options.RetrievingStrategies == LoadingStrategies.LOAD_BY_MEMBER_ATTRIBUTE)
+        {
+            if (!userEntry.Attributes.Contains(options.MembershipUserLDAPAttribute)) return result;
+            var userGroupId = userEntry.Attributes[options.MembershipUserLDAPAttribute][0].ToString();
+            var groupObjectClassLst = options.GroupObjectClasses.Split(',');
+            foreach(var groupObjectClass in groupObjectClassLst)
+            {
+                var request = new SearchRequest(options.UsersDN, $"&((objectClass={groupObjectClass})({options.MembershipLDAPAttribute}={userGroupId}))", System.DirectoryServices.Protocols.SearchScope.Subtree);
+                var response = (SearchResponse)connection.SendRequest(request);
+                var entries = response.Entries;
+                if (entries.Count == 0) continue;
+                result.AddRange(ExtractGroups(userId, entries, options, definition));
+            }
+
+            return result;
+        }
+
+        if(options.RetrievingStrategies == LoadingStrategies.LOAD_FROM_USER_MEMBEROF_ATTRIBUTE)
+        {
+            foreach(DirectoryAttribute attr in userEntry.Attributes)
+            {
+                if (attr.Name != options.MemberOfAttribute) continue;
+                var values = (string[])attr.GetValues(typeof(string));
+                if (values == null || values.Count() > 1) continue;
+                var dn = values.First();
+                var request = new SearchRequest(options.UsersDN, $"&((distinguishedName={dn}))", System.DirectoryServices.Protocols.SearchScope.Subtree);
+                var response = (SearchResponse)connection.SendRequest(request);
+                var entries = response.Entries;
+                if (entries.Count == 0) continue;
+                result.AddRange(ExtractGroups(userId, entries, options, definition));
+            }
+        }
+
+        return result;
+    }
+
+    private List<ExtractedGroup> ExtractGroups(string userId, SearchResultEntryCollection entries, LDAPRepresentationsExtractionJobOptions options, IdentityProvisioningDefinition definition)
+    {
+        var result = new List<ExtractedGroup>();
+        foreach (SearchResultEntry entry in entries)
+        {
+            var groupId = GetRepresentationId(entry, options);
+            var version = GetVersion(entry, options);
+            result.Add(new ExtractedGroup
+            {
+                Id = groupId,
+                Values = ExtractUser(entry, definition),
+                Version = version,
+                UserId = userId
             });
         }
 
@@ -123,13 +182,13 @@ public class LDAPProvisioningService : IProvisioningService
             }
 
             var attribute = entry.Attributes[mappingRule.From];
-            if(mappingRule.MapperType == MappingRuleTypes.USERATTRIBUTE && !mappingRule.HasMultipleAttribute && attribute.Count > 1)
+            if (mappingRule.MapperType == MappingRuleTypes.USERATTRIBUTE && !mappingRule.HasMultipleAttribute && attribute.Count > 1)
             {
                 invalidMappingRules.Add($"mapping rule '{mappingRule.From}' is not configured to fetch more than one attribute");
                 continue;
             }
 
-            if(attribute.Count == 1)
+            if (attribute.Count == 1)
             {
                 var record = entry.Attributes[mappingRule.From][0];
                 lst.Add(record.ToString());
@@ -148,10 +207,17 @@ public class LDAPProvisioningService : IProvisioningService
         return lst;
     }
 
-    private string GetUserId(SearchResultEntry entry, LDAPRepresentationsExtractionJobOptions options)
+    private string GetRepresentationId(SearchResultEntry entry, LDAPRepresentationsExtractionJobOptions options)
     {
         if (!entry.Attributes.Contains(options.UUIDLDAPAttribute)) return entry.DistinguishedName;
-        return entry.Attributes[options.UUIDLDAPAttribute][0].ToString();
+        var result = entry.Attributes[options.UUIDLDAPAttribute][0];
+        var payload = result as byte[];
+        if(payload != null)
+        {
+            return (new SecurityIdentifier(payload, 0)).ToString();
+        }
+
+        return result.ToString();
     }
 
     private string GetVersion(SearchResultEntry entry, LDAPRepresentationsExtractionJobOptions options)

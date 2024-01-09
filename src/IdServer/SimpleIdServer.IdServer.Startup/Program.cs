@@ -184,7 +184,7 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
     {
         o.Add<FacebookOptionsLite>();
         o.Add<GoogleOptionsLite>();
-        o.Add<LDAPRepresentationsExtractionJobOptions>();
+        o.Add<LDAPServerOptions>();
         o.Add<SCIMRepresentationsExtractionJobOptions>();
         o.Add<IdServerEmailOptions>();
         o.Add<IdServerSmsOptions>();
@@ -436,7 +436,7 @@ void SeedData(WebApplication application, string scimBaseUrl)
                 });
 
             AddMissingConfigurationDefinition<FacebookOptionsLite>(dbContext);
-            AddMissingConfigurationDefinition<LDAPRepresentationsExtractionJobOptions>(dbContext);
+            AddMissingConfigurationDefinition<LDAPServerOptions>(dbContext);
             AddMissingConfigurationDefinition<SCIMRepresentationsExtractionJobOptions>(dbContext);
             AddMissingConfigurationDefinition<IdServerEmailOptions>(dbContext);
             AddMissingConfigurationDefinition<IdServerSmsOptions>(dbContext);
