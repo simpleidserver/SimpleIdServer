@@ -22,9 +22,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Email;
 using SimpleIdServer.IdServer.Fido;
 using SimpleIdServer.IdServer.Provisioning.LDAP;
-using SimpleIdServer.IdServer.Provisioning.LDAP.Jobs;
 using SimpleIdServer.IdServer.Provisioning.SCIM;
-using SimpleIdServer.IdServer.Provisioning.SCIM.Jobs;
 using SimpleIdServer.IdServer.Pwd;
 using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Startup;
@@ -184,7 +182,7 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
     {
         o.Add<FacebookOptionsLite>();
         o.Add<GoogleOptionsLite>();
-        o.Add<LDAPServerOptions>();
+        o.Add<LDAPRepresentationsExtractionJobOptions>();
         o.Add<SCIMRepresentationsExtractionJobOptions>();
         o.Add<IdServerEmailOptions>();
         o.Add<IdServerSmsOptions>();
@@ -436,7 +434,7 @@ void SeedData(WebApplication application, string scimBaseUrl)
                 });
 
             AddMissingConfigurationDefinition<FacebookOptionsLite>(dbContext);
-            AddMissingConfigurationDefinition<LDAPServerOptions>(dbContext);
+            AddMissingConfigurationDefinition<LDAPRepresentationsExtractionJobOptions>(dbContext);
             AddMissingConfigurationDefinition<SCIMRepresentationsExtractionJobOptions>(dbContext);
             AddMissingConfigurationDefinition<IdServerEmailOptions>(dbContext);
             AddMissingConfigurationDefinition<IdServerSmsOptions>(dbContext);

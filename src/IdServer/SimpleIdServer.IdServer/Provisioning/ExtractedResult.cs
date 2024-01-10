@@ -3,14 +3,13 @@
 
 using System.Collections.Generic;
 
-namespace SimpleIdServer.IdServer.Jobs;
+namespace SimpleIdServer.IdServer.Provisioning;
 
 
 public class ExtractedResult
 {
     public List<ExtractedUser> Users { get; set; } = new List<ExtractedUser>();
     public List<ExtractedGroup> Groups { get; set; } = new List<ExtractedGroup>();
-    public int CurrentPage { get; set; }
 }
 
 public class ExtractedUser
@@ -18,6 +17,7 @@ public class ExtractedUser
     public string Id { get; set; }
     public string Version { get; set; }
     public List<string> Values { get; set; }
+    public List<string> GroupIds { get; set; }
 }
 
 public class ExtractedGroup

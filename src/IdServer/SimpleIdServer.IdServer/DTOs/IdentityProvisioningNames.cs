@@ -14,4 +14,11 @@ public class IdentityProvisioningNames
     public const string Definition = "definition";
     public const string Histories = "histories";
     public const string Values = "values";
+    public const string Processes = "processes";
+    public const string IsExported = "is_exported";
+    public const string IsImported = "is_imported";
+    public const string NbExtractedPages = "nb_extracted_pages";
+    public const string NbImportedPages = "nb_imported_pages";
+    public const string TotalPageToExtract = "total_page_to_extract";
+    public const string TotalPageToImport = "total_page_to_import";
 }

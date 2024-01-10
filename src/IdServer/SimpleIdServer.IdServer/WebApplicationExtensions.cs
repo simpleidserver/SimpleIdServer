@@ -243,11 +243,8 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/.search",
                 defaults: new { controller = "IdentityProvisioning", action = "Search" });
             webApplication.SidMapControllerRoute("importRepresentations",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/import",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}/{processId}/import",
                 defaults: new { controller = "IdentityProvisioning", action = "Import" });
-            webApplication.SidMapControllerRoute("removeIdProvisioning",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}",
-                defaults: new { controller = "IdentityProvisioning", action = "Remove" });
             webApplication.SidMapControllerRoute("getIdProvisioning",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}",
                 defaults: new { controller = "IdentityProvisioning", action = "Get" });
@@ -270,8 +267,8 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}/mappers",
                 defaults: new { controller = "IdentityProvisioning", action = "AddMapper" });
             webApplication.SidMapControllerRoute("extractRepresentations",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{name}/{id}/enqueue",
-                defaults: new { controller = "IdentityProvisioning", action = "Enqueue" });
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}/extract",
+                defaults: new { controller = "IdentityProvisioning", action = "Extract" });
             webApplication.SidMapControllerRoute("idProvisioningTestConnection",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}/test",
                 defaults: new { controller = "IdentityProvisioning", action = "TestConnection" });

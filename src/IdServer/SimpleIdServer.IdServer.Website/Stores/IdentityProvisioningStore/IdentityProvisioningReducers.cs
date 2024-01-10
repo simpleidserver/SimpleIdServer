@@ -41,28 +41,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         }
 
         [ReducerMethod]
-        public static SearchIdentityProvisioningState ReduceRemoveSelectedIdentityProvisioningAction(SearchIdentityProvisioningState state, RemoveSelectedIdentityProvisioningAction act)
-        {
-            return state with
-            {
-                IsLoading = true
-            };
-        }
-
-        [ReducerMethod]
-        public static SearchIdentityProvisioningState ReduceRemoveSelectedIdentityProvisioningSuccessAction(SearchIdentityProvisioningState state, RemoveSelectedIdentityProvisioningSuccessAction act)
-        {
-            var values = state.Values.ToList();
-            values = values.Where(v => !act.Ids.Contains(v.Value.Id)).ToList();
-            return state with
-            {
-                IsLoading = false,
-                Values = values,
-                Count = values.Count
-            };
-        }
-
-        [ReducerMethod]
         public static SearchIdentityProvisioningState ReduceUpdateIdProvisioningDetailSuccessAction(SearchIdentityProvisioningState state, UpdateIdProvisioningDetailsSuccessAction act)
         {
             var idProvisioningLst = state.Values.ToList();
@@ -127,14 +105,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         public static IdentityProvisioningState ReduceLaunchIdentityProvisioningSuccessAction(IdentityProvisioningState state, LaunchIdentityProvisioningSuccessAction act)
         {
             var idProvisioning = state.IdentityProvisioning;
-            var histories = state.IdentityProvisioning.Histories.ToList();
-            histories.Add(new IdentityProvisioningHistoryResult
-            {
-                StartDateTime = DateTime.UtcNow,
-                NbRepresentations = 0,
-                Status = IdentityProvisioningHistoryStatus.START
-            });
-            idProvisioning.Histories = histories;
             return state with
             {
                 IsLoading = false,
@@ -236,7 +206,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
                 From = act.From,
                 MapperType = act.MappingRule,
                 TargetUserAttribute = act.TargetUserAttribute,
-                TargetUserProperty = act.TargetUserProperty
+                TargetUserProperty = act.TargetUserProperty,
+                Usage = act.Usage
             })
             {
                 IsNew = true
@@ -257,6 +228,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
 
         [ReducerMethod]
         public static UpdateIdentityProvisioningState ReduceAddIdentityProvisioningMappingRuleSuccessAction(UpdateIdentityProvisioningState state, AddIdentityProvisioningMappingRuleSuccessAction act) => new(false, null);
+
+        [ReducerMethod]
+        public static UpdateIdentityProvisioningState ReduceAddIdentityProvisioningMappingRuleFailureAction(UpdateIdentityProvisioningState state, AddIdentityProvisioningMappingRuleFailureAction act) => new(false, null);
 
         [ReducerMethod]
         public static UpdateIdentityProvisioningState ReduceUpdateIdentityProvisioningMappingRuleAction(UpdateIdentityProvisioningState state, UpdateIdentityProvisioningMappingRuleAction act) => new(true, null);

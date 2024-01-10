@@ -52,24 +52,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         }
 
         [EffectMethod]
-        public async Task Handle(RemoveSelectedIdentityProvisioningAction action, IDispatcher dispatcher)
-        {
-            var baseUrl = await GetBaseUrl();
-            var httpClient = await _websiteHttpClientFactory.Build();
-            foreach (var id in action.Ids)
-            {
-                var requestMessage = new HttpRequestMessage
-                {
-                    Method = HttpMethod.Delete,
-                    RequestUri = new Uri($"{baseUrl}/{id}")
-                };
-                await httpClient.SendAsync(requestMessage);
-            }
-
-            dispatcher.Dispatch(new RemoveSelectedIdentityProvisioningSuccessAction { Ids = action.Ids });
-        }
-
-        [EffectMethod]
         public async Task Handle(GetIdentityProvisioningAction action, IDispatcher dispatcher)
         {
             var baseUrl = await GetBaseUrl();
@@ -92,7 +74,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             var httpClient = await _websiteHttpClientFactory.Build();
             var requestMessage = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{baseUrl}/{action.Name}/{action.Id}/enqueue")
+                RequestUri = new Uri($"{baseUrl}/{action.Id}/extract")
             };
             await httpClient.SendAsync(requestMessage);
             dispatcher.Dispatch(new LaunchIdentityProvisioningSuccessAction { Id = action.Id, Name = action.Name });
@@ -165,7 +147,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
                 From = action.From,
                 TargetUserAttribute = action.TargetUserAttribute,
                 TargetUserProperty = action.TargetUserProperty,
-                HasMultipleAttribute = action.HasMultipleAttribute
+                HasMultipleAttribute = action.HasMultipleAttribute,
+                Usage = action.Usage
             };
             var requestMessage = new HttpRequestMessage
             {
@@ -175,8 +158,17 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var newMapper = JsonSerializer.Deserialize<IdentityProvisioningMappingRuleResult>(json);
-            dispatcher.Dispatch(new AddIdentityProvisioningMappingRuleSuccessAction { NewId = newMapper.Id, Id = action.Id, MappingRule = action.MappingRule, From = action.From, TargetUserAttribute = action.TargetUserAttribute, TargetUserProperty = action.TargetUserProperty });
+            try
+            {
+                httpResult.EnsureSuccessStatusCode();
+                var newMapper = JsonSerializer.Deserialize<IdentityProvisioningMappingRuleResult>(json);
+                dispatcher.Dispatch(new AddIdentityProvisioningMappingRuleSuccessAction { Usage = action.Usage, NewId = newMapper.Id, Id = action.Id, MappingRule = action.MappingRule, From = action.From, TargetUserAttribute = action.TargetUserAttribute, TargetUserProperty = action.TargetUserProperty });
+            }
+            catch
+            {
+                var jsonObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new AddIdentityProvisioningMappingRuleFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
+            }
         }
 
 
@@ -262,31 +254,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             }
         }
 
-        [EffectMethod]
-        public async Task Handle(GetIdentityProvisioningAllowedAttributesAction action, IDispatcher dispatcher)
-        {
-            var baseUrl = await GetBaseUrl();
-            var httpClient = await _websiteHttpClientFactory.Build();
-            var requestMessage = new HttpRequestMessage
-            {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri($"{baseUrl}/{action.Id}/allowedattributes")
-            };
-            var httpResult = await httpClient.SendAsync(requestMessage);
-            var json = await httpResult.Content.ReadAsStringAsync();
-            try
-            {
-                httpResult.EnsureSuccessStatusCode();
-                var allowedAttributes = JsonSerializer.Deserialize<List<string>>(json);
-                dispatcher.Dispatch(new GetIdentityProvisioningAllowedAttributesSuccessAction { AllowedAttributes = allowedAttributes });
-            }
-            catch
-            {
-                var jsonObj = JsonObject.Parse(json);
-                dispatcher.Dispatch(new GetIdentityProvisioningAllowedAttributesFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
-            }
-        }
-
         private async Task<string> GetBaseUrl()
         {
             if(_options.IsReamEnabled)
@@ -338,16 +305,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
     {
         public bool IsSelected { get; set; }
         public string IdentityProvisioningId { get; set; }
-    }
-
-    public class RemoveSelectedIdentityProvisioningAction
-    {
-        public IEnumerable<string> Ids { get; set; }
-    }
-
-    public class RemoveSelectedIdentityProvisioningSuccessAction
-    {
-        public IEnumerable<string> Ids { get; set; }
     }
 
     public class LaunchIdentityProvisioningAction
@@ -417,6 +374,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         public string? TargetUserAttribute { get; set; } = null;
         public string? TargetUserProperty { get; set; } = null;
         public bool HasMultipleAttribute { get; set; }
+        public IdentityProvisioningMappingUsage Usage { get; set; }
     }
 
     public class AddIdentityProvisioningMappingRuleSuccessAction
@@ -427,6 +385,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         public string From { get; set; } = null!;
         public string? TargetUserAttribute { get; set; } = null;
         public string? TargetUserProperty { get; set; } = null;
+        public IdentityProvisioningMappingUsage Usage { get; set; } 
+    }
+
+    public class AddIdentityProvisioningMappingRuleFailureAction
+    {
+        public string ErrorMessage { get; set; }
     }
 
     public class TestIdentityProvisioningAction
@@ -442,21 +406,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
     public class TestIdentityProvisioningSuccessAction
     {
         public TestConnectionResult ConnectionResult { get; set; }
-    }
-
-    public class GetIdentityProvisioningAllowedAttributesAction
-    {
-        public string Id { get; set; }
-    }
-
-    public class GetIdentityProvisioningAllowedAttributesSuccessAction
-    {
-        public List<string> AllowedAttributes { get; set; }
-    }
-
-    public class GetIdentityProvisioningAllowedAttributesFailureAction
-    {
-        public string ErrorMessage { get; set; }
     }
 
     public class GetIdentityProvisioningMappingRuleAction

@@ -3,7 +3,7 @@
 
 using SimpleIdServer.Configuration;
 
-namespace SimpleIdServer.IdServer.Provisioning.LDAP.Jobs;
+namespace SimpleIdServer.IdServer.Provisioning.LDAP;
 
 public class LDAPRepresentationsExtractionJobOptions
 {
@@ -33,7 +33,7 @@ public class LDAPRepresentationsExtractionJobOptions
     public string GroupObjectClasses { get; set; } = "posixGroup";
     [ConfigurationRecord("Membership Group LDAP Attribute.", "It is the name of the LDAP Attribute on the group, which is used for membership mappings, for example memberUid", order: 8)]
     public string MembershipLDAPAttribute { get; set; }
-    [ConfigurationRecord("Membership User LDAP Attribute.", "It is the name of the LDAP Attribute on the user, which is used for membership mappings, for example uid", order: 9)]
+    [ConfigurationRecord("Membership User LDAP Attribute.", "It is the name of the LDAP Attribute on the user, which is used for membership mappings, for example uidNumber", order: 9)]
     public string MembershipUserLDAPAttribute { get; set; }
     [ConfigurationRecord("User Groups Retrieve Strategy", "Membership User LDAP Attribute.", order: 10)]
     public LoadingStrategies RetrievingStrategies { get; set; }

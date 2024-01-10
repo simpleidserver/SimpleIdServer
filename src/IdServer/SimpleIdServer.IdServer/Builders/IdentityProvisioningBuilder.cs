@@ -15,11 +15,11 @@ namespace SimpleIdServer.IdServer.Builders
             _identityProvisioning = identityProvisioning;
         }
 
-        public static IdentityProvisioningBuilder Create(IdentityProvisioningDefinition definition, string name, string description, Domains.Realm realm = null)
+        public static IdentityProvisioningBuilder Create(IdentityProvisioningDefinition definition, string name, string description, string id = null, Domains.Realm realm = null)
         {
             var result = new IdentityProvisioning
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = id ?? Guid.NewGuid().ToString(),
                 Name = name,
                 Description = description,
                 CreateDateTime = DateTime.UtcNow,

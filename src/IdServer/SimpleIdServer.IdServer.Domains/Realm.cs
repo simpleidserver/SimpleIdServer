@@ -35,8 +35,6 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonIgnore]
         public ICollection<IdentityProvisioning> IdentityProvisioningLst { get; set; } = new List<IdentityProvisioning>();
         [JsonIgnore]
-        public ICollection<ImportSummary> ImportSummaries { get; set; } = new List<ImportSummary>();
-        [JsonIgnore]
         public ICollection<Group> Groups { get; set; } = new List<Group>();
         [JsonIgnore]
         public ICollection<CredentialTemplate> CredentialTemplates { get; set; } = new List<CredentialTemplate>();

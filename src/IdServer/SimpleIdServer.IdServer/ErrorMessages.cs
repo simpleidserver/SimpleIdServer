@@ -300,5 +300,7 @@ namespace SimpleIdServer.IdServer
         public const string SCOPE_CLAIM_MAPPER_SAML_ATTRIBUTE_NAME = "SAML Attribute name must be unique";
         public const string REALM_EXISTS = "realm {0} already exists";
         public const string GROUP_EXISTS = "group {0} already exists";
+        public const string IDPROVISIONING_TYPE_UNIQUE = "The same mapping type cannot be added twice.";
+        public const string SCOPE_MAPPER_TYPE_UNIQUE = "The same mapping type cannot be added twice.";
     }
 }

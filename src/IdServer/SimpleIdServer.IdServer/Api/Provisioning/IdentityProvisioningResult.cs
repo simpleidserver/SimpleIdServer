@@ -24,8 +24,26 @@ public class IdentityProvisioningResult
     public DateTime UpdateDateTime { get; set; }
     [JsonPropertyName(IdentityProvisioningNames.Definition)]
     public IdentityProvisioningDefinitionResult Definition { get; set; }
-    [JsonPropertyName(IdentityProvisioningNames.Histories)]
-    public List<IdentityProvisioningHistoryResult> Histories { get; set; } = new List<IdentityProvisioningHistoryResult>();
+    [JsonPropertyName(IdentityProvisioningNames.Processes)]
+    public List<IdentityProvisioningProcessResult> Processes { get; set; } = new List<IdentityProvisioningProcessResult>();
     [JsonPropertyName(IdentityProvisioningNames.Values)]
     public Dictionary<string, string> Values { get; set; }
+}
+
+public class IdentityProvisioningProcessResult
+{
+    [JsonPropertyName(IdentityProvisioningNames.Id)]
+    public string Id { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.IsExported)]
+    public bool IsExported { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.IsImported)]
+    public bool IsImported { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.NbExtractedPages)]
+    public int NbExtractedPages { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.NbImportedPages)]
+    public int NbImportedPages { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.TotalPageToExtract)]
+    public int TotalPageToExtract { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.TotalPageToImport)]
+    public int TotalPageToImport { get; set; }
 }

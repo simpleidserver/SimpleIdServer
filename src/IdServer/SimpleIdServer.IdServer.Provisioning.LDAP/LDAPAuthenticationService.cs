@@ -3,7 +3,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Provisioning.LDAP.Jobs;
+using SimpleIdServer.IdServer.Provisioning.LDAP.Services;
 using SimpleIdServer.IdServer.UI.Services;
 using System.DirectoryServices.Protocols;
 using System.Net;
@@ -21,7 +21,7 @@ namespace SimpleIdServer.IdServer.Provisioning.LDAP
             _configuration = configuration;
         }
 
-        public string Name => LDAPRepresentationsExtractionJob.NAME;
+        public string Name => LDAPProvisioningService.NAME;
 
         public bool Authenticate(User user, IdentityProvisioning identityProvisioning, string password)
         {

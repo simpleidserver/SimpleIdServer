@@ -7,8 +7,8 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Provisioning.LDAP.Jobs;
-using SimpleIdServer.IdServer.Provisioning.SCIM.Jobs;
+using SimpleIdServer.IdServer.Provisioning.LDAP;
+using SimpleIdServer.IdServer.Provisioning.SCIM;
 using SimpleIdServer.IdServer.Startup.Converters;
 using System;
 using System.Collections.Generic;
@@ -22,12 +22,12 @@ namespace SimpleIdServer.IdServer.Startup
         private static AuthenticationSchemeProviderDefinition Google = AuthenticationSchemeProviderDefinitionBuilder.Create("google", "Google", typeof(GoogleHandler), typeof(GoogleOptionsLite)).Build();
         private static AuthenticationSchemeProviderDefinition Negotiate = AuthenticationSchemeProviderDefinitionBuilder.Create("negotiate", "Negotiate", typeof(NegotiateHandler), typeof(NegotiateOptionsLite)).Build();
 
-        private static IdentityProvisioningDefinition Scim = IdentityProvisioningDefinitionBuilder.Create<SCIMRepresentationsExtractionJobOptions>(SimpleIdServer.IdServer.Provisioning.SCIM.Jobs.SCIMRepresentationsExtractionJob.NAME, "SCIM")
+        private static IdentityProvisioningDefinition Scim = IdentityProvisioningDefinitionBuilder.Create<SCIMRepresentationsExtractionJobOptions>(SimpleIdServer.IdServer.Provisioning.SCIM.Services.SCIMProvisioningService.NAME, "SCIM")
             .AddUserSubjectMappingRule("$.userName")
             .AddUserPropertyMappingRule("$.name.familyName", nameof(User.Lastname))
             .AddUserAttributeMappingRule("$.name.givenName", JwtRegisteredClaimNames.GivenName).Build();
 
-        private static IdentityProvisioningDefinition Ldap = IdentityProvisioningDefinitionBuilder.Create<LDAPRepresentationsExtractionJobOptions>(SimpleIdServer.IdServer.Provisioning.LDAP.Jobs.LDAPRepresentationsExtractionJob.NAME, "LDAP")
+        private static IdentityProvisioningDefinition Ldap = IdentityProvisioningDefinitionBuilder.Create<LDAPRepresentationsExtractionJobOptions>(SimpleIdServer.IdServer.Provisioning.LDAP.Services.LDAPProvisioningService.NAME, "LDAP")
             .AddUserSubjectMappingRule("cn")
             .AddLDAPDistinguishedName()
             .Build();
@@ -194,7 +194,7 @@ namespace SimpleIdServer.IdServer.Startup
         public static ICollection<IdentityProvisioning> GetIdentityProvisiongLst(string scimEdp) => new List<IdentityProvisioning>
         {
             IdentityProvisioningBuilder.Create(Scim, "SCIM", "SCIM").Build(),
-            IdentityProvisioningBuilder.Create(Ldap, "LDAP", "LDAP").Build()
+            IdentityProvisioningBuilder.Create(Ldap, "LDAP", "LDAP", "LDAP").Build()
         };
     }
 }

@@ -18,7 +18,7 @@
 <RadzenText class="mt-3 mb-3" Text="@identityProvisioningState.Value.IdentityProvisioning?.Name" TextStyle="TextStyle.DisplayH3" />
 
 <div>
-    <RadzenButton class="mb-1" Click="@(args => LaunchIdentityProvisioning())" Icon="launch" Text="Launch" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+    <RadzenButton class="mb-1" Click="@(args => ExtractUsers())" Icon="launch" Text="Launch" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
     <RadzenButton class="mb-1" Click="@(args => TestIdentityProvisioning())" Icon="launch" Text="Try to extract the users" ButtonStyle="ButtonStyle.Secondary" Disabled=@isTesting Size="ButtonSize.Medium"></RadzenButton>
 </div>
 
@@ -127,7 +127,7 @@
         navigationManager.NavigateTo($"/identityprovisioning/{id}/{rec.Key}");
     }
 
-    void LaunchIdentityProvisioning()
+    void ExtractUsers()
     {
         dispatcher.Dispatch(new LaunchIdentityProvisioningAction { Id = identityProvisioningState.Value.IdentityProvisioning.Id, Name = identityProvisioningState.Value.IdentityProvisioning.Name });
     }
