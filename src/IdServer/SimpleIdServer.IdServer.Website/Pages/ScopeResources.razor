@@ -141,6 +141,6 @@
     void UpdateResource()
     {
         var selectedApiResources = searchApiResourcesState.Value.ApiResources.Where(r => r.IsSelected).Select(r => r.Value.Name);
-        dispatcher.Dispatch(new UpdateApiScopeResourcesAction { Name = Scope.Name, Resources = selectedApiResources });
+        dispatcher.Dispatch(new UpdateApiScopeResourcesAction { Id = Scope.Id, Resources = selectedApiResources });
     }
 }

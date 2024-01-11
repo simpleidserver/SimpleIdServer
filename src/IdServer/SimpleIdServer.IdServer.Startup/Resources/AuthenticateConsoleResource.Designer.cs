@@ -106,6 +106,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The confirmation code is invalid.
+        /// </summary>
+        public static string invalid_credential {
+            get {
+                return ResourceManager.GetString("invalid_credential", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Login.
         /// </summary>
         public static string login {
