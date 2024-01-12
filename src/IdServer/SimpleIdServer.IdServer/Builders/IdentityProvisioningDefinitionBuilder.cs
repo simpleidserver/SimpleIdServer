@@ -34,7 +34,8 @@ namespace SimpleIdServer.IdServer.Builders
                 Id = Guid.NewGuid().ToString(),
                 From = from,
                 TargetUserProperty = targetUserProperty,
-                MapperType = MappingRuleTypes.USERPROPERTY
+                MapperType = MappingRuleTypes.USERPROPERTY,
+                Usage = IdentityProvisioningMappingUsage.USER
             });
             return this;
         }
@@ -46,7 +47,8 @@ namespace SimpleIdServer.IdServer.Builders
                 Id = Guid.NewGuid().ToString(),
                 From = from,
                 TargetUserAttribute = targetUserAttribute,
-                MapperType = MappingRuleTypes.USERATTRIBUTE
+                MapperType = MappingRuleTypes.USERATTRIBUTE,
+                Usage = IdentityProvisioningMappingUsage.USER
             });
             return this;
         }
@@ -59,7 +61,20 @@ namespace SimpleIdServer.IdServer.Builders
             {
                 Id = Guid.NewGuid().ToString(),
                 From = from,
-                MapperType = MappingRuleTypes.SUBJECT
+                MapperType = MappingRuleTypes.SUBJECT,
+                Usage = IdentityProvisioningMappingUsage.USER
+            });
+            return this;
+        }
+
+        public IdentityProvisioningDefinitionBuilder AddGroupNameMappingRule(string from)
+        {
+            _idProvisioningDef.MappingRules.Add(new IdentityProvisioningMappingRule
+            {
+                Id = Guid.NewGuid().ToString(),
+                From = from,
+                MapperType = MappingRuleTypes.GROUPNAME,
+                Usage = IdentityProvisioningMappingUsage.GROUP
             });
             return this;
         }

@@ -106,6 +106,7 @@ namespace SimpleIdServer.IdServer.Store
             builder.ApplyConfiguration(new RegistrationWorkflowConfiguration());
             builder.ApplyConfiguration(new AuthorizedResourceConfiguration());
             builder.ApplyConfiguration(new ExtractedRepresentationStagingConfiguration());
+            builder.ApplyConfiguration(new GroupRealmConfiguration());
         }
     }
 }

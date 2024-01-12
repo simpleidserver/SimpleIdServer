@@ -13,6 +13,7 @@ namespace SimpleIdServer.IdServer.Store
         void DeleteRange(IEnumerable<Group> groups);
         Task<int> SaveChanges(CancellationToken cancellationToken);
         Task BulkUpdate(List<Group> groups);
+        Task BulkUpdate(List<GroupRealm> groupRealms);
     }
 
     public class GroupRepository : IGroupRepository
@@ -49,6 +50,29 @@ namespace SimpleIdServer.IdServer.Store
             var existingGroups = await _dbContext.Groups.Where(u => groupIds.Contains(u.Id)).ToListAsync();
             _dbContext.Groups.RemoveRange(existingGroups);
             _dbContext.Groups.AddRange(groups);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task BulkUpdate(List<GroupRealm> groupRealms)
+        {
+            if (_dbContext.Database.IsRelational())
+            {
+                var bulkConfig = new BulkConfig
+                {
+                    PropertiesToIncludeOnCompare = new List<string> { nameof(GroupRealm.GroupsId), nameof(GroupRealm.RealmsName) }
+                };
+                await _dbContext.BulkInsertOrUpdateAsync(groupRealms, bulkConfig);
+            }
+
+            var groupIds = groupRealms.Select(r => r.GroupsId).ToList();
+            var existingGroups = await _dbContext.Groups
+                .Include(u => u.Realms)
+                .Where(u => groupIds.Contains(u.Id)).ToListAsync();
+            foreach (var existingGroup in existingGroups)
+            {
+                existingGroup.Realms = groupRealms.Where(r => r.GroupsId == existingGroup.Id).ToList();
+            }
+
             await _dbContext.SaveChangesAsync();
         }
     }

@@ -254,6 +254,24 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             }
         }
 
+        [EffectMethod]
+        public async Task Handle(LaunchIdentityProvisioningImportAction action, IDispatcher dispatcher)
+        {
+            var baseUrl = await GetBaseUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"{baseUrl}/{action.InstanceId}/{action.ProcessId}/import")
+            };
+            await httpClient.SendAsync(requestMessage);
+            dispatcher.Dispatch(new LaunchIdentityProvisioningImportSuccessAction
+            {
+                InstanceId = action.InstanceId,
+                ProcessId = action.ProcessId
+            });
+        }
+
         private async Task<string> GetBaseUrl()
         {
             if(_options.IsReamEnabled)
@@ -448,5 +466,17 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
     public class UpdateIdentityProvisioningMappingRuleFailureAction
     {
         public string ErrorMessage { get; set; }
+    }
+
+    public class LaunchIdentityProvisioningImportAction
+    {
+        public string InstanceId { get; set; }
+        public string ProcessId { get; set; }
+    }
+
+    public class LaunchIdentityProvisioningImportSuccessAction
+    {
+        public string InstanceId { get; set; }
+        public string ProcessId { get; set; }
     }
 }

@@ -12,7 +12,7 @@ namespace SimpleIdServer.IdServer.Store.Configurations
         {
             builder.HasKey(r => r.Name);
             builder.HasMany(u => u.Users).WithOne(u => u.Realm).HasForeignKey(u => u.RealmsName);
-            builder.HasMany(u => u.Groups).WithMany(u => u.Realms);
+            builder.HasMany(u => u.Groups).WithOne(u => u.Realm).HasForeignKey(g => g.RealmsName);
             builder.HasMany(u => u.CredentialTemplates).WithMany(u => u.Realms);
             builder.HasMany(u => u.RegistrationWorkflows).WithOne(u => u.Realm).HasForeignKey(u => u.RealmName);
         }

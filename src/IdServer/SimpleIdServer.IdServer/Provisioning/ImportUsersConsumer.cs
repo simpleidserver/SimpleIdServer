@@ -20,11 +20,12 @@ public class ImportUsersConsumer :
     IConsumer<CheckUsersImportedCommand>
 {
     private int _pageSize = 1000;
-    private TimeSpan _checkInterval = TimeSpan.FromSeconds(15);
+    private TimeSpan _checkInterval = TimeSpan.FromSeconds(5);
     private readonly IIdentityProvisioningStore _identityProvisioningStore;
     private readonly IProvisioningStagingStore _provisioningStagingStore;
     private readonly IUserRepository _userRepository;
     private readonly IGroupRepository _groupRepository;
+    public const string Queuename = "import-users";
 
     public ImportUsersConsumer(
         IIdentityProvisioningStore identityProvisioningStore,
@@ -50,9 +51,10 @@ public class ImportUsersConsumer :
         var nbRecords = await _provisioningStagingStore.NbStagingExtractedRepresentations(context.Message.ProcessId, context.CancellationToken);
         var nbPages = ((int)Math.Ceiling((double)nbRecords / _pageSize));
         var allPages = Enumerable.Range(1, nbPages);
-        foreach(var page in allPages)
+        var destination = new Uri($"queue:{ImportUsersConsumer.Queuename}");
+        foreach (var page in allPages)
         {
-            await context.Send(new ImportUsersCommand
+            await context.Send(destination, new ImportUsersCommand
             {
                 InstanceId = message.InstanceId,
                 Page = page,
@@ -62,7 +64,7 @@ public class ImportUsersConsumer :
             });
         }
 
-        await context.ScheduleSend(_checkInterval, new CheckUsersImportedCommand
+        await context.ScheduleSend(destination, _checkInterval, new CheckUsersImportedCommand
         {
             InstanceId = message.InstanceId,
             ProcessId = message.ProcessId,
@@ -105,14 +107,15 @@ public class ImportUsersConsumer :
             .Include(d => d.Definition).ThenInclude(d => d.MappingRules)
             .SingleAsync(i => i.Id == message.InstanceId && i.Realms.Any(r => r.Name == message.Realm));
         var process = instance.GetProcess(message.ProcessId);
-        if (process.IsImported)
+        if (process.TotalPageToImport == process.NbImportedPages)
         {
             instance.FinishImport(message.ProcessId);
             await _identityProvisioningStore.SaveChanges(context.CancellationToken);
             return;
         }
 
-        await context.ScheduleSend(_checkInterval, new CheckUsersImportedCommand
+        var destination = new Uri($"queue:{ImportUsersConsumer.Queuename}");
+        await context.ScheduleSend(destination, _checkInterval, new CheckUsersImportedCommand
         {
             InstanceId = message.InstanceId,
             ProcessId = message.ProcessId,
@@ -138,6 +141,11 @@ public class ImportUsersConsumer :
         }
 
         await _groupRepository.BulkUpdate(groups);
+        await _groupRepository.BulkUpdate(groups.Select(g => new GroupRealm
+        {
+            GroupsId = g.Id,
+            RealmsName = realm
+        }).ToList());
         await _userRepository.BulkUpdate(users);
         await _userRepository.BulkUpdate(userClaims);
         await _userRepository.BulkUpdate(users.Select(u => new RealmUser
@@ -145,6 +153,8 @@ public class ImportUsersConsumer :
             UsersId = u.Id,
             RealmsName = realm
         }).ToList());
+        // TODO : Assign the groups !!!
+        // TODO : Fix problem in the UI (NULL EXCEPTION).
     }
 
     private Group ExtractGroup(IdentityProvisioning idProvisioning, ExtractedRepresentationStaging extractedGroup)
@@ -167,6 +177,7 @@ public class ImportUsersConsumer :
                     case MappingRuleTypes.GROUPNAME:
                         var value = jObj[kvp.Key].ToString();
                         result.Name = value;
+                        result.FullPath = value;
                         break;
                 }
             }
@@ -187,7 +198,7 @@ public class ImportUsersConsumer :
         var userClaims = new List<UserClaim>();
         var user = new User
         {
-            Id = extractedUser.Id,
+            Id = extractedUser.RepresentationId,
             Source = idProvisioning.Definition.Name,
             IdentityProvisioningId = idProvisioning.Id,
             UpdateDateTime = DateTime.UtcNow
@@ -240,7 +251,7 @@ public class ImportUsersConsumer :
             }
             catch
             {
-                return new List<string> { serializedValue };
+                return new List<string> { serializedValue.Trim('"') };
             }
         }
     }
@@ -249,5 +260,24 @@ public class ImportUsersConsumer :
     {
         public List<UserClaim> UserClaims { get; set; }
         public User User { get; set; }
+    }
+}
+
+public class ImportUsersConsumerDefinition : ConsumerDefinition<ImportUsersConsumer>
+{
+    public ImportUsersConsumerDefinition()
+    {
+        EndpointName = ImportUsersConsumer.Queuename;
+        ConcurrentMessageLimit = 8;
+    }
+
+    protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator,
+        IConsumerConfigurator<ImportUsersConsumer> consumerConfigurator)
+    {
+        // configure message retry with millisecond intervals
+        endpointConfigurator.UseMessageRetry(r => r.Intervals(100, 200, 500, 800, 1000));
+
+        // use the outbox to prevent duplicate events from being published
+        endpointConfigurator.UseInMemoryOutbox();
     }
 }

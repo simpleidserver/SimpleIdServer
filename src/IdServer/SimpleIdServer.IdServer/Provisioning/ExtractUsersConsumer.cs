@@ -20,7 +20,7 @@ public class ExtractUsersConsumer :
     IConsumer<ExtractUsersCommand>,
     IConsumer<CheckUsersExtractedCommand>
 {
-    private TimeSpan _checkInterval = TimeSpan.FromSeconds(15);
+    private TimeSpan _checkInterval = TimeSpan.FromSeconds(5);
     private readonly IIdentityProvisioningStore _identityProvisioningStore;
     private readonly IEnumerable<IProvisioningService> _provisioningServices;
     private readonly IProvisioningStagingStore _stagingStore;
@@ -131,14 +131,15 @@ public class ExtractUsersConsumer :
             .Include(d => d.Definition).ThenInclude(d => d.MappingRules)
             .SingleAsync(i => i.Id == message.InstanceId && i.Realms.Any(r => r.Name == message.Realm));
         var process = instance.GetProcess(message.ProcessId);
-        if(process.IsExported)
+        if(process.TotalPageToExtract == process.NbExtractedPages)
         {
             instance.FinishExtract(message.ProcessId);
             await _identityProvisioningStore.SaveChanges(context.CancellationToken);
             return;
         }
 
-        await context.ScheduleSend(_checkInterval, new CheckUsersExtractedCommand
+        var destination = new Uri($"queue:{ExtractUsersConsumer.Queuename}");
+        await context.ScheduleSend(destination, _checkInterval, new CheckUsersExtractedCommand
         {
             InstanceId = message.InstanceId,
             ProcessId = message.ProcessId,

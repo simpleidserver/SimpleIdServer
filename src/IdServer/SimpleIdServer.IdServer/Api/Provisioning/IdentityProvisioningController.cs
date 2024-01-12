@@ -356,7 +356,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
         public async Task<IActionResult> Extract([FromRoute] string prefix, string id)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            // await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
+            await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
             var sendEndpoint = await _busControl.GetSendEndpoint(new Uri($"queue:{ExtractUsersConsumer.Queuename}"));
             await sendEndpoint.Send(new StartExtractUsersCommand
             {
@@ -371,7 +371,8 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
         {
             prefix = prefix ?? Constants.DefaultRealm;
             await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
-            await _busControl.Send(new StartImportUsersCommand
+            var sendEndpoint = await _busControl.GetSendEndpoint(new Uri($"queue:{ImportUsersConsumer.Queuename}"));
+            await sendEndpoint.Send(new StartImportUsersCommand
             {
                 InstanceId = id,
                 Realm = prefix,
@@ -420,8 +421,15 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
                     NbExtractedPages = h.NbExtractedPages,
                     NbImportedPages = h.NbImportedPages,
                     TotalPageToExtract = h.TotalPageToExtract,
-                    TotalPageToImport = h.TotalPageToImport
-                    
+                    TotalPageToImport = h.TotalPageToImport,
+                    EndExportDateTime = h.EndExportDateTime,
+                    EndImportDateTime = h.EndImportDateTime,
+                    NbExtractedGroups = h.NbExtractedGroups,
+                    NbExtractedUsers = h.NbExtractedUsers,
+                    NbImportedGroups = h.NbImportedGroups,
+                    NbImportedUsers = h.NbImportedUsers,
+                    StartExportDateTime = h.StartExportDateTime,
+                    StartImportDateTime = h.StartImportDateTime,
                 }).ToList(),
                 Name = idProvisioning.Name,
                 UpdateDateTime = idProvisioning.UpdateDateTime,

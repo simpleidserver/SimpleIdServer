@@ -34,6 +34,22 @@ public class IdentityProvisioningProcessResult
 {
     [JsonPropertyName(IdentityProvisioningNames.Id)]
     public string Id { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.StartExportDateTime)]
+    public DateTime StartExportDateTime { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.EndExportDateTime)]
+    public DateTime? EndExportDateTime { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.StartImportDateTime)]
+    public DateTime? StartImportDateTime { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.EndImportDateTime)]
+    public DateTime? EndImportDateTime { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.NbExtractedUsers)]
+    public int NbExtractedUsers { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.NbExtractedGroups)]
+    public int NbExtractedGroups { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.NbImportedUsers)]
+    public int NbImportedUsers { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.NbImportedGroups)]
+    public int NbImportedGroups { get; set; }
     [JsonPropertyName(IdentityProvisioningNames.IsExported)]
     public bool IsExported { get; set; }
     [JsonPropertyName(IdentityProvisioningNames.IsImported)]

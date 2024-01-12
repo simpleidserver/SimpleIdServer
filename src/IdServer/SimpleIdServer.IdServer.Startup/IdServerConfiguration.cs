@@ -29,6 +29,7 @@ namespace SimpleIdServer.IdServer.Startup
 
         private static IdentityProvisioningDefinition Ldap = IdentityProvisioningDefinitionBuilder.Create<LDAPRepresentationsExtractionJobOptions>(SimpleIdServer.IdServer.Provisioning.LDAP.Services.LDAPProvisioningService.NAME, "LDAP")
             .AddUserSubjectMappingRule("cn")
+            .AddGroupNameMappingRule("cn")
             .AddLDAPDistinguishedName()
             .Build();
 

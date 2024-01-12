@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
 using SimpleIdServer.IdServer.Api.Provisioning;
-using SimpleIdServer.IdServer.Domains;
 
 namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
 {
@@ -104,11 +103,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         [ReducerMethod]
         public static IdentityProvisioningState ReduceLaunchIdentityProvisioningSuccessAction(IdentityProvisioningState state, LaunchIdentityProvisioningSuccessAction act)
         {
-            var idProvisioning = state.IdentityProvisioning;
             return state with
             {
-                IsLoading = false,
-                IdentityProvisioning = idProvisioning
+                IsLoading = false
             };
         }
 

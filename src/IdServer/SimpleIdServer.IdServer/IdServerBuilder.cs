@@ -112,7 +112,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 o.AddHangfireConsumers();
                 o.AddConsumer<IdServerEventsConsumer>();
                 o.AddConsumer<ExtractUsersConsumer, ExtractUsersConsumerDefinition>();
-                o.AddConsumer<ImportUsersConsumer>();
+                o.AddConsumer<ImportUsersConsumer, ImportUsersConsumerDefinition>();
                 o.UsingInMemory((ctx, cfg) =>
                 {
                     cfg.UsePublishMessageScheduler();

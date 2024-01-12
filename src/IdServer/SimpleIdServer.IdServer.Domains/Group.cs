@@ -30,7 +30,7 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonIgnore]
         public ICollection<User> Users { get; set; } = new List<User>();
         [JsonIgnore]
-        public ICollection<Realm> Realms { get; set; } = new List<Realm>();
+        public ICollection<GroupRealm> Realms { get; set; } = new List<GroupRealm>();
 
         public List<string> ResolveAllPath()
         {

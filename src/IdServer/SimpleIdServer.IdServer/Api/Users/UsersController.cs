@@ -493,7 +493,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                     if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_USER, id));
                     var newGroup = await _groupRepository.Query()
                         .Include(g => g.Realms)
-                        .SingleOrDefaultAsync(a => a.Id == groupId && a.Realms.Any(r => r.Name == prefix)); ;
+                        .SingleOrDefaultAsync(a => a.Id == groupId && a.Realms.Any(r => r.RealmsName == prefix)); ;
                     if (newGroup == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_USER_GROUP, groupId));
                     user.Groups.Add(newGroup);
                     user.UpdateDateTime = DateTime.UtcNow;

@@ -1,8 +1,10 @@
 ﻿@using SimpleIdServer.IdServer.Api.Provisioning;
 @using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @using SimpleIdServer.IdServer.Website.Stores.UserStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject TooltipService tooltipService
 @inject IDispatcher dispatcher
 @inject IState<UserState> userState
 @inject IState<RealmsState> realmsState
@@ -15,13 +17,108 @@
 
 @if(IdentityProvisioning != null)
 {
-    <ul>
-        <li>Exported</li>
-        <li>Imported</li>
-    </ul>
+    <RadzenDataGrid
+                AllowFiltering="false"
+                AllowColumnResize="true"
+                AllowAlternatingRows="true"
+                AllowSorting="false"
+                PageSize="30"
+                AllowPaging="false"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="false"
+                Data="@IdentityProvisioning.Processes"
+                TItem="IdentityProvisioningProcessResult"
+                ColumnWidth="300px">
+            <Columns>
+                <RadzenDataGridColumn Title="Workflow" TItem="IdentityProvisioningProcessResult" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+                    <Template Context="data">
+                        <div style="display: flex; justify-content: center">
+                            <ul class="stateDig">
+                                <li @onmouseenter="@( _ => ShowStep(extractedElements[data.Id].Value, data, true) )" class=@(data.IsExported ? "node finished" : "node active")>
+                                    <div @ref=extractedElements[data.Id] class="title">Extracted</div>
+                                </li>
+                                <li @ref=importedElements[data.Id] @onmouseenter="@( _ => ShowStep(importedElements[data.Id].Value, data, false) )" class="@(data.IsImported ? "finished" : (data.StartImportDateTime != null ? "active" : ""))">
+                                    <div class="title">Imported</div>
+                                </li>
+                            </ul>
+                        </div>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Title="Start export" FormatString="{0:dd/M/yyyy HH:mm:ss}" Property="StartExportDateTime" SortOrder="SortOrder.Descending" TItem="IdentityProvisioningProcessResult" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn Title="End export" FormatString="{0:dd/M/yyyy HH:mm:ss}" Property="EndExportDateTime" TItem="IdentityProvisioningProcessResult" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn Title="Start import" FormatString="{0:dd/M/yyyy HH:mm:ss}" Property="StartImportDateTime" TItem="IdentityProvisioningProcessResult" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn Title="End import" FormatString="{0:dd/M/yyyy HH:mm:ss}" Property="EndImportDateTime" TItem="IdentityProvisioningProcessResult" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn TItem="IdentityProvisioningProcessResult" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+                    <Template Context="data">
+                        @if(data.IsExported)
+                        {
+                            <RadzenButton Click=@(args => Import(data)) Icon="launch" MouseEnter="@(args => ShowTooltip(args, "Import users and groups"))" />
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+    </RadzenDataGrid>
 }
 
 @code {
+    private IdentityProvisioningResult _identityProvisioning;
+    Dictionary<string, ElementReference?> extractedElements = new Dictionary<string, ElementReference?>();
+    Dictionary<string, ElementReference?> importedElements = new Dictionary<string, ElementReference?>();
+
     [Parameter]
-    public IdentityProvisioningResult IdentityProvisioning { get; set; }
+    public IdentityProvisioningResult IdentityProvisioning
+    {
+        get
+        {
+            return _identityProvisioning;
+        }
+        set
+        {
+            if(value == null) return;
+            extractedElements = new Dictionary<string, ElementReference?>();
+            importedElements = new Dictionary<string, ElementReference?>();
+            if(value.Processes != null)
+            {
+                foreach (var process in value.Processes)
+                {
+                    extractedElements.Add(process.Id, null);
+                    importedElements.Add(process.Id, null);
+                }
+            }
+
+            _identityProvisioning = value;
+        }
+    }
+
+    void Import(IdentityProvisioningProcessResult process)
+    {
+        if (!process.IsExported) return;
+        var act = new LaunchIdentityProvisioningImportAction { InstanceId = IdentityProvisioning.Id, ProcessId = process.Id };
+        dispatcher.Dispatch(act);
+        contextMenuService.Close();
+    }
+
+    void ShowStep(ElementReference elementReference, IdentityProvisioningProcessResult process, bool isExtracted = true)
+    {
+        string message = string.Empty;
+        if (isExtracted)
+        {
+            message = $"Users {process.NbExtractedUsers}, Groups {process.NbExtractedGroups}, Page {process.NbExtractedPages} / {process.TotalPageToExtract}";
+        }
+        else
+        {
+            if (process.StartImportDateTime == null) message = "Import didn't start";
+            else
+            {
+                message = $"Users {process.NbImportedUsers}, Groups {process.NbImportedGroups}, Page {process.NbImportedPages} / {process.TotalPageToImport}";
+            }
+        }
+                
+        tooltipService.Open(elementReference, message);
+    }
+
+    void ShowTooltip(ElementReference eltRef, string msg)
+    {
+        tooltipService.Open(eltRef, msg, null);
+    }
 }

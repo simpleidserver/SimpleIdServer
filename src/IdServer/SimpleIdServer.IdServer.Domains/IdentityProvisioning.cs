@@ -25,6 +25,7 @@ public class IdentityProvisioning
                 record.Id = grp.Key;
                 foreach (var row in grp)
                     record.Consume(row);
+                result.Add(record);
             }
 
             return result;
@@ -62,7 +63,7 @@ public class IdentityProvisioning
         Histories.Add(new IdentityProvisioningHistory
         {
             ProcessId = processId,
-            Status = IdentityProvisioningHistoryStatus.EXPORT,
+            Status = IdentityProvisioningHistoryStatus.FINISHEXPORT,
             ExecutionDateTime = DateTime.UtcNow
         });
     }
@@ -72,7 +73,7 @@ public class IdentityProvisioning
         Histories.Add(new IdentityProvisioningHistory
         {
             ProcessId = processId,
-            Status = IdentityProvisioningHistoryStatus.IMPORT,
+            Status = IdentityProvisioningHistoryStatus.STARTIMPORT,
             ExecutionDateTime = DateTime.UtcNow,
             TotalPages = totalPage
         });
@@ -107,7 +108,7 @@ public class IdentityProvisioning
         {
             Id = processId
         };
-        foreach(var history in Histories)
+        foreach(var history in Histories.Where(h => h.ProcessId == processId))
         {
             result.Consume(history);
         }
@@ -119,8 +120,16 @@ public class IdentityProvisioning
 public class IdentityProvisioningProcess
 {
     public string Id { get; set; }
+    public DateTime StartExportDateTime { get; set; }
+    public DateTime? EndExportDateTime { get; set; }
+    public DateTime? StartImportDateTime { get; set; }
+    public DateTime? EndImportDateTime { get; set; }
     public int NbExtractedPages { get; set; }
+    public int NbExtractedUsers { get; set; }
+    public int NbExtractedGroups { get; set; }
     public int NbImportedPages { get; set; }
+    public int NbImportedGroups { get; set; }
+    public int NbImportedUsers { get; set; }
     public int TotalPageToExtract { get; set; }
     public int TotalPageToImport { get; set; }
 
@@ -128,7 +137,7 @@ public class IdentityProvisioningProcess
     {
         get
         {
-            return NbExtractedPages == TotalPageToExtract;
+            return EndExportDateTime != null;
         }
     }
 
@@ -136,7 +145,7 @@ public class IdentityProvisioningProcess
     {
         get
         {
-            return NbImportedPages == TotalPageToImport;
+            return EndImportDateTime != null;
         }
     }
 
@@ -146,16 +155,28 @@ public class IdentityProvisioningProcess
         {
             case IdentityProvisioningHistoryStatus.START:
                 Id = history.ProcessId;
+                StartExportDateTime = history.ExecutionDateTime;
                 TotalPageToExtract = history.TotalPages;
                 break;
             case IdentityProvisioningHistoryStatus.EXPORT:
                 NbExtractedPages++;
+                NbExtractedUsers += history.NbUsers;
+                NbExtractedGroups += history.NbGroups;
+                break;
+            case IdentityProvisioningHistoryStatus.FINISHEXPORT:
+                EndExportDateTime = history.ExecutionDateTime;
                 break;
             case IdentityProvisioningHistoryStatus.STARTIMPORT:
                 TotalPageToImport = history.TotalPages;
+                StartImportDateTime = history.ExecutionDateTime;
                 break;
             case IdentityProvisioningHistoryStatus.IMPORT:
                 NbImportedPages++;
+                NbImportedUsers += history.NbUsers;
+                NbImportedGroups += history.NbGroups;
+                break;
+            case IdentityProvisioningHistoryStatus.FINISHIMPORT:
+                EndImportDateTime = history.ExecutionDateTime;
                 break;
         }
     }
