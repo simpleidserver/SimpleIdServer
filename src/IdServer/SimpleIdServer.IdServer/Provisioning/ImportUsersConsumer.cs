@@ -126,6 +126,7 @@ public class ImportUsersConsumer :
     private async Task Export(IEnumerable<ExtractedRepresentationStaging> extractedUsers, IEnumerable<ExtractedRepresentationStaging> extractedGroups, IdentityProvisioning idProvisioning, string realm)
     {
         var userClaims = new List<UserClaim>();
+        var groupUsers = new List<GroupUser>();
         var users = new List<User>();
         var groups = new List<Group>();
         foreach(var extractedGroup in extractedGroups)
@@ -138,6 +139,7 @@ public class ImportUsersConsumer :
             var extraction = ExtractUsersAndClaims(idProvisioning,  extractedUser);
             users.Add(extraction.User);
             userClaims.AddRange(extraction.UserClaims);
+            groupUsers.AddRange(extraction.GroupUsers);
         }
 
         await _groupRepository.BulkUpdate(groups);
@@ -153,8 +155,7 @@ public class ImportUsersConsumer :
             UsersId = u.Id,
             RealmsName = realm
         }).ToList());
-        // TODO : Assign the groups !!!
-        // TODO : Fix problem in the UI (NULL EXCEPTION).
+        await _userRepository.BulkUpdate(groupUsers);
     }
 
     private Group ExtractGroup(IdentityProvisioning idProvisioning, ExtractedRepresentationStaging extractedGroup)
@@ -196,6 +197,7 @@ public class ImportUsersConsumer :
                 return attr == null ? false : attr.IsVisible;
             });
         var userClaims = new List<UserClaim>();
+        var groupUsers = new List<GroupUser>();
         var user = new User
         {
             Id = extractedUser.RepresentationId,
@@ -239,8 +241,19 @@ public class ImportUsersConsumer :
                 }
             }
         }
+        if(extractedUser.GroupIds != null)
+        {
+            foreach(var groupId in extractedUser.GroupIds)
+            {
+                groupUsers.Add(new GroupUser
+                {
+                    UsersId = extractedUser.RepresentationId,
+                    GroupsId = groupId
+                });
+            }
+        }
 
-        return new ExtractionUserResult { UserClaims = userClaims, User = user };
+        return new ExtractionUserResult { UserClaims = userClaims, User = user, GroupUsers = groupUsers };
 
         List<string> ExtractValues(string serializedValue)
         {
@@ -260,6 +273,7 @@ public class ImportUsersConsumer :
     {
         public List<UserClaim> UserClaims { get; set; }
         public User User { get; set; }
+        public List<GroupUser> GroupUsers { get; set; }
     }
 }
 

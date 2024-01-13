@@ -34,8 +34,10 @@ public class IdentityProvisioningProcessResult
 {
     [JsonPropertyName(IdentityProvisioningNames.Id)]
     public string Id { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.CreateDateTime)]
+    public DateTime CreateDateTime { get; set; }
     [JsonPropertyName(IdentityProvisioningNames.StartExportDateTime)]
-    public DateTime StartExportDateTime { get; set; }
+    public DateTime? StartExportDateTime { get; set; }
     [JsonPropertyName(IdentityProvisioningNames.EndExportDateTime)]
     public DateTime? EndExportDateTime { get; set; }
     [JsonPropertyName(IdentityProvisioningNames.StartImportDateTime)]
@@ -46,6 +48,8 @@ public class IdentityProvisioningProcessResult
     public int NbExtractedUsers { get; set; }
     [JsonPropertyName(IdentityProvisioningNames.NbExtractedGroups)]
     public int NbExtractedGroups { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.NbFilteredRepresentations)]
+    public int NbFilteredRepresentations { get; set; }
     [JsonPropertyName(IdentityProvisioningNames.NbImportedUsers)]
     public int NbImportedUsers { get; set; }
     [JsonPropertyName(IdentityProvisioningNames.NbImportedGroups)]

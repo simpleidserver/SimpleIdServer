@@ -90,6 +90,11 @@
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedIdentityProvisioningMappingRulesRemoved });
                 StateHasChanged();
             });
+            SubscribeToAction<LaunchIdentityProvisioningFailureAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
+                StateHasChanged();
+            });
             SubscribeToAction<TestIdentityProvisioningSuccessAction>((act) =>
             {
                 isTesting = false;

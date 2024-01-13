@@ -28,7 +28,7 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonPropertyName(GroupNames.Roles)]
         public ICollection<Scope> Roles { get; set; } = new List<Scope>();
         [JsonIgnore]
-        public ICollection<User> Users { get; set; } = new List<User>();
+        public ICollection<GroupUser> Users { get; set; } = new List<GroupUser>();
         [JsonIgnore]
         public ICollection<GroupRealm> Realms { get; set; } = new List<GroupRealm>();
 

@@ -29,4 +29,5 @@ public class IdentityProvisioningNames
     public const string NbExtractedGroups = "nb_extracted_groups";
     public const string NbImportedUsers = "nb_imported_users";
     public const string NbImportedGroups = "nb_imported_groups";
+    public const string NbFilteredRepresentations = "nb_filtered_representations";
 }

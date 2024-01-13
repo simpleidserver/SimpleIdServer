@@ -19,5 +19,4 @@ public class ExtractionPage
 {
     public int BatchSize { get; set; }
     public int Page { get; set; }
-    public byte[] Cookie { get; set; }
 }

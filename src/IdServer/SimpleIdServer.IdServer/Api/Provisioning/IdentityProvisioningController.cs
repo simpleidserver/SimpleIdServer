@@ -353,37 +353,91 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
         }
 
         [HttpGet]
-        public async Task<IActionResult> Extract([FromRoute] string prefix, string id)
+        public async Task<IActionResult> Extract([FromRoute] string prefix, string id, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
-            var sendEndpoint = await _busControl.GetSendEndpoint(new Uri($"queue:{ExtractUsersConsumer.Queuename}"));
-            await sendEndpoint.Send(new StartExtractUsersCommand
+            try
             {
-                InstanceId = id,
-                Realm = prefix
-            });
-            return new NoContentResult();
+                await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
+                var result = await _identityProvisioningStore.Query()
+                    .Include(p => p.Realms)
+                    .Include(p => p.Definition).ThenInclude(p => p.MappingRules)
+                    .SingleOrDefaultAsync(p => p.Id == id && p.Realms.Any(r => r.Name == prefix), cancellationToken);
+                if (result == null) 
+                    return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_IDPROVISIONING, id));
+                var provisioningService = _provisioningServices.Single(s => s.Name == result.Definition.Name);
+                await provisioningService.ExtractTestData(result.Definition, cancellationToken);
+
+                var processId = result.Launch();
+                await _identityProvisioningStore.SaveChanges(cancellationToken);
+                var sendEndpoint = await _busControl.GetSendEndpoint(new Uri($"queue:{ExtractUsersConsumer.Queuename}"));
+                await sendEndpoint.Send(new StartExtractUsersCommand
+                {
+                    InstanceId = id,
+                    Realm = prefix,
+                    ProcessId = processId
+                });
+                return new ContentResult
+                {
+                    StatusCode = (int)HttpStatusCode.Created,
+                    Content = JsonSerializer.Serialize(new IdentityProvisioningLaunchedResult { Id = processId }),
+                    ContentType = "application/json"
+                };
+            }
+            catch(OAuthException ex)
+            {
+                return BuildError(ex);
+            }
+            catch(Exception ex)
+            {
+                return BuildError(ex);
+            }
         }
 
         [HttpGet]
-        public async Task<IActionResult> Import([FromRoute] string prefix, string id, string processId)
+        public async Task<IActionResult> Import([FromRoute] string prefix, string id, string processId, CancellationToken cancellationToken)
         {
-            prefix = prefix ?? Constants.DefaultRealm;
-            await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
-            var sendEndpoint = await _busControl.GetSendEndpoint(new Uri($"queue:{ImportUsersConsumer.Queuename}"));
-            await sendEndpoint.Send(new StartImportUsersCommand
+            try
             {
-                InstanceId = id,
-                Realm = prefix,
-                ProcessId = processId
-            });
-            return new ContentResult
+                prefix = prefix ?? Constants.DefaultRealm;
+                await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
+                var result = await _identityProvisioningStore.Query()
+                    .Include(p => p.Realms)
+                    .Include(p => p.Histories)
+                    .Include(p => p.Definition).ThenInclude(p => p.MappingRules)
+                    .SingleOrDefaultAsync(p => p.Id == id && p.Realms.Any(r => r.Name == prefix), cancellationToken);
+                if (result == null) 
+                    return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_IDPROVISIONING, id));
+                var process = result.GetProcess(processId);
+                if (process == null) 
+                    return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_IDPROVISIONING_PROCESS, processId));
+                if (!process.IsExported)
+                    return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.IDPROVISIONING_PROCESS_ISNOTEXTRACTED);
+                if(process.StartImportDateTime != null)
+                    return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.IDPROVISIONING_PROCESS_STARTED);
+
+                var sendEndpoint = await _busControl.GetSendEndpoint(new Uri($"queue:{ImportUsersConsumer.Queuename}"));
+                await sendEndpoint.Send(new StartImportUsersCommand
+                {
+                    InstanceId = id,
+                    Realm = prefix,
+                    ProcessId = processId
+                });
+                return new ContentResult
+                {
+                    StatusCode = (int)HttpStatusCode.Created,
+                    Content = JsonSerializer.Serialize(new { id = id }),
+                    ContentType = "application/json"
+                };
+            }
+            catch (OAuthException ex)
             {
-                StatusCode = (int)HttpStatusCode.Created,
-                Content = JsonSerializer.Serialize(new { id = id }),
-                ContentType = "application/json"
-            };
+                return BuildError(ex);
+            }
+            catch (Exception ex)
+            {
+                return BuildError(ex);
+            }
         }
 
         private void SyncConfiguration(IdentityProvisioning identityProvisioning, Dictionary<string, string> values)
@@ -426,10 +480,12 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
                     EndImportDateTime = h.EndImportDateTime,
                     NbExtractedGroups = h.NbExtractedGroups,
                     NbExtractedUsers = h.NbExtractedUsers,
+                    NbFilteredRepresentations = h.NbFilteredRepresentations,
                     NbImportedGroups = h.NbImportedGroups,
                     NbImportedUsers = h.NbImportedUsers,
                     StartExportDateTime = h.StartExportDateTime,
                     StartImportDateTime = h.StartImportDateTime,
+                    CreateDateTime = h.CreateDateTime
                 }).ToList(),
                 Name = idProvisioning.Name,
                 UpdateDateTime = idProvisioning.UpdateDateTime,

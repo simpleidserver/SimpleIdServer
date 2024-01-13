@@ -17,7 +17,7 @@ public class ExtractedUser
     public string Id { get; set; }
     public string Version { get; set; }
     public List<string> Values { get; set; }
-    public List<string> GroupIds { get; set; }
+    public List<string> GroupIds { get; set; } = new List<string>();
 }
 
 public class ExtractedGroup
@@ -25,5 +25,4 @@ public class ExtractedGroup
     public string Id { get; set; }
     public string Version { get; set; }
     public List<string> Values { get; set; }
-    public string UserId { get; set; }
 }

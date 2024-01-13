@@ -35,7 +35,6 @@ public class ExtractUsersConsumer :
         _identityProvisioningStore = identityProvisioningStore;
         _provisioningServices = provisioningServices;
         _stagingStore = stagingStore;
-
     }
 
     public async Task Consume(ConsumeContext<StartExtractUsersCommand> context)
@@ -53,27 +52,25 @@ public class ExtractUsersConsumer :
 
         var provisioningService = _provisioningServices.Single(p => p.Name == instance.Definition.Name);
         var pages = (await provisioningService.Paginate(instance.Definition, context.CancellationToken)).OrderBy(p => p.Page);
-        var processId = Guid.NewGuid().ToString();
         var destination = new Uri($"queue:{ExtractUsersConsumer.Queuename}");
         foreach (var page in pages.OrderBy(p => p.Page))
-        {
-            await context.Send(destination, new ExtractUsersCommand
             {
-                InstanceId = message.InstanceId,
-                ProcessId = processId,
-                BatchSize = page.BatchSize,
-                Cookie = page.Cookie,
-                Page = page.Page,
-                Realm = message.Realm
-            });
-        }
+                await context.Send(destination, new ExtractUsersCommand
+                {
+                    InstanceId = message.InstanceId,
+                    ProcessId = message.ProcessId,
+                    BatchSize = page.BatchSize,
+                    Page = page.Page,
+                    Realm = message.Realm
+                });
+            }
 
-        instance.Start(processId, pages.Last().Page);
+        instance.Start(message.ProcessId, pages.Last().Page);
         await _identityProvisioningStore.SaveChanges(context.CancellationToken);
         await context.ScheduleSend(destination, _checkInterval, new CheckUsersExtractedCommand
         {
             InstanceId = message.InstanceId,
-            ProcessId = processId,
+            ProcessId = message.ProcessId,
             Realm = message.Realm
         });
     }
@@ -90,33 +87,38 @@ public class ExtractUsersConsumer :
         var extractionResult = await provisioningService.Extract(new ExtractionPage
         {
             BatchSize = message.BatchSize,
-            Cookie = message.Cookie,
             Page = message.Page
         }, instance.Definition, context.CancellationToken);
         var newRepresentations = Extract(message.ProcessId, extractionResult, instance.Definition);
         var newRepresentationIds = newRepresentations.Select(r => r.RepresentationId);
         var lastRepresentations = await _stagingStore.GetLastExtractedRepresentations(newRepresentationIds, context.CancellationToken);
         // Filter representations.
-        newRepresentations = newRepresentations.Where((r) =>
+        var newOrChangedRepresentations = newRepresentations.Where((r) =>
         {
             var er = lastRepresentations.SingleOrDefault(er => er.ExternalId == r.RepresentationId);
             return er == null || er.Version != r.RepresentationVersion;
+        }).ToList();
+        var filteredRepresentations = newRepresentations.Where((r) =>
+        {
+            var er = lastRepresentations.SingleOrDefault(er => er.ExternalId == r.RepresentationId);
+            return er != null && er.Version == r.RepresentationVersion;
         }).ToList();
 
         using (var transactionScope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = System.Transactions.IsolationLevel.Snapshot }, TransactionScopeAsyncFlowOption.Enabled))
         {
             // Store the representation id and its version.
-            await _stagingStore.BulkUpdate(newRepresentations.Select(r => new ExtractedRepresentation
+            await _stagingStore.BulkUpdate(newOrChangedRepresentations.Select(r => new ExtractedRepresentation
             {
                 ExternalId = r.RepresentationId,
                 Version = r.RepresentationVersion
             }).ToList(), context.CancellationToken);
             // Store the extracted representations.
-            await _stagingStore.BulkUpdate(newRepresentations, context.CancellationToken);
+            await _stagingStore.BulkUpdate(newOrChangedRepresentations, context.CancellationToken);
             instance.Extract(message.ProcessId,
                 message.Page,
-                newRepresentations.Count(r => r.Type == ExtractedRepresentationType.USER),
-                newRepresentations.Count(u => u.Type == ExtractedRepresentationType.GROUP));
+                newOrChangedRepresentations.Count(r => r.Type == ExtractedRepresentationType.USER),
+                newOrChangedRepresentations.Count(u => u.Type == ExtractedRepresentationType.GROUP),
+                filteredRepresentations.Count());
             await _identityProvisioningStore.SaveChanges(context.CancellationToken);
             transactionScope.Complete();
         }

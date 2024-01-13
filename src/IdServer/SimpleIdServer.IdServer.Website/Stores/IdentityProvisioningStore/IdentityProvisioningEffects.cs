@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.Provisioning;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Provisioning;
 using SimpleIdServer.IdServer.Store;
 using System.Text;
 using System.Text.Json;
@@ -76,8 +77,20 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             {
                 RequestUri = new Uri($"{baseUrl}/{action.Id}/extract")
             };
-            await httpClient.SendAsync(requestMessage);
-            dispatcher.Dispatch(new LaunchIdentityProvisioningSuccessAction { Id = action.Id, Name = action.Name });
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            try
+            {
+                httpResult.EnsureSuccessStatusCode();
+                var launchedProcess = JsonSerializer.Deserialize<IdentityProvisioningLaunchedResult>(json);
+                dispatcher.Dispatch(new LaunchIdentityProvisioningSuccessAction { Id = action.Id, Name = action.Name, ProcessId = launchedProcess.Id });
+            }
+            catch
+            {
+                var jsonObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new LaunchIdentityProvisioningFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
+            }
+
         }
 
         [EffectMethod]
@@ -264,12 +277,22 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
                 Method = HttpMethod.Get,
                 RequestUri = new Uri($"{baseUrl}/{action.InstanceId}/{action.ProcessId}/import")
             };
-            await httpClient.SendAsync(requestMessage);
-            dispatcher.Dispatch(new LaunchIdentityProvisioningImportSuccessAction
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            try
             {
-                InstanceId = action.InstanceId,
-                ProcessId = action.ProcessId
-            });
+                httpResult.EnsureSuccessStatusCode();
+                dispatcher.Dispatch(new LaunchIdentityProvisioningImportSuccessAction
+                {
+                    InstanceId = action.InstanceId,
+                    ProcessId = action.ProcessId
+                });
+            }
+            catch
+            {
+                var jsonObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new LaunchIdentityProvisioningImportFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
+            }
         }
 
         private async Task<string> GetBaseUrl()
@@ -335,6 +358,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
     {
         public string Id { get; set; }
         public string Name { get; set; }
+        public string ProcessId { get; set; }
+    }
+
+    public class LaunchIdentityProvisioningFailureAction
+    {
+        public string ErrorMessage { get; set; }
     }
 
     public class UpdateIdProvisioningPropertiesAction
@@ -478,5 +507,10 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
     {
         public string InstanceId { get; set; }
         public string ProcessId { get; set; }
+    }
+
+    public class LaunchIdentityProvisioningImportFailureAction
+    {
+        public string ErrorMessage { get; set; }
     }
 }

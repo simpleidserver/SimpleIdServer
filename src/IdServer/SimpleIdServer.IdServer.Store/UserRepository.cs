@@ -29,6 +29,7 @@ namespace SimpleIdServer.IdServer.Store
         Task BulkUpdate(List<UserClaim> userClaims);
         Task BulkUpdate(List<User> users);
         Task BulkUpdate(List<RealmUser> userRealms);
+        Task BulkUpdate(List<GroupUser> groupUsers);
         Task<int> SaveChanges(CancellationToken cancellationToken);
     }
 
@@ -243,6 +244,29 @@ namespace SimpleIdServer.IdServer.Store
             await _dbContext.SaveChangesAsync();
         }
 
+        public async Task BulkUpdate(List<GroupUser> groupUsers)
+        {
+            if (_dbContext.Database.IsRelational())
+            {
+                var bulkConfig = new BulkConfig
+                {
+                    PropertiesToIncludeOnCompare = new List<string> { nameof(GroupUser.GroupsId), nameof(GroupUser.UsersId) }
+                };
+                await _dbContext.BulkInsertOrUpdateAsync(groupUsers, bulkConfig);
+            }
+
+            var userIds = groupUsers.Select(r => r.UsersId).ToList();
+            var existingUsers = await _dbContext.Users
+                .Include(u => u.Groups)
+                .Where(u => userIds.Contains(u.Id)).ToListAsync();
+            foreach (var existingUser in existingUsers)
+            {
+                existingUser.Groups = groupUsers.Where(r => r.UsersId == existingUser.Id).ToList();
+            }
+
+            await _dbContext.SaveChangesAsync();
+        }
+
         public virtual Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
 
         private IQueryable<User> GetUsers() => _dbContext.Users
@@ -250,7 +274,7 @@ namespace SimpleIdServer.IdServer.Store
                         .Include(u => u.IdentityProvisioning).ThenInclude(i => i.Definition)
                         .Include(u => u.Credentials)
                         .Include(u => u.ExternalAuthProviders)
-                        .Include(u => u.Groups)
+                        .Include(u => u.Groups).ThenInclude(u => u.Group)
                         .Include(u => u.Devices)
                         .Include(u => u.OAuthUserClaims)
                         .Include(u => u.CredentialOffers)

@@ -22,20 +22,20 @@ public class SCIMProvisioningService : BaseProvisioningService<SCIMRepresentatio
     public override Task<ExtractedResult> ExtractTestData(IdentityProvisioningDefinition definition, CancellationToken cancellationToken)
     {
         var options = GetOptions(definition);
-        return Extract(new ExtractionPage { BatchSize = options.Count, Cookie = null, Page = 1 }, definition, cancellationToken);
+        return Extract(new ExtractionPage { BatchSize = options.Count, Page = 1 }, definition, cancellationToken);
     }
 
     public override async Task<ExtractedResult> Extract(ExtractionPage currentPage, IdentityProvisioningDefinition definition, CancellationToken cancellationToken)
     {
         var options = GetOptions(definition);
-        var page = currentPage.Page - 1;
+        var page = currentPage.Page;
         using (var scimClient = new SCIMClient(options.SCIMEdp))
         {
             var accessToken = await GetAccessToken(options);
             var searchUsers = await scimClient.SearchUsers(new Scim.Client.SearchRequest
             {
                 Count = currentPage.BatchSize,
-                StartIndex = page == 0 ? 1 : page * currentPage.BatchSize
+                StartIndex = page == 1 ? 1 : page * currentPage.BatchSize
             }, accessToken, cancellationToken);
             var result = await Extract(searchUsers.Item1.Resources, definition, scimClient, options, CancellationToken.None);
             return result;
@@ -59,8 +59,7 @@ public class SCIMProvisioningService : BaseProvisioningService<SCIMRepresentatio
             return result.Select(p => new ExtractionPage
             {
                 BatchSize = options.Count,
-                Page = p,
-                Cookie = null
+                Page = p
             }).ToList();
         }
     }
@@ -73,10 +72,9 @@ public class SCIMProvisioningService : BaseProvisioningService<SCIMRepresentatio
             var user = ExtractUser(resource, definition);
             result.Users.Add(user);
             var jsonDoc = JsonDocument.Parse(resource.AdditionalData.ToJsonString());
-            var memberIdsElt = jsonDoc.SelectToken("$.members[].id");
-            if (memberIdsElt == null) return result;
-            var groupIds = memberIdsElt.Value.Deserialize<List<string>>();
-            if (groupIds == null) return result;
+            var memberIdsElt = jsonDoc.SelectTokens("$.groups[*].value");
+            if (memberIdsElt == null || !memberIdsElt.Any()) continue;
+            var groupIds = memberIdsElt.Select(e => e.GetString()).ToList();
             user.GroupIds = groupIds;
             result.Groups.AddRange(await ExtractGroups(groupIds, client, options, definition, cancellationToken));
         }
@@ -86,7 +84,6 @@ public class SCIMProvisioningService : BaseProvisioningService<SCIMRepresentatio
 
     private async Task<List<ExtractedGroup>> ExtractGroups(List<string> groupIds, SCIMClient client, SCIMRepresentationsExtractionJobOptions options, IdentityProvisioningDefinition definition, CancellationToken cancellationToken)
     {
-        // Use an another call ?
         var result = new List<ExtractedGroup>();
         var accessToken = await GetAccessToken(options);
         foreach(var groupId in groupIds)

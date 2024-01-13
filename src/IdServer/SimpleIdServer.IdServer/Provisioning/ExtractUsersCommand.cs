@@ -10,5 +10,4 @@ public class ExtractUsersCommand
     public string ProcessId { get; set; }
     public int BatchSize { get; set; }
     public int Page { get; set; }
-    public byte[] Cookie { get; set; }
 }

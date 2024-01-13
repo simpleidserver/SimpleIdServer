@@ -42,11 +42,14 @@ public class LDAPRepresentationsExtractionJobOptions
 
     #endregion
 
-    [ConfigurationRecord("UUID LDAP Attribute", "Name of the LDAP attribute, which is used as a unique object identifier (UUID) for objects in LDAP, objectSID for active directory", order: 12)]
-    public string UUIDLDAPAttribute { get; set; } = "entryUUID";
-    [ConfigurationRecord("Modification Date Attribute", "Name of the LDAP Attribute, which is used as the modification date for objects in LDAP", order: 13)]
+    [ConfigurationRecord("User Identifier LDAP Attribute", "Name of the LDAP attribute, which is used as a unique object identifier for objects in LDAP, objectSID for Active Directory or uidNumber of Open Ldap", order: 12)]
+    public string UserIdLDAPAttribute { get; set; }
+    [ConfigurationRecord("Group Identifier LDAP Attribute", "Name of the LDAP attribute, which is used as a unique object identifier for objects in LDAP, objectSID for Active Directory or gidNumber of Open Ldap", order: 13)]
+    public string GroupIdLDAPAttribute { get; set; }
+
+    [ConfigurationRecord("Modification Date Attribute", "Name of the LDAP Attribute, which is used as the modification date for objects in LDAP", order: 14)]
     public string ModificationDateAttribute { get; set; } = "modificationDate";
-    [ConfigurationRecord("Batch size", "Number of records", order: 14)]
+    [ConfigurationRecord("Batch size", "Number of records", order: 15)]
     public int BatchSize { get; set; } = 1;
 }
 

@@ -28,21 +28,30 @@ public class LDAPProvisioningService : BaseProvisioningService<LDAPRepresentatio
 
     public override Task<ExtractedResult> Extract(ExtractionPage currentPage, IdentityProvisioningDefinition definition, CancellationToken cancellationToken)
     {
+        int page = 1;
         var options = GetOptions(definition);
+        var pr = new PageResultRequestControl(options.BatchSize);
+        var request = new SearchRequest(options.UsersDN, $"(&{string.Join(string.Empty, options.UserObjectClasses.Split(',').Select(o => $"(objectClass={o})"))})", SearchScope.Subtree);
+        request.Controls.Add(pr);
         using (var connection = BuildConnection(options))
         {
-            var pr = new PageResultRequestControl(options.BatchSize)
+            while(true)
             {
-                Cookie = currentPage.Cookie
-            };
-            if(currentPage.Cookie != null) 
-                pr.Cookie = currentPage.Cookie;
-            var request = new SearchRequest(options.UsersDN, $"(&{string.Join(string.Empty, options.UserObjectClasses.Split(',').Select(o => $"(objectClass={o})"))})", SearchScope.Subtree);
-            request.Controls.Add(pr);
-            var response = (SearchResponse)connection.SendRequest(request);
-            var record = Extract(response.Entries, options, definition, connection);
-            return Task.FromResult(record);
+                var response = (SearchResponse)connection.SendRequest(request);
+                if(page == currentPage.Page)
+                {
+                    var record = Extract(response.Entries, options, definition, connection);
+                    return Task.FromResult(record);
+                }
+
+                var pageResponse = (PageResultResponseControl)response.Controls[0];
+                pr.Cookie = pageResponse.Cookie;
+                if (!pageResponse.Cookie.Any()) break;
+                page++;
+            }
         }
+
+        return Task.FromResult((ExtractedResult)null);
     }
 
     public override async Task<List<ExtractionPage>> Paginate(IdentityProvisioningDefinition definition, CancellationToken cancellationToken)
@@ -63,8 +72,7 @@ public class LDAPProvisioningService : BaseProvisioningService<LDAPRepresentatio
                 result.Add(new ExtractionPage
                 {
                     BatchSize = options.BatchSize,
-                    Page = currentPage,
-                    Cookie = pr.Cookie.ToArray()
+                    Page = currentPage
                 });
                 pr.Cookie = pageResponse.Cookie;
                 if (!pageResponse.Cookie.Any()) break;
@@ -81,7 +89,7 @@ public class LDAPProvisioningService : BaseProvisioningService<LDAPRepresentatio
         var groups = new List<ExtractedGroup>();
         foreach(SearchResultEntry entry in entries)
         {
-            var userId = GetRepresentationId(entry, options);
+            var userId = GetRepresentationId(entry, options, true);
             var version = GetVersion(entry, options);
             var user = new ExtractedUser
             {
@@ -144,14 +152,13 @@ public class LDAPProvisioningService : BaseProvisioningService<LDAPRepresentatio
         var result = new List<ExtractedGroup>();
         foreach (SearchResultEntry entry in entries)
         {
-            var groupId = GetRepresentationId(entry, options);
+            var groupId = GetRepresentationId(entry, options, false);
             var version = GetVersion(entry, options);
             result.Add(new ExtractedGroup
             {
                 Id = groupId,
                 Values = ExtractRepresentation(entry, definition, IdentityProvisioningMappingUsage.GROUP),
-                Version = version,
-                UserId = userId
+                Version = version
             });
         }
 
@@ -196,10 +203,11 @@ public class LDAPProvisioningService : BaseProvisioningService<LDAPRepresentatio
         return lst;
     }
 
-    private string GetRepresentationId(SearchResultEntry entry, LDAPRepresentationsExtractionJobOptions options)
+    private string GetRepresentationId(SearchResultEntry entry, LDAPRepresentationsExtractionJobOptions options, bool isUser = true)
     {
-        if (!entry.Attributes.Contains(options.UUIDLDAPAttribute)) return entry.DistinguishedName;
-        var result = entry.Attributes[options.UUIDLDAPAttribute][0];
+        var attributeName = isUser ? options.UserIdLDAPAttribute : options.GroupIdLDAPAttribute;
+        if (!entry.Attributes.Contains(attributeName)) return entry.DistinguishedName;
+        var result = entry.Attributes[attributeName][0];
         var payload = result as byte[];
         if(payload != null)
         {

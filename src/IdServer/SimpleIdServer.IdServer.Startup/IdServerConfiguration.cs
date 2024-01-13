@@ -25,7 +25,9 @@ namespace SimpleIdServer.IdServer.Startup
         private static IdentityProvisioningDefinition Scim = IdentityProvisioningDefinitionBuilder.Create<SCIMRepresentationsExtractionJobOptions>(SimpleIdServer.IdServer.Provisioning.SCIM.Services.SCIMProvisioningService.NAME, "SCIM")
             .AddUserSubjectMappingRule("$.userName")
             .AddUserPropertyMappingRule("$.name.familyName", nameof(User.Lastname))
-            .AddUserAttributeMappingRule("$.name.givenName", JwtRegisteredClaimNames.GivenName).Build();
+            .AddUserAttributeMappingRule("$.name.givenName", JwtRegisteredClaimNames.GivenName)
+            .AddGroupNameMappingRule("$.displayName")
+            .Build();
 
         private static IdentityProvisioningDefinition Ldap = IdentityProvisioningDefinitionBuilder.Create<LDAPRepresentationsExtractionJobOptions>(SimpleIdServer.IdServer.Provisioning.LDAP.Services.LDAPProvisioningService.NAME, "LDAP")
             .AddUserSubjectMappingRule("cn")

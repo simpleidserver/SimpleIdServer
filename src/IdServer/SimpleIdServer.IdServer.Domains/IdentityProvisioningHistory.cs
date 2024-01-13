@@ -9,6 +9,7 @@ public class IdentityProvisioningHistory
     public int CurrentPage { get; set; }
     public int NbUsers { get; set; }
     public int NbGroups { get; set; }
+    public int NbFilteredRepresentations { get; set; }
     public int TotalPages { get; set; }
     public IdentityProvisioningHistoryStatus Status { get; set; }
     public IdentityProvisioning IdentityProvisioning { get; set; } = null!;
@@ -16,9 +17,10 @@ public class IdentityProvisioningHistory
 
 public enum IdentityProvisioningHistoryStatus
 {
-    START = 0,
-    EXPORT = 1,
-    FINISHEXPORT = 2,
+    CREATE = 0,
+    START = 1,
+    EXPORT = 2,
+    FINISHEXPORT = 3,
     STARTIMPORT = 4,
     IMPORT = 5,
     FINISHIMPORT = 6

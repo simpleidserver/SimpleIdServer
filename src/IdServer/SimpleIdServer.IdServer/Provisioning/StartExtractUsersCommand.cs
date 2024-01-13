@@ -7,4 +7,5 @@ public class StartExtractUsersCommand
 {
     public string InstanceId { get; set; } = null!;
     public string Realm { get; set; } = null!;
+    public string ProcessId { get; set; } = null!;
 }

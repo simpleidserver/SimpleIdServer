@@ -34,6 +34,18 @@ public class IdentityProvisioning
     public ICollection<Realm> Realms { get; set; } = new List<Realm>();
     public ICollection<User> Users { get; set; } = new List<User>();
 
+    public string Launch()
+    {
+        var processId = Guid.NewGuid().ToString();
+        Histories.Add(new IdentityProvisioningHistory
+        {
+            ProcessId = processId,
+            Status = IdentityProvisioningHistoryStatus.CREATE,
+            ExecutionDateTime = DateTime.UtcNow
+        });
+        return processId;
+    }
+
     public void Start(string processId, int totalPages)
     {
         Histories.Add(new IdentityProvisioningHistory
@@ -45,7 +57,7 @@ public class IdentityProvisioning
         });
     }
 
-    public void Extract(string processId, int currentPage, int nbUsers, int nbGroups)
+    public void Extract(string processId, int currentPage, int nbUsers, int nbGroups, int nbFilteredRepresentations)
     {
         Histories.Add(new IdentityProvisioningHistory
         {
@@ -54,7 +66,8 @@ public class IdentityProvisioning
             ExecutionDateTime = DateTime.UtcNow,
             CurrentPage = currentPage,
             NbUsers = nbUsers,
-            NbGroups = nbGroups
+            NbGroups = nbGroups,
+            NbFilteredRepresentations = nbFilteredRepresentations
         });
     }
 
@@ -104,11 +117,13 @@ public class IdentityProvisioning
 
     public IdentityProvisioningProcess GetProcess(string processId)
     {
+        var filteredHistories = Histories.Where(h => h.ProcessId == processId);
+        if (!filteredHistories.Any()) return null;
         var result = new IdentityProvisioningProcess
         {
             Id = processId
         };
-        foreach(var history in Histories.Where(h => h.ProcessId == processId))
+        foreach (var history in filteredHistories)
         {
             result.Consume(history);
         }
@@ -120,13 +135,15 @@ public class IdentityProvisioning
 public class IdentityProvisioningProcess
 {
     public string Id { get; set; }
-    public DateTime StartExportDateTime { get; set; }
+    public DateTime CreateDateTime { get; set; }
+    public DateTime? StartExportDateTime { get; set; }
     public DateTime? EndExportDateTime { get; set; }
     public DateTime? StartImportDateTime { get; set; }
     public DateTime? EndImportDateTime { get; set; }
     public int NbExtractedPages { get; set; }
     public int NbExtractedUsers { get; set; }
     public int NbExtractedGroups { get; set; }
+    public int NbFilteredRepresentations { get; set; }
     public int NbImportedPages { get; set; }
     public int NbImportedGroups { get; set; }
     public int NbImportedUsers { get; set; }
@@ -153,8 +170,11 @@ public class IdentityProvisioningProcess
     {
         switch (history.Status)
         {
-            case IdentityProvisioningHistoryStatus.START:
+            case IdentityProvisioningHistoryStatus.CREATE:
                 Id = history.ProcessId;
+                CreateDateTime = history.ExecutionDateTime;
+                break;
+            case IdentityProvisioningHistoryStatus.START:
                 StartExportDateTime = history.ExecutionDateTime;
                 TotalPageToExtract = history.TotalPages;
                 break;
@@ -162,6 +182,7 @@ public class IdentityProvisioningProcess
                 NbExtractedPages++;
                 NbExtractedUsers += history.NbUsers;
                 NbExtractedGroups += history.NbGroups;
+                NbFilteredRepresentations += history.NbFilteredRepresentations;
                 break;
             case IdentityProvisioningHistoryStatus.FINISHEXPORT:
                 EndExportDateTime = history.ExecutionDateTime;

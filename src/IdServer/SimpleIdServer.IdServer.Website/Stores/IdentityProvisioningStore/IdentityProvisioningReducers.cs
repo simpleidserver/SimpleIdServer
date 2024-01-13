@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
+using Nethereum.ABI.Encoders;
 using SimpleIdServer.IdServer.Api.Provisioning;
 
 namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
@@ -102,6 +103,53 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
 
         [ReducerMethod]
         public static IdentityProvisioningState ReduceLaunchIdentityProvisioningSuccessAction(IdentityProvisioningState state, LaunchIdentityProvisioningSuccessAction act)
+        {
+            var identityProvisioning = state.IdentityProvisioning;
+            identityProvisioning.Processes.Add(new IdentityProvisioningProcessResult
+            {
+                Id = act.ProcessId,
+                CreateDateTime = DateTime.UtcNow
+            });
+            return state with
+            {
+                IdentityProvisioning = identityProvisioning,
+                IsLoading = false
+            };
+        }
+
+        [ReducerMethod]
+        public static IdentityProvisioningState ReduceLaunchIdentityProvisioningImportAction(IdentityProvisioningState state, LaunchIdentityProvisioningImportAction act)
+        {
+            return state with
+            {
+                IsLoading = true
+            };
+        }
+
+        [ReducerMethod]
+        public static IdentityProvisioningState ReduceLaunchIdentityProvisioningImportSuccessAction(IdentityProvisioningState state, LaunchIdentityProvisioningImportSuccessAction act)
+        {
+            var identityProvisioning = state.IdentityProvisioning;
+            var process = identityProvisioning.Processes.Single(p => p.Id == act.ProcessId);
+            process.StartImportDateTime = DateTime.UtcNow;
+            return state with
+            {
+                IdentityProvisioning = identityProvisioning,
+                IsLoading = false
+            };
+        }
+
+        [ReducerMethod]
+        public static IdentityProvisioningState ReduceLaunchIdentityProvisioningImportFailureAction(IdentityProvisioningState state, LaunchIdentityProvisioningImportFailureAction act)
+        {
+            return state with
+            {
+                IsLoading = false
+            };
+        }
+
+        [ReducerMethod]
+        public static IdentityProvisioningState ReduceLaunchIdentityProvisioningFailureAction(IdentityProvisioningState state, LaunchIdentityProvisioningFailureAction act)
         {
             return state with
             {

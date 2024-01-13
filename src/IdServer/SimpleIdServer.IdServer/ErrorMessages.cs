@@ -43,6 +43,7 @@ namespace SimpleIdServer.IdServer
         public const string UNKNOWN_AUTH_SCHEME_PROVIDER = "the authentication scheme provider {0} doesn't exist";
         public const string UNKNOWN_IDPROVISIONING = "the identity provisioning {0} doesn't exist";
         public const string UNKNOWN_IDPROVISIONING_MAPPINGRULE = "the mapping rule {0} doesn't exist";
+        public const string UNKNOWN_IDPROVISIONING_PROCESS = "the process {0} doesn't exist";
         public const string UNKNOWN_AUTH_SCHEME_PROVIDER_PROPERTIES = "the authentication scheme provider cannot be updated because the following properties are unknown : {0}";
         public const string UNAUTHORIZED_CLIENT = "unauthorized client";
         public const string UNAUTHORIZED_ACCESSTOKEN = "the access token is not authorized to access to the operation";
@@ -302,5 +303,7 @@ namespace SimpleIdServer.IdServer
         public const string GROUP_EXISTS = "group {0} already exists";
         public const string IDPROVISIONING_TYPE_UNIQUE = "The same mapping type cannot be added twice.";
         public const string SCOPE_MAPPER_TYPE_UNIQUE = "The same mapping type cannot be added twice.";
+        public const string IDPROVISIONING_PROCESS_ISNOTEXTRACTED = "users are not extracted";
+        public const string IDPROVISIONING_PROCESS_STARTED = "process cannot be started twice";
     }
 }

@@ -129,7 +129,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                 await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
                 var user = await _userRepository.GetById(id, prefix, cancellationToken);
                 if (user == null) return new NotFoundResult();
-                var grpPathLst = user.Groups.SelectMany(g => g.ResolveAllPath()).Distinct();
+                var grpPathLst = user.Groups.SelectMany(g => g.Group.ResolveAllPath()).Distinct();
                 var allGroups = await _groupRepository.Query()
                     .Include(g => g.Roles)
                     .AsNoTracking()
@@ -495,7 +495,10 @@ namespace SimpleIdServer.IdServer.Api.Users
                         .Include(g => g.Realms)
                         .SingleOrDefaultAsync(a => a.Id == groupId && a.Realms.Any(r => r.RealmsName == prefix)); ;
                     if (newGroup == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_USER_GROUP, groupId));
-                    user.Groups.Add(newGroup);
+                    user.Groups.Add(new GroupUser
+                    {
+                        GroupsId = newGroup.Id
+                    });
                     user.UpdateDateTime = DateTime.UtcNow;
                     await _userRepository.SaveChanges(cancellationToken);
                     activity?.SetStatus(ActivityStatusCode.Ok, "User's group is added");
@@ -536,7 +539,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                     await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
                     var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_USER, id));
-                    var assignedGroup = user.Groups.SingleOrDefault(g => g.Id == groupId);
+                    var assignedGroup = user.Groups.SingleOrDefault(g => g.GroupsId == groupId);
                     if (assignedGroup == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_USER_GROUP, groupId));
                     user.Groups.Remove(assignedGroup);
                     user.UpdateDateTime = DateTime.UtcNow;

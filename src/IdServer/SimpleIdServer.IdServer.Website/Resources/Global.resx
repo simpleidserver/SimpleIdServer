@@ -438,4 +438,7 @@
   <data name="NoProperties" xml:space="preserve">
     <value>There is no property</value>
   </data>
+  <data name="ProcessImportStarted" xml:space="preserve">
+    <value>Process import has been started</value>
+  </data>
 </root>
