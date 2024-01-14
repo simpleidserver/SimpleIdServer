@@ -3,7 +3,7 @@
 
 using SimpleIdServer.Configuration;
 
-namespace SimpleIdServer.IdServer.Provisioning.SCIM.Jobs
+namespace SimpleIdServer.IdServer.Provisioning.SCIM
 {
     public class SCIMRepresentationsExtractionJobOptions
     {

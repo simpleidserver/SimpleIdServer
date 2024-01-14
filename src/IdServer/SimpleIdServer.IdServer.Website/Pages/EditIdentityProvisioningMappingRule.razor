@@ -23,6 +23,15 @@
     <RadzenBreadCrumbItem Text="Mapper details" />
 </RadzenBreadCrumb>
 
+<RadzenText class="mt-3 mb-3 no-margin" Text="@GetTitle()" TextStyle="TextStyle.DisplayH3" />
+
+@if (identityProvisioningMappingRuleState.Value.Mapping != null)
+{
+    <div class="mb-1">
+        <RadzenBadge Text="@(Enum.GetName(typeof(MappingRuleTypes), identityProvisioningMappingRuleState.Value.Mapping.MapperType))" IsPill="true" />
+    </div>
+}
+
 <RadzenCardLoader class="m-3" Variant=Variant.Filled IsLoading=@identityProvisioningMappingRuleState.Value.IsLoading>
     <EditIdProvisioningRule Id="@id" IsUpdating="@updateIdentityProvisioningState.Value.IsUpdating" MappingRule="@identityProvisioningMappingRuleState.Value.Mapping" Saved="@SubmitUpdateIdentityProvisioningMappingRule"></EditIdProvisioningRule>
 </RadzenCardLoader>
@@ -85,5 +94,23 @@
             TargetUserAttribute = form.TargetUserAttribute,
             HasMultipleAttribute = form.HasMultipleAttribute
         });
+    }
+
+    string GetTitle()
+    {
+        if (identityProvisioningMappingRuleState.Value.Mapping == null) return string.Empty;
+        switch (identityProvisioningMappingRuleState.Value.Mapping.MapperType)
+        {
+            case MappingRuleTypes.IDENTIFIER:
+                return "Identifier";
+            case MappingRuleTypes.SUBJECT:
+                return "Subject";
+            case MappingRuleTypes.GROUPNAME:
+                return "Group";
+            case MappingRuleTypes.USERPROPERTY:
+                return $"{identityProvisioningMappingRuleState.Value.Mapping.From} / {identityProvisioningMappingRuleState.Value.Mapping.TargetUserProperty}";
+            default:
+                return $"{identityProvisioningMappingRuleState.Value.Mapping.From} / {identityProvisioningMappingRuleState.Value.Mapping.TargetUserAttribute}";
+        }
     }
 }

@@ -29,6 +29,7 @@ namespace SimpleIdServer.IdServer.Store
         Task BulkUpdate(List<UserClaim> userClaims);
         Task BulkUpdate(List<User> users);
         Task BulkUpdate(List<RealmUser> userRealms);
+        Task BulkUpdate(List<GroupUser> groupUsers);
         Task<int> SaveChanges(CancellationToken cancellationToken);
     }
 
@@ -186,18 +187,12 @@ namespace SimpleIdServer.IdServer.Store
                 return;
             }
 
-            var userIds = userClaims.Select(u => u.UserId).ToList();
-            var existingUsers = await _dbContext.Users
-                .Include(u => u.OAuthUserClaims)
-                .Where(u => userIds.Contains(u.Id))
+            var userClaimIds = userClaims.Select(u => u.Id).ToList();
+            var existingUserClaims = await _dbContext.UserClaims
+                .Where(u => userClaimIds.Contains(u.Id))
                 .ToListAsync();
-            foreach(var existingUser in existingUsers)
-            {
-                var newClaims = existingUser.OAuthUserClaims.Where(uc => !userClaims.Any(c => c.Name == uc.Name)).ToList();
-                newClaims.AddRange(userClaims);
-                existingUser.OAuthUserClaims = newClaims;
-            }
-
+            _dbContext.UserClaims.RemoveRange(existingUserClaims);
+            _dbContext.UserClaims.AddRange(userClaims);
             await _dbContext.SaveChangesAsync();
         }
 
@@ -232,14 +227,31 @@ namespace SimpleIdServer.IdServer.Store
             }
 
             var userIds = userRealms.Select(r => r.UsersId).ToList();
-            var existingUsers = await _dbContext.Users
-                .Include(u => u.Realms)
-                .Where(u => userIds.Contains(u.Id)).ToListAsync();
-            foreach(var existingUser in existingUsers)
+            var existingRealms = await _dbContext.RealmUser
+                .Where(u => userIds.Contains(u.UsersId))
+                .ToListAsync();
+            var newRealms = userRealms.Where(g => !existingRealms.Any(r => r.UsersId == g.UsersId && r.RealmsName == g.RealmsName));
+            _dbContext.RealmUser.AddRange(newRealms);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task BulkUpdate(List<GroupUser> groupUsers)
+        {
+            if (_dbContext.Database.IsRelational())
             {
-                existingUser.Realms = userRealms.Where(r => r.UsersId == existingUser.Id).ToList();
+                var bulkConfig = new BulkConfig
+                {
+                    PropertiesToIncludeOnCompare = new List<string> { nameof(GroupUser.GroupsId), nameof(GroupUser.UsersId) }
+                };
+                await _dbContext.BulkInsertOrUpdateAsync(groupUsers, bulkConfig);
             }
 
+            var userIds = groupUsers.Select(r => r.UsersId).ToList();
+            var existingGroupUsers = await _dbContext.GroupUser
+                .Where(u => userIds.Contains(u.UsersId))
+                .ToListAsync();
+            var newGroupUsers = groupUsers.Where(g => !existingGroupUsers.Any(eg => eg.UsersId == g.UsersId && eg.GroupsId == g.GroupsId));
+            _dbContext.GroupUser.AddRange(newGroupUsers);
             await _dbContext.SaveChangesAsync();
         }
 
@@ -250,7 +262,7 @@ namespace SimpleIdServer.IdServer.Store
                         .Include(u => u.IdentityProvisioning).ThenInclude(i => i.Definition)
                         .Include(u => u.Credentials)
                         .Include(u => u.ExternalAuthProviders)
-                        .Include(u => u.Groups)
+                        .Include(u => u.Groups).ThenInclude(u => u.Group)
                         .Include(u => u.Devices)
                         .Include(u => u.OAuthUserClaims)
                         .Include(u => u.CredentialOffers)

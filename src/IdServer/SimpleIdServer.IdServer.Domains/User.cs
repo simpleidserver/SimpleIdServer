@@ -111,7 +111,7 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonPropertyName(UserNames.Devices)]
         public ICollection<UserDevice> Devices { get; set; } = new List<UserDevice>();
         [JsonPropertyName(UserNames.Groups)]
-        public ICollection<Group> Groups { get; set; } = new List<Group>();
+        public ICollection<GroupUser> Groups { get; set; } = new List<GroupUser>();
         [JsonIgnore]
         public ICollection<RealmUser> Realms { get; set; } = new List<RealmUser>();
         [JsonIgnore]
@@ -300,15 +300,20 @@ namespace SimpleIdServer.IdServer.Domains
                     Type = c.Type,
                     Value = c.Value                    
                 }).ToList(),
-                Groups = Groups.Select(g => new Group
+                Groups = Groups.Select(g => new GroupUser
                 {
-                    CreateDateTime = g.CreateDateTime,
-                    Name = g.Name,
-                    FullPath = g.FullPath,
-                    ParentGroupId = g.ParentGroupId,
-                    UpdateDateTime = g.UpdateDateTime,
-                    Description = g.Description,
-                    Id = g.Id
+                    GroupsId = g.GroupsId,
+                    UsersId = Id,
+                    Group = new Group
+                    {
+                        CreateDateTime = g.Group.CreateDateTime,
+                        Name = g.Group.Name,
+                        FullPath = g.Group.FullPath,
+                        ParentGroupId = g.Group.ParentGroupId,
+                        UpdateDateTime = g.Group.UpdateDateTime,
+                        Description = g.Group.Description,
+                        Id = g.Group.Id
+                    }
                 }).ToList()
             };
         }

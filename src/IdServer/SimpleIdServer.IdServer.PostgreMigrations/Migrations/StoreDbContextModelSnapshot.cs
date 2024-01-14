@@ -17,7 +17,7 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.14")
+                .HasAnnotation("ProductVersion", "7.0.15")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -172,21 +172,6 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.ToTable("CredentialTemplateRealm");
                 });
 
-            modelBuilder.Entity("GroupRealm", b =>
-                {
-                    b.Property<string>("GroupsId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("RealmsName")
-                        .HasColumnType("text");
-
-                    b.HasKey("GroupsId", "RealmsName");
-
-                    b.HasIndex("RealmsName");
-
-                    b.ToTable("GroupRealm");
-                });
-
             modelBuilder.Entity("GroupScope", b =>
                 {
                     b.Property<string>("GroupsId")
@@ -200,21 +185,6 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.HasIndex("RolesId");
 
                     b.ToTable("GroupScope");
-                });
-
-            modelBuilder.Entity("GroupUser", b =>
-                {
-                    b.Property<string>("GroupsId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("UsersId")
-                        .HasColumnType("text");
-
-                    b.HasKey("GroupsId", "UsersId");
-
-                    b.HasIndex("UsersId");
-
-                    b.ToTable("GroupUser");
                 });
 
             modelBuilder.Entity("IdentityProvisioningRealm", b =>
@@ -1359,6 +1329,38 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.ToTable("ExtractedRepresentations");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ExtractedRepresentationStaging", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("GroupIds")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("IdProvisioningProcessId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("RepresentationId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("RepresentationVersion")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Values")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ExtractedRepresentationsStaging");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Group", b =>
                 {
                     b.Property<string>("Id")
@@ -1397,7 +1399,39 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
 
                     b.ToTable("Groups");
 
-                    b.HasAnnotation("Relational:JsonPropertyName", "children");
+                    b.HasAnnotation("Relational:JsonPropertyName", "group");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.GroupRealm", b =>
+                {
+                    b.Property<string>("GroupsId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("RealmsName")
+                        .HasColumnType("text");
+
+                    b.HasKey("GroupsId", "RealmsName");
+
+                    b.HasIndex("RealmsName");
+
+                    b.ToTable("GroupRealm");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.GroupUser", b =>
+                {
+                    b.Property<string>("GroupsId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UsersId")
+                        .HasColumnType("text");
+
+                    b.HasKey("GroupsId", "UsersId");
+
+                    b.HasIndex("UsersId");
+
+                    b.ToTable("GroupUser");
+
+                    b.HasAnnotation("Relational:JsonPropertyName", "groups");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.IdentityProvisioning", b =>
@@ -1466,26 +1500,33 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("EndDateTime")
+                    b.Property<int>("CurrentPage")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("ExecutionDateTime")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("ErrorMessage")
-                        .HasColumnType("text");
-
-                    b.Property<string>("FolderName")
-                        .HasColumnType("text");
 
                     b.Property<string>("IdentityProvisioningId")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("NbRepresentations")
+                    b.Property<int>("NbFilteredRepresentations")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("StartDateTime")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<int>("NbGroups")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("NbUsers")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ProcessId")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TotalPages")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -1520,49 +1561,14 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.Property<string>("TargetUserProperty")
                         .HasColumnType("text");
 
+                    b.Property<int>("Usage")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("IdentityProvisioningDefinitionName");
 
                     b.ToTable("IdentityProvisioningMappingRule");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ImportSummary", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "id");
-
-                    b.Property<DateTime?>("EndDateTime")
-                        .HasColumnType("timestamp with time zone")
-                        .HasAnnotation("Relational:JsonPropertyName", "end_datetime");
-
-                    b.Property<string>("ErrorMessage")
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "error_message");
-
-                    b.Property<int>("NbRepresentations")
-                        .HasColumnType("integer")
-                        .HasAnnotation("Relational:JsonPropertyName", "nb_representations");
-
-                    b.Property<string>("RealmName")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "realm");
-
-                    b.Property<DateTime>("StartDateTime")
-                        .HasColumnType("timestamp with time zone")
-                        .HasAnnotation("Relational:JsonPropertyName", "start_datetime");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer")
-                        .HasAnnotation("Relational:JsonPropertyName", "status");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RealmName");
-
-                    b.ToTable("ImportSummaries");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Language", b =>
@@ -2695,21 +2701,6 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("GroupRealm", b =>
-                {
-                    b.HasOne("SimpleIdServer.IdServer.Domains.Group", null)
-                        .WithMany()
-                        .HasForeignKey("GroupsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SimpleIdServer.IdServer.Domains.Realm", null)
-                        .WithMany()
-                        .HasForeignKey("RealmsName")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("GroupScope", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.Group", null)
@@ -2721,21 +2712,6 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.HasOne("SimpleIdServer.IdServer.Domains.Scope", null)
                         .WithMany()
                         .HasForeignKey("RolesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("GroupUser", b =>
-                {
-                    b.HasOne("SimpleIdServer.IdServer.Domains.Group", null)
-                        .WithMany()
-                        .HasForeignKey("GroupsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SimpleIdServer.IdServer.Domains.User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -2920,6 +2896,44 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.Navigation("ParentGroup");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.GroupRealm", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Group", "Group")
+                        .WithMany("Realms")
+                        .HasForeignKey("GroupsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Realm", "Realm")
+                        .WithMany("Groups")
+                        .HasForeignKey("RealmsName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
+
+                    b.Navigation("Realm");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.GroupUser", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Group", "Group")
+                        .WithMany("Users")
+                        .HasForeignKey("GroupsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SimpleIdServer.IdServer.Domains.User", "User")
+                        .WithMany("Groups")
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.IdentityProvisioning", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.IdentityProvisioningDefinition", "Definition")
@@ -2951,17 +2965,6 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .IsRequired();
 
                     b.Navigation("IdentityProvisioningDefinition");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ImportSummary", b =>
-                {
-                    b.HasOne("SimpleIdServer.IdServer.Domains.Realm", "Realm")
-                        .WithMany("ImportSummaries")
-                        .HasForeignKey("RealmName")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Realm");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.RealmUser", b =>
@@ -3218,6 +3221,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Group", b =>
                 {
                     b.Navigation("Children");
+
+                    b.Navigation("Realms");
+
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.IdentityProvisioning", b =>
@@ -3236,7 +3243,7 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Realm", b =>
                 {
-                    b.Navigation("ImportSummaries");
+                    b.Navigation("Groups");
 
                     b.Navigation("RegistrationWorkflows");
 
@@ -3276,6 +3283,8 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.Navigation("Devices");
 
                     b.Navigation("ExternalAuthProviders");
+
+                    b.Navigation("Groups");
 
                     b.Navigation("OAuthUserClaims");
 

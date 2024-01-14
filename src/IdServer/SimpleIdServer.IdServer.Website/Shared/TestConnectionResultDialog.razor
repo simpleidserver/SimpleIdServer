@@ -10,6 +10,9 @@
 @inject IState<AddApiResourceState> addApiResourceState
 @inject IDispatcher dispatcher
 
+<!-- Users -->
+<RadzenText class="mt-3 mb-3" Text="Users" TextStyle="TextStyle.DisplayH3" />
+
 <RadzenDataGrid 
                 AllowFiltering="false"
                 AllowColumnResize="true"
@@ -19,14 +22,14 @@
                 AllowPaging="false"
                 PagerHorizontalAlign="HorizontalAlign.Left"
                 ShowPagingSummary="false"
-                Data="@ConnectionResult.Values"
+                Data="@ConnectionResult.Users.Values"
                 TItem="IdentityProvisioningExtractionResult"
                 ColumnWidth="300px">
     <Columns>
-        @for (var i = 0; i <= ConnectionResult.Columns.Count() - 1; i++)
+        @for (var i = 0; i <= ConnectionResult.Users.Columns.Count() - 1; i++)
         {
             var index = i;
-            <RadzenDataGridColumn Title="@ConnectionResult.Columns[i]" TItem="IdentityProvisioningExtractionResult">
+            <RadzenDataGridColumn Title="@ConnectionResult.Users.Columns[i]" TItem="IdentityProvisioningExtractionResult">
                 <Template Context="data">
                     @GetColumnValue(index, data)
                 </Template>
@@ -34,6 +37,55 @@
         }
     </Columns>
 </RadzenDataGrid>
+
+
+<!-- Assigned groups -->
+<RadzenText class="mt-3 mb-3" Text="Assigned groups" TextStyle="TextStyle.DisplayH3" />
+
+<RadzenDataGrid AllowFiltering="false"
+                AllowColumnResize="true"
+                AllowAlternatingRows="true"
+                AllowSorting="false"
+                PageSize="30"
+                AllowPaging="false"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="false"
+                Data="@ConnectionResult.AssignedGroups"
+                TItem="AssignedGroupResult"
+                ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn Title="User Identifier" Property="UserId" TItem="AssignedGroupResult"></RadzenDataGridColumn>
+        <RadzenDataGridColumn Title="Group Identifier" Property="GroupId" TItem="AssignedGroupResult"></RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+<!-- Groups -->
+<RadzenText class="mt-3 mb-3" Text="Groups" TextStyle="TextStyle.DisplayH3" />
+
+<RadzenDataGrid AllowFiltering="false"
+                AllowColumnResize="true"
+                AllowAlternatingRows="true"
+                AllowSorting="false"
+                PageSize="30"
+                AllowPaging="false"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="false"
+                Data="@ConnectionResult.Groups.Values"
+                TItem="IdentityProvisioningExtractionResult"
+                ColumnWidth="300px">
+    <Columns>
+        @for (var i = 0; i <= ConnectionResult.Groups.Columns.Count() - 1; i++)
+        {
+            var index = i;
+            <RadzenDataGridColumn Title="@ConnectionResult.Groups.Columns[i]" TItem="IdentityProvisioningExtractionResult">
+                <Template Context="data">
+                    @GetColumnValue(index, data)
+                </Template>
+            </RadzenDataGridColumn>
+        }
+    </Columns>
+</RadzenDataGrid>
+
 
 @code {
     [Parameter]

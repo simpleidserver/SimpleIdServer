@@ -35,7 +35,7 @@ namespace SimpleIdServer.IdServer.Extractors
             newContext.SetUser((User)context.User?.Clone(), (UserSession)context.Session?.Clone());
             if(newContext.User != null)
             {
-                var grpPathLst = newContext.User.Groups.SelectMany(g => g.ResolveAllPath()).Distinct();
+                var grpPathLst = newContext.User.Groups.SelectMany(g => g.Group.ResolveAllPath()).Distinct();
                 var allGroups = await _groupRepository.Query().Include(g => g.Roles).AsNoTracking().Where(g => grpPathLst.Contains(g.FullPath)).ToListAsync();
                 var roles = allGroups.SelectMany(g => g.Roles).Select(r => r.Name).Distinct();
                 foreach (var role in roles)

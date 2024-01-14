@@ -38,14 +38,19 @@
                 <RadzenLink Text="@data.Value.From" Path="@($"/identityprovisioning/{IdProvisioning?.Id}/mappingrules/{data.Value.Id}")" />
             </Template>
         </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableIdentityProvisioningMappingRule" Filterable="false" Sortable="false" Title="To" Width="80px">
+            <Template Context="data">
+                @GetValue(data)
+            </Template>
+        </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableIdentityProvisioningMappingRule" Filterable="false" Sortable="false" Title="Type" Width="80px">
             <Template Context="data">
                 <RadzenBadge IsPill=true Text="@Enum.GetName(typeof(MappingRuleTypes), data.Value.MapperType)" BadgeStyle="BadgeStyle.Primary"></RadzenBadge>
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableIdentityProvisioningMappingRule" Filterable="false" Sortable="false" Title="To" Width="80px">
+        <RadzenDataGridColumn TItem="SelectableIdentityProvisioningMappingRule" Filterable="false" Sortable="false" Title="Usage" Width="80px">
             <Template Context="data">
-                @GetValue(data)
+                <RadzenBadge IsPill=true Text="@Enum.GetName(typeof(IdentityProvisioningMappingUsage), data.Value.Usage)" BadgeStyle="BadgeStyle.Primary"></RadzenBadge>
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableIdentityProvisioningMappingRule" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">

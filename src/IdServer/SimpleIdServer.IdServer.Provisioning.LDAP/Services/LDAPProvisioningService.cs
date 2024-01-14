@@ -1,108 +1,163 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.Configuration;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Jobs;
-using SimpleIdServer.IdServer.Provisioning.LDAP.Jobs;
 using System.DirectoryServices.Protocols;
 using System.Net;
+using System.Security.Principal;
 using System.Text;
 using System.Text.Json;
 
 namespace SimpleIdServer.IdServer.Provisioning.LDAP.Services;
 
-public class LDAPProvisioningService : IProvisioningService
+public class LDAPProvisioningService : BaseProvisioningService<LDAPRepresentationsExtractionJobOptions>
 {
-    public string Name => LDAPRepresentationsExtractionJob.NAME;
-
-    public async IAsyncEnumerable<ExtractedResult> Extract(object obj, IdentityProvisioningDefinition definition)
+    public LDAPProvisioningService(IConfiguration configuration) : base(configuration)
     {
-        var options = obj as LDAPRepresentationsExtractionJobOptions;
+
+    }
+
+    public override string Name => NAME;
+
+    public static string NAME = "LDAP";
+
+    public override Task<ExtractedResult> ExtractTestData(IdentityProvisioningDefinition definition, CancellationToken cancellationToken)
+    {
+        return Extract(new ExtractionPage(), definition, cancellationToken);
+    }
+
+    public override Task<ExtractedResult> Extract(ExtractionPage currentPage, IdentityProvisioningDefinition definition, CancellationToken cancellationToken)
+    {
+        int page = 1;
+        var options = GetOptions(definition);
         var pr = new PageResultRequestControl(options.BatchSize);
         var request = new SearchRequest(options.UsersDN, $"(&{string.Join(string.Empty, options.UserObjectClasses.Split(',').Select(o => $"(objectClass={o})"))})", SearchScope.Subtree);
         request.Controls.Add(pr);
-        var credentials = new NetworkCredential(options.BindDN, options.BindCredentials);
-        int currentPage = 0;
-        using (var connection = new LdapConnection(new LdapDirectoryIdentifier(options.Server, options.Port), credentials, AuthType.Basic))
+        using (var connection = BuildConnection(options))
         {
-            connection.SessionOptions.ProtocolVersion = 3;
-            connection.Bind();
-            while (true)
+            while(true)
+            {
+                var response = (SearchResponse)connection.SendRequest(request);
+                if(page == currentPage.Page)
+                {
+                    var record = Extract(response.Entries, options, definition, connection);
+                    return Task.FromResult(record);
+                }
+
+                var pageResponse = (PageResultResponseControl)response.Controls[0];
+                pr.Cookie = pageResponse.Cookie;
+                if (!pageResponse.Cookie.Any()) break;
+                page++;
+            }
+        }
+
+        return Task.FromResult((ExtractedResult)null);
+    }
+
+    public override async Task<List<ExtractionPage>> Paginate(IdentityProvisioningDefinition definition, CancellationToken cancellationToken)
+    {
+        var result = new List<ExtractionPage>();
+        int currentPage = 1;
+        var options = GetOptions(definition);
+        var pr = new PageResultRequestControl(options.BatchSize);
+        var request = new SearchRequest(options.UsersDN, $"(&{string.Join(string.Empty, options.UserObjectClasses.Split(',').Select(o => $"(objectClass={o})"))})", SearchScope.Subtree);
+        request.Controls.Add(pr);
+        using (var connection = BuildConnection(options))
+        {
+            while(true)
             {
                 var response = (SearchResponse)connection.SendRequest(request);
                 if (!response.Controls.Any()) break;
                 var pageResponse = (PageResultResponseControl)response.Controls[0];
-                var extractionResultLst = ExtractUsers(response.Entries, options, definition);
-                var record = new ExtractedResult { CurrentPage = currentPage, Users = extractionResultLst };
+                result.Add(new ExtractionPage
+                {
+                    BatchSize = options.BatchSize,
+                    Page = currentPage
+                });
                 pr.Cookie = pageResponse.Cookie;
-                yield return record;
                 if (!pageResponse.Cookie.Any()) break;
                 currentPage++;
             }
         }
+
+        return result;
     }
 
-    public async Task<ExtractedResult> ExtractTestData(object obj, IdentityProvisioningDefinition definition)
+    private ExtractedResult Extract(SearchResultEntryCollection entries, LDAPRepresentationsExtractionJobOptions options, IdentityProvisioningDefinition definition, LdapConnection ldapConnection)
     {
-        var options = obj as LDAPRepresentationsExtractionJobOptions;
-        var pr = new PageResultRequestControl(options.BatchSize);
-        var request = new SearchRequest(options.UsersDN, $"(&{string.Join(string.Empty, options.UserObjectClasses.Split(',').Select(o => $"(objectClass={o})"))})", SearchScope.Subtree);
-        request.Controls.Add(pr);
-        var credentials = new NetworkCredential(options.BindDN, options.BindCredentials);
-        int currentPage = 0;
-        using (var connection = new LdapConnection(new LdapDirectoryIdentifier(options.Server, options.Port), credentials, AuthType.Basic))
+        var users = new List<ExtractedUser>();
+        var groups = new List<ExtractedGroup>();
+        foreach(SearchResultEntry entry in entries)
         {
-            connection.SessionOptions.ProtocolVersion = 3;
-            connection.Bind();
-            var response = (SearchResponse)connection.SendRequest(request);
-            if (!response.Controls.Any()) return new ExtractedResult();
-            var pageResponse = (PageResultResponseControl)response.Controls[0];
-            var extractionResultLst = ExtractUsers(response.Entries, options, definition);
-            var record = new ExtractedResult { CurrentPage = currentPage, Users = extractionResultLst };
-            return record;
-        }
-    }
-
-    public Task<IEnumerable<string>> GetAllowedAttributes(object obj)
-    {
-        var result = new List<string>();
-        var options = obj as LDAPRepresentationsExtractionJobOptions;
-        var userObjectClassLst = options.UserObjectClasses.Split(',');
-        var pr = new PageResultRequestControl(1);
-        var credentials = new NetworkCredential(options.BindDN, options.BindCredentials);
-        using (var connection = new LdapConnection(new LdapDirectoryIdentifier(options.Server, options.Port), credentials, AuthType.Basic))
-        {
-            connection.SessionOptions.ProtocolVersion = 3;
-            connection.Bind();
-            foreach (var userObjectClass in userObjectClassLst)
+            var userId = GetRepresentationId(entry, options, true);
+            var version = GetVersion(entry, options);
+            var user = new ExtractedUser
             {
-                var request = new SearchRequest(options.UsersDN, $"(objectClass={userObjectClass})", System.DirectoryServices.Protocols.SearchScope.Subtree);
-                request.Controls.Add(pr);
+                Id = userId,
+                Values = ExtractRepresentation(entry, definition, IdentityProvisioningMappingUsage.USER),
+                Version = version
+            };
+            users.Add(user);
+            var userGroups = ResolveUserGroups(userId, entry, options, ldapConnection, definition);
+            groups.AddRange(userGroups);
+            user.GroupIds = userGroups.Select(g => g.Id).ToList();
+        }
+
+        return new ExtractedResult { Users = users, Groups = groups };
+    }
+
+    private List<ExtractedGroup> ResolveUserGroups(string userId, SearchResultEntry userEntry, LDAPRepresentationsExtractionJobOptions options, LdapConnection connection, IdentityProvisioningDefinition definition)
+    {
+        var result = new List<ExtractedGroup>();
+        if(options.RetrievingStrategies == LoadingStrategies.LOAD_BY_MEMBER_ATTRIBUTE)
+        {
+            if (!userEntry.Attributes.Contains(options.MembershipUserLDAPAttribute)) return result;
+            var userGroupId = userEntry.Attributes[options.MembershipUserLDAPAttribute][0].ToString();
+            var groupObjectClassLst = options.GroupObjectClasses.Split(',');
+            foreach(var groupObjectClass in groupObjectClassLst)
+            {
+                var request = new SearchRequest(options.GroupsDN, $"(&(objectClass={groupObjectClass})({options.MembershipLDAPAttribute}={userGroupId}))", SearchScope.OneLevel);
                 var response = (SearchResponse)connection.SendRequest(request);
                 var entries = response.Entries;
                 if (entries.Count == 0) continue;
-                var firstEntry = entries[0] as SearchResultEntry;
-                foreach(var attr in firstEntry.Attributes.AttributeNames)
-                {
-                    if (result.Contains(attr.ToString())) continue;
-                    result.Add(attr.ToString());
-                }
+                result.AddRange(ExtractGroups(userId, entries, options, definition));
+            }
+
+            return result;
+        }
+
+        if(options.RetrievingStrategies == LoadingStrategies.LOAD_FROM_USER_MEMBEROF_ATTRIBUTE)
+        {
+            foreach(DirectoryAttribute attr in userEntry.Attributes)
+            {
+                if (attr.Name != options.MemberOfAttribute) continue;
+                var values = (string[])attr.GetValues(typeof(string));
+                if (values == null || values.Count() > 1) continue;
+                var dn = values.First();
+                var splitted = dn.Split(',');
+                var rootDN = splitted.Skip(1).Join(",");
+                var request = new SearchRequest(rootDN, $"({splitted.First()})", System.DirectoryServices.Protocols.SearchScope.OneLevel);
+                var response = (SearchResponse)connection.SendRequest(request);
+                var entries = response.Entries;
+                if (entries.Count == 0) continue;
+                result.AddRange(ExtractGroups(userId, entries, options, definition));
             }
         }
 
-        return Task.FromResult((IEnumerable<string>)result.Distinct().OrderBy(r => r).ToList());
+        return result;
     }
 
-    private List<ExtractedUserResult> ExtractUsers(SearchResultEntryCollection entries, LDAPRepresentationsExtractionJobOptions options, IdentityProvisioningDefinition definition)
+    private List<ExtractedGroup> ExtractGroups(string userId, SearchResultEntryCollection entries, LDAPRepresentationsExtractionJobOptions options, IdentityProvisioningDefinition definition)
     {
-        var result = new List<ExtractedUserResult>();
-        foreach(SearchResultEntry entry in entries)
+        var result = new List<ExtractedGroup>();
+        foreach (SearchResultEntry entry in entries)
         {
-            var userId = GetUserId(entry, options);
+            var groupId = GetRepresentationId(entry, options, false);
             var version = GetVersion(entry, options);
-            result.Add(new ExtractedUserResult
+            result.Add(new ExtractedGroup
             {
-                Id = userId,
-                Values = ExtractUser(entry, definition),
+                Id = groupId,
+                Values = ExtractRepresentation(entry, definition, IdentityProvisioningMappingUsage.GROUP),
                 Version = version
             });
         }
@@ -110,11 +165,11 @@ public class LDAPProvisioningService : IProvisioningService
         return result;
     }
 
-    private List<string> ExtractUser(SearchResultEntry entry, IdentityProvisioningDefinition definition)
+    private List<string> ExtractRepresentation(SearchResultEntry entry, IdentityProvisioningDefinition definition, IdentityProvisioningMappingUsage usage)
     {
         var invalidMappingRules = new List<string>();
         var lst = new List<string>();
-        foreach (var mappingRule in definition.MappingRules)
+        foreach (var mappingRule in definition.MappingRules.Where(r => r.Usage == usage))
         {
             if (!entry.Attributes.Contains(mappingRule.From))
             {
@@ -123,13 +178,13 @@ public class LDAPProvisioningService : IProvisioningService
             }
 
             var attribute = entry.Attributes[mappingRule.From];
-            if(mappingRule.MapperType == MappingRuleTypes.USERATTRIBUTE && !mappingRule.HasMultipleAttribute && attribute.Count > 1)
+            if (mappingRule.MapperType == MappingRuleTypes.USERATTRIBUTE && !mappingRule.HasMultipleAttribute && attribute.Count > 1)
             {
                 invalidMappingRules.Add($"mapping rule '{mappingRule.From}' is not configured to fetch more than one attribute");
                 continue;
             }
 
-            if(attribute.Count == 1)
+            if (attribute.Count == 1)
             {
                 var record = entry.Attributes[mappingRule.From][0];
                 lst.Add(record.ToString());
@@ -148,15 +203,32 @@ public class LDAPProvisioningService : IProvisioningService
         return lst;
     }
 
-    private string GetUserId(SearchResultEntry entry, LDAPRepresentationsExtractionJobOptions options)
+    private string GetRepresentationId(SearchResultEntry entry, LDAPRepresentationsExtractionJobOptions options, bool isUser = true)
     {
-        if (!entry.Attributes.Contains(options.UUIDLDAPAttribute)) return entry.DistinguishedName;
-        return entry.Attributes[options.UUIDLDAPAttribute][0].ToString();
+        var attributeName = isUser ? options.UserIdLDAPAttribute : options.GroupIdLDAPAttribute;
+        if (!entry.Attributes.Contains(attributeName)) return entry.DistinguishedName;
+        var result = entry.Attributes[attributeName][0];
+        var payload = result as byte[];
+        if(payload != null)
+        {
+            return (new SecurityIdentifier(payload, 0)).ToString();
+        }
+
+        return result.ToString();
     }
 
     private string GetVersion(SearchResultEntry entry, LDAPRepresentationsExtractionJobOptions options)
     {
         if (!entry.Attributes.Contains(options.ModificationDateAttribute)) return Guid.NewGuid().ToString();
         return entry.Attributes[options.ModificationDateAttribute][0].ToString();
+    }
+    
+    private LdapConnection BuildConnection(LDAPRepresentationsExtractionJobOptions options)
+    {
+        var credentials = new NetworkCredential(options.BindDN, options.BindCredentials);
+        var connection = new LdapConnection(new LdapDirectoryIdentifier(options.Server, options.Port), credentials, AuthType.Basic);
+        connection.SessionOptions.ProtocolVersion = 3;
+        connection.Bind();
+        return connection;
     }
 }

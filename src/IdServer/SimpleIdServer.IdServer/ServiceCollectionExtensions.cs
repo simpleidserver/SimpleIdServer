@@ -101,7 +101,6 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddRegisterApi()
                 .AddBCAuthorizeApi()
                 .AddDeviceAuthorizationApi()
-                .AddIdentityProvisioning()
                 .AddTokenTypes();
             services.AddAuthorization();
             services.Configure<AuthorizationOptions>(o =>
@@ -300,12 +299,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IBCAuthorizeHandler, BCAuthorizeHandler>();
             services.AddTransient<IBCAuthorizeRequestValidator, BCAuthorizeRequestValidator>();
             services.AddTransient<IBCNotificationService, BCNotificationService>();
-            return services;
-        }
-
-        private static IServiceCollection AddIdentityProvisioning(this IServiceCollection services)
-        {
-            services.AddTransient<IImportRepresentationJob, ImportRepresentationJob>();
             return services;
         }
 

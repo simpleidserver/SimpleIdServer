@@ -24,8 +24,46 @@ public class IdentityProvisioningResult
     public DateTime UpdateDateTime { get; set; }
     [JsonPropertyName(IdentityProvisioningNames.Definition)]
     public IdentityProvisioningDefinitionResult Definition { get; set; }
-    [JsonPropertyName(IdentityProvisioningNames.Histories)]
-    public List<IdentityProvisioningHistoryResult> Histories { get; set; } = new List<IdentityProvisioningHistoryResult>();
+    [JsonPropertyName(IdentityProvisioningNames.Processes)]
+    public List<IdentityProvisioningProcessResult> Processes { get; set; } = new List<IdentityProvisioningProcessResult>();
     [JsonPropertyName(IdentityProvisioningNames.Values)]
     public Dictionary<string, string> Values { get; set; }
+}
+
+public class IdentityProvisioningProcessResult
+{
+    [JsonPropertyName(IdentityProvisioningNames.Id)]
+    public string Id { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.CreateDateTime)]
+    public DateTime CreateDateTime { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.StartExportDateTime)]
+    public DateTime? StartExportDateTime { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.EndExportDateTime)]
+    public DateTime? EndExportDateTime { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.StartImportDateTime)]
+    public DateTime? StartImportDateTime { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.EndImportDateTime)]
+    public DateTime? EndImportDateTime { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.NbExtractedUsers)]
+    public int NbExtractedUsers { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.NbExtractedGroups)]
+    public int NbExtractedGroups { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.NbFilteredRepresentations)]
+    public int NbFilteredRepresentations { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.NbImportedUsers)]
+    public int NbImportedUsers { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.NbImportedGroups)]
+    public int NbImportedGroups { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.IsExported)]
+    public bool IsExported { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.IsImported)]
+    public bool IsImported { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.NbExtractedPages)]
+    public int NbExtractedPages { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.NbImportedPages)]
+    public int NbImportedPages { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.TotalPageToExtract)]
+    public int TotalPageToExtract { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.TotalPageToImport)]
+    public int TotalPageToImport { get; set; }
 }

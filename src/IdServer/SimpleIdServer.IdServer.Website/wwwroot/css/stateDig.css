@@ -1,0 +1,42 @@
+/* State diagram */
+.stateDig {
+    display: flex;
+    padding: 0;
+    margin: 0;
+    container: flex;
+    flex-direction: row;
+}
+
+.stateDig > li {
+    display: flex;
+    flex-direction: row;
+    height: 50px;
+}
+
+.stateDig > li > .title {
+    line-height: 50px;
+    padding-right: 5px;
+    padding-left: 5px;
+    background-color: #d4d4d4;
+    border: 1px solid gray;
+    pointer-events: none;
+}
+
+.stateDig > li.active > .title {
+    background-color: #ffc29a;
+    border: 1px solid #ff8434;
+}
+
+.stateDig > li.finished > .title {
+    background-color: #b9eeb9;
+    border: 1px solid green;
+}
+
+.stateDig > li.node::after {
+    content: "";
+    border: 1px solid black;
+    display: flex;
+    flex-grow: 1;
+    margin: auto;
+    width: 20px;
+}

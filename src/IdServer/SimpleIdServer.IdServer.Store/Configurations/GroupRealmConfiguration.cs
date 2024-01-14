@@ -4,13 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SimpleIdServer.IdServer.Domains;
 
-namespace SimpleIdServer.IdServer.Store.Configurations
+namespace SimpleIdServer.IdServer.Store.Configurations;
+
+public class GroupRealmConfiguration : IEntityTypeConfiguration<GroupRealm>
 {
-    public class ImportSummaryConfiguration : IEntityTypeConfiguration<ImportSummary>
+    public void Configure(EntityTypeBuilder<GroupRealm> builder)
     {
-        public void Configure(EntityTypeBuilder<ImportSummary> builder)
-        {
-            builder.HasKey(i => i.Id);
-        }
+        builder.HasKey(b => new { b.GroupsId, b.RealmsName });
     }
 }

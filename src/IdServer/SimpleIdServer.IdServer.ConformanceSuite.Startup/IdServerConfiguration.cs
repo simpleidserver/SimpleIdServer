@@ -6,7 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.ConformanceSuite.Startup.Converters;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Provisioning.SCIM.Jobs;
+using SimpleIdServer.IdServer.Provisioning.SCIM;
 using System;
 using System.Collections.Generic;
 using System.Linq;

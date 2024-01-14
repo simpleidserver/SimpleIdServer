@@ -19,5 +19,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
         public string? TargetUserProperty { get; set; } = null;
         [JsonPropertyName(IdentityProvisioningMappingRuleNames.HasMultipleAttribute)]
         public bool HasMultipleAttribute { get; set; }
+        [JsonPropertyName(IdentityProvisioningMappingRuleNames.Usage)]
+        public IdentityProvisioningMappingUsage Usage { get; set; } = IdentityProvisioningMappingUsage.USER;
     }
 }

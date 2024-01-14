@@ -20,6 +20,7 @@ using System.Net;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using static MassTransit.ValidationResultExtensions;
 
 namespace SimpleIdServer.IdServer.Api.Scopes;
 
@@ -229,6 +230,8 @@ public class ScopesController : BaseController
                     throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.SCOPE_CLAIM_MAPPER_TOKENCLAIMNAME_MUSTBEUNIQUE);
                 if (!string.IsNullOrWhiteSpace(request.SAMLAttributeName) && scope.ClaimMappers.Any(m => m.SAMLAttributeName == request.SAMLAttributeName))
                     throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.SCOPE_CLAIM_MAPPER_SAML_ATTRIBUTE_NAME);
+                if (IProvisioningMappingRule.IsUnique(request.MapperType) && scope.ClaimMappers.Any(r => r.MapperType == request.MapperType))
+                    return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.IDPROVISIONING_TYPE_UNIQUE);
 
                 request.Id = Guid.NewGuid().ToString();
                 scope.ClaimMappers.Add(request);

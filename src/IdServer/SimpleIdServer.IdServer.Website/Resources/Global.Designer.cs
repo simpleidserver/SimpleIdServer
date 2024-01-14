@@ -520,6 +520,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Process import has been started.
+        /// </summary>
+        public static string ProcessImportStarted {
+            get {
+                return ResourceManager.GetString("ProcessImportStarted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Realms has been added.
         /// </summary>
         public static string RealmAdded {

@@ -7,6 +7,13 @@ namespace SimpleIdServer.IdServer.Domains
         public MappingRuleTypes MapperType { get; set; }
         public string? TargetUserAttribute { get; set; }
         public string? TargetUserProperty { get; set; }
+
+        public static bool IsUnique(MappingRuleTypes mapperType)
+        {
+            return mapperType == MappingRuleTypes.SUBJECT || 
+                mapperType == MappingRuleTypes.IDENTIFIER  || 
+                mapperType == MappingRuleTypes.GROUPNAME;
+        }
     }
 
     public enum MappingRuleTypes
@@ -14,6 +21,7 @@ namespace SimpleIdServer.IdServer.Domains
         USERATTRIBUTE = 0,
         USERPROPERTY = 1,
         SUBJECT = 2,
-        IDENTIFIER = 3
+        IDENTIFIER = 3,
+        GROUPNAME = 4
     }
 }

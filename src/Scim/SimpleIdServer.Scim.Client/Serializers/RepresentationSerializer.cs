@@ -32,5 +32,23 @@ namespace SimpleIdServer.Scim.Client.Serializers
 
             return result;
         }
+
+        public static RepresentationResult DeserializeRepresentation(JsonObject jsonObj)
+        {
+            var result = JsonSerializer.Deserialize<RepresentationResult>(jsonObj.ToJsonString());
+            var properties = typeof(RepresentationResult).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            var visibleProperties = properties.Select(p =>
+            {
+                var attr = p.GetCustomAttribute<JsonPropertyNameAttribute>();
+                return attr == null ? (p, null) : (p, attr.Name);
+            }).Where(kvp => kvp.Name != null);
+            foreach (var record in jsonObj)
+            {
+                if (visibleProperties.Any(p => p.Name == record.Key)) continue;
+                result.AdditionalData.Add(record.Key, JsonNode.Parse(record.Value.ToJsonString()));
+            }
+
+            return result;
+        }
     }
 }
