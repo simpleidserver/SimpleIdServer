@@ -47,6 +47,8 @@ namespace SimpleIdServer.IdServer.Store
         public DbSet<ConfigurationKeyPairValueRecord> ConfigurationKeyPairValueRecords { get; set; }
         public DbSet<RegistrationWorkflow> RegistrationWorkflows { get; set; }
         public DbSet<Language> Languages { get; set; }
+        public DbSet<GroupRealm> GroupRealm { get; set; }
+        public DbSet<GroupUser> GroupUser { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

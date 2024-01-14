@@ -50,6 +50,14 @@ public class ImportUsersConsumer :
             .SingleAsync(i => i.Id == message.InstanceId && i.Realms.Any(r => r.Name == message.Realm), context.CancellationToken);
         var nbRecords = await _provisioningStagingStore.NbStagingExtractedRepresentations(context.Message.ProcessId, context.CancellationToken);
         var nbPages = ((int)Math.Ceiling((double)nbRecords / _pageSize));
+        if(nbPages == 0)
+        {
+            idProvisioning.Import(message.ProcessId, 0);
+            idProvisioning.FinishImport(message.ProcessId);
+            await _identityProvisioningStore.SaveChanges(context.CancellationToken);
+            return;
+        }
+
         var allPages = Enumerable.Range(1, nbPages);
         var destination = new Uri($"queue:{ImportUsersConsumer.Queuename}");
         foreach (var page in allPages)
