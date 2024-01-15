@@ -415,8 +415,13 @@ namespace SimpleIdServer.IdServer
             public static Scope OfflineAccessScope = new Scope
             {
                 Id = Guid.NewGuid().ToString(),
-                Type = ScopeTypes.IDENTITY,
+                Type = ScopeTypes.APIRESOURCE,
+                Protocol = ScopeProtocols.OAUTH,
                 Name = "offline_access",
+                Realms = new List<Domains.Realm>
+                {
+                    StandardRealms.Master
+                },
                 IsExposedInConfigurationEdp = true,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow

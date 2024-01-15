@@ -125,10 +125,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table366.AddRow(new string[] {
                             "resource",
                             "https://cal.example.com"});
+                table366.AddRow(new string[] {
+                            "scope",
+                            "offline_access"});
 #line 6
  testRunner.When("execute HTTP GET request \'https://localhost:8080/authorization\'", ((string)(null)), table366, "When ");
 #line hidden
-#line 16
+#line 17
  testRunner.And("extract parameter \'code\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table367 = new TechTalk.SpecFlow.Table(new string[] {
@@ -149,13 +152,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table367.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-#line 18
+#line 19
  testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table367, "And ");
 #line hidden
-#line 26
+#line 27
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 27
+#line 28
  testRunner.And("extract parameter \'$.refresh_token\' from JSON body into \'refreshToken\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table368 = new TechTalk.SpecFlow.Table(new string[] {
@@ -173,22 +176,22 @@ this.ScenarioInitialize(scenarioInfo);
                 table368.AddRow(new string[] {
                             "refresh_token",
                             "$refreshToken$"});
-#line 29
+#line 30
  testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table368, "And ");
 #line hidden
-#line 36
+#line 37
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 38
- testRunner.Then("JSON \'scope\'=\'admin calendar\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
 #line 39
- testRunner.And("access_token audience contains \'https://cal.example.com\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.Then("JSON \'scope\'=\'admin calendar offline_access\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 40
- testRunner.And("access_token contains the claim \'scope\'=\'admin\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("access_token audience contains \'https://cal.example.com\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 41
+ testRunner.And("access_token contains the claim \'scope\'=\'admin\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 42
  testRunner.And("access_token contains the claim \'scope\'=\'calendar\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }

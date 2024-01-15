@@ -60,7 +60,7 @@ Scenario: grant is returned when a valid refreshed access token is passed
 	| claims                  | { "id_token": { "acr": { "essential" : true, "value": "urn:openbanking:psd2:ca" } } } | 
 	| resource                | https://cal.example.com                                                               |
 	| grant_management_action | create                                                                                |
-	| scope                   | grant_management_query                                                                |
+	| scope                   | grant_management_query offline_access												  |
 
 	And extract parameter 'code' from redirect url
 	

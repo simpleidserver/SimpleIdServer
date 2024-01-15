@@ -267,7 +267,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "create"});
                 table208.AddRow(new string[] {
                             "scope",
-                            "grant_management_query"});
+                            "grant_management_query offline_access"});
 #line 52
  testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table208, "When ");
 #line hidden

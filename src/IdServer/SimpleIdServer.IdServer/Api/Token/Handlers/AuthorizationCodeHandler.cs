@@ -119,7 +119,10 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     context.SetOriginalRequest(previousRequest);
                     var parameters = new BuildTokenParameter { AuthorizationDetails = extractionResult.AuthorizationDetails, Scopes = extractionResult.Scopes, Audiences = extractionResult.Audiences, Claims = claims, GrantId = authCode.GrantId };
                     foreach (var tokenBuilder in _tokenBuilders)
+                    {
+                        if (tokenBuilder.Name == TokenResponseParameters.RefreshToken && !extractionResult.Scopes.Contains(Constants.StandardScopes.OfflineAccessScope.Name)) continue;
                         await tokenBuilder.Build(parameters, context, cancellationToken, true);
+                    }
 
                     AddTokenProfile(context);
                     foreach (var kvp in context.Response.Parameters)

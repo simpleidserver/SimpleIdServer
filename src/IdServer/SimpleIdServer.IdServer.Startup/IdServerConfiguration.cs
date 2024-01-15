@@ -38,7 +38,8 @@ namespace SimpleIdServer.IdServer.Startup
         public static ICollection<RegistrationWorkflow> RegistrationWorkflows => new List<RegistrationWorkflow>
         {
             RegistrationWorkflowBuilder.New("pwd", true).AddStep("pwd").Build(),
-            RegistrationWorkflowBuilder.New("pwd-email").AddStep("pwd").AddStep("email").Build()
+            RegistrationWorkflowBuilder.New("pwd-email").AddStep("pwd").AddStep("email").Build(),
+            RegistrationWorkflowBuilder.New("mobile").AddStep("mobile").Build()
         };
 
         public static ICollection<Scope> Scopes => new List<Scope>
@@ -67,6 +68,7 @@ namespace SimpleIdServer.IdServer.Startup
             SimpleIdServer.IdServer.CredentialIssuer.Constants.StandardScopes.CredentialTemplates,
             SimpleIdServer.IdServer.Constants.StandardScopes.Realms,
             SimpleIdServer.IdServer.Constants.StandardScopes.Groups,
+            SimpleIdServer.IdServer.Constants.StandardScopes.OfflineAccessScope
         };
 
         public static ICollection<User> Users => new List<User>
