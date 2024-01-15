@@ -6,8 +6,8 @@ using MongoDB.Driver.Linq;
 using SimpleIdServer.Persistence.Filters;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Domains;
-using SimpleIdServer.Scim.Parser.Expressions;
 using SimpleIdServer.Scim.Persistence.MongoDB.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -59,50 +59,59 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 
         public async Task<SearchSCIMRepresentationsResponse> FindSCIMRepresentations(SearchSCIMRepresentationsParameter parameter, CancellationToken cancellationToken)
         {
-            IQueryable<EnrichedRepresentation> representationAttributes = from a in _scimDbContext.SCIMRepresentationLst.AsQueryable()
-                join b in _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable() on a.Id equals b.RepresentationId into FlatAttributes
-                select new EnrichedRepresentation
-                {
-                    Id = a.Id,
-                    ExternalId = a.ExternalId,
-                    Version = a.Version,
-                    Representation = a,
-                    FlatAttributes = FlatAttributes
-                };
-            var queryableRepresentations = representationAttributes.Where(s => s.Representation.ResourceType == parameter.ResourceType);
-            if(parameter.SortBy == null)
-                queryableRepresentations = queryableRepresentations.OrderBy(s => s.Representation.Id);
-
+            List<string> filteredRepresentationIds = null;
+            int total = 0;
             if (parameter.Filter != null)
             {
-                var evaluatedExpression = parameter.Filter.Evaluate(queryableRepresentations);
-                queryableRepresentations = evaluatedExpression.Compile().DynamicInvoke(queryableRepresentations) as IMongoQueryable<EnrichedRepresentation>;
-            }
-
-            if (parameter.SortBy != null)
-            {
-                var evaluatedExpression = parameter.SortBy.EvaluateMongoDbOrderBy(
-                    queryableRepresentations,
-                    parameter.SortOrder ?? SearchSCIMRepresentationOrders.Descending);
-                var orderedResult = evaluatedExpression.Compile().DynamicInvoke(queryableRepresentations) as IEnumerable<EnrichedRepresentation>;
-                int total = orderedResult.Count();
-                orderedResult = orderedResult.Skip(parameter.StartIndex <= 1 ? 0 : parameter.StartIndex - 1).Take(parameter.Count);
-                var result = orderedResult.ToList();
-                foreach (var record in result) record.Representation.FlatAttributes = record.FlatAttributes.ToList();
-                var representations = result.Select(r => r.Representation);
-                representations.FilterAttributes(parameter.IncludedAttributes, parameter.ExcludedAttributes);
-                return new SearchSCIMRepresentationsResponse(total, representations);
+                IQueryable<EnrichedAttribute> filteredRepresentationAttributes = from a in _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable().Where(a => parameter.SchemaNames.Contains(a.Namespace))
+                    join b in _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable() on a.ParentAttributeId equals b.Id into Parents
+                    select new EnrichedAttribute
+                    {
+                        Attribute = a,
+                        Parent = Parents.First(),
+                        Children = new List<SCIMRepresentationAttribute>()
+                    };
+                filteredRepresentationIds = (await parameter.Filter
+                    .EvaluateMongoDbAttributes(filteredRepresentationAttributes)
+                    .Select(a => a.Attribute.RepresentationId)
+                    .ToMongoListAsync())
+                    .Distinct()
+                    .ToList();
+                total = filteredRepresentationIds.Count();
             }
             else
             {
-                int total = queryableRepresentations.Count();
-                queryableRepresentations = queryableRepresentations.Skip(parameter.StartIndex <= 1 ? 0 : parameter.StartIndex - 1).Take(parameter.Count);
-                var result = await queryableRepresentations.ToMongoListAsync();
-                foreach (var record in result) record.Representation.FlatAttributes = record.FlatAttributes.ToList();
-                var representations = result.Select(r => r.Representation);
-                representations.FilterAttributes(parameter.IncludedAttributes, parameter.ExcludedAttributes);
-                return new SearchSCIMRepresentationsResponse(total, representations);
+                total = await _scimDbContext.SCIMRepresentationLst.AsQueryable()
+                    .Where(s => s.ResourceType == parameter.ResourceType)
+                    .CountAsync();
             }
+
+
+            var filteredRepresentations = _scimDbContext.SCIMRepresentationLst.AsQueryable().Where(s => s.ResourceType == parameter.ResourceType);
+            if(filteredRepresentationIds != null)
+                filteredRepresentations = filteredRepresentations.Where(r => filteredRepresentationIds.Contains(r.Id));
+
+            if (parameter.SortBy == null)
+                filteredRepresentations = filteredRepresentations.OrderBy(s => s.Id);
+            else
+            {
+                filteredRepresentations = parameter.SortBy.EvaluateMongoDbOrderBy(
+                    filteredRepresentations,
+                    parameter.SortOrder ?? SearchSCIMRepresentationOrders.Descending);
+            }
+
+            var representations = await filteredRepresentations
+                .Skip(parameter.StartIndex <= 1 ? 0 : parameter.StartIndex - 1)
+                .Take(parameter.Count)
+                .ToListAsync();
+            var representationIds = representations.Select(r => r.Id);
+            var representationAttributes = await _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
+                .Where(a => representationIds.Contains(a.RepresentationId))
+                .ToListAsync();
+            foreach (var representation in representations) 
+                representation.FlatAttributes = representationAttributes.Where(a => a.RepresentationId == representation.Id).ToList();
+            representations.FilterAttributes(parameter.IncludedAttributes, parameter.ExcludedAttributes);
+            return new SearchSCIMRepresentationsResponse(total, representations);
         }
     }
 }

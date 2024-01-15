@@ -56,7 +56,16 @@ namespace SimpleIdServer.Scim.Queries
             standardSchemas.AddRange(schemas);
             var includedAttributes = searchRequest.Attributes == null ? new List<SCIMAttributeExpression>() : searchRequest.Attributes.Select(a => SCIMFilterParser.Parse(a, standardSchemas)).Cast<SCIMAttributeExpression>().ToList();
             var excludedAttributes = searchRequest.ExcludedAttributes == null ? new List<SCIMAttributeExpression>() : searchRequest.ExcludedAttributes.Select(a => SCIMFilterParser.Parse(a, standardSchemas)).Cast<SCIMAttributeExpression>().ToList();
-            var result = await _scimRepresentationQueryRepository.FindSCIMRepresentations(new SearchSCIMRepresentationsParameter(resourceType, searchRequest.StartIndex, searchRequest.Count.Value, sortByFilter, searchRequest.SortOrder, SCIMFilterParser.Parse(searchRequest.Filter, schemas), includedAttributes, excludedAttributes), cancellationToken);
+            var result = await _scimRepresentationQueryRepository.FindSCIMRepresentations(new SearchSCIMRepresentationsParameter(
+                schemas.Select(s => s.Id).ToList(),
+                resourceType, 
+                searchRequest.StartIndex, 
+                searchRequest.Count.Value, 
+                sortByFilter, 
+                searchRequest.SortOrder, 
+                SCIMFilterParser.Parse(searchRequest.Filter, schemas), 
+                includedAttributes, 
+                excludedAttributes), cancellationToken);
             var representations = result.Content.ToList();
             foreach (var representation in representations) representation.Schemas = schemas;
             return GenericResult<SearchSCIMRepresentationsResponse>.Ok(result);

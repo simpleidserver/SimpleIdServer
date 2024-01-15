@@ -8,8 +8,18 @@ namespace SimpleIdServer.Scim.Persistence
 {
     public class SearchSCIMRepresentationsParameter
     {
-        public SearchSCIMRepresentationsParameter(string resourceType, int startIndex, int count, SCIMExpression sortBy, SearchSCIMRepresentationOrders? sortOrder = null, SCIMExpression filter = null, IEnumerable<SCIMAttributeExpression> includedAttributes = null, IEnumerable<SCIMAttributeExpression> excludedAttributes = null)
+        public SearchSCIMRepresentationsParameter(
+            List<string> schemaNames,
+            string resourceType, 
+            int startIndex, 
+            int count, 
+            SCIMExpression sortBy, 
+            SearchSCIMRepresentationOrders? sortOrder = null, 
+            SCIMExpression filter = null, 
+            IEnumerable<SCIMAttributeExpression> includedAttributes = null, 
+            IEnumerable<SCIMAttributeExpression> excludedAttributes = null)
         {
+            SchemaNames = schemaNames;
             ResourceType = resourceType;
             StartIndex = startIndex;
             Count = count;
@@ -27,6 +37,7 @@ namespace SimpleIdServer.Scim.Persistence
         public int Count { get; set; }
         public SCIMExpression SortBy { get; set; }
         public SearchSCIMRepresentationOrders? SortOrder { get; set; }
-        public SCIMExpression Filter { get; set; } 
+        public SCIMExpression Filter { get; set; }
+        public List<string> SchemaNames { get; set; } = new List<string>();
     }
 }

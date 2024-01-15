@@ -6,7 +6,6 @@ using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Persistence.MongoDB.Models;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata;
 
 namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
 {

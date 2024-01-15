@@ -1,15 +1,14 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using MongoDB.Driver.Linq;
 using SimpleIdServer.Persistence.Filters;
 using SimpleIdServer.Scim.Domains;
-using SimpleIdServer.Scim.Parser;
 using SimpleIdServer.Scim.Parser.Expressions;
 using SimpleIdServer.Scim.Parser.Operators;
+using SimpleIdServer.Scim.Persistence.MongoDB.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 
 namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
 {
@@ -19,26 +18,18 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
 
         public static IQueryable<EnrichedAttribute> EvaluateMongoDbAttributes(this SCIMExpression expression, IQueryable<EnrichedAttribute> attributes)
         {
-            var attr = expression as SCIMAttributeExpression;
-            if (attr.SchemaAttribute == null || string.IsNullOrWhiteSpace(attr.SchemaAttribute.Id))
-            {
-                return new List<EnrichedAttribute>().AsQueryable();
-            }
-            else
-            {
-                var treeNodeParameter = Expression.Parameter(typeof(EnrichedAttribute), "tn");
-                var anyWhereExpression = expression.EvaluateAttributes(treeNodeParameter);
-                var enumarableType = typeof(Queryable);
-                var whereMethod = enumarableType.GetMethods()
-                     .Where(m => m.Name == "Where" && m.IsGenericMethodDefinition)
-                     .Where(m => m.GetParameters().Count() == 2).First().MakeGenericMethod(typeof(EnrichedAttribute));
-                var equalLambda = Expression.Lambda<Func<EnrichedAttribute, bool>>(anyWhereExpression, treeNodeParameter);
-                var whereExpr = Expression.Call(whereMethod, Expression.Constant(attributes), equalLambda);
-                var finalSelectArg = Expression.Parameter(typeof(IQueryable<EnrichedAttribute>), "f");
-                var finalSelectRequestBody = Expression.Lambda(whereExpr, new ParameterExpression[] { finalSelectArg });
-                var result = (IQueryable<EnrichedAttribute>)finalSelectRequestBody.Compile().DynamicInvoke(attributes);
-                return result;
-            }
+            var treeNodeParameter = Expression.Parameter(typeof(EnrichedAttribute), "tn");
+            var anyWhereExpression = expression.EvaluateAttributes(treeNodeParameter);
+            var enumarableType = typeof(Queryable);
+            var whereMethod = enumarableType.GetMethods()
+                 .Where(m => m.Name == "Where" && m.IsGenericMethodDefinition)
+                 .Where(m => m.GetParameters().Count() == 2).First().MakeGenericMethod(typeof(EnrichedAttribute));
+            var equalLambda = Expression.Lambda<Func<EnrichedAttribute, bool>>(anyWhereExpression, treeNodeParameter);
+            var whereExpr = Expression.Call(whereMethod, Expression.Constant(attributes), equalLambda);
+            var finalSelectArg = Expression.Parameter(typeof(IQueryable<EnrichedAttribute>), "f");
+            var finalSelectRequestBody = Expression.Lambda(whereExpr, new ParameterExpression[] { finalSelectArg });
+            var result = (IQueryable<EnrichedAttribute>)finalSelectRequestBody.Compile().DynamicInvoke(attributes);
+            return result;
         }
 
         public static Expression EvaluateAttributes(this SCIMExpression expression, ParameterExpression parameterExpression)
@@ -101,7 +92,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
 
         #region Order By
 
-        public static LambdaExpression EvaluateMongoDbOrderBy(this SCIMExpression expression, IQueryable<EnrichedRepresentation> representations, SearchSCIMRepresentationOrders order)
+        public static IOrderedMongoQueryable<SCIMRepresentationModel> EvaluateMongoDbOrderBy(this SCIMExpression expression, IMongoQueryable<SCIMRepresentationModel> representations, SearchSCIMRepresentationOrders order)
         {
             var attrExpression = expression as SCIMAttributeExpression;
             if (attrExpression == null)
@@ -110,70 +101,31 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
             }
 
             var result = EvaluateOrderByMetadata(attrExpression, representations, order);
-            if (result == null)
-            {
-                result = EvaluateOrderByProperty(attrExpression, representations, order);
-            }
-
             return result;
         }
 
-        public static LambdaExpression EvaluateOrderByMetadata(SCIMAttributeExpression attrExpression, IQueryable<EnrichedRepresentation> representations, SearchSCIMRepresentationOrders order)
+        public static IOrderedMongoQueryable<SCIMRepresentationModel> EvaluateOrderByMetadata(SCIMAttributeExpression attrExpression, IMongoQueryable<SCIMRepresentationModel> representations, SearchSCIMRepresentationOrders order)
         {
             var fullPath = attrExpression.GetFullPath();
-            var record = ParserConstants.MappingStandardAttributePathToProperty.FirstOrDefault(kvp => string.Equals(kvp.Key, fullPath, StringComparison.InvariantCultureIgnoreCase));
-            if (record.Equals(default(KeyValuePair<string, string>)) || string.IsNullOrWhiteSpace(record.Key)) return null;
-            var representationParameter = Expression.Parameter(typeof(EnrichedRepresentation), "rp");
-            var propertyName = record.Value;
-            var property = Expression.Property(Expression.Property(representationParameter, "Representation"), record.Value);
-            var propertyType = typeof(SCIMRepresentation).GetProperty(propertyName).PropertyType;
-            var orderBy = GetOrderByType(order, propertyType);
-            var innerLambda = Expression.Lambda(property, new ParameterExpression[] { representationParameter });
-            var orderExpr = Expression.Call(orderBy, Expression.Constant(representations), innerLambda);
-            var finalSelectArg = Expression.Parameter(typeof(IQueryable<EnrichedRepresentation>), "f");
-            var finalOrderRequestBody = Expression.Lambda(orderExpr, new ParameterExpression[] { finalSelectArg });
-            return finalOrderRequestBody;
-        }
-
-        public static LambdaExpression EvaluateOrderByProperty(SCIMAttributeExpression attrExpression, IQueryable<EnrichedRepresentation> representations, SearchSCIMRepresentationOrders order)
-        {
-            var lastChild = attrExpression.GetLastChild();
-            var lastChildType = SCIMConstants.MappingSchemaAttrTypeToType[lastChild.SchemaAttribute.Type];
-            var orderBy = GetOrderByType(order, typeof(SCIMRepresentationAttribute));
-            var firstOrDefaultMethodInfo = typeof(Enumerable).GetMethods()
-                .Where(m => m.Name == "FirstOrDefault" && m.IsGenericMethod)
-                .Where(m => m.GetParameters().Count() == 1).First().MakeGenericMethod(typeof(SCIMRepresentationAttribute));
-            var whereMethodInfo = typeof(Enumerable).GetMethods()
-                .Where(m => m.Name == "Where" && m.IsGenericMethod)
-                .Where(m => m.GetParameters().Count() == 2).First().MakeGenericMethod(typeof(SCIMRepresentationAttribute));
-            var attrRepresentation = Expression.Parameter(typeof(EnrichedRepresentation), "r");
-            var attrRepresentationAttribute = Expression.Parameter(typeof(SCIMRepresentationAttribute), "ra");
-            var attributesProperty = Expression.Property(attrRepresentation, "FlatAttributes");
-            var schemaAttributeIdProperty = Expression.Property(attrRepresentationAttribute, "SchemaAttributeId");
-            var schemaAttributeIdEqualBody = Expression.Equal(schemaAttributeIdProperty, Expression.Constant(lastChild.SchemaAttribute.Id));
-            var schemaAttributeIdEqualLambda = Expression.Lambda<Func<SCIMRepresentationAttribute, bool>>(schemaAttributeIdEqualBody, attrRepresentationAttribute);
-            var whereExpr = Expression.Call(whereMethodInfo, attributesProperty, schemaAttributeIdEqualLambda);
-            var selectExpr = Expression.Call(firstOrDefaultMethodInfo, whereExpr);
-            var orderLambda = Expression.Lambda<Func<EnrichedRepresentation, SCIMRepresentationAttribute>>(selectExpr, attrRepresentation);
-            var orderExpr = Expression.Call(orderBy, Expression.Constant(representations), orderLambda);
-            var finalSelectArg = Expression.Parameter(typeof(IQueryable<EnrichedRepresentation>), "f");
-            var finalOrderRequestBody = Expression.Lambda(orderExpr, new ParameterExpression[] { finalSelectArg });
-            return finalOrderRequestBody;
-        }
-
-        private static MethodInfo GetOrderByType(SearchSCIMRepresentationOrders order, Type lastChildType)
-        {
-            var orderBy = typeof(Enumerable).GetMethods()
-                .Where(m => m.Name == "OrderBy" && m.IsGenericMethod)
-                .Where(m => m.GetParameters().Count() == 2).First().MakeGenericMethod(typeof(EnrichedRepresentation), lastChildType);
-            if (order == SearchSCIMRepresentationOrders.Descending)
+            switch(fullPath)
             {
-                orderBy = typeof(Enumerable).GetMethods()
-                    .Where(m => m.Name == "OrderByDescending" && m.IsGenericMethod)
-                    .Where(m => m.GetParameters().Count() == 2).First().MakeGenericMethod(typeof(EnrichedRepresentation), lastChildType);
+                case StandardSCIMRepresentationAttributes.Id:
+                    return order == SearchSCIMRepresentationOrders.Ascending ? representations.OrderBy(r => r.Id) : representations.OrderByDescending(r => r.Id);
+                case StandardSCIMRepresentationAttributes.ExternalId:
+                    return order == SearchSCIMRepresentationOrders.Ascending ? representations.OrderBy(r => r.ExternalId) : representations.OrderByDescending(r => r.ExternalId);
+                case $"{StandardSCIMRepresentationAttributes.Meta}.{StandardSCIMMetaAttributes.ResourceType}":
+                    return order == SearchSCIMRepresentationOrders.Ascending ? representations.OrderBy(r => r.ResourceType) : representations.OrderByDescending(r => r.ResourceType);
+                case $"{StandardSCIMRepresentationAttributes.Meta}.{StandardSCIMMetaAttributes.Created}":
+                    return order == SearchSCIMRepresentationOrders.Ascending ? representations.OrderBy(r => r.Created) : representations.OrderByDescending(r => r.Created);
+                case $"{StandardSCIMRepresentationAttributes.Meta}.{StandardSCIMMetaAttributes.LastModified}":
+                    return order == SearchSCIMRepresentationOrders.Ascending ? representations.OrderBy(r => r.LastModified) : representations.OrderByDescending(r => r.LastModified);
+                case $"{StandardSCIMRepresentationAttributes.Meta}.{StandardSCIMMetaAttributes.Version}":
+                    return order == SearchSCIMRepresentationOrders.Ascending ? representations.OrderBy(r => r.Version) : representations.OrderByDescending(r => r.Version);
+                case StandardSCIMRepresentationAttributes.DisplayName:
+                    return order == SearchSCIMRepresentationOrders.Ascending ? representations.OrderBy(r => r.DisplayName) : representations.OrderByDescending(r => r.DisplayName);
             }
 
-            return orderBy;
+            return representations.OrderBy(r => r.Id);
         }
 
         #endregion
