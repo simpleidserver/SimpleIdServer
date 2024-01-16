@@ -120,9 +120,6 @@
   <data name="authenticate" xml:space="preserve">
     <value>Authenticate</value>
   </data>
-  <data name="bad_email" xml:space="preserve">
-    <value>Email is not correct</value>
-  </data>
   <data name="code_validity" xml:space="preserve">
     <value>Code has a validity of {0} seconds</value>
   </data>
@@ -135,17 +132,20 @@
   <data name="cryptographic_error" xml:space="preserve">
     <value>An error occured while trying to decrypt the return url</value>
   </data>
-  <data name="email" xml:space="preserve">
-    <value>Email</value>
-  </data>
   <data name="invalid_confirmationcode" xml:space="preserve">
     <value>Confirmation code is invalid</value>
+  </data>
+  <data name="invalid_credential" xml:space="preserve">
+    <value>The OTP is not valid</value>
+  </data>
+  <data name="login" xml:space="preserve">
+    <value>Login</value>
   </data>
   <data name="missing_confirmationcode" xml:space="preserve">
     <value>Confirmation code is missing</value>
   </data>
   <data name="missing_login" xml:space="preserve">
-    <value>Email is missing</value>
+    <value>Login is missing</value>
   </data>
   <data name="missing_return_url" xml:space="preserve">
     <value>Return url is missing</value>
@@ -159,25 +159,16 @@
   <data name="remember_login" xml:space="preserve">
     <value>Remember my login</value>
   </data>
-  <data name="sendconfirmationcode" xml:space="preserve">
-    <value>Send confirmation code</value>
-  </data>
   <data name="title" xml:space="preserve">
     <value>Authenticate</value>
   </data>
   <data name="tos" xml:space="preserve">
     <value>Terms of service</value>
   </data>
-  <data name="unknown_email" xml:space="preserve">
-    <value>Email is unknown</value>
+  <data name="unknown_login" xml:space="preserve">
+    <value>Login is unknown</value>
   </data>
   <data name="unknown_user" xml:space="preserve">
-    <value>The given email does not correspond to any user</value>
-  </data>
-  <data name="user_exists" xml:space="preserve">
-    <value>User with the same name already exists</value>
-  </data>
-  <data name="value_exists" xml:space="preserve">
-    <value>Email is already taken by an another user</value>
+    <value>The given login does not correspond to any user</value>
   </data>
 </root>

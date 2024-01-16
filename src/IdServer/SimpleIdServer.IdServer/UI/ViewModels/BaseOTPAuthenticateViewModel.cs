@@ -16,7 +16,7 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
                 modelStateDictionary.AddModelError("missing_return_url", "missing_return_url");
 
             if (string.IsNullOrWhiteSpace(Login))
-                modelStateDictionary.AddModelError("missing_email", "missing_email");
+                modelStateDictionary.AddModelError("missing_login", "missing_login");
         }
 
 

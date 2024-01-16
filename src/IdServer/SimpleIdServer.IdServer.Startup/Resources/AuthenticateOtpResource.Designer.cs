@@ -22,14 +22,14 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class AuthenticateEmailResource {
+    public class AuthenticateOtpResource {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal AuthenticateEmailResource() {
+        internal AuthenticateOtpResource() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.IdServer.Startup.Resources.AuthenticateEmailResource", typeof(AuthenticateEmailResource).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.IdServer.Startup.Resources.AuthenticateOtpResource", typeof(AuthenticateOtpResource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -66,15 +66,6 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static string authenticate {
             get {
                 return ResourceManager.GetString("authenticate", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à Email is not correct.
-        /// </summary>
-        public static string bad_email {
-            get {
-                return ResourceManager.GetString("bad_email", resourceCulture);
             }
         }
         
@@ -115,20 +106,29 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Email.
-        /// </summary>
-        public static string email {
-            get {
-                return ResourceManager.GetString("email", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Recherche une chaîne localisée semblable à Confirmation code is invalid.
         /// </summary>
         public static string invalid_confirmationcode {
             get {
                 return ResourceManager.GetString("invalid_confirmationcode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The OTP is not valid.
+        /// </summary>
+        public static string invalid_credential {
+            get {
+                return ResourceManager.GetString("invalid_credential", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Login.
+        /// </summary>
+        public static string login {
+            get {
+                return ResourceManager.GetString("login", resourceCulture);
             }
         }
         
@@ -142,7 +142,7 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Email is missing.
+        ///   Recherche une chaîne localisée semblable à Login is missing.
         /// </summary>
         public static string missing_login {
             get {
@@ -187,15 +187,6 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Send confirmation code.
-        /// </summary>
-        public static string sendconfirmationcode {
-            get {
-                return ResourceManager.GetString("sendconfirmationcode", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Recherche une chaîne localisée semblable à Authenticate.
         /// </summary>
         public static string title {
@@ -214,38 +205,20 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Email is unknown.
+        ///   Recherche une chaîne localisée semblable à Login is unknown.
         /// </summary>
-        public static string unknown_email {
+        public static string unknown_login {
             get {
-                return ResourceManager.GetString("unknown_email", resourceCulture);
+                return ResourceManager.GetString("unknown_login", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à The given email does not correspond to any user.
+        ///   Recherche une chaîne localisée semblable à The given login does not correspond to any user.
         /// </summary>
         public static string unknown_user {
             get {
                 return ResourceManager.GetString("unknown_user", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à User with the same name already exists.
-        /// </summary>
-        public static string user_exists {
-            get {
-                return ResourceManager.GetString("user_exists", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à Email is already taken by an another user.
-        /// </summary>
-        public static string value_exists {
-            get {
-                return ResourceManager.GetString("value_exists", resourceCulture);
             }
         }
     }

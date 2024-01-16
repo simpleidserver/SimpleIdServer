@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.UI.Services;
 
-public abstract class OTPAuthenticationService : GenericAuthenticationService<BaseOTPAuthenticateViewModel>
+public abstract class BaseOTPAuthenticationService : GenericAuthenticationService<BaseOTPAuthenticateViewModel>
 {
     private readonly IEnumerable<IOTPAuthenticator> _otpAuthenticators;
 
-    public OTPAuthenticationService
+    public BaseOTPAuthenticationService
         (IEnumerable<IOTPAuthenticator> otpAuthenticators, 
         IAuthenticationHelper authenticationHelper, 
         IUserRepository userRepository) : base(authenticationHelper, userRepository)

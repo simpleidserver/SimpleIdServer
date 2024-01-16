@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Store;
@@ -9,26 +8,29 @@ using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
 
-namespace SimpleIdServer.IdServer.Sms.Services;
+namespace SimpleIdServer.IdServer.Otp.Services;
 
-public interface IUserSmsAuthenticationService : IUserAuthenticationService
+public interface IOtpAuthenticationService : IUserAuthenticationService
 {
 
 }
 
-public class UserSmsAuthenticationService : BaseOTPAuthenticationService, IUserSmsAuthenticationService
+public class OtpAuthenticationService : BaseOTPAuthenticationService, IOtpAuthenticationService
 {
-    public UserSmsAuthenticationService(IEnumerable<IOTPAuthenticator> otpAuthenticators, IAuthenticationHelper authenticationHelper, IUserRepository userRepository) : base(otpAuthenticators, authenticationHelper, userRepository)
+    public OtpAuthenticationService(
+        IEnumerable<IOTPAuthenticator> otpAuthenticators, 
+        IAuthenticationHelper authenticationHelper, 
+        IUserRepository userRepository) : base(otpAuthenticators, authenticationHelper, userRepository)
     {
     }
 
-    public override string Amr => Constants.AMR;
+    public override string Amr => Constants.Amr;
 
     protected override async Task<User> GetUser(string authenticatedUserId, BaseOTPAuthenticateViewModel viewModel, string realm, CancellationToken cancellationToken)
     {
         User authenticatedUser = null;
         if (string.IsNullOrWhiteSpace(authenticatedUserId))
-            authenticatedUser = await UserRepository.GetByClaim(JwtRegisteredClaimNames.PhoneNumber, viewModel.Login, realm, cancellationToken);
+            authenticatedUser = await AuthenticateUser(viewModel.Login, realm, cancellationToken);
         else
             authenticatedUser = await FetchAuthenticatedUser(realm, authenticatedUserId, cancellationToken);
 

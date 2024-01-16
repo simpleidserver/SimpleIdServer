@@ -8,13 +8,24 @@
 @if (authMethodsState.Value != null && !authMethodsState.Value.IsLoading)
 {
     <RadzenRow>
-        @foreach(var authMethod in authMethodsState.Value.AuthenticationMethods)
+        <RadzenColumn Size="12" SizeMD="4">
+            <RadzenCard Variant="Variant.Filled">
+                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
+                    <RadzenImage Path="_content/SimpleIdServer.IdServer.Website/images/OTP.png" Style="height: 60px"></RadzenImage>
+                    <RadzenText TextStyle="TextStyle.DisplayH6">OTP</RadzenText>
+                    <div>
+                        <RadzenBadge BadgeStyle="BadgeStyle.Info" Variant="Variant.Outlined">Authentication</RadzenBadge>
+                    </div>
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+        @foreach(var authMethod in authMethodsState.Value.AuthenticationMethods.Where(a => a.Name != "otp"))
         {
             <RadzenColumn Size="12" SizeMD="4">             
                 <RadzenLink Path="@(GetAuthMethodUrl(authMethod))">
                     <RadzenCard Variant="Variant.Filled">
                         <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
-                            <RadzenImage Path="@GetPicture(authMethod)" Style="width: 60px"></RadzenImage>
+                            <RadzenImage Path="@GetPicture(authMethod)" Style="height: 60px"></RadzenImage>
                             <RadzenText TextStyle="TextStyle.DisplayH6">@authMethod.Name</RadzenText>
                             <div>                                    
                                 @if (authMethod.Capabilities.HasFlag(AuthenticationMethodCapabilities.USERAUTHENTICATION))

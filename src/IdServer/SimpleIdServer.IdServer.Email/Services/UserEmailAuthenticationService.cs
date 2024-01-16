@@ -16,7 +16,7 @@ public interface IUserEmailAuthenticationService : IUserAuthenticationService
 
 }
 
-public class UserEmailAuthenticationService : OTPAuthenticationService, IUserEmailAuthenticationService
+public class UserEmailAuthenticationService : BaseOTPAuthenticationService, IUserEmailAuthenticationService
 {
     public UserEmailAuthenticationService(IEnumerable<IOTPAuthenticator> otpAuthenticators, IAuthenticationHelper authenticationHelper, IUserRepository userRepository) : base(otpAuthenticators, authenticationHelper, userRepository)
     {
