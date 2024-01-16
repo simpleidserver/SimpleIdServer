@@ -123,7 +123,7 @@ namespace SimpleIdServer.IdServer.Startup
                 SimpleIdServer.IdServer.CredentialIssuer.Constants.StandardScopes.CredentialTemplates,
                 SimpleIdServer.IdServer.Constants.StandardScopes.Realms,
                 SimpleIdServer.IdServer.Constants.StandardScopes.Groups).Build(),
-            ClientBuilder.BuildTraditionalWebsiteClient("postman", "password", null, "http://localhost").AddScope(
+            ClientBuilder.BuildTraditionalWebsiteClient("postman", "password", null, "http://localhost").EnableClientGrantType().AddScope(
                 SimpleIdServer.IdServer.Constants.StandardScopes.Provisioning,
                 SimpleIdServer.IdServer.Constants.StandardScopes.Users,
                 SimpleIdServer.IdServer.Constants.StandardScopes.Networks,
