@@ -1,11 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MongoDB.Driver.Linq;
-using SimpleIdServer.Persistence.Filters;
-using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Parser.Expressions;
 using SimpleIdServer.Scim.Parser.Operators;
-using SimpleIdServer.Scim.Persistence.MongoDB.Models;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
@@ -77,7 +74,8 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
             var propertyValueBoolean = Expression.Property(attr, "ValueBoolean");
             var propertyValueDecimal = Expression.Property(attr, "ValueDecimal");
             var propertyValueBinary = Expression.Property(attr, "ValueBinary");
-            var comparison = SCIMExpressionLinqExtensions.BuildComparisonExpression(expression, expression.LeftExpression.SchemaAttribute,
+            var lastChild = expression.LeftExpression.GetLastChild();
+            var comparison = SCIMExpressionLinqExtensions.BuildComparisonExpression(expression, lastChild.SchemaAttribute,
                 propertyValueString,
                 propertyValueInteger,
                 propertyValueDatetime,
@@ -85,47 +83,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
                 propertyValueDecimal,
                 propertyValueBinary,
                 parameterExpression);
-            return Expression.And(Expression.Equal(schemaAttributeId, Expression.Constant(expression.LeftExpression.SchemaAttribute.Id)), comparison);
-        }
-
-        #endregion
-
-        #region Order By
-
-        public static IOrderedMongoQueryable<SCIMRepresentationModel> EvaluateMongoDbOrderBy(this SCIMExpression expression, IMongoQueryable<SCIMRepresentationModel> representations, SearchSCIMRepresentationOrders order)
-        {
-            var attrExpression = expression as SCIMAttributeExpression;
-            if (attrExpression == null)
-            {
-                return null;
-            }
-
-            var result = EvaluateOrderByMetadata(attrExpression, representations, order);
-            return result;
-        }
-
-        public static IOrderedMongoQueryable<SCIMRepresentationModel> EvaluateOrderByMetadata(SCIMAttributeExpression attrExpression, IMongoQueryable<SCIMRepresentationModel> representations, SearchSCIMRepresentationOrders order)
-        {
-            var fullPath = attrExpression.GetFullPath();
-            switch(fullPath)
-            {
-                case StandardSCIMRepresentationAttributes.Id:
-                    return order == SearchSCIMRepresentationOrders.Ascending ? representations.OrderBy(r => r.Id) : representations.OrderByDescending(r => r.Id);
-                case StandardSCIMRepresentationAttributes.ExternalId:
-                    return order == SearchSCIMRepresentationOrders.Ascending ? representations.OrderBy(r => r.ExternalId) : representations.OrderByDescending(r => r.ExternalId);
-                case $"{StandardSCIMRepresentationAttributes.Meta}.{StandardSCIMMetaAttributes.ResourceType}":
-                    return order == SearchSCIMRepresentationOrders.Ascending ? representations.OrderBy(r => r.ResourceType) : representations.OrderByDescending(r => r.ResourceType);
-                case $"{StandardSCIMRepresentationAttributes.Meta}.{StandardSCIMMetaAttributes.Created}":
-                    return order == SearchSCIMRepresentationOrders.Ascending ? representations.OrderBy(r => r.Created) : representations.OrderByDescending(r => r.Created);
-                case $"{StandardSCIMRepresentationAttributes.Meta}.{StandardSCIMMetaAttributes.LastModified}":
-                    return order == SearchSCIMRepresentationOrders.Ascending ? representations.OrderBy(r => r.LastModified) : representations.OrderByDescending(r => r.LastModified);
-                case $"{StandardSCIMRepresentationAttributes.Meta}.{StandardSCIMMetaAttributes.Version}":
-                    return order == SearchSCIMRepresentationOrders.Ascending ? representations.OrderBy(r => r.Version) : representations.OrderByDescending(r => r.Version);
-                case StandardSCIMRepresentationAttributes.DisplayName:
-                    return order == SearchSCIMRepresentationOrders.Ascending ? representations.OrderBy(r => r.DisplayName) : representations.OrderByDescending(r => r.DisplayName);
-            }
-
-            return representations.OrderBy(r => r.Id);
+            return Expression.And(Expression.Equal(schemaAttributeId, Expression.Constant(lastChild.SchemaAttribute.Id)), comparison);
         }
 
         #endregion
