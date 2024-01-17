@@ -176,7 +176,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
             int total = representations.Count();
             var fullPath = attrExpression.GetFullPath();
             var record = ParserConstants.MappingStandardAttributePathToProperty.FirstOrDefault(kvp => string.Equals(kvp.Key, fullPath, StringComparison.InvariantCultureIgnoreCase));
-            if (record.Equals(default(KeyValuePair<string, string>)) || string.IsNullOrWhiteSpace(record.Key)) return null;
+            if (record.Equals(default(KeyValuePair<string, string>)) || string.IsNullOrWhiteSpace(record.Key)) return Task.FromResult((SearchSCIMRepresentationsResponse)null);
             var representationParameter = Expression.Parameter(typeof(SCIMRepresentation), "rp");
             var propertyName = record.Value;
             var property = Expression.Property(representationParameter, record.Value);

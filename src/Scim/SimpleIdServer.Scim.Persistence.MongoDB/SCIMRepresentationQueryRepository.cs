@@ -64,7 +64,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             int total = 0;
             if (parameter.Filter != null)
             {
-                var filteredRepresentationAttributes = from a in _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable().Where(a => parameter.SchemaNames.Contains(a.Namespace) || a.ResourceType == parameter.ResourceType)
+                var filteredRepresentationAttributes = from a in _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
                     join b in _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable() on a.ParentAttributeId equals b.Id into Parents
                     select new EnrichedAttribute
                     {
@@ -72,13 +72,17 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                         Parent = Parents.First(),
                         Children = new List<SCIMRepresentationAttribute>()
                     };
-                filteredRepresentationIds = (await parameter.Filter
-                    .EvaluateMongoDbAttributes(filteredRepresentationAttributes)
-                    .Select(a => a.Attribute.RepresentationId)
-                    .ToMongoListAsync())
-                    .Distinct()
-                    .ToList();
-                total = filteredRepresentationIds.Count();
+                filteredRepresentationAttributes = parameter.Filter.EvaluateMongoDbAttributes(filteredRepresentationAttributes);
+                if(filteredRepresentationAttributes != null)
+                {
+                    filteredRepresentationIds = (await
+                        filteredRepresentationAttributes
+                        .Select(a => a.Attribute.RepresentationId)
+                        .ToMongoListAsync())
+                        .Distinct()
+                        .ToList();
+                    total = filteredRepresentationIds.Count();
+                }
             }
             else
             {
@@ -90,6 +94,25 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             
             var filteredRepresentations = _scimDbContext.SCIMRepresentationLst.AsQueryable()
                 .Where(r => r.ResourceType == parameter.ResourceType);
+            if(parameter.Filter != null)
+            {
+                var tmp = parameter.Filter.EvaluateMongoDbRepresentations(filteredRepresentations);
+                if (tmp != null)
+                {
+                    var tmpIds = await tmp.Select(r => r.Id).ToListAsync();
+                    var logical = parameter.Filter as SCIMLogicalExpression;
+                    if(logical != null)
+                    {
+                        if (logical.LogicalOperator == Parser.Operators.SCIMLogicalOperators.AND)
+                            filteredRepresentationIds = filteredRepresentationIds.Intersect(tmpIds).ToList();
+                        else
+                            filteredRepresentationIds = filteredRepresentationIds.Union(tmpIds).ToList();
+                    }
+
+                    total = filteredRepresentationIds.Count();
+                }
+            }
+
             if(filteredRepresentationIds != null)
             {
                 filteredRepresentations = filteredRepresentations.Where(r => filteredRepresentationIds.Contains(r.Id));
