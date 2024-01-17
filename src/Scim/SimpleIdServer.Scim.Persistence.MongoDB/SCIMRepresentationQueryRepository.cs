@@ -10,6 +10,7 @@ using SimpleIdServer.Scim.Parser.Expressions;
 using SimpleIdServer.Scim.Persistence.MongoDB.Extensions;
 using SimpleIdServer.Scim.Persistence.MongoDB.Models;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -91,7 +92,6 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                     .CountAsync();
             }
 
-            
             var filteredRepresentations = _scimDbContext.SCIMRepresentationLst.AsQueryable()
                 .Where(r => r.ResourceType == parameter.ResourceType);
             if(parameter.Filter != null)
@@ -100,13 +100,17 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                 if (tmp != null)
                 {
                     var tmpIds = await tmp.Select(r => r.Id).ToListAsync();
-                    var logical = parameter.Filter as SCIMLogicalExpression;
-                    if(logical != null)
+                    if (filteredRepresentationIds == null) filteredRepresentationIds = tmpIds.ToList();
+                    else
                     {
-                        if (logical.LogicalOperator == Parser.Operators.SCIMLogicalOperators.AND)
-                            filteredRepresentationIds = filteredRepresentationIds.Intersect(tmpIds).ToList();
-                        else
-                            filteredRepresentationIds = filteredRepresentationIds.Union(tmpIds).ToList();
+                        var logical = parameter.Filter as SCIMLogicalExpression;
+                        if (logical != null)
+                        {
+                            if (logical.LogicalOperator == Parser.Operators.SCIMLogicalOperators.AND)
+                                filteredRepresentationIds = filteredRepresentationIds.Intersect(tmpIds).ToList();
+                            else
+                                filteredRepresentationIds = filteredRepresentationIds.Union(tmpIds).ToList();
+                        }
                     }
 
                     total = filteredRepresentationIds.Count();
