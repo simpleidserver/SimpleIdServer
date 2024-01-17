@@ -8,26 +8,41 @@
 @if (authMethodsState.Value != null && !authMethodsState.Value.IsLoading)
 {
     <RadzenRow>
-        <RadzenColumn Size="12" SizeMD="4">
-            <RadzenCard Variant="Variant.Filled">
-                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
-                    <RadzenImage Path="_content/SimpleIdServer.IdServer.Website/images/OTP.png" Style="height: 60px"></RadzenImage>
-                    <RadzenText TextStyle="TextStyle.DisplayH6">OTP</RadzenText>
-                    <div>
-                        <RadzenBadge BadgeStyle="BadgeStyle.Info" Variant="Variant.Outlined">Authentication</RadzenBadge>
-                    </div>
-                </RadzenStack>
-            </RadzenCard>
-        </RadzenColumn>
         @foreach(var authMethod in authMethodsState.Value.AuthenticationMethods.Where(a => a.Name != "otp"))
         {
-            <RadzenColumn Size="12" SizeMD="4">             
-                <RadzenLink Path="@(GetAuthMethodUrl(authMethod))">
+            var link = GetAuthMethodUrl(authMethod);
+            if (!string.IsNullOrWhiteSpace(link))
+            {
+                <RadzenColumn Size="12" SizeMD="4">
+                    <RadzenLink Path="@link">
+                        <RadzenCard Variant="Variant.Filled">
+                            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
+                                <RadzenImage Path="@GetPicture(authMethod)" Style="height: 60px"></RadzenImage>
+                                <RadzenText TextStyle="TextStyle.DisplayH6">@authMethod.Name</RadzenText>
+                                <div>
+                                    @if (authMethod.Capabilities.HasFlag(AuthenticationMethodCapabilities.USERAUTHENTICATION))
+                                    {
+                                        <RadzenBadge BadgeStyle="BadgeStyle.Info" Variant="Variant.Outlined">Authentication</RadzenBadge>
+                                    }
+
+                                    @if (authMethod.Capabilities.HasFlag(AuthenticationMethodCapabilities.PUSHNOTIFICATION))
+                                    {
+                                        <RadzenBadge BadgeStyle="BadgeStyle.Info" Variant="Variant.Outlined">Push notification</RadzenBadge>
+                                    }
+                                </div>
+                            </RadzenStack>
+                        </RadzenCard>
+                    </RadzenLink>
+                </RadzenColumn>
+            }
+            else
+            {
+                <RadzenColumn Size="12" SizeMD="4">
                     <RadzenCard Variant="Variant.Filled">
                         <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
                             <RadzenImage Path="@GetPicture(authMethod)" Style="height: 60px"></RadzenImage>
                             <RadzenText TextStyle="TextStyle.DisplayH6">@authMethod.Name</RadzenText>
-                            <div>                                    
+                            <div>
                                 @if (authMethod.Capabilities.HasFlag(AuthenticationMethodCapabilities.USERAUTHENTICATION))
                                 {
                                     <RadzenBadge BadgeStyle="BadgeStyle.Info" Variant="Variant.Outlined">Authentication</RadzenBadge>
@@ -40,8 +55,8 @@
                             </div>
                         </RadzenStack>
                     </RadzenCard>
-                </RadzenLink>
-            </RadzenColumn>
+                </RadzenColumn>
+            }
         }
     </RadzenRow>
 }
@@ -59,6 +74,7 @@
 
     string GetAuthMethodUrl(AuthenticationMethodResult authMethod)
     {
+        if (string.IsNullOrWhiteSpace(authMethod.OptionsName)) return null;
         return "/authentications/authmethods/" + authMethod.Id + "/options";
     }
 
@@ -79,6 +95,8 @@
                 return result + "/firebase.png";
             case "console":
                 return result + "/MachineClient.png";
+            case "otp":
+                return result + "/OTP.png";
             default:
                 return result + "/pwd.png";
         }

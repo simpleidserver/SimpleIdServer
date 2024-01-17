@@ -7,13 +7,10 @@ namespace SimpleIdServer.IdServer.Otp
     public class OtpAuthenticationMethodService : IAuthenticationMethodService
     {
         public string Amr => Constants.Amr;
-
         public string Name => "OTP";
-
         public Type? OptionsType => null;
-
         public AuthenticationMethodCapabilities Capabilities => AuthenticationMethodCapabilities.USERAUTHENTICATION;
-
+        public bool IsRegistrationSupported => false;
         public bool IsCredentialExists(User user) => user.ActiveOTP != null;
     }
 }

@@ -58,7 +58,7 @@
     {
         get 
         {
-            return authMethodsState.Value.AuthenticationMethods.Select(a => a.Id).ToList();
+            return authMethodsState.Value.AuthenticationMethods.Where(a => a.IsRegistrationSupported).Select(a => a.Id).ToList();
         }
     }
 

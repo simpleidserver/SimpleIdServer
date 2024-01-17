@@ -11,6 +11,7 @@ namespace SimpleIdServer.IdServer.Fido
         public string Name => "Mobile";
         public Type? OptionsType => typeof(FidoOptions);
         public AuthenticationMethodCapabilities Capabilities => AuthenticationMethodCapabilities.USERAUTHENTICATION;
+        public bool IsRegistrationSupported => true;
         public bool IsCredentialExists(User user) => user.Credentials.Any(c => c.CredentialType == Amr);
     }
 }
