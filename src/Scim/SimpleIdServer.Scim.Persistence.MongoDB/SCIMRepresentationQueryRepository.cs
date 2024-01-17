@@ -118,7 +118,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                 filteredRepresentations = filteredRepresentations.Where(r => filteredRepresentationIds.Contains(r.Id));
             }
 
-            var paginationResult = await OrderByAndPaginate(filteredRepresentations, parameter);
+            var paginationResult = await OrderByAndPaginate(filteredRepresentations, parameter, filteredRepresentationIds);
             filteredRepresentations = paginationResult.Query;
             var filteredRepresentationsWithAttributes = from a in filteredRepresentations
                   join b in _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable() on a.Id equals b.RepresentationId into Attributes
@@ -155,7 +155,8 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 
         private async Task<PaginationResult> OrderByAndPaginate(
             IMongoQueryable<SCIMRepresentationModel> representations, 
-            SearchSCIMRepresentationsParameter parameter)
+            SearchSCIMRepresentationsParameter parameter,
+            List<string> representationIds)
         {
             if (parameter.SortBy == null) return new PaginationResult
             {
@@ -178,7 +179,8 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                 parameter.SchemaNames,
                 order,
                 parameter.StartIndex,
-                parameter.Count);
+                parameter.Count,
+                representationIds);
         }
 
         private PaginationResult OrderByMetadataAndPaginate(
@@ -229,12 +231,16 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             List<string> schemaNames,
             SearchSCIMRepresentationOrders order,
             int startIndex,
-            int count)
+            int count,
+            List<string> ids)
         {
             var fullPath = attrExpression.GetFullPath();
             var attributes = _scimDbContext.SCIMRepresentationAttributeLst
                 .AsQueryable()
                 .Where(r => r.FullPath == fullPath && schemaNames.Contains(r.Namespace));
+            if (ids != null)
+                attributes = attributes.Where(a => ids.Contains(a.RepresentationId));
+
             var lastExpr = attrExpression.GetLastChild();
             switch(lastExpr.SchemaAttribute.Type)
             {
