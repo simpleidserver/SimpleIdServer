@@ -12,6 +12,7 @@ Scenario: parameter resource and scope are always coming from the original reque
 	| redirect_uri  | http://localhost:8080        |
 	| nonce         | nonce                        |
 	| resource      | https://cal.example.com      |	
+	| scope         | offline_access               |
 	
 	And extract parameter 'code' from redirect url
 	
@@ -35,7 +36,7 @@ Scenario: parameter resource and scope are always coming from the original reque
 
 	And extract JSON from body
 	
-	Then JSON 'scope'='admin calendar'
+	Then JSON 'scope'='admin calendar offline_access'
 	And access_token audience contains 'https://cal.example.com'
 	And access_token contains the claim 'scope'='admin'
 	And access_token contains the claim 'scope'='calendar'

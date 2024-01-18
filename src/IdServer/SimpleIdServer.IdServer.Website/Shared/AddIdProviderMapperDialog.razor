@@ -37,6 +37,12 @@
                 case MappingRuleTypes.USERPROPERTY:
                     <UserPropertyIdProviderMapper AuthProviderMapperUpdated=@UpdateAuthProviderMapper></UserPropertyIdProviderMapper>
                     break;
+                case MappingRuleTypes.IDENTIFIER:
+                    <UserUniqueIdProviderMapper Type=MappingRuleTypes.IDENTIFIER AuthProviderMapperUpdated=@UpdateAuthProviderMapper></UserUniqueIdProviderMapper>
+                    break;
+                case MappingRuleTypes.SUBJECT:
+                    <UserUniqueIdProviderMapper Type=MappingRuleTypes.SUBJECT AuthProviderMapperUpdated=@UpdateAuthProviderMapper></UserUniqueIdProviderMapper>
+                    break;
             }
         </RadzenStepsItem>
     </Steps>
@@ -58,7 +64,9 @@
     ICollection<MapperType> MapperTypes { get; set; } = new List<MapperType>
     {
         new MapperType { Name = "Attribute", ShortDescription = "User attribute", Description = "Map one claim to a user attribute", Type = MappingRuleTypes.USERATTRIBUTE,  PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserAttribute.png" },
-        new MapperType { Name = "Property", ShortDescription = "User property", Description = "Map one claim to a user property", Type = MappingRuleTypes.USERPROPERTY, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserProperty.png" }
+        new MapperType { Name = "Property", ShortDescription = "User property", Description = "Map one claim to a user property", Type = MappingRuleTypes.USERPROPERTY, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserProperty.png" },
+        new MapperType { Name = "Subject", ShortDescription = "User subject", Description = "Map one claim to a user subject", Type = MappingRuleTypes.SUBJECT, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserSubject.png" },
+        new MapperType { Name = "Identifier", ShortDescription = "User identifier", Description = "Map one claim to a user identifier", Type = MappingRuleTypes.IDENTIFIER, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserId.png" }
     };
 
     MapperType? SelectedMapperType { get; set; } = null;

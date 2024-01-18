@@ -1,4 +1,5 @@
 ﻿@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@using SimpleIdServer.IdServer.Api.Provisioning;
 @using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore;
@@ -12,6 +13,15 @@
     <Steps>
         <RadzenStepsItem Text="Mapper Type">
             <div class="row gy-4">
+                <!-- Choose a template -->
+                <div>
+                    <RadzenLabel Text="Choose a type of mapping rule" />
+                    <RadzenDropDown @bind-Value=@selectedUsage
+                                    TValue="IdentityProvisioningMappingUsage"
+                                    Data="@mappingRuleUsages"
+                                    Change=@(args => SelectUsage(args))
+                                    TextProperty="Name" ValueProperty="Usage"></RadzenDropDown>
+                </div>
                 @foreach (var mappingRule in IdProvisioningMappingRules)
                 {
                     <div class="col-md-6">
@@ -29,72 +39,45 @@
                     </div>
                 }
             </div>
-        </RadzenStepsItem>
-        <RadzenStepsItem Text="Create" Disabled=@(SelectedMappingRule == null || isAllowedAttributesLoading)>
-            @if(!string.IsNullOrWhiteSpace(errorMessage))
-            {
-                <RadzenAlert AlertStyle="AlertStyle.Danger" AllowClose="false" Variant="Variant.Flat" Shade="Shade.Lighter">
-                   @errorMessage
-                </RadzenAlert>
-            }
 
-            @switch(SelectedMappingRule.Type)
+            <hr />
+
+            @if (SelectedMappingRule != null)
             {
-                case MappingRuleTypes.USERATTRIBUTE:
-                    <RadzenTemplateForm Submit=@SubmitUpdateUserAttributeIdProvisioning TItem="UserAttributeIdProvisioningMappingRuleForm" Data=@userAttributeIdProvisioningMappingRuleForm>
-                        <!-- Checkbox -->
-                        <div>
-                            <RadzenCheckBox Name="HasMultipleAttribute" @bind-Value=userAttributeIdProvisioningMappingRuleForm.HasMultipleAttribute></RadzenCheckBox>
-                            <RadzenLabel Text="Does the source contain more than one value ?" Component="HasMultipleAttribute" Style="margin-left: 8px; vertical-align: middle;" />
-                        </div>
-                        <!-- Token Claim Name -->
-                        <div>
-                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Source</RadzenText>
-                            <RadzenDropDown Name="From" @bind-Value=@userAttributeIdProvisioningMappingRuleForm.From Data=@allowedAttributes Class="w-100" />
-                            <RadzenRequiredValidator Component="From" Text="According to the type of identity provisioning, you must specify an LDAP property or a JSON path if you are using SCIM."></RadzenRequiredValidator>
-                        </div>
-                        <!-- User attribute -->
-                        <div>
-                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">User Attribute</RadzenText>
-                            <RadzenTextBox Name="TargetUserAttribute" @bind-Value="@userAttributeIdProvisioningMappingRuleForm.TargetUserAttribute" Class="w-100"></RadzenTextBox>
-                            <RadzenRequiredValidator Component="TargetUserAttribute" Text="User attribute is required"></RadzenRequiredValidator>
-                        </div>
-                        <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addIdProvisioningState.Value.IsUpdating ? "Saving..." : "Save")" Disabled="@(addIdProvisioningState.Value.IsUpdating)" />
-                    </RadzenTemplateForm>
-                    break;
-                case MappingRuleTypes.USERPROPERTY:
-                    <RadzenTemplateForm Submit=@SubmitUpdateUserPropertyIdProvisioning TItem="UserPropertyIdProvisioningMappingRuleForm" Data=@userPropertyIdProvisioningMappingRuleForm>
-                        <!-- Token Claim Name -->
-                        <div>
-                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Source</RadzenText>
-                            <RadzenDropDown Name="From" @bind-Value=@userPropertyIdProvisioningMappingRuleForm.From Data=@allowedAttributes Class="w-100" />
-                            <RadzenRequiredValidator Component="From" Text="According to the type of identity provisioning, you must specify an LDAP property or a JSON path if you are using SCIM."></RadzenRequiredValidator>
-                        </div>
-                        <!-- Property -->
-                        <div>
-                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">User property</RadzenText>
-                            <RadzenDropDown Name="UserPropertyName" Class="w-100"
-                                    Data=@userProperties
-                                    TValue="String"
-                                    @bind-Value=@userPropertyIdProvisioningMappingRuleForm.TargetUserProperty />
-                            <p class="text-muted">Name of the property</p>
-                            <RadzenRequiredValidator Component="UserPropertyName" Text="Property is required"></RadzenRequiredValidator>
-                        </div>
-                        <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addIdProvisioningState.Value.IsUpdating ? "Saving..." : "Save")" Disabled="@(addIdProvisioningState.Value.IsUpdating)" />
-                    </RadzenTemplateForm>
-                    break;
+                <h5><RadzenIcon Icon="info" /> @SelectedMappingRule.Name</h5>
+                <p class="text-muted">@(new MarkupString(SelectedMappingRule.Description))</p>
             }
+        </RadzenStepsItem>
+        <RadzenStepsItem Text="Create" Disabled=@(SelectedMappingRule == null)>
+            <EditIdProvisioningRule IsAdding=true Id="@IdProvisioningId" MappingRule="@idProvisioningMappingRule" IsUpdating="@addIdProvisioningState.Value.IsUpdating" Saved="@AddIdentityProvisioningMappingRule" />
         </RadzenStepsItem>
     </Steps>
 </RadzenSteps>
 
 @code {
+    static ICollection<IdProvisioningMappingRule> AllIdProvisioningMappingRules = new List<IdProvisioningMappingRule>
+    {
+        new IdProvisioningMappingRule { Name = "Property", ShortDescription = "User property", Description = "Map to one user's property", Type = MappingRuleTypes.USERPROPERTY, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserProperty.png", Usage = IdentityProvisioningMappingUsage.USER },
+        new IdProvisioningMappingRule { Name = "Claims", ShortDescription = "User claims", Description = "Map to one user claim", Type = MappingRuleTypes.USERATTRIBUTE,  PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserAttribute.png", Usage = IdentityProvisioningMappingUsage.USER },
+        new IdProvisioningMappingRule { Name = "Name", ShortDescription = "Group name", Description = "Set the name of the group", Type = MappingRuleTypes.GROUPNAME, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserProperty.png", Usage = IdentityProvisioningMappingUsage.GROUP }
+    };
+
     [Parameter]
     public string IdProvisioningId { get; set; }
-    IEnumerable<string> userProperties = new List<string>();
-    bool isAllowedAttributesLoading { get; set; } = true;
-    string errorMessage { get; set; }
-    List<string> allowedAttributes { get; set; } = new List<string>();
+
+    record MappingRuleUsage
+    {
+        public IdentityProvisioningMappingUsage Usage { get; set; }
+        public string Name { get; set; }
+    }
+
+    List<MappingRuleUsage> mappingRuleUsages = new List<MappingRuleUsage>
+    {
+        new MappingRuleUsage { Name = "User", Usage = IdentityProvisioningMappingUsage.USER },
+        new MappingRuleUsage { Name = "Group", Usage = IdentityProvisioningMappingUsage.GROUP  }
+    };
+
+    IdentityProvisioningMappingUsage selectedUsage = IdentityProvisioningMappingUsage.USER;
 
     record IdProvisioningMappingRule
     {
@@ -103,29 +86,12 @@
         public string Description { get; set; } = null!;
         public MappingRuleTypes Type { get; set; }
         public string PictureUrl { get; set; } = null!;
+        public IdentityProvisioningMappingUsage Usage { get; set; }
     }
 
-    record UserAttributeIdProvisioningMappingRuleForm
-    {
-        public string From { get; set; } = null!;
-        public string TargetUserAttribute { get; set; } = null!;
-        public bool HasMultipleAttribute { get; set; } = false;
-    }
+    IdentityProvisioningMappingRuleResult idProvisioningMappingRule = new IdentityProvisioningMappingRuleResult();
 
-    record UserPropertyIdProvisioningMappingRuleForm
-    {
-        public string From { get; set; } = null!;
-        public string TargetUserProperty { get; set; } = null!;
-    }
-
-    UserAttributeIdProvisioningMappingRuleForm userAttributeIdProvisioningMappingRuleForm = new UserAttributeIdProvisioningMappingRuleForm();
-    UserPropertyIdProvisioningMappingRuleForm userPropertyIdProvisioningMappingRuleForm = new UserPropertyIdProvisioningMappingRuleForm();
-
-    ICollection<IdProvisioningMappingRule> IdProvisioningMappingRules { get; set; } = new List<IdProvisioningMappingRule>
-    {
-        new IdProvisioningMappingRule { Name = "Attribute", ShortDescription = "User attribute", Description = "Map one claim to a user attribute", Type = MappingRuleTypes.USERATTRIBUTE,  PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserAttribute.png" },
-        new IdProvisioningMappingRule { Name = "Property", ShortDescription = "User property", Description = "Map one claim to a user property", Type = MappingRuleTypes.USERPROPERTY, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserProperty.png" }
-    };
+    ICollection<IdProvisioningMappingRule> IdProvisioningMappingRules { get; set; } = AllIdProvisioningMappingRules.Where(id => id.Usage == IdentityProvisioningMappingUsage.USER).ToList();
 
     IdProvisioningMappingRule? SelectedMappingRule { get; set; } = null;
 
@@ -140,16 +106,10 @@
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.IdProvisioningMappingRuleAdded });
                 StateHasChanged();
             });
-            SubscribeToAction<GetIdentityProvisioningAllowedAttributesSuccessAction>((act) =>
+            SubscribeToAction<AddIdentityProvisioningMappingRuleFailureAction>((act) =>
             {
-                isAllowedAttributesLoading = false;
-                allowedAttributes = act.AllowedAttributes;
-                StateHasChanged();
-            });
-            SubscribeToAction<GetIdentityProvisioningAllowedAttributesFailureAction>((act) =>
-            {
-                isAllowedAttributesLoading = false;
-                errorMessage = act.ErrorMessage;
+                dialogService.Close();
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
                 StateHasChanged();
             });
         }
@@ -157,46 +117,27 @@
         return Task.CompletedTask;
     }
 
-    protected override void OnParametersSet()
-    {
-        base.OnParametersSet();
-        if(string.IsNullOrWhiteSpace(IdProvisioningId)) return;
-        userProperties = typeof(User).GetProperties(BindingFlags.Instance | BindingFlags.Public)
-                .Where(p =>
-                {
-                    var attr = p.GetCustomAttribute<UserPropertyAttribute>();
-                    return attr == null ? false : attr.IsVisible;
-                })
-                .Select(p => p.Name);
-        this.isAllowedAttributesLoading = true;
-        dispatcher.Dispatch(new GetIdentityProvisioningAllowedAttributesAction { Id = IdProvisioningId });
-    }
-
     void SelectMappingRule(IdProvisioningMappingRule mappingRule)
     {
         SelectedMappingRule = mappingRule;
+        idProvisioningMappingRule.MapperType = mappingRule.Type;
     }
 
-    void SubmitUpdateUserAttributeIdProvisioning(UserAttributeIdProvisioningMappingRuleForm form)
+    void AddIdentityProvisioningMappingRule(IdentityProvisioningMappingRuleResult form)
     {
         dispatcher.Dispatch(new AddIdentityProvisioningMappingRuleAction
         {
             Id = IdProvisioningId,
-            MappingRule = MappingRuleTypes.USERATTRIBUTE,
+            MappingRule = SelectedMappingRule.Type,
             From = form.From,
             TargetUserAttribute = form.TargetUserAttribute,
-            HasMultipleAttribute = form.HasMultipleAttribute
+            HasMultipleAttribute = form.HasMultipleAttribute,
+            Usage = selectedUsage
         });
     }
 
-    void SubmitUpdateUserPropertyIdProvisioning(UserPropertyIdProvisioningMappingRuleForm form)
+    void SelectUsage(object usage)
     {
-        dispatcher.Dispatch(new AddIdentityProvisioningMappingRuleAction
-        {
-            Id = IdProvisioningId,
-            MappingRule = MappingRuleTypes.USERPROPERTY,
-            From = form.From,
-            TargetUserProperty = form.TargetUserProperty
-        });        
+        IdProvisioningMappingRules = AllIdProvisioningMappingRules.Where(id => id.Usage == (IdentityProvisioningMappingUsage)usage).ToList();
     }
 }

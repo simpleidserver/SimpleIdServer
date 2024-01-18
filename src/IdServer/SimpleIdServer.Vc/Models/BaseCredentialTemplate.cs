@@ -43,7 +43,7 @@ namespace SimpleIdServer.Vc.Models
             get
             {
                 var result = DisplayLst.FirstOrDefault(d => d.Locale == Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName);
-                return result ?? DisplayLst.FirstOrDefault();
+                return result;
             }
         }
 

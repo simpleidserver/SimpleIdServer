@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
@@ -16,9 +15,8 @@ using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.Services;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -61,10 +59,20 @@ namespace SimpleIdServer.IdServer.UI
         }
 
         [HttpGet]
-        public IActionResult Login(string scheme, string returnUrl)
+        public async Task<IActionResult> Login([FromRoute] string prefix, string scheme, string returnUrl, CancellationToken cancellationToken)
         {
+            prefix = prefix ?? Constants.DefaultRealm;
             if (string.IsNullOrWhiteSpace(scheme))
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, nameof(scheme)));
+
+            var result = await HttpContext.AuthenticateAsync(scheme);
+            if(result is {  Succeeded : true})
+            {
+                var user = await JustInTimeProvision(prefix, scheme, result, cancellationToken);
+                if (!string.IsNullOrWhiteSpace(returnUrl))
+                    return await Authenticate(prefix, returnUrl, Constants.Areas.Password, user, cancellationToken, false);
+                return await Sign(prefix, "~/", Constants.Areas.Password, user, null, cancellationToken, false);
+            }
 
             var items = new Dictionary<string, string>
             {
@@ -96,7 +104,8 @@ namespace SimpleIdServer.IdServer.UI
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.BAD_EXTERNAL_AUTHENTICATION);
             }
 
-            var user = await JustInTimeProvision(prefix, result, cancellationToken);
+            var scheme = result.Properties.Items[SCHEME_NAME];
+            var user = await JustInTimeProvision(prefix, scheme, result, cancellationToken);
             await HttpContext.SignOutAsync(Constants.DefaultExternalCookieAuthenticationScheme);
             if (result.Properties.Items.ContainsKey(RETURN_URL_NAME))
                 return await Authenticate(prefix, result.Properties.Items[RETURN_URL_NAME], Constants.Areas.Password, user, cancellationToken, false);     
@@ -104,11 +113,21 @@ namespace SimpleIdServer.IdServer.UI
             return await Sign(prefix, "~/", Constants.Areas.Password, user, null, cancellationToken, false);
         }
 
-        private async Task<User> JustInTimeProvision(string realm, AuthenticateResult authResult, CancellationToken cancellationToken)
+        private async Task<User> JustInTimeProvision(string realm, string scheme, AuthenticateResult authResult, CancellationToken cancellationToken)
         {
-            var scheme = authResult.Properties.Items[SCHEME_NAME];
             var principal = authResult.Principal;
-            var sub = GetClaim(principal, JwtRegisteredClaimNames.Sub) ?? GetClaim(principal, ClaimTypes.NameIdentifier);
+            var idProvider = await _authenticationSchemeProviderRepository
+                .Query()
+                .AsNoTracking()
+                .Include(p => p.Mappers)
+                .SingleOrDefaultAsync(p => p.Name == scheme, cancellationToken);
+            if(idProvider == null)
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_SCHEME_PROVIDER, scheme));
+            }
+
+
+            var sub = UserTransformer.ResolveSubject(idProvider, principal);
             if (string.IsNullOrWhiteSpace(sub))
             {
                 _logger.LogError("There is not valid subject");
@@ -128,8 +147,8 @@ namespace SimpleIdServer.IdServer.UI
                 }
                 else
                 {
+                    
                     var r = await _realmRepository.Query().FirstAsync(r => r.Name == realm);
-                    var idProvider = await _authenticationSchemeProviderRepository.Query().AsNoTracking().Include(p => p.Mappers).SingleAsync(p => p.Name == scheme, cancellationToken);
                     user = _userTransformer.Transform(r, principal, idProvider);
                     user.AddExternalAuthProvider(scheme, sub);
                     UserRepository.Add(user);
@@ -140,14 +159,6 @@ namespace SimpleIdServer.IdServer.UI
             }
 
             return user;
-        }
-
-        public static string GetClaim(ClaimsPrincipal principal, string claimType)
-        {
-            var claim = principal.Claims.FirstOrDefault(c => c.Type == claimType);
-            if (claim == null || string.IsNullOrWhiteSpace(claim.Value))
-                return null;
-            return claim.Value;
         }
     }
 }

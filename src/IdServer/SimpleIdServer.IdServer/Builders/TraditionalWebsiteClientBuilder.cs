@@ -525,7 +525,7 @@ namespace SimpleIdServer.IdServer.Builders
         public TraditionalWebsiteClientBuilder SetClientName(string clientName, string language = null)
         {
             if (string.IsNullOrWhiteSpace(language))
-                language = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
+                language = Domains.Language.Default;
 
             _client.Translations.Add(new Translation
             {
@@ -544,7 +544,7 @@ namespace SimpleIdServer.IdServer.Builders
         public TraditionalWebsiteClientBuilder SetClientLogoUri(string logoUri, string language = null)
         {
             if (string.IsNullOrWhiteSpace(language))
-                language = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
+                language = Domains.Language.Default;
 
             _client.Translations.Add(new Translation
             {

@@ -12,7 +12,7 @@
 
 @if (!ViewData.ModelState.IsValid)
 {
-    <ul class="list-group">
+    <ul class="list-group mb-3">
         @foreach (var modelState in ViewData.ModelState.Values)
         {
             foreach (var error in modelState.Errors)
@@ -26,7 +26,7 @@
 @if(Model.IsLoginMissing)
 {
     <div class="alert alert-danger">
-        @AuthenticateEmailResource.missing_email
+        @AuthenticateEmailResource.missing_login
     </div>
 }
 else

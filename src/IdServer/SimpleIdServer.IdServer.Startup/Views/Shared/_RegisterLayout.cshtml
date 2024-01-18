@@ -26,6 +26,11 @@
                     <div class="alert alert-success">@LayoutResource.user_is_created</div>
                 }
 
+                if(!string.IsNullOrWhiteSpace(Model.RedirectUrl))
+                {
+                    <a href="@Model.RedirectUrl" class="btn btn-primary mt-1">@LayoutResource.back</a>
+                }
+
                 IgnoreBody();
             }
             else

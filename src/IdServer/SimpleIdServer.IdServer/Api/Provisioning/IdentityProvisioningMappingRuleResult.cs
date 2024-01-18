@@ -18,4 +18,8 @@ public class IdentityProvisioningMappingRuleResult
     public string? TargetUserAttribute { get; set; } = null;
     [JsonPropertyName(IdentityProvisioningMappingRuleNames.TargetUserProperty)]
     public string? TargetUserProperty { get; set; } = null;
+    [JsonPropertyName(IdentityProvisioningMappingRuleNames.HasMultipleAttribute)]
+    public bool HasMultipleAttribute { get; set; }
+    [JsonPropertyName(IdentityProvisioningMappingRuleNames.Usage)]
+    public IdentityProvisioningMappingUsage Usage { get; set; }
 }

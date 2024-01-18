@@ -532,6 +532,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             return state with
             {
                 UserCredentials = credentials,
+                Count = credentials.Count()
             };
         }
 
@@ -559,6 +560,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             return state with
             {
                 UserCredentials = credentials,
+                Count = credentials.Count()
             };
         }
 
@@ -585,7 +587,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         public static UserGroupsState ReduceGetUserAction(UserGroupsState state, GetUserAction act) => new(new List<Group>(), true);
 
         [ReducerMethod]
-        public static UserGroupsState ReduceGetUserSuccessAction(UserGroupsState state, GetUserSuccessAction act) => new(act.User.Groups, false);
+        public static UserGroupsState ReduceGetUserSuccessAction(UserGroupsState state, GetUserSuccessAction act) => new(act.User.Groups.Select(g => g.Group), false);
 
         [ReducerMethod]
         public static UserGroupsState ReduceToggleAllUserGroupsAction(UserGroupsState state, ToggleAllUserGroupsAction act)

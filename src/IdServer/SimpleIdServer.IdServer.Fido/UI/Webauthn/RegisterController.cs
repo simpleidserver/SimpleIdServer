@@ -54,7 +54,8 @@ namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
                 BeginRegisterUrl = $"{issuer}/{prefix}{Constants.EndPoints.BeginRegister}",
                 EndRegisterUrl = $"{issuer}/{prefix}{Constants.EndPoints.EndRegister}",
                 Amr = userRegistrationProgress?.Amr,
-                Steps = userRegistrationProgress?.Steps
+                Steps = userRegistrationProgress?.Steps,
+                RedirectUrl = userRegistrationProgress?.RedirectUrl,
             });
         }
 

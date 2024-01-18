@@ -6,7 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.ConformanceSuite.Startup.Converters;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Provisioning.SCIM.Jobs;
+using SimpleIdServer.IdServer.Provisioning.SCIM;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +17,7 @@ namespace SimpleIdServer.IdServer.ConformanceSuite.Startup
     {
         private static AuthenticationSchemeProviderDefinition Facebook = AuthenticationSchemeProviderDefinitionBuilder.Create("facebook", "Facebook", typeof(FacebookHandler), typeof(FacebookOptionsLite)).Build();
 
-        private static IdentityProvisioningDefinition Scim = IdentityProvisioningDefinitionBuilder.Create<SCIMRepresentationsExtractionJobOptions>(SimpleIdServer.IdServer.Provisioning.SCIM.Jobs.SCIMRepresentationsExtractionJob.NAME, "SCIM")
+        private static IdentityProvisioningDefinition Scim = IdentityProvisioningDefinitionBuilder.Create<SCIMRepresentationsExtractionJobOptions>(SimpleIdServer.IdServer.Provisioning.SCIM.Services.SCIMProvisioningService.NAME, "SCIM")
             .AddUserSubjectMappingRule("$.userName")
             .AddUserPropertyMappingRule("$.name.familyName", nameof(User.Lastname))
             .AddUserAttributeMappingRule("$.name.givenName", JwtRegisteredClaimNames.GivenName).Build();

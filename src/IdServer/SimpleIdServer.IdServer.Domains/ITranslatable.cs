@@ -19,7 +19,8 @@ namespace SimpleIdServer.IdServer.Domains
         protected string? GetTranslation(ICollection<Translation> translations)
         {
             var language = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
-            return translations.SingleOrDefault(t => t.Language == language)?.Value;
+            var result = translations.SingleOrDefault(t => t.Language == language);
+            return result?.Value;
         }
     }
 }

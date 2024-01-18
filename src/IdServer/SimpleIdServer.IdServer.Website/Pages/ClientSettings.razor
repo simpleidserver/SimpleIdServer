@@ -82,6 +82,15 @@
                             <RadzenCheckBox Name="IsRedirectUrlCaseSensitive" @bind-Value="@updateClient.IsRedirectUrlCaseSensitive"></RadzenCheckBox>
                         </div>
                     </div>
+                    <div class="row mat-2">
+                        <div class="col-md-2">
+                            <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, "After 3 seconds, the session is revoked, and the user agent is automatically redirected to the client"))" />
+                            <RadzenLabel Text="Manual action is required to revoke a session" Style="padding: 0px;" />
+                        </div>
+                        <div class="col">
+                            <RadzenCheckBox Name="RedirectToRevokeSessionUI" @bind-Value="@updateClient.RedirectToRevokeSessionUI"></RadzenCheckBox>
+                        </div>
+                    </div>
                 </RadzenAccordionItem>
             }
 
@@ -323,6 +332,7 @@
         public bool IsDeviceGrantTypeEnabled { get; set; }
         public bool UseAcs { get; set; }
         public bool IsRedirectUrlCaseSensitive { get; set; }
+        public bool RedirectToRevokeSessionUI { get; set; }
         public string MetadataUrl { get; set; }
         public TokenExchangeTypes? TokenExchangeType { get; set;  }
         public AccessTokenTypes AccessTokenType { get; set;  }
@@ -366,6 +376,7 @@
             UseAcs = this.Client.GetUseAcrsArtifact(),
             MetadataUrl = this.Client.GetSaml2SpMetadataUrl(),
             IsRedirectUrlCaseSensitive = this.Client.IsRedirectUrlCaseSensitive,
+            RedirectToRevokeSessionUI = this.Client.RedirectToRevokeSessionUI,
             TokenExchangeType = this.Client.TokenExchangeType,
             AccessTokenType = this.Client.AccessTokenType
         };
@@ -413,7 +424,8 @@
             MetadataUrl = client.MetadataUrl,
             TokenExchangeType = client.TokenExchangeType,
             JwksUrl = this.Client.JwksUri,
-            AccessTokenType = client.AccessTokenType
+            AccessTokenType = client.AccessTokenType,
+            RedirectToRevokeSessionUI = client.RedirectToRevokeSessionUI
         });
     }
 

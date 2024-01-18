@@ -7,6 +7,7 @@ using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Consumers;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Provisioning;
 using SimpleIdServer.IdServer.UI.AuthProviders;
 using System;
 
@@ -29,9 +30,9 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public IdServerBuilder EnableConfigurableAuthentication()
         {
-            _serviceCollection.AddTransient<IAuthenticationSchemeProvider, DynamicAuthenticationSchemeProvider>();
-            _serviceCollection.AddTransient<ISIDAuthenticationSchemeProvider, DynamicAuthenticationSchemeProvider>();
-            _serviceCollection.AddTransient<IAuthenticationHandlerProvider, DynamicAuthenticationHandlerProvider>();
+            _serviceCollection.AddSingleton<IAuthenticationSchemeProvider, DynamicAuthenticationSchemeProvider>();
+            _serviceCollection.AddSingleton<ISIDAuthenticationSchemeProvider>(x => x.GetService<IAuthenticationSchemeProvider>() as ISIDAuthenticationSchemeProvider);
+            _serviceCollection.AddScoped<IAuthenticationHandlerProvider, DynamicAuthenticationHandlerProvider>();
             return this;
         }
 
@@ -57,6 +58,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             _serviceCollection.AddTransient<BCNotificationJob>();
             _serviceCollection.AddHangfire(callback == null ? (o => {
+                o.UseRecommendedSerializerSettings();
                 o.UseIgnoredAssemblyVersionTypeResolver();
                 o.UseInMemoryStorage();
             }) : callback);
@@ -104,11 +106,16 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         public IdServerBuilder UseInMemoryMassTransit()
         {
-            _serviceCollection.AddMassTransit((o) =>
+            _serviceCollection.AddMassTransitTestHarness((o) =>
             {
+                o.AddPublishMessageScheduler();
+                o.AddHangfireConsumers();
                 o.AddConsumer<IdServerEventsConsumer>();
+                o.AddConsumer<ExtractUsersConsumer, ExtractUsersConsumerDefinition>();
+                o.AddConsumer<ImportUsersConsumer, ImportUsersConsumerDefinition>();
                 o.UsingInMemory((ctx, cfg) =>
                 {
+                    cfg.UsePublishMessageScheduler();
                     cfg.ConfigureEndpoints(ctx);
                 });
             });

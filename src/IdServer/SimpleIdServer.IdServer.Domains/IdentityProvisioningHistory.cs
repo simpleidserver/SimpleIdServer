@@ -4,24 +4,24 @@ namespace SimpleIdServer.IdServer.Domains;
 
 public class IdentityProvisioningHistory
 {
-    public DateTime StartDateTime { get; set; }
-    public DateTime? EndDateTime { get; set; }
-    public string? FolderName { get; set; } = null;
-    public int NbRepresentations { get; set; }
+    public string ProcessId { get; set; } = null!;
+    public DateTime ExecutionDateTime { get; set; }
+    public int CurrentPage { get; set; }
+    public int NbUsers { get; set; }
+    public int NbGroups { get; set; }
+    public int NbFilteredRepresentations { get; set; }
+    public int TotalPages { get; set; }
     public IdentityProvisioningHistoryStatus Status { get; set; }
-    public string? ErrorMessage { get; set; } = null;
     public IdentityProvisioning IdentityProvisioning { get; set; } = null!;
-
-    public void Import()
-    {
-        Status = IdentityProvisioningHistoryStatus.IMPORT;
-    }
 }
 
 public enum IdentityProvisioningHistoryStatus
 {
-    START = 0,
-    EXPORT = 1,
-    ERROR = 2,
-    IMPORT = 3
+    CREATE = 0,
+    START = 1,
+    EXPORT = 2,
+    FINISHEXPORT = 3,
+    STARTIMPORT = 4,
+    IMPORT = 5,
+    FINISHIMPORT = 6
 }

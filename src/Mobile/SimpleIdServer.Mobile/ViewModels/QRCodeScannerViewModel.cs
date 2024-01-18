@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Windows.Input;
 using ZXing.Net.Maui;
 #if IOS
@@ -85,8 +86,9 @@ public class QRCodeScannerViewModel
                 else await Authenticate(qrCodeResult);
             }
         }
-        catch
+        catch(Exception ex)
         {
+            await _promptService.ShowAlert("Error", ex.ToString());
             await _promptService.ShowAlert("Error", "An error occured while trying to parse the QR Code");
         }
         finally
@@ -144,7 +146,16 @@ public class QRCodeScannerViewModel
                 var httpResponse = await httpClient.SendAsync(requestMessage);
                 httpResponse.EnsureSuccessStatusCode();
                 var json = await httpResponse.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<BeginU2FRegisterResult>(json);
+                var jObj = JsonObject.Parse(json);
+                var credentialCreateOptionsJson = jObj["credential_create_options"].ToString();
+                var result = new BeginU2FRegisterResult
+                {
+                    SessionId = jObj["session_id"].ToString(),
+                    Login = jObj["login"].ToString(),
+                    EndRegisterUrl = jObj["end_register_url"].ToString(),
+                    CredentialCreateOptions = CredentialCreateOptions.FromJson(credentialCreateOptionsJson)
+                };
+                return result;
             }
         }
 
@@ -173,7 +184,7 @@ public class QRCodeScannerViewModel
                 {
                     { "login", beginResult.Login },
                     { "session_id", beginResult.SessionId },
-                    { "attestation", enrollResponse.Response },
+                    { "attestation", ToJson(enrollResponse.Response) },
                     { "device_data", deviceData }
                 };
                 var requestMessage = new HttpRequestMessage
@@ -239,7 +250,16 @@ public class QRCodeScannerViewModel
                 var httpResponse = await httpClient.SendAsync(requestMessage);
                 httpResponse.EnsureSuccessStatusCode();
                 var json = await httpResponse.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<BeginU2FAuthenticateResult>(json);
+                var jObj = JsonObject.Parse(json);
+                var assertionJson = jObj["assertion"].ToString();
+                var result = new BeginU2FAuthenticateResult
+                {
+                    SessionId = jObj["session_id"].ToString(),
+                    Login = jObj["login"].ToString(),
+                    EndLoginUrl = jObj["end_login_url"].ToString(),
+                    Assertion = AssertionOptions.FromJson(assertionJson)
+                };
+                return result;
             }
         }
 
@@ -253,12 +273,13 @@ public class QRCodeScannerViewModel
             using (var httpClient = new HttpClient(handler))
             {
                 var deviceInfo = DeviceInfo.Current;
-                var endLoginRequest = new EndU2FLoginRequest
+                var endLoginRequest = new JsonObject
                 {
-                    Login = beginAuthenticate.Login,
-                    Assertion = assertion,
-                    SessionId = beginAuthenticate.SessionId
+                    { "login", beginAuthenticate.Login },
+                    { "session_id", beginAuthenticate.SessionId },
+                    { "assertion", ConvertToJson(assertion) }
                 };
+                var json = JsonSerializer.Serialize(assertion);
                 var requestMessage = new HttpRequestMessage
                 {
                     Method = HttpMethod.Post,
@@ -293,6 +314,63 @@ public class QRCodeScannerViewModel
             }
 
             return false;
+        }
+
+        #endregion
+
+        #region Serializer
+
+        JsonObject ToJson(AuthenticatorAttestationRawResponse response)
+        {
+            var json = new JsonObject();
+            if (response.Id != null)
+                json.Add("id", Base64Url.Encode(response.Id));
+            if (response.RawId != null)
+                json.Add("rawId", Base64Url.Encode(response.RawId));
+            if (response.Type == Fido2NetLib.Objects.PublicKeyCredentialType.PublicKey)
+                json.Add("type", "public-key");
+            if (response.Type == Fido2NetLib.Objects.PublicKeyCredentialType.Invalid)
+                json.Add("type", "invalid");
+
+            if (response.Response != null)
+            {
+                var responseJson = new JsonObject();
+                if (response.Response.AttestationObject != null)
+                    responseJson.Add("attestationObject", Base64Url.Encode(response.Response.AttestationObject));
+                if (response.Response.ClientDataJson != null)
+                    responseJson.Add("clientDataJSON", Base64Url.Encode(response.Response.ClientDataJson));
+                json.Add("response", responseJson);
+            }
+
+            return json;
+        }
+
+        JsonObject ConvertToJson(AuthenticatorAssertionRawResponse response)
+        {
+            var json = new JsonObject();
+            if (response.Id != null)
+                json.Add("id", Base64Url.Encode(response.Id));
+            if (response.RawId != null)
+                json.Add("rawId", Base64Url.Encode(response.RawId));
+            if (response.Type == Fido2NetLib.Objects.PublicKeyCredentialType.PublicKey)
+                json.Add("type", "public-key");
+            if (response.Type == Fido2NetLib.Objects.PublicKeyCredentialType.Invalid)
+                json.Add("type", "invalid");
+            if (response.Response != null)
+            {
+                var responseJson = new JsonObject();
+                if (response.Response.AuthenticatorData != null)
+                    responseJson.Add("authenticatorData", Base64Url.Encode(response.Response.AuthenticatorData));
+                if (response.Response.Signature != null)
+                    responseJson.Add("signature", Base64Url.Encode(response.Response.Signature));
+                if (response.Response.ClientDataJson != null)
+                    responseJson.Add("clientDataJSON", Base64Url.Encode(response.Response.ClientDataJson));
+                if (response.Response.UserHandle != null)
+                    responseJson.Add("userHandle", Base64Url.Encode(response.Response.UserHandle));
+                json.Add("response", responseJson);
+            }
+
+            return json;
         }
 
         #endregion

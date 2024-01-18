@@ -18,6 +18,7 @@ namespace Microsoft.AspNetCore.Builder
             var opts = webApplication.Services.GetRequiredService<IOptions<IdServerHostOptions>>().Value;
             var usePrefix = opts.UseRealm;
             if(usePrefix) webApplication.UseMiddleware<RealmMiddleware>();
+            webApplication.UseMiddleware<LanguageMiddleware>();
             webApplication.UseCookiePolicy(new CookiePolicyOptions
             {
                 Secure = Http.CookieSecurePolicy.Always
@@ -242,11 +243,8 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/.search",
                 defaults: new { controller = "IdentityProvisioning", action = "Search" });
             webApplication.SidMapControllerRoute("importRepresentations",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/import",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}/{processId}/import",
                 defaults: new { controller = "IdentityProvisioning", action = "Import" });
-            webApplication.SidMapControllerRoute("removeIdProvisioning",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}",
-                defaults: new { controller = "IdentityProvisioning", action = "Remove" });
             webApplication.SidMapControllerRoute("getIdProvisioning",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}",
                 defaults: new { controller = "IdentityProvisioning", action = "Get" });
@@ -259,12 +257,18 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("removeIdProvisioningMapper",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}/mappers/{mapperId}",
                 defaults: new { controller = "IdentityProvisioning", action = "RemoveMapper" });
+            webApplication.SidMapControllerRoute("updateIdProvisioningMapper",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}/mappers/{mapperId}",
+                defaults: new { controller = "IdentityProvisioning", action = "UpdateMapper" });
+            webApplication.SidMapControllerRoute("getIdProvisioningMapper",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}/mappers/{mapperId}",
+                defaults: new { controller = "IdentityProvisioning", action = "GetMapper" });
             webApplication.SidMapControllerRoute("addIdProvisioningMapper",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}/mappers",
                 defaults: new { controller = "IdentityProvisioning", action = "AddMapper" });
             webApplication.SidMapControllerRoute("extractRepresentations",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{name}/{id}/enqueue",
-                defaults: new { controller = "IdentityProvisioning", action = "Enqueue" });
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}/extract",
+                defaults: new { controller = "IdentityProvisioning", action = "Extract" });
             webApplication.SidMapControllerRoute("idProvisioningTestConnection",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/{id}/test",
                 defaults: new { controller = "IdentityProvisioning", action = "TestConnection" });
@@ -510,6 +514,10 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("addRealm",
                 pattern: Constants.EndPoints.Realms,
                 defaults: new { controller = "Realms", action = "Add" });
+
+            webApplication.SidMapControllerRoute("getAllLanguages",
+                pattern: Constants.EndPoints.Languages,
+                defaults: new { controller = "Languages", action = "GetAll" });
 
             webApplication.MapControllerRoute(
                 name: "defaultWithArea",

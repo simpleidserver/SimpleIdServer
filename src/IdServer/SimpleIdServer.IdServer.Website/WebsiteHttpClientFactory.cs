@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.IdentityModel.JsonWebTokens;
+using System.Globalization;
 using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.IdServer.Website
@@ -14,6 +15,7 @@ namespace SimpleIdServer.IdServer.Website
     public class WebsiteHttpClientFactory : IWebsiteHttpClientFactory
     {
         private readonly DefaultSecurityOptions _securityOptions;
+        private static SemaphoreSlim _lck = new SemaphoreSlim(1);
         private readonly HttpClient _httpClient;
         private readonly JsonWebTokenHandler _jsonWebTokenHandler;
         private GetAccessTokenResult _accessToken;
@@ -36,6 +38,13 @@ namespace SimpleIdServer.IdServer.Website
         {
             var token = await GetAccessToken();
             _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token.AccessToken);
+            var acceptLanguage = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+            if(_httpClient.DefaultRequestHeaders.Contains("Language"))
+            {
+                _httpClient.DefaultRequestHeaders.Remove("Language");
+            }
+
+            _httpClient.DefaultRequestHeaders.Add("Language", acceptLanguage);
             return _httpClient;   
         }
 
@@ -43,32 +52,45 @@ namespace SimpleIdServer.IdServer.Website
 
         private async Task<GetAccessTokenResult> GetAccessToken()
         {
-            if (_accessToken != null && _accessToken.IsValid) return _accessToken;
-            var content = new List<KeyValuePair<string, string>>
+            await _lck.WaitAsync();
+            if (_accessToken != null && _accessToken.IsValid)
+            {
+                _lck.Release();
+                return _accessToken;
+            }
+
+            try
+            {
+                var content = new List<KeyValuePair<string, string>>
             {
                 new KeyValuePair<string, string>("client_id", _securityOptions.ClientId),
                 new KeyValuePair<string, string>("client_secret", _securityOptions.ClientSecret),
                 new KeyValuePair<string, string>("scope", "provisioning networks users credential_offer acrs configurations authenticationschemeproviders authenticationmethods registrationworkflows apiresources auditing certificateauthorities clients credential_templates realms groups scopes"),
                 new KeyValuePair<string, string>("grant_type", "client_credentials")
             };
-            var httpRequest = new HttpRequestMessage
-            {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri($"{_securityOptions.Issuer}/token"),
-                Content = new FormUrlEncodedContent(content)
-            };
-            _httpClient.DefaultRequestHeaders.Clear();
-            var httpResult = await _httpClient.SendAsync(httpRequest);
-            var json = await httpResult.Content.ReadAsStringAsync();
-            var accessToken = JsonObject.Parse(json)["access_token"].GetValue<string>();
-            JsonWebToken jwt = null;
-            if(_jsonWebTokenHandler.CanReadToken(accessToken))
-            {
-                jwt = _jsonWebTokenHandler.ReadJsonWebToken(accessToken);
-            }
+                var httpRequest = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Post,
+                    RequestUri = new Uri($"{_securityOptions.Issuer}/token"),
+                    Content = new FormUrlEncodedContent(content)
+                };
+                _httpClient.DefaultRequestHeaders.Clear();
+                var httpResult = await _httpClient.SendAsync(httpRequest);
+                var json = await httpResult.Content.ReadAsStringAsync();
+                var accessToken = JsonObject.Parse(json)["access_token"].GetValue<string>();
+                JsonWebToken jwt = null;
+                if (_jsonWebTokenHandler.CanReadToken(accessToken))
+                {
+                    jwt = _jsonWebTokenHandler.ReadJsonWebToken(accessToken);
+                }
 
-            _accessToken = new GetAccessTokenResult(accessToken, jwt);
-            return _accessToken;
+                _accessToken = new GetAccessTokenResult(accessToken, jwt);
+                return _accessToken;
+            }
+            finally
+            {
+                _lck.Release();
+            }
         }
 
         private record GetAccessTokenResult

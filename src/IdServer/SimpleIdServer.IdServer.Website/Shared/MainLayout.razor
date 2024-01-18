@@ -1,8 +1,12 @@
 ﻿@using SimpleIdServer.IdServer.Website.Stores.AuthMethodsStore;
 @using SimpleIdServer.IdServer.Website.Stores.ConfigurationDefinitionStore;
+@using SimpleIdServer.IdServer.Website.Stores.LanguageStore;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
+@using System.Globalization;
+@using SimpleIdServer.IdServer.Website.Resources;
 @inherits Fluxor.Blazor.Web.Components.FluxorLayout
 @inject IState<RealmsState> state
+@inject IState<LanguagesState> languagesState
 @inject ContextMenuService contextMenuService
 @inject IDispatcher dispatcher
 @inject DialogService dialogService
@@ -27,7 +31,18 @@
             <div class="p-2">
                 <RadzenText Style="margin: 0; color: white;" Text="SimpleIdServer" TextStyle="TextStyle.DisplayH6" />
             </div>
-            <div class="ml-auto p-2">
+            <div class="ml-auto"></div>
+            <div class="p-2">
+                @if(!languagesState.Value.IsLoading)
+                {
+                    <RadzenDropDown Name="UserPropertyName" Class="w-100"
+                                    Data=@languagesState.Value.Languages
+                                    TValue="string"
+                                    @bind-Value=@CurrentLanguage
+                                    TextProperty="Description" ValueProperty="Code" />
+                }
+            </div>
+            <div class="p-2">
                 <RadzenLink Text="Sign out" Icon="logout" Path="/logout" />
             </div>
         </div>
@@ -37,7 +52,7 @@
         <RadzenSidebar @bind-Expanded="@sidebarExpanded">
             <RadzenPanelMenu>
                 <RadzenPanelMenuItem Text=@("Active Realm : " + activeRealm) Path="/realm" />
-                <RadzenPanelMenuItem Text="Manage" />
+                <RadzenPanelMenuItem Text="@Global.Manage" />
                 <RadzenPanelMenuItem Text="Clients" Icon="apps" Path="/clients" />
                 <RadzenPanelMenuItem Text="Scopes" Icon="visibility" Path="/scopes" />
                 <RadzenPanelMenuItem Text="User Management">
@@ -88,6 +103,25 @@
     bool isLoading = true;
     string activeRealm;
 
+    public string CurrentLanguage
+    {
+        get => CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+        set
+        {
+            if (CultureInfo.CurrentCulture.TwoLetterISOLanguageName != value)
+            {
+                var uri = new Uri(Navigation.Uri)
+                    .GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
+                var cultureEscaped = Uri.EscapeDataString(value);
+                var uriEscaped = Uri.EscapeDataString(uri);
+
+                Navigation.NavigateTo(
+                    $"Culture/Set?culture={cultureEscaped}&redirectUri={uriEscaped}",
+                    forceLoad: true);
+            }
+        }
+    }
+
     protected override void OnAfterRender(bool firstRender)
     {
         base.OnAfterRender(firstRender);
@@ -119,5 +153,6 @@
         dispatcher.Dispatch(new GetActiveRealmAction());
         dispatcher.Dispatch(new GetAllRealmAction());
         dispatcher.Dispatch(new GetAllAuthMethodAction());
+        dispatcher.Dispatch(new GetLanguagesAction());
     }
 }

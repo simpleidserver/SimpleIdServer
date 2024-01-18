@@ -7,13 +7,10 @@ namespace SimpleIdServer.IdServer.Notification.Fcm;
 public class FcmAuthenticationService : IAuthenticationMethodService
 {
     public string Amr => Constants.NotificationName;
-
     public string Name => "Firebase";
-
     public Type? OptionsType => typeof(FcmOptions);
-
     public AuthenticationMethodCapabilities Capabilities => AuthenticationMethodCapabilities.PUSHNOTIFICATION;
-
+    public bool IsRegistrationSupported => false;
     public bool IsCredentialExists(User user)
     {
         return true;

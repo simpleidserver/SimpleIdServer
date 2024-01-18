@@ -25,7 +25,11 @@
             break;
         case MappingRuleTypes.USERPROPERTY:
             <UserPropertyIdProviderMapper Mapper=mapper AuthProviderMapperUpdated=@UpdateAuthProviderMapper></UserPropertyIdProviderMapper>
-            break;   
+            break;
+        case MappingRuleTypes.SUBJECT:
+        case MappingRuleTypes.IDENTIFIER:
+            <UserUniqueIdProviderMapper Mapper=mapper Type=mapper.MapperType AuthProviderMapperUpdated=@UpdateAuthProviderMapper></UserUniqueIdProviderMapper>
+            break;
     }
 </RadzenCardLoader>
 

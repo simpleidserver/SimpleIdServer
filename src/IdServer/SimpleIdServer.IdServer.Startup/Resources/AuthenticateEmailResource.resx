@@ -144,7 +144,7 @@
   <data name="missing_confirmationcode" xml:space="preserve">
     <value>Confirmation code is missing</value>
   </data>
-  <data name="missing_email" xml:space="preserve">
+  <data name="missing_login" xml:space="preserve">
     <value>Email is missing</value>
   </data>
   <data name="missing_return_url" xml:space="preserve">
@@ -170,6 +170,9 @@
   </data>
   <data name="unknown_email" xml:space="preserve">
     <value>Email is unknown</value>
+  </data>
+  <data name="unknown_user" xml:space="preserve">
+    <value>The given email does not correspond to any user</value>
   </data>
   <data name="user_exists" xml:space="preserve">
     <value>User with the same name already exists</value>

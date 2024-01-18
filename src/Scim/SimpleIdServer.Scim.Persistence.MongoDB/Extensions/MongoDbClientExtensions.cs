@@ -6,7 +6,6 @@ using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Persistence.MongoDB.Models;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata;
 
 namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
 {
@@ -53,15 +52,21 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
             }
 		}
 
-		private static async void EnsureSCIMRepresentationAttributeIndexesAreCreated(IMongoDatabase db, string name)
-		{
-			const string indexName = "RepresentationId_1_SchemaAttributeId_1_ValueString_1";
-			var collection = db.GetCollection<SCIMRepresentationAttribute>(name);
+		private static void EnsureSCIMRepresentationAttributeIndexesAreCreated(IMongoDatabase db, string name)
+        {
+			var compoundIndex = Builders<SCIMRepresentationAttribute>.IndexKeys.Ascending(a => a.RepresentationId).Ascending(a => a.SchemaAttributeId).Ascending(a => a.ValueString);
+			var representationIdIndex = Builders<SCIMRepresentationAttribute>.IndexKeys.Ascending(a => a.RepresentationId);
+            EnsureIndexCreated(db, "RepresentationId_1_SchemaAttributeId_1_ValueString_1", name, compoundIndex);
+            EnsureIndexCreated(db, "RepresentationId_1", name, representationIdIndex);
+        }
+
+		private static async void EnsureIndexCreated(IMongoDatabase db, string indexName, string name, IndexKeysDefinition<SCIMRepresentationAttribute> indexDefinition)
+        {
+            var collection = db.GetCollection<SCIMRepresentationAttribute>(name);
             var indexes = await collection.Indexes.List().ToListAsync();
-			if (indexes.Any(i => i.Elements.Any(e => e.Name == "name" && e.Value.AsString == "RepresentationId_1_SchemaAttributeId_1_ValueString_1"))) return;
-			var indexDefinition = Builders<SCIMRepresentationAttribute>.IndexKeys.Ascending(a => a.RepresentationId).Ascending(a => a.SchemaAttributeId).Ascending(a => a.ValueString);
-			collection.Indexes.CreateOne(indexDefinition);
-		}
+            if (indexes.Any(i => i.Elements.Any(e => e.Name == "name" && e.Value.AsString == indexName))) return;
+            collection.Indexes.CreateOne(indexDefinition);
+        }
 
 		private static IMongoCollection<T> EnsureCollectionIsCreated<T>(IMongoDatabase db, string name)
 		{

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.Provisioning;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Provisioning;
 using SimpleIdServer.IdServer.Store;
 using System.Text;
 using System.Text.Json;
@@ -52,24 +53,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         }
 
         [EffectMethod]
-        public async Task Handle(RemoveSelectedIdentityProvisioningAction action, IDispatcher dispatcher)
-        {
-            var baseUrl = await GetBaseUrl();
-            var httpClient = await _websiteHttpClientFactory.Build();
-            foreach (var id in action.Ids)
-            {
-                var requestMessage = new HttpRequestMessage
-                {
-                    Method = HttpMethod.Delete,
-                    RequestUri = new Uri($"{baseUrl}/{id}")
-                };
-                await httpClient.SendAsync(requestMessage);
-            }
-
-            dispatcher.Dispatch(new RemoveSelectedIdentityProvisioningSuccessAction { Ids = action.Ids });
-        }
-
-        [EffectMethod]
         public async Task Handle(GetIdentityProvisioningAction action, IDispatcher dispatcher)
         {
             var baseUrl = await GetBaseUrl();
@@ -92,10 +75,22 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             var httpClient = await _websiteHttpClientFactory.Build();
             var requestMessage = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{baseUrl}/{action.Name}/{action.Id}/enqueue")
+                RequestUri = new Uri($"{baseUrl}/{action.Id}/extract")
             };
-            await httpClient.SendAsync(requestMessage);
-            dispatcher.Dispatch(new LaunchIdentityProvisioningSuccessAction { Id = action.Id, Name = action.Name });
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            try
+            {
+                httpResult.EnsureSuccessStatusCode();
+                var launchedProcess = JsonSerializer.Deserialize<IdentityProvisioningLaunchedResult>(json);
+                dispatcher.Dispatch(new LaunchIdentityProvisioningSuccessAction { Id = action.Id, Name = action.Name, ProcessId = launchedProcess.Id });
+            }
+            catch
+            {
+                var jsonObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new LaunchIdentityProvisioningFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
+            }
+
         }
 
         [EffectMethod]
@@ -165,7 +160,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
                 From = action.From,
                 TargetUserAttribute = action.TargetUserAttribute,
                 TargetUserProperty = action.TargetUserProperty,
-                HasMultipleAttribute = action.HasMultipleAttribute
+                HasMultipleAttribute = action.HasMultipleAttribute,
+                Usage = action.Usage
             };
             var requestMessage = new HttpRequestMessage
             {
@@ -175,8 +171,75 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var newMapper = JsonSerializer.Deserialize<IdentityProvisioningMappingRuleResult>(json);
-            dispatcher.Dispatch(new AddIdentityProvisioningMappingRuleSuccessAction { NewId = newMapper.Id, Id = action.Id, MappingRule = action.MappingRule, From = action.From, TargetUserAttribute = action.TargetUserAttribute, TargetUserProperty = action.TargetUserProperty });
+            try
+            {
+                httpResult.EnsureSuccessStatusCode();
+                var newMapper = JsonSerializer.Deserialize<IdentityProvisioningMappingRuleResult>(json);
+                dispatcher.Dispatch(new AddIdentityProvisioningMappingRuleSuccessAction { Usage = action.Usage, NewId = newMapper.Id, Id = action.Id, MappingRule = action.MappingRule, From = action.From, TargetUserAttribute = action.TargetUserAttribute, TargetUserProperty = action.TargetUserProperty });
+            }
+            catch
+            {
+                var jsonObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new AddIdentityProvisioningMappingRuleFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
+            }
+        }
+
+
+        [EffectMethod]
+        public async Task Handle(GetIdentityProvisioningMappingRuleAction action, IDispatcher dispatcher)
+        {
+            var baseUrl = await GetBaseUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"{baseUrl}/{action.Id}/mappers/{action.MappingRuleId}")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            try
+            {
+                httpResult.EnsureSuccessStatusCode();
+                var mappingRule = JsonSerializer.Deserialize<IdentityProvisioningMappingRuleResult>(json);
+                dispatcher.Dispatch(new GetIdentityPriovisioningMappingRuleSuccessAction { MappingRule = mappingRule });
+            }
+            catch
+            {
+                var jsonObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new GetIdentityPriovisioningMappingRuleFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
+            }
+        }
+
+        [EffectMethod]
+        public async Task Handle(UpdateIdentityProvisioningMappingRuleAction action, IDispatcher dispatcher)
+        {
+            var baseUrl = await GetBaseUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var request = new UpdateIdentityProvisioningMapperRequest
+            {
+                From = action.From,
+                HasMultipleAttribute = action.HasMultipleAttribute,
+                TargetUserAttribute = action.TargetUserAttribute,
+                TargetUserProperty = action.TargetUserProperty
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Put,
+                RequestUri = new Uri($"{baseUrl}/{action.Id}/mappers/{action.MappingRuleId}"),
+                Content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            try
+            {
+                httpResult.EnsureSuccessStatusCode();
+                dispatcher.Dispatch(new UpdateIdentityProvisioningMappingRuleSuccessAction { Id = action.Id, From = action.From, HasMultipleAttribute = action.HasMultipleAttribute, TargetUserAttribute = action.TargetUserAttribute, MappingRuleId = action.MappingRuleId, TargetUserProperty = action.TargetUserProperty });
+            }
+            catch
+            {
+                var jsonObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new UpdateIdentityProvisioningMappingRuleFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
+            }
         }
 
         [EffectMethod]
@@ -205,27 +268,30 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         }
 
         [EffectMethod]
-        public async Task Handle(GetIdentityProvisioningAllowedAttributesAction action, IDispatcher dispatcher)
+        public async Task Handle(LaunchIdentityProvisioningImportAction action, IDispatcher dispatcher)
         {
             var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             var requestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri($"{baseUrl}/{action.Id}/allowedattributes")
+                RequestUri = new Uri($"{baseUrl}/{action.InstanceId}/{action.ProcessId}/import")
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
             try
             {
                 httpResult.EnsureSuccessStatusCode();
-                var allowedAttributes = JsonSerializer.Deserialize<List<string>>(json);
-                dispatcher.Dispatch(new GetIdentityProvisioningAllowedAttributesSuccessAction { AllowedAttributes = allowedAttributes });
+                dispatcher.Dispatch(new LaunchIdentityProvisioningImportSuccessAction
+                {
+                    InstanceId = action.InstanceId,
+                    ProcessId = action.ProcessId
+                });
             }
             catch
             {
                 var jsonObj = JsonObject.Parse(json);
-                dispatcher.Dispatch(new GetIdentityProvisioningAllowedAttributesFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
+                dispatcher.Dispatch(new LaunchIdentityProvisioningImportFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
             }
         }
 
@@ -282,16 +348,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         public string IdentityProvisioningId { get; set; }
     }
 
-    public class RemoveSelectedIdentityProvisioningAction
-    {
-        public IEnumerable<string> Ids { get; set; }
-    }
-
-    public class RemoveSelectedIdentityProvisioningSuccessAction
-    {
-        public IEnumerable<string> Ids { get; set; }
-    }
-
     public class LaunchIdentityProvisioningAction
     {
         public string Id { get; set; }
@@ -302,6 +358,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
     {
         public string Id { get; set; }
         public string Name { get; set; }
+        public string ProcessId { get; set; }
+    }
+
+    public class LaunchIdentityProvisioningFailureAction
+    {
+        public string ErrorMessage { get; set; }
     }
 
     public class UpdateIdProvisioningPropertiesAction
@@ -359,6 +421,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         public string? TargetUserAttribute { get; set; } = null;
         public string? TargetUserProperty { get; set; } = null;
         public bool HasMultipleAttribute { get; set; }
+        public IdentityProvisioningMappingUsage Usage { get; set; }
     }
 
     public class AddIdentityProvisioningMappingRuleSuccessAction
@@ -369,6 +432,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         public string From { get; set; } = null!;
         public string? TargetUserAttribute { get; set; } = null;
         public string? TargetUserProperty { get; set; } = null;
+        public IdentityProvisioningMappingUsage Usage { get; set; } 
+    }
+
+    public class AddIdentityProvisioningMappingRuleFailureAction
+    {
+        public string ErrorMessage { get; set; }
     }
 
     public class TestIdentityProvisioningAction
@@ -386,17 +455,61 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         public TestConnectionResult ConnectionResult { get; set; }
     }
 
-    public class GetIdentityProvisioningAllowedAttributesAction
+    public class GetIdentityProvisioningMappingRuleAction
     {
         public string Id { get; set; }
+        public string MappingRuleId { get; set; }
     }
 
-    public class GetIdentityProvisioningAllowedAttributesSuccessAction
+    public class GetIdentityPriovisioningMappingRuleSuccessAction
     {
-        public List<string> AllowedAttributes { get; set; }
+        public string Id { get; set; }
+        public IdentityProvisioningMappingRuleResult MappingRule { get; set; }
     }
 
-    public class GetIdentityProvisioningAllowedAttributesFailureAction
+    public class GetIdentityPriovisioningMappingRuleFailureAction
+    {
+        public string ErrorMessage { get; set; }
+    }
+
+    public class UpdateIdentityProvisioningMappingRuleAction
+    {
+        public string Id { get; set; }
+        public string MappingRuleId { get; set; }
+        public string From { get; set; } = null!;
+        public string? TargetUserAttribute { get; set; } = null;
+        public string? TargetUserProperty { get; set; } = null;
+        public bool HasMultipleAttribute { get; set; }
+    }
+
+    public class UpdateIdentityProvisioningMappingRuleSuccessAction
+    {
+        public string Id { get; set; }
+        public string MappingRuleId { get; set; }
+        public string From { get; set; } = null!;
+        public string? TargetUserAttribute { get; set; } = null;
+        public string? TargetUserProperty { get; set; } = null;
+        public bool HasMultipleAttribute { get; set; }
+    }
+
+    public class UpdateIdentityProvisioningMappingRuleFailureAction
+    {
+        public string ErrorMessage { get; set; }
+    }
+
+    public class LaunchIdentityProvisioningImportAction
+    {
+        public string InstanceId { get; set; }
+        public string ProcessId { get; set; }
+    }
+
+    public class LaunchIdentityProvisioningImportSuccessAction
+    {
+        public string InstanceId { get; set; }
+        public string ProcessId { get; set; }
+    }
+
+    public class LaunchIdentityProvisioningImportFailureAction
     {
         public string ErrorMessage { get; set; }
     }

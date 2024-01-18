@@ -15,7 +15,7 @@ public interface IUserConsoleAuthenticationService : IUserAuthenticationService
 
 }
 
-public class UserConsoleAuthenticationService : OTPAuthenticationService, IUserConsoleAuthenticationService
+public class UserConsoleAuthenticationService : BaseOTPAuthenticationService, IUserConsoleAuthenticationService
 {
     public UserConsoleAuthenticationService(
         IEnumerable<IOTPAuthenticator> otpAuthenticators, 

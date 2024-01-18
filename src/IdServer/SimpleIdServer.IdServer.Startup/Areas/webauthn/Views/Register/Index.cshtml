@@ -47,8 +47,14 @@
     </form>
 </div>
 
-<div class="alert alert-success" id="registerSuccessMessage" style="display: none;">
-    @AuthenticateWebauthnResource.credential_added
+<div style="display: none;" id="registerSuccessMessage">
+    <div class="alert alert-success">
+        @AuthenticateWebauthnResource.credential_added
+    </div>
+    @if(!string.IsNullOrWhiteSpace(Model.RedirectUrl))
+    {
+    <a href="@Model.RedirectUrl" class="btn btn-primary mt-1">@LayoutResource.back</a>
+    }
 </div>
 
 @section SubScripts {
@@ -56,6 +62,7 @@
         $(document).ready(function() {
             var beginRegisterUrl = "@Model.BeginRegisterUrl";
             var endRegisterUrl = "@Model.EndRegisterUrl";
+            var redirectUrl = "@Model.RedirectUrl";
 
             var toggleBtn = function(isDisabled) {
                 $("#registerWebauthn button[type='submit']").attr('disabled', isDisabled);

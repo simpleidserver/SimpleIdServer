@@ -62,9 +62,6 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseTypes
             var dpopJkt = context.Request.RequestData.GetDPOPJktFromAuthorizationRequest();
             var authCode = await _grantedTokenHelper.AddAuthorizationCode(dic, parameter.GrantId, _options.AuthorizationCodeExpirationInSeconds, dpopJkt, context.Session?.SessionId, cancellationToken);
             context.Response.Add(AuthorizationResponseParameters.Code, authCode);
-            var isScopeContainsOfflineAccess = parameter.Scopes.Contains(Constants.StandardScopes.OfflineAccessScope.Name);
-            if (isScopeContainsOfflineAccess)
-                await _tokenBuilders.First(t => t.Name == TokenResponseParameters.RefreshToken).Build(new BuildTokenParameter { Scopes = parameter.Scopes, AuthorizationDetails = parameter.AuthorizationDetails?.ToList(), Audiences = parameter.Audiences, Claims = parameter.Claims, GrantId = parameter.GrantId }, context, cancellationToken);
         }
 
         protected virtual void CheckPKCEParameters(HandlerContext handlerContext)

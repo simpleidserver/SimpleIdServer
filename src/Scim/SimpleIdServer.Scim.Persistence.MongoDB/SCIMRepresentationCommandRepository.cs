@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Parser.Expressions;
 using SimpleIdServer.Scim.Persistence.MongoDB.Extensions;
@@ -167,7 +168,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
         public async Task<List<SCIMRepresentationAttribute>> FindAttributes(string representationId, SCIMAttributeExpression pathExpression, CancellationToken cancellationToken)
         {
             if (pathExpression.SchemaAttribute == null || string.IsNullOrWhiteSpace(pathExpression.SchemaAttribute.Id)) return new List<SCIMRepresentationAttribute>();
-            IQueryable<EnrichedAttribute> representationAttributes = from a in _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
+            IMongoQueryable<EnrichedAttribute> representationAttributes = from a in _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
                 join b in _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable() on a.ParentAttributeId equals b.Id into Parents
                 where a.RepresentationId == representationId
                 select new EnrichedAttribute
@@ -273,7 +274,12 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             if (!scimRepresentationAttributes.Any()) return;
             scimRepresentationAttributes = scimRepresentationAttributes.Where(r => !string.IsNullOrWhiteSpace(r.RepresentationId));
             var representationIds = scimRepresentationAttributes.Select(r => r.RepresentationId).Distinct();
-            var result = await _scimDbContext.SCIMRepresentationLst.AsQueryable().Where(r => representationIds.Contains(r.Id)).ToMongoListAsync();
+            List<SCIMRepresentationModel> result = null;
+            if (_session == null)
+                result = await _scimDbContext.SCIMRepresentationLst.AsQueryable().Where(r => representationIds.Contains(r.Id)).ToMongoListAsync();
+            else
+                result = await _scimDbContext.SCIMRepresentationLst.AsQueryable(_session).Where(r => representationIds.Contains(r.Id)).ToMongoListAsync();
+
             _addedAttributeIds.AddRange(scimRepresentationAttributes.Where(a => a.RepresentationId == currentRepresentationId).Select(a => a.Id));
             if (_session != null)
             {
@@ -324,7 +330,11 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             if (!scimRepresentationAttributes.Any()) return;
             scimRepresentationAttributes = scimRepresentationAttributes.Where(r => !string.IsNullOrWhiteSpace(r.RepresentationId));
             var representationIds = scimRepresentationAttributes.Select(r => r.RepresentationId).Distinct();
-            var result = await _scimDbContext.SCIMRepresentationLst.AsQueryable().Where(r => representationIds.Contains(r.Id)).ToMongoListAsync();
+            List<SCIMRepresentationModel> result = null;
+            if (_session == null)
+                result = await _scimDbContext.SCIMRepresentationLst.AsQueryable().Where(r => representationIds.Contains(r.Id)).ToMongoListAsync();
+            else
+                result = await _scimDbContext.SCIMRepresentationLst.AsQueryable(_session).Where(r => representationIds.Contains(r.Id)).ToMongoListAsync();
             var attributeIds = scimRepresentationAttributes.Select(a => a.Id);
             var filter = Builders<SCIMRepresentationAttribute>.Filter.In(a => a.Id, attributeIds);
             _removedAttributeIds.AddRange(scimRepresentationAttributes.Where(r => r.RepresentationId == currentRepresentationId).Select(r => r.Id));

@@ -51,7 +51,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
                 await CheckAccessToken(prefix, Constants.StandardScopes.Groups.Name);
                 IQueryable<Group> query = _groupRepository.Query()
                     .Include(c => c.Realms)
-                    .Where(c => c.Realms.Any(r => r.Name == prefix) && (!request.OnlyRoot || request.OnlyRoot && c.Name == c.FullPath))
+                    .Where(c => c.Realms.Any(r => r.RealmsName == prefix) && (!request.OnlyRoot || request.OnlyRoot && c.Name == c.FullPath))
                     .AsNoTracking();
                 if (!string.IsNullOrWhiteSpace(request.Filter))
                     query = query.Where(request.Filter);
@@ -88,7 +88,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
                     .Include(c => c.Children)
                     .Include(c => c.Roles)
                     .AsNoTracking()
-                    .SingleAsync(g => g.Realms.Any(r => r.Name == prefix) && g.Id == id);
+                    .SingleAsync(g => g.Realms.Any(r => r.RealmsName == prefix) && g.Id == id);
                 if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_GROUP, id));
                 var splittedFullPath = result.FullPath.Split('.');
                var rootGroup = result;
@@ -128,7 +128,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
                     await CheckAccessToken(prefix, Constants.StandardScopes.Groups.Name);
                     var result = await _groupRepository.Query()
                         .Include(c => c.Realms)
-                        .Where(g => g.FullPath.StartsWith(request.FullPath) && g.Realms.Any(r => r.Name == prefix))
+                        .Where(g => g.FullPath.StartsWith(request.FullPath) && g.Realms.Any(r => r.RealmsName == prefix))
                         .ToListAsync();
                     _groupRepository.DeleteRange(result);
                     activity?.SetStatus(ActivityStatusCode.Ok, $"Groups {request.FullPath} are removed");
@@ -164,9 +164,8 @@ namespace SimpleIdServer.IdServer.Api.Groups
                     var groupAlreadyExists = await _groupRepository
                         .Query()
                         .Include(g => g.Realms)
-                        .AnyAsync(g => g.Realms.Any(r => r.Name == prefix) && g.FullPath == fullPath);
+                        .AnyAsync(g => g.Realms.Any(r => r.RealmsName == prefix) && g.FullPath == fullPath);
                     if (groupAlreadyExists) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.GROUP_EXISTS, fullPath));
-                    var realm = await _realmRepository.Query().SingleAsync(r => r.Name == prefix);
                     var grp = new Group
                     {
                         Id = Guid.NewGuid().ToString(),
@@ -177,7 +176,11 @@ namespace SimpleIdServer.IdServer.Api.Groups
                         CreateDateTime = DateTime.UtcNow,
                         UpdateDateTime = DateTime.UtcNow
                     };
-                    grp.Realms.Add(realm);
+                    grp.Realms.Add(new GroupRealm
+                    {
+                        RealmsName = prefix,
+                        GroupsId = grp.Id
+                    });
                     _groupRepository.Add(grp);
                     await _groupRepository.SaveChanges(CancellationToken.None);
                     activity?.SetStatus(ActivityStatusCode.Ok, $"Group {fullPath} is added");
@@ -214,7 +217,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
                     var result = await _groupRepository.Query()
                         .Include(c => c.Realms)
                         .Include(c => c.Roles)
-                        .SingleOrDefaultAsync(g => g.Realms.Any(r => r.Name == prefix) && g.Id == id);
+                        .SingleOrDefaultAsync(g => g.Realms.Any(r => r.RealmsName == prefix) && g.Id == id);
                     if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_GROUP, id));
                     var scope = await _scopeRepository.Query()
                         .Include(s => s.Realms)
@@ -253,7 +256,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
                     var result = await _groupRepository.Query()
                         .Include(c => c.Realms)
                         .Include(c => c.Roles)
-                        .SingleOrDefaultAsync(g => g.Realms.Any(r => r.Name == prefix) && g.Id == id);
+                        .SingleOrDefaultAsync(g => g.Realms.Any(r => r.RealmsName == prefix) && g.Id == id);
                     if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_GROUP, id));
                     var role = result.Roles.SingleOrDefault(r => r.Id == roleId);
                     if (role == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_GROUP_ROLE, roleId));

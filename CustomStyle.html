@@ -1,0 +1,55 @@
+<html>
+	<head>
+		<style>
+			body {
+				margin: 0;
+			}
+			.stateDig{
+				display: flex;
+				padding: 0;
+				margin: 0;
+				container: flex;
+				flex-direction: row;
+			}
+			
+			.stateDig > li {
+				display: flex;
+				flex-direction: row;
+				height: 50px;
+			}
+			
+			.stateDig > li > .title {
+				line-height: 50px;
+				padding-right: 5px;
+				padding-left: 5px;
+				background-color: #d4d4d4;
+				border: 1px solid gray;
+				pointer-events: none;
+			}
+			
+			.stateDig > li.active > .title {
+				background-color: #b9eeb9;
+				border: 1px solid green;
+			}
+			
+			li.node::after {
+				content: "";
+				border: 1px solid black;
+				display: flex;
+				flex-grow: 1;
+				margin: auto;
+				width: 20px;
+			}
+		</style>
+	</head>
+	<body>
+		<ul class="stateDig">
+			<li class="node">
+				<div class="title">Extracted</div>
+			</li>
+			<li class="active">
+				<div class="title">Imported</div>
+			</li>
+		</ul>
+	</body>
+</html>

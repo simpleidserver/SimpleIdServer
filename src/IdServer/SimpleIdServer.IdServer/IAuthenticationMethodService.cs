@@ -12,6 +12,7 @@ namespace SimpleIdServer.IdServer
         string Name { get; }
         Type? OptionsType { get; }
         AuthenticationMethodCapabilities Capabilities { get; }
+        bool IsRegistrationSupported { get; }
         bool IsCredentialExists(User user);
     }
 

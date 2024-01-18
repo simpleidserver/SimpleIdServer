@@ -79,6 +79,24 @@ namespace SimpleIdServer.Scim.Client
             return (RepresentationSerializer.DeserializeSearchRepresentations(jsonObj), json);
         }
 
+        public async Task<RepresentationResult> GetGroup(string id, string accessToken, CancellationToken cancellationToken)
+        {
+            if (_resourceTypes == null) await GetResourceTypes(cancellationToken);
+            var groupEdp = _resourceTypes.Resources.Single(r => r.Name == "Group").Endpoint;
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"{GetPath(groupEdp)}/{id}")
+            };
+            if (!string.IsNullOrWhiteSpace(accessToken)) request.Headers.Add("Authorization", $"Bearer {accessToken}");
+            var httpClient = GetHttpClient();
+            var httpResult = await httpClient.SendAsync(request, cancellationToken);
+            httpResult.EnsureSuccessStatusCode();
+            var json = await httpResult.Content.ReadAsStringAsync(cancellationToken);
+            var jsonObj = JsonObject.Parse(json).AsObject();
+            return RepresentationSerializer.DeserializeRepresentation(jsonObj);
+        }
+
         private HttpClient GetHttpClient()
         {
             if (_httpClient != null) return _httpClient;

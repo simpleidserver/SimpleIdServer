@@ -1,7 +1,6 @@
 ﻿@page "/identityprovisioning"
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject IState<SearchIdentityProvisioningState> searchIdentityProvisioningState
-@inject IState<SearchImportSummariesState> searchImportSummariesState
 @inject IDispatcher dispatcher
 @inject NotificationService notificationService
 @inject DialogService dialogService
@@ -9,11 +8,10 @@
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
-@using SimpleIdServer.IdServer.Website.Stores.ImportSummaryStore;
 
 <RadzenText class="mb-3 no-margin" Text="Extract" TextStyle="TextStyle.DisplayH3" />
 <p>
-    Extract users/groups from one or more storage sources and store the results into CSV files.
+    Extract users and groups from one or more storage sources.
 </p>
 
 <RadzenDataGrid @ref="identityProvisioningGrid"
@@ -35,14 +33,6 @@
                 TItem="SelectableIdentityProvisioning"
                 ColumnWidth="300px">
     <Columns>
-        <RadzenDataGridColumn TItem="SelectableIdentityProvisioning" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
-            <HeaderTemplate>
-                <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
-            </HeaderTemplate>
-            <Template Context="data">
-                <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
-            </Template>
-        </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableIdentityProvisioning" Filterable="false" Sortable="false" Title="Name" Width="80px">
             <Template Context="data">                
                 <RadzenLink Text="@data.Value.Name" Path="@($"/identityprovisioning/{data.Value.Id}/details")" />
@@ -62,77 +52,12 @@
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableIdentityProvisioning" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Update datetime" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableIdentityProvisioning" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
-            <Template Context="data">
-                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
-            </Template>
-        </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
 
-<div class="row mt-2">
-    <div class="col">
-        <RadzenText class="mt-3 mb-3 no-margin" Text="Import" TextStyle="TextStyle.DisplayH3" />
-        <p>
-            Import the extracted users/groups into the Identity Server.
-        </p>
-    </div>
-    <div class="col-3">
-        <RadzenButton class="mb-1" Click="@(args => LaunchImport())" Icon="launch" Text="Import" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
-    </div>
-</div>
-
-<RadzenDataGrid @ref="importSummaryGrid"
-                AllowFiltering="true"
-                AllowColumnResize="true"
-                AllowAlternatingRows="false"
-                FilterMode="FilterMode.Simple"
-                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                AllowSorting="true"
-                PageSize="15"
-                AllowPaging="true"
-                PagerHorizontalAlign="HorizontalAlign.Left"
-                ShowPagingSummary="true"
-                IsLoading="@searchIdentityProvisioningState.Value.IsLoading"
-                Count="@searchImportSummariesState.Value.Count"
-                Data="@searchImportSummariesState.Value.ImportSummaries"
-                LoadData="@LoadImportSummaries"
-                TItem="ImportSummary"
-                ColumnWidth="300px">
-    <Columns>
-        <RadzenDataGridColumn TItem="ImportSummary" Property="StartDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Start" Width="80px" />
-        <RadzenDataGridColumn TItem="ImportSummary" Property="EndDateTime" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Title="End" Width="80px" />
-        <RadzenDataGridColumn TItem="ImportSummary" Property="NbRepresentations" Filterable="false" Sortable="false" Title="Nb Imported" Width="80px" />
-        <RadzenDataGridColumn TItem="ImportSummary" Title="Status" Filterable="false" Sortable="false" Width="80px">
-            <Template Context="data">
-                @if (data.Status == ImportStatus.START)
-                {                    
-                    <RadzenBadge Text="Started" IsPill="true" BadgeStyle="BadgeStyle.Info"></RadzenBadge>
-                }
-                else if (data.Status == ImportStatus.ERROR)
-                {
-                    <RadzenBadge Text="Failed" IsPill="true" BadgeStyle="BadgeStyle.Danger"></RadzenBadge>
-                }
-                else if (data.Status == ImportStatus.SUCCESS)
-                {
-                    <RadzenBadge Text="Success" IsPill="true" BadgeStyle="BadgeStyle.Success"></RadzenBadge>
-                }
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="ImportSummary" Title="Error" Filterable="false" Sortable="false" Width="80px">
-            <Template Context="data">
-                @if(!string.IsNullOrWhiteSpace(data.ErrorMessage))
-                {
-                    <RadzenButton Icon="search" Click="@(args => ShowAudit(data))" />
-                }
-            </Template>
-        </RadzenDataGridColumn>
-    </Columns>
-</RadzenDataGrid>
 
 @code {
     RadzenDataGrid<SelectableIdentityProvisioning> identityProvisioningGrid;
-    RadzenDataGrid<ImportSummary> importSummaryGrid;
     bool selectAll;
 
     protected override void OnAfterRender(bool firstRender)
@@ -145,31 +70,9 @@
                 identityProvisioningGrid.Reload();
                 StateHasChanged();
             });
-            SubscribeToAction<RemoveSelectedIdentityProvisioningSuccessAction>((act) =>
-            {
-                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedIdentityProvisioningRemoved });
-                StateHasChanged();
-            });
-            SubscribeToAction<LaunchImportSuccessAction>((act) =>
-            {
-                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.ImportLaunched });
-                StateHasChanged();
-            });
             if (!searchIdentityProvisioningState.Value.IsLoading)
                 identityProvisioningGrid.Reload();
         }
-    }
-
-    void ToggleAll(bool isSelected)
-    {
-        var act = new ToggleAllIdentityProvisioningAction { IsSelected = isSelected };
-        dispatcher.Dispatch(act);
-    }
-
-    void ToggleChanged(bool isSelected, SelectableIdentityProvisioning identityProvisioning)
-    {
-        var act = new ToggleIdentityProvisioningSelectionAction { IsSelected = isSelected, IdentityProvisioningId = identityProvisioning.Value.Id };
-        dispatcher.Dispatch(act);
     }
 
     void RowRender(RowRenderEventArgs<SelectableIdentityProvisioning> row)
@@ -183,53 +86,9 @@
             row.Attributes.Remove(className);
     }
 
-    void ShowMoreContextMenu(SelectableIdentityProvisioning identityProvisioning, MouseEventArgs args)
-    {
-        contextMenuService.Open(args, new List<ContextMenuItem>
-        {
-            new ContextMenuItem { Text = "Delete", Value = 1 }
-        }, (a) =>
-    {
-    if (a.Value.Equals(1))
-    {
-        var ids = searchIdentityProvisioningState.Value.Values?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
-        if (!ids.Contains(identityProvisioning.Value.Id)) ids.Add(identityProvisioning.Value.Id);
-        var act = new RemoveSelectedIdentityProvisioningAction { Ids = ids};
-        dispatcher.Dispatch(act);
-        contextMenuService.Close();
-    }
-    });
-    }
-
     void LoadIdentityProvisioningLst(LoadDataArgs args)
     {
         var act = new SearchIdentityProvisioningAction { Filter = args.Filter, OrderBy = args.OrderBy, Skip = args.Skip, Take = args.Top };
         dispatcher.Dispatch(act);
-    }
-
-    void LoadImportSummaries(LoadDataArgs args)
-    {
-        var act = new SearchImportSummariesAction { Filter = args.Filter, OrderBy = args.OrderBy, Skip = args.Skip, Take = args.Top };
-        dispatcher.Dispatch(act);
-    }
-
-    void LaunchImport()
-    {
-        var act = new LaunchImportAction();
-        dispatcher.Dispatch(act);
-    }
-
-    async void ShowAudit(ImportSummary importSummary)
-    {
-        await dialogService.OpenAsync<RequestDialog>("Error", new Dictionary<string, object>
-        {
-            { "Content", importSummary.ErrorMessage }
-        }, new DialogOptions
-        {
-            Width = "700px",
-            Height = "512px",
-            Resizable = true,
-            Draggable = true
-        });
     }
 }

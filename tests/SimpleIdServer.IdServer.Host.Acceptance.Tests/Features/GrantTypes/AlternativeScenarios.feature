@@ -85,18 +85,19 @@ Scenario: when using offline_scope the client can access to the userinfo even if
 	| redirect_uri  | http://localhost:8080            |
 	| nonce         | nonce                            |
 	| display       | popup                            |
-	
-	And extract parameter 'refresh_token' from redirect url
-	And disconnect the user
+	And extract parameter 'code' from redirect url
 	
 	And execute HTTP POST request 'http://localhost/token'
-	| Key           | Value            |
-	| grant_type    | refresh_token    |
-	| refresh_token | $refresh_token$  |
-	| client_id     | thirtySixClient  |
-	| client_secret | password         |
-	
-	And extract JSON from body
+	| Key           | Value                 |
+	| grant_type    | authorization_code    |
+	| code          | $code$                |
+	| client_id     | thirtySixClient       |
+	| client_secret | password              |
+	| redirect_uri  | http://localhost:8080	|
+
+	And disconnect the user	
+	And extract JSON from body	
+	And extract parameter 'refresh_token' from JSON body
 	And extract parameter 'access_token' from JSON body
 
 	And execute HTTP GET request 'http://localhost/userinfo'

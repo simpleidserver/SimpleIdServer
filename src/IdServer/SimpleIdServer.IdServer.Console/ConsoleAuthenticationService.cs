@@ -14,5 +14,7 @@ public class ConsoleAuthenticationService : IAuthenticationMethodService
 
     public AuthenticationMethodCapabilities Capabilities => AuthenticationMethodCapabilities.PUSHNOTIFICATION | AuthenticationMethodCapabilities.USERAUTHENTICATION;
 
+    public bool IsRegistrationSupported => false;
+
     public bool IsCredentialExists(User user) => true;
 }

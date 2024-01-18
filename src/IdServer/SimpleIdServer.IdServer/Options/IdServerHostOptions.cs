@@ -6,7 +6,6 @@ using SimpleIdServer.IdServer.Api.Token.PKCECodeChallengeMethods;
 using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.ClaimTokenFormats;
-using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Middlewares;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
 using System.Collections.Generic;
@@ -199,6 +198,10 @@ namespace SimpleIdServer.IdServer.Options
         /// Lifetime of a DPoP in seconds.
         /// </summary>
         public double DPoPLifetimeSeconds { get; set; } = 5 * 60;
+        /// <summary>
+        /// Defint the time in MS to end the user's session.
+        /// </summary>
+        public int EndSessionRedirectionTimeInMS { get; set; } = 3 * 1000;
 
         public int GetIntParameter(string name) => int.Parse(Parameters[name]);
 

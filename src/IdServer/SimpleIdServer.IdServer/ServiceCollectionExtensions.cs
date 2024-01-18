@@ -52,6 +52,7 @@ using SimpleIdServer.IdServer.UI.Services;
 using System;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -100,7 +101,6 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddRegisterApi()
                 .AddBCAuthorizeApi()
                 .AddDeviceAuthorizationApi()
-                .AddIdentityProvisioning()
                 .AddTokenTypes();
             services.AddAuthorization();
             services.Configure<AuthorizationOptions>(o =>
@@ -122,7 +122,7 @@ namespace Microsoft.Extensions.DependencyInjection
                             var cookieValue = ctx.Options.TicketDataFormat.Protect(ticket, GetTlsTokenBinding(ctx));
                             ctx.Options.CookieManager.AppendResponseCookie(
                                 ctx.HttpContext,
-                                $"{IdServerCookieAuthenticationHandler.GetCookieName(ctx.Options.Cookie.Name)}-{nameIdentifier}",
+                                $"{IdServerCookieAuthenticationHandler.GetCookieName(ctx.Options.Cookie.Name)}-{nameIdentifier.SanitizeNameIdentifier()}",
                                 cookieValue,
                                 ctx.CookieOptions);
                         }
@@ -136,7 +136,7 @@ namespace Microsoft.Extensions.DependencyInjection
                             var nameIdentifier = ctx.HttpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
                             ctx.Options.CookieManager.DeleteCookie(
                                 ctx.HttpContext,
-                                $"{IdServerCookieAuthenticationHandler.GetCookieName(ctx.Options.Cookie.Name)}-{nameIdentifier}",
+                                $"{IdServerCookieAuthenticationHandler.GetCookieName(ctx.Options.Cookie.Name)}-{nameIdentifier.SanitizeNameIdentifier()}",
                                 ctx.CookieOptions);
                             return Task.CompletedTask;
                         }
@@ -299,12 +299,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IBCAuthorizeHandler, BCAuthorizeHandler>();
             services.AddTransient<IBCAuthorizeRequestValidator, BCAuthorizeRequestValidator>();
             services.AddTransient<IBCNotificationService, BCNotificationService>();
-            return services;
-        }
-
-        private static IServiceCollection AddIdentityProvisioning(this IServiceCollection services)
-        {
-            services.AddTransient<IImportRepresentationJob, ImportRepresentationJob>();
             return services;
         }
 

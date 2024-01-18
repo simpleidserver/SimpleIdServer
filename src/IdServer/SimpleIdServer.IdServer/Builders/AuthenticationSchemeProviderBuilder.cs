@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Domains;
 using System;
 using System.Collections.Generic;
@@ -32,6 +33,12 @@ namespace SimpleIdServer.IdServer.Builders
                     Constants.StandardRealms.Master
                 }
             });
+        }
+
+        public AuthenticationSchemeProviderBuilder SetMappers(ICollection<AuthenticationSchemeProviderMapper> mappers)
+        {
+            _provider.Mappers = mappers;
+            return this;
         }
 
         public AuthenticationSchemeProvider Build() => _provider;

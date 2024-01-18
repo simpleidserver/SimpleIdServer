@@ -11,5 +11,12 @@ public class IdentityProvisioningMappingRule : IProvisioningMappingRule
     public string? TargetUserAttribute { get; set; } = null;
     public string? TargetUserProperty { get; set; } = null;
     public bool HasMultipleAttribute { get; set; } = false;
+    public IdentityProvisioningMappingUsage Usage { get; set; } = IdentityProvisioningMappingUsage.USER;
     public IdentityProvisioningDefinition IdentityProvisioningDefinition { get; set; } = null!;
+}
+
+public enum IdentityProvisioningMappingUsage
+{
+    USER = 0,
+    GROUP = 1
 }

@@ -35,7 +35,7 @@ public class RegistrationController : BaseController
 	}
 
 	[HttpGet]
-	public async Task<IActionResult> Index([FromRoute] string prefix, string? workflowName = null)
+	public async Task<IActionResult> Index([FromRoute] string prefix, string? workflowName = null, string? redirectUrl = null)
 	{
 		prefix = prefix ?? Constants.DefaultRealm;
 		RegistrationWorkflow registrationWorkflow = null;
@@ -45,7 +45,15 @@ public class RegistrationController : BaseController
 		var amr = registrationWorkflow.Steps.First();
 		var cookieName = _options.GetRegistrationCookieName();
 		var registrationProgressId = Guid.NewGuid().ToString();
-		var registrationProgress = new UserRegistrationProgress { RegistrationProgressId = registrationProgressId, Amr = amr, WorkflowName = registrationWorkflow.Name, Realm = prefix, Steps = registrationWorkflow.Steps };
+		var registrationProgress = new UserRegistrationProgress 
+		{ 
+			RegistrationProgressId = registrationProgressId, 
+			Amr = amr, 
+			WorkflowName = registrationWorkflow.Name, 
+			Realm = prefix, 
+			Steps = registrationWorkflow.Steps,
+			RedirectUrl = redirectUrl
+		};
         Response.Cookies.Append(cookieName, registrationProgress.RegistrationProgressId, new CookieOptions
         {
             Secure = true

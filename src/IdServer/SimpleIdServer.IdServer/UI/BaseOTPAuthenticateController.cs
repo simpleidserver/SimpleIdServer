@@ -56,6 +56,12 @@ namespace SimpleIdServer.IdServer.UI
             }
 
             var activeOtp = authenticatedUser.ActiveOTP;
+            if(activeOtp == null)
+            {
+                ModelState.AddModelError("no_active_otp", "no_active_otp");
+                return UserAuthenticationResult.Error(View(viewModel));
+            }
+
             var otpAuthenticator = _otpAuthenticators.Single(a => a.Alg == activeOtp.OTPAlg);
             switch(viewModel.Action)
             {

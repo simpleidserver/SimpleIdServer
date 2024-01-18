@@ -2,6 +2,7 @@
 @using Fluxor.Blazor.Web.Components;
 @using SimpleIdServer.Configuration.DTOs;
 @using SimpleIdServer.Configuration;
+@using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.AuthMethodsStore;
 @using SimpleIdServer.IdServer.Website.Stores.ConfigurationDefinitionStore;
 @using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
@@ -11,73 +12,80 @@
 @if(Properties != null)
 {
     <RadzenStack>
-        @foreach (var property in Properties.OrderBy(p => p.Order))
+        @if(!Properties.Any())
         {
-            @if(property.Type != ConfigurationDefinitionRecordTypes.CHECKBOX && property.Type != ConfigurationDefinitionRecordTypes.OTPVALUE && property.Type != ConfigurationDefinitionRecordTypes.NOTIFICATIONMODE)
+            <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@Global.NoProperties</RadzenAlert>
+        }
+        else
+        {
+            @foreach (var property in Properties.OrderBy(p => p.Order))
             {
-                <RadzenFormField Text="@property.DisplayName" Variant=Variant.Outlined>
-                    <ChildContent>
-                        @switch (property.Type)
-                        {
-                            case ConfigurationDefinitionRecordTypes.INPUT:
-                                <RadzenTextBox @bind-Value="@property.Value"></RadzenTextBox>
-                                break;
-                            case ConfigurationDefinitionRecordTypes.PASSWORD:
-                                <RadzenPassword @bind-Value="@property.Value"></RadzenPassword>
-                                break;
-                            case ConfigurationDefinitionRecordTypes.NUMBER:
-                                <RadzenNumeric @bind-Value="@property.Value"></RadzenNumeric>
-                                break;
-                            case ConfigurationDefinitionRecordTypes.SELECT:
-                                <RadzenDropDown @bind-Value="@property.Value" Data="@property.PossibleValues" Change="@((o) => Select(property, o))" TextProperty="Name" ValueProperty="Value" />
-                                break;
-                        }
-                    </ChildContent>
-                    <Helper>
-                        <RadzenText TextStyle="TextStyle.Caption">@property.Description</RadzenText>
-                    </Helper>
-                </RadzenFormField>
-            }
-            else if(property.Type == ConfigurationDefinitionRecordTypes.OTPVALUE)
-            {
-                <RadzenRow Gap="1rem">
-                    <RadzenColumn Size="10">
-                        <RadzenFormField Class="w-100" Text="@property.DisplayName" Variant=Variant.Outlined>
-                            <ChildContent>
-                                <RadzenTextBox @bind-Value="@property.Value"></RadzenTextBox>
-                            </ChildContent>
-                            <Helper>
-                                <RadzenText TextStyle="TextStyle.Caption">@property.Description</RadzenText>
-                            </Helper>
-                        </RadzenFormField>
-                    </RadzenColumn>
-                    <RadzenColumn><RadzenButton Click="@((args) => GenerateOTPValue(property))" ButtonStyle="ButtonStyle.Secondary" Text="Generate OTP Value"></RadzenButton></RadzenColumn>
-                </RadzenRow>            
-            }
-            else if(property.Type == ConfigurationDefinitionRecordTypes.NOTIFICATIONMODE)
-            {
-                <RadzenFormField Text="@property.DisplayName" Variant=Variant.Outlined>
-                    <ChildContent>                        
-                        <RadzenDropDown @bind-Value="@property.Value" 
-                            Data="@authMethodsState.Value.AuthenticationMethods.Where(m => m.Capabilities.HasFlag(AuthenticationMethodCapabilities.PUSHNOTIFICATION))"  
-                            TextProperty="Name" 
-                            ValueProperty="Id" />
-                    </ChildContent>
-                    <Helper>
-                        <RadzenText TextStyle="TextStyle.Caption">@property.Description</RadzenText>
-                    </Helper>
-                </RadzenFormField>
-            }
-            else if(property.Type == ConfigurationDefinitionRecordTypes.CHECKBOX)
-            {
-                <div>
+                @if (property.Type != ConfigurationDefinitionRecordTypes.CHECKBOX && property.Type != ConfigurationDefinitionRecordTypes.OTPVALUE && property.Type != ConfigurationDefinitionRecordTypes.NOTIFICATIONMODE)
+                {
+                    <RadzenFormField Text="@property.DisplayName" Variant=Variant.Outlined>
+                        <ChildContent>
+                            @switch (property.Type)
+                            {
+                                case ConfigurationDefinitionRecordTypes.INPUT:
+                                    <RadzenTextBox @bind-Value="@property.Value"></RadzenTextBox>
+                                    break;
+                                case ConfigurationDefinitionRecordTypes.PASSWORD:
+                                    <RadzenPassword @bind-Value="@property.Value"></RadzenPassword>
+                                    break;
+                                case ConfigurationDefinitionRecordTypes.NUMBER:
+                                    <RadzenNumeric @bind-Value="@property.Value"></RadzenNumeric>
+                                    break;
+                                case ConfigurationDefinitionRecordTypes.SELECT:
+                                    <RadzenDropDown @bind-Value="@property.Value" Data="@property.PossibleValues" Change="@((o) => Select(property, o))" TextProperty="Name" ValueProperty="Value" />
+                                    break;
+                            }
+                        </ChildContent>
+                        <Helper>
+                            <RadzenText TextStyle="TextStyle.Caption">@property.Description</RadzenText>
+                        </Helper>
+                    </RadzenFormField>
+                }
+                else if (property.Type == ConfigurationDefinitionRecordTypes.OTPVALUE)
+                {
+                    <RadzenRow Gap="1rem">
+                        <RadzenColumn Size="10">
+                            <RadzenFormField Class="w-100" Text="@property.DisplayName" Variant=Variant.Outlined>
+                                <ChildContent>
+                                    <RadzenTextBox @bind-Value="@property.Value"></RadzenTextBox>
+                                </ChildContent>
+                                <Helper>
+                                    <RadzenText TextStyle="TextStyle.Caption">@property.Description</RadzenText>
+                                </Helper>
+                            </RadzenFormField>
+                        </RadzenColumn>
+                        <RadzenColumn><RadzenButton Click="@((args) => GenerateOTPValue(property))" ButtonStyle="ButtonStyle.Secondary" Text="Generate OTP Value"></RadzenButton></RadzenColumn>
+                    </RadzenRow>
+                }
+                else if (property.Type == ConfigurationDefinitionRecordTypes.NOTIFICATIONMODE)
+                {
+                    <RadzenFormField Text="@property.DisplayName" Variant=Variant.Outlined>
+                        <ChildContent>
+                            <RadzenDropDown @bind-Value="@property.Value"
+                                            Data="@authMethodsState.Value.AuthenticationMethods.Where(m => m.Capabilities.HasFlag(AuthenticationMethodCapabilities.PUSHNOTIFICATION))"
+                                            TextProperty="Name"
+                                            ValueProperty="Id" />
+                        </ChildContent>
+                        <Helper>
+                            <RadzenText TextStyle="TextStyle.Caption">@property.Description</RadzenText>
+                        </Helper>
+                    </RadzenFormField>
+                }
+                else if (property.Type == ConfigurationDefinitionRecordTypes.CHECKBOX)
+                {
                     <div>
-                        <RadzenCheckBox @bind-Value="@property.ValueBoolean" Name="Checkbox" />
-                        <RadzenLabel Text="@property.DisplayName" Component="Checkbox" Style="margin-left: 8px; vertical-align: middle;" />
+                        <div>
+                            <RadzenCheckBox @bind-Value="@property.ValueBoolean" Name="Checkbox" />
+                            <RadzenLabel Text="@property.DisplayName" Component="Checkbox" Style="margin-left: 8px; vertical-align: middle;" />
+                        </div>
+                        <p class="text-muted">@property.Description</p>
                     </div>
-                    <p class="text-muted">@property.Description</p>
-                </div>
-            }
+                }
+            }            
         }
     </RadzenStack>
 

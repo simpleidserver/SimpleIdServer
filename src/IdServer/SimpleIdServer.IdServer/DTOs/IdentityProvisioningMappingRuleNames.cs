@@ -10,4 +10,5 @@ public static class IdentityProvisioningMappingRuleNames
     public const string TargetUserAttribute = "target_user_attribute";
     public const string TargetUserProperty = "target_user_property";
     public const string HasMultipleAttribute = "has_multiple_attribute";
+    public const string Usage = "usage";
 }

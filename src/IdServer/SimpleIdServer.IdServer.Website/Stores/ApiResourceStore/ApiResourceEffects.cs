@@ -119,11 +119,11 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
             var requestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Put,
-                RequestUri = new Uri($"{baseUrl}/{action.Name}/resources"),
+                RequestUri = new Uri($"{baseUrl}/{action.Id}/resources"),
                 Content = new StringContent(JsonSerializer.Serialize(addRequest), Encoding.UTF8, "application/json")
             };
             await httpClient.SendAsync(requestMessage);
-            dispatcher.Dispatch(new UpdateApiScopeResourcesSuccessAction { Name = action.Name, Resources = action.Resources });
+            dispatcher.Dispatch(new UpdateApiScopeResourcesSuccessAction { Id = action.Id, Resources = action.Resources });
         }
 
         private Task<string> GetApiResourcesBaseUrl() => GetBaseUrl("apiresources");
@@ -193,13 +193,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
 
     public class UpdateApiScopeResourcesAction
     {
-        public string Name { get; set; } = null!;
+        public string Id { get; set; } = null!;
         public IEnumerable<string> Resources { get; set; } = new List<string>();
     }
 
     public class UpdateApiScopeResourcesSuccessAction
     {
-        public string Name { get; set; } = null!;
+        public string Id { get; set; } = null!;
         public IEnumerable<string> Resources { get; set; } = new List<string>();
     }
 

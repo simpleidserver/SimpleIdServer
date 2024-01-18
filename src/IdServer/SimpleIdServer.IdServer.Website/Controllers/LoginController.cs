@@ -4,19 +4,25 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using SimpleIdServer.IdServer.Website.ViewModels;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.IdServer.Website.Controllers;
 
 public class LoginController : Controller
 {
     private readonly DefaultSecurityOptions _defaultSecurityOptions;
+    private readonly ILogger<LoginController> _logger;
 
-    public LoginController(DefaultSecurityOptions defaultSecurityOptions)
+    public LoginController(
+        DefaultSecurityOptions defaultSecurityOptions,
+        ILogger<LoginController> logger)
     {
         _defaultSecurityOptions = defaultSecurityOptions;
+        _logger = logger;
     }
 
     [Route("login")]
@@ -36,7 +42,8 @@ public class LoginController : Controller
 
     [Route("callback")]
     public async Task<IActionResult> Callback()
-    {        
+    {
+        _logger.LogInformation("Execute callback");
         var tokenEndpoint = $"{_defaultSecurityOptions.Issuer}/token";
         var userInfoEndpoint = $"{_defaultSecurityOptions.Issuer}/userinfo";
         var authorizationResponse = await ExtractAuthorizationResponse();
@@ -68,7 +75,7 @@ public class LoginController : Controller
     private async Task<OpenIdConnectMessage> GetToken(OpenIdConnectMessage authorizationResponse, string tokenEndpoint)
     {
         var redirectUri = GetRedirectUri();
-        using (var httpClient = new HttpClient())
+        using (var httpClient = BuildHttpClient())
         {
             var tokenEndpointRequest = new OpenIdConnectMessage
             {
@@ -88,15 +95,35 @@ public class LoginController : Controller
 
     private async Task<Dictionary<string, string>> GetUserInfo(OpenIdConnectMessage token, string userInfoEndpoint)
     {
-        using(var httpClient = new HttpClient())
+        using(var httpClient = BuildHttpClient())
         {
             var request = new HttpRequestMessage { Method = HttpMethod.Get, RequestUri = new Uri(userInfoEndpoint) };
             request.Headers.Add("Authorization", $"Bearer {token.AccessToken}");
             var httpResult = await httpClient.SendAsync(request);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+            var jObj = JsonObject.Parse(json).AsObject();
+            var result = new Dictionary<string, string>();
+            foreach(var record in jObj)
+            {
+                if (record.Value == null) continue;
+                result.Add(record.Key, record.Value.ToString());
+            }
+
             return result;
         }
+    }
+
+    private HttpClient BuildHttpClient()
+    {
+        if (!_defaultSecurityOptions.IgnoreCertificateError) return new HttpClient();
+        var handler = new HttpClientHandler
+        {
+            ServerCertificateCustomValidationCallback = (httpRequestMessage, cert, cetChain, policyErrors) =>
+            {
+                return true;
+            }
+        };
+        return new HttpClient(handler);
     }
 
     private string GetRedirectUri()

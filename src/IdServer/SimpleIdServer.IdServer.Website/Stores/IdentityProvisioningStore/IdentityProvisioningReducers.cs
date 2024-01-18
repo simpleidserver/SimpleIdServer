@@ -1,8 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
+using Nethereum.ABI.Encoders;
 using SimpleIdServer.IdServer.Api.Provisioning;
-using SimpleIdServer.IdServer.Domains;
 
 namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
 {
@@ -37,28 +37,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             return state with
             {
                 Values = values
-            };
-        }
-
-        [ReducerMethod]
-        public static SearchIdentityProvisioningState ReduceRemoveSelectedIdentityProvisioningAction(SearchIdentityProvisioningState state, RemoveSelectedIdentityProvisioningAction act)
-        {
-            return state with
-            {
-                IsLoading = true
-            };
-        }
-
-        [ReducerMethod]
-        public static SearchIdentityProvisioningState ReduceRemoveSelectedIdentityProvisioningSuccessAction(SearchIdentityProvisioningState state, RemoveSelectedIdentityProvisioningSuccessAction act)
-        {
-            var values = state.Values.ToList();
-            values = values.Where(v => !act.Ids.Contains(v.Value.Id)).ToList();
-            return state with
-            {
-                IsLoading = false,
-                Values = values,
-                Count = values.Count
             };
         }
 
@@ -126,19 +104,56 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         [ReducerMethod]
         public static IdentityProvisioningState ReduceLaunchIdentityProvisioningSuccessAction(IdentityProvisioningState state, LaunchIdentityProvisioningSuccessAction act)
         {
-            var idProvisioning = state.IdentityProvisioning;
-            var histories = state.IdentityProvisioning.Histories.ToList();
-            histories.Add(new IdentityProvisioningHistoryResult
+            var identityProvisioning = state.IdentityProvisioning;
+            identityProvisioning.Processes.Add(new IdentityProvisioningProcessResult
             {
-                StartDateTime = DateTime.UtcNow,
-                NbRepresentations = 0,
-                Status = IdentityProvisioningHistoryStatus.START
+                Id = act.ProcessId,
+                CreateDateTime = DateTime.UtcNow
             });
-            idProvisioning.Histories = histories;
             return state with
             {
-                IsLoading = false,
-                IdentityProvisioning = idProvisioning
+                IdentityProvisioning = identityProvisioning,
+                IsLoading = false
+            };
+        }
+
+        [ReducerMethod]
+        public static IdentityProvisioningState ReduceLaunchIdentityProvisioningImportAction(IdentityProvisioningState state, LaunchIdentityProvisioningImportAction act)
+        {
+            return state with
+            {
+                IsLoading = true
+            };
+        }
+
+        [ReducerMethod]
+        public static IdentityProvisioningState ReduceLaunchIdentityProvisioningImportSuccessAction(IdentityProvisioningState state, LaunchIdentityProvisioningImportSuccessAction act)
+        {
+            var identityProvisioning = state.IdentityProvisioning;
+            var process = identityProvisioning.Processes.Single(p => p.Id == act.ProcessId);
+            process.StartImportDateTime = DateTime.UtcNow;
+            return state with
+            {
+                IdentityProvisioning = identityProvisioning,
+                IsLoading = false
+            };
+        }
+
+        [ReducerMethod]
+        public static IdentityProvisioningState ReduceLaunchIdentityProvisioningImportFailureAction(IdentityProvisioningState state, LaunchIdentityProvisioningImportFailureAction act)
+        {
+            return state with
+            {
+                IsLoading = false
+            };
+        }
+
+        [ReducerMethod]
+        public static IdentityProvisioningState ReduceLaunchIdentityProvisioningFailureAction(IdentityProvisioningState state, LaunchIdentityProvisioningFailureAction act)
+        {
+            return state with
+            {
+                IsLoading = false
             };
         }
 
@@ -236,7 +251,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
                 From = act.From,
                 MapperType = act.MappingRule,
                 TargetUserAttribute = act.TargetUserAttribute,
-                TargetUserProperty = act.TargetUserProperty
+                TargetUserProperty = act.TargetUserProperty,
+                Usage = act.Usage
             })
             {
                 IsNew = true
@@ -257,6 +273,62 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
 
         [ReducerMethod]
         public static UpdateIdentityProvisioningState ReduceAddIdentityProvisioningMappingRuleSuccessAction(UpdateIdentityProvisioningState state, AddIdentityProvisioningMappingRuleSuccessAction act) => new(false, null);
+
+        [ReducerMethod]
+        public static UpdateIdentityProvisioningState ReduceAddIdentityProvisioningMappingRuleFailureAction(UpdateIdentityProvisioningState state, AddIdentityProvisioningMappingRuleFailureAction act) => new(false, null);
+
+        [ReducerMethod]
+        public static UpdateIdentityProvisioningState ReduceUpdateIdentityProvisioningMappingRuleAction(UpdateIdentityProvisioningState state, UpdateIdentityProvisioningMappingRuleAction act) => new(true, null);
+
+        [ReducerMethod]
+        public static UpdateIdentityProvisioningState ReduceUpdateIdentityProvisioningMappingRuleSuccessAction(UpdateIdentityProvisioningState state, UpdateIdentityProvisioningMappingRuleSuccessAction act) => new(false, null);
+
+        [ReducerMethod]
+        public static UpdateIdentityProvisioningState ReduceUpdateIdentityProvisioningMappingRuleFailureAction(UpdateIdentityProvisioningState state, UpdateIdentityProvisioningMappingRuleFailureAction act) => new(false, null);
+
+        #endregion
+
+        #region IdentityProvisioningMappingRuleState
+
+        [ReducerMethod]
+        public static IdentityProvisioningMappingRuleState ReduceGetIdentityProvisioningMappingRuleAction(IdentityProvisioningMappingRuleState state, GetIdentityProvisioningMappingRuleAction act)
+        {
+            return state with
+            {
+                IsLoading = true
+            };
+        }
+
+        [ReducerMethod]
+        public static IdentityProvisioningMappingRuleState ReduceGetIdentityPriovisioningMappingRuleSuccessAction(IdentityProvisioningMappingRuleState state, GetIdentityPriovisioningMappingRuleSuccessAction act)
+        {
+            return state with
+            {
+                IsLoading = false,
+                Mapping = act.MappingRule
+            };
+        }
+
+        [ReducerMethod]
+        public static IdentityProvisioningMappingRuleState ReduceGetIdentityPriovisioningMappingRuleFailureAction(IdentityProvisioningMappingRuleState state, GetIdentityPriovisioningMappingRuleFailureAction act)
+        {
+            return state with
+            {
+                IsLoading = false,
+                Mapping = null
+            };
+        }
+
+        [ReducerMethod]
+        public static IdentityProvisioningMappingRuleState ReduceUpdateIdentityProvisioningMappingRuleSuccessAction(IdentityProvisioningMappingRuleState state, UpdateIdentityProvisioningMappingRuleSuccessAction act)
+        {
+            var mapping = state.Mapping;
+            mapping.From = act.From;
+            mapping.TargetUserAttribute = act.TargetUserAttribute;
+            mapping.TargetUserProperty = act.TargetUserProperty;
+            mapping.HasMultipleAttribute = act.HasMultipleAttribute;
+            return state;
+        }
 
         #endregion
     }

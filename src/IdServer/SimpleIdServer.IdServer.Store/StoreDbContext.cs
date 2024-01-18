@@ -13,6 +13,7 @@ namespace SimpleIdServer.IdServer.Store
 
         public DbSet<Client> Clients { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<RealmUser> RealmUser { get; set; }
         public DbSet<Scope> Scopes { get; set; }
         public DbSet<Translation> Translations { get; set; }
         public DbSet<Token> Tokens { get; set; }
@@ -34,7 +35,7 @@ namespace SimpleIdServer.IdServer.Store
         public DbSet<UserClaim> UserClaims { get; set; }
         public DbSet<UserCredential> UserCredential { get; set; }
         public DbSet<ExtractedRepresentation> ExtractedRepresentations { get; set; }
-        public DbSet<ImportSummary> ImportSummaries { get; set; }
+        public DbSet<ExtractedRepresentationStaging> ExtractedRepresentationsStaging { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<CredentialTemplate> CredentialTemplates { get; set; }
         public DbSet<UserCredentialOffer> CredentialOffers { get; set; }
@@ -45,10 +46,14 @@ namespace SimpleIdServer.IdServer.Store
         public DbSet<ConfigurationDefinition> Definitions { get; set; }
         public DbSet<ConfigurationKeyPairValueRecord> ConfigurationKeyPairValueRecords { get; set; }
         public DbSet<RegistrationWorkflow> RegistrationWorkflows { get; set; }
+        public DbSet<Language> Languages { get; set; }
+        public DbSet<GroupRealm> GroupRealm { get; set; }
+        public DbSet<GroupUser> GroupUser { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            builder.ApplyConfiguration(new LanguageConfiguration());
             builder.ApplyConfiguration(new ClientConfiguration());
             builder.ApplyConfiguration(new ConsentConfiguration());
             builder.ApplyConfiguration(new ScopeClaimConfiguration());
@@ -89,7 +94,6 @@ namespace SimpleIdServer.IdServer.Store
             builder.ApplyConfiguration(new IdentityProvisioningHistoryConfiguration());
             builder.ApplyConfiguration(new ExtractedRepresentationConfiguration());
             builder.ApplyConfiguration(new RealmUserConfiguration());
-            builder.ApplyConfiguration(new ImportSummaryConfiguration());
             builder.ApplyConfiguration(new GroupConfiguration());
             builder.ApplyConfiguration(new BaseCredentialTemplateConfiguration());
             builder.ApplyConfiguration(new CredentialTemplateConfiguration());
@@ -103,6 +107,9 @@ namespace SimpleIdServer.IdServer.Store
             builder.ApplyConfiguration(new ConfigurationKeyPairValueRecordConfiguration());
             builder.ApplyConfiguration(new RegistrationWorkflowConfiguration());
             builder.ApplyConfiguration(new AuthorizedResourceConfiguration());
+            builder.ApplyConfiguration(new ExtractedRepresentationStagingConfiguration());
+            builder.ApplyConfiguration(new GroupRealmConfiguration());
+            builder.ApplyConfiguration(new GroupUserConfiguration());
         }
     }
 }

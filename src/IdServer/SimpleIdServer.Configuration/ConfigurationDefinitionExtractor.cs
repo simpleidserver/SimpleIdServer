@@ -5,16 +5,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 
 namespace SimpleIdServer.Configuration;
 
 public class ConfigurationDefinitionExtractor
 {
-    public static ConfigurationDefinition Extract<T>(string language = null)
+    public static ConfigurationDefinition Extract<T>()
     {
         var type = typeof(T);
-        language ??= Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
+        var language = Language.Default;
+        // default language (en).
         var result = new ConfigurationDefinition { Id = type.Name, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow, FullQualifiedName = type.FullName };
         var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
         foreach(var property in properties)

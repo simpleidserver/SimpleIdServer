@@ -12,6 +12,8 @@ namespace System
 
         public static string Join(this IEnumerable<string> arr, string separator = ",") => string.Join(separator, arr);
 
+        public static string SanitizeNameIdentifier(this string nameIdentifier) => nameIdentifier.Replace("\\", string.Empty);
+
         public static string ExtractAuthorizationValue(this string str, IEnumerable<string> authenticationSchemes)
         {
             if (string.IsNullOrWhiteSpace(str)) return null;

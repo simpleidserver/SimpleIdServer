@@ -86,5 +86,6 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
         public const string Scopes = "scopes";
         public const string IsRedirectUrlCaseSensitive = "is_redirect_url_casesensitive";
         public const string AccessTokenType = "access_token_type";
+        public const string RedirectToRevokeSessionUI = "redirect_revoke_session_ui";
     }
 }

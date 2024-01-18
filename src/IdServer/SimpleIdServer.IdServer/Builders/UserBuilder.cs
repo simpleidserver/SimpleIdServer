@@ -82,7 +82,10 @@ namespace SimpleIdServer.IdServer.Builders
 
         public UserBuilder AddGroup(Group group)
         {
-            _user.Groups.Add(group);
+            _user.Groups.Add(new GroupUser
+            {
+                GroupsId = group.Id
+            });
             return this; 
         }
 

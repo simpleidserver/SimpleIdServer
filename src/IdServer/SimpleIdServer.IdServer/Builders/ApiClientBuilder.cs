@@ -114,7 +114,7 @@ namespace SimpleIdServer.IdServer.Builders
         public ApiClientBuilder SetClientName(string clientName, string language = null)
         {
             if (string.IsNullOrWhiteSpace(language))
-                language = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
+                language = Domains.Language.Default;
 
             _client.Translations.Add(new Translation
             {

@@ -1,0 +1,65 @@
+﻿@using SimpleIdServer.IdServer.Api.AuthenticationSchemeProviders;
+@using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
+@using System.Reflection;
+@inject IState<UpdateIdProviderState> updateIdProviderState
+
+<RadzenTemplateForm Submit=@SubmitUpdateUserPropertyIdProvider TItem="UserUniqueIdentifierIdProviderMapperForm" Data=@userUniqueIdentiferMapperForm>
+    <!-- Name -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+        <RadzenTextBox Name="Name" @bind-Value="@userUniqueIdentiferMapperForm.Name" Class="w-100"></RadzenTextBox>
+        <RadzenRequiredValidator Component="Name" Text="Name is required"></RadzenRequiredValidator>
+    </div>
+    <!-- Token Claim Name -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Source Claim Name</RadzenText>
+        <RadzenTextBox Name="SourceClaimName" @bind-Value="@userUniqueIdentiferMapperForm.SourceClaimName" Class="w-100"></RadzenTextBox>
+        <RadzenRequiredValidator Component="SourceClaimName" Text="Source Claim name is required"></RadzenRequiredValidator>
+    </div>
+    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateIdProviderState.Value.IsUpdating ? "Saving..." : "Save")" Disabled="@(updateIdProviderState.Value.IsUpdating)" />
+</RadzenTemplateForm>
+
+@code {
+    [Parameter]
+    public EventCallback<AuthenticationSchemeProviderMapperResult> AuthProviderMapperUpdated { get; set; }
+    [Parameter]
+    public AuthenticationSchemeProviderMapperResult Mapper { get; set; }
+    [Parameter]
+    public MappingRuleTypes Type { get; set; }
+    IEnumerable<string> userProperties = new List<string>();
+
+    record UserUniqueIdentifierIdProviderMapperForm
+    {
+        public string Name { get; set; }
+        public string SourceClaimName { get; set; }
+    }
+
+    UserUniqueIdentifierIdProviderMapperForm userUniqueIdentiferMapperForm = new UserUniqueIdentifierIdProviderMapperForm();
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        userProperties = typeof(User).GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                .Where(p =>
+                {
+                    var attr = p.GetCustomAttribute<UserPropertyAttribute>();
+                    return attr == null ? false : attr.IsVisible;
+                })
+                .Select(p => p.Name);
+        if (Mapper != null)
+        {
+            userUniqueIdentiferMapperForm.Name = Mapper.Name;
+            userUniqueIdentiferMapperForm.SourceClaimName = Mapper.SourceClaimName;
+        }
+    }
+
+    async void SubmitUpdateUserPropertyIdProvider(UserUniqueIdentifierIdProviderMapperForm value)
+    {
+        await AuthProviderMapperUpdated.InvokeAsync(new AuthenticationSchemeProviderMapperResult
+        {
+            Name = value.Name,
+            SourceClaimName = value.SourceClaimName,
+            MapperType = Type
+        });
+    }
+}

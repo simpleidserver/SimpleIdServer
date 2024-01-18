@@ -11,70 +11,48 @@
 			"item": [
 				{
 					"name": "Get access token",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"access_token\", jsonData.access_token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
-							"type": "oauth2",
-							"oauth2": [
-								{
-									"key": "tokenName",
-									"value": "Users",
-									"type": "string"
-								},
-								{
-									"key": "scope",
-									"value": "openid users",
-									"type": "string"
-								},
-								{
-									"key": "client_authentication",
-									"value": "body",
-									"type": "string"
-								},
-								{
-									"key": "clientSecret",
-									"value": "password",
-									"type": "string"
-								},
-								{
-									"key": "accessTokenUrl",
-									"value": "https://localhost:5001/master/token",
-									"type": "string"
-								},
-								{
-									"key": "grant_type",
-									"value": "authorization_code_with_pkce",
-									"type": "string"
-								},
-								{
-									"key": "clientId",
-									"value": "postman",
-									"type": "string"
-								},
-								{
-									"key": "authUrl",
-									"value": "https://localhost:5001/master/authorization",
-									"type": "string"
-								},
-								{
-									"key": "redirect_uri",
-									"value": "http://localhost",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								}
-							]
+							"type": "noauth"
 						},
-						"method": "GET",
+						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "urlencoded",
-							"urlencoded": []
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "postman",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "password",
+									"type": "text"
+								},
+								{
+									"key": "scope",
+									"value": "users groups clients",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "text"
+								}
+							]
 						},
 						"url": {
 							"raw": "https://localhost:5001/master/token",
@@ -107,62 +85,16 @@
 					],
 					"request": {
 						"auth": {
-							"type": "oauth2",
-							"oauth2": [
-								{
-									"key": "scope",
-									"value": "openid users",
-									"type": "string"
-								},
-								{
-									"key": "client_authentication",
-									"value": "body",
-									"type": "string"
-								},
-								{
-									"key": "tokenName",
-									"value": "GetAccessToken",
-									"type": "string"
-								},
-								{
-									"key": "clientSecret",
-									"value": "password",
-									"type": "string"
-								},
-								{
-									"key": "accessTokenUrl",
-									"value": "https://localhost:5001/master/token",
-									"type": "string"
-								},
-								{
-									"key": "grant_type",
-									"value": "authorization_code_with_pkce",
-									"type": "string"
-								},
-								{
-									"key": "clientId",
-									"value": "postman",
-									"type": "string"
-								},
-								{
-									"key": "authUrl",
-									"value": "https://localhost:5001/master/authorization",
-									"type": "string"
-								},
-								{
-									"key": "redirect_uri",
-									"value": "http://localhost",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								}
-							]
+							"type": "noauth"
 						},
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n    \"name\": \"name\",\r\n    \"firstname\": \"firstname\",\r\n    \"lastname\": \"lastname\",\r\n    \"email\": \"email\",\r\n    \"emailverified\": true,\r\n    \"claims\": { }\r\n}",
@@ -191,62 +123,16 @@
 					"name": "Update user properties",
 					"request": {
 						"auth": {
-							"type": "oauth2",
-							"oauth2": [
-								{
-									"key": "scope",
-									"value": "openid users",
-									"type": "string"
-								},
-								{
-									"key": "client_authentication",
-									"value": "body",
-									"type": "string"
-								},
-								{
-									"key": "tokenName",
-									"value": "GetAccessToken",
-									"type": "string"
-								},
-								{
-									"key": "clientSecret",
-									"value": "password",
-									"type": "string"
-								},
-								{
-									"key": "accessTokenUrl",
-									"value": "https://localhost:5001/master/token",
-									"type": "string"
-								},
-								{
-									"key": "grant_type",
-									"value": "authorization_code_with_pkce",
-									"type": "string"
-								},
-								{
-									"key": "clientId",
-									"value": "postman",
-									"type": "string"
-								},
-								{
-									"key": "authUrl",
-									"value": "https://localhost:5001/master/authorization",
-									"type": "string"
-								},
-								{
-									"key": "redirect_uri",
-									"value": "http://localhost",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								}
-							]
+							"type": "noauth"
 						},
 						"method": "PUT",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n    \"email\": \"newEmail\",\r\n    \"emailverified\": false,\r\n    \"lastname\": \"newLastName\",\r\n    \"notification_mode\": \"email\"\r\n}",
@@ -276,62 +162,16 @@
 					"name": "Add UTF8(SHA256(password))",
 					"request": {
 						"auth": {
-							"type": "oauth2",
-							"oauth2": [
-								{
-									"key": "scope",
-									"value": "openid users",
-									"type": "string"
-								},
-								{
-									"key": "client_authentication",
-									"value": "body",
-									"type": "string"
-								},
-								{
-									"key": "tokenName",
-									"value": "GetAccessToken",
-									"type": "string"
-								},
-								{
-									"key": "clientSecret",
-									"value": "password",
-									"type": "string"
-								},
-								{
-									"key": "accessTokenUrl",
-									"value": "https://localhost:5001/master/token",
-									"type": "string"
-								},
-								{
-									"key": "grant_type",
-									"value": "authorization_code_with_pkce",
-									"type": "string"
-								},
-								{
-									"key": "clientId",
-									"value": "postman",
-									"type": "string"
-								},
-								{
-									"key": "authUrl",
-									"value": "https://localhost:5001/master/authorization",
-									"type": "string"
-								},
-								{
-									"key": "redirect_uri",
-									"value": "http://localhost",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								}
-							]
+							"type": "noauth"
 						},
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n  \"active\": true,\r\n  \"credential\": {\r\n    \"type\": \"pwd\",\r\n    \"value\": \"^�H��(\\u0004qQ��o��)'s`=\\rj���*\\u0011�r\\u001d\\u0015B�\"\r\n  }\r\n}",
@@ -362,62 +202,16 @@
 					"name": "Add BASE32(RANDOMKEY(20)) TOTP",
 					"request": {
 						"auth": {
-							"type": "oauth2",
-							"oauth2": [
-								{
-									"key": "scope",
-									"value": "openid users",
-									"type": "string"
-								},
-								{
-									"key": "client_authentication",
-									"value": "body",
-									"type": "string"
-								},
-								{
-									"key": "tokenName",
-									"value": "GetAccessToken",
-									"type": "string"
-								},
-								{
-									"key": "clientSecret",
-									"value": "password",
-									"type": "string"
-								},
-								{
-									"key": "accessTokenUrl",
-									"value": "https://localhost:5001/master/token",
-									"type": "string"
-								},
-								{
-									"key": "grant_type",
-									"value": "authorization_code_with_pkce",
-									"type": "string"
-								},
-								{
-									"key": "clientId",
-									"value": "postman",
-									"type": "string"
-								},
-								{
-									"key": "authUrl",
-									"value": "https://localhost:5001/master/authorization",
-									"type": "string"
-								},
-								{
-									"key": "redirect_uri",
-									"value": "http://localhost",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								}
-							]
+							"type": "noauth"
 						},
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n  \"active\": true,\r\n  \"credential\": {\r\n    \"type\": \"otp\",\r\n    \"otp_alg\": 1,\r\n    \"value\": \"OUH265BK7VXWIKO6GB76DZFOQQ62QUEZ\"\r\n  }\r\n}",
@@ -448,62 +242,16 @@
 					"name": "Add BASE32(RANDOMKEY(20)) HOTP",
 					"request": {
 						"auth": {
-							"type": "oauth2",
-							"oauth2": [
-								{
-									"key": "scope",
-									"value": "openid users",
-									"type": "string"
-								},
-								{
-									"key": "client_authentication",
-									"value": "body",
-									"type": "string"
-								},
-								{
-									"key": "tokenName",
-									"value": "GetAccessToken",
-									"type": "string"
-								},
-								{
-									"key": "clientSecret",
-									"value": "password",
-									"type": "string"
-								},
-								{
-									"key": "accessTokenUrl",
-									"value": "https://localhost:5001/master/token",
-									"type": "string"
-								},
-								{
-									"key": "grant_type",
-									"value": "authorization_code_with_pkce",
-									"type": "string"
-								},
-								{
-									"key": "clientId",
-									"value": "postman",
-									"type": "string"
-								},
-								{
-									"key": "authUrl",
-									"value": "https://localhost:5001/master/authorization",
-									"type": "string"
-								},
-								{
-									"key": "redirect_uri",
-									"value": "http://localhost",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								}
-							]
+							"type": "noauth"
 						},
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n  \"active\": true,\r\n  \"credential\": {\r\n    \"type\": \"otp\",\r\n    \"otp_alg\": 0,\r\n    \"value\": \"OUH265BK7VXWIKO6GB76DZFOQQ62QUEZ\"\r\n  }\r\n}",
@@ -534,62 +282,16 @@
 					"name": "Update claims",
 					"request": {
 						"auth": {
-							"type": "oauth2",
-							"oauth2": [
-								{
-									"key": "scope",
-									"value": "openid users",
-									"type": "string"
-								},
-								{
-									"key": "client_authentication",
-									"value": "body",
-									"type": "string"
-								},
-								{
-									"key": "tokenName",
-									"value": "GetAccessToken",
-									"type": "string"
-								},
-								{
-									"key": "clientSecret",
-									"value": "password",
-									"type": "string"
-								},
-								{
-									"key": "accessTokenUrl",
-									"value": "https://localhost:5001/master/token",
-									"type": "string"
-								},
-								{
-									"key": "grant_type",
-									"value": "authorization_code_with_pkce",
-									"type": "string"
-								},
-								{
-									"key": "clientId",
-									"value": "postman",
-									"type": "string"
-								},
-								{
-									"key": "authUrl",
-									"value": "https://localhost:5001/master/authorization",
-									"type": "string"
-								},
-								{
-									"key": "redirect_uri",
-									"value": "http://localhost",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								}
-							]
+							"type": "noauth"
 						},
 						"method": "PUT",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n  \"claims\": [\r\n    {\r\n      \"name\": \"phone_number\",\r\n      \"value\": \"0485\"\r\n    }\r\n  ]\r\n}",
@@ -623,70 +325,48 @@
 			"item": [
 				{
 					"name": "Get access token",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"access_token\", jsonData.access_token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
-							"type": "oauth2",
-							"oauth2": [
-								{
-									"key": "tokenName",
-									"value": "Groups",
-									"type": "string"
-								},
-								{
-									"key": "scope",
-									"value": "openid groups",
-									"type": "string"
-								},
-								{
-									"key": "client_authentication",
-									"value": "body",
-									"type": "string"
-								},
-								{
-									"key": "clientSecret",
-									"value": "password",
-									"type": "string"
-								},
-								{
-									"key": "accessTokenUrl",
-									"value": "https://localhost:5001/master/token",
-									"type": "string"
-								},
-								{
-									"key": "grant_type",
-									"value": "authorization_code_with_pkce",
-									"type": "string"
-								},
-								{
-									"key": "clientId",
-									"value": "postman",
-									"type": "string"
-								},
-								{
-									"key": "authUrl",
-									"value": "https://localhost:5001/master/authorization",
-									"type": "string"
-								},
-								{
-									"key": "redirect_uri",
-									"value": "http://localhost",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								}
-							]
+							"type": "noauth"
 						},
-						"method": "GET",
+						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "urlencoded",
-							"urlencoded": []
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "postman",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "password",
+									"type": "text"
+								},
+								{
+									"key": "scope",
+									"value": "users groups clients",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "text"
+								}
+							]
 						},
 						"url": {
 							"raw": "https://localhost:5001/master/token",
@@ -719,62 +399,17 @@
 					],
 					"request": {
 						"auth": {
-							"type": "oauth2",
-							"oauth2": [
-								{
-									"key": "scope",
-									"value": "openid users",
-									"type": "string"
-								},
-								{
-									"key": "client_authentication",
-									"value": "body",
-									"type": "string"
-								},
-								{
-									"key": "tokenName",
-									"value": "GetAccessToken",
-									"type": "string"
-								},
-								{
-									"key": "clientSecret",
-									"value": "password",
-									"type": "string"
-								},
-								{
-									"key": "accessTokenUrl",
-									"value": "https://localhost:5001/master/token",
-									"type": "string"
-								},
-								{
-									"key": "grant_type",
-									"value": "authorization_code_with_pkce",
-									"type": "string"
-								},
-								{
-									"key": "clientId",
-									"value": "postman",
-									"type": "string"
-								},
-								{
-									"key": "authUrl",
-									"value": "https://localhost:5001/master/authorization",
-									"type": "string"
-								},
-								{
-									"key": "redirect_uri",
-									"value": "http://localhost",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								}
-							]
+							"type": "noauth"
 						},
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"warning": "This is a duplicate header and will be overridden by the Authorization header generated by Postman.",
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n  \"name\": \"administrator\",\r\n  \"description\": \"administrator\"\r\n}",
@@ -806,70 +441,36 @@
 			"item": [
 				{
 					"name": "Get access token",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"auth": {
-							"type": "oauth2",
-							"oauth2": [
-								{
-									"key": "scope",
-									"value": "openid clients",
-									"type": "string"
-								},
-								{
-									"key": "tokenName",
-									"value": "Clients",
-									"type": "string"
-								},
-								{
-									"key": "client_authentication",
-									"value": "body",
-									"type": "string"
-								},
-								{
-									"key": "clientSecret",
-									"value": "password",
-									"type": "string"
-								},
-								{
-									"key": "accessTokenUrl",
-									"value": "https://localhost:5001/master/token",
-									"type": "string"
-								},
-								{
-									"key": "grant_type",
-									"value": "authorization_code_with_pkce",
-									"type": "string"
-								},
-								{
-									"key": "clientId",
-									"value": "postman",
-									"type": "string"
-								},
-								{
-									"key": "authUrl",
-									"value": "https://localhost:5001/master/authorization",
-									"type": "string"
-								},
-								{
-									"key": "redirect_uri",
-									"value": "http://localhost",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								}
-							]
+							"type": "noauth"
 						},
-						"method": "GET",
+						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "urlencoded",
-							"urlencoded": []
+							"urlencoded": [
+								{
+									"key": "scope",
+									"value": "users groups clients",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "postman",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "password",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "text"
+								}
+							]
 						},
 						"url": {
 							"raw": "https://localhost:5001/master/token",
@@ -902,62 +503,16 @@
 					],
 					"request": {
 						"auth": {
-							"type": "oauth2",
-							"oauth2": [
-								{
-									"key": "scope",
-									"value": "openid users",
-									"type": "string"
-								},
-								{
-									"key": "client_authentication",
-									"value": "body",
-									"type": "string"
-								},
-								{
-									"key": "tokenName",
-									"value": "GetAccessToken",
-									"type": "string"
-								},
-								{
-									"key": "clientSecret",
-									"value": "password",
-									"type": "string"
-								},
-								{
-									"key": "accessTokenUrl",
-									"value": "https://localhost:5001/master/token",
-									"type": "string"
-								},
-								{
-									"key": "grant_type",
-									"value": "authorization_code_with_pkce",
-									"type": "string"
-								},
-								{
-									"key": "clientId",
-									"value": "postman",
-									"type": "string"
-								},
-								{
-									"key": "authUrl",
-									"value": "https://localhost:5001/master/authorization",
-									"type": "string"
-								},
-								{
-									"key": "redirect_uri",
-									"value": "http://localhost",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								}
-							]
+							"type": "noauth"
 						},
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n    \"id\": \"{{$guid}}\",\r\n    \"client_id\": \"otherMachineClient\",\r\n    \"client_secret\" : \"secret\",\r\n    \"client_type\": \"MACHINE\",\r\n    \"grant_types\": [\r\n        \"client_credentials\"\r\n    ],\r\n    \"token_endpoint_auth_method\": \"client_secret_post\"\r\n}",
@@ -998,62 +553,16 @@
 					],
 					"request": {
 						"auth": {
-							"type": "oauth2",
-							"oauth2": [
-								{
-									"key": "scope",
-									"value": "openid clients",
-									"type": "string"
-								},
-								{
-									"key": "tokenName",
-									"value": "Clients",
-									"type": "string"
-								},
-								{
-									"key": "client_authentication",
-									"value": "body",
-									"type": "string"
-								},
-								{
-									"key": "clientSecret",
-									"value": "password",
-									"type": "string"
-								},
-								{
-									"key": "accessTokenUrl",
-									"value": "https://localhost:5001/master/token",
-									"type": "string"
-								},
-								{
-									"key": "grant_type",
-									"value": "authorization_code_with_pkce",
-									"type": "string"
-								},
-								{
-									"key": "clientId",
-									"value": "postman",
-									"type": "string"
-								},
-								{
-									"key": "authUrl",
-									"value": "https://localhost:5001/master/authorization",
-									"type": "string"
-								},
-								{
-									"key": "redirect_uri",
-									"value": "http://localhost",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								}
-							]
+							"type": "noauth"
 						},
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n    \"name\": \"admin\",\r\n    \"description\": \"administrator\"\r\n}",
@@ -1100,62 +609,17 @@
 					],
 					"request": {
 						"auth": {
-							"type": "oauth2",
-							"oauth2": [
-								{
-									"key": "scope",
-									"value": "openid groups",
-									"type": "string"
-								},
-								{
-									"key": "client_authentication",
-									"value": "body",
-									"type": "string"
-								},
-								{
-									"key": "tokenName",
-									"value": "GetAccessToken",
-									"type": "string"
-								},
-								{
-									"key": "clientSecret",
-									"value": "password",
-									"type": "string"
-								},
-								{
-									"key": "accessTokenUrl",
-									"value": "https://localhost:5001/master/token",
-									"type": "string"
-								},
-								{
-									"key": "grant_type",
-									"value": "authorization_code_with_pkce",
-									"type": "string"
-								},
-								{
-									"key": "clientId",
-									"value": "postman",
-									"type": "string"
-								},
-								{
-									"key": "authUrl",
-									"value": "https://localhost:5001/master/authorization",
-									"type": "string"
-								},
-								{
-									"key": "redirect_uri",
-									"value": "http://localhost",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								}
-							]
+							"type": "noauth"
 						},
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"warning": "This is a duplicate header and will be overridden by the Authorization header generated by Postman.",
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n  \"scope\": \"{{roleId}}\"\r\n}",
@@ -1191,62 +655,16 @@
 					"name": "Assign a group",
 					"request": {
 						"auth": {
-							"type": "oauth2",
-							"oauth2": [
-								{
-									"key": "scope",
-									"value": "openid users",
-									"type": "string"
-								},
-								{
-									"key": "client_authentication",
-									"value": "body",
-									"type": "string"
-								},
-								{
-									"key": "tokenName",
-									"value": "GetAccessToken",
-									"type": "string"
-								},
-								{
-									"key": "clientSecret",
-									"value": "password",
-									"type": "string"
-								},
-								{
-									"key": "accessTokenUrl",
-									"value": "https://localhost:5001/master/token",
-									"type": "string"
-								},
-								{
-									"key": "grant_type",
-									"value": "authorization_code_with_pkce",
-									"type": "string"
-								},
-								{
-									"key": "clientId",
-									"value": "postman",
-									"type": "string"
-								},
-								{
-									"key": "authUrl",
-									"value": "https://localhost:5001/master/authorization",
-									"type": "string"
-								},
-								{
-									"key": "redirect_uri",
-									"value": "http://localhost",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								}
-							]
+							"type": "noauth"
 						},
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n    \r\n}",

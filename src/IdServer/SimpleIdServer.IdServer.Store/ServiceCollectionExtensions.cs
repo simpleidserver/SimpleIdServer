@@ -46,8 +46,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IGrantRepository, GrantRepository>();
             services.AddTransient<IIdentityProvisioningStore, IdentityProvisioningStore>();
             services.AddTransient<IIdentityProvisioningDefinitionStore, IdentityProvisioningDefinitionStore>();
-            services.AddTransient<IExtractedRepresentationRepository, ExtractedRepresentationRepository>();
-            services.AddTransient<IImportSummaryStore, ImportSummaryStore>();
             services.AddTransient<IGroupRepository, GroupRepository>();
             services.AddTransient<ICredentialTemplateRepository, CredentialTemplateRepository>();
             services.AddTransient<ICredentialOfferRepository, CredentialOfferRepository>();
@@ -57,6 +55,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IUserSessionResitory, UserSessionRepository>();
             services.AddTransient<IConfigurationDefinitionStore, ConfigurationDefinitionStore>();
             services.AddTransient<IRegistrationWorkflowRepository, RegistrationWorkflowRepository>();
+            services.AddTransient<ILanguageRepository, LanguageRepository>();
+            services.AddTransient<IProvisioningStagingStore, ProvisioningStagingStore>();
         }
     }
 }

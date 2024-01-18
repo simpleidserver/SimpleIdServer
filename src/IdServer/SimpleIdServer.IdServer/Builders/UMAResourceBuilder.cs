@@ -31,7 +31,7 @@ namespace SimpleIdServer.IdServer.Builders
         public UMAResourceBuilder SetName(string name, string language = null)
         {
             if (string.IsNullOrWhiteSpace(language))
-                language = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
+                language = Domains.Language.Default;
 
             _umaResource.Translations.Add(new Translation
             {
@@ -45,7 +45,7 @@ namespace SimpleIdServer.IdServer.Builders
         public UMAResourceBuilder SetDescription(string description, string language = null)
         {
             if (string.IsNullOrWhiteSpace(language))
-                language = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
+                language = Domains.Language.Default;
 
             _umaResource.Translations.Add(new Translation
             {

@@ -39,4 +39,6 @@ public class UpdateClientRequest
     public bool IsRedirectUrlCaseSensitive { get; set; }
     [JsonPropertyName(OAuthClientParameters.AccessTokenType)]
     public AccessTokenTypes AccessTokenType { get; set; }
+    [JsonPropertyName(OAuthClientParameters.RedirectToRevokeSessionUI)]
+    public bool RedirectToRevokeSessionUI { get; set; }
 }

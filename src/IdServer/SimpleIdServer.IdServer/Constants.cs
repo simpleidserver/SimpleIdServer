@@ -84,6 +84,7 @@ namespace SimpleIdServer.IdServer
             public const string Statistics = "stats";
             public const string Realms = "realms";
             public const string Groups = "groups";
+            public const string Languages = "languages";
         }
 
         public static List<string> AllStandardNotificationModes = new List<string>
@@ -217,6 +218,25 @@ namespace SimpleIdServer.IdServer
             public static ScopeClaimMapper SAMLNameIdentifier = ScopeClaimMapper.CreateSAMLNameIdentifierClaim();
             public static ScopeClaimMapper SAMLName = ScopeClaimMapper.CreateSAMLPropertyClaim("name", ClaimTypes.Name, nameof(User.Firstname));
         }
+
+        public static ICollection<AuthenticationSchemeProviderMapper> GetNegotiateIdProviderMappers() => new List<AuthenticationSchemeProviderMapper>
+        {
+            new AuthenticationSchemeProviderMapper
+            {
+                Id = Guid.NewGuid().ToString(),
+                MapperType = MappingRuleTypes.IDENTIFIER,
+                Name = "Identifier",
+                SourceClaimName = ClaimTypes.PrimarySid
+            },
+            new AuthenticationSchemeProviderMapper
+            {
+                Id = Guid.NewGuid().ToString(),
+                MapperType = MappingRuleTypes.SUBJECT,
+                Name = "Name",
+                SourceClaimName = ClaimTypes.Name,
+                TargetUserProperty = nameof(User.Name)
+            }
+        };
 
         public static ICollection<AuthenticationSchemeProviderMapper> GetDefaultIdProviderMappers() =>new List<AuthenticationSchemeProviderMapper>
         {
@@ -395,8 +415,13 @@ namespace SimpleIdServer.IdServer
             public static Scope OfflineAccessScope = new Scope
             {
                 Id = Guid.NewGuid().ToString(),
-                Type = ScopeTypes.IDENTITY,
+                Type = ScopeTypes.APIRESOURCE,
+                Protocol = ScopeProtocols.OAUTH,
                 Name = "offline_access",
+                Realms = new List<Domains.Realm>
+                {
+                    StandardRealms.Master
+                },
                 IsExposedInConfigurationEdp = true,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
@@ -776,5 +801,6 @@ namespace SimpleIdServer.IdServer
         public const string DefaultRealmCookieName = "CurrentRealm";
         public const string DefaultCurrentAmrCookieName = "currentAmr";
         public const string Prefix = "prefix";
+        public const string DefaultLanguage = "en";
     }
 }

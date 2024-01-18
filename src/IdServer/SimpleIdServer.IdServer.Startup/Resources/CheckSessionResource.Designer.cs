@@ -68,5 +68,14 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
                 return ResourceManager.GetString("revoke_session_title", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The session is being revoked; you will be redirected to the website in {0} seconds..
+        /// </summary>
+        public static string session_being_revoked {
+            get {
+                return ResourceManager.GetString("session_being_revoked", resourceCulture);
+            }
+        }
     }
 }

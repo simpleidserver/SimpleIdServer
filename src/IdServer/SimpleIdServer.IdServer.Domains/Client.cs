@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Domains.DTOs;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -266,6 +267,11 @@ namespace SimpleIdServer.IdServer.Domains
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.PostLogoutRedirectUris)]
         public ICollection<string> PostLogoutRedirectUris { get; set; } = new List<string>();
+        /// <summary>
+        /// Redirect the user-agent to the revoke session UI.
+        /// </summary>
+        [JsonPropertyName(OAuthClientParameters.RedirectToRevokeSessionUI)]
+        public bool RedirectToRevokeSessionUI { get; set; } = true;
         /// <summary>
         /// Preferred token profile.
         /// </summary>
@@ -554,7 +560,7 @@ namespace SimpleIdServer.IdServer.Domains
 
         public void UpdateClientName(string clientName)
         {
-            var language = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
+            var language = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
             var translation = Translations.FirstOrDefault(tr => tr.Key == "client_name" && tr.Language == language);
             if (translation == null)
                 Translations.Add(new Translation { Language = language, Key = "client_name", Value = clientName });
@@ -566,7 +572,7 @@ namespace SimpleIdServer.IdServer.Domains
 
         private string? Translate(string key)
         {
-            var translation = Translations.FirstOrDefault(t => t.Key == key && t.Language == Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName);
+            var translation = Translations.FirstOrDefault(t => t.Key == key && t.Language == CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
             return translation?.Value;
         }
 
