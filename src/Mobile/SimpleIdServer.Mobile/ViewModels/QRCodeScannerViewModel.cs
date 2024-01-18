@@ -250,7 +250,16 @@ public class QRCodeScannerViewModel
                 var httpResponse = await httpClient.SendAsync(requestMessage);
                 httpResponse.EnsureSuccessStatusCode();
                 var json = await httpResponse.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<BeginU2FAuthenticateResult>(json);
+                var jObj = JsonObject.Parse(json);
+                var assertionJson = jObj["assertion"].ToString();
+                var result = new BeginU2FAuthenticateResult
+                {
+                    SessionId = jObj["session_id"].ToString(),
+                    Login = jObj["login"].ToString(),
+                    EndLoginUrl = jObj["end_login_url"].ToString(),
+                    Assertion = AssertionOptions.FromJson(assertionJson)
+                };
+                return result;
             }
         }
 
