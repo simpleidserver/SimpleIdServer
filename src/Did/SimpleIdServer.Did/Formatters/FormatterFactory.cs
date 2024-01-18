@@ -59,4 +59,7 @@ public class FormatterFactory : IFormatterFactory
         => new X25519KeyAgreementFormatter(
                MulticodecSerializerFactory.Build()
             );
+
+    public static IVerificationMethodFormatter BuildEcdsaSecp256k1VerificationKey2019Formatter()
+        => new EcdsaSecp256k1VerificationKey2019Formatter();
 }

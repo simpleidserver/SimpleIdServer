@@ -26,7 +26,8 @@ namespace SimpleIdServer.Did
         {
             FormatterFactory.BuildJsonWebKey2020Formatter(),
             FormatterFactory.BuildEd25519VerificationKey2020Formatter(),
-            FormatterFactory.BuildX25519KeyAgreementFormatter()
+            FormatterFactory.BuildX25519KeyAgreementFormatter(),
+            FormatterFactory.BuildEcdsaSecp256k1VerificationKey2019Formatter()
         };
 
         protected DidDocumentBuilder(DidDocument identityDocument, bool includePrivateKey) 
@@ -96,6 +97,20 @@ namespace SimpleIdServer.Did
 
         public DidDocumentBuilder AddEd25519VerificationKey2020VerificationMethod(IAsymmetricKey asymmKey, string controller, VerificationMethodUsages usage, bool isReference = true, string id = null)
             => AddVerificationMethod(asymmKey, controller, Ed25519VerificationKey2020Formatter.JSON_LD_CONTEXT, usage, isReference, id);
+
+        public DidDocumentBuilder AddEcdsaSecp256k1RecoveryMethod2020(IAsymmetricKey asymmKey, string controller, VerificationMethodUsages usage, bool isReference = true, string id = null)
+            => AddVerificationMethod(asymmKey, controller, EcdsaSecp256k1RecoveryMethod2020Formatter.JSON_LD_CONTEXT, usage, isReference, id);
+
+        public DidDocumentBuilder AddEcdsaSecp256k1RecoveryMethod2020BlockChain(string controller, VerificationMethodUsages usage, CAIP10BlockChainAccount blockChainAccount, bool isReference = true, string id = null)
+        {
+            var builder = EcdsaSecp256k1RecoveryMethod2020Formatter.BuildBlockChainFormatter(blockChainAccount);
+            var verificationMethod = BuildVerificationMethod(builder, null, controller, EcdsaSecp256k1RecoveryMethod2020Formatter.JSON_LD_CONTEXT, id);
+            AddVerificationMethod(verificationMethod, usage, isReference);
+            return this;
+        }
+
+        public DidDocumentBuilder AddEcdsaSecp256k1VerificationKey2019(ES256KSignatureKey asymmKey, string controller, VerificationMethodUsages usage, bool isReference = true, string id = null)
+            => AddVerificationMethod(asymmKey, controller, EcdsaSecp256k1VerificationKey2019Formatter.JSON_LD_CONTEXT, usage, isReference, id);
 
         public DidDocumentBuilder AddX25519KeyAgreementVerificationMethod(IAsymmetricKey asymmKey, string controller, bool isReference = true, string id = null)
             => AddVerificationMethod(asymmKey, controller, X25519KeyAgreementFormatter.JSON_LD_CONTEXT, VerificationMethodUsages.KEY_AGREEMENT, isReference, id);
@@ -171,6 +186,11 @@ namespace SimpleIdServer.Did
             var isKeyAgreement = (asymmKey as IAgreementKey) != null;
             if (usage.HasFlag(VerificationMethodUsages.KEY_AGREEMENT) && !isKeyAgreement) throw new ArgumentException("Signature key cannot be used in a Key Agreement");
             var verificationMethod = BuildVerificationMethod(asymmKey, controller, ldContext, id);
+            return AddVerificationMethod(verificationMethod, usage, isReference);
+        }
+
+        private DidDocumentBuilder AddVerificationMethod(DidDocumentVerificationMethod verificationMethod, VerificationMethodUsages usage, bool isReference)
+        {
             verificationMethod.Usage = usage;
             if (isReference)
             {
@@ -187,6 +207,11 @@ namespace SimpleIdServer.Did
         private DidDocumentVerificationMethod BuildVerificationMethod(IAsymmetricKey signatureKey, string controller, string ldContext, string id)
         {
             var builder = _verificationMethodBuilders.Single(v => v.JSONLDContext == ldContext);
+            return BuildVerificationMethod(builder, signatureKey, controller, ldContext, id);
+        }
+
+        private DidDocumentVerificationMethod BuildVerificationMethod(IVerificationMethodFormatter builder, IAsymmetricKey signatureKey, string controller, string ldContext, string id)
+        {
             var verificationMethod = builder.Format(_identityDocument, signatureKey, _includePrivateKey);
             verificationMethod.Type = builder.Type;
             verificationMethod.Controller = controller;

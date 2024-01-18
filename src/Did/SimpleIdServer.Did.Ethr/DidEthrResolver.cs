@@ -3,9 +3,13 @@
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using Nethereum.Web3;
+using SimpleIdServer.Did.Crypto;
+using SimpleIdServer.Did.Crypto.Multicodec;
 using SimpleIdServer.Did.Ethr.Models;
 using SimpleIdServer.Did.Ethr.Services;
 using SimpleIdServer.Did.Ethr.Stores;
+using SimpleIdServer.Did.Extensions;
+using SimpleIdServer.Did.Formatters;
 using SimpleIdServer.Did.Models;
 using System;
 using System.Collections.Generic;
@@ -17,11 +21,14 @@ namespace SimpleIdServer.Did.Ethr;
 public class DidEthrResolver : IDidResolver
 {
     private readonly INetworkConfigurationStore _networkConfigurationStore;
+    private readonly IMulticodecSerializer _serializer;
 
     public DidEthrResolver(
-        INetworkConfigurationStore networkConfigurationStore)
+        INetworkConfigurationStore networkConfigurationStore,
+        IMulticodecSerializer serializer)
     {
         _networkConfigurationStore = networkConfigurationStore;
+        _serializer = serializer;
     }
 
     public string Method => Constants.Type;
@@ -38,7 +45,27 @@ public class DidEthrResolver : IDidResolver
         var w3 = new Web3(networkConfiguration.RpcUrl);
         var attributeChangedDTO = service.ContractHandler.GetEvent<DIDAttributeChangedEventDTO>();
         await ReadEvents(service, decentralizedIdentifier, networkConfiguration);
-        return null;
+        var builder = DidDocumentBuilder.New(did);
+        if(decentralizedIdentifier.PublicKey == null)
+        {
+            builder.AddEcdsaSecp256k1RecoveryMethod2020BlockChain(did,
+                VerificationMethodUsages.AUTHENTICATION | VerificationMethodUsages.ASSERTION_METHOD,
+                CAIP10BlockChainAccount.BuildEthereumMainet(decentralizedIdentifier.Address));
+        }
+        else
+        {
+            var payload = decentralizedIdentifier.PublicKey.HexToByteArray();
+            builder.AddEcdsaSecp256k1RecoveryMethod2020BlockChain(did,
+                VerificationMethodUsages.AUTHENTICATION | VerificationMethodUsages.ASSERTION_METHOD,
+                CAIP10BlockChainAccount.BuildEthereumMainet(decentralizedIdentifier.Address));
+            var publicKey = ES256KSignatureKey.From(payload, null);
+            builder.AddEcdsaSecp256k1VerificationKey2019(publicKey,
+                did,
+                VerificationMethodUsages.AUTHENTICATION | VerificationMethodUsages.ASSERTION_METHOD,
+                true);
+        }
+
+        return builder.Build();
     }
 
     private async Task<List<ERC1056Event>> ReadEvents(
