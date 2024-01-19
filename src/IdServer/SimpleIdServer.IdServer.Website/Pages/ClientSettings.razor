@@ -35,19 +35,22 @@
                     </div>
                 </div>
                 <!-- Access Token Type -->
-                <div class="row mt-1">
-                    <div class="col-md-2">
-                        <RadzenLabel Text="Access Token Type" Style="padding: 0px;" />
+                @if(Client.ClientType != WsFederationConstants.CLIENT_TYPE && Client.ClientType != SimpleIdServer.IdServer.Saml.Idp.Constants.CLIENT_TYPE)
+                {                    
+                    <div class="row mt-1">
+                        <div class="col-md-2">
+                            <RadzenLabel Text="Access Token Type" Style="padding: 0px;" />
+                        </div>
+                        <div class="col">
+                            <RadzenDropDown Name="AccessTokenType" Class="w-100"
+                                            Data=@AllAccessTokenTypes
+                                            TextProperty="Description"
+                                            ValueProperty="Value"
+                                            TValue="AccessTokenTypes"
+                                            @bind-Value=@updateClient.AccessTokenType />
+                        </div>
                     </div>
-                    <div class="col">
-                        <RadzenDropDown Name="AccessTokenType" Class="w-100"
-                                        Data=@AllAccessTokenTypes
-                                        TextProperty="Description"
-                                        ValueProperty="Value"
-                                        TValue="AccessTokenTypes"
-                                        @bind-Value=@updateClient.AccessTokenType />
-                    </div>
-                </div>
+                }
             </RadzenAccordionItem>
             @if (Client.ClientType == ClientTypes.SPA || Client.ClientType == ClientTypes.WEBSITE || Client.ClientType == ClientTypes.EXTERNAL || Client.ClientType == ClientTypes.MOBILE || Client.ClientType == ClientTypes.HIGHLYSECUREDWEBSITE || Client.ClientType == ClientTypes.GRANTMANAGEMENT)
             {

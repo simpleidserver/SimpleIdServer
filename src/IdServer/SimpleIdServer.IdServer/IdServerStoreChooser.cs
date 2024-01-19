@@ -11,6 +11,7 @@ using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace SimpleIdServer.IdServer
 {
@@ -68,6 +69,18 @@ namespace SimpleIdServer.IdServer
             if (!storeDbContext.Scopes.Any())
             {
                 storeDbContext.Scopes.AddRange(scopes);
+                storeDbContext.SaveChanges();
+            }
+
+            return this;
+        }
+
+        public IdServerInMemoryStoreBuilder AddInMemoryBCAuthorize(ICollection<BCAuthorize> bcAuthorizeLst)
+        {
+            var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
+            if (!storeDbContext.BCAuthorizeLst.Any())
+            {
+                storeDbContext.BCAuthorizeLst.AddRange(bcAuthorizeLst);
                 storeDbContext.SaveChanges();
             }
 

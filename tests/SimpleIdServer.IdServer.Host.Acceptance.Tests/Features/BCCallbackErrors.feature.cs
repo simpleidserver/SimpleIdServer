@@ -80,14 +80,14 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="authorization request must exists")]
+        [Xunit.SkippableFactAttribute(DisplayName="access token is required")]
         [Xunit.TraitAttribute("FeatureTitle", "BCCallbackErrors")]
-        [Xunit.TraitAttribute("Description", "authorization request must exists")]
-        public void AuthorizationRequestMustExists()
+        [Xunit.TraitAttribute("Description", "access token is required")]
+        public void AccessTokenIsRequired()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("authorization request must exists", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("access token is required", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 4
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -101,23 +101,285 @@ this.ScenarioInitialize(scenarioInfo);
                 TechTalk.SpecFlow.Table table88 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table88.AddRow(new string[] {
-                            "auth_req_id",
-                            "invalid"});
 #line 5
  testRunner.When("execute HTTP POST JSON request \'http://localhost/bc-callback\'", ((string)(null)), table88, "When ");
 #line hidden
-#line 9
+#line 8
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
+#line 10
+ testRunner.Then("HTTP status code equals to \'401\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
 #line 11
- testRunner.Then("HTTP status code equals to \'404\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("JSON \'error\'=\'access_denied\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 12
+ testRunner.And("JSON \'error_description\'=\'missing token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="access token must be valid")]
+        [Xunit.TraitAttribute("FeatureTitle", "BCCallbackErrors")]
+        [Xunit.TraitAttribute("Description", "access token must be valid")]
+        public void AccessTokenMustBeValid()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("access token must be valid", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 14
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table89 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table89.AddRow(new string[] {
+                            "Authorization",
+                            "Bearer invalid"});
+#line 15
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/bc-callback\'", ((string)(null)), table89, "When ");
+#line hidden
+#line 19
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 21
+ testRunner.Then("HTTP status code equals to \'401\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 22
+ testRunner.And("JSON \'error\'=\'invalid_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 23
+ testRunner.And("JSON \'error_description\'=\'either the access token has been revoked or is invalid\'" +
+                        "", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="authorization request must exists")]
+        [Xunit.TraitAttribute("FeatureTitle", "BCCallbackErrors")]
+        [Xunit.TraitAttribute("Description", "authorization request must exists")]
+        public void AuthorizationRequestMustExists()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("authorization request must exists", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 25
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table90 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table90.AddRow(new string[] {
+                            "sub",
+                            "user"});
+#line 26
+ testRunner.Given("build access_token and sign with the key \'keyid\'", ((string)(null)), table90, "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table91 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table91.AddRow(new string[] {
+                            "Authorization",
+                            "Bearer $access_token$"});
+                table91.AddRow(new string[] {
+                            "auth_req_id",
+                            "id"});
+#line 30
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/bc-callback\'", ((string)(null)), table91, "When ");
+#line hidden
+#line 35
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 37
+ testRunner.Then("HTTP status code equals to \'404\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 38
  testRunner.And("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 13
- testRunner.And("JSON \'error_description\'=\'the back channel authorization invalid doesn\'t exist\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 39
+ testRunner.And("JSON \'error_description\'=\'the back channel authorization id doesn\'t exist\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="authorization request must be active")]
+        [Xunit.TraitAttribute("FeatureTitle", "BCCallbackErrors")]
+        [Xunit.TraitAttribute("Description", "authorization request must be active")]
+        public void AuthorizationRequestMustBeActive()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("authorization request must be active", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 41
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table92 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table92.AddRow(new string[] {
+                            "sub",
+                            "user"});
+#line 42
+ testRunner.Given("build access_token and sign with the key \'keyid\'", ((string)(null)), table92, "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table93 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table93.AddRow(new string[] {
+                            "Authorization",
+                            "Bearer $access_token$"});
+                table93.AddRow(new string[] {
+                            "auth_req_id",
+                            "expiredBC"});
+#line 46
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/bc-callback\'", ((string)(null)), table93, "When ");
+#line hidden
+#line 51
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 53
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 54
+ testRunner.And("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 55
+ testRunner.And("JSON \'error_description\'=\'the authorization request is expired\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="authorization request must be pending")]
+        [Xunit.TraitAttribute("FeatureTitle", "BCCallbackErrors")]
+        [Xunit.TraitAttribute("Description", "authorization request must be pending")]
+        public void AuthorizationRequestMustBePending()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("authorization request must be pending", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 57
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table94 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table94.AddRow(new string[] {
+                            "sub",
+                            "user"});
+#line 58
+ testRunner.Given("build access_token and sign with the key \'keyid\'", ((string)(null)), table94, "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table95 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table95.AddRow(new string[] {
+                            "Authorization",
+                            "Bearer $access_token$"});
+                table95.AddRow(new string[] {
+                            "auth_req_id",
+                            "confirmedBC"});
+#line 62
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/bc-callback\'", ((string)(null)), table95, "When ");
+#line hidden
+#line 67
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 69
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 70
+ testRunner.And("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 71
+ testRunner.And("JSON \'error_description\'=\'the authorization request is not in pending\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="incoming access token must have the correct subject")]
+        [Xunit.TraitAttribute("FeatureTitle", "BCCallbackErrors")]
+        [Xunit.TraitAttribute("Description", "incoming access token must have the correct subject")]
+        public void IncomingAccessTokenMustHaveTheCorrectSubject()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("incoming access token must have the correct subject", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 73
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table96 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table96.AddRow(new string[] {
+                            "sub",
+                            "user"});
+#line 74
+ testRunner.Given("build access_token and sign with the key \'keyid\'", ((string)(null)), table96, "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table97 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table97.AddRow(new string[] {
+                            "Authorization",
+                            "Bearer $access_token$"});
+                table97.AddRow(new string[] {
+                            "auth_req_id",
+                            "invalidUser"});
+#line 78
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/bc-callback\'", ((string)(null)), table97, "When ");
+#line hidden
+#line 83
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 85
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 86
+ testRunner.And("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 87
+ testRunner.And("JSON \'error_description\'=\'you are not authorized to validate the authorization re" +
+                        "quest\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();

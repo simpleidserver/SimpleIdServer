@@ -108,6 +108,9 @@ Scenario: authorization request must be confirmed
 
 Scenario: authorization request cannot be rejected
 	Given authenticate a user
+	And build access_token and sign with the key 'keyid'
+	| Key | Value |
+	| sub | user  |
 	
 	When execute HTTP POST request 'https://localhost:8080/bc-authorize'
 	| Key                       | Value            |
@@ -124,6 +127,7 @@ Scenario: authorization request cannot be rejected
 	| Key           | Value                  |
 	| auth_req_id   | $auth_req_id$          |
 	| action        | 1                      |
+	| Authorization	| Bearer $access_token$	 |
 
 	And execute HTTP POST request 'https://localhost:8080/token'
 	| Key                  | Value                             |

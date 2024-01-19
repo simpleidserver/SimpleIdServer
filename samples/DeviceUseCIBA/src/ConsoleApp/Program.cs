@@ -8,7 +8,7 @@ var req = new BackchannelAuthenticationRequest()
     Address = "https://localhost:5001/master/mtls/bc-authorize",
     ClientId = "cibaConformance",
     Scope = "openid profile",
-    LoginHint = "mobileUser",
+    LoginHint = "user",
     BindingMessage = "Message",
     RequestedExpiry = 200
 };

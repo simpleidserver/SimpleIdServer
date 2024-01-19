@@ -101,11 +101,11 @@ this.ScenarioInitialize(scenarioInfo);
 #line 5
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table176 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table185 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
 #line 7
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table176, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table185, "When ");
 #line hidden
 #line 10
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -144,14 +144,14 @@ this.ScenarioInitialize(scenarioInfo);
 #line 17
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table177 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table186 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table177.AddRow(new string[] {
+                table186.AddRow(new string[] {
                             "wallet_client_id",
                             "wallet"});
 #line 19
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table177, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table186, "When ");
 #line hidden
 #line 23
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -190,17 +190,17 @@ this.ScenarioInitialize(scenarioInfo);
 #line 30
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table178 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table187 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table178.AddRow(new string[] {
+                table187.AddRow(new string[] {
                             "wallet_client_id",
                             "unknown"});
-                table178.AddRow(new string[] {
+                table187.AddRow(new string[] {
                             "credential_template_id",
                             "unknown"});
 #line 32
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table178, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table187, "When ");
 #line hidden
 #line 37
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -239,17 +239,17 @@ this.ScenarioInitialize(scenarioInfo);
 #line 44
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table179 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table188 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table179.AddRow(new string[] {
+                table188.AddRow(new string[] {
                             "wallet_client_id",
                             "unknown"});
-                table179.AddRow(new string[] {
+                table188.AddRow(new string[] {
                             "credential_template_id",
                             "credentialOfferId"});
 #line 46
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table179, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table188, "When ");
 #line hidden
 #line 51
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

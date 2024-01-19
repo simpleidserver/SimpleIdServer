@@ -101,32 +101,32 @@ this.ScenarioInitialize(scenarioInfo);
 #line 5
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table520 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table532 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table520.AddRow(new string[] {
+                table532.AddRow(new string[] {
                             "response_type",
                             "token"});
-                table520.AddRow(new string[] {
+                table532.AddRow(new string[] {
                             "client_id",
                             "fiftyFourClient"});
-                table520.AddRow(new string[] {
+                table532.AddRow(new string[] {
                             "state",
                             "state"});
-                table520.AddRow(new string[] {
+                table532.AddRow(new string[] {
                             "response_mode",
                             "fragment.jwt"});
-                table520.AddRow(new string[] {
+                table532.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table520.AddRow(new string[] {
+                table532.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table520.AddRow(new string[] {
+                table532.AddRow(new string[] {
                             "scope",
                             "openid profile"});
 #line 7
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table520, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table532, "When ");
 #line hidden
 #line 17
  testRunner.And("extract parameter \'response\' from redirect url fragment", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

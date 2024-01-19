@@ -283,6 +283,13 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             UMAResourceBuilder.Create("id", "read", "write").Build()
         };
 
+        public static List<BCAuthorize> BCAuthorizeLst = new List<BCAuthorize>
+        {
+            new BCAuthorize { Id = "expiredBC", ExpirationDateTime = DateTime.UtcNow.AddYears(-1), Realm = SimpleIdServer.IdServer.Constants.DefaultRealm },
+            new BCAuthorize { Id = "confirmedBC", ExpirationDateTime = DateTime.UtcNow.AddYears(1), LastStatus = BCAuthorizeStatus.Confirmed, Realm = SimpleIdServer.IdServer.Constants.DefaultRealm },
+            new BCAuthorize { Id = "invalidUser", ExpirationDateTime = DateTime.UtcNow.AddYears(1), LastStatus = BCAuthorizeStatus.Pending, UserId = "otherUserId", Realm = SimpleIdServer.IdServer.Constants.DefaultRealm }
+        };
+
         public static List<SimpleIdServer.IdServer.Domains.Realm> Realms = new List<SimpleIdServer.IdServer.Domains.Realm>
         {
             SimpleIdServer.IdServer.Constants.StandardRealms.Master

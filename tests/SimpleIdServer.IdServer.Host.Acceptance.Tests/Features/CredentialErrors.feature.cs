@@ -98,11 +98,11 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table137 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table146 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
 #line 5
- testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/credential\'", ((string)(null)), table137, "When ");
+ testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/credential\'", ((string)(null)), table146, "When ");
 #line hidden
 #line 8
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -135,14 +135,14 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table138 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table147 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table138.AddRow(new string[] {
+                table147.AddRow(new string[] {
                             "Authorization",
                             "Bearer INVALID"});
 #line 14
- testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/credential\'", ((string)(null)), table138, "When ");
+ testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/credential\'", ((string)(null)), table147, "When ");
 #line hidden
 #line 18
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -182,17 +182,17 @@ this.ScenarioInitialize(scenarioInfo);
 #line 25
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table139 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table148 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table139.AddRow(new string[] {
+                table148.AddRow(new string[] {
                             "wallet_client_id",
                             "fiftyNineClient"});
-                table139.AddRow(new string[] {
+                table148.AddRow(new string[] {
                             "credential_template_id",
                             "credTemplate"});
 #line 27
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table139, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table148, "When ");
 #line hidden
 #line 32
  testRunner.And("extract query parameters into JSON", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -204,24 +204,24 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("extract parameter \'$.grants.urn:ietf:params:oauth:grant-type:pre-authorized_code." +
                         "pre-authorized_code\' from JSON body into \'preAuthorizedCode\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table140 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table149 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table140.AddRow(new string[] {
+                table149.AddRow(new string[] {
                             "grant_type",
                             "urn:ietf:params:oauth:grant-type:pre-authorized_code"});
-                table140.AddRow(new string[] {
+                table149.AddRow(new string[] {
                             "client_id",
                             "fiftyNineClient"});
-                table140.AddRow(new string[] {
+                table149.AddRow(new string[] {
                             "pre-authorized_code",
                             "$preAuthorizedCode$"});
-                table140.AddRow(new string[] {
+                table149.AddRow(new string[] {
                             "authorization_details",
                             "{ \"type\" : \"openid_credential\", \"format\": \"jwt_vc_json\", \"types\": [ \"VerifiableCr" +
                                 "edential\", \"UniversityDegreeCredential\"] }"});
 #line 36
- testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table140, "And ");
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table149, "And ");
 #line hidden
 #line 43
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -232,14 +232,14 @@ this.ScenarioInitialize(scenarioInfo);
 #line 45
  testRunner.And("extract payload from JWT \'$access_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table141 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table150 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table141.AddRow(new string[] {
+                table150.AddRow(new string[] {
                             "Authorization",
                             "Bearer $access_token$"});
 #line 47
- testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/credential\'", ((string)(null)), table141, "And ");
+ testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/credential\'", ((string)(null)), table150, "And ");
 #line hidden
 #line 51
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -275,17 +275,17 @@ this.ScenarioInitialize(scenarioInfo);
 #line 57
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table142 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table151 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table142.AddRow(new string[] {
+                table151.AddRow(new string[] {
                             "wallet_client_id",
                             "fiftyNineClient"});
-                table142.AddRow(new string[] {
+                table151.AddRow(new string[] {
                             "credential_template_id",
                             "credTemplate"});
 #line 59
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table142, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table151, "When ");
 #line hidden
 #line 64
  testRunner.And("extract query parameters into JSON", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -297,24 +297,24 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("extract parameter \'$.grants.urn:ietf:params:oauth:grant-type:pre-authorized_code." +
                         "pre-authorized_code\' from JSON body into \'preAuthorizedCode\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table143 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table152 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table143.AddRow(new string[] {
+                table152.AddRow(new string[] {
                             "grant_type",
                             "urn:ietf:params:oauth:grant-type:pre-authorized_code"});
-                table143.AddRow(new string[] {
+                table152.AddRow(new string[] {
                             "client_id",
                             "fiftyNineClient"});
-                table143.AddRow(new string[] {
+                table152.AddRow(new string[] {
                             "pre-authorized_code",
                             "$preAuthorizedCode$"});
-                table143.AddRow(new string[] {
+                table152.AddRow(new string[] {
                             "authorization_details",
                             "{ \"type\" : \"openid_credential\", \"format\": \"jwt_vc_json\", \"types\": [ \"VerifiableCr" +
                                 "edential\", \"UniversityDegreeCredential\"] }"});
 #line 68
- testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table143, "And ");
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table152, "And ");
 #line hidden
 #line 75
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -325,17 +325,17 @@ this.ScenarioInitialize(scenarioInfo);
 #line 77
  testRunner.And("extract payload from JWT \'$access_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table144 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table153 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table144.AddRow(new string[] {
+                table153.AddRow(new string[] {
                             "Authorization",
                             "Bearer $access_token$"});
-                table144.AddRow(new string[] {
+                table153.AddRow(new string[] {
                             "format",
                             "notSupported"});
 #line 79
- testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/credential\'", ((string)(null)), table144, "And ");
+ testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/credential\'", ((string)(null)), table153, "And ");
 #line hidden
 #line 84
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -371,17 +371,17 @@ this.ScenarioInitialize(scenarioInfo);
 #line 90
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table145 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table154 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table145.AddRow(new string[] {
+                table154.AddRow(new string[] {
                             "wallet_client_id",
                             "fiftyNineClient"});
-                table145.AddRow(new string[] {
+                table154.AddRow(new string[] {
                             "credential_template_id",
                             "credTemplate"});
 #line 92
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table145, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table154, "When ");
 #line hidden
 #line 97
  testRunner.And("extract query parameters into JSON", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -393,24 +393,24 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("extract parameter \'$.grants.urn:ietf:params:oauth:grant-type:pre-authorized_code." +
                         "pre-authorized_code\' from JSON body into \'preAuthorizedCode\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table146 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table155 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table146.AddRow(new string[] {
+                table155.AddRow(new string[] {
                             "grant_type",
                             "urn:ietf:params:oauth:grant-type:pre-authorized_code"});
-                table146.AddRow(new string[] {
+                table155.AddRow(new string[] {
                             "client_id",
                             "fiftyNineClient"});
-                table146.AddRow(new string[] {
+                table155.AddRow(new string[] {
                             "pre-authorized_code",
                             "$preAuthorizedCode$"});
-                table146.AddRow(new string[] {
+                table155.AddRow(new string[] {
                             "authorization_details",
                             "{ \"type\" : \"openid_credential\", \"format\": \"jwt_vc_json\", \"types\": [ \"VerifiableCr" +
                                 "edential\", \"UniversityDegreeCredential\"] }"});
 #line 101
- testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table146, "And ");
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table155, "And ");
 #line hidden
 #line 108
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -421,17 +421,17 @@ this.ScenarioInitialize(scenarioInfo);
 #line 110
  testRunner.And("extract payload from JWT \'$access_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table147 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table156 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table147.AddRow(new string[] {
+                table156.AddRow(new string[] {
                             "Authorization",
                             "Bearer $access_token$"});
-                table147.AddRow(new string[] {
+                table156.AddRow(new string[] {
                             "format",
                             "jwt_vc_json"});
 #line 112
- testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/credential\'", ((string)(null)), table147, "And ");
+ testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/credential\'", ((string)(null)), table156, "And ");
 #line hidden
 #line 117
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -467,17 +467,17 @@ this.ScenarioInitialize(scenarioInfo);
 #line 123
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table148 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table157 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table148.AddRow(new string[] {
+                table157.AddRow(new string[] {
                             "wallet_client_id",
                             "fiftyNineClient"});
-                table148.AddRow(new string[] {
+                table157.AddRow(new string[] {
                             "credential_template_id",
                             "credTemplate"});
 #line 125
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table148, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table157, "When ");
 #line hidden
 #line 130
  testRunner.And("extract query parameters into JSON", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -489,24 +489,24 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("extract parameter \'$.grants.urn:ietf:params:oauth:grant-type:pre-authorized_code." +
                         "pre-authorized_code\' from JSON body into \'preAuthorizedCode\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table149 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table158 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table149.AddRow(new string[] {
+                table158.AddRow(new string[] {
                             "grant_type",
                             "urn:ietf:params:oauth:grant-type:pre-authorized_code"});
-                table149.AddRow(new string[] {
+                table158.AddRow(new string[] {
                             "client_id",
                             "fiftyNineClient"});
-                table149.AddRow(new string[] {
+                table158.AddRow(new string[] {
                             "pre-authorized_code",
                             "$preAuthorizedCode$"});
-                table149.AddRow(new string[] {
+                table158.AddRow(new string[] {
                             "authorization_details",
                             "{ \"type\" : \"openid_credential\", \"format\": \"jwt_vc_json\", \"types\": [ \"VerifiableCr" +
                                 "edential\", \"UniversityDegreeCredential\"] }"});
 #line 134
- testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table149, "And ");
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table158, "And ");
 #line hidden
 #line 141
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -517,20 +517,20 @@ this.ScenarioInitialize(scenarioInfo);
 #line 143
  testRunner.And("extract payload from JWT \'$access_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table150 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table159 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table150.AddRow(new string[] {
+                table159.AddRow(new string[] {
                             "Authorization",
                             "Bearer $access_token$"});
-                table150.AddRow(new string[] {
+                table159.AddRow(new string[] {
                             "format",
                             "jwt_vc_json"});
-                table150.AddRow(new string[] {
+                table159.AddRow(new string[] {
                             "types",
                             "[\"firstcred\", \"secondcred\"]"});
 #line 145
- testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/credential\'", ((string)(null)), table150, "And ");
+ testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/credential\'", ((string)(null)), table159, "And ");
 #line hidden
 #line 151
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -569,17 +569,17 @@ this.ScenarioInitialize(scenarioInfo);
 #line 157
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table151 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table160 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table151.AddRow(new string[] {
+                table160.AddRow(new string[] {
                             "wallet_client_id",
                             "fiftyNineClient"});
-                table151.AddRow(new string[] {
+                table160.AddRow(new string[] {
                             "credential_template_id",
                             "credTemplate"});
 #line 159
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table151, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table160, "When ");
 #line hidden
 #line 164
  testRunner.And("extract query parameters into JSON", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -591,24 +591,24 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("extract parameter \'$.grants.urn:ietf:params:oauth:grant-type:pre-authorized_code." +
                         "pre-authorized_code\' from JSON body into \'preAuthorizedCode\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table152 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table161 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table152.AddRow(new string[] {
+                table161.AddRow(new string[] {
                             "grant_type",
                             "urn:ietf:params:oauth:grant-type:pre-authorized_code"});
-                table152.AddRow(new string[] {
+                table161.AddRow(new string[] {
                             "client_id",
                             "fiftyNineClient"});
-                table152.AddRow(new string[] {
+                table161.AddRow(new string[] {
                             "pre-authorized_code",
                             "$preAuthorizedCode$"});
-                table152.AddRow(new string[] {
+                table161.AddRow(new string[] {
                             "authorization_details",
                             "{ \"type\" : \"openid_credential\", \"format\": \"jwt_vc_json\", \"types\": [ \"VerifiableCr" +
                                 "edential\", \"InvalidCredential\"] }"});
 #line 168
- testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table152, "And ");
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table161, "And ");
 #line hidden
 #line 175
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -619,20 +619,20 @@ this.ScenarioInitialize(scenarioInfo);
 #line 177
  testRunner.And("extract payload from JWT \'$access_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table153 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table162 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table153.AddRow(new string[] {
+                table162.AddRow(new string[] {
                             "Authorization",
                             "Bearer $access_token$"});
-                table153.AddRow(new string[] {
+                table162.AddRow(new string[] {
                             "format",
                             "jwt_vc_json"});
-                table153.AddRow(new string[] {
+                table162.AddRow(new string[] {
                             "types",
                             "[\"VerifiableCredential\",\"UniversityDegree\"]"});
 #line 179
- testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/credential\'", ((string)(null)), table153, "And ");
+ testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/credential\'", ((string)(null)), table162, "And ");
 #line hidden
 #line 185
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -668,17 +668,17 @@ this.ScenarioInitialize(scenarioInfo);
 #line 191
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table154 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table163 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table154.AddRow(new string[] {
+                table163.AddRow(new string[] {
                             "wallet_client_id",
                             "fiftyNineClient"});
-                table154.AddRow(new string[] {
+                table163.AddRow(new string[] {
                             "credential_template_id",
                             "credTemplate"});
 #line 193
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table154, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table163, "When ");
 #line hidden
 #line 198
  testRunner.And("extract query parameters into JSON", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -690,24 +690,24 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("extract parameter \'$.grants.urn:ietf:params:oauth:grant-type:pre-authorized_code." +
                         "pre-authorized_code\' from JSON body into \'preAuthorizedCode\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table155 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table164 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table155.AddRow(new string[] {
+                table164.AddRow(new string[] {
                             "grant_type",
                             "urn:ietf:params:oauth:grant-type:pre-authorized_code"});
-                table155.AddRow(new string[] {
+                table164.AddRow(new string[] {
                             "client_id",
                             "fiftyNineClient"});
-                table155.AddRow(new string[] {
+                table164.AddRow(new string[] {
                             "pre-authorized_code",
                             "$preAuthorizedCode$"});
-                table155.AddRow(new string[] {
+                table164.AddRow(new string[] {
                             "authorization_details",
                             "{ \"type\" : \"openid_credential\", \"format\": \"jwt_vc_json\", \"types\": [ \"VerifiableCr" +
                                 "edential\", \"UniversityDegree\"] }"});
 #line 202
- testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table155, "And ");
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table164, "And ");
 #line hidden
 #line 209
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -718,23 +718,23 @@ this.ScenarioInitialize(scenarioInfo);
 #line 211
  testRunner.And("extract payload from JWT \'$access_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table156 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table165 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table156.AddRow(new string[] {
+                table165.AddRow(new string[] {
                             "Authorization",
                             "Bearer $access_token$"});
-                table156.AddRow(new string[] {
+                table165.AddRow(new string[] {
                             "format",
                             "jwt_vc_json"});
-                table156.AddRow(new string[] {
+                table165.AddRow(new string[] {
                             "types",
                             "[\"VerifiableCredential\", \"UniversityDegree\"]"});
-                table156.AddRow(new string[] {
+                table165.AddRow(new string[] {
                             "proof",
                             "{ }"});
 #line 213
- testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/credential\'", ((string)(null)), table156, "And ");
+ testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/credential\'", ((string)(null)), table165, "And ");
 #line hidden
 #line 220
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -770,17 +770,17 @@ this.ScenarioInitialize(scenarioInfo);
 #line 226
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table157 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table166 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table157.AddRow(new string[] {
+                table166.AddRow(new string[] {
                             "wallet_client_id",
                             "fiftyNineClient"});
-                table157.AddRow(new string[] {
+                table166.AddRow(new string[] {
                             "credential_template_id",
                             "credTemplate"});
 #line 228
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table157, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table166, "When ");
 #line hidden
 #line 233
  testRunner.And("extract query parameters into JSON", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -792,24 +792,24 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("extract parameter \'$.grants.urn:ietf:params:oauth:grant-type:pre-authorized_code." +
                         "pre-authorized_code\' from JSON body into \'preAuthorizedCode\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table158 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table167 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table158.AddRow(new string[] {
+                table167.AddRow(new string[] {
                             "grant_type",
                             "urn:ietf:params:oauth:grant-type:pre-authorized_code"});
-                table158.AddRow(new string[] {
+                table167.AddRow(new string[] {
                             "client_id",
                             "fiftyNineClient"});
-                table158.AddRow(new string[] {
+                table167.AddRow(new string[] {
                             "pre-authorized_code",
                             "$preAuthorizedCode$"});
-                table158.AddRow(new string[] {
+                table167.AddRow(new string[] {
                             "authorization_details",
                             "{ \"type\" : \"openid_credential\", \"format\": \"jwt_vc_json\", \"types\": [ \"VerifiableCr" +
                                 "edential\", \"UniversityDegree\"] }"});
 #line 237
- testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table158, "And ");
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table167, "And ");
 #line hidden
 #line 244
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -820,23 +820,23 @@ this.ScenarioInitialize(scenarioInfo);
 #line 246
  testRunner.And("extract payload from JWT \'$access_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table159 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table168 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table159.AddRow(new string[] {
+                table168.AddRow(new string[] {
                             "Authorization",
                             "Bearer $access_token$"});
-                table159.AddRow(new string[] {
+                table168.AddRow(new string[] {
                             "format",
                             "jwt_vc_json"});
-                table159.AddRow(new string[] {
+                table168.AddRow(new string[] {
                             "types",
                             "[\"VerifiableCredential\", \"UniversityDegree\"]"});
-                table159.AddRow(new string[] {
+                table168.AddRow(new string[] {
                             "proof",
                             "{ \"proof_type\": \"invalid\" }"});
 #line 248
- testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/credential\'", ((string)(null)), table159, "And ");
+ testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/credential\'", ((string)(null)), table168, "And ");
 #line hidden
 #line 255
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -872,17 +872,17 @@ this.ScenarioInitialize(scenarioInfo);
 #line 261
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table160 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table169 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table160.AddRow(new string[] {
+                table169.AddRow(new string[] {
                             "wallet_client_id",
                             "fiftyNineClient"});
-                table160.AddRow(new string[] {
+                table169.AddRow(new string[] {
                             "credential_template_id",
                             "credTemplate"});
 #line 263
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table160, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table169, "When ");
 #line hidden
 #line 268
  testRunner.And("extract query parameters into JSON", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -894,24 +894,24 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("extract parameter \'$.grants.urn:ietf:params:oauth:grant-type:pre-authorized_code." +
                         "pre-authorized_code\' from JSON body into \'preAuthorizedCode\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table161 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table170 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table161.AddRow(new string[] {
+                table170.AddRow(new string[] {
                             "grant_type",
                             "urn:ietf:params:oauth:grant-type:pre-authorized_code"});
-                table161.AddRow(new string[] {
+                table170.AddRow(new string[] {
                             "client_id",
                             "fiftyNineClient"});
-                table161.AddRow(new string[] {
+                table170.AddRow(new string[] {
                             "pre-authorized_code",
                             "$preAuthorizedCode$"});
-                table161.AddRow(new string[] {
+                table170.AddRow(new string[] {
                             "authorization_details",
                             "{ \"type\" : \"openid_credential\", \"format\": \"jwt_vc_json\", \"types\": [ \"VerifiableCr" +
                                 "edential\", \"UniversityDegree\"] }"});
 #line 272
- testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table161, "And ");
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table170, "And ");
 #line hidden
 #line 279
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -922,23 +922,23 @@ this.ScenarioInitialize(scenarioInfo);
 #line 281
  testRunner.And("extract payload from JWT \'$access_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table162 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table171 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table162.AddRow(new string[] {
+                table171.AddRow(new string[] {
                             "Authorization",
                             "Bearer $access_token$"});
-                table162.AddRow(new string[] {
+                table171.AddRow(new string[] {
                             "format",
                             "jwt_vc_json"});
-                table162.AddRow(new string[] {
+                table171.AddRow(new string[] {
                             "types",
                             "[\"VerifiableCredential\", \"UniversityDegree\"]"});
-                table162.AddRow(new string[] {
+                table171.AddRow(new string[] {
                             "proof",
                             "{ \"proof_type\": \"jwt\" }"});
 #line 283
- testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/credential\'", ((string)(null)), table162, "And ");
+ testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/credential\'", ((string)(null)), table171, "And ");
 #line hidden
 #line 290
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -974,17 +974,17 @@ this.ScenarioInitialize(scenarioInfo);
 #line 296
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table163 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table172 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table163.AddRow(new string[] {
+                table172.AddRow(new string[] {
                             "wallet_client_id",
                             "fiftyNineClient"});
-                table163.AddRow(new string[] {
+                table172.AddRow(new string[] {
                             "credential_template_id",
                             "credTemplate"});
 #line 298
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table163, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table172, "When ");
 #line hidden
 #line 303
  testRunner.And("extract query parameters into JSON", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -996,24 +996,24 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("extract parameter \'$.grants.urn:ietf:params:oauth:grant-type:pre-authorized_code." +
                         "pre-authorized_code\' from JSON body into \'preAuthorizedCode\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table164 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table173 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table164.AddRow(new string[] {
+                table173.AddRow(new string[] {
                             "grant_type",
                             "urn:ietf:params:oauth:grant-type:pre-authorized_code"});
-                table164.AddRow(new string[] {
+                table173.AddRow(new string[] {
                             "client_id",
                             "fiftyNineClient"});
-                table164.AddRow(new string[] {
+                table173.AddRow(new string[] {
                             "pre-authorized_code",
                             "$preAuthorizedCode$"});
-                table164.AddRow(new string[] {
+                table173.AddRow(new string[] {
                             "authorization_details",
                             "{ \"type\" : \"openid_credential\", \"format\": \"jwt_vc_json\", \"types\": [ \"VerifiableCr" +
                                 "edential\", \"UniversityDegree\"] }"});
 #line 307
- testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table164, "And ");
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table173, "And ");
 #line hidden
 #line 314
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -1024,23 +1024,23 @@ this.ScenarioInitialize(scenarioInfo);
 #line 316
  testRunner.And("extract payload from JWT \'$access_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table165 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table174 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table165.AddRow(new string[] {
+                table174.AddRow(new string[] {
                             "Authorization",
                             "Bearer $access_token$"});
-                table165.AddRow(new string[] {
+                table174.AddRow(new string[] {
                             "format",
                             "jwt_vc_json"});
-                table165.AddRow(new string[] {
+                table174.AddRow(new string[] {
                             "types",
                             "[\"VerifiableCredential\", \"UniversityDegree\"]"});
-                table165.AddRow(new string[] {
+                table174.AddRow(new string[] {
                             "proof",
                             "{ \"proof_type\": \"jwt\", \"jwt\": \"invalid\" }"});
 #line 318
- testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/credential\'", ((string)(null)), table165, "And ");
+ testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/credential\'", ((string)(null)), table174, "And ");
 #line hidden
 #line 325
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -1076,26 +1076,26 @@ this.ScenarioInitialize(scenarioInfo);
 #line 331
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table166 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table175 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table166.AddRow(new string[] {
+                table175.AddRow(new string[] {
                             "wallet_client_id",
                             "fiftyNineClient"});
-                table166.AddRow(new string[] {
+                table175.AddRow(new string[] {
                             "credential_template_id",
                             "credTemplate"});
 #line 333
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table166, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table175, "When ");
 #line hidden
-                TechTalk.SpecFlow.Table table167 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table176 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table167.AddRow(new string[] {
+                table176.AddRow(new string[] {
                             "c_nonce",
                             "test"});
 #line 338
- testRunner.And("build proof", ((string)(null)), table167, "And ");
+ testRunner.And("build proof", ((string)(null)), table176, "And ");
 #line hidden
 #line 342
  testRunner.And("extract query parameters into JSON", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -1107,24 +1107,24 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("extract parameter \'$.grants.urn:ietf:params:oauth:grant-type:pre-authorized_code." +
                         "pre-authorized_code\' from JSON body into \'preAuthorizedCode\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table168 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table177 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table168.AddRow(new string[] {
+                table177.AddRow(new string[] {
                             "grant_type",
                             "urn:ietf:params:oauth:grant-type:pre-authorized_code"});
-                table168.AddRow(new string[] {
+                table177.AddRow(new string[] {
                             "client_id",
                             "fiftyNineClient"});
-                table168.AddRow(new string[] {
+                table177.AddRow(new string[] {
                             "pre-authorized_code",
                             "$preAuthorizedCode$"});
-                table168.AddRow(new string[] {
+                table177.AddRow(new string[] {
                             "authorization_details",
                             "{ \"type\" : \"openid_credential\", \"format\": \"jwt_vc_json\", \"types\": [ \"VerifiableCr" +
                                 "edential\", \"UniversityDegree\"] }"});
 #line 346
- testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table168, "And ");
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table177, "And ");
 #line hidden
 #line 353
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -1135,23 +1135,23 @@ this.ScenarioInitialize(scenarioInfo);
 #line 355
  testRunner.And("extract payload from JWT \'$access_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table169 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table178 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table169.AddRow(new string[] {
+                table178.AddRow(new string[] {
                             "Authorization",
                             "Bearer $access_token$"});
-                table169.AddRow(new string[] {
+                table178.AddRow(new string[] {
                             "format",
                             "jwt_vc_json"});
-                table169.AddRow(new string[] {
+                table178.AddRow(new string[] {
                             "types",
                             "[\"VerifiableCredential\",\"UniversityDegree\"]"});
-                table169.AddRow(new string[] {
+                table178.AddRow(new string[] {
                             "proof",
                             "{ \"proof_type\": \"jwt\", \"jwt\": \"$proof$\" }"});
 #line 357
- testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/credential\'", ((string)(null)), table169, "And ");
+ testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/credential\'", ((string)(null)), table178, "And ");
 #line hidden
 #line 364
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -1187,29 +1187,29 @@ this.ScenarioInitialize(scenarioInfo);
 #line 370
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table170 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table179 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table170.AddRow(new string[] {
+                table179.AddRow(new string[] {
                             "wallet_client_id",
                             "fiftyNineClient"});
-                table170.AddRow(new string[] {
+                table179.AddRow(new string[] {
                             "credential_template_id",
                             "credTemplate"});
 #line 372
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table170, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer/share\'", ((string)(null)), table179, "When ");
 #line hidden
-                TechTalk.SpecFlow.Table table171 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table180 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table171.AddRow(new string[] {
+                table180.AddRow(new string[] {
                             "typ",
                             "openid4vci-proof+jwt"});
-                table171.AddRow(new string[] {
+                table180.AddRow(new string[] {
                             "c_nonce",
                             "invalid"});
 #line 377
- testRunner.And("build proof", ((string)(null)), table171, "And ");
+ testRunner.And("build proof", ((string)(null)), table180, "And ");
 #line hidden
 #line 382
  testRunner.And("extract query parameters into JSON", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -1221,24 +1221,24 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("extract parameter \'$.grants.urn:ietf:params:oauth:grant-type:pre-authorized_code." +
                         "pre-authorized_code\' from JSON body into \'preAuthorizedCode\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table172 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table181 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table172.AddRow(new string[] {
+                table181.AddRow(new string[] {
                             "grant_type",
                             "urn:ietf:params:oauth:grant-type:pre-authorized_code"});
-                table172.AddRow(new string[] {
+                table181.AddRow(new string[] {
                             "client_id",
                             "fiftyNineClient"});
-                table172.AddRow(new string[] {
+                table181.AddRow(new string[] {
                             "pre-authorized_code",
                             "$preAuthorizedCode$"});
-                table172.AddRow(new string[] {
+                table181.AddRow(new string[] {
                             "authorization_details",
                             "{ \"type\" : \"openid_credential\", \"format\": \"jwt_vc_json\", \"types\": [ \"VerifiableCr" +
                                 "edential\", \"UniversityDegree\"] }"});
 #line 386
- testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table172, "And ");
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table181, "And ");
 #line hidden
 #line 393
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -1249,23 +1249,23 @@ this.ScenarioInitialize(scenarioInfo);
 #line 395
  testRunner.And("extract payload from JWT \'$access_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table173 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table182 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table173.AddRow(new string[] {
+                table182.AddRow(new string[] {
                             "Authorization",
                             "Bearer $access_token$"});
-                table173.AddRow(new string[] {
+                table182.AddRow(new string[] {
                             "format",
                             "jwt_vc_json"});
-                table173.AddRow(new string[] {
+                table182.AddRow(new string[] {
                             "types",
                             "[\"VerifiableCredential\",\"UniversityDegree\"]"});
-                table173.AddRow(new string[] {
+                table182.AddRow(new string[] {
                             "proof",
                             "{ \"proof_type\": \"jwt\", \"jwt\": \"$proof$\" }"});
 #line 397
- testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/credential\'", ((string)(null)), table173, "And ");
+ testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/credential\'", ((string)(null)), table182, "And ");
 #line hidden
 #line 404
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

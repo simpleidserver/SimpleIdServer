@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Api.BCCallback;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Store;
@@ -18,14 +19,17 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
     {
         private readonly IBCAuthorizeRepository _bcAuthorizeRepository;
         private readonly IRecurringJobManager _recurringJobManager;
+        private readonly IAuthenticationHelper _authenticationHelper;
 
         public BCCallbackController(ITokenRepository tokenRepository,
             IJwtBuilder jwtBuilder, 
             IBCAuthorizeRepository bCAuthorizeRepository, 
-            IRecurringJobManager recurringJobManager) : base(tokenRepository, jwtBuilder)
+            IRecurringJobManager recurringJobManager,
+            IAuthenticationHelper authenticationHelper) : base(tokenRepository, jwtBuilder)
         {
             _bcAuthorizeRepository = bCAuthorizeRepository;
             _recurringJobManager = recurringJobManager;
+            _authenticationHelper = authenticationHelper;
         }
 
         [HttpPost]
@@ -34,21 +38,22 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             try
             {
                 prefix = prefix ?? Constants.DefaultRealm;
-                var bcAuthorize = await _bcAuthorizeRepository.Query().Include(a => a.Histories).FirstOrDefaultAsync(b => b.Id == parameter.AuthReqId, cancellationToken);
+                var kvp = await CheckAccessToken(prefix);
+                var bcAuthorize = await _bcAuthorizeRepository.Query()
+                    .Include(a => a.Histories)
+                    .FirstOrDefaultAsync(b => b.Id == parameter.AuthReqId, cancellationToken);
                 if (bcAuthorize == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_BC_AUTHORIZE, parameter.AuthReqId));
-                switch(parameter.ActionEnum)
+                if (!bcAuthorize.IsActive) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.EXPIRED_BC_AUTHORIZE);
+                if (bcAuthorize.LastStatus != Domains.BCAuthorizeStatus.Pending) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.BC_AUTHORIZE_NOT_PENDING);
+                var user = await _authenticationHelper.GetUserByLogin(kvp.Item1.Subject, prefix, cancellationToken);
+                if (user.Id != bcAuthorize.UserId) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.UNAUTHORIZED_TO_VALIDATE_BC_AUTHORIZATION);
+                switch (parameter.ActionEnum)
                 {
                     case BCCallbackActions.CONFIRM:
-                        {
-                            if (bcAuthorize.LastStatus != Domains.BCAuthorizeStatus.Pending) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.BC_AUTHORIZE_NOT_PENDING);
-                            bcAuthorize.Confirm();
-                        }
+                        bcAuthorize.Confirm();
                         break;
                     case BCCallbackActions.REJECT:
-                        {
-                            if (bcAuthorize.LastStatus != Domains.BCAuthorizeStatus.Pending) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.BC_AUTHORIZE_NOT_PENDING);
-                            bcAuthorize.Reject();
-                        }
+                        bcAuthorize.Reject();
                         break;
                 }
 
