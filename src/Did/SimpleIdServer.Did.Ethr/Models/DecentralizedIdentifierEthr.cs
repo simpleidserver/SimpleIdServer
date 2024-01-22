@@ -13,4 +13,5 @@ public class DecentralizedIdentifierEthr : DecentralizedIdentifier
     public string Network { get; set; } = null!;
     public string Address { get; set; } = null!;
     public string PublicKey { get; set; } = null;
+    public int? Version { get; set; } = null;
 }

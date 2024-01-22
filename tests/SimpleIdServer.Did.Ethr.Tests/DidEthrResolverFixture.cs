@@ -103,6 +103,24 @@ public class DidEthrResolverFixture
     [Test]
     public async Task When_Resolve_DID_With_Transactions_Then_DID_Document_Is_Resolved()
     {
+        var store = new NetworkConfigurationStore();
+        store.NetworkConfigurations.Add(new Models.NetworkConfiguration
+        {
+            Name = "mainnet",
+            ContractAdr = "0xdca7ef03e98e0dc2b855be647c39abe984fcf21b",
+            RpcUrl = "https://mainnet.infura.io/v3/405e16111db4419e8d94431737f8ba53",
+            UpdateDateTime = DateTime.UtcNow,
+            CreateDateTime = DateTime.UtcNow
+        });
+        var serializer = MulticodecSerializerFactory.Build();
+        var resolver = new DidEthrResolver(store, serializer);
+
+        // ACT
+        // var didDocument = await resolver.Resolve("did:ethr:0x6918893854B2Eb01B194c46c4Efe2ea1ef36B7BC", CancellationToken.None);
+        var didDocument = await resolver.Resolve("did:ethr:0x19711CD19e609FEBdBF607960220898268B7E24b", CancellationToken.None);
+        var serialize = didDocument.Serialize();
+
+        // did:ethr:0x26bf14321004e770e7a8b080b7a526d8eed8b388
         // https://github.com/decentralized-identity/ethr-did-resolver/blob/master/doc/did-method-spec.md#read-resolve
     }
 }

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.IdentityModel.Tokens;
-using SimpleIdServer.Did.Builders;
-using SimpleIdServer.Did.Crypto;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text.Json.Nodes;
@@ -86,12 +84,18 @@ namespace SimpleIdServer.Did.Models
         [JsonPropertyName("publicKeyHex")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string PublicKeyHex { get; set; } = null;
+        [JsonPropertyName("privateKeyHex")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string PrivateKeyHex { get; set; } = null;
         [JsonPropertyName("publicKeyBase64")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string PublicKeyBase64 { get; set; } = null;
         [JsonPropertyName("publicKeyBase58")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string PublicKeyBase58 { get; set; } = null;
+        [JsonPropertyName("privateKeyBase58")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string PrivateKeyBase58 { get; set; } = null;
         [JsonPropertyName("publicKeyPem")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string PublicKeyPem { get; set; } = null;
@@ -103,12 +107,6 @@ namespace SimpleIdServer.Did.Models
         [JsonIgnore]
         public Dictionary<string, string> AdditionalParameters = new Dictionary<string, string>();
         [JsonIgnore]
-        public IVerificationMethodFormatter Formatter { get; set; }
-
-        public IAsymmetricKey GetKey()
-        {
-            if (Formatter == null) return null;
-            return Formatter.Extract(this);
-        }
+        public string JsonLdContext { get; set; }
     }
 }

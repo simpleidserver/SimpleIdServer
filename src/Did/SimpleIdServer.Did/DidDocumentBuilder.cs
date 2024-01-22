@@ -1,9 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-using SimpleIdServer.Did.Builders;
 using SimpleIdServer.Did.Crypto;
-using SimpleIdServer.Did.Formatters;
+using SimpleIdServer.Did.Crypto.Multicodec;
+using SimpleIdServer.Did.Encoders;
 using SimpleIdServer.Did.Models;
 using System;
 using System.Collections.Generic;
@@ -20,37 +20,27 @@ namespace SimpleIdServer.Did
         private readonly List<JsonObject> _context = new List<JsonObject>();
         private readonly List<string> _controllers = new List<string>();
         private readonly List<DidDocumentVerificationMethod> _innerVerificationMethods = new List<DidDocumentVerificationMethod>();
-        private readonly bool _includePrivateKey = false;
         private readonly DidDocument _identityDocument;
-        private readonly IEnumerable<IVerificationMethodFormatter> _verificationMethodBuilders = new List<IVerificationMethodFormatter>
-        {
-            FormatterFactory.BuildJsonWebKey2020Formatter(),
-            FormatterFactory.BuildEd25519VerificationKey2020Formatter(),
-            FormatterFactory.BuildX25519KeyAgreementFormatter(),
-            FormatterFactory.BuildEcdsaSecp256k1VerificationKey2019Formatter()
-        };
-
-        protected DidDocumentBuilder(DidDocument identityDocument, bool includePrivateKey) 
-        {
-            _identityDocument = identityDocument;
-            _includePrivateKey = includePrivateKey;
-        }
+        private readonly IVerificationMethodEncoding _verificationMethodEncoding;
 
         protected DidDocumentBuilder(DidDocument identityDocument,
-            bool includePrivateKey,
-            IEnumerable<IVerificationMethodFormatter> verificationMethodBuilders) : this(identityDocument, includePrivateKey)
+            IVerificationMethodEncoding verificationMethodEncoding)
         {
-            _verificationMethodBuilders = verificationMethodBuilders;
+            _identityDocument = identityDocument;
+            _verificationMethodEncoding = verificationMethodEncoding;
         }
 
         protected DidDocument IdentityDocument => _identityDocument;
 
-        public static DidDocumentBuilder New(string id, bool includePrivateKey = false) => new DidDocumentBuilder(new DidDocument
+        public static DidDocumentBuilder New(string id, IVerificationMethodEncoding verificationMethodEncoding) => new DidDocumentBuilder(new DidDocument
         {
             Id = id
-        }, includePrivateKey);
+        }, verificationMethodEncoding);
 
-        public static DidDocumentBuilder New(DidDocument identityDocument, bool includePrivateKey = false) => new DidDocumentBuilder(identityDocument, includePrivateKey);
+        public static DidDocumentBuilder New(string id) => new DidDocumentBuilder(new DidDocument
+        {
+            Id = id
+        }, new VerificationMethodEncoding(VerificationMethodStandardFactory.GetAll(), MulticodecSerializerFactory.Build()));
 
         #region JSON-LD Context
 
@@ -92,34 +82,58 @@ namespace SimpleIdServer.Did
 
         #region Verification method
 
-        public DidDocumentBuilder AddJsonWebKeyVerificationMethod(IAsymmetricKey asymmKey, string controller, VerificationMethodUsages usage, bool isReference = true, string id = null)
-            => AddVerificationMethod(asymmKey, controller, JsonWebKey2020Formatter.JSON_LD_CONTEXT, usage, isReference, id);
-
-        public DidDocumentBuilder AddEd25519VerificationKey2020VerificationMethod(IAsymmetricKey asymmKey, string controller, VerificationMethodUsages usage, bool isReference = true, string id = null)
-            => AddVerificationMethod(asymmKey, controller, Ed25519VerificationKey2020Formatter.JSON_LD_CONTEXT, usage, isReference, id);
-
-        public DidDocumentBuilder AddEcdsaSecp256k1RecoveryMethod2020(IAsymmetricKey asymmKey, string controller, VerificationMethodUsages usage, bool isReference = true, string id = null)
-            => AddVerificationMethod(asymmKey, controller, EcdsaSecp256k1RecoveryMethod2020Formatter.JSON_LD_CONTEXT, usage, isReference, id);
-
-        public DidDocumentBuilder AddEcdsaSecp256k1RecoveryMethod2020BlockChain(string controller, VerificationMethodUsages usage, CAIP10BlockChainAccount blockChainAccount, bool isReference = true, string id = null)
+        public DidDocumentBuilder AddVerificationMethod(string verificationMethodStandard,
+            IAsymmetricKey asymmKey,
+            string controller,
+            VerificationMethodUsages usage,
+            bool isReference = true,
+            bool includePrivateKey = false,
+            SignatureKeyEncodingTypes? encoding = null,
+            Action<DidDocumentVerificationMethod> callback = null)
         {
-            var builder = EcdsaSecp256k1RecoveryMethod2020Formatter.BuildBlockChainFormatter(blockChainAccount);
-            var verificationMethod = BuildVerificationMethod(builder, null, controller, EcdsaSecp256k1RecoveryMethod2020Formatter.JSON_LD_CONTEXT, id);
-            AddVerificationMethod(verificationMethod, usage, isReference);
+            var verificationMethod = _verificationMethodEncoding.Encode(
+                verificationMethodStandard,
+                controller,
+                asymmKey,
+                encoding,
+                includePrivateKey);
+            return this.AddVerificationMethod(verificationMethod, usage, isReference);
+        }
+
+        public DidDocumentBuilder AddVerificationMethod(
+            DidDocumentVerificationMethod verificationMethod,
+            VerificationMethodUsages usage,
+            bool isReference = true)
+        {
+            var standard = _verificationMethodEncoding.Standards.Single(s => s.Type == verificationMethod.Type);
+            if(!string.IsNullOrWhiteSpace(standard.JSONLDContext))
+                AddContext(standard.JSONLDContext);
+            verificationMethod.Usage = usage;
+            if (isReference)
+                _identityDocument.AddVerificationMethod(verificationMethod);
+            else
+                _innerVerificationMethods.Add(verificationMethod);
+
             return this;
         }
 
-        public DidDocumentBuilder AddEcdsaSecp256k1VerificationKey2019(ES256KSignatureKey asymmKey, string controller, VerificationMethodUsages usage, bool isReference = true, string id = null)
-            => AddVerificationMethod(asymmKey, controller, EcdsaSecp256k1VerificationKey2019Formatter.JSON_LD_CONTEXT, usage, isReference, id);
-
-        public DidDocumentBuilder AddX25519KeyAgreementVerificationMethod(IAsymmetricKey asymmKey, string controller, bool isReference = true, string id = null)
-            => AddVerificationMethod(asymmKey, controller, X25519KeyAgreementFormatter.JSON_LD_CONTEXT, VerificationMethodUsages.KEY_AGREEMENT, isReference, id);
+        public DidDocumentBuilder AddKeyAggreement(
+            string verificationMethodStandard,
+            X25519AgreementKey asymmKey,
+            string controller,
+            bool isReference = true)
+        {
+            return this;
+        }
 
         #endregion
 
         #region Service endpoint
+
         public DidDocumentBuilder AddServiceEndpoint(string type, string serviceEndpoint)
         {
+            if (_identityDocument.Service == null)
+                _identityDocument.Service = new List<DidDocumentService>();
             var id = $"{_identityDocument.Id}#service-{(_identityDocument.Service.Count() + 1)}";
             _identityDocument.AddService(new DidDocumentService
             {
@@ -127,6 +141,14 @@ namespace SimpleIdServer.Did
                 Type = type,
                 ServiceEndpoint = serviceEndpoint
             }, false);
+            return this;
+        }
+
+        public DidDocumentBuilder AddServiceEndpoint(DidDocumentService service)
+        {
+            if (_identityDocument.Service == null)
+                _identityDocument.Service = new List<DidDocumentService>();
+            _identityDocument.Service.Add(service);
             return this;
         }
 
@@ -179,47 +201,6 @@ namespace SimpleIdServer.Did
             foreach(var controller in _controllers)
                 result.Add(controller);
             return result;
-        }
-
-        private DidDocumentBuilder AddVerificationMethod(IAsymmetricKey asymmKey, string controller, string ldContext, VerificationMethodUsages usage, bool isReference, string id)
-        {
-            var isKeyAgreement = (asymmKey as IAgreementKey) != null;
-            if (usage.HasFlag(VerificationMethodUsages.KEY_AGREEMENT) && !isKeyAgreement) throw new ArgumentException("Signature key cannot be used in a Key Agreement");
-            var verificationMethod = BuildVerificationMethod(asymmKey, controller, ldContext, id);
-            return AddVerificationMethod(verificationMethod, usage, isReference);
-        }
-
-        private DidDocumentBuilder AddVerificationMethod(DidDocumentVerificationMethod verificationMethod, VerificationMethodUsages usage, bool isReference)
-        {
-            verificationMethod.Usage = usage;
-            if (isReference)
-            {
-                _identityDocument.AddVerificationMethod(verificationMethod);
-            }
-            else
-            {
-                _innerVerificationMethods.Add(verificationMethod);
-            }
-
-            return this;
-        }
-
-        private DidDocumentVerificationMethod BuildVerificationMethod(IAsymmetricKey signatureKey, string controller, string ldContext, string id)
-        {
-            var builder = _verificationMethodBuilders.Single(v => v.JSONLDContext == ldContext);
-            return BuildVerificationMethod(builder, signatureKey, controller, ldContext, id);
-        }
-
-        private DidDocumentVerificationMethod BuildVerificationMethod(IVerificationMethodFormatter builder, IAsymmetricKey signatureKey, string controller, string ldContext, string id)
-        {
-            var verificationMethod = builder.Format(_identityDocument, signatureKey, _includePrivateKey);
-            verificationMethod.Type = builder.Type;
-            verificationMethod.Controller = controller;
-            verificationMethod.Formatter = builder;
-            if (!string.IsNullOrWhiteSpace(id))
-                verificationMethod.Id = id;
-            AddContext(builder.JSONLDContext);
-            return verificationMethod;
         }
 
         private JsonArray BuildEmbeddedVerificationMethods(VerificationMethodUsages usage)

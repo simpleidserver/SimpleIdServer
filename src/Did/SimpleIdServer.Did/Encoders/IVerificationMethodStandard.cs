@@ -4,15 +4,16 @@
 using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Models;
 
-namespace SimpleIdServer.Did.Builders;
+namespace SimpleIdServer.Did.Encoders;
 
 /// <summary>
 /// Documentation : https://www.w3.org/TR/did-spec-registries/#verification-method-types
 /// </summary>
-public interface IVerificationMethodFormatter
+public interface IVerificationMethodStandard
 {
     string JSONLDContext { get; }
     string Type { get; }
-    DidDocumentVerificationMethod Format(DidDocument idDocument, IAsymmetricKey signatureKey, bool includePrivateKey);
-    IAsymmetricKey Extract(DidDocumentVerificationMethod didDocumentVerificationMethod);
+    SignatureKeyEncodingTypes DefaultEncoding { get; }
+    SignatureKeyEncodingTypes SupportedEncoding { get; }
+    string BuildId(DidDocumentVerificationMethod verificationMethod, IAsymmetricKey asymmKey);
 }
