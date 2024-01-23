@@ -3,6 +3,7 @@
 
 using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Models;
+using System.Collections.Generic;
 
 namespace SimpleIdServer.Did.Encoders;
 
@@ -21,6 +22,11 @@ public class Ed25519VerificationKey2020Standard : IVerificationMethodStandard
     public SignatureKeyEncodingTypes DefaultEncoding => SignatureKeyEncodingTypes.MULTIBASE;
 
     public SignatureKeyEncodingTypes SupportedEncoding => SignatureKeyEncodingTypes.MULTIBASE;
+
+    public IEnumerable<string> SupportedCurves => new List<string>
+    {
+        Constants.StandardCrvOrSize.Ed25519
+    };
 
     public string BuildId(DidDocumentVerificationMethod verificationMethod, IAsymmetricKey asymmKey)
     {

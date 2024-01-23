@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Extensions;
 using SimpleIdServer.Did.Models;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 
 namespace SimpleIdServer.Did.Encoders;
@@ -24,6 +25,9 @@ public class JsonWebKey2020Standard : IVerificationMethodStandard
     public SignatureKeyEncodingTypes DefaultEncoding => SignatureKeyEncodingTypes.JWK;
 
     public SignatureKeyEncodingTypes SupportedEncoding => SignatureKeyEncodingTypes.JWK;
+
+
+    public IEnumerable<string> SupportedCurves { get; } = null;
 
     public string BuildId(DidDocumentVerificationMethod verificationMethod, IAsymmetricKey asymmKey)
     {

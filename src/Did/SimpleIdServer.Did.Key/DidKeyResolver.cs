@@ -1,9 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.Did.Builders;
 using SimpleIdServer.Did.Crypto.Multicodec;
+using SimpleIdServer.Did.Encoders;
 using SimpleIdServer.Did.Models;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SimpleIdServer.Did.Key;
 
@@ -32,7 +34,7 @@ public class DidKeyResolver : IDidResolver
 
     public string Method => Constants.Type;
 
-    public DidDocument Resolve(string did)
+    public Task<DidDocument> Resolve(string did, CancellationToken cancellationToken)
     {
         var decentralizedIdentifier = DidExtractor.Extract(did);
         if (decentralizedIdentifier.Method != Method) throw new ArgumentException($"method must be equals to {Method}");
@@ -40,29 +42,19 @@ public class DidKeyResolver : IDidResolver
         var verificationMethod = _serializer.Deserialize(multibaseValue, null);
         var builder = DidDocumentBuilder.New(did);
         var verificationMethodId = $"{did}#{multibaseValue}";
-        switch(_options.PublicKeyFormat)
-        {
-            case Ed25519VerificationKey2020Formatter.TYPE:
-                builder.AddEd25519VerificationKey2020VerificationMethod(
-                    verificationMethod,
-                    did,
-                    VerificationMethodUsages.AUTHENTICATION | VerificationMethodUsages.ASSERTION_METHOD |
-                    VerificationMethodUsages.CAPABILITY_INVOCATION | VerificationMethodUsages.CAPABILITY_DELEGATION,
-                    id: verificationMethodId);
-                    break;
-            case JsonWebKey2020Formatter.TYPE:
-                builder.AddJsonWebKeyVerificationMethod(
-                    verificationMethod,
-                    did,
-                    VerificationMethodUsages.AUTHENTICATION | VerificationMethodUsages.ASSERTION_METHOD |
-                    VerificationMethodUsages.CAPABILITY_INVOCATION | VerificationMethodUsages.CAPABILITY_DELEGATION,
-                    id: verificationMethodId);
-                break;
-            default:
-                throw new InvalidOperationException($"The key format {_options.PublicKeyFormat} is not supported");
-        }
-
-        if(_options.EnableEncryptionKeyDerivation)
+        if(_options.PublicKeyFormat != Ed25519VerificationKey2020Standard.TYPE 
+            && _options.PublicKeyFormat != JsonWebKey2020Standard.TYPE)
+            throw new InvalidOperationException($"The key format {_options.PublicKeyFormat} is not supported");
+        builder.AddVerificationMethod(_options.PublicKeyFormat,
+            verificationMethod,
+            did,
+            VerificationMethodUsages.AUTHENTICATION | VerificationMethodUsages.ASSERTION_METHOD |
+            VerificationMethodUsages.CAPABILITY_INVOCATION | VerificationMethodUsages.CAPABILITY_DELEGATION,
+            callback: (c) =>
+            {
+                c.Id = verificationMethodId;
+            });
+        if (_options.EnableEncryptionKeyDerivation)
         {
             throw new NotSupportedException("This feature is not yet supported");
             /*
@@ -75,6 +67,6 @@ public class DidKeyResolver : IDidResolver
             */
         }
 
-        return builder.Build();
+        return Task.FromResult(builder.Build());
     }
 }

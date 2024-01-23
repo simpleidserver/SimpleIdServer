@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using NUnit.Framework;
-using SimpleIdServer.Did.Crypto.Multicodec;
 
 namespace SimpleIdServer.Did.Ethr.Tests;
 
@@ -40,8 +39,7 @@ public class DidEthrResolverFixture
             UpdateDateTime = DateTime.UtcNow,
             CreateDateTime = DateTime.UtcNow
         });
-        var serializer = MulticodecSerializerFactory.Build();
-        var resolver = new DidEthrResolver(store, serializer);
+        var resolver = new DidEthrResolver(store);
         
         // ACT
         var didDocument = await resolver.Resolve("did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a", CancellationToken.None);
@@ -74,8 +72,7 @@ public class DidEthrResolverFixture
             UpdateDateTime = DateTime.UtcNow,
             CreateDateTime = DateTime.UtcNow
         });
-        var serializer = MulticodecSerializerFactory.Build();
-        var resolver = new DidEthrResolver(store, serializer);
+        var resolver = new DidEthrResolver(store);
 
         // ACT
         var didDocument = await resolver.Resolve("did:ethr:0x0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798", CancellationToken.None);
@@ -112,12 +109,12 @@ public class DidEthrResolverFixture
             UpdateDateTime = DateTime.UtcNow,
             CreateDateTime = DateTime.UtcNow
         });
-        var serializer = MulticodecSerializerFactory.Build();
-        var resolver = new DidEthrResolver(store, serializer);
+        var resolver = new DidEthrResolver(store);
 
         // ACT
-        // var didDocument = await resolver.Resolve("did:ethr:0x6918893854B2Eb01B194c46c4Efe2ea1ef36B7BC", CancellationToken.None);
-        var didDocument = await resolver.Resolve("did:ethr:0x19711CD19e609FEBdBF607960220898268B7E24b", CancellationToken.None);
+        // FIX THE INDEX...
+        var didDocument = await resolver.Resolve("did:ethr:0x6918893854B2Eb01B194c46c4Efe2ea1ef36B7BC", CancellationToken.None);
+        // var didDocument = await resolver.Resolve("did:ethr:0x19711CD19e609FEBdBF607960220898268B7E24b", CancellationToken.None);
         var serialize = didDocument.Serialize();
 
         // did:ethr:0x26bf14321004e770e7a8b080b7a526d8eed8b388

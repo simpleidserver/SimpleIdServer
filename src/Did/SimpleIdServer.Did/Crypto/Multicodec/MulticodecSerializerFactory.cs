@@ -7,14 +7,16 @@ public class MulticodecSerializerFactory
 {
     public static IMulticodecSerializer Build() =>
         new MulticodecSerializer(
-                    new IVerificationMethod[]
-                    {
-                        new Ed25519VerificationMethod(),
-                        new Es256KVerificationMethod(),
-                        new Es256VerificationMethod(),
-                        new Es384VerificationMethod(),
-                        new X25519VerificationMethod(),
-                        new RSAVerificationMethod()
-                    }
+                    AllVerificationMethods
                 );
+
+    public static IVerificationMethod[] AllVerificationMethods = new IVerificationMethod[]
+    {
+        new Ed25519VerificationMethod(),
+        new Es256KVerificationMethod(),
+        new Es256VerificationMethod(),
+        new Es384VerificationMethod(),
+        new X25519VerificationMethod(),
+        new RSAVerificationMethod()
+    };
 }

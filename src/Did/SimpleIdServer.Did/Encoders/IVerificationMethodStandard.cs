@@ -3,6 +3,8 @@
 
 using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Models;
+using System;
+using System.Collections.Generic;
 
 namespace SimpleIdServer.Did.Encoders;
 
@@ -15,5 +17,6 @@ public interface IVerificationMethodStandard
     string Type { get; }
     SignatureKeyEncodingTypes DefaultEncoding { get; }
     SignatureKeyEncodingTypes SupportedEncoding { get; }
+    IEnumerable<string> SupportedCurves { get; }
     string BuildId(DidDocumentVerificationMethod verificationMethod, IAsymmetricKey asymmKey);
 }

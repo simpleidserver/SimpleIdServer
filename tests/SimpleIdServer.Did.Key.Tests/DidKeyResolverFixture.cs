@@ -2,21 +2,21 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using NUnit.Framework;
-using SimpleIdServer.Did.Builders;
+using SimpleIdServer.Did.Encoders;
 
 namespace SimpleIdServer.Did.Key.Tests;
 
 public class DidKeyResolverFixture
 {
     [Test]
-    public void When_Resolve_DidDocument_With_DefaultOptions_Then_VerificationMethodIsReturned()
+    public async Task When_Resolve_DidDocument_With_DefaultOptions_Then_VerificationMethodIsReturned()
     {
         // ARRANGE
         var key = "did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK";
         var resolver = DidKeyResolver.New();
 
         // ACT
-        var didDocument = resolver.Resolve(key);
+        var didDocument = await resolver.Resolve(key, CancellationToken.None);
 
 
         // ASSERT
@@ -32,14 +32,14 @@ public class DidKeyResolverFixture
     }
 
     [Test]
-    public void When_Resolve_DidDocument_With_JsonWebKey2020Formatter_Then_VerificationMethodIsCorrect()
+    public async Task When_Resolve_DidDocument_With_JsonWebKey2020Formatter_Then_VerificationMethodIsCorrect()
     {
         // ARRANGE
         var key = "did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp";
-        var resolver = DidKeyResolver.New(new DidKeyOptions { PublicKeyFormat = JsonWebKey2020Formatter.TYPE });
+        var resolver = DidKeyResolver.New(new DidKeyOptions { PublicKeyFormat = JsonWebKey2020Standard.TYPE });
 
         // ACT
-        var didDocument = resolver.Resolve(key);
+        var didDocument = await resolver.Resolve(key, CancellationToken.None);
 
         // ASSERT
         Assert.IsNotNull(didDocument);

@@ -14,6 +14,7 @@ namespace SimpleIdServer.Did.Encoders;
 public interface IVerificationMethodEncoding
 {
     DidDocumentVerificationMethod Encode(string type, string controller, IAsymmetricKey key, SignatureKeyEncodingTypes? encoding = null, bool includePrivateKey = false);
+    IAsymmetricKey Decode(DidDocumentVerificationMethod verificationMethod);
     IEnumerable<IVerificationMethodStandard> Standards { get; }
 }
 
@@ -21,13 +22,16 @@ public class VerificationMethodEncoding : IVerificationMethodEncoding
 {
     private readonly IEnumerable<IVerificationMethodStandard> _standards;
     private readonly IMulticodecSerializer _multicodecSerializer;
+    private readonly IEnumerable<IVerificationMethod> _verificationMethods;
 
     public VerificationMethodEncoding(
         IEnumerable<IVerificationMethodStandard> standards,
-        IMulticodecSerializer multicodecSerializer)
+        IMulticodecSerializer multicodecSerializer,
+        IEnumerable<IVerificationMethod> verificationMethods)
     {
         _standards = standards;
         _multicodecSerializer = multicodecSerializer;
+        _verificationMethods = verificationMethods;
     }
 
     public IEnumerable<IVerificationMethodStandard> Standards => _standards;
@@ -42,6 +46,9 @@ public class VerificationMethodEncoding : IVerificationMethodEncoding
         if (encoding == null) encoding = standard.DefaultEncoding;
         if (!standard.SupportedEncoding.HasFlag(encoding)) 
             throw new InvalidOperationException("This type of encoding is not supported");
+        if (standard.SupportedCurves != null && !standard.SupportedCurves.Any(k => key.CrvOrSize == k))
+            throw new InvalidOperationException("The format doesn't support this type of key");
+
         byte[] privateKey = null;
         if(includePrivateKey)
         {
@@ -91,5 +98,30 @@ public class VerificationMethodEncoding : IVerificationMethodEncoding
         }
 
         return result;
+    }
+
+    public IAsymmetricKey Decode(
+        DidDocumentVerificationMethod verificationMethod)
+    {
+        var standard = _standards.Single(s => s.Type == verificationMethod.Type);
+        var defaultEncoding = standard.DefaultEncoding;
+        byte[] publicKey = null;
+        switch(defaultEncoding)
+        {
+            case SignatureKeyEncodingTypes.BASE58:
+                publicKey = Encoding.Base58Encoding.Decode(verificationMethod.PublicKeyBase58);
+                break;
+            case SignatureKeyEncodingTypes.HEX:
+                publicKey = verificationMethod.PublicKeyHex.HexToByteArray();
+                break;
+            case SignatureKeyEncodingTypes.MULTIBASE:
+                return _multicodecSerializer.Deserialize(verificationMethod.PublicKeyMultibase, verificationMethod.SecretKeyMultibase);
+            case SignatureKeyEncodingTypes.JWK:
+                return _verificationMethods.Single(v => v.Kty == verificationMethod.PublicKeyJwk.Kty && v.CrvOrSize == verificationMethod.PublicKeyJwk.Crv)
+                    .Build(verificationMethod.PublicKeyJwk, verificationMethod.PrivateKeyJwk);
+        }
+
+        var curve = standard.SupportedCurves.Single();
+        return _verificationMethods.Single(v => v.CrvOrSize == curve).Build(publicKey, null);
     }
 }

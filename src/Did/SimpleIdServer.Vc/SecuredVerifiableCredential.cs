@@ -1,7 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.Did.Extensions;
-using SimpleIdServer.Did.Formatters;
+using SimpleIdServer.Did.Crypto.Multicodec;
+using SimpleIdServer.Did.Encoders;
 using SimpleIdServer.Did.Models;
 using SimpleIdServer.Vc.Canonize;
 using SimpleIdServer.Vc.Hashing;
@@ -23,18 +23,18 @@ public class SecuredVerifiableCredential
     private readonly IEnumerable<ISignatureProof> _proofs;
     private readonly IEnumerable<ICanonize> _canonizeMethods;
     private readonly IEnumerable<IHashing> _hashingMethods;
-    private readonly IFormatterFactory _formatterFactory;
+    private readonly IVerificationMethodEncoding _verificationMethodEncoding;
 
     private SecuredVerifiableCredential(
         IEnumerable<ISignatureProof> proofs,
         IEnumerable<ICanonize> canonizeMethods,
         IEnumerable<IHashing> hashingMethods,
-        IFormatterFactory formatterFactory)
+        IVerificationMethodEncoding verificationMethodEncoding)
     {
         _proofs = proofs;
         _canonizeMethods = canonizeMethods;
         _hashingMethods = hashingMethods;
-        _formatterFactory = formatterFactory;
+        _verificationMethodEncoding = verificationMethodEncoding;
     }
 
     public static SecuredVerifiableCredential New()
@@ -49,7 +49,7 @@ public class SecuredVerifiableCredential
         }, new IHashing[]
         {
             new SHA256Hash()
-        }, new FormatterFactory());
+        }, new VerificationMethodEncoding(VerificationMethodStandardFactory.GetAll(), MulticodecSerializerFactory.Build(), MulticodecSerializerFactory.AllVerificationMethods));
     }
 
     public string Secure(
@@ -82,8 +82,7 @@ public class SecuredVerifiableCredential
         result.AddRange(hashProof);
         result.AddRange(hashPayload);
         // 3. Signature
-        var formatter = _formatterFactory.ResolveFormatter(verificationMethod);
-        var asymKey = formatter.Extract(verificationMethod);
+        var asymKey = _verificationMethodEncoding.Decode(verificationMethod);
         proof.ComputeProof(dataIntegrityProof, result.ToArray(), asymKey, proof.HashingMethod);
         jObj.Add("proof", JsonObject.Parse(JsonSerializer.Serialize(dataIntegrityProof, typeof(DataIntegrityProof), GetJsonOptions())));
         return jObj.ToString();
@@ -110,9 +109,8 @@ public class SecuredVerifiableCredential
         result.AddRange(hashProof);
         result.AddRange(hashPayload);
         // 3. CheckHash signature.
-        var formatter = _formatterFactory.ResolveFormatter(verificationMethod);
         var signature = proof.GetSignature(dataIntegrityProof);
-        var asymKey = formatter.Extract(verificationMethod);
+        var asymKey = _verificationMethodEncoding.Decode(verificationMethod);
         return asymKey.CheckHash(result.ToArray(), signature, proof.HashingMethod);
     }
 

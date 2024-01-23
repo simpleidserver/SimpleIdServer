@@ -5,6 +5,7 @@ using NUnit.Framework;
 using SimpleIdServer.Did;
 using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Crypto.Multicodec;
+using SimpleIdServer.Did.Encoders;
 using SimpleIdServer.Did.Models;
 using System.Text.Json.Nodes;
 
@@ -17,14 +18,14 @@ public class SecuredVerifiableCredentialFixture
     #region Ed25519VerificationKey2020
 
     [Test]
-    public void When_Secure_With_ED25519_And_Ed25519VerificationKey2020_Then_Proof_Is_AddedAndValid()
+    public void When_Secure_VerifiableCredentials_With_Random_Ed25519VerificationKey2020_VerificationKey_Then_Proof_Is_Valid()
     {
         // ARRANGE
         var ed25119Sig = Ed25519SignatureKey.Generate();
-        var identityDocument = DidDocumentBuilder.New("did", true)
+        var identityDocument = DidDocumentBuilder.New("did")
             .AddAlsoKnownAs("didSubject")
             .AddController("didController")
-            .AddEd25519VerificationKey2020VerificationMethod(ed25119Sig, "controller", VerificationMethodUsages.AUTHENTICATION)
+            .AddVerificationMethod(Ed25519VerificationKey2020Standard.TYPE, ed25119Sig, "controller", VerificationMethodUsages.AUTHENTICATION, includePrivateKey: true)
             .Build();
         var vc = SecuredVerifiableCredential.New();
 
@@ -40,53 +41,7 @@ public class SecuredVerifiableCredentialFixture
     }
 
     [Test]
-    public void When_Secure_WithES256K_And_Ed25519VerificationKey2020_Then_Proof_Is_AddedAndValid()
-    {
-        // ARRANGE
-        var es256K = ES256KSignatureKey.Generate();
-        var identityDocument = DidDocumentBuilder.New("did", true)
-            .AddAlsoKnownAs("didSubject")
-            .AddController("didController")
-            .AddEd25519VerificationKey2020VerificationMethod(es256K, "controller", VerificationMethodUsages.AUTHENTICATION)
-            .Build();
-        var vc = SecuredVerifiableCredential.New();
-
-        // ACT
-        var securedJson = vc.Secure(_json, identityDocument, identityDocument.VerificationMethod.First().Id);
-        var isSignatureValid = vc.Check(securedJson, identityDocument);
-
-        // ASSERT
-        Assert.IsNotNull(securedJson);
-        var jObj = JsonObject.Parse(securedJson).AsObject();
-        Assert.True(jObj.ContainsKey("proof"));
-        Assert.True(isSignatureValid);
-    }
-
-    [Test]
-    public void When_Secure_WithES256_And_Ed25519VerificationKey2020_Then_Proof_Is_AddedAndValid()
-    {
-        // ARRANGE
-        var es256 = ES256SignatureKey.Generate();
-        var identityDocument = DidDocumentBuilder.New("did", true)
-            .AddAlsoKnownAs("didSubject")
-            .AddController("didController")
-            .AddEd25519VerificationKey2020VerificationMethod(es256, "controller", VerificationMethodUsages.AUTHENTICATION)
-            .Build();
-        var vc = SecuredVerifiableCredential.New();
-
-        // ACT
-        var securedJson = vc.Secure(_json, identityDocument, identityDocument.VerificationMethod.First().Id);
-        var isSignatureValid = vc.Check(securedJson, identityDocument);
-
-        // ASSERT
-        Assert.IsNotNull(securedJson);
-        var jObj = JsonObject.Parse(securedJson).AsObject();
-        Assert.True(jObj.ContainsKey("proof"));
-        Assert.True(isSignatureValid);
-    }
-
-    [Test]
-    public void When_Secure_WithES256_And_Ed25519VerificationKey2020_And_StaticPrivateKey_Then_Proof_Is_Valid()
+    public void When_Secure_VerifiableCredentials_With_Static_Ed25519VerificationKey2020_VerificationKey_Then_Proof_Is_Valid()
     {
         // Test vector : https://w3c.github.io/vc-di-eddsa/#representation-ed25519signature2020
         // ARRANGE
@@ -95,10 +50,13 @@ public class SecuredVerifiableCredentialFixture
         var privateKeybase = "z3u2en7t5LR2WtQH5PfFqMqwVHBeXouLzo6haApm8XHqvjxq";
         var factory = MulticodecSerializerFactory.Build();
         var asymKey = factory.Deserialize(publicKeybase, privateKeybase);
-        var identityDocument = DidDocumentBuilder.New("did", true)
+        var identityDocument = DidDocumentBuilder.New("did")
             .AddAlsoKnownAs("didSubject")
             .AddController("didController")
-            .AddEd25519VerificationKey2020VerificationMethod(asymKey, "controller", VerificationMethodUsages.AUTHENTICATION, id: "https://vc.example/issuers/5678#z6MkrJVnaZkeFzdQyMZu1cgjg7k1pZZ6pvBQ7XJPt4swbTQ2")
+            .AddVerificationMethod(Ed25519VerificationKey2020Standard.TYPE, asymKey, "controller", VerificationMethodUsages.AUTHENTICATION, callback: c =>
+            {
+                c.Id = "https://vc.example/issuers/5678#z6MkrJVnaZkeFzdQyMZu1cgjg7k1pZZ6pvBQ7XJPt4swbTQ2";
+            }, includePrivateKey: true)
             .Build();
         var vc = SecuredVerifiableCredential.New();
 
@@ -120,14 +78,14 @@ public class SecuredVerifiableCredentialFixture
     #region JsonWebKey2020
 
     [Test]
-    public void When_Secure_With_ED25519_And_JsonWebKey2020_Then_Proof_Is_AddedAndValid()
+    public void When_Secure_VerifiableCredentials_With_Random_ED25519_JsonWebKey2020_VerificationKey_Then_Proof_Is_Valid()
     {
         // ARRANGE
         var ed25119Sig = Ed25519SignatureKey.Generate();
-        var identityDocument = DidDocumentBuilder.New("did", true)
+        var identityDocument = DidDocumentBuilder.New("did")
             .AddAlsoKnownAs("didSubject")
             .AddController("didController")
-            .AddJsonWebKeyVerificationMethod(ed25119Sig, "controller", VerificationMethodUsages.AUTHENTICATION)
+            .AddVerificationMethod(JsonWebKey2020Standard.TYPE, ed25119Sig, "controller", VerificationMethodUsages.AUTHENTICATION, includePrivateKey: true)
             .Build();
         var vc = SecuredVerifiableCredential.New();
 
@@ -143,7 +101,7 @@ public class SecuredVerifiableCredentialFixture
     }
 
     [Test]
-    public void When_Secure_With_Ed25519_And_JsonWebKey2020_And_StaticPrivateKey_Then_ProofIsValid()
+    public void When_Secure_VerifiableCredentials_With_Static_ED25519_JsonWebKey2020_VerificationKey_Then_Proof_Is_Valid()
     {
         // ARRANGE
         var json = "{\r\n    \"@context\": [\r\n      \"https://www.w3.org/2018/credentials/v1\",\r\n      \"https://www.w3.org/2018/credentials/examples/v1\",\r\n      \"https://w3id.org/security/suites/jws-2020/v1\"\r\n    ],\r\n    \"id\": \"http://example.gov/credentials/3732\",\r\n    \"type\": [\"VerifiableCredential\", \"UniversityDegreeCredential\"],\r\n    \"issuer\": { \"id\": \"did:example:123\" },\r\n    \"issuanceDate\": \"2020-03-10T04:24:12.164Z\",\r\n    \"credentialSubject\": {\r\n      \"id\": \"did:example:456\",\r\n      \"degree\": {\r\n        \"type\": \"BachelorDegree\",\r\n        \"name\": \"Bachelor of Science and Arts\"\r\n      }\r\n    }\r\n  }";
@@ -152,9 +110,9 @@ public class SecuredVerifiableCredentialFixture
         var xPayload = Base64UrlEncoder.DecodeBytes(x);
         var dPayload = Base64UrlEncoder.DecodeBytes(d);
         var ed25119Sig = Ed25519SignatureKey.From(xPayload, dPayload);
-        var identityDocument = DidDocumentBuilder.New("did", true)
+        var identityDocument = DidDocumentBuilder.New("did")
             .AddController("didController")
-            .AddJsonWebKeyVerificationMethod(ed25119Sig, "controller", VerificationMethodUsages.AUTHENTICATION)
+            .AddVerificationMethod(JsonWebKey2020Standard.TYPE, ed25119Sig, "controller", VerificationMethodUsages.AUTHENTICATION, includePrivateKey: true)
             .Build();
         var vc = SecuredVerifiableCredential.New();
 

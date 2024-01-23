@@ -3,6 +3,7 @@
 
 using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Models;
+using System.Collections.Generic;
 
 namespace SimpleIdServer.Did.Encoders;
 
@@ -22,32 +23,13 @@ public class X25519KeyAgreementKey2020Standard : IVerificationMethodStandard
 
     public SignatureKeyEncodingTypes SupportedEncoding => SignatureKeyEncodingTypes.MULTIBASE;
 
+    public IEnumerable<string> SupportedCurves => new List<string>
+    {
+        Constants.StandardCrvOrSize.X25519
+    };
+
     public string BuildId(DidDocumentVerificationMethod verificationMethod, IAsymmetricKey asymmKey)
     {
-
-        return null;
+        return verificationMethod.PublicKeyMultibase;
     }
-
-    /*
-    public SignatureKeyEncodingTypes Encoding => SignatureKeyEncodingTypes.MULTIBASE;
-
-    public IAsymmetricKey Extract(DidDocumentVerificationMethod didDocumentVerificationMethod)
-        => _serializer.Deserialize(didDocumentVerificationMethod.PublicKeyMultibase, didDocumentVerificationMethod.SecretKeyMultibase);
-
-    public DidDocumentVerificationMethod Format(DidDocument idDocument, IAsymmetricKey signatureKey, bool includePrivateKey)
-    {
-        var publicKey = _serializer.SerializePublicKey(signatureKey);
-        var result = new DidDocumentVerificationMethod
-        {
-            Id = $"{idDocument.Id}#{publicKey}",
-            PublicKeyMultibase = publicKey
-        };
-        if(includePrivateKey)
-        {
-            result.SecretKeyMultibase = _serializer.SerializePrivateKey(signatureKey);
-        }
-
-        return result;
-    }
-    */
 }

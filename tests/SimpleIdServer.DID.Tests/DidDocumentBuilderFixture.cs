@@ -12,7 +12,7 @@ namespace SimpleIdServer.DID.Tests
     public class DidDocumentBuilderFixture
     {
         [Test]
-        public void When_Build_IdentityDocument_With_Ed25519VerificationKey2020VerificationMethods_Then_DocumentIsCorrect()
+        public void When_Build_IdentityDocument_With_Ed25519VerificationKey2020VerificationMethod_Then_DocumentIsCorrect()
         {
             // https://www.w3.org/TR/did-spec-registries/#verification-method-types
             // ARRANGE
@@ -35,33 +35,33 @@ namespace SimpleIdServer.DID.Tests
             Assert.That(identityDocument.AlsoKnownAs.First(), Is.EqualTo("didSubject"));
             Assert.That(identityDocument.Controller.ToString(), Is.EqualTo("didController"));
             Assert.That(identityDocument.VerificationMethod.ElementAt(0).Type, Is.EqualTo("Ed25519VerificationKey2020"));
-            // Assert.True(publicKeyMultibaseFormatter.Extract(identityDocument.VerificationMethod.ElementAt(0)).GetPublicKey().SequenceEqual(ed25119Sig.GetPublicKey()));
+            Assert.IsNotNull(identityDocument.VerificationMethod.ElementAt(0).PublicKeyMultibase);
         }
 
-        /*
         [Test]
-        public void When_Build_IdentityDocument_With_JwkVerificationMethods_Then_DocumentIsCorrect()
+        public void When_Build_IdentityDocument_With_JsonWebKey2020VerificationMethods_Then_Document_Is_Correct()
         {
             // ARRANGE
             var ed25119Sig = Ed25519SignatureKey.Generate();
             var es256K = ES256KSignatureKey.Generate();
             var es256 = ES256SignatureKey.Generate();
             var es384 = ES384SignatureKey.Generate();
-            var jwkFormatter = FormatterFactory.BuildJsonWebKey2020Formatter();
+
+            // ACT
             var identityDocument = DidDocumentBuilder.New("did")
                 .AddAlsoKnownAs("didSubject")
                 .AddController("didController")
-                .AddJsonWebKeyVerificationMethod(ed25119Sig, "controller", VerificationMethodUsages.AUTHENTICATION)
-                .AddJsonWebKeyVerificationMethod(es256K, "controller", VerificationMethodUsages.AUTHENTICATION)
-                .AddJsonWebKeyVerificationMethod(es256, "controller", VerificationMethodUsages.AUTHENTICATION)
-                .AddJsonWebKeyVerificationMethod(es384, "controller", VerificationMethodUsages.AUTHENTICATION)
+                .AddVerificationMethod(JsonWebKey2020Standard.TYPE, ed25119Sig, "controller", VerificationMethodUsages.AUTHENTICATION)
+                .AddVerificationMethod(JsonWebKey2020Standard.TYPE, es256K, "controller", VerificationMethodUsages.AUTHENTICATION)
+                .AddVerificationMethod(JsonWebKey2020Standard.TYPE, es256, "controller", VerificationMethodUsages.AUTHENTICATION)
+                .AddVerificationMethod(JsonWebKey2020Standard.TYPE, es384, "controller", VerificationMethodUsages.AUTHENTICATION)
                 .Build();
 
-            // ACT
+            // ASSERT
             var json = identityDocument.Serialize();
             var contextLst = JsonObject.Parse(json)["@context"] as JsonArray;
 
-            Assert.IsNotNull(json);
+            // ASSERT
             Assert.That(identityDocument.Id, Is.EqualTo("did"));
             Assert.That(contextLst.ElementAt(0).ToString(), Is.EqualTo("https://www.w3.org/ns/did/v1"));
             Assert.That(contextLst.ElementAt(1).ToString(), Is.EqualTo("https://w3id.org/security/suites/jws-2020/v1"));
@@ -71,56 +71,81 @@ namespace SimpleIdServer.DID.Tests
             Assert.That(identityDocument.VerificationMethod.ElementAt(1).Type, Is.EqualTo("JsonWebKey2020"));
             Assert.That(identityDocument.VerificationMethod.ElementAt(2).Type, Is.EqualTo("JsonWebKey2020"));
             Assert.That(identityDocument.VerificationMethod.ElementAt(3).Type, Is.EqualTo("JsonWebKey2020"));
-            Assert.True(jwkFormatter.Extract(identityDocument.VerificationMethod.ElementAt(0)).GetPublicKey().SequenceEqual(ed25119Sig.GetPublicKey()));
-            Assert.True(jwkFormatter.Extract(identityDocument.VerificationMethod.ElementAt(1)).GetPublicKey().SequenceEqual(es256K.GetPublicKey()));
-            Assert.True(jwkFormatter.Extract(identityDocument.VerificationMethod.ElementAt(2)).GetPublicKey().SequenceEqual(es256.GetPublicKey()));
-            Assert.True(jwkFormatter.Extract(identityDocument.VerificationMethod.ElementAt(3)).GetPublicKey().SequenceEqual(es384.GetPublicKey()));
         }
 
         [Test]
-        public void When_BuildIdentityDocument_With_X25519KeyAgreementVerificationMethods_Then_Document_Is_Correct()
+        public void When_Build_IdentityDocument_With_X25519KeyAgreementVerificationMethod_Then_Document_Is_Correct()
         {
             // ARRANGE
-            var x25519 = X25519AgreementKey.Generate();
-            var keyAgreementFormatter = FormatterFactory.BuildX25519KeyAgreementFormatter();
+            var firstX25519 = X25519AgreementKey.Generate();
+            var secondX25519 = X25519AgreementKey.Generate();
             var identityDocument = DidDocumentBuilder.New("did")
                 .AddAlsoKnownAs("didSubject")
                 .AddController("didController")
-                .AddX25519KeyAgreementVerificationMethod(x25519, "controller")
+                .AddKeyAggreement(X25519KeyAgreementKey2019Standard.TYPE, firstX25519, "controller")
+                .AddKeyAggreement(X25519KeyAgreementKey2020Standard.TYPE, secondX25519, "controller")
                 .Build();
 
             // ACT
             var json = identityDocument.Serialize();
             var contextLst = JsonObject.Parse(json)["@context"] as JsonArray;
 
-            Assert.IsNotNull(json);
+            // ASSERT
             Assert.That(identityDocument.Id, Is.EqualTo("did"));
             Assert.That(contextLst.ElementAt(0).ToString(), Is.EqualTo("https://www.w3.org/ns/did/v1"));
             Assert.That(contextLst.ElementAt(1).ToString(), Is.EqualTo("https://w3id.org/security/suites/x25519-2019/v1"));
+            Assert.That(contextLst.ElementAt(2).ToString(), Is.EqualTo("https://w3id.org/security/suites/x25519-2020/v1"));
             Assert.That(identityDocument.AlsoKnownAs.First(), Is.EqualTo("didSubject"));
             Assert.That(identityDocument.Controller.ToString(), Is.EqualTo("didController"));
             Assert.That(identityDocument.VerificationMethod.ElementAt(0).Type, Is.EqualTo("X25519KeyAgreementKey2019"));
-            Assert.True(keyAgreementFormatter.Extract(identityDocument.VerificationMethod.ElementAt(0)).GetPublicKey().SequenceEqual(x25519.GetPublicKey()));
+            Assert.That(identityDocument.VerificationMethod.ElementAt(1).Type, Is.EqualTo("X25519KeyAgreementKey2020"));
         }
 
         [Test]
-        public void When_BuildIdentityDocument_And_ExtractPrivateKey_In_MulticodecFormat_Then_PrivateKeyExists()
+        public void When_Build_IdentityDocument_With_EcdsaSecp256k1RecoveryMethod2020VerificationMethod_Then_Document_Is_Correct()
         {
             // ARRANGE
-            var ed25119Sig = Ed25519SignatureKey.Generate();
-            var identityDocument = DidDocumentBuilder.New("did", true)
+            var es256K = ES256KSignatureKey.Generate();
+            var identityDocument = DidDocumentBuilder.New("did")
                 .AddAlsoKnownAs("didSubject")
                 .AddController("didController")
-                .AddEd25519VerificationKey2020VerificationMethod(ed25119Sig, "controller", VerificationMethodUsages.AUTHENTICATION)
+                .AddVerificationMethod(EcdsaSecp256k1RecoveryMethod2020Standard.TYPE, es256K, "controller", VerificationMethodUsages.AUTHENTICATION)
                 .Build();
 
             // ACT
             var json = identityDocument.Serialize();
+            var context = JsonObject.Parse(json)["@context"].ToString();
 
             // ASSERT
-            Assert.That(identityDocument.VerificationMethod.ElementAt(0).Type, Is.EqualTo("Ed25519VerificationKey2020"));
-            Assert.IsNotNull(identityDocument.VerificationMethod.ElementAt(0).SecretKeyMultibase);
+            Assert.That(identityDocument.Id, Is.EqualTo("did"));
+            Assert.That(context, Is.EqualTo("https://www.w3.org/ns/did/v1"));
+            Assert.That(identityDocument.AlsoKnownAs.First(), Is.EqualTo("didSubject"));
+            Assert.That(identityDocument.Controller.ToString(), Is.EqualTo("didController"));
+            Assert.That(identityDocument.VerificationMethod.ElementAt(0).Type, Is.EqualTo("EcdsaSecp256k1RecoveryMethod2020"));
         }
-        */
+
+        [Test]
+        public void When_Build_IdentityDocument_With_EcdsaSecp256k1VerificationKey2019VerificationMethod_Then_Document_Is_Correct()
+        {
+            // ARRANGE
+            var es256K = ES256KSignatureKey.Generate();
+            var identityDocument = DidDocumentBuilder.New("did")
+                .AddAlsoKnownAs("didSubject")
+                .AddController("didController")
+                .AddVerificationMethod(EcdsaSecp256k1VerificationKey2019Standard.TYPE, es256K, "controller", VerificationMethodUsages.AUTHENTICATION)
+                .Build();
+
+            // ACT
+            var json = identityDocument.Serialize();
+            var contextLst = JsonObject.Parse(json)["@context"] as JsonArray;
+
+            // ASSERT
+            Assert.That(identityDocument.Id, Is.EqualTo("did"));
+            Assert.That(contextLst.ElementAt(0).ToString(), Is.EqualTo("https://www.w3.org/ns/did/v1"));
+            Assert.That(contextLst.ElementAt(1).ToString(), Is.EqualTo("https://w3id.org/security/suites/secp256k1-2019/v1"));
+            Assert.That(identityDocument.AlsoKnownAs.First(), Is.EqualTo("didSubject"));
+            Assert.That(identityDocument.Controller.ToString(), Is.EqualTo("didController"));
+            Assert.That(identityDocument.VerificationMethod.ElementAt(0).Type, Is.EqualTo("EcdsaSecp256k1VerificationKey2019"));
+        }
     }
 }

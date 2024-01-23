@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Nethereum.ABI.Decoders;
 using Nethereum.Contracts;
-using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using Nethereum.Web3;
 using SimpleIdServer.Did.Crypto;
@@ -83,8 +82,8 @@ public class DidEthrResolver : IDidResolver
         var logs = await service.ContractHandler.EthApiContractService.Filters.GetLogs.SendRequestAsync(new NewFilterInput
         {
             Address = new string[] { networkConfig.ContractAdr },
-            FromBlock = new BlockParameter(new HexBigInteger(blockNumber)),
-            ToBlock = new BlockParameter(new HexBigInteger(blockNumber))
+            FromBlock = new BlockParameter(new Nethereum.Hex.HexTypes.HexBigInteger(blockNumber)),
+            ToBlock = new BlockParameter(new Nethereum.Hex.HexTypes.HexBigInteger(blockNumber))
         });
         while(logs.Any())
         {
@@ -97,8 +96,8 @@ public class DidEthrResolver : IDidResolver
                 logs = await service.ContractHandler.EthApiContractService.Filters.GetLogs.SendRequestAsync(new NewFilterInput
                 {
                     Address = new string[] { networkConfig.ContractAdr },
-                    FromBlock = new BlockParameter(new HexBigInteger(blockNumber)),
-                    ToBlock = new BlockParameter(new HexBigInteger(blockNumber))
+                    FromBlock = new BlockParameter(new Nethereum.Hex.HexTypes.HexBigInteger(blockNumber)),
+                    ToBlock = new BlockParameter(new Nethereum.Hex.HexTypes.HexBigInteger(blockNumber))
                 });
             }
         }
@@ -141,7 +140,7 @@ public class DidEthrResolver : IDidResolver
         int serviceCount = 0;
         int delegateCount = 0;
         var services = new Dictionary<string, DidDocumentService>();
-        var verificationMethods = new Dictionary<string, DidDocumentVerificationMethod>();
+        var verificationMethods = new Dictionary<string, (DidDocumentVerificationMethod, VerificationMethodUsages)>();
         foreach (var evt in events.OrderByDescending(e => e.ValidTo))
         {
             if (!regex.IsMatch(evt.Identity)) continue;
@@ -159,21 +158,35 @@ public class DidEthrResolver : IDidResolver
                         var encoding = splitted.ElementAt(4);
                         var resolvedType = VerificationMethodTypeResolver.Resolve(keyAlgorithm);
                         if (string.IsNullOrWhiteSpace(resolvedType)) continue;
-                        verificationMethods.Add(eventIndex, new DidDocumentVerificationMethod
+                        var verificationMethod = new DidDocumentVerificationMethod
                         {
                             Id = $"{id}#delegate-{delegateCount}",
                             Type = resolvedType,
                             Controller = id
-                        });
-                        // For all the formatters, check if the asymmetric key is correct.
-                        // Have the possibility to retrieve the list of formatters for a given asymmetric key.
-                        // All the formatters have common logic, such as encode into BASE58, or BASE64 or JWK or MULTICODEC.
-                        // Read encoding...
-                        // TODO : Refactor encoding.
+                        };
+                        VerificationMethodUsages usage = VerificationMethodUsages.ASSERTION_METHOD;
+                        if (keyPurpose == "sigAuth")
+                            usage = VerificationMethodUsages.AUTHENTICATION;
+                        else if (keyPurpose == "enc")
+                            usage = VerificationMethodUsages.KEY_AGREEMENT;
+                        verificationMethods.Add(eventIndex, (verificationMethod, usage));
+                        var payload = GetEventPayload(evt.Value);
+                        switch (encoding)
+                        {
+                            case "hex":
+                                verificationMethod.PublicKeyHex = payload.ToHex();
+                                break;
+                            case "base64":
+                                verificationMethod.PublicKeyBase64 = Convert.ToBase64String(payload);
+                                break;
+                            case "base58":
+                                verificationMethod.PublicKeyBase58 = Encoding.Base58Encoding.Encode(payload);
+                                break;
+                        }
                         break;
                     case "svc":
                         serviceCount++;
-                        var serviceEndpoint = System.Text.Encoding.UTF8.GetString(Strip0X(evt.Value).HexToByteArray());
+                        var serviceEndpoint = System.Text.Encoding.UTF8.GetString(GetEventPayload(evt.Value));
                         var type = splitted.ElementAt(2);
                         services.Add(eventIndex, new DidDocumentService
                         {
@@ -196,7 +209,14 @@ public class DidEthrResolver : IDidResolver
 
         foreach (var kvp in services)
             builder.AddServiceEndpoint(kvp.Value);
+
+        foreach (var kvp in verificationMethods)
+            builder.AddVerificationMethod(kvp.Value.Item1, kvp.Value.Item2);
     }
 
-    private static string Strip0X(string str) => str.StartsWith("0x") ? new string(str.Skip(2).ToArray()) : str;
+    private static byte[] GetEventPayload(string value)
+    {
+        value = value.StartsWith("0x") ? new string(value.Skip(2).ToArray()) : value;
+        return value.HexToByteArray();
+    }
 }

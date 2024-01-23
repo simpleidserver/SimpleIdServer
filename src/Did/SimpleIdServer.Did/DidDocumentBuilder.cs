@@ -40,7 +40,7 @@ namespace SimpleIdServer.Did
         public static DidDocumentBuilder New(string id) => new DidDocumentBuilder(new DidDocument
         {
             Id = id
-        }, new VerificationMethodEncoding(VerificationMethodStandardFactory.GetAll(), MulticodecSerializerFactory.Build()));
+        }, new VerificationMethodEncoding(VerificationMethodStandardFactory.GetAll(), MulticodecSerializerFactory.Build(), MulticodecSerializerFactory.AllVerificationMethods));
 
         #region JSON-LD Context
 
@@ -97,7 +97,21 @@ namespace SimpleIdServer.Did
                 asymmKey,
                 encoding,
                 includePrivateKey);
+            if (callback != null) callback(verificationMethod);
             return this.AddVerificationMethod(verificationMethod, usage, isReference);
+        }
+
+        public DidDocumentBuilder AddKeyAggreement(
+            string verificationMethodStandard,
+            X25519AgreementKey asymmKey,
+            string controller,
+            bool isReference = true)
+        {
+            var verificationMethod = _verificationMethodEncoding.Encode(
+                verificationMethodStandard,
+                controller,
+                asymmKey);
+            return this.AddVerificationMethod(verificationMethod, VerificationMethodUsages.KEY_AGREEMENT, isReference);
         }
 
         public DidDocumentBuilder AddVerificationMethod(
@@ -109,20 +123,17 @@ namespace SimpleIdServer.Did
             if(!string.IsNullOrWhiteSpace(standard.JSONLDContext))
                 AddContext(standard.JSONLDContext);
             verificationMethod.Usage = usage;
+            if(string.IsNullOrWhiteSpace(verificationMethod.Id))
+            {
+                var index = (_identityDocument.VerificationMethod.Count() + _innerVerificationMethods.Count()) + 1;
+                verificationMethod.Id = $"{verificationMethod.Controller}#keys-{index}";
+            }
+
             if (isReference)
                 _identityDocument.AddVerificationMethod(verificationMethod);
             else
                 _innerVerificationMethods.Add(verificationMethod);
 
-            return this;
-        }
-
-        public DidDocumentBuilder AddKeyAggreement(
-            string verificationMethodStandard,
-            X25519AgreementKey asymmKey,
-            string controller,
-            bool isReference = true)
-        {
             return this;
         }
 

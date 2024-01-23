@@ -1,8 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-using SimpleIdServer.Did.Builders;
 using SimpleIdServer.Did.Crypto;
+using SimpleIdServer.Did.Encoders;
 using SimpleIdServer.Did.Encoding;
 using SimpleIdServer.Vc.Canonize;
 using SimpleIdServer.Vc.Models;
@@ -17,9 +17,9 @@ public class Ed25519Signature2020Proof : ISignatureProof
 {
     public string Type => "Ed25519Signature2020";
 
-    public string JsonLdContext => Ed25519VerificationKey2020Formatter.JSON_LD_CONTEXT;
+    public string JsonLdContext => Ed25519VerificationKey2020Standard.JSON_LD_CONTEXT;
 
-    public string VerificationMethod => Ed25519VerificationKey2020Formatter.TYPE;
+    public string VerificationMethod => Ed25519VerificationKey2020Standard.TYPE;
 
     public string TransformationMethod => RdfCanonize.NAME;
 

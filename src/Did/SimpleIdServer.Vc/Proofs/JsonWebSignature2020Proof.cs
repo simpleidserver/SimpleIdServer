@@ -1,8 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.IdentityModel.Tokens;
-using SimpleIdServer.Did.Builders;
 using SimpleIdServer.Did.Crypto;
+using SimpleIdServer.Did.Encoders;
 using SimpleIdServer.Vc.Canonize;
 using SimpleIdServer.Vc.Models;
 using System.Linq;
@@ -19,9 +19,9 @@ public class JsonWebSignature2020Proof : ISignatureProof
 {
     public string Type => "JsonWebSignature2020";
 
-    public string JsonLdContext = JsonWebKey2020Formatter.JSON_LD_CONTEXT;
+    public string JsonLdContext = JsonWebKey2020Standard.JSON_LD_CONTEXT;
 
-    public string VerificationMethod => JsonWebKey2020Formatter.TYPE;
+    public string VerificationMethod => JsonWebKey2020Standard.TYPE;
 
     public string TransformationMethod => RdfCanonize.NAME;
 

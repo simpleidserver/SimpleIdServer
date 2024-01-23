@@ -3,6 +3,7 @@
 
 using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Models;
+using System.Collections.Generic;
 
 namespace SimpleIdServer.Did.Encoders;
 
@@ -20,6 +21,11 @@ public class EcdsaSecp256k1VerificationKey2019Standard : IVerificationMethodStan
     public SignatureKeyEncodingTypes SupportedEncoding => SignatureKeyEncodingTypes.JWK | 
         SignatureKeyEncodingTypes.BASE58 | 
         SignatureKeyEncodingTypes.MULTIBASE;
+
+    public IEnumerable<string> SupportedCurves => new List<string>
+    {
+        Constants.StandardCrvOrSize.SECP256k1
+    };
 
     public string BuildId(DidDocumentVerificationMethod verificationMethod, IAsymmetricKey asymmKey)
     {
