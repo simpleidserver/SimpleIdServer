@@ -113,8 +113,11 @@ public class DidEthrResolverFixture
 
         // ACT
         // FIX THE INDEX...
-        var didDocument = await resolver.Resolve("did:ethr:0x6918893854B2Eb01B194c46c4Efe2ea1ef36B7BC", CancellationToken.None);
+        // var didDocument = await resolver.Resolve("did:ethr:0x6918893854B2Eb01B194c46c4Efe2ea1ef36B7BC", CancellationToken.None);
         // var didDocument = await resolver.Resolve("did:ethr:0x19711CD19e609FEBdBF607960220898268B7E24b", CancellationToken.None);
+        // var didDocument = await resolver.Resolve("did:ethr:0x001192d8Ad6fF5988e026fdFD37AA33aE05A9064", CancellationToken.None);
+        var didDocument  = await resolver.Resolve("did:ethr:0x19711CD19e609FEBdBF607960220898268B7E24b?versionId=18341433", CancellationToken.None);
+
         var serialize = didDocument.Serialize();
 
         // did:ethr:0x26bf14321004e770e7a8b080b7a526d8eed8b388

@@ -38,11 +38,19 @@ public class DidEthrResolver : IDidResolver
     {
         if (string.IsNullOrWhiteSpace(did)) throw new ArgumentNullException(nameof(did));
         var decentralizedIdentifier = DidEthrExtractor.Extract(did);
-        var networkConfiguration = await _networkConfigurationStore.Get(decentralizedIdentifier.Network, cancellationToken);
+        did = decentralizedIdentifier.Format();
+        var networkConfiguration = await _networkConfigurationStore.Get(decentralizedIdentifier.Network ?? Constants.DefaultNetwork, cancellationToken);
         if (networkConfiguration == null) throw new InvalidOperationException($"The network {decentralizedIdentifier.Network} is not valid");
         var service = new EthereumDIDRegistryService(
             new Web3(networkConfiguration.RpcUrl),
             networkConfiguration.ContractAdr);
+        var now = (int)Math.Floor((decimal)DateTimeHelper.GetTime() / 1000);
+        if (decentralizedIdentifier.Version != null)
+        {
+            var blockMetadata = await service.ContractHandler.EthApiContractService.Blocks.GetBlockWithTransactionsByNumber.SendRequestAsync(new BlockParameter(new Nethereum.Hex.HexTypes.HexBigInteger(decentralizedIdentifier.Version.Value)));
+            now = (int)blockMetadata.Timestamp.Value;
+        }
+
         var evts = await ReadEvents(service, decentralizedIdentifier, networkConfiguration);
         var builder = DidDocumentBuilder.New(did);
         var blockChainVerificationMethod = new DidDocumentVerificationMethod
@@ -63,10 +71,14 @@ public class DidEthrResolver : IDidResolver
                 did,
                 VerificationMethodUsages.AUTHENTICATION | VerificationMethodUsages.ASSERTION_METHOD,
                 true,
-                encoding: SignatureKeyEncodingTypes.HEX);
+                encoding: SignatureKeyEncodingTypes.HEX,
+                callback: c =>
+                {
+                    c.Id = $"{did}#controllerKey";
+                });
         }
 
-        Consume(did, decentralizedIdentifier, builder, evts);
+        Consume(did, builder, evts, now, decentralizedIdentifier.Version);
         return builder.Build();
     }
 
@@ -77,6 +89,7 @@ public class DidEthrResolver : IDidResolver
     {
         var result = new List<ERC1056Event>();
         var attributeChangedDTO = service.ContractHandler.GetEvent<DIDAttributeChangedEventDTO>();
+        var ownerChangeDTO = service.ContractHandler.GetEvent<DIDOwnerChangedEventDTO>();
         var changedQueryResult = await service.ChangedQueryAsync(decentralizedIdentifier.Address);
         var blockNumber = changedQueryResult;
         var logs = await service.ContractHandler.EthApiContractService.Filters.GetLogs.SendRequestAsync(new NewFilterInput
@@ -87,7 +100,8 @@ public class DidEthrResolver : IDidResolver
         });
         while(logs.Any())
         {
-            var evt = Extract(logs, attributeChangedDTO);
+            var evt = Extract(logs, attributeChangedDTO, ownerChangeDTO);
+            if (evt == null) break;
             evt.BlockNumber = blockNumber;
             result.Add(evt);
             if (evt.PreviousChange < blockNumber)
@@ -105,10 +119,18 @@ public class DidEthrResolver : IDidResolver
         return result;
     }
 
+    private ERC1056Event Extract(FilterLog[] logs, Event<DIDAttributeChangedEventDTO> attributeChangedDTO, Event<DIDOwnerChangedEventDTO> ownerChangedDTO)
+    {
+        var evt = Extract(logs, attributeChangedDTO);
+        if (evt == null) return Extract(logs, ownerChangedDTO);
+        return evt;
+    }
+
     private ERC1056Event Extract(FilterLog[] logs, Event<DIDAttributeChangedEventDTO> attributeChangedDTO)
     {
-        var attributeChanged = attributeChangedDTO.DecodeAllEventsForEvent(logs).First();
-        var evt = attributeChanged.Event;
+        var attributeChangedLst = attributeChangedDTO.DecodeAllEventsForEvent(logs);
+        if (!attributeChangedLst.Any()) return null;
+        var evt = attributeChangedLst.First().Event;
         var stringBytesDecoder = new StringBytes32Decoder();
         return new ERC1056Event
         {
@@ -119,83 +141,101 @@ public class DidEthrResolver : IDidResolver
         };
     }
 
-    private void Consume(string id, DecentralizedIdentifierEthr did, DidDocumentBuilder builder, List<ERC1056Event> events)
+    private ERC1056Event Extract(FilterLog[] logs, Event<DIDOwnerChangedEventDTO> ownerChangedDTO)
     {
-        /*
-         * Only events with a validTo (measured in seconds) greater or equal to the current time should be included in the DID document. 
-         * When resolving an older version (using versionId in the didURL query string), the validTo entry MUST be compared to the timestamp of the block of versionId height.
-         */
-        var now = (int)Math.Floor((decimal)DateTimeHelper.GetTime() / 1000);
-        if (did.Version != null)
+        var attributeChangedLst = ownerChangedDTO.DecodeAllEventsForEvent(logs);
+        if (!attributeChangedLst.Any()) return null;
+        var evt = attributeChangedLst.First().Event;
+        return new ERC1056Event
         {
-            throw new NotImplementedException();
-        }
-
-        ConsumeDIDAttributeChanged(id, builder, events.Where(e => e.EventName == "DIDAttributeChanged").ToList(), now);
+            Identity = evt.Identity,
+            Value = evt.Owner,
+            PreviousChange = evt.PreviousChange,
+            EventName = "DIDOwnerChanged"
+        };
     }
 
-    private void ConsumeDIDAttributeChanged(string id, DidDocumentBuilder builder, List<ERC1056Event> events, BigInteger now)
+    private void Consume(string id, DidDocumentBuilder builder, List<ERC1056Event> events, int now, int? blockNumber)
     {
+        events.Reverse();
+        ConsumeEvents(id, builder, events, now, blockNumber);
+    }
+
+    private void ConsumeEvents(string id, DidDocumentBuilder builder, List<ERC1056Event> events, BigInteger now, int? blockNumber)
+    {
+        var controller = id;
         var regex = new Regex(@"^did\/(pub|svc)\/(\w+)(\/(\w+))?(\/(\w+))?$");
         int serviceCount = 0;
         int delegateCount = 0;
         var services = new Dictionary<string, DidDocumentService>();
         var verificationMethods = new Dictionary<string, (DidDocumentVerificationMethod, VerificationMethodUsages)>();
-        foreach (var evt in events.OrderByDescending(e => e.ValidTo))
+        foreach (var evt in events)
         {
-            if (!regex.IsMatch(evt.Identity)) continue;
+            if(blockNumber != null && evt.BlockNumber > blockNumber.Value)
+            {
+                continue;
+            }
+            // TODO : Finish DIDDelegateChanged.
             var eventIndex = $"{evt.Identity}-{evt.Value}";
             var splitted = evt.Identity.Split('/');
             if (evt.ValidTo  >= now)
             {
-                var section = splitted.ElementAt(1);
-                switch (section)
+                if(evt.EventName == "DIDAttributeChanged")
                 {
-                    case "pub":
-                        delegateCount++;
-                        var keyAlgorithm = splitted.ElementAt(2);
-                        var keyPurpose = splitted.ElementAt(3);
-                        var encoding = splitted.ElementAt(4);
-                        var resolvedType = VerificationMethodTypeResolver.Resolve(keyAlgorithm);
-                        if (string.IsNullOrWhiteSpace(resolvedType)) continue;
-                        var verificationMethod = new DidDocumentVerificationMethod
-                        {
-                            Id = $"{id}#delegate-{delegateCount}",
-                            Type = resolvedType,
-                            Controller = id
-                        };
-                        VerificationMethodUsages usage = VerificationMethodUsages.ASSERTION_METHOD;
-                        if (keyPurpose == "sigAuth")
-                            usage = VerificationMethodUsages.AUTHENTICATION;
-                        else if (keyPurpose == "enc")
-                            usage = VerificationMethodUsages.KEY_AGREEMENT;
-                        verificationMethods.Add(eventIndex, (verificationMethod, usage));
-                        var payload = GetEventPayload(evt.Value);
-                        switch (encoding)
-                        {
-                            case "hex":
-                                verificationMethod.PublicKeyHex = payload.ToHex();
-                                break;
-                            case "base64":
-                                verificationMethod.PublicKeyBase64 = Convert.ToBase64String(payload);
-                                break;
-                            case "base58":
-                                verificationMethod.PublicKeyBase58 = Encoding.Base58Encoding.Encode(payload);
-                                break;
-                        }
-                        break;
-                    case "svc":
-                        serviceCount++;
-                        var serviceEndpoint = System.Text.Encoding.UTF8.GetString(GetEventPayload(evt.Value));
-                        var type = splitted.ElementAt(2);
-                        services.Add(eventIndex, new DidDocumentService
-                        {
-                            Id = $"{id}#service-{serviceCount}",
-                            Type = type,
-                            ServiceEndpoint = serviceEndpoint
-                        });
-                        break;
+                    if (!regex.IsMatch(evt.Identity)) continue;
+                    var section = splitted.ElementAt(1);
+                    switch (section)
+                    {
+                        case "pub":
+                            delegateCount++;
+                            var keyAlgorithm = splitted.ElementAt(2);
+                            var keyPurpose = splitted.ElementAt(3);
+                            var encoding = splitted.ElementAt(4);
+                            var resolvedType = VerificationMethodTypeResolver.Resolve(keyAlgorithm);
+                            if (string.IsNullOrWhiteSpace(resolvedType)) continue;
+                            var verificationMethod = new DidDocumentVerificationMethod
+                            {
+                                Id = $"{id}#delegate-{delegateCount}",
+                                Type = resolvedType,
+                                Controller = controller
+                            };
+                            VerificationMethodUsages usage = VerificationMethodUsages.ASSERTION_METHOD;
+                            if (keyPurpose == "sigAuth")
+                                usage = VerificationMethodUsages.AUTHENTICATION;
+                            else if (keyPurpose == "enc")
+                                usage = VerificationMethodUsages.KEY_AGREEMENT;
+                            verificationMethods.Add(eventIndex, (verificationMethod, usage));
+                            var payload = GetEventPayload(evt.Value);
+                            switch (encoding)
+                            {
+                                case "hex":
+                                    verificationMethod.PublicKeyHex = payload.ToHex();
+                                    break;
+                                case "base64":
+                                    verificationMethod.PublicKeyBase64 = Convert.ToBase64String(payload);
+                                    break;
+                                case "base58":
+                                    verificationMethod.PublicKeyBase58 = Encoding.Base58Encoding.Encode(payload);
+                                    break;
+                            }
+                            break;
+                        case "svc":
+                            serviceCount++;
+                            var serviceEndpoint = System.Text.Encoding.UTF8.GetString(GetEventPayload(evt.Value));
+                            var type = splitted.ElementAt(2);
+                            services.Add(eventIndex, new DidDocumentService
+                            {
+                                Id = $"{id}#service-{serviceCount}",
+                                Type = type,
+                                ServiceEndpoint = serviceEndpoint
+                            });
+                            break;
+                    }
                 }
+            }
+            else if(evt.EventName == "DIDOwnerChanged")
+            {
+                controller = evt.Value;
             }
             else
             {

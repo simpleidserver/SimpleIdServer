@@ -13,7 +13,7 @@ namespace SimpleIdServer.Did.Encoders;
 
 public interface IVerificationMethodEncoding
 {
-    DidDocumentVerificationMethod Encode(string type, string controller, IAsymmetricKey key, SignatureKeyEncodingTypes? encoding = null, bool includePrivateKey = false);
+    DidDocumentVerificationMethod Encode(string type, string did, string controller, IAsymmetricKey key, SignatureKeyEncodingTypes? encoding = null, bool includePrivateKey = false);
     IAsymmetricKey Decode(DidDocumentVerificationMethod verificationMethod);
     IEnumerable<IVerificationMethodStandard> Standards { get; }
 }
@@ -37,6 +37,7 @@ public class VerificationMethodEncoding : IVerificationMethodEncoding
     public IEnumerable<IVerificationMethodStandard> Standards => _standards;
 
     public DidDocumentVerificationMethod Encode(string type,
+        string did,
         string controller,
         IAsymmetricKey key, 
         SignatureKeyEncodingTypes? encoding = null, 
@@ -94,7 +95,7 @@ public class VerificationMethodEncoding : IVerificationMethodEncoding
         var builtId = standard.BuildId(result, key);
         if(!string.IsNullOrWhiteSpace(builtId))
         {
-            result.Id = $"{controller}#{builtId}";
+            result.Id = $"{did}#{builtId}";
         }
 
         return result;

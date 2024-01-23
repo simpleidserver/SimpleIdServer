@@ -3,7 +3,6 @@
 
 using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Models;
-using System;
 using System.Collections.Generic;
 
 namespace SimpleIdServer.Did.Encoders;
@@ -11,8 +10,9 @@ namespace SimpleIdServer.Did.Encoders;
 public class EcdsaSecp256k1RecoveryMethod2020Standard : IVerificationMethodStandard
 {
     public const string TYPE = "EcdsaSecp256k1RecoveryMethod2020";
+    public const string JSON_LD_CONTEXT = "https://w3id.org/security/suites/secp256k1recovery-2020/v2";
 
-    public string JSONLDContext => null;
+    public string JSONLDContext => JSON_LD_CONTEXT;
 
     public string Type => TYPE;
 

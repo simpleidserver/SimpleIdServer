@@ -93,6 +93,7 @@ namespace SimpleIdServer.Did
         {
             var verificationMethod = _verificationMethodEncoding.Encode(
                 verificationMethodStandard,
+                _identityDocument.Id,
                 controller,
                 asymmKey,
                 encoding,
@@ -109,6 +110,7 @@ namespace SimpleIdServer.Did
         {
             var verificationMethod = _verificationMethodEncoding.Encode(
                 verificationMethodStandard,
+                _identityDocument.Id,
                 controller,
                 asymmKey);
             return this.AddVerificationMethod(verificationMethod, VerificationMethodUsages.KEY_AGREEMENT, isReference);

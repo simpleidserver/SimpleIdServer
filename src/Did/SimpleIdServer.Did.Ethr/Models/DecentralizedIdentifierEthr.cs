@@ -14,4 +14,11 @@ public class DecentralizedIdentifierEthr : DecentralizedIdentifier
     public string Address { get; set; } = null!;
     public string PublicKey { get; set; } = null;
     public int? Version { get; set; } = null;
+
+    public string Format()
+    {
+        var result = $"{Scheme}:{Method}";
+        if (!string.IsNullOrWhiteSpace(Network)) result = $"{result}:{Network}";
+        return $"{result}:{Identifier}";
+    }
 }
