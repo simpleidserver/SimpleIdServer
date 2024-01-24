@@ -8,8 +8,18 @@ public record ERC1056Event
 {
     public string Identity { get; set; }
     public string Value { get; set; }
+    public string Owner { get; set; }
+    public string Delegate { get; set; }
+    public string DelegateType { get; set; }
     public BigInteger ValidTo { get; set; }
     public BigInteger PreviousChange { get; set; }
     public BigInteger BlockNumber { get; set; }
-    public string EventName { get; set; } = "DIDAttributeChanged";
+    public EventTypes Type { get; set; } = EventTypes.DIDAttributeChanged;
+}
+
+public enum EventTypes
+{
+    DIDAttributeChanged = 0,
+    DIDOwnerChanged = 1,
+    DIDDelegateChanged = 2
 }

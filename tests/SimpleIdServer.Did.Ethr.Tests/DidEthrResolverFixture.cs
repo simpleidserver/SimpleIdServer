@@ -98,12 +98,13 @@ public class DidEthrResolverFixture
     }
 
     [Test]
-    public async Task When_Resolve_DID_With_Transactions_Then_DID_Document_Is_Resolved()
+    public async Task When_Resolve_DID_With_Two_Services_Then_DID_Document_Is_Resolved()
     {
         var store = new NetworkConfigurationStore();
         store.NetworkConfigurations.Add(new Models.NetworkConfiguration
         {
             Name = "mainnet",
+
             ContractAdr = "0xdca7ef03e98e0dc2b855be647c39abe984fcf21b",
             RpcUrl = "https://mainnet.infura.io/v3/405e16111db4419e8d94431737f8ba53",
             UpdateDateTime = DateTime.UtcNow,
@@ -112,15 +113,41 @@ public class DidEthrResolverFixture
         var resolver = new DidEthrResolver(store);
 
         // ACT
-        // FIX THE INDEX...
-        // var didDocument = await resolver.Resolve("did:ethr:0x6918893854B2Eb01B194c46c4Efe2ea1ef36B7BC", CancellationToken.None);
-        // var didDocument = await resolver.Resolve("did:ethr:0x19711CD19e609FEBdBF607960220898268B7E24b", CancellationToken.None);
-        // var didDocument = await resolver.Resolve("did:ethr:0x001192d8Ad6fF5988e026fdFD37AA33aE05A9064", CancellationToken.None);
-        var didDocument  = await resolver.Resolve("did:ethr:0x19711CD19e609FEBdBF607960220898268B7E24b?versionId=18341433", CancellationToken.None);
+        var didDocument = await resolver.Resolve("did:ethr:0x6918893854B2Eb01B194c46c4Efe2ea1ef36B7BC", CancellationToken.None);
+        var travelProto = didDocument.Service.Single(m => m.Type == "TravelRuleProtocols");
+        var travemEmail = didDocument.Service.Single(m => m.Type == "TravelRuleEmail");
 
-        var serialize = didDocument.Serialize();
+        // ASSERT
+        Assert.That(didDocument.Id, Is.EqualTo("did:ethr:0x6918893854B2Eb01B194c46c4Efe2ea1ef36B7BC"));
+        Assert.That(didDocument.Service.Count(), Is.EqualTo(2));
+        Assert.That(travelProto.Id, Is.EqualTo("did:ethr:0x6918893854B2Eb01B194c46c4Efe2ea1ef36B7BC#service-4"));
+        Assert.That(travemEmail.Id, Is.EqualTo("did:ethr:0x6918893854B2Eb01B194c46c4Efe2ea1ef36B7BC#service-12"));
+        Assert.That(travelProto.ServiceEndpoint, Is.EqualTo("https://travel-rule-protocols.notabene.dev/0x6918893854B2Eb01B194c46c4Efe2ea1ef36B7BC"));
+        Assert.That(travemEmail.ServiceEndpoint, Is.EqualTo("mailto:did:ethr:0x6918893854B2Eb01B194c46c4Efe2ea1ef36B7BC@tr-email.notabene.dev"));
+    }
 
-        // did:ethr:0x26bf14321004e770e7a8b080b7a526d8eed8b388
-        // https://github.com/decentralized-identity/ethr-did-resolver/blob/master/doc/did-method-spec.md#read-resolve
+    [Test]
+    public async Task When_Resolve_DID_With_Two_VerificationMethod_Then_DID_Document_Is_Resolved()
+    {
+        var store = new NetworkConfigurationStore();
+        store.NetworkConfigurations.Add(new Models.NetworkConfiguration
+        {
+            Name = "mainnet",
+
+            ContractAdr = "0xdca7ef03e98e0dc2b855be647c39abe984fcf21b",
+            RpcUrl = "https://mainnet.infura.io/v3/405e16111db4419e8d94431737f8ba53",
+            UpdateDateTime = DateTime.UtcNow,
+            CreateDateTime = DateTime.UtcNow
+        });
+        var resolver = new DidEthrResolver(store);
+
+        // ACT
+        var didDocument = await resolver.Resolve("did:ethr:0x19711CD19e609FEBdBF607960220898268B7E24b", CancellationToken.None);
+        var keyAgreement = didDocument.VerificationMethod.Single(m => m.Type == "X25519KeyAgreementKey2019");
+
+        // ASSERT
+        Assert.That(didDocument.Id, Is.EqualTo("did:ethr:0x19711CD19e609FEBdBF607960220898268B7E24b"));
+        Assert.That(didDocument.VerificationMethod.Count(), Is.EqualTo(2));
+        Assert.That(keyAgreement.Id, Is.EqualTo("did:ethr:0x19711CD19e609FEBdBF607960220898268B7E24b#delegate-2"));
     }
 }
