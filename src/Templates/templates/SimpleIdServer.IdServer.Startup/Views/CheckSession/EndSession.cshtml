@@ -1,5 +1,8 @@
-﻿@using SimpleIdServer.IdServer.Startup.Resources
+﻿@using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Options;
+@using SimpleIdServer.IdServer.Startup.Resources
 @model SimpleIdServer.IdServer.UI.ViewModels.RevokeSessionViewModel
+@inject IOptions<IdServerHostOptions> options
 
 @{
     ViewBag.Title = CheckSessionResource.revoke_session_title;
@@ -11,4 +14,28 @@
     <iframe src="@Model.FrontChannelLogout" style="display: none"></iframe>
 }
 
-<a href="@Model.RevokeSessionCallbackUrl" class="btn btn-danger">@CheckSessionResource.revoke_session_title</a>
+@if(Model.RedirectToRevokeSessionUI)
+{
+    <a href="@Model.RevokeSessionCallbackUrl" class="btn btn-danger">@CheckSessionResource.revoke_session_title</a>
+}
+else
+{
+    <div class="alert alert-info">
+        <p>@string.Format(CheckSessionResource.session_being_revoked, (options.Value.EndSessionRedirectionTimeInMS / 1000))</p>
+    </div>
+}
+
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var isRedirected = '@Model.RedirectToRevokeSessionUI.ToString().ToLowerInvariant()' == 'false';
+            var callback = '@Html.Raw(Model.RevokeSessionCallbackUrl)';
+            var timeMS = parseInt('@options.Value.EndSessionRedirectionTimeInMS');
+            if(isRedirected) {
+                setTimeout(() => {
+                    window.location.replace(callback);
+                }, timeMS);
+            }
+        })    
+    </script>
+}

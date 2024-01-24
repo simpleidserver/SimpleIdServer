@@ -1,12 +1,14 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authentication.Facebook;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Provisioning.LDAP.Jobs;
-using SimpleIdServer.IdServer.Provisioning.SCIM.Jobs;
+using SimpleIdServer.IdServer.Provisioning.LDAP;
+using SimpleIdServer.IdServer.Provisioning.SCIM;
 using SimpleIdServer.IdServer.Startup.Converters;
 using System;
 using System.Collections.Generic;
@@ -17,21 +19,27 @@ namespace SimpleIdServer.IdServer.Startup
     public class IdServerConfiguration
     {
         private static AuthenticationSchemeProviderDefinition Facebook = AuthenticationSchemeProviderDefinitionBuilder.Create("facebook", "Facebook", typeof(FacebookHandler), typeof(FacebookOptionsLite)).Build();
+        private static AuthenticationSchemeProviderDefinition Google = AuthenticationSchemeProviderDefinitionBuilder.Create("google", "Google", typeof(GoogleHandler), typeof(GoogleOptionsLite)).Build();
+        private static AuthenticationSchemeProviderDefinition Negotiate = AuthenticationSchemeProviderDefinitionBuilder.Create("negotiate", "Negotiate", typeof(NegotiateHandler), typeof(NegotiateOptionsLite)).Build();
 
-        private static IdentityProvisioningDefinition Scim = IdentityProvisioningDefinitionBuilder.Create<SCIMRepresentationsExtractionJobOptions>(SimpleIdServer.IdServer.Provisioning.SCIM.Jobs.SCIMRepresentationsExtractionJob.NAME, "SCIM")
+        private static IdentityProvisioningDefinition Scim = IdentityProvisioningDefinitionBuilder.Create<SCIMRepresentationsExtractionJobOptions>(SimpleIdServer.IdServer.Provisioning.SCIM.Services.SCIMProvisioningService.NAME, "SCIM")
             .AddUserSubjectMappingRule("$.userName")
             .AddUserPropertyMappingRule("$.name.familyName", nameof(User.Lastname))
-            .AddUserAttributeMappingRule("$.name.givenName", JwtRegisteredClaimNames.GivenName).Build();
+            .AddUserAttributeMappingRule("$.name.givenName", JwtRegisteredClaimNames.GivenName)
+            .AddGroupNameMappingRule("$.displayName")
+            .Build();
 
-        private static IdentityProvisioningDefinition Ldap = IdentityProvisioningDefinitionBuilder.Create<LDAPRepresentationsExtractionJobOptions>(SimpleIdServer.IdServer.Provisioning.LDAP.Jobs.LDAPRepresentationsExtractionJob.NAME, "LDAP")
+        private static IdentityProvisioningDefinition Ldap = IdentityProvisioningDefinitionBuilder.Create<LDAPRepresentationsExtractionJobOptions>(SimpleIdServer.IdServer.Provisioning.LDAP.Services.LDAPProvisioningService.NAME, "LDAP")
             .AddUserSubjectMappingRule("cn")
+            .AddGroupNameMappingRule("cn")
             .AddLDAPDistinguishedName()
             .Build();
 
         public static ICollection<RegistrationWorkflow> RegistrationWorkflows => new List<RegistrationWorkflow>
         {
             RegistrationWorkflowBuilder.New("pwd", true).AddStep("pwd").Build(),
-            RegistrationWorkflowBuilder.New("pwd-email").AddStep("pwd").AddStep("email").Build()
+            RegistrationWorkflowBuilder.New("pwd-email").AddStep("pwd").AddStep("email").Build(),
+            RegistrationWorkflowBuilder.New("mobile").AddStep("mobile").Build()
         };
 
         public static ICollection<Scope> Scopes => new List<Scope>
@@ -60,6 +68,7 @@ namespace SimpleIdServer.IdServer.Startup
             SimpleIdServer.IdServer.CredentialIssuer.Constants.StandardScopes.CredentialTemplates,
             SimpleIdServer.IdServer.Constants.StandardScopes.Realms,
             SimpleIdServer.IdServer.Constants.StandardScopes.Groups,
+            SimpleIdServer.IdServer.Constants.StandardScopes.OfflineAccessScope
         };
 
         public static ICollection<User> Users => new List<User>
@@ -96,7 +105,7 @@ namespace SimpleIdServer.IdServer.Startup
                     SimpleIdServer.IdServer.CredentialIssuer.Constants.StandardScopes.CredentialTemplates,
                     SimpleIdServer.IdServer.Constants.StandardScopes.Realms, 
                     SimpleIdServer.IdServer.Constants.StandardScopes.Groups).Build(),
-            ClientBuilder.BuildTraditionalWebsiteClient("swagger", "password", null, "https://localhost:5001/swagger/oauth2-redirect.html", "https://localhost:5001/(.*)/swagger/oauth2-redirect.html", "http://localhost").AddScope(
+            ClientBuilder.BuildTraditionalWebsiteClient("swaggerClient", "password", null, "https://localhost:5001/swagger/oauth2-redirect.html", "https://localhost:5001/(.*)/swagger/oauth2-redirect.html", "http://localhost").AddScope(
                 SimpleIdServer.IdServer.Constants.StandardScopes.Provisioning, 
                 SimpleIdServer.IdServer.Constants.StandardScopes.Users, 
                 SimpleIdServer.IdServer.Constants.StandardScopes.Networks,
@@ -114,7 +123,7 @@ namespace SimpleIdServer.IdServer.Startup
                 SimpleIdServer.IdServer.CredentialIssuer.Constants.StandardScopes.CredentialTemplates,
                 SimpleIdServer.IdServer.Constants.StandardScopes.Realms,
                 SimpleIdServer.IdServer.Constants.StandardScopes.Groups).Build(),
-            ClientBuilder.BuildTraditionalWebsiteClient("postman", "password", null, "http://localhost").AddScope(
+            ClientBuilder.BuildTraditionalWebsiteClient("postman", "password", null, "http://localhost").EnableClientGrantType().AddScope(
                 SimpleIdServer.IdServer.Constants.StandardScopes.Provisioning,
                 SimpleIdServer.IdServer.Constants.StandardScopes.Users,
                 SimpleIdServer.IdServer.Constants.StandardScopes.Networks,
@@ -153,12 +162,23 @@ namespace SimpleIdServer.IdServer.Startup
 
         public static ICollection<AuthenticationSchemeProviderDefinition> ProviderDefinitions => new List<AuthenticationSchemeProviderDefinition>
         {
-            Facebook
+            Facebook,
+            Google,
+            Negotiate
+        };
+
+        public static ICollection<Language> Languages => new List<Language>
+        {
+            LanguageBuilder.Build(Language.Default).AddDescription("English").Build()
         };
 
         public static ICollection<AuthenticationSchemeProvider> Providers => new List<AuthenticationSchemeProvider>
         {
-           AuthenticationSchemeProviderBuilder.Create(Facebook, "Facebook", "Facebook", "Facebook").Build()
+           AuthenticationSchemeProviderBuilder.Create(Facebook, "Facebook", "Facebook", "Facebook").Build(),
+           AuthenticationSchemeProviderBuilder.Create(Google, "Google", "Google", "Google").Build(),
+           AuthenticationSchemeProviderBuilder.Create(Negotiate, "Negotiate", "Negotiate", "Negotiate")
+            .SetMappers(SimpleIdServer.IdServer.Constants.GetNegotiateIdProviderMappers())
+            .Build()
         };
 
         public static ICollection<SimpleIdServer.IdServer.Domains.Realm> Realms = new List<SimpleIdServer.IdServer.Domains.Realm>
@@ -179,7 +199,7 @@ namespace SimpleIdServer.IdServer.Startup
         public static ICollection<IdentityProvisioning> GetIdentityProvisiongLst(string scimEdp) => new List<IdentityProvisioning>
         {
             IdentityProvisioningBuilder.Create(Scim, "SCIM", "SCIM").Build(),
-            IdentityProvisioningBuilder.Create(Ldap, "LDAP", "LDAP").Build()
+            IdentityProvisioningBuilder.Create(Ldap, "LDAP", "LDAP", "LDAP").Build()
         };
     }
 }

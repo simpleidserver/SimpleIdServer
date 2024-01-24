@@ -8,9 +8,11 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NeoSmart.Caching.Sqlite.AspNetCore;
 using SimpleIdServer.Configuration;
 using SimpleIdServer.Configuration.Redis;
 using SimpleIdServer.IdServer;
@@ -20,9 +22,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Email;
 using SimpleIdServer.IdServer.Fido;
 using SimpleIdServer.IdServer.Provisioning.LDAP;
-using SimpleIdServer.IdServer.Provisioning.LDAP.Jobs;
 using SimpleIdServer.IdServer.Provisioning.SCIM;
-using SimpleIdServer.IdServer.Provisioning.SCIM.Jobs;
 using SimpleIdServer.IdServer.Pwd;
 using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Startup;
@@ -81,11 +81,13 @@ if (identityServerConfiguration.IsForwardedEnabled)
     });
 }
 
+
 builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
     .AllowAnyMethod()
     .AllowAnyHeader()));
 builder.Services.AddRazorPages()
     .AddRazorRuntimeCompilation();
+builder.Services.AddLocalization();
 ConfigureIdServer(builder.Services);
 
 var app = builder.Build();
@@ -99,6 +101,13 @@ if (identityServerConfiguration.IsForwardedEnabled)
 if (identityServerConfiguration.ForceHttps)
     app.SetHttpsScheme();
 
+app.UseRequestLocalization(e =>
+{
+    e.SetDefaultCulture("en");
+    e.AddSupportedCultures("en");
+    e.AddSupportedUICultures("en");
+});
+
 app
     .UseSID()
     .UseSIDSwagger()
@@ -109,6 +118,7 @@ app
     .UseCredentialIssuer()
     .UseSamlIdp()
     .UseAutomaticConfiguration();
+
 app.Run();
 
 void ConfigureIdServer(IServiceCollection services)
@@ -135,6 +145,7 @@ void ConfigureIdServer(IServiceCollection services)
         .AddBackChannelAuthentication()
         .AddPwdAuthentication()
         .AddEmailAuthentication()
+        .AddOtpAuthentication()
         .AddSmsAuthentication()
         .AddFcmNotification()
         .AddSamlIdp()
@@ -171,6 +182,7 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
     builder.AddAutomaticConfiguration(o =>
     {
         o.Add<FacebookOptionsLite>();
+        o.Add<GoogleOptionsLite>();
         o.Add<LDAPRepresentationsExtractionJobOptions>();
         o.Add<SCIMRepresentationsExtractionJobOptions>();
         o.Add<IdServerEmailOptions>();
@@ -200,6 +212,9 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
                         break;
                     case DistributedCacheTypes.MYSQL:
                         b.UseMySql(conf.ConnectionString, ServerVersion.AutoDetect(conf.ConnectionString));
+                        break;
+                    case DistributedCacheTypes.SQLITE:
+                        b.UseSqlite(conf.ConnectionString);
                         break;
                 }
             });
@@ -244,6 +259,13 @@ void ConfigureDistributedCache()
                 opts.TableName = "DistributedCache";
             });
             break;
+        case DistributedCacheTypes.SQLITE:
+            // Note : we cannot use the same database, because the library Neosmart, checks if the database contains only two tables and one index.
+            builder.Services.AddSqliteCache(options =>
+            {
+                options.CachePath = "SidCache.db";
+            });
+            break;
     }
 }
 
@@ -276,6 +298,15 @@ void ConfigureStorage(DbContextOptionsBuilder b)
             break;
         case StorageTypes.INMEMORY:
             b.UseInMemoryDatabase(conf.ConnectionString);
+            break;
+        case StorageTypes.SQLITE:
+            b.UseSqlite(conf.ConnectionString, o =>
+            {
+                o.MigrationsAssembly("SimpleIdServer.IdServer.SqliteMigrations");
+                o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+            });
+            // SQLITE creates an ambient transaction.
+            b.ConfigureWarnings(x => x.Ignore(RelationalEventId.AmbientTransactionWarning));
             break;
     }
 }
@@ -310,6 +341,20 @@ void SeedData(WebApplication application, string scimBaseUrl)
 
             if (!dbContext.UmaResources.Any())
                 dbContext.UmaResources.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Resources);
+
+            if(!dbContext.Languages.Any())
+            {
+                dbContext.Languages.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Languages);
+                dbContext.Translations.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Languages.SelectMany(l => l.Descriptions));
+            }
+
+            foreach(var providerDefinition in SimpleIdServer.IdServer.Startup.IdServerConfiguration.ProviderDefinitions)
+            {
+                if (!dbContext.AuthenticationSchemeProviderDefinitions.Any(d => d.Name == providerDefinition.Name))
+                {
+                    dbContext.AuthenticationSchemeProviderDefinitions.Add(providerDefinition);
+                }
+            }
 
             if (!dbContext.AuthenticationSchemeProviderDefinitions.Any())
                 dbContext.AuthenticationSchemeProviderDefinitions.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.ProviderDefinitions);
@@ -389,19 +434,17 @@ void SeedData(WebApplication application, string scimBaseUrl)
                     CreateDateTime = DateTime.UtcNow
                 });
 
-            if (!dbContext.Definitions.Any())
-            {
-                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<FacebookOptionsLite>());
-                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<LDAPRepresentationsExtractionJobOptions>());
-                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<SCIMRepresentationsExtractionJobOptions>());
-                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<IdServerEmailOptions>());
-                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<IdServerSmsOptions>());
-                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<IdServerPasswordOptions>());
-                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<FidoOptions>());
-                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<IdServerConsoleOptions>());
-                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>());
-            }
-
+            AddMissingConfigurationDefinition<FacebookOptionsLite>(dbContext);
+            AddMissingConfigurationDefinition<LDAPRepresentationsExtractionJobOptions>(dbContext);
+            AddMissingConfigurationDefinition<SCIMRepresentationsExtractionJobOptions>(dbContext);
+            AddMissingConfigurationDefinition<IdServerEmailOptions>(dbContext);
+            AddMissingConfigurationDefinition<IdServerSmsOptions>(dbContext);
+            AddMissingConfigurationDefinition<IdServerPasswordOptions>(dbContext);
+            AddMissingConfigurationDefinition<FidoOptions>(dbContext);
+            AddMissingConfigurationDefinition<IdServerConsoleOptions>(dbContext);
+            AddMissingConfigurationDefinition<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>(dbContext);
+            AddMissingConfigurationDefinition<GoogleOptionsLite>(dbContext);
+            AddMissingConfigurationDefinition<NegotiateOptionsLite>(dbContext);
             EnableIsolationLevel(dbContext);
             dbContext.SaveChanges();
         }
@@ -415,7 +458,7 @@ void SeedData(WebApplication application, string scimBaseUrl)
             {
                 if (sqlConnection.State != System.Data.ConnectionState.Open) sqlConnection.Open();
                 var cmd = sqlConnection.CreateCommand();
-                cmd.CommandText = "ALTER DATABASE IdServer SET ALLOW_SNAPSHOT_ISOLATION ON";
+                cmd.CommandText = "ALTER DATABASE CURRENT SET ALLOW_SNAPSHOT_ISOLATION ON";
                 cmd.ExecuteNonQuery();
                 cmd = sqlConnection.CreateCommand();
                 cmd.CommandText = SQLServerCreateTableFormat;
@@ -431,6 +474,15 @@ void SeedData(WebApplication application, string scimBaseUrl)
                 cmd.CommandText = MYSQLCreateTableFormat;
                 cmd.ExecuteNonQuery();
                 return;
+            }
+        }
+
+        void AddMissingConfigurationDefinition<T>(StoreDbContext dbContext)
+        {
+            var name = typeof(T).Name;
+            if(!dbContext.Definitions.Any(d => d.Id == name))
+            {
+                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<T>());
             }
         }
     }

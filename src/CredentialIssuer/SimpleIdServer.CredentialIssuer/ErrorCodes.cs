@@ -11,5 +11,6 @@ namespace SimpleIdServer.IdServer.CredentialIssuer
         public const string INVALID_CREDOFFER = "invalid_credoffer";
         public const string UNAUTHORIZED = "unauthorized";
         public const string UNSUPPORTED_CREDENTIAL_FORMAT = "unsupported_credential_format";
+        public const string UNSUPPORTED_CREDENTIAL_TYPE = "unsupported_credential_type";
     }
 }

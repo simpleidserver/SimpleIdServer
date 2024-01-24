@@ -65,8 +65,6 @@
                                     <th></th>
                                     <th>@ProfileResource.client</th>
                                     <th>@ProfileResource.scopes</th>
-                                    <th>@ProfileResource.claims</th>
-                                    <th>@ProfileResource.auth_details</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -82,32 +80,6 @@
                                                 foreach(var scopeName in consent.ScopeNames)
                                                 {
                                                     <span class="badge bg-secondary">@scopeName</span>
-                                                }
-                                            }
-                                            else
-                                            {
-                                                <span>-</span>
-                                            }
-                                        </td>
-                                        <td class="align-middle">
-                                            @if (consent.ClaimNames != null && consent.ClaimNames.Where(n => !string.IsNullOrWhiteSpace(n)).Any())
-                                            {
-                                                foreach(var claimName in consent.ClaimNames)
-                                                {
-                                                    <span class="badge bg-secondary">@claimName</span>
-                                                }
-                                            }
-                                            else
-                                            {
-                                                <span>-</span>
-                                            }
-                                        </td>
-                                        <td class="align-middle">
-                                            @if(consent.AuthDataTypes != null && consent.AuthDataTypes.Any())
-                                            {
-                                                foreach(var authDataType in consent.AuthDataTypes)
-                                                {
-                                                    <span class="badge bg-secondary">@authDataType</span>
                                                 }
                                             }
                                             else
@@ -137,7 +109,6 @@
                                 <thead>
                                     <tr>
                                         <th>@ProfileResource.resource</th>
-                                        <th>@ProfileResource.description</th>
                                         <th>@ProfileResource.scopes</th>
                                         <th>@ProfileResource.requester</th>
                                         <th></th>
@@ -148,7 +119,6 @@
                                     {
                                         <tr>
                                             <td>@(string.IsNullOrWhiteSpace(consent.ResourceName) ? '-' : consent.ResourceName)</td>
-                                            <td>@(string.IsNullOrWhiteSpace(consent.ResourceDescription) ? '-' : consent.ResourceDescription)</td>
                                             <td>
                                                 @if(consent.Scopes != null && consent.Scopes.Any())
                                                 {

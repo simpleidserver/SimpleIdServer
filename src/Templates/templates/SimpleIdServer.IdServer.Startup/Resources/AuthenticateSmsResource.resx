@@ -162,6 +162,9 @@
   <data name="unknown_phonenumber" xml:space="preserve">
     <value>Phone number is unknown</value>
   </data>
+  <data name="unknown_user" xml:space="preserve">
+    <value>The given phone number does not correspond to any user</value>
+  </data>
   <data name="user_exists" xml:space="preserve">
     <value>User with the same name already exists</value>
   </data>

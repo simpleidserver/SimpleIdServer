@@ -51,5 +51,8 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
         /// </summary>
         [JsonPropertyName(CredentialRequestNames.CredentialResponseEncryptionEnc)]
         public string CredentialResponseEncryptionEnc { get; set; }
+
+        [JsonIgnore]
+        public JsonObject Data { get; set; }
     }
 }

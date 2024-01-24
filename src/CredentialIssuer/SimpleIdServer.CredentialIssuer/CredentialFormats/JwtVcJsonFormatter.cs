@@ -4,7 +4,17 @@ using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.CredentialIssuer.CredentialFormats;
 
-public class LdpVcSerializer : ICredentialSerializer
+public class JwtVcJsonFormatter : ICredentialFormatter
 {
-    public string Format => "ldp_vc";
+    public string Format => "jwt_vc_json";
+
+    public CredentialHeader ExtractHeader(JsonObject jsonObj)
+    {
+        return null;
+    }
+
+    public void BuildCredential()
+    {
+
+    }
 }

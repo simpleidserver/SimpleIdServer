@@ -3,6 +3,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SimpleIdServer.CredentialIssuer.CredentialFormats;
+using SimpleIdServer.CredentialIssuer.Domains;
+using SimpleIdServer.CredentialIssuer.Store;
 using SimpleIdServer.IdServer.CredentialIssuer;
 using SimpleIdServer.IdServer.CredentialIssuer.Api.Credential.Formats;
 using SimpleIdServer.IdServer.CredentialIssuer.Api.Credential.Validators;
@@ -13,6 +16,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,20 +27,23 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
         private readonly IEnumerable<ICredentialRequestParser> _parsers;
         private readonly IEnumerable<IProofValidator> _proofValidators;
         private readonly ICredentialTemplateClaimsExtractor _claimsExtractor;
-        private readonly IEnumerable<ICredentialFormat> _formats;
+        private readonly IEnumerable<ICredentialFormatter> _formatters;
+        private readonly ICredentialTemplateStore _credentialTemplateStore;
         private readonly ILogger<CredentialController> _logger;
 
         public CredentialController(
             IEnumerable<ICredentialRequestParser> parsers, 
             IEnumerable<IProofValidator> proofValidators, 
             ICredentialTemplateClaimsExtractor claimsExtractor,
-            IEnumerable<ICredentialFormat> formats,
+            IEnumerable<ICredentialFormatter> formatters,
+            ICredentialTemplateStore credentialTemplateStore,
             ILogger<CredentialController> logger)
         {
             _parsers = parsers;
             _proofValidators = proofValidators;
             _claimsExtractor = claimsExtractor;
-            _formats = formats;
+            _formatters = formatters;
+            _credentialTemplateStore = credentialTemplateStore;
             _logger = logger;
         }
 
@@ -45,8 +52,15 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
         public async Task<IActionResult> Get([FromRoute] string prefix, [FromBody] CredentialRequest request, CancellationToken cancellationToken)
         {
             var subject = User.FindFirst("sub").Value;
-            if (TryValidate(request, out ErrorResult error)) return Build(error);
-
+            var validationResult = await Validate(request, cancellationToken);
+            if (validationResult.ErrorResult != null) return Build(validationResult.ErrorResult.Value);
+            // get the claims of the user.
+            // build and sign the credential (JSON). DID of the service can be used.
+            var formatter = validationResult.Formatter;
+            
+            // jwt_vs_json, type ["VerifiableCredential", "UniversityDegreeCredential"]
+            // mso_mdoc, doctype : org.iso.18013.5.1.mDL
+            // CredentialTemplate
 
             var extractionResult = await ValidateRequest(request, token, cancellationToken);
             var user = await _authenticationHelper.GetUserByLogin(token.Subject, prefix, cancellationToken);
@@ -60,34 +74,41 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
             return new OkObjectResult(result);
         }
 
-        private bool Validate(CredentialRequest credentialRequest, out ErrorResult error)
+        private async Task<ValidationResult> Validate(CredentialRequest credentialRequest, CancellationToken cancellationToken)
         {
             if (credentialRequest == null)
             {
-                error = new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
-                return false;
+                return ValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST));
             }
 
-            var credentialIdentifier = User.FindFirst("credential_identifier")?.Value;
-            if(string.IsNullOrWhiteSpace(credentialIdentifier) && string.IsNullOrWhiteSpace(credentialRequest.Format))
-            {
-                error = new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, CredentialRequestNames.Format));
-                return false;
-            }
+            var atCredentialIdentifiers = GetCredentialIdentifiers();
+            if(atCredentialIdentifiers == null && string.IsNullOrWhiteSpace(credentialRequest.Format))
+                return ValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, CredentialRequestNames.Format)));
+
+            // Proof.
+
+            if(atCredentialIdentifiers != null && string.IsNullOrWhiteSpace(credentialRequest.Credentialidentifier))
+                return ValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, CredentialRequestNames.CredentialIdentifier)));
 
             if(!string.IsNullOrWhiteSpace(credentialRequest.Format) && !string.IsNullOrWhiteSpace(credentialRequest.Credentialidentifier))
+                return ValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, ErrorMessages.CANNOT_USER_CREDENTIAL_IDENTIFIER_WITH_FORMAT));
+
+            if(!atCredentialIdentifiers.Contains(credentialRequest.Credentialidentifier))
+                return ValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, ErrorMessages.INVALID_CREDENTIAL_IDENTIFIER));
+
+            ICredentialFormatter formatter = null;
+            CredentialTemplate credentialTemplate = null;
+            if (!string.IsNullOrWhiteSpace(credentialRequest.Format))
             {
-                error = new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, ErrorMessages.CREDENTIAL_IDENTIFIER_MUST_NOT_BE_PRESENT);
-                return false;
+                formatter = _formatters.SingleOrDefault(f => f.Format == credentialRequest.Format);
+                if (formatter == null) return ValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.UNSUPPORTED_CREDENTIAL_FORMAT, string.Format(ErrorMessages.UNSUPPORTED_CREDENTIAL_FORMAT, credentialRequest.Format)));
+                var header = formatter.ExtractHeader(credentialRequest.Data);
+                if (header == null) return ValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, ErrorMessages.CREDENTIAL_TYPE_CANNOT_BE_EXTRACTED));
+                credentialTemplate = await _credentialTemplateStore.Get(header.Type, cancellationToken);
+                if (credentialTemplate == null) return ValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.UNSUPPORTED_CREDENTIAL_TYPE, string.Format(ErrorMessages.UNSUPPORTED_CREDENTIAL_TYPE, header.Type)));
             }
 
-            if(!string.IsNullOrWhiteSpace(credentialIdentifier) && string.IsNullOrWhiteSpace(credentialRequest.Credentialidentifier))
-            {
-                error = new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, CredentialRequestNames.CredentialIdentifier));
-                return false;
-            }
-
-            return true;
+            return ValidationResult.Ok(formatter, credentialTemplate);
         }
 
         protected async Task<ExtractionResult> ValidateRequest(CredentialRequest request, JsonWebToken jsonWebToken, CancellationToken cancellationToken)
@@ -122,9 +143,36 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
             return validationResult;
         }
 
+        private record ValidationResult
+        {
+            public ValidationResult(ErrorResult? error)
+            {
+                ErrorResult = error;
+            }
+
+            public ValidationResult(ICredentialFormatter formatter, CredentialTemplate credentialTemplate)
+            {
+                Formatter = formatter;
+            }
+
+            public ErrorResult? ErrorResult { get; private set; }
+
+            public ICredentialFormatter Formatter { get; private set; }
+
+            public CredentialTemplate CredentialTemplate { get; private set; }
+
+            public static ValidationResult Error(ErrorResult error) => new ValidationResult(error);
+
+            public static ValidationResult Ok(ICredentialFormatter formatter, CredentialTemplate credentialTemplate) => new ValidationResult(formatter, credentialTemplate);
+        }
+
         private List<string> GetCredentialIdentifiers()
         {
-            return null;
+            var claim = User.Claims.SingleOrDefault(c => c.Type == "authorization_details");
+            if (claim == null) return null;
+            var jsonObj = JsonObject.Parse(claim.Value).AsObject();
+            if (jsonObj.ContainsKey("credential_identifiers")) return null;
+            return (jsonObj["credential_identifiers"] as JsonArray).Select(c => c.ToString()).ToList();
         }
     }
 }

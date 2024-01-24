@@ -144,9 +144,9 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         /// <summary>
         ///   Recherche une chaîne localisée semblable à Email is missing.
         /// </summary>
-        public static string missing_email {
+        public static string missing_login {
             get {
-                return ResourceManager.GetString("missing_email", resourceCulture);
+                return ResourceManager.GetString("missing_login", resourceCulture);
             }
         }
         
@@ -219,6 +219,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static string unknown_email {
             get {
                 return ResourceManager.GetString("unknown_email", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The given email does not correspond to any user.
+        /// </summary>
+        public static string unknown_user {
+            get {
+                return ResourceManager.GetString("unknown_user", resourceCulture);
             }
         }
         

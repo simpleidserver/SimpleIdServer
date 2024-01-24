@@ -14,9 +14,9 @@ public interface ICredentialDefinitionSerializer
 
 public class CredentialDefinitionSerializer
 {
-    private readonly IEnumerable<ICredentialSerializer> _credentialSerializers;
+    private readonly IEnumerable<ICredentialFormatter> _credentialSerializers;
 
-    public CredentialDefinitionSerializer(IEnumerable<ICredentialSerializer> credentialSerializers)
+    public CredentialDefinitionSerializer(IEnumerable<ICredentialFormatter> credentialSerializers)
     {
         _credentialSerializers = credentialSerializers;
     }

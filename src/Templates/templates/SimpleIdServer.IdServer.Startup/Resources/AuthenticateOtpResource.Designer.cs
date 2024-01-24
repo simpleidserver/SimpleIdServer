@@ -22,14 +22,14 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class AuthenticateConsoleResource {
+    public class AuthenticateOtpResource {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal AuthenticateConsoleResource() {
+        internal AuthenticateOtpResource() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.IdServer.Startup.Resources.AuthenticateConsoleResource", typeof(AuthenticateConsoleResource).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.IdServer.Startup.Resources.AuthenticateOtpResource", typeof(AuthenticateOtpResource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -97,6 +97,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à An error occured while trying to decrypt the return url.
+        /// </summary>
+        public static string cryptographic_error {
+            get {
+                return ResourceManager.GetString("cryptographic_error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Confirmation code is invalid.
         /// </summary>
         public static string invalid_confirmationcode {
@@ -106,7 +115,7 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à The confirmation code is invalid.
+        ///   Recherche une chaîne localisée semblable à The OTP is not valid.
         /// </summary>
         public static string invalid_credential {
             get {
@@ -133,11 +142,38 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Login is missing.
+        /// </summary>
+        public static string missing_login {
+            get {
+                return ResourceManager.GetString("missing_login", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Return url is missing.
+        /// </summary>
+        public static string missing_return_url {
+            get {
+                return ResourceManager.GetString("missing_return_url", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à There is no OTP configured.
         /// </summary>
         public static string no_active_otp {
             get {
                 return ResourceManager.GetString("no_active_otp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Policy.
+        /// </summary>
+        public static string policy {
+            get {
+                return ResourceManager.GetString("policy", resourceCulture);
             }
         }
         
@@ -151,20 +187,38 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Send confirmation code.
-        /// </summary>
-        public static string sendconfirmationcode {
-            get {
-                return ResourceManager.GetString("sendconfirmationcode", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Recherche une chaîne localisée semblable à Authenticate.
         /// </summary>
         public static string title {
             get {
                 return ResourceManager.GetString("title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Terms of service.
+        /// </summary>
+        public static string tos {
+            get {
+                return ResourceManager.GetString("tos", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Login is unknown.
+        /// </summary>
+        public static string unknown_login {
+            get {
+                return ResourceManager.GetString("unknown_login", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The given login does not correspond to any user.
+        /// </summary>
+        public static string unknown_user {
+            get {
+                return ResourceManager.GetString("unknown_user", resourceCulture);
             }
         }
     }

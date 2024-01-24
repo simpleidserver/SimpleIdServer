@@ -32,6 +32,10 @@ namespace SimpleIdServer.IdServer.CredentialIssuer
         public const string NO_CREDENTIAL_FOUND = "no credential found";
         public const string USER_HAS_NO_DID = "user doesn't have a valid DID";
         public const string DID_METHOD_NOT_SUPPORTED = "DID method is not supported";
-        public const string CREDENTIAL_IDENTIFIER_MUST_NOT_BE_PRESENT = "the credential_identifier parameter must not be present";
+        public const string CANNOT_USER_CREDENTIAL_IDENTIFIER_WITH_FORMAT = "the credential_identifier parameter cannot be used with the format parameter";
+        public const string INVALID_CREDENTIAL_IDENTIFIER = "the credential_identifier parameter is not valid";
+        public const string UNSUPPORTED_CREDENTIAL_FORMAT = "the credential format {0} is not supported";
+        public const string UNSUPPORTED_CREDENTIAL_TYPE = "the credential type {0} is not supported";
+        public const string CREDENTIAL_TYPE_CANNOT_BE_EXTRACTED = "the credential type cannot be extracted";
     }
 }
