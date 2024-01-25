@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using MassTransit.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -14,6 +15,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace SimpleIdServer.IdServer.Swagger;
 
@@ -21,7 +23,10 @@ public class SidSwaggerUIMiddleware
 {
     private const string EmbeddedFileNamespace = "Swashbuckle.AspNetCore.SwaggerUI.node_modules.swagger_ui_dist";
     private readonly SwaggerUIOptions _options;
-    private readonly StaticFileMiddleware _staticFileMiddleware;
+    private readonly RequestDelegate _next;
+    private readonly IWebHostEnvironment _hostingEnv;
+    private readonly ILoggerFactory _loggerFactory;
+    private static Dictionary<string, StaticFileMiddleware> _middlewares = new Dictionary<string, StaticFileMiddleware>();
     private readonly JsonSerializerOptions _jsonSerializerOptions;
     private readonly IdServerHostOptions _idOptions;
 
@@ -33,9 +38,10 @@ public class SidSwaggerUIMiddleware
         IOptions<IdServerHostOptions> idOptions)
     {
         _options = options ?? new SwaggerUIOptions();
+        _next = next;
+        _hostingEnv = hostingEnv;
+        _loggerFactory = loggerFactory;
         _idOptions = idOptions.Value;
-
-        _staticFileMiddleware = CreateStaticFileMiddleware(next, hostingEnv, loggerFactory, options);
 
         _jsonSerializerOptions = new JsonSerializerOptions();
 #if NET6_0
@@ -70,7 +76,35 @@ public class SidSwaggerUIMiddleware
             return;
         }
 
-        await _staticFileMiddleware.Invoke(httpContext);
+
+        var middleware = GetStaticFileMiddleware(path);
+        await middleware.Invoke(httpContext);
+    }
+
+    private StaticFileMiddleware GetStaticFileMiddleware(string path)
+    {
+        string key = $"/{_options.RoutePrefix}";
+        if(_idOptions.UseRealm)
+        {
+            var splittedPath = path.TrimStart('/').Split('/');
+            if (splittedPath.Length >= 3 && 
+                splittedPath.ElementAt(1) == _options.RoutePrefix)
+            {
+                key = $"/{splittedPath.First()}/{_options.RoutePrefix}";
+            }
+        }
+
+        if(!_middlewares.ContainsKey(key))
+        {
+            var staticFileOptions = new StaticFileOptions
+            {
+                RequestPath = key,
+                FileProvider = new EmbeddedFileProvider(typeof(SwaggerUIMiddleware).GetTypeInfo().Assembly, EmbeddedFileNamespace),
+            };
+            _middlewares.Add(key, new StaticFileMiddleware(_next, _hostingEnv, Microsoft.Extensions.Options.Options.Create(staticFileOptions), _loggerFactory));
+        }
+
+        return _middlewares[key];
     }
 
     private StaticFileMiddleware CreateStaticFileMiddleware(
@@ -84,8 +118,6 @@ public class SidSwaggerUIMiddleware
             RequestPath = string.IsNullOrEmpty(options.RoutePrefix) ? string.Empty : $"/{options.RoutePrefix}",
             FileProvider = new EmbeddedFileProvider(typeof(SwaggerUIMiddleware).GetTypeInfo().Assembly, EmbeddedFileNamespace),
         };
-
-
         return new StaticFileMiddleware(next, hostingEnv, Microsoft.Extensions.Options.Options.Create(staticFileOptions), loggerFactory);
     }
 
