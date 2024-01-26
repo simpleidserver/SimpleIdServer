@@ -29,6 +29,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
         private readonly ICredentialTemplateClaimsExtractor _claimsExtractor;
         private readonly IEnumerable<ICredentialFormatter> _formatters;
         private readonly ICredentialTemplateStore _credentialTemplateStore;
+        private readonly IUserCredentialStore _userCredentialClaimStore;
         private readonly ILogger<CredentialController> _logger;
 
         public CredentialController(
@@ -37,6 +38,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
             ICredentialTemplateClaimsExtractor claimsExtractor,
             IEnumerable<ICredentialFormatter> formatters,
             ICredentialTemplateStore credentialTemplateStore,
+            IUserCredentialClaimStore userCredentialClaimStore,
             ILogger<CredentialController> logger)
         {
             _parsers = parsers;
@@ -44,6 +46,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
             _claimsExtractor = claimsExtractor;
             _formatters = formatters;
             _credentialTemplateStore = credentialTemplateStore;
+            _userCredentialClaimStore = userCredentialClaimStore;
             _logger = logger;
         }
 
@@ -54,9 +57,11 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
             var subject = User.FindFirst("sub").Value;
             var validationResult = await Validate(request, cancellationToken);
             if (validationResult.ErrorResult != null) return Build(validationResult.ErrorResult.Value);
-            // get the claims of the user.
-            // build and sign the credential (JSON). DID of the service can be used.
+
+            var credentialTemplateClaims = validationResult.CredentialTemplate.Claims;
+            var userCredentials = await _userCredentialClaimStore.Resolve(subject, credentialTemplateClaims);
             var formatter = validationResult.Formatter;
+
             
             // jwt_vs_json, type ["VerifiableCredential", "UniversityDegreeCredential"]
             // mso_mdoc, doctype : org.iso.18013.5.1.mDL

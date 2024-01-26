@@ -1,0 +1,58 @@
+Decentralized Identifiers (DIDs)
+
+URL : https://www.w3.org/TR/did-core/
+
+Comprendre comment utiliser le format DID Query par exemple :
+* did:example:123456?versionId=1
+* did:example:123?service=agent&relativeRef=/credentials#degree
+* did:example:123?versionTime=2021-05-10T17:00:00Z
+
+Le contrôleur présent dans le document DID, est l'entité autorisée à effectuer des changements sur le document.
+Le processur d'autorisation est defini par la méthode DID.
+
+JSON-LD avec les full IRIs
+
+{
+  "http://schema.org/name": "Manu Sporny",
+  "http://schema.org/url": {
+    "@id": "http://manu.sporny.org/"
+    ↑ The '@id' keyword means 'This value is an identifier that is an IRI'
+  },
+  "http://schema.org/image": {
+    "@id": "http://manu.sporny.org/images/manu.png"
+  }
+}
+
+Contexte :
+
+{
+  "@context": {
+    "name": "http://schema.org/name",
+    ↑ This means that 'name' is shorthand for 'http://schema.org/name'
+    "image": {
+      "@id": "http://schema.org/image",
+      ↑ This means that 'image' is shorthand for 'http://schema.org/image'
+      "@type": "@id"
+      ↑ This means that a string value associated with 'image'
+        should be interpreted as an identifier that is an IRI
+    },
+    "homepage": {
+      "@id": "http://schema.org/url",
+      ↑ This means that 'homepage' is shorthand for 'http://schema.org/url'
+      "@type": "@id"
+      ↑ This means that a string value associated with 'homepage'
+        should be interpreted as an identifier that is an IRI 
+    }
+  }
+}
+
+ "id": "urn:uuid:c499e122-3ba9-4e95-8d4d-c0ebfcf8c51a",
+  "type": "VerifiableCredential",
+  "issuanceDate": "2021-02-07T16:02:08.571Z",
+  "issuer": {
+    "id": "did:example:123"
+  },
+  "credentialSubject": {
+    "id": "did:example:456",
+    "birthDate": "2021-02-07"
+  },
