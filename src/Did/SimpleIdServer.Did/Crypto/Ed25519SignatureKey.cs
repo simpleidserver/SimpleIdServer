@@ -5,6 +5,7 @@ using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Crypto.Signers;
 using Org.BouncyCastle.Security;
+using SimpleIdServer.Did.Crypto.SecurityKeys;
 using System;
 using System.Linq;
 using System.Security.Cryptography;
@@ -86,7 +87,7 @@ public class Ed25519SignatureKey : IAsymmetricKey
         }
     }
 
-    public bool CheckHash(byte[] payload, byte[] signaturePayload, HashAlgorithmName alg)
+    public bool CheckHash(byte[] payload, byte[] signaturePayload, HashAlgorithmName? alg = null)
     {
         if (_publicKey == null) throw new InvalidOperationException("There is no public key");
         var verifier = new Ed25519Signer();
@@ -128,6 +129,12 @@ public class Ed25519SignatureKey : IAsymmetricKey
     {
         var result = GetPublicJwk();
         result.D = Base64UrlEncoder.Encode(_privateKey.GetEncoded());
+        return result;
+    }
+
+    public SigningCredentials BuildSigningCredentials()
+    {
+        var result = new SigningCredentials(new Ed25519SecurityKey(_publicKey, _privateKey), CrvOrSize);
         return result;
     }
 }

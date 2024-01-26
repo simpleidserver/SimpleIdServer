@@ -117,14 +117,19 @@ namespace SimpleIdServer.Did.Crypto
             _rsa.ImportParameters(rsaParameters);
         }
 
-        public bool CheckHash(byte[] payload, byte[] signaturePayload, HashAlgorithmName alg)
+        public bool CheckHash(byte[] payload, byte[] signaturePayload, HashAlgorithmName? alg = null)
         {
-            return _rsa.VerifyHash(payload, signaturePayload, alg, RSASignaturePadding.Pkcs1);
+            return _rsa.VerifyHash(payload, signaturePayload, alg.Value, RSASignaturePadding.Pkcs1);
         }
 
         public byte[] SignHash(byte[] content, HashAlgorithmName alg)
         {
             return _rsa.SignHash(content, alg, RSASignaturePadding.Pkcs1);
+        }
+
+        public SigningCredentials BuildSigningCredentials()
+        {
+            throw new NotImplementedException();
         }
     }
 }

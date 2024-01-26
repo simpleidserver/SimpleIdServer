@@ -112,8 +112,13 @@ public class X25519AgreementKey : IAgreementKey
         throw new NotSupportedException("Cannot be used for signing");
     }
 
-    public bool CheckHash(byte[] content, byte[] signature, HashAlgorithmName alg)
+    public bool CheckHash(byte[] content, byte[] signature, HashAlgorithmName? alg = null)
     {
         throw new NotSupportedException("Cannot be used for signing");
+    }
+
+    public SigningCredentials BuildSigningCredentials()
+    {
+        throw new NotImplementedException();
     }
 }

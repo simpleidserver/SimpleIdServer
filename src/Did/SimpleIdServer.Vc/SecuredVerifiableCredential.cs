@@ -1,9 +1,13 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
+using Org.BouncyCastle.Pkcs;
 using SimpleIdServer.Did.Crypto.Multicodec;
 using SimpleIdServer.Did.Encoders;
 using SimpleIdServer.Did.Models;
 using SimpleIdServer.Vc.Canonize;
+using SimpleIdServer.Vc.CredentialFormats.Serializers;
 using SimpleIdServer.Vc.Hashing;
 using SimpleIdServer.Vc.Models;
 using SimpleIdServer.Vc.Proofs;
@@ -11,6 +15,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -112,6 +118,59 @@ public class SecuredVerifiableCredential
         var signature = proof.GetSignature(dataIntegrityProof);
         var asymKey = _verificationMethodEncoding.Decode(verificationMethod);
         return asymKey.CheckHash(result.ToArray(), signature, proof.HashingMethod);
+    }
+
+    public string SecureJwt(
+        string issuer,
+        DidDocument didDocument,
+        string verificationMethodId,
+        W3CVerifiableCredential vcCredential)
+    {
+        if (didDocument == null) throw new ArgumentNullException(nameof(didDocument));
+        if (string.IsNullOrWhiteSpace(verificationMethodId)) throw new ArgumentNullException(nameof(verificationMethodId));
+        if (vcCredential == null) throw new ArgumentNullException(nameof(vcCredential));
+        var verificationMethod = didDocument.VerificationMethod.SingleOrDefault(m => m.Id == verificationMethodId);
+        if (verificationMethod == null) throw new ArgumentException($"The verification method {verificationMethodId} doesn't exist");
+        var asymKey = _verificationMethodEncoding.Decode(verificationMethod);
+        var signingCredentials = asymKey.BuildSigningCredentials();
+        var claims = new Dictionary<string, object>
+        {
+            { "sub", didDocument.Id },
+            { "vc", new W3CVerifiableCredentialJsonSerializer().SerializeToDic(vcCredential) }
+        };
+        var securityTokenDescriptor = new SecurityTokenDescriptor
+        {
+            Issuer = issuer,
+            IssuedAt = DateTime.UtcNow,
+            SigningCredentials = signingCredentials,
+            Claims = claims
+        };
+        var handler = new JsonWebTokenHandler();
+        var result = handler.CreateToken(securityTokenDescriptor);
+        return result;
+    }
+
+    public bool CheckJwt(
+        string jwt,
+        DidDocument didDocument)
+    {
+        if (string.IsNullOrWhiteSpace(jwt)) throw new ArgumentNullException(nameof(jwt));
+        if (didDocument == null) throw new ArgumentNullException(nameof(didDocument));
+        if (didDocument.AssertionMethod == null) throw new InvalidOperationException("There is no assertion method");
+        var assertionIds = didDocument.AssertionMethod.Select(m => m.ToString());
+        if (!assertionIds.Any()) throw new InvalidOperationException("There is no assertion method");
+        var assertionMethods = didDocument.VerificationMethod.Where(m => assertionIds.Contains(m.Id));
+        var handler = new JsonWebTokenHandler();
+        var jsonWebToken = handler.ReadJsonWebToken(jwt);
+        var content = Encoding.UTF8.GetBytes($"{jsonWebToken.EncodedHeader}.{jsonWebToken.EncodedPayload}");
+        var signature = Base64UrlEncoder.DecodeBytes(jsonWebToken.EncodedSignature);
+        foreach (var assertionMethod in assertionMethods)
+        {
+            var asymKey = _verificationMethodEncoding.Decode(assertionMethod);
+            if (asymKey.CheckHash(content, signature, HashAlgorithmName.SHA256)) return true;
+        }
+
+        return false;
     }
 
     private byte[] HashDocument(JsonObject jObj, ISignatureProof proof)

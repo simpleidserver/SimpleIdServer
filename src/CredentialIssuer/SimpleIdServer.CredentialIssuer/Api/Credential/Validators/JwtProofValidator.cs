@@ -1,18 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.IdentityModel.JsonWebTokens;
-using SimpleIdServer.Did;
-using SimpleIdServer.Did.Jwt;
-using SimpleIdServer.IdServer.CredentialIssuer.DTOs;
-using SimpleIdServer.IdServer.CredentialIssuer.Helpers;
-using SimpleIdServer.IdServer.Domains;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential.Validators
 {
+    /*
     public class JwtProofValidator : IProofValidator
     {
         private readonly IEnumerable<IIdentityDocumentExtractor> _didExtractors;
@@ -47,4 +38,5 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential.Validators
             return ProofValidationResult.Ok(cNonce.Value, expiresIn.Value, didDocument);
         }
     }
+    */
 }

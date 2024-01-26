@@ -8,7 +8,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
-namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential
+namespace SimpleIdServer.CredentialIssuer.Api.Credential
 {
     public class CredentialRequestConverter : JsonConverter<CredentialRequest>
     {

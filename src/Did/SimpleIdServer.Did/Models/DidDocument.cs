@@ -89,18 +89,6 @@ namespace SimpleIdServer.Did.Models
             VerificationMethod.Add(verificationMethod);
         }
 
-        public void AddAuthentication(string authentication)
-        {
-            // if (Authentication == null) Authentication = new List<string>();
-            // Authentication.Add(authentication);
-        }
-
-        public void AddAssertionMethod(string assertionMethod)
-        {
-            // if(AssertionMethod == null) AssertionMethod = new List<string>();
-            // AssertionMethod.Add(assertionMethod);
-        }
-
         public void AddService(DidDocumentService service, bool isStandard = true)
         {
             if (Service == null) Service = new List<DidDocumentService>();

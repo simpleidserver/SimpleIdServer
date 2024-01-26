@@ -5,7 +5,7 @@ using SimpleIdServer.IdServer.CredentialIssuer.DTOs;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace SimpleIdServer.IdServer.CredentialIssuer.Api.Credential
+namespace SimpleIdServer.CredentialIssuer.Api.Credential
 {
     [JsonConverter(typeof(CredentialProofRequestConverter))]
     public class CredentialProofRequest

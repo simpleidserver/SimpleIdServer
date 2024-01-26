@@ -13,6 +13,8 @@ public class UserCredentialClaimStore : IUserCredentialClaimStore
 {
     public Task<List<UserCredentialClaim>> Resolve(string subject, List<CredentialTemplateClaim> claims)
     {
+        // degree.name
+        // degree.type 
         throw new NotImplementedException();
     }
 }

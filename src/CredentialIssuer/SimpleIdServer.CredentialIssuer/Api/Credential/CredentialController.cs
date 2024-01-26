@@ -7,13 +7,11 @@ using SimpleIdServer.CredentialIssuer.CredentialFormats;
 using SimpleIdServer.CredentialIssuer.Domains;
 using SimpleIdServer.CredentialIssuer.Store;
 using SimpleIdServer.IdServer.CredentialIssuer;
-using SimpleIdServer.IdServer.CredentialIssuer.Api.Credential.Formats;
 using SimpleIdServer.IdServer.CredentialIssuer.Api.Credential.Validators;
 using SimpleIdServer.IdServer.CredentialIssuer.DTOs;
 using SimpleIdServer.IdServer.CredentialIssuer.Extractors;
 using SimpleIdServer.IdServer.CredentialIssuer.Parsers;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Text.Json.Nodes;
@@ -29,7 +27,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
         private readonly ICredentialTemplateClaimsExtractor _claimsExtractor;
         private readonly IEnumerable<ICredentialFormatter> _formatters;
         private readonly ICredentialTemplateStore _credentialTemplateStore;
-        private readonly IUserCredentialStore _userCredentialClaimStore;
+        private readonly IUserCredentialClaimStore _userCredentialClaimStore;
         private readonly ILogger<CredentialController> _logger;
 
         public CredentialController(
@@ -57,12 +55,10 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
             var subject = User.FindFirst("sub").Value;
             var validationResult = await Validate(request, cancellationToken);
             if (validationResult.ErrorResult != null) return Build(validationResult.ErrorResult.Value);
-
             var credentialTemplateClaims = validationResult.CredentialTemplate.Claims;
             var userCredentials = await _userCredentialClaimStore.Resolve(subject, credentialTemplateClaims);
             var formatter = validationResult.Formatter;
-
-            
+            /*
             // jwt_vs_json, type ["VerifiableCredential", "UniversityDegreeCredential"]
             // mso_mdoc, doctype : org.iso.18013.5.1.mDL
             // CredentialTemplate
@@ -75,8 +71,10 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
             var extractedClaims = await _claimsExtractor.ExtractClaims(context, extractionResult.CredentialTemplate);
             var format = _formats.Single(v => v.Format == request.Format);
             var result = format.Transform(new CredentialFormatParameter(extractedClaims, user, validationResult.IdentityDocument, extractionResult.CredentialTemplate, context.GetIssuer(), validationResult.CNonce, validationResult.CNonceExpiresIn));
-            activity?.SetStatus(ActivityStatusCode.Ok, "Credential issued");
+            
             return new OkObjectResult(result);
+            */
+            return null;
         }
 
         private async Task<ValidationResult> Validate(CredentialRequest credentialRequest, CancellationToken cancellationToken)
@@ -116,6 +114,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
             return ValidationResult.Ok(formatter, credentialTemplate);
         }
 
+        /*
         protected async Task<ExtractionResult> ValidateRequest(CredentialRequest request, JsonWebToken jsonWebToken, CancellationToken cancellationToken)
         {
             if (request == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.CREDENTIAL_REQUEST_INVALID);
@@ -147,6 +146,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
             if (!string.IsNullOrWhiteSpace(validationResult.ErrorMessage)) throw new OAuthException(ErrorCodes.INVALID_PROOF, validationResult.ErrorMessage);
             return validationResult;
         }
+        */
 
         private record ValidationResult
         {

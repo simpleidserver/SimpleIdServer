@@ -66,7 +66,7 @@ public abstract class BaseESSignatureKey : IAsymmetricKey
         }
     }
 
-    public bool CheckHash(byte[] content, byte[] signature, HashAlgorithmName alg)
+    public bool CheckHash(byte[] content, byte[] signature, HashAlgorithmName? alg = null)
     {
         if (content == null) throw new ArgumentNullException(nameof(content));
         if (signature == null) throw new ArgumentNullException(nameof(signature));
@@ -154,5 +154,10 @@ public abstract class BaseESSignatureKey : IAsymmetricKey
         var keyPair = generator.GenerateKeyPair();
         _publicKey = keyPair.Public as ECPublicKeyParameters;
         _privateKey = keyPair.Private as ECPrivateKeyParameters;
+    }
+
+    public SigningCredentials BuildSigningCredentials()
+    {
+        throw new NotImplementedException();
     }
 }
