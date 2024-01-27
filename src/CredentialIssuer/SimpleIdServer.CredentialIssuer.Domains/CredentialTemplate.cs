@@ -9,6 +9,7 @@ public class CredentialTemplate
 {
     public string Id { get; set; }
     public string JsonLdContext { get; set; }
+    public string Format { get; set; }
     public DateTime CreateDateTime { get; set; }
     public DateTime UpdateDateTime { get; set; }
     public List<CredentialTemplateClaim> Claims { get; set; }

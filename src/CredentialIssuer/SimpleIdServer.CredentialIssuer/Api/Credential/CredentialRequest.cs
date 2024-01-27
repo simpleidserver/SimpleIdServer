@@ -1,19 +1,15 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.CredentialIssuer.Converters;
 using SimpleIdServer.IdServer.CredentialIssuer.DTOs;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.CredentialIssuer.Api.Credential
 {
-    [JsonConverter(typeof(CredentialRequestConverter))]
+    [JsonConverter(typeof(OtherDataConverter))]
     public class CredentialRequest
     {
-        // format: mso_mdoc
-        // doctype : org.iso.18013.5.1.mDL
-
-        // 
-
         /// <summary>
         /// Format of the Credential to be issued.
         /// The Credential format identifier determines further parameters required to determine the type and (optionally) the content of the credential to be issued.

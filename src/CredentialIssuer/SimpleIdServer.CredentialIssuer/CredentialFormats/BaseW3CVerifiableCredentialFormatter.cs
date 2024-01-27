@@ -1,4 +1,5 @@
-﻿using SimpleIdServer.Vc.Models;
+﻿using SimpleIdServer.Did.Models;
+using SimpleIdServer.Vc.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,8 @@ public abstract class BaseW3CVerifiableCredentialFormatter : ICredentialFormatte
     {
         return null;
     }
+
+    public abstract JsonNode Build(BuildCredentialRequest request, DidDocument didDocument, string verificationMethodId);
 
     protected W3CVerifiableCredential BuildCredential(BuildCredentialRequest request, bool includeContext = true)
     {

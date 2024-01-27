@@ -1,16 +1,15 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.CredentialIssuer.CredentialFormats;
 using SimpleIdServer.CredentialIssuer.Domains;
 using SimpleIdServer.CredentialIssuer.Store;
 using SimpleIdServer.IdServer.CredentialIssuer;
 using SimpleIdServer.IdServer.CredentialIssuer.Api.Credential.Validators;
 using SimpleIdServer.IdServer.CredentialIssuer.DTOs;
-using SimpleIdServer.IdServer.CredentialIssuer.Extractors;
-using SimpleIdServer.IdServer.CredentialIssuer.Parsers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,30 +22,22 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
 {
     public class CredentialController : BaseController
     {
-        private readonly IEnumerable<ICredentialRequestParser> _parsers;
-        private readonly IEnumerable<IProofValidator> _proofValidators;
-        private readonly ICredentialTemplateClaimsExtractor _claimsExtractor;
         private readonly IEnumerable<ICredentialFormatter> _formatters;
         private readonly ICredentialTemplateStore _credentialTemplateStore;
         private readonly IUserCredentialClaimStore _userCredentialClaimStore;
-        private readonly ILogger<CredentialController> _logger;
+        private readonly CredentialIssuerOptions _options;
 
         public CredentialController(
-            IEnumerable<ICredentialRequestParser> parsers, 
             IEnumerable<IProofValidator> proofValidators, 
-            ICredentialTemplateClaimsExtractor claimsExtractor,
             IEnumerable<ICredentialFormatter> formatters,
             ICredentialTemplateStore credentialTemplateStore,
             IUserCredentialClaimStore userCredentialClaimStore,
-            ILogger<CredentialController> logger)
+            IOptions<CredentialIssuerOptions> options)
         {
-            _parsers = parsers;
-            _proofValidators = proofValidators;
-            _claimsExtractor = claimsExtractor;
             _formatters = formatters;
             _credentialTemplateStore = credentialTemplateStore;
             _userCredentialClaimStore = userCredentialClaimStore;
-            _logger = logger;
+            _options = options.Value;
         }
 
         [HttpPost(Constants.EndPoints.Credential)]
@@ -54,13 +45,12 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
         public async Task<IActionResult> Get([FromRoute] string prefix, [FromBody] CredentialRequest request, CancellationToken cancellationToken)
         {
             var subject = User.FindFirst("sub").Value;
+            var issuer = Request.GetAbsoluteUriWithVirtualPath();
             var validationResult = await Validate(request, cancellationToken);
             if (validationResult.ErrorResult != null) return Build(validationResult.ErrorResult.Value);
             var credentialTemplateClaims = validationResult.CredentialTemplate.Claims;
             var userCredentials = await _userCredentialClaimStore.Resolve(subject, credentialTemplateClaims);
             var formatter = validationResult.Formatter;
-            // Pass DID + verification method id + different parameters.
-            // Build correct json.
             var result = formatter.Build(new BuildCredentialRequest
             {
                 JsonLdContext = validationResult.CredentialTemplate.JsonLdContext,
@@ -70,25 +60,14 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
                 // ValidFrom - from credential template ??
                 // ValidUntil - from credential template ??
                 Id = Guid.NewGuid().ToString(), // What is the identifier ??? // https://www.w3.org/TR/vc-data-model-2.0/#identifiers
-                Issuer = "ULR???"
-            }, null, null);
-            return null;
-            /*
-            // jwt_vs_json, type ["VerifiableCredential", "UniversityDegreeCredential"]
-            // mso_mdoc, doctype : org.iso.18013.5.1.mDL
-            // CredentialTemplate
+                Issuer = issuer
+            }, _options.DidDocument, _options.VerificationMethodId);
 
-            var extractionResult = await ValidateRequest(request, token, cancellationToken);
-            var user = await _authenticationHelper.GetUserByLogin(token.Subject, prefix, cancellationToken);
-            var validationResult = await CheckProof(request, user, cancellationToken);
-            context.SetClient(null);
-            context.SetUser(user, null);
-            var extractedClaims = await _claimsExtractor.ExtractClaims(context, extractionResult.CredentialTemplate);
-            var format = _formats.Single(v => v.Format == request.Format);
-            var result = format.Transform(new CredentialFormatParameter(extractedClaims, user, validationResult.IdentityDocument, extractionResult.CredentialTemplate, context.GetIssuer(), validationResult.CNonce, validationResult.CNonceExpiresIn));
-            
-            return new OkObjectResult(result);
-            */
+            return new OkObjectResult(new CredentialResult
+            {
+                Format = validationResult.CredentialTemplate.Format,
+                Credential = result
+            });
         }
 
         private async Task<ValidationResult> Validate(CredentialRequest credentialRequest, CancellationToken cancellationToken)
@@ -102,6 +81,13 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
             if(atCredentialIdentifiers == null && string.IsNullOrWhiteSpace(credentialRequest.Format))
                 return ValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, CredentialRequestNames.Format)));
 
+
+            if(credentialRequest.Proof != null)
+            {
+
+            }
+            // proof_type = jwt
+            // proof_type = cwt
             // Proof.
 
             if(atCredentialIdentifiers != null && string.IsNullOrWhiteSpace(credentialRequest.Credentialidentifier))
@@ -127,40 +113,6 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
 
             return ValidationResult.Ok(formatter, credentialTemplate);
         }
-
-        /*
-        protected async Task<ExtractionResult> ValidateRequest(CredentialRequest request, JsonWebToken jsonWebToken, CancellationToken cancellationToken)
-        {
-            if (request == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.CREDENTIAL_REQUEST_INVALID);
-            if (string.IsNullOrWhiteSpace(request.Format)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, CredentialRequestNames.Format));
-            var parser = _parsers.SingleOrDefault(p => p.Format == request.Format);
-            if (parser == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_FORMAT, request.Format));
-            var extractionResult = await parser.Extract(request, cancellationToken);
-            if (!string.IsNullOrWhiteSpace(extractionResult.ErrorMessage)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, extractionResult.ErrorMessage);
-            var serializedClaims = jsonWebToken.GetClaimJson();
-            var authDetails = serializedClaims.GetAuthorizationDetailsFromAuthorizationRequest();
-            IEnumerable<AuthorizationData> filteredAuthDefailts;
-            if (authDetails != null && (filteredAuthDefailts = authDetails.Where(a => a.Type == Constants.StandardAuthorizationDetails.OpenIdCredential)).Any())
-            {
-                var validationResult = extractionResult.Request.Validate(filteredAuthDefailts);
-                if (!string.IsNullOrWhiteSpace(validationResult.ErrorMessage)) throw new OAuthUnauthorizedException(ErrorCodes.INVALID_REQUEST, validationResult.ErrorMessage);
-                return extractionResult;
-            }
-
-            throw new OAuthUnauthorizedException(ErrorCodes.INVALID_REQUEST, ErrorMessages.UNAUHTORIZED_TO_ACCESS_TO_CREDENTIAL);
-        }
-
-        protected async Task<ProofValidationResult> CheckProof(CredentialRequest request, User user, CancellationToken cancellationToken)
-        {
-            if (request.Proof == null) return null;
-            if (string.IsNullOrWhiteSpace(request.Proof.ProofType)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, CredentialRequestNames.ProofType));
-            var proofValidator = _proofValidators.FirstOrDefault(v => v.Type == request.Proof.ProofType);
-            if (proofValidator == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_PROOF_TYPE, request.Proof.ProofType));
-            var validationResult = await proofValidator.Validate(request.Proof, user, cancellationToken);
-            if (!string.IsNullOrWhiteSpace(validationResult.ErrorMessage)) throw new OAuthException(ErrorCodes.INVALID_PROOF, validationResult.ErrorMessage);
-            return validationResult;
-        }
-        */
 
         private record ValidationResult
         {

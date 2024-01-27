@@ -3,6 +3,7 @@
 using SimpleIdServer.Did.Models;
 using SimpleIdServer.Vc;
 using System;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.CredentialIssuer.CredentialFormats;
 
@@ -13,7 +14,7 @@ public class JwtVcJsonLdFormatter : BaseW3CVerifiableCredentialFormatter
 {
     public override string Format => "jwt_vc_json-ld";
 
-    public string Build(BuildCredentialRequest request, DidDocument didDocument, string verificationMethodId)
+    public override JsonNode Build(BuildCredentialRequest request, DidDocument didDocument, string verificationMethodId)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
         if (didDocument == null) throw new ArgumentNullException(nameof(didDocument));

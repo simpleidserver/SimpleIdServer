@@ -12,7 +12,7 @@ public interface ICredentialFormatter
 {
     public string Format { get; }
     CredentialHeader ExtractHeader(JsonObject jsonObj);
-    string Build(BuildCredentialRequest request, DidDocument didDocument, string verificationMethodId);
+    JsonNode Build(BuildCredentialRequest request, DidDocument didDocument, string verificationMethodId);
 }
 
 public class BuildCredentialRequest

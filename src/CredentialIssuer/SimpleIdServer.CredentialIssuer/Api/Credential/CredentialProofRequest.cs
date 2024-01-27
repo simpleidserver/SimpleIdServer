@@ -1,13 +1,14 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using SimpleIdServer.CredentialIssuer.Converters;
 using SimpleIdServer.IdServer.CredentialIssuer.DTOs;
-using System.Collections.Generic;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.CredentialIssuer.Api.Credential
 {
-    [JsonConverter(typeof(CredentialProofRequestConverter))]
+    [JsonConverter(typeof(OtherDataConverter))]
     public class CredentialProofRequest
     {
         /// <summary>
@@ -17,6 +18,6 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
         public string ProofType { get; set; }
 
         [JsonIgnore]
-        public Dictionary<string, string> Parameters { get; set; } = new Dictionary<string, string>();
+        public JsonObject Data { get; set; }
     }
 }

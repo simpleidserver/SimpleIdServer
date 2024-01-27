@@ -1,149 +1,37 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using QRCoder;
-using SimpleIdServer.IdServer.Api;
-using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.CredentialIssuer.DTOs;
-using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Exceptions;
-using SimpleIdServer.IdServer.Helpers;
-using SimpleIdServer.IdServer.Jwt;
-using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialOffer
+namespace SimpleIdServer.CredentialIssuer.Api.CredentialOffer
 {
     public class CredentialOfferController : BaseController
     {
-        private readonly ICredentialTemplateRepository _credentialTemplateRepository;
-        private readonly ICredentialOfferRepository _credentialOfferRepository;
-        private readonly IAuthenticationHelper _authenticationHelper;
-        private readonly IClientRepository _clientRepository;
-        private readonly IEnumerable<IUserNotificationService> _notificationServices;
-        private readonly IGrantedTokenHelper _grantedTokenHelper;
-        private readonly UrlEncoder _urlEncoder;
-        private readonly IdServerHostOptions _options;
-
-        public CredentialOfferController(
-            ICredentialTemplateRepository credentialTemplateRepository, 
-            ICredentialOfferRepository credentialOfferRepository, 
-            IAuthenticationHelper authenticationHelper, 
-            IClientRepository clientRepository,
-            IEnumerable<IUserNotificationService> notificationServices, 
-            IGrantedTokenHelper grantedTokenHelper, 
-            ITokenRepository tokenRepository,
-            IJwtBuilder jwtBuilder,
-            UrlEncoder urlEncoder, 
-            IOptions<IdServerHostOptions> options) : base(tokenRepository, jwtBuilder)
+        public CredentialOfferController()
         {
-            _credentialTemplateRepository = credentialTemplateRepository;
-            _credentialOfferRepository = credentialOfferRepository;
-            _authenticationHelper = authenticationHelper;
-            _clientRepository = clientRepository;
-            _notificationServices = notificationServices;
-            _grantedTokenHelper = grantedTokenHelper;
-            _urlEncoder = urlEncoder;
-            _options = options.Value;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create()
+        {
+            // create a credential offer.
         }
 
         [HttpPost]
         public async Task<IActionResult> ClientShareQR([FromRoute] string prefix, string id, [FromBody] ShareCredentialTemplateRequest request, CancellationToken cancellationToken)
         {
-            prefix = prefix ?? SimpleIdServer.IdServer.Constants.DefaultRealm;
-            try
-            {
-                await CheckAccessToken(prefix, IdServer.Constants.StandardScopes.CredentialOffer.Name);
-                var kvp = await InternalShare(prefix, id, request, cancellationToken);
-                if (kvp.Item1 != null) return kvp.Item1;
-                return GetQRCode(kvp.Item2);
-            }
-            catch (OAuthException ex)
-            {
-                return BuildError(ex);
-            }
         }
 
-        [HttpPost]
-        public async Task<IActionResult> ClientShare([FromRoute] string prefix, string id, [FromBody] ShareCredentialTemplateRequest request, CancellationToken cancellationToken)
-        {
-            prefix = prefix ?? SimpleIdServer.IdServer.Constants.DefaultRealm;
-            try
-            {
-                await CheckAccessToken(prefix, IdServer.Constants.StandardScopes.CredentialOffer.Name);
-                var kvp = await InternalShare(prefix, id, request, cancellationToken);
-                if (kvp.Item1 != null) return kvp.Item1;
-                return Redirect(kvp.Item2.Url);
-            }
-            catch (OAuthException ex)
-            {
-                return BuildError(ex);
-            }
-        }
-
-        [HttpPost]
-        [Authorize(IdServer.Constants.Policies.Authenticated)]
-        public async Task<IActionResult> ShareQR([FromRoute] string prefix, [FromBody] ShareCredentialTemplateRequest request, CancellationToken cancellationToken)
-        {
-            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var kvp = await InternalShare(prefix, nameIdentifier, request, cancellationToken);
-            if (kvp.Item1 != null) return kvp.Item1;
-            return GetQRCode(kvp.Item2);
-        }
-
-        [HttpPost]
-        [Authorize(IdServer.Constants.Policies.Authenticated)]
-        public async Task<IActionResult> Share([FromRoute] string prefix, [FromBody] ShareCredentialTemplateRequest request, CancellationToken cancellationToken)
-        {
-            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var kvp = await InternalShare(prefix, nameIdentifier, request, cancellationToken);
-            if (kvp.Item1 != null) return kvp.Item1;
-            return Redirect(kvp.Item2.Url);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> GetQRCode([FromRoute] string prefix, string id, CancellationToken cancellationToken)
-        {
-            try
-            {
-                var result = await InternalGet(prefix, id, cancellationToken);
-                if (result.Code != HttpStatusCode.OK) return BuildError(result.Code, result.ErrorCode, result.ErrorMessage);
-                return GetQRCode(result);
-            }
-            catch (OAuthException ex)
-            {
-                return BuildError(HttpStatusCode.BadRequest, ex.Code, ex.Message);
-            }
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Get([FromRoute] string prefix, string id, CancellationToken cancellationToken)
-        {
-            try
-            {
-                var result = await InternalGet(prefix, id, cancellationToken);
-                if (result.Code != HttpStatusCode.OK) return BuildError(result.Code, result.ErrorCode, result.ErrorMessage);
-                return Redirect(result.Url);
-            }
-            catch (OAuthException ex)
-            {
-                return BuildError(HttpStatusCode.BadRequest, ex.Code, ex.Message);
-            }
-        }
 
         private async Task<CredentialOfferBuildResult> InternalGet(string prefix, string id, CancellationToken cancellationToken)
         {

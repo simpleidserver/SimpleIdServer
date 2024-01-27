@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.IdServer.CredentialIssuer.DTOs;
 using System.Collections.Generic;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialOffer
@@ -19,6 +20,6 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialOffer
         /// A JSON object indicating to the Wallet the Grant Types the Credential Issuer's AS is prepared to process for this credential offer.
         /// </summary>
         [JsonPropertyName(CredentialOfferResultNames.Grants)]
-        public Dictionary<string, object> Grants { get; set; } = new Dictionary<string, object>();
+        public Dictionary<string, JsonObject> Grants { get; set; } = new Dictionary<string, JsonObject>();
     }
 }

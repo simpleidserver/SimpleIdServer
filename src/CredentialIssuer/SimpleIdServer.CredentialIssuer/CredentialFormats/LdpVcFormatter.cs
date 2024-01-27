@@ -4,6 +4,7 @@ using SimpleIdServer.Did.Models;
 using SimpleIdServer.Vc;
 using SimpleIdServer.Vc.CredentialFormats.Serializers;
 using System;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.CredentialIssuer.CredentialFormats
 {
@@ -11,14 +12,14 @@ namespace SimpleIdServer.CredentialIssuer.CredentialFormats
     {
         public override string Format => "ldp_vc";
 
-        public string Build(BuildCredentialRequest request, DidDocument didDocument, string verificationMethodId)
+        public override JsonNode Build(BuildCredentialRequest request, DidDocument didDocument, string verificationMethodId)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
             if (didDocument == null) throw new ArgumentNullException(nameof(didDocument));
             var credential = BuildCredential(request, true);
             var json = new W3CVerifiableCredentialJsonSerializer().Serialize(credential);
-            return SecuredVerifiableCredential.New()
-                .Secure(json, didDocument, verificationMethodId);
+            return JsonObject.Parse(SecuredVerifiableCredential.New()
+                .Secure(json, didDocument, verificationMethodId));
         }
     }
 }
