@@ -169,7 +169,8 @@ namespace SimpleIdServer.IdServer.Startup
 
         public static ICollection<Language> Languages => new List<Language>
         {
-            LanguageBuilder.Build(Language.Default).AddDescription("English").Build()
+            LanguageBuilder.Build(Language.Default).AddDescription("English", Language.Default).AddDescription("Anglais", "fr").Build(),
+            LanguageBuilder.Build("fr").AddDescription("French", Language.Default).AddDescription("Français", "fr").Build()
         };
 
         public static ICollection<AuthenticationSchemeProvider> Providers => new List<AuthenticationSchemeProvider>

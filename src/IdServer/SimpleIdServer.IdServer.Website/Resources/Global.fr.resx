@@ -430,7 +430,7 @@
     <value>Scope resources have been removed</value>
   </data>
   <data name="Manage" xml:space="preserve">
-    <value>Manage</value>
+    <value>Gérer</value>
   </data>
   <data name="IdProvisioningMapperUpdated" xml:space="preserve">
     <value>The identity provisioning mapping rule has been updated</value>
@@ -448,10 +448,10 @@
     <value>Auditing</value>
   </data>
   <data name="Authentication" xml:space="preserve">
-    <value>Authentication</value>
+    <value>Authentification</value>
   </data>
   <data name="AuthenticationContext" xml:space="preserve">
-    <value>Authentication Context</value>
+    <value>Contexte d'authentification</value>
   </data>
   <data name="AutomaticIdProvisioning" xml:space="preserve">
     <value>Automatic Identity Provisioning</value>
@@ -469,7 +469,7 @@
     <value>Credential Management</value>
   </data>
   <data name="Groups" xml:space="preserve">
-    <value>Groups</value>
+    <value>Groupes</value>
   </data>
   <data name="IdProvisioning" xml:space="preserve">
     <value>Identity Provisioning</value>
@@ -481,9 +481,9 @@
     <value>Scopes</value>
   </data>
   <data name="UserManagement" xml:space="preserve">
-    <value>User Management</value>
+    <value>Gérer les utilisateurs</value>
   </data>
   <data name="Users" xml:space="preserve">
-    <value>Users</value>
+    <value>Utilisateurs</value>
   </data>
 </root>

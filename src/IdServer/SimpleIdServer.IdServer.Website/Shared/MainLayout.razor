@@ -51,19 +51,19 @@
     {
         <RadzenSidebar @bind-Expanded="@sidebarExpanded">
             <RadzenPanelMenu>
-                <RadzenPanelMenuItem Text=@("Active Realm : " + activeRealm) Path="/realm" />
+                <RadzenPanelMenuItem Text=@(string.Format(Global.ActiveRealm, activeRealm)) Path="/realm" />
                 <RadzenPanelMenuItem Text="@Global.Manage" />
-                <RadzenPanelMenuItem Text="Clients" Icon="apps" Path="/clients" />
-                <RadzenPanelMenuItem Text="Scopes" Icon="visibility" Path="/scopes" />
-                <RadzenPanelMenuItem Text="User Management">
-                    <RadzenPanelMenuItem Text="Users" Icon="person" Path="/users" />
-                    <RadzenPanelMenuItem Text="Groups" Icon="group" Path="/groups" />
+                <RadzenPanelMenuItem Text="@Global.Clients" Icon="apps" Path="/clients" />
+                <RadzenPanelMenuItem Text="@Global.Scopes" Icon="visibility" Path="/scopes" />
+                <RadzenPanelMenuItem Text="@Global.UserManagement">
+                    <RadzenPanelMenuItem Text="@Global.Users" Icon="person" Path="/users" />
+                    <RadzenPanelMenuItem Text="@Global.Groups" Icon="group" Path="/groups" />
                 </RadzenPanelMenuItem>
-                <RadzenPanelMenuItem Text="Authentication">
-                    <RadzenPanelMenuItem Text="Authentication Context" Icon="security" Path="/acrs" />
-                    <RadzenPanelMenuItem Text="Authentication" Icon="person" Path="/authentications/authmethods" />
+                <RadzenPanelMenuItem Text="@Global.Authentication">
+                    <RadzenPanelMenuItem Text="@Global.AuthenticationContext" Icon="security" Path="/acrs" />
+                    <RadzenPanelMenuItem Text="@Global.Authentication" Icon="person" Path="/authentications/authmethods" />
                 </RadzenPanelMenuItem>
-                <RadzenPanelMenuItem Text="Credential Management">
+                <RadzenPanelMenuItem Text="@Global.CredentialManagement">
                     <RadzenPanelMenuItem Icon="wallet" Path="/credentialtemplates">
                         <Template>
                             <span class="rz-navigation-item-text">Credential templates</span>
@@ -77,13 +77,13 @@
                         </Template>    
                     </RadzenPanelMenuItem>
                 </RadzenPanelMenuItem>
-                <RadzenPanelMenuItem Text="Identity Provisioning">
-                    <RadzenPanelMenuItem Text="Manual Identity Provisioning" Icon="back_hand" Path="/registrationworkflows"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="Automatic Identity Provisioning" Icon="refresh" Path="/identityprovisioning" />
+                <RadzenPanelMenuItem Text="@Global.IdProvisioning">
+                    <RadzenPanelMenuItem Text="@Global.ManualIdProvisioning" Icon="back_hand" Path="/registrationworkflows"></RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem Text="@Global.AutomaticIdProvisioning" Icon="refresh" Path="/identityprovisioning" />
                 </RadzenPanelMenuItem>
-                <RadzenPanelMenuItem Text="Configure" />
-                <RadzenPanelMenuItem Text="Certificate Authorities" Icon="shield" Path="/certificateauthorities" />
-                <RadzenPanelMenuItem Text="Auditing" Icon="source" Path="/auditing" />
+                <RadzenPanelMenuItem Text="@Global.Configure" />
+                <RadzenPanelMenuItem Text="@Global.CertificateAuth" Icon="shield" Path="/certificateauthorities" />
+                <RadzenPanelMenuItem Text="@Global.Auditing" Icon="source" Path="/auditing" />
             </RadzenPanelMenu>
         </RadzenSidebar>
         <RadzenBody>
