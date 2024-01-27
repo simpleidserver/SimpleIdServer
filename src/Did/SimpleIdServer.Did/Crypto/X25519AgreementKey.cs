@@ -21,6 +21,8 @@ public class X25519AgreementKey : IAgreementKey
 
     public string CrvOrSize => Constants.StandardCrvOrSize.X25519;
 
+    public string JwtAlg => Constants.StandardJwtAlgs.X25519;
+
     public static X25519AgreementKey From(byte[] publicKey, byte[] privateKey)
     {
         var result = new X25519AgreementKey();

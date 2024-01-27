@@ -11,6 +11,7 @@ using SimpleIdServer.IdServer.CredentialIssuer.Api.Credential.Validators;
 using SimpleIdServer.IdServer.CredentialIssuer.DTOs;
 using SimpleIdServer.IdServer.CredentialIssuer.Extractors;
 using SimpleIdServer.IdServer.CredentialIssuer.Parsers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -58,6 +59,20 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
             var credentialTemplateClaims = validationResult.CredentialTemplate.Claims;
             var userCredentials = await _userCredentialClaimStore.Resolve(subject, credentialTemplateClaims);
             var formatter = validationResult.Formatter;
+            // Pass DID + verification method id + different parameters.
+            // Build correct json.
+            var result = formatter.Build(new BuildCredentialRequest
+            {
+                JsonLdContext = validationResult.CredentialTemplate.JsonLdContext,
+                Type = validationResult.CredentialTemplate.Id,
+                Subject = subject,
+                UserCredentialClaims = userCredentials,
+                // ValidFrom - from credential template ??
+                // ValidUntil - from credential template ??
+                Id = Guid.NewGuid().ToString(), // What is the identifier ??? // https://www.w3.org/TR/vc-data-model-2.0/#identifiers
+                Issuer = "ULR???"
+            }, null, null);
+            return null;
             /*
             // jwt_vs_json, type ["VerifiableCredential", "UniversityDegreeCredential"]
             // mso_mdoc, doctype : org.iso.18013.5.1.mDL
@@ -74,7 +89,6 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
             
             return new OkObjectResult(result);
             */
-            return null;
         }
 
         private async Task<ValidationResult> Validate(CredentialRequest credentialRequest, CancellationToken cancellationToken)

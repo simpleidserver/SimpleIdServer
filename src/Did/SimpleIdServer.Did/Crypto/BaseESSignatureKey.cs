@@ -7,6 +7,7 @@ using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Crypto.Signers;
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Security;
+using SimpleIdServer.Did.Crypto.SecurityKeys;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
@@ -28,6 +29,8 @@ public abstract class BaseESSignatureKey : IAsymmetricKey
     public string Kty => Constants.StandardKty.EC;
 
     public abstract string CrvOrSize { get; }
+
+    public abstract string JwtAlg { get; }
 
     public void Import(byte[] publicKey, byte[] privateKey)
     {
@@ -126,7 +129,7 @@ public abstract class BaseESSignatureKey : IAsymmetricKey
         return result;
     }
 
-    private static ECDSASignature ExtractSignature(byte[] payload)
+    public static ECDSASignature ExtractSignature(byte[] payload)
     {
         byte? v = null;
         if (payload.Length > 64)
@@ -158,6 +161,7 @@ public abstract class BaseESSignatureKey : IAsymmetricKey
 
     public SigningCredentials BuildSigningCredentials()
     {
-        throw new NotImplementedException();
+        var result = new SigningCredentials(new EsSecurityKey(_curve, _publicKey, _privateKey), JwtAlg);
+        return result;
     }
 }

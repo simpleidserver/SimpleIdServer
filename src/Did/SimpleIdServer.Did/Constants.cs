@@ -46,6 +46,16 @@ public static class Constants
         public const string RSA2048 = "2048+";
     }
 
+    public static class StandardJwtAlgs
+    {
+        public const string Es256K = "ES256K";
+        public const string EdDsa = "EdDSA";
+        public const string Es256 = "ES256";
+        public const string Es384 = "ES384";
+        public const string Rsa = "RS256";
+        public const string X25519 = "X25519";
+    }
+
     public const string DefaultIdentityDocumentContext = "https://www.w3.org/ns/did/v1";
     public const string Scheme = "did";
 }

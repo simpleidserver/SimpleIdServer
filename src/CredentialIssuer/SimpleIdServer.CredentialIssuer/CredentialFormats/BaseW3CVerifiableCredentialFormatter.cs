@@ -1,4 +1,4 @@
-﻿using SimpleIdServer.CredentialIssuer.CredentialFormats.Models;
+﻿using SimpleIdServer.Vc.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

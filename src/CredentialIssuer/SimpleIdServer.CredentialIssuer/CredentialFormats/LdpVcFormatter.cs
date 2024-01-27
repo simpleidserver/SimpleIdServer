@@ -1,8 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.CredentialIssuer.CredentialFormats.Serializer;
 using SimpleIdServer.Did.Models;
 using SimpleIdServer.Vc;
+using SimpleIdServer.Vc.CredentialFormats.Serializers;
 using System;
 
 namespace SimpleIdServer.CredentialIssuer.CredentialFormats
@@ -15,9 +15,10 @@ namespace SimpleIdServer.CredentialIssuer.CredentialFormats
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
             if (didDocument == null) throw new ArgumentNullException(nameof(didDocument));
-            var credential = BuildCredential(request);
+            var credential = BuildCredential(request, true);
             var json = new W3CVerifiableCredentialJsonSerializer().Serialize(credential);
-            return SecuredVerifiableCredential.New().Secure(json, didDocument, verificationMethodId);
+            return SecuredVerifiableCredential.New()
+                .Secure(json, didDocument, verificationMethodId);
         }
     }
 }

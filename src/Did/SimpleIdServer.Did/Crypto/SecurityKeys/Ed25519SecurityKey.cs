@@ -23,6 +23,7 @@ public class Ed25519SecurityKey : AsymmetricSecurityKey
         _publicKey = publicKey;
         _privateKey = privateKey;
     }
+
     public Ed25519PublicKeyParameters PublicKey => _publicKey;
     public Ed25519PrivateKeyParameters PrivateKey => _privateKey;
 
@@ -61,7 +62,7 @@ public class Ed25519CryptoProvider : ICryptoProvider
 
     public bool IsSupportedAlgorithm(string algorithm, params object[] args)
     {
-        return algorithm == Constants.StandardCrvOrSize.Ed25519;
+        return algorithm == Constants.StandardJwtAlgs.EdDsa;
     }
 
     public void Release(object cryptoInstance) { }

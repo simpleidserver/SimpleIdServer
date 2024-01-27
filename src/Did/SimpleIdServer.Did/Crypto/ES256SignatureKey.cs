@@ -12,6 +12,8 @@ public class ES256SignatureKey : BaseESSignatureKey
 
     public override string CrvOrSize => Constants.StandardCrvOrSize.P256;
 
+    public override string JwtAlg => Constants.StandardJwtAlgs.Es256;
+
     public static ES256SignatureKey Generate()
     {
         var result = new ES256SignatureKey();

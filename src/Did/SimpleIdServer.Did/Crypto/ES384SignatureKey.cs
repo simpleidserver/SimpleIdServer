@@ -14,6 +14,8 @@ public class ES384SignatureKey : BaseESSignatureKey
 
     public override string CrvOrSize => Constants.StandardCrvOrSize.P384;
 
+    public override string JwtAlg => Constants.StandardJwtAlgs.Es384;
+
     public static ES384SignatureKey Generate()
     {
         var result = new ES384SignatureKey();

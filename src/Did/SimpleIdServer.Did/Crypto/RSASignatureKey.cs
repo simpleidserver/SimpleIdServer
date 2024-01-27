@@ -19,6 +19,8 @@ namespace SimpleIdServer.Did.Crypto
 
         public string CrvOrSize => Constants.StandardCrvOrSize.RSA2048;
 
+        public string JwtAlg => Constants.StandardJwtAlgs.Rsa;
+
         public static RSASignatureKey Generate()
         {
             return new RSASignatureKey();

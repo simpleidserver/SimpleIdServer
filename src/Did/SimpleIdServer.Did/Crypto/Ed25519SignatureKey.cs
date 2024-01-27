@@ -36,6 +36,8 @@ public class Ed25519SignatureKey : IAsymmetricKey
 
     public string CrvOrSize => Constants.StandardCrvOrSize.Ed25519;
 
+    public string JwtAlg => Constants.StandardJwtAlgs.EdDsa;
+
     public static Ed25519SignatureKey From(byte[] publicKey, byte[] privateKey)
     {
         var result = new Ed25519SignatureKey();
@@ -134,7 +136,7 @@ public class Ed25519SignatureKey : IAsymmetricKey
 
     public SigningCredentials BuildSigningCredentials()
     {
-        var result = new SigningCredentials(new Ed25519SecurityKey(_publicKey, _privateKey), CrvOrSize);
+        var result = new SigningCredentials(new Ed25519SecurityKey(_publicKey, _privateKey), JwtAlg);
         return result;
     }
 }

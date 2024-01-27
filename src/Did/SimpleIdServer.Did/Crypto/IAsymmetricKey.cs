@@ -9,6 +9,7 @@ public interface IAsymmetricKey
 {
     string Kty { get; }
     string CrvOrSize { get; }
+    string JwtAlg { get; }
     void Import(byte[] publicKey, byte[] privateKey);
     void Import(JsonWebKey publicKey, JsonWebKey privateKey);
     byte[] GetPublicKey(bool compressed = false);

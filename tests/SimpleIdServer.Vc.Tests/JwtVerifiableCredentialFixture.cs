@@ -40,4 +40,32 @@ public class JwtVerifiableCredentialFixture
     }
 
     #endregion
+
+    #region JsonWebKey2020
+
+    [Test]
+    public void When_Secure_Jwt_VerifiableCredentials_With_Random_JsonWebKey2020_VerificationKey_Then_Proof_Is_Valid()
+    {
+        // ARRANGE
+        var es256Sig = ES256SignatureKey.Generate();
+        var identityDocument = DidDocumentBuilder.New("did")
+            .AddAlsoKnownAs("didSubject")
+            .AddController("didController")
+            .AddVerificationMethod(JsonWebKey2020Standard.TYPE, es256Sig, "controller", VerificationMethodUsages.ASSERTION_METHOD, includePrivateKey: true)
+            .Build();
+        var vc = SecuredVerifiableCredential.New();
+
+        // ACT
+        var securedJson = vc.SecureJwt("http://localhost:5001",
+            identityDocument,
+            identityDocument.VerificationMethod.First().Id,
+            new W3CVerifiableCredentialJsonSerializer().Deserialize(_json));
+        var isSignatureValid = vc.CheckJwt(securedJson, identityDocument);
+
+        // ASSERT
+        Assert.IsNotNull(securedJson);
+        Assert.IsTrue(isSignatureValid);
+    }
+
+    #endregion
 }
