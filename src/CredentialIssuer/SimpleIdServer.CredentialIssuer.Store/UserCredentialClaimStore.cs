@@ -6,12 +6,12 @@ namespace SimpleIdServer.CredentialIssuer.Store;
 
 public interface IUserCredentialClaimStore
 {
-    Task<List<UserCredentialClaim>> Resolve(string subject, List<CredentialTemplateClaim> claims);
+    Task<List<UserCredentialClaim>> Resolve(string subject, List<CredentialConfigurationClaim> claims);
 }
 
 public class UserCredentialClaimStore : IUserCredentialClaimStore
 {
-    public Task<List<UserCredentialClaim>> Resolve(string subject, List<CredentialTemplateClaim> claims)
+    public Task<List<UserCredentialClaim>> Resolve(string subject, List<CredentialConfigurationClaim> claims)
     {
         // degree.name
         // degree.type 

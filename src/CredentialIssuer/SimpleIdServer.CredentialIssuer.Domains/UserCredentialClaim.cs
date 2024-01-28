@@ -4,6 +4,6 @@ namespace SimpleIdServer.CredentialIssuer.Domains;
 
 public class UserCredentialClaim
 {
-    public CredentialTemplateClaim Template { get; set; }
+    public CredentialConfigurationClaim Template { get; set; }
     public string Value { get; set; }
 }

@@ -9,7 +9,7 @@ namespace SimpleIdServer.CredentialIssuer.CredentialFormats;
 
 public interface ICredentialDefinitionSerializer
 {
-    JsonObject Serialize(CredentialTemplate template);
+    JsonObject Serialize(CredentialConfiguration template);
 }
 
 public class CredentialDefinitionSerializer
@@ -21,7 +21,7 @@ public class CredentialDefinitionSerializer
         _credentialSerializers = credentialSerializers;
     }
 
-    public JsonObject Serialize(CredentialTemplate template)
+    public JsonObject Serialize(CredentialConfiguration template)
     {
         if (template == null) throw new ArgumentNullException(nameof(template));
         return null;

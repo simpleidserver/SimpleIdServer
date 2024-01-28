@@ -8,7 +8,6 @@ using SimpleIdServer.CredentialIssuer.CredentialFormats;
 using SimpleIdServer.CredentialIssuer.Domains;
 using SimpleIdServer.CredentialIssuer.Store;
 using SimpleIdServer.IdServer.CredentialIssuer;
-using SimpleIdServer.IdServer.CredentialIssuer.Api.Credential.Validators;
 using SimpleIdServer.IdServer.CredentialIssuer.DTOs;
 using System;
 using System.Collections.Generic;
@@ -28,7 +27,6 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
         private readonly CredentialIssuerOptions _options;
 
         public CredentialController(
-            IEnumerable<IProofValidator> proofValidators, 
             IEnumerable<ICredentialFormatter> formatters,
             ICredentialTemplateStore credentialTemplateStore,
             IUserCredentialClaimStore userCredentialClaimStore,
@@ -70,71 +68,69 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
             });
         }
 
-        private async Task<ValidationResult> Validate(CredentialRequest credentialRequest, CancellationToken cancellationToken)
+        private async Task<CredentialValidationResult> Validate(CredentialRequest credentialRequest, CancellationToken cancellationToken)
         {
             if (credentialRequest == null)
             {
-                return ValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST));
+                return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST));
             }
 
             var atCredentialIdentifiers = GetCredentialIdentifiers();
             if(atCredentialIdentifiers == null && string.IsNullOrWhiteSpace(credentialRequest.Format))
-                return ValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, CredentialRequestNames.Format)));
+                return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, CredentialRequestNames.Format)));
 
 
             if(credentialRequest.Proof != null)
             {
+                // proof_type = jwt
+                // proof_type = cwt
 
+                // Proof.
             }
-            // proof_type = jwt
-            // proof_type = cwt
-            // Proof.
 
-            if(atCredentialIdentifiers != null && string.IsNullOrWhiteSpace(credentialRequest.Credentialidentifier))
-                return ValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, CredentialRequestNames.CredentialIdentifier)));
+            if (atCredentialIdentifiers != null && string.IsNullOrWhiteSpace(credentialRequest.Credentialidentifier))
+                return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, CredentialRequestNames.CredentialIdentifier)));
 
             if(!string.IsNullOrWhiteSpace(credentialRequest.Format) && !string.IsNullOrWhiteSpace(credentialRequest.Credentialidentifier))
-                return ValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, ErrorMessages.CANNOT_USER_CREDENTIAL_IDENTIFIER_WITH_FORMAT));
+                return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, ErrorMessages.CANNOT_USER_CREDENTIAL_IDENTIFIER_WITH_FORMAT));
 
             if(!atCredentialIdentifiers.Contains(credentialRequest.Credentialidentifier))
-                return ValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, ErrorMessages.INVALID_CREDENTIAL_IDENTIFIER));
+                return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, ErrorMessages.INVALID_CREDENTIAL_IDENTIFIER));
 
             ICredentialFormatter formatter = null;
-            CredentialTemplate credentialTemplate = null;
+            CredentialConfiguration credentialTemplate = null;
             if (!string.IsNullOrWhiteSpace(credentialRequest.Format))
             {
                 formatter = _formatters.SingleOrDefault(f => f.Format == credentialRequest.Format);
-                if (formatter == null) return ValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.UNSUPPORTED_CREDENTIAL_FORMAT, string.Format(ErrorMessages.UNSUPPORTED_CREDENTIAL_FORMAT, credentialRequest.Format)));
+                if (formatter == null) return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.UNSUPPORTED_CREDENTIAL_FORMAT, string.Format(ErrorMessages.UNSUPPORTED_CREDENTIAL_FORMAT, credentialRequest.Format)));
                 var header = formatter.ExtractHeader(credentialRequest.Data);
-                if (header == null) return ValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, ErrorMessages.CREDENTIAL_TYPE_CANNOT_BE_EXTRACTED));
+                if (header == null) return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, ErrorMessages.CREDENTIAL_TYPE_CANNOT_BE_EXTRACTED));
                 credentialTemplate = await _credentialTemplateStore.Get(header.Type, cancellationToken);
-                if (credentialTemplate == null) return ValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.UNSUPPORTED_CREDENTIAL_TYPE, string.Format(ErrorMessages.UNSUPPORTED_CREDENTIAL_TYPE, header.Type)));
+                if (credentialTemplate == null) return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.UNSUPPORTED_CREDENTIAL_TYPE, string.Format(ErrorMessages.UNSUPPORTED_CREDENTIAL_TYPE, header.Type)));
             }
 
-            return ValidationResult.Ok(formatter, credentialTemplate);
+            return CredentialValidationResult.Ok(formatter, credentialTemplate);
         }
 
-        private record ValidationResult
+        private class CredentialValidationResult : BaseValidationResult
         {
-            public ValidationResult(ErrorResult? error)
+            private CredentialValidationResult(ErrorResult error) : base(error)
             {
-                ErrorResult = error;
             }
 
-            public ValidationResult(ICredentialFormatter formatter, CredentialTemplate credentialTemplate)
+            private CredentialValidationResult(ICredentialFormatter formatter, CredentialConfiguration credentialTemplate)
             {
                 Formatter = formatter;
+                CredentialTemplate = credentialTemplate;
             }
-
-            public ErrorResult? ErrorResult { get; private set; }
 
             public ICredentialFormatter Formatter { get; private set; }
 
-            public CredentialTemplate CredentialTemplate { get; private set; }
+            public CredentialConfiguration CredentialTemplate { get; private set; }
 
-            public static ValidationResult Error(ErrorResult error) => new ValidationResult(error);
+            public static CredentialValidationResult Ok(ICredentialFormatter formatter, CredentialConfiguration credentialTemplate) => new CredentialValidationResult(formatter, credentialTemplate);
 
-            public static ValidationResult Ok(ICredentialFormatter formatter, CredentialTemplate credentialTemplate) => new ValidationResult(formatter, credentialTemplate);
+            public static CredentialValidationResult Error(ErrorResult error) => new CredentialValidationResult(error);
         }
 
         private List<string> GetCredentialIdentifiers()

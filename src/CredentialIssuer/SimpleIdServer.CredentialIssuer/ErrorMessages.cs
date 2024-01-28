@@ -15,8 +15,10 @@ namespace SimpleIdServer.IdServer.CredentialIssuer
         public const string INVALID_PROOF_JWT_TYP = "the proof typ must be equals to {0}";
         public const string INVALID_PROOF_C_NONCE = "the credential nonce (c_nonce) is not valid";
         public const string UNSUPPORTED_FORMAT = "the format {0} is not supported";
+        public const string UNSUPPORTED_CREDENTIAL = "the credentials {0} are not supported";
+        public const string UNSUPPORTED_GRANT_TYPES = "the grant types {0} are not supported";
         public const string UNKNOWN_ACCESS_TOKEN = "either the access token has been revoked or is invalid";
-        public const string UNKNOWN_CREDENTIAL_OFFER = "the credential offer doesn't exist";
+        public const string UNKNOWN_CREDENTIAL_OFFER = "the credential offer {0} doesn't exist";
         public const string UNKNOWN_CREDENTIAL_TEMPLATE = "the credential template {0} doesn't exist";
         public const string UNKNOWN_CREDENTIAL_DISPLAY_TEMPLATE = "the credential template display {0} doesn't exist";
         public const string UNKNOWN_CREDENTIAL_DISPLAY_PARAMETER = "the credential template parameter {0} doesn't exist";

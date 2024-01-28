@@ -5,10 +5,10 @@ using System.Collections.Generic;
 
 namespace SimpleIdServer.CredentialIssuer.Domains;
 
-public class CredentialTemplateClaim
+public class CredentialConfigurationClaim
 {
     public string Name { get; set; }
     public bool? Mandatory { get; set; }    
     public string? ValueType { get; set; }
-    public List<CredentialTemplateTranslation> Translations { get; set; }
+    public List<CredentialConfigurationTranslation> Translations { get; set; }
 }

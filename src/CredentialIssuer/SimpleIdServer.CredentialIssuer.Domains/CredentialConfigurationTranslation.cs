@@ -3,7 +3,7 @@
 
 namespace SimpleIdServer.CredentialIssuer.Domains;
 
-public class CredentialTemplateTranslation
+public class CredentialConfigurationTranslation
 {
     public string Name { get; set; }
     public string Locale { get; set; }

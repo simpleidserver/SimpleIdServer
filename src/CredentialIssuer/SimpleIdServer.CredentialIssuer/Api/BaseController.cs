@@ -39,4 +39,16 @@ public class BaseController : Controller
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? ErrorDescription { get; set; } = null;
     }
+
+    protected class BaseValidationResult
+    {
+        protected BaseValidationResult() { }
+
+        protected BaseValidationResult(ErrorResult error)
+        {
+            ErrorResult = error;
+        }
+
+        public ErrorResult? ErrorResult { get; private set; }
+    }
 }

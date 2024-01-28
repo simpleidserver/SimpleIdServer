@@ -19,4 +19,13 @@ public class CredentialIssuerOptions
     /// Identifier of the verification method used to sign the verifiable credential.
     /// </summary>
     public string VerificationMethodId { get; set; }
+    /// <summary>
+    /// Base URL of the authorization server.
+    /// </summary>
+    public string AuthorizationServer { get; set; } = "https://localhost:5001";
+    /// <summary>
+    /// If the value is true, then the credential offer is returned in the credential_offer parameter.
+    /// If the value is false, then the credential offer is returned by reference, in the credential_offer_uri parameter.
+    /// </summary>
+    public bool IsCredentialOfferReturnedByReference { get; set; } = false;
 }

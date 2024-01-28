@@ -1,38 +1,92 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using SimpleIdServer.CredentialIssuer.Domains;
+using SimpleIdServer.CredentialIssuer.Store;
+using SimpleIdServer.IdServer.CredentialIssuer;
+using SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialOffer;
 using SimpleIdServer.IdServer.CredentialIssuer.DTOs;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace SimpleIdServer.CredentialIssuer.Api.CredentialOffer
 {
     public class CredentialOfferController : BaseController
     {
-        public CredentialOfferController()
+        private readonly ICredentialTemplateStore _credentialTemplateStore;
+        private readonly ICredentialOfferStore _credentialOfferStore;
+        private readonly CredentialIssuerOptions _options;
+
+        public CredentialOfferController(
+            ICredentialTemplateStore credentialTemplateStore,
+            ICredentialOfferStore credentialOfferStore,
+            IOptions<CredentialIssuerOptions> options)
         {
+            _credentialTemplateStore = credentialTemplateStore;
+            _credentialOfferStore = credentialOfferStore;
+            _options = options.Value;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> Create([FromBody] CreateCredentialOfferRequest request, CancellationToken cancellationToken)
         {
-            // create a credential offer.
+            // https://openid.github.io/OpenID4VCI/openid-4-verifiable-credential-issuance-wg-draft.html#name-authorization-code-flow
+            // https://curity.io/resources/learn/pre-authorized-code/ - exchange the access token for a pre-authorized code and PIN.
+            var issuer = Request.GetAbsoluteUriWithVirtualPath();
+            var validationResult = await Validate(request, cancellationToken);
+            if (validationResult.ErrorResult != null)
+                return Build(validationResult.ErrorResult.Value);
+            var credentialOffer = validationResult.CredentialOffer;
+            if(credentialOffer.GrantTypes.Contains(CredentialOfferResultNames.AuthorizedCodeGrant))
+            {
+                credentialOffer.IssuerState = Guid.NewGuid().ToString();
+            }
+            else
+            {
+                // call the token endpoint to get a pre-authorized-code.
+                credentialOffer.PreAuthorizedCode = Guid.NewGuid().ToString();
+            }
+
+            _credentialOfferStore.Add(credentialOffer);
+            await _credentialOfferStore.SaveChanges(cancellationToken);
+            return new ContentResult
+            {
+                StatusCode = (int)HttpStatusCode.Created,
+                Content = JsonSerializer.Serialize(ToDto(credentialOffer, issuer)),
+                ContentType = "application/json"
+            };
         }
 
-        [HttpPost]
-        public async Task<IActionResult> ClientShareQR([FromRoute] string prefix, string id, [FromBody] ShareCredentialTemplateRequest request, CancellationToken cancellationToken)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(string id, CancellationToken cancellationToken)
         {
+            var issuer = Request.GetAbsoluteUriWithVirtualPath();
+            var credentialOffer = await _credentialOfferStore.Get(id, cancellationToken);
+            if (credentialOffer == null)
+                return Build(new ErrorResult(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CREDENTIAL_OFFER, id)));
+            return new OkObjectResult(ToOfferDtoResult(credentialOffer, issuer));
         }
 
+        [HttpGet("{id}/qr")]
+        public async Task<IActionResult> GetQrCode(string id, CancellationToken cancellationToken)
+        {
+            var issuer = Request.GetAbsoluteUriWithVirtualPath();
+            var credentialOffer = await _credentialOfferStore.Get(id, cancellationToken);
+            if (credentialOffer == null)
+                return Build(new ErrorResult(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CREDENTIAL_OFFER, id)));
+            var dto = ToDto(credentialOffer, issuer);
+            // Generate the QR Code.
+            return null;
+        }
 
+        /*
         private async Task<CredentialOfferBuildResult> InternalGet(string prefix, string id, CancellationToken cancellationToken)
         {
             prefix = prefix ?? SimpleIdServer.IdServer.Constants.DefaultRealm;
@@ -202,6 +256,118 @@ namespace SimpleIdServer.CredentialIssuer.Api.CredentialOffer
                     ErrorMessage = errorMessage
                 };
             }
+        }
+        */
+
+        private async Task<CredentialOfferValidationResult> Validate(CreateCredentialOfferRequest request, CancellationToken cancellationToken)
+        {
+            if (request == null) 
+                return CredentialOfferValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_OFFER_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST));
+            if (request.Grants == null || !request.Grants.Any())
+                return CredentialOfferValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_OFFER_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, CredentialOfferResultNames.Grants)));
+            if (request.CredentialConfigurationIds == null || !request.CredentialConfigurationIds.Any())
+                return CredentialOfferValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_OFFER_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, CredentialOfferResultNames.CredentialConfigurationIds)));
+            if (string.IsNullOrWhiteSpace(request.Subject))
+                return CredentialOfferValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_OFFER_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, "sub")));
+            var invalidGrants = request.Grants.Where(g => g != CredentialOfferResultNames.PreAuthorizedCodeGrant && g != CredentialOfferResultNames.AuthorizedCodeGrant);
+            if (invalidGrants.Any())
+                return CredentialOfferValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_OFFER_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_GRANT_TYPES, string.Join(',', invalidGrants))));
+            var existingCredentials = await _credentialTemplateStore.Get(request.CredentialConfigurationIds, cancellationToken);
+            var unknownCredentials = request.CredentialConfigurationIds.Where(id => !existingCredentials.Any(c => c.Id != id));
+            if (unknownCredentials.Any())
+                return CredentialOfferValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_OFFER_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_CREDENTIAL, string.Join(',', unknownCredentials))));
+            var credentialOffer = new Domains.CredentialOfferRecord
+            {
+                Id = Guid.NewGuid().ToString(),
+                GrantTypes = request.Grants,
+                CredentialConfigurationIds = request.CredentialConfigurationIds,
+                Subject = request.Subject,
+                CreateDateTime = DateTime.UtcNow,
+            };
+            return CredentialOfferValidationResult.Ok(credentialOffer);
+        }
+
+        private CredentialOfferRecordResult ToDto(CredentialOfferRecord credentialOffer, string issuer)
+        {
+            var result = new CredentialOfferRecordResult
+            {
+                Id = credentialOffer.Id,
+                GrantTypes = credentialOffer.GrantTypes,
+                Subject = credentialOffer.Subject,
+                CredentialConfigurationIds = credentialOffer.CredentialConfigurationIds,
+                CreateDateTime = credentialOffer.CreateDateTime,
+                Offer = ToOfferDtoResult(credentialOffer, issuer)
+            };
+            if (_options.IsCredentialOfferReturnedByReference)
+                result.OfferUri = SerializeByReference(result, issuer);
+            else
+                result.OfferUri = SerializeByValue(result);
+
+            return result;
+        }
+
+        private CredentialOfferResult ToOfferDtoResult(CredentialOfferRecord credentialOffer, string issuer)
+        {
+            AuthorizedCodeGrant authorizedCodeGrant = null;
+            PreAuthorizedCodeGrant preAuthorizedCodeGrant = null;
+            if (credentialOffer.GrantTypes.Contains(CredentialOfferResultNames.AuthorizedCodeGrant))
+            {
+                authorizedCodeGrant = new AuthorizedCodeGrant
+                {
+                    IssuerState = issuer
+                };
+            }
+
+            if (credentialOffer.GrantTypes.Contains(CredentialOfferResultNames.PreAuthorizedCodeGrant))
+            {
+                preAuthorizedCodeGrant = new PreAuthorizedCodeGrant
+                {
+                    PreAuthorizedCode = credentialOffer.PreAuthorizedCode
+                };
+            }
+
+            return new CredentialOfferResult
+            {
+                CredentialIssuer = issuer,
+                CredentialConfigurationIds = credentialOffer.CredentialConfigurationIds,
+                Grants = new CredentialOfferGrants
+                {
+                    AuthorizedCodeGrant = authorizedCodeGrant,
+                    PreAuthorizedCodeGrant = preAuthorizedCodeGrant
+                }
+            };
+        }
+
+        private string SerializeByReference(CredentialOfferRecordResult offerRecord, string issuer)
+        {
+            var action = Url.Action("Get", new { id = offerRecord.Id });
+            var url = $"{issuer}{action}";
+            return $"openid-credential-offer://?credential_offer_uri={url}";
+        }
+
+        private string SerializeByValue(CredentialOfferRecordResult offerRecord)
+        {
+            var json = JsonSerializer.Serialize(offerRecord.Offer);
+            var encodedJson = HttpUtility.UrlEncode(json);
+            return $"openid-credential-offer://?credential_offer={encodedJson}";
+        }
+
+        private class CredentialOfferValidationResult : BaseValidationResult
+        {
+            private CredentialOfferValidationResult(Domains.CredentialOfferRecord credentialOffer)
+            {
+                CredentialOffer = credentialOffer;   
+            }
+
+            private CredentialOfferValidationResult(ErrorResult error) : base(error)
+            {
+            }
+
+            public Domains.CredentialOfferRecord CredentialOffer { get; private set; }
+
+            public static CredentialOfferValidationResult Ok(Domains.CredentialOfferRecord credentialOffer) => new CredentialOfferValidationResult(credentialOffer);
+
+            public static CredentialOfferValidationResult Error(ErrorResult error) => new CredentialOfferValidationResult(error);
         }
     }
 }

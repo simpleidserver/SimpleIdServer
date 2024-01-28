@@ -6,18 +6,24 @@ namespace SimpleIdServer.CredentialIssuer.Store;
 
 public interface ICredentialTemplateStore
 {
-    Task<List<CredentialTemplate>> GetAll(CancellationToken cancellationToken);
-    Task<CredentialTemplate> Get(string id, CancellationToken cancellationToken);
+    Task<List<CredentialConfiguration>> GetAll(CancellationToken cancellationToken);
+    Task<CredentialConfiguration> Get(string id, CancellationToken cancellationToken);
+    Task<List<CredentialConfiguration>> Get(List<string> ids, CancellationToken cancellationToken);
 }
 
 public class CredentialTemplateStore : ICredentialTemplateStore
 {
-    public Task<List<CredentialTemplate>> GetAll(CancellationToken cancellationToken)
+    public Task<List<CredentialConfiguration>> GetAll(CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
 
-    public Task<CredentialTemplate> Get(string id, CancellationToken cancellationToken)
+    public Task<CredentialConfiguration> Get(string id, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<CredentialConfiguration> Get(List<string> ids, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
