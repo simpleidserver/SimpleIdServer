@@ -14,5 +14,21 @@ public class CredentialIssuerClientBuilder
         _client = client;
     }
 
+    #region Scopes
+
+    public CredentialIssuerClientBuilder AddScope(params Scope[] scopes)
+    {
+        foreach (var scope in scopes) _client.Scopes.Add(scope);
+        return this;
+    }
+
+    #endregion
+
+    public CredentialIssuerClientBuilder IsTransactionCodeRequired()
+    {
+        _client.IsTransactionCodeRequired = true;
+        return this;
+    }
+
     public Client Build() => _client;
 }

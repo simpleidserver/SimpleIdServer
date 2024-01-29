@@ -86,6 +86,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
             if (unsupportedAuthorizationDetailsTypes.Any())
                 throw new OAuthException(ErrorCodes.INVALID_AUTHORIZATION_DETAILS, string.Format(ErrorMessages.UNSUPPORTED_AUTHORIZATION_DETAILS_TYPES, string.Join(",", unsupportedAuthorizationDetailsTypes.Select(t => t.Type))));
 
+            OpenIdCredentialValidator.ValidateOpenIdCredential(authDetails);
             await CommonValidate(context, cancellationToken);
             var nonce = context.Request.RequestData.GetNonceFromAuthorizationRequest();
             var redirectUri = context.Request.RequestData.GetRedirectUriFromAuthorizationRequest();

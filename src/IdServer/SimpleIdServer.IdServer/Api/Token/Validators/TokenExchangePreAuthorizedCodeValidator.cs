@@ -42,12 +42,13 @@ public class TokenExchangePreAuthorizedCodeValidator : ITokenExchangePreAuthoriz
         var tokenTypeParser = _tokenTypeParsers.SingleOrDefault(t => t.Name == subjectTokenType);
         if (tokenTypeParser == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_TOKENTYPE, subjectTokenType));
         var tokenResult = tokenTypeParser.Parse(context.Realm, subjectToken);
-        if (string.IsNullOrWhiteSpace(tokenResult.Subject)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_SUBJECT_SUBJECTTOKEN);
+        if (!tokenResult.Claims.ContainsKey("sub")) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_SUBJECT_SUBJECTTOKEN);
         var existingScopes = context.Client.Scopes;
         var unknownScopes = scopes.Where(s => !existingScopes.Any(sc => sc.Name == s));
         if (unknownScopes.Any())
             throw new OAuthException(ErrorCodes.INVALID_SCOPE, string.Format(ErrorMessages.UNKNOWN_SCOPE, string.Join(",", unknownScopes)));
-        var user = await _authenticationHelper.GetUserByLogin(tokenResult.Subject, context.Realm, cancellationToken);
+        var sub = tokenResult.Claims["sub"].ToString();
+        var user = await _authenticationHelper.GetUserByLogin(sub, context.Realm, cancellationToken);
         if (context.Client.IsTransactionCodeRequired)
         {
             var otp = user.ActiveOTP;

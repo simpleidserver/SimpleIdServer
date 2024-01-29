@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using SimpleIdServer.IdServer.CredentialIssuer;
 using SimpleIdServer.IdServer.Host.Acceptance.Tests;
 using SimpleIdServer.OAuth.Host.Acceptance.Tests;
 using System;
@@ -27,7 +26,6 @@ builder.Services.AddSIDIdentityServer(o =>
         o.AddInMemoryUMAResources(IdServerConfiguration.UmaResources);
         o.AddInMemoryGroups(IdServerConfiguration.Groups);
         o.AddInMemoryUserSessions(IdServerConfiguration.Sessions);
-        o.AddInMemoryCredentialTemplates(IdServerConfiguration.CredTemplates);
         o.AddInMemoryDeviceCodes(IdServerConfiguration.DeviceAuthCodes);
         o.AddInMemoryKeys(SimpleIdServer.IdServer.Constants.StandardRealms.Master, new List<SigningCredentials>
         {
@@ -48,7 +46,6 @@ builder.Services.AddSIDIdentityServer(o =>
     .UseInMemoryMassTransit()
     .AddConsoleNotification()
     .AddPwdAuthentication()
-    .AddCredentialIssuer()
     .AddBackChannelAuthentication()
     .AddAuthentication(o =>
     {
@@ -58,7 +55,6 @@ builder.Services.AddSIDIdentityServer(o =>
             m.RevocationMode = System.Security.Cryptography.X509Certificates.X509RevocationMode.NoCheck;
         });
     });
-builder.Services.AddDIDKey();
 var antiforgeryService = builder.Services.First(s => s.ServiceType == typeof(IAntiforgery));
 var memoryDistribution = builder.Services.First(s => s.ServiceType == typeof(IDistributedCache));
 builder.Services.Remove(antiforgeryService);
@@ -66,7 +62,6 @@ builder.Services.Remove(memoryDistribution);
 builder.Services.AddTransient<IAntiforgery, FakeAntiforgery>();
 builder.Services.AddSingleton<IDistributedCache>(SingletonDistributedCache.Instance().Get());
 var app = builder.Build()
-    .UseCredentialIssuer()
     .UseSID();
 app.Run();
 

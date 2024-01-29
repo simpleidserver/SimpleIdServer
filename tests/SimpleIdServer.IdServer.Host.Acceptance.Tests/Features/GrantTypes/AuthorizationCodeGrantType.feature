@@ -162,14 +162,14 @@ Scenario: access token contains authorization_details with openid_credential
 	Given authenticate a user
 	
 	When execute HTTP GET request 'http://localhost/authorization'
-	| Key                     | Value                                                                                                                                                               |
-	| response_type           | code token                                                                                                                                                          |
-	| client_id               | fiftyEightClient                                                                                                                                                    |
-	| state                   | state                                                                                                                                                               |
-	| response_mode           | query                                                                                                                                                               |
-	| redirect_uri            | http://localhost:8080                                                                                                                                               |
-	| nonce                   | nonce                                                                                                                                                               |
-	| authorization_details   |  { "type" : "openid_credential", "format": "jwt_vc_json", "types": [ "VerifiableCredential", "UniversityDegreeCredential" ], "locations" : [ "http://localhost" ] } |
+	| Key                     | Value                                                                                           |
+	| response_type           | code token                                                                                      |
+	| client_id               | fiftyEightClient                                                                                |
+	| state                   | state                                                                                           |
+	| response_mode           | query                                                                                           |
+	| redirect_uri            | http://localhost:8080                                                                           |
+	| nonce                   | nonce                                                                                           |
+	| authorization_details   |  { "type" : "openid_credential", "credential_configuration_id": "UniversityDegreeCredential" }  |
 	
 	And extract parameter 'code' from redirect url
 	

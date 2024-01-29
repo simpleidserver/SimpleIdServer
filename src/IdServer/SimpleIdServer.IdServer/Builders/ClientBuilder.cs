@@ -33,8 +33,9 @@ namespace SimpleIdServer.IdServer.Builders
             };
             if (realm == null) client.Realms.Add(Constants.StandardRealms.Master);
             else client.Realms.Add(realm);
+            client.AuthorizationDataTypes.Add("openid_credential");
             client.GrantTypes.Add(PreAuthorizedCodeHandler.GRANT_TYPE);
-            client.GrantTypes.Add(ClientCredentialsHandler.GRANT_TYPE);
+            client.GrantTypes.Add(AuthorizationCodeHandler.GRANT_TYPE);
             return new WalletClientBuilder(client);
         }
 

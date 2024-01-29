@@ -24,6 +24,7 @@
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\GrantTypes\CIBAGrantTypeErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\GrantTypes\HappyFlows - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\GrantTypes\PasswordGrantTypeErrors - Copier.feature.cs" />
+	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\GrantTypes\PreAuthorizedCodeErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\GrantTypes\RefreshTokenGrantTypeErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\IdTokenSignatureAndOrEncryption - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\ImplicitGrantType.feature.cs" />
@@ -51,6 +52,7 @@
 	  </None>
 	</ItemGroup>
 	<ItemGroup>
+		<PackageReference Include="BlushingPenguin.JsonPath" Version="1.0.6" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.0" />
 		<PackageReference Include="SpecFlow" Version="3.9.74" />
@@ -76,20 +78,8 @@
 	  <Compile Update="Features\DeviceAuthorizationErrors.feature.cs">
 	    <DependentUpon>DeviceAuthorizationErrors.feature</DependentUpon>
 	  </Compile>
-	  <Compile Update="Features\CredentialErrors.feature.cs">
-	    <DependentUpon>CredentialErrors.feature</DependentUpon>
-	  </Compile>
-	  <Compile Update="Features\Credential.feature.cs">
-	    <DependentUpon>Credential.feature</DependentUpon>
-	  </Compile>
-	  <Compile Update="Features\CredentialIssuer.feature.cs">
-	    <DependentUpon>CredentialIssuer.feature</DependentUpon>
-	  </Compile>
-	  <Compile Update="Features\CredentialOffer.feature.cs">
-	    <DependentUpon>CredentialOffer.feature</DependentUpon>
-	  </Compile>
-	  <Compile Update="Features\CredentialOfferErrors.feature.cs">
-	    <DependentUpon>CredentialOfferErrors.feature</DependentUpon>
+	  <Compile Update="Features\GrantTypes\TokenExchangePreAuthorizedCodeErrors.feature.cs">
+	    <DependentUpon>TokenExchangePreAuthorizedCodeErrors.feature</DependentUpon>
 	  </Compile>
 	  <Compile Update="Features\GrantTypes\TokenExchangeGrantTypeErrors.feature.cs">
 	    <DependentUpon>TokenExchangeGrantTypeErrors.feature</DependentUpon>
@@ -257,23 +247,7 @@
 	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
 	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
 	  </SpecFlowFeatureFiles>
-	  <SpecFlowFeatureFiles Update="Features\CredentialErrors.feature">
-	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
-	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-	  </SpecFlowFeatureFiles>
-	  <SpecFlowFeatureFiles Update="Features\Credential.feature">
-	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
-	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-	  </SpecFlowFeatureFiles>
-	  <SpecFlowFeatureFiles Update="Features\CredentialIssuer.feature">
-	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
-	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-	  </SpecFlowFeatureFiles>
-	  <SpecFlowFeatureFiles Update="Features\CredentialOffer.feature">
-	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
-	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-	  </SpecFlowFeatureFiles>
-	  <SpecFlowFeatureFiles Update="Features\CredentialOfferErrors.feature">
+	  <SpecFlowFeatureFiles Update="Features\GrantTypes\TokenExchangePreAuthorizedCodeErrors.feature">
 	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
 	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
 	  </SpecFlowFeatureFiles>

@@ -393,32 +393,34 @@ Scenario: Use 'urn:openid:params:grant-type:ciba' grant type to get an identity 
 	And JWT has authorization_details action 'read'
 
 Scenario: Use 'urn:ietf:params:oauth:grant-type:pre-authorized_code' grant type to get an access token with authorization details
-	Given authenticate a user
+	Given build access_token and sign with the key 'keyid'
+	| Key   | Value    |
+	| sub   | otpUser  |
 
-	When execute HTTP POST JSON request 'http://localhost/credential_offer/share'
-	| Key                    | Value             |
-	| wallet_client_id       | fiftyNineClient   |
-	| credential_template_id | credTemplate      |
-
-	And extract query parameters into JSON
-	And extract query parameter 'credential_offer' into JSON
-	And extract parameter '$.grants.urn:ietf:params:oauth:grant-type:pre-authorized_code.pre-authorized_code' from JSON body into 'preAuthorizedCode'
+	When execute HTTP POST request 'https://localhost:8080/token'
+	| Key                 | Value                                                         |
+	| grant_type          | urn:ietf:params:oauth:grant-type:exchange-pre-authorized_code |
+	| client_id           | seventyOneClient                                              |
+	| client_secret       | password                                                      |
+	| subject_token       | $access_token$                                                |
+	| subject_token_type  | urn:ietf:params:oauth:token-type:access_token                 |
+	| scope               | UniversityCredential                                          |
+	
+	And extract JSON from body
+	And extract parameter '$.pre-authorized_code' from JSON body into 'preAuthorizedCode'
 
 	And execute HTTP POST request 'https://localhost:8080/token'
-	| Key                     | Value                                                                                                                        |
-	| grant_type              | urn:ietf:params:oauth:grant-type:pre-authorized_code                                                                         |
-	| client_id               | fiftyNineClient                                                                                                              |
-	| pre-authorized_code     | $preAuthorizedCode$                                                                                                          |
-	| authorization_details   |  { "type" : "openid_credential", "format": "jwt_vc_json", "types": [ "VerifiableCredential", "UniversityDegreeCredential"] } |
+	| Key                     | Value                                                    |
+	| grant_type              | urn:ietf:params:oauth:grant-type:pre-authorized_code     |
+	| client_id               | seventyTwoClient                                         |
+	| client_secret           | password                                                 |
+	| pre-authorized_code     | $preAuthorizedCode$                                      |
 	
 	And extract JSON from body
 	And extract parameter 'access_token' from JSON body
 	And extract payload from JWT '$access_token$'
 
 	Then HTTP status code equals to '200'
-	And JWT has authorization_details type 'openid_credential'
-	And JSON exists 'c_nonce'	
-	And JSON exists 'c_nonce_expires_in'	
 
 Scenario: Use 'urn:ietf:params:oauth:grant-type:device_code' grant type to get an access token
 	Given authenticate a user
@@ -636,3 +638,21 @@ Scenario: Use 'urn:ietf:params:oauth:grant-type:token-exchange' grant_type and d
 	And access_token contains the claim 'client_id'='fortyFourClient'
 	And access_token contains act 'sixtySevenClient'
 	And access_token contains sub act 'sixtySevenClient'
+
+Scenario: Use 'urn:ietf:params:oauth:grant-type:exchange-pre-authorized_code' grant-type to get the pre-authorized code
+	Given build access_token and sign with the key 'keyid'
+	| Key   | Value    |
+	| sub   | otpUser  |
+	
+	When execute HTTP POST request 'https://localhost:8080/token'
+	| Key                 | Value                                                         |
+	| grant_type          | urn:ietf:params:oauth:grant-type:exchange-pre-authorized_code |
+	| client_id           | seventyOneClient                                              |
+	| client_secret       | password                                                      |
+	| subject_token       | $access_token$                                                |
+	| subject_token_type  | urn:ietf:params:oauth:token-type:access_token                 |
+	| scope               | UniversityCredential                                          |
+
+	And extract JSON from body
+	Then HTTP status code equals to '200'
+	And JSON exists '$.pre-authorized_code'

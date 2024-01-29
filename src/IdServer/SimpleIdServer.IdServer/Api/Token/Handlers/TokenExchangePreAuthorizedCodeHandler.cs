@@ -63,7 +63,8 @@ public class TokenExchangePreAuthorizedCodeHandler : BaseCredentialsHandler
                 {
                     ClientId = oauthClient.ClientId,
                     Code = Guid.NewGuid().ToString(),
-                    UserId = user.Id
+                    UserId = user.Id,
+                    Scopes = scopes
                 };
                 if (oauthClient.IsTransactionCodeRequired)
                 {
