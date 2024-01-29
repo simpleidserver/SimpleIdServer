@@ -227,6 +227,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildApiClient("sixtyEightClient", "password").AddScope(FirstScope).SetAccessTokenType(AccessTokenTypes.Reference).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("sixtyNineClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().DisableConsent().AddScope(GetRoleScope()).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("seventyClient", "password", null, "http://localhost:8080").SetAccessTokenType(AccessTokenTypes.Reference).UseClientSecretPostAuthentication().AddScope(StandardScopes.OpenIdScope, StandardScopes.Role, StandardScopes.Profile, StandardScopes.Email).Build(),
+            ClientBuilder.BuildApiClient("seventyOneClient", "password").AddScope(FirstScope).UseClientSecretBasicAuthentication().Build()
         };
 
         public static List<DeviceAuthCode> DeviceAuthCodes = new List<DeviceAuthCode>

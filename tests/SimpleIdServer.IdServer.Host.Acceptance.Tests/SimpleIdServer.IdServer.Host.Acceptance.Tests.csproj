@@ -11,6 +11,7 @@
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\BCAuthorizeCreate - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\BCAuthorizeErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\ClientAuthenticationErrors - Copier.feature.cs" />
+	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\ClientAuths\ClientAuthenticationErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\ClientAuths\ClientPrivateKeyJwtAuthenticationErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\ClientAuths\ClientSecretJwtAuthenticationErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\ClientAuths\ClientSelfSignedTlsAuthenticationErrors - Copier.feature.cs" />
@@ -74,6 +75,9 @@
 	<ItemGroup>
 	  <Compile Update="Features\AuthenticationClassReferencesErrors.feature.cs">
 	    <DependentUpon>AuthenticationClassReferencesErrors.feature</DependentUpon>
+	  </Compile>
+	  <Compile Update="Features\ClientAuths\HappyFlow.feature.cs">
+	    <DependentUpon>HappyFlow.feature</DependentUpon>
 	  </Compile>
 	  <Compile Update="Features\DeviceAuthorizationErrors.feature.cs">
 	    <DependentUpon>DeviceAuthorizationErrors.feature</DependentUpon>
@@ -252,6 +256,10 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <SpecFlowFeatureFiles Update="Features\AuthenticationClassReferencesErrors.feature">
+	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
+	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+	  </SpecFlowFeatureFiles>
+	  <SpecFlowFeatureFiles Update="Features\ClientAuths\HappyFlow.feature">
 	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
 	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
 	  </SpecFlowFeatureFiles>
