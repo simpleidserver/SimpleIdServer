@@ -171,10 +171,6 @@ namespace System.Text.Json.Nodes
             return authDetails == null ? new List<AuthorizationData>() : JsonSerializerExtensions.DeserializeAuthorizationDetails(authDetails);
         }
 
-        public static string GetPreAuthorizedCode(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.PreAuthorizedCode);
-
-        public static string GetUserPin(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.UserPin);
-
         public static IEnumerable<string> GetResponseTypesFromAuthorizationRequest(this JsonObject jObj)
         {
             var responseType = jObj.GetStr(AuthorizationRequestParameters.ResponseType);
@@ -299,6 +295,10 @@ namespace System.Text.Json.Nodes
         #endregion
 
         #region Token request
+
+        public static string GetPreAuthorizedCode(this JsonObject jObj) => jObj.GetStr(TokenRequestParameters.PreAuthorizedCode);
+
+        public static string GetTransactionCode(this JsonObject jObj) => jObj.GetStr(TokenRequestParameters.TransactionCode);
 
         public static string GetTicket(this JsonObject jObj) => jObj.GetStr(TokenRequestParameters.Ticket);
 

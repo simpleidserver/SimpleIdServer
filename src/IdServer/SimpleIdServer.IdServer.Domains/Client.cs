@@ -389,7 +389,12 @@ namespace SimpleIdServer.IdServer.Domains
         /// If the wallet decided to use Pre-Authorized Code Flow, a PIN value must be sent in the user_pin parameter with the respective token request.
         /// </summary>
         [JsonIgnore]
-        public bool UserPinRequired { get; set; } = false;
+        public bool IsTransactionCodeRequired { get; set; } = false;
+        /// <summary>
+        /// Expiration time in seconds of the pre-authorized code.
+        /// </summary>
+        [JsonPropertyName(OAuthClientParameters.PreAuthCodeExpirationTimeInSeconds)]
+        public double PreAuthCodeExpirationTimeInSeconds { get; set; } = 5 * 60;
         [JsonPropertyName(OAuthClientParameters.FrontChannelLogoutSessionRequired)]
         /// <summary>
         /// Boolean value specifying whether the RP requires that iss (issuer) and sid (session id) query parameters be included to identify the RP session
@@ -622,5 +627,6 @@ namespace SimpleIdServer.IdServer.Domains
         public const string HIGHLYSECUREDWEBSITE = "HIGHLYSECUREDWEBSITE";
         public const string GRANTMANAGEMENT = "GRANTMANAGEMENT";
         public const string SAML = "SAML";
+        public const string CREDENTIAL_ISSUER = "CREDENTIALISSUER";
     }
 }

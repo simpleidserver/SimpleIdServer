@@ -37,11 +37,6 @@
                             Welcome @User.Identity.Name
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("Credentials", "Home")">
-                            @LayoutResource.credentials
-                        </a>
-                    </li>
                 }
                 @RenderSection("SubMenu", required: false)
             </ul>

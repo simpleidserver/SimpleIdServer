@@ -242,9 +242,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IGrantTypeHandler, UmaTicketHandler>();
             services.AddTransient<IGrantTypeHandler, PreAuthorizedCodeHandler>();
             services.AddTransient<IGrantTypeHandler, DeviceCodeHandler>();
+            services.AddTransient<IGrantTypeHandler, TokenExchangePreAuthorizedCodeHandler>();
             services.AddTransient<ICIBAGrantTypeValidator, CIBAGrantTypeValidator>();
             services.AddTransient<IClientAuthenticationHelper, ClientAuthenticationHelper>();
             services.AddTransient<IRevokeTokenRequestHandler, RevokeTokenRequestHandler>();
+            services.AddTransient<ITokenExchangePreAuthorizedCodeValidator, TokenExchangePreAuthorizedCodeValidator>();
             services.AddTransient<ITokenProfile, BearerTokenProfile>();
             services.AddTransient<ITokenProfile, MacTokenProfile>();
             services.AddTransient<ITokenBuilder, AccessTokenBuilder>();

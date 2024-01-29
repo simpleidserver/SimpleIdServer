@@ -43,5 +43,6 @@ namespace SimpleIdServer.IdServer
         public const string UNEXPECTED_ERROR = "unexpected_error";
         public const string USE_DPOP_NONCE = "use_dpop_nonce";
         public const string INACTIVE_SESSION = "inactive_session";
+        public const string NO_ACTIVE_OTP = "no_active_otp";
     }
 }

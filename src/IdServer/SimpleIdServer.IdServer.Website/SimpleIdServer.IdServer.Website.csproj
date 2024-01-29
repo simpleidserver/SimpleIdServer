@@ -15,9 +15,6 @@
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\SimpleIdServer.Configuration\SimpleIdServer.Configuration.csproj" />
-		<ProjectReference Include="..\SimpleIdServer.Did.Ethr\SimpleIdServer.Did.Ethr.csproj" />
-		<ProjectReference Include="..\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj" />
-		<ProjectReference Include="..\SimpleIdServer.IdServer.CredentialIssuer\SimpleIdServer.IdServer.CredentialIssuer.csproj" />
 		<ProjectReference Include="..\SimpleIdServer.IdServer.Saml.Idp\SimpleIdServer.IdServer.Saml.Idp.csproj" />
 		<ProjectReference Include="..\SimpleIdServer.IdServer.WsFederation\SimpleIdServer.IdServer.WsFederation.csproj" />
 		<ProjectReference Include="..\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />

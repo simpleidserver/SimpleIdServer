@@ -40,7 +40,6 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IUmaPendingRequestRepository _pendingRequestRepository;
         private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
         private readonly IOTPQRCodeGenerator _otpQRCodeGenerator;
-        private readonly ICredentialTemplateRepository _credentialTemplateRepository;
         private readonly IBusControl _busControl;
         private readonly IEnumerable<IAuthenticationMethodService> _authenticationMethodServices;
         private readonly IUserSessionResitory _userSessionRepository;
@@ -54,7 +53,6 @@ namespace SimpleIdServer.IdServer.UI
             IUmaPendingRequestRepository pendingRequestRepository,
             IAuthenticationSchemeProvider authenticationSchemeProvider,
             IOTPQRCodeGenerator otpQRCodeGenerator,
-            ICredentialTemplateRepository credentialTemplateRepository,
             IBusControl busControl,
             IEnumerable<IAuthenticationMethodService> authenticationMethodServices,
             IUserSessionResitory userSessionRepository,
@@ -68,7 +66,6 @@ namespace SimpleIdServer.IdServer.UI
             _pendingRequestRepository = pendingRequestRepository;
             _authenticationSchemeProvider = authenticationSchemeProvider;
             _otpQRCodeGenerator = otpQRCodeGenerator;
-            _credentialTemplateRepository = credentialTemplateRepository;
             _busControl = busControl;
             _authenticationMethodServices = authenticationMethodServices;
             _userSessionRepository = userSessionRepository;
@@ -87,35 +84,6 @@ namespace SimpleIdServer.IdServer.UI
             var viewModel = new ProfileViewModel();
             await Build(prefix, viewModel, cancellationToken);
             return View(viewModel);
-        }
-
-        [HttpGet]
-        [Authorize(Constants.Policies.Authenticated)]
-        public async virtual Task<IActionResult> Credentials([FromRoute] string prefix, CancellationToken cancellationToken)
-        {
-            prefix = prefix ?? Constants.DefaultRealm;
-            var credentials = await GetCredentialTemplates();
-            return View(new CredentialsViewModel
-            {
-                Credentials = credentials,
-                ClientIds = await GetClients()
-            });
-
-            async Task<ICollection<CredentialTemplateViewModel>> GetCredentialTemplates()
-            {
-                var credentialTemplates = await _credentialTemplateRepository.Query().Include(c => c.DisplayLst).Include(c => c.Realms).AsNoTracking().Where(c => c.Realms.All(r => r.Name == prefix)).ToListAsync(cancellationToken);
-                return credentialTemplates.Select(c => new CredentialTemplateViewModel
-                {
-                    Id = c.TechnicalId,
-                    Display = c.Display
-                }).ToList();
-            }
-
-            async Task<IEnumerable<string>> GetClients()
-            {
-                var clients = await _clientRepository.Query().Include(c => c.Realms).Where(c => c.ClientType == ClientTypes.WALLET && c.Realms.All(r => r.Name == prefix)).ToListAsync(cancellationToken);
-                return clients.Select(c => c.ClientId);
-            }
         }
 
         [HttpGet]

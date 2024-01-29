@@ -47,9 +47,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IIdentityProvisioningStore, IdentityProvisioningStore>();
             services.AddTransient<IIdentityProvisioningDefinitionStore, IdentityProvisioningDefinitionStore>();
             services.AddTransient<IGroupRepository, GroupRepository>();
-            services.AddTransient<ICredentialTemplateRepository, CredentialTemplateRepository>();
-            services.AddTransient<ICredentialOfferRepository, CredentialOfferRepository>();
-            services.AddTransient<IIdentityDocumentConfigurationStore, IdentityDocumentConfigurationStore>();
             services.AddTransient<IDeviceAuthCodeRepository, DeviceAuthCodeRepository>();
             services.AddTransient<IUserCredentialRepository, UserCredentialRepository>();
             services.AddTransient<IUserSessionResitory, UserSessionRepository>();

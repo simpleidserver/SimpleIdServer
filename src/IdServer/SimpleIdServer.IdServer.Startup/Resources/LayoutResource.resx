@@ -129,9 +129,6 @@
   <data name="consents" xml:space="preserve">
     <value>Consents</value>
   </data>
-  <data name="credentials" xml:space="preserve">
-    <value>Credentials</value>
-  </data>
   <data name="credential_is_updated" xml:space="preserve">
     <value>Credential has been updated</value>
   </data>

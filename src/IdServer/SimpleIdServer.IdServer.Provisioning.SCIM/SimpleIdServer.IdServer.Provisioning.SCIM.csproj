@@ -9,4 +9,7 @@
 	  <ProjectReference Include="..\SimpleIdServer.Configuration\SimpleIdServer.Configuration.csproj" />
 		<ProjectReference Include="..\..\Scim\SimpleIdServer.Scim.Client\SimpleIdServer.Scim.Client.csproj" />
 	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="BlushingPenguin.JsonPath" Version="1.0.6" />
+	</ItemGroup>
 </Project>

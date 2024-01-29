@@ -30,5 +30,7 @@ namespace SimpleIdServer.IdServer.DTOs
         public const string ActorToken = "actor_token";
         public const string ActorTokenType = "actor_token_type";
         public const string RequestedTokenType = "requested_token_type";
+        public const string PreAuthorizedCode = "pre-authorized_code";
+        public const string TransactionCode = "tx_code";
     }
 }

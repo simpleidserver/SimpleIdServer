@@ -37,8 +37,6 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonIgnore]
         public ICollection<GroupRealm> Groups { get; set; } = new List<GroupRealm>();
         [JsonIgnore]
-        public ICollection<CredentialTemplate> CredentialTemplates { get; set; } = new List<CredentialTemplate>();
-        [JsonIgnore]
         public ICollection<RegistrationWorkflow> RegistrationWorkflows { get; set; } = new List<RegistrationWorkflow>();
     }
 }

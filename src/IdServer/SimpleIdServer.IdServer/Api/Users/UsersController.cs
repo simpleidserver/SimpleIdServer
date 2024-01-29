@@ -7,10 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using SimpleIdServer.Did;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Domains.DTOs;
-using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
@@ -40,7 +38,6 @@ namespace SimpleIdServer.IdServer.Api.Users
         private readonly IRecurringJobManager _recurringJobManager;
         private readonly ILogger<UsersController> _logger;
         private readonly IdServerHostOptions _options;
-        private readonly IEnumerable<IDIDGenerator> _generators;
 
         public UsersController(
             IUserRepository userRepository,
@@ -53,8 +50,7 @@ namespace SimpleIdServer.IdServer.Api.Users
             IJwtBuilder jwtBuilder,
             IRecurringJobManager recurringJobManager,
             ILogger<UsersController> logger,
-            IOptions<IdServerHostOptions> options,
-            IEnumerable<IDIDGenerator> generators) : base(tokenRepository, jwtBuilder)
+            IOptions<IdServerHostOptions> options) : base(tokenRepository, jwtBuilder)
         {
             _userRepository = userRepository;
             _userSessionRepository = userSessionRepository;
@@ -65,7 +61,6 @@ namespace SimpleIdServer.IdServer.Api.Users
             _recurringJobManager = recurringJobManager;
             _logger = logger;
             _options = options.Value;
-            _generators = generators;
         }
 
         #region Querying
@@ -732,56 +727,6 @@ namespace SimpleIdServer.IdServer.Api.Users
                     });
                     return BuildError(ex);
                 }
-            }
-        }
-
-        #endregion
-
-        #region DID
-
-        [HttpPost]
-        public async Task<IActionResult> GenerateDecentralizedIdentity([FromRoute] string prefix, string id, [FromBody] GenerateDecentralizedIdentityRequest request, CancellationToken cancellationToken)
-        {
-            using (var activity = Tracing.IdServerActivitySource.StartActivity("Generate decentralized identity"))
-            {
-                try
-                {
-                    prefix = prefix ?? Constants.DefaultRealm;
-                    await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
-                    Validate();
-                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
-                    if (user == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_USER, id));
-                    var generator = _generators.FirstOrDefault(g => g.Method == request.Method);
-                    if (generator == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.INVALID_DECENTRALIZED_IDENTITY_METHOD, request.Method));
-                    var generationResult = await generator.Generate(request.Parameters, cancellationToken);
-                    if (!string.IsNullOrWhiteSpace(generationResult.ErrorMessage)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, generationResult.ErrorMessage);
-                    user.Did = generationResult.DID;
-                    user.DidPrivateHex = generationResult.PrivateKey;
-                    user.CredentialOffers.Clear();
-                    await _userRepository.SaveChanges(cancellationToken);
-                    activity?.SetStatus(ActivityStatusCode.Ok, "Decentralized Identity is generated");
-                    return new ContentResult
-                    {
-                        Content = JsonSerializer.Serialize(new GenerateDecentralizedIdentifierResult
-                        {
-                            DID = generationResult.DID,
-                            PrivateKey = generationResult.PrivateKey
-                        }),
-                        ContentType = "application/json",
-                        StatusCode = (int)HttpStatusCode.Created
-                    };
-                }
-                catch (OAuthException ex)
-                {
-                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                    return BuildError(ex);
-                }
-            }
-
-            void Validate()
-            {
-                if (request == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
-                if (string.IsNullOrWhiteSpace(request.Method)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, GenerateDecentralizedIdentityRequestNames.Method));
             }
         }
 

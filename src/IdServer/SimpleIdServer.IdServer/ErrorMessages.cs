@@ -64,6 +64,7 @@ namespace SimpleIdServer.IdServer
         public const string UNAUTHORIZED_TO_SCOPES = "unauthorized to scopes : {0}";
         public const string INVALID_CLAIMS = "claims {0} are invalid";
         public const string INVALID_DPOP_HEADER = "the DPoP parameter must be a string";
+        public const string INVALID_TRANSACTION_CODE = "the tx_code is invalid";
         public const string INVALID_PREAUTHORIZEDCODE = "either the pre-authorized code has expired or is invalid";
         public const string INVALID_IDTOKENHINT = "id_token_hint is invalid";
         public const string INVALID_ISSUED_DEVICE_CODE = "the device code has already been used to get a token";
@@ -305,5 +306,6 @@ namespace SimpleIdServer.IdServer
         public const string SCOPE_MAPPER_TYPE_UNIQUE = "The same mapping type cannot be added twice.";
         public const string IDPROVISIONING_PROCESS_ISNOTEXTRACTED = "users are not extracted";
         public const string IDPROVISIONING_PROCESS_STARTED = "process cannot be started twice";
+        public const string NO_ACTIVE_OTP = "the user doesn't have an active OTP";
     }
 }

@@ -116,8 +116,6 @@ namespace SimpleIdServer.IdServer.Domains
         public ICollection<RealmUser> Realms { get; set; } = new List<RealmUser>();
         [JsonIgnore]
         public IdentityProvisioning? IdentityProvisioning { get; set; } = null;
-        [JsonIgnore]
-        public ICollection<UserCredentialOffer> CredentialOffers { get; set; } = new List<UserCredentialOffer>();
 
         #region User claims
 

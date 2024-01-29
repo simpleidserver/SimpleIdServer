@@ -65,7 +65,6 @@ namespace SimpleIdServer.IdServer.Startup
             SimpleIdServer.IdServer.Constants.StandardScopes.Scopes,
             SimpleIdServer.IdServer.Constants.StandardScopes.CertificateAuthorities,
             SimpleIdServer.IdServer.Constants.StandardScopes.Clients,
-            SimpleIdServer.IdServer.CredentialIssuer.Constants.StandardScopes.CredentialTemplates,
             SimpleIdServer.IdServer.Constants.StandardScopes.Realms,
             SimpleIdServer.IdServer.Constants.StandardScopes.Groups,
             SimpleIdServer.IdServer.Constants.StandardScopes.OfflineAccessScope
@@ -102,7 +101,6 @@ namespace SimpleIdServer.IdServer.Startup
                     SimpleIdServer.IdServer.Constants.StandardScopes.Scopes, 
                     SimpleIdServer.IdServer.Constants.StandardScopes.CertificateAuthorities,
                     SimpleIdServer.IdServer.Constants.StandardScopes.Clients,
-                    SimpleIdServer.IdServer.CredentialIssuer.Constants.StandardScopes.CredentialTemplates,
                     SimpleIdServer.IdServer.Constants.StandardScopes.Realms, 
                     SimpleIdServer.IdServer.Constants.StandardScopes.Groups).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("swaggerClient", "password", null, "https://localhost:5001/swagger/oauth2-redirect.html", "https://localhost:5001/(.*)/swagger/oauth2-redirect.html", "http://localhost").AddScope(
@@ -120,7 +118,6 @@ namespace SimpleIdServer.IdServer.Startup
                 SimpleIdServer.IdServer.Constants.StandardScopes.Scopes, 
                 SimpleIdServer.IdServer.Constants.StandardScopes.CertificateAuthorities,
                 SimpleIdServer.IdServer.Constants.StandardScopes.Clients, 
-                SimpleIdServer.IdServer.CredentialIssuer.Constants.StandardScopes.CredentialTemplates,
                 SimpleIdServer.IdServer.Constants.StandardScopes.Realms,
                 SimpleIdServer.IdServer.Constants.StandardScopes.Groups).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("postman", "password", null, "http://localhost").EnableClientGrantType().AddScope(
@@ -138,14 +135,13 @@ namespace SimpleIdServer.IdServer.Startup
                 SimpleIdServer.IdServer.Constants.StandardScopes.Scopes,
                 SimpleIdServer.IdServer.Constants.StandardScopes.CertificateAuthorities,
                 SimpleIdServer.IdServer.Constants.StandardScopes.Clients,
-                SimpleIdServer.IdServer.CredentialIssuer.Constants.StandardScopes.CredentialTemplates,
                 SimpleIdServer.IdServer.Constants.StandardScopes.Realms,
                 SimpleIdServer.IdServer.Constants.StandardScopes.Groups).Build(),
             WsClientBuilder.BuildWsFederationClient("urn:website").SetClientName("NAME").Build(),
             ClientBuilder.BuildUserAgentClient("oauth", "password", null, "https://oauth.tools/callback/code").AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope, SimpleIdServer.IdServer.Constants.StandardScopes.Profile).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("fapi", "password", null, "https://localhost:8443/test/(.*)").SetIdTokenSignedResponseAlg(SecurityAlgorithms.EcdsaSha256).SetRequestObjectSigning(SecurityAlgorithms.EcdsaSha256).SetSigAuthorizationResponse(SecurityAlgorithms.EcdsaSha256).AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope, SimpleIdServer.IdServer.Constants.StandardScopes.Profile).UseClientTlsAuthentication("CN=sidClient, O=Internet Widgits Pty Ltd, S=BE, C=BE").AddSigningKey(new SigningCredentials(SimpleIdServer.IdServer.PemImporter.Import(new SimpleIdServer.IdServer.PemResult("-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEK21CoKCA2Vk5zPM+7+vqtnrq4pIe\nsCLiWObLDFKKf3gJl0hll/ZTI5ww/oRrKIXO/uRe9AkckkKwqrqqXGnvsQ==\n-----END PUBLIC KEY-----", "-----BEGIN EC PRIVATE KEY-----\nMHcCAQEEIDHtu+N0u38ZN7DF/TpycDfaUs8WfPGUB3UusR0uv3TVoAoGCCqGSM49\nAwEHoUQDQgAEK21CoKCA2Vk5zPM+7+vqtnrq4pIesCLiWObLDFKKf3gJl0hll/ZT\nI5ww/oRrKIXO/uRe9AkckkKwqrqqXGnvsQ==\n-----END EC PRIVATE KEY-----"), "keyId"), SecurityAlgorithms.EcdsaSha256), SecurityAlgorithms.EcdsaSha256, SecurityKeyTypes.ECDSA).Build(),
             ClientBuilder.BuildApiClient("managementClient", "password").AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.Users).AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.Register).Build(),
-            ClientBuilder.BuildTraditionalWebsiteClient("walletClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().EnableTokenInResponseType().TrustOpenIdCredential().Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("walletClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().EnableTokenInResponseType().Build(),
             ClientBuilder.BuildDeviceClient("deviceClient", "password").AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope, SimpleIdServer.IdServer.Constants.StandardScopes.Profile).Build(),
             SamlSpClientBuilder.BuildSamlSpClient("samlSp", "http://localhost:5125/Metadata").Build()
         };

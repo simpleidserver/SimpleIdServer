@@ -15,12 +15,12 @@ namespace SimpleIdServer.IdServer.Builders
         }
 
         /// <summary>
-        /// Boolean value specifying whether the Credential Issuer expects presentation of a user PIN along with the Token Request in a Pre-Authorized Code Flow. 
+        /// Boolean value specifying whether the Credential Issuer expects presentation of a transaction code along with the Token Request in a Pre-Authorized Code Flow. 
         /// </summary>
         /// <returns></returns>
-        public WalletClientBuilder RequirePin()
+        public WalletClientBuilder RequireTransactionCode()
         {
-            _client.UserPinRequired = true;
+            _client.IsTransactionCodeRequired = true;
             return this;
         }
 

@@ -265,7 +265,6 @@ namespace SimpleIdServer.IdServer.Store
                         .Include(u => u.Groups).ThenInclude(u => u.Group)
                         .Include(u => u.Devices)
                         .Include(u => u.OAuthUserClaims)
-                        .Include(u => u.CredentialOffers)
                         .Include(u => u.Realms);
     }
 }

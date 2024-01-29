@@ -17,7 +17,6 @@ using SimpleIdServer.Configuration;
 using SimpleIdServer.Configuration.Redis;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Console;
-using SimpleIdServer.IdServer.CredentialIssuer;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Email;
 using SimpleIdServer.IdServer.Fido;
@@ -115,7 +114,6 @@ app
     // .UseSIDReDoc()
     .UseWsFederation()
     .UseFIDO()
-    .UseCredentialIssuer()
     .UseSamlIdp()
     .UseAutomaticConfiguration();
 
@@ -140,7 +138,6 @@ void ConfigureIdServer(IServiceCollection services)
             o.AddOAuthSecurity();
         })
         .AddConsoleNotification()
-        .AddCredentialIssuer()
         .UseInMemoryMassTransit()
         .AddBackChannelAuthentication()
         .AddPwdAuthentication()
@@ -170,8 +167,6 @@ void ConfigureIdServer(IServiceCollection services)
         });
     var isRealmEnabled = identityServerConfiguration.IsRealmEnabled;
     if (isRealmEnabled) idServerBuilder.UseRealm();
-    services.AddDIDKey();
-    services.AddDIDEthr();
     ConfigureDistributedCache();
 }
 
@@ -422,17 +417,6 @@ void SeedData(WebApplication application, string scimBaseUrl)
                     }
                 });
             }
-
-            if (!dbContext.Networks.Any())
-                dbContext.Networks.Add(new SimpleIdServer.IdServer.Domains.NetworkConfiguration
-                {
-                    Name = "sepolia",
-                    RpcUrl = "https://rpc.sepolia.org",
-                    ContractAdr = SimpleIdServer.Did.Ethr.Constants.DefaultContractAdr,
-                    PrivateAccountKey = "0fda34d0029c91481b1f54b0b68efea94c4572c80b2902cb3a2ab722b41fc1e1",
-                    UpdateDateTime = DateTime.UtcNow,
-                    CreateDateTime = DateTime.UtcNow
-                });
 
             AddMissingConfigurationDefinition<FacebookOptionsLite>(dbContext);
             AddMissingConfigurationDefinition<LDAPRepresentationsExtractionJobOptions>(dbContext);

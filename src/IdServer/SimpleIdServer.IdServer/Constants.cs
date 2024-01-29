@@ -36,6 +36,12 @@ namespace SimpleIdServer.IdServer
             StandardScopes.SAMLProfile.Name
         };
 
+        public static class StandardAuthorizationDetails
+        {
+            public const string OpenIdCredential = "openid_credential";
+            public const string CredentialConfigurationId = "credential_configuration_id";
+        }
+
         public static class EndPoints
         {
             public const string Token = "token";

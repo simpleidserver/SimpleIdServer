@@ -40,7 +40,7 @@ namespace SimpleIdServer.IdServer.Helpers
         Task<string> AddAuthorizationCode(JsonObject originalRequest, string grantId, double validityPeriodsInSeconds, string dpopJkt, string sessionId, CancellationToken cancellationToken);
         Task<AuthCode> GetAuthorizationCode(string code, CancellationToken cancellationToken);
         Task RemoveAuthorizationCode(string code, CancellationToken cancellationToken);
-        Task AddPreAuthCode(string preAuthorizationCode, string pin, string clientId, string userId, double validityPeriodsInSeconds, CancellationToken cancellationToken);
+        Task AddPreAuthCode(PreAuthCode preAuthCode, double validityPeriodsInSeconds, CancellationToken cancellationToken);
         Task<PreAuthCode> GetPreAuthCode(string preAuthorizationCode, CancellationToken cancellationToken);
         Task RemovePreAuthCode(string preAuthorizationCode, CancellationToken cancellationToken);
         Task AddResetPasswordLink(string otpCode, string login, string realm, double expirationTimeInSeconds, CancellationToken cancellationToken);
@@ -271,11 +271,10 @@ namespace SimpleIdServer.IdServer.Helpers
 
         #region Pre Authorization Code
 
-        public async Task AddPreAuthCode(string preAuthorizationCode, string pin, string clientId, string userId, double validityPeriodsInSeconds, CancellationToken cancellationToken)
+        public async Task AddPreAuthCode(PreAuthCode preAuthCode, double validityPeriodsInSeconds, CancellationToken cancellationToken)
         {
-            var credOffer = new PreAuthCode { ClientId = clientId, Pin = pin, Code = preAuthorizationCode, UserId = userId };
-            var serializedCredOffer = JsonSerializer.Serialize(credOffer);
-            await _distributedCache.SetAsync(preAuthorizationCode, Encoding.UTF8.GetBytes(serializedCredOffer), new DistributedCacheEntryOptions
+            var serializedPreAuthCode = JsonSerializer.Serialize(preAuthCode);
+            await _distributedCache.SetAsync(preAuthCode.Code, Encoding.UTF8.GetBytes(serializedPreAuthCode), new DistributedCacheEntryOptions
             {
                 SlidingExpiration = TimeSpan.FromSeconds(validityPeriodsInSeconds)
             }, cancellationToken);
