@@ -9,4 +9,5 @@ namespace SimpleIdServer.Did;
 public interface IDidResolver
 {
     Task<DidDocument> Resolve(string did, CancellationToken cancellationToken);
+    string Method { get; }
 }

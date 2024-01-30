@@ -11,6 +11,7 @@ namespace SimpleIdServer.CredentialIssuer.CredentialFormats;
 public interface ICredentialFormatter
 {
     public string Format { get; }
+    JsonObject ExtractCredentialIssuerMetadata(CredentialConfiguration configuration);
     CredentialHeader ExtractHeader(JsonObject jsonObj);
     JsonNode Build(BuildCredentialRequest request, DidDocument didDocument, string verificationMethodId);
 }

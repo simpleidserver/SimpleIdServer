@@ -14,27 +14,29 @@ namespace SimpleIdServer.CredentialIssuer.Api.CredentialIssuer
 {
     public class CredentialIssuerController : Controller
     {
-        private readonly ICredentialTemplateStore _credentialTemplateStore;
-        private readonly ICredentialDefinitionSerializer _serializer;
+        private readonly ICredentialConfigurationStore _credentialConfigurationStore;
+        private readonly ICredentialConfigurationSerializer _serializer;
 
         public CredentialIssuerController(
-            ICredentialTemplateStore credentialTemplateStore,
-            ICredentialDefinitionSerializer serializer)
+            ICredentialConfigurationStore credentialConfigurationStore,
+            ICredentialConfigurationSerializer serializer)
         {
-            _credentialTemplateStore = credentialTemplateStore;
+            _credentialConfigurationStore = credentialConfigurationStore;
             _serializer = serializer;
         }
 
         [HttpGet(Constants.EndPoints.CredentialIssuer)]
-        public async Task<IActionResult> Get([FromRoute] string prefix, CancellationToken cancellationToken)
+        public async Task<IActionResult> Get(CancellationToken cancellationToken)
         {
-            var credentialTemplates = await _credentialTemplateStore.GetAll(cancellationToken);
+            var credentialTemplates = await _credentialConfigurationStore.GetAll(cancellationToken);
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
             var result = new CredentialIssuerResult
             {
                 CredentialIssuer = issuer,
                 CredentialEndpoint = $"{issuer}/{Constants.EndPoints.Credential}",
-                CredentialsSupported = credentialTemplates.ToDictionary(kvp => kvp.Id, kvp => _serializer.Serialize(kvp))
+                CredentialsSupported = credentialTemplates.ToDictionary(kvp => kvp.Id, kvp => _serializer.Serialize(kvp)),
+                CredentialIdentifiersSupported = true,
+                RequireCredentialResponseEncryption = false
             };
             return new ContentResult
             {

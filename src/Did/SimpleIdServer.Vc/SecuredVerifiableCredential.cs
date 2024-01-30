@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
-using Org.BouncyCastle.Pkcs;
 using SimpleIdServer.Did.Crypto.Multicodec;
 using SimpleIdServer.Did.Encoders;
 using SimpleIdServer.Did.Models;
@@ -15,7 +14,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;

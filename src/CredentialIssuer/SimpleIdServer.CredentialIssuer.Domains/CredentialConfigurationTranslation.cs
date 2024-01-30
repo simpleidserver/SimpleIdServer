@@ -5,10 +5,12 @@ namespace SimpleIdServer.CredentialIssuer.Domains;
 
 public class CredentialConfigurationTranslation
 {
+    public string Id { get; set; }
     public string Name { get; set; }
-    public string Locale { get; set; }
-    public string LogoUrl { get; set; }
-    public string LogoAltText { get; set; }
-    public string BackgroundColor { get; set; }
-    public string TextColor { get; set; }
+    public string? Locale { get; set; } = null;
+    public string? LogoUrl { get; set; } = null;
+    public string? LogoAltText { get; set; } = null;
+    public string? Description { get; set; } = null;
+    public string? BackgroundColor { get; set; } = null;
+    public string? TextColor { get; set; } = null;
 }

@@ -145,16 +145,16 @@ Scenario: merge the authorization_details types and check the grant is updated
 	Given authenticate a user
 	
 	When execute HTTP GET request 'http://localhost/authorization'
-	| Key                     | Value                                                                                                                                |
-	| response_type           | code                                                                                                                                 |
-	| client_id               | fiftyEightClient                                                                                                                     |
-	| state                   | state                                                                                                                                |
-	| response_mode           | query                                                                                                                                |
-	| redirect_uri            | http://localhost:8080                                                                                                                |
-	| nonce                   | nonce                                                                                                                                |
-	| authorization_details   |  { "type" : "openid_credential", "format": "jwt_vc_json", "types": [ "VerifiableCredential"], "locations" : [ "http://localhost" ] } |
-	| grant_management_action | create                                                                                                                               |
-	| scope                   | grant_management_query                                                                                                               |
+	| Key                     | Value																					  |
+	| response_type           | code																					  |
+	| client_id               | fiftyEightClient																		  |
+	| state                   | state																					  |
+	| response_mode           | query																					  |
+	| redirect_uri            | http://localhost:8080																	  |
+	| nonce                   | nonce																					  |
+	| authorization_details   |  { "type" : "openid_credential", "credential_configuration_id" : "VerifiableCredential" } |
+	| grant_management_action | create                                                                                    |
+	| scope                   | grant_management_query                                                                    |
 
 	And extract parameter 'code' from redirect url
 	
@@ -169,18 +169,18 @@ Scenario: merge the authorization_details types and check the grant is updated
 	And extract JSON from body
 	And extract parameter '$.grant_id' from JSON body into 'grantId'	
 	
-	And execute HTTP GET request 'http://localhost/authorization'
-	| Key                     | Value                                                                                                                                                              |
-	| response_type           | code                                                                                                                                                               |
-	| client_id               | fiftyEightClient                                                                                                                                                   |
-	| state                   | state                                                                                                                                                              |
-	| response_mode           | query                                                                                                                                                              |
-	| redirect_uri            | http://localhost:8080                                                                                                                                              |
-	| nonce                   | nonce                                                                                                                                                              |
-	| grant_management_action | merge                                                                                                                                                              |
-	| scope                   | grant_management_revoke grant_management_query                                                                                                                     |
-	| grant_id                | $grantId$                                                                                                                                                          |	
-	| authorization_details   |  { "type" : "openid_credential", "format": "jwt_vc_json", "types": [ "VerifiableCredential", "UniversityDegreeCredential"], "locations" : [ "http://localhost" ] } |
+	And execute HTTP GET request 'http://localhost/authorization'														        
+	| Key                     | Value                                                                                           |
+	| response_type           | code                                                                                            |
+	| client_id               | fiftyEightClient                                                                                |
+	| state                   | state                                                                                           |
+	| response_mode           | query                                                                                           |
+	| redirect_uri            | http://localhost:8080                                                                           |
+	| nonce                   | nonce                                                                                           |
+	| grant_management_action | merge                                                                                           |
+	| scope                   | grant_management_revoke grant_management_query                                                  |
+	| grant_id                | $grantId$                                                                                       |
+	| authorization_details   |  { "type" : "openid_credential", "credential_configuration_id" : "UniversityDegreeCredential" } |
 	
 	And extract parameter 'code' from redirect url
 	
@@ -202,10 +202,7 @@ Scenario: merge the authorization_details types and check the grant is updated
 	And extract JSON from body
 
 	Then JSON '$.authorization_details[0].type'='openid_credential'
-	And JSON '$.authorization_details[0].format'='jwt_vc_json'
-	And JSON '$.authorization_details[0].locations[0]'='http://localhost'
-	And JSON '$.authorization_details[0].types[0]'='VerifiableCredential'
-	And JSON '$.authorization_details[0].types[1]'='UniversityDegreeCredential'
+	And JSON '$.authorization_details[0].credential_configuration_id'='UniversityDegreeCredential'
 
 Scenario: merge the permissions consented by the user in the actual request with those already exist within the grant
 	Given authenticate a user

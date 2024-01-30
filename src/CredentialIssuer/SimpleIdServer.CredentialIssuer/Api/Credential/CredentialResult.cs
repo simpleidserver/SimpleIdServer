@@ -8,8 +8,6 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential;
 
 public class CredentialResult
 {
-    [JsonPropertyName(CredentialResultNames.Format)]
-    public string Format { get; set; }
     [JsonPropertyName(CredentialResultNames.Credential)]
     public JsonNode Credential { get; set; }
     [JsonPropertyName(CredentialResultNames.CNonce)]

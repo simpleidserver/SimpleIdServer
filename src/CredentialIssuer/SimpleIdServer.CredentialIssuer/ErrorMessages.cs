@@ -9,15 +9,20 @@ namespace SimpleIdServer.IdServer.CredentialIssuer
         public const string MISSING_OPENID_CREDENTIAL_FORMAT = "the authorization_details must contain a format";
         public const string EXISTING_CREDENTIAL_TEMPLATE = "Credential template with the type {0} already exists";
         public const string INVALID_INCOMING_REQUEST = "the incoming request is not valid";
+        public const string INVALID_PROOF_FORMAT = "the proof format {0} is not supported";
         public const string INVALID_ACCESS_TOKEN_SCOPE = "access token has an invalid scope";
         public const string INVALID_PROOF_SIG = "the proof signature is not correct";
         public const string INVALID_PROOF_JWT = "the proof is not a well formed JWT token";
         public const string INVALID_PROOF_JWT_TYP = "the proof typ must be equals to {0}";
+        public const string INVALID_PROOF_JWT_ALG = "the proof alg cannot be equals to {0}";
         public const string INVALID_PROOF_C_NONCE = "the credential nonce (c_nonce) is not valid";
+        public const string INVALID_PROOF_JWT_KID = "the kid must be a did";
         public const string UNSUPPORTED_FORMAT = "the format {0} is not supported";
         public const string UNSUPPORTED_CREDENTIAL = "the credentials {0} are not supported";
         public const string UNSUPPORTED_GRANT_TYPES = "the grant types {0} are not supported";
+        public const string UNSUPPORTED_DID_METHOD = "the did method {0} is not supported";
         public const string UNKNOWN_ACCESS_TOKEN = "either the access token has been revoked or is invalid";
+        public const string UNKNOWN_CREDENTIAL_ID = "the credential {0} doesn't exist";
         public const string UNKNOWN_CREDENTIAL_OFFER = "the credential offer {0} doesn't exist";
         public const string UNKNOWN_CREDENTIAL_TEMPLATE = "the credential template {0} doesn't exist";
         public const string UNKNOWN_CREDENTIAL_DISPLAY_TEMPLATE = "the credential template display {0} doesn't exist";
@@ -39,5 +44,6 @@ namespace SimpleIdServer.IdServer.CredentialIssuer
         public const string UNSUPPORTED_CREDENTIAL_FORMAT = "the credential format {0} is not supported";
         public const string UNSUPPORTED_CREDENTIAL_TYPE = "the credential type {0} is not supported";
         public const string CREDENTIAL_TYPE_CANNOT_BE_EXTRACTED = "the credential type cannot be extracted";
+        public const string MISSING_PROOF_JWT_KID = "the jwt proof doesn't contain a kid";
     }
 }

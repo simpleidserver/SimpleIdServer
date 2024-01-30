@@ -1,4 +1,5 @@
-﻿using SimpleIdServer.Did.Models;
+﻿using SimpleIdServer.CredentialIssuer.Domains;
+using SimpleIdServer.Did.Models;
 using SimpleIdServer.Vc.Models;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,50 @@ public abstract class BaseW3CVerifiableCredentialFormatter : ICredentialFormatte
 {
     private const string VerifiableCredentialJsonLdContext = "https://www.w3.org/2018/credentials/v1";
     public abstract string Format { get; }
+
+    public JsonObject ExtractCredentialIssuerMetadata(CredentialConfiguration configuration)
+    {
+        var ctx = new JsonArray
+        {
+            VerifiableCredentialJsonLdContext,
+            configuration.JsonLdContext
+        };
+        var type = new JsonArray
+        {
+            "VerifiableCredential",
+            configuration.Id
+        };
+        var credentialSubject = new JsonObject();
+        foreach(var claim in configuration.Claims)
+        {
+            var record = new JsonObject();
+            if (claim.Mandatory != null)
+                record.Add("mandatory", claim.Mandatory.Value);
+            if (!string.IsNullOrWhiteSpace(claim.ValueType))
+                record.Add("value_type", claim.ValueType);
+            var displays = new JsonArray();
+            foreach(var display in claim.Translations)
+            {
+                var translation = new JsonObject();
+                if (!string.IsNullOrWhiteSpace(display.Name))
+                    translation.Add("name", display.Name);
+                if (!string.IsNullOrWhiteSpace(display.Locale))
+                    translation.Add("locale", display.Locale);
+                displays.Add(translation);
+            }
+
+            record.Add("display", displays);
+            credentialSubject.Add(claim.Name, record);
+        }
+
+        var result = new JsonObject
+        {
+            { "@context", ctx },
+            { "type", type },
+            { "credentialSubject", credentialSubject }
+        };
+        return result;
+    }
 
     public CredentialHeader ExtractHeader(JsonObject jsonObj)
     {
