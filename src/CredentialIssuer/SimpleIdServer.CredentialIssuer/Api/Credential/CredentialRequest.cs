@@ -7,8 +7,8 @@ using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.CredentialIssuer.Api.Credential
 {
-    [JsonConverter(typeof(OtherDataConverter))]
-    public class CredentialRequest
+    [JsonConverter(typeof(OtherDataJsonConverter<CredentialRequest>))]
+    public class CredentialRequest : IOtherData
     {
         /// <summary>
         /// Format of the Credential to be issued.

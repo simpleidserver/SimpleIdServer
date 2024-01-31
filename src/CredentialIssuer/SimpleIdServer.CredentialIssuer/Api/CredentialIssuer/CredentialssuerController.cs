@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.CredentialIssuer.Api.CredentialIssuer
 {
+    [Route(Constants.EndPoints.CredentialIssuer)]
     public class CredentialIssuerController : Controller
     {
         private readonly ICredentialConfigurationStore _credentialConfigurationStore;
@@ -25,7 +26,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.CredentialIssuer
             _serializer = serializer;
         }
 
-        [HttpGet(Constants.EndPoints.CredentialIssuer)]
+        [HttpGet]
         public async Task<IActionResult> Get(CancellationToken cancellationToken)
         {
             var credentialTemplates = await _credentialConfigurationStore.GetAll(cancellationToken);

@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.CredentialIssuer.Api.Credential
 {
+    [Route(Constants.EndPoints.Credential)]
     public class CredentialController : BaseController
     {
         private readonly IEnumerable<ICredentialFormatter> _formatters;
@@ -45,7 +46,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
             _options = options.Value;
         }
 
-        [HttpPost(Constants.EndPoints.Credential)]
+        [HttpPost]
         [Authorize("Authenticated")]
         public async Task<IActionResult> Get([FromRoute] string prefix, [FromBody] CredentialRequest request, CancellationToken cancellationToken)
         {
@@ -82,7 +83,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
                 credentialTemplateClaims = validationResult.CredentialTemplate.Claims;
             }
 
-            var userCredentials = await _userCredentialClaimStore.Resolve(subject, credentialTemplateClaims);
+            var userCredentials = await _userCredentialClaimStore.Resolve(subject, credentialTemplateClaims, request.Credentialidentifier);
             buildRequest.UserCredentialClaims = userCredentials;
             var formatter = validationResult.Formatter;
             var result = formatter.Build(buildRequest, _options.DidDocument, _options.VerificationMethodId);

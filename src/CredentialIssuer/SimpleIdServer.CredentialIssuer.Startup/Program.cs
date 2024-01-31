@@ -6,6 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddCredentialIssuer()
+    .UseInMemoryStore();
 
 var app = builder.Build();
 app.MapControllers();

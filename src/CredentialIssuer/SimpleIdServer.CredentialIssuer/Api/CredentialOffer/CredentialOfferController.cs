@@ -18,6 +18,7 @@ using System.Web;
 
 namespace SimpleIdServer.CredentialIssuer.Api.CredentialOffer
 {
+    [Route(Constants.EndPoints.CredentialOffer)]
     public class CredentialOfferController : BaseController
     {
         private readonly ICredentialConfigurationStore _credentialConfigurationStore;

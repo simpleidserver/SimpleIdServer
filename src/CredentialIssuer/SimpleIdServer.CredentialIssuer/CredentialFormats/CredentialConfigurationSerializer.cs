@@ -15,7 +15,7 @@ public interface ICredentialConfigurationSerializer
     JsonObject Serialize(CredentialConfiguration template);
 }
 
-public class CredentialConfigurationSerializer
+public class CredentialConfigurationSerializer : ICredentialConfigurationSerializer
 {
     private readonly IEnumerable<ICredentialFormatter> _credentialSerializers;
     private readonly IEnumerable<IKeyProofTypeValidator> _keyProofTypeValidators;

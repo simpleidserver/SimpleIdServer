@@ -2,11 +2,10 @@
   "profiles": {
     "SimpleIdServer.CredentialIssuer.Startup": {
       "commandName": "Project",
-      "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "https://localhost:55910;http://localhost:55911"
+      "applicationUrl": "http://localhost:5005"
     }
   }
 }
