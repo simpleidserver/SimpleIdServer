@@ -1,6 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using System.Collections.Generic;
+
 namespace SimpleIdServer.Did;
 
 public static class Constants
@@ -55,6 +57,16 @@ public static class Constants
         public const string Rsa = "RS256";
         public const string X25519 = "X25519";
     }
+
+    public static List<string> AllStandardJwtAlgs => new List<string>
+    {
+        StandardJwtAlgs.Es256K,
+        StandardJwtAlgs.EdDsa,
+        StandardJwtAlgs.Es256,
+        StandardJwtAlgs.Es384,
+        StandardJwtAlgs.Rsa,
+        StandardJwtAlgs.X25519
+    };
 
     public const string DefaultIdentityDocumentContext = "https://www.w3.org/ns/did/v1";
     public const string Scheme = "did";

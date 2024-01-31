@@ -10,11 +10,12 @@ public class CredentialConfiguration
     public string Id { get; set; }
     public string JsonLdContext { get; set; }
     public string BaseUrl { get; set; }
+    public string Type { get; set; }
     public string Format { get; set; }
     public string Scope { get; set; }
     public DateTime CreateDateTime { get; set; }
     public DateTime UpdateDateTime { get; set; }
-    public List<CredentialConfigurationClaim> Claims { get; set; }
-    public List<CredentialConfigurationTranslation> Displays { get; set; }
+    public virtual List<CredentialConfigurationClaim> Claims { get; set; } = new List<CredentialConfigurationClaim>();
+    public virtual List<CredentialConfigurationTranslation> Displays { get; set; } = new List<CredentialConfigurationTranslation>();
     public virtual List<Credential> Credentials { get; set; }
 }

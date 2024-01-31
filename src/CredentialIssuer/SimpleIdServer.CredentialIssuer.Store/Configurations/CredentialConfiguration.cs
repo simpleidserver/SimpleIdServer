@@ -11,6 +11,6 @@ public class CredentialConfiguration : IEntityTypeConfiguration<Domains.Credenti
 {
     public void Configure(EntityTypeBuilder<Credential> builder)
     {
-        throw new NotImplementedException();
+        builder.HasKey(c => c.Id);
     }
 }

@@ -39,10 +39,13 @@ public class CredentialConfigurationSerializer : ICredentialConfigurationSeriali
         var cryptographicBindingMethodsSupported = new JsonArray();
         foreach (var didResolver in _didResolvers)
             cryptographicBindingMethodsSupported.Add($"{Did.Constants.Scheme}:{didResolver.Method}");
+        var cryptographicSuitesSupported = new JsonArray();
+        foreach (var alg in Did.Constants.AllStandardJwtAlgs)
+            cryptographicSuitesSupported.Add(alg);
         result.Add("format", configuration.Format);
         result.Add("scope", configuration.Scope);
         result.Add("cryptographic_binding_methods_supported", cryptographicBindingMethodsSupported);
-        result.Add("cryptographic_suites_supported", ""); // ES256 etc...
+        result.Add("cryptographic_suites_supported", cryptographicSuitesSupported);
         result.Add("proof_types", SerializeProofTypes());
         result.Add("display", SerializeDisplay(configuration));
         return result;

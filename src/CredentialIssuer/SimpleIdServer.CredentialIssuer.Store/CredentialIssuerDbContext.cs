@@ -17,6 +17,8 @@ public class CredentialIssuerDbContext : DbContext
 
     public DbSet<Credential> Credentials { get; set; }
 
+    public DbSet<UserCredentialClaim> UserCredentialClaims { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

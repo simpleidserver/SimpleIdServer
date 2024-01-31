@@ -11,6 +11,6 @@ public class CredentialConfigurationTranslationConfiguration : IEntityTypeConfig
 {
     public void Configure(EntityTypeBuilder<CredentialConfigurationTranslation> builder)
     {
-        throw new NotImplementedException();
+        builder.HasKey(c => c.Id);
     }
 }

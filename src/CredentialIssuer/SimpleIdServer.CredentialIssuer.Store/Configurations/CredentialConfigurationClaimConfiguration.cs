@@ -11,6 +11,7 @@ public class CredentialConfigurationClaimConfiguration : IEntityTypeConfiguratio
 {
     public void Configure(EntityTypeBuilder<CredentialConfigurationClaim> builder)
     {
-        throw new NotImplementedException();
+        builder.HasKey(c => c.Id);
+        builder.HasMany(c => c.Translations).WithOne(c => c.CredentialConfigurationClaim).OnDelete(DeleteBehavior.Cascade);
     }
 }

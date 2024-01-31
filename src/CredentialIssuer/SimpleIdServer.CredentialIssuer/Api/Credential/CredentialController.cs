@@ -48,7 +48,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
 
         [HttpPost]
         [Authorize("Authenticated")]
-        public async Task<IActionResult> Get([FromRoute] string prefix, [FromBody] CredentialRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> Get([FromBody] CredentialRequest request, CancellationToken cancellationToken)
         {
             var subject = User.FindFirst("sub").Value;
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
@@ -67,6 +67,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
                 buildRequest.Type = validationResult.Credential.Configuration.Id;
                 buildRequest.ValidFrom = validationResult.Credential.IssueDateTime;
                 buildRequest.ValidUntil = validationResult.Credential.ExpirationDateTime;
+                buildRequest.CredentialConfiguration = validationResult.Credential.Configuration;
                 credentialTemplateClaims = validationResult.Credential.Configuration.Claims;
             }
             else
@@ -80,14 +81,14 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
                     buildRequest.ValidUntil = DateTime.UtcNow.AddSeconds(_options.CredentialExpirationTimeInSeconds.Value);
                 }
 
+                buildRequest.CredentialConfiguration = validationResult.CredentialTemplate;
                 credentialTemplateClaims = validationResult.CredentialTemplate.Claims;
             }
 
-            var userCredentials = await _userCredentialClaimStore.Resolve(subject, credentialTemplateClaims, request.Credentialidentifier);
+            var userCredentials = await _userCredentialClaimStore.Resolve(subject, credentialTemplateClaims, cancellationToken);
             buildRequest.UserCredentialClaims = userCredentials;
             var formatter = validationResult.Formatter;
             var result = formatter.Build(buildRequest, _options.DidDocument, _options.VerificationMethodId);
-
             return new OkObjectResult(new CredentialResult
             {
                 Credential = result
@@ -131,7 +132,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
                 if (formatter == null) return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.UNSUPPORTED_CREDENTIAL_FORMAT, string.Format(ErrorMessages.UNSUPPORTED_CREDENTIAL_FORMAT, credentialRequest.Format)));
                 var header = formatter.ExtractHeader(credentialRequest.Data);
                 if (header == null) return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, ErrorMessages.CREDENTIAL_TYPE_CANNOT_BE_EXTRACTED));
-                var credentialConfiguration = await _credentialConfigurationStore.Get(header.Type, cancellationToken);
+                var credentialConfiguration = await _credentialConfigurationStore.GetByType(header.Type, cancellationToken);
                 if (credentialConfiguration == null) return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.UNSUPPORTED_CREDENTIAL_TYPE, string.Format(ErrorMessages.UNSUPPORTED_CREDENTIAL_TYPE, header.Type)));
                 return CredentialValidationResult.Ok(formatter, credentialConfiguration);
             }

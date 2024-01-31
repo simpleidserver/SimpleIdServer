@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.CredentialIssuer.Domains;
 
 namespace SimpleIdServer.CredentialIssuer.Store;
@@ -13,18 +14,25 @@ public interface ICredentialOfferStore
 
 public class CredentialOfferStore : ICredentialOfferStore
 {
+    private readonly CredentialIssuerDbContext _dbContext;
+
+    public CredentialOfferStore(CredentialIssuerDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
     public void Add(CredentialOfferRecord credentialOffer)
     {
-        throw new NotImplementedException();
+        _dbContext.CredentialOfferRecords.Add(credentialOffer);
     }
 
     public Task<CredentialOfferRecord> Get(string id, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        return _dbContext.CredentialOfferRecords.SingleOrDefaultAsync(c => c.Id == id, cancellationToken);
     }
 
     public Task<int> SaveChanges(CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        return _dbContext.SaveChangesAsync(cancellationToken);
     }
 }

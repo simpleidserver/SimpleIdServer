@@ -10,7 +10,10 @@ namespace SimpleIdServer.CredentialIssuer.Store.Configurations
     {
         public void Configure(EntityTypeBuilder<Domains.CredentialConfiguration> builder)
         {
-            throw new NotImplementedException();
+            builder.HasKey(c => c.Id);
+            builder.HasMany(c => c.Claims).WithOne(c => c.CredentialConfiguration).OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(c => c.Displays).WithOne(c => c.CredentialConfiguration).OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(c => c.Credentials).WithOne(c => c.Configuration).OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

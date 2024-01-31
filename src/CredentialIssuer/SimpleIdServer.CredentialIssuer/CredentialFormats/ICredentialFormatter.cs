@@ -25,5 +25,6 @@ public class BuildCredentialRequest
     public string JsonLdContext { get; set; }
     public DateTime? ValidFrom { get; set; }
     public DateTime? ValidUntil { get; set; }
+    public CredentialConfiguration CredentialConfiguration { get; set; }
     public List<UserCredentialClaim> UserCredentialClaims { get; set; }
 }

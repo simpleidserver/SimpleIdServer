@@ -13,4 +13,6 @@ public class CredentialConfigurationTranslation
     public string? Description { get; set; } = null;
     public string? BackgroundColor { get; set; } = null;
     public string? TextColor { get; set; } = null;
+    public virtual CredentialConfigurationClaim CredentialConfigurationClaim { get; set; }
+    public virtual CredentialConfiguration CredentialConfiguration { get; set; }
 }

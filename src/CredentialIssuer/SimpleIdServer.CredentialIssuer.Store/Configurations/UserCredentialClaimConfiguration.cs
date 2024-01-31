@@ -11,6 +11,6 @@ public class UserCredentialClaimConfiguration : IEntityTypeConfiguration<UserCre
 {
     public void Configure(EntityTypeBuilder<UserCredentialClaim> builder)
     {
-        throw new NotImplementedException();
+        builder.HasKey(c => c.Id);
     }
 }

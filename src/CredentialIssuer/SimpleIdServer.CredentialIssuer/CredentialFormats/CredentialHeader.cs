@@ -5,6 +5,5 @@ namespace SimpleIdServer.CredentialIssuer.CredentialFormats;
 
 public class CredentialHeader
 {
-    public string Format { get; set; }
     public string Type { get; set; }
 }

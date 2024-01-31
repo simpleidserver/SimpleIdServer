@@ -4,6 +4,8 @@
 using SimpleIdServer.CredentialIssuer;
 using SimpleIdServer.CredentialIssuer.Api.Credential.Validators;
 using SimpleIdServer.CredentialIssuer.CredentialFormats;
+using SimpleIdServer.CredentialIssuer.Factories;
+using SimpleIdServer.CredentialIssuer.Services;
 using SimpleIdServer.IdServer.CredentialIssuer;
 using System;
 
@@ -20,6 +22,8 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ICredentialFormatter, JwtVcJsonFormatter>();
         services.AddTransient<ICredentialFormatter, JwtVcJsonLdFormatter>();
         services.AddTransient<ICredentialFormatter, LdpVcFormatter>();
+        services.AddTransient<IPreAuthorizedCodeService, PreAuthorizedCodeService>();
+        services.AddTransient<IHttpClientFactory, HttpClientFactory>();
         return new CredentialIssuerServer(services);
     }
 }

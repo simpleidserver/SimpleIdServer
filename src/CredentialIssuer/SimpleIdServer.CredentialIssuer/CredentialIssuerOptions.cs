@@ -32,4 +32,19 @@ public class CredentialIssuerOptions
     /// Default expiration time of a credential.
     /// </summary>
     public int? CredentialExpirationTimeInSeconds { get; set; }
+
+    /// <summary>
+    /// Client identifier.
+    /// </summary>
+    public string ClientId { get; set; }
+
+    /// <summary>
+    /// Client secret.
+    /// </summary>
+    public string ClientSecret { get; set; }
+
+    /// <summary>
+    /// Ignore the HTTPS certificate error.
+    /// </summary>
+    public bool IgnoreHttpsCertificateError { get; set; }
 }

@@ -10,7 +10,9 @@ namespace SimpleIdServer.CredentialIssuer.CredentialFormats
 {
     public class LdpVcFormatter : BaseW3CVerifiableCredentialFormatter
     {
-        public override string Format => "ldp_vc";
+        public override string Format => FORMAT;
+
+        public static string FORMAT = "ldp_vc";
 
         public override JsonNode Build(BuildCredentialRequest request, DidDocument didDocument, string verificationMethodId)
         {

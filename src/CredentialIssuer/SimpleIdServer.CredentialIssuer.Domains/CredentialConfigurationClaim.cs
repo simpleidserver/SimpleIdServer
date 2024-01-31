@@ -7,8 +7,11 @@ namespace SimpleIdServer.CredentialIssuer.Domains;
 
 public class CredentialConfigurationClaim
 {
+    public string Id {  get; set; }
+    public string SourceUserClaimName { get; set; }
     public string Name { get; set; }
     public bool? Mandatory { get; set; }    
     public string? ValueType { get; set; }
-    public List<CredentialConfigurationTranslation> Translations { get; set; }
+    public virtual List<CredentialConfigurationTranslation> Translations { get; set; } = new List<CredentialConfigurationTranslation>();
+    public virtual CredentialConfiguration CredentialConfiguration { get; set; }
 }

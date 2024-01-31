@@ -11,6 +11,12 @@ public class CredentialOfferRecordConfiguration : IEntityTypeConfiguration<Crede
 {
     public void Configure(EntityTypeBuilder<CredentialOfferRecord> builder)
     {
-        throw new NotImplementedException();
+        builder.HasKey(c => c.Id);
+        builder.Property(a => a.GrantTypes).HasConversion(
+            v => string.Join(',', v),
+            v => v.Split(',', StringSplitOptions.None).ToList());
+        builder.Property(a => a.CredentialConfigurationIds).HasConversion(
+            v => string.Join(',', v),
+            v => v.Split(',', StringSplitOptions.None).ToList());
     }
 }

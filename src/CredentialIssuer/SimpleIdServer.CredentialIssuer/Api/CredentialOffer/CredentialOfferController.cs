@@ -1,9 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using QRCoder;
 using SimpleIdServer.CredentialIssuer.Domains;
+using SimpleIdServer.CredentialIssuer.Services;
 using SimpleIdServer.CredentialIssuer.Store;
 using SimpleIdServer.IdServer.CredentialIssuer;
 using SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialOffer;
@@ -23,23 +26,33 @@ namespace SimpleIdServer.CredentialIssuer.Api.CredentialOffer
     {
         private readonly ICredentialConfigurationStore _credentialConfigurationStore;
         private readonly ICredentialOfferStore _credentialOfferStore;
+        private readonly IPreAuthorizedCodeService _preAuthorizedCodeService;
         private readonly CredentialIssuerOptions _options;
 
         public CredentialOfferController(
             ICredentialConfigurationStore credentialConfigurationStore,
             ICredentialOfferStore credentialOfferStore,
+            IPreAuthorizedCodeService preAuthorizedCodeService,
             IOptions<CredentialIssuerOptions> options)
         {
             _credentialConfigurationStore = credentialConfigurationStore;
             _credentialOfferStore = credentialOfferStore;
+            _preAuthorizedCodeService = preAuthorizedCodeService;
             _options = options.Value;
         }
 
         [HttpPost]
+        [Authorize("Authenticated")]
         public async Task<IActionResult> Create([FromBody] CreateCredentialOfferRequest request, CancellationToken cancellationToken)
         {
             // https://openid.github.io/OpenID4VCI/openid-4-verifiable-credential-issuance-wg-draft.html#name-authorization-code-flow
             // https://curity.io/resources/learn/pre-authorized-code/ - exchange the access token for a pre-authorized code and PIN.
+            var accessToken = Request.Headers
+                .Single(h => h.Key == "Authorization")
+                .Value
+                .Single()
+                .Split(" ")
+                .Last();
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
             var validationResult = await Validate(request, cancellationToken);
             if (validationResult.ErrorResult != null)
@@ -49,10 +62,10 @@ namespace SimpleIdServer.CredentialIssuer.Api.CredentialOffer
             {
                 credentialOffer.IssuerState = Guid.NewGuid().ToString();
             }
-            else
+
+            if(credentialOffer.GrantTypes.Contains(CredentialOfferResultNames.PreAuthorizedCodeGrant))
             {
-                // call the token endpoint to get a pre-authorized-code.
-                credentialOffer.PreAuthorizedCode = Guid.NewGuid().ToString();
+                credentialOffer.PreAuthorizedCode = await _preAuthorizedCodeService.Get(accessToken, cancellationToken);
             }
 
             _credentialOfferStore.Add(credentialOffer);
@@ -83,8 +96,11 @@ namespace SimpleIdServer.CredentialIssuer.Api.CredentialOffer
             if (credentialOffer == null)
                 return Build(new ErrorResult(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CREDENTIAL_OFFER, id)));
             var dto = ToDto(credentialOffer, issuer);
-            // Generate the QR Code.
-            return null;
+            var qrGenerator = new QRCodeGenerator();
+            var qrCodeData = qrGenerator.CreateQrCode(dto.OfferUri, QRCodeGenerator.ECCLevel.Q);
+            var qrCode = new PngByteQRCode(qrCodeData);
+            var payload = qrCode.GetGraphic(20);
+            return File(payload, "image/png");
         }
 
         private async Task<CredentialOfferValidationResult> Validate(CreateCredentialOfferRequest request, CancellationToken cancellationToken)
@@ -101,7 +117,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.CredentialOffer
             if (invalidGrants.Any())
                 return CredentialOfferValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_OFFER_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_GRANT_TYPES, string.Join(',', invalidGrants))));
             var existingCredentials = await _credentialConfigurationStore.Get(request.CredentialConfigurationIds, cancellationToken);
-            var unknownCredentials = request.CredentialConfigurationIds.Where(id => !existingCredentials.Any(c => c.Id != id));
+            var unknownCredentials = request.CredentialConfigurationIds.Where(id => !existingCredentials.Any(c => c.Id == id));
             if (unknownCredentials.Any())
                 return CredentialOfferValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_OFFER_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_CREDENTIAL, string.Join(',', unknownCredentials))));
             var credentialOffer = new Domains.CredentialOfferRecord
@@ -142,7 +158,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.CredentialOffer
             {
                 authorizedCodeGrant = new AuthorizedCodeGrant
                 {
-                    IssuerState = issuer
+                    IssuerState = credentialOffer.IssuerState
                 };
             }
 
