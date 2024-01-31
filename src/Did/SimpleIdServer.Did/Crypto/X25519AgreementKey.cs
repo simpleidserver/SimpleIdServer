@@ -119,7 +119,7 @@ public class X25519AgreementKey : IAgreementKey
         throw new NotSupportedException("Cannot be used for signing");
     }
 
-    public SigningCredentials BuildSigningCredentials()
+    public SigningCredentials BuildSigningCredentials(string kid = null)
     {
         throw new NotImplementedException();
     }

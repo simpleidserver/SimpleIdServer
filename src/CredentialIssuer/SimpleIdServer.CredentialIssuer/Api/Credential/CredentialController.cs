@@ -98,14 +98,11 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
         private async Task<CredentialValidationResult> Validate(CredentialRequest credentialRequest, CancellationToken cancellationToken)
         {
             if (credentialRequest == null)
-            {
                 return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST));
-            }
 
             var atCredentialIdentifiers = GetCredentialIdentifiers();
             if(atCredentialIdentifiers == null && string.IsNullOrWhiteSpace(credentialRequest.Format))
                 return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, CredentialRequestNames.Format)));
-
 
             if(credentialRequest.Proof != null)
             {
@@ -114,7 +111,6 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
                 if (proofType == null) return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, string.Format(ErrorMessages.INVALID_PROOF_FORMAT, credentialRequest.Proof.ProofType)));
                 var proofTypeValidationResult = await proofType.Validate(credentialRequest.Proof, cancellationToken);
                 if (!proofTypeValidationResult.IsValid) return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_PROOF, proofTypeValidationResult.ErrorMessage));
-
             }
 
             if (atCredentialIdentifiers != null && string.IsNullOrWhiteSpace(credentialRequest.Credentialidentifier))

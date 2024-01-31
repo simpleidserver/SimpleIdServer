@@ -6,7 +6,7 @@ namespace SimpleIdServer.Did.Ethr.Models;
 
 public class DecentralizedIdentifierEthr : DecentralizedIdentifier
 {
-    public DecentralizedIdentifierEthr(string scheme, string method, string identifier) : base(scheme, method, identifier)
+    public DecentralizedIdentifierEthr(string scheme, string method, string identifier, string fragment) : base(scheme, method, identifier, fragment)
     {
     }
 

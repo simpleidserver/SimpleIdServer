@@ -48,7 +48,7 @@ public class DidEthrExtractor
             pk = tmp.Replace("0x", string.Empty);
         }
 
-        return new DecentralizedIdentifierEthr(decentralizedIdentifier.Scheme, decentralizedIdentifier.Method, decentralizedIdentifier.Identifier)
+        return new DecentralizedIdentifierEthr(decentralizedIdentifier.Scheme, decentralizedIdentifier.Method, decentralizedIdentifier.Identifier, decentralizedIdentifier.Fragment)
         {
             Address = address,
             Network = network,

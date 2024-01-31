@@ -14,7 +14,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -146,29 +145,6 @@ public class SecuredVerifiableCredential
         var handler = new JsonWebTokenHandler();
         var result = handler.CreateToken(securityTokenDescriptor);
         return result;
-    }
-
-    public bool CheckJwt(
-        string jwt,
-        DidDocument didDocument)
-    {
-        if (string.IsNullOrWhiteSpace(jwt)) throw new ArgumentNullException(nameof(jwt));
-        if (didDocument == null) throw new ArgumentNullException(nameof(didDocument));
-        if (didDocument.AssertionMethod == null) throw new InvalidOperationException("There is no assertion method");
-        var assertionIds = didDocument.AssertionMethod.Select(m => m.ToString());
-        if (!assertionIds.Any()) throw new InvalidOperationException("There is no assertion method");
-        var assertionMethods = didDocument.VerificationMethod.Where(m => assertionIds.Contains(m.Id));
-        var handler = new JsonWebTokenHandler();
-        var jsonWebToken = handler.ReadJsonWebToken(jwt);
-        var content = Encoding.UTF8.GetBytes($"{jsonWebToken.EncodedHeader}.{jsonWebToken.EncodedPayload}");
-        var signature = Base64UrlEncoder.DecodeBytes(jsonWebToken.EncodedSignature);
-        foreach (var assertionMethod in assertionMethods)
-        {
-            var asymKey = _verificationMethodEncoding.Decode(assertionMethod);
-            if (asymKey.CheckHash(content, signature, HashAlgorithmName.SHA256)) return true;
-        }
-
-        return false;
     }
 
     private byte[] HashDocument(JsonObject jObj, ISignatureProof proof)

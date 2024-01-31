@@ -30,7 +30,8 @@ public class CustomAuthenticationHandler : AuthenticationHandler<CustomAuthentic
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, "user"),
-            new Claim(ClaimTypes.Name, "user")
+            new Claim(ClaimTypes.Name, "user"),
+            new Claim("sub", "user")
         };
         var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);

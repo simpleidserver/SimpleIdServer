@@ -98,23 +98,23 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table1 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table12 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table1.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "Authorization",
                             "Bearer AT"});
-                table1.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "grants",
                             "[\"authorization_code\"]"});
-                table1.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "credential_configuration_ids",
                             "[\"UniversityDegree_ldp_vc\"]"});
-                table1.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "sub",
                             "user"});
 #line 5
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer\'", ((string)(null)), table1, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer\'", ((string)(null)), table12, "When ");
 #line hidden
 #line 12
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

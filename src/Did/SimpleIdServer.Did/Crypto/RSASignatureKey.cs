@@ -129,7 +129,7 @@ namespace SimpleIdServer.Did.Crypto
             return _rsa.SignHash(content, alg, RSASignaturePadding.Pkcs1);
         }
 
-        public SigningCredentials BuildSigningCredentials()
+        public SigningCredentials BuildSigningCredentials(string kid = null)
         {
             throw new NotImplementedException();
         }

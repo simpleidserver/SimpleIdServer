@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
 using SimpleIdServer.CredentialIssuer.Host.Acceptance.Tests;
 using SimpleIdServer.CredentialIssuer.Services;
+using SimpleIdServer.Did.Key;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,6 +21,7 @@ builder.Services.AddCredentialIssuer()
     {
         o.AddCredentialConfigurations(CredentialIssuerConfiguration.CredentialConfigurations);
     });
+builder.Services.AddDidKey();
 builder.Services.RemoveAll<IPreAuthorizedCodeService>();
 var mck = new Mock<IPreAuthorizedCodeService>();
 mck.Setup(x => x.Get(It.IsAny<string>(), It.IsAny<CancellationToken>()))

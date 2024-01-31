@@ -134,9 +134,11 @@ public class Ed25519SignatureKey : IAsymmetricKey
         return result;
     }
 
-    public SigningCredentials BuildSigningCredentials()
+    public SigningCredentials BuildSigningCredentials(string kid = null)
     {
-        var result = new SigningCredentials(new Ed25519SecurityKey(_publicKey, _privateKey), JwtAlg);
+        var key = new Ed25519SecurityKey(_publicKey, _privateKey);
+        key.KeyId = kid;
+        var result = new SigningCredentials(key, JwtAlg);
         return result;
     }
 }

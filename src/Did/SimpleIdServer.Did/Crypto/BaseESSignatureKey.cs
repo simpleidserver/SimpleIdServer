@@ -159,9 +159,11 @@ public abstract class BaseESSignatureKey : IAsymmetricKey
         _privateKey = keyPair.Private as ECPrivateKeyParameters;
     }
 
-    public SigningCredentials BuildSigningCredentials()
+    public SigningCredentials BuildSigningCredentials(string kid = null)
     {
-        var result = new SigningCredentials(new EsSecurityKey(_curve, _publicKey, _privateKey), JwtAlg);
+        var key = new EsSecurityKey(_curve, _publicKey, _privateKey);
+        key.KeyId = kid;
+        var result = new SigningCredentials(key, JwtAlg);
         return result;
     }
 }

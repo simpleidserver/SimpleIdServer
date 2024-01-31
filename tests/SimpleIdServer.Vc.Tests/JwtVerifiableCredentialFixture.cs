@@ -4,6 +4,7 @@ using NUnit.Framework;
 using SimpleIdServer.Did;
 using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Encoders;
+using SimpleIdServer.Did.Jwt;
 using SimpleIdServer.Did.Models;
 using SimpleIdServer.Vc.CredentialFormats.Serializers;
 
@@ -26,13 +27,14 @@ public class JwtVerifiableCredentialFixture
             .AddVerificationMethod(Ed25519VerificationKey2020Standard.TYPE, ed25119Sig, "controller", VerificationMethodUsages.ASSERTION_METHOD, includePrivateKey: true)
             .Build();
         var vc = SecuredVerifiableCredential.New();
+        var handler = DidJsonWebTokenHandler.New();
 
         // ACT
         var securedJson = vc.SecureJwt("http://localhost:5001",
             identityDocument, 
             identityDocument.VerificationMethod.First().Id,
             new W3CVerifiableCredentialJsonSerializer().Deserialize(_json));
-        var isSignatureValid = vc.CheckJwt(securedJson, identityDocument);
+        var isSignatureValid = handler.CheckJwt(securedJson, identityDocument);
 
         // ASSERT
         Assert.IsNotNull(securedJson);
@@ -54,13 +56,14 @@ public class JwtVerifiableCredentialFixture
             .AddVerificationMethod(JsonWebKey2020Standard.TYPE, es256Sig, "controller", VerificationMethodUsages.ASSERTION_METHOD, includePrivateKey: true)
             .Build();
         var vc = SecuredVerifiableCredential.New();
+        var handler = DidJsonWebTokenHandler.New();
 
         // ACT
         var securedJson = vc.SecureJwt("http://localhost:5001",
             identityDocument,
             identityDocument.VerificationMethod.First().Id,
             new W3CVerifiableCredentialJsonSerializer().Deserialize(_json));
-        var isSignatureValid = vc.CheckJwt(securedJson, identityDocument);
+        var isSignatureValid = handler.CheckJwt(securedJson, identityDocument);
 
         // ASSERT
         Assert.IsNotNull(securedJson);

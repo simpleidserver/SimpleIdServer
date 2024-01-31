@@ -18,5 +18,5 @@ public interface IAsymmetricKey
     JsonWebKey GetPrivateJwk();
     byte[] SignHash(byte[] content, HashAlgorithmName alg);
     bool CheckHash(byte[] content, byte[] signature, HashAlgorithmName? alg = null);
-    SigningCredentials BuildSigningCredentials();
+    SigningCredentials BuildSigningCredentials(string kid = null);
 }

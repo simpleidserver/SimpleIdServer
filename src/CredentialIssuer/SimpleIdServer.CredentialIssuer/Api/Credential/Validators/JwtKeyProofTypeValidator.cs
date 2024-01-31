@@ -2,9 +2,9 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.Did;
+using SimpleIdServer.Did.Jwt;
 using SimpleIdServer.IdServer.CredentialIssuer;
 using SimpleIdServer.IdServer.CredentialIssuer.DTOs;
-using SimpleIdServer.Vc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,7 +41,7 @@ public class JwtKeyProofTypeValidator : IKeyProofTypeValidator
             var resolver = _didResolvers.SingleOrDefault(r => r.Method == did.Method);
             if (resolver == null) return KeyProofTypeValidationResult.Error(string.Format(ErrorMessages.UNSUPPORTED_DID_METHOD, did.Method));
             var result = await resolver.Resolve(jwt.Kid, cancellationToken);
-            if (!SecuredVerifiableCredential.New().CheckJwt(request.Jwt, result)) return KeyProofTypeValidationResult.Error(ErrorMessages.INVALID_PROOF_SIG);
+            if (!DidJsonWebTokenHandler.New().CheckJwt(request.Jwt, result, jwt.Kid)) return KeyProofTypeValidationResult.Error(ErrorMessages.INVALID_PROOF_SIG);
             string nonce = null;
             var nonceClaim = jwt.Claims.SingleOrDefault(c => c.Type == "nonce");
             if (nonceClaim != null)
