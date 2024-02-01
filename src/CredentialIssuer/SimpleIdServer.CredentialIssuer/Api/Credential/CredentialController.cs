@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.CredentialIssuer.Api.Credential.Validators;
 using SimpleIdServer.CredentialIssuer.CredentialFormats;
 using SimpleIdServer.CredentialIssuer.Domains;
@@ -88,10 +89,21 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
             var userCredentials = await _userCredentialClaimStore.Resolve(subject, credentialTemplateClaims, cancellationToken);
             buildRequest.UserCredentialClaims = userCredentials;
             var formatter = validationResult.Formatter;
-            var result = formatter.Build(buildRequest, _options.DidDocument, _options.VerificationMethodId);
+            var credentialResult = formatter.Build(buildRequest, _options.DidDocument, _options.VerificationMethodId, _options.AsymmKey);
+            if(request.CredentialResponseEncryption != null)
+            {
+                var handler = new JsonWebTokenHandler();
+                var encKey = request.CredentialResponseEncryption.Jwk;
+                var encryptedCredential = handler.EncryptToken(credentialResult.ToJsonString(), new Microsoft.IdentityModel.Tokens.EncryptingCredentials(
+                    encKey,
+                    request.CredentialResponseEncryption.Alg,
+                    request.CredentialResponseEncryption.Enc));
+                credentialResult = encryptedCredential;
+            }
+
             return new OkObjectResult(new CredentialResult
             {
-                Credential = result
+                Credential = credentialResult
             });
         }
 
@@ -119,8 +131,18 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
             if(!string.IsNullOrWhiteSpace(credentialRequest.Format) && !string.IsNullOrWhiteSpace(credentialRequest.Credentialidentifier))
                 return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, ErrorMessages.CANNOT_USER_CREDENTIAL_IDENTIFIER_WITH_FORMAT));
 
-            if(!atCredentialIdentifiers.Contains(credentialRequest.Credentialidentifier))
+            if(!string.IsNullOrWhiteSpace(credentialRequest.Credentialidentifier) && !atCredentialIdentifiers.Contains(credentialRequest.Credentialidentifier))
                 return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, ErrorMessages.INVALID_CREDENTIAL_IDENTIFIER));
+
+            if (credentialRequest.CredentialResponseEncryption != null)
+            {
+                if (string.IsNullOrWhiteSpace(credentialRequest.CredentialResponseEncryption.Alg))
+                    return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_ENCRYPTION_PARAMETERS, string.Format(ErrorMessages.MISSING_PARAMETER, CredentialRequestNames.Alg)));
+                if (string.IsNullOrWhiteSpace(credentialRequest.CredentialResponseEncryption.Enc))
+                    return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_ENCRYPTION_PARAMETERS, string.Format(ErrorMessages.MISSING_PARAMETER, CredentialRequestNames.Enc)));
+                if (credentialRequest.CredentialResponseEncryption.Jwk == null)
+                    return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_ENCRYPTION_PARAMETERS, string.Format(ErrorMessages.MISSING_PARAMETER, CredentialRequestNames.Jwk)));
+            }
 
             if (!string.IsNullOrWhiteSpace(credentialRequest.Format))
             {
@@ -173,7 +195,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
             var claim = User.Claims.SingleOrDefault(c => c.Type == "authorization_details");
             if (claim == null) return null;
             var jsonObj = JsonObject.Parse(claim.Value).AsObject();
-            if (jsonObj.ContainsKey("credential_identifiers")) return null;
+            if (!jsonObj.ContainsKey("credential_identifiers")) return null;
             return (jsonObj["credential_identifiers"] as JsonArray).Select(c => c.ToString()).ToList();
         }
     }

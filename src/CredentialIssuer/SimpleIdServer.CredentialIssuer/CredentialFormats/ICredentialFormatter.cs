@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.CredentialIssuer.Domains;
+using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Models;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ public interface ICredentialFormatter
     public string Format { get; }
     JsonObject ExtractCredentialIssuerMetadata(CredentialConfiguration configuration);
     CredentialHeader ExtractHeader(JsonObject jsonObj);
-    JsonNode Build(BuildCredentialRequest request, DidDocument didDocument, string verificationMethodId);
+    JsonNode Build(BuildCredentialRequest request, DidDocument didDocument, string verificationMethodId, IAsymmetricKey asymmetricKey);
 }
 
 public class BuildCredentialRequest

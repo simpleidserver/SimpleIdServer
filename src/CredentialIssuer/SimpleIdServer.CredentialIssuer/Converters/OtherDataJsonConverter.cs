@@ -31,7 +31,8 @@ public class OtherDataJsonConverter<T> : JsonConverter<T> where T : IOtherData
             var prop = props.FirstOrDefault(p => p.Name == kvp.Key);
             if(prop.p == null)
             {
-                otherData.Add(prop.Name, nodeVal);
+                var duplicateValue = JsonNode.Parse(nodeVal.ToJsonString());
+                otherData.Add(kvp.Key, duplicateValue);
                 continue;
             }
 

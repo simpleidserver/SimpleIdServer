@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Crypto.Multicodec;
 using SimpleIdServer.Did.Encoders;
 using SimpleIdServer.Did.Models;
@@ -60,6 +61,7 @@ public class SecuredVerifiableCredential
         DidDocument didDocument, 
         string verificationMethodId, 
         ProofPurposeTypes purpose = ProofPurposeTypes.assertionMethod, 
+        IAsymmetricKey asymKey = null,
         DateTime? creationDateTime = null)
     {
         if (string.IsNullOrWhiteSpace(json)) throw new ArgumentNullException(nameof(json));
@@ -85,7 +87,8 @@ public class SecuredVerifiableCredential
         result.AddRange(hashProof);
         result.AddRange(hashPayload);
         // 3. Signature
-        var asymKey = _verificationMethodEncoding.Decode(verificationMethod);
+        if(asymKey == null)
+            asymKey = _verificationMethodEncoding.Decode(verificationMethod);
         proof.ComputeProof(dataIntegrityProof, result.ToArray(), asymKey, proof.HashingMethod);
         jObj.Add("proof", JsonObject.Parse(JsonSerializer.Serialize(dataIntegrityProof, typeof(DataIntegrityProof), GetJsonOptions())));
         return jObj.ToString();
@@ -121,14 +124,16 @@ public class SecuredVerifiableCredential
         string issuer,
         DidDocument didDocument,
         string verificationMethodId,
-        W3CVerifiableCredential vcCredential)
+        W3CVerifiableCredential vcCredential,
+        IAsymmetricKey asymKey = null)
     {
         if (didDocument == null) throw new ArgumentNullException(nameof(didDocument));
         if (string.IsNullOrWhiteSpace(verificationMethodId)) throw new ArgumentNullException(nameof(verificationMethodId));
         if (vcCredential == null) throw new ArgumentNullException(nameof(vcCredential));
         var verificationMethod = didDocument.VerificationMethod.SingleOrDefault(m => m.Id == verificationMethodId);
         if (verificationMethod == null) throw new ArgumentException($"The verification method {verificationMethodId} doesn't exist");
-        var asymKey = _verificationMethodEncoding.Decode(verificationMethod);
+        if(asymKey == null)
+            asymKey = _verificationMethodEncoding.Decode(verificationMethod);
         var signingCredentials = asymKey.BuildSigningCredentials();
         var claims = new Dictionary<string, object>
         {

@@ -1,21 +1,39 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using SimpleIdServer.Did.Crypto;
+using SimpleIdServer.Did.Key;
 using SimpleIdServer.Did.Models;
+using System.Linq;
+using System.Threading;
 
 namespace SimpleIdServer.IdServer.CredentialIssuer;
 
 public class CredentialIssuerOptions
 {
+    public CredentialIssuerOptions()
+    {
+        var resolver = DidKeyResolver.New();
+        AsymmKey = Ed25519SignatureKey.Generate();
+        var did = DidKeyGenerator.New().Generate(AsymmKey);
+        DidDocument = resolver.Resolve(did, CancellationToken.None).Result;
+        VerificationMethodId = DidDocument.VerificationMethod.First().Id;
+    }
+
     /// <summary>
-    /// Distributed Identity Document used to sign verifiable credential.
+    /// Did Document of the issuer. Contains only the public key.
     /// </summary>
     public DidDocument DidDocument { get; set; }
 
     /// <summary>
-    /// Identifier of the verification method used to sign the verifiable credential.
+    /// Identifier of the verification method. It will be used to signed the verifiable credential.
     /// </summary>
     public string VerificationMethodId { get; set; }
+
+    /// <summary>
+    /// Private key used to sign the Verifiable Credential.
+    /// </summary>
+    public IAsymmetricKey AsymmKey { get; set; }
 
     /// <summary>
     /// Base URL of the authorization server.

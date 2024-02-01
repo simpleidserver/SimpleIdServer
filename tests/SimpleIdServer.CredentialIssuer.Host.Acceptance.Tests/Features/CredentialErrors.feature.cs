@@ -101,11 +101,11 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table1 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table3 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
 #line 5
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table1, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table3, "When ");
 #line hidden
 #line 8
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -141,17 +141,17 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table2 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table4 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table2.AddRow(new string[] {
+                table4.AddRow(new string[] {
                             "proof",
                             "{ }"});
-                table2.AddRow(new string[] {
+                table4.AddRow(new string[] {
                             "format",
                             "format"});
 #line 15
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table2, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table4, "When ");
 #line hidden
 #line 20
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -187,17 +187,17 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table3 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table5 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table3.AddRow(new string[] {
+                table5.AddRow(new string[] {
                             "proof",
                             "{ \"proof_type\": \"invalid\" }"});
-                table3.AddRow(new string[] {
+                table5.AddRow(new string[] {
                             "format",
                             "format"});
 #line 27
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table3, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table5, "When ");
 #line hidden
 #line 32
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -233,26 +233,26 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table4 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table6 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table4.AddRow(new string[] {
+                table6.AddRow(new string[] {
                             "typ",
                             "invalid"});
 #line 39
- testRunner.Given("build jwt proof", ((string)(null)), table4, "Given ");
+ testRunner.Given("build jwt proof", ((string)(null)), table6, "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table5 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table7 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table5.AddRow(new string[] {
+                table7.AddRow(new string[] {
                             "proof",
                             "{ \"proof_type\": \"jwt\", \"jwt\": \"$jwtProof$\" }"});
-                table5.AddRow(new string[] {
+                table7.AddRow(new string[] {
                             "format",
                             "format"});
 #line 43
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table5, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table7, "When ");
 #line hidden
 #line 48
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -270,61 +270,6 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="proof kid must be present")]
-        [Xunit.TraitAttribute("FeatureTitle", "CredentialErrors")]
-        [Xunit.TraitAttribute("Description", "proof kid must be present")]
-        public void ProofKidMustBePresent()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("proof kid must be present", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 54
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-                TechTalk.SpecFlow.Table table6 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table6.AddRow(new string[] {
-                            "typ",
-                            "openid4vci-proof+jwt"});
-#line 55
- testRunner.Given("build jwt proof", ((string)(null)), table6, "Given ");
-#line hidden
-                TechTalk.SpecFlow.Table table7 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table7.AddRow(new string[] {
-                            "proof",
-                            "{ \"proof_type\": \"jwt\", \"jwt\": \"$jwtProof$\" }"});
-                table7.AddRow(new string[] {
-                            "format",
-                            "format"});
-#line 59
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table7, "When ");
-#line hidden
-#line 64
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 66
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 67
- testRunner.And("JSON \'error\'=\'invalid_proof\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 68
- testRunner.And("JSON \'error_description\'=\'the jwt proof doesn\'t contain a kid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
         [Xunit.SkippableFactAttribute(DisplayName="proof kid must be a did")]
         [Xunit.TraitAttribute("FeatureTitle", "CredentialErrors")]
         [Xunit.TraitAttribute("Description", "proof kid must be a did")]
@@ -333,7 +278,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("proof kid must be a did", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 70
+#line 54
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -352,7 +297,7 @@ this.ScenarioInitialize(scenarioInfo);
                 table8.AddRow(new string[] {
                             "kid",
                             "did"});
-#line 71
+#line 55
  testRunner.Given("build jwt proof", ((string)(null)), table8, "Given ");
 #line hidden
                 TechTalk.SpecFlow.Table table9 = new TechTalk.SpecFlow.Table(new string[] {
@@ -364,19 +309,19 @@ this.ScenarioInitialize(scenarioInfo);
                 table9.AddRow(new string[] {
                             "format",
                             "format"});
-#line 76
+#line 60
  testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table9, "When ");
 #line hidden
-#line 81
+#line 65
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 83
+#line 67
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 84
+#line 68
  testRunner.And("JSON \'error\'=\'invalid_proof\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 85
+#line 69
  testRunner.And("JSON \'error_description\'=\'did doesn\'t have the correct format\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -394,7 +339,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("credential_identifier must be present when access token contains credential_ident" +
                     "ifiers", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 87
+#line 71
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -410,8 +355,11 @@ this.ScenarioInitialize(scenarioInfo);
                 table10.AddRow(new string[] {
                             "typ",
                             "openid4vci-proof+jwt"});
-#line 88
+#line 72
  testRunner.Given("build jwt proof", ((string)(null)), table10, "Given ");
+#line hidden
+#line 76
+ testRunner.And("access token contains one credential identifier \'ItMaster\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table11 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
@@ -422,20 +370,555 @@ this.ScenarioInitialize(scenarioInfo);
                 table11.AddRow(new string[] {
                             "format",
                             "format"});
-#line 92
+#line 78
  testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table11, "When ");
 #line hidden
-#line 97
+#line 83
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 99
+#line 85
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 100
+#line 86
  testRunner.And("JSON \'error\'=\'invalid_credential_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 101
+#line 87
  testRunner.And("JSON \'error_description\'=\'the parameter credential_identifier is missing\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="format parameter must not be present when the credential_identifier parameter is " +
+            "passed")]
+        [Xunit.TraitAttribute("FeatureTitle", "CredentialErrors")]
+        [Xunit.TraitAttribute("Description", "format parameter must not be present when the credential_identifier parameter is " +
+            "passed")]
+        public void FormatParameterMustNotBePresentWhenTheCredential_IdentifierParameterIsPassed()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("format parameter must not be present when the credential_identifier parameter is " +
+                    "passed", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 89
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table12 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table12.AddRow(new string[] {
+                            "typ",
+                            "openid4vci-proof+jwt"});
+#line 90
+ testRunner.Given("build jwt proof", ((string)(null)), table12, "Given ");
+#line hidden
+#line 94
+ testRunner.And("access token contains one credential identifier \'ItMaster\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table13 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table13.AddRow(new string[] {
+                            "proof",
+                            "{ \"proof_type\": \"jwt\", \"jwt\": \"$jwtProof$\" }"});
+                table13.AddRow(new string[] {
+                            "format",
+                            "format"});
+                table13.AddRow(new string[] {
+                            "credential_identifier",
+                            "ItMaster"});
+#line 96
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table13, "When ");
+#line hidden
+#line 102
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 104
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 105
+ testRunner.And("JSON \'error\'=\'invalid_credential_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 106
+ testRunner.And("JSON \'error_description\'=\'the credential_identifier parameter cannot be used with" +
+                        " the format parameter\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="credential_identifier parameter must be present in the access token")]
+        [Xunit.TraitAttribute("FeatureTitle", "CredentialErrors")]
+        [Xunit.TraitAttribute("Description", "credential_identifier parameter must be present in the access token")]
+        public void Credential_IdentifierParameterMustBePresentInTheAccessToken()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("credential_identifier parameter must be present in the access token", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 108
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table14 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table14.AddRow(new string[] {
+                            "typ",
+                            "openid4vci-proof+jwt"});
+#line 109
+ testRunner.Given("build jwt proof", ((string)(null)), table14, "Given ");
+#line hidden
+#line 113
+ testRunner.And("access token contains one credential identifier \'ItMaster\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table15 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table15.AddRow(new string[] {
+                            "proof",
+                            "{ \"proof_type\": \"jwt\", \"jwt\": \"$jwtProof$\" }"});
+                table15.AddRow(new string[] {
+                            "credential_identifier",
+                            "Invalid"});
+#line 115
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table15, "When ");
+#line hidden
+#line 120
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 122
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 123
+ testRunner.And("JSON \'error\'=\'invalid_credential_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 124
+ testRunner.And("JSON \'error_description\'=\'the credential_identifier parameter is not valid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="format must be supported")]
+        [Xunit.TraitAttribute("FeatureTitle", "CredentialErrors")]
+        [Xunit.TraitAttribute("Description", "format must be supported")]
+        public void FormatMustBeSupported()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("format must be supported", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 126
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table16 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table16.AddRow(new string[] {
+                            "typ",
+                            "openid4vci-proof+jwt"});
+#line 127
+ testRunner.Given("build jwt proof", ((string)(null)), table16, "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table17 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table17.AddRow(new string[] {
+                            "proof",
+                            "{ \"proof_type\": \"jwt\", \"jwt\": \"$jwtProof$\" }"});
+                table17.AddRow(new string[] {
+                            "format",
+                            "format"});
+#line 131
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table17, "When ");
+#line hidden
+#line 136
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 138
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 139
+ testRunner.And("JSON \'error\'=\'unsupported_credential_format\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 140
+ testRunner.And("JSON \'error_description\'=\'the credential format format is not supported\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="the credential_definition parameter is required when format is equals to jwt_vc_j" +
+            "son")]
+        [Xunit.TraitAttribute("FeatureTitle", "CredentialErrors")]
+        [Xunit.TraitAttribute("Description", "the credential_definition parameter is required when format is equals to jwt_vc_j" +
+            "son")]
+        public void TheCredential_DefinitionParameterIsRequiredWhenFormatIsEqualsToJwt_Vc_Json()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("the credential_definition parameter is required when format is equals to jwt_vc_j" +
+                    "son", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 142
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table18 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table18.AddRow(new string[] {
+                            "typ",
+                            "openid4vci-proof+jwt"});
+#line 143
+ testRunner.Given("build jwt proof", ((string)(null)), table18, "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table19 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table19.AddRow(new string[] {
+                            "proof",
+                            "{ \"proof_type\": \"jwt\", \"jwt\": \"$jwtProof$\" }"});
+                table19.AddRow(new string[] {
+                            "format",
+                            "jwt_vc_json"});
+#line 147
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table19, "When ");
+#line hidden
+#line 152
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 154
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 155
+ testRunner.And("JSON \'error\'=\'invalid_credential_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 156
+ testRunner.And("JSON \'error_description\'=\'the credential type cannot be extracted\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="the type parameter is required when format is equals to jwt_vc_json")]
+        [Xunit.TraitAttribute("FeatureTitle", "CredentialErrors")]
+        [Xunit.TraitAttribute("Description", "the type parameter is required when format is equals to jwt_vc_json")]
+        public void TheTypeParameterIsRequiredWhenFormatIsEqualsToJwt_Vc_Json()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("the type parameter is required when format is equals to jwt_vc_json", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 158
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table20 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table20.AddRow(new string[] {
+                            "typ",
+                            "openid4vci-proof+jwt"});
+#line 159
+ testRunner.Given("build jwt proof", ((string)(null)), table20, "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table21 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table21.AddRow(new string[] {
+                            "proof",
+                            "{ \"proof_type\": \"jwt\", \"jwt\": \"$jwtProof$\" }"});
+                table21.AddRow(new string[] {
+                            "format",
+                            "jwt_vc_json"});
+                table21.AddRow(new string[] {
+                            "credential_definition",
+                            "{ }"});
+#line 163
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table21, "When ");
+#line hidden
+#line 169
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 171
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 172
+ testRunner.And("JSON \'error\'=\'invalid_credential_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 173
+ testRunner.And("JSON \'error_description\'=\'the credential type cannot be extracted\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="the credential type must be supported")]
+        [Xunit.TraitAttribute("FeatureTitle", "CredentialErrors")]
+        [Xunit.TraitAttribute("Description", "the credential type must be supported")]
+        public void TheCredentialTypeMustBeSupported()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("the credential type must be supported", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 175
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table22 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table22.AddRow(new string[] {
+                            "typ",
+                            "openid4vci-proof+jwt"});
+#line 176
+ testRunner.Given("build jwt proof", ((string)(null)), table22, "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table23 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table23.AddRow(new string[] {
+                            "proof",
+                            "{ \"proof_type\": \"jwt\", \"jwt\": \"$jwtProof$\" }"});
+                table23.AddRow(new string[] {
+                            "format",
+                            "jwt_vc_json"});
+                table23.AddRow(new string[] {
+                            "credential_definition",
+                            "{ \"type\" : [\"VerifiableCredential\",\"Type\"] }"});
+#line 180
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table23, "When ");
+#line hidden
+#line 186
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 188
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 189
+ testRunner.And("JSON \'error\'=\'unsupported_credential_type\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 190
+ testRunner.And("JSON \'error_description\'=\'the credential type Type is not supported\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="the alg parameter is required when credential_response_encryption is passed")]
+        [Xunit.TraitAttribute("FeatureTitle", "CredentialErrors")]
+        [Xunit.TraitAttribute("Description", "the alg parameter is required when credential_response_encryption is passed")]
+        public void TheAlgParameterIsRequiredWhenCredential_Response_EncryptionIsPassed()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("the alg parameter is required when credential_response_encryption is passed", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 192
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table24 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table24.AddRow(new string[] {
+                            "typ",
+                            "openid4vci-proof+jwt"});
+#line 193
+ testRunner.Given("build jwt proof", ((string)(null)), table24, "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table25 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table25.AddRow(new string[] {
+                            "proof",
+                            "{ \"proof_type\": \"jwt\", \"jwt\": \"$jwtProof$\" }"});
+                table25.AddRow(new string[] {
+                            "format",
+                            "jwt_vc_json"});
+                table25.AddRow(new string[] {
+                            "credential_definition",
+                            "{ \"type\" : [\"VerifiableCredential\",\"UniversityDegree\"] }"});
+                table25.AddRow(new string[] {
+                            "credential_response_encryption",
+                            "{ }"});
+#line 197
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table25, "When ");
+#line hidden
+#line 204
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 206
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 207
+ testRunner.And("JSON \'error\'=\'invalid_encryption_parameters\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 208
+ testRunner.And("JSON \'error_description\'=\'the parameter alg is missing\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="the enc parameter is required when credential_response_encryption is passed")]
+        [Xunit.TraitAttribute("FeatureTitle", "CredentialErrors")]
+        [Xunit.TraitAttribute("Description", "the enc parameter is required when credential_response_encryption is passed")]
+        public void TheEncParameterIsRequiredWhenCredential_Response_EncryptionIsPassed()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("the enc parameter is required when credential_response_encryption is passed", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 210
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table26 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table26.AddRow(new string[] {
+                            "typ",
+                            "openid4vci-proof+jwt"});
+#line 211
+ testRunner.Given("build jwt proof", ((string)(null)), table26, "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table27 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table27.AddRow(new string[] {
+                            "proof",
+                            "{ \"proof_type\": \"jwt\", \"jwt\": \"$jwtProof$\" }"});
+                table27.AddRow(new string[] {
+                            "format",
+                            "jwt_vc_json"});
+                table27.AddRow(new string[] {
+                            "credential_definition",
+                            "{ \"type\" : [\"VerifiableCredential\",\"UniversityDegree\"] }"});
+                table27.AddRow(new string[] {
+                            "credential_response_encryption",
+                            "{ \"alg\": \"alg\" }"});
+#line 215
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table27, "When ");
+#line hidden
+#line 222
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 224
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 225
+ testRunner.And("JSON \'error\'=\'invalid_encryption_parameters\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 226
+ testRunner.And("JSON \'error_description\'=\'the parameter enc is missing\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="the jwk parameter is required when credential_response_encryption is passed")]
+        [Xunit.TraitAttribute("FeatureTitle", "CredentialErrors")]
+        [Xunit.TraitAttribute("Description", "the jwk parameter is required when credential_response_encryption is passed")]
+        public void TheJwkParameterIsRequiredWhenCredential_Response_EncryptionIsPassed()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("the jwk parameter is required when credential_response_encryption is passed", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 228
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table28 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table28.AddRow(new string[] {
+                            "typ",
+                            "openid4vci-proof+jwt"});
+#line 229
+ testRunner.Given("build jwt proof", ((string)(null)), table28, "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table29 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table29.AddRow(new string[] {
+                            "proof",
+                            "{ \"proof_type\": \"jwt\", \"jwt\": \"$jwtProof$\" }"});
+                table29.AddRow(new string[] {
+                            "format",
+                            "jwt_vc_json"});
+                table29.AddRow(new string[] {
+                            "credential_definition",
+                            "{ \"type\" : [\"VerifiableCredential\",\"UniversityDegree\"] }"});
+                table29.AddRow(new string[] {
+                            "credential_response_encryption",
+                            "{ \"alg\": \"alg\", \"enc\": \"enc\" }"});
+#line 233
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table29, "When ");
+#line hidden
+#line 240
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 242
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 243
+ testRunner.And("JSON \'error\'=\'invalid_encryption_parameters\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 244
+ testRunner.And("JSON \'error_description\'=\'the parameter jwk is missing\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();

@@ -19,7 +19,7 @@ namespace SimpleIdServer.CredentialIssuer.Host.Acceptance.Tests.Features
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class CredentialOfferFeature : object, Xunit.IClassFixture<CredentialOfferFeature.FixtureData>, System.IDisposable
+    public partial class CredentialFeature : object, Xunit.IClassFixture<CredentialFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
@@ -28,10 +28,10 @@ namespace SimpleIdServer.CredentialIssuer.Host.Acceptance.Tests.Features
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
-#line 1 "CredentialOffer.feature"
+#line 1 "Credential.feature"
 #line hidden
         
-        public CredentialOfferFeature(CredentialOfferFeature.FixtureData fixtureData, SimpleIdServer_CredentialIssuer_Host_Acceptance_Tests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
+        public CredentialFeature(CredentialFeature.FixtureData fixtureData, SimpleIdServer_CredentialIssuer_Host_Acceptance_Tests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
             this.TestInitialize();
@@ -40,7 +40,7 @@ namespace SimpleIdServer.CredentialIssuer.Host.Acceptance.Tests.Features
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "CredentialOffer", "\tGet credential offer", ProgrammingLanguage.CSharp, featureTags);
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "Credential", "\tCheck the credential endpoint", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -80,14 +80,14 @@ namespace SimpleIdServer.CredentialIssuer.Host.Acceptance.Tests.Features
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Create a credential offer")]
-        [Xunit.TraitAttribute("FeatureTitle", "CredentialOffer")]
-        [Xunit.TraitAttribute("Description", "Create a credential offer")]
-        public void CreateACredentialOffer()
+        [Xunit.SkippableFactAttribute(DisplayName="use the format and type parameters to get a credential")]
+        [Xunit.TraitAttribute("FeatureTitle", "Credential")]
+        [Xunit.TraitAttribute("Description", "use the format and type parameters to get a credential")]
+        public void UseTheFormatAndTypeParametersToGetACredential()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Create a credential offer", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("use the format and type parameters to get a credential", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 4
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -98,44 +98,32 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table30 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table1 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table30.AddRow(new string[] {
-                            "Authorization",
-                            "Bearer AT"});
-                table30.AddRow(new string[] {
-                            "grants",
-                            "[\"authorization_code\"]"});
-                table30.AddRow(new string[] {
-                            "credential_configuration_ids",
-                            "[\"UniversityDegree_ldp_vc\"]"});
-                table30.AddRow(new string[] {
-                            "sub",
-                            "user"});
+                table1.AddRow(new string[] {
+                            "typ",
+                            "openid4vci-proof+jwt"});
 #line 5
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential_offer\'", ((string)(null)), table30, "When ");
+ testRunner.Given("build jwt proof", ((string)(null)), table1, "Given ");
 #line hidden
-#line 12
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 14
- testRunner.Then("HTTP status code equals to \'201\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+                TechTalk.SpecFlow.Table table2 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table2.AddRow(new string[] {
+                            "proof",
+                            "{ \"proof_type\": \"jwt\", \"jwt\": \"$jwtProof$\" }"});
+                table2.AddRow(new string[] {
+                            "format",
+                            "jwt_vc_json"});
+                table2.AddRow(new string[] {
+                            "credential_definition",
+                            "{ \"type\" : [\"VerifiableCredential\",\"UniversityDegree\"] }"});
+#line 9
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table2, "When ");
 #line hidden
 #line 15
- testRunner.And("JSON exists \'$.id\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 16
- testRunner.And("JSON exists \'$.sub\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 17
- testRunner.And("JSON exists \'$.create_datetime\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 18
- testRunner.And("JSON exists \'$.offer.grants.authorization_code.issuer_state\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 19
- testRunner.And("JSON exists \'$.offer_uri\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -148,12 +136,12 @@ this.ScenarioInitialize(scenarioInfo);
             
             public FixtureData()
             {
-                CredentialOfferFeature.FeatureSetup();
+                CredentialFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                CredentialOfferFeature.FeatureTearDown();
+                CredentialFeature.FeatureTearDown();
             }
         }
     }

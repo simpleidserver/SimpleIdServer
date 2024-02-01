@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Models;
 using SimpleIdServer.Vc;
 using System;
@@ -14,12 +15,14 @@ public class JwtVcJsonLdFormatter : BaseW3CVerifiableCredentialFormatter
 {
     public override string Format => "jwt_vc_json-ld";
 
-    public override JsonNode Build(BuildCredentialRequest request, DidDocument didDocument, string verificationMethodId)
+    public override JsonNode Build(BuildCredentialRequest request, DidDocument didDocument, string verificationMethodId, IAsymmetricKey asymmetricKey)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
         if (didDocument == null) throw new ArgumentNullException(nameof(didDocument));
+        if (verificationMethodId == null) throw new ArgumentNullException(nameof(verificationMethodId));
+        if (asymmetricKey == null) throw new ArgumentNullException(nameof(asymmetricKey));
         var credential = BuildCredential(request, true);
         return SecuredVerifiableCredential.New()
-            .SecureJwt(request.Issuer, didDocument, verificationMethodId, credential);
+            .SecureJwt(request.Issuer, didDocument, verificationMethodId, credential, asymKey: asymmetricKey);
     }
 }

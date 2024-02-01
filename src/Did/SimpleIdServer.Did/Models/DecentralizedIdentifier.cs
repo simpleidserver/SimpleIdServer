@@ -16,4 +16,9 @@ public class DecentralizedIdentifier
     public string Method { get; set; }
     public string Identifier { get; set; }
     public string Fragment { get; set; }
+
+    public string GetDidWithoutFragment()
+    {
+        return $"{Scheme}:{Method}:{Identifier}";
+    }
 }

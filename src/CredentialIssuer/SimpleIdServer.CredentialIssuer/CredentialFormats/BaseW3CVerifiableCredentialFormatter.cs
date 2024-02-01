@@ -1,4 +1,5 @@
 ﻿using SimpleIdServer.CredentialIssuer.Domains;
+using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Models;
 using SimpleIdServer.Vc.Models;
 using System;
@@ -62,7 +63,7 @@ public abstract class BaseW3CVerifiableCredentialFormatter : ICredentialFormatte
         };
     }
 
-    public abstract JsonNode Build(BuildCredentialRequest request, DidDocument didDocument, string verificationMethodId);
+    public abstract JsonNode Build(BuildCredentialRequest request, DidDocument didDocument, string verificationMethodId, IAsymmetricKey asymmetricKey);
 
     protected W3CVerifiableCredential BuildCredential(BuildCredentialRequest request, bool includeContext = true)
     {

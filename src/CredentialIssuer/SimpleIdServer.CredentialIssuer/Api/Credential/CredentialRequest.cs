@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.CredentialIssuer.Converters;
 using SimpleIdServer.IdServer.CredentialIssuer.DTOs;
 using System.Text.Json.Nodes;
@@ -31,24 +32,22 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
         public string Credentialidentifier { get; set; }
 
         /// <summary>
-        /// An object containing a single public key as a JWK used for encrypting the Credential Response.
+        /// Object containing information for encrypting the Credential Response.
         /// </summary>
-        [JsonPropertyName(CredentialRequestNames.CredentialEncryptionJwk)]
-        public JsonObject CredentialEncryptionJwk { get; set; }
-
-        /// <summary>
-        /// JWE [RFC7516] alg algorithm [RFC7518] REQUIRED for encrypting Credential and/or Batch Credential Responses.
-        /// </summary>
-        [JsonPropertyName(CredentialRequestNames.CredentialResponseEncryptionAlg)]
-        public string CredentialResponseEncryptionAlg { get; set; }
-
-        /// <summary>
-        /// OPTIONAL. JWE [RFC7516] enc algorithm [RFC7518] REQUIRED for encrypting Credential Responses.
-        /// </summary>
-        [JsonPropertyName(CredentialRequestNames.CredentialResponseEncryptionEnc)]
-        public string CredentialResponseEncryptionEnc { get; set; }
+        [JsonPropertyName(CredentialRequestNames.CredentialResponseEncryption)]
+        public CredentialResponseEncryption CredentialResponseEncryption { get; set; }
 
         [JsonIgnore]
         public JsonObject Data { get; set; }
+    }
+
+    public class CredentialResponseEncryption
+    {
+        [JsonPropertyName(CredentialRequestNames.Jwk)]
+        public JsonWebKey Jwk { get; set; }
+        [JsonPropertyName(CredentialRequestNames.Alg)]
+        public string Alg { get; set; }
+        [JsonPropertyName(CredentialRequestNames.Enc)]
+        public string Enc { get; set; }
     }
 }

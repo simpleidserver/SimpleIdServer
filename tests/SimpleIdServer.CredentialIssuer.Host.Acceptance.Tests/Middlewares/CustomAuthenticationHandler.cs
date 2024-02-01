@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
@@ -15,7 +16,6 @@ namespace SimpleIdServer.CredentialIssuer.Host.Acceptance.Tests.Middlewares;
 public class CustomAuthenticationHandler : AuthenticationHandler<CustomAuthenticationHandlerOptions>
 {
     public const string AuthenticationScheme = "Test";
-    private readonly CustomAuthenticationHandlerOptions _options;
 
     public CustomAuthenticationHandler(
         IOptionsMonitor<CustomAuthenticationHandlerOptions> options, 
@@ -33,6 +33,15 @@ public class CustomAuthenticationHandler : AuthenticationHandler<CustomAuthentic
             new Claim(ClaimTypes.Name, "user"),
             new Claim("sub", "user")
         };
+        if(Options.ScenarioContext.ContainsKey("credentialIdentifier"))
+        {
+            var authDetails = new JsonObject();
+            var arr = new JsonArray();
+            arr.Add(Options.ScenarioContext["credentialIdentifier"]);
+            authDetails.Add("credential_identifiers", arr);
+            claims.Add(new Claim("authorization_details", authDetails.ToJsonString()));
+        }
+
         var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
         var authenticationTicket = new AuthenticationTicket(

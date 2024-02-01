@@ -10,8 +10,9 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.DTOs
         public const string Types = "types";
         public const string Jwt = "jwt";
         public const string CredentialIdentifier = "credential_identifier";
-        public const string CredentialEncryptionJwk = "credential_encryption_jwk";
-        public const string CredentialResponseEncryptionAlg = "credential_response_encryption_alg";
-        public const string CredentialResponseEncryptionEnc = "credential_response_encryption_enc";
+        public const string CredentialResponseEncryption = "credential_response_encryption";
+        public const string Alg = "alg";
+        public const string Enc = "enc";
+        public const string Jwk = "jwk";
     }
 }

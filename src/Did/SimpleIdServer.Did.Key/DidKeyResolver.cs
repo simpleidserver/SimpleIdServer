@@ -38,6 +38,7 @@ public class DidKeyResolver : IDidResolver
     {
         var decentralizedIdentifier = DidExtractor.Extract(did);
         if (decentralizedIdentifier.Method != Method) throw new ArgumentException($"method must be equals to {Method}");
+        did = decentralizedIdentifier.GetDidWithoutFragment();
         var multibaseValue = decentralizedIdentifier.Identifier;
         var verificationMethod = _serializer.Deserialize(multibaseValue, null);
         var builder = DidDocumentBuilder.New(did);

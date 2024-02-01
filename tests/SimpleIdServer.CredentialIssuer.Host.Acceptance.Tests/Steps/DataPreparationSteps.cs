@@ -44,4 +44,10 @@ public class DataPreparationSteps
         var jwtProof = securedVc.Secure(claims, ed25519, tokenType, kid);
         _scenarioContext.Set(jwtProof, "jwtProof");
     }
+
+    [Given("access token contains one credential identifier '(.*)'")]
+    public void GivenAccessTokenContainsCredentialIdentifiers(string credentialIdentifier)
+    {
+        _scenarioContext.Set(credentialIdentifier, "credentialIdentifier");
+    }
 }
