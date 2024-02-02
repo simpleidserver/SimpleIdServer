@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.CredentialIssuer.Api.CredentialIssuer;
 using System.Text.Json;
 
@@ -13,11 +14,10 @@ public class CredentialIssuerEffects
 
     public CredentialIssuerEffects(
         IWebsiteHttpClientFactory websiteHttpClientFactory,
-        CredentialIssuerWebsiteOptions options)
+        IOptions<CredentialIssuerWebsiteOptions> options)
     {
         _websiteHttpClientFactory = websiteHttpClientFactory;
-        _options = options;
-
+        _options = options.Value;
     }
 
     [EffectMethod]
@@ -43,4 +43,9 @@ public class GetCredentialConfigurationsAction { }
 public class GetCredentialConfigurationsSuccessAction
 {
     public Dictionary<string, CredentialConfiguration> CredentialConfigurations { get; set; }
+}
+
+public class RemoveCredentialConfigurationAction
+{
+    public List<string> Names { get; set; }
 }

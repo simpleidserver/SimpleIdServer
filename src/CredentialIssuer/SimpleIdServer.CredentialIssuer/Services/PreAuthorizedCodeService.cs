@@ -17,11 +17,11 @@ public interface IPreAuthorizedCodeService
 
 public class PreAuthorizedCodeService : IPreAuthorizedCodeService
 {
-    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly Factories.IHttpClientFactory _httpClientFactory;
     private readonly CredentialIssuerOptions _options;
 
     public PreAuthorizedCodeService(
-        IHttpClientFactory httpClientFactory,
+        Factories.IHttpClientFactory httpClientFactory,
         IOptions<CredentialIssuerOptions> options)
     {
         _httpClientFactory = httpClientFactory;
@@ -30,7 +30,7 @@ public class PreAuthorizedCodeService : IPreAuthorizedCodeService
 
     public async Task<string> Get(string accessToken, CancellationToken cancellationToken)
     {
-        using (var httpClient = _httpClientFactory.CreateClient())
+        using (var httpClient = _httpClientFactory.Build())
         {
             var dic = new Dictionary<string, string>
             {

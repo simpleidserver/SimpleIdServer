@@ -1,0 +1,54 @@
+﻿@using System.Globalization;
+@inherits Fluxor.Blazor.Web.Components.FluxorLayout
+@inject ContextMenuService contextMenuService
+@inject IDispatcher dispatcher
+@inject DialogService dialogService
+@inject NavigationManager Navigation
+
+<PageTitle>@Global.WebsiteTitle</PageTitle>
+
+<RadzenDialog />
+<RadzenNotification />
+<RadzenContextMenu />
+<RadzenTooltip />
+
+<RadzenLayout class="rz-shadow-3">
+    <RadzenHeader>
+        <div class="d-flex align-items-center">
+            <div class="p-2">
+                <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" />
+            </div>
+            <div class="p-2">
+                <RadzenImage Path="_content/SimpleIdServer.CredentialIssuer.Website/images/SIDLogo.svg" Style="width: 40px" />
+            </div>
+            <div class="p-2">
+                <RadzenText Style="margin: 0; color: white;" Text="SimpleIdServer" TextStyle="TextStyle.DisplayH6" />
+            </div>
+            <div class="ml-auto"></div>
+            <div class="p-2">
+                <RadzenLink Text="Sign out" Icon="logout" Path="/logout" />
+            </div>
+        </div>
+    </RadzenHeader>
+    <RadzenSidebar @bind-Expanded="@sidebarExpanded">
+        <RadzenPanelMenu>
+            <RadzenPanelMenuItem Text="@Global.CerdentialConfigurations" Icon="wallet" Path="/credentialconfs" />
+        </RadzenPanelMenu>
+    </RadzenSidebar>
+    <RadzenBody>
+        <div class="p-2">
+            @Body
+        </div>
+    </RadzenBody>
+</RadzenLayout>
+
+@code {
+    bool sidebarExpanded = true;
+    bool isLoading = true;
+    string activeRealm;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+    }
+}

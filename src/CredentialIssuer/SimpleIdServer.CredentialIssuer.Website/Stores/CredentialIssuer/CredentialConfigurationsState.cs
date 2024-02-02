@@ -13,8 +13,24 @@ public record CredentialConfigurationsState
 
     }
 
-    public Dictionary<string, CredentialConfiguration> CredentialConfigurations { get; set; } = new Dictionary<string, CredentialConfiguration>();
+    public List<SelectableCredentialConfiguration> CredentialConfigurations { get; set; } = null;
     public bool IsLoading { get; set; } = true;
+}
+
+public class SelectableCredentialConfiguration
+{
+    public SelectableCredentialConfiguration(string name, CredentialConfiguration credentialConfiguration)
+    {
+        Name = name;
+        CredentialConfiguration = credentialConfiguration;
+        IsSelected = false;
+        IsNew = false;
+    }
+
+    public string Name { get; set; }
+    public CredentialConfiguration CredentialConfiguration { get; set; }
+    public bool IsNew { get; set; }
+    public bool IsSelected { get; set; }
 }
 
 public class CredentialConfiguration

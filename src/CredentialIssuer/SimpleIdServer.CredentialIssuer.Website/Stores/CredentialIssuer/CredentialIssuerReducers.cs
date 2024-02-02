@@ -10,7 +10,7 @@ public static class CredentialIssuerReducers
     #region CredentialConfigurationsState
 
     [ReducerMethod]
-    public static CredentialConfigurationsState ReduceGetCredentialConfigurationsAction(ConfigurationDefinitionsState state, GetCredentialConfigurationsAction action) => new CredentialConfigurationsState { IsLoading = true };
+    public static CredentialConfigurationsState ReduceGetCredentialConfigurationsAction(CredentialConfigurationsState state, GetCredentialConfigurationsAction action) => new CredentialConfigurationsState { IsLoading = true };
 
     [ReducerMethod]
     public static CredentialConfigurationsState ReduceGetCredentialConfigurationsSuccessAction(CredentialConfigurationsState state, GetCredentialConfigurationsSuccessAction action)
@@ -18,7 +18,11 @@ public static class CredentialIssuerReducers
         return state with
         {
             IsLoading = false,
-            CredentialConfigurations = action.CredentialConfigurations
+            CredentialConfigurations = action.CredentialConfigurations.Select(kvp => new SelectableCredentialConfiguration(kvp.Key, kvp.Value)
+            {
+                IsNew = false,
+                IsSelected = false
+            }).ToList()
         };
     }
 

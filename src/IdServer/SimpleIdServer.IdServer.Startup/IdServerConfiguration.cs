@@ -53,9 +53,7 @@ namespace SimpleIdServer.IdServer.Startup
             SimpleIdServer.IdServer.Constants.StandardScopes.Register,
             SimpleIdServer.IdServer.Constants.StandardScopes.Provisioning,
             SimpleIdServer.IdServer.Constants.StandardScopes.Address,
-            SimpleIdServer.IdServer.Constants.StandardScopes.Networks,
             SimpleIdServer.IdServer.Constants.StandardScopes.Role,
-            SimpleIdServer.IdServer.Constants.StandardScopes.CredentialOffer,
             SimpleIdServer.IdServer.Constants.StandardScopes.AuthenticationSchemeProviders,
             SimpleIdServer.IdServer.Constants.StandardScopes.RegistrationWorkflows,
             SimpleIdServer.IdServer.Constants.StandardScopes.AuthenticationMethods,
@@ -67,7 +65,8 @@ namespace SimpleIdServer.IdServer.Startup
             SimpleIdServer.IdServer.Constants.StandardScopes.Clients,
             SimpleIdServer.IdServer.Constants.StandardScopes.Realms,
             SimpleIdServer.IdServer.Constants.StandardScopes.Groups,
-            SimpleIdServer.IdServer.Constants.StandardScopes.OfflineAccessScope
+            SimpleIdServer.IdServer.Constants.StandardScopes.OfflineAccessScope,
+            SimpleIdServer.IdServer.Constants.StandardScopes.CredentialConfigurations
         };
 
         public static ICollection<User> Users => new List<User>
@@ -78,6 +77,16 @@ namespace SimpleIdServer.IdServer.Startup
 
         public static ICollection<Client> Clients => new List<Client>
         {
+            ClientBuilder.BuildTraditionalWebsiteClient("CredentialIssuer-manager", "password", null, "https://localhost:5006/*", "https://credissuer-website.simpleidserver.com/*", "https://credissuer-website.localhost.com/*", "http://credissuer-website.localhost.com/*", "https://credissuer-website.sid.svc.cluster.local/*").EnableClientGrantType().SetRequestObjectEncryption().AddPostLogoutUri("https://localhost:5006/signout-callback-oidc").AddPostLogoutUri("https://credissuer-website.sid.svc.cluster.local/signout-callback-oidc")
+                .AddPostLogoutUri("https://website.simpleidserver.com/signout-callback-oidc")
+                .AddAuthDataTypes("photo")
+                .SetClientName("Credential issuer manager")
+                .SetBackChannelLogoutUrl("https://localhost:5006/bc-logout")
+                .SetClientLogoUri("https://cdn.logo.com/hotlink-ok/logo-social.png")
+                .AddScope(
+                    SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope,
+                    SimpleIdServer.IdServer.Constants.StandardScopes.Profile,
+                    SimpleIdServer.IdServer.Constants.StandardScopes.CredentialConfigurations).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("SIDS-manager", "password", null, "https://localhost:5002/*", "https://website.simpleidserver.com/*", "https://website.localhost.com/*", "http://website.localhost.com/*", "https://website.sid.svc.cluster.local/*").EnableClientGrantType().SetRequestObjectEncryption().AddPostLogoutUri("https://localhost:5002/signout-callback-oidc").AddPostLogoutUri("https://website.sid.svc.cluster.local/signout-callback-oidc")
                 .AddPostLogoutUri("https://website.simpleidserver.com/signout-callback-oidc")
                 .AddAuthDataTypes("photo")
@@ -89,8 +98,6 @@ namespace SimpleIdServer.IdServer.Startup
                     SimpleIdServer.IdServer.Constants.StandardScopes.Profile, 
                     SimpleIdServer.IdServer.Constants.StandardScopes.Provisioning,
                     SimpleIdServer.IdServer.Constants.StandardScopes.Users, 
-                    SimpleIdServer.IdServer.Constants.StandardScopes.Networks, 
-                    SimpleIdServer.IdServer.Constants.StandardScopes.CredentialOffer,
                     SimpleIdServer.IdServer.Constants.StandardScopes.Acrs,
                     SimpleIdServer.Configuration.Constants.ConfigurationsScope, 
                     SimpleIdServer.IdServer.Constants.StandardScopes.AuthenticationSchemeProviders, 
@@ -106,8 +113,6 @@ namespace SimpleIdServer.IdServer.Startup
             ClientBuilder.BuildTraditionalWebsiteClient("swaggerClient", "password", null, "https://localhost:5001/swagger/oauth2-redirect.html", "https://localhost:5001/(.*)/swagger/oauth2-redirect.html", "http://localhost").AddScope(
                 SimpleIdServer.IdServer.Constants.StandardScopes.Provisioning, 
                 SimpleIdServer.IdServer.Constants.StandardScopes.Users, 
-                SimpleIdServer.IdServer.Constants.StandardScopes.Networks,
-                SimpleIdServer.IdServer.Constants.StandardScopes.CredentialOffer,
                 SimpleIdServer.IdServer.Constants.StandardScopes.Acrs, 
                 SimpleIdServer.Configuration.Constants.ConfigurationsScope,
                 SimpleIdServer.IdServer.Constants.StandardScopes.AuthenticationSchemeProviders,
@@ -123,8 +128,6 @@ namespace SimpleIdServer.IdServer.Startup
             ClientBuilder.BuildTraditionalWebsiteClient("postman", "password", null, "http://localhost").EnableClientGrantType().AddScope(
                 SimpleIdServer.IdServer.Constants.StandardScopes.Provisioning,
                 SimpleIdServer.IdServer.Constants.StandardScopes.Users,
-                SimpleIdServer.IdServer.Constants.StandardScopes.Networks,
-                SimpleIdServer.IdServer.Constants.StandardScopes.CredentialOffer,
                 SimpleIdServer.IdServer.Constants.StandardScopes.Acrs,
                 SimpleIdServer.Configuration.Constants.ConfigurationsScope,
                 SimpleIdServer.IdServer.Constants.StandardScopes.AuthenticationSchemeProviders,
