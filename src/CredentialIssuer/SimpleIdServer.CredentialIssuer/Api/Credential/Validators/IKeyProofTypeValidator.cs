@@ -25,6 +25,7 @@ public record KeyProofTypeValidationResult
     }
 
     public string CNonce { get; private set; }
+    public string Subject { get; private set; }
     public bool IsValid { get; private set; }
     public string ErrorMessage { get; private set; }
 
@@ -34,5 +35,12 @@ public record KeyProofTypeValidationResult
         CNonce = cNonce
     };
 
+    public static KeyProofTypeValidationResult Ok(string cNonce, string subject) => new KeyProofTypeValidationResult
+    {
+        IsValid = true,
+        CNonce = cNonce,
+        Subject = subject
+    };
+    
     public static KeyProofTypeValidationResult Error(string errorMessage) => new KeyProofTypeValidationResult(errorMessage: errorMessage);
 }

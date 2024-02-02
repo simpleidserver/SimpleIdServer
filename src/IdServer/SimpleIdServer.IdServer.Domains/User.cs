@@ -59,10 +59,6 @@ namespace SimpleIdServer.IdServer.Domains
         public string? Source { get; set; } = null;
         [JsonIgnore]
         public string? IdentityProvisioningId { get; set; } = null;
-        [JsonPropertyName(UserNames.DID)]
-        public string? Did { get; set; } = null;
-        [JsonPropertyName(UserNames.DIDPrivateHex)]
-        public string? DidPrivateHex { get; set; } = null;
         [JsonIgnore]
         [Newtonsoft.Json.JsonIgnore]
         public ICollection<Claim> Claims

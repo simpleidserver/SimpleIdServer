@@ -121,7 +121,7 @@ public class SecuredVerifiableCredential
     }
 
     public string SecureJwt(
-        string issuer,
+        string subject,
         DidDocument didDocument,
         string verificationMethodId,
         W3CVerifiableCredential vcCredential,
@@ -137,12 +137,12 @@ public class SecuredVerifiableCredential
         var signingCredentials = asymKey.BuildSigningCredentials();
         var claims = new Dictionary<string, object>
         {
-            { "sub", didDocument.Id },
+            { "sub", subject },
             { "vc", new W3CVerifiableCredentialJsonSerializer().SerializeToDic(vcCredential) }
         };
         var securityTokenDescriptor = new SecurityTokenDescriptor
         {
-            Issuer = issuer,
+            Issuer = didDocument.Id,
             IssuedAt = DateTime.UtcNow,
             SigningCredentials = signingCredentials,
             Claims = claims

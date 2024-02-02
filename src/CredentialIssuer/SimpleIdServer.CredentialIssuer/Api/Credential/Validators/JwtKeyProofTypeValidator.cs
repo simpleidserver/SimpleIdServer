@@ -49,7 +49,7 @@ public class JwtKeyProofTypeValidator : IKeyProofTypeValidator
                 nonce = nonceClaim.Value;
             }
 
-            return KeyProofTypeValidationResult.Ok(nonce);
+            return KeyProofTypeValidationResult.Ok(nonce, did.GetDidWithoutFragment());
         }
         catch(Exception ex)
         {

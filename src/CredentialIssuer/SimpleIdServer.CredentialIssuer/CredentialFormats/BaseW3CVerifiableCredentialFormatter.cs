@@ -65,7 +65,7 @@ public abstract class BaseW3CVerifiableCredentialFormatter : ICredentialFormatte
 
     public abstract JsonNode Build(BuildCredentialRequest request, DidDocument didDocument, string verificationMethodId, IAsymmetricKey asymmetricKey);
 
-    protected W3CVerifiableCredential BuildCredential(BuildCredentialRequest request, bool includeContext = true)
+    protected W3CVerifiableCredential BuildCredential(BuildCredentialRequest request)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
         var verifiableCredential = new W3CVerifiableCredential
@@ -79,12 +79,8 @@ public abstract class BaseW3CVerifiableCredentialFormatter : ICredentialFormatte
                 { "id", request.Subject }
             }
         };
-        if(includeContext)
-        {
-            verifiableCredential.Context.Add(VerifiableCredentialJsonLdContext);
-            verifiableCredential.Context.Add(request.JsonLdContext);
-        }
-
+        verifiableCredential.Context.Add(VerifiableCredentialJsonLdContext);
+        verifiableCredential.Context.Add(request.JsonLdContext);
         var flatNodes = request.UserCredentialClaims.Select(c =>
         {
             var cl = request.CredentialConfiguration.Claims.Single(cl => cl.SourceUserClaimName == c.Name);

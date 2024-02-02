@@ -14,7 +14,9 @@ namespace SimpleIdServer.CredentialIssuer.CredentialFormats;
 /// </summary>
 public class JwtVcJsonFormatter : BaseW3CVerifiableCredentialFormatter
 {
-    public override string Format => "jwt_vc_json";
+    public override string Format => FORMAT;
+
+    public const string FORMAT = "jwt_vc_json";
 
     public override JsonNode Build(BuildCredentialRequest request, DidDocument didDocument, string verificationMethodId, IAsymmetricKey asymmetricKey)
     {
@@ -22,8 +24,8 @@ public class JwtVcJsonFormatter : BaseW3CVerifiableCredentialFormatter
         if (didDocument == null) throw new ArgumentNullException(nameof(didDocument));
         if (verificationMethodId == null) throw new ArgumentNullException(nameof(verificationMethodId));
         if (asymmetricKey == null) throw new ArgumentNullException(nameof(asymmetricKey));
-        var credential = BuildCredential(request, false);
+        var credential = BuildCredential(request);
         return SecuredVerifiableCredential.New()
-            .SecureJwt(request.Issuer, didDocument, verificationMethodId, credential, asymKey: asymmetricKey);
+            .SecureJwt(request.Subject, didDocument, verificationMethodId, credential, asymKey: asymmetricKey);
     }
 }

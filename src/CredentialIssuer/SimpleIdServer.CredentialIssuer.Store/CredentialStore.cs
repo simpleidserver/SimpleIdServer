@@ -21,6 +21,8 @@ public class CredentialStore : ICredentialStore
 
     public Task<Credential> GetByCredentialId(string credentialId, CancellationToken cancellationToken)
     {
-        return _dbContext.Credentials.SingleOrDefaultAsync(c => c.CredentialId == credentialId, cancellationToken);
+        return _dbContext.Credentials
+            .Include(c => c.Configuration)
+            .SingleOrDefaultAsync(c => c.CredentialId == credentialId, cancellationToken);
     }
 }

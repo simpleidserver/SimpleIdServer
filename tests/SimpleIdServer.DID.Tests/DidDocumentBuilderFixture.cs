@@ -118,7 +118,7 @@ namespace SimpleIdServer.DID.Tests
 
             // ASSERT
             Assert.That(identityDocument.Id, Is.EqualTo("did"));
-            Assert.That(context, Is.EqualTo("https://www.w3.org/ns/did/v1"));
+            Assert.That(context, Is.EqualTo("[\r\n  \"https://www.w3.org/ns/did/v1\",\r\n  \"https://w3id.org/security/suites/secp256k1recovery-2020/v2\"\r\n]"));
             Assert.That(identityDocument.AlsoKnownAs.First(), Is.EqualTo("didSubject"));
             Assert.That(identityDocument.Controller.ToString(), Is.EqualTo("didController"));
             Assert.That(identityDocument.VerificationMethod.ElementAt(0).Type, Is.EqualTo("EcdsaSecp256k1RecoveryMethod2020"));

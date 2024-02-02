@@ -21,7 +21,7 @@ namespace SimpleIdServer.CredentialIssuer.CredentialFormats
             if (didDocument == null) throw new ArgumentNullException(nameof(didDocument));
             if (verificationMethodId == null) throw new ArgumentNullException(nameof(verificationMethodId));
             if (asymmetricKey == null) throw new ArgumentNullException(nameof(asymmetricKey));
-            var credential = BuildCredential(request, true);
+            var credential = BuildCredential(request);
             var json = new W3CVerifiableCredentialJsonSerializer().Serialize(credential);
             return JsonObject.Parse(SecuredVerifiableCredential.New()
                 .Secure(json, didDocument, verificationMethodId, asymKey: asymmetricKey));

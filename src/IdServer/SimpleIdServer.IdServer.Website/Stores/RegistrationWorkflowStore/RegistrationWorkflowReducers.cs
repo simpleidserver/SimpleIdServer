@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using Fluxor;
-using Nethereum.ABI.Encoders;
 using SimpleIdServer.IdServer.Api.RegistrationWorkflows;
 
 namespace SimpleIdServer.IdServer.Website.Stores.RegistrationWorkflowStore;

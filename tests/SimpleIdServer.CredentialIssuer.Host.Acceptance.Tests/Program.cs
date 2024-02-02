@@ -20,6 +20,7 @@ builder.Services.AddCredentialIssuer()
     .UseInMemoryStore(o =>
     {
         o.AddCredentialConfigurations(CredentialIssuerConfiguration.CredentialConfigurations);
+        o.AddCredentials(CredentialIssuerConfiguration.Credentials);
     });
 builder.Services.AddDidKey();
 builder.Services.RemoveAll<IPreAuthorizedCodeService>();

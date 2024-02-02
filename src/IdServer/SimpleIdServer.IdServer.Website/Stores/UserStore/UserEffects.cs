@@ -3,7 +3,6 @@
 using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
-using QRCoder;
 using Radzen;
 using SimpleIdServer.IdServer.Api.Users;
 using SimpleIdServer.IdServer.Domains;
@@ -387,109 +386,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             }
         }
 
-        [EffectMethod]
-        public async Task Handle(ShareCredentialOfferAction action, IDispatcher dispatcher)
-        {
-            var baseUrl = await GetBaseUrl();
-            var httpClient = await _websiteHttpClientFactory.Build();
-            var request = new JsonObject
-            {
-                { "credential_template_id", action.CredentialTemplateId },
-                { "wallet_client_id", action.ClientId }
-            };
-            var requestMessage = new HttpRequestMessage
-            {
-                RequestUri = new Uri($"{baseUrl}/credential_offer/share/{action.UserName}"),
-                Method = HttpMethod.Post,
-                Content = new StringContent(request.ToJsonString(), Encoding.UTF8, "application/json")
-            };
-            var httpResult = await httpClient.SendAsync(requestMessage);
-            var json = await httpResult.Content.ReadAsStringAsync();
-            if(httpResult.StatusCode == System.Net.HttpStatusCode.Redirect)
-            {
-                var credentialOffer = httpResult.Headers.Location.OriginalString;
-                var picture = GetQRCode(credentialOffer);
-                dispatcher.Dispatch(new ShareCredentialOfferSuccessAction { Picture = picture, CredentialOffer = credentialOffer });
-                dispatcher.Dispatch(new GetUserAction { UserId = action.UserId });
-                return;
-            }
-
-            var jObj = JsonObject.Parse(json);
-            dispatcher.Dispatch(new ShareCredentialOfferFailureAction { ErrorMessage = jObj["error_description"].GetValue<string>() });
-
-            string GetQRCode(string url)
-            {
-                var qrGenerator = new QRCodeGenerator();
-                var qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
-                var qrCode = new Base64QRCode(qrCodeData);
-                var payload = qrCode.GetGraphic(20);
-                return $"data:image/jpeg;base64,{payload}";
-            }
-        }
-
-        [EffectMethod]
-        public async Task Handle(GenerateDIDEthrAction action, IDispatcher dispatcher)
-        {
-            var baseUrl = await GetBaseUrl();
-            var httpClient = await _websiteHttpClientFactory.Build();
-            var request = new JsonObject
-            {
-                { "method", "ethr" },
-                { "publicKey", action.PublicKey },
-                { "network", action.NetworkName }
-            };
-            var requestMessage = new HttpRequestMessage
-            {
-                RequestUri = new Uri($"{baseUrl}/users/{action.UserId}/did"),
-                Method = HttpMethod.Post,
-                Content = new StringContent(request.ToJsonString(), Encoding.UTF8, "application/json")
-            };
-            var httpResult = await httpClient.SendAsync(requestMessage);
-            var json = await httpResult.Content.ReadAsStringAsync();
-            try
-            {
-                httpResult.EnsureSuccessStatusCode();
-                var jObj = JsonObject.Parse(json);
-                dispatcher.Dispatch(new GenerateDIDEthrSuccessAction { UserId = action.UserId, Did = jObj["did"].GetValue<string>(), DidPrivateHex = jObj["private_key"].GetValue<string>() });
-            }
-            catch
-            {
-                var jObj = JsonObject.Parse(json);
-                dispatcher.Dispatch(new GenerateDIDEthrFailureAction { ErrorMessage = jObj["error_description"].GetValue<string>() });
-            }
-        }
-
-
-        [EffectMethod]
-        public async Task Handle(GenerateDIDKeyAction action, IDispatcher dispatcher)
-        {
-            var baseUrl = await GetBaseUrl();
-            var httpClient = await _websiteHttpClientFactory.Build();
-            var request = new JsonObject
-            {
-                { "method", "key" }
-            };
-            var requestMessage = new HttpRequestMessage
-            {
-                RequestUri = new Uri($"{baseUrl}/users/{action.UserId}/did"),
-                Method = HttpMethod.Post,
-                Content = new StringContent(request.ToJsonString(), Encoding.UTF8, "application/json")
-            };
-            var httpResult = await httpClient.SendAsync(requestMessage);
-            var json = await httpResult.Content.ReadAsStringAsync();
-            try
-            {
-                httpResult.EnsureSuccessStatusCode();
-                var jObj = JsonObject.Parse(json);
-                dispatcher.Dispatch(new GenerateDIDKeySuccessAction { UserId = action.UserId, Did = jObj["did"].GetValue<string>(), DidPrivateHex = jObj["private_key"].GetValue<string>() });
-            }
-            catch
-            {
-                var jObj = JsonObject.Parse(json);
-                dispatcher.Dispatch(new GenerateDIDKeyFailureAction { ErrorMessage = jObj["error_description"].GetValue<string>() });
-            }
-        }
-
         private async Task<string> GetUsersUrl()
         {
             var baseUrl = await GetBaseUrl();
@@ -818,83 +714,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
     public class RemoveSelectedUsersSuccessAction
     {
         public IEnumerable<string> UserIds { get; set; }
-    }
-
-    public class ToggleAllUserCredentialOffersAction
-    {
-        public bool IsSelected { get; set; }
-    }
-
-    public class ToggleUserCredentialOfferAction
-    {
-        public bool IsSelected { get; set; }
-        public string CredentialOfferId { get; set; }
-        public string UserId { get; set; }
-    }
-
-    public class RemoveSelectedUserCredentialOffersSuccessAction
-    {
-        public ICollection<string> CredentialOffersId { get; set; }
-    }
-
-    public class ShareCredentialOfferAction
-    {
-        public string UserId { get; set; }
-        public string UserName { get; set; }
-        public string CredentialTemplateId { get; set; }
-        public string ClientId { get; set; }
-    }
-
-    public class ShareCredentialOfferSuccessAction
-    {
-        public string Picture { get; set; }
-        public string CredentialOffer { get; set; }
-    }
-
-    public class ShareCredentialOfferFailureAction
-    {
-        public string ErrorMessage { get; set; }
-    }
-
-    public class AddCredentialOfferSuccessAction
-    {
-        public UserCredentialOffer CredentialOffer { get; set; }
-    }
-
-    public class GenerateDIDEthrAction
-    {
-        public string UserId { get; set; }
-        public string PublicKey { get; set; }
-        public string NetworkName { get; set; }
-    }
-
-    public class GenerateDIDEthrSuccessAction
-    {
-        public string UserId { get; set; }
-        public string Did { get; set; }
-        public string DidPrivateHex { get; set; }
-    }
-
-    public class GenerateDIDEthrFailureAction
-    {
-        public string ErrorMessage { get; set; }
-    }
-
-    public class GenerateDIDKeyAction
-    {
-        public string UserId { get; set; }
-    }
-
-    public class GenerateDIDKeySuccessAction
-    {
-        public string UserId { get; set; }
-        public string Did { get; set; }
-        public string DidPrivateHex { get; set; }
-    }
-
-    public class GenerateDIDKeyFailureAction
-    {
-        public string ErrorMessage { get; set; }
     }
 
     public class RevokeUserSessionsAction

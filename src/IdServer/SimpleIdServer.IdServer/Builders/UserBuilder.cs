@@ -137,13 +137,6 @@ namespace SimpleIdServer.IdServer.Builders
 
         #endregion
 
-        public UserBuilder SetDID(string did, string privateKey)
-        {
-            _user.Did = did;
-            _user.DidPrivateHex = privateKey;
-            return this;
-        }
-
         public UserBuilder GenerateRandomHOTPKey()
         {
             _user.GenerateHOTP();
