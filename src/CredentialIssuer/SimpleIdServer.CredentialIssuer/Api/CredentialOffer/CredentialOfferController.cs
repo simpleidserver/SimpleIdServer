@@ -116,7 +116,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.CredentialOffer
             var invalidGrants = request.Grants.Where(g => g != CredentialOfferResultNames.PreAuthorizedCodeGrant && g != CredentialOfferResultNames.AuthorizedCodeGrant);
             if (invalidGrants.Any())
                 return CredentialOfferValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_OFFER_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_GRANT_TYPES, string.Join(',', invalidGrants))));
-            var existingCredentials = await _credentialConfigurationStore.Get(request.CredentialConfigurationIds, cancellationToken);
+            var existingCredentials = await _credentialConfigurationStore.GetByServerIds(request.CredentialConfigurationIds, cancellationToken);
             var unknownCredentials = request.CredentialConfigurationIds.Where(id => !existingCredentials.Any(c => c.Id == id));
             if (unknownCredentials.Any())
                 return CredentialOfferValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_OFFER_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_CREDENTIAL, string.Join(',', unknownCredentials))));

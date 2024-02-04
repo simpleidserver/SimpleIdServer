@@ -70,11 +70,65 @@ namespace SimpleIdServer.CredentialIssuer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Add display.
+        /// </summary>
+        internal static string AddCredentialConfigurationDisplay {
+            get {
+                return ResourceManager.GetString("AddCredentialConfigurationDisplay", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Base url.
+        /// </summary>
+        internal static string BaseUrl {
+            get {
+                return ResourceManager.GetString("BaseUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à BaseUrlDescription.
+        /// </summary>
+        internal static string BaseUrlDescription {
+            get {
+                return ResourceManager.GetString("BaseUrlDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Credential configurations.
         /// </summary>
         internal static string CerdentialConfigurations {
             get {
                 return ResourceManager.GetString("CerdentialConfigurations", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Claims.
+        /// </summary>
+        internal static string Claims {
+            get {
+                return ResourceManager.GetString("Claims", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à CredentialConfigurationFormatHelper.
+        /// </summary>
+        internal static string CredentialConfigurationFormatHelper {
+            get {
+                return ResourceManager.GetString("CredentialConfigurationFormatHelper", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à CredentialConfigurationScopeHelper.
+        /// </summary>
+        internal static string CredentialConfigurationScopeHelper {
+            get {
+                return ResourceManager.GetString("CredentialConfigurationScopeHelper", resourceCulture);
             }
         }
         
@@ -106,11 +160,47 @@ namespace SimpleIdServer.CredentialIssuer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Details.
+        /// </summary>
+        internal static string Details {
+            get {
+                return ResourceManager.GetString("Details", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Edit.
+        /// </summary>
+        internal static string Edit {
+            get {
+                return ResourceManager.GetString("Edit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Format.
         /// </summary>
         internal static string Format {
             get {
                 return ResourceManager.GetString("Format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Json-LD context.
+        /// </summary>
+        internal static string JsonLdContext {
+            get {
+                return ResourceManager.GetString("JsonLdContext", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à JsonLdContextDescription.
+        /// </summary>
+        internal static string JsonLdContextDescription {
+            get {
+                return ResourceManager.GetString("JsonLdContextDescription", resourceCulture);
             }
         }
         
@@ -133,11 +223,56 @@ namespace SimpleIdServer.CredentialIssuer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Save.
+        /// </summary>
+        internal static string Save {
+            get {
+                return ResourceManager.GetString("Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Scope.
         /// </summary>
         internal static string Scope {
             get {
                 return ResourceManager.GetString("Scope", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Text color.
+        /// </summary>
+        internal static string TextColor {
+            get {
+                return ResourceManager.GetString("TextColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Type.
+        /// </summary>
+        internal static string Type {
+            get {
+                return ResourceManager.GetString("Type", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à TypeHelper.
+        /// </summary>
+        internal static string TypeHelper {
+            get {
+                return ResourceManager.GetString("TypeHelper", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à View.
+        /// </summary>
+        internal static string View {
+            get {
+                return ResourceManager.GetString("View", resourceCulture);
             }
         }
         

@@ -28,6 +28,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer
         public const string UNKNOWN_CREDENTIAL_DISPLAY_TEMPLATE = "the credential template display {0} doesn't exist";
         public const string UNKNOWN_CREDENTIAL_DISPLAY_PARAMETER = "the credential template parameter {0} doesn't exist";
         public const string UNKNOWN_WALLET_CLIENT_ID = "the wallet {0} doesn't exist";
+        public const string UNKNOWN_CREDENTIAL_CONFIGURATION = "the credential configuration {0} doesn't exist";
         public const string UNKNOWN_PROOF_TYPE = "the proof type {0} is unknown";
         public const string UNKNOWN_USER = "the user {0} doesn't exist";
         public const string UNSUPPORTED_CREDENTIALS_FORMAT = "credential formats {0} are not supported";

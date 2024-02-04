@@ -29,7 +29,7 @@ public class CredentialIssuerConfiguration
             {
                 cb.AddTranslation("Name of degree", "en-US");
             })
-            .AddDisplay("University Credential", "en-US", "https://university.example.edu/public/logo.png", "A square logo of a university", null,"#12107c", "#FFFFFF")
+            .AddDisplay("University Credential", "en-US", "https://university.example.edu/public/logo.png", "A square logo of a university", null,"#12107c", "#acd2b1")
             .Build()
     };
 }

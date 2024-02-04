@@ -9,7 +9,8 @@ public interface ICredentialConfigurationStore
 {
     Task<List<CredentialConfiguration>> GetAll(CancellationToken cancellationToken);
     Task<CredentialConfiguration> GetByTypeAndFormat(string type, string format, CancellationToken cancellationToken);
-    Task<List<CredentialConfiguration>> Get(List<string> ids, CancellationToken cancellationToken);
+    Task<List<CredentialConfiguration>> GetByServerIds(List<string> ids, CancellationToken cancellationToken);
+    Task<CredentialConfiguration> Get(string id, CancellationToken cancellationToken);
 }
 
 public class CredentialConfigurationStore : ICredentialConfigurationStore
@@ -21,6 +22,14 @@ public class CredentialConfigurationStore : ICredentialConfigurationStore
         _dbContext = dbContext;
     }
 
+    public Task<CredentialConfiguration> Get(string id, CancellationToken cancellationToken)
+    {
+        return _dbContext.CredentialConfigurations
+            .Include(c => c.Claims).ThenInclude(c => c.Translations)
+            .Include(c => c.Displays)
+            .SingleOrDefaultAsync(c => c.Id == id);
+    }
+
     public Task<CredentialConfiguration> GetByTypeAndFormat(string type, string format, CancellationToken cancellationToken)
     {
         return _dbContext.CredentialConfigurations
@@ -29,12 +38,12 @@ public class CredentialConfigurationStore : ICredentialConfigurationStore
             .SingleOrDefaultAsync(c => c.Type == type && c.Format == format, cancellationToken);
     }
 
-    public Task<List<CredentialConfiguration>> Get(List<string> ids, CancellationToken cancellationToken)
+    public Task<List<CredentialConfiguration>> GetByServerIds(List<string> ids, CancellationToken cancellationToken)
     {
         return _dbContext.CredentialConfigurations
             .Include(c => c.Claims).ThenInclude(c => c.Translations)
             .Include(c => c.Displays)
-            .Where(c => ids.Contains(c.Id))
+            .Where(c => ids.Contains(c.ServerId))
             .ToListAsync(cancellationToken);
     }
 

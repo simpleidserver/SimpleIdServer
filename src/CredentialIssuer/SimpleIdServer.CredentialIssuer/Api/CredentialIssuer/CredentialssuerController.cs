@@ -35,7 +35,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.CredentialIssuer
             {
                 CredentialIssuer = issuer,
                 CredentialEndpoint = $"{issuer}/{Constants.EndPoints.Credential}",
-                CredentialsSupported = credentialTemplates.ToDictionary(kvp => kvp.Id, kvp => _serializer.Serialize(kvp)),
+                CredentialsSupported = credentialTemplates.ToDictionary(kvp =>kvp.ServerId, kvp => _serializer.Serialize(kvp)),
                 CredentialIdentifiersSupported = true,
                 CredentialResponseEncryptionAlgValuesSupported = Constants.AllEncAlgs,
                 CredentialResponseEncryptionEncValuesSupported = Constants.AllEncryptions,

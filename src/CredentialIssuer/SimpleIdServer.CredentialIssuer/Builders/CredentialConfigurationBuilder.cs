@@ -24,7 +24,8 @@ public class CredentialConfigurationBuilder
     {
         return new CredentialConfigurationBuilder(new CredentialConfiguration
         {
-            Id = $"{type}_{format}",
+            Id = Guid.NewGuid().ToString(),
+            ServerId = $"{type}_{format}",
             Format = format,
             Type = type,
             JsonLdContext = jsonLdContext,

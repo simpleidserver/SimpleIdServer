@@ -14,10 +14,12 @@ builder.Services.AddAuthentication(o =>
 {
     o.Authority = "https://localhost:5001/master";
     o.RequireHttpsMetadata = false;
+    o.TokenValidationParameters.ValidateAudience = false;
 });
 builder.Services.AddAuthorization(b =>
 {
     b.AddPolicy("Authenticated", p => p.RequireAuthenticatedUser());
+    b.AddPolicy("credconfs", p => p.RequireClaim("scope", "credconfs"));
 });
 
 builder.Services.AddEndpointsApiExplorer();
