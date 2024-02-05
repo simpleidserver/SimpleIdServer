@@ -1,9 +1,12 @@
 ﻿@using System.Globalization;
+@using Microsoft.AspNetCore.Builder;
+@using Microsoft.Extensions.Options;
 @inherits Fluxor.Blazor.Web.Components.FluxorLayout
 @inject ContextMenuService contextMenuService
 @inject IDispatcher dispatcher
 @inject DialogService dialogService
 @inject NavigationManager Navigation
+@inject IOptions<RequestLocalizationOptions> requestLocalizationOptions
 
 <PageTitle>@Global.WebsiteTitle</PageTitle>
 
@@ -26,7 +29,14 @@
             </div>
             <div class="ml-auto"></div>
             <div class="p-2">
-                <RadzenLink Text="Sign out" Icon="logout" Path="/logout" />
+                <RadzenDropDown Class="w-100"
+                                Data=@SupportedCultures
+                                TValue="CultureInfo"
+                                @bind-Value=@CurrentLanguage
+                                TextProperty="DisplayName" />
+            </div>
+            <div class="p-2">
+                <RadzenLink Text="@Global.SignOut" Icon="logout" Path="/logout" />
             </div>
         </div>
     </RadzenHeader>
@@ -44,8 +54,26 @@
 
 @code {
     bool sidebarExpanded = true;
-    bool isLoading = true;
-    string activeRealm;
+
+    IList<CultureInfo> SupportedCultures => requestLocalizationOptions.Value.SupportedCultures;
+
+    CultureInfo CurrentLanguage
+    {
+        get => CultureInfo.CurrentCulture;
+        set
+        {
+            if (CultureInfo.CurrentCulture != value)
+            {
+                var uri = new Uri(Navigation.Uri)
+                    .GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
+                var cultureEscaped = Uri.EscapeDataString(value.ToString());
+                var uriEscaped = Uri.EscapeDataString(uri);
+                Navigation.NavigateTo(
+                    $"Culture/Set?culture={cultureEscaped}&redirectUri={uriEscaped}",
+                    forceLoad: true);
+            }
+        }
+    }
 
     protected override void OnAfterRender(bool firstRender)
     {

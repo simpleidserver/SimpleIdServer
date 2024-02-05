@@ -123,6 +123,12 @@
   <data name="AddCredentialConfigurationDisplay" xml:space="preserve">
     <value>Add display</value>
   </data>
+  <data name="BackgroundColor" xml:space="preserve">
+    <value>Background color</value>
+  </data>
+  <data name="BackgroundColorHelper" xml:space="preserve">
+    <value>BackgroundColorHelper</value>
+  </data>
   <data name="BaseUrl" xml:space="preserve">
     <value>Base url</value>
   </data>
@@ -134,6 +140,18 @@
   </data>
   <data name="Claims" xml:space="preserve">
     <value>Claims</value>
+  </data>
+  <data name="CredentialConfigurationDetailsUpdated" xml:space="preserve">
+    <value>Credential configuration is updated</value>
+  </data>
+  <data name="CredentialConfigurationDisplayAdded" xml:space="preserve">
+    <value>Display is added</value>
+  </data>
+  <data name="CredentialConfigurationDisplayRemoved" xml:space="preserve">
+    <value>Display is removed</value>
+  </data>
+  <data name="CredentialConfigurationDisplayUpdated" xml:space="preserve">
+    <value>Display is updated</value>
   </data>
   <data name="CredentialConfigurationFormatHelper" xml:space="preserve">
     <value>CredentialConfigurationFormatHelper</value>
@@ -150,11 +168,20 @@
   <data name="Delete" xml:space="preserve">
     <value>Delete</value>
   </data>
+  <data name="Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="DescriptionHelper" xml:space="preserve">
+    <value>DescriptionHelper</value>
+  </data>
   <data name="Details" xml:space="preserve">
     <value>Details</value>
   </data>
   <data name="Edit" xml:space="preserve">
     <value>Edit</value>
+  </data>
+  <data name="EditCredentialConfigurationDisplay" xml:space="preserve">
+    <value>Edit display</value>
   </data>
   <data name="Format" xml:space="preserve">
     <value>Format</value>
@@ -168,8 +195,32 @@
   <data name="Loading" xml:space="preserve">
     <value>Loading</value>
   </data>
+  <data name="Locale" xml:space="preserve">
+    <value>Locale</value>
+  </data>
+  <data name="LocaleHelper" xml:space="preserve">
+    <value>LocaleHelper</value>
+  </data>
+  <data name="LogoAltText" xml:space="preserve">
+    <value>Logo alt text</value>
+  </data>
+  <data name="LogoAltTextHelper" xml:space="preserve">
+    <value>LogoAltTextHelper</value>
+  </data>
+  <data name="LogoUrl" xml:space="preserve">
+    <value>Logo url</value>
+  </data>
+  <data name="LogoUrlHelper" xml:space="preserve">
+    <value>LogoUrlHelper</value>
+  </data>
   <data name="Name" xml:space="preserve">
     <value>Name</value>
+  </data>
+  <data name="NameHelper" xml:space="preserve">
+    <value>NameHelper</value>
+  </data>
+  <data name="Preview" xml:space="preserve">
+    <value>Preview</value>
   </data>
   <data name="Save" xml:space="preserve">
     <value>Save</value>
@@ -177,8 +228,17 @@
   <data name="Scope" xml:space="preserve">
     <value>Scope</value>
   </data>
+  <data name="SignOut" xml:space="preserve">
+    <value>Sign out</value>
+  </data>
+  <data name="String1" xml:space="preserve">
+    <value />
+  </data>
   <data name="TextColor" xml:space="preserve">
     <value>Text color</value>
+  </data>
+  <data name="TextColorHelper" xml:space="preserve">
+    <value>TextColorHelper</value>
   </data>
   <data name="Type" xml:space="preserve">
     <value>Type</value>

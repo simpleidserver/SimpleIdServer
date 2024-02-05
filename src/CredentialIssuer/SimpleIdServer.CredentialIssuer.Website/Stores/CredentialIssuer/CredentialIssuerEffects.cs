@@ -2,8 +2,11 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.CredentialIssuer.Api.CredentialConf;
 using SimpleIdServer.CredentialIssuer.Domains;
+using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.CredentialIssuer.Website.Stores.CredentialIssuer;
 
@@ -52,6 +55,122 @@ public class CredentialIssuerEffects
         dispatcher.Dispatch(new GetCredentialConfigurationSuccessAction { Configuration = credentialConfiguration });
     }
 
+    [EffectMethod]
+    public async Task Handle(UpdateCredentialDetailsAction action, IDispatcher dispatcher)
+    {
+        var baseUrl = $"{GetBaseUrl()}/{action.Id}";
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var requestMessage = new HttpRequestMessage
+        {
+            Method = HttpMethod.Put,
+            RequestUri = new Uri(baseUrl),
+            Content = new StringContent(JsonSerializer.Serialize(new UpdateCredentialConfigurationDetailsRequest
+            {
+                BaseUrl = action.BaseUrl,
+                Format = action.Format,
+                JsonLdContext = action.JsonLdContext,
+                Scope = action.Scope,
+                Type = action.Type
+            }), Encoding.UTF8, "application/json")
+        };
+        var httpResult = await httpClient.SendAsync(requestMessage);
+        var json = await httpResult.Content.ReadAsStringAsync();
+        try
+        {
+            httpResult.EnsureSuccessStatusCode();
+            var credentialConfiguration = JsonSerializer.Deserialize<CredentialConfiguration>(json);
+            dispatcher.Dispatch(new UpdateCredentialDetailsSuccessAction { CredentialConfiguration = credentialConfiguration });
+        }
+        catch
+        {
+            var jsonObj = JsonObject.Parse(json);
+            dispatcher.Dispatch(new UpdateCredentialDetailsErrorAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
+        }
+    }
+
+    [EffectMethod]
+    public async Task Handle(AddCredentialDisplayAction action, IDispatcher dispatcher)
+    {
+        var baseUrl = $"{GetBaseUrl()}/{action.Id}/displays";
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var requestMessage = new HttpRequestMessage
+        {
+            Method = HttpMethod.Post,
+            RequestUri = new Uri(baseUrl),
+            Content = new StringContent(JsonSerializer.Serialize(new CredentialConfigurationDisplayRequest
+            {
+                BackgroundColor = action.BackgroundColor,
+                Description = action.Description,
+                Locale = action.Locale,
+                LogoAltText = action.LogoAltText,
+                LogoUrl = action.LogoUrl,
+                Name = action.Name,
+                TextColor = action.TextColor
+            }), Encoding.UTF8, "application/json")
+        };
+        var httpResult = await httpClient.SendAsync(requestMessage);
+        var json = await httpResult.Content.ReadAsStringAsync();
+        try
+        {
+            httpResult.EnsureSuccessStatusCode();
+            var display = JsonSerializer.Deserialize<CredentialConfigurationTranslation>(json);
+            dispatcher.Dispatch(new AddCredentialDisplaySuccessAction { Display = display });
+        }
+        catch
+        {
+            var jsonObj = JsonObject.Parse(json);
+            dispatcher.Dispatch(new AddCredentialDisplayErrorAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
+        }
+    }
+
+    [EffectMethod]
+    public async Task Handle(UpdateCredentialDisplayAction action, IDispatcher dispatcher)
+    {
+        var baseUrl = $"{GetBaseUrl()}/{action.Id}/displays/{action.DisplayId}";
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var requestMessage = new HttpRequestMessage
+        {
+            Method = HttpMethod.Put,
+            RequestUri = new Uri(baseUrl),
+            Content = new StringContent(JsonSerializer.Serialize(new CredentialConfigurationDisplayRequest
+            {
+                BackgroundColor = action.BackgroundColor,
+                Description = action.Description,
+                Locale = action.Locale,
+                LogoAltText = action.LogoAltText,
+                LogoUrl = action.LogoUrl,
+                Name = action.Name,
+                TextColor = action.TextColor
+            }), Encoding.UTF8, "application/json")
+        };
+        var httpResult = await httpClient.SendAsync(requestMessage);
+        var json = await httpResult.Content.ReadAsStringAsync();
+        try
+        {
+            httpResult.EnsureSuccessStatusCode();
+            dispatcher.Dispatch(new UpdateCredentialDisplaySuccessAction { BackgroundColor = action.BackgroundColor, Description = action.Description, DisplayId = action.DisplayId, Id = action.Id, Locale = action.Locale, LogoAltText = action.LogoAltText, LogoUrl = action.LogoUrl, Name = action.Name, TextColor = action.TextColor });
+        }
+        catch
+        {
+            var jsonObj = JsonObject.Parse(json);
+            dispatcher.Dispatch(new UpdateCredentialDisplayErrorAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
+        }
+    }
+
+    [EffectMethod]
+    public async Task Handle(DeleteCredentialDisplayAction action, IDispatcher dispatcher)
+    {
+        var baseUrl = $"{GetBaseUrl()}/{action.Id}/displays/{action.DisplayId}";
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var requestMessage = new HttpRequestMessage
+        {
+            Method = HttpMethod.Delete,
+            RequestUri = new Uri(baseUrl)
+        };
+        await httpClient.SendAsync(requestMessage);
+        dispatcher.Dispatch(new DeleteCredentialDisplaySuccessAction { Id = action.Id, DisplayId = action.DisplayId });
+    }
+
     private string GetBaseUrl()
         => $"{_options.CredentialIssuerUrl}/credential_configurations";
 }
@@ -76,4 +195,88 @@ public class GetCredentialConfigurationAction
 public class GetCredentialConfigurationSuccessAction
 {
     public CredentialConfiguration Configuration { get; set; }
+}
+
+public class UpdateCredentialDetailsAction
+{
+    public string Id { get; set; }
+    public string Type { get; set; }
+    public string Format { get; set; }
+    public string Scope { get; set; }
+    public string JsonLdContext { get; set; }
+    public string BaseUrl { get; set; }
+}
+
+public class UpdateCredentialDetailsSuccessAction
+{
+    public CredentialConfiguration CredentialConfiguration { get; set; }
+}
+ 
+public class UpdateCredentialDetailsErrorAction
+{
+    public string ErrorMessage { get; set; }
+}
+
+public class AddCredentialDisplayAction
+{
+    public string Id { get; set; }
+    public string Name { get; set; }
+    public string? Locale { get; set; } = null;
+    public string? LogoUrl { get; set; } = null;
+    public string? LogoAltText { get; set; } = null;
+    public string? Description { get; set; } = null;
+    public string? BackgroundColor { get; set; } = null;
+    public string? TextColor { get; set; } = null;
+}
+
+public class AddCredentialDisplaySuccessAction
+{
+    public CredentialConfigurationTranslation Display { get; set; }
+}
+
+public class AddCredentialDisplayErrorAction
+{
+    public string ErrorMessage { get; set; }
+}
+
+public class UpdateCredentialDisplayAction
+{
+    public string Id { get; set; }
+    public string DisplayId { get; set; }
+    public string Name { get; set; }
+    public string? Locale { get; set; } = null;
+    public string? LogoUrl { get; set; } = null;
+    public string? LogoAltText { get; set; } = null;
+    public string? Description { get; set; } = null;
+    public string? BackgroundColor { get; set; } = null;
+    public string? TextColor { get; set; } = null;
+}
+
+public class UpdateCredentialDisplaySuccessAction
+{
+    public string Id { get; set; }
+    public string DisplayId { get; set; }
+    public string Name { get; set; }
+    public string? Locale { get; set; } = null;
+    public string? LogoUrl { get; set; } = null;
+    public string? LogoAltText { get; set; } = null;
+    public string? Description { get; set; } = null;
+    public string? BackgroundColor { get; set; } = null;
+    public string? TextColor { get; set; } = null;
+}
+public class UpdateCredentialDisplayErrorAction
+{
+    public string ErrorMessage { get; set; }
+}
+
+public class DeleteCredentialDisplayAction
+{
+    public string Id { get; set; }
+    public string DisplayId { get; set; }
+}
+
+public class DeleteCredentialDisplaySuccessAction
+{
+    public string Id { get; set; }
+    public string DisplayId { get; set; }
 }

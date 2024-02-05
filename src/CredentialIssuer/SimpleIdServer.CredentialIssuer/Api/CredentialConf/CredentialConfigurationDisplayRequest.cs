@@ -1,15 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-
-using System;
 using System.Text.Json.Serialization;
 
-namespace SimpleIdServer.CredentialIssuer.Domains;
+namespace SimpleIdServer.CredentialIssuer.Api.CredentialConf;
 
-public class CredentialConfigurationTranslation : ICloneable
+public class CredentialConfigurationDisplayRequest
 {
-    [JsonPropertyName("id")]
-    public string Id { get; set; }
     [JsonPropertyName("name")]
     public string Name { get; set; }
     [JsonPropertyName("locale")]
@@ -24,22 +20,4 @@ public class CredentialConfigurationTranslation : ICloneable
     public string? BackgroundColor { get; set; } = null;
     [JsonPropertyName("text_color")]
     public string? TextColor { get; set; } = null;
-    [JsonIgnore]
-    public virtual CredentialConfigurationClaim CredentialConfigurationClaim { get; set; }
-    [JsonIgnore]
-    public virtual CredentialConfiguration CredentialConfiguration { get; set; }
-
-    public object Clone()
-    {
-        return new CredentialConfigurationTranslation
-        {
-            Name = Name,
-            Locale = Locale,
-            LogoUrl = LogoUrl,
-            LogoAltText = LogoAltText,
-            Description = Description,
-            BackgroundColor = BackgroundColor,
-            TextColor = TextColor
-        };
-    }
 }

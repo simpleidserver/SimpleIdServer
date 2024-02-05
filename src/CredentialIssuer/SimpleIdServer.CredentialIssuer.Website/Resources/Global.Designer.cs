@@ -79,6 +79,24 @@ namespace SimpleIdServer.CredentialIssuer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Background color.
+        /// </summary>
+        internal static string BackgroundColor {
+            get {
+                return ResourceManager.GetString("BackgroundColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à BackgroundColorHelper.
+        /// </summary>
+        internal static string BackgroundColorHelper {
+            get {
+                return ResourceManager.GetString("BackgroundColorHelper", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Base url.
         /// </summary>
         internal static string BaseUrl {
@@ -111,6 +129,42 @@ namespace SimpleIdServer.CredentialIssuer.Website.Resources {
         internal static string Claims {
             get {
                 return ResourceManager.GetString("Claims", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Credential configuration is updated.
+        /// </summary>
+        internal static string CredentialConfigurationDetailsUpdated {
+            get {
+                return ResourceManager.GetString("CredentialConfigurationDetailsUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Display is added.
+        /// </summary>
+        internal static string CredentialConfigurationDisplayAdded {
+            get {
+                return ResourceManager.GetString("CredentialConfigurationDisplayAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Display is removed.
+        /// </summary>
+        internal static string CredentialConfigurationDisplayRemoved {
+            get {
+                return ResourceManager.GetString("CredentialConfigurationDisplayRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Display is updated.
+        /// </summary>
+        internal static string CredentialConfigurationDisplayUpdated {
+            get {
+                return ResourceManager.GetString("CredentialConfigurationDisplayUpdated", resourceCulture);
             }
         }
         
@@ -160,6 +214,24 @@ namespace SimpleIdServer.CredentialIssuer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Description.
+        /// </summary>
+        internal static string Description {
+            get {
+                return ResourceManager.GetString("Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à DescriptionHelper.
+        /// </summary>
+        internal static string DescriptionHelper {
+            get {
+                return ResourceManager.GetString("DescriptionHelper", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Details.
         /// </summary>
         internal static string Details {
@@ -174,6 +246,15 @@ namespace SimpleIdServer.CredentialIssuer.Website.Resources {
         internal static string Edit {
             get {
                 return ResourceManager.GetString("Edit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Edit display.
+        /// </summary>
+        internal static string EditCredentialConfigurationDisplay {
+            get {
+                return ResourceManager.GetString("EditCredentialConfigurationDisplay", resourceCulture);
             }
         }
         
@@ -214,11 +295,83 @@ namespace SimpleIdServer.CredentialIssuer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Locale.
+        /// </summary>
+        internal static string Locale {
+            get {
+                return ResourceManager.GetString("Locale", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à LocaleHelper.
+        /// </summary>
+        internal static string LocaleHelper {
+            get {
+                return ResourceManager.GetString("LocaleHelper", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Logo alt text.
+        /// </summary>
+        internal static string LogoAltText {
+            get {
+                return ResourceManager.GetString("LogoAltText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à LogoAltTextHelper.
+        /// </summary>
+        internal static string LogoAltTextHelper {
+            get {
+                return ResourceManager.GetString("LogoAltTextHelper", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Logo url.
+        /// </summary>
+        internal static string LogoUrl {
+            get {
+                return ResourceManager.GetString("LogoUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à LogoUrlHelper.
+        /// </summary>
+        internal static string LogoUrlHelper {
+            get {
+                return ResourceManager.GetString("LogoUrlHelper", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Name.
         /// </summary>
         internal static string Name {
             get {
                 return ResourceManager.GetString("Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à NameHelper.
+        /// </summary>
+        internal static string NameHelper {
+            get {
+                return ResourceManager.GetString("NameHelper", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Preview.
+        /// </summary>
+        internal static string Preview {
+            get {
+                return ResourceManager.GetString("Preview", resourceCulture);
             }
         }
         
@@ -241,11 +394,38 @@ namespace SimpleIdServer.CredentialIssuer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Sign out.
+        /// </summary>
+        internal static string SignOut {
+            get {
+                return ResourceManager.GetString("SignOut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à .
+        /// </summary>
+        internal static string String1 {
+            get {
+                return ResourceManager.GetString("String1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Text color.
         /// </summary>
         internal static string TextColor {
             get {
                 return ResourceManager.GetString("TextColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à TextColorHelper.
+        /// </summary>
+        internal static string TextColorHelper {
+            get {
+                return ResourceManager.GetString("TextColorHelper", resourceCulture);
             }
         }
         
