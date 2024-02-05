@@ -171,6 +171,126 @@ public class CredentialIssuerEffects
         dispatcher.Dispatch(new DeleteCredentialDisplaySuccessAction { Id = action.Id, DisplayId = action.DisplayId });
     }
 
+    [EffectMethod]
+    public async Task Handle(AddCredentialClaimAction action, IDispatcher dispatcher)
+    {
+        var baseUrl = $"{GetBaseUrl()}/{action.Id}/claims";
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var requestMessage = new HttpRequestMessage
+        {
+            Method = HttpMethod.Post,
+            RequestUri = new Uri(baseUrl),
+            Content = new StringContent(JsonSerializer.Serialize(new CredentialConfigurationClaimRequest
+            {
+                Mandatory = action.Mandatory,
+                Name = action.Name,
+                SourceUserClaimName = action.SourceUserClaimName,
+                ValueType = action.ValueType
+            }), Encoding.UTF8, "application/json")
+        };
+        var httpResult = await httpClient.SendAsync(requestMessage);
+        var json = await httpResult.Content.ReadAsStringAsync();
+        try
+        {
+            httpResult.EnsureSuccessStatusCode();
+            var claim = JsonSerializer.Deserialize<CredentialConfigurationClaim>(json);
+            dispatcher.Dispatch(new AddCredentialClaimSuccessAction { Claim = claim });
+        }
+        catch
+        {
+            var jsonObj = JsonObject.Parse(json);
+            dispatcher.Dispatch(new AddCredentialClaimFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
+        }
+    }
+
+    [EffectMethod]
+    public async Task Handle(DeleteCredentialClaimAction action, IDispatcher dispatcher)
+    {
+        var baseUrl = $"{GetBaseUrl()}/{action.Id}/claims/{action.ClaimId}";
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var requestMessage = new HttpRequestMessage
+        {
+            Method = HttpMethod.Delete,
+            RequestUri = new Uri(baseUrl)
+        };
+        await httpClient.SendAsync(requestMessage);
+        dispatcher.Dispatch(new DeleteCredentialClaimSuccessAction { Id = action.Id, ClaimId = action.ClaimId });
+    }
+
+    [EffectMethod]
+    public async Task Handle(AddCredentialClaimTranslationAction action, IDispatcher dispatcher)
+    {
+        var baseUrl = $"{GetBaseUrl()}/{action.Id}/claims/{action.ClaimId}/translations";
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var requestMessage = new HttpRequestMessage
+        {
+            Method = HttpMethod.Post,
+            RequestUri = new Uri(baseUrl),
+            Content = new StringContent(JsonSerializer.Serialize(new CredentialConfigurationClaimDisplayRequest
+            {
+                Name = action.Name,
+                Locale = action.Locale
+            }), Encoding.UTF8, "application/json")
+        };
+        var httpResult = await httpClient.SendAsync(requestMessage);
+        var json = await httpResult.Content.ReadAsStringAsync();
+        try
+        {
+            httpResult.EnsureSuccessStatusCode();
+            var translation = JsonSerializer.Deserialize<CredentialConfigurationTranslation>(json);
+            dispatcher.Dispatch(new AddCredentialClaimTranslationSuccessAction { ClaimId = action.ClaimId, Translation = translation });
+        }
+        catch
+        {
+            var jsonObj = JsonObject.Parse(json);
+            dispatcher.Dispatch(new AddCredentialClaimTranslationFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
+        }
+    }
+
+    [EffectMethod]
+    public async Task Handle(UpdateCredentialClaimTranslationAction action, IDispatcher dispatcher)
+    {
+        var baseUrl = $"{GetBaseUrl()}/{action.Id}/claims/{action.ClaimId}/translations/{action.TranslationId}";
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var requestMessage = new HttpRequestMessage
+        {
+            Method = HttpMethod.Put,
+            RequestUri = new Uri(baseUrl),
+            Content = new StringContent(JsonSerializer.Serialize(new CredentialConfigurationClaimDisplayRequest
+            {
+                Name = action.Name,
+                Locale = action.Locale
+            }), Encoding.UTF8, "application/json")
+        };
+        var httpResult = await httpClient.SendAsync(requestMessage);
+        var json = await httpResult.Content.ReadAsStringAsync();
+        try
+        {
+            httpResult.EnsureSuccessStatusCode();
+            var translation = JsonSerializer.Deserialize<CredentialConfigurationTranslation>(json);
+            dispatcher.Dispatch(new UpdateCredentialClaimTranslationSuccessAction { ClaimId = action.ClaimId, Id = action.Id, Locale = action.Locale, Name = action.Name, TranslationId = action.TranslationId });
+        }
+        catch
+        {
+            var jsonObj = JsonObject.Parse(json);
+            dispatcher.Dispatch(new UpdateCredentialClaimTranslationFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
+        }
+    }
+
+    [EffectMethod]
+    public async Task Handle(DeleteCredentialClaimTranslationAction action, IDispatcher dispatcher)
+    {
+        var baseUrl = $"{GetBaseUrl()}/{action.Id}/claims/{action.ClaimId}/translations/{action.TranslationId}";
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var requestMessage = new HttpRequestMessage
+        {
+            Method = HttpMethod.Delete,
+            RequestUri = new Uri(baseUrl)
+        };
+        await httpClient.SendAsync(requestMessage);
+        dispatcher.Dispatch(new DeleteCredentialClaimTranslationSuccessAction { ClaimId = action.ClaimId, Id = action.Id, TranslationId = action.TranslationId });
+    }
+
     private string GetBaseUrl()
         => $"{_options.CredentialIssuerUrl}/credential_configurations";
 }
@@ -279,4 +399,91 @@ public class DeleteCredentialDisplaySuccessAction
 {
     public string Id { get; set; }
     public string DisplayId { get; set; }
+}
+
+public class AddCredentialClaimAction
+{
+    public string Id { get; set; }
+    public string SourceUserClaimName { get; set; }
+    public string Name { get; set; }
+    public bool? Mandatory { get; set; }
+    public string? ValueType { get; set; }
+}
+
+public class AddCredentialClaimSuccessAction
+{
+    public CredentialConfigurationClaim Claim { get; set; }
+}
+
+public class AddCredentialClaimFailureAction
+{
+    public string ErrorMessage { get; set; }
+}
+
+public class DeleteCredentialClaimAction
+{
+    public string Id { get; set; }
+    public string ClaimId { get; set; }
+}
+
+public class DeleteCredentialClaimSuccessAction
+{
+    public string Id { get; set; }
+    public string ClaimId { get; set; }
+}
+
+public class AddCredentialClaimTranslationAction
+{
+    public string Id { get; set; }
+    public string ClaimId { get; set; }
+    public string Locale { get; set; }
+    public string Name { get; set; }
+}
+
+public class AddCredentialClaimTranslationSuccessAction
+{
+    public string ClaimId { get; set; }
+    public CredentialConfigurationTranslation Translation { get; set; }
+}
+
+public class AddCredentialClaimTranslationFailureAction
+{
+    public string ErrorMessage { get; set; }
+}
+
+public class UpdateCredentialClaimTranslationAction
+{
+    public string Id { get; set; }
+    public string ClaimId { get; set; }
+    public string TranslationId { get; set; }
+    public string Locale { get; set; }
+    public string Name { get; set; }
+}
+
+public class UpdateCredentialClaimTranslationSuccessAction
+{
+    public string Id { get; set; }
+    public string ClaimId { get; set; }
+    public string TranslationId { get; set; }
+    public string Locale { get; set; }
+    public string Name { get; set; }
+}
+
+public class UpdateCredentialClaimTranslationFailureAction
+{
+    public string ErrorMessage { get; set; }
+}
+
+public class DeleteCredentialClaimTranslationAction
+{
+    public string Id { get; set; }
+    public string ClaimId { get; set; }
+    public string TranslationId { get; set; }
+}
+
+public class DeleteCredentialClaimTranslationSuccessAction
+{
+    public string Id { get; set; }
+    public string ClaimId { get; set; }
+    public string TranslationId { get; set; }
 }

@@ -9,6 +9,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer
         public const string MISSING_OPENID_CREDENTIAL_FORMAT = "the authorization_details must contain a format";
         public const string EXISTING_CREDENTIAL_TEMPLATE = "Credential template with the type {0} already exists";
         public const string EXISTING_CREDENTIAL_CONFIGURATION = "credential configuration {0} already exists";
+        public const string EXISTING_CREDENTIAL_CLAIM = "the credential configuration claim {0} already exists";
         public const string INVALID_INCOMING_REQUEST = "the incoming request is not valid";
         public const string INVALID_PROOF_FORMAT = "the proof format {0} is not supported";
         public const string INVALID_ACCESS_TOKEN_SCOPE = "access token has an invalid scope";
@@ -30,6 +31,8 @@ namespace SimpleIdServer.IdServer.CredentialIssuer
         public const string UNKNOWN_CREDENTIAL_DISPLAY_PARAMETER = "the credential template parameter {0} doesn't exist";
         public const string UNKNOWN_WALLET_CLIENT_ID = "the wallet {0} doesn't exist";
         public const string UNKNOWN_CREDENTIAL_CONFIGURATION = "the credential configuration {0} doesn't exist";
+        public const string UNKNOWN_CREDENTIAL_CLAIM = "the credential configuration claim {0} doesn't exist";
+        public const string UNKNOWN_CREDENTIAL_CLAIM_TRANSLATION = "the translation {0} doesn't exist";
         public const string UNKNOWN_CREDENTIAL_CONFIGURATION_DISPLAY = "the credential configuration display {0} doesn't exist";
         public const string UNKNOWN_PROOF_TYPE = "the proof type {0} is unknown";
         public const string UNKNOWN_USER = "the user {0} doesn't exist";

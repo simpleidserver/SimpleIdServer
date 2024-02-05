@@ -156,6 +156,119 @@ public class CredentialConfigurationsController : BaseController
         };
     }
 
+    [HttpPost("{id}/claims")]
+    public async Task<IActionResult> AddClaim(string id, [FromBody] CredentialConfigurationClaimRequest request, CancellationToken cancellationToken)
+    {
+        var credentialConfiguration = await _credentialConfigurationStore.Get(id, cancellationToken);
+        if (credentialConfiguration == null)
+            return Build(new ErrorResult(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CREDENTIAL_CONFIGURATION, id)));
+        if (!TryValidate(request, out ErrorResult? error))
+            return Build(error.Value);
+        var existingClaim = credentialConfiguration.Claims.SingleOrDefault(c => c.Name == request.Name);
+        if (existingClaim == null)
+            return Build(new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.EXISTING_CREDENTIAL_CLAIM, request.Name)));
+        var claim = new CredentialConfigurationClaim
+        {
+            Id = Guid.NewGuid().ToString(),
+            Mandatory = request.Mandatory,
+            Name = request.Name,
+            SourceUserClaimName = request.SourceUserClaimName,
+            ValueType = request.ValueType
+        };
+        credentialConfiguration.Claims.Add(claim);
+        credentialConfiguration.UpdateDateTime = DateTime.UtcNow;
+        await _credentialConfigurationStore.SaveChanges(cancellationToken);
+        return new ContentResult
+        {
+            ContentType = "application/json",
+            Content = JsonSerializer.Serialize(claim),
+            StatusCode = (int)HttpStatusCode.Created
+        };
+    }
+
+    [HttpDelete("{id}/claims/{claimId}")]
+    public async Task<IActionResult> DeleteClaim(string id, string claimId, CancellationToken cancellationToken)
+    {
+        var credentialConfiguration = await _credentialConfigurationStore.Get(id, cancellationToken);
+        if (credentialConfiguration == null)
+            return Build(new ErrorResult(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CREDENTIAL_CONFIGURATION, id)));
+        var claim = credentialConfiguration.Claims.SingleOrDefault(c => c.Id == claimId);
+        if (claim == null)
+            return Build(new ErrorResult(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CREDENTIAL_CLAIM, claimId)));
+        credentialConfiguration.Claims.Remove(claim);
+        await _credentialConfigurationStore.SaveChanges(cancellationToken);
+        return new NoContentResult();
+    }
+
+    [HttpPost("{id}/claims/{claimId}/translations")]
+    public async Task<IActionResult> AddClaimTranslation(string id, string claimId, [FromBody] CredentialConfigurationClaimDisplayRequest request, CancellationToken cancellationToken)
+    {
+        var credentialConfiguration = await _credentialConfigurationStore.Get(id, cancellationToken);
+        if (credentialConfiguration == null)
+            return Build(new ErrorResult(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CREDENTIAL_CONFIGURATION, id)));
+        var claim = credentialConfiguration.Claims.SingleOrDefault(c => c.Id == claimId);
+        if (claim == null)
+            return Build(new ErrorResult(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CREDENTIAL_CLAIM, claimId)));
+        if (!TryValidate(request, out ErrorResult? error))
+            return Build(error.Value);
+        var otherDisplaySameLanguage = claim.Translations.SingleOrDefault(d => d.Locale == request.Locale);
+        if (otherDisplaySameLanguage != null)
+            return Build(new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.EXISTING_DISPLAY_SAME_LANGUAGE));
+        var record = new CredentialConfigurationTranslation
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = request.Name,
+            Locale = request.Locale
+        };
+        claim.Translations.Add(record);
+        await _credentialConfigurationStore.SaveChanges(cancellationToken);
+        return new ContentResult
+        {
+            ContentType = "application/json",
+            Content = JsonSerializer.Serialize(record),
+            StatusCode = (int)HttpStatusCode.Created
+        };
+    }
+
+    [HttpDelete("{id}/claims/{claimId}/translations/{translationId}")]
+    public async Task<IActionResult> AddClaimTranslation(string id, string claimId, string translationId, CancellationToken cancellationToken)
+    {
+        var credentialConfiguration = await _credentialConfigurationStore.Get(id, cancellationToken);
+        if (credentialConfiguration == null)
+            return Build(new ErrorResult(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CREDENTIAL_CONFIGURATION, id)));
+        var claim = credentialConfiguration.Claims.SingleOrDefault(c => c.Id == claimId);
+        if (claim == null)
+            return Build(new ErrorResult(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CREDENTIAL_CLAIM, claimId)));
+        var translation = claim.Translations.SingleOrDefault(t => t.Id == translationId);
+        if (translation == null)
+            return Build(new ErrorResult(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CREDENTIAL_CLAIM_TRANSLATION, translationId)));
+        await _credentialConfigurationStore.SaveChanges(cancellationToken);
+        return new NoContentResult();
+    }
+
+    [HttpPut("{id}/claims/{claimId}/translations/{translationId}")]
+    public async Task<IActionResult> UpdateClaimTranslation(string id, string claimId, string translationId, [FromBody] CredentialConfigurationClaimDisplayRequest request, CancellationToken cancellationToken)
+    {
+        var credentialConfiguration = await _credentialConfigurationStore.Get(id, cancellationToken);
+        if (credentialConfiguration == null)
+            return Build(new ErrorResult(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CREDENTIAL_CONFIGURATION, id)));
+        var claim = credentialConfiguration.Claims.SingleOrDefault(c => c.Id == claimId);
+        if (claim == null)
+            return Build(new ErrorResult(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CREDENTIAL_CLAIM, claimId)));
+        var translation = claim.Translations.SingleOrDefault(t => t.Id == translationId);
+        if (translation == null)
+            return Build(new ErrorResult(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CREDENTIAL_CLAIM_TRANSLATION, translationId)));
+        if (!TryValidate(request, out ErrorResult? error))
+            return Build(error.Value);
+        var otherDisplaySameLanguage = claim.Translations.SingleOrDefault(d => d.Locale == request.Locale);
+        if (otherDisplaySameLanguage != null)
+            return Build(new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.EXISTING_DISPLAY_SAME_LANGUAGE));
+        translation.Name = request.Name;
+        translation.Locale = request.Locale;
+        await _credentialConfigurationStore.SaveChanges(cancellationToken);
+        return new NoContentResult();
+    }
+
     private bool TryValidate(UpdateCredentialConfigurationDetailsRequest request, out ErrorResult? error)
     {
         error = null;
@@ -188,6 +301,30 @@ public class CredentialConfigurationsController : BaseController
             error = new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
         if (string.IsNullOrWhiteSpace(request.Locale))
             error = new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Join(ErrorMessages.MISSING_PARAMETER, "locale"));
+        return error == null;
+    }
+
+    private bool TryValidate(CredentialConfigurationClaimRequest request, out ErrorResult? error)
+    {
+        error = null;
+        if (request == null)
+            error = new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
+        if (string.IsNullOrWhiteSpace(request.SourceUserClaimName))
+            error = new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, "source_claim_name"));
+        if (string.IsNullOrWhiteSpace(request.Name))
+            error = new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, "name"));
+        return error == null;
+    }
+
+    private bool TryValidate(CredentialConfigurationClaimDisplayRequest request, out ErrorResult? error)
+    {
+        error = null;
+        if (request == null)
+            error = new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
+        if (string.IsNullOrWhiteSpace(request.Name))
+            error = new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, "name"));
+        if (string.IsNullOrWhiteSpace(request.Locale))
+            error = new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, "locale"));
         return error == null;
     }
 }

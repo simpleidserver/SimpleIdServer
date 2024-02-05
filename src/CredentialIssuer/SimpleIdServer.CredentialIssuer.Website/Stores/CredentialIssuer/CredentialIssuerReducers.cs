@@ -160,5 +160,144 @@ public static class CredentialIssuerReducers
         };
     }
 
+    [ReducerMethod]
+    public static CredentialConfigurationState ReduceAddCredentialClaimAction(CredentialConfigurationState state, AddCredentialClaimAction action)
+    {
+        return state with
+        {
+            IsLoading = true
+        };
+    }
+
+    [ReducerMethod]
+    public static CredentialConfigurationState ReduceAddCredentialClaimSuccessAction(CredentialConfigurationState state, AddCredentialClaimSuccessAction action)
+    {
+        var credConfiguration = state.CredentialConfiguration;
+        credConfiguration.Claims.Add(action.Claim);
+        return state with
+        {
+            IsLoading = false,
+            CredentialConfiguration = credConfiguration
+        };
+    }
+
+    [ReducerMethod]
+    public static CredentialConfigurationState ReduceAddCredentialClaimFailureAction(CredentialConfigurationState state, AddCredentialClaimFailureAction action)
+    {
+        return state with
+        {
+            IsLoading = false
+        };
+    }
+
+    [ReducerMethod]
+    public static CredentialConfigurationState ReduceDeleteCredentialClaimAction(CredentialConfigurationState state, DeleteCredentialClaimAction action)
+    {
+        return state with
+        {
+            IsLoading = true
+        };
+    }
+
+    [ReducerMethod]
+    public static CredentialConfigurationState ReduceDeleteCredentialClaimSuccessAction(CredentialConfigurationState state, DeleteCredentialClaimSuccessAction action)
+    {
+        var credConfiguration = state.CredentialConfiguration;
+        var claim = credConfiguration.Claims.Single(c => c.Id == action.ClaimId);
+        credConfiguration.Claims.Remove(claim);
+        return state with
+        {
+            IsLoading = false,
+            CredentialConfiguration = credConfiguration
+        };
+    }
+
+    [ReducerMethod]
+    public static CredentialConfigurationState ReduceAddCredentialClaimTranslationAction(CredentialConfigurationState state, AddCredentialClaimTranslationAction action)
+    {
+        return state with
+        {
+            IsLoading = true
+        };
+    }
+
+    [ReducerMethod]
+    public static CredentialConfigurationState ReduceAddCredentialClaimTranslationSuccessAction(CredentialConfigurationState state, AddCredentialClaimTranslationSuccessAction action)
+    {
+        var credentialConfiguration = state.CredentialConfiguration;
+        var claim = credentialConfiguration.Claims.Single(c => c.Id == action.ClaimId);
+        claim.Translations.Add(action.Translation);
+        return state with
+        {
+            IsLoading = false,
+            CredentialConfiguration = credentialConfiguration
+        };
+    }
+
+    [ReducerMethod]
+    public static CredentialConfigurationState ReduceAddCredentialClaimTranslationFailureAction(CredentialConfigurationState state, AddCredentialClaimTranslationFailureAction action)
+    {
+        return state with
+        {
+            IsLoading = false
+        };
+    }
+
+    [ReducerMethod]
+    public static CredentialConfigurationState ReduceUpdateCredentialClaimTranslationAction(CredentialConfigurationState state, UpdateCredentialClaimTranslationAction action)
+    {
+        return state with
+        {
+            IsLoading = true
+        };
+    }
+
+    [ReducerMethod]
+    public static CredentialConfigurationState ReduceUpdateCredentialClaimTranslationSuccessAction(CredentialConfigurationState state, UpdateCredentialClaimTranslationSuccessAction action)
+    {
+        var credentialConfiguration = state.CredentialConfiguration;
+        var claim = credentialConfiguration.Claims.Single(c => c.Id == action.ClaimId);
+        var tr = claim.Translations.Single(c => c.Id == action.TranslationId);
+        tr.Name = action.Name;
+        tr.Locale = action.Locale;
+        return state with
+        {
+            IsLoading = false,
+            CredentialConfiguration = credentialConfiguration
+        };
+    }
+
+    [ReducerMethod]
+    public static CredentialConfigurationState ReduceUpdateCredentialClaimTranslationFailureAction(CredentialConfigurationState state, UpdateCredentialClaimTranslationFailureAction action)
+    {
+        return state with
+        {
+            IsLoading = false
+        };
+    }
+
+    [ReducerMethod]
+    public static CredentialConfigurationState ReduceDeleteCredentialClaimTranslationAction(CredentialConfigurationState state, DeleteCredentialClaimTranslationAction action)
+    {
+        return state with
+        {
+            IsLoading = true
+        };
+    }
+
+    [ReducerMethod]
+    public static CredentialConfigurationState ReduceDeleteCredentialClaimTranslationSuccessAction(CredentialConfigurationState state, UpdateCredentialClaimTranslationSuccessAction action)
+    {
+        var credentialConfiguration = state.CredentialConfiguration;
+        var claim = credentialConfiguration.Claims.Single(c => c.Id == action.ClaimId);
+        var tr = claim.Translations.Single(c => c.Id == action.TranslationId);
+        claim.Translations.Remove(tr);
+        return state with
+        {
+            IsLoading = false,
+            CredentialConfiguration = credentialConfiguration
+        };
+    }
+
     #endregion
 }

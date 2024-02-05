@@ -1,0 +1,69 @@
+﻿@using Microsoft.AspNetCore.Builder;
+@using Microsoft.Extensions.Options;
+@using SimpleIdServer.CredentialIssuer.Domains;
+@using SimpleIdServer.CredentialIssuer.Website.Stores.CredentialIssuer;
+@using System.Globalization;
+@inject IOptions<RequestLocalizationOptions> requestLocalizationOptions
+
+<RadzenCard Variant="Variant.Filled">
+    <RadzenStack Gap="1rem">
+        <!-- Locale -->
+        <RadzenFormField Text="@Global.Locale" Variant=Variant.Outlined>
+            <ChildContent>
+                <RadzenDropDown Class="w-100"
+                                Data=@SupportedCultures
+                                Disabled=@IsReadOnly
+                                TValue="CultureInfo"
+                                @bind-Value=@CurrentCulture
+                                TextProperty="DisplayName" />
+            </ChildContent>
+            <Helper>
+                <RadzenText TextStyle="TextStyle.Caption">@Global.LocaleHelper</RadzenText>
+            </Helper>
+        </RadzenFormField>
+        <!-- Name -->
+        <RadzenFormField Text="@Global.Name" Variant=Variant.Outlined>
+            <ChildContent>
+                <RadzenTextBox Disabled=@IsReadOnly @bind-Value="@Translation.Name"></RadzenTextBox>
+            </ChildContent>
+            <Helper>
+                <RadzenText TextStyle="TextStyle.Caption">@Global.NameHelper</RadzenText>
+            </Helper>
+        </RadzenFormField>
+        <div>
+            @if (ActionsContent != null)
+            {
+                @ActionsContent
+            }
+        </div>
+    </RadzenStack>
+</RadzenCard>
+
+@code {
+    [Parameter]
+    public CredentialConfigurationTranslation Translation { get; set; }
+    [Parameter]
+    public RenderFragment ActionsContent { get; set; }
+    [Parameter]
+    public bool IsReadOnly { get; set; }
+
+    CultureInfo CurrentCulture
+    {
+        get
+        {
+            if (Translation != null && !string.IsNullOrWhiteSpace(Translation.Locale)) return new CultureInfo(Translation.Locale);
+            return requestLocalizationOptions.Value.DefaultRequestCulture.Culture;
+        }
+        set
+        {
+            Translation.Locale = value.ToString();
+        }
+    }
+
+    IList<CultureInfo> SupportedCultures => requestLocalizationOptions.Value.SupportedCultures;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+    }
+}
