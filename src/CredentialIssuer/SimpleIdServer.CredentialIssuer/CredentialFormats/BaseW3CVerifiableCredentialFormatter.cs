@@ -81,17 +81,7 @@ public abstract class BaseW3CVerifiableCredentialFormatter : ICredentialFormatte
         };
         verifiableCredential.Context.Add(VerifiableCredentialJsonLdContext);
         verifiableCredential.Context.Add(request.JsonLdContext);
-        var flatNodes = request.UserCredentialClaims.Select(c =>
-        {
-            var cl = request.CredentialConfiguration.Claims.Single(cl => cl.SourceUserClaimName == c.Name);
-            return new CredentialUserClaimNode
-            {
-                Level = cl.Name.Split('.').Count(),
-                Name = cl.Name,
-                Value = c.Value
-            };
-        });
-        Build(flatNodes, verifiableCredential.CredentialSubject, 1);
+        Build(request.UserClaims, verifiableCredential.CredentialSubject, 1);
         verifiableCredential.Type.Add(request.Type);
         return verifiableCredential;
     }
@@ -157,19 +147,6 @@ public abstract class BaseW3CVerifiableCredentialFormatter : ICredentialFormatte
         record.Add("display", displays);
         return record;
     }
-}
-
-public interface INode
-{
-    int Level { get; set; }
-    string Name { get; set; }
-}
-
-public class CredentialUserClaimNode : INode
-{
-    public int Level { get; set; }
-    public string Name { get; set; }
-    public string Value { get; set; }
 }
 
 public class CredentialConfigurationClaimNode : INode

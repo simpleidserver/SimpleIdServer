@@ -20,13 +20,21 @@ namespace SimpleIdServer.CredentialIssuer.Api.CredentialConf;
 [Authorize("credconfs")]
 public class CredentialConfigurationsController : BaseController
 {
+    private readonly ICredentialStore _credentialStore;
     private readonly ICredentialConfigurationStore _credentialConfigurationStore;
     private readonly IEnumerable<ICredentialFormatter> _formatters;
+    private readonly IUserCredentialClaimStore _userCredentialClaimStore;
 
-    public CredentialConfigurationsController(ICredentialConfigurationStore credentialConfigurationStore, IEnumerable<ICredentialFormatter> formatters)
+    public CredentialConfigurationsController(
+        ICredentialStore credentialStore,
+        ICredentialConfigurationStore credentialConfigurationStore,
+        IEnumerable<ICredentialFormatter> formatters,
+        IUserCredentialClaimStore userCredentialClaimStore)
     {
+        _credentialStore = credentialStore;
         _credentialConfigurationStore = credentialConfigurationStore;
         _formatters = formatters;
+        _userCredentialClaimStore = userCredentialClaimStore;
     }
 
     [HttpGet]
@@ -36,6 +44,38 @@ public class CredentialConfigurationsController : BaseController
         return new OkObjectResult(credentialConfigurations);
     }
 
+    [HttpPost]
+    public async Task<IActionResult> Add([FromBody] UpdateCredentialConfigurationDetailsRequest request, CancellationToken cancellationToken)
+    {
+        if (!TryValidate(request, out ErrorResult? error))
+            return Build(error.Value);
+        var serverId = $"{request.Type}_{request.Format}";
+        var existingCredentialConfiguration = await _credentialConfigurationStore.GetByServerId(serverId, cancellationToken);
+        if (existingCredentialConfiguration != null)
+            return Build(new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.EXISTING_CREDENTIAL_CONFIGURATION, serverId)));
+
+        var record = new Domains.CredentialConfiguration
+        {
+            Id = Guid.NewGuid().ToString(),
+            JsonLdContext = request.JsonLdContext,
+            BaseUrl = request.BaseUrl,
+            Type = request.Type,
+            Scope = request.Scope,
+            Format = request.Format,
+            ServerId = serverId,
+            UpdateDateTime = DateTime.UtcNow,
+            CreateDateTime = DateTime.UtcNow
+        };
+        _credentialConfigurationStore.Add(record);
+        await _credentialConfigurationStore.SaveChanges(cancellationToken);
+        return new ContentResult
+        {
+            ContentType = "application/json",
+            Content = JsonSerializer.Serialize(record),
+            StatusCode = (int)HttpStatusCode.Created
+        };
+    }
+
     [HttpGet("{id}")]
     public async Task<IActionResult> Get(string id, CancellationToken cancellationToken)
     {
@@ -43,6 +83,17 @@ public class CredentialConfigurationsController : BaseController
         if (credentialConfiguration == null)
             return Build(new ErrorResult(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CREDENTIAL_CONFIGURATION, id)));
         return new OkObjectResult(credentialConfiguration);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(string id, CancellationToken cancellationToken)
+    {
+        var credentialConfiguration = await _credentialConfigurationStore.Get(id, cancellationToken);
+        if (credentialConfiguration == null)
+            return Build(new ErrorResult(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CREDENTIAL_CONFIGURATION, id)));
+        _credentialConfigurationStore.Remove(credentialConfiguration);
+        await _credentialConfigurationStore.SaveChanges(cancellationToken);
+        return new NoContentResult();
     }
 
     [HttpPut("{id}")]
@@ -165,7 +216,7 @@ public class CredentialConfigurationsController : BaseController
         if (!TryValidate(request, out ErrorResult? error))
             return Build(error.Value);
         var existingClaim = credentialConfiguration.Claims.SingleOrDefault(c => c.Name == request.Name);
-        if (existingClaim == null)
+        if (existingClaim != null)
             return Build(new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.EXISTING_CREDENTIAL_CLAIM, request.Name)));
         var claim = new CredentialConfigurationClaim
         {
@@ -242,6 +293,7 @@ public class CredentialConfigurationsController : BaseController
         var translation = claim.Translations.SingleOrDefault(t => t.Id == translationId);
         if (translation == null)
             return Build(new ErrorResult(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CREDENTIAL_CLAIM_TRANSLATION, translationId)));
+        claim.Translations.Remove(translation);
         await _credentialConfigurationStore.SaveChanges(cancellationToken);
         return new NoContentResult();
     }
@@ -260,7 +312,7 @@ public class CredentialConfigurationsController : BaseController
             return Build(new ErrorResult(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CREDENTIAL_CLAIM_TRANSLATION, translationId)));
         if (!TryValidate(request, out ErrorResult? error))
             return Build(error.Value);
-        var otherDisplaySameLanguage = claim.Translations.SingleOrDefault(d => d.Locale == request.Locale);
+        var otherDisplaySameLanguage = claim.Translations.SingleOrDefault(d => d.Locale == request.Locale && d.Id != translation.Id);
         if (otherDisplaySameLanguage != null)
             return Build(new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.EXISTING_DISPLAY_SAME_LANGUAGE));
         translation.Name = request.Name;
@@ -269,27 +321,67 @@ public class CredentialConfigurationsController : BaseController
         return new NoContentResult();
     }
 
+    [HttpPost("{id}/issue")]
+    public async Task<IActionResult> Issue(string id, [FromBody] IssueCredentialRequest request, CancellationToken cancellationToken)
+    {
+        var credentialConfiguration = await _credentialConfigurationStore.Get(id, cancellationToken);
+        if (credentialConfiguration == null)
+            return Build(new ErrorResult(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CREDENTIAL_CONFIGURATION, id)));
+        if (!TryValidate(request, out ErrorResult? error))
+            return Build(error.Value);
+        var existingCredential = await _credentialStore.GetByCredentialId(request.CredentialId, cancellationToken);
+        if (existingCredential != null)
+            return Build(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.EXISTING_CREDENTIAL, request.CredentialId)));
+        var userCredentials = await _userCredentialClaimStore.Resolve(request.Subject, credentialConfiguration.Claims, cancellationToken);
+        var claims = userCredentials.Select(c =>
+        {
+            var cl = credentialConfiguration.Claims.Single(cl => cl.SourceUserClaimName == c.Name);
+            return new CredentialClaim
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = cl.Name,
+                Value = c.Value
+            };
+        }).ToList();
+        var record = new Domains.Credential
+        {
+            Id = Guid.NewGuid().ToString(),
+            CredentialConfigurationId = credentialConfiguration.Id,
+            ExpirationDateTime = request.ExpirationDateTime,
+            IssueDateTime = request.IssueDateTime,
+            Subject = request.Subject,
+            CredentialId = request.CredentialId,
+            Claims = claims
+        };
+        _credentialStore.Add(record);
+        await _credentialStore.SaveChanges(cancellationToken);
+        return new ContentResult
+        {
+            Content = JsonSerializer.Serialize(record),
+            ContentType = "application/json",
+            StatusCode = (int)HttpStatusCode.Created
+        };
+    }
+
     private bool TryValidate(UpdateCredentialConfigurationDetailsRequest request, out ErrorResult? error)
     {
         error = null;
         if (request == null)
             error = new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
-
-        if (string.IsNullOrWhiteSpace(request.JsonLdContext))
-            error = new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Join(ErrorMessages.MISSING_PARAMETER, "json_ld_context"));
-
-        if (string.IsNullOrWhiteSpace(request.BaseUrl))
-            error = new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Join(ErrorMessages.MISSING_PARAMETER, "base_url"));
-
-        if (string.IsNullOrWhiteSpace(request.Type))
-            error = new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Join(ErrorMessages.MISSING_PARAMETER, "type"));
-
-        if (string.IsNullOrWhiteSpace(request.Format))
-            error = new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Join(ErrorMessages.MISSING_PARAMETER, "format"));
-
-        var formatter = _formatters.SingleOrDefault(f => f.Format == request.Format);
-        if (formatter == null)
-            error = new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_FORMAT, request.Format));
+        else if (string.IsNullOrWhiteSpace(request.JsonLdContext))
+            error = new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, "json_ld_context"));
+        else if (string.IsNullOrWhiteSpace(request.BaseUrl))
+            error = new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, "base_url"));
+        else if (string.IsNullOrWhiteSpace(request.Type))
+            error = new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, "type"));
+        else if (string.IsNullOrWhiteSpace(request.Format))
+            error = new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, "format"));
+        else
+        {
+            var formatter = _formatters.SingleOrDefault(f => f.Format == request.Format);
+            if (formatter == null)
+                error = new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_FORMAT, request.Format));
+        }
 
         return error == null;
     }
@@ -299,8 +391,8 @@ public class CredentialConfigurationsController : BaseController
         error = null;
         if (request == null)
             error = new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
-        if (string.IsNullOrWhiteSpace(request.Locale))
-            error = new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Join(ErrorMessages.MISSING_PARAMETER, "locale"));
+        else if (string.IsNullOrWhiteSpace(request.Locale))
+            error = new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, "locale"));
         return error == null;
     }
 
@@ -309,9 +401,9 @@ public class CredentialConfigurationsController : BaseController
         error = null;
         if (request == null)
             error = new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
-        if (string.IsNullOrWhiteSpace(request.SourceUserClaimName))
+        else if (string.IsNullOrWhiteSpace(request.SourceUserClaimName))
             error = new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, "source_claim_name"));
-        if (string.IsNullOrWhiteSpace(request.Name))
+        else if (string.IsNullOrWhiteSpace(request.Name))
             error = new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, "name"));
         return error == null;
     }
@@ -321,10 +413,22 @@ public class CredentialConfigurationsController : BaseController
         error = null;
         if (request == null)
             error = new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
-        if (string.IsNullOrWhiteSpace(request.Name))
+        else if (string.IsNullOrWhiteSpace(request.Name))
             error = new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, "name"));
-        if (string.IsNullOrWhiteSpace(request.Locale))
+        else if (string.IsNullOrWhiteSpace(request.Locale))
             error = new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, "locale"));
+        return error == null;
+    }
+
+    private bool TryValidate(IssueCredentialRequest request, out ErrorResult? error)
+    {
+        error = null;
+        if (request == null)
+            error = new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
+        else if (string.IsNullOrWhiteSpace(request.Subject))
+            error = new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, "sub"));
+        else if (request.ExpirationDateTime != null && request.ExpirationDateTime <= request.IssueDateTime)
+            error = new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.EXP_MUST_BE_GREATER_THAN_ISSUE_DATETIME);
         return error == null;
     }
 }

@@ -27,5 +27,18 @@ public class BuildCredentialRequest
     public DateTime? ValidFrom { get; set; }
     public DateTime? ValidUntil { get; set; }
     public CredentialConfiguration CredentialConfiguration { get; set; }
-    public List<UserCredentialClaim> UserCredentialClaims { get; set; }
+    public List<CredentialUserClaimNode> UserClaims { get; set; }
+}
+
+public interface INode
+{
+    int Level { get; set; }
+    string Name { get; set; }
+}
+
+public class CredentialUserClaimNode : INode
+{
+    public int Level { get; set; }
+    public string Name { get; set; }
+    public string Value { get; set; }
 }

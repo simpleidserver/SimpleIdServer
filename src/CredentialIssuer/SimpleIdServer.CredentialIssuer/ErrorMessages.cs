@@ -10,6 +10,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer
         public const string EXISTING_CREDENTIAL_TEMPLATE = "Credential template with the type {0} already exists";
         public const string EXISTING_CREDENTIAL_CONFIGURATION = "credential configuration {0} already exists";
         public const string EXISTING_CREDENTIAL_CLAIM = "the credential configuration claim {0} already exists";
+        public const string EXISTING_CREDENTIAL = "the credential {0} already exists";
         public const string INVALID_INCOMING_REQUEST = "the incoming request is not valid";
         public const string INVALID_PROOF_FORMAT = "the proof format {0} is not supported";
         public const string INVALID_ACCESS_TOKEN_SCOPE = "access token has an invalid scope";
@@ -52,5 +53,6 @@ namespace SimpleIdServer.IdServer.CredentialIssuer
         public const string CREDENTIAL_TYPE_CANNOT_BE_EXTRACTED = "the credential type cannot be extracted";
         public const string MISSING_PROOF_JWT_KID = "the jwt proof doesn't contain a kid";
         public const string EXISTING_DISPLAY_SAME_LANGUAGE = "a display already exists for the same language";
+        public const string EXP_MUST_BE_GREATER_THAN_ISSUE_DATETIME = "expiration time must greater than issue date time";
     }
 }

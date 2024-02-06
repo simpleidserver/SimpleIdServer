@@ -60,7 +60,8 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
                 Subject = subject,
                 Issuer = _options.DidDocument.Id
             };
-            List<CredentialConfigurationClaim> credentialTemplateClaims = null;
+            var claims = new List<CredentialUserClaimNode>();
+            List<CredentialUserClaimNode> userClaims = null;
             if (validationResult.Credential != null)
             {
                 buildRequest.Id = $"{validationResult.Credential.Configuration.BaseUrl}/{validationResult.Credential.CredentialId}";
@@ -69,25 +70,43 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
                 buildRequest.ValidFrom = validationResult.Credential.IssueDateTime;
                 buildRequest.ValidUntil = validationResult.Credential.ExpirationDateTime;
                 buildRequest.CredentialConfiguration = validationResult.Credential.Configuration;
-                credentialTemplateClaims = validationResult.Credential.Configuration.Claims;
+                userClaims = validationResult.Credential.Claims.Select(c =>
+                {
+                    var cl = validationResult.CredentialTemplate.Claims.Single(cl => cl.SourceUserClaimName == c.Name);
+                    return new CredentialUserClaimNode
+                    {
+                        Level = cl.Name.Split('.').Count(),
+                        Name = cl.Name,
+                        Value = c.Value
+                    };
+                }).ToList();
             }
             else
             {
                 buildRequest.Id = $"{validationResult.CredentialTemplate.BaseUrl}/{Guid.NewGuid()}";
                 buildRequest.JsonLdContext = validationResult.CredentialTemplate.JsonLdContext;
                 buildRequest.Type = validationResult.CredentialTemplate.Type;
-                if(_options.CredentialExpirationTimeInSeconds != null)
+                buildRequest.CredentialConfiguration = validationResult.CredentialTemplate;
+                if (_options.CredentialExpirationTimeInSeconds != null)
                 {
                     buildRequest.ValidFrom = DateTime.UtcNow;
                     buildRequest.ValidUntil = DateTime.UtcNow.AddSeconds(_options.CredentialExpirationTimeInSeconds.Value);
                 }
 
-                buildRequest.CredentialConfiguration = validationResult.CredentialTemplate;
-                credentialTemplateClaims = validationResult.CredentialTemplate.Claims;
+                var userCredentials = await _userCredentialClaimStore.Resolve(subject, validationResult.Credential.Configuration.Claims, cancellationToken);
+                userClaims = userCredentials.Select(c =>
+                {
+                    var cl = validationResult.CredentialTemplate.Claims.Single(cl => cl.SourceUserClaimName == c.Name);
+                    return new CredentialUserClaimNode
+                    {
+                        Level = cl.Name.Split('.').Count(),
+                        Name = cl.Name,
+                        Value = c.Value
+                    };
+                }).ToList();
             }
 
-            var userCredentials = await _userCredentialClaimStore.Resolve(subject, credentialTemplateClaims, cancellationToken);
-            buildRequest.UserCredentialClaims = userCredentials;
+            buildRequest.UserClaims = userClaims;
             var formatter = validationResult.Formatter;
             var credentialResult = formatter.Build(buildRequest, 
                 _options.DidDocument, 

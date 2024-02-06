@@ -28,5 +28,6 @@ public class CredentialIssuerDbContext : DbContext
         modelBuilder.ApplyConfiguration(new CredentialConfigurationTranslationConfiguration());
         modelBuilder.ApplyConfiguration(new CredentialOfferRecordConfiguration());
         modelBuilder.ApplyConfiguration(new UserCredentialClaimConfiguration());
+        modelBuilder.ApplyConfiguration(new CredentialClaimConfiguration());
     }
 }

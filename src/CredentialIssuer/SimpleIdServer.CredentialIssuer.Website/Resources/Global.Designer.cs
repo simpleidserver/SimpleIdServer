@@ -97,6 +97,15 @@ namespace SimpleIdServer.CredentialIssuer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Add credential configuration.
+        /// </summary>
+        internal static string AddCredentialConfigurationTitle {
+            get {
+                return ResourceManager.GetString("AddCredentialConfigurationTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Add translation.
         /// </summary>
         internal static string AddCredentialConfigurationTranslation {
@@ -196,6 +205,15 @@ namespace SimpleIdServer.CredentialIssuer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Credential configuration has been added.
+        /// </summary>
+        internal static string CredentialConfigurationAdded {
+            get {
+                return ResourceManager.GetString("CredentialConfigurationAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Credential configuration is updated.
         /// </summary>
         internal static string CredentialConfigurationDetailsUpdated {
@@ -241,6 +259,15 @@ namespace SimpleIdServer.CredentialIssuer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Credential configuration has been removed.
+        /// </summary>
+        internal static string CredentialConfigurationRemoved {
+            get {
+                return ResourceManager.GetString("CredentialConfigurationRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à CredentialConfigurationScopeHelper.
         /// </summary>
         internal static string CredentialConfigurationScopeHelper {
@@ -264,6 +291,60 @@ namespace SimpleIdServer.CredentialIssuer.Website.Resources {
         internal static string CredentialConfigurationsTitle {
             get {
                 return ResourceManager.GetString("CredentialConfigurationsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Credential identifier.
+        /// </summary>
+        internal static string CredentialId {
+            get {
+                return ResourceManager.GetString("CredentialId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Identifier.
+        /// </summary>
+        internal static string CredentialIdentifier {
+            get {
+                return ResourceManager.GetString("CredentialIdentifier", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à CredentialIdHelper.
+        /// </summary>
+        internal static string CredentialIdHelper {
+            get {
+                return ResourceManager.GetString("CredentialIdHelper", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Credential has been issued.
+        /// </summary>
+        internal static string CredentialIssued {
+            get {
+                return ResourceManager.GetString("CredentialIssued", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Credential has been removed.
+        /// </summary>
+        internal static string CredentialRemoved {
+            get {
+                return ResourceManager.GetString("CredentialRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Credentials.
+        /// </summary>
+        internal static string Credentials {
+            get {
+                return ResourceManager.GetString("Credentials", resourceCulture);
             }
         }
         
@@ -349,6 +430,24 @@ namespace SimpleIdServer.CredentialIssuer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Expiration datetime.
+        /// </summary>
+        internal static string ExpirationDateTime {
+            get {
+                return ResourceManager.GetString("ExpirationDateTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à ExpirationDateTimeHelper.
+        /// </summary>
+        internal static string ExpirationDateTimeHelper {
+            get {
+                return ResourceManager.GetString("ExpirationDateTimeHelper", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Format.
         /// </summary>
         internal static string Format {
@@ -363,6 +462,33 @@ namespace SimpleIdServer.CredentialIssuer.Website.Resources {
         internal static string IsRequired {
             get {
                 return ResourceManager.GetString("IsRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Issue credential.
+        /// </summary>
+        internal static string IssueCredential {
+            get {
+                return ResourceManager.GetString("IssueCredential", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Issue datetime.
+        /// </summary>
+        internal static string IssueDateTime {
+            get {
+                return ResourceManager.GetString("IssueDateTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à IssueDateTimeHelper.
+        /// </summary>
+        internal static string IssueDateTimeHelper {
+            get {
+                return ResourceManager.GetString("IssueDateTimeHelper", resourceCulture);
             }
         }
         
@@ -525,6 +651,24 @@ namespace SimpleIdServer.CredentialIssuer.Website.Resources {
         internal static string SourceUserClaimNameHelper {
             get {
                 return ResourceManager.GetString("SourceUserClaimNameHelper", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Subject.
+        /// </summary>
+        internal static string Subject {
+            get {
+                return ResourceManager.GetString("Subject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à SubjectHelper.
+        /// </summary>
+        internal static string SubjectHelper {
+            get {
+                return ResourceManager.GetString("SubjectHelper", resourceCulture);
             }
         }
         

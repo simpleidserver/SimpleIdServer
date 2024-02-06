@@ -20,6 +20,7 @@ builder.Services.AddAuthorization(b =>
 {
     b.AddPolicy("Authenticated", p => p.RequireAuthenticatedUser());
     b.AddPolicy("credconfs", p => p.RequireClaim("scope", "credconfs"));
+    b.AddPolicy("credinstances", p => p.RequireClaim("scope", "credinstances"));
 });
 
 builder.Services.AddEndpointsApiExplorer();

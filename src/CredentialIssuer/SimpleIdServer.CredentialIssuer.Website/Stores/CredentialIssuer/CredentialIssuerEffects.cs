@@ -3,6 +3,7 @@
 using Fluxor;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.CredentialIssuer.Api.CredentialConf;
+using SimpleIdServer.CredentialIssuer.Api.CredentialInstance;
 using SimpleIdServer.CredentialIssuer.Domains;
 using System.Text;
 using System.Text.Json;
@@ -267,7 +268,6 @@ public class CredentialIssuerEffects
         try
         {
             httpResult.EnsureSuccessStatusCode();
-            var translation = JsonSerializer.Deserialize<CredentialConfigurationTranslation>(json);
             dispatcher.Dispatch(new UpdateCredentialClaimTranslationSuccessAction { ClaimId = action.ClaimId, Id = action.Id, Locale = action.Locale, Name = action.Name, TranslationId = action.TranslationId });
         }
         catch
@@ -289,6 +289,120 @@ public class CredentialIssuerEffects
         };
         await httpClient.SendAsync(requestMessage);
         dispatcher.Dispatch(new DeleteCredentialClaimTranslationSuccessAction { ClaimId = action.ClaimId, Id = action.Id, TranslationId = action.TranslationId });
+    }
+
+    [EffectMethod]
+    public async Task Handle(DeleteCredentialConfigurationAction action, IDispatcher dispatcher)
+    {
+        var baseUrl = $"{GetBaseUrl()}/{action.Id}";
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var requestMessage = new HttpRequestMessage
+        {
+            Method = HttpMethod.Delete,
+            RequestUri = new Uri(baseUrl)
+        };
+        await httpClient.SendAsync(requestMessage);
+        dispatcher.Dispatch(new DeleteCredentialConfigurationSuccessAction { Id = action.Id });
+    }
+
+    [EffectMethod]
+    public async Task Handle(AddCredentialConfigurationAction action, IDispatcher dispatcher)
+    {
+        var baseUrl = GetBaseUrl();
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var requestMessage = new HttpRequestMessage
+        {
+            Method = HttpMethod.Post,
+            RequestUri = new Uri(baseUrl),
+            Content = new StringContent(JsonSerializer.Serialize(new UpdateCredentialConfigurationDetailsRequest
+            {
+                BaseUrl = action.BaseUrl,
+                Format = action.Format,
+                JsonLdContext = action.JsonLdContext,
+                Scope = action.Scope,
+                Type = action.Type
+            }), Encoding.UTF8, "application/json")
+        };
+        var httpResult = await httpClient.SendAsync(requestMessage);
+        var json = await httpResult.Content.ReadAsStringAsync();
+        try
+        {
+            httpResult.EnsureSuccessStatusCode();
+            var credentialConfiguration = JsonSerializer.Deserialize<CredentialConfiguration>(json);
+            dispatcher.Dispatch(new AddCredentialConfigurationSuccessAction { CredentialConfiguration = credentialConfiguration });
+        }
+        catch
+        {
+            var jsonObj = JsonObject.Parse(json);
+            dispatcher.Dispatch(new AddCredentialConfigurationFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
+        }
+    }
+
+    [EffectMethod]
+    public async Task Handle(IssueCredentialInstanceAction action, IDispatcher dispatcher)
+    {
+        var baseUrl = $"{GetBaseUrl()}/{action.CredentialConfigurationId}/issue";
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var requestMessage = new HttpRequestMessage
+        {
+            Method = HttpMethod.Post,
+            RequestUri = new Uri(baseUrl),
+            Content = new StringContent(JsonSerializer.Serialize(new IssueCredentialRequest
+            {
+                CredentialId = action.CredentialId,
+                ExpirationDateTime = action.ExpirationDateTime,
+                IssueDateTime = action.IssueDateTime,
+                Subject = action.Subject
+            }), Encoding.UTF8, "application/json")
+        };
+        var httpResult = await httpClient.SendAsync(requestMessage);
+        var json = await httpResult.Content.ReadAsStringAsync();
+        try
+        {
+            httpResult.EnsureSuccessStatusCode();
+            var credential = JsonSerializer.Deserialize<Domains.Credential>(json);
+            dispatcher.Dispatch(new IssueCredentialInstanceSuccessAction { Credential = credential });
+        }
+        catch
+        {
+            var jsonObj = JsonObject.Parse(json);
+            dispatcher.Dispatch(new IssueCredentialInstanceFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
+        }
+    }
+
+    [EffectMethod]
+    public async Task Handle(GetCredentialInstancesAction action, IDispatcher dispatcher)
+    {
+        var baseUrl = $"{_options.CredentialIssuerUrl}/credential_instances/.search";
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var requestMessage = new HttpRequestMessage
+        {
+            Method = HttpMethod.Post,
+            RequestUri = new Uri(baseUrl),
+            Content = new StringContent(JsonSerializer.Serialize(new SearchCredentialInstancesRequest
+            {
+                CredentialConfigurationId = action.CredentialConfigurationId,
+            }), Encoding.UTF8, "application/json")
+        };
+        var httpResult = await httpClient.SendAsync(requestMessage);
+        var json = await httpResult.Content.ReadAsStringAsync();
+        var credentials = JsonSerializer.Deserialize<List<Domains.Credential>>(json);
+        credentials = credentials ?? new List<Credential>();
+        dispatcher.Dispatch(new GetCredentialInstancesSuccessAction { Credentials = credentials });
+    }
+
+    [EffectMethod]
+    public async Task Handle(RemoveCredentialInstanceAction action, IDispatcher dispatcher)
+    {
+        var baseUrl = $"{_options.CredentialIssuerUrl}/credential_instances/{action.Id}";
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var requestMessage = new HttpRequestMessage
+        {
+            Method = HttpMethod.Delete,
+            RequestUri = new Uri(baseUrl)
+        };
+        await httpClient.SendAsync(requestMessage);
+        dispatcher.Dispatch(new RemoveCredentialInstanceSuccessAction { Id = action.Id });
     }
 
     private string GetBaseUrl()
@@ -486,4 +600,72 @@ public class DeleteCredentialClaimTranslationSuccessAction
     public string Id { get; set; }
     public string ClaimId { get; set; }
     public string TranslationId { get; set; }
+}
+
+public class DeleteCredentialConfigurationAction
+{
+    public string Id { get; set; }
+}
+
+public class DeleteCredentialConfigurationSuccessAction
+{
+    public string Id { get; set; }
+}
+
+public class AddCredentialConfigurationAction
+{
+    public string Type { get; set; }
+    public string Format { get; set; }
+    public string Scope { get; set; }
+    public string JsonLdContext { get; set; }
+    public string BaseUrl { get; set; }
+}
+
+public class AddCredentialConfigurationSuccessAction
+{
+    public CredentialConfiguration CredentialConfiguration { get; set; }
+}
+
+public class AddCredentialConfigurationFailureAction
+{
+    public string ErrorMessage { get; set; }
+}
+
+public class IssueCredentialInstanceAction
+{
+    public string CredentialConfigurationId { get; set; }
+    public string Subject { get; set; }
+    public DateTime IssueDateTime { get; set; }
+    public DateTime? ExpirationDateTime { get; set; }
+    public string CredentialId { get; set; }
+}
+
+public class IssueCredentialInstanceSuccessAction
+{
+    public Domains.Credential Credential { get; set; }
+}
+
+public class IssueCredentialInstanceFailureAction
+{
+    public string ErrorMessage { get; set; }
+}
+
+public class GetCredentialInstancesAction
+{
+    public string CredentialConfigurationId { get; set; }
+}
+
+public class GetCredentialInstancesSuccessAction
+{
+    public List<Domains.Credential> Credentials { get; set; }
+}
+
+public class RemoveCredentialInstanceAction
+{
+    public string Id { get; set; }
+}
+
+public class RemoveCredentialInstanceSuccessAction
+{
+    public string Id { get; set; }
 }

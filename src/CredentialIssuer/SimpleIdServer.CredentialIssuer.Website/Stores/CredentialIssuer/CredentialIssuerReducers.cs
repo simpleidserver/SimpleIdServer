@@ -1,7 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
-
+using System.Data;
 
 namespace SimpleIdServer.CredentialIssuer.Website.Stores.CredentialIssuer;
 
@@ -18,13 +18,63 @@ public static class CredentialIssuerReducers
         return state with
         {
             IsLoading = false,
-            CredentialConfigurations = action.CredentialConfigurations.Select(c => new SelectableCredentialConfiguration(c)
-            {
-                IsNew = false,
-                IsSelected = false
-            }).ToList()
+            CredentialConfigurations = action.CredentialConfigurations.ToList()
         };
     }
+
+    [ReducerMethod]
+    public static CredentialConfigurationsState ReduceDeleteCredentialConfigurationAction(CredentialConfigurationsState state, DeleteCredentialConfigurationAction action)
+    {
+        return state with
+        {
+            IsLoading = true
+        };
+    }
+
+
+    [ReducerMethod]
+    public static CredentialConfigurationsState ReduceDeleteCredentialConfigurationSuccessAction(CredentialConfigurationsState state, DeleteCredentialConfigurationSuccessAction action)
+    {
+        var credentialConfigurations = state.CredentialConfigurations;
+        var credentialConfiguration = credentialConfigurations.Single(c => c.Id == action.Id);
+        credentialConfigurations.Remove(credentialConfiguration);
+        return state with
+        {
+            IsLoading = false,
+            CredentialConfigurations = credentialConfigurations
+        };
+    }
+
+    [ReducerMethod]
+    public static CredentialConfigurationsState ReduceAddCredentialConfigurationAction(CredentialConfigurationsState state, AddCredentialConfigurationAction action)
+    {
+        return state with
+        {
+            IsLoading = true
+        };
+    }
+
+    [ReducerMethod]
+    public static CredentialConfigurationsState ReduceAddCredentialConfigurationSuccessAction(CredentialConfigurationsState state, AddCredentialConfigurationSuccessAction action)
+    {
+        var credentialConfigurations = state.CredentialConfigurations;
+        credentialConfigurations.Add(action.CredentialConfiguration);
+        return state with
+        {
+            IsLoading = false,
+            CredentialConfigurations = credentialConfigurations
+        };
+    }
+
+    [ReducerMethod]
+    public static CredentialConfigurationsState ReduceAddCredentialConfigurationFailureAction(CredentialConfigurationsState state, AddCredentialConfigurationFailureAction action)
+    {
+        return state with
+        {
+            IsLoading = false
+        };
+    }
+
 
     #endregion
 
@@ -286,7 +336,7 @@ public static class CredentialIssuerReducers
     }
 
     [ReducerMethod]
-    public static CredentialConfigurationState ReduceDeleteCredentialClaimTranslationSuccessAction(CredentialConfigurationState state, UpdateCredentialClaimTranslationSuccessAction action)
+    public static CredentialConfigurationState ReduceDeleteCredentialClaimTranslationSuccessAction(CredentialConfigurationState state, DeleteCredentialClaimTranslationSuccessAction action)
     {
         var credentialConfiguration = state.CredentialConfiguration;
         var claim = credentialConfiguration.Claims.Single(c => c.Id == action.ClaimId);
@@ -296,6 +346,80 @@ public static class CredentialIssuerReducers
         {
             IsLoading = false,
             CredentialConfiguration = credentialConfiguration
+        };
+    }
+
+    #endregion
+
+    #region CredentialsState
+
+    [ReducerMethod]
+    public static CredentialsState ReduceIssueCredentialInstanceAction(CredentialsState state, IssueCredentialInstanceAction action)
+    {
+        return state with
+        {
+            IsLoading = true
+        };
+    }
+
+    [ReducerMethod]
+    public static CredentialsState ReduceIssueCredentialInstanceSuccessAction(CredentialsState state, IssueCredentialInstanceSuccessAction action)
+    {
+        var credentials = state.Credentials;
+        credentials.Add(action.Credential);
+        return state with
+        {
+            IsLoading = false,
+            Credentials = credentials
+        };
+    }
+
+    [ReducerMethod]
+    public static CredentialsState ReduceIssueCredentialInstanceFailureAction(CredentialsState state, IssueCredentialInstanceFailureAction action)
+    {
+        return state with
+        {
+            IsLoading = false
+        };
+    }
+
+    [ReducerMethod]
+    public static CredentialsState ReduceGetCredentialInstancesAction(CredentialsState state, GetCredentialInstancesAction action)
+    {
+        return state with
+        {
+            IsLoading = true
+        };
+    }
+
+    [ReducerMethod]
+    public static CredentialsState ReduceGetCredentialInstancesSuccessAction(CredentialsState state, GetCredentialInstancesSuccessAction action)
+    {
+        return state with
+        {
+            IsLoading = false,
+            Credentials = action.Credentials
+        };
+    }
+
+    [ReducerMethod]
+    public static CredentialsState ReduceRemoveCredentialInstanceAction(CredentialsState state, RemoveCredentialInstanceAction action)
+    {
+        return state with
+        {
+            IsLoading = true
+        };
+    }
+
+    [ReducerMethod]
+    public static CredentialsState ReduceRemoveCredentialInstanceSuccessAction(CredentialsState state, RemoveCredentialInstanceSuccessAction action)
+    {
+        var credential = state.Credentials.Single(c => c.Id == action.Id);
+        state.Credentials.Remove(credential);
+        return state with
+        {
+            IsLoading = false,
+            Credentials = state.Credentials
         };
     }
 

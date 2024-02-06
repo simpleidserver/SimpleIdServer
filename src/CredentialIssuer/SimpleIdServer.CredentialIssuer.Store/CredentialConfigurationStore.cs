@@ -12,6 +12,8 @@ public interface ICredentialConfigurationStore
     Task<CredentialConfiguration> GetByServerId(string id, CancellationToken cancellationToken);
     Task<List<CredentialConfiguration>> GetByServerIds(List<string> ids, CancellationToken cancellationToken);
     Task<CredentialConfiguration> Get(string id, CancellationToken cancellationToken);
+    void Remove(CredentialConfiguration credentialConfiguration);
+    void Add(CredentialConfiguration credentialConfiguration);
     Task<int> SaveChanges(CancellationToken cancellationToken);
 }
 
@@ -64,6 +66,12 @@ public class CredentialConfigurationStore : ICredentialConfigurationStore
             .Include(c => c.Displays)
             .ToListAsync(cancellationToken);
     }
+
+    public void Remove(CredentialConfiguration credentialConfiguration)
+        => _dbContext.CredentialConfigurations.Remove(credentialConfiguration);
+
+    public void Add(CredentialConfiguration credentialConfiguration) 
+        => _dbContext.CredentialConfigurations.Add(credentialConfiguration);
 
     public Task<int> SaveChanges(CancellationToken cancellationToken)
         => _dbContext.SaveChangesAsync(cancellationToken);

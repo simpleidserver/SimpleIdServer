@@ -14,6 +14,7 @@ public static class Constants
         public const string Credential = "credential";
         public const string CredentialOffer = "credential_offer";
         public const string CredentialConfigurations = "credential_configurations";
+        public const string CredentialInstances = "credential_instances";
     }
 
     public static List<string> AllEncAlgs = new List<string>

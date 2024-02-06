@@ -66,7 +66,8 @@ namespace SimpleIdServer.IdServer.Startup
             SimpleIdServer.IdServer.Constants.StandardScopes.Realms,
             SimpleIdServer.IdServer.Constants.StandardScopes.Groups,
             SimpleIdServer.IdServer.Constants.StandardScopes.OfflineAccessScope,
-            SimpleIdServer.IdServer.Constants.StandardScopes.CredentialConfigurations
+            SimpleIdServer.IdServer.Constants.StandardScopes.CredentialConfigurations,
+            SimpleIdServer.IdServer.Constants.StandardScopes.CredentialInstances
         };
 
         public static ICollection<User> Users => new List<User>
@@ -86,7 +87,8 @@ namespace SimpleIdServer.IdServer.Startup
                 .AddScope(
                     SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope,
                     SimpleIdServer.IdServer.Constants.StandardScopes.Profile,
-                    SimpleIdServer.IdServer.Constants.StandardScopes.CredentialConfigurations).Build(),
+                    SimpleIdServer.IdServer.Constants.StandardScopes.CredentialConfigurations,
+                    SimpleIdServer.IdServer.Constants.StandardScopes.CredentialInstances).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("SIDS-manager", "password", null, "https://localhost:5002/*", "https://website.simpleidserver.com/*", "https://website.localhost.com/*", "http://website.localhost.com/*", "https://website.sid.svc.cluster.local/*").EnableClientGrantType().SetRequestObjectEncryption().AddPostLogoutUri("https://localhost:5002/signout-callback-oidc").AddPostLogoutUri("https://website.sid.svc.cluster.local/signout-callback-oidc")
                 .AddPostLogoutUri("https://website.simpleidserver.com/signout-callback-oidc")
                 .AddAuthDataTypes("photo")
