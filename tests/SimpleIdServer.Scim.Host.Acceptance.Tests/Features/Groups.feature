@@ -1101,3 +1101,33 @@ Scenario: Add one sub group into a group and check user has an indirect link to 
 	And 'groups' length is equals to '2'
 	And JSON 'groups[0].type'='direct'
 	And JSON 'groups[1].type'='indirect'
+
+Scenario: Check member can be removed when full path is passed in the PATH remove operation
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen                                                                                                           |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+	And extract JSON from body
+	And extract 'id' from JSON body into 'userid'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | Tour Guides                                       |
+	| members     | [ { "value": "$userid$" } ]                       |
+	And extract JSON from body
+	And extract 'id' from JSON body	
+
+	And execute HTTP PATCH JSON request 'http://localhost/Groups/$id$'
+	| Key        | Value                                                          |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]            |
+	| Operations | [ { "op": "remove", "path": "members[value eq $userid$]" } ] |
+
+	And execute HTTP GET request 'http://localhost/Groups/$id$'	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	And 'members' length is equals to '0'
