@@ -12,7 +12,7 @@ namespace SimpleIdServer.CredentialIssuer.Services;
 
 public interface IPreAuthorizedCodeService
 {
-    Task<string> Get(string accessToken, CancellationToken cancellationToken);
+    Task<string> Get(string accessToken, List<string> scopes, CancellationToken cancellationToken);
 }
 
 public class PreAuthorizedCodeService : IPreAuthorizedCodeService
@@ -28,7 +28,7 @@ public class PreAuthorizedCodeService : IPreAuthorizedCodeService
         _options = options.Value;
     }
 
-    public async Task<string> Get(string accessToken, CancellationToken cancellationToken)
+    public async Task<string> Get(string accessToken, List<string> scopes, CancellationToken cancellationToken)
     {
         using (var httpClient = _httpClientFactory.Build())
         {
@@ -38,7 +38,8 @@ public class PreAuthorizedCodeService : IPreAuthorizedCodeService
                 { "client_secret", _options.ClientSecret },
                 { "grant_type", "urn:ietf:params:oauth:grant-type:exchange-pre-authorized_code" },
                 { "subject_token", accessToken },
-                { "subject_token_type", "urn:ietf:params:oauth:token-type:access_token" }
+                { "subject_token_type", "urn:ietf:params:oauth:token-type:access_token" },
+                { "scope", string.Join((" "), scopes) }
             };
             var requestMessage = new HttpRequestMessage
             {

@@ -22,9 +22,10 @@ builder.Services.AddAuthorization(b =>
     b.AddPolicy("credconfs", p => p.RequireClaim("scope", "credconfs"));
     b.AddPolicy("credinstances", p => p.RequireClaim("scope", "credinstances"));
 });
-
+builder.Services.AddLocalization();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddRazorPages();
 builder.Services.AddControllers();
 
 builder.Services.AddCredentialIssuer()
@@ -34,9 +35,23 @@ builder.Services.AddCredentialIssuer()
     });
 
 var app = builder.Build();
+app.UseStaticFiles();
+app.UseRequestLocalization(e =>
+{
+    e.SetDefaultCulture("en-US");
+    e.AddSupportedCultures("en-US");
+    e.AddSupportedUICultures("en-US");
+});
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseSwagger();
 app.UseSwaggerUI();
-app.MapControllers();
+app.UseRouting();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    endpoints.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}");
+});
 app.Run();

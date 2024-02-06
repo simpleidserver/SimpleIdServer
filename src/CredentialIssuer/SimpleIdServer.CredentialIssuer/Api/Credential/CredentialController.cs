@@ -51,7 +51,14 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
         public async Task<IActionResult> Get([FromBody] CredentialRequest request, CancellationToken cancellationToken)
         {
             var subject = User.FindFirst("sub").Value;
-            var validationResult = await Validate(request, cancellationToken);
+            var scope = User.Claims.SingleOrDefault(c => c.Type == "scope")?.Value;
+            var authorizedScopes = new List<string>();
+            if (!string.IsNullOrWhiteSpace(scope))
+            {
+                authorizedScopes = scope.Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList();
+            }
+
+            var validationResult = await Validate(request, authorizedScopes, cancellationToken);
             if (validationResult.ErrorResult != null) return Build(validationResult.ErrorResult.Value);
             if (!string.IsNullOrWhiteSpace(validationResult.Subject))
                 subject = validationResult.Subject;
@@ -130,7 +137,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
             });
         }
 
-        private async Task<CredentialValidationResult> Validate(CredentialRequest credentialRequest, CancellationToken cancellationToken)
+        private async Task<CredentialValidationResult> Validate(CredentialRequest credentialRequest, List<string> authorizedScopes, CancellationToken cancellationToken)
         {
             string subject = null;
             string nonce = null;
@@ -179,6 +186,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
                 if (header == null) return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, ErrorMessages.CREDENTIAL_TYPE_CANNOT_BE_EXTRACTED));
                 var credentialConfiguration = await _credentialConfigurationStore.GetByTypeAndFormat(header.Type, credentialRequest.Format, cancellationToken);
                 if (credentialConfiguration == null) return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.UNSUPPORTED_CREDENTIAL_TYPE, string.Format(ErrorMessages.UNSUPPORTED_CREDENTIAL_TYPE, header.Type)));
+                if (!authorizedScopes.Any(s => credentialConfiguration.Scope != s)) return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.Unauthorized, ErrorCodes.UNAUTHORIZED, string.Format(ErrorMessages.UNAUTHORIZED_TO_ACCESS, header.Type))); 
                 return CredentialValidationResult.Ok(formatter, credentialConfiguration, subject, nonce);
             }
 

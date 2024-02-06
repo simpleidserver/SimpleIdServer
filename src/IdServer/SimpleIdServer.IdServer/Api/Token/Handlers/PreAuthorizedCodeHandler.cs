@@ -92,8 +92,6 @@ public class PreAuthorizedCodeHandler : BaseCredentialsHandler
                     ClientId = context.Client.ClientId,
                     Realm = context.Realm
                 });
-                // Add c_nonce
-                // Add c_nonce_expires
                 activity?.SetStatus(ActivityStatusCode.Ok, "Token has been issued");
                 return new OkObjectResult(result);
             }
