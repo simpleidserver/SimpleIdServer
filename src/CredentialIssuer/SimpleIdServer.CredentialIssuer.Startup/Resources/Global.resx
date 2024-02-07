@@ -120,11 +120,29 @@
   <data name="Authenticate" xml:space="preserve">
     <value>Authenticate</value>
   </data>
+  <data name="Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Credentials" xml:space="preserve">
+    <value>Credentials</value>
+  </data>
   <data name="Disconnect" xml:space="preserve">
     <value>Disconnect</value>
   </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Loading</value>
+  </data>
+  <data name="ScanQrCodeWithYourWalletApplication" xml:space="preserve">
+    <value>Scan the QR code with your wallet application</value>
+  </data>
   <data name="Share" xml:space="preserve">
     <value>Share</value>
+  </data>
+  <data name="ShareCredentialsTitle" xml:space="preserve">
+    <value>Share your credentials</value>
   </data>
   <data name="WelcomeMessage" xml:space="preserve">
     <value>Welcome {0}</value>

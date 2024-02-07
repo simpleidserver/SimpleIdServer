@@ -22,8 +22,13 @@
                 @if (User.Identity.IsAuthenticated)
                 {
                     <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("Index", "Credentials")">
+                        <a class="nav-link" href="@Url.Action("Index", "Home")">
                             @string.Format(Global.WelcomeMessage, User.Identity.Name)
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Index", "Credentials")">
+                            @Global.Credentials
                         </a>
                     </li>
                 }

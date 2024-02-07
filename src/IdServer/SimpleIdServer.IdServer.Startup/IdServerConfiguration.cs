@@ -13,6 +13,7 @@ using SimpleIdServer.IdServer.Startup.Converters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static SimpleIdServer.IdServer.Constants;
 
 namespace SimpleIdServer.IdServer.Startup
 {
@@ -42,6 +43,21 @@ namespace SimpleIdServer.IdServer.Startup
             RegistrationWorkflowBuilder.New("mobile").AddStep("mobile").Build()
         };
 
+        public static Scope UniversityDegreeScope = new Scope
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = "university_degree",
+            Realms = new List<Domains.Realm>
+            {
+                StandardRealms.Master
+            },
+            Type = ScopeTypes.APIRESOURCE,
+            Protocol = ScopeProtocols.OAUTH,
+            IsExposedInConfigurationEdp = true,
+            CreateDateTime = DateTime.UtcNow,
+            UpdateDateTime = DateTime.UtcNow
+        };
+
         public static ICollection<Scope> Scopes => new List<Scope>
         {
             SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope,
@@ -67,7 +83,8 @@ namespace SimpleIdServer.IdServer.Startup
             SimpleIdServer.IdServer.Constants.StandardScopes.Groups,
             SimpleIdServer.IdServer.Constants.StandardScopes.OfflineAccessScope,
             SimpleIdServer.IdServer.Constants.StandardScopes.CredentialConfigurations,
-            SimpleIdServer.IdServer.Constants.StandardScopes.CredentialInstances
+            SimpleIdServer.IdServer.Constants.StandardScopes.CredentialInstances,
+            UniversityDegreeScope
         };
 
         public static ICollection<User> Users => new List<User>
@@ -78,6 +95,12 @@ namespace SimpleIdServer.IdServer.Startup
 
         public static ICollection<Client> Clients => new List<Client>
         {
+            ClientBuilder.BuildCredentialIssuer("CredentialIssuer", "password", null, "https://localhost:5005/*")
+                .SetClientName("Credential issuer")
+                .AddScope(
+                    SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope,
+                    SimpleIdServer.IdServer.Constants.StandardScopes.Profile,
+                    UniversityDegreeScope).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("CredentialIssuer-manager", "password", null, "https://localhost:5006/*", "https://credissuer-website.simpleidserver.com/*", "https://credissuer-website.localhost.com/*", "http://credissuer-website.localhost.com/*", "https://credissuer-website.sid.svc.cluster.local/*").EnableClientGrantType().SetRequestObjectEncryption().AddPostLogoutUri("https://localhost:5006/signout-callback-oidc").AddPostLogoutUri("https://credissuer-website.sid.svc.cluster.local/signout-callback-oidc")
                 .AddPostLogoutUri("https://website.simpleidserver.com/signout-callback-oidc")
                 .AddAuthDataTypes("photo")
@@ -143,8 +166,17 @@ namespace SimpleIdServer.IdServer.Startup
                 SimpleIdServer.IdServer.Constants.StandardScopes.Realms,
                 SimpleIdServer.IdServer.Constants.StandardScopes.Groups).Build(),
             WsClientBuilder.BuildWsFederationClient("urn:website").SetClientName("NAME").Build(),
-            ClientBuilder.BuildUserAgentClient("oauth", "password", null, "https://oauth.tools/callback/code").AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope, SimpleIdServer.IdServer.Constants.StandardScopes.Profile).Build(),
-            ClientBuilder.BuildTraditionalWebsiteClient("fapi", "password", null, "https://localhost:8443/test/(.*)").SetIdTokenSignedResponseAlg(SecurityAlgorithms.EcdsaSha256).SetRequestObjectSigning(SecurityAlgorithms.EcdsaSha256).SetSigAuthorizationResponse(SecurityAlgorithms.EcdsaSha256).AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope, SimpleIdServer.IdServer.Constants.StandardScopes.Profile).UseClientTlsAuthentication("CN=sidClient, O=Internet Widgits Pty Ltd, S=BE, C=BE").AddSigningKey(new SigningCredentials(SimpleIdServer.IdServer.PemImporter.Import(new SimpleIdServer.IdServer.PemResult("-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEK21CoKCA2Vk5zPM+7+vqtnrq4pIe\nsCLiWObLDFKKf3gJl0hll/ZTI5ww/oRrKIXO/uRe9AkckkKwqrqqXGnvsQ==\n-----END PUBLIC KEY-----", "-----BEGIN EC PRIVATE KEY-----\nMHcCAQEEIDHtu+N0u38ZN7DF/TpycDfaUs8WfPGUB3UusR0uv3TVoAoGCCqGSM49\nAwEHoUQDQgAEK21CoKCA2Vk5zPM+7+vqtnrq4pIesCLiWObLDFKKf3gJl0hll/ZT\nI5ww/oRrKIXO/uRe9AkckkKwqrqqXGnvsQ==\n-----END EC PRIVATE KEY-----"), "keyId"), SecurityAlgorithms.EcdsaSha256), SecurityAlgorithms.EcdsaSha256, SecurityKeyTypes.ECDSA).Build(),
+            ClientBuilder.BuildUserAgentClient("oauth", "password", null, "https://oauth.tools/callback/code")
+                .AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope, SimpleIdServer.IdServer.Constants.StandardScopes.Profile)
+                .Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("fapi", "password", null, "https://localhost:8443/test/(.*)")
+                .SetIdTokenSignedResponseAlg(SecurityAlgorithms.EcdsaSha256)
+                .SetRequestObjectSigning(SecurityAlgorithms.EcdsaSha256)
+                .SetSigAuthorizationResponse(SecurityAlgorithms.EcdsaSha256)
+                .AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope, SimpleIdServer.IdServer.Constants.StandardScopes.Profile)
+                .UseClientTlsAuthentication("CN=sidClient, O=Internet Widgits Pty Ltd, S=BE, C=BE")
+                .AddSigningKey(new SigningCredentials(SimpleIdServer.IdServer.PemImporter.Import(new SimpleIdServer.IdServer.PemResult("-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEK21CoKCA2Vk5zPM+7+vqtnrq4pIe\nsCLiWObLDFKKf3gJl0hll/ZTI5ww/oRrKIXO/uRe9AkckkKwqrqqXGnvsQ==\n-----END PUBLIC KEY-----", "-----BEGIN EC PRIVATE KEY-----\nMHcCAQEEIDHtu+N0u38ZN7DF/TpycDfaUs8WfPGUB3UusR0uv3TVoAoGCCqGSM49\nAwEHoUQDQgAEK21CoKCA2Vk5zPM+7+vqtnrq4pIesCLiWObLDFKKf3gJl0hll/ZT\nI5ww/oRrKIXO/uRe9AkckkKwqrqqXGnvsQ==\n-----END EC PRIVATE KEY-----"), "keyId"), SecurityAlgorithms.EcdsaSha256), SecurityAlgorithms.EcdsaSha256, SecurityKeyTypes.ECDSA)
+                .Build(),
             ClientBuilder.BuildApiClient("managementClient", "password").AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.Users).AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.Register).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("walletClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().EnableTokenInResponseType().Build(),
             ClientBuilder.BuildDeviceClient("deviceClient", "password").AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope, SimpleIdServer.IdServer.Constants.StandardScopes.Profile).Build(),

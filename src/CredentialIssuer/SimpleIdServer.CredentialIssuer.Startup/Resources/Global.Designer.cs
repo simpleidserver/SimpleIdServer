@@ -70,6 +70,24 @@ namespace SimpleIdServer.CredentialIssuer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Close.
+        /// </summary>
+        public static string Close {
+            get {
+                return ResourceManager.GetString("Close", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Credentials.
+        /// </summary>
+        public static string Credentials {
+            get {
+                return ResourceManager.GetString("Credentials", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Disconnect.
         /// </summary>
         public static string Disconnect {
@@ -79,11 +97,47 @@ namespace SimpleIdServer.CredentialIssuer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Error.
+        /// </summary>
+        public static string Error {
+            get {
+                return ResourceManager.GetString("Error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Loading.
+        /// </summary>
+        public static string Loading {
+            get {
+                return ResourceManager.GetString("Loading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Scan the QR code with your wallet application.
+        /// </summary>
+        public static string ScanQrCodeWithYourWalletApplication {
+            get {
+                return ResourceManager.GetString("ScanQrCodeWithYourWalletApplication", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Share.
         /// </summary>
         public static string Share {
             get {
                 return ResourceManager.GetString("Share", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Share your credentials.
+        /// </summary>
+        public static string ShareCredentialsTitle {
+            get {
+                return ResourceManager.GetString("ShareCredentialsTitle", resourceCulture);
             }
         }
         

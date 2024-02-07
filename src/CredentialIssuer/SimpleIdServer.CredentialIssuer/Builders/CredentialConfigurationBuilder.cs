@@ -20,11 +20,12 @@ public class CredentialConfigurationBuilder
         string type, 
         string jsonLdContext, 
         string baseUrl,
-        string scope = null)
+        string scope = null,
+        string id = null)
     {
         return new CredentialConfigurationBuilder(new CredentialConfiguration
         {
-            Id = Guid.NewGuid().ToString(),
+            Id = id ?? Guid.NewGuid().ToString(),
             ServerId = $"{type}_{format}",
             Format = format,
             Type = type,

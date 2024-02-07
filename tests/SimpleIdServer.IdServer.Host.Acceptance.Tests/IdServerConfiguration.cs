@@ -145,7 +145,6 @@ public class IdServerConfiguration
         Constants.StandardScopes.Users,
         Constants.StandardScopes.Register,
         Constants.StandardScopes.Provisioning,
-        Constants.StandardScopes.Networks,
         Constants.StandardScopes.Acrs
     };
 

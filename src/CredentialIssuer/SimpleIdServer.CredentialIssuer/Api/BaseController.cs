@@ -1,10 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 
 namespace SimpleIdServer.CredentialIssuer.Api;
 
@@ -17,14 +19,16 @@ public class BaseController : Controller
         ContentType = "application/json"
     };
 
-    protected string GetAccessToken()
+    protected async Task<string> GetAccessToken()
     {
-        var accessToken = Request.Headers
-            .Single(h => h.Key == "Authorization")
-            .Value
-            .Single()
-            .Split(" ")
-            .Last();
+        var accessToken = await HttpContext.GetTokenAsync("access_token");
+        if (string.IsNullOrWhiteSpace(accessToken))
+            accessToken = Request.Headers
+                .Single(h => h.Key == "Authorization")
+                .Value
+                .Single()
+                .Split(" ")
+                .Last();
         return accessToken;
     }
 }

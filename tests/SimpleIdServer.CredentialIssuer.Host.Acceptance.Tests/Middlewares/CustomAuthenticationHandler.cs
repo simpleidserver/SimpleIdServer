@@ -31,7 +31,8 @@ public class CustomAuthenticationHandler : AuthenticationHandler<CustomAuthentic
         {
             new Claim(ClaimTypes.NameIdentifier, "user"),
             new Claim(ClaimTypes.Name, "user"),
-            new Claim("sub", "user")
+            new Claim("sub", "user"),
+            new Claim("scope", "university_degree")
         };
         if(Options.ScenarioContext.ContainsKey("credentialIdentifier"))
         {

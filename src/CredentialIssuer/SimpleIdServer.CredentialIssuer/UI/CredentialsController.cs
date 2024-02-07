@@ -10,12 +10,13 @@ using SimpleIdServer.CredentialIssuer.Store;
 using SimpleIdServer.CredentialIssuer.UI.ViewModels;
 using SimpleIdServer.IdServer.CredentialIssuer.DTOs;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.CredentialIssuer.UI;
 
-[Authorize("Authenticated")]
+[Authorize("WebsiteAuthenticated")]
 public class CredentialsController : BaseController
 {
     private readonly ICredentialConfigurationStore _credentialConfigurationStore;
@@ -35,7 +36,6 @@ public class CredentialsController : BaseController
     [HttpGet]
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
-        var subject = User.FindFirst("sub").Value;
         var credentialConfigurations = await _credentialConfigurationStore.GetAll(cancellationToken);
         return View(new CredentialsViewModel
         {
@@ -44,25 +44,32 @@ public class CredentialsController : BaseController
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Share(string configurationId, CancellationToken cancellationToken)
+    public async Task<IActionResult> Share([FromBody] ShareCredentialRequest request, CancellationToken cancellationToken)
     {
         var issuer = Request.GetAbsoluteUriWithVirtualPath();
-        var subject = User.FindFirst("sub").Value;
+        var subject = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         var result = await _createCredentialOfferCommandHandler.Handle(new CreateCredentialOfferCommand
         {
-            AccessToken = GetAccessToken(),
-            CredentialConfigurationIds = new List<string> { configurationId },
+            AccessToken = await GetAccessToken(),
+            CredentialConfigurationIds = new List<string> { request.ConfigurationId },
             Grants = new List<string>
             {
                 CredentialOfferResultNames.PreAuthorizedCodeGrant
             },
             Subject = subject
         }, cancellationToken);
+        if (result.Error != null)
+            return Build(result.Error.Value);
         return File(_getCredentialOfferQueryHandler.GetQrCode(new GetCredentialOfferQuery 
         { 
             CredentialOffer = result.CredentialOffer, 
             Issuer = issuer 
         }), "image/png");
     }
+}
+
+
+public class ShareCredentialRequest
+{
+    public string ConfigurationId { get; set; }
 }

@@ -14,6 +14,27 @@ namespace SimpleIdServer.IdServer.Builders
 {
     public class ClientBuilder
     {
+        public static CredentialIssuerClientBuilder BuildCredentialIssuer(string clientId, string clientSecret, Domains.Realm realm = null, params string[] redirectUrls)
+        {
+            var client = new Client
+            {
+                Id = Guid.NewGuid().ToString(),
+                ClientId = clientId,
+                ClientSecret = clientSecret,
+                ClientType = ClientTypes.CREDENTIAL_ISSUER,
+                RedirectionUrls = redirectUrls,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow,
+                ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE }
+            };
+            if (realm == null) client.Realms.Add(Constants.StandardRealms.Master);
+            else client.Realms.Add(realm);
+            client.GrantTypes.Add(TokenExchangePreAuthorizedCodeHandler.GRANT_TYPE);
+            client.GrantTypes.Add(AuthorizationCodeHandler.GRANT_TYPE);
+            client.TokenEndPointAuthMethod = OAuthClientSecretPostAuthenticationHandler.AUTH_METHOD;
+            return new CredentialIssuerClientBuilder(client);
+        }
+
         /// <summary>
         /// Build wallet client - use credential offer - cross device (with information pre-submitted by the End-User).
         /// </summary>

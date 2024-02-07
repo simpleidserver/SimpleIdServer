@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,6 +22,7 @@ using System.Threading.Tasks;
 namespace SimpleIdServer.CredentialIssuer.Api.Credential
 {
     [Route(Constants.EndPoints.Credential)]
+    [Authorize("ApiAuthenticated")]
     public class CredentialController : BaseController
     {
         private readonly IEnumerable<ICredentialFormatter> _formatters;
@@ -47,10 +49,9 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
         }
 
         [HttpPost]
-        [Authorize("Authenticated")]
         public async Task<IActionResult> Get([FromBody] CredentialRequest request, CancellationToken cancellationToken)
         {
-            var subject = User.FindFirst("sub").Value;
+            var subject = User.FindFirst(ClaimTypes.Name).Value;
             var scope = User.Claims.SingleOrDefault(c => c.Type == "scope")?.Value;
             var authorizedScopes = new List<string>();
             if (!string.IsNullOrWhiteSpace(scope))
@@ -100,7 +101,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
                     buildRequest.ValidUntil = DateTime.UtcNow.AddSeconds(_options.CredentialExpirationTimeInSeconds.Value);
                 }
 
-                var userCredentials = await _userCredentialClaimStore.Resolve(subject, validationResult.Credential.Configuration.Claims, cancellationToken);
+                var userCredentials = await _userCredentialClaimStore.Resolve(subject, validationResult.CredentialTemplate.Claims, cancellationToken);
                 userClaims = userCredentials.Select(c =>
                 {
                     var cl = validationResult.CredentialTemplate.Claims.Single(cl => cl.SourceUserClaimName == c.Name);
@@ -186,7 +187,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
                 if (header == null) return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, ErrorMessages.CREDENTIAL_TYPE_CANNOT_BE_EXTRACTED));
                 var credentialConfiguration = await _credentialConfigurationStore.GetByTypeAndFormat(header.Type, credentialRequest.Format, cancellationToken);
                 if (credentialConfiguration == null) return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.UNSUPPORTED_CREDENTIAL_TYPE, string.Format(ErrorMessages.UNSUPPORTED_CREDENTIAL_TYPE, header.Type)));
-                if (!authorizedScopes.Any(s => credentialConfiguration.Scope != s)) return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.Unauthorized, ErrorCodes.UNAUTHORIZED, string.Format(ErrorMessages.UNAUTHORIZED_TO_ACCESS, header.Type))); 
+                if (!authorizedScopes.Any(s => credentialConfiguration.Scope == s)) return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.Unauthorized, ErrorCodes.UNAUTHORIZED, string.Format(ErrorMessages.UNAUTHORIZED_TO_ACCESS, header.Type))); 
                 return CredentialValidationResult.Ok(formatter, credentialConfiguration, subject, nonce);
             }
 

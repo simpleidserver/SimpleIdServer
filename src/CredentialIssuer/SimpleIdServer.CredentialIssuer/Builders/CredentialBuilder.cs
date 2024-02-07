@@ -14,13 +14,13 @@ public class CredentialBuilder
         _credential = credential;
     }
 
-    public static CredentialBuilder New(string credentialId, CredentialConfiguration configuration, string subject, DateTime issueDateTime, DateTime? expirationDateTime = null)
+    public static CredentialBuilder New(string credentialId, string configurationId, string subject, DateTime issueDateTime, DateTime? expirationDateTime = null)
         => new CredentialBuilder(new Credential
         {
             Id = Guid.NewGuid().ToString(),
             CredentialId = credentialId,
             Subject = subject,
-            CredentialConfigurationId = configuration.Id,
+            CredentialConfigurationId = configurationId,
             IssueDateTime = DateTime.UtcNow,
             ExpirationDateTime = expirationDateTime
         });

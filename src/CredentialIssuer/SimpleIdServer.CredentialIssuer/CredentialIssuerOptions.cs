@@ -38,7 +38,7 @@ public class CredentialIssuerOptions
     /// <summary>
     /// Base URL of the authorization server.
     /// </summary>
-    public string AuthorizationServer { get; set; } = "https://localhost:5001";
+    public string AuthorizationServer { get; set; } = "https://localhost:5001/master";
 
     /// <summary>
     /// If the value is true, then the credential offer is returned in the credential_offer parameter.

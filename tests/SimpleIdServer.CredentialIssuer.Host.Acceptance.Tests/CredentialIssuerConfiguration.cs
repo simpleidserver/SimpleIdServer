@@ -11,10 +11,12 @@ namespace SimpleIdServer.CredentialIssuer.Host.Acceptance.Tests;
 
 public class CredentialIssuerConfiguration
 {
+    private static string FirstCredentialConfigurationId = Guid.NewGuid().ToString();
+
     public static List<CredentialConfiguration> CredentialConfigurations => new List<CredentialConfiguration>
     {
         CredentialConfigurationBuilder
-            .New(JwtVcJsonFormatter.FORMAT, "UniversityDegree", "https://www.w3.org/2018/credentials/examples/v1", "https://www.w3.org/2018/credentials")
+            .New(JwtVcJsonFormatter.FORMAT, "UniversityDegree", "https://www.w3.org/2018/credentials/examples/v1", "https://www.w3.org/2018/credentials", scope: "university_degree", id: FirstCredentialConfigurationId)
             .AddClaim("given_name", "GivenName", (cb) =>
             {
                 cb.AddTranslation("Given Name", "en-US");
@@ -34,7 +36,7 @@ public class CredentialIssuerConfiguration
             .AddDisplay("University Credential", "en-US", "https://university.example.edu/public/logo.png", "A square logo of a university", null,"#12107c", "#FFFFFF")
             .Build(),
         CredentialConfigurationBuilder
-            .New(LdpVcFormatter.FORMAT, "UniversityDegree", "https://www.w3.org/2018/credentials/examples/v1", "https://www.w3.org/2018/credentials")
+            .New(LdpVcFormatter.FORMAT, "UniversityDegree", "https://www.w3.org/2018/credentials/examples/v1", "https://www.w3.org/2018/credentials", scope: "university_degree")
             .AddClaim("given_name", "GivenName", (cb) =>
             {
                 cb.AddTranslation("Given Name", "en-US");
@@ -57,6 +59,6 @@ public class CredentialIssuerConfiguration
 
     public static List<Domains.Credential> Credentials => new List<Domains.Credential>
     {
-        CredentialBuilder.New("MasterComputerScience", CredentialConfigurations.First(), "user", DateTime.UtcNow).Build()
+        CredentialBuilder.New("MasterComputerScience", FirstCredentialConfigurationId, "user", DateTime.UtcNow).Build()
     };
 }

@@ -83,7 +83,7 @@ public class CreateCredentialOfferCommandHandler : ICreateCredentialOfferCommand
         if (invalidGrants.Any())
             return CredentialOfferValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_OFFER_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_GRANT_TYPES, string.Join(',', invalidGrants))));
         var existingCredentials = await _credentialConfigurationStore.GetByServerIds(command.CredentialConfigurationIds, cancellationToken);
-        var unknownCredentials = command.CredentialConfigurationIds.Where(id => !existingCredentials.Any(c => c.Id == id));
+        var unknownCredentials = command.CredentialConfigurationIds.Where(id => !existingCredentials.Any(c => c.ServerId == id));
         if (unknownCredentials.Any())
             return CredentialOfferValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_OFFER_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_CREDENTIAL, string.Join(',', unknownCredentials))));
         var credentialOffer = new Domains.CredentialOfferRecord
