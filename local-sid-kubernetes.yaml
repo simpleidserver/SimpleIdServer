@@ -40,6 +40,8 @@ spec:
       - scim.sid.svc.cluster.local
       - idserver.sid.svc.cluster.local
       - website.sid.svc.cluster.local
+      - credentialissuer.sid.svc.cluster.local
+      - credentialissuerwebsite.sid.svc.cluster.local
     secretName: testsecret-tls
   rules:
   - host: "scim.sid.svc.cluster.local"
@@ -70,6 +72,26 @@ spec:
         backend:
           service:
             name: website
+            port:
+              number: 80
+  - host: "credentialissuer.sid.svc.cluster.local"
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: credentialissuer
+            port:
+              number: 80
+  - host: "credentialissuerwebsite.sid.svc.cluster.local"
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: credentialissuerwebsite
             port:
               number: 80
 ---
@@ -116,6 +138,40 @@ spec:
   type: NodePort
   selector:
     app: website-deploy
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+    - name: https
+      protocol: TCP
+      port: 443
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: credentialissuer
+  namespace: sid
+spec:
+  type: NodePort
+  selector:
+    app: credentialissuer-deploy
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+    - name: https
+      protocol: TCP
+      port: 443
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: credentialissuerwebsite
+  namespace: sid
+spec:
+  type: NodePort
+  selector:
+    app: credentialissuerwebsite-deploy
   ports:
     - name: http
       protocol: TCP
@@ -274,3 +330,79 @@ spec:
               value: "https://idserver.sid.svc.cluster.local"
             - name: "ScimBaseUrl"
               value: "https://scim.sid.svc.cluster.local"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: credentialissuer-deployment
+  namespace: sid
+  labels:
+    app: credentialissuer-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: credentialissuer-deploy
+  template:
+    metadata:
+      labels:
+        app: credentialissuer-deploy
+    spec:
+      subdomain: localhost
+      containers:
+      - name: credentialissuer-deploy
+        image: simpleidserver/credentialissuer:ci-local
+        imagePullPolicy: Never
+        ports:
+          - containerPort: 80
+        env:
+            - name: "ASPNETCORE_URLS"
+              value: "http://*:80;https://*:443"    
+            - name: "ASPNETCORE_Kestrel__Certificates__Default__Password"
+              value: "password"
+            - name: "ASPNETCORE_Kestrel__Certificates__Default__Path"
+              value: "/certificates/sid.pfx"
+            - name: "ASPNETCORE_FORWARDEDHEADERS_ENABLED"
+              value: "true"
+            - name: "Authorization__Issuer"
+              value: "https://idserver.sid.svc.cluster.local/master"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: credentialissuerwebsite-deployment
+  namespace: sid
+  labels:
+    app: credentialissuerwebsite-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: credentialissuerwebsite-deploy
+  template:
+    metadata:
+      labels:
+        app: credentialissuerwebsite-deploy
+    spec:
+      subdomain: localhost
+      containers:
+      - name: credentialissuerwebsite-deploy
+        image: simpleidserver/credentialissuerwebsite:ci-local
+        imagePullPolicy: Never
+        ports:
+          - containerPort: 80
+        env:
+            - name: "ASPNETCORE_URLS"
+              value: "http://*:80;https://*:443"    
+            - name: "ASPNETCORE_Kestrel__Certificates__Default__Password"
+              value: "password"
+            - name: "ASPNETCORE_Kestrel__Certificates__Default__Path"
+              value: "/certificates/sid.pfx"
+            - name: "ASPNETCORE_FORWARDEDHEADERS_ENABLED"
+              value: "true"
+            - name: "DefaultSecurityOptions__Issuer"
+              value: "https://idserver.sid.svc.cluster.local/master"
+            - name: "DefaultSecurityOptions__IgnoreCertificateError"
+              value: "true"
+            - name: "CredentialIssuerUrl"
+              value: "https://credentialissuer.sid.svc.cluster.local"

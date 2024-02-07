@@ -1,0 +1,34 @@
+{
+  "author": "SimpleIdServer",
+  "classifications": [
+    "CredentialIssuer",
+	"AdminUI"
+  ],
+  "name": "Credential Issuer administration UI",
+  "identity": "SimpleIdServer.CredentialIssuer.Website.Startup",
+  "groupIdentity": "SimpleIdServer.CredentialIssuer.Website.Startup",
+  "shortName": "credissueradminui",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "symbols": {
+	  "idServerBaseUrl": {
+		  "type": "parameter",
+		  "defaultValue": "https://localhost:5001",
+		  "replaces": "ISSUER-URL",
+		  "isRequired": false,
+		  "description": "Base URL of the identity server."
+	  },
+	  "credentialIssuerUrl": {
+		  "type": "parameter",
+		  "defaultValue": "https://localhost:5005",
+		  "replaces": "CREDENTIALISSUER-URL",
+		  "isRequired": false,
+		  "description": "Base URL of the credential issuer."
+	  }
+  },
+  "sourceName": "SimpleIdServer.CredentialIssuer.Website.Startup",
+  "preferNameDirectory": "true",
+  "primaryOutputs": [ { "path": "SimpleIdServer.CredentialIssuer.Website.Startup.csproj" } ]
+}

@@ -41,15 +41,7 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddDefaultSecurity(this IServiceCollection services, IConfiguration configuration)
     {
-        string authoritySectionName = nameof(CredentialIssuerWebsiteOptions.IdServerBaseUrl);
         string defaultSecurityOptionsSectionName = nameof(DefaultSecurityOptions);
-        string? authority = configuration.GetValue<string>(authoritySectionName);
-        if (string.IsNullOrEmpty(authority))
-        {
-            Console.WriteLine($"Please configure the '{authoritySectionName}' section.");
-            Environment.Exit(1);
-        }
-
         DefaultSecurityOptions? defaultSecurityOptions = configuration.GetSection(defaultSecurityOptionsSectionName).Get<DefaultSecurityOptions>();
         if (defaultSecurityOptions == null)
         {

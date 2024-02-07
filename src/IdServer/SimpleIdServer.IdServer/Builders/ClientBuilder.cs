@@ -14,6 +14,14 @@ namespace SimpleIdServer.IdServer.Builders
 {
     public class ClientBuilder
     {
+        /// <summary>
+        /// Build credential issuer client.
+        /// </summary>
+        /// <param name="clientId"></param>
+        /// <param name="clientSecret"></param>
+        /// <param name="realm"></param>
+        /// <param name="redirectUrls"></param>
+        /// <returns></returns>
         public static CredentialIssuerClientBuilder BuildCredentialIssuer(string clientId, string clientSecret, Domains.Realm realm = null, params string[] redirectUrls)
         {
             var client = new Client

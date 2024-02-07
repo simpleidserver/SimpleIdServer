@@ -204,6 +204,17 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         }
 
         [EffectMethod]
+        public async Task Handle(AddCredentialIssuerApplicationAction action, IDispatcher dispatcher)
+        {
+            var newClientBuilder = ClientBuilder.BuildCredentialIssuer(action.ClientId, action.ClientSecret, null, action.RedirectionUrls.ToArray())
+                    .AddScope(new Domains.Scope { Name = Constants.StandardScopes.OpenIdScope.Name }, new Domains.Scope { Name = Constants.StandardScopes.Profile.Name });
+            if (!string.IsNullOrWhiteSpace(action.ClientName))
+                newClientBuilder.SetClientName(action.ClientName);
+            var newClient = newClientBuilder.Build();
+            await CreateClient(newClient, dispatcher, ClientTypes.CREDENTIAL_ISSUER);
+        }
+
+        [EffectMethod]
         public async Task Handle(AddWsFederationApplicationAction action, IDispatcher dispatcher)
         {
             var newClientBuilder = WsClientBuilder.BuildWsFederationClient(action.ClientId, null);
@@ -290,6 +301,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 grantTypes.Add(UmaTicketHandler.GRANT_TYPE);
             if (act.IsDeviceGrantTypeEnabled)
                 grantTypes.Add(DeviceCodeHandler.GRANT_TYPE);
+            if (act.IsTokenExchangePreAuthorizedCodeEnabled)
+                grantTypes.Add(TokenExchangePreAuthorizedCodeHandler.GRANT_TYPE);
             if (act.IsTokenExchangeEnabled)
             {
                 grantTypes.Add(TokenExchangeHandler.GRANT_TYPE);
@@ -821,6 +834,14 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public string ClientSecret { get; set; } = null!;
     }
 
+    public class AddCredentialIssuerApplicationAction
+    {
+        public string ClientId { get; set; } = null!;
+        public string ClientName { get; set; } = null!;
+        public string ClientSecret { get; set; } = null!;
+        public IEnumerable<string> RedirectionUrls { get; set; } = new List<string>();
+    }
+
     public class AddWsFederationApplicationAction
     {
         public string ClientId { get; set; } = null!;
@@ -912,6 +933,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public bool IsRedirectUrlCaseSensitive { get; set; }
         public AccessTokenTypes AccessTokenType { get; set; }
         public bool RedirectToRevokeSessionUI { get; set; }
+        public bool IsTokenExchangePreAuthorizedCodeEnabled { get; set; }
     }
 
     public class UpdateClientDetailsSuccessAction

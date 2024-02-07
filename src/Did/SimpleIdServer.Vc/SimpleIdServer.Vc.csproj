@@ -2,9 +2,17 @@
 	<PropertyGroup>
 		<TargetFramework>net7.0</TargetFramework>
 		<Description>Library used to generate Verifiable Credentials.</Description>
+		<TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
 	</PropertyGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\..\..\json-ld.net\src\json-ld.net\json-ld.net.csproj" />
-	  <ProjectReference Include="..\SimpleIdServer.Did\SimpleIdServer.Did.csproj" />
+		<ProjectReference Include="..\..\..\json-ld.net\src\json-ld.net\json-ld.net.csproj">
+			<PrivateAssets>all</PrivateAssets>	
+		</ProjectReference>
+		<ProjectReference Include="..\SimpleIdServer.Did\SimpleIdServer.Did.csproj" />
 	</ItemGroup>
+	<Target Name="CopyProjectReferencesToPackage" DependsOnTargets="BuildOnlySettings;ResolveReferences">
+		<ItemGroup>
+			<BuildOutputInPackage Include="@(ReferenceCopyLocalPaths->WithMetadataValue('ReferenceSourceTarget', 'ProjectReference')->WithMetadataValue('PrivateAssets', 'All'))" />
+		</ItemGroup>
+	</Target>
 </Project>

@@ -4,6 +4,5 @@ namespace SimpleIdServer.CredentialIssuer.Website;
 
 public class CredentialIssuerWebsiteOptions
 {
-    public string IdServerBaseUrl { get; set; } = "https://localhost:5001";
     public string CredentialIssuerUrl { get; set; } = "https://localhost:5005";
 }

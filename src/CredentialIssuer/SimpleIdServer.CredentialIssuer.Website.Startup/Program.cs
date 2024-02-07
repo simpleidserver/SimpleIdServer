@@ -8,7 +8,6 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddCredentialIssuerWebsite(o =>
 {
-    o.IdServerBaseUrl = builder.Configuration["IdServerBaseUrl"];
     o.CredentialIssuerUrl = builder.Configuration["CredentialIssuerUrl"];
 });
 bool forceHttps = false;

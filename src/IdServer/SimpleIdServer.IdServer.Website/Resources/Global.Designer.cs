@@ -70,6 +70,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Adding...
+        /// </summary>
+        public static string Adding {
+            get {
+                return ResourceManager.GetString("Adding", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à API Resource with the name &apos;{0}&apos; already exists.
         /// </summary>
         public static string ApiResourceAlreadyExists {
@@ -79,11 +88,29 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à At least one redirection URL must be specified.
+        /// </summary>
+        public static string AtLeastOneRedirectionUrl {
+            get {
+                return ResourceManager.GetString("AtLeastOneRedirectionUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Authentication Method has been updated.
         /// </summary>
         public static string AuthMethodUpdated {
             get {
                 return ResourceManager.GetString("AuthMethodUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Authorization code.
+        /// </summary>
+        public static string AuthorizationCode {
+            get {
+                return ResourceManager.GetString("AuthorizationCode", resourceCulture);
             }
         }
         
@@ -367,6 +394,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Identifier.
+        /// </summary>
+        public static string Identifier {
+            get {
+                return ResourceManager.GetString("Identifier", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Identifier is required.
+        /// </summary>
+        public static string IdentifierIsRequired {
+            get {
+                return ResourceManager.GetString("IdentifierIsRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Identity Provisioning is launched.
         /// </summary>
         public static string IdentityProvisioningLaunched {
@@ -502,6 +547,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Name.
+        /// </summary>
+        public static string Name {
+            get {
+                return ResourceManager.GetString("Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Name is required.
         /// </summary>
         public static string NameIsRequired {
@@ -547,6 +601,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Redirection URLs.
+        /// </summary>
+        public static string RedirectionUrls {
+            get {
+                return ResourceManager.GetString("RedirectionUrls", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Redirection URLs must be passed as a list of URLs separated by &lt;b&gt;;&lt;/b&gt;. &lt;br /&gt; URLs must be valid and must not contain fragments, for example (http://localhost#fragment).
+        /// </summary>
+        public static string RedirectionUrlsDescription {
+            get {
+                return ResourceManager.GetString("RedirectionUrlsDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Redirection url &apos;{0}&apos; cannot contains fragment (#).
         /// </summary>
         public static string RedirectUriContainsFragment {
@@ -570,6 +642,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string RegistrationWorkflowUpdated {
             get {
                 return ResourceManager.GetString("RegistrationWorkflowUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Save.
+        /// </summary>
+        public static string Save {
+            get {
+                return ResourceManager.GetString("Save", resourceCulture);
             }
         }
         
@@ -669,6 +750,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string ScopeResourcesUpdated {
             get {
                 return ResourceManager.GetString("ScopeResourcesUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Secret.
+        /// </summary>
+        public static string Secret {
+            get {
+                return ResourceManager.GetString("Secret", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Secret is required.
+        /// </summary>
+        public static string SecretIsRequired {
+            get {
+                return ResourceManager.GetString("SecretIsRequired", resourceCulture);
             }
         }
         
@@ -885,6 +984,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string SigKeyAlreadyExists {
             get {
                 return ResourceManager.GetString("SigKeyAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Token exchange pre-authorized code.
+        /// </summary>
+        public static string TokenExchangePreAuthorizedCode {
+            get {
+                return ResourceManager.GetString("TokenExchangePreAuthorizedCode", resourceCulture);
             }
         }
         

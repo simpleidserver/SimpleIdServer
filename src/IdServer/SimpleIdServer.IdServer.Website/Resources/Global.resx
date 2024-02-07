@@ -441,4 +441,40 @@
   <data name="ProcessImportStarted" xml:space="preserve">
     <value>Process import has been started</value>
   </data>
+  <data name="Adding" xml:space="preserve">
+    <value>Adding..</value>
+  </data>
+  <data name="AtLeastOneRedirectionUrl" xml:space="preserve">
+    <value>At least one redirection URL must be specified</value>
+  </data>
+  <data name="Identifier" xml:space="preserve">
+    <value>Identifier</value>
+  </data>
+  <data name="IdentifierIsRequired" xml:space="preserve">
+    <value>Identifier is required</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="RedirectionUrls" xml:space="preserve">
+    <value>Redirection URLs</value>
+  </data>
+  <data name="RedirectionUrlsDescription" xml:space="preserve">
+    <value>Redirection URLs must be passed as a list of URLs separated by &lt;b&gt;;&lt;/b&gt;. &lt;br /&gt; URLs must be valid and must not contain fragments, for example (http://localhost#fragment)</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Secret" xml:space="preserve">
+    <value>Secret</value>
+  </data>
+  <data name="SecretIsRequired" xml:space="preserve">
+    <value>Secret is required</value>
+  </data>
+  <data name="AuthorizationCode" xml:space="preserve">
+    <value>Authorization code</value>
+  </data>
+  <data name="TokenExchangePreAuthorizedCode" xml:space="preserve">
+    <value>Token exchange pre-authorized code</value>
+  </data>
 </root>

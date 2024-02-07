@@ -413,6 +413,39 @@
                             <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addClientState.Value.IsAdding)" />
                         </RadzenTemplateForm>
                         break;
+                    // Credential issuer
+                    case ClientTypes.CREDENTIAL_ISSUER:
+                        <RadzenTemplateForm Submit=@AddCredentialIssuerApplication TItem="CredentialIssuerApplication" Data=@credentialIssuerApplication>
+                            @if (!addClientState.Value.IsAdding && !string.IsNullOrWhiteSpace(addClientState.Value.ErrorMessage))
+                            {
+                                <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@addClientState.Value.ErrorMessage</RadzenAlert>
+                            }
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Identifier</RadzenText>
+                                <RadzenTextBox Name="ClientIdentifier" @bind-Value="@credentialIssuerApplication.ClientIdentifier" Class="w-100"></RadzenTextBox>
+                                <RadzenRequiredValidator Component="ClientIdentifier" Text="@Global.IdentifierIsRequired"></RadzenRequiredValidator>
+                            </div>
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Secret</RadzenText>
+                                <RadzenPassword Name="ClientSecret" @bind-Value="@credentialIssuerApplication.ClientSecret" Class="w-100"></RadzenPassword>
+                                <RadzenRequiredValidator Component="ClientSecret" Text="@Global.SecretIsRequired"></RadzenRequiredValidator>
+                            </div>
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Name</RadzenText>
+                                <RadzenTextBox Name="ClientName" @bind-Value="@credentialIssuerApplication.ClientName" Class="w-100"></RadzenTextBox>
+                            </div>
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.RedirectionUrls</RadzenText>
+                                <RadzenTextBox Name="RedirectionUris" @bind-Value="@credentialIssuerApplication.RedirectionUris" Class="w-100"></RadzenTextBox>
+                                <p class="text-muted">
+                                    @((MarkupString)Global.RedirectionUrlsDescription)
+                                </p>
+                                <RadzenRequiredValidator Component="RedirectionUris" Text="@Global.AtLeastOneRedirectionUrl"></RadzenRequiredValidator>
+                            </div>
+                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? Global.Adding : Global.Save)" Disabled="@(addClientState.Value.IsAdding)" />
+                        </RadzenTemplateForm>
+                        break;
+                        
                 }
             }
         </RadzenStepsItem>
@@ -511,6 +544,14 @@
         public string ClientSecret { get; set; } = null!;
     }
 
+    record CredentialIssuerApplication
+    {
+        public string ClientName { get; set; } = null!;
+        public string ClientIdentifier { get; set;} = null!;
+        public string ClientSecret { get; set;} = null!;
+        public string RedirectionUris { get; set; }
+    }
+
     record ProofOfPossession
     {
         public string Name { get; set; }
@@ -533,6 +574,7 @@
     ExternalDeviceApplication externalDeviceApplication = new ExternalDeviceApplication();
     DeviceApplication deviceApplication = new DeviceApplication();
     SamlSpApplication samlSpApplication = new SamlSpApplication();
+    CredentialIssuerApplication credentialIssuerApplication = new CredentialIssuerApplication();
     ICollection<ProofOfPossession> ProofOfPossessions { get; set; } = new List<ProofOfPossession>
     {
         DPoP,
@@ -580,7 +622,8 @@
         new ApplicationType { Name = "Device", ClientTemplate = ClientTemplateTypes.STANDARD,  ShortDescription = "Device Authorization grant", Description = "An IoT application or otherwise browserless or input constrained device.", Type = ClientTypes.DEVICE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/DeviceClient.png" },
         new ApplicationType { Name = "Highly secure Web Application", ClientTemplate = ClientTemplateTypes.FAPI, ShortDescription = "Web Application with FAPI 2.0 security requirements.", Description = "The web application is executed on a server (ASP.NET CORE, SPRING, etc.) and implements all the security requirements proposed by FAPI 2.0.", PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/WebsiteClient.png", Type = ClientTypes.HIGHLYSECUREDWEBSITE },
         new ApplicationType { Name = "Grant Management", ClientTemplate = ClientTemplateTypes.FAPI, ShortDescription = "Web application with FAPI 2.0 security requirements and grant management support.", Description = "The web application is executed on a server (ASP.NET CORE, SPRING, etc.) and implements all the security requirements proposed by FAPI 2.0. Additionally, it supports grant management.", PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/WebsiteClient.png", Type = ClientTypes.GRANTMANAGEMENT },
-        new ApplicationType { Name = "External Device Authentication", ClientTemplate = ClientTemplateTypes.FAPI,  ShortDescription = "Client Initiated Backchannel Authentication (CIBA) flow", Description = "Authentication is performed via an Authentication Device by the user who also consents (if required) to the request.", Type = ClientTypes.EXTERNAL, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/ExternalDeviceClient.png" }
+        new ApplicationType { Name = "External Device Authentication", ClientTemplate = ClientTemplateTypes.FAPI,  ShortDescription = "Client Initiated Backchannel Authentication (CIBA) flow", Description = "Authentication is performed via an Authentication Device by the user who also consents (if required) to the request.", Type = ClientTypes.EXTERNAL, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/ExternalDeviceClient.png" },
+        new ApplicationType { Name = "Credential issuer", ClientTemplate = ClientTemplateTypes.CREDENTIALISSUER, ShortDescription = "Credential issuer", Description = "A REST API for credential issuance capable of generating trusted and verifiable credentials, such as University Degrees.", PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/CredentialIssuer.png", Type = ClientTypes.CREDENTIAL_ISSUER }
     };
 
     ICollection<ClientTemplate> ClientTemplates { get; set; } = new List<ClientTemplate>
@@ -652,5 +695,10 @@
     void AddDeviceApplication(DeviceApplication deviceApplication)
     {
         dispatcher.Dispatch(new AddDeviceApplicationAction { ClientId = deviceApplication.ClientIdentifier, ClientName = deviceApplication.ClientName, ClientSecret = deviceApplication.ClientSecret });
+    }
+
+    void AddCredentialIssuerApplication(CredentialIssuerApplication credentialIssuerApplication)
+    {
+        dispatcher.Dispatch(new AddCredentialIssuerApplicationAction { ClientId = credentialIssuerApplication.ClientIdentifier, ClientName = credentialIssuerApplication.ClientName, ClientSecret = credentialIssuerApplication.ClientSecret });
     }
 }

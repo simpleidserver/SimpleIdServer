@@ -49,7 +49,13 @@
                     </div>
                 </div>
             </RadzenAccordionItem>
-            @if (Client.ClientType == ClientTypes.SPA || Client.ClientType == ClientTypes.WEBSITE || Client.ClientType == ClientTypes.EXTERNAL || Client.ClientType == ClientTypes.MOBILE || Client.ClientType == ClientTypes.HIGHLYSECUREDWEBSITE || Client.ClientType == ClientTypes.GRANTMANAGEMENT)
+            @if (Client.ClientType == ClientTypes.CREDENTIAL_ISSUER || 
+                Client.ClientType == ClientTypes.SPA || 
+                Client.ClientType == ClientTypes.WEBSITE || 
+                Client.ClientType == ClientTypes.EXTERNAL || 
+                Client.ClientType == ClientTypes.MOBILE || 
+                Client.ClientType == ClientTypes.HIGHLYSECUREDWEBSITE ||
+                Client.ClientType == ClientTypes.GRANTMANAGEMENT)
             {
                 <RadzenAccordionItem Text="Access settings" Selected=true>
                     <!-- Redirect URIs -->
@@ -129,7 +135,11 @@
                                     </div>
                                 }
 
-                                @if (Client.ClientType == ClientTypes.WEBSITE || Client.ClientType == ClientTypes.MOBILE || Client.ClientType == ClientTypes.EXTERNAL || Client.ClientType == ClientTypes.HIGHLYSECUREDWEBSITE || Client.ClientType == ClientTypes.GRANTMANAGEMENT)
+                                @if (Client.ClientType == ClientTypes.WEBSITE ||
+                                    Client.ClientType == ClientTypes.MOBILE || 
+                                    Client.ClientType == ClientTypes.EXTERNAL || 
+                                    Client.ClientType == ClientTypes.HIGHLYSECUREDWEBSITE || 
+                                    Client.ClientType == ClientTypes.GRANTMANAGEMENT)
                                 {
                                     <!-- Authorization code  -->
                                     <div>
@@ -159,6 +169,20 @@
                                     <div>
                                         <RadzenCheckBox Name="IsDeviceGrantTypeEnabled" @bind-Value=updateClient.IsDeviceGrantTypeEnabled></RadzenCheckBox>
                                         <RadzenLabel Text="Device" Component="IsDeviceGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
+                                    </div>
+                                }
+
+                                @if(Client.ClientType == ClientTypes.CREDENTIAL_ISSUER)
+                                {                                    
+                                    <!-- Authorization code  -->
+                                    <div>
+                                        <RadzenCheckBox Name="IsAuthorizationCodeGrantTypeEnabled" Disabled=true @bind-Value=updateClient.IsAuthorizationCodeGrantTypeEnabled></RadzenCheckBox>
+                                        <RadzenLabel Text="@Global.AuthorizationCode" Component="IsAuthorizationCodeGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
+                                    </div>
+                                    <!-- Token exchange pre authorized code -->
+                                    <div>
+                                        <RadzenCheckBox Name="IsTokenExchangePreAuthorizedCodeEnabled" Disabled=true @bind-Value=updateClient.IsTokenExchangePreAuthorizedCodeEnabled></RadzenCheckBox>
+                                        <RadzenLabel Text=@Global.TokenExchangePreAuthorizedCode Component="IsTokenExchangePreAuthorizedCodeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
                                     </div>
                                 }
 
@@ -215,7 +239,13 @@
                 </RadzenAccordionItem>
             }
 
-            @if (Client.ClientType == ClientTypes.SPA || Client.ClientType == ClientTypes.WEBSITE || Client.ClientType == ClientTypes.HIGHLYSECUREDWEBSITE || Client.ClientType == ClientTypes.GRANTMANAGEMENT || Client.ClientType == ClientTypes.MOBILE || Client.ClientType == ClientTypes.EXTERNAL)
+            @if (Client.ClientType == ClientTypes.SPA ||
+                Client.ClientType == ClientTypes.WEBSITE || 
+                Client.ClientType == ClientTypes.HIGHLYSECUREDWEBSITE || 
+                Client.ClientType == ClientTypes.GRANTMANAGEMENT || 
+                Client.ClientType == ClientTypes.MOBILE || 
+                Client.ClientType == ClientTypes.EXTERNAL ||
+                Client.ClientType == ClientTypes.CREDENTIAL_ISSUER)
             {
                 <RadzenAccordionItem Text="Login settings" Selected=true>
                     <!-- Consent required -->
@@ -231,7 +261,13 @@
             }
 
             
-            @if (Client.ClientType == ClientTypes.WEBSITE || Client.ClientType == ClientTypes.HIGHLYSECUREDWEBSITE || Client.ClientType == ClientTypes.GRANTMANAGEMENT || Client.ClientType == ClientTypes.SPA || Client.ClientType == ClientTypes.MOBILE || Client.ClientType == ClientTypes.EXTERNAL)
+            @if (Client.ClientType == ClientTypes.WEBSITE || 
+                Client.ClientType == ClientTypes.HIGHLYSECUREDWEBSITE || 
+                Client.ClientType == ClientTypes.GRANTMANAGEMENT || 
+                Client.ClientType == ClientTypes.SPA || 
+                Client.ClientType == ClientTypes.MOBILE || 
+                Client.ClientType == ClientTypes.EXTERNAL ||
+                Client.ClientType == ClientTypes.CREDENTIAL_ISSUER)
             {
                 <RadzenAccordionItem Text="Logout settings" Selected=true>
                     <!-- Front-channel logout session required -->
@@ -326,6 +362,7 @@
         public bool IsRefreshTokenGrantTypeEnabled { get; set; }
         public bool IsTokenExchangeEnabled { get; set; }
         public bool IsAuthorizationCodeGrantTypeEnabled { get; set; }
+        public bool IsTokenExchangePreAuthorizedCodeEnabled { get; set; }
         public bool IsCIBAGrantTypeEnabled { get; set; }
         public bool IsUMAGrantTypeEnabled { get; set; }
         public bool IsConsentEnabled { get; set; }
@@ -388,6 +425,8 @@
             updateClient.IsRefreshTokenGrantTypeEnabled = true;
         if (this.Client.GrantTypes.Contains(AuthorizationCodeHandler.GRANT_TYPE))
             updateClient.IsAuthorizationCodeGrantTypeEnabled = true;
+        if (this.Client.GrantTypes.Contains(TokenExchangePreAuthorizedCodeHandler.GRANT_TYPE))
+            updateClient.IsTokenExchangePreAuthorizedCodeEnabled = true;
         if (this.Client.GrantTypes.Contains(CIBAHandler.GRANT_TYPE))
             updateClient.IsCIBAGrantTypeEnabled = true;
         if (this.Client.GrantTypes.Contains(UmaTicketHandler.GRANT_TYPE))
@@ -425,7 +464,8 @@
             TokenExchangeType = client.TokenExchangeType,
             JwksUrl = this.Client.JwksUri,
             AccessTokenType = client.AccessTokenType,
-            RedirectToRevokeSessionUI = client.RedirectToRevokeSessionUI
+            RedirectToRevokeSessionUI = client.RedirectToRevokeSessionUI,
+            IsTokenExchangePreAuthorizedCodeEnabled = client.IsTokenExchangePreAuthorizedCodeEnabled
         });
     }
 
