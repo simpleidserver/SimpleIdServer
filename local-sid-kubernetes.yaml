@@ -242,6 +242,8 @@ spec:
               value: "/certificates/sid.pfx"
             - name: "ASPNETCORE_FORWARDEDHEADERS_ENABLED"
               value: "true"
+            - name: "StorageConfiguration__Type"
+              value: "SQLSERVER"
             - name: "StorageConfiguration__ConnectionString"
               value: "Data Source=db-service,1433;Initial Catalog=Scim;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"
 ---

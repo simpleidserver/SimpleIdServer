@@ -63,6 +63,24 @@ steps:
     workingDirectory: '$(Build.Repository.LocalPath)\src\Scim\SimpleIdServer.Scim.Startup'
 
 - task: DotNetCoreCLI@2
+  displayName: 'Publish Credential Issuer'
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    zipAfterPublish: false
+    modifyOutputPath: false
+    workingDirectory: '$(Build.Repository.LocalPath)\src\CredentialIssuer\SimpleIdServer.CredentialIssuer.Startup'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Publish Credential Issuer website'
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    zipAfterPublish: false
+    modifyOutputPath: false
+    workingDirectory: '$(Build.Repository.LocalPath)\src\CredentialIssuer\SimpleIdServer.CredentialIssuer.Website.Startup'
+
+- task: DotNetCoreCLI@2
   displayName: 'Publish Mobile application'
   inputs:
     command: 'publish'
@@ -100,6 +118,20 @@ steps:
     Contents: '**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)\scim'
 
+- task: CopyFiles@2
+  displayName: 'Copy Credential Issuer'
+  inputs:
+    SourceFolder: '$(Build.Repository.LocalPath)\src\CredentialIssuer\SimpleIdServer.CredentialIssuer.Website\bin\Debug\net7.0\publish'
+    Contents: '**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)\credentialissuer'
+
+- task: CopyFiles@2
+  displayName: 'Copy Credential issuer website'
+  inputs:
+    SourceFolder: '$(Build.Repository.LocalPath)\src\CredentialIssuer\SimpleIdServer.CredentialIssuer.Website.Startup\bin\Debug\net7.0\publish'
+    Contents: '**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)\credentialissuerwebsite'
+
 - task: PublishBuildArtifacts@1
   displayName: 'Publish website artifacts'
   inputs:
@@ -129,7 +161,21 @@ steps:
     publishLocation: 'Container'
 
 - task: PublishBuildArtifacts@1
-  displayName: 'Publish SCIM'
+  displayName: 'Publish Credential issuer'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)\credentialissuer'
+    ArtifactName: 'credentialissuer'
+    publishLocation: 'Container'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Credential issuer website'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)\credentialissuerwebsite'
+    ArtifactName: 'credentialissuerwebsite'
+    publishLocation: 'Container'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Mobile application'
   inputs:
     PathtoPublish: '$(Build.Repository.LocalPath)\src\Mobile\SimpleIdServer.Mobile\bin\Release\net7.0-android\publish'
     ArtifactName: 'mobileApp'

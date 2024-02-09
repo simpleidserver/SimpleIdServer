@@ -16,11 +16,21 @@ function HomepageHeader() {
       <div className="container">
         <h1 className="hero__title">{siteConfig.title}</h1>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
-        <div className={styles.buttons}>
+        <div className={styles.link}>
           <Link
             className="button button--secondary button--lg"
             to="https://website.simpleidserver.com">
-            Demo
+            Identity server  
+          </Link>
+          <Link
+            className="button button--secondary button--lg"
+            to="https://credentialissuerwebsite.simpleidserver.com">
+            Credential issuer
+          </Link>
+          <Link
+            className="button button--secondary button--lg"
+            to="https://install.appcenter.ms/users/agentsimpleidserver-gmail.com/apps/simpleidserver/distribution_groups/public">
+              Mobile
           </Link>
         </div>
       </div>
@@ -36,16 +46,16 @@ export default function Home() {
       description="Description will go into a meta tag in <head />">
       <HomepageHeader />
       <main>
-        <div style={{borderBottom: "1px solid #ebedf0"}}>
+        <div>
           <HomepagePhilosophy />
         </div>
-        <div style={{borderBottom: "1px solid #ebedf0"}}>
+        <div style={{backgroundColor: "#f5f6f7"}}>
           <HomepageInstallations />
         </div>
-        <div style={{borderBottom: "1px solid #ebedf0"}}>
+        <div>
           <HomepageFeatures />
         </div>
-        <div style={{borderBottom: "1px solid #ebedf0"}}>
+        <div style={{backgroundColor: "#f5f6f7"}}>
           <HomepageOpenStandards />
         </div>
       </main>

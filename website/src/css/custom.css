@@ -15,6 +15,9 @@
   --ifm-color-primary-lightest: #ffba8dff;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --bs-gutter-y: 0;
+  --bs-gutter-x: 1.5rem;
+  --spacers: 1rem;
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
@@ -91,6 +94,30 @@
   justify-content: center;
 }
 
+.gy-5 {
+  --bs-gutter-y: 3rem;
+}
+
+.mb-5 {
+  padding-bottom: calc(3 * var(--spacers));
+}
+
+.pt-3 {
+  padding-top: var(--spacers);
+}
+
+.row {
+  margin-top: calc(-1 * var(--bs-gutter-y));
+  margin-right: calc(-.5 * var(--bs-gutter-x));
+  margin-left: calc(-.5 * var(--bs-gutter-x));
+}
+
+.row>* {
+  padding-right: calc(var(--bs-gutter-x) * .5);
+  padding-left: calc(var(--bs-gutter-x) * .5);
+  margin-top: var(--bs-gutter-y);
+}
+
 .column {
   display: flex;
   flex-flow: column wrap;
@@ -131,8 +158,7 @@
   }
 }
 
-@media all and (max-width: 430px) {
-  
+@media all and (max-width: 430px) {  
   .flex-table {
     .flex-row {
       border-bottom: 0;

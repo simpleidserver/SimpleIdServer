@@ -6,11 +6,11 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleIdServer.CredentialIssuer.Startup;
-using static Org.BouncyCastle.Math.EC.ECCurve;
 using System.Net.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var ignoreCertificateError = bool.Parse(builder.Configuration["Authorization:IgnoreCertificateError"]);
 builder.Services.AddAuthentication(o =>
 {
     o.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -23,10 +23,20 @@ builder.Services.AddAuthentication(o =>
     o.Authority = builder.Configuration["Authorization:Issuer"];
     o.RequireHttpsMetadata = false;
     o.TokenValidationParameters.ValidateAudience = false;
+    if (ignoreCertificateError)
+    {
+        var handler = new HttpClientHandler
+        {
+            ServerCertificateCustomValidationCallback = (httpRequestMessage, cert, cetChain, policyErrors) =>
+            {
+                return true;
+            }
+        };
+        o.BackchannelHttpHandler = handler;
+    }
 })
 .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
 {
-    var ignoreCertificateError = bool.Parse(builder.Configuration["Authorization:IgnoreCertificateError"]);
     if (ignoreCertificateError)
     {
         var handler = new HttpClientHandler
@@ -85,6 +95,7 @@ builder.Services.AddCredentialIssuer(o =>
     o.ClientId = builder.Configuration["Authorization:ClientId"];
     o.ClientSecret = builder.Configuration["Authorization:ClientSecret"];
     o.AuthorizationServer = builder.Configuration["Authorization:Issuer"];
+    o.IgnoreHttpsCertificateError = ignoreCertificateError;
 })
 .UseInMemoryStore(c =>
 {
