@@ -2,6 +2,7 @@
 	<PropertyGroup>
 		<TargetFramework>net7.0</TargetFramework>
 		<OutputType>Exe</OutputType>
+		<ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
 	</PropertyGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\SimpleIdServer.Configuration.Redis\SimpleIdServer.Configuration.Redis.csproj" />

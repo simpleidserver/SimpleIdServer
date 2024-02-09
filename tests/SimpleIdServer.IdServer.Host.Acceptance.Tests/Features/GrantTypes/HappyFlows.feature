@@ -179,6 +179,9 @@ Scenario: Use 'refresh_token' grant type to get an access token
 
 Scenario: Use 'urn:openid:params:grant-type:ciba' grant type to get an identity token (POLL mode)
 	Given authenticate a user
+	And build access_token and sign with the key 'keyid'
+	| Key | Value |
+	| sub | user  |
 	
 	When execute HTTP POST request 'https://localhost:8080/bc-authorize'
 	| Key                       | Value            |
@@ -193,6 +196,7 @@ Scenario: Use 'urn:openid:params:grant-type:ciba' grant type to get an identity 
 
 	And execute HTTP POST JSON request 'http://localhost/bc-callback'
 	| Key           | Value						|
+	| Authorization	| Bearer $access_token$	    |
 	| auth_req_id   | $auth_req_id$				|
 	| action        | 0							|
 
@@ -210,6 +214,10 @@ Scenario: Use 'urn:openid:params:grant-type:ciba' grant type to get an identity 
 
 Scenario: Use 'urn:openid:params:grant-type:ciba' grant type to get an identity token (PUSH mode)
 	Given authenticate a user	
+
+	And build access_token and sign with the key 'keyid'
+	| Key | Value |
+	| sub | user  |
 	
 	When execute HTTP POST request 'https://localhost:8080/bc-authorize'
 	| Key                       | Value                                |
@@ -225,6 +233,7 @@ Scenario: Use 'urn:openid:params:grant-type:ciba' grant type to get an identity 
 
 	And execute HTTP POST JSON request 'http://localhost/bc-callback'
 	| Key           | Value                  |
+	| Authorization	| Bearer $access_token$	 |
 	| auth_req_id   | $auth_req_id$          |
 	| action        | 0                      |
 
@@ -234,11 +243,11 @@ Scenario: Use 'urn:openid:params:grant-type:ciba' grant type to get an identity 
 	And access_token audience contains 'fiftyOneClient'
 
 Scenario: Use 'urn:openid:params:grant-type:ciba' grant type to get an identity token (PING mode)
-	Given authenticate a user
+	Given authenticate a user	
 
 	When execute HTTP GET request 'http://localhost/authorization'
 	| Key           | Value                 |
-	| response_type | id_token              |
+	| response_type | id_token token        |
 	| client_id     | fourteenClient        |
 	| state         | state                 |
 	| response_mode | query                 |
@@ -246,7 +255,7 @@ Scenario: Use 'urn:openid:params:grant-type:ciba' grant type to get an identity 
 	| redirect_uri  | http://localhost:8080 |
 	| nonce         | nonce                 |
 	
-	And extract parameter 'id_token' from redirect url
+	And extract parameter 'access_token' from redirect url
 
 	And execute HTTP POST request 'https://localhost:8080/bc-authorize'
 	| Key                       | Value                                |
@@ -262,7 +271,7 @@ Scenario: Use 'urn:openid:params:grant-type:ciba' grant type to get an identity 
 
 	And execute HTTP POST JSON request 'http://localhost/bc-callback'
 	| Key           | Value                  |
-	| Authorization | Bearer $id_token$      |
+	| Authorization	| Bearer $access_token$	 |
 	| auth_req_id   | $auth_req_id$          |
 	| action        | 0                      |
 
@@ -350,7 +359,7 @@ Scenario: Use 'urn:openid:params:grant-type:ciba' grant type to get an identity 
 
 	When execute HTTP GET request 'http://localhost/authorization'
 	| Key           | Value                 |
-	| response_type | id_token              |
+	| response_type | id_token token        |
 	| client_id     | fourteenClient        |
 	| state         | state                 |
 	| response_mode | query                 |
@@ -358,7 +367,7 @@ Scenario: Use 'urn:openid:params:grant-type:ciba' grant type to get an identity 
 	| redirect_uri  | http://localhost:8080 |
 	| nonce         | nonce                 |
 	
-	And extract parameter 'id_token' from redirect url
+	And extract parameter 'access_token' from redirect url
 
 	And execute HTTP POST request 'https://localhost:8080/bc-authorize'
 	| Key                       | Value                                                                                                |
@@ -373,7 +382,7 @@ Scenario: Use 'urn:openid:params:grant-type:ciba' grant type to get an identity 
 
 	And execute HTTP POST JSON request 'http://localhost/bc-callback'
 	| Key           | Value                  |
-	| Authorization | Bearer $id_token$      |
+	| Authorization	| Bearer $access_token$	 |
 	| auth_req_id   | $auth_req_id$          |
 	| action        | 0                      |
 
@@ -400,7 +409,7 @@ Scenario: Use 'urn:ietf:params:oauth:grant-type:pre-authorized_code' grant type 
 	When execute HTTP POST request 'https://localhost:8080/token'
 	| Key                 | Value                                                         |
 	| grant_type          | urn:ietf:params:oauth:grant-type:exchange-pre-authorized_code |
-	| client_id           | seventyOneClient                                              |
+	| client_id           | seventyTwoClient                                              |
 	| client_secret       | password                                                      |
 	| subject_token       | $access_token$                                                |
 	| subject_token_type  | urn:ietf:params:oauth:token-type:access_token                 |
@@ -412,7 +421,7 @@ Scenario: Use 'urn:ietf:params:oauth:grant-type:pre-authorized_code' grant type 
 	And execute HTTP POST request 'https://localhost:8080/token'
 	| Key                     | Value                                                    |
 	| grant_type              | urn:ietf:params:oauth:grant-type:pre-authorized_code     |
-	| client_id               | seventyTwoClient                                         |
+	| client_id               | seventyThreeClient                                       |
 	| client_secret           | password                                                 |
 	| pre-authorized_code     | $preAuthorizedCode$                                      |
 	
@@ -647,7 +656,7 @@ Scenario: Use 'urn:ietf:params:oauth:grant-type:exchange-pre-authorized_code' gr
 	When execute HTTP POST request 'https://localhost:8080/token'
 	| Key                 | Value                                                         |
 	| grant_type          | urn:ietf:params:oauth:grant-type:exchange-pre-authorized_code |
-	| client_id           | seventyOneClient                                              |
+	| client_id           | seventyTwoClient                                              |
 	| client_secret       | password                                                      |
 	| subject_token       | $access_token$                                                |
 	| subject_token_type  | urn:ietf:params:oauth:token-type:access_token                 |

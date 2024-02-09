@@ -276,7 +276,7 @@ namespace SimpleIdServer.IdServer
         public const string POLLING_DEVICE_ALREADY_REGISTERED = "only one polling device can be registrered";
         public const string POLLING_DEVICE_NOT_REGISTERED = "polling device is not registered";
         public const string GRANT_ID_CANNOT_BE_SPECIFIED = "grant_id cannot be specified because the grant_management_action is equals to create";
-        public const string BC_AUTHORIZE_NOT_PENDING = "the back channel authorization is not in pending";
+        public const string BC_AUTHORIZE_NOT_PENDING = "the authorization request is not in pending";
         public const string UNEXPECTED_REQUEST_URI_PARAMETER = "the request cannot contains request_uri";
         public const string REQUEST_URI_IS_REQUIRED = "the request_uri is required";
         public const string REQUEST_URI_IS_INVALID = "the request_uri is invalid";
@@ -306,6 +306,8 @@ namespace SimpleIdServer.IdServer
         public const string SCOPE_MAPPER_TYPE_UNIQUE = "The same mapping type cannot be added twice.";
         public const string IDPROVISIONING_PROCESS_ISNOTEXTRACTED = "users are not extracted";
         public const string IDPROVISIONING_PROCESS_STARTED = "process cannot be started twice";
-        public const string NO_ACTIVE_OTP = "the user doesn't have an active OTP";
+	public const string NO_ACTIVE_OTP = "the user doesn't have an active OTP";
+        public const string EXPIRED_BC_AUTHORIZE = "the authorization request is expired";
+        public const string UNAUTHORIZED_TO_VALIDATE_BC_AUTHORIZATION = "you are not authorized to validate the authorization request";
     }
 }

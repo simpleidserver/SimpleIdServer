@@ -11,7 +11,6 @@ using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using System;
 using System.Linq;
-using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Nodes;
@@ -28,12 +27,18 @@ namespace SimpleIdServer.IdServer.Helpers
 
     public class ExtractRequestHelper : IExtractRequestHelper
     {
+        private readonly Infrastructures.IHttpClientFactory _httpClientFactory;
         private readonly IJwtBuilder _jwtBuilder;
         private readonly IDistributedCache _distributedCache;
         private readonly IdServerHostOptions _options;
 
-        public ExtractRequestHelper(IJwtBuilder jwtBuilder, IDistributedCache distributedCache, IOptions<IdServerHostOptions> options)
+        public ExtractRequestHelper(
+            Infrastructures.IHttpClientFactory httpClientFactory,
+            IJwtBuilder jwtBuilder, 
+            IDistributedCache distributedCache, 
+            IOptions<IdServerHostOptions> options)
         {
+            _httpClientFactory = httpClientFactory;
             _jwtBuilder = jwtBuilder;
             _distributedCache = distributedCache;
             _options = options.Value;
@@ -85,7 +90,7 @@ namespace SimpleIdServer.IdServer.Helpers
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_REQUEST_URI_PARAMETER);
 
             var cleanedUrl = uri.AbsoluteUri.Replace(uri.Fragment, "");
-            using (var httpClient = new HttpClient())
+            using (var httpClient = _httpClientFactory.GetHttpClient())
             {
                 var httpResult = await httpClient.GetAsync(cleanedUrl);
                 json = await httpResult.Content.ReadAsStringAsync();

@@ -18,6 +18,7 @@ builder.Services.AddSIDIdentityServer(o =>
 })
     .UseInMemoryStore(o =>
     {
+        o.AddInMemoryBCAuthorize(IdServerConfiguration.BCAuthorizeLst);
         o.AddInMemoryRealms(IdServerConfiguration.Realms);
         o.AddInMemoryScopes(IdServerConfiguration.Scopes);
         o.AddInMemoryClients(IdServerConfiguration.Clients);

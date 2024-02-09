@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleIdServer.CredentialIssuer.Startup;
+using static Org.BouncyCastle.Math.EC.ECCurve;
+using System.Net.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,12 +20,25 @@ builder.Services.AddAuthentication(o =>
 .AddCookie()
 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, o =>
 {
-    o.Authority = "https://localhost:5001/master";
+    o.Authority = builder.Configuration["Authorization:Issuer"];
     o.RequireHttpsMetadata = false;
     o.TokenValidationParameters.ValidateAudience = false;
 })
 .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
 {
+    var ignoreCertificateError = bool.Parse(builder.Configuration["Authorization:IgnoreCertificateError"]);
+    if (ignoreCertificateError)
+    {
+        var handler = new HttpClientHandler
+        {
+            ServerCertificateCustomValidationCallback = (httpRequestMessage, cert, cetChain, policyErrors) =>
+            {
+                return true;
+            }
+        };
+        options.BackchannelHttpHandler = handler;
+    }
+
     options.ClientId = builder.Configuration["Authorization:ClientId"];
     options.ClientSecret = builder.Configuration["Authorization:ClientSecret"];
     options.Authority = builder.Configuration["Authorization:Issuer"];

@@ -8,8 +8,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Api.BCCallback;
+using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
-using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.ViewModels;
@@ -32,20 +32,22 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IClientRepository _clientRepository;
         private readonly IdServer.Infrastructures.IHttpClientFactory _httpClientFactory;
         private readonly IJwtBuilder _jwtBuilder;
+        private readonly ITokenRepository _tokenRepository;
         private readonly ILogger<BackChannelConsentsController> _logger;
 
         public BackChannelConsentsController(
-            IDataProtectionProvider dataProtectionProvider, 
-            IClientRepository clientRepository, 
+            IDataProtectionProvider dataProtectionProvider,
+            IClientRepository clientRepository,
             IdServer.Infrastructures.IHttpClientFactory httpClientFactory,
-            IJwtBuilder jwtBuilder, 
-            IAmrHelper amrHelper, 
+            IJwtBuilder jwtBuilder,
+            ITokenRepository tokenRepository,
             ILogger<BackChannelConsentsController> logger)
         {
             _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
             _clientRepository = clientRepository;
             _httpClientFactory = httpClientFactory;
             _jwtBuilder = jwtBuilder;
+            _tokenRepository = tokenRepository;
             _logger = logger;
         }
 
@@ -65,6 +67,7 @@ namespace SimpleIdServer.IdServer.UI
                 }
 
                 var viewModel = await BuildViewModel(prefix, queries, returnUrl, cancellationToken);
+
                 return View(viewModel);
             }
             catch(CryptographicException)
@@ -107,7 +110,16 @@ namespace SimpleIdServer.IdServer.UI
                         { JwtRegisteredClaimNames.Sub, sub },
                     }
                 };
-                var idToken = _jwtBuilder.Sign(prefix ?? Constants.DefaultRealm, tokenDescriptor, SecurityAlgorithms.RsaSha256);
+                var accessToken = _jwtBuilder.Sign(prefix ?? Constants.DefaultRealm, tokenDescriptor, SecurityAlgorithms.RsaSha256);
+                _tokenRepository.Add(new Domains.Token
+                {
+                    Id = accessToken,
+                    ClientId = viewModel.ClientId,
+                    CreateDateTime = DateTime.UtcNow,
+                    TokenType = DTOs.TokenResponseParameters.AccessToken,
+                    AccessTokenType = AccessTokenTypes.Jwt
+                });
+                await _tokenRepository.SaveChanges(cancellationToken);
                 using (var httpClient = _httpClientFactory.GetHttpClient())
                 {
                     var json = JsonSerializer.Serialize(parameter);
@@ -117,7 +129,7 @@ namespace SimpleIdServer.IdServer.UI
                         RequestUri = new Uri(issuer),
                         Content = new StringContent(JsonSerializer.Serialize(parameter), System.Text.Encoding.UTF8, "application/json")
                     };
-                    request.Headers.Add(Constants.AuthorizationHeaderName, $"{AutenticationSchemes.Bearer} {idToken}");
+                    request.Headers.Add(Constants.AuthorizationHeaderName, $"{AutenticationSchemes.Bearer} {accessToken}");
                     var responseMessage = await httpClient.SendAsync(request, cancellationToken);
                     try
                     {
@@ -154,7 +166,11 @@ namespace SimpleIdServer.IdServer.UI
                 ReturnUrl = returnUrl
             };
             var str = realm ?? Constants.DefaultRealm;
-            var client = await _clientRepository.Query().Include(c => c.Translations).Include(c => c.Realms).AsNoTracking().FirstOrDefaultAsync(c => c.ClientId == viewModel.ClientId && c.Realms.Any(r => r.Name == str), cancellationToken);
+            var client = await _clientRepository.Query()
+                .Include(c => c.Translations)
+                .Include(c => c.Realms)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.ClientId == viewModel.ClientId && c.Realms.Any(r => r.Name == str), cancellationToken);
             viewModel.ClientName = client.ClientName;
             return viewModel;
         }

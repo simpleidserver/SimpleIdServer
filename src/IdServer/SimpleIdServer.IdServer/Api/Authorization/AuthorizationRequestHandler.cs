@@ -95,15 +95,21 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                 context.Response.Add(AuthorizationResponseParameters.State, state);
 
             _authorizationRequestEnricher.Enrich(context);
-            var grant = await ExecuteGrantManagementAction(grantRequest, context, cancellationToken);
-            foreach (var responseTypeHandler in responseTypeHandlers)
-                await responseTypeHandler.Enrich(new EnrichParameter { AuthorizationDetails = grantRequest.AuthorizationDetails, Scopes = grantRequest.Scopes, Audiences = grantRequest.Audiences, GrantId = grant?.Id, Claims = context.Request.RequestData.GetClaimsFromAuthorizationRequest() }, context, cancellationToken);
+            try
+            {
+                var grant = await ExecuteGrantManagementAction(grantRequest, context, cancellationToken);
+                foreach (var responseTypeHandler in responseTypeHandlers)
+                    await responseTypeHandler.Enrich(new EnrichParameter { AuthorizationDetails = grantRequest.AuthorizationDetails, Scopes = grantRequest.Scopes, Audiences = grantRequest.Audiences, GrantId = grant?.Id, Claims = context.Request.RequestData.GetClaimsFromAuthorizationRequest() }, context, cancellationToken);
 
-            _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? _options.DefaultTokenProfile)).Enrich(context);
-            UpdateSession(context);
-            await _userRepository.SaveChanges(cancellationToken);
-            await _userSessionRepository.SaveChanges(cancellationToken);
-            return new RedirectURLAuthorizationResponse(redirectUri, context.Response.Parameters);
+                _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? _options.DefaultTokenProfile)).Enrich(context);
+                UpdateSession(context);
+                await _userSessionRepository.SaveChanges(cancellationToken);
+                return new RedirectURLAuthorizationResponse(redirectUri, context.Response.Parameters);
+            }
+            finally
+            {
+                await _userRepository.SaveChanges(cancellationToken);
+            }
         }
 
         protected async Task<UserSession> GetActiveSession(HandlerContext context, CancellationToken cancellationToken)

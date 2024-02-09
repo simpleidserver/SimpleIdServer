@@ -10,7 +10,7 @@
 // ------------------------------------------------------------------------------
 #region Designer generated code
 #pragma warning disable
-namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
+namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features.ClientAuths
 {
     using TechTalk.SpecFlow;
     using System;
@@ -19,7 +19,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class JwksFeature : object, Xunit.IClassFixture<JwksFeature.FixtureData>, System.IDisposable
+    public partial class HappyFlowFeature : object, Xunit.IClassFixture<HappyFlowFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
@@ -28,10 +28,10 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
-#line 1 "Jwks.feature"
+#line 1 "HappyFlow.feature"
 #line hidden
         
-        public JwksFeature(JwksFeature.FixtureData fixtureData, SimpleIdServer_IdServer_Host_Acceptance_Tests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
+        public HappyFlowFeature(HappyFlowFeature.FixtureData fixtureData, SimpleIdServer_IdServer_Host_Acceptance_Tests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
             this.TestInitialize();
@@ -40,7 +40,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "Jwks", "\tGet JWKS and check its content", ProgrammingLanguage.CSharp, featureTags);
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/ClientAuths", "HappyFlow", "\tCheck the different client authentication methods", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -80,14 +80,14 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Get Json Web Keys (JWKS)")]
-        [Xunit.TraitAttribute("FeatureTitle", "Jwks")]
-        [Xunit.TraitAttribute("Description", "Get Json Web Keys (JWKS)")]
-        public void GetJsonWebKeysJWKS()
+        [Xunit.SkippableFactAttribute(DisplayName="Use client_secret_basic authentication method")]
+        [Xunit.TraitAttribute("FeatureTitle", "HappyFlow")]
+        [Xunit.TraitAttribute("Description", "Use client_secret_basic authentication method")]
+        public void UseClient_Secret_BasicAuthenticationMethod()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Get Json Web Keys (JWKS)", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Use client_secret_basic authentication method", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 4
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -98,16 +98,28 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table420 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table137 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
+                table137.AddRow(new string[] {
+                            "grant_type",
+                            "client_credentials"});
+                table137.AddRow(new string[] {
+                            "scope",
+                            "firstScope"});
+                table137.AddRow(new string[] {
+                            "client_id",
+                            "seventyOneClient"});
+                table137.AddRow(new string[] {
+                            "Authorization",
+                            "Basic c2V2ZW50eU9uZUNsaWVudDpwYXNzd29yZA=="});
 #line 5
- testRunner.When("execute HTTP GET request \'https://localhost:8080/jwks\'", ((string)(null)), table420, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table137, "When ");
 #line hidden
-#line 8
+#line 12
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 10
+#line 13
  testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -121,12 +133,12 @@ this.ScenarioInitialize(scenarioInfo);
             
             public FixtureData()
             {
-                JwksFeature.FeatureSetup();
+                HappyFlowFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                JwksFeature.FeatureTearDown();
+                HappyFlowFeature.FeatureTearDown();
             }
         }
     }

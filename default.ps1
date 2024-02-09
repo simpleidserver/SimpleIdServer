@@ -75,10 +75,14 @@ task buildInstaller {
     New-Item $result_dir\windows64\IdServer -Type Directory
     New-Item $result_dir\windows64\IdServerWebsite -Type Directory
     New-Item $result_dir\windows64\Scim -Type Directory
+    New-Item $result_dir\windows64\CredentialIssuer -Type Directory
+    New-Item $result_dir\windows64\CredentialIssuerWebsite -Type Directory
 	
     New-Item $result_dir\linux64\IdServer -Type Directory
     New-Item $result_dir\linux64\IdServerWebsite -Type Directory
     New-Item $result_dir\linux64\Scim -Type Directory
+    New-Item $result_dir\linux64\CredentialIssuer -Type Directory
+    New-Item $result_dir\linux64\CredentialIssuerWebsite -Type Directory
 	
     New-Item $result_dir\docker -Type Directory
 	
@@ -87,14 +91,14 @@ task buildInstaller {
 	Copy-Item -Path $base_dir\scripts\IdServer\Windows\run.ps1 -Destination $result_dir\windows64\IdServer -force
 	Copy-Item -Path $base_dir\scripts\IdServerWebsite\Windows\run.ps1 -Destination $result_dir\windows64\IdServerWebsite -force
 	Copy-Item -Path $base_dir\scripts\Scim\Windows\run.ps1 -Destination $result_dir\windows64\Scim -force
-	Copy-Item -Path $base_dir\scripts\CredentialIssuer\Windows\run.ps1 -Destination $result_dir\windows64\Scim -force
-	Copy-Item -Path $base_dir\scripts\CredentialIssuerWebsite\Windows\run.ps1 -Destination $result_dir\windows64\Scim -force
+	Copy-Item -Path $base_dir\scripts\CredentialIssuer\Windows\run.ps1 -Destination $result_dir\windows64\CredentialIssuer -force
+	Copy-Item -Path $base_dir\scripts\CredentialIssuerWebsite\Windows\run.ps1 -Destination $result_dir\windows64\CredentialIssuerWebsite -force
 	
 	Copy-Item -Path $base_dir\scripts\IdServer\Linux\* -Destination $result_dir\linux64\IdServer -recurse -force
 	Copy-Item -Path $base_dir\scripts\IdServerWebsite\Linux\* -Destination $result_dir\linux64\IdServerWebsite -recurse -force
 	Copy-Item -Path $base_dir\scripts\Scim\Linux\* -Destination $result_dir\linux64\Scim -recurse -force	
-	Copy-Item -Path $base_dir\scripts\CredentialIssuer\Linux\* -Destination $result_dir\linux64\IdServerWebsite -recurse -force
-	Copy-Item -Path $base_dir\scripts\CredentialIssuerWebsite\Linux\* -Destination $result_dir\linux64\Scim -recurse -force	
+	Copy-Item -Path $base_dir\scripts\CredentialIssuer\Linux\* -Destination $result_dir\linux64\CredentialIssuer -recurse -force
+	Copy-Item -Path $base_dir\scripts\CredentialIssuerWebsite\Linux\* -Destination $result_dir\linux64\CredentialIssuerWebsite -recurse -force	
 
 	Copy-Item -Path $base_dir\docker-compose.yml -Destination $result_dir\docker\docker-compose.yml
 	Copy-Item -Path $base_dir\compose -Destination $result_dir\docker -recurse -force
@@ -184,7 +188,6 @@ task buildTemplate {
 }
  
 task pack -depends release, compile, buildTemplate {
-	exec { dotnet pack $base_dir\json-ld.net\src\json-ld.net\json-ld.net.csproj -p:PackageVersion=4.0.9 -c $config --output $result_dir }
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Domains\SimpleIdServer.IdServer.Domains.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Email\SimpleIdServer.IdServer.Email.csproj -c $config --no-build $versionSuffix --output $result_dir }

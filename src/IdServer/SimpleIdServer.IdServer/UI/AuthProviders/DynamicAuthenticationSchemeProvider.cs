@@ -13,7 +13,6 @@ using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,6 +43,7 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
 
     public class DynamicAuthenticationSchemeProvider : AuthenticationSchemeProvider, ISIDAuthenticationSchemeProvider
     {
+        private readonly IdServer.Infrastructures.IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _configuration;
         private readonly IServiceProvider _serviceProvider;
         private readonly IdServerHostOptions _options;
@@ -53,8 +53,15 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
         private IEnumerable<Domains.AuthenticationSchemeProvider> _cachedAuthenticationProviders;
         private DateTime? _nextExpirationTime;
 
-        public DynamicAuthenticationSchemeProvider(IConfiguration configuration, IServiceProvider serviceProvider, IOptions<IdServerHostOptions> opts, IDataProtectionProvider dataProtection, IOptions<AuthenticationOptions> options) : base(options)
+        public DynamicAuthenticationSchemeProvider(
+            IdServer.Infrastructures.IHttpClientFactory httpClientFactory,
+            IConfiguration configuration, 
+            IServiceProvider serviceProvider, 
+            IOptions<IdServerHostOptions> opts, 
+            IDataProtectionProvider dataProtection, 
+            IOptions<AuthenticationOptions> options) : base(options)
         {
+            _httpClientFactory = httpClientFactory;
             _configuration = configuration;
             _serviceProvider = serviceProvider;
             _options = opts.Value;
@@ -156,7 +163,7 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
                     oauthOptions.StateDataFormat = new PropertiesDataFormat(_protections[handlerType.FullName]);
                     if (oauthOptions.Backchannel == null)
                     {
-                        oauthOptions.Backchannel = new HttpClient(new HttpClientHandler());
+                        oauthOptions.Backchannel = _httpClientFactory.GetHttpClient();
                         oauthOptions.Backchannel.DefaultRequestHeaders.UserAgent.ParseAdd("Microsoft ASP.NET Core OAuth handler");
                         oauthOptions.Backchannel.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB
                     }

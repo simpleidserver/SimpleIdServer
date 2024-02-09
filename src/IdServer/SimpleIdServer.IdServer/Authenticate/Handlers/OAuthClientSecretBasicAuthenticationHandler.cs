@@ -20,7 +20,7 @@ namespace SimpleIdServer.IdServer.Authenticate.Handlers
             if (client == null) throw new ArgumentNullException(nameof(client));
             if (string.IsNullOrWhiteSpace(client.ClientSecret)) return Task.FromResult(false);
             var result = string.Compare(client.ClientSecret, authenticateInstruction.ClientSecretFromAuthorizationHeader, StringComparison.CurrentCultureIgnoreCase) == 0;
-            return Task.FromResult(true);
+            return Task.FromResult(result);
         }
     }
 }

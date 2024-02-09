@@ -11,11 +11,13 @@ In a Linux environment, three systemd daemons will be installed, each running a 
 
 There are three services hosted on different ports :
 
-| Service  | Port |
-| -------- | ---- |
-| IdServer | 5001 |
-| Website  | 5002 |
-| Scim     | 5003 |
+| Service                 | Port |
+| ----------------------- | ---- |
+| IdServer                | 5001 |
+| Website                 | 5002 |
+| Scim                    | 5003 |
+| CredentialIssuer        | 5005 |
+| CredentialIssuerWebsite | 5006 |
 
 They share the same characteristics:
 * Hosted under HTTPS.
@@ -155,7 +157,7 @@ You can use [Let's Encrypt](https://letsencrypt.org/) to generate SSL Certificat
 For example, the following command line generates a certificate valid for three domains:
 
 ```
-sudo certbot certonly -d  openid.simpleidserver.com -d scim.simpleidserver.com -d website.simpleidserver.com
+sudo certbot certonly -d  openid.simpleidserver.com -d scim.simpleidserver.com -d website.simpleidserver.com credentialissuer.simpleidserver.com credentialissuerwebsite.simpleidserver.com
 ```
 
 Once the certificate is generated, you must update the `server` blocks add the `ssl_certificate` and `ssl_certificate_key` directives.

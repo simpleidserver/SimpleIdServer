@@ -62,12 +62,17 @@ public static class ClientExtensions
     public static void SetSaml2SpMetadataUrl(this Client client, string saml2SpMetadataUrl)
     {
         var parameters = client.Parameters;
-        if (parameters.ContainsKey(SAML2_SP_METADATA_NAME)) parameters[SAML2_SP_METADATA_NAME] = saml2SpMetadataUrl;
+        if (parameters.ContainsKey(SAML2_SP_METADATA_NAME))
+        {
+            parameters[SAML2_SP_METADATA_NAME] = saml2SpMetadataUrl;
+        }
         else
         {
             parameters.Add(SAML2_SP_METADATA_NAME, saml2SpMetadataUrl);
             client.Parameters = parameters;
         }
+
+        client.Parameters = parameters;
     }
 
     public static void SetUseAcsArtifact(this Client client, bool useAcs)

@@ -164,6 +164,17 @@ namespace SimpleIdServer.IdServer.Builders
         }
 
         /// <summary>
+        /// Use 'client_secret_basic' as authentication method.
+        /// For more information : https://datatracker.ietf.org/doc/html/rfc7617.
+        /// </summary>
+        /// <returns></returns>
+        public ApiClientBuilder UseClientSecretBasicAuthentication()
+        {
+            _client.TokenEndPointAuthMethod = OAuthClientSecretBasicAuthenticationHandler.AUTH_METHOD;
+            return this;
+        }
+
+        /// <summary>
         /// Use 'tls_client_auth' as authentication method.
         /// For more information : https://oauth.net/2/mtls/
         /// </summary>

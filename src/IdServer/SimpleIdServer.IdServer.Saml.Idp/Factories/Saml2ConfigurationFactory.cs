@@ -20,11 +20,16 @@ namespace SimpleIdServer.IdServer.Saml.Idp.Factories
     public class Saml2ConfigurationFactory : ISaml2ConfigurationFactory
     {
         private readonly IKeyStore _keyStore;
+        private readonly Infrastructures.IHttpClientFactory _httpClientFactory;
         private readonly SamlIdpOptions _options;
 
-        public Saml2ConfigurationFactory(IKeyStore keyStore, IOptions<SamlIdpOptions> options)
+        public Saml2ConfigurationFactory(
+            IKeyStore keyStore,
+            Infrastructures.IHttpClientFactory httpClientFactory,
+            IOptions<SamlIdpOptions> options)
         {
             _keyStore = keyStore;
+            _httpClientFactory = httpClientFactory;
             _options = options.Value;
         }
 
@@ -72,7 +77,7 @@ namespace SimpleIdServer.IdServer.Saml.Idp.Factories
         {
             var spMetadataUrl = client.GetSaml2SpMetadataUrl();
             if (string.IsNullOrWhiteSpace(spMetadataUrl)) throw new Saml2BindingException("Client doesn't contain metadata URL");
-            using (var httpClient = new HttpClient())
+            using (var httpClient = _httpClientFactory.GetHttpClient())
             {
                 var httpResult = await httpClient.GetAsync(spMetadataUrl, cancellationToken);
                 var xml = await httpResult.Content.ReadAsStringAsync();

@@ -38,7 +38,7 @@ Scenario: subject_token is required
 	When execute HTTP POST request 'https://localhost:8080/token'
 	| Key           | Value                                                         |
 	| grant_type    | urn:ietf:params:oauth:grant-type:exchange-pre-authorized_code |
-	| client_id     | seventyOneClient                                              |
+	| client_id     | seventyTwoClient                                              |
 	| client_secret | password                                                      |
 
 	And extract JSON from body
@@ -50,7 +50,7 @@ Scenario: subject_token_type is required
 	When execute HTTP POST request 'https://localhost:8080/token'
 	| Key                 | Value                                                         |
 	| grant_type          | urn:ietf:params:oauth:grant-type:exchange-pre-authorized_code |
-	| client_id           | seventyOneClient                                              |
+	| client_id           | seventyTwoClient                                              |
 	| client_secret       | password                                                      |
 	| subject_token       | sub                                                           |
 
@@ -63,7 +63,7 @@ Scenario: scope is required
 	When execute HTTP POST request 'https://localhost:8080/token'
 	| Key                 | Value                                                         |
 	| grant_type          | urn:ietf:params:oauth:grant-type:exchange-pre-authorized_code |
-	| client_id           | seventyOneClient                                              |
+	| client_id           | seventyTwoClient                                              |
 	| client_secret       | password                                                      |
 	| subject_token       | sub                                                           |
 	| subject_token_type  | type                                                          |
@@ -77,7 +77,7 @@ Scenario: subject_token_type must be supported
 	When execute HTTP POST request 'https://localhost:8080/token'
 	| Key                 | Value                                                         |
 	| grant_type          | urn:ietf:params:oauth:grant-type:exchange-pre-authorized_code |
-	| client_id           | seventyOneClient                                              |
+	| client_id           | seventyTwoClient                                              |
 	| client_secret       | password                                                      |
 	| subject_token       | sub                                                           |
 	| subject_token_type  | type                                                          |
@@ -96,7 +96,7 @@ Scenario: Subject cannot be extracted from the subject_token
 	When execute HTTP POST request 'https://localhost:8080/token'
 	| Key                 | Value                                                         |
 	| grant_type          | urn:ietf:params:oauth:grant-type:exchange-pre-authorized_code |
-	| client_id           | seventyOneClient                                              |
+	| client_id           | seventyTwoClient                                              |
 	| client_secret       | password                                                      |
 	| subject_token       | $access_token$                                                |
 	| subject_token_type  | type                                                          |
@@ -116,7 +116,7 @@ Scenario: Scopes must be supported
 	When execute HTTP POST request 'https://localhost:8080/token'
 	| Key                 | Value                                                         |
 	| grant_type          | urn:ietf:params:oauth:grant-type:exchange-pre-authorized_code |
-	| client_id           | seventyOneClient                                              |
+	| client_id           | seventyTwoClient                                              |
 	| client_secret       | password                                                      |
 	| subject_token       | $access_token$                                                |
 	| subject_token_type  | urn:ietf:params:oauth:token-type:access_token                 |
@@ -135,7 +135,7 @@ Scenario: User must have an active OTP
 	When execute HTTP POST request 'https://localhost:8080/token'
 	| Key                 | Value                                                         |
 	| grant_type          | urn:ietf:params:oauth:grant-type:exchange-pre-authorized_code |
-	| client_id           | seventyOneClient                                              |
+	| client_id           | seventyTwoClient                                              |
 	| client_secret       | password                                                      |
 	| subject_token       | $access_token$                                                |
 	| subject_token_type  | urn:ietf:params:oauth:token-type:access_token                 |

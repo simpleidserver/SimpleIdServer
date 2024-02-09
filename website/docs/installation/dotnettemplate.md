@@ -181,6 +181,12 @@ dotnet run --urls=https://localhost:5005
 
 The CredentialIssuer is now ready to be used.
 
+## Credential issuer UI preview
+
+The CredentialIssuer UI uses Bootstrap 5.
+
+![CredentialIssuer](../images/CredentialIssuer-1.png)
+
 ## Create credential issuer website project
 
 To create a web project named `CredentialIssuerAdminui` with the `SimpleIdServer.CredentialIssuer.Website` package installed, execute the command line :
@@ -200,3 +206,9 @@ dotnet run --urls=https://localhost:5006
 The credential issuer administration ui is now ready to be used.
 
 The website can be used to manage the credential configurations.
+
+## Credential issuer website UI preview
+
+The CredentialIssuer website UI uses Radzen.
+
+![CredentialIssuerAdminUi](../images/CredentialIssuer-2.png)

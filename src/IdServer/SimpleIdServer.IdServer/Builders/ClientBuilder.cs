@@ -69,30 +69,6 @@ namespace SimpleIdServer.IdServer.Builders
         }
 
         /// <summary>
-        /// Build credential issuer client.
-        /// </summary>
-        /// <param name="clientId"></param>
-        /// <param name="clientSecret"></param>
-        /// <param name="realm"></param>
-        /// <returns></returns>
-        public static CredentialIssuerClientBuilder BuildCredentialIssuerClient(string clientId, string clientSecret, Domains.Realm realm = null)
-        {
-            var client = new Client
-            {
-                Id = Guid.NewGuid().ToString(),
-                ClientId = clientId,
-                ClientSecret = clientSecret,
-                ClientType = ClientTypes.CREDENTIAL_ISSUER,
-                CreateDateTime = DateTime.UtcNow,
-                UpdateDateTime = DateTime.UtcNow
-            };
-            if (realm == null) client.Realms.Add(Constants.StandardRealms.Master);
-            else client.Realms.Add(realm);
-            client.GrantTypes.Add(TokenExchangePreAuthorizedCodeHandler.GRANT_TYPE);
-            return new CredentialIssuerClientBuilder(client);
-        }
-
-        /// <summary>
         /// Build client for REST.API.
         /// By default client_credentials grant-type is used to obtain an access token outside of the context of a user.
         /// </summary>

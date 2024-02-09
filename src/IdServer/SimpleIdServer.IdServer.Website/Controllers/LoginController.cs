@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using SimpleIdServer.IdServer.Website.ViewModels;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.IdServer.Website.Controllers;

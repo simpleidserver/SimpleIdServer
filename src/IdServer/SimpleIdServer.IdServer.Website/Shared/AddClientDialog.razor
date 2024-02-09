@@ -699,6 +699,6 @@
 
     void AddCredentialIssuerApplication(CredentialIssuerApplication credentialIssuerApplication)
     {
-        dispatcher.Dispatch(new AddCredentialIssuerApplicationAction { ClientId = credentialIssuerApplication.ClientIdentifier, ClientName = credentialIssuerApplication.ClientName, ClientSecret = credentialIssuerApplication.ClientSecret });
+        dispatcher.Dispatch(new AddCredentialIssuerApplicationAction { ClientId = credentialIssuerApplication.ClientIdentifier, ClientName = credentialIssuerApplication.ClientName, ClientSecret = credentialIssuerApplication.ClientSecret, RedirectionUrls = credentialIssuerApplication.RedirectionUris.Split(';') });
     }
 }
