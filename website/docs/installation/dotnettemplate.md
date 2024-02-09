@@ -13,6 +13,8 @@ This will add the following templates
 | dotnet new idserver          | Create Identity Server. By default, Entity Framework is configured to use SQLServer              |
 | dotnet new idserverwebsite   | Create Identity Server website. By default, Entity Framework is configured to use SQLServer      |
 | dotnet new scim              | Create SCIM Server.                                                                              |
+| dotnet new credissuer        | Create credential issuer API.                                                                    |
+| dotnet new credissueradminui | Create credential issuer administration UI.                                                      |
 
 ## Create Visual Studio Solution
 
@@ -131,7 +133,6 @@ Now that the SCIM server is running, you can check its Schemas endpoint by acces
 
 ## Create SCIM project with MongoDB support
 
-
 To create a web project named ScimMongoDB with the SimpleIdServer.Scim.Persistence.MongoDB package installed and MongoDB support, execute the command line :
 
 ```
@@ -154,3 +155,48 @@ dotnet run --urls=https://localhost:5003
 ```
 
 Now that the SCIM server is running, you can check its Schemas endpoint by accessing [https://localhost:5003/Schemas](https://localhost:5003/Schemas).
+
+## Create credential issuer project
+
+To create a web project named `CredentialIssuer` with the `SimpleIdServer.CredentialIssuer` package installed, execute the command line :
+
+```
+cd src
+dotnet new credissuer -n CredentialIssuer
+```
+
+The following files will be created within a new `src/CredentialIssuer` directory :
+
+* `CredentialIssuer.csproj` : Project file with the `SimpleIdServer.CredentialIssuer` NuGet package added.
+* `appsettings.json` : Contains the properties to configure the Openid authentication, such as the ClientId, ClientSecret and Issuer.
+* `Program.cs` : Main application entry point.
+* `CredentialIssuerConfiguration.cs` : Contains the `CredentialConfigurations`.
+
+Run the CredentialIssuer project, ensuring that it listens on the URL `https://localhost:5005`.
+
+```
+cd src/IdServer
+dotnet run --urls=https://localhost:5005
+```
+
+The CredentialIssuer is now ready to be used.
+
+## Create credential issuer website project
+
+To create a web project named `CredentialIssuerAdminui` with the `SimpleIdServer.CredentialIssuer.Website` package installed, execute the command line :
+
+```
+cd src
+dotnet new credissueradminui -n CredentialIssuerAdminui
+```
+
+Run the `CredentialIssuerAdminui` project, it must listens on the url `https://localhost:5006`.
+
+```
+cd src/IdServerWebsite
+dotnet run --urls=https://localhost:5006
+```
+
+The credential issuer administration ui is now ready to be used.
+
+The website can be used to manage the credential configurations.

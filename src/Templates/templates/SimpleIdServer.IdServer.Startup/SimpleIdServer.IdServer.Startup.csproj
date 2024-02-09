@@ -4,12 +4,10 @@
 		<OutputType>Exe</OutputType>
 	</PropertyGroup>
 	<ItemGroup>
-	  <PackageReference Include="SimpleIdServer.Did.Ethr" Version="4.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.Did.Key" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Swagger" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Pwd" Version="4.0.*-*" />
+	  <PackageReference Include="SimpleIdServer.IdServer.Otp" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Console" Version="4.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.IdServer.CredentialIssuer" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Email" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Fido" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Notification.Fcm" Version="4.0.*-*" />
@@ -26,10 +24,13 @@
 	  <PackageReference Include="SimpleIdServer.Configuration.Redis" Version="4.0.*-*" />
 	  <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.1" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="7.0.1" />
+	  <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="7.0.1" />
+	  <PackageReference Include="Microsoft.AspNetCore.Authentication.Negotiate" Version="7.0.1" />
 	  <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="7.0.*" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.*" />
 	  <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.*" />
+	  <PackageReference Include="NeoSmart.Caching.Sqlite.AspNetCore" Version="7.0.2" />
 	  <PackageReference Include="Microsoft.Extensions.Caching.SqlServer" Version="7.0.*" />
 	  <PackageReference Include="Pomelo.Extensions.Caching.MySql" Version="2.1.4" />
 	  <PackageReference Include="Community.Microsoft.Extensions.Caching.PostgreSql" Version="4.0.4" />
@@ -213,5 +214,10 @@
 	    <Generator>PublicResXFileCodeGenerator</Generator>
 	    <LastGenOutput>LayoutResource.Designer.cs</LastGenOutput>
 	  </EmbeddedResource>
+	</ItemGroup>
+	<ItemGroup>
+	  <None Update="SimpleIdServer.IdServer.xml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 </Project>

@@ -157,21 +157,6 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.ToTable("ConfigurationDefinitionRecordValueTranslation");
                 });
 
-            modelBuilder.Entity("CredentialTemplateRealm", b =>
-                {
-                    b.Property<string>("CredentialTemplatesTechnicalId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("RealmsName")
-                        .HasColumnType("text");
-
-                    b.HasKey("CredentialTemplatesTechnicalId", "RealmsName");
-
-                    b.HasIndex("RealmsName");
-
-                    b.ToTable("CredentialTemplateRealm");
-                });
-
             modelBuilder.Entity("GroupScope", b =>
                 {
                     b.Property<string>("GroupsId")
@@ -855,6 +840,9 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .HasColumnType("boolean")
                         .HasAnnotation("Relational:JsonPropertyName", "is_token_exchange_enabled");
 
+                    b.Property<bool>("IsTransactionCodeRequired")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("JwksUri")
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "jwks_uri");
@@ -866,6 +854,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "post_logout_redirect_uris");
+
+                    b.Property<double>("PreAuthCodeExpirationTimeInSeconds")
+                        .HasColumnType("double precision")
+                        .HasAnnotation("Relational:JsonPropertyName", "pre_auth_code_expiration_time");
 
                     b.Property<string>("PreferredTokenProfile")
                         .HasColumnType("text")
@@ -991,9 +983,6 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.Property<string>("UserInfoSignedResponseAlg")
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "userinfo_signed_response_alg");
-
-                    b.Property<bool>("UserPinRequired")
-                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 
@@ -1228,41 +1217,6 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.ToTable("Grants");
 
                     b.HasAnnotation("Relational:JsonPropertyName", "consents");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.CredentialTemplateClaimMapper", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<string>("CredentialTemplateId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsMultiValued")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("MapperType")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("SourceUserAttribute")
-                        .HasColumnType("text");
-
-                    b.Property<string>("SourceUserProperty")
-                        .HasColumnType("text");
-
-                    b.Property<string>("TargetClaimPath")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int?>("TokenClaimJsonType")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CredentialTemplateId");
-
-                    b.ToTable("CredentialTemplateClaimMapper");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.DeviceAuthCode", b =>
@@ -1588,39 +1542,6 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.HasKey("Code");
 
                     b.ToTable("Languages");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.NetworkConfiguration", b =>
-                {
-                    b.Property<string>("Name")
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "name");
-
-                    b.Property<string>("ContractAdr")
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "contract_adr");
-
-                    b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp with time zone")
-                        .HasAnnotation("Relational:JsonPropertyName", "create_datetime");
-
-                    b.Property<string>("PrivateAccountKey")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "private_accountkey");
-
-                    b.Property<string>("RpcUrl")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "rpc_url");
-
-                    b.Property<DateTime>("UpdateDateTime")
-                        .HasColumnType("timestamp with time zone")
-                        .HasAnnotation("Relational:JsonPropertyName", "update_datetime");
-
-                    b.HasKey("Name");
-
-                    b.ToTable("Networks");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Realm", b =>
@@ -2104,14 +2025,6 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "device_registration_token");
 
-                    b.Property<string>("Did")
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "did");
-
-                    b.Property<string>("DidPrivateHex")
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "did_private_key");
-
                     b.Property<string>("Email")
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "email");
@@ -2242,57 +2155,6 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.HasAnnotation("Relational:JsonPropertyName", "credentials");
                 });
 
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UserCredentialOffer", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ClientId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CredIssuerState")
-                        .HasColumnType("text");
-
-                    b.Property<string>("CredentialNames")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("CredentialTemplateId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("ExpirationDateTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Pin")
-                        .HasColumnType("text");
-
-                    b.Property<string>("PreAuthorizedCode")
-                        .HasColumnType("text");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("UpdateDateTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CredentialTemplateId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("CredentialOffers");
-                });
-
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UserDevice", b =>
                 {
                     b.Property<string>("Id")
@@ -2414,121 +2276,6 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.HasAnnotation("Relational:JsonPropertyName", "sessions");
                 });
 
-            modelBuilder.Entity("SimpleIdServer.Vc.Models.BaseCredentialTemplate", b =>
-                {
-                    b.Property<string>("TechnicalId")
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "technical_id");
-
-                    b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp with time zone")
-                        .HasAnnotation("Relational:JsonPropertyName", "create_datetime");
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Format")
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "format");
-
-                    b.Property<string>("Id")
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "id");
-
-                    b.Property<DateTime>("UpdateDateTime")
-                        .HasColumnType("timestamp with time zone")
-                        .HasAnnotation("Relational:JsonPropertyName", "update_datetime");
-
-                    b.HasKey("TechnicalId");
-
-                    b.ToTable("BaseCredentialTemplate");
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("BaseCredentialTemplate");
-
-                    b.UseTphMappingStrategy();
-                });
-
-            modelBuilder.Entity("SimpleIdServer.Vc.Models.CredentialTemplateDisplay", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "id");
-
-                    b.Property<string>("BackgroundColor")
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "background_color");
-
-                    b.Property<string>("CredentialTemplateId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "description");
-
-                    b.Property<string>("Locale")
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "locale");
-
-                    b.Property<string>("LogoAltText")
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "alt_text");
-
-                    b.Property<string>("LogoUrl")
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "logo_url");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "name");
-
-                    b.Property<string>("TextColor")
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "text_color");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CredentialTemplateId");
-
-                    b.ToTable("CredentialTemplateDisplay");
-
-                    b.HasAnnotation("Relational:JsonPropertyName", "display");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.Vc.Models.CredentialTemplateParameter", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "id");
-
-                    b.Property<string>("CredentialTemplateId")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsArray")
-                        .HasColumnType("boolean")
-                        .HasAnnotation("Relational:JsonPropertyName", "is_array");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "name");
-
-                    b.Property<int>("ParameterType")
-                        .HasColumnType("integer")
-                        .HasAnnotation("Relational:JsonPropertyName", "type");
-
-                    b.Property<string>("Value")
-                        .HasColumnType("text")
-                        .HasAnnotation("Relational:JsonPropertyName", "value");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CredentialTemplateId");
-
-                    b.ToTable("CredentialTemplateParameter");
-
-                    b.HasAnnotation("Relational:JsonPropertyName", "parameters");
-                });
-
             modelBuilder.Entity("TranslationUMAResource", b =>
                 {
                     b.Property<int>("TranslationsId")
@@ -2542,13 +2289,6 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.HasIndex("UMAResourceId");
 
                     b.ToTable("TranslationUMAResource");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.CredentialTemplate", b =>
-                {
-                    b.HasBaseType("SimpleIdServer.Vc.Models.BaseCredentialTemplate");
-
-                    b.HasDiscriminator().HasValue("CredentialTemplate");
                 });
 
             modelBuilder.Entity("ApiResourceRealm", b =>
@@ -2682,21 +2422,6 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.HasOne("SimpleIdServer.IdServer.Domains.Translation", null)
                         .WithMany()
                         .HasForeignKey("TranslationsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("CredentialTemplateRealm", b =>
-                {
-                    b.HasOne("SimpleIdServer.IdServer.Domains.CredentialTemplate", null)
-                        .WithMany()
-                        .HasForeignKey("CredentialTemplatesTechnicalId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SimpleIdServer.IdServer.Domains.Realm", null)
-                        .WithMany()
-                        .HasForeignKey("RealmsName")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -2857,17 +2582,6 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.CredentialTemplateClaimMapper", b =>
-                {
-                    b.HasOne("SimpleIdServer.IdServer.Domains.CredentialTemplate", "CredentialTemplate")
-                        .WithMany("ClaimMappers")
-                        .HasForeignKey("CredentialTemplateId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CredentialTemplate");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.DeviceAuthCode", b =>
@@ -3082,25 +2796,6 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UserCredentialOffer", b =>
-                {
-                    b.HasOne("SimpleIdServer.IdServer.Domains.CredentialTemplate", "CredentialTemplate")
-                        .WithMany("CredentialOffers")
-                        .HasForeignKey("CredentialTemplateId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SimpleIdServer.IdServer.Domains.User", "User")
-                        .WithMany("CredentialOffers")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CredentialTemplate");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UserDevice", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.User", "User")
@@ -3132,26 +2827,6 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.Vc.Models.CredentialTemplateDisplay", b =>
-                {
-                    b.HasOne("SimpleIdServer.Vc.Models.BaseCredentialTemplate", "CredentialTemplate")
-                        .WithMany("DisplayLst")
-                        .HasForeignKey("CredentialTemplateId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("CredentialTemplate");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.Vc.Models.CredentialTemplateParameter", b =>
-                {
-                    b.HasOne("SimpleIdServer.Vc.Models.BaseCredentialTemplate", "CredentialTemplate")
-                        .WithMany("Parameters")
-                        .HasForeignKey("CredentialTemplateId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("CredentialTemplate");
                 });
 
             modelBuilder.Entity("TranslationUMAResource", b =>
@@ -3276,8 +2951,6 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                 {
                     b.Navigation("Consents");
 
-                    b.Navigation("CredentialOffers");
-
                     b.Navigation("Credentials");
 
                     b.Navigation("Devices");
@@ -3291,20 +2964,6 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.Navigation("Realms");
 
                     b.Navigation("Sessions");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.Vc.Models.BaseCredentialTemplate", b =>
-                {
-                    b.Navigation("DisplayLst");
-
-                    b.Navigation("Parameters");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.CredentialTemplate", b =>
-                {
-                    b.Navigation("ClaimMappers");
-
-                    b.Navigation("CredentialOffers");
                 });
 #pragma warning restore 612, 618
         }

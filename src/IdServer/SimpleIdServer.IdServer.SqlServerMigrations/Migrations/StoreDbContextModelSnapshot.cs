@@ -157,21 +157,6 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.ToTable("ConfigurationDefinitionRecordValueTranslation");
                 });
 
-            modelBuilder.Entity("CredentialTemplateRealm", b =>
-                {
-                    b.Property<string>("CredentialTemplatesTechnicalId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("RealmsName")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("CredentialTemplatesTechnicalId", "RealmsName");
-
-                    b.HasIndex("RealmsName");
-
-                    b.ToTable("CredentialTemplateRealm");
-                });
-
             modelBuilder.Entity("GroupScope", b =>
                 {
                     b.Property<string>("GroupsId")
@@ -855,6 +840,9 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .HasColumnType("bit")
                         .HasAnnotation("Relational:JsonPropertyName", "is_token_exchange_enabled");
 
+                    b.Property<bool>("IsTransactionCodeRequired")
+                        .HasColumnType("bit");
+
                     b.Property<string>("JwksUri")
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "jwks_uri");
@@ -866,6 +854,10 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "post_logout_redirect_uris");
+
+                    b.Property<double>("PreAuthCodeExpirationTimeInSeconds")
+                        .HasColumnType("float")
+                        .HasAnnotation("Relational:JsonPropertyName", "pre_auth_code_expiration_time");
 
                     b.Property<string>("PreferredTokenProfile")
                         .HasColumnType("nvarchar(max)")
@@ -991,9 +983,6 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.Property<string>("UserInfoSignedResponseAlg")
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "userinfo_signed_response_alg");
-
-                    b.Property<bool>("UserPinRequired")
-                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -1228,41 +1217,6 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.ToTable("Grants");
 
                     b.HasAnnotation("Relational:JsonPropertyName", "consents");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.CredentialTemplateClaimMapper", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("CredentialTemplateId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<bool>("IsMultiValued")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("MapperType")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SourceUserAttribute")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SourceUserProperty")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TargetClaimPath")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("TokenClaimJsonType")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CredentialTemplateId");
-
-                    b.ToTable("CredentialTemplateClaimMapper");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.DeviceAuthCode", b =>
@@ -1588,39 +1542,6 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.HasKey("Code");
 
                     b.ToTable("Languages");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.NetworkConfiguration", b =>
-                {
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)")
-                        .HasAnnotation("Relational:JsonPropertyName", "name");
-
-                    b.Property<string>("ContractAdr")
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "contract_adr");
-
-                    b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("datetime2")
-                        .HasAnnotation("Relational:JsonPropertyName", "create_datetime");
-
-                    b.Property<string>("PrivateAccountKey")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "private_accountkey");
-
-                    b.Property<string>("RpcUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "rpc_url");
-
-                    b.Property<DateTime>("UpdateDateTime")
-                        .HasColumnType("datetime2")
-                        .HasAnnotation("Relational:JsonPropertyName", "update_datetime");
-
-                    b.HasKey("Name");
-
-                    b.ToTable("Networks");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Realm", b =>
@@ -2104,14 +2025,6 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "device_registration_token");
 
-                    b.Property<string>("Did")
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "did");
-
-                    b.Property<string>("DidPrivateHex")
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "did_private_key");
-
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "email");
@@ -2242,57 +2155,6 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.HasAnnotation("Relational:JsonPropertyName", "credentials");
                 });
 
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UserCredentialOffer", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ClientId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CredIssuerState")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CredentialNames")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CredentialTemplateId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("ExpirationDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Pin")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PreAuthorizedCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdateDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CredentialTemplateId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("CredentialOffers");
-                });
-
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UserDevice", b =>
                 {
                     b.Property<string>("Id")
@@ -2414,121 +2276,6 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.HasAnnotation("Relational:JsonPropertyName", "sessions");
                 });
 
-            modelBuilder.Entity("SimpleIdServer.Vc.Models.BaseCredentialTemplate", b =>
-                {
-                    b.Property<string>("TechnicalId")
-                        .HasColumnType("nvarchar(450)")
-                        .HasAnnotation("Relational:JsonPropertyName", "technical_id");
-
-                    b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("datetime2")
-                        .HasAnnotation("Relational:JsonPropertyName", "create_datetime");
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Format")
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "format");
-
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "id");
-
-                    b.Property<DateTime>("UpdateDateTime")
-                        .HasColumnType("datetime2")
-                        .HasAnnotation("Relational:JsonPropertyName", "update_datetime");
-
-                    b.HasKey("TechnicalId");
-
-                    b.ToTable("BaseCredentialTemplate");
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("BaseCredentialTemplate");
-
-                    b.UseTphMappingStrategy();
-                });
-
-            modelBuilder.Entity("SimpleIdServer.Vc.Models.CredentialTemplateDisplay", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)")
-                        .HasAnnotation("Relational:JsonPropertyName", "id");
-
-                    b.Property<string>("BackgroundColor")
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "background_color");
-
-                    b.Property<string>("CredentialTemplateId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "description");
-
-                    b.Property<string>("Locale")
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "locale");
-
-                    b.Property<string>("LogoAltText")
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "alt_text");
-
-                    b.Property<string>("LogoUrl")
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "logo_url");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "name");
-
-                    b.Property<string>("TextColor")
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "text_color");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CredentialTemplateId");
-
-                    b.ToTable("CredentialTemplateDisplay");
-
-                    b.HasAnnotation("Relational:JsonPropertyName", "display");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.Vc.Models.CredentialTemplateParameter", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)")
-                        .HasAnnotation("Relational:JsonPropertyName", "id");
-
-                    b.Property<string>("CredentialTemplateId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<bool>("IsArray")
-                        .HasColumnType("bit")
-                        .HasAnnotation("Relational:JsonPropertyName", "is_array");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "name");
-
-                    b.Property<int>("ParameterType")
-                        .HasColumnType("int")
-                        .HasAnnotation("Relational:JsonPropertyName", "type");
-
-                    b.Property<string>("Value")
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "value");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CredentialTemplateId");
-
-                    b.ToTable("CredentialTemplateParameter");
-
-                    b.HasAnnotation("Relational:JsonPropertyName", "parameters");
-                });
-
             modelBuilder.Entity("TranslationUMAResource", b =>
                 {
                     b.Property<int>("TranslationsId")
@@ -2542,13 +2289,6 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.HasIndex("UMAResourceId");
 
                     b.ToTable("TranslationUMAResource");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.CredentialTemplate", b =>
-                {
-                    b.HasBaseType("SimpleIdServer.Vc.Models.BaseCredentialTemplate");
-
-                    b.HasDiscriminator().HasValue("CredentialTemplate");
                 });
 
             modelBuilder.Entity("ApiResourceRealm", b =>
@@ -2682,21 +2422,6 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.HasOne("SimpleIdServer.IdServer.Domains.Translation", null)
                         .WithMany()
                         .HasForeignKey("TranslationsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("CredentialTemplateRealm", b =>
-                {
-                    b.HasOne("SimpleIdServer.IdServer.Domains.CredentialTemplate", null)
-                        .WithMany()
-                        .HasForeignKey("CredentialTemplatesTechnicalId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SimpleIdServer.IdServer.Domains.Realm", null)
-                        .WithMany()
-                        .HasForeignKey("RealmsName")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -2857,17 +2582,6 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.CredentialTemplateClaimMapper", b =>
-                {
-                    b.HasOne("SimpleIdServer.IdServer.Domains.CredentialTemplate", "CredentialTemplate")
-                        .WithMany("ClaimMappers")
-                        .HasForeignKey("CredentialTemplateId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CredentialTemplate");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.DeviceAuthCode", b =>
@@ -3082,25 +2796,6 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UserCredentialOffer", b =>
-                {
-                    b.HasOne("SimpleIdServer.IdServer.Domains.CredentialTemplate", "CredentialTemplate")
-                        .WithMany("CredentialOffers")
-                        .HasForeignKey("CredentialTemplateId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SimpleIdServer.IdServer.Domains.User", "User")
-                        .WithMany("CredentialOffers")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CredentialTemplate");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UserDevice", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.User", "User")
@@ -3132,26 +2827,6 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.Vc.Models.CredentialTemplateDisplay", b =>
-                {
-                    b.HasOne("SimpleIdServer.Vc.Models.BaseCredentialTemplate", "CredentialTemplate")
-                        .WithMany("DisplayLst")
-                        .HasForeignKey("CredentialTemplateId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("CredentialTemplate");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.Vc.Models.CredentialTemplateParameter", b =>
-                {
-                    b.HasOne("SimpleIdServer.Vc.Models.BaseCredentialTemplate", "CredentialTemplate")
-                        .WithMany("Parameters")
-                        .HasForeignKey("CredentialTemplateId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("CredentialTemplate");
                 });
 
             modelBuilder.Entity("TranslationUMAResource", b =>
@@ -3276,8 +2951,6 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                 {
                     b.Navigation("Consents");
 
-                    b.Navigation("CredentialOffers");
-
                     b.Navigation("Credentials");
 
                     b.Navigation("Devices");
@@ -3291,20 +2964,6 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.Navigation("Realms");
 
                     b.Navigation("Sessions");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.Vc.Models.BaseCredentialTemplate", b =>
-                {
-                    b.Navigation("DisplayLst");
-
-                    b.Navigation("Parameters");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.CredentialTemplate", b =>
-                {
-                    b.Navigation("ClaimMappers");
-
-                    b.Navigation("CredentialOffers");
                 });
 #pragma warning restore 612, 618
         }

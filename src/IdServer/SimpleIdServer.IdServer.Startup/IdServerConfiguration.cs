@@ -47,7 +47,7 @@ namespace SimpleIdServer.IdServer.Startup
         {
             Id = Guid.NewGuid().ToString(),
             Name = "university_degree",
-            Realms = new List<Domains.Realm>
+            Realms = new List<SimpleIdServer.IdServer.Domains.Realm>
             {
                 StandardRealms.Master
             },

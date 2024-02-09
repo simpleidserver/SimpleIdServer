@@ -254,4 +254,9 @@
 			<LastGenOutput>LayoutResource.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
 	</ItemGroup>
+	<ItemGroup>
+	  <None Update="SimpleIdServer.IdServer.xml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
 </Project>
