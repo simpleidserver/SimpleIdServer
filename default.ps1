@@ -43,7 +43,7 @@ task local -depends compile, test
 task ci -depends clean, release, local, pack, buildInstaller
 
 task fetchSubComponent {
-	git submodule update
+	git submodule update --init --recursive
 }
 
 task clean -depends fetchSubComponent {

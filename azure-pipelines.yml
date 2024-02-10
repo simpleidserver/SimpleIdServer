@@ -12,6 +12,7 @@ pool:
 steps:
 - checkout: self
   fetchDepth: 0
+  submodules: true
   fetchTags: true
 
 - powershell: |
