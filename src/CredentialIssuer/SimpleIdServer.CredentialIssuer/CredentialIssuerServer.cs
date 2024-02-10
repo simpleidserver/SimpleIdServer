@@ -7,6 +7,7 @@ using SimpleIdServer.CredentialIssuer.Domains;
 using SimpleIdServer.CredentialIssuer.Store;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace SimpleIdServer.CredentialIssuer;
@@ -36,6 +37,7 @@ public class CredentialIssuerServer
 public class CredentialIssuerInMemoryStoreBuilder
 {
     private readonly IServiceProvider _serviceProvider;
+    private static object _lck = new object();
 
     public CredentialIssuerInMemoryStoreBuilder(IServiceProvider serviceProvider)
     {
@@ -44,49 +46,61 @@ public class CredentialIssuerInMemoryStoreBuilder
 
     public CredentialIssuerInMemoryStoreBuilder AddCredentialConfigurations(ICollection<CredentialConfiguration> credentialConfigurations)
     {
-        var dbContext = _serviceProvider.GetService<CredentialIssuerDbContext>();
-        if(!dbContext.CredentialConfigurations.Any())
+        lock(_lck)
         {
-            dbContext.CredentialConfigurations.AddRange(credentialConfigurations);
-            dbContext.SaveChanges();
-        }
+            var dbContext = _serviceProvider.GetService<CredentialIssuerDbContext>();
+            if (!dbContext.CredentialConfigurations.Any())
+            {
+                dbContext.CredentialConfigurations.AddRange(credentialConfigurations);
+                dbContext.SaveChanges();
+            }
 
-        return this;
+            return this;
+        }
     }
 
     public CredentialIssuerInMemoryStoreBuilder AddCredentialOfferRecords(ICollection<CredentialOfferRecord> credentialOfferRecords)
     {
-        var dbContext = _serviceProvider.GetService<CredentialIssuerDbContext>();
-        if (!dbContext.CredentialOfferRecords.Any())
+        lock(_lck)
         {
-            dbContext.CredentialOfferRecords.AddRange(credentialOfferRecords);
-            dbContext.SaveChanges();
-        }
+            var dbContext = _serviceProvider.GetService<CredentialIssuerDbContext>();
+            if (!dbContext.CredentialOfferRecords.Any())
+            {
+                dbContext.CredentialOfferRecords.AddRange(credentialOfferRecords);
+                dbContext.SaveChanges();
+            }
 
-        return this;
+            return this;
+        }
     }
 
     public CredentialIssuerInMemoryStoreBuilder AddCredentials(ICollection<Domains.Credential> credentials)
     {
-        var dbContext = _serviceProvider.GetService<CredentialIssuerDbContext>();
-        if (!dbContext.Credentials.Any())
+        lock (_lck)
         {
-            dbContext.Credentials.AddRange(credentials);
-            dbContext.SaveChanges();
-        }
+            var dbContext = _serviceProvider.GetService<CredentialIssuerDbContext>();
+            if (!dbContext.Credentials.Any())
+            {
+                dbContext.Credentials.AddRange(credentials);
+                dbContext.SaveChanges();
+            }
 
-        return this;
+            return this;
+        }
     }
 
     public CredentialIssuerInMemoryStoreBuilder AddUserCredentialClaims(ICollection<UserCredentialClaim> userClaims)
     {
-        var dbContext = _serviceProvider.GetService<CredentialIssuerDbContext>();
-        if (!dbContext.UserCredentialClaims.Any())
+        lock(_lck)
         {
-            dbContext.UserCredentialClaims.AddRange(userClaims);
-            dbContext.SaveChanges();
-        }
+            var dbContext = _serviceProvider.GetService<CredentialIssuerDbContext>();
+            if (!dbContext.UserCredentialClaims.Any())
+            {
+                dbContext.UserCredentialClaims.AddRange(userClaims);
+                dbContext.SaveChanges();
+            }
 
-        return this;
+            return this;
+        }
     }
 }
