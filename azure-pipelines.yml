@@ -122,7 +122,7 @@ steps:
 - task: CopyFiles@2
   displayName: 'Copy Credential Issuer'
   inputs:
-    SourceFolder: '$(Build.Repository.LocalPath)\src\CredentialIssuer\SimpleIdServer.CredentialIssuer.Website\bin\Debug\net7.0\publish'
+    SourceFolder: '$(Build.Repository.LocalPath)\src\CredentialIssuer\SimpleIdServer.CredentialIssuer.Startup\bin\Debug\net7.0\publish'
     Contents: '**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)\credentialissuer'
 
