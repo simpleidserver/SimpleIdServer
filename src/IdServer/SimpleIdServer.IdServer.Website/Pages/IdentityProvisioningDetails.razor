@@ -11,16 +11,16 @@
     <RadzenTemplateForm Submit=@SubmitUpdateIdProvisioningDetails TItem="UpdateIdentityProvisioningDetails" Data=@updateIdentityProvisioning>
         <!-- Name -->
         <div>
-            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Name</RadzenText>
             <RadzenTextBox Name="Name" @bind-Value="@updateIdentityProvisioning.Name" Class="w-100" Disabled=true></RadzenTextBox>
         </div>
         <!-- Description -->
         <div>
-            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Description</RadzenText>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Description</RadzenText>
             <RadzenTextArea Name="Description" @bind-Value="@updateIdentityProvisioning.Description" Class="w-100"></RadzenTextArea>
-            <RadzenRequiredValidator Component="Description" Text="Description is required"></RadzenRequiredValidator>
+            <RadzenRequiredValidator Component="Description" Text="@Global.DescriptionRequired"></RadzenRequiredValidator>
         </div>
-        <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Update" />
+        <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@Global.Update" />
     </RadzenTemplateForm>
 }
 

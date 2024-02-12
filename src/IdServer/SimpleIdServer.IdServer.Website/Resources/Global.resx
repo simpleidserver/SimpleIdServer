@@ -477,4 +477,976 @@
   <data name="TokenExchangePreAuthorizedCode" xml:space="preserve">
     <value>Token exchange pre-authorized code</value>
   </data>
+  <data name="AcrsDescription" xml:space="preserve">
+    <value>ACR stands for Authentication Context Class Reference. It is used to enhance the user's level of assurance before accessing any sensitive information.</value>
+  </data>
+  <data name="AcrsTitle" xml:space="preserve">
+    <value>ACRS</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="AddAcr" xml:space="preserve">
+    <value>Add Authentication Context Reference</value>
+  </data>
+  <data name="AddCertificateAuthority" xml:space="preserve">
+    <value>Add Certificate Authority</value>
+  </data>
+  <data name="AddClientCertificate" xml:space="preserve">
+    <value>Add Client Certificate</value>
+  </data>
+  <data name="Auditing" xml:space="preserve">
+    <value>Auditing</value>
+  </data>
+  <data name="Authentication" xml:space="preserve">
+    <value>Authentication</value>
+  </data>
+  <data name="AuthenticationMethods" xml:space="preserve">
+    <value>Authentication methods</value>
+  </data>
+  <data name="Authentications" xml:space="preserve">
+    <value>Authentications</value>
+  </data>
+  <data name="CertificateAuthoritiesDescription" xml:space="preserve">
+    <value>Manage the Certificate Authorities used by SimpleIdServer during the configuration of the &lt;i&gt;tls_client_auth&lt;/i&gt; authentication method</value>
+  </data>
+  <data name="CertificateAuthoritiesTitle" xml:space="preserve">
+    <value>Certificate Authorities</value>
+  </data>
+  <data name="CertificateAuthorityDetailsTitle" xml:space="preserve">
+    <value>Certificate Authority Details</value>
+  </data>
+  <data name="ClientCertificate" xml:space="preserve">
+    <value>Client Certificate</value>
+  </data>
+  <data name="ClientCertificates" xml:space="preserve">
+    <value>Client certificates</value>
+  </data>
+  <data name="ClientIdentifier" xml:space="preserve">
+    <value>Client identifier</value>
+  </data>
+  <data name="CreateDateTime" xml:space="preserve">
+    <value>Creation Datetime</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="DisplayName" xml:space="preserve">
+    <value>Display name</value>
+  </data>
+  <data name="DisplayOnlyErrors" xml:space="preserve">
+    <value>Display Only Errors</value>
+  </data>
+  <data name="Download" xml:space="preserve">
+    <value>Download</value>
+  </data>
+  <data name="EndDatetime" xml:space="preserve">
+    <value>End Datetime</value>
+  </data>
+  <data name="ErrorMessage" xml:space="preserve">
+    <value>Error Message</value>
+  </data>
+  <data name="ExternalIdentityProviders" xml:space="preserve">
+    <value>External identity providers</value>
+  </data>
+  <data name="FindType" xml:space="preserve">
+    <value>Find type</value>
+  </data>
+  <data name="FindValue" xml:space="preserve">
+    <value>Find value</value>
+  </data>
+  <data name="Options" xml:space="preserve">
+    <value>Options</value>
+  </data>
+  <data name="PrivateKey" xml:space="preserve">
+    <value>Private Key</value>
+  </data>
+  <data name="PublicKey" xml:space="preserve">
+    <value>Public Key</value>
+  </data>
+  <data name="PushNotification" xml:space="preserve">
+    <value>Push notification</value>
+  </data>
+  <data name="Request" xml:space="preserve">
+    <value>Request</value>
+  </data>
+  <data name="Source" xml:space="preserve">
+    <value>Source</value>
+  </data>
+  <data name="StartDatetime" xml:space="preserve">
+    <value>Start Datetime</value>
+  </data>
+  <data name="StoreLocation" xml:space="preserve">
+    <value>Store Location</value>
+  </data>
+  <data name="StoreName" xml:space="preserve">
+    <value>Store name</value>
+  </data>
+  <data name="UpdateDateTime" xml:space="preserve">
+    <value>Update datetime</value>
+  </data>
+  <data name="UserName" xml:space="preserve">
+    <value>User Name</value>
+  </data>
+  <data name="ValidFrom" xml:space="preserve">
+    <value>Valid from</value>
+  </data>
+  <data name="ValidTo" xml:space="preserve">
+    <value>Valid to</value>
+  </data>
+  <data name="View" xml:space="preserve">
+    <value>View</value>
+  </data>
+  <data name="AccessRequest" xml:space="preserve">
+    <value>Access request</value>
+  </data>
+  <data name="AccessSettings" xml:space="preserve">
+    <value>Access settings</value>
+  </data>
+  <data name="AccessTokenType" xml:space="preserve">
+    <value>Access Token Type</value>
+  </data>
+  <data name="Active" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="AddApiResource" xml:space="preserve">
+    <value>Add API resource</value>
+  </data>
+  <data name="AddClaim" xml:space="preserve">
+    <value>Add claim</value>
+  </data>
+  <data name="AddClient" xml:space="preserve">
+    <value>Add client</value>
+  </data>
+  <data name="AddClientScope" xml:space="preserve">
+    <value>Add client scope</value>
+  </data>
+  <data name="AddCredential" xml:space="preserve">
+    <value>Add credential</value>
+  </data>
+  <data name="AddGroup" xml:space="preserve">
+    <value>Add group</value>
+  </data>
+  <data name="AddIdentityProvider" xml:space="preserve">
+    <value>Add Identity Provider</value>
+  </data>
+  <data name="AddMapper" xml:space="preserve">
+    <value>Add Mapper</value>
+  </data>
+  <data name="AddMappingRule" xml:space="preserve">
+    <value>Add mapping rule</value>
+  </data>
+  <data name="AddMember" xml:space="preserve">
+    <value>Add member</value>
+  </data>
+  <data name="AddRealm" xml:space="preserve">
+    <value>Add realm</value>
+  </data>
+  <data name="AddRegistrationWorkflow" xml:space="preserve">
+    <value>Add registration workflow</value>
+  </data>
+  <data name="AddRole" xml:space="preserve">
+    <value>Add client role</value>
+  </data>
+  <data name="AddScope" xml:space="preserve">
+    <value>Add scope</value>
+  </data>
+  <data name="AddUser" xml:space="preserve">
+    <value>Add user</value>
+  </data>
+  <data name="Advanced" xml:space="preserve">
+    <value>Advanced</value>
+  </data>
+  <data name="Algorithm" xml:space="preserve">
+    <value>Algorithm</value>
+  </data>
+  <data name="ApiResource" xml:space="preserve">
+    <value>API Resource</value>
+  </data>
+  <data name="ApiResources" xml:space="preserve">
+    <value>API Resources</value>
+  </data>
+  <data name="ApiScope" xml:space="preserve">
+    <value>API Scope</value>
+  </data>
+  <data name="AreYouSure" xml:space="preserve">
+    <value>Are-you sure?</value>
+  </data>
+  <data name="AssignGroups" xml:space="preserve">
+    <value>Assign groups</value>
+  </data>
+  <data name="AttemptAuthentication" xml:space="preserve">
+    <value>Authentication attempt today</value>
+  </data>
+  <data name="Attribute" xml:space="preserve">
+    <value>Attribute</value>
+  </data>
+  <data name="Audience" xml:space="preserve">
+    <value>Audience</value>
+  </data>
+  <data name="AuthenticationMethod" xml:space="preserve">
+    <value>Authentication method</value>
+  </data>
+  <data name="AuthenticationMethodRequired" xml:space="preserve">
+    <value>Authentication method is required</value>
+  </data>
+  <data name="AuthenticationTime" xml:space="preserve">
+    <value>Authentication time</value>
+  </data>
+  <data name="AuthorizationDataTypes" xml:space="preserve">
+    <value>Authorization data types</value>
+  </data>
+  <data name="AuthorizationDataTypesDescription" xml:space="preserve">
+    <value>Authorization data types must be passed as a list separated by &lt;b&gt;;&lt;/b&gt;</value>
+  </data>
+  <data name="AuthorizationDataTypesTooltip" xml:space="preserve">
+    <value>Authorization data types supported by the client</value>
+  </data>
+  <data name="AuthorizationDetails" xml:space="preserve">
+    <value>Authorization details</value>
+  </data>
+  <data name="AuthorizationResponseSignatureAlg" xml:space="preserve">
+    <value>Authorization response signature algorithm</value>
+  </data>
+  <data name="AuthorizationResponseSignatureAlgTooltip" xml:space="preserve">
+    <value>JWA algorithm used for signing authorization response tokens when the response mode is jwt.</value>
+  </data>
+  <data name="BackChannelLogoutSessionRequired" xml:space="preserve">
+    <value>Backchannel logout session required</value>
+  </data>
+  <data name="BackChannelLogoutSessionRequiredTooltip" xml:space="preserve">
+    <value>Boolean value specifying whether the OP can pass a SID claim in the Logout token to identify the RP session with the OP. &lt;br /&gt; If supported, the sid claim is also included in ID tokens issued by the OP.</value>
+  </data>
+  <data name="BackChannelLogoutUri" xml:space="preserve">
+    <value>Backchannel logout URL</value>
+  </data>
+  <data name="BackChannelLogoutUriTooltip" xml:space="preserve">
+    <value>RP URL that will cause the RP to log itself out when sent a Logout Token by the OP.</value>
+  </data>
+  <data name="CapabilityConfig" xml:space="preserve">
+    <value>Capability config</value>
+  </data>
+  <data name="CertificateAuthorityType" xml:space="preserve">
+    <value>Certificate Authority Type</value>
+  </data>
+  <data name="CertificateStore" xml:space="preserve">
+    <value>Certificate store</value>
+  </data>
+  <data name="Children" xml:space="preserve">
+    <value>Children</value>
+  </data>
+  <data name="ChooseMappingRule" xml:space="preserve">
+    <value>Choose a type of mapping rule</value>
+  </data>
+  <data name="ChooseRealm" xml:space="preserve">
+    <value>Choose realm</value>
+  </data>
+  <data name="CIBA" xml:space="preserve">
+    <value>CIBA</value>
+  </data>
+  <data name="Claims" xml:space="preserve">
+    <value>Claims</value>
+  </data>
+  <data name="ClaimsDescription" xml:space="preserve">
+    <value>List of user claims.</value>
+  </data>
+  <data name="Client" xml:space="preserve">
+    <value>Client</value>
+  </data>
+  <data name="ClientCredentials" xml:space="preserve">
+    <value>Client credentials</value>
+  </data>
+  <data name="ClientDetailsTitle" xml:space="preserve">
+    <value>Client details</value>
+  </data>
+  <data name="Clients" xml:space="preserve">
+    <value>Clients</value>
+  </data>
+  <data name="ClientScopes" xml:space="preserve">
+    <value>Client scopes</value>
+  </data>
+  <data name="ClientsDescription" xml:space="preserve">
+    <value>Set up mobile, web, or IoT clients to use SimpleIdServer for authentication.</value>
+  </data>
+  <data name="ClientSecret" xml:space="preserve">
+    <value>Client secret</value>
+  </data>
+  <data name="ClientSecretBasicDescription" xml:space="preserve">
+    <value>The application utilizes the HTTP Basic Authentication scheme.</value>
+  </data>
+  <data name="ClientSecretBasicName" xml:space="preserve">
+    <value>Client secret basic</value>
+  </data>
+  <data name="ClientSecretPostDescription" xml:space="preserve">
+    <value>The application includes its secret in the HTTP request body as a form parameter.</value>
+  </data>
+  <data name="ClientSecretPostName" xml:space="preserve">
+    <value>Client secret post</value>
+  </data>
+  <data name="ClientSecretRequired" xml:space="preserve">
+    <value>Client secret is required</value>
+  </data>
+  <data name="ClientsTitle" xml:space="preserve">
+    <value>Clients</value>
+  </data>
+  <data name="Confirmed" xml:space="preserve">
+    <value>Confirmed</value>
+  </data>
+  <data name="ConsentRequired" xml:space="preserve">
+    <value>Consent required</value>
+  </data>
+  <data name="Consents" xml:space="preserve">
+    <value>Consents</value>
+  </data>
+  <data name="CreatedAt" xml:space="preserve">
+    <value>Created at</value>
+  </data>
+  <data name="Credentials" xml:space="preserve">
+    <value>Credentials</value>
+  </data>
+  <data name="Data" xml:space="preserve">
+    <value>Data</value>
+  </data>
+  <data name="Delegation" xml:space="preserve">
+    <value>Delegation</value>
+  </data>
+  <data name="DescriptionRequired" xml:space="preserve">
+    <value>Description is required</value>
+  </data>
+  <data name="Device" xml:space="preserve">
+    <value>Device</value>
+  </data>
+  <data name="Disable" xml:space="preserve">
+    <value>Disable</value>
+  </data>
+  <data name="DisplayNameRequired" xml:space="preserve">
+    <value>Display Name is required</value>
+  </data>
+  <data name="Dns" xml:space="preserve">
+    <value>DNS</value>
+  </data>
+  <data name="DpopNonceLifetime" xml:space="preserve">
+    <value>Lifetime of DPoP Nonce</value>
+  </data>
+  <data name="DpopNonceLifetimeTooltip" xml:space="preserve">
+    <value>Lifetime of a DPoP nonce in seconds.</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="EndExport" xml:space="preserve">
+    <value>End export</value>
+  </data>
+  <data name="EndImport" xml:space="preserve">
+    <value>End import</value>
+  </data>
+  <data name="ExecutionHistory" xml:space="preserve">
+    <value>Execution history.</value>
+  </data>
+  <data name="ExpirationTime" xml:space="preserve">
+    <value>Expiration time</value>
+  </data>
+  <data name="Expired" xml:space="preserve">
+    <value>Expired</value>
+  </data>
+  <data name="ExternalIdProviders" xml:space="preserve">
+    <value>External Identity Providers</value>
+  </data>
+  <data name="Extracted" xml:space="preserve">
+    <value>Extracted</value>
+  </data>
+  <data name="ExtractionResult" xml:space="preserve">
+    <value>Extraction result</value>
+  </data>
+  <data name="Firstname" xml:space="preserve">
+    <value>First name</value>
+  </data>
+  <data name="From" xml:space="preserve">
+    <value>From</value>
+  </data>
+  <data name="FrontChannelLogoutSessionRequired" xml:space="preserve">
+    <value>Front-channel logout session required</value>
+  </data>
+  <data name="FrontChannelLogoutSessionRequiredTooltip" xml:space="preserve">
+    <value>Boolean value specifying whether the RP requires that iss (issuer) and sid (session id) query parameters be included to identify the RP session with the OP when the front_channel_logout_uri is used.</value>
+  </data>
+  <data name="FrontChannelLogoutUri" xml:space="preserve">
+    <value>Front-channel logout URL</value>
+  </data>
+  <data name="FrontChannelLogoutUriTooltip" xml:space="preserve">
+    <value>RP URL that will cause the RP to log itself out when rendered in an iframe by the OP.</value>
+  </data>
+  <data name="GeneralSettings" xml:space="preserve">
+    <value>General settings</value>
+  </data>
+  <data name="Generate" xml:space="preserve">
+    <value>Generate</value>
+  </data>
+  <data name="GenerateCADescription" xml:space="preserve">
+    <value>Generate a Certificate Authority and store it in the database.</value>
+  </data>
+  <data name="GenerateCAName" xml:space="preserve">
+    <value>Generate one Certificate Authority</value>
+  </data>
+  <data name="GenerateNewKey" xml:space="preserve">
+    <value>Generate new key</value>
+  </data>
+  <data name="Group" xml:space="preserve">
+    <value>Group</value>
+  </data>
+  <data name="GroupDetails" xml:space="preserve">
+    <value>Group details</value>
+  </data>
+  <data name="GroupName" xml:space="preserve">
+    <value>Group name</value>
+  </data>
+  <data name="Groups" xml:space="preserve">
+    <value>Groups</value>
+  </data>
+  <data name="Histories" xml:space="preserve">
+    <value>Histories</value>
+  </data>
+  <data name="IdentityProviderDetails" xml:space="preserve">
+    <value>Identity Provider details</value>
+  </data>
+  <data name="IdentityProviderMappers" xml:space="preserve">
+    <value>Identity Provider mappers</value>
+  </data>
+  <data name="IdentityProviders" xml:space="preserve">
+    <value>Identity providers</value>
+  </data>
+  <data name="IdentityProvidersDescription" xml:space="preserve">
+    <value>Configure external Identity Providers such as Facebook, Twitter, GitHub, and others, so that your users can log in using them.</value>
+  </data>
+  <data name="IdentityProviderType" xml:space="preserve">
+    <value>Identity Provider Type</value>
+  </data>
+  <data name="IdentityProvisioning" xml:space="preserve">
+    <value>Identity provisioning</value>
+  </data>
+  <data name="IdentityProvisioningDetails" xml:space="preserve">
+    <value>Identity Provisioning details</value>
+  </data>
+  <data name="IdentityProvisioningLstDescription" xml:space="preserve">
+    <value>Extract users and groups from one or more storage sources.</value>
+  </data>
+  <data name="IdentityResource" xml:space="preserve">
+    <value>Identity Resource</value>
+  </data>
+  <data name="IdentityScope" xml:space="preserve">
+    <value>Identity Scope</value>
+  </data>
+  <data name="IdServerSwagger" xml:space="preserve">
+    <value>IdServer swagger</value>
+  </data>
+  <data name="IdTokenSignatureAlg" xml:space="preserve">
+    <value>ID token signature algorithm</value>
+  </data>
+  <data name="IdTokenSignatureAlgTooltip" xml:space="preserve">
+    <value>JWA algorithm used for signing ID tokens</value>
+  </data>
+  <data name="Impersonation" xml:space="preserve">
+    <value>Impersonation</value>
+  </data>
+  <data name="Import" xml:space="preserve">
+    <value>Import</value>
+  </data>
+  <data name="Imported" xml:space="preserve">
+    <value>Imported</value>
+  </data>
+  <data name="ImportUsersAndGroupsTooltip" xml:space="preserve">
+    <value>Import users and groups</value>
+  </data>
+  <data name="Information" xml:space="preserve">
+    <value>Information</value>
+  </data>
+  <data name="Ip" xml:space="preserve">
+    <value>Ip</value>
+  </data>
+  <data name="IsDefault" xml:space="preserve">
+    <value>Is default?</value>
+  </data>
+  <data name="IsDpopNonceRequired" xml:space="preserve">
+    <value>Is DPoP Nonce required?</value>
+  </data>
+  <data name="IsDpopNonceRequiredTooltip" xml:space="preserve">
+    <value>May be used by the authorization server to limit the lifetime of DPoP Proof.</value>
+  </data>
+  <data name="IsDpopRequired" xml:space="preserve">
+    <value>Is DPoP required?</value>
+  </data>
+  <data name="IsDpopRequiredTooltip" xml:space="preserve">
+    <value>DPoP is an application-level mechanism for sender-constraining OAuth access and refresh tokens.</value>
+  </data>
+  <data name="IsExposed" xml:space="preserve">
+    <value>Is exposed ?</value>
+  </data>
+  <data name="IsExposedDescription" xml:space="preserve">
+    <value>Scope can be exposed by the configuration endpoint &lt;i&gt;.well-known/openid-configuration&lt;/i&gt;</value>
+  </data>
+  <data name="Jwt" xml:space="preserve">
+    <value>Json Web Token (JWT)</value>
+  </data>
+  <data name="Key" xml:space="preserve">
+    <value>Key</value>
+  </data>
+  <data name="KeyRequired" xml:space="preserve">
+    <value>Key is required</value>
+  </data>
+  <data name="Keys" xml:space="preserve">
+    <value>Keys</value>
+  </data>
+  <data name="Label" xml:space="preserve">
+    <value>Label</value>
+  </data>
+  <data name="Lastname" xml:space="preserve">
+    <value>Last name</value>
+  </data>
+  <data name="Launch" xml:space="preserve">
+    <value>Launch</value>
+  </data>
+  <data name="Login" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="LoginSettings" xml:space="preserve">
+    <value>Login settings</value>
+  </data>
+  <data name="ManualActionRequiredRevokeSession" xml:space="preserve">
+    <value>Manual action is required to revoke a session</value>
+  </data>
+  <data name="ManualActionRequiredRevokeSessionTooltip" xml:space="preserve">
+    <value>After 3 seconds, the session is revoked, and the user agent is automatically redirected to the client</value>
+  </data>
+  <data name="MapperDetails" xml:space="preserve">
+    <value>Mapper details</value>
+  </data>
+  <data name="Mappers" xml:space="preserve">
+    <value>Mappers</value>
+  </data>
+  <data name="MapperType" xml:space="preserve">
+    <value>Mapper Type</value>
+  </data>
+  <data name="MappingRules" xml:space="preserve">
+    <value>Mapping rules</value>
+  </data>
+  <data name="MapToOneUserClaim" xml:space="preserve">
+    <value>Map to one user claim</value>
+  </data>
+  <data name="MetadataUrl" xml:space="preserve">
+    <value>Metadata URL</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="NotificationMode" xml:space="preserve">
+    <value>Notification mode</value>
+  </data>
+  <data name="NotificationModeTooltip" xml:space="preserve">
+    <value>Notification mode used during Backchannel Authentication</value>
+  </data>
+  <data name="NumberOfDays" xml:space="preserve">
+    <value>Number of days</value>
+  </data>
+  <data name="NumberOfDaysDescription" xml:space="preserve">
+    <value>Number of days the certificate will be valid</value>
+  </data>
+  <data name="NumberOfDaysRequired" xml:space="preserve">
+    <value>Number of Days is required</value>
+  </data>
+  <data name="OAuth" xml:space="preserve">
+    <value>OAUTH</value>
+  </data>
+  <data name="OpenId" xml:space="preserve">
+    <value>OPENID</value>
+  </data>
+  <data name="OpenIdConnect" xml:space="preserve">
+    <value>OpenID Connect</value>
+  </data>
+  <data name="Otp" xml:space="preserve">
+    <value>One Time Password (OTP)</value>
+  </data>
+  <data name="OtpCredDescription" xml:space="preserve">
+    <value>A random and unique password will be generated</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="PasswordCredDescription" xml:space="preserve">
+    <value>Generate a static password</value>
+  </data>
+  <data name="Path" xml:space="preserve">
+    <value>Path</value>
+  </data>
+  <data name="Pending" xml:space="preserve">
+    <value>Pending</value>
+  </data>
+  <data name="PKCEDescription" xml:space="preserve">
+    <value>It introduces a secret generated by the calling application that can be validated by the authorization server.</value>
+  </data>
+  <data name="PKCEName" xml:space="preserve">
+    <value>PKCE</value>
+  </data>
+  <data name="PrivatePem" xml:space="preserve">
+    <value>Private pem</value>
+  </data>
+  <data name="Properties" xml:space="preserve">
+    <value>Properties</value>
+  </data>
+  <data name="Property" xml:space="preserve">
+    <value>Property</value>
+  </data>
+  <data name="Protocol" xml:space="preserve">
+    <value>Protocol</value>
+  </data>
+  <data name="ProtocolIsRequired" xml:space="preserve">
+    <value>Protocol is required</value>
+  </data>
+  <data name="PublicPem" xml:space="preserve">
+    <value>Public pem</value>
+  </data>
+  <data name="RedirectUrlCaseSensitive" xml:space="preserve">
+    <value>Redirect URL is case sensitive</value>
+  </data>
+  <data name="RedirectUrlCaseSensitiveTooltip" xml:space="preserve">
+    <value>Redirect URL is case sensitive</value>
+  </data>
+  <data name="Reference" xml:space="preserve">
+    <value>Reference</value>
+  </data>
+  <data name="RefreshToken" xml:space="preserve">
+    <value>Refresh token</value>
+  </data>
+  <data name="RegistrationMethods" xml:space="preserve">
+    <value>Registration methods</value>
+  </data>
+  <data name="RegistrationWorkflows" xml:space="preserve">
+    <value>Registration Workflows</value>
+  </data>
+  <data name="Reject" xml:space="preserve">
+    <value>Reject</value>
+  </data>
+  <data name="Rejected" xml:space="preserve">
+    <value>Rejected</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="RemoveSubjectClaimMapper" xml:space="preserve">
+    <value>Remove subject claim mapper</value>
+  </data>
+  <data name="Reset" xml:space="preserve">
+    <value>Reset</value>
+  </data>
+  <data name="ResolveRoles" xml:space="preserve">
+    <value>Resolve roles</value>
+  </data>
+  <data name="Resource" xml:space="preserve">
+    <value>Resource</value>
+  </data>
+  <data name="ResourceType" xml:space="preserve">
+    <value>Resource type</value>
+  </data>
+  <data name="ResponseTypes" xml:space="preserve">
+    <value>Response types</value>
+  </data>
+  <data name="ResponseTypesTooltip" xml:space="preserve">
+    <value>Informs the Authorization Server of the desired authorization processing flow, including what parameters are returned from the endpoints used.</value>
+  </data>
+  <data name="Revoke" xml:space="preserve">
+    <value>Revoke</value>
+  </data>
+  <data name="RevokeSessions" xml:space="preserve">
+    <value>Revoke sessions</value>
+  </data>
+  <data name="Role" xml:space="preserve">
+    <value>Role</value>
+  </data>
+  <data name="Roles" xml:space="preserve">
+    <value>Roles</value>
+  </data>
+  <data name="RolesDescription" xml:space="preserve">
+    <value>Create and manage Groups for your Applications. Groups contain collections of Permissions and can be assigned to Users.</value>
+  </data>
+  <data name="Saml" xml:space="preserve">
+    <value>SAML</value>
+  </data>
+  <data name="SamlAttributeName" xml:space="preserve">
+    <value>SAML Attribute Name</value>
+  </data>
+  <data name="SamlAttributeNameDescription" xml:space="preserve">
+    <value>SAML Attribute Name</value>
+  </data>
+  <data name="Saving" xml:space="preserve">
+    <value>Saving...</value>
+  </data>
+  <data name="ScimEdp" xml:space="preserve">
+    <value>SCIM endpoint</value>
+  </data>
+  <data name="ScopeDetails" xml:space="preserve">
+    <value>Scope details</value>
+  </data>
+  <data name="ScopeResourcesDescription" xml:space="preserve">
+    <value>Select one or more active &lt;b&gt;API resources&lt;/b&gt;  for the scope. The &lt;b&gt;aud&lt;/b&gt; claim is populated with the relevant &lt;b&gt;API resources&lt;/b&gt;. This claim is utilized by the API during the authorization process</value>
+  </data>
+  <data name="Scopes" xml:space="preserve">
+    <value>Scopes</value>
+  </data>
+  <data name="ScopesDescription" xml:space="preserve">
+    <value>Specify the precise actions or resources that a client application can access on behalf of an end-user.</value>
+  </data>
+  <data name="SelectAmrsHelper" xml:space="preserve">
+    <value>Select one or more authentication methods and update the order. The order is important as it determines the sequence of actions for authenticating the end-user.</value>
+  </data>
+  <data name="SelectRealm" xml:space="preserve">
+    <value>Select realm</value>
+  </data>
+  <data name="SelectResponseTypes" xml:space="preserve">
+    <value>Select response types</value>
+  </data>
+  <data name="SelfSignedX509CertificateDescription" xml:space="preserve">
+    <value>The application utilizes a self-signed certificate. The public key of the certificate (RSA or EC) must be provided to the Identity Server either as a value in JWKS (JSON Web Key Set) format or as a URL using the jwks_uri.</value>
+  </data>
+  <data name="SelfSignedX509CertificateName" xml:space="preserve">
+    <value>Self Signed X509 Certificate</value>
+  </data>
+  <data name="Sessions" xml:space="preserve">
+    <value>Sessions</value>
+  </data>
+  <data name="SetGroupName" xml:space="preserve">
+    <value>Set the name of the group</value>
+  </data>
+  <data name="ShowData" xml:space="preserve">
+    <value>Show data</value>
+  </data>
+  <data name="SignedJwtClientSecretDescription" xml:space="preserve">
+    <value>The application constructs a JWT assertion that includes a message authentication code (MAC) in its signature component, and includes it in the request.</value>
+  </data>
+  <data name="SignedJwtClientSecretName" xml:space="preserve">
+    <value>Signed JWT with Client Secret</value>
+  </data>
+  <data name="SignedJwtDescription" xml:space="preserve">
+    <value>The application creates a digitally signed JWT assertion and includes it in the request.</value>
+  </data>
+  <data name="SignedJwtName" xml:space="preserve">
+    <value>Signed jwt</value>
+  </data>
+  <data name="StartExport" xml:space="preserve">
+    <value>Start export</value>
+  </data>
+  <data name="StartImport" xml:space="preserve">
+    <value>Start import</value>
+  </data>
+  <data name="State" xml:space="preserve">
+    <value>State</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Subject" xml:space="preserve">
+    <value>Subject</value>
+  </data>
+  <data name="SubjectName" xml:space="preserve">
+    <value>Subject Name</value>
+  </data>
+  <data name="SubjectNameDescription" xml:space="preserve">
+    <value>Contains identifying information about the entity to which the certificate is issued. &lt;br /&gt; It must starts with &lt;b&gt;CN=&lt;/b&gt;</value>
+  </data>
+  <data name="SubjectNameRequired" xml:space="preserve">
+    <value>Subject Name is required</value>
+  </data>
+  <data name="SubjetDistinguishedName" xml:space="preserve">
+    <value>Subject Distinguished Name</value>
+  </data>
+  <data name="SuccessAuthentication" xml:space="preserve">
+    <value>Successful authentication today</value>
+  </data>
+  <data name="To" xml:space="preserve">
+    <value>To</value>
+  </data>
+  <data name="TokenClaimName" xml:space="preserve">
+    <value>Token claim name</value>
+  </data>
+  <data name="TokenClaimNameDescription" xml:space="preserve">
+    <value>Name of the claim to insert into the token</value>
+  </data>
+  <data name="TokenExchange" xml:space="preserve">
+    <value>Token exchange</value>
+  </data>
+  <data name="TokenExchangeType" xml:space="preserve">
+    <value>Type of token exchange</value>
+  </data>
+  <data name="TokenExpirationTime" xml:space="preserve">
+    <value>Token expiration time</value>
+  </data>
+  <data name="TokenExpirationTimeTooltip" xml:space="preserve">
+    <value>Set the token duration in seconds; by default, the value is 30 minutes.</value>
+  </data>
+  <data name="TokenSignatureAlg" xml:space="preserve">
+    <value>Token signature algorithm</value>
+  </data>
+  <data name="TokenSignatureAlgTooltip" xml:space="preserve">
+    <value>JWA algorithm used for signing access tokens</value>
+  </data>
+  <data name="TryExtractUsers" xml:space="preserve">
+    <value>Try to extract the users</value>
+  </data>
+  <data name="Type" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="UMA" xml:space="preserve">
+    <value>UMA</value>
+  </data>
+  <data name="Unassign" xml:space="preserve">
+    <value>Unassign</value>
+  </data>
+  <data name="Unlink" xml:space="preserve">
+    <value>Unlink</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>Update</value>
+  </data>
+  <data name="UpdateCredential" xml:space="preserve">
+    <value>Update credential</value>
+  </data>
+  <data name="UpdatedAt" xml:space="preserve">
+    <value>Updated at</value>
+  </data>
+  <data name="Updating" xml:space="preserve">
+    <value>Updating...</value>
+  </data>
+  <data name="Url" xml:space="preserve">
+    <value>Url</value>
+  </data>
+  <data name="UrlRequired" xml:space="preserve">
+    <value>URL is required</value>
+  </data>
+  <data name="Usage" xml:space="preserve">
+    <value>Usage</value>
+  </data>
+  <data name="UseArtifact" xml:space="preserve">
+    <value>Use artifact</value>
+  </data>
+  <data name="UseCertificateStoreDescription" xml:space="preserve">
+    <value>Utilize the Certificate Authority from your local Certificate Store. The Certificate must contain a &lt;b&gt;Private Key&lt;/b&gt;, which will be used to generate the Client Certificate.</value>
+  </data>
+  <data name="UseCertificateStoreName" xml:space="preserve">
+    <value>Use Certificate Store</value>
+  </data>
+  <data name="UseJwksUrl" xml:space="preserve">
+    <value>Use JWKS URL</value>
+  </data>
+  <data name="UseJwksUrlHelper" xml:space="preserve">
+    <value>If the 'Use JWKS URL' switch is enabled, you need to provide a valid JWKS URL. After saving, the administrator can download keys from the JWKS URL.</value>
+  </data>
+  <data name="UserAttribute" xml:space="preserve">
+    <value>User attribute</value>
+  </data>
+  <data name="UserAttributeDescription" xml:space="preserve">
+    <value>Map one claim to a user attribute</value>
+  </data>
+  <data name="UserClaims" xml:space="preserve">
+    <value>User claims</value>
+  </data>
+  <data name="UserConsentsDescription" xml:space="preserve">
+    <value>List of consents accepted by the user for specific clients.</value>
+  </data>
+  <data name="UserCredentialsDescription" xml:space="preserve">
+    <value>List of user credentials. Only one credential per type can be enabled.</value>
+  </data>
+  <data name="UserDetails" xml:space="preserve">
+    <value>User details</value>
+  </data>
+  <data name="UserGroupsDescription" xml:space="preserve">
+    <value>List of groups assigned to the user.</value>
+  </data>
+  <data name="UserIdentifier" xml:space="preserve">
+    <value>User identifier</value>
+  </data>
+  <data name="UserIdentifierDescription" xml:space="preserve">
+    <value>Map one claim to a user identifier</value>
+  </data>
+  <data name="UserProfilesDescription" xml:space="preserve">
+    <value>List of external identification providers (such as Facebook and Google) linked to the user's profile.</value>
+  </data>
+  <data name="UserProperty" xml:space="preserve">
+    <value>User property</value>
+  </data>
+  <data name="UserPropertyDescription" xml:space="preserve">
+    <value>Map one claim to a user property</value>
+  </data>
+  <data name="Users" xml:space="preserve">
+    <value>Users</value>
+  </data>
+  <data name="UsersDescription" xml:space="preserve">
+    <value>An easy way to manage user identities, handle credentials, and assign or remove groups.</value>
+  </data>
+  <data name="UserSessionsDescription" xml:space="preserve">
+    <value>List of active/inactive user sessions.</value>
+  </data>
+  <data name="UserSubject" xml:space="preserve">
+    <value>User subject</value>
+  </data>
+  <data name="UserSubjectDescription" xml:space="preserve">
+    <value>Map one claim to a user subject</value>
+  </data>
+  <data name="ValidationPostLogoutRedirectUris" xml:space="preserve">
+    <value>Validation post logout redirect URIs</value>
+  </data>
+  <data name="ValidationPostLogoutRedirectUrisTooltip" xml:space="preserve">
+    <value>Array of URLs supplied by the RP to which it MAY request that the End-User's User Agent be redirected using the post_logout_redirect_uri parameter after a logout has been performed. &lt;br /&gt; Post Logout URLs must be passed as a list of URL separated by ;</value>
+  </data>
+  <data name="ValidationRedirectionUris" xml:space="preserve">
+    <value>Validation redirection URIs</value>
+  </data>
+  <data name="ValidationRedirectionUrisTooltip" xml:space="preserve">
+    <value>Valid URI pattern a browser can redirect to after a successful login. &lt;br /&gt; Redirection URLs must be passed as a list of URL separated by ;</value>
+  </data>
+  <data name="Value" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="ValueRequired" xml:space="preserve">
+    <value>Value is required</value>
+  </data>
+  <data name="WebAuthn" xml:space="preserve">
+    <value>WebAuthn</value>
+  </data>
+  <data name="Workflow" xml:space="preserve">
+    <value>Workflow</value>
+  </data>
+  <data name="WsFederation" xml:space="preserve">
+    <value>WS-Federation</value>
+  </data>
+  <data name="X509CertificateDescription" xml:space="preserve">
+    <value>The application employs a certificate issued by a trusted Certificate Authority (CA).</value>
+  </data>
+  <data name="X509CertificateName" xml:space="preserve">
+    <value>X509 Certificate</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="AccessClaimsAuthenticatedUser" xml:space="preserve">
+    <value>Access to the claims of the authenticated user</value>
+  </data>
+  <data name="AccessOneOrMoreApiResources" xml:space="preserve">
+    <value>Access to one or more API resources</value>
+  </data>
+  <data name="APIValue" xml:space="preserve">
+    <value>API Value</value>
+  </data>
+  <data name="ClientsAuthorizedToAccessApiResource" xml:space="preserve">
+    <value>Clients authorized to access an API resource are granted access to one or more scopes. For example, a &lt;i&gt;Client API&lt;/i&gt; can have scopes such as &lt;i&gt;read,delete,update&lt;/i&gt;. For more information, please refer to the documentation at &lt;a href='https://www.rfc-editor.org/rfc/rfc8707.pdf' target='_blank'&gt;RFC8707&lt;/a&gt;</value>
+  </data>
+  <data name="ClientsAuthorizedToAccessSpecificClaims" xml:space="preserve">
+    <value>Clients authorized to access the Identity Value have access to specific claims. Standard Identity Resources are defined by the OPENID standard (such as profile, email, etc.). For more information, please refer to the documentation at &lt;a href='https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims' target='_blank'&gt;OPENID Connect Core 1.0 - Scope Claims&lt;/a&gt;</value>
+  </data>
+  <data name="IdentityValue" xml:space="preserve">
+    <value>Identity Value</value>
+  </data>
 </root>

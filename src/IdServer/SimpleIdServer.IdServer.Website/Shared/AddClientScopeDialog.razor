@@ -34,28 +34,28 @@
                 }
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="EditableClientScope" Filterable="false" Sortable="false" Title="Name" Width="80px">
+        <RadzenDataGridColumn TItem="EditableClientScope" Filterable="false" Sortable="false" Title="@Global.Name" Width="80px">
             <Template Context="data">
                 <RadzenLink Text="@data.Value.Name" Path="@($"/scopes/{data.Value.Name}/settings")" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="EditableClientScope" Filterable="false" Sortable="false" Title="Type" Width="80px">
+        <RadzenDataGridColumn TItem="EditableClientScope" Filterable="false" Sortable="false" Title="@Global.Type" Width="80px">
             <Template Context="data">
                 @if (data.Value.Type == ScopeTypes.IDENTITY)
                 {
-                    <RadzenBadge Text="Identity Resource" IsPill="true" />
+                    <RadzenBadge Text="@Global.IdentityResource" IsPill="true" />
                 }
                 else
                 {
-                    <RadzenBadge Text="API Resource" IsPill="true" />
+                    <RadzenBadge Text="@Global.ApiResource" IsPill="true" />
                 }
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="EditableClientScope" Property="Value.Description" Filterable="false" Sortable="false" Title="Description" Width="80px" />
+        <RadzenDataGridColumn TItem="EditableClientScope" Property="Value.Description" Filterable="false" Sortable="false" Title="@Global.Description" Width="80px" />
     </Columns>
 </RadzenDataGrid>
 
-<RadzenButton Click="@(args => UpdateClientScopes())" class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateClientState.Value.IsUpdating ? "Saving..." : "Save")" Disabled="@(updateClientState.Value.IsUpdating)" />
+<RadzenButton Click="@(args => UpdateClientScopes())" class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateClientState.Value.IsUpdating ? Global.Saving : @Global.Save)" Disabled="@(updateClientState.Value.IsUpdating)" />
 
 @code {
     RadzenDataGrid<EditableClientScope> grid;

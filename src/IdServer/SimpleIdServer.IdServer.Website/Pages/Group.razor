@@ -14,8 +14,8 @@
 @inject IState<GroupState> groupState
 
     <RadzenBreadCrumb>
-        <RadzenBreadCrumbItem Path="/groups" Text="Groups" />
-        <RadzenBreadCrumbItem Text="Group details" />
+        <RadzenBreadCrumbItem Path="/groups" Text="@Global.Groups" />
+        <RadzenBreadCrumbItem Text="@Global.GroupDetails" />
     </RadzenBreadCrumb>
 
     <RadzenText class="mt-3 mb-3 no-margin" Text="@groupState.Value.Group?.Name" TextStyle="TextStyle.DisplayH3" />
@@ -38,10 +38,10 @@
             <div class="ml-3">
                 <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
                     <Tabs>
-                        <RadzenTabsItem Text="Children">
+                        <RadzenTabsItem Text="@Global.Children">
                             <GroupChildren Group="@groupState.Value.Group"></GroupChildren>
                         </RadzenTabsItem>
-                        <RadzenTabsItem Text="Roles">
+                        <RadzenTabsItem Text="@Global.Roles">
                             <GroupRoles Group="@groupState.Value.Group"></GroupRoles>
                         </RadzenTabsItem>
                     </Tabs>

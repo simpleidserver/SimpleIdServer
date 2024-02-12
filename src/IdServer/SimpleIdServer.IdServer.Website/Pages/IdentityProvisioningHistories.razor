@@ -13,7 +13,7 @@
 @inject ContextMenuService contextMenuService
 @inject NotificationService notificationService
 
-<p class="text-muted">Execution history.</p>
+<p class="text-muted">@Global.ExecutionHistory</p>
 
 @if(IdentityProvisioning != null)
 {
@@ -30,29 +30,29 @@
                 TItem="IdentityProvisioningProcessResult"
                 ColumnWidth="300px">
             <Columns>
-                <RadzenDataGridColumn Title="Workflow" TItem="IdentityProvisioningProcessResult" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+                <RadzenDataGridColumn Title="@Global.Workflow" TItem="IdentityProvisioningProcessResult" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
                     <Template Context="data">
                         <div style="display: flex; justify-content: center">
                             <ul class="stateDig">
                                 <li @onmouseenter="@( _ => ShowStep(extractedElements[data.Id], data, true) )" class=@(data.IsExported ? "node finished" : "node active")>
-                                    <div @ref=extractedElements[data.Id] class="title">Extracted</div>
+                                    <div @ref=extractedElements[data.Id] class="title">@Global.Extracted</div>
                                 </li>
                                 <li @ref=importedElements[data.Id] @onmouseenter="@( _ => ShowStep(importedElements[data.Id], data, false) )" class="@(data.IsImported ? "finished" : (data.StartImportDateTime != null ? "active" : ""))">
-                                    <div class="title">Imported</div>
+                                    <div class="title">@Global.Imported</div>
                                 </li>
                             </ul>
                         </div>
                     </Template>
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn Title="Start export" FormatString="{0:dd/M/yyyy HH:mm:ss}" Property="StartExportDateTime" TItem="IdentityProvisioningProcessResult" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center" />
-                <RadzenDataGridColumn Title="End export" FormatString="{0:dd/M/yyyy HH:mm:ss}" Property="EndExportDateTime" TItem="IdentityProvisioningProcessResult" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center" />
-                <RadzenDataGridColumn Title="Start import" FormatString="{0:dd/M/yyyy HH:mm:ss}" Property="StartImportDateTime" TItem="IdentityProvisioningProcessResult" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center" />
-                <RadzenDataGridColumn Title="End import" FormatString="{0:dd/M/yyyy HH:mm:ss}" Property="EndImportDateTime" TItem="IdentityProvisioningProcessResult" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn Title="@Global.StartExport" FormatString="{0:dd/M/yyyy HH:mm:ss}" Property="StartExportDateTime" TItem="IdentityProvisioningProcessResult" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn Title="@Global.EndExport" FormatString="{0:dd/M/yyyy HH:mm:ss}" Property="EndExportDateTime" TItem="IdentityProvisioningProcessResult" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn Title="@Global.StartImport" FormatString="{0:dd/M/yyyy HH:mm:ss}" Property="StartImportDateTime" TItem="IdentityProvisioningProcessResult" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn Title="@Global.EndImport" FormatString="{0:dd/M/yyyy HH:mm:ss}" Property="EndImportDateTime" TItem="IdentityProvisioningProcessResult" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center" />
                 <RadzenDataGridColumn TItem="IdentityProvisioningProcessResult" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
                     <Template Context="data">
                         @if(data.IsExported && data.StartImportDateTime == null)
                         {
-                            <RadzenButton Click=@(args => Import(data)) Icon="launch" MouseEnter="@(args => ShowTooltip(args, "Import users and groups"))" />
+                            <RadzenButton Click=@(args => Import(data)) Icon="launch" MouseEnter="@(args => ShowTooltip(args, Global.ImportUsersAndGroupsTooltip))" />
                         }
                     </Template>
                 </RadzenDataGridColumn>

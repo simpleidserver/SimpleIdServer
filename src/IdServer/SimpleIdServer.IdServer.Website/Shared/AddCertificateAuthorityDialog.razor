@@ -1,4 +1,5 @@
 ﻿@using Fluxor.Blazor.Web.Components;
+@using Microsoft.AspNetCore.Html;
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore;
 @using System.Security.Cryptography.X509Certificates;
@@ -10,7 +11,7 @@
 
 <RadzenSteps>
     <Steps>
-        <RadzenStepsItem Text="Certificate Authority Type">
+        <RadzenStepsItem Text="@Global.CertificateAuthorityType">
             <div class="row gy-4">
                 @foreach (var certificateAuthorityType in CertificateAuthorityTypes)
                 {
@@ -53,31 +54,31 @@
                     case CertificateAuthoritySources.DB:
                         <RadzenTemplateForm Submit=@GenerateCertificateAuthority TItem="AddCertificateAuthorityDB" Data=@addCertificateAuthorityDB>
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Subject Name</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.SubjectName</RadzenText>
                                 <RadzenTextBox Name="SubjectName" @bind-Value="@addCertificateAuthorityDB.SubjectName" Class="w-100"></RadzenTextBox>
-                                <p class="text-muted">Contains identifying information about the entity to which the certificate is issued. <br /> It must starts with <b>CN=</b></p>
-                                <RadzenRequiredValidator Component="SubjectName" Text="Subject Name is required"></RadzenRequiredValidator>
+                                <p class="text-muted">@(new HtmlString(Global.SubjectNameDescription))</p>
+                                <RadzenRequiredValidator Component="SubjectName" Text="@Global.SubjectNameRequired"></RadzenRequiredValidator>
                             </div>
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Number of days</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.NumberOfDays</RadzenText>
                                 <RadzenNumeric Name="NumberOfDays" @bind-Value="@addCertificateAuthorityDB.NumberOfDays" Class="w-100"></RadzenNumeric>
-                                <p class="text-muted">Number of days the certificate will be valid</p>
+                                <p class="text-muted">@Global.NumberOfDaysDescription</p>
                             </div>
                             @if(updateCertificateAuthorityState.Value.CertificateAuthority != null)
                             {
                                 <div>
-                                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Public Pem</RadzenText>
+                                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.PublicPem</RadzenText>
                                     <RadzenTextArea Rows=10 Name="ClientName" Disabled=true @bind-Value="@updateCertificateAuthorityState.Value.CertificateAuthority.PublicKey" Class="w-100"></RadzenTextArea>
                                 </div>
                                 <div>
-                                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Private Pem</RadzenText>
+                                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.PrivatePem</RadzenText>
                                     <RadzenTextArea Rows=10 Name="ClientName" Disabled=true @bind-Value="@updateCertificateAuthorityState.Value.CertificateAuthority.PrivateKey" Class="w-100"></RadzenTextArea>
                                 </div>
                             }
 
                             <div>
-                                <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Primary" Text="Generate" Disabled="@(updateCertificateAuthorityState.Value.IsUpdating)" />
-                                <RadzenButton Click=@((args) => SaveCertificateAuthority()) class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Save" Disabled="@(updateCertificateAuthorityState.Value.IsUpdating || updateCertificateAuthorityState.Value.CertificateAuthority == null)" />
+                                <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Primary" Text="@Global.Generate" Disabled="@(updateCertificateAuthorityState.Value.IsUpdating)" />
+                                <RadzenButton Click=@((args) => SaveCertificateAuthority()) class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@Global.Save" Disabled="@(updateCertificateAuthorityState.Value.IsUpdating || updateCertificateAuthorityState.Value.CertificateAuthority == null)" />
                             </div>                            
                         </RadzenTemplateForm>
                         break;
@@ -90,7 +91,7 @@
 
                             <!-- Store location -->
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Store Location</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.StoreLocation</RadzenText>
                                 <RadzenDropDown Name="StoreLocation" Class="w-100"
                                     Data=@Enum.GetValues(typeof(StoreLocation))
                                     TValue="StoreLocation"
@@ -98,7 +99,7 @@
                             </div>
                             <!-- Store name -->
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Store Name</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.StoreName</RadzenText>
                                 <RadzenDropDown Name="StoreName" Class="w-100"
                                     Data=@Enum.GetValues(typeof(StoreName))
                                     TValue="StoreName"
@@ -106,7 +107,7 @@
                             </div>
                             <!-- Store name -->
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Find Type</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.FindType</RadzenText>
                                 <RadzenDropDown Name="FindType" Class="w-100"
                                     Data=@Enum.GetValues(typeof(X509FindType))
                                     TValue="X509FindType"
@@ -114,27 +115,27 @@
                             </div>
                             <!-- Find Value -->
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Find Value</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.FindValue</RadzenText>
                                 <RadzenTextBox Name="FindValue" @bind-Value="@importCertificateAuthorityForm.FindValue" Class="w-100"></RadzenTextBox>
                             </div>
                             @if(updateCertificateAuthorityState.Value.CertificateAuthority != null)
                             {
                                 <div>
-                                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Subject Name</RadzenText>
+                                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.SubjectName</RadzenText>
                                     <RadzenTextBox Name="SubjectName" Disabled=true @bind-Value="@updateCertificateAuthorityState.Value.CertificateAuthority.SubjectName" Class="w-100"></RadzenTextBox>
                                 </div>
                                 <div>
-                                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Valid From</RadzenText>
+                                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.ValidFrom</RadzenText>
                                     <RadzenDatePicker Name="ValidFrom" DateFormat="d" Disabled=true @bind-Value="@updateCertificateAuthorityState.Value.CertificateAuthority.StartDateTime" Class="w-100"></RadzenDatePicker>
                                 </div>
                                 <div>
-                                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Valid To</RadzenText>
+                                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.ValidTo</RadzenText>
                                     <RadzenDatePicker Name="ValidTo" DateFormat="d" Disabled=true @bind-Value="@updateCertificateAuthorityState.Value.CertificateAuthority.EndDateTime" Class="w-100"></RadzenDatePicker>
                                 </div>
                             }
                             <div>
-                                <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Primary" Text="Import" Disabled="@(updateCertificateAuthorityState.Value.IsUpdating)" />
-                                <RadzenButton Click=@((args) => SaveCertificateAuthority()) class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Save" Disabled="@(updateCertificateAuthorityState.Value.IsUpdating || updateCertificateAuthorityState.Value.CertificateAuthority == null)" />
+                                <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Primary" Text="@Global.Import" Disabled="@(updateCertificateAuthorityState.Value.IsUpdating)" />
+                                <RadzenButton Click=@((args) => SaveCertificateAuthority()) class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@Global.Save" Disabled="@(updateCertificateAuthorityState.Value.IsUpdating || updateCertificateAuthorityState.Value.CertificateAuthority == null)" />
                             </div>
                         </RadzenTemplateForm>
                         break;
@@ -204,8 +205,8 @@
 
     public ICollection<CertificateAuthorityType> CertificateAuthorityTypes = new List<CertificateAuthorityType>
     {
-        new CertificateAuthorityType { Name = "Generate", ShortDescription = "Generate one Certificate Authority", Description = "Generate a Certificate Authority and store it in the database.", Source = CertificateAuthoritySources.DB, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/db.png" },
-        new CertificateAuthorityType { Name = "Certificate Store", ShortDescription = "Use Certificate Store", Description = "Utilize the Certificate Authority from your local Certificate Store. The Certificate must contain a <b>Private Key</b>, which will be used to generate the Client Certificate.", Source = CertificateAuthoritySources.CERTIFICATESTORE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/certificatestore.png" }
+        new CertificateAuthorityType { Name = Global.Generate, ShortDescription = Global.GenerateCAName, Description = Global.GenerateCADescription, Source = CertificateAuthoritySources.DB, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/db.png" },
+        new CertificateAuthorityType { Name = Global.CertificateStore, ShortDescription = Global.UseCertificateStoreName, Description = Global.UseCertificateStoreDescription, Source = CertificateAuthoritySources.CERTIFICATESTORE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/certificatestore.png" }
     };
 
     void SelectCertificateAuthorityType(CertificateAuthorityType type)

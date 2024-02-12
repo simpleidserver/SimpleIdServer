@@ -7,11 +7,11 @@
 @inject ContextMenuService contextMenuService
 @inject NotificationService notificationService
 
-<p class="text-muted">List of active/inactive user sessions.</p>
+<p class="text-muted">@Global.UserSessionsDescription</p>
 
 @if(User != null)
 {
-    <RadzenButton class="mb-1" Click="@(args => RevokeSessions())" Icon="delete" Text="Revoke sessions" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+    <RadzenButton class="mb-1" Click="@(args => RevokeSessions())" Icon="delete" Text="@Global.RevokeSessions" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
     <RadzenDataGrid AllowFiltering="true"
                 AllowColumnResize="true"
                 AllowAlternatingRows="false"
@@ -28,9 +28,9 @@
                 TItem="UserSession"
                 ColumnWidth="300px">
         <Columns>
-            <RadzenDataGridColumn TItem="UserSession" Property="AuthenticationDateTime" Title="Authentication time" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Width="80px" />
-            <RadzenDataGridColumn TItem="UserSession" Property="SessionId" Title="Identifier" Filterable="false" Sortable="false" Width="80px" />
-            <RadzenDataGridColumn TItem="UserSession" Title="Clients" Filterable="false" Sortable="false" Width="80px">
+            <RadzenDataGridColumn TItem="UserSession" Property="AuthenticationDateTime" Title="@Global.AuthenticationTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Width="80px" />
+            <RadzenDataGridColumn TItem="UserSession" Property="SessionId" Title="@Global.Identifier" Filterable="false" Sortable="false" Width="80px" />
+            <RadzenDataGridColumn TItem="UserSession" Title="@Global.Clients" Filterable="false" Sortable="false" Width="80px">
                 <Template Context="data">
                     @foreach(var clientId in data.ClientIds)
                     {
@@ -38,20 +38,20 @@
                     }
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="UserSession" Property="ExpirationDateTime" Title="Expiration time" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" />
-            <RadzenDataGridColumn TItem="UserSession" Title="State" Filterable="false" Sortable="false" Width="80px">
+            <RadzenDataGridColumn TItem="UserSession" Property="ExpirationDateTime" Title="@Global.ExpirationTime" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" />
+            <RadzenDataGridColumn TItem="UserSession" Title="@Global.State" Filterable="false" Sortable="false" Width="80px">
                 <Template Context="data">
                     @if (data.State == UserSessionStates.Rejected)
                     {
-                        <RadzenBadge Text="Rejected" IsPill="true" BadgeStyle="BadgeStyle.Danger" />
+                        <RadzenBadge Text="@Global.Rejected" IsPill="true" BadgeStyle="BadgeStyle.Danger" />
                     }
                     else if (data.State == UserSessionStates.Active && data.ExpirationDateTime > DateTime.UtcNow)
                     {
-                        <RadzenBadge Text="Active" IsPill="true" BadgeStyle="BadgeStyle.Success"></RadzenBadge>
+                        <RadzenBadge Text="@Global.Active" IsPill="true" BadgeStyle="BadgeStyle.Success"></RadzenBadge>
                     }
                     else
                     {
-                        <RadzenBadge Text="Expired" IsPill="true" BadgeStyle="BadgeStyle.Danger"></RadzenBadge>
+                        <RadzenBadge Text="@Global.Expired" IsPill="true" BadgeStyle="BadgeStyle.Danger"></RadzenBadge>
                     }
                 </Template>
             </RadzenDataGridColumn>
@@ -88,7 +88,7 @@
     {
         contextMenuService.Open(args, new List<ContextMenuItem>
         {
-            new ContextMenuItem { Text = "Reject", Value = 1 }
+            new ContextMenuItem { Text = Global.Reject, Value = 1 }
         }, (a) => {
         if (a.Value.Equals(1))
         {

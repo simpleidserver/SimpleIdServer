@@ -1,4 +1,5 @@
 ﻿@using Fluxor.Blazor.Web.Components;
+@using Microsoft.AspNetCore.Html;
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.ClientStore;
 @using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
@@ -10,7 +11,7 @@
 
 <RadzenSteps>
     <Steps>
-        <RadzenStepsItem Text="Resource type">
+        <RadzenStepsItem Text="@Global.ResourceType">
             <div class="row gy-4">
                 @foreach (var scopType in ScopeTypes)
                 {
@@ -51,34 +52,34 @@
                                 <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@addScopeState.Value.ErrorMessage</RadzenAlert>
                             }
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Name</RadzenText>
                                 <RadzenTextBox Name="Name" @bind-Value="@identityScope.Name" Class="w-100"></RadzenTextBox>
-                                <RadzenRequiredValidator Component="Name" Text="Name is required"></RadzenRequiredValidator>
+                                <RadzenRequiredValidator Component="Name" Text="@Global.NameIsRequired"></RadzenRequiredValidator>
                             </div>
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Description</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Description</RadzenText>
                                 <RadzenTextArea Name="Description" @bind-Value="@identityScope.Description" Class="w-100"></RadzenTextArea>
                             </div>
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Protocol</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Protocol</RadzenText>
                                 <RadzenDropDown Name="Protocol" Class="w-100"
                                     Data=@scopeProtocols
                                     TValue="ScopeProtocols"
                                     @bind-Value=@identityScope.Protocol
                                     TextProperty="Name" ValueProperty="Protocol" />
-                                <RadzenRequiredValidator Component="Protocol" Text="Protocol is required"></RadzenRequiredValidator>
+                                <RadzenRequiredValidator Component="Protocol" Text="@Global.ProtocolIsRequired"></RadzenRequiredValidator>
                             </div>
                             @if (identityScope.Protocol == ScopeProtocols.OPENID)
                             {
                                 <div>
                                     <RadzenCheckBox Name="IsExposedInConfigrationEdp" @bind-Value="@identityScope.IsExposedInConfigrationEdp"></RadzenCheckBox>
-                                    <RadzenLabel Text="Is exposed ?" Component="IsExposedInConfigrationEdp" Style="margin-left: 8px; vertical-align: middle;" />
+                                    <RadzenLabel Text="@Global.IsExposed" Component="IsExposedInConfigrationEdp" Style="margin-left: 8px; vertical-align: middle;" />
                                     <p class="text-muted">
-                                        Scope can be exposed by the configuration endpoint <i>@SimpleIdServer.IdServer.Constants.EndPoints.OpenIDConfiguration</i>
+                                        @(new HtmlString(Global.IsExposedDescription))
                                     </p>
                                 </div>
                             }
-                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addScopeState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addScopeState.Value.IsAdding)" />
+                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addScopeState.Value.IsAdding ? @Global.Adding : Global.Save)" Disabled="@(addScopeState.Value.IsAdding)" />
                         </RadzenTemplateForm>
                         break;
                     case Domains.ScopeTypes.APIRESOURCE:
@@ -88,22 +89,22 @@
                                 <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@addScopeState.Value.ErrorMessage</RadzenAlert>
                             }
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Name</RadzenText>
                                 <RadzenTextBox Name="Name" @bind-Value="@apiScope.Name" Class="w-100"></RadzenTextBox>
-                                <RadzenRequiredValidator Component="Name" Text="Name is required"></RadzenRequiredValidator>
+                                <RadzenRequiredValidator Component="Name" Text="@Global.NameIsRequired"></RadzenRequiredValidator>
                             </div>
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Description</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Description</RadzenText>
                                 <RadzenTextArea Name="Description" @bind-Value="@apiScope.Description" Class="w-100"></RadzenTextArea>
                             </div>
                             <div>
                                 <RadzenCheckBox Name="IsExposedInConfigrationEdp" @bind-Value="@apiScope.IsExposedInConfigrationEdp"></RadzenCheckBox>
-                                <RadzenLabel Text="Is exposed ?" Component="IsExposedInConfigrationEdp" Style="margin-left: 8px; vertical-align: middle;" />
+                                <RadzenLabel Text="@Global.IsExposed" Component="IsExposedInConfigrationEdp" Style="margin-left: 8px; vertical-align: middle;" />
                                 <p class="text-muted">
-                                    Scope can be exposed by the configuration endpoint <i>@SimpleIdServer.IdServer.Constants.EndPoints.OpenIDConfiguration</i>
+                                    @(new HtmlString(Global.IsExposedDescription))
                                 </p>
                             </div>
-                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addScopeState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addScopeState.Value.IsAdding)" />
+                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addScopeState.Value.IsAdding ? Global.Adding : Global.Save)" Disabled="@(addScopeState.Value.IsAdding)" />
                         </RadzenTemplateForm>
                         break;
                 }
@@ -165,8 +166,8 @@
 
     ICollection<ScopeType> ScopeTypes { get; set; } = new List<ScopeType>
     {
-        new ScopeType { Name = "Identity Value", ShortDescription = "Access to the claims of the authenticated user", Description = "Clients authorized to access the Identity Value have access to specific claims. Standard Identity Resources are defined by the OPENID standard (such as profile, email, etc.). For more information, please refer to the documentation at <a href='https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims' target='_blank'>OPENID Connect Core 1.0 - Scope Claims</a>", Type = Domains.ScopeTypes.IDENTITY, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/IdentityResource.png" },
-        new ScopeType { Name = "API Value", ShortDescription = "Access to one or more API resources", Description = "Clients authorized to access an API resource are granted access to one or more scopes. For example, a <i>Client API</i> can have scopes such as <i>read,delete,update</i>. For more information, please refer to the documentation at <a href='https://www.rfc-editor.org/rfc/rfc8707.pdf' target='_blank'>RFC8707</a>", Type = Domains.ScopeTypes.APIRESOURCE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/ApiResource.png" }
+        new ScopeType { Name = Global.IdentityValue, ShortDescription = Global.AccessClaimsAuthenticatedUser, Description = Global.ClientsAuthorizedToAccessSpecificClaims, Type = Domains.ScopeTypes.IDENTITY, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/IdentityResource.png" },
+        new ScopeType { Name = Global.APIValue, ShortDescription = Global.AccessOneOrMoreApiResources, Description = Global.ClientsAuthorizedToAccessApiResource, Type = Domains.ScopeTypes.APIRESOURCE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/ApiResource.png" }
     };
 
     ScopeType? SelectedScopeType { get; set; } = null;

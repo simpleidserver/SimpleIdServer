@@ -11,7 +11,7 @@
 
 <RadzenText class="mb-3 no-margin" Text="Extract" TextStyle="TextStyle.DisplayH3" />
 <p>
-    Extract users and groups from one or more storage sources.
+    @Global.IdentityProvisioningLstDescription
 </p>
 
 <RadzenDataGrid @ref="identityProvisioningGrid"
@@ -33,25 +33,25 @@
                 TItem="SelectableIdentityProvisioning"
                 ColumnWidth="300px">
     <Columns>
-        <RadzenDataGridColumn TItem="SelectableIdentityProvisioning" Filterable="false" Sortable="false" Title="Name" Width="80px">
+        <RadzenDataGridColumn TItem="SelectableIdentityProvisioning" Filterable="false" Sortable="false" Title="@Global.Name" Width="80px">
             <Template Context="data">                
                 <RadzenLink Text="@data.Value.Name" Path="@($"/identityprovisioning/{data.Value.Id}/details")" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableIdentityProvisioning" Property="Value.Description" Filterable="false" Sortable="false" Title="Description" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableIdentityProvisioning" Filterable="false" Sortable="false" Title="Active" Width="80px">
+        <RadzenDataGridColumn TItem="SelectableIdentityProvisioning" Property="Value.Description" Filterable="false" Sortable="false" Title="@Global.Description" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableIdentityProvisioning" Filterable="false" Sortable="false" Title="@Global.Active" Width="80px">
             <Template Context="data">
                 @if(data.Value.IsEnabled)
                 {
-                    <RadzenBadge Text="Active" IsPill="true" BadgeStyle="BadgeStyle.Success"></RadzenBadge>
+                    <RadzenBadge Text="@Global.Active" IsPill="true" BadgeStyle="BadgeStyle.Success"></RadzenBadge>
                 }
                 else
                 {
-                    <RadzenBadge Text="Disable" IsPill="true" BadgeStyle="BadgeStyle.Danger"></RadzenBadge>
+                    <RadzenBadge Text="@Global.Disable" IsPill="true" BadgeStyle="BadgeStyle.Danger"></RadzenBadge>
                 }
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableIdentityProvisioning" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Update datetime" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableIdentityProvisioning" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
     </Columns>
 </RadzenDataGrid>
 

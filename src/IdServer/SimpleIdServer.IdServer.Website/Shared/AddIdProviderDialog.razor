@@ -12,7 +12,7 @@
 
 <RadzenSteps>
     <Steps>
-        <RadzenStepsItem Text="Identity Provider Type">
+        <RadzenStepsItem Text="@Global.IdentityProviderType">
             <div class="row gy-4">
                 @if (!idProviderDefsState.Value.IsLoading)
                 {
@@ -45,19 +45,19 @@
         <RadzenStepsItem Text="Details" Disabled="@(SelectedIdProvider == null)">
             <!-- Name -->
             <div>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Name</RadzenText>
                 <RadzenTextBox Name="Name" @bind-Value="@info.Name" Class="w-100"></RadzenTextBox>
-                <RadzenRequiredValidator Component="Name" Text="Name is required"></RadzenRequiredValidator>
+                <RadzenRequiredValidator Component="Name" Text="@Global.NameIsRequired"></RadzenRequiredValidator>
             </div>
             <!-- Display name -->
             <div>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Display name</RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.DisplayName</RadzenText>
                 <RadzenTextBox Name="DisplayName" @bind-Value="@info.DisplayName" Class="w-100"></RadzenTextBox>
-                <RadzenRequiredValidator Component="DisplayName" Text="Display name is required"></RadzenRequiredValidator>
+                <RadzenRequiredValidator Component="DisplayName" Text="@Global.DisplayNameRequired"></RadzenRequiredValidator>
             </div>
             <!-- Description -->
             <div>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Description</RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Description</RadzenText>
                 <RadzenTextArea @bind-Value="@info.Description" Class="w-100"></RadzenTextArea>
             </div>
         </RadzenStepsItem>

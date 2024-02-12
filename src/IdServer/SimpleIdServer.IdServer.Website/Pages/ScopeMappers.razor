@@ -8,7 +8,7 @@
 @inject IState<ScopeMappersState> scopeMappersState
 @inject NotificationService notificationService
 
-<RadzenButton class="mb-1" Click="@(args => AddMapper())" Icon="add" Text="Add mapper" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+<RadzenButton class="mb-1" Click="@(args => AddMapper())" Icon="add" Text="@Global.AddMapper" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
 
 <RadzenDataGrid AllowFiltering="true"
                 AllowColumnResize="true"
@@ -33,23 +33,23 @@
                 <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableScopeMapper" Title="Name" Filterable="false" Sortable="true" Width="80px" SortOrder="SortOrder.Ascending">
+        <RadzenDataGridColumn TItem="SelectableScopeMapper" Title="@Global.Name" Filterable="false" Sortable="true" Width="80px" SortOrder="SortOrder.Ascending">
             <Template Context="data">
                 <RadzenLink Text="@data.Value.Name" Path="@($"/scopes/{Scope.Id}/mappers/" + data.Value.Id)" />
             </Template>        
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableScopeMapper" Title="Type" Filterable="false" Sortable="false" Width="80px">
+        <RadzenDataGridColumn TItem="SelectableScopeMapper" Title="@Global.Type" Filterable="false" Sortable="false" Width="80px">
             <Template Context="data">
                 @switch (data.Value.MapperType)
                 {
                     case MappingRuleTypes.USERATTRIBUTE:
-                        <span>User attribute</span>
+                        <span>@Global.UserAttribute</span>
                         break;
                     case MappingRuleTypes.USERPROPERTY:
-                        <span>User property</span>
+                        <span>@Global.UserProperty</span>
                         break;
                     case MappingRuleTypes.SUBJECT:
-                        <span>Subject</span>
+                        <span>@Global.Subject</span>
                         break;
                 }
             </Template>
@@ -101,7 +101,7 @@
     {
         contextMenuService.Open(args, new List<ContextMenuItem>
         {
-            new ContextMenuItem { Text = "Delete", Value = 1 }
+            new ContextMenuItem { Text = Global.Delete, Value = 1 }
         }, async (a) => {
         if (a.Value.Equals(1))
         {
@@ -109,7 +109,7 @@
             if (!mapperIds.Contains(mapper.Value.Id)) mapperIds.Add(mapper.Value.Id);
             if (scopeMappersState.Value.Mappers.Any(r => mapperIds.Contains(r.Value.Id) && r.Value.MapperType == MappingRuleTypes.SUBJECT))
             {
-                var isConfirmed = await dialogService.Confirm("Are you sure?", "Remove subject claim mapper", new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
+                var isConfirmed = await dialogService.Confirm(Global.AreYouSure, Global.RemoveSubjectClaimMapper, new ConfirmOptions { OkButtonText = Global.Yes, CancelButtonText = Global.No });
                 if (isConfirmed == null || !isConfirmed.Value) return;
             }
 
@@ -133,7 +133,7 @@
 
     async void AddMapper() 
     {
-        await dialogService.OpenAsync<AddScopeMapperDialog>("Add mapper", new Dictionary<string, object>
+        await dialogService.OpenAsync<AddScopeMapperDialog>(Global.AddMapper, new Dictionary<string, object>
         {
             { "Scope", Scope }
         }, new DialogOptions

@@ -17,18 +17,18 @@
 
     <!-- Name -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Name</RadzenText>
         <RadzenTextBox Name="Key" @bind-Value="@addApiResource.Name" Class="w-100"></RadzenTextBox>
-        <RadzenRequiredValidator Component="Key" Text="Name id required"></RadzenRequiredValidator>
+        <RadzenRequiredValidator Component="Key" Text="@Global.NameIsRequired"></RadzenRequiredValidator>
     </div>
     <!-- Audience -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Audience</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Audience</RadzenText>
         <RadzenTextBox Name="Audience" @bind-Value="@addApiResource.Audience" Class="w-100"></RadzenTextBox>
     </div>
     <!-- Description -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Value</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Value</RadzenText>
         <RadzenTextArea Name="Description" @bind-Value="@addApiResource.Description" Class="w-100"></RadzenTextArea>
     </div>
     <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Add"  />

@@ -11,8 +11,8 @@
 @inject IState<IdProviderState> idProviderState
 
 <RadzenBreadCrumb>
-    <RadzenBreadCrumbItem Path="/authentications/idproviders" Text="Identity Providers" />
-    <RadzenBreadCrumbItem Path=@($"/authentications/idproviders/{id}/mappers") Text="Identity Provider mappers" />
+    <RadzenBreadCrumbItem Path="/authentications/idproviders" Text="@Global.IdentityProviders" />
+    <RadzenBreadCrumbItem Path=@($"/authentications/idproviders/{id}/mappers") Text="@Global.IdentityProviderMappers" />
     <RadzenBreadCrumbItem Text="@(mapper?.Name)" />
 </RadzenBreadCrumb>
 

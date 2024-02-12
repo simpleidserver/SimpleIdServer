@@ -11,23 +11,23 @@
 @inject IDispatcher dispatcher
 
 <div>
-    <p class="text-muted">If the 'Use JWKS URL' switch is enabled, you need to provide a valid JWKS URL. After saving, the administrator can download keys from the JWKS URL.</p>
-    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Use JWKS URL</RadzenText>
+    <p class="text-muted">@Global.UseJwksUrlHelper</p>
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.UseJwksUrl</RadzenText>
     <RadzenSwitch Change="HandleUseJWKSUrl" @bind-Value=@isJWKSUrlUsed></RadzenSwitch>
     <RadzenTemplateForm Submit=@UpdateJWKSUrl TItem="UpdateJWKSUrlForm" Data=@updateJWKSUrl>
         <div>
-            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">URL</RadzenText>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Url</RadzenText>
             <RadzenTextBox Name="JWKSUrl" @bind-Value="@updateJWKSUrl.Url" Disabled=@(!isJWKSUrlUsed) Class="w-100"></RadzenTextBox>
-            <RadzenRequiredValidator Component="JWKSUrl" Text="URL is required"></RadzenRequiredValidator>
+            <RadzenRequiredValidator Component="JWKSUrl" Text="@Global.UrlRequired"></RadzenRequiredValidator>
         </div>
-        <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Update" Disabled=@(!isJWKSUrlUsed) />
+        <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@Global.Update" Disabled=@(!isJWKSUrlUsed) />
     </RadzenTemplateForm>
 </div>
 
 <hr />
 
 <div>
-    <RadzenButton class="mb-1" Click="@(args => GenerateKey())" Icon="add" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium" Text="Generate new key" />
+    <RadzenButton class="mb-1" Click="@(args => GenerateKey())" Icon="add" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium" Text="@Global.GenerateNewKey" />
 
     <RadzenDataGrid AllowFiltering="true"
                     AllowColumnResize="true"
@@ -52,9 +52,9 @@
                     <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="SelectableClientKey" Property="Value.Kid" Filterable="false" Sortable="true" SortOrder=SortOrder.Ascending Title="Identifier" Width="80px" />
-            <RadzenDataGridColumn TItem="SelectableClientKey" Property="Value.Alg" Filterable="false" Title="Algorithm" Width="80px" />
-            <RadzenDataGridColumn TItem="SelectableClientKey" Filterable="false" Title="Usage" Width="80px">
+            <RadzenDataGridColumn TItem="SelectableClientKey" Property="Value.Kid" Filterable="false" Sortable="true" SortOrder=SortOrder.Ascending Title="@Global.Identifier" Width="80px" />
+            <RadzenDataGridColumn TItem="SelectableClientKey" Property="Value.Alg" Filterable="false" Title="@Global.Algorithm" Width="80px" />
+            <RadzenDataGridColumn TItem="SelectableClientKey" Filterable="false" Title="@Global.Usage" Width="80px">
                 <Template Context="data">
                     <RadzenBadge Text="@data.Value.Usage" IsPill="true" />
                 </Template>
@@ -113,7 +113,7 @@
     {
         contextMenuService.Open(args, new List<ContextMenuItem>
         {
-            new ContextMenuItem { Text = "Delete", Value = 1 }
+            new ContextMenuItem { Text = Global.Delete, Value = 1 }
         }, (a) =>
     {
     if (a.Value.Equals(1))
@@ -153,7 +153,7 @@
 
     async void GenerateKey()
     {
-        await dialogService.OpenAsync<GenerateKeyDialog>("Generate key", new Dictionary<string, object>
+        await dialogService.OpenAsync<GenerateKeyDialog>(Global.GenerateNewKey, new Dictionary<string, object>
         {
             { "Client", Client }
         }, new DialogOptions

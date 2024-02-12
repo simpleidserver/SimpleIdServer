@@ -9,8 +9,8 @@
 @using SimpleIdServer.IdServer.Website.Stores.AuthMethodsStore;
 
 <RadzenBreadCrumb>
-    <RadzenBreadCrumbItem Path="/authentications/authmethods" Text="Authentication methods" />
-    <RadzenBreadCrumbItem Text="Options" />
+    <RadzenBreadCrumbItem Path="/authentications/authmethods" Text="@Global.AuthenticationMethods" />
+    <RadzenBreadCrumbItem Text="@Global.Options" />
 </RadzenBreadCrumb>
 
 <RadzenText class="mt-3 mb-3" Text="@authMethodState.Value.AuthenticationMethod?.Name" TextStyle="TextStyle.DisplayH3" />

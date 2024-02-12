@@ -11,21 +11,21 @@
 <RadzenTemplateForm Submit=@SubmitUpdateIdProviderDetails TItem="UpdateIdProviderDetails" Data=@updateIdProviderDetails>
     <!-- Name -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Name</RadzenText>
         <RadzenTextBox Name="Name" @bind-Value="@updateIdProviderDetails.Name" Class="w-100" Disabled=true></RadzenTextBox>
     </div>
     <!-- Display Name -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Display Name</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.DisplayName</RadzenText>
         <RadzenTextBox Name="DisplayName" @bind-Value="@updateIdProviderDetails.DisplayName" Class="w-100"></RadzenTextBox>
-        <RadzenRequiredValidator Component="DisplayName" Text="Display Name is required"></RadzenRequiredValidator>
+        <RadzenRequiredValidator Component="DisplayName" Text="@Global.DisplayNameRequired"></RadzenRequiredValidator>
     </div>
     <!-- Description -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Description</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Description</RadzenText>
         <RadzenTextArea Name="Description" @bind-Value="@updateIdProviderDetails.Description" Class="w-100"></RadzenTextArea>
     </div>
-    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateIdProvider.Value.IsUpdating ? "Updating..." : "Update")" Disabled=@updateIdProvider.Value.IsUpdating />
+    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateIdProvider.Value.IsUpdating ? Global.Updating : Global.Update)" Disabled=@updateIdProvider.Value.IsUpdating />
 </RadzenTemplateForm>
 @code {
     [Parameter]

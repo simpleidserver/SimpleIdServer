@@ -1,11 +1,12 @@
-﻿@using SimpleIdServer.IdServer.Website.Stores.GroupStore;
+﻿@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.GroupStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject IState<GroupMembersState> groupsMembersState
 @inject IDispatcher dispatcher
 @inject ContextMenuService contextMenuService
 @inject DialogService dialogService
 
-<RadzenButton class="mb-1" Click="@(args => AddMember())" Icon="add" Text="Add member" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+<RadzenButton class="mb-1" Click="@(args => AddMember())" Icon="add" Text="@Global.AddMember" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
 
 <RadzenDataGrid AllowFiltering="true"
                 AllowColumnResize="true"
@@ -30,13 +31,13 @@
                 <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableGroupMember" Filterable="false" Sortable="true" Title="Name" Width="80px">
+        <RadzenDataGridColumn TItem="SelectableGroupMember" Filterable="false" Sortable="true" Title="@Global.Name" Width="80px">
             <Template Context="data">
                 <RadzenLink Text="@data.Value.Name" Path="@($"/groups/{data.Value.Id}/children")" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableGroupMember" Property="Value.Description" Filterable="false" Sortable="false" Title="Description" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableGroupMember" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Update datetime" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableGroupMember" Property="Value.Description" Filterable="false" Sortable="false" Title="@Global.Description" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableGroupMember" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableGroupMember" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
                 <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
@@ -55,7 +56,7 @@
     {
         contextMenuService.Open(args, new List<ContextMenuItem>
         {
-            new ContextMenuItem { Text = "Delete", Value = 1 }
+            new ContextMenuItem { Text = Global.Delete, Value = 1 }
         }, (a) =>
         {
             if (a.Value.Equals(1))
@@ -94,7 +95,7 @@
 
     async void AddMember()
     {
-        await dialogService.OpenAsync<AddGroupDialog>("Add member", new Dictionary<string, object>
+        await dialogService.OpenAsync<AddGroupDialog>(Global.AddMember, new Dictionary<string, object>
         {
             { "ParentId", Group.Id }
         }, new DialogOptions

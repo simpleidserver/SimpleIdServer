@@ -10,17 +10,17 @@
 <RadzenTemplateForm Submit=@SubmitAddClientCertificate TItem="ClientCertificateForm" Data=@clientCertificate>
     <!-- Key -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Subject Name</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.SubjectName</RadzenText>
         <RadzenTextBox Name="SubjectName" @bind-Value="@clientCertificate.SubjectName" Class="w-100"></RadzenTextBox>
-        <RadzenRequiredValidator Component="SubjectName" Text="Subject Name is required"></RadzenRequiredValidator>
+        <RadzenRequiredValidator Component="SubjectName" Text="@Global.SubjectNameRequired"></RadzenRequiredValidator>
     </div>
     <!-- Number of days -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Number of Days</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.NumberOfDays</RadzenText>
         <RadzenNumeric Name="NbDays" @bind-Value="@clientCertificate.NbDays" Class="w-100"></RadzenNumeric>
-        <RadzenRequiredValidator Component="NbDays" Text="Number of days is required"></RadzenRequiredValidator>
+        <RadzenRequiredValidator Component="NbDays" Text="@Global.NumberOfDaysRequired"></RadzenRequiredValidator>
     </div>
-    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateCertificateAuthorityState.Value.IsUpdating ? "Adding..." : "Add")" Disabled=updateCertificateAuthorityState.Value.IsUpdating />
+    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateCertificateAuthorityState.Value.IsUpdating ? Global.Adding : Global.Add)" Disabled=updateCertificateAuthorityState.Value.IsUpdating />
 </RadzenTemplateForm>
 
 @code{

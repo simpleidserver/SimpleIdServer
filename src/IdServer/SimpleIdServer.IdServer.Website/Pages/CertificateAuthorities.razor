@@ -1,5 +1,6 @@
 ﻿@page "/certificateauthorities"
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@using Microsoft.AspNetCore.Html;
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
@@ -13,17 +14,15 @@
 
 <div class="row">
     <div class="col">
-        <RadzenText class="mt-3 mb-3 no-margin" Text="Certificate Authorities" TextStyle="TextStyle.DisplayH3" />
+        <RadzenText class="mt-3 mb-3 no-margin" Text="@Global.CertificateAuthoritiesTitle" TextStyle="TextStyle.DisplayH3" />
         <p>
-            Manage the Certificate Authorities used by SimpleIdServer during the configuration of the <i>tls_client_auth</i> authentication method
+            @(new HtmlString(Global.CertificateAuthoritiesDescription))
         </p>
     </div>
     <div class="col-3">
-        <RadzenButton class="mb-1" Click="@(args => AddCertificateAuthority())" Icon="add" Text="Add Certificate Authority" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+        <RadzenButton class="mb-1" Click="@(args => AddCertificateAuthority())" Icon="add" Text="@Global.AddCertificateAuthority" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
     </div>
 </div>
-
-
 
 <RadzenDataGrid @ref="caGrid"
                 AllowFiltering="true"
@@ -50,19 +49,19 @@
                 <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Filterable="false" Sortable="false" Title="Identifier" Width="80px">
+        <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Filterable="false" Sortable="false" Title="@Global.Identifier" Width="80px">
             <Template Context="data">
                 <RadzenLink Text="@data.Value.SubjectName" Path="@($"/certificateauthorities/{data.Value.Id}/details")" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Filterable="false" Sortable="false" Title="Source" Width="80px">
+        <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Filterable="false" Sortable="false" Title="@Global.Source" Width="80px">
             <Template Context="data">
                 <RadzenBadge Text="@(Enum.GetName(typeof(CertificateAuthoritySources), data.Value.Source))" IsPill="true" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Property="Value.StartDateTime" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Title="Start Datetime" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Property="Value.EndDateTime" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Title="End Datetime" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Update datetime" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Property="Value.StartDateTime" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Title="@Global.StartDatetime" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Property="Value.EndDateTime" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Title="@Global.EndDatetime" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
                 <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
@@ -112,8 +111,8 @@
     {
         contextMenuService.Open(args, new List<ContextMenuItem>
         {
-            new ContextMenuItem { Text = "Delete", Value = 1 },
-            new ContextMenuItem { Text = "Download", Value = 2 }
+            new ContextMenuItem { Text = Global.Delete, Value = 1 },
+            new ContextMenuItem { Text = Global.Download, Value = 2 }
         }, (a) =>
         {
             if (a.Value.Equals(1))
@@ -158,7 +157,7 @@
 
     async void AddCertificateAuthority()
     {
-        await dialogService.OpenAsync<AddCertificateAuthorityDialog>("Add Certificate Authority", new Dictionary<string, object>(), new DialogOptions
+        await dialogService.OpenAsync<AddCertificateAuthorityDialog>(Global.AddCertificateAuthority, new Dictionary<string, object>(), new DialogOptions
         {
             Width = "700px",
             Height = "512px",

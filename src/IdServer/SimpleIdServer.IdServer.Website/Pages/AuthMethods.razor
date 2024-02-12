@@ -22,12 +22,12 @@
                                 <div>
                                     @if (authMethod.Capabilities.HasFlag(AuthenticationMethodCapabilities.USERAUTHENTICATION))
                                     {
-                                        <RadzenBadge BadgeStyle="BadgeStyle.Info" Variant="Variant.Outlined">Authentication</RadzenBadge>
+                                        <RadzenBadge BadgeStyle="BadgeStyle.Info" Variant="Variant.Outlined">@Global.Authentication</RadzenBadge>
                                     }
 
                                     @if (authMethod.Capabilities.HasFlag(AuthenticationMethodCapabilities.PUSHNOTIFICATION))
                                     {
-                                        <RadzenBadge BadgeStyle="BadgeStyle.Info" Variant="Variant.Outlined">Push notification</RadzenBadge>
+                                        <RadzenBadge BadgeStyle="BadgeStyle.Info" Variant="Variant.Outlined">@Global.PushNotification</RadzenBadge>
                                     }
                                 </div>
                             </RadzenStack>
@@ -45,12 +45,12 @@
                             <div>
                                 @if (authMethod.Capabilities.HasFlag(AuthenticationMethodCapabilities.USERAUTHENTICATION))
                                 {
-                                    <RadzenBadge BadgeStyle="BadgeStyle.Info" Variant="Variant.Outlined">Authentication</RadzenBadge>
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Info" Variant="Variant.Outlined">@Global.Authentication</RadzenBadge>
                                 }
 
                                 @if (authMethod.Capabilities.HasFlag(AuthenticationMethodCapabilities.PUSHNOTIFICATION))
                                 {
-                                    <RadzenBadge BadgeStyle="BadgeStyle.Info" Variant="Variant.Outlined">Push notification</RadzenBadge>
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Info" Variant="Variant.Outlined">>@Global.PushNotification</RadzenBadge>
                                 }
                             </div>
                         </RadzenStack>

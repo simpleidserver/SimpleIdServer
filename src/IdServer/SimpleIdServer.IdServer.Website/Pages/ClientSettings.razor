@@ -15,11 +15,11 @@
 <RadzenTemplateForm Submit=@SubmitUpdateClient TItem="UpdateClient" Data=@updateClient>
     <RadzenAccordion Multiple=true>    
         <Items>
-            <RadzenAccordionItem Text="General settings" Selected=true>
+            <RadzenAccordionItem Text="@Global.GeneralSettings" Selected=true>
                 <!-- Client ID -->
                 <div class="row">
                     <div class="col-md-2">
-                        <RadzenLabel Text="Client ID" Style="padding: 0px;" />
+                        <RadzenLabel Text="@Global.ClientIdentifier" Style="padding: 0px;" />
                     </div>
                     <div class="col">
                         <RadzenTextBox Name="ClientId" @bind-Value="@updateClient.ClientId" Class="w-100" Disabled=true></RadzenTextBox>
@@ -28,10 +28,10 @@
                 <!-- Name -->
                 <div class="row mt-1">
                     <div class="col-md-2">
-                        <RadzenLabel Text="Name" Style="padding: 0px;" />
+                        <RadzenLabel Text="@Global.Name" Style="padding: 0px;" />
                     </div>
                     <div class="col">
-                        <RadzenTextBox Name="ClientId" @bind-Value="@updateClient.ClientName" Class="w-100"></RadzenTextBox>
+                        <RadzenTextBox Name="ClientName" @bind-Value="@updateClient.ClientName" Class="w-100"></RadzenTextBox>
                     </div>
                 </div>
                 <!-- Access Token Type -->
@@ -39,7 +39,7 @@
                 {                    
                     <div class="row mt-1">
                         <div class="col-md-2">
-                            <RadzenLabel Text="Access Token Type" Style="padding: 0px;" />
+                            <RadzenLabel Text="@Global.AccessTokenType" Style="padding: 0px;" />
                         </div>
                         <div class="col">
                             <RadzenDropDown Name="AccessTokenType" Class="w-100"
@@ -60,12 +60,12 @@
                 Client.ClientType == ClientTypes.HIGHLYSECUREDWEBSITE ||
                 Client.ClientType == ClientTypes.GRANTMANAGEMENT)
             {
-                <RadzenAccordionItem Text="Access settings" Selected=true>
+                <RadzenAccordionItem Text="@Global.AccessSettings" Selected=true>
                     <!-- Redirect URIs -->
                     <div class="row">
                         <div class="col-md-2">
-                            <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, "Valid URI pattern a browser can redirect to after a successful login. <br /> Redirection URLs must be passed as a list of URL separated by ;"))" />
-                            <RadzenLabel Text="Validation redirection URIs" Style="padding: 0px;" />
+                            <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, Global.ValidationRedirectionUrisTooltip))" />
+                            <RadzenLabel Text="@Global.ValidationRedirectionUris" Style="padding: 0px;" />
                         </div>
                         <div class="col">
                             <RadzenTextBox Name="RedirectionUris" @bind-Value="@updateClient.RedirectionUrls" Class="w-100"></RadzenTextBox>
@@ -74,8 +74,8 @@
                     <!-- Post logout redirect URIs -->
                     <div class="row mt-2">
                         <div class="col-md-2">
-                            <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, "Array of URLs supplied by the RP to which it MAY request that the End-User's User Agent be redirected using the post_logout_redirect_uri parameter after a logout has been performed. <br /> Post Logout URLs must be passed as a list of URL separated by ;"))" />
-                            <RadzenLabel Text="Validation post logout redirect URIs" Style="padding: 0px;" />
+                            <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, Global.ValidationPostLogoutRedirectUrisTooltip))" />
+                            <RadzenLabel Text="@Global.ValidationPostLogoutRedirectUris" Style="padding: 0px;" />
                         </div>
                         <div class="col">
                             <RadzenTextBox Name="PostLogoutRedirectUris" @bind-Value="@updateClient.PostLogoutRedirectUris" Class="w-100"></RadzenTextBox>
@@ -84,8 +84,8 @@
                     <!-- Redirect URL is case sensitive -->
                     <div class="row mat-2">
                         <div class="col-md-2">
-                            <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, "Redirect URL is case sensitive"))" />
-                            <RadzenLabel Text="Redirect URL is case sensitive" Style="padding: 0px;" />
+                            <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, Global.RedirectUrlCaseSensitiveTooltip))" />
+                            <RadzenLabel Text="@Global.RedirectUrlCaseSensitive" Style="padding: 0px;" />
                         </div>
                         <div class="col">
                             <RadzenCheckBox Name="IsRedirectUrlCaseSensitive" @bind-Value="@updateClient.IsRedirectUrlCaseSensitive"></RadzenCheckBox>
@@ -93,8 +93,8 @@
                     </div>
                     <div class="row mat-2">
                         <div class="col-md-2">
-                            <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, "After 3 seconds, the session is revoked, and the user agent is automatically redirected to the client"))" />
-                            <RadzenLabel Text="Manual action is required to revoke a session" Style="padding: 0px;" />
+                            <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, Global.ManualActionRequiredRevokeSessionTooltip))" />
+                            <RadzenLabel Text="@Global.ManualActionRequiredRevokeSession" Style="padding: 0px;" />
                         </div>
                         <div class="col">
                             <RadzenCheckBox Name="RedirectToRevokeSessionUI" @bind-Value="@updateClient.RedirectToRevokeSessionUI"></RadzenCheckBox>
@@ -104,14 +104,14 @@
             }
 
             @if(Client.ClientType != WsFederationConstants.CLIENT_TYPE)
-            {                
-                <RadzenAccordionItem Text="Capability config" Selected=true>
+            {
+                <RadzenAccordionItem Text="@Global.CapabilityConfig" Selected=true>
                     <!-- Grant types -->
                     @if(Client.ClientType != SimpleIdServer.IdServer.Saml.Idp.Constants.CLIENT_TYPE)
                     {
                         <div class="row">
                             <div class="col-md-2">
-                                <RadzenLabel Text="Access request" Style="padding: 0px;" />
+                                <RadzenLabel Text="@Global.AccessRequest" Style="padding: 0px;" />
                             </div>
                             <div class="col">
                                 @if (Client.ClientType == ClientTypes.MACHINE)
@@ -119,22 +119,22 @@
                                     <!-- Client credentials  -->
                                     <div>
                                         <RadzenCheckBox Name="IsClientCredentialsGrantTypeEnabled" Disabled=true @bind-Value=updateClient.IsClientCredentialsGrantTypeEnabled></RadzenCheckBox>
-                                        <RadzenLabel Text="Client credentials" Component="IsClientCredentialsGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
+                                        <RadzenLabel Text="@Global.ClientCredentials" Component="IsClientCredentialsGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
                                     </div>
                                     <!-- Password -->
                                     <div>
                                         <RadzenCheckBox Name="IsPasswordGrantTypeEnabled" @bind-Value=updateClient.IsPasswordGrantTypeEnabled></RadzenCheckBox>
-                                        <RadzenLabel Text="Password" Component="IsPasswordGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
+                                        <RadzenLabel Text="@Global.Password" Component="IsPasswordGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
                                     </div>
                                     <!-- Refresh token -->
                                     <div>
                                         <RadzenCheckBox Name="IsRefreshTokenGrantTypeEnabled" @bind-Value=updateClient.IsRefreshTokenGrantTypeEnabled></RadzenCheckBox>
-                                        <RadzenLabel Text="Refresh token" Component="IsRefreshTokenGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
+                                        <RadzenLabel Text="@Global.RefreshToken" Component="IsRefreshTokenGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
                                     </div>
                                     <!-- Token exchange -->
                                     <div>
                                         <RadzenCheckBox Name="IsTokenExchangeEnabled" @bind-Value=updateClient.IsTokenExchangeEnabled></RadzenCheckBox>
-                                        <RadzenLabel Text="Token exchange" Component="IsTokenExchangeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
+                                        <RadzenLabel Text="@Global.TokenExchange" Component="IsTokenExchangeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
                                     </div>
                                 }
 
@@ -147,22 +147,22 @@
                                     <!-- Authorization code  -->
                                     <div>
                                         <RadzenCheckBox Name="IsAuthorizationCodeGrantTypeEnabled" Disabled=true @bind-Value=updateClient.IsAuthorizationCodeGrantTypeEnabled></RadzenCheckBox>
-                                        <RadzenLabel Text="Authorization code" Component="IsAuthorizationCodeGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
+                                        <RadzenLabel Text="@Global.AuthorizationCode" Component="IsAuthorizationCodeGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
                                     </div>
                                     <!-- CIBA -->
                                     <div>
                                         <RadzenCheckBox Name="IsCIBAGrantTypeEnabled" @bind-Value=updateClient.IsCIBAGrantTypeEnabled></RadzenCheckBox>
-                                        <RadzenLabel Text="CIBA" Component="IsCIBAGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
+                                        <RadzenLabel Text="@Global.CIBA" Component="IsCIBAGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
                                     </div>
                                     <!-- UMA -->
                                     <div>
                                         <RadzenCheckBox Name="IsUMAGrantTypeEnabled" @bind-Value=updateClient.IsUMAGrantTypeEnabled></RadzenCheckBox>
-                                        <RadzenLabel Text="UMA" Component="IsUMAGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
+                                        <RadzenLabel Text="@Global.UMA" Component="IsUMAGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
                                     </div>
                                     <!-- Refresh token -->
                                     <div>
                                         <RadzenCheckBox Name="IsRefreshTokenGrantTypeEnabled" @bind-Value=updateClient.IsRefreshTokenGrantTypeEnabled></RadzenCheckBox>
-                                        <RadzenLabel Text="Refresh token" Component="IsRefreshTokenGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
+                                        <RadzenLabel Text="@Global.RefreshToken" Component="IsRefreshTokenGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
                                     </div>
                                 }
 
@@ -171,7 +171,7 @@
                                     <!-- DEVICE -->
                                     <div>
                                         <RadzenCheckBox Name="IsDeviceGrantTypeEnabled" @bind-Value=updateClient.IsDeviceGrantTypeEnabled></RadzenCheckBox>
-                                        <RadzenLabel Text="Device" Component="IsDeviceGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
+                                        <RadzenLabel Text="@Global.Device" Component="IsDeviceGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
                                     </div>
                                 }
 
@@ -194,7 +194,7 @@
                                     <!-- Authorization code  -->
                                     <div>
                                         <RadzenCheckBox Name="IsAuthorizationCodeGrantTypeEnabled" Disabled=true @bind-Value=updateClient.IsAuthorizationCodeGrantTypeEnabled></RadzenCheckBox>
-                                        <RadzenLabel Text="Authorization code" Component="IsAuthorizationCodeGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
+                                        <RadzenLabel Text="@Global.AuthorizationCode" Component="IsAuthorizationCodeGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
                                     </div>
                                 }
                             </div>
@@ -205,7 +205,7 @@
                     {
                         <div class="row">
                             <div class="col-md-2">
-                                <RadzenLabel Text="Type of token exchange" Style="padding: 0px;" />
+                                <RadzenLabel Text="@Global.TokenExchangeType" Style="padding: 0px;" />
                             </div>
                             <div class="col">
                                 <RadzenDropDown Name="IdTokenSignedResponseAlg" Class="w-100"
@@ -223,7 +223,7 @@
                         <!-- Metadata Url -->
                         <div class="row">                            
                             <div class="col-md-2">
-                                <RadzenLabel Text="Metadata URL" Style="padding: 0px;" />
+                                <RadzenLabel Text="@Global.MetadataUrl" Style="padding: 0px;" />
                             </div>
                             <div class="col">
                                 <RadzenTextBox Name="MetadataUrl" @bind-Value="@updateClient.MetadataUrl" Class="w-100"></RadzenTextBox>
@@ -232,7 +232,7 @@
                         <!-- Use Artifact-->
                         <div class="row">
                             <div class="col-md-2">
-                                <RadzenLabel Text="Use Artifact" Style="padding: 0px;" />
+                                <RadzenLabel Text="@Global.UseArtifact" Style="padding: 0px;" />
                             </div>
                             <div class="col">
                                 <RadzenCheckBox Name="UseAcs" @bind-Value="@updateClient.UseAcs"></RadzenCheckBox>
@@ -250,11 +250,11 @@
                 Client.ClientType == ClientTypes.EXTERNAL ||
                 Client.ClientType == ClientTypes.CREDENTIAL_ISSUER)
             {
-                <RadzenAccordionItem Text="Login settings" Selected=true>
+                <RadzenAccordionItem Text="@Global.LoginSettings" Selected=true>
                     <!-- Consent required -->
                     <div class="row">
                         <div class="col-md-2">
-                            <RadzenLabel Text="Consent required" Style="padding: 0px;" />
+                            <RadzenLabel Text="@Global.ConsentRequired" Style="padding: 0px;" />
                         </div>
                         <div class="col">
                             <RadzenCheckBox @bind-Value=updateClient.IsConsentEnabled></RadzenCheckBox>
@@ -276,8 +276,8 @@
                     <!-- Front-channel logout session required -->
                     <div class="row">
                         <div class="col-md-2">
-                            <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, "Boolean value specifying whether the RP requires that iss (issuer) and sid (session id) query parameters be included to identify the RP session with the OP when the front_channel_logout_uri is used."))" />
-                            <RadzenLabel Text="Front-channel logout session required" Style="padding: 0px;" />
+                            <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, Global.FrontChannelLogoutSessionRequiredTooltip))" />
+                            <RadzenLabel Text="@Global.FrontChannelLogoutSessionRequired" Style="padding: 0px;" />
                         </div>
                         <div class="col">
                             <RadzenCheckBox Name="FrontChannelLogoutSessionRequired" @bind-Value=updateClient.FrontChannelLogoutSessionRequired></RadzenCheckBox>
@@ -286,8 +286,8 @@
                     <!-- Front-channel logout URL -->
                     <div class="row mt-2">
                         <div class="col-md-2">
-                            <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, "RP URL that will cause the RP to log itself out when rendered in an iframe by the OP."))" />
-                            <RadzenLabel Text="Front-channel logout URL" Style="padding: 0px;" />
+                            <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, Global.FrontChannelLogoutUriTooltip))" />
+                            <RadzenLabel Text="@Global.FrontChannelLogoutUri" Style="padding: 0px;" />
                         </div>
                         <div class="col">
                             <RadzenTextBox Name="FrontChannelLogoutUri" @bind-Value="@updateClient.FrontChannelLogoutUri" Class="w-100"></RadzenTextBox>
@@ -296,8 +296,8 @@
                     <!-- Backchannel logout session required  -->
                     <div class="row mt-2">
                         <div class="col-md-2">
-                            <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, "Boolean value specifying whether the OP can pass a SID claim in the Logout token to identify the RP session with the OP. <br /> If supported, the sid claim is also included in ID tokens issued by the OP."))" />
-                            <RadzenLabel Text="Backchannel logout session required" Style="padding: 0px;" />
+                            <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, Global.BackChannelLogoutSessionRequiredTooltip))" />
+                            <RadzenLabel Text="@Global.BackChannelLogoutSessionRequired" Style="padding: 0px;" />
                         </div>
                         <div class="col">
                             <RadzenCheckBox Name="BackChannelLogoutSessionRequired" @bind-Value="@updateClient.BackChannelLogoutSessionRequired"></RadzenCheckBox>
@@ -306,8 +306,8 @@
                     <!-- Back-channel logout URL -->
                     <div class="row mt-2">
                         <div class="col-md-2">
-                            <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, "RP URL that will cause the RP to log itself out when sent a Logout Token by the OP."))" />
-                            <RadzenLabel Text="Backchannel logout URL" Style="padding: 0px;" />
+                            <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, Global.BackChannelLogoutUriTooltip))" />
+                            <RadzenLabel Text="@Global.BackChannelLogoutUri" Style="padding: 0px;" />
                         </div>
                         <div class="col">
                             <RadzenTextBox Name="BackChannelLogoutUri" @bind-Value="@updateClient.BackChannelLogoutUri" Class="w-100"></RadzenTextBox>
@@ -318,7 +318,7 @@
         </Items>
     </RadzenAccordion>
 
-    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateClientState.Value.IsUpdating ? "Updating..." : "Update")" Disabled=@updateClientState.Value.IsUpdating />
+    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateClientState.Value.IsUpdating ? Global.Updating : Global.Update)" Disabled=@updateClientState.Value.IsUpdating />
 </RadzenTemplateForm>
 
 
@@ -328,14 +328,14 @@
 
     List<TokenExchangeType> AllTokenExchangeTypes = new List<TokenExchangeType>
     {
-        new TokenExchangeType { Value = TokenExchangeTypes.IMPERSONATION, Description = "Impersonation" },
-        new TokenExchangeType { Value = TokenExchangeTypes.DELEGATION, Description = "Delegation" }
+        new TokenExchangeType { Value = TokenExchangeTypes.IMPERSONATION, Description = Global.Impersonation },
+        new TokenExchangeType { Value = TokenExchangeTypes.DELEGATION, Description = Global.Delegation }
     };
 
     List<AccessTokenTypesDesc> AllAccessTokenTypes = new List<AccessTokenTypesDesc>
     {
-        new AccessTokenTypesDesc { Description = "Json Web Token (JWT)", Value = AccessTokenTypes.Jwt },
-        new AccessTokenTypesDesc { Description = "Reference", Value = AccessTokenTypes.Reference }
+        new AccessTokenTypesDesc { Description = Global.Jwt, Value = AccessTokenTypes.Jwt },
+        new AccessTokenTypesDesc { Description = Global.Reference, Value = AccessTokenTypes.Reference }
     };
 
     record AccessTokenTypesDesc

@@ -13,7 +13,7 @@
 @inject TooltipService tooltipService
 @inject NotificationService notificationService
 
-<RadzenButton class="mb-1" Click="@(args => AddScope())" Icon="add" Text="Add client scope" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+<RadzenButton class="mb-1" Click="@(args => AddScope())" Icon="add" Text="@Global.AddClientScope" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
 
 <RadzenDataGrid AllowFiltering="true"
                 AllowColumnResize="true"
@@ -38,12 +38,12 @@
                 <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableClientScope" Filterable="false" Sortable="true" Title="Name" Width="80px" SortOrder="SortOrder.Ascending">
+        <RadzenDataGridColumn TItem="SelectableClientScope" Filterable="false" Sortable="true" Title="@Global.Name" Width="80px" SortOrder="SortOrder.Ascending">
             <Template Context="data">
                 <RadzenLink Text="@data.Value.Name" Path="@($"/scopes/{data.Value.Id}/settings")" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableClientScope" Filterable="false" Sortable="false" Title="Type" Width="80px">
+        <RadzenDataGridColumn TItem="SelectableClientScope" Filterable="false" Sortable="false" Title="@Global.Type" Width="80px">
             <Template Context="data">
                 @if (data.Value.Type == ScopeTypes.IDENTITY)
                 {
@@ -55,7 +55,7 @@
                 }
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableClientScope" Property="Value.Description" Filterable="false" Sortable="false" Title="Description" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableClientScope" Property="Value.Description" Filterable="false" Sortable="false" Title="@Global.Description" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableClientScope" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
                 <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
@@ -106,7 +106,7 @@
 
     async void AddScope()
     {
-        await dialogService.OpenAsync<AddClientScopeDialog>("Add scopes", new Dictionary<string, object>
+        await dialogService.OpenAsync<AddClientScopeDialog>(Global.AddClientScope, new Dictionary<string, object>
         {
             { "Client", Client }
         }, new DialogOptions
@@ -122,7 +122,7 @@
     {
         contextMenuService.Open(args, new List<ContextMenuItem>
         {
-            new ContextMenuItem { Text = "Delete", Value = 1 }
+            new ContextMenuItem { Text = Global.Delete, Value = 1 }
         }, (a) =>
     {
         if (a.Value.Equals(1))

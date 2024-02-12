@@ -13,9 +13,9 @@
 @inject NotificationService notificationService
 
 <RadzenBreadCrumb>
-    <RadzenBreadCrumbItem Path="/scopes" Text="Scopes" />
-    <RadzenBreadCrumbItem Path=@("/scopes/" + id + "/mappers") Text="Scope details" />
-    <RadzenBreadCrumbItem Text="Mapper details" />
+    <RadzenBreadCrumbItem Path="/scopes" Text="@Global.Scopes" />
+    <RadzenBreadCrumbItem Path=@("/scopes/" + id + "/mappers") Text="@Global.ScopeDetails" />
+    <RadzenBreadCrumbItem Text="@Global.MapperDetails" />
 </RadzenBreadCrumb>
 
 <RadzenText class="mt-3 mb-3 no-margin" Text="@mapper?.Name" TextStyle="TextStyle.DisplayH3" />
@@ -41,7 +41,7 @@
             case MappingRuleTypes.SUBJECT:
                 <!-- Name -->
                 <div>
-                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Name</RadzenText>
                     <RadzenTextBox Name="Name" @bind-Value="@mapper.Name" Class="w-100" Disabled="true"></RadzenTextBox>
                 </div>
                 @if (scopeState.Value.Scope != null)
@@ -50,18 +50,18 @@
                     {
                         <!-- Token Claim Name -->
                         <div>
-                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Token Claim Name</RadzenText>
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.TokenClaimName</RadzenText>
                             <RadzenTextBox Name="TokenClaimName" @bind-Value="@mapper.TargetClaimPath" Class="w-100" Disabled=true></RadzenTextBox>
-                            <p class="text-muted">Name of the claim to insert into the token</p>
+                            <p class="text-muted">@Global.TokenClaimNameDescription</p>
                         </div>
                     }
                     else
                     {
                         <!-- Token Claim Name -->
                         <div>
-                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">SAML Attribute Name</RadzenText>
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.SamlAttributeName</RadzenText>
                             <RadzenTextBox Name="SAMLAttributeName" @bind-Value="@mapper.SAMLAttributeName" Class="w-100"></RadzenTextBox>
-                            <p class="text-muted">SAML Attribute Name</p>
+                            <p class="text-muted">@Global.SamlAttributeNameDescription</p>
                         </div>
                     }
                 }

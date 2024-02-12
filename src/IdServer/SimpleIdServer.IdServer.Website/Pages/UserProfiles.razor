@@ -7,7 +7,7 @@
 @inject ContextMenuService contextMenuService
 @inject NotificationService notificationService
 
-<p class="text-muted">List of external identification providers (such as Facebook and Google) linked to the user's profile.</p>
+<p class="text-muted">@Global.UserProfilesDescription</p>
 
 @if(User != null)
 {
@@ -25,9 +25,9 @@
             TItem="UserExternalAuthProvider" 
             ColumnWidth="300px">
         <Columns>
-            <RadzenDataGridColumn TItem="UserExternalAuthProvider" Property="Scheme" Title="Name" Filterable="false" Sortable="false" Width="80px" />
-            <RadzenDataGridColumn TItem="UserExternalAuthProvider" Property="Subject" Title="Login" Filterable="false" Sortable="false" Width="80px" />
-            <RadzenDataGridColumn TItem="UserExternalAuthProvider" Property="CreateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Created at" Width="80px" />
+            <RadzenDataGridColumn TItem="UserExternalAuthProvider" Property="Scheme" Title="@Global.Name" Filterable="false" Sortable="false" Width="80px" />
+            <RadzenDataGridColumn TItem="UserExternalAuthProvider" Property="Subject" Title="@Global.Login" Filterable="false" Sortable="false" Width="80px" />
+            <RadzenDataGridColumn TItem="UserExternalAuthProvider" Property="CreateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.CreatedAt" Width="80px" />
             <RadzenDataGridColumn TItem="UserExternalAuthProvider" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
                 <Template Context="data">
                     <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
@@ -58,7 +58,7 @@
     {
         contextMenuService.Open(args, new List<ContextMenuItem>
         {
-            new ContextMenuItem { Text = "Unlink", Value = 1 }
+            new ContextMenuItem { Text = Global.Unlink, Value = 1 }
         }, (a) =>
     {
         if (a.Value.Equals(1))

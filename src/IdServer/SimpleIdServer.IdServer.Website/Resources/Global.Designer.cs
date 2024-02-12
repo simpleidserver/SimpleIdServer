@@ -61,11 +61,182 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Access to the claims of the authenticated user.
+        /// </summary>
+        public static string AccessClaimsAuthenticatedUser {
+            get {
+                return ResourceManager.GetString("AccessClaimsAuthenticatedUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Access to one or more API resources.
+        /// </summary>
+        public static string AccessOneOrMoreApiResources {
+            get {
+                return ResourceManager.GetString("AccessOneOrMoreApiResources", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Access request.
+        /// </summary>
+        public static string AccessRequest {
+            get {
+                return ResourceManager.GetString("AccessRequest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Access settings.
+        /// </summary>
+        public static string AccessSettings {
+            get {
+                return ResourceManager.GetString("AccessSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Access Token Type.
+        /// </summary>
+        public static string AccessTokenType {
+            get {
+                return ResourceManager.GetString("AccessTokenType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Authentication Class Reference has been added.
         /// </summary>
         public static string AcrAdded {
             get {
                 return ResourceManager.GetString("AcrAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à ACR stands for Authentication Context Class Reference. It is used to enhance the user&apos;s level of assurance before accessing any sensitive information..
+        /// </summary>
+        public static string AcrsDescription {
+            get {
+                return ResourceManager.GetString("AcrsDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à ACRS.
+        /// </summary>
+        public static string AcrsTitle {
+            get {
+                return ResourceManager.GetString("AcrsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Active.
+        /// </summary>
+        public static string Active {
+            get {
+                return ResourceManager.GetString("Active", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Add.
+        /// </summary>
+        public static string Add {
+            get {
+                return ResourceManager.GetString("Add", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Add Authentication Context Reference.
+        /// </summary>
+        public static string AddAcr {
+            get {
+                return ResourceManager.GetString("AddAcr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Add API resource.
+        /// </summary>
+        public static string AddApiResource {
+            get {
+                return ResourceManager.GetString("AddApiResource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Add Certificate Authority.
+        /// </summary>
+        public static string AddCertificateAuthority {
+            get {
+                return ResourceManager.GetString("AddCertificateAuthority", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Add claim.
+        /// </summary>
+        public static string AddClaim {
+            get {
+                return ResourceManager.GetString("AddClaim", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Add client.
+        /// </summary>
+        public static string AddClient {
+            get {
+                return ResourceManager.GetString("AddClient", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Add Client Certificate.
+        /// </summary>
+        public static string AddClientCertificate {
+            get {
+                return ResourceManager.GetString("AddClientCertificate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Add client scope.
+        /// </summary>
+        public static string AddClientScope {
+            get {
+                return ResourceManager.GetString("AddClientScope", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Add credential.
+        /// </summary>
+        public static string AddCredential {
+            get {
+                return ResourceManager.GetString("AddCredential", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Add group.
+        /// </summary>
+        public static string AddGroup {
+            get {
+                return ResourceManager.GetString("AddGroup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Add Identity Provider.
+        /// </summary>
+        public static string AddIdentityProvider {
+            get {
+                return ResourceManager.GetString("AddIdentityProvider", resourceCulture);
             }
         }
         
@@ -79,6 +250,105 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Add Mapper.
+        /// </summary>
+        public static string AddMapper {
+            get {
+                return ResourceManager.GetString("AddMapper", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Add mapping rule.
+        /// </summary>
+        public static string AddMappingRule {
+            get {
+                return ResourceManager.GetString("AddMappingRule", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Add member.
+        /// </summary>
+        public static string AddMember {
+            get {
+                return ResourceManager.GetString("AddMember", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Add realm.
+        /// </summary>
+        public static string AddRealm {
+            get {
+                return ResourceManager.GetString("AddRealm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Add registration workflow.
+        /// </summary>
+        public static string AddRegistrationWorkflow {
+            get {
+                return ResourceManager.GetString("AddRegistrationWorkflow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Add client role.
+        /// </summary>
+        public static string AddRole {
+            get {
+                return ResourceManager.GetString("AddRole", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Add scope.
+        /// </summary>
+        public static string AddScope {
+            get {
+                return ResourceManager.GetString("AddScope", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Add user.
+        /// </summary>
+        public static string AddUser {
+            get {
+                return ResourceManager.GetString("AddUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Advanced.
+        /// </summary>
+        public static string Advanced {
+            get {
+                return ResourceManager.GetString("Advanced", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Algorithm.
+        /// </summary>
+        public static string Algorithm {
+            get {
+                return ResourceManager.GetString("Algorithm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à API Resource.
+        /// </summary>
+        public static string ApiResource {
+            get {
+                return ResourceManager.GetString("ApiResource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à API Resource with the name &apos;{0}&apos; already exists.
         /// </summary>
         public static string ApiResourceAlreadyExists {
@@ -88,11 +358,146 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à API Resources.
+        /// </summary>
+        public static string ApiResources {
+            get {
+                return ResourceManager.GetString("ApiResources", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à API Scope.
+        /// </summary>
+        public static string ApiScope {
+            get {
+                return ResourceManager.GetString("ApiScope", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à API Value.
+        /// </summary>
+        public static string APIValue {
+            get {
+                return ResourceManager.GetString("APIValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Are-you sure?.
+        /// </summary>
+        public static string AreYouSure {
+            get {
+                return ResourceManager.GetString("AreYouSure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Assign groups.
+        /// </summary>
+        public static string AssignGroups {
+            get {
+                return ResourceManager.GetString("AssignGroups", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à At least one redirection URL must be specified.
         /// </summary>
         public static string AtLeastOneRedirectionUrl {
             get {
                 return ResourceManager.GetString("AtLeastOneRedirectionUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Authentication attempt today.
+        /// </summary>
+        public static string AttemptAuthentication {
+            get {
+                return ResourceManager.GetString("AttemptAuthentication", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Attribute.
+        /// </summary>
+        public static string Attribute {
+            get {
+                return ResourceManager.GetString("Attribute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Audience.
+        /// </summary>
+        public static string Audience {
+            get {
+                return ResourceManager.GetString("Audience", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Auditing.
+        /// </summary>
+        public static string Auditing {
+            get {
+                return ResourceManager.GetString("Auditing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Authentication.
+        /// </summary>
+        public static string Authentication {
+            get {
+                return ResourceManager.GetString("Authentication", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Authentication method.
+        /// </summary>
+        public static string AuthenticationMethod {
+            get {
+                return ResourceManager.GetString("AuthenticationMethod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Authentication method is required.
+        /// </summary>
+        public static string AuthenticationMethodRequired {
+            get {
+                return ResourceManager.GetString("AuthenticationMethodRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Authentication methods.
+        /// </summary>
+        public static string AuthenticationMethods {
+            get {
+                return ResourceManager.GetString("AuthenticationMethods", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Authentications.
+        /// </summary>
+        public static string Authentications {
+            get {
+                return ResourceManager.GetString("Authentications", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Authentication time.
+        /// </summary>
+        public static string AuthenticationTime {
+            get {
+                return ResourceManager.GetString("AuthenticationTime", resourceCulture);
             }
         }
         
@@ -115,6 +520,96 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Authorization data types.
+        /// </summary>
+        public static string AuthorizationDataTypes {
+            get {
+                return ResourceManager.GetString("AuthorizationDataTypes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Authorization data types must be passed as a list separated by &lt;b&gt;;&lt;/b&gt;.
+        /// </summary>
+        public static string AuthorizationDataTypesDescription {
+            get {
+                return ResourceManager.GetString("AuthorizationDataTypesDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Authorization data types supported by the client.
+        /// </summary>
+        public static string AuthorizationDataTypesTooltip {
+            get {
+                return ResourceManager.GetString("AuthorizationDataTypesTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Authorization details.
+        /// </summary>
+        public static string AuthorizationDetails {
+            get {
+                return ResourceManager.GetString("AuthorizationDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Authorization response signature algorithm.
+        /// </summary>
+        public static string AuthorizationResponseSignatureAlg {
+            get {
+                return ResourceManager.GetString("AuthorizationResponseSignatureAlg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à JWA algorithm used for signing authorization response tokens when the response mode is jwt..
+        /// </summary>
+        public static string AuthorizationResponseSignatureAlgTooltip {
+            get {
+                return ResourceManager.GetString("AuthorizationResponseSignatureAlgTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Backchannel logout session required.
+        /// </summary>
+        public static string BackChannelLogoutSessionRequired {
+            get {
+                return ResourceManager.GetString("BackChannelLogoutSessionRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Boolean value specifying whether the OP can pass a SID claim in the Logout token to identify the RP session with the OP. &lt;br /&gt; If supported, the sid claim is also included in ID tokens issued by the OP..
+        /// </summary>
+        public static string BackChannelLogoutSessionRequiredTooltip {
+            get {
+                return ResourceManager.GetString("BackChannelLogoutSessionRequiredTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Backchannel logout URL.
+        /// </summary>
+        public static string BackChannelLogoutUri {
+            get {
+                return ResourceManager.GetString("BackChannelLogoutUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à RP URL that will cause the RP to log itself out when sent a Logout Token by the OP..
+        /// </summary>
+        public static string BackChannelLogoutUriTooltip {
+            get {
+                return ResourceManager.GetString("BackChannelLogoutUriTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Realm cannot be added because the option is disabled.
         /// </summary>
         public static string CannotAddRealmBecauseOptionIsDisabled {
@@ -133,11 +628,56 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Capability config.
+        /// </summary>
+        public static string CapabilityConfig {
+            get {
+                return ResourceManager.GetString("CapabilityConfig", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Manage the Certificate Authorities used by SimpleIdServer during the configuration of the &lt;i&gt;tls_client_auth&lt;/i&gt; authentication method.
+        /// </summary>
+        public static string CertificateAuthoritiesDescription {
+            get {
+                return ResourceManager.GetString("CertificateAuthoritiesDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Certificate Authorities.
+        /// </summary>
+        public static string CertificateAuthoritiesTitle {
+            get {
+                return ResourceManager.GetString("CertificateAuthoritiesTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Certificate Authority Details.
+        /// </summary>
+        public static string CertificateAuthorityDetailsTitle {
+            get {
+                return ResourceManager.GetString("CertificateAuthorityDetailsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Certificate Authority has been saved.
         /// </summary>
         public static string CertificateAuthoritySaved {
             get {
                 return ResourceManager.GetString("CertificateAuthoritySaved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Certificate Authority Type.
+        /// </summary>
+        public static string CertificateAuthorityType {
+            get {
+                return ResourceManager.GetString("CertificateAuthorityType", resourceCulture);
             }
         }
         
@@ -156,6 +696,78 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string CertificateDoesntHavePrivateKey {
             get {
                 return ResourceManager.GetString("CertificateDoesntHavePrivateKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Certificate store.
+        /// </summary>
+        public static string CertificateStore {
+            get {
+                return ResourceManager.GetString("CertificateStore", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Children.
+        /// </summary>
+        public static string Children {
+            get {
+                return ResourceManager.GetString("Children", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Choose a type of mapping rule.
+        /// </summary>
+        public static string ChooseMappingRule {
+            get {
+                return ResourceManager.GetString("ChooseMappingRule", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Choose realm.
+        /// </summary>
+        public static string ChooseRealm {
+            get {
+                return ResourceManager.GetString("ChooseRealm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à CIBA.
+        /// </summary>
+        public static string CIBA {
+            get {
+                return ResourceManager.GetString("CIBA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Claims.
+        /// </summary>
+        public static string Claims {
+            get {
+                return ResourceManager.GetString("Claims", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à List of user claims..
+        /// </summary>
+        public static string ClaimsDescription {
+            get {
+                return ResourceManager.GetString("ClaimsDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Client.
+        /// </summary>
+        public static string Client {
+            get {
+                return ResourceManager.GetString("Client", resourceCulture);
             }
         }
         
@@ -187,11 +799,38 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Client Certificate.
+        /// </summary>
+        public static string ClientCertificate {
+            get {
+                return ResourceManager.GetString("ClientCertificate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Client Certificate has been added.
         /// </summary>
         public static string ClientCertificateAdded {
             get {
                 return ResourceManager.GetString("ClientCertificateAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Client certificates.
+        /// </summary>
+        public static string ClientCertificates {
+            get {
+                return ResourceManager.GetString("ClientCertificates", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Client credentials.
+        /// </summary>
+        public static string ClientCredentials {
+            get {
+                return ResourceManager.GetString("ClientCredentials", resourceCulture);
             }
         }
         
@@ -205,11 +844,65 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Client details.
+        /// </summary>
+        public static string ClientDetailsTitle {
+            get {
+                return ResourceManager.GetString("ClientDetailsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Client identifier.
+        /// </summary>
+        public static string ClientIdentifier {
+            get {
+                return ResourceManager.GetString("ClientIdentifier", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Client role has been added.
         /// </summary>
         public static string ClientRoleAdded {
             get {
                 return ResourceManager.GetString("ClientRoleAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Clients.
+        /// </summary>
+        public static string Clients {
+            get {
+                return ResourceManager.GetString("Clients", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Clients authorized to access an API resource are granted access to one or more scopes. For example, a &lt;i&gt;Client API&lt;/i&gt; can have scopes such as &lt;i&gt;read,delete,update&lt;/i&gt;. For more information, please refer to the documentation at &lt;a href=&apos;https://www.rfc-editor.org/rfc/rfc8707.pdf&apos; target=&apos;_blank&apos;&gt;RFC8707&lt;/a&gt;.
+        /// </summary>
+        public static string ClientsAuthorizedToAccessApiResource {
+            get {
+                return ResourceManager.GetString("ClientsAuthorizedToAccessApiResource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Clients authorized to access the Identity Value have access to specific claims. Standard Identity Resources are defined by the OPENID standard (such as profile, email, etc.). For more information, please refer to the documentation at &lt;a href=&apos;https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims&apos; target=&apos;_blank&apos;&gt;OPENID Connect Core 1.0 - Scope Claims&lt;/a&gt;.
+        /// </summary>
+        public static string ClientsAuthorizedToAccessSpecificClaims {
+            get {
+                return ResourceManager.GetString("ClientsAuthorizedToAccessSpecificClaims", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Client scopes.
+        /// </summary>
+        public static string ClientScopes {
+            get {
+                return ResourceManager.GetString("ClientScopes", resourceCulture);
             }
         }
         
@@ -223,6 +916,69 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Set up mobile, web, or IoT clients to use SimpleIdServer for authentication..
+        /// </summary>
+        public static string ClientsDescription {
+            get {
+                return ResourceManager.GetString("ClientsDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Client secret.
+        /// </summary>
+        public static string ClientSecret {
+            get {
+                return ResourceManager.GetString("ClientSecret", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The application utilizes the HTTP Basic Authentication scheme..
+        /// </summary>
+        public static string ClientSecretBasicDescription {
+            get {
+                return ResourceManager.GetString("ClientSecretBasicDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Client secret basic.
+        /// </summary>
+        public static string ClientSecretBasicName {
+            get {
+                return ResourceManager.GetString("ClientSecretBasicName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The application includes its secret in the HTTP request body as a form parameter..
+        /// </summary>
+        public static string ClientSecretPostDescription {
+            get {
+                return ResourceManager.GetString("ClientSecretPostDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Client secret post.
+        /// </summary>
+        public static string ClientSecretPostName {
+            get {
+                return ResourceManager.GetString("ClientSecretPostName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Client secret is required.
+        /// </summary>
+        public static string ClientSecretRequired {
+            get {
+                return ResourceManager.GetString("ClientSecretRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Client settings have been updated.
         /// </summary>
         public static string ClientSettingsUpdated {
@@ -232,11 +988,74 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Clients.
+        /// </summary>
+        public static string ClientsTitle {
+            get {
+                return ResourceManager.GetString("ClientsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Confirmed.
+        /// </summary>
+        public static string Confirmed {
+            get {
+                return ResourceManager.GetString("Confirmed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Consent required.
+        /// </summary>
+        public static string ConsentRequired {
+            get {
+                return ResourceManager.GetString("ConsentRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Consents.
+        /// </summary>
+        public static string Consents {
+            get {
+                return ResourceManager.GetString("Consents", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Created at.
+        /// </summary>
+        public static string CreatedAt {
+            get {
+                return ResourceManager.GetString("CreatedAt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Creation Datetime.
+        /// </summary>
+        public static string CreateDateTime {
+            get {
+                return ResourceManager.GetString("CreateDateTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Credential offer has been added.
         /// </summary>
         public static string CredentialOfferAdded {
             get {
                 return ResourceManager.GetString("CredentialOfferAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Credentials.
+        /// </summary>
+        public static string Credentials {
+            get {
+                return ResourceManager.GetString("Credentials", resourceCulture);
             }
         }
         
@@ -286,6 +1105,69 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Data.
+        /// </summary>
+        public static string Data {
+            get {
+                return ResourceManager.GetString("Data", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Delegation.
+        /// </summary>
+        public static string Delegation {
+            get {
+                return ResourceManager.GetString("Delegation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Delete.
+        /// </summary>
+        public static string Delete {
+            get {
+                return ResourceManager.GetString("Delete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Description.
+        /// </summary>
+        public static string Description {
+            get {
+                return ResourceManager.GetString("Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Description is required.
+        /// </summary>
+        public static string DescriptionRequired {
+            get {
+                return ResourceManager.GetString("DescriptionRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Details.
+        /// </summary>
+        public static string Details {
+            get {
+                return ResourceManager.GetString("Details", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Device.
+        /// </summary>
+        public static string Device {
+            get {
+                return ResourceManager.GetString("Device", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à DID has been generated.
         /// </summary>
         public static string DIDKeyCreated {
@@ -295,11 +1177,128 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Disable.
+        /// </summary>
+        public static string Disable {
+            get {
+                return ResourceManager.GetString("Disable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Display name.
+        /// </summary>
+        public static string DisplayName {
+            get {
+                return ResourceManager.GetString("DisplayName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Display Name is required.
+        /// </summary>
+        public static string DisplayNameRequired {
+            get {
+                return ResourceManager.GetString("DisplayNameRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Display Only Errors.
+        /// </summary>
+        public static string DisplayOnlyErrors {
+            get {
+                return ResourceManager.GetString("DisplayOnlyErrors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à DNS.
+        /// </summary>
+        public static string Dns {
+            get {
+                return ResourceManager.GetString("Dns", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Download.
+        /// </summary>
+        public static string Download {
+            get {
+                return ResourceManager.GetString("Download", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Lifetime of DPoP Nonce.
+        /// </summary>
+        public static string DpopNonceLifetime {
+            get {
+                return ResourceManager.GetString("DpopNonceLifetime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Lifetime of a DPoP nonce in seconds..
+        /// </summary>
+        public static string DpopNonceLifetimeTooltip {
+            get {
+                return ResourceManager.GetString("DpopNonceLifetimeTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Email.
+        /// </summary>
+        public static string Email {
+            get {
+                return ResourceManager.GetString("Email", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Encryption key has been added.
         /// </summary>
         public static string EncKeyAdded {
             get {
                 return ResourceManager.GetString("EncKeyAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à End Datetime.
+        /// </summary>
+        public static string EndDatetime {
+            get {
+                return ResourceManager.GetString("EndDatetime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à End export.
+        /// </summary>
+        public static string EndExport {
+            get {
+                return ResourceManager.GetString("EndExport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à End import.
+        /// </summary>
+        public static string EndImport {
+            get {
+                return ResourceManager.GetString("EndImport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Error Message.
+        /// </summary>
+        public static string ErrorMessage {
+            get {
+                return ResourceManager.GetString("ErrorMessage", resourceCulture);
             }
         }
         
@@ -331,11 +1330,200 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Execution history..
+        /// </summary>
+        public static string ExecutionHistory {
+            get {
+                return ResourceManager.GetString("ExecutionHistory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Expiration time.
+        /// </summary>
+        public static string ExpirationTime {
+            get {
+                return ResourceManager.GetString("ExpirationTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Expired.
+        /// </summary>
+        public static string Expired {
+            get {
+                return ResourceManager.GetString("Expired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à External authentication provider has been unlinked.
         /// </summary>
         public static string ExternalAuthProviderUnlinked {
             get {
                 return ResourceManager.GetString("ExternalAuthProviderUnlinked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à External identity providers.
+        /// </summary>
+        public static string ExternalIdentityProviders {
+            get {
+                return ResourceManager.GetString("ExternalIdentityProviders", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à External Identity Providers.
+        /// </summary>
+        public static string ExternalIdProviders {
+            get {
+                return ResourceManager.GetString("ExternalIdProviders", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Extracted.
+        /// </summary>
+        public static string Extracted {
+            get {
+                return ResourceManager.GetString("Extracted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Extraction result.
+        /// </summary>
+        public static string ExtractionResult {
+            get {
+                return ResourceManager.GetString("ExtractionResult", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Find type.
+        /// </summary>
+        public static string FindType {
+            get {
+                return ResourceManager.GetString("FindType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Find value.
+        /// </summary>
+        public static string FindValue {
+            get {
+                return ResourceManager.GetString("FindValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à First name.
+        /// </summary>
+        public static string Firstname {
+            get {
+                return ResourceManager.GetString("Firstname", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à From.
+        /// </summary>
+        public static string From {
+            get {
+                return ResourceManager.GetString("From", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Front-channel logout session required.
+        /// </summary>
+        public static string FrontChannelLogoutSessionRequired {
+            get {
+                return ResourceManager.GetString("FrontChannelLogoutSessionRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Boolean value specifying whether the RP requires that iss (issuer) and sid (session id) query parameters be included to identify the RP session with the OP when the front_channel_logout_uri is used..
+        /// </summary>
+        public static string FrontChannelLogoutSessionRequiredTooltip {
+            get {
+                return ResourceManager.GetString("FrontChannelLogoutSessionRequiredTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Front-channel logout URL.
+        /// </summary>
+        public static string FrontChannelLogoutUri {
+            get {
+                return ResourceManager.GetString("FrontChannelLogoutUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à RP URL that will cause the RP to log itself out when rendered in an iframe by the OP..
+        /// </summary>
+        public static string FrontChannelLogoutUriTooltip {
+            get {
+                return ResourceManager.GetString("FrontChannelLogoutUriTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à General settings.
+        /// </summary>
+        public static string GeneralSettings {
+            get {
+                return ResourceManager.GetString("GeneralSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Generate.
+        /// </summary>
+        public static string Generate {
+            get {
+                return ResourceManager.GetString("Generate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Generate a Certificate Authority and store it in the database..
+        /// </summary>
+        public static string GenerateCADescription {
+            get {
+                return ResourceManager.GetString("GenerateCADescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Generate one Certificate Authority.
+        /// </summary>
+        public static string GenerateCAName {
+            get {
+                return ResourceManager.GetString("GenerateCAName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Generate new key.
+        /// </summary>
+        public static string GenerateNewKey {
+            get {
+                return ResourceManager.GetString("GenerateNewKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Group.
+        /// </summary>
+        public static string Group {
+            get {
+                return ResourceManager.GetString("Group", resourceCulture);
             }
         }
         
@@ -358,6 +1546,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Group details.
+        /// </summary>
+        public static string GroupDetails {
+            get {
+                return ResourceManager.GetString("GroupDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Member has been added.
         /// </summary>
         public static string GroupMemberAdded {
@@ -372,6 +1569,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string GroupMembersRemoved {
             get {
                 return ResourceManager.GetString("GroupMembersRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Group name.
+        /// </summary>
+        public static string GroupName {
+            get {
+                return ResourceManager.GetString("GroupName", resourceCulture);
             }
         }
         
@@ -394,6 +1600,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Groups.
+        /// </summary>
+        public static string Groups {
+            get {
+                return ResourceManager.GetString("Groups", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Histories.
+        /// </summary>
+        public static string Histories {
+            get {
+                return ResourceManager.GetString("Histories", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Identifier.
         /// </summary>
         public static string Identifier {
@@ -412,11 +1636,110 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Identity Provider details.
+        /// </summary>
+        public static string IdentityProviderDetails {
+            get {
+                return ResourceManager.GetString("IdentityProviderDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Identity Provider mappers.
+        /// </summary>
+        public static string IdentityProviderMappers {
+            get {
+                return ResourceManager.GetString("IdentityProviderMappers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Identity providers.
+        /// </summary>
+        public static string IdentityProviders {
+            get {
+                return ResourceManager.GetString("IdentityProviders", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Configure external Identity Providers such as Facebook, Twitter, GitHub, and others, so that your users can log in using them..
+        /// </summary>
+        public static string IdentityProvidersDescription {
+            get {
+                return ResourceManager.GetString("IdentityProvidersDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Identity Provider Type.
+        /// </summary>
+        public static string IdentityProviderType {
+            get {
+                return ResourceManager.GetString("IdentityProviderType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Identity provisioning.
+        /// </summary>
+        public static string IdentityProvisioning {
+            get {
+                return ResourceManager.GetString("IdentityProvisioning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Identity Provisioning details.
+        /// </summary>
+        public static string IdentityProvisioningDetails {
+            get {
+                return ResourceManager.GetString("IdentityProvisioningDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Identity Provisioning is launched.
         /// </summary>
         public static string IdentityProvisioningLaunched {
             get {
                 return ResourceManager.GetString("IdentityProvisioningLaunched", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Extract users and groups from one or more storage sources..
+        /// </summary>
+        public static string IdentityProvisioningLstDescription {
+            get {
+                return ResourceManager.GetString("IdentityProvisioningLstDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Identity Resource.
+        /// </summary>
+        public static string IdentityResource {
+            get {
+                return ResourceManager.GetString("IdentityResource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Identity Scope.
+        /// </summary>
+        public static string IdentityScope {
+            get {
+                return ResourceManager.GetString("IdentityScope", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Identity Value.
+        /// </summary>
+        public static string IdentityValue {
+            get {
+                return ResourceManager.GetString("IdentityValue", resourceCulture);
             }
         }
         
@@ -511,11 +1834,83 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à IdServer swagger.
+        /// </summary>
+        public static string IdServerSwagger {
+            get {
+                return ResourceManager.GetString("IdServerSwagger", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à ID token signature algorithm.
+        /// </summary>
+        public static string IdTokenSignatureAlg {
+            get {
+                return ResourceManager.GetString("IdTokenSignatureAlg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à JWA algorithm used for signing ID tokens.
+        /// </summary>
+        public static string IdTokenSignatureAlgTooltip {
+            get {
+                return ResourceManager.GetString("IdTokenSignatureAlgTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Impersonation.
+        /// </summary>
+        public static string Impersonation {
+            get {
+                return ResourceManager.GetString("Impersonation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Import.
+        /// </summary>
+        public static string Import {
+            get {
+                return ResourceManager.GetString("Import", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Imported.
+        /// </summary>
+        public static string Imported {
+            get {
+                return ResourceManager.GetString("Imported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Import is launched.
         /// </summary>
         public static string ImportLaunched {
             get {
                 return ResourceManager.GetString("ImportLaunched", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Import users and groups.
+        /// </summary>
+        public static string ImportUsersAndGroupsTooltip {
+            get {
+                return ResourceManager.GetString("ImportUsersAndGroupsTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Information.
+        /// </summary>
+        public static string Information {
+            get {
+                return ResourceManager.GetString("Information", resourceCulture);
             }
         }
         
@@ -529,6 +1924,78 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Ip.
+        /// </summary>
+        public static string Ip {
+            get {
+                return ResourceManager.GetString("Ip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Is default?.
+        /// </summary>
+        public static string IsDefault {
+            get {
+                return ResourceManager.GetString("IsDefault", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Is DPoP Nonce required?.
+        /// </summary>
+        public static string IsDpopNonceRequired {
+            get {
+                return ResourceManager.GetString("IsDpopNonceRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à May be used by the authorization server to limit the lifetime of DPoP Proof..
+        /// </summary>
+        public static string IsDpopNonceRequiredTooltip {
+            get {
+                return ResourceManager.GetString("IsDpopNonceRequiredTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Is DPoP required?.
+        /// </summary>
+        public static string IsDpopRequired {
+            get {
+                return ResourceManager.GetString("IsDpopRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à DPoP is an application-level mechanism for sender-constraining OAuth access and refresh tokens..
+        /// </summary>
+        public static string IsDpopRequiredTooltip {
+            get {
+                return ResourceManager.GetString("IsDpopRequiredTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Is exposed ?.
+        /// </summary>
+        public static string IsExposed {
+            get {
+                return ResourceManager.GetString("IsExposed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Scope can be exposed by the configuration endpoint &lt;i&gt;.well-known/openid-configuration&lt;/i&gt;.
+        /// </summary>
+        public static string IsExposedDescription {
+            get {
+                return ResourceManager.GetString("IsExposedDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à JWKS Url has been updated.
         /// </summary>
         public static string JWKSUrlUpdated {
@@ -538,11 +2005,164 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Json Web Token (JWT).
+        /// </summary>
+        public static string Jwt {
+            get {
+                return ResourceManager.GetString("Jwt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Key.
+        /// </summary>
+        public static string Key {
+            get {
+                return ResourceManager.GetString("Key", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Key is required.
+        /// </summary>
+        public static string KeyRequired {
+            get {
+                return ResourceManager.GetString("KeyRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Keys.
+        /// </summary>
+        public static string Keys {
+            get {
+                return ResourceManager.GetString("Keys", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Label.
+        /// </summary>
+        public static string Label {
+            get {
+                return ResourceManager.GetString("Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Last name.
+        /// </summary>
+        public static string Lastname {
+            get {
+                return ResourceManager.GetString("Lastname", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Launch.
+        /// </summary>
+        public static string Launch {
+            get {
+                return ResourceManager.GetString("Launch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Login.
+        /// </summary>
+        public static string Login {
+            get {
+                return ResourceManager.GetString("Login", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Login settings.
+        /// </summary>
+        public static string LoginSettings {
+            get {
+                return ResourceManager.GetString("LoginSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Manage.
         /// </summary>
         public static string Manage {
             get {
                 return ResourceManager.GetString("Manage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Manual action is required to revoke a session.
+        /// </summary>
+        public static string ManualActionRequiredRevokeSession {
+            get {
+                return ResourceManager.GetString("ManualActionRequiredRevokeSession", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à After 3 seconds, the session is revoked, and the user agent is automatically redirected to the client.
+        /// </summary>
+        public static string ManualActionRequiredRevokeSessionTooltip {
+            get {
+                return ResourceManager.GetString("ManualActionRequiredRevokeSessionTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Mapper details.
+        /// </summary>
+        public static string MapperDetails {
+            get {
+                return ResourceManager.GetString("MapperDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Mappers.
+        /// </summary>
+        public static string Mappers {
+            get {
+                return ResourceManager.GetString("Mappers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Mapper Type.
+        /// </summary>
+        public static string MapperType {
+            get {
+                return ResourceManager.GetString("MapperType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Mapping rules.
+        /// </summary>
+        public static string MappingRules {
+            get {
+                return ResourceManager.GetString("MappingRules", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Map to one user claim.
+        /// </summary>
+        public static string MapToOneUserClaim {
+            get {
+                return ResourceManager.GetString("MapToOneUserClaim", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Metadata URL.
+        /// </summary>
+        public static string MetadataUrl {
+            get {
+                return ResourceManager.GetString("MetadataUrl", resourceCulture);
             }
         }
         
@@ -565,6 +2185,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à No.
+        /// </summary>
+        public static string No {
+            get {
+                return ResourceManager.GetString("No", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à There is no property.
         /// </summary>
         public static string NoProperties {
@@ -574,11 +2203,245 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Notification mode.
+        /// </summary>
+        public static string NotificationMode {
+            get {
+                return ResourceManager.GetString("NotificationMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Notification mode used during Backchannel Authentication.
+        /// </summary>
+        public static string NotificationModeTooltip {
+            get {
+                return ResourceManager.GetString("NotificationModeTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Number of days.
+        /// </summary>
+        public static string NumberOfDays {
+            get {
+                return ResourceManager.GetString("NumberOfDays", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Number of days the certificate will be valid.
+        /// </summary>
+        public static string NumberOfDaysDescription {
+            get {
+                return ResourceManager.GetString("NumberOfDaysDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Number of Days is required.
+        /// </summary>
+        public static string NumberOfDaysRequired {
+            get {
+                return ResourceManager.GetString("NumberOfDaysRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à OAUTH.
+        /// </summary>
+        public static string OAuth {
+            get {
+                return ResourceManager.GetString("OAuth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à OPENID.
+        /// </summary>
+        public static string OpenId {
+            get {
+                return ResourceManager.GetString("OpenId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à OpenID Connect.
+        /// </summary>
+        public static string OpenIdConnect {
+            get {
+                return ResourceManager.GetString("OpenIdConnect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Options.
+        /// </summary>
+        public static string Options {
+            get {
+                return ResourceManager.GetString("Options", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à One Time Password (OTP).
+        /// </summary>
+        public static string Otp {
+            get {
+                return ResourceManager.GetString("Otp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à A random and unique password will be generated.
+        /// </summary>
+        public static string OtpCredDescription {
+            get {
+                return ResourceManager.GetString("OtpCredDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Password.
+        /// </summary>
+        public static string Password {
+            get {
+                return ResourceManager.GetString("Password", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Generate a static password.
+        /// </summary>
+        public static string PasswordCredDescription {
+            get {
+                return ResourceManager.GetString("PasswordCredDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Path.
+        /// </summary>
+        public static string Path {
+            get {
+                return ResourceManager.GetString("Path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Pending.
+        /// </summary>
+        public static string Pending {
+            get {
+                return ResourceManager.GetString("Pending", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à It introduces a secret generated by the calling application that can be validated by the authorization server..
+        /// </summary>
+        public static string PKCEDescription {
+            get {
+                return ResourceManager.GetString("PKCEDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à PKCE.
+        /// </summary>
+        public static string PKCEName {
+            get {
+                return ResourceManager.GetString("PKCEName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Private Key.
+        /// </summary>
+        public static string PrivateKey {
+            get {
+                return ResourceManager.GetString("PrivateKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Private pem.
+        /// </summary>
+        public static string PrivatePem {
+            get {
+                return ResourceManager.GetString("PrivatePem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Process import has been started.
         /// </summary>
         public static string ProcessImportStarted {
             get {
                 return ResourceManager.GetString("ProcessImportStarted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Properties.
+        /// </summary>
+        public static string Properties {
+            get {
+                return ResourceManager.GetString("Properties", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Property.
+        /// </summary>
+        public static string Property {
+            get {
+                return ResourceManager.GetString("Property", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Protocol.
+        /// </summary>
+        public static string Protocol {
+            get {
+                return ResourceManager.GetString("Protocol", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Protocol is required.
+        /// </summary>
+        public static string ProtocolIsRequired {
+            get {
+                return ResourceManager.GetString("ProtocolIsRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Public Key.
+        /// </summary>
+        public static string PublicKey {
+            get {
+                return ResourceManager.GetString("PublicKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Public pem.
+        /// </summary>
+        public static string PublicPem {
+            get {
+                return ResourceManager.GetString("PublicPem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Push notification.
+        /// </summary>
+        public static string PushNotification {
+            get {
+                return ResourceManager.GetString("PushNotification", resourceCulture);
             }
         }
         
@@ -628,11 +2491,65 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Redirect URL is case sensitive.
+        /// </summary>
+        public static string RedirectUrlCaseSensitive {
+            get {
+                return ResourceManager.GetString("RedirectUrlCaseSensitive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Redirect URL is case sensitive.
+        /// </summary>
+        public static string RedirectUrlCaseSensitiveTooltip {
+            get {
+                return ResourceManager.GetString("RedirectUrlCaseSensitiveTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Reference.
+        /// </summary>
+        public static string Reference {
+            get {
+                return ResourceManager.GetString("Reference", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Refresh token.
+        /// </summary>
+        public static string RefreshToken {
+            get {
+                return ResourceManager.GetString("RefreshToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Registration methods.
+        /// </summary>
+        public static string RegistrationMethods {
+            get {
+                return ResourceManager.GetString("RegistrationMethods", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Registration workflow &apos;{0}&apos; has been added.
         /// </summary>
         public static string RegistrationWorkflowAdded {
             get {
                 return ResourceManager.GetString("RegistrationWorkflowAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Registration Workflows.
+        /// </summary>
+        public static string RegistrationWorkflows {
+            get {
+                return ResourceManager.GetString("RegistrationWorkflows", resourceCulture);
             }
         }
         
@@ -646,11 +2563,200 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Reject.
+        /// </summary>
+        public static string Reject {
+            get {
+                return ResourceManager.GetString("Reject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Rejected.
+        /// </summary>
+        public static string Rejected {
+            get {
+                return ResourceManager.GetString("Rejected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Remove.
+        /// </summary>
+        public static string Remove {
+            get {
+                return ResourceManager.GetString("Remove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Remove subject claim mapper.
+        /// </summary>
+        public static string RemoveSubjectClaimMapper {
+            get {
+                return ResourceManager.GetString("RemoveSubjectClaimMapper", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Request.
+        /// </summary>
+        public static string Request {
+            get {
+                return ResourceManager.GetString("Request", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Reset.
+        /// </summary>
+        public static string Reset {
+            get {
+                return ResourceManager.GetString("Reset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Resolve roles.
+        /// </summary>
+        public static string ResolveRoles {
+            get {
+                return ResourceManager.GetString("ResolveRoles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Resource.
+        /// </summary>
+        public static string Resource {
+            get {
+                return ResourceManager.GetString("Resource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Resource type.
+        /// </summary>
+        public static string ResourceType {
+            get {
+                return ResourceManager.GetString("ResourceType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Response types.
+        /// </summary>
+        public static string ResponseTypes {
+            get {
+                return ResourceManager.GetString("ResponseTypes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Informs the Authorization Server of the desired authorization processing flow, including what parameters are returned from the endpoints used..
+        /// </summary>
+        public static string ResponseTypesTooltip {
+            get {
+                return ResourceManager.GetString("ResponseTypesTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Revoke.
+        /// </summary>
+        public static string Revoke {
+            get {
+                return ResourceManager.GetString("Revoke", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Revoke sessions.
+        /// </summary>
+        public static string RevokeSessions {
+            get {
+                return ResourceManager.GetString("RevokeSessions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Role.
+        /// </summary>
+        public static string Role {
+            get {
+                return ResourceManager.GetString("Role", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Roles.
+        /// </summary>
+        public static string Roles {
+            get {
+                return ResourceManager.GetString("Roles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Create and manage Groups for your Applications. Groups contain collections of Permissions and can be assigned to Users..
+        /// </summary>
+        public static string RolesDescription {
+            get {
+                return ResourceManager.GetString("RolesDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à SAML.
+        /// </summary>
+        public static string Saml {
+            get {
+                return ResourceManager.GetString("Saml", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à SAML Attribute Name.
+        /// </summary>
+        public static string SamlAttributeName {
+            get {
+                return ResourceManager.GetString("SamlAttributeName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à SAML Attribute Name.
+        /// </summary>
+        public static string SamlAttributeNameDescription {
+            get {
+                return ResourceManager.GetString("SamlAttributeNameDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Save.
         /// </summary>
         public static string Save {
             get {
                 return ResourceManager.GetString("Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Saving....
+        /// </summary>
+        public static string Saving {
+            get {
+                return ResourceManager.GetString("Saving", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à SCIM endpoint.
+        /// </summary>
+        public static string ScimEdp {
+            get {
+                return ResourceManager.GetString("ScimEdp", resourceCulture);
             }
         }
         
@@ -718,6 +2824,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Scope details.
+        /// </summary>
+        public static string ScopeDetails {
+            get {
+                return ResourceManager.GetString("ScopeDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Scope details have been updated.
         /// </summary>
         public static string ScopeDetailsUpdated {
@@ -732,6 +2847,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string ScopeResourceAdded {
             get {
                 return ResourceManager.GetString("ScopeResourceAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Select one or more active &lt;b&gt;API resources&lt;/b&gt;  for the scope. The &lt;b&gt;aud&lt;/b&gt; claim is populated with the relevant &lt;b&gt;API resources&lt;/b&gt;. This claim is utilized by the API during the authorization process.
+        /// </summary>
+        public static string ScopeResourcesDescription {
+            get {
+                return ResourceManager.GetString("ScopeResourcesDescription", resourceCulture);
             }
         }
         
@@ -754,6 +2878,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Scopes.
+        /// </summary>
+        public static string Scopes {
+            get {
+                return ResourceManager.GetString("Scopes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Specify the precise actions or resources that a client application can access on behalf of an end-user..
+        /// </summary>
+        public static string ScopesDescription {
+            get {
+                return ResourceManager.GetString("ScopesDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Secret.
         /// </summary>
         public static string Secret {
@@ -768,6 +2910,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string SecretIsRequired {
             get {
                 return ResourceManager.GetString("SecretIsRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Select one or more authentication methods and update the order. The order is important as it determines the sequence of actions for authenticating the end-user..
+        /// </summary>
+        public static string SelectAmrsHelper {
+            get {
+                return ResourceManager.GetString("SelectAmrsHelper", resourceCulture);
             }
         }
         
@@ -970,6 +3121,69 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Select realm.
+        /// </summary>
+        public static string SelectRealm {
+            get {
+                return ResourceManager.GetString("SelectRealm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Select response types.
+        /// </summary>
+        public static string SelectResponseTypes {
+            get {
+                return ResourceManager.GetString("SelectResponseTypes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The application utilizes a self-signed certificate. The public key of the certificate (RSA or EC) must be provided to the Identity Server either as a value in JWKS (JSON Web Key Set) format or as a URL using the jwks_uri..
+        /// </summary>
+        public static string SelfSignedX509CertificateDescription {
+            get {
+                return ResourceManager.GetString("SelfSignedX509CertificateDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Self Signed X509 Certificate.
+        /// </summary>
+        public static string SelfSignedX509CertificateName {
+            get {
+                return ResourceManager.GetString("SelfSignedX509CertificateName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Sessions.
+        /// </summary>
+        public static string Sessions {
+            get {
+                return ResourceManager.GetString("Sessions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Set the name of the group.
+        /// </summary>
+        public static string SetGroupName {
+            get {
+                return ResourceManager.GetString("SetGroupName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Show data.
+        /// </summary>
+        public static string ShowData {
+            get {
+                return ResourceManager.GetString("ShowData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Signature key has been added.
         /// </summary>
         public static string SigKeyAdded {
@@ -988,11 +3202,290 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The application constructs a JWT assertion that includes a message authentication code (MAC) in its signature component, and includes it in the request..
+        /// </summary>
+        public static string SignedJwtClientSecretDescription {
+            get {
+                return ResourceManager.GetString("SignedJwtClientSecretDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Signed JWT with Client Secret.
+        /// </summary>
+        public static string SignedJwtClientSecretName {
+            get {
+                return ResourceManager.GetString("SignedJwtClientSecretName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The application creates a digitally signed JWT assertion and includes it in the request..
+        /// </summary>
+        public static string SignedJwtDescription {
+            get {
+                return ResourceManager.GetString("SignedJwtDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Signed jwt.
+        /// </summary>
+        public static string SignedJwtName {
+            get {
+                return ResourceManager.GetString("SignedJwtName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Source.
+        /// </summary>
+        public static string Source {
+            get {
+                return ResourceManager.GetString("Source", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Start Datetime.
+        /// </summary>
+        public static string StartDatetime {
+            get {
+                return ResourceManager.GetString("StartDatetime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Start export.
+        /// </summary>
+        public static string StartExport {
+            get {
+                return ResourceManager.GetString("StartExport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Start import.
+        /// </summary>
+        public static string StartImport {
+            get {
+                return ResourceManager.GetString("StartImport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à State.
+        /// </summary>
+        public static string State {
+            get {
+                return ResourceManager.GetString("State", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Status.
+        /// </summary>
+        public static string Status {
+            get {
+                return ResourceManager.GetString("Status", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Store Location.
+        /// </summary>
+        public static string StoreLocation {
+            get {
+                return ResourceManager.GetString("StoreLocation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Store name.
+        /// </summary>
+        public static string StoreName {
+            get {
+                return ResourceManager.GetString("StoreName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Subject.
+        /// </summary>
+        public static string Subject {
+            get {
+                return ResourceManager.GetString("Subject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Subject Name.
+        /// </summary>
+        public static string SubjectName {
+            get {
+                return ResourceManager.GetString("SubjectName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Contains identifying information about the entity to which the certificate is issued. &lt;br /&gt; It must starts with &lt;b&gt;CN=&lt;/b&gt;.
+        /// </summary>
+        public static string SubjectNameDescription {
+            get {
+                return ResourceManager.GetString("SubjectNameDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Subject Name is required.
+        /// </summary>
+        public static string SubjectNameRequired {
+            get {
+                return ResourceManager.GetString("SubjectNameRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Subject Distinguished Name.
+        /// </summary>
+        public static string SubjetDistinguishedName {
+            get {
+                return ResourceManager.GetString("SubjetDistinguishedName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Successful authentication today.
+        /// </summary>
+        public static string SuccessAuthentication {
+            get {
+                return ResourceManager.GetString("SuccessAuthentication", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à To.
+        /// </summary>
+        public static string To {
+            get {
+                return ResourceManager.GetString("To", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Token claim name.
+        /// </summary>
+        public static string TokenClaimName {
+            get {
+                return ResourceManager.GetString("TokenClaimName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Name of the claim to insert into the token.
+        /// </summary>
+        public static string TokenClaimNameDescription {
+            get {
+                return ResourceManager.GetString("TokenClaimNameDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Token exchange.
+        /// </summary>
+        public static string TokenExchange {
+            get {
+                return ResourceManager.GetString("TokenExchange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Token exchange pre-authorized code.
         /// </summary>
         public static string TokenExchangePreAuthorizedCode {
             get {
                 return ResourceManager.GetString("TokenExchangePreAuthorizedCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Type of token exchange.
+        /// </summary>
+        public static string TokenExchangeType {
+            get {
+                return ResourceManager.GetString("TokenExchangeType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Token expiration time.
+        /// </summary>
+        public static string TokenExpirationTime {
+            get {
+                return ResourceManager.GetString("TokenExpirationTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Set the token duration in seconds; by default, the value is 30 minutes..
+        /// </summary>
+        public static string TokenExpirationTimeTooltip {
+            get {
+                return ResourceManager.GetString("TokenExpirationTimeTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Token signature algorithm.
+        /// </summary>
+        public static string TokenSignatureAlg {
+            get {
+                return ResourceManager.GetString("TokenSignatureAlg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à JWA algorithm used for signing access tokens.
+        /// </summary>
+        public static string TokenSignatureAlgTooltip {
+            get {
+                return ResourceManager.GetString("TokenSignatureAlgTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Try to extract the users.
+        /// </summary>
+        public static string TryExtractUsers {
+            get {
+                return ResourceManager.GetString("TryExtractUsers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Type.
+        /// </summary>
+        public static string Type {
+            get {
+                return ResourceManager.GetString("Type", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à UMA.
+        /// </summary>
+        public static string UMA {
+            get {
+                return ResourceManager.GetString("UMA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Unassign.
+        /// </summary>
+        public static string Unassign {
+            get {
+                return ResourceManager.GetString("Unassign", resourceCulture);
             }
         }
         
@@ -1051,11 +3544,164 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Unlink.
+        /// </summary>
+        public static string Unlink {
+            get {
+                return ResourceManager.GetString("Unlink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Update.
+        /// </summary>
+        public static string Update {
+            get {
+                return ResourceManager.GetString("Update", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Update credential.
+        /// </summary>
+        public static string UpdateCredential {
+            get {
+                return ResourceManager.GetString("UpdateCredential", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Updated at.
+        /// </summary>
+        public static string UpdatedAt {
+            get {
+                return ResourceManager.GetString("UpdatedAt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Update datetime.
+        /// </summary>
+        public static string UpdateDateTime {
+            get {
+                return ResourceManager.GetString("UpdateDateTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Updating....
+        /// </summary>
+        public static string Updating {
+            get {
+                return ResourceManager.GetString("Updating", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Url.
+        /// </summary>
+        public static string Url {
+            get {
+                return ResourceManager.GetString("Url", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à URL is required.
+        /// </summary>
+        public static string UrlRequired {
+            get {
+                return ResourceManager.GetString("UrlRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Usage.
+        /// </summary>
+        public static string Usage {
+            get {
+                return ResourceManager.GetString("Usage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Use artifact.
+        /// </summary>
+        public static string UseArtifact {
+            get {
+                return ResourceManager.GetString("UseArtifact", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Utilize the Certificate Authority from your local Certificate Store. The Certificate must contain a &lt;b&gt;Private Key&lt;/b&gt;, which will be used to generate the Client Certificate..
+        /// </summary>
+        public static string UseCertificateStoreDescription {
+            get {
+                return ResourceManager.GetString("UseCertificateStoreDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Use Certificate Store.
+        /// </summary>
+        public static string UseCertificateStoreName {
+            get {
+                return ResourceManager.GetString("UseCertificateStoreName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Use JWKS URL.
+        /// </summary>
+        public static string UseJwksUrl {
+            get {
+                return ResourceManager.GetString("UseJwksUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à If the &apos;Use JWKS URL&apos; switch is enabled, you need to provide a valid JWKS URL. After saving, the administrator can download keys from the JWKS URL..
+        /// </summary>
+        public static string UseJwksUrlHelper {
+            get {
+                return ResourceManager.GetString("UseJwksUrlHelper", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à A new user has been added.
         /// </summary>
         public static string UserAdded {
             get {
                 return ResourceManager.GetString("UserAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à User attribute.
+        /// </summary>
+        public static string UserAttribute {
+            get {
+                return ResourceManager.GetString("UserAttribute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Map one claim to a user attribute.
+        /// </summary>
+        public static string UserAttributeDescription {
+            get {
+                return ResourceManager.GetString("UserAttributeDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à User claims.
+        /// </summary>
+        public static string UserClaims {
+            get {
+                return ResourceManager.GetString("UserClaims", resourceCulture);
             }
         }
         
@@ -1078,6 +3724,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à List of consents accepted by the user for specific clients..
+        /// </summary>
+        public static string UserConsentsDescription {
+            get {
+                return ResourceManager.GetString("UserConsentsDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à User credential has been added.
         /// </summary>
         public static string UserCredentialAdded {
@@ -1096,11 +3751,29 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à List of user credentials. Only one credential per type can be enabled..
+        /// </summary>
+        public static string UserCredentialsDescription {
+            get {
+                return ResourceManager.GetString("UserCredentialsDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à User credential is updated.
         /// </summary>
         public static string UserCredentialUpdated {
             get {
                 return ResourceManager.GetString("UserCredentialUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à User details.
+        /// </summary>
+        public static string UserDetails {
+            get {
+                return ResourceManager.GetString("UserDetails", resourceCulture);
             }
         }
         
@@ -1123,6 +3796,69 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à List of groups assigned to the user..
+        /// </summary>
+        public static string UserGroupsDescription {
+            get {
+                return ResourceManager.GetString("UserGroupsDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à User identifier.
+        /// </summary>
+        public static string UserIdentifier {
+            get {
+                return ResourceManager.GetString("UserIdentifier", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Map one claim to a user identifier.
+        /// </summary>
+        public static string UserIdentifierDescription {
+            get {
+                return ResourceManager.GetString("UserIdentifierDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à User Name.
+        /// </summary>
+        public static string UserName {
+            get {
+                return ResourceManager.GetString("UserName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à List of external identification providers (such as Facebook and Google) linked to the user&apos;s profile..
+        /// </summary>
+        public static string UserProfilesDescription {
+            get {
+                return ResourceManager.GetString("UserProfilesDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à User property.
+        /// </summary>
+        public static string UserProperty {
+            get {
+                return ResourceManager.GetString("UserProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Map one claim to a user property.
+        /// </summary>
+        public static string UserPropertyDescription {
+            get {
+                return ResourceManager.GetString("UserPropertyDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à User roles have been unassigned.
         /// </summary>
         public static string UserRolesUnassigned {
@@ -1132,11 +3868,191 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Users.
+        /// </summary>
+        public static string Users {
+            get {
+                return ResourceManager.GetString("Users", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à An easy way to manage user identities, handle credentials, and assign or remove groups..
+        /// </summary>
+        public static string UsersDescription {
+            get {
+                return ResourceManager.GetString("UsersDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à User session has been rejected.
         /// </summary>
         public static string UserSessionRejected {
             get {
                 return ResourceManager.GetString("UserSessionRejected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à List of active/inactive user sessions..
+        /// </summary>
+        public static string UserSessionsDescription {
+            get {
+                return ResourceManager.GetString("UserSessionsDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à User subject.
+        /// </summary>
+        public static string UserSubject {
+            get {
+                return ResourceManager.GetString("UserSubject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Map one claim to a user subject.
+        /// </summary>
+        public static string UserSubjectDescription {
+            get {
+                return ResourceManager.GetString("UserSubjectDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Validation post logout redirect URIs.
+        /// </summary>
+        public static string ValidationPostLogoutRedirectUris {
+            get {
+                return ResourceManager.GetString("ValidationPostLogoutRedirectUris", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Array of URLs supplied by the RP to which it MAY request that the End-User&apos;s User Agent be redirected using the post_logout_redirect_uri parameter after a logout has been performed. &lt;br /&gt; Post Logout URLs must be passed as a list of URL separated by ;.
+        /// </summary>
+        public static string ValidationPostLogoutRedirectUrisTooltip {
+            get {
+                return ResourceManager.GetString("ValidationPostLogoutRedirectUrisTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Validation redirection URIs.
+        /// </summary>
+        public static string ValidationRedirectionUris {
+            get {
+                return ResourceManager.GetString("ValidationRedirectionUris", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Valid URI pattern a browser can redirect to after a successful login. &lt;br /&gt; Redirection URLs must be passed as a list of URL separated by ;.
+        /// </summary>
+        public static string ValidationRedirectionUrisTooltip {
+            get {
+                return ResourceManager.GetString("ValidationRedirectionUrisTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Valid from.
+        /// </summary>
+        public static string ValidFrom {
+            get {
+                return ResourceManager.GetString("ValidFrom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Valid to.
+        /// </summary>
+        public static string ValidTo {
+            get {
+                return ResourceManager.GetString("ValidTo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Value.
+        /// </summary>
+        public static string Value {
+            get {
+                return ResourceManager.GetString("Value", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Value is required.
+        /// </summary>
+        public static string ValueRequired {
+            get {
+                return ResourceManager.GetString("ValueRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à View.
+        /// </summary>
+        public static string View {
+            get {
+                return ResourceManager.GetString("View", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à WebAuthn.
+        /// </summary>
+        public static string WebAuthn {
+            get {
+                return ResourceManager.GetString("WebAuthn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Workflow.
+        /// </summary>
+        public static string Workflow {
+            get {
+                return ResourceManager.GetString("Workflow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à WS-Federation.
+        /// </summary>
+        public static string WsFederation {
+            get {
+                return ResourceManager.GetString("WsFederation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The application employs a certificate issued by a trusted Certificate Authority (CA)..
+        /// </summary>
+        public static string X509CertificateDescription {
+            get {
+                return ResourceManager.GetString("X509CertificateDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à X509 Certificate.
+        /// </summary>
+        public static string X509CertificateName {
+            get {
+                return ResourceManager.GetString("X509CertificateName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Yes.
+        /// </summary>
+        public static string Yes {
+            get {
+                return ResourceManager.GetString("Yes", resourceCulture);
             }
         }
     }

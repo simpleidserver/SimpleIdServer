@@ -16,16 +16,16 @@
 
         <!-- Name -->
         <div>
-            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Name</RadzenText>
             <RadzenTextBox Name="Name" @bind-Value="@addRealmForm.Name" Class="w-100"></RadzenTextBox>
-            <RadzenRequiredValidator Component="Name" Text="Name is required"></RadzenRequiredValidator>
+            <RadzenRequiredValidator Component="Name" Text="@Global.NameIsRequired"></RadzenRequiredValidator>
         </div>
         <!-- Description -->
         <div>
-            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Description</RadzenText>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Description</RadzenText>
             <RadzenTextArea Name="Description" @bind-Value="@addRealmForm.Description" Class="w-100"></RadzenTextArea>
         </div>
-        <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateRealmState.Value.IsUpdating ? "Adding..." : "Add")" Disabled=updateRealmState.Value.IsUpdating />
+        <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateRealmState.Value.IsUpdating ? Global.Adding : Global.Add)" Disabled=updateRealmState.Value.IsUpdating />
     </RadzenTemplateForm>
 </RadzenCard>
 

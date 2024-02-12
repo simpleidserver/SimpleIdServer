@@ -11,13 +11,13 @@
 
 <div class="row">
     <div class="col">
-        <RadzenText class="mt-3 mb-3 no-margin" Text="Users" TextStyle="TextStyle.DisplayH3" />
+        <RadzenText class="mt-3 mb-3 no-margin" Text="@Global.Users" TextStyle="TextStyle.DisplayH3" />
         <p>
-            An easy way to manage user identities, handle credentials, and assign or remove groups.
+            @Global.UsersDescription
         </p>
     </div>
     <div class="col-3">
-        <RadzenButton class="mb-1" Click="@(args => AddUser())" Icon="add" Text="Add user" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+        <RadzenButton class="mb-1" Click="@(args => AddUser())" Icon="add" Text="@Global.AddUser" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
     </div>
 </div>
 
@@ -51,11 +51,11 @@
                 <RadzenLink Text="@data.Value.Id" Path="@($"/users/{data.Value.Id}/settings")" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableUser" Property="Value.Name" Filterable="false" Sortable="false" Title="Name" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableUser" Property="Value.Email" Filterable="false" Sortable="false" Title="Email" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableUser" Property="Value.Firstname" Filterable="false" Sortable="false" Title="First name" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableUser" Property="Value.Lastname" Filterable="false" Sortable="false" Title="Last name" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableUser" Filterable="false" Sortable="false" Title="Source" Width="80px">
+        <RadzenDataGridColumn TItem="SelectableUser" Property="Value.Name" Filterable="false" Sortable="false" Title="@Global.Name" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableUser" Property="Value.Email" Filterable="false" Sortable="false" Title="@Global.Email" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableUser" Property="Value.Firstname" Filterable="false" Sortable="false" Title="@Global.Firstname" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableUser" Property="Value.Lastname" Filterable="false" Sortable="false" Title="@Global.Lastname" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableUser" Filterable="false" Sortable="false" Title="@Global.Source" Width="80px">
             <Template Context="data">
                 @if(!string.IsNullOrWhiteSpace(data.Value.Source))
                 {
@@ -63,7 +63,7 @@
                 }
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableUser" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Update datetime" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableUser" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableUser" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">                
                 <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
@@ -116,7 +116,7 @@
     {
         contextMenuService.Open(args, new List<ContextMenuItem>
         {
-            new ContextMenuItem { Text = "Delete", Value = 1 }
+            new ContextMenuItem { Text = Global.Delete, Value = 1 }
         }, (a) => {
             if(a.Value.Equals(1)) 
             {
@@ -156,7 +156,7 @@
 
     async void AddUser()
     {
-        await dialogService.OpenAsync<AddUserDialog>("Add user", new Dictionary<string, object>(), new DialogOptions
+        await dialogService.OpenAsync<AddUserDialog>(Global.AddUser, new Dictionary<string, object>(), new DialogOptions
         {
             Width = "700px",
             Height ="512px",

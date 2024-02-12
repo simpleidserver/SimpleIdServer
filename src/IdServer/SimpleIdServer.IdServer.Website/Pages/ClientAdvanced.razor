@@ -1,4 +1,5 @@
-﻿@using SimpleIdServer.IdServer.Api.Token.Handlers;
+﻿@using Microsoft.AspNetCore.Html;
+@using SimpleIdServer.IdServer.Api.Token.Handlers;
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.ClientStore;
 @using SimpleIdServer.IdServer.Website.Stores.IdServerConfigurationStore;
@@ -19,8 +20,8 @@
                 <!-- TokenSignedResponseAlg -->
                 <div class="row">
                     <div class="col-md-2">
-                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, "JWA algorithm used for signing access tokens"))" />
-                        <RadzenLabel Text="Token signature algorithm" Style="padding: 0px;" />
+                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, Global.TokenSignatureAlgTooltip))" />
+                        <RadzenLabel Text="@Global.TokenSignatureAlg" Style="padding: 0px;" />
                     </div>
                     <div class="col">
                         <RadzenDropDown Name="TokenSignedResponseAlg" Class="w-100"
@@ -32,8 +33,8 @@
                 <!-- IdTokenSignedResponseAlg -->
                 <div class="row mt-1">
                     <div class="col-md-2">
-                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, "JWA algorithm used for signing ID tokens"))" />
-                        <RadzenLabel Text="ID token signature algorithm" Style="padding: 0px;" />
+                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, Global.IdTokenSignatureAlgTooltip))" />
+                        <RadzenLabel Text="@Global.IdTokenSignatureAlg" Style="padding: 0px;" />
                     </div>
                     <div class="col">
                         <RadzenDropDown Name="IdTokenSignedResponseAlg" Class="w-100"
@@ -45,8 +46,8 @@
                 <!-- AuthorizationSignedResponseAlg -->
                 <div class="row mt-1">
                     <div class="col-md-2">
-                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, "JWA algorithm used for signing authorization response tokens when the response mode is jwt."))" />                        
-                        <RadzenLabel Text="Authorization response signature algorithm" Style="padding: 0px;" />
+                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, Global.AuthorizationResponseSignatureAlgTooltip))" />
+                        <RadzenLabel Text="@Global.AuthorizationResponseSignatureAlg" Style="padding: 0px;" />
                     </div>
                     <div class="col">
                         <RadzenDropDown Name="AuthorizationSignedResponseAlg" Class="w-100"
@@ -58,29 +59,29 @@
                 <!-- AuthorizationDataTypes -->
                 <div class="row mt-1">
                     <div class="col-md-2">
-                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, "Authorization data types supported by the client"))" />
-                        <RadzenLabel Text="Authorization data types" Style="padding: 0px;" />
+                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, Global.AuthorizationDataTypesTooltip))" />
+                        <RadzenLabel Text="@Global.AuthorizationDataTypes" Style="padding: 0px;" />
                     </div>
                     <div class="col">
                         <RadzenTextBox Name="AuthorizationDataTypes" Class="w-100" @bind-Value=@updateAdvancedClient.AuthorizationDataTypes></RadzenTextBox>
-                        <p class="text-muted">Authorization data types must be passed as a list separated by <b>;</b></p>
+                        <p class="text-muted">@(new HtmlString(Global.AuthorizationDataTypesDescription))</p>
                     </div>
                 </div>
                 <!-- Response types -->
                 <div class="row mt-1">
                     <div class="col-md-2">
-                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, "Informs the Authorization Server of the desired authorization processing flow, including what parameters are returned from the endpoints used."))" />
-                        <RadzenLabel Text="Response types" Style="padding: 0px;" />
+                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, Global.ResponseTypesTooltip))" />
+                        <RadzenLabel Text="@Global.ResponseTypes" Style="padding: 0px;" />
                     </div>
                     <div class="col">
-                        <RadzenDropDown @bind-Value=@selectedResponseTypes Chips=true Data=@responseTypes Multiple=true AllowClear=true Placeholder="Select Response Types" class="w-100"></RadzenDropDown>
+                        <RadzenDropDown @bind-Value=@selectedResponseTypes Chips=true Data=@responseTypes Multiple=true AllowClear=true Placeholder="@Global.SelectResponseTypes" class="w-100"></RadzenDropDown>
                     </div>
                 </div>
                 <!-- Token expiration time -->
                 <div class="row mt-1">
                     <div class="col-md-2">
-                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, "Set the token duration in seconds; by default, the value is 30 minutes."))" />
-                        <RadzenLabel Text="Token expiration time" Style="padding: 0px;" />
+                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, Global.TokenExpirationTimeTooltip))" />
+                        <RadzenLabel Text="@Global.TokenExpirationTime" Style="padding: 0px;" />
                     </div>
                     <div class="col">
                         <RadzenNumeric Name="TokenExpirationTimeInSeconds" Class="w-100" @bind-Value=@updateAdvancedClient.TokenExpirationTimeInSeconds></RadzenNumeric>
@@ -89,8 +90,8 @@
                 <!-- DPoP -->
                 <div class="row mt-1">
                     <div class="col-md-2">
-                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, "DPoP is an application-level mechanism for sender-constraining OAuth access and refresh tokens."))" />
-                        <RadzenLabel Text="Is DPoP required?" Style="padding: 0px;" />
+                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, Global.IsDpopRequiredTooltip))" />
+                        <RadzenLabel Text="@Global.IsDpopRequired" Style="padding: 0px;" />
                     </div>
                     <div class="col">
                         <RadzenCheckBox @bind-Value="@updateAdvancedClient.IsDPoPRequired" />
@@ -99,8 +100,8 @@
                 <!-- DPoP Nonce -->
                 <div class="row mt-1">
                     <div class="col-md-2">
-                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, "May be used by the authorization server to limit the lifetime of DPoP Proof."))" />
-                        <RadzenLabel Text="Is DPoP Nonce required?" Style="padding: 0px;" />
+                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, Global.IsDpopNonceRequiredTooltip))" />
+                        <RadzenLabel Text="@Global.IsDpopNonceRequired" Style="padding: 0px;" />
                     </div>
                     <div class="col">
                         <RadzenCheckBox @bind-Value="@updateAdvancedClient.IsDPoPNonceRequired" />
@@ -109,8 +110,8 @@
                 <!-- DPoP Nonce lifetime in seconds -->
                 <div class="row mt-1">
                     <div class="col-md-2">
-                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, "Lifetime of a DPoP nonce in seconds."))" />
-                        <RadzenLabel Text="Lifetime of DPoP Nonce" Style="padding: 0px;" />
+                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, Global.DpopNonceLifetimeTooltip))" />
+                        <RadzenLabel Text="@Global.DpopNonceLifetime" Style="padding: 0px;" />
                     </div>
                     <div class="col">
                         <RadzenNumeric @bind-Value=@updateAdvancedClient.DPOPNonceLifetimeInSeconds Class="w-100" />
@@ -120,7 +121,7 @@
         </Items>
     </RadzenAccordion>
 
-    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateClientState.Value.IsUpdating ? "Updating..." : "Update")" Disabled=@updateClientState.Value.IsUpdating />
+    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateClientState.Value.IsUpdating ? Global.Updating : Global.Update)" Disabled=@updateClientState.Value.IsUpdating />
 </RadzenTemplateForm>
 
 @code {

@@ -11,17 +11,17 @@
 <RadzenTemplateForm Submit=@SubmitAddClaim TItem="AddClaim" Data=@addClaim>
     <!-- Key -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Key</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Key</RadzenText>
         <RadzenTextBox Name="Key" @bind-Value="@addClaim.Key" Class="w-100"></RadzenTextBox>
-        <RadzenRequiredValidator Component="Key" Text="Key id required"></RadzenRequiredValidator>
+        <RadzenRequiredValidator Component="Key" Text="@Global.KeyRequired"></RadzenRequiredValidator>
     </div>
     <!-- Value -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Value</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Value</RadzenText>
         <RadzenTextBox Name="Value" @bind-Value="@addClaim.Value" Class="w-100"></RadzenTextBox>
-        <RadzenRequiredValidator Component="Value" Text="Value id required"></RadzenRequiredValidator>
+        <RadzenRequiredValidator Component="Value" Text="@Global.ValueRequired"></RadzenRequiredValidator>
     </div>
-    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Add"  />
+    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@Global.Add"  />
 </RadzenTemplateForm>
 
 @code {

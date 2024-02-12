@@ -1,4 +1,5 @@
-﻿@using SimpleIdServer.IdServer.Website.Resources;
+﻿@using Microsoft.AspNetCore.Html;
+@using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.ApiResourceStore;
 @using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
 @using SimpleIdServer.IdServer.Website.Stores.UserStore;
@@ -10,12 +11,12 @@
 @inject NotificationService notificationService
 
 <div class="mb-1">
-    <RadzenButton Click="@(args => AddResource())" Icon="add" Text="Add API resource" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
-    <RadzenButton Click="@(args => UpdateResource())" Icon="save" Text="Update" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+    <RadzenButton Click="@(args => AddResource())" Icon="add" Text="@Global.AddApiResource" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+    <RadzenButton Click="@(args => UpdateResource())" Icon="save" Text="@Global.Update" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
 </div>
 
 <p class="text-muted">
-    Select one or more active <b>API resources</b>  for the scope. The <b>aud</b> claim is populated with the relevant <b>API resources</b>. This claim is utilized by the API during the authorization process
+    @(new HtmlString(Global.ScopeResourcesDescription))
 </p>
 
 <RadzenDataGrid @ref="grid" 
@@ -43,9 +44,9 @@
                 <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableApiResource" Property="Value.Name" Title="Resource" Filterable="false" Sortable="false" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableApiResource" Property="Value.Audience" Title="Audience" Filterable="false" Sortable="false" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableApiResource" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Update datetime" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableApiResource" Property="Value.Name" Title="@Global.Resource" Filterable="false" Sortable="false" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableApiResource" Property="Value.Audience" Title="@Global.Audience" Filterable="false" Sortable="false" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableApiResource" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableApiResource" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
                 <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
@@ -107,7 +108,7 @@
     {
         contextMenuService.Open(args, new List<ContextMenuItem>
         {
-            new ContextMenuItem { Text = "Delete", Value = 1 }
+            new ContextMenuItem { Text = Global.Delete, Value = 1 }
         }, (a) =>
     {
         if (a.Value.Equals(1))
@@ -129,7 +130,7 @@
 
     async void AddResource() 
     {
-        await dialogService.OpenAsync<AddApiResourceDialog>("Add API resource", new Dictionary<string, object>(), new DialogOptions
+        await dialogService.OpenAsync<AddApiResourceDialog>(Global.AddApiResource, new Dictionary<string, object>(), new DialogOptions
         {
             Width = "700px",
             Height ="512px",

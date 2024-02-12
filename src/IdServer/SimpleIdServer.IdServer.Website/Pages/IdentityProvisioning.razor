@@ -11,30 +11,30 @@
 @inject IDispatcher dispatcher
 
 <RadzenBreadCrumb>
-    <RadzenBreadCrumbItem Path="/identityprovisioning" Text="Identity Provisioning" />
-    <RadzenBreadCrumbItem Text="Identity Provisioning details" />
+    <RadzenBreadCrumbItem Path="/identityprovisioning" Text="@Global.IdentityProvisioning" />
+    <RadzenBreadCrumbItem Text="@Global.IdentityProvisioningDetails" />
 </RadzenBreadCrumb>
 
 <RadzenText class="mt-3 mb-3" Text="@identityProvisioningState.Value.IdentityProvisioning?.Name" TextStyle="TextStyle.DisplayH3" />
 
 <div>
-    <RadzenButton class="mb-1" Click="@(args => ExtractUsers())" Icon="launch" Text="Launch" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
-    <RadzenButton class="mb-1" Click="@(args => TestIdentityProvisioning())" Icon="launch" Text="Try to extract the users" ButtonStyle="ButtonStyle.Secondary" Disabled=@isTesting Size="ButtonSize.Medium"></RadzenButton>
+    <RadzenButton class="mb-1" Click="@(args => ExtractUsers())" Icon="launch" Text="@Global.Launch" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+    <RadzenButton class="mb-1" Click="@(args => TestIdentityProvisioning())" Icon="launch" Text="@Global.TryExtractUsers" ButtonStyle="ButtonStyle.Secondary" Disabled=@isTesting Size="ButtonSize.Medium"></RadzenButton>
 </div>
 
 <RadzenCardLoader IsLoading=@identityProvisioningState.Value.IsLoading Variant="Variant.Filled">
     <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
         <Tabs>
-            <RadzenTabsItem Text="Details">
+            <RadzenTabsItem Text="@Global.Details">
                 <IdentityProvisioningDetails IdProvisioning="@identityProvisioningState.Value.IdentityProvisioning"></IdentityProvisioningDetails>
             </RadzenTabsItem>
-            <RadzenTabsItem Text="Properties">
+            <RadzenTabsItem Text="@Global.Properties">
                 <IdentityProvisioningProperties IdProvisioning="@identityProvisioningState.Value.IdentityProvisioning"></IdentityProvisioningProperties>
             </RadzenTabsItem>
-            <RadzenTabsItem Text="Mapping rules">
+            <RadzenTabsItem Text="@Global.MappingRules">
                 <IdentityProvisioningMappingRules IdProvisioning="@identityProvisioningState.Value.IdentityProvisioning"></IdentityProvisioningMappingRules>
             </RadzenTabsItem>
-            <RadzenTabsItem Text="Histories" >
+            <RadzenTabsItem Text="@Global.Histories" >
                 <IdentityProvisioningHistories IdentityProvisioning="@identityProvisioningState.Value.IdentityProvisioning"></IdentityProvisioningHistories>
             </RadzenTabsItem>
         </Tabs>
@@ -98,7 +98,7 @@
             SubscribeToAction<TestIdentityProvisioningSuccessAction>((act) =>
             {
                 isTesting = false;
-                dialogService.OpenAsync<TestConnectionResultDialog>("Extraction result", new Dictionary<string, object>
+                dialogService.OpenAsync<TestConnectionResultDialog>(Global.ExtractionResult, new Dictionary<string, object>
                 {
                     { "ConnectionResult", act.ConnectionResult }
                 }, new DialogOptions

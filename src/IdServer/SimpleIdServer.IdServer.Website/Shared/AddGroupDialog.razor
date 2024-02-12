@@ -1,4 +1,5 @@
-﻿@using SimpleIdServer.IdServer.Website.Stores.GroupStore;
+﻿@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.GroupStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject IDispatcher dispatcher
 @inject IState<UpdateGroupState> updateGroupState
@@ -11,16 +12,16 @@
 
     <!-- Name -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Name</RadzenText>
         <RadzenTextBox Name="Name" @bind-Value="@addGroup.Name" Class="w-100"></RadzenTextBox>
-        <RadzenRequiredValidator Component="Name" Text="Name is required"></RadzenRequiredValidator>
+        <RadzenRequiredValidator Component="Name" Text="@Global.NameIsRequired"></RadzenRequiredValidator>
     </div>
     <!-- Description -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Description</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Description</RadzenText>
         <RadzenTextArea Name="Description" @bind-Value="@addGroup.Description" class="w-100"></RadzenTextArea>
     </div>
-    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateGroupState.Value.IsUpdating ? "Adding..." : "Add")" Disabled=updateGroupState.Value.IsUpdating />
+    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateGroupState.Value.IsUpdating ? Global.Adding : Global.Add)" Disabled=updateGroupState.Value.IsUpdating />
 </RadzenTemplateForm>
 
 @code {

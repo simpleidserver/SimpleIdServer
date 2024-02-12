@@ -8,7 +8,7 @@
 @inject DialogService dialogService
 @inject IState<ClientRolesState> clientRolesState
 
-<RadzenButton class="mb-1" Click="@(args => AddScope())" Icon="add" Text="Add role" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+<RadzenButton class="mb-1" Click="@(args => AddScope())" Icon="add" Text="@Global.AddRole" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
 
 <RadzenDataGrid AllowFiltering="true"
                 AllowColumnResize="true"
@@ -33,9 +33,9 @@
                 <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableClientRole" Property="Value.Name" Filterable="false" Sortable="false" SortOrder=SortOrder.Ascending Title="Name" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableClientRole" Property="Value.Description" Filterable="false" Sortable="false" Title="Description" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableClientRole" Property="Value.UpdateDateTime" Filterable="false" Sortable="false" SortOrder=SortOrder.Descending Title="Update Datetime" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableClientRole" Property="Value.Name" Filterable="false" Sortable="false" SortOrder=SortOrder.Ascending Title="@Global.Name" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableClientRole" Property="Value.Description" Filterable="false" Sortable="false" Title="@Global.Description" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableClientRole" Property="Value.UpdateDateTime" Filterable="false" Sortable="false" SortOrder=SortOrder.Descending Title="@Global.UpdateDateTime" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableClientRole" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
                 <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
@@ -73,18 +73,18 @@
     {
         contextMenuService.Open(args, new List<ContextMenuItem>
         {
-            new ContextMenuItem { Text = "Delete", Value = 1 }
+            new ContextMenuItem { Text = Global.Delete, Value = 1 }
         }, (a) =>
-    {
-    if (a.Value.Equals(1))
-    {
-        var scopeIds = clientRolesState.Value.Roles.Where(s => s.IsSelected).Select(s => s.Value.Id).ToList();
-        if (!scopeIds.Contains(role.Value.Id)) scopeIds.Add(role.Value.Id);
-        var act = new RemoveSelectedScopesAction { ScopeIds = scopeIds, IsRole = true };
-        dispatcher.Dispatch(act);
-        contextMenuService.Close();
-    }
-    });
+        {
+            if (a.Value.Equals(1))
+            {
+                var scopeIds = clientRolesState.Value.Roles.Where(s => s.IsSelected).Select(s => s.Value.Id).ToList();
+                if (!scopeIds.Contains(role.Value.Id)) scopeIds.Add(role.Value.Id);
+                var act = new RemoveSelectedScopesAction { ScopeIds = scopeIds, IsRole = true };
+                dispatcher.Dispatch(act);
+                contextMenuService.Close();
+            }
+        });
     }
 
     void ToggleAll(bool isSelected)
@@ -112,7 +112,7 @@
 
     async void AddScope()
     {
-        await dialogService.OpenAsync<AddClientRoleDialog>("Add client role", new Dictionary<string, object>
+        await dialogService.OpenAsync<AddClientRoleDialog>(Global.AddRole, new Dictionary<string, object>
         {
             { "ClientId", Client.ClientId }
         }, new DialogOptions

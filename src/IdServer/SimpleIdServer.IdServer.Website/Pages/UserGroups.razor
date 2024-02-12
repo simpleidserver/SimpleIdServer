@@ -7,9 +7,9 @@
 @inject DialogService dialogService
 @inject NotificationService notificationService
 
-<p class="text-muted">List of groups assigned to the user.</p>
+<p class="text-muted">@Global.UserGroupsDescription</p>
 
-<RadzenButton class="mb-1" Click="@(args => AssignGroups())" Icon="add" Text="Assign groups" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+<RadzenButton class="mb-1" Click="@(args => AssignGroups())" Icon="add" Text="@Global.AssignGroups" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
 
 <RadzenDataGrid AllowFiltering="true"
                 AllowColumnResize="true"
@@ -34,8 +34,8 @@
                 <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableUserGroup" Property="Value.FullPath" Title="Path" Filterable="false" Sortable="false" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableUserGroup" Property="Value.UpdateDateTime" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Updated at" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableUserGroup" Property="Value.FullPath" Title="@Global.Path" Filterable="false" Sortable="false" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableUserGroup" Property="Value.UpdateDateTime" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdatedAt" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableUserGroup" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
                 <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
@@ -67,7 +67,7 @@
     {
         contextMenuService.Open(args, new List<ContextMenuItem>
         {
-            new ContextMenuItem { Text = "Unassign", Value = 1 }
+            new ContextMenuItem { Text = Global.Unassign, Value = 1 }
         }, (a) =>
     {
         if (a.Value.Equals(1))
@@ -106,7 +106,7 @@
 
     async void AssignGroups()
     {
-        await dialogService.OpenAsync<AssignUserGroupsDialog>("Assign groups", new Dictionary<string, object>
+        await dialogService.OpenAsync<AssignUserGroupsDialog>(Global.AssignGroups, new Dictionary<string, object>
         {
             { "User", User }
         }, new DialogOptions

@@ -9,13 +9,13 @@
 @inject ContextMenuService contextMenuService
 @inject NotificationService notificationService
 
-<p class="text-muted">List of user claims.</p>
+<p class="text-muted">@Global.ClaimsDescription</p>
 
-<RadzenButton class="mb-1" Click="@(args => AddClaim())" Icon="add" Text="Add claim" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+<RadzenButton class="mb-1" Click="@(args => AddClaim())" Icon="add" Text="@Global.AddClaim" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
 
 <div class="mb-1">
     <RadzenCheckBox @bind-Value=@resolveRoles Change=@ResolveRoles TValue="bool" />
-    <RadzenLabel Text="Resolve roles" Style="margin-left: 8px; vertical-align: middle;" />
+    <RadzenLabel Text="@Global.ResolveRoles" Style="margin-left: 8px; vertical-align: middle;" />
 </div>
 
 <RadzenDataGrid AllowFiltering="true" 
@@ -33,8 +33,8 @@
         RowRender="@RowRender"
         ColumnWidth="300px">
     <Columns>
-        <RadzenDataGridColumn TItem="SelectableUserClaim" Property="Value.Name" Title="Key" Filterable="false" Sortable="true" SortOrder="SortOrder.Ascending" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableUserClaim" Property="Value.Value" Title="Value" Filterable="false" Sortable="false" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableUserClaim" Property="Value.Name" Title="@Global.Key" Filterable="false" Sortable="true" SortOrder="SortOrder.Ascending" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableUserClaim" Property="Value.Value" Title="@Global.Value" Filterable="false" Sortable="false" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableUserClaim" Filterable="false" Sortable="false" Width="80px">
             <Template Context="data">
                 @if(!data.IsRole)
@@ -46,7 +46,7 @@
     </Columns>
 </RadzenDataGrid>
 
-<RadzenButton class="mt-1" Click="@(args => SaveClaims())" Icon="save" Text="Save" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+<RadzenButton class="mt-1" Click="@(args => SaveClaims())" Icon="save" Text="@Global.Save" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
 
 @code {
     [Parameter]
@@ -71,7 +71,7 @@
     {
         contextMenuService.Open(args, new List<ContextMenuItem>
         {
-            new ContextMenuItem { Text = "Remove", Value = 1 }
+            new ContextMenuItem { Text = Global.Remove, Value = 1 }
         }, (a) =>
         {
             if (a.Value.Equals(1))
@@ -108,7 +108,7 @@
 
     async void AddClaim()
     {
-        await dialogService.OpenAsync<AddClaimDialog>("Add claim", new Dictionary<string, object>(), new DialogOptions
+        await dialogService.OpenAsync<AddClaimDialog>(Global.AddClaim, new Dictionary<string, object>(), new DialogOptions
         {
             Width = "700px",
             Height = "512px",

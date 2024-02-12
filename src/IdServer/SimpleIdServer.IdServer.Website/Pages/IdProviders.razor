@@ -9,10 +9,10 @@
 @inject IDispatcher dispatcher
 
 <p>
-    Configure external Identity Providers such as Facebook, Twitter, GitHub, and others, so that your users can log in using them.
+    @Global.IdentityProvidersDescription
 </p>
 
-<RadzenButton class="mb-1" Click="@(args => AddIdProvider())" Icon="add" Text="Add Identity Provider" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+<RadzenButton class="mb-1" Click="@(args => AddIdProvider())" Icon="add" Text="@Global.AddIdentityProvider" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
 
 <RadzenDataGrid @ref=idProvidersGrid
                 AllowFiltering="true"
@@ -39,12 +39,12 @@
                 <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableIdProvider" Filterable="false" Sortable="true" Title="Name" Width="80px">
+        <RadzenDataGridColumn TItem="SelectableIdProvider" Filterable="false" Sortable="true" Title="@Global.Name" Width="80px">
             <Template Context="data">
                 <RadzenLink Text="@data.Value.DisplayName" Path="@($"/authentications/idproviders/{data.Value.Name}/details")" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableIdProvider" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Update datetime" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableIdProvider" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableIdProvider" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
                 <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
@@ -99,7 +99,7 @@
     {
         contextMenuService.Open(args, new List<ContextMenuItem>
         {
-            new ContextMenuItem { Text = "Delete", Value = 1 }
+            new ContextMenuItem { Text = Global.Delete, Value = 1 }
         }, (a) =>
         {
             if (a.Value.Equals(1))
@@ -127,7 +127,7 @@
 
     async void AddIdProvider()
     {
-        await dialogService.OpenAsync<AddIdProviderDialog>("Add Identity Provider", new Dictionary<string, object>(), new DialogOptions
+        await dialogService.OpenAsync<AddIdProviderDialog>(Global.AddIdentityProvider, new Dictionary<string, object>(), new DialogOptions
         {
             Width = "900px",
             Height = "512px",

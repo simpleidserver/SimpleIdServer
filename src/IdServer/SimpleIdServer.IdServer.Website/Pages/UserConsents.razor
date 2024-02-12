@@ -9,7 +9,7 @@
 @inject ContextMenuService contextMenuService
 @inject NotificationService notificationService
 
-<p class="text-muted">List of consents accepted by the user for specific clients.</p>
+<p class="text-muted">@Global.UserConsentsDescription</p>
 
 @if(User != null)
 {
@@ -27,20 +27,20 @@
             TItem="Consent" 
             ColumnWidth="300px">
         <Columns>
-            <RadzenDataGridColumn TItem="Consent" Property="ClientId" Title="Client" Filterable="false" Sortable="false" Width="80px" />
-            <RadzenDataGridColumn TItem="Consent" Title="Status" Filterable="false" Sortable="false" Width="80px">
+            <RadzenDataGridColumn TItem="Consent" Property="ClientId" Title="@Global.Client" Filterable="false" Sortable="false" Width="80px" />
+            <RadzenDataGridColumn TItem="Consent" Title="@Global.Status" Filterable="false" Sortable="false" Width="80px">
                 <Template Context="data">
                     @if(data.Status == ConsentStatus.PENDING)
-                    {                    
-                        <RadzenBadge Text="Pending" IsPill="true" BadgeStyle="BadgeStyle.Danger"></RadzenBadge>
+                    {
+                        <RadzenBadge Text="@Global.Pending" IsPill="true" BadgeStyle="BadgeStyle.Danger"></RadzenBadge>
                     }
                     else
                     {
-                        <RadzenBadge Text="Confirmed" IsPill="true" BadgeStyle="BadgeStyle.Success"></RadzenBadge>
+                        <RadzenBadge Text="@Global.Confirmed" IsPill="true" BadgeStyle="BadgeStyle.Success"></RadzenBadge>
                     }
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Consent" Title="Scopes" Filterable="false" Sortable="false" Width="80px">
+            <RadzenDataGridColumn TItem="Consent" Title="@Global.Scopes" Filterable="false" Sortable="false" Width="80px">
                 <Template Context="data">
                     @foreach(var scope in data.Scopes)
                     {
@@ -48,7 +48,7 @@
                     }
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Consent" Title="Claims" Filterable="false" Sortable="false" Width="80px">
+            <RadzenDataGridColumn TItem="Consent" Title="@Global.Claims" Filterable="false" Sortable="false" Width="80px">
                 <Template Context="data">
                     @foreach (var claim in data.Claims.Where(c => !string.IsNullOrWhiteSpace(c)))
                     {
@@ -56,7 +56,7 @@
                     }
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Consent" Title="Authorization Details" Filterable="false" Sortable="false" Width="80px">
+            <RadzenDataGridColumn TItem="Consent" Title="@Global.AuthorizationDetails" Filterable="false" Sortable="false" Width="80px">
                 <Template Context="data">
                     @foreach (var authData in data.AuthorizationDetails)
                     {
@@ -64,7 +64,7 @@
                     }
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Consent" Property="UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Created at" Width="80px" />
+            <RadzenDataGridColumn TItem="Consent" Property="UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.CreatedAt" Width="80px" />
             <RadzenDataGridColumn TItem="Consent" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
                 <Template Context="data">
                     <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
@@ -95,7 +95,7 @@
     {
         contextMenuService.Open(args, new List<ContextMenuItem>
         {
-            new ContextMenuItem { Text = "Revoke", Value = 1 }
+            new ContextMenuItem { Text = Global.Revoke, Value = 1 }
         }, (a) => {
             if (a.Value.Equals(1))
             {

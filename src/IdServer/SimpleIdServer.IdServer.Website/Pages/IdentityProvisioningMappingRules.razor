@@ -1,4 +1,5 @@
 ﻿@using SimpleIdServer.IdServer.Api.Provisioning;
+@using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject IState<SearchIdentityProvisioningMappingRuleState> searchIdentityProvisioningMappingRulesState
@@ -7,7 +8,7 @@
 @inject DialogService dialogService
 
 
-<RadzenButton class="mb-1" Click="@(args => AddMappingRule())" Icon="add" Text="Add mapping rule" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+<RadzenButton class="mb-1" Click="@(args => AddMappingRule())" Icon="add" Text="@Global.AddMappingRule" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
 
 <RadzenDataGrid AllowFiltering="true"
                 AllowColumnResize="true"
@@ -33,22 +34,22 @@
                 <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableIdentityProvisioningMappingRule" Filterable="false" Sortable="false" Title="From" Width="80px">
+        <RadzenDataGridColumn TItem="SelectableIdentityProvisioningMappingRule" Filterable="false" Sortable="false" Title="@Global.From" Width="80px">
             <Template Context="data">
                 <RadzenLink Text="@data.Value.From" Path="@($"/identityprovisioning/{IdProvisioning?.Id}/mappingrules/{data.Value.Id}")" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableIdentityProvisioningMappingRule" Filterable="false" Sortable="false" Title="To" Width="80px">
+        <RadzenDataGridColumn TItem="SelectableIdentityProvisioningMappingRule" Filterable="false" Sortable="false" Title="@Global.To" Width="80px">
             <Template Context="data">
                 @GetValue(data)
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableIdentityProvisioningMappingRule" Filterable="false" Sortable="false" Title="Type" Width="80px">
+        <RadzenDataGridColumn TItem="SelectableIdentityProvisioningMappingRule" Filterable="false" Sortable="false" Title="@Global.Type" Width="80px">
             <Template Context="data">
                 <RadzenBadge IsPill=true Text="@Enum.GetName(typeof(MappingRuleTypes), data.Value.MapperType)" BadgeStyle="BadgeStyle.Primary"></RadzenBadge>
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableIdentityProvisioningMappingRule" Filterable="false" Sortable="false" Title="Usage" Width="80px">
+        <RadzenDataGridColumn TItem="SelectableIdentityProvisioningMappingRule" Filterable="false" Sortable="false" Title="@Global.Usage" Width="80px">
             <Template Context="data">
                 <RadzenBadge IsPill=true Text="@Enum.GetName(typeof(IdentityProvisioningMappingUsage), data.Value.Usage)" BadgeStyle="BadgeStyle.Primary"></RadzenBadge>
             </Template>
@@ -93,7 +94,7 @@
     {
         contextMenuService.Open(args, new List<ContextMenuItem>
         {
-            new ContextMenuItem { Text = "Delete", Value = 1 }
+            new ContextMenuItem { Text = Global.Delete, Value = 1 }
         }, (a) =>
     {
     if(a.Value.Equals(1))
@@ -109,7 +110,7 @@
 
     async void AddMappingRule()
     {
-        await dialogService.OpenAsync<AddIdProvisioningMapperDialog>("Add mapping rule", new Dictionary<string, object> { { "IdProvisioningId", IdProvisioning.Id } }, new DialogOptions
+        await dialogService.OpenAsync<AddIdProvisioningMapperDialog>(Global.AddMappingRule, new Dictionary<string, object> { { "IdProvisioningId", IdProvisioning.Id } }, new DialogOptions
         {
             Width = "700px",
             Height = "512px",

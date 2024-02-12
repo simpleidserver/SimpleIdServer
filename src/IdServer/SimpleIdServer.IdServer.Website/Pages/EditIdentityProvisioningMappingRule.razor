@@ -18,8 +18,8 @@
 @inject NotificationService notificationService
 
 <RadzenBreadCrumb>
-    <RadzenBreadCrumbItem Path="/identityprovisioning" Text="Identity Provisioning" />
-    <RadzenBreadCrumbItem Path=@("/identityprovisioning/" + id + "/mappingrules") Text="Identity Provisioning details" />
+    <RadzenBreadCrumbItem Path="/identityprovisioning" Text="@Global.IdentityProvisioning" />
+    <RadzenBreadCrumbItem Path=@("/identityprovisioning/" + id + "/mappingrules") Text="@Global.IdentityProvisioningDetails" />
     <RadzenBreadCrumbItem Text="Mapper details" />
 </RadzenBreadCrumb>
 
@@ -102,11 +102,11 @@
         switch (identityProvisioningMappingRuleState.Value.Mapping.MapperType)
         {
             case MappingRuleTypes.IDENTIFIER:
-                return "Identifier";
+                return Global.Identifier;
             case MappingRuleTypes.SUBJECT:
-                return "Subject";
+                return Global.Subject;
             case MappingRuleTypes.GROUPNAME:
-                return "Group";
+                return Global.Group;
             case MappingRuleTypes.USERPROPERTY:
                 return $"{identityProvisioningMappingRuleState.Value.Mapping.From} / {identityProvisioningMappingRuleState.Value.Mapping.TargetUserProperty}";
             default:

@@ -12,45 +12,45 @@
 <RadzenTemplateForm Submit=@UpdateUserSettings TItem="UpdateUserSettingsParameter" Data=@updateUserSettings>
     <!-- Identifier -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Identifier</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Identifier</RadzenText>
         <RadzenTextBox Name="Id" @bind-Value="@updateUserSettings.Id" Class="w-100" Disabled=true></RadzenTextBox>
     </div>
     <!-- Login -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Name</RadzenText>
         <RadzenTextBox Name="Login" @bind-Value="@updateUserSettings.Login" Class="w-100" Disabled=true></RadzenTextBox>
     </div>
     <!-- Created at -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Created at</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.CreatedAt</RadzenText>
         <RadzenDatePicker @bind-Value=@updateUserSettings.CreateDateTime DateFormat="d" Class="w-100" Disabled=true />
     </div>
     <!-- Updated at -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Updated at</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.UpdatedAt</RadzenText>
         <RadzenDatePicker @bind-Value=@updateUserSettings.UpdateDateTime DateFormat="d" Class="w-100" Disabled=true />
     </div>
     <!-- Email -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Email</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Email</RadzenText>
         <RadzenTextBox Name="Email" @bind-Value="@updateUserSettings.Email" Class="w-100"></RadzenTextBox>
         <RadzenEmailValidator Component="Email" Text="Provide a valid email address"></RadzenEmailValidator>
     </div>
     <!-- First name -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">First name</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Firstname</RadzenText>
         <RadzenTextBox Name="Firstname" @bind-Value="@updateUserSettings.Firstname" Class="w-100"></RadzenTextBox>
     </div>
     <!-- Last name -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Last name</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Lastname</RadzenText>
         <RadzenTextBox Name="Lastname" @bind-Value="@updateUserSettings.Lastname" Class="w-100"></RadzenTextBox>
     </div>
     <!-- Notification Mode -->
     <div>
         <div>
-            <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, "Notification mode used during Backchannel Authentication"))" />
-            <RadzenLabel Text="Notification mode" Style="padding: 0px;"></RadzenLabel>
+            <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, Global.NotificationModeTooltip))" />
+            <RadzenLabel Text="@Global.NotificationMode" Style="padding: 0px;"></RadzenLabel>
         </div>
         <RadzenDropDown Class="w-100"
             Data=@authMethodsState.Value.AuthenticationMethods.Where(m => m.Capabilities.HasFlag(AuthenticationMethodCapabilities.PUSHNOTIFICATION))
@@ -60,7 +60,7 @@
             @bind-Value=@updateUserSettings.NotificationMode></RadzenDropDown>
         
     </div>
-    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateUserState.Value.IsUpdating ? "Updating..." : "Update")" Disabled=@updateUserState.Value.IsUpdating />
+    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateUserState.Value.IsUpdating ? Global.Updating : Global.Update)" Disabled=@updateUserState.Value.IsUpdating />
 </RadzenTemplateForm>
 @code {
     [Parameter]

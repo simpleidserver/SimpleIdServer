@@ -1,4 +1,5 @@
 ﻿@using Fluxor.Blazor.Web.Components;
+@using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore;
 @using System.Security.Cryptography.X509Certificates;
 @inherits FluxorComponent
@@ -9,17 +10,17 @@
 {
     <!-- Name -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Name</RadzenText>
         <RadzenTextBox Name="Id" @bind-Value="@certificateAuthorityState.Value.CertificateAuthority.SubjectName" Class="w-100" Disabled=true></RadzenTextBox>
     </div>
     <!-- Valid From -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Valid From</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.ValidFrom</RadzenText>
         <RadzenDatePicker @bind-Value=@certificateAuthorityState.Value.CertificateAuthority.StartDateTime DateFormat="d" Class="w-100" Disabled=true />
     </div>
     <!-- Valid To -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Valid To</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.ValidTo</RadzenText>
         <RadzenDatePicker @bind-Value=@certificateAuthorityState.Value.CertificateAuthority.EndDateTime DateFormat="d" Class="w-100" Disabled=true />
     </div>
     @switch (certificateAuthorityState.Value.CertificateAuthority.Source)
@@ -27,19 +28,19 @@
         case CertificateAuthoritySources.DB:
             <!-- Public key-->
             <div>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Public Key</RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.PublicKey</RadzenText>
                 <RadzenTextArea Rows="10" @bind-Value=@certificateAuthorityState.Value.CertificateAuthority.PublicKey Class="w-100" Disabled=true />
             </div>
             <!-- Private key-->
             <div>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Private Key</RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.PrivateKey</RadzenText>
                 <RadzenTextArea Rows="10" @bind-Value=@certificateAuthorityState.Value.CertificateAuthority.PrivateKey Class="w-100" Disabled=true />
             </div>
             break;
         case CertificateAuthoritySources.CERTIFICATESTORE:
             <!-- Store location -->
             <div>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Store Location</RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.StoreLocation</RadzenText>
                 <RadzenDropDown Name="StoreLocation" Class="w-100"
                     Data=@Enum.GetValues(typeof(StoreLocation))
                     TValue="StoreLocation?"
@@ -48,16 +49,16 @@
             </div>
             <!-- Store name -->
             <div>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Store Name</RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.StoreName</RadzenText>
                 <RadzenDropDown Name="StoreName" Class="w-100"
                     Data=@Enum.GetValues(typeof(StoreName))
                     TValue="StoreName?"
                     Disabled=true
                     @bind-Value=@certificateAuthorityState.Value.CertificateAuthority.StoreName />
             </div>
-            <!-- Store name -->
+            <!-- Find type -->
             <div>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Find Type</RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.FindType</RadzenText>
                 <RadzenDropDown Name="FindType" Class="w-100"
                     Data=@Enum.GetValues(typeof(X509FindType))
                     TValue="X509FindType?"
@@ -66,13 +67,13 @@
             </div>
             <!-- Find Value -->
             <div>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Find Value</RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.FindValue</RadzenText>
                 <RadzenTextBox Name="FindValue" Disabled=true @bind-Value="@certificateAuthorityState.Value.CertificateAuthority.FindValue" Class="w-100"></RadzenTextBox>
             </div>
             break;
     }
 
-    <RadzenButton class="mt-1" Click=@(a => Download()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="Download" />
+    <RadzenButton class="mt-1" Click=@(a => Download()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="@Global.Download" />
 }
 
 @code {

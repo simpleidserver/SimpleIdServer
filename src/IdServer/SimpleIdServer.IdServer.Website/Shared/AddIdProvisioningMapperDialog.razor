@@ -11,11 +11,11 @@
 
 <RadzenSteps>
     <Steps>
-        <RadzenStepsItem Text="Mapper Type">
+        <RadzenStepsItem Text="@Global.MapperType">
             <div class="row gy-4">
                 <!-- Choose a template -->
                 <div>
-                    <RadzenLabel Text="Choose a type of mapping rule" />
+                    <RadzenLabel Text="@Global.ChooseMappingRule" />
                     <RadzenDropDown @bind-Value=@selectedUsage
                                     TValue="IdentityProvisioningMappingUsage"
                                     Data="@mappingRuleUsages"
@@ -57,9 +57,9 @@
 @code {
     static ICollection<IdProvisioningMappingRule> AllIdProvisioningMappingRules = new List<IdProvisioningMappingRule>
     {
-        new IdProvisioningMappingRule { Name = "Property", ShortDescription = "User property", Description = "Map to one user's property", Type = MappingRuleTypes.USERPROPERTY, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserProperty.png", Usage = IdentityProvisioningMappingUsage.USER },
-        new IdProvisioningMappingRule { Name = "Claims", ShortDescription = "User claims", Description = "Map to one user claim", Type = MappingRuleTypes.USERATTRIBUTE,  PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserAttribute.png", Usage = IdentityProvisioningMappingUsage.USER },
-        new IdProvisioningMappingRule { Name = "Name", ShortDescription = "Group name", Description = "Set the name of the group", Type = MappingRuleTypes.GROUPNAME, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserProperty.png", Usage = IdentityProvisioningMappingUsage.GROUP }
+        new IdProvisioningMappingRule { Name = Global.Property, ShortDescription = Global.UserProperty, Description = Global.UserPropertyDescription, Type = MappingRuleTypes.USERPROPERTY, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserProperty.png", Usage = IdentityProvisioningMappingUsage.USER },
+        new IdProvisioningMappingRule { Name = Global.Claims, ShortDescription = Global.UserClaims, Description = Global.MapToOneUserClaim, Type = MappingRuleTypes.USERATTRIBUTE,  PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserAttribute.png", Usage = IdentityProvisioningMappingUsage.USER },
+        new IdProvisioningMappingRule { Name = Global.Name, ShortDescription = Global.GroupName, Description = Global.SetGroupName, Type = MappingRuleTypes.GROUPNAME, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserProperty.png", Usage = IdentityProvisioningMappingUsage.GROUP }
     };
 
     [Parameter]

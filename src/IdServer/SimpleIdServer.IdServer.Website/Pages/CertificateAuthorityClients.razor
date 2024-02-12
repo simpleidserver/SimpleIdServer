@@ -10,8 +10,7 @@
 @inject DialogService dialogService
 @inject ContextMenuService contextMenuService
 
-
-<RadzenButton class="mb-1" Click="@(args => AddCertificateClient())" Icon="add" Text="Add Client Certificate" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+<RadzenButton class="mb-1" Click="@(args => AddCertificateClient())" Icon="add" Text="@Global.AddClientCertificate" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
 
 <RadzenDataGrid @ref="caGrid"
                 AllowFiltering="true"
@@ -37,9 +36,9 @@
                 <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableClientCertificate" Property="Value.Name" Filterable="false" Sortable="false" Title="Name" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableClientCertificate" Property="Value.StartDateTime" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Title="Start Datetime" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableClientCertificate" Property="Value.EndDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" Title="End Datetime" Width="80px" SortOrder="SortOrder.Descending" />
+        <RadzenDataGridColumn TItem="SelectableClientCertificate" Property="Value.Name" Filterable="false" Sortable="false" Title="@Global.Name" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableClientCertificate" Property="Value.StartDateTime" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Title="@Global.StartDatetime" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableClientCertificate" Property="Value.EndDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" Title="@Global.EndDatetime" Width="80px" SortOrder="SortOrder.Descending" />
         <RadzenDataGridColumn TItem="SelectableClientCertificate" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
                 <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
@@ -107,46 +106,46 @@
     {
         contextMenuService.Open(args, new List<ContextMenuItem>
         {
-            new ContextMenuItem { Text = "Delete", Value = 1 },
-            new ContextMenuItem { Text = "Download", Value = 2 },
-            new ContextMenuItem { Text= "View", Value = 3 }
+            new ContextMenuItem { Text = Global.Delete, Value = 1 },
+            new ContextMenuItem { Text = Global.Download, Value = 2 },
+            new ContextMenuItem { Text = Global.View, Value = 3 }
         }, async (a) =>
     {
-        if (a.Value.Equals(1))
-        {
-            var caIds = searchCertificateClientsState.Value?.ClientCertificates.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
-            if (!caIds.Contains(certificateAuthority.Value.Id)) caIds.Add(certificateAuthority.Value.Id);
-            var act = new RemoveSelectedClientCertificatesAction { CertificateClientIds = caIds, CertificateAuthorityId = CertificateAuthority.Id };
-            dispatcher.Dispatch(act);
-            contextMenuService.Close();
-        }
+    if (a.Value.Equals(1))
+    {
+        var caIds = searchCertificateClientsState.Value?.ClientCertificates.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
+        if (!caIds.Contains(certificateAuthority.Value.Id)) caIds.Add(certificateAuthority.Value.Id);
+        var act = new RemoveSelectedClientCertificatesAction { CertificateClientIds = caIds, CertificateAuthorityId = CertificateAuthority.Id };
+        dispatcher.Dispatch(act);
+        contextMenuService.Close();
+    }
 
-        if (a.Value.Equals(2))
-        {
-            var memoryStream = new MemoryStream(certificateAuthority.Certificate.Export(X509ContentType.Pkcs12));
-            var fileName = $"{certificateAuthority.Value.Name}.pfx";
-            using var streamRef = new DotNetStreamReference(stream: memoryStream);
-            await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
-        }
+    if (a.Value.Equals(2))
+    {
+        var memoryStream = new MemoryStream(certificateAuthority.Certificate.Export(X509ContentType.Pkcs12));
+        var fileName = $"{certificateAuthority.Value.Name}.pfx";
+        using var streamRef = new DotNetStreamReference(stream: memoryStream);
+        await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+    }
 
-        if (a.Value.Equals(3))
-        {
-            var dic = new Dictionary<string, object> { { "ClientCertificate", certificateAuthority.Value } };
-            await dialogService.OpenAsync<ViewClientCertificateDialog>("Client Certificate", dic, new DialogOptions
+    if (a.Value.Equals(3))
+    {
+        var dic = new Dictionary<string, object> { { "ClientCertificate", certificateAuthority.Value } };
+        await dialogService.OpenAsync<ViewClientCertificateDialog>(Global.ClientCertificate, dic, new DialogOptions
                 {
                     Width = "700px",
                     Height = "512px",
                     Resizable = true,
                     Draggable = true
                 });
-        }
+    }
         });
     }
 
     async void AddCertificateClient()
     {
         var dic = new Dictionary<string, object> { { "CertificateAuthorityId", CertificateAuthority.Id } };
-        await dialogService.OpenAsync<AddClientCertificate>("Add Client Certificate", dic , new DialogOptions
+        await dialogService.OpenAsync<AddClientCertificate>(Global.AddClientCertificate, dic, new DialogOptions
             {
                 Width = "700px",
                 Height = "512px",

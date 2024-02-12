@@ -1,5 +1,6 @@
 ﻿@page "/realm"
 @using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @using SimpleIdServer.IdServer.Website.Stores.StatisticStore;
 @inject IOptions<IdServerWebsiteOptions> Options;
@@ -23,8 +24,8 @@
 @if(Options.Value.IsReamEnabled)
 {
     <div>
-        <RadzenButton Click=@((args) => AddRealm()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="Add Realm" />
-        <RadzenButton Click=@((args) => ChooseRealm()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="Choose Realm" />
+        <RadzenButton Click=@((args) => AddRealm()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="@Global.AddRealm" />
+        <RadzenButton Click=@((args) => ChooseRealm()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="@Global.ChooseRealm" />
     </div>    
 }
 
@@ -36,7 +37,7 @@
             <!-- OpenID Connect -->
             <div class="row">
                 <div class="col-2">
-                    <RadzenLabel Text="OpenID Connect" Style="padding: 0px;" />
+                    <RadzenLabel Text="@Global.OpenIdConnect" Style="padding: 0px;" />
                 </div>
                 <div class="col">
                     <RadzenTextBox Value=@GetOpenIdConnectUrl() Class="w-100"></RadzenTextBox>
@@ -45,7 +46,7 @@
             <!-- Id server swagger endpoint -->
             <div class="row mt-2">
                 <div class="col-2">
-                    <RadzenLabel Text="IdServer swagger" Style="padding: 0px;"></RadzenLabel>
+                    <RadzenLabel Text="@Global.IdServerSwagger" Style="padding: 0px;"></RadzenLabel>
                 </div>
                 <div class="col">
                     <RadzenTextBox Value=@GetIdServerSwaggerUrl() Class="w-100"></RadzenTextBox>
@@ -54,7 +55,7 @@
             <!-- WSFederation -->
             <div class="row mt-2">
                 <div class="col-2">
-                    <RadzenLabel Text="WS-Federation" Style="padding: 0px;"></RadzenLabel>
+                    <RadzenLabel Text="@Global.WsFederation" Style="padding: 0px;"></RadzenLabel>
                 </div>
                 <div class="col">
                     <RadzenTextBox Value=@GetFederationMetadataUrl() Class="w-100"></RadzenTextBox>
@@ -63,7 +64,7 @@
             <!-- SAML -->
             <div class="row mt-2">
                 <div class="col-2">
-                    <RadzenLabel Text="SAML" Style="padding: 0px;"></RadzenLabel>
+                    <RadzenLabel Text="@Global.Saml" Style="padding: 0px;"></RadzenLabel>
                 </div>
                 <div class="col">
                     <RadzenTextBox Value=@GetSamlMetadataUrl() Class="w-100"></RadzenTextBox>
@@ -72,7 +73,7 @@
             <!-- SCIM Endpoint -->
             <div class="row mt-2">
                 <div class="col-2">
-                    <RadzenLabel Text="SCIM endpoint" Style="padding: 0px;"></RadzenLabel>
+                    <RadzenLabel Text="@Global.ScimEdp" Style="padding: 0px;"></RadzenLabel>
                 </div>
                 <div class="col">
                     <RadzenTextBox Value=@GetSCIMSchemasUrl() Class="w-100"></RadzenTextBox>
@@ -83,28 +84,28 @@
     <!-- Number of clients -->
     <RadzenColumn Size="3">
         <RadzenCardLoader Variant="Variant.Filled" IsLoading=@statisticsState.Value.IsLoading>
-            <RadzenText TextStyle="TextStyle.DisplayH6">Users</RadzenText>
+            <RadzenText TextStyle="TextStyle.DisplayH6">@Global.Users</RadzenText>
             <RadzenText TextStyle="TextStyle.DisplayH3">@statisticsState.Value.NbUsers</RadzenText>
         </RadzenCardLoader>
     </RadzenColumn>
     <!-- Number of users -->
     <RadzenColumn Size="3">
         <RadzenCardLoader Variant="Variant.Filled" IsLoading=@statisticsState.Value.IsLoading>
-            <RadzenText TextStyle="TextStyle.DisplayH6">Clients</RadzenText>
+            <RadzenText TextStyle="TextStyle.DisplayH6">@Global.Clients</RadzenText>
             <RadzenText TextStyle="TextStyle.DisplayH3">@statisticsState.Value.NbClients</RadzenText>
         </RadzenCardLoader>
     </RadzenColumn>
     <!-- Authentication success today -->
     <RadzenColumn Size="6">
         <RadzenCardLoader Variant="Variant.Filled" IsLoading=@statisticsState.Value.IsLoading>
-            <RadzenText TextStyle="TextStyle.DisplayH6">Successful authentication today</RadzenText>
+            <RadzenText TextStyle="TextStyle.DisplayH6">@Global.SuccessAuthentication</RadzenText>
             <RadzenText TextStyle="TextStyle.DisplayH3" class="green">@statisticsState.Value.NbValidAuthentications</RadzenText>
         </RadzenCardLoader>
     </RadzenColumn>
     <!-- Authentication attempt today -->
     <RadzenColumn Size="6">
         <RadzenCardLoader Variant="Variant.Filled" IsLoading=@statisticsState.Value.IsLoading>
-            <RadzenText TextStyle="TextStyle.DisplayH6">Authentication attempt today</RadzenText>
+            <RadzenText TextStyle="TextStyle.DisplayH6">@Global.AttemptAuthentication</RadzenText>
             <RadzenText TextStyle="TextStyle.DisplayH3" class="red">@statisticsState.Value.NbInvalidAuthentications</RadzenText>
         </RadzenCardLoader>
     </RadzenColumn>
@@ -139,7 +140,7 @@
 
     async void ChooseRealm()
     {
-        await dialogService.OpenAsync<SelectRealmDialog>("Select Realm", new Dictionary<string, object>
+        await dialogService.OpenAsync<SelectRealmDialog>(Global.SelectRealm, new Dictionary<string, object>
         {
             { "activeRealm", realmsState.Value.ActiveRealm }
         }, new DialogOptions

@@ -34,12 +34,12 @@
                 }
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="EditableGroupScope" Property="Value.Name" Filterable="false" Sortable="false" Title="Role" Width="80px" />
-        <RadzenDataGridColumn TItem="EditableGroupScope" Property="Value.Description" Filterable="false" Sortable="false" Title="Description" Width="80px" />
+        <RadzenDataGridColumn TItem="EditableGroupScope" Property="Value.Name" Filterable="false" Sortable="false" Title="@Global.Role" Width="80px" />
+        <RadzenDataGridColumn TItem="EditableGroupScope" Property="Value.Description" Filterable="false" Sortable="false" Title="@Global.Description" Width="80px" />
     </Columns>
 </RadzenDataGrid>
 
-<RadzenButton Click="@(args => UpdateGroupRoles())" class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateGroupState.Value.IsUpdating ? "Saving..." : "Save")" Disabled="@(updateGroupState.Value.IsUpdating)" />
+<RadzenButton Click="@(args => UpdateGroupRoles())" class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateGroupState.Value.IsUpdating ? Global.Saving : Global.Save)" Disabled="@(updateGroupState.Value.IsUpdating)" />
 
 @code {
     RadzenDataGrid<EditableGroupScope> grid;
