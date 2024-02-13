@@ -75,7 +75,7 @@
                                     <RadzenCheckBox Name="IsExposedInConfigrationEdp" @bind-Value="@identityScope.IsExposedInConfigrationEdp"></RadzenCheckBox>
                                     <RadzenLabel Text="@Global.IsExposed" Component="IsExposedInConfigrationEdp" Style="margin-left: 8px; vertical-align: middle;" />
                                     <p class="text-muted">
-                                        @(new HtmlString(Global.IsExposedDescription))
+                                        @((MarkupString)(Global.IsExposedDescription))
                                     </p>
                                 </div>
                             }
@@ -101,7 +101,7 @@
                                 <RadzenCheckBox Name="IsExposedInConfigrationEdp" @bind-Value="@apiScope.IsExposedInConfigrationEdp"></RadzenCheckBox>
                                 <RadzenLabel Text="@Global.IsExposed" Component="IsExposedInConfigrationEdp" Style="margin-left: 8px; vertical-align: middle;" />
                                 <p class="text-muted">
-                                    @(new HtmlString(Global.IsExposedDescription))
+                                    @((MarkupString)(Global.IsExposedDescription))
                                 </p>
                             </div>
                             <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addScopeState.Value.IsAdding ? Global.Adding : Global.Save)" Disabled="@(addScopeState.Value.IsAdding)" />

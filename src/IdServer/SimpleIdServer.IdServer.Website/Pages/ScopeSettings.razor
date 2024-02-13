@@ -31,7 +31,7 @@
             <RadzenCheckBox Name="IsExposedInConfigrationEdp" @bind-Value="@updateScopeSettings.IsExposedInConfigrationEdp"></RadzenCheckBox>
             <RadzenLabel Text="@Global.IsExposed" Component="IsExposedInConfigrationEdp" Style="margin-left: 8px; vertical-align: middle;" />
             <p class="text-muted">
-                @(new HtmlString(Global.IsExposedDescription))
+                @((MarkupString)(Global.IsExposedDescription))
             </p>
         </div>
     }

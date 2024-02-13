@@ -56,7 +56,7 @@
                             <div>
                                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.SubjectName</RadzenText>
                                 <RadzenTextBox Name="SubjectName" @bind-Value="@addCertificateAuthorityDB.SubjectName" Class="w-100"></RadzenTextBox>
-                                <p class="text-muted">@(new HtmlString(Global.SubjectNameDescription))</p>
+                                <p class="text-muted">@((MarkupString)(Global.SubjectNameDescription))</p>
                                 <RadzenRequiredValidator Component="SubjectName" Text="@Global.SubjectNameRequired"></RadzenRequiredValidator>
                             </div>
                             <div>

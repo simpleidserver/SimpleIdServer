@@ -1,4 +1,5 @@
 ﻿@using Fluxor.Blazor.Web.Components;
+@using Microsoft.AspNetCore.Html;
 @using Microsoft.IdentityModel.Tokens;
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.ClientStore;
@@ -10,10 +11,10 @@
 
 <RadzenSteps>
     <Steps>
-        <RadzenStepsItem Text="Application type">
+        <RadzenStepsItem Text="@Global.ApplicationType">
             <!-- Choose a template -->
             <div>
-                <RadzenLabel Text="Choose a template" />
+                <RadzenLabel Text="@Global.ChooseTemplate" />
                 <RadzenDropDown @bind-Value=@SelectedClientType 
                     TValue="ClientTemplateTypes"
                     Data="@ClientTemplates"
@@ -61,24 +62,23 @@
                                 <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@addClientState.Value.ErrorMessage</RadzenAlert>
                             }
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Identifier</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Identifier</RadzenText>
                                 <RadzenTextBox Name="ClientIdentifier" @bind-Value="@spaApplication.ClientIdentifier" Class="w-100"></RadzenTextBox>
-                                <RadzenRequiredValidator Component="ClientIdentifier" Text="Identifier is required"></RadzenRequiredValidator>
+                                <RadzenRequiredValidator Component="ClientIdentifier" Text="@Global.IdentifierIsRequired"></RadzenRequiredValidator>
                             </div>
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Name</RadzenText>
                                 <RadzenTextBox Name="ClientName" @bind-Value="@spaApplication.ClientName" Class="w-100"></RadzenTextBox>
                             </div>
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Redirection URLs</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.RedirectionUrls</RadzenText>
                                 <RadzenTextBox Name="RedirectionUris" @bind-Value="@spaApplication.RedirectionUris" Class="w-100"></RadzenTextBox>
                                 <p class="text-muted">
-                                    Redirection URLs must be passed as a list of URLs separated by <b>;</b>. <br />
-                                    URLs must be valid and must not contain fragments, for example (http://localhost#fragment)
+                                    @((MarkupString)(@Global.RedirectionUrlsDescription))
                                 </p>
-                                <RadzenRequiredValidator Component="RedirectionUris" Text="At leat one redirection URL must be specified"></RadzenRequiredValidator>
+                                <RadzenRequiredValidator Component="RedirectionUris" Text="@Global.AtLeastOneRedirectionUrl"></RadzenRequiredValidator>
                             </div>
-                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addClientState.Value.IsAdding)" />
+                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? Global.Adding : Global.Save)" Disabled="@(addClientState.Value.IsAdding)" />
                         </RadzenTemplateForm>
                         break;
                     // Machine application
@@ -89,20 +89,20 @@
                                 <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@addClientState.Value.ErrorMessage</RadzenAlert>
                             }
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Identifier</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Identifier</RadzenText>
                                 <RadzenTextBox Name="ClientIdentifier" @bind-Value="@machineApplication.ClientIdentifier" Class="w-100"></RadzenTextBox>
-                                <RadzenRequiredValidator Component="ClientIdentifier" Text="Identifier is required"></RadzenRequiredValidator>
+                                <RadzenRequiredValidator Component="ClientIdentifier" Text="@Global.IdentifierIsRequired"></RadzenRequiredValidator>
                             </div>
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Secret</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Secret</RadzenText>
                                 <RadzenPassword Name="ClientSecret" @bind-Value="@machineApplication.ClientSecret" Class="w-100"></RadzenPassword>
-                                <RadzenRequiredValidator Component="ClientSecret" Text="Secret is required"></RadzenRequiredValidator>
+                                <RadzenRequiredValidator Component="ClientSecret" Text="@Global.SecretRequired"></RadzenRequiredValidator>
                             </div>
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Name</RadzenText>
                                 <RadzenTextBox Name="ClientName" @bind-Value="@machineApplication.ClientName" Class="w-100"></RadzenTextBox>
                             </div>
-                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addClientState.Value.IsAdding)" />
+                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? Global.Adding : Global.Save)" Disabled="@(addClientState.Value.IsAdding)" />
                         </RadzenTemplateForm>
                         break;
                     // Website application.
@@ -114,29 +114,28 @@
                             }
 
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Identifier</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Identifier</RadzenText>
                                 <RadzenTextBox Name="ClientIdentifier" @bind-Value="@websiteApplication.ClientIdentifier" Class="w-100"></RadzenTextBox>
-                                <RadzenRequiredValidator Component="ClientIdentifier" Text="Identifier is required"></RadzenRequiredValidator>
+                                <RadzenRequiredValidator Component="ClientIdentifier" Text="@Global.IdentifierIsRequired"></RadzenRequiredValidator>
                             </div>
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Secret</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Secret</RadzenText>
                                 <RadzenPassword Name="ClientSecret" @bind-Value="@websiteApplication.ClientSecret" Class="w-100"></RadzenPassword>
-                                <RadzenRequiredValidator Component="ClientSecret" Text="Secret is required"></RadzenRequiredValidator>
+                                <RadzenRequiredValidator Component="ClientSecret" Text="@Global.SecretRequired"></RadzenRequiredValidator>
                             </div>
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Name</RadzenText>
                                 <RadzenTextBox Name="ClientName" @bind-Value="@websiteApplication.ClientName" Class="w-100"></RadzenTextBox>
                             </div>
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Redirection URLs</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.RedirectionUrls</RadzenText>
                                 <RadzenTextBox Name="RedirectionUris" @bind-Value="@websiteApplication.RedirectionUris" Class="w-100"></RadzenTextBox>
                                 <p class="text-muted">
-                                    Redirection URLs must be passed as a list of URLs separated by <b>;</b>. <br />
-                                    URLs must be valid and must not contain fragments, for example (http://localhost#fragment)
+                                    @((MarkupString)(@Global.RedirectionUrlsDescription))
                                 </p>
-                                <RadzenRequiredValidator Component="RedirectionUris" Text="At leat one redirection URL must be specified"></RadzenRequiredValidator>
+                                <RadzenRequiredValidator Component="RedirectionUris" Text="@Global.AtLeastOneRedirectionUrl"></RadzenRequiredValidator>
                             </div>
-                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addClientState.Value.IsAdding)" />
+                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? Global.Adding : Global.Save)" Disabled="@(addClientState.Value.IsAdding)" />
                         </RadzenTemplateForm>
                         break;
                     // Mobile application.
@@ -147,24 +146,23 @@
                                 <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@addClientState.Value.ErrorMessage</RadzenAlert>
                             }
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Identifier</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Identifier</RadzenText>
                                 <RadzenTextBox Name="ClientIdentifier" @bind-Value="@mobileApplication.ClientIdentifier" Class="w-100"></RadzenTextBox>
-                                <RadzenRequiredValidator Component="ClientIdentifier" Text="Identifier is required"></RadzenRequiredValidator>
+                                <RadzenRequiredValidator Component="ClientIdentifier" Text="@Global.IdentifierIsRequired"></RadzenRequiredValidator>
                             </div>
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Name</RadzenText>
                                 <RadzenTextBox Name="ClientName" @bind-Value="@mobileApplication.ClientName" Class="w-100"></RadzenTextBox>
                             </div>
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Redirection URLs</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.RedirectionUrls</RadzenText>
                                 <RadzenTextBox Name="RedirectionUris" @bind-Value="@mobileApplication.RedirectionUris" Class="w-100"></RadzenTextBox>
                                 <p class="text-muted">
-                                    Redirection URLs must be passed as a list of URLs separated by <b>;</b>. <br />
-                                    URLs must be valid and must not contain fragments, for example (http://localhost#fragment)
+                                    @((MarkupString)(@Global.RedirectionUrlsDescription))
                                 </p>
-                                <RadzenRequiredValidator Component="RedirectionUris" Text="At leat one redirection URL must be specified"></RadzenRequiredValidator>
+                                <RadzenRequiredValidator Component="RedirectionUris" Text="@Global.AtLeastOneRedirectionUrl"></RadzenRequiredValidator>
                             </div>
-                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addClientState.Value.IsAdding)" />
+                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? Global.Adding : Global.Save)" Disabled="@(addClientState.Value.IsAdding)" />
                         </RadzenTemplateForm>
                         break;
                     // Ws-Federation
@@ -175,15 +173,15 @@
                                 <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@addClientState.Value.ErrorMessage</RadzenAlert>
                             }
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Identifier</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Identifier</RadzenText>
                                 <RadzenTextBox Name="ClientIdentifier" @bind-Value="@wsFederationApplication.ClientIdentifier" Class="w-100"></RadzenTextBox>
-                                <RadzenRequiredValidator Component="ClientIdentifier" Text="Identifier is required"></RadzenRequiredValidator>
+                                <RadzenRequiredValidator Component="ClientIdentifier" Text="@Global.IdentifierIsRequired"></RadzenRequiredValidator>
                             </div>
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Name</RadzenText>
                                 <RadzenTextBox Name="ClientName" @bind-Value="@wsFederationApplication.ClientName" Class="w-100"></RadzenTextBox>
                             </div>
-                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addClientState.Value.IsAdding)" />
+                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? Global.Adding : Global.Save)" Disabled="@(addClientState.Value.IsAdding)" />
                         </RadzenTemplateForm>
                         break;
                     // Device
@@ -196,23 +194,23 @@
 
                             <!-- Client Identifier -->
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Identifier</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Identifier</RadzenText>
                                 <RadzenTextBox Name="ClientIdentifier" @bind-Value="@deviceApplication.ClientIdentifier" Class="w-100"></RadzenTextBox>
-                                <RadzenRequiredValidator Component="ClientIdentifier" Text="Identifier is required"></RadzenRequiredValidator>
+                                <RadzenRequiredValidator Component="ClientIdentifier" Text="@Global.IdentifierIsRequired"></RadzenRequiredValidator>
                             </div>
                             <!-- Client Name -->
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Name</RadzenText>
                                 <RadzenTextBox Name="ClientName" @bind-Value="@deviceApplication.ClientName" Class="w-100"></RadzenTextBox>
-                                <RadzenRequiredValidator Component="ClientName" Text="Name is required"></RadzenRequiredValidator>
+                                <RadzenRequiredValidator Component="ClientName" Text="@Global.NameIsRequired"></RadzenRequiredValidator>
                             </div>
                             <!-- Client Secret -->
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Secret</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Secret</RadzenText>
                                 <RadzenPassword Name="ClientSecret" @bind-Value="@deviceApplication.ClientSecret" Class="w-100"></RadzenPassword>
-                                <RadzenRequiredValidator Component="ClientSecret" Text="Secret is required"></RadzenRequiredValidator>
+                                <RadzenRequiredValidator Component="ClientSecret" Text="@Global.SecretIsRequired"></RadzenRequiredValidator>
                             </div>
-                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addClientState.Value.IsAdding)" />
+                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? Global.Adding : Global.Save)" Disabled="@(addClientState.Value.IsAdding)" />
                         </RadzenTemplateForm>
                         break;                        
                     // Device
@@ -225,28 +223,28 @@
 
                             <!-- Client Identifier -->
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Identifier</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Identifier</RadzenText>
                                 <RadzenTextBox Name="ClientIdentifier" @bind-Value="@samlSpApplication.ClientIdentifier" Class="w-100"></RadzenTextBox>
-                                <RadzenRequiredValidator Component="ClientIdentifier" Text="Identifier is required"></RadzenRequiredValidator>
+                                <RadzenRequiredValidator Component="ClientIdentifier" Text="@Global.IdentifierIsRequired"></RadzenRequiredValidator>
                             </div>
                             <!-- Client Name -->
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Name</RadzenText>
                                 <RadzenTextBox Name="ClientName" @bind-Value="@samlSpApplication.ClientName" Class="w-100"></RadzenTextBox>
-                                <RadzenRequiredValidator Component="ClientName" Text="Name is required"></RadzenRequiredValidator>
+                                <RadzenRequiredValidator Component="ClientName" Text="@Global.NameIsRequired"></RadzenRequiredValidator>
                             </div>
                             <!-- Metadata Url -->
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Metadata URL</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.MetadataUrl</RadzenText>
                                 <RadzenTextBox Name="MetadataUrl" @bind-Value="@samlSpApplication.MetadataUrl" Class="w-100"></RadzenTextBox>
-                                <RadzenRequiredValidator Component="MetadataUrl" Text="Metadata URL is required"></RadzenRequiredValidator>
+                                <RadzenRequiredValidator Component="MetadataUrl" Text="@Global.MetadataUrlRequired"></RadzenRequiredValidator>
                             </div>
                             <!-- Use Artifact -->
                             <div>
                                 <RadzenCheckBox Name="UseAcs" @bind-Value="@samlSpApplication.UseAcs"></RadzenCheckBox>
-                                <RadzenLabel Text="Use Artifact?" Component="UseAcs" Style="margin-left: 8px; vertical-align: middle;" />
+                                <RadzenLabel Text="@Global.UseArtifact" Component="UseAcs" Style="margin-left: 8px; vertical-align: middle;" />
                             </div>
-                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addClientState.Value.IsAdding)" />
+                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? Global.Adding : Global.Save)" Disabled="@(addClientState.Value.IsAdding)" />
                         </RadzenTemplateForm>
                         break;    
                     // Highly secured web application.
@@ -257,60 +255,56 @@
                                 <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@addClientState.Value.ErrorMessage</RadzenAlert>
                             }
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Identifier</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Identifier</RadzenText>
                                 <RadzenTextBox Name="ClientIdentifier" @bind-Value="@highlySecuredWebsiteApplication.ClientIdentifier" Class="w-100"></RadzenTextBox>
-                                <RadzenRequiredValidator Component="ClientIdentifier" Text="Identifier is required"></RadzenRequiredValidator>
+                                <RadzenRequiredValidator Component="ClientIdentifier" Text="@Global.IdentifierIsRequired"></RadzenRequiredValidator>
                             </div>
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Secret</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Secret</RadzenText>
                                 <RadzenPassword Name="ClientSecret" @bind-Value="@highlySecuredWebsiteApplication.ClientSecret" Class="w-100"></RadzenPassword>
-                                <RadzenRequiredValidator Component="ClientSecret" Text="Secret is required"></RadzenRequiredValidator>
+                                <RadzenRequiredValidator Component="ClientSecret" Text="@Global.SecretIsRequired"></RadzenRequiredValidator>
                             </div>
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Name</RadzenText>
                                 <RadzenTextBox Name="ClientName" @bind-Value="@highlySecuredWebsiteApplication.ClientName" Class="w-100"></RadzenTextBox>
                             </div>
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Redirection URLs</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.RedirectionUrls</RadzenText>
                                 <RadzenTextBox Name="RedirectionUris" @bind-Value="@highlySecuredWebsiteApplication.RedirectionUris" Class="w-100"></RadzenTextBox>
                                 <p class="text-muted">
-                                    Redirection URLs must be passed as a list of URLs separated by <b>;</b>. <br />
-                                    URLs must be valid and must not contain fragments, for example (http://localhost#fragment)
+                                    @((MarkupString)(@Global.RedirectionUrlsDescription))
                                 </p>
-                                <RadzenRequiredValidator Component="RedirectionUris" Text="At leat one redirection URL must be specified"></RadzenRequiredValidator>
+                                <RadzenRequiredValidator Component="RedirectionUris" Text="@Global.AtLeastOneRedirectionUrl"></RadzenRequiredValidator>
                             </div>
                             <!-- Choose proof of possession -->
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Proof of possession</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.ProofOfPossession</RadzenText>
                                 <RadzenDropDown TValue=string @bind-Value=@highlySecuredWebsiteApplication.ProofOfPossession Data=@ProofOfPossessions TextProperty="Description" ValueProperty="Name" />
-                                <p class="text-muted">Please select a <b>Proof of Possession mechanism</b>. Access tokens are securely linked to a specific cryptographic key, ensuring that only the sender possesses this key..</p>
+                                <p class="text-muted">
+                                    @((MarkupString)(@Global.SelectProofOfPossessionHelper))
+                                </p>
                             </div>
                             @if (highlySecuredWebsiteApplication.ProofOfPossession == MTLs.Name)
                             {
                                 <RadzenAlert AlertStyle="AlertStyle.Info" ShowIcon="false" Variant="Variant.Flat" AllowClose="false" Shade="Shade.Lighter">
-                                    The client will be configured to use <b>tls_client_auth</b> authentication method. <br />
-                                    A Signature Key with algorithm <b>ES256</b> will be added. <br />
-                                    The <b>authorization_signed_response_alg</b> will be set to <b>ES256</b>. This value is used by Identity Server during the generation of the authorization response (JARM).
+                                    @((MarkupString)(@Global.SelectMtlsProofOfPossessionHelper))
                                 </RadzenAlert>
                                 <div>
-                                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Subject Name</RadzenText>
+                                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.SubjectName</RadzenText>
                                     <RadzenTextBox Name="SubjectName" @bind-Value="@highlySecuredWebsiteApplication.SubjectName" Class="w-100"></RadzenTextBox>
                                     <p class="text-muted">
-                                        MTLS authentication is configured by default. <br />
-                                        The Subject Name is used to verify the validity of the Client Certificate.
+                                        @((MarkupString)(@Global.MtlsProofOfPossessionSubjectNameHelper))
                                     </p>
                                 </div>
                             }
                             else if (highlySecuredWebsiteApplication.ProofOfPossession == DPoP.Name)
                             {
                                 <RadzenAlert AlertStyle="AlertStyle.Info" ShowIcon="false" Variant="Variant.Flat" AllowClose="false" Shade="Shade.Lighter">
-                                    The client will be configured to use <b>private_key_jwt</b> authentication method. <br />
-                                    A Signature Key with algorithm <b>ES256</b> will be added. <br />
-                                    The <b>authorization_signed_response_alg</b> will be set to <b>ES256</b>. This value is used by Identity Server during the generation of the authorization response (JARM).
+                                    @((MarkupString)(@Global.SelectDpopProofOfPossessionHelper))
                                 </RadzenAlert>
                             }
 
-                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addClientState.Value.IsAdding)" />
+                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? Global.Adding : Global.Save)" Disabled="@(addClientState.Value.IsAdding)" />
                         </RadzenTemplateForm>
                         break;
                     // Highly secured web application with Grant Management support
@@ -321,68 +315,64 @@
                                 <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@addClientState.Value.ErrorMessage</RadzenAlert>
                             }
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Identifier</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Identifier</RadzenText>
                                 <RadzenTextBox Name="ClientIdentifier" @bind-Value="@highlySecuredWebApplicationWithGrantMgtSupport.ClientIdentifier" Class="w-100"></RadzenTextBox>
-                                <RadzenRequiredValidator Component="ClientIdentifier" Text="Identifier is required"></RadzenRequiredValidator>
+                                <RadzenRequiredValidator Component="ClientIdentifier" Text="@Global.IdentifierIsRequired"></RadzenRequiredValidator>
                             </div>
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Secret</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Secret</RadzenText>
                                 <RadzenPassword Name="ClientSecret" @bind-Value="@highlySecuredWebApplicationWithGrantMgtSupport.ClientSecret" Class="w-100"></RadzenPassword>
-                                <RadzenRequiredValidator Component="ClientSecret" Text="Secret is required"></RadzenRequiredValidator>
+                                <RadzenRequiredValidator Component="ClientSecret" Text="@Global.SecretRequired"></RadzenRequiredValidator>
                             </div>
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Name</RadzenText>
                                 <RadzenTextBox Name="ClientName" @bind-Value="@highlySecuredWebApplicationWithGrantMgtSupport.ClientName" Class="w-100"></RadzenTextBox>
                             </div>
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Redirection URLs</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.RedirectionUrls</RadzenText>
                                 <RadzenTextBox Name="RedirectionUris" @bind-Value="@highlySecuredWebApplicationWithGrantMgtSupport.RedirectionUris" Class="w-100"></RadzenTextBox>
                                 <p class="text-muted">
-                                    Redirection URLs must be passed as a list of URLs separated by <b>;</b>. <br />
-                                    URLs must be valid and must not contain fragments, for example (http://localhost#fragment)
+                                    @((MarkupString)(@Global.RedirectionUrlsDescription))
                                 </p>
-                                <RadzenRequiredValidator Component="RedirectionUris" Text="At leat one redirection URL must be specified"></RadzenRequiredValidator>
+                                <RadzenRequiredValidator Component="RedirectionUris" Text="@Global.AtLeastOneRedirectionUrl"></RadzenRequiredValidator>
                             </div>
                             <!-- Grant management -->
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Authorization Data Types</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.AuthorizationDataTypes</RadzenText>
                                 <RadzenTextBox Name="AuthDataTypes" @bind-Value="@highlySecuredWebApplicationWithGrantMgtSupport.AuthDataTypes" Class="w-100"></RadzenTextBox>
                                 <p class="text-muted">
-                                    List of Authorization Data Types separated by <b>;</b>
+                                    @((MarkupString)(@Global.AuthorizationDataTypesDescription))
                                 </p>
                             </div>
                             <!-- Choose proof of possession -->
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Proof of possession</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.ProofOfPossession</RadzenText>
                                 <RadzenDropDown TValue=string @bind-Value=@highlySecuredWebApplicationWithGrantMgtSupport.ProofOfPossession Data=@ProofOfPossessions TextProperty="Description" ValueProperty="Name" />
-                                <p class="text-muted">Please select a <b>Proof of Possession mechanism</b>. Access tokens are securely linked to a specific cryptographic key, ensuring that only the sender possesses this key..</p>
+                                <p class="text-muted">
+                                    @((MarkupString)(@Global.SelectProofOfPossessionHelper))
+                                    </p>
                             </div>
                             @if (highlySecuredWebApplicationWithGrantMgtSupport.ProofOfPossession == MTLs.Name)
                             {
                                 <RadzenAlert AlertStyle="AlertStyle.Info" ShowIcon="false" Variant="Variant.Flat" AllowClose="false" Shade="Shade.Lighter">
-                                    The client will be configured to use <b>tls_client_auth</b> authentication method. <br />
-                                    A Signature Key with algorithm <b>ES256</b> will be added. <br />
-                                    The <b>authorization_signed_response_alg</b> will be set to <b>ES256</b>. This value is used by Identity Server during the generation of the authorization response (JARM).
+                                    @((MarkupString)(@Global.SelectMtlsProofOfPossessionHelper))
                                 </RadzenAlert>
                                 <div>
-                                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Subject Name</RadzenText>
+                                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.SubjectName</RadzenText>
                                     <RadzenTextBox Name="SubjectName" @bind-Value="@highlySecuredWebApplicationWithGrantMgtSupport.SubjectName" Class="w-100"></RadzenTextBox>
                                     <p class="text-muted">
-                                        MTLS authentication is configured by default. <br />
-                                        The Subject Name is used to verify the validity of the Client Certificate.
+                                        @((MarkupString)(@Global.MtlsProofOfPossessionSubjectNameHelper))
                                     </p>
                                 </div>
                             }
                             else if (highlySecuredWebApplicationWithGrantMgtSupport.ProofOfPossession == DPoP.Name)
                             {
                                 <RadzenAlert AlertStyle="AlertStyle.Info" ShowIcon="false" Variant="Variant.Flat" AllowClose="false" Shade="Shade.Lighter">
-                                    The client will be configured to use <b>private_key_jwt</b> authentication method. <br />
-                                    A Signature Key with algorithm <b>ES256</b> will be added. <br />
-                                    The <b>authorization_signed_response_alg</b> will be set to <b>ES256</b>. This value is used by Identity Server during the generation of the authorization response (JARM).
+                                    @((MarkupString)(@Global.SelectDpopProofOfPossessionHelper))
                                 </RadzenAlert>
                             }
 
-                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addClientState.Value.IsAdding)" />
+                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? Global.Adding : Global.Save)" Disabled="@(addClientState.Value.IsAdding)" />
                         </RadzenTemplateForm>
                         break;
                     // External Device used for the authentication.
@@ -393,24 +383,23 @@
                                 <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@addClientState.Value.ErrorMessage</RadzenAlert>
                             }
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Identifier</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Identifier</RadzenText>
                                 <RadzenTextBox Name="ClientIdentifier" @bind-Value="@externalDeviceApplication.ClientIdentifier" Class="w-100"></RadzenTextBox>
-                                <RadzenRequiredValidator Component="ClientIdentifier" Text="Identifier is required"></RadzenRequiredValidator>
+                                <RadzenRequiredValidator Component="ClientIdentifier" Text="@Global.IdentifierIsRequired"></RadzenRequiredValidator>
                             </div>
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Name</RadzenText>
                                 <RadzenTextBox Name="ClientName" @bind-Value="@externalDeviceApplication.ClientName" Class="w-100"></RadzenTextBox>
                             </div>
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Subject Name</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.SubjectName</RadzenText>
                                 <RadzenTextBox Name="SubjectName" @bind-Value="@externalDeviceApplication.SubjectName" Class="w-100"></RadzenTextBox>
                                 <p class="text-muted">
-                                    By default, the client is configured to use MTLS authentication. <br/>
-                                    The Subject Name of the client certificate must be specified.
+                                    @((MarkupString)(@Global.MtlsAuthenticationIsEnabled))
                                 </p>
-                                <RadzenRequiredValidator Component="SubjectName" Text="Subject Name is required"></RadzenRequiredValidator>
+                                <RadzenRequiredValidator Component="SubjectName" Text="@Global.SubjectNameRequired"></RadzenRequiredValidator>
                             </div>
-                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addClientState.Value.IsAdding)" />
+                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? Global.Adding : Global.Save)" Disabled="@(addClientState.Value.IsAdding)" />
                         </RadzenTemplateForm>
                         break;
                     // Credential issuer
@@ -444,8 +433,7 @@
                             </div>
                             <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? Global.Adding : Global.Save)" Disabled="@(addClientState.Value.IsAdding)" />
                         </RadzenTemplateForm>
-                        break;
-                        
+                        break;                       
                 }
             }
         </RadzenStepsItem>
@@ -454,7 +442,7 @@
 
 @code {
     static ProofOfPossession DPoP = new ProofOfPossession { Name = "DPoP", Description = "DPoP" };
-    static ProofOfPossession MTLs = new ProofOfPossession { Name = "MTLS", Description = "Mutual-TLS Client Authentication" };
+    static ProofOfPossession MTLs = new ProofOfPossession { Name = "MTLS", Description = Global.Mtls };
 
     record ApplicationType
     {
@@ -597,7 +585,7 @@
             dialogService.Close();
             notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = string.Format(Global.ClientAdded, act.ClientId) });
 
-            await dialogService.OpenAsync<ViewAddedClientDialog>("Client has been added", new Dictionary<string, object>
+            await dialogService.OpenAsync<ViewAddedClientDialog>(string.Format(Global.ClientAdded, act.ClientId), new Dictionary<string, object>
             {
                 { "Client", act }
             }, new DialogOptions
@@ -613,24 +601,24 @@
 
     ICollection<ApplicationType> AllApplicationTypes { get; set; } = new List<ApplicationType>
     {
-        new ApplicationType { Name = "User Agent Based application", ClientTemplate = ClientTemplateTypes.STANDARD, ShortDescription = "Authorization code + PKCE", Description = "A client-side application running in a browser (Angular, EmberJS, VueJS etc...). <br/> Client secret and/or refresh tokens cannot be stored by these applications because there is a security risk.", Type = ClientTypes.SPA, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/angular.png" },
-        new ApplicationType { Name = "Machine", ClientTemplate = ClientTemplateTypes.STANDARD, ShortDescription = "Client credentials", Description = "Machine-to-machine (M2M) applications, such as CLIs, daemons, or services running on your back-end, the system authenticates and authorizes the app rather than a user.", Type = ClientTypes.MACHINE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/MachineClient.png" },
-        new ApplicationType { Name = "Web application", ClientTemplate = ClientTemplateTypes.STANDARD, ShortDescription = "Authorization code", Description = "Web application executed on server (ASP.NET CORE, SPRING etc...)", Type = ClientTypes.WEBSITE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/WebsiteClient.png" },
-        new ApplicationType { Name = "Mobile", ClientTemplate = ClientTemplateTypes.STANDARD, ShortDescription = "Authorization code + PKCE", Description = "A desktop or mobile application running on a user's device", Type = ClientTypes.MOBILE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/MobileClient.png" },
-        new ApplicationType { Name = "WS-Fed Relying Party", ClientTemplate = ClientTemplateTypes.STANDARD,  ShortDescription = "WS-Federation application", Description = "A WS-Federation relying party commonly used by older Microsoft applications", Type = SimpleIdServer.IdServer.WsFederation.WsFederationConstants.CLIENT_TYPE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/WsFedClient.png" },
-        new ApplicationType { Name = "SAML SP", ClientTemplate = ClientTemplateTypes.STANDARD, ShortDescription = "SAML Service Provider", Description = "A Service Provider (SP) is the entity providing the service, typically in the form of an application", Type = SimpleIdServer.IdServer.Saml.Idp.Constants.CLIENT_TYPE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/SAMLSP.png" },
-        new ApplicationType { Name = "Device", ClientTemplate = ClientTemplateTypes.STANDARD,  ShortDescription = "Device Authorization grant", Description = "An IoT application or otherwise browserless or input constrained device.", Type = ClientTypes.DEVICE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/DeviceClient.png" },
-        new ApplicationType { Name = "Highly secure Web Application", ClientTemplate = ClientTemplateTypes.FAPI, ShortDescription = "Web Application with FAPI 2.0 security requirements.", Description = "The web application is executed on a server (ASP.NET CORE, SPRING, etc.) and implements all the security requirements proposed by FAPI 2.0.", PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/WebsiteClient.png", Type = ClientTypes.HIGHLYSECUREDWEBSITE },
-        new ApplicationType { Name = "Grant Management", ClientTemplate = ClientTemplateTypes.FAPI, ShortDescription = "Web application with FAPI 2.0 security requirements and grant management support.", Description = "The web application is executed on a server (ASP.NET CORE, SPRING, etc.) and implements all the security requirements proposed by FAPI 2.0. Additionally, it supports grant management.", PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/WebsiteClient.png", Type = ClientTypes.GRANTMANAGEMENT },
-        new ApplicationType { Name = "External Device Authentication", ClientTemplate = ClientTemplateTypes.FAPI,  ShortDescription = "Client Initiated Backchannel Authentication (CIBA) flow", Description = "Authentication is performed via an Authentication Device by the user who also consents (if required) to the request.", Type = ClientTypes.EXTERNAL, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/ExternalDeviceClient.png" },
-        new ApplicationType { Name = "Credential issuer", ClientTemplate = ClientTemplateTypes.CREDENTIALISSUER, ShortDescription = "Credential issuer", Description = "A REST API for credential issuance capable of generating trusted and verifiable credentials, such as University Degrees.", PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/CredentialIssuer.png", Type = ClientTypes.CREDENTIAL_ISSUER }
+        new ApplicationType { Name = Global.UserBasedApp, ClientTemplate = ClientTemplateTypes.STANDARD, ShortDescription = Global.UserBasedAppShortDescription, Description = Global.UserBasedAppDescription, Type = ClientTypes.SPA, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/angular.png" },
+        new ApplicationType { Name = Global.Machine, ClientTemplate = ClientTemplateTypes.STANDARD, ShortDescription = Global.MachineShortDescription, Description = Global.MachineDescription, Type = ClientTypes.MACHINE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/MachineClient.png" },
+        new ApplicationType { Name = Global.WebApp, ClientTemplate = ClientTemplateTypes.STANDARD, ShortDescription = Global.WebAppShortDescription, Description = Global.WebAppDescription, Type = ClientTypes.WEBSITE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/WebsiteClient.png" },
+        new ApplicationType { Name = Global.Mobile, ClientTemplate = ClientTemplateTypes.STANDARD, ShortDescription = Global.MobileShortDescription, Description = Global.MobileDescription, Type = ClientTypes.MOBILE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/MobileClient.png" },
+        new ApplicationType { Name = Global.WsRelyingParty, ClientTemplate = ClientTemplateTypes.STANDARD,  ShortDescription = Global.WsRelyingPartyShortDescription, Description = Global.WsRelyingPartyDescription, Type = SimpleIdServer.IdServer.WsFederation.WsFederationConstants.CLIENT_TYPE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/WsFedClient.png" },
+        new ApplicationType { Name = Global.SamlSp, ClientTemplate = ClientTemplateTypes.STANDARD, ShortDescription = Global.SamlSpShortDescription, Description = Global.SamlSpDescription, Type = SimpleIdServer.IdServer.Saml.Idp.Constants.CLIENT_TYPE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/SAMLSP.png" },
+        new ApplicationType { Name = Global.Device, ClientTemplate = ClientTemplateTypes.STANDARD,  ShortDescription = Global.DeviceShortDescription, Description = Global.DeviceDescription, Type = ClientTypes.DEVICE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/DeviceClient.png" },
+        new ApplicationType { Name = Global.HighlySecuredWebApp, ClientTemplate = ClientTemplateTypes.FAPI, ShortDescription = Global.HighlySecuredWebAppShortDescription, Description = Global.HighlySecuredWebAppDescription, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/WebsiteClient.png", Type = ClientTypes.HIGHLYSECUREDWEBSITE },
+        new ApplicationType { Name = Global.GrantMgt, ClientTemplate = ClientTemplateTypes.FAPI, ShortDescription = Global.GrantMgtShortDescription, Description = Global.GrantMgtDescription, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/WebsiteClient.png", Type = ClientTypes.GRANTMANAGEMENT },
+        new ApplicationType { Name = Global.ExternalDeviceAuth, ClientTemplate = ClientTemplateTypes.FAPI,  ShortDescription = Global.ExternalDeviceAuthShortDescription, Description = Global.ExternalDeviceDescription, Type = ClientTypes.EXTERNAL, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/ExternalDeviceClient.png" },
+        new ApplicationType { Name = Global.CredentialIssuer, ClientTemplate = ClientTemplateTypes.CREDENTIALISSUER, ShortDescription = Global.CredentialIssuerShortDescription, Description = Global.CredentialIssuerDescription, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/CredentialIssuer.png", Type = ClientTypes.CREDENTIAL_ISSUER }
     };
 
     ICollection<ClientTemplate> ClientTemplates { get; set; } = new List<ClientTemplate>
     {
-        new ClientTemplate { Name = "Standard", Type = ClientTemplateTypes.STANDARD },
+        new ClientTemplate { Name = Global.Standard, Type = ClientTemplateTypes.STANDARD },
         new ClientTemplate { Name = "FAPI2.0", Type = ClientTemplateTypes.FAPI },
-        new ClientTemplate { Name = "Credentials Issuer", Type = ClientTemplateTypes.CREDENTIALISSUER }
+        new ClientTemplate { Name = Global.CredentialIssuer, Type = ClientTemplateTypes.CREDENTIALISSUER }
     };
 
     ApplicationType? SelectedApplicationType { get; set; } = null;

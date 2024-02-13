@@ -89,7 +89,7 @@
         }
     </RadzenStack>
 
-    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(IsUpdating ? (IsAddForm ? "Adding..." : "Updating...") : (IsAddForm ? "Add" : "Update"))" Disabled=@IsUpdating Click="@(args => UpdateConfiguration())" />
+    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(IsUpdating ? (IsAddForm ? Global.Adding : Global.Updating) : (IsAddForm ? Global.Add : Global.Update))" Disabled=@IsUpdating Click="@(args => UpdateConfiguration())" />
 }
     
 @code {

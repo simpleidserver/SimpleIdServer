@@ -34,17 +34,17 @@
                 }
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="EditableUserGroup" Filterable="false" Sortable="false" Title="Path" Width="80px">
+        <RadzenDataGridColumn TItem="EditableUserGroup" Filterable="false" Sortable="false" Title="@Global.Path" Width="80px">
             <Template Context="data">
                 <RadzenLink Text="@data.Value.FullPath" Path="@($"/groups/{data.Value.Id}/children")" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="EditableUserGroup" Property="Value.Description" Filterable="false" Sortable="false" Title="Description" Width="80px" />
-        <RadzenDataGridColumn TItem="EditableUserGroup" Property="Value.UpdateDateTime" Filterable="false" Sortable="false" Title="Updated at" Width="80px" FormatString="{0:dd/M/yyyy HH:mm:ss}" />
+        <RadzenDataGridColumn TItem="EditableUserGroup" Property="Value.Description" Filterable="false" Sortable="false" Title="@Global.Description" Width="80px" />
+        <RadzenDataGridColumn TItem="EditableUserGroup" Property="Value.UpdateDateTime" Filterable="false" Sortable="false" Title="@Global.UpdatedAt" Width="80px" FormatString="{0:dd/M/yyyy HH:mm:ss}" />
     </Columns>
 </RadzenDataGrid>
 
-<RadzenButton Click="@(args => AssignUserGroups())" class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateUserState.Value.IsUpdating ? "Saving..." : "Save")" Disabled="@(updateUserState.Value.IsUpdating)" />
+<RadzenButton Click="@(args => AssignUserGroups())" class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateUserState.Value.IsUpdating ? Global.Saving : Global.Save)" Disabled="@(updateUserState.Value.IsUpdating)" />
 
 @code {
     RadzenDataGrid<EditableUserGroup> grid;

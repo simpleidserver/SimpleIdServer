@@ -10,7 +10,7 @@
 
 <RadzenSteps>
     <Steps>
-        <RadzenStepsItem Text="Key">
+        <RadzenStepsItem Text="@Global.Key">
             <div class="row gy-4">
                 @foreach (var key in KeyTypes)
                 {
@@ -40,7 +40,7 @@
                 </div>
             }
         </RadzenStepsItem>
-        <RadzenStepsItem Text="Generate" Disabled="@(SelectedKeyType == null)">
+        <RadzenStepsItem Text="@Global.Generate" Disabled="@(SelectedKeyType == null)">
             @if (!updateClientState.Value.IsUpdating && !string.IsNullOrWhiteSpace(updateClientState.Value.ErrorMessage))
             {
                 <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@updateClientState.Value.ErrorMessage</RadzenAlert>
@@ -48,7 +48,7 @@
 
             @if (keyIsGenerated)
             {
-                <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Success" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">Key has been generated !</RadzenAlert>
+                <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Success" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@Global.KeyGenerated</RadzenAlert>
             }
 
             @switch(SelectedKeyType.Usage)
@@ -62,86 +62,86 @@
 
                         <!-- Key Identifier -->
                         <div>
-                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Identifier</RadzenText>
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Identifier</RadzenText>
                             <RadzenTextBox Name="KeyId" @bind-Value="@sigKeyGeneration.KeyId" Class="w-100"></RadzenTextBox>
-                            <RadzenRequiredValidator Component="KeyId" Text="Identifier is required"></RadzenRequiredValidator>
+                            <RadzenRequiredValidator Component="KeyId" Text="@Global.IdentifierIsRequired"></RadzenRequiredValidator>
                         </div>
                         <!-- Key Type -->
                         <div>
-                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Key type</RadzenText>
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.KeyType</RadzenText>
                             <RadzenDropDown Name="KeyType" Class="w-100"
                                     Data=@sigKeyTypes
                                     TValue="SecurityKeyTypes"
                                     Change="@OnSigSecurityKeyTypeChange"
                                     @bind-Value=@sigKeyGeneration.KeyType
                                     TextProperty="Name" ValueProperty="KeyType" />
-                            <RadzenRequiredValidator Component="KeyType" Text="Key type is required"></RadzenRequiredValidator>
+                            <RadzenRequiredValidator Component="KeyType" Text="@Global.KeyTypeRequired"></RadzenRequiredValidator>
                         </div>
                         <!-- Alg -->
                         <div>
-                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Algorithm</RadzenText>
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Algorithm</RadzenText>
                             <RadzenDropDown Name="Alg" Class="w-100"
                                             Data=@signingAlgs
                                             TValue="string"
                                             @bind-Value=@sigKeyGeneration.Alg />
-                            <RadzenRequiredValidator Component="Alg" Text="Algorithm is required"></RadzenRequiredValidator>
+                            <RadzenRequiredValidator Component="Alg" Text="@Global.AlgorithmRequired"></RadzenRequiredValidator>
                         </div>
-                        <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Generate" />
+                        <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@Global.Generate" />
                     </RadzenTemplateForm>
                     break;
                 case SimpleIdServer.IdServer.Constants.JWKUsages.Enc:
                     <RadzenTemplateForm Submit=@GenerateEncKey TItem="EncKeyGenerationForm" Data=@encKeyGeneration>
                         <!-- Key Identifier -->
                         <div>
-                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Identifier</RadzenText>
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Identifier</RadzenText>
                             <RadzenTextBox Name="KeyId" @bind-Value="@encKeyGeneration.KeyId" Class="w-100"></RadzenTextBox>
-                            <RadzenRequiredValidator Component="KeyId" Text="Identifier is required"></RadzenRequiredValidator>
+                            <RadzenRequiredValidator Component="KeyId" Text="@Global.IdentifierIsRequired"></RadzenRequiredValidator>
                         </div>
                         <!-- Key Type -->
                         <div>
-                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Key type</RadzenText>
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.KeyType</RadzenText>
                             <RadzenDropDown Name="KeyType" Class="w-100"
                                     Data=@encKeyTypes
                                     TValue="SecurityKeyTypes"
                                     Change="@OnEncSecurityKeyTypeChange"
                                     @bind-Value=@encKeyGeneration.KeyType
                                     TextProperty="Name" ValueProperty="KeyType" />
-                            <RadzenRequiredValidator Component="KeyType" Text="Key type is required"></RadzenRequiredValidator>
+                            <RadzenRequiredValidator Component="KeyType" Text="@Global.KeyTypeRequired"></RadzenRequiredValidator>
                         </div>
                         <!-- Alg -->
                         <div>
-                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Algorithm</RadzenText>
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Algorithm</RadzenText>
                             <RadzenDropDown Name="Alg" Class="w-100"
                                     Data=@encryptionAlgs
                                     TValue="string"
                                     @bind-Value=@encKeyGeneration.Alg />
-                            <RadzenRequiredValidator Component="Alg" Text="Algorithm is required"></RadzenRequiredValidator>
+                            <RadzenRequiredValidator Component="Alg" Text="@Global.AlgorithmRequired"></RadzenRequiredValidator>
                         </div>
                         <!-- Enc -->
                         <div>
-                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Encryption</RadzenText>
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Encryption</RadzenText>
                             <RadzenDropDown Name="Enc" Class="w-100"
                                     Data=@SimpleIdServer.IdServer.Constants.AllEncryptions
                                     TValue="string"
                                     @bind-Value=@encKeyGeneration.Enc />
-                            <RadzenRequiredValidator Component="Enc" Text="Encryption is required"></RadzenRequiredValidator>
+                            <RadzenRequiredValidator Component="Enc" Text="@Global.EncryptionRequired"></RadzenRequiredValidator>
                         </div>
-                        <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Generate" />
+                        <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@Global.Generate" />
                     </RadzenTemplateForm>
                     break;
             }
         </RadzenStepsItem>
-        <RadzenStepsItem Text="Summary" Disabled="@(generatedSigKey == null && generatedEncKey == null)">
+        <RadzenStepsItem Text="@Global.Summary" Disabled="@(generatedSigKey == null && generatedEncKey == null)">
             @if(generatedSigKey != null)
             {                
                 <!-- Key Identifier -->
                 <div>
-                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Identifier</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Identifier</RadzenText>
                     <RadzenTextBox Name="KeyId" @bind-Value="@generatedSigKey.KeyId" Disabled=true Class="w-100"></RadzenTextBox>
                 </div>
                 <!-- Key Type -->
                 <div>
-                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Key type</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.KeyType</RadzenText>
                     <RadzenDropDown Name="KeyType" Class="w-100"
                                 Data=@sigKeyTypes
                                     TValue="SecurityKeyTypes"
@@ -151,7 +151,7 @@
                 </div>
                 <!-- Alg -->
                 <div>
-                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Algorithm</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Algorithm</RadzenText>
                     <RadzenDropDown Name="Alg" Class="w-100"
                                     Data=@SimpleIdServer.IdServer.Constants.AllSigningAlgs
                                     TValue="string"
@@ -160,31 +160,31 @@
                 </div>
                 <!-- Public Pem -->
                 <div>
-                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Public Key</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.PublicKey</RadzenText>
                     <RadzenTextArea Class="w-100" Rows=10 Value=@generatedSigKey.Pem.PublicKey Disabled=true></RadzenTextArea>
                 </div>
                 <!-- Private Pem -->
                 <div>
-                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Private Key</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.PrivateKey</RadzenText>
                     <RadzenTextArea Class="w-100" Rows=10 Value=@generatedSigKey.Pem.PrivateKey Disabled=true></RadzenTextArea>
                 </div>
                 <!-- Json Web Key -->
                 <div>
-                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Json Web Key (JWK)</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Jwk</RadzenText>
                     <RadzenTextArea Class="w-100" Rows=10 Value=@generatedSigKey.JsonWebKey Disabled=true></RadzenTextArea>
                 </div>
-                <RadzenButton Click="@(args => SaveSigKey())" class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Confirm" />
+                <RadzenButton Click="@(args => SaveSigKey())" class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@Global.Confirm" />
             }
             else
             {
                 <!-- Key Identifier -->
                 <div>
-                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Identifier</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Identifier</RadzenText>
                     <RadzenTextBox Name="KeyId" @bind-Value="@generatedEncKey.KeyId" Disabled=true Class="w-100"></RadzenTextBox>
                 </div>
                 <!-- Key Type -->
                 <div>
-                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Key type</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.KeyType</RadzenText>
                     <RadzenDropDown Name="KeyType" Class="w-100"
                                     Data=@encKeyTypes
                                     TValue="SecurityKeyTypes"
@@ -194,7 +194,7 @@
                 </div>
                 <!-- Alg -->
                 <div>
-                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Algorithm</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Algorithm</RadzenText>
                     <RadzenDropDown Name="Alg" Class="w-100"
                                     Data=@SimpleIdServer.IdServer.Constants.AllEncAlgs
                                     TValue="string"
@@ -203,7 +203,7 @@
                 </div>
                 <!-- Enc -->
                 <div>
-                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Encryption</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Encryption</RadzenText>
                     <RadzenDropDown Name="Alg" Class="w-100"
                                 Data=@SimpleIdServer.IdServer.Constants.AllEncryptions
                                 TValue="string"
@@ -212,20 +212,20 @@
                 </div>
                 <!-- Public Pem -->
                 <div>
-                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Public Key</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.PublicKey</RadzenText>
                     <RadzenTextArea Class="w-100" Rows=10 Value=@generatedEncKey.Pem.PublicKey Disabled=true></RadzenTextArea>
                 </div>
                 <!-- Private Pem -->
                 <div>
-                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Private Key</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.PrivateKey</RadzenText>
                     <RadzenTextArea Class="w-100" Rows=10 Value=@generatedEncKey.Pem.PrivateKey Disabled=true></RadzenTextArea>
                 </div>
                 <!-- Json Web Key -->
                 <div>
-                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Json Web Key (JWK)</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Jwk</RadzenText>
                     <RadzenTextArea Class="w-100" Rows=10 Value=@generatedEncKey.JsonWebKey Disabled=true></RadzenTextArea>
                 </div>
-                <RadzenButton Click="@(args => SaveEncKey())" class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Confirm" />                
+                <RadzenButton Click="@(args => SaveEncKey())" class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@Global.Confirm" />                
             }
         </RadzenStepsItem>
     </Steps>
@@ -301,8 +301,8 @@
 
     ICollection<KeyType> KeyTypes { get; set;} = new List<KeyType>
     {
-        new KeyType { Name = "Signature Key", ShortDescription = "request object, private_key_jwt and client_secret_jwt", Description = "Generate a signature key. Check the JWT request object at <a href='https://openid.net/specs/openid-connect-core-1_0.html#JWTRequests' target='_blank'>OpenID Connect Core 1.0 - JWT Requests</a>. This key is used in the <i>private_key_jwt</i> and <i>client_secret_jwt</i> authentication flows, as described in <a href='https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication' target='_blank'>OpenID Connect Core 1.0 - Client Authentication.</a>", Usage = SimpleIdServer.IdServer.Constants.JWKUsages.Sig, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/SigKey.png" },
-        new KeyType { Name = "Encryption Key", ShortDescription = "JWE", Description = "Generate JSON Web Encryption (JWE) <a href='https://www.rfc-editor.org/rfc/rfc7516' target='_blank'>https://www.rfc-editor.org/rfc/rfc7516</a>", PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/EncKey.png", Usage = SimpleIdServer.IdServer.Constants.JWKUsages.Enc }
+        new KeyType { Name = Global.SignatureKey, ShortDescription = Global.SignatureKeyParameters, Description = Global.GenerateSignatureKeyHelper, Usage = SimpleIdServer.IdServer.Constants.JWKUsages.Sig, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/SigKey.png" },
+        new KeyType { Name = Global.EncryptionKey, ShortDescription = Global.Jwe, Description = Global.GenerateEncryptionKeyHelper, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/EncKey.png", Usage = SimpleIdServer.IdServer.Constants.JWKUsages.Enc }
     };
 
     KeyType? SelectedKeyType { get; set; } = null;

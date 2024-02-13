@@ -1,4 +1,5 @@
 ﻿@using SimpleIdServer.IdServer.Api.AuthenticationSchemeProviders;
+@using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
 @using System.Reflection;
 @inject IState<UpdateIdProviderState> updateIdProviderState
@@ -6,27 +7,27 @@
 <RadzenTemplateForm Submit=@SubmitUpdateUserPropertyIdProvider TItem="UserPropertyIdProviderMapperForm" Data=@userPropertyIdProviderMapperForm>
     <!-- Name -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Name</RadzenText>
         <RadzenTextBox Name="Name" @bind-Value="@userPropertyIdProviderMapperForm.Name" Class="w-100"></RadzenTextBox>
-        <RadzenRequiredValidator Component="Name" Text="Name is required"></RadzenRequiredValidator>
+        <RadzenRequiredValidator Component="Name" Text="@Global.NameIsRequired"></RadzenRequiredValidator>
     </div>
     <!-- Token Claim Name -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Source Claim Name</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.SourceClaimName</RadzenText>
         <RadzenTextBox Name="SourceClaimName" @bind-Value="@userPropertyIdProviderMapperForm.SourceClaimName" Class="w-100"></RadzenTextBox>
-        <RadzenRequiredValidator Component="SourceClaimName" Text="Source Claim name is required"></RadzenRequiredValidator>
+        <RadzenRequiredValidator Component="SourceClaimName" Text="@Global.SourceClaimNameRequired"></RadzenRequiredValidator>
     </div>
     <!-- Property -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">User property</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.UserProperty</RadzenText>
         <RadzenDropDown Name="UserPropertyName" Class="w-100"
                         Data=@userProperties
                         TValue="String"
                         @bind-Value=@userPropertyIdProviderMapperForm.TargetUserProperty />
-        <p class="text-muted">Name of the property</p>
-        <RadzenRequiredValidator Component="UserPropertyName" Text="Property is required"></RadzenRequiredValidator>
+        <p class="text-muted">@Global.PropertyName</p>
+        <RadzenRequiredValidator Component="UserPropertyName" Text="@Global.UserPropertyRequired"></RadzenRequiredValidator>
     </div>
-    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateIdProviderState.Value.IsUpdating ? "Saving..." : "Save")" Disabled="@(updateIdProviderState.Value.IsUpdating)" />
+    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateIdProviderState.Value.IsUpdating ? Global.Saving : Global.Save)" Disabled="@(updateIdProviderState.Value.IsUpdating)" />
 </RadzenTemplateForm>
 
 @code {

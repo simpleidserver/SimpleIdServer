@@ -1,3 +1,4 @@
+@using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.UserStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject IDispatcher dispatcher
@@ -11,27 +12,27 @@
 
     <!-- Name -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Name</RadzenText>
         <RadzenTextBox Name="Name" @bind-Value="@addUser.Name" Class="w-100"></RadzenTextBox>
-        <RadzenRequiredValidator Component="Name" Text="Name is required"></RadzenRequiredValidator>
+        <RadzenRequiredValidator Component="Name" Text="@Global.NameIsRequired"></RadzenRequiredValidator>
     </div>
     <!-- FirstName -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">First name</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Firstname</RadzenText>
         <RadzenTextBox Name="FirstName" @bind-Value="@addUser.FirstName" class="w-100"></RadzenTextBox>
     </div>
     <!-- LastName -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Last name</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Lastname</RadzenText>
         <RadzenTextBox Name="LastName" @bind-Value="@addUser.LastName" class="w-100"></RadzenTextBox>
     </div>
     <!-- Email -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Email</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Email</RadzenText>
         <RadzenTextBox Name="Email" @bind-Value="@addUser.Email" class="w-100"></RadzenTextBox>
-        <RadzenEmailValidator Component="Email" Text="Provide a valid email address" />
+        <RadzenEmailValidator Component="Email" Text="@Global.EmailIsInvalid" />
     </div>
-    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateUserState.Value.IsUpdating ? "Adding..." : "Add")" Disabled=updateUserState.Value.IsUpdating />
+    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateUserState.Value.IsUpdating ? Global.Adding : Global.Add)" Disabled=updateUserState.Value.IsUpdating />
 </RadzenTemplateForm>
 
 @code {

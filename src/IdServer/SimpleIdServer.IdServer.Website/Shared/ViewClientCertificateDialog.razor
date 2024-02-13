@@ -4,12 +4,12 @@
 
 <!-- Public Key -->
 <div>
-    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Public Key</RadzenText>
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.PublicKey</RadzenText>
     <RadzenTextArea Rows=10 Name="PublicKey" @bind-Value="@ClientCertificate.PublicKey" Class="w-100"></RadzenTextArea>
 </div>
 <!-- Private Key -->
 <div>
-    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Private Key</RadzenText>
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.PrivateKey</RadzenText>
     <RadzenTextArea Rows=10 Name="PrivateKey" @bind-Value="@ClientCertificate.PrivateKey" Class="w-100"></RadzenTextArea>
 </div>
 

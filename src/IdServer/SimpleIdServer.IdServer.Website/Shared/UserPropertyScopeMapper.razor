@@ -19,20 +19,20 @@
     <UserScopeMapper UserScopeMapperForm="@scopeMapperFom" Scope="@Scope" IsEditModeEnabled="@IsEditModeEnabled"></UserScopeMapper>
     <!-- Property -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">User property</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.UserProperty</RadzenText>
         <RadzenDropDown Name="SourceUserPropertyName" Class="w-100"
                         Data=@userProperties
                         TValue="String"
                         @bind-Value=@scopeMapperFom.SourceUserPropertyName />
         <p class="text-muted">Name of the property</p>
-        <RadzenRequiredValidator Component="SourceUserPropertyName" Text="Property is required"></RadzenRequiredValidator>
+        <RadzenRequiredValidator Component="SourceUserPropertyName" Text="@Global.UserPropertyRequired"></RadzenRequiredValidator>
     </div>
     <!-- Include the claims into the access token -->
     <div class="mt-1">
         <RadzenSwitch @bind-Value=@scopeMapperFom.IncludeInAccessToken Name="IncludeInAccessToken" TValue="bool" />
-        <RadzenLabel Text="Include in access token" Component="IncludeInAccessToken" Style="margin-left: 8px; vertical-align: middle;" />
+        <RadzenLabel Text="@Global.IncludeInAccessToken" Component="IncludeInAccessToken" Style="margin-left: 8px; vertical-align: middle;" />
     </div>
-    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateScopeMapperState.Value.IsUpdating ? "Saving..." : "Save")" Disabled="@(updateScopeMapperState.Value.IsUpdating)" />
+    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateScopeMapperState.Value.IsUpdating ? Global.Saving : Global.Save)" Disabled="@(updateScopeMapperState.Value.IsUpdating)" />
 </RadzenTemplateForm>
 @code {
     [Parameter]

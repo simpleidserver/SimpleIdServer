@@ -11,9 +11,9 @@
 
 <!-- Name -->
 <div>
-    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Name</RadzenText>
     <RadzenTextBox Name="Name" @bind-Value="@UserScopeMapperForm.Name" Class="w-100" Disabled="@IsEditModeEnabled"></RadzenTextBox>
-    <RadzenRequiredValidator Component="Name" Text="Name is required"></RadzenRequiredValidator>
+    <RadzenRequiredValidator Component="Name" Text="@Global.NameIsRequired"></RadzenRequiredValidator>
 </div>
 @if(Scope != null)
 {
@@ -21,14 +21,14 @@
     {
         <!-- Token Claim Name -->
         <div>
-            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Token Claim Name</RadzenText>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.TokenClaimName</RadzenText>
             <RadzenTextBox Name="TokenClaimName" @bind-Value="@UserScopeMapperForm.TokenClaimName" Class="w-100"></RadzenTextBox>
-            <RadzenRequiredValidator Component="TokenClaimName" Text="Token claim is required"></RadzenRequiredValidator>
-            <p class="text-muted">Name of the claim to insert into the token</p>
+            <RadzenRequiredValidator Component="TokenClaimName" Text="@Global.TokenClaimNameRequired"></RadzenRequiredValidator>
+            <p class="text-muted">@Global.ClaimToInsertInTheToken</p>
         </div>
         <!-- Claim JSON Type -->
         <div>
-            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Claim JSON Type</RadzenText>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.ClaimJsonType</RadzenText>
             <RadzenDropDown Name="ClaimJsonType" Class="w-100"
                     Data=@jsonTypeInfos
                     TValue="TokenClaimJsonTypes"
@@ -41,10 +41,9 @@
     {
         <!-- Token Claim Name -->
         <div>
-            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">SAML Attribute Name</RadzenText>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.SamlAttributeName</RadzenText>
             <RadzenTextBox Name="SAMLAttributeName" @bind-Value="@UserScopeMapperForm.SAMLAttributeName" Class="w-100"></RadzenTextBox>
-            <RadzenRequiredValidator Component="SAMLAttributeName" Text="SAML Attribute Name is required"></RadzenRequiredValidator>
-            <p class="text-muted">SAML Attribute Name</p>
+            <RadzenRequiredValidator Component="SAMLAttributeName" Text="@Global.SamlAttributeNameRequired"></RadzenRequiredValidator>
         </div>
     }
 }

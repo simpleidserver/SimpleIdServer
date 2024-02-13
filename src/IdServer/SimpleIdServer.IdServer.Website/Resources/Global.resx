@@ -1347,7 +1347,7 @@
   <data name="UserAttribute" xml:space="preserve">
     <value>User attribute</value>
   </data>
-  <data name="UserAttributeDescription" xml:space="preserve">
+  <data name="MapClaimToUserAttribute" xml:space="preserve">
     <value>Map one claim to a user attribute</value>
   </data>
   <data name="UserClaims" xml:space="preserve">
@@ -1448,5 +1448,314 @@
   </data>
   <data name="IdentityValue" xml:space="preserve">
     <value>Identity Value</value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="ActiveRealm" xml:space="preserve">
+    <value>Active realm {0}</value>
+  </data>
+  <data name="AlgorithmRequired" xml:space="preserve">
+    <value>Algorithm is required</value>
+  </data>
+  <data name="ApplicationType" xml:space="preserve">
+    <value>Application type</value>
+  </data>
+  <data name="AssignedGroups" xml:space="preserve">
+    <value>Assigned groups</value>
+  </data>
+  <data name="AuthenticationContext" xml:space="preserve">
+    <value>Authentication context</value>
+  </data>
+  <data name="AutomaticIdentityProvisioning" xml:space="preserve">
+    <value>Automatic Identity Provisioning</value>
+  </data>
+  <data name="ChooseTemplate" xml:space="preserve">
+    <value>Choose template</value>
+  </data>
+  <data name="ClaimJsonType" xml:space="preserve">
+    <value>Claim JSON Type</value>
+  </data>
+  <data name="ClaimJsonTypeRequired" xml:space="preserve">
+    <value>Claim JSON Type is required</value>
+  </data>
+  <data name="ClaimToInsertInTheToken" xml:space="preserve">
+    <value>Name of the claim to insert into the token</value>
+  </data>
+  <data name="Configure" xml:space="preserve">
+    <value>Configure</value>
+  </data>
+  <data name="Confirm" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="Content" xml:space="preserve">
+    <value>Content</value>
+  </data>
+  <data name="Counter" xml:space="preserve">
+    <value>Counter</value>
+  </data>
+  <data name="CredentialIssuer" xml:space="preserve">
+    <value>Credential issuer</value>
+  </data>
+  <data name="CredentialIssuerDescription" xml:space="preserve">
+    <value>A REST API for credential issuance capable of generating trusted and verifiable credentials, such as University Degrees.</value>
+  </data>
+  <data name="CredentialIssuerShortDescription" xml:space="preserve">
+    <value>Credential issuer</value>
+  </data>
+  <data name="DeviceDescription" xml:space="preserve">
+    <value>An IoT application or otherwise browserless or input constrained device.</value>
+  </data>
+  <data name="DeviceShortDescription" xml:space="preserve">
+    <value>Device Authorization grant</value>
+  </data>
+  <data name="EmailIsInvalid" xml:space="preserve">
+    <value>Provide a valid email address</value>
+  </data>
+  <data name="Encryption" xml:space="preserve">
+    <value>Encryption</value>
+  </data>
+  <data name="EncryptionKey" xml:space="preserve">
+    <value>Encryption Key</value>
+  </data>
+  <data name="EncryptionRequired" xml:space="preserve">
+    <value>Encryption is required</value>
+  </data>
+  <data name="ExternalDeviceAuth" xml:space="preserve">
+    <value>External Device Authentication</value>
+  </data>
+  <data name="ExternalDeviceAuthShortDescription" xml:space="preserve">
+    <value>Client Initiated Backchannel Authentication (CIBA) flow</value>
+  </data>
+  <data name="ExternalDeviceDescription" xml:space="preserve">
+    <value>Authentication is performed via an Authentication Device by the user who also consents (if required) to the request.</value>
+  </data>
+  <data name="GenerateEncryptionKeyHelper" xml:space="preserve">
+    <value>Generate JSON Web Encryption (JWE) &lt;a href='https://www.rfc-editor.org/rfc/rfc7516' target='_blank'&gt;https://www.rfc-editor.org/rfc/rfc7516&lt;/a&gt;</value>
+  </data>
+  <data name="GenerateSignatureKeyHelper" xml:space="preserve">
+    <value>Generate a signature key. Check the JWT request object at &lt;a href='https://openid.net/specs/openid-connect-core-1_0.html#JWTRequests' target='_blank'&gt;OpenID Connect Core 1.0 - JWT Requests&lt;/a&gt;. This key is used in the &lt;i&gt;private_key_jwt&lt;/i&gt; and &lt;i&gt;client_secret_jwt&lt;/i&gt; authentication flows, as described in &lt;a href='https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication' target='_blank'&gt;OpenID Connect Core 1.0 - Client Authentication.&lt;/a&gt;</value>
+  </data>
+  <data name="GrantMgt" xml:space="preserve">
+    <value>Grant Management</value>
+  </data>
+  <data name="GrantMgtDescription" xml:space="preserve">
+    <value>The web application is executed on a server (ASP.NET CORE, SPRING, etc.) and implements all the security requirements proposed by FAPI 2.0. Additionally, it supports grant management</value>
+  </data>
+  <data name="GrantMgtShortDescription" xml:space="preserve">
+    <value>Web application with FAPI 2.0 security requirements and grant management support.</value>
+  </data>
+  <data name="GroupIdentifier" xml:space="preserve">
+    <value>Group Identifier</value>
+  </data>
+  <data name="HighlySecuredWebApp" xml:space="preserve">
+    <value>Highly secure Web Application</value>
+  </data>
+  <data name="HighlySecuredWebAppDescription" xml:space="preserve">
+    <value>The web application is executed on a server (ASP.NET CORE, SPRING, etc.) and implements all the security requirements proposed by FAPI 2.0.</value>
+  </data>
+  <data name="HighlySecuredWebAppShortDescription" xml:space="preserve">
+    <value>Web Application with FAPI 2.0 security requirements</value>
+  </data>
+  <data name="HotpDescription" xml:space="preserve">
+    <value>HMAC-based One time Password algorithm (HOTP) is an event-based OTP where the moving factor in each code is based on a counter.</value>
+  </data>
+  <data name="IncludeInAccessToken" xml:space="preserve">
+    <value>Include in access token</value>
+  </data>
+  <data name="Jwe" xml:space="preserve">
+    <value>Jwe</value>
+  </data>
+  <data name="Jwk" xml:space="preserve">
+    <value>Json Web Key (JWK)</value>
+  </data>
+  <data name="JwkClientUsageDescription" xml:space="preserve">
+    <value>Check the JWT request object at &lt;a href='https://openid.net/specs/openid-connect-core-1_0.html#JWTRequests' target='_blank'&gt;OpenID Connect Core 1.0 - JWT Requests&lt;/a&gt;. This key is used in the &lt;i&gt;private_key_jwt&lt;/i&gt; and &lt;i&gt;client_secret_jwt&lt;/i&gt; authentication flows, as described in &lt;a href='https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication' target='_blank'&gt;OpenID Connect Core 1.0 - Client Authentication.&lt;/a&gt;</value>
+  </data>
+  <data name="KeyGenerated" xml:space="preserve">
+    <value>Key has been generated !</value>
+  </data>
+  <data name="KeyType" xml:space="preserve">
+    <value>Key type</value>
+  </data>
+  <data name="KeyTypeRequired" xml:space="preserve">
+    <value>Key type is required</value>
+  </data>
+  <data name="LdapOrJsonPathRequired" xml:space="preserve">
+    <value>According to the type of identity provisioning, you must specify an LDAP property or a JSON path if you are using SCIM.</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Loading...</value>
+  </data>
+  <data name="Machine" xml:space="preserve">
+    <value>Machine</value>
+  </data>
+  <data name="MachineDescription" xml:space="preserve">
+    <value>Machine-to-machine (M2M) applications, such as CLIs, daemons, or services running on your back-end, the system authenticates and authorizes the app rather than a user.</value>
+  </data>
+  <data name="MachineShortDescription" xml:space="preserve">
+    <value>Client credentials</value>
+  </data>
+  <data name="ManualIdentityProvisioning" xml:space="preserve">
+    <value>Manual Identity Provisioning</value>
+  </data>
+  <data name="MapUserAttributeToClaim" xml:space="preserve">
+    <value>Map one user attribute to one claim</value>
+  </data>
+  <data name="MapUserPropertyToClaim" xml:space="preserve">
+    <value>Map one user property to one claim</value>
+  </data>
+  <data name="MetadataUrlRequired" xml:space="preserve">
+    <value>Metadata URL is required</value>
+  </data>
+  <data name="Mobile" xml:space="preserve">
+    <value>Mobile</value>
+  </data>
+  <data name="MobileDescription" xml:space="preserve">
+    <value>A desktop or mobile application running on a user's device</value>
+  </data>
+  <data name="MobileShortDescription" xml:space="preserve">
+    <value>Authorization code + PKCE</value>
+  </data>
+  <data name="Mtls" xml:space="preserve">
+    <value>Mutual-TLS Client Authentication</value>
+  </data>
+  <data name="MtlsAuthenticationIsEnabled" xml:space="preserve">
+    <value>By default, the client is configured to use MTLS authentication. &lt;br/&gt;
+The Subject Name of the client certificate must be specified.</value>
+  </data>
+  <data name="MtlsProofOfPossessionSubjectNameHelper" xml:space="preserve">
+    <value>MTLS authentication is configured by default. &lt;br /&gt;
+The Subject Name is used to verify the validity of the Client Certificate.</value>
+  </data>
+  <data name="Multivalued" xml:space="preserve">
+    <value>Multivalued</value>
+  </data>
+  <data name="PasswordConfirmation" xml:space="preserve">
+    <value>Password confirmation</value>
+  </data>
+  <data name="PasswordRequired" xml:space="preserve">
+    <value>Password is required</value>
+  </data>
+  <data name="ProofOfPossession" xml:space="preserve">
+    <value>Proof of possession</value>
+  </data>
+  <data name="PropertyName" xml:space="preserve">
+    <value>Name of the property</value>
+  </data>
+  <data name="QrCode" xml:space="preserve">
+    <value>QR Code</value>
+  </data>
+  <data name="Realm" xml:space="preserve">
+    <value>Realm</value>
+  </data>
+  <data name="SamePassword" xml:space="preserve">
+    <value>Passwords should be the same</value>
+  </data>
+  <data name="SamlAttributeNameRequired" xml:space="preserve">
+    <value>SAML Attribute Name is required</value>
+  </data>
+  <data name="SamlSp" xml:space="preserve">
+    <value>SAML SP</value>
+  </data>
+  <data name="SamlSpDescription" xml:space="preserve">
+    <value>A Service Provider (SP) is the entity providing the service, typically in the form of an application</value>
+  </data>
+  <data name="SamlSpShortDescription" xml:space="preserve">
+    <value>SAML Service Provider</value>
+  </data>
+  <data name="SecretRequired" xml:space="preserve">
+    <value>Secret is required</value>
+  </data>
+  <data name="Select" xml:space="preserve">
+    <value>Select</value>
+  </data>
+  <data name="SelectDpopProofOfPossessionHelper" xml:space="preserve">
+    <value>The client will be configured to use &lt;b&gt;private_key_jwt&lt;/b&gt; authentication method. &lt;br /&gt;
+A Signature Key with algorithm &lt;b&gt;ES256&lt;/b&gt; will be added. &lt;br /&gt;
+The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt;ES256&lt;/b&gt;. This value is used by Identity Server during the generation of the authorization response (JARM).</value>
+  </data>
+  <data name="SelectMtlsProofOfPossessionHelper" xml:space="preserve">
+    <value>The client will be configured to use &lt;b&gt;tls_client_auth&lt;/b&gt; authentication method. &lt;br /&gt;
+A Signature Key with algorithm &lt;b&gt;ES256&lt;/b&gt; will be added. &lt;br /&gt;
+The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt;ES256&lt;/b&gt;. This value is used by Identity Server during the generation of the authorization response (JARM).</value>
+  </data>
+  <data name="SelectOneOrMoreAuthMethods" xml:space="preserve">
+    <value>Select Authentication Methods</value>
+  </data>
+  <data name="SelectOneOrMoreAuthMethodsHelper" xml:space="preserve">
+    <value>Select one or more registration methods and update the order. The order is important as it determines the sequence of actions for registering the end-user.</value>
+  </data>
+  <data name="SelectProofOfPossessionHelper" xml:space="preserve">
+    <value>Please select a &lt;b&gt;Proof of Possession mechanism&lt;/b&gt;. Access tokens are securely linked to a specific cryptographic key, ensuring that only the sender possesses this key.</value>
+  </data>
+  <data name="SidAdminUi" xml:space="preserve">
+    <value>SimpleIdServer Administration UI</value>
+  </data>
+  <data name="SignatureKey" xml:space="preserve">
+    <value>Signature Key</value>
+  </data>
+  <data name="SignatureKeyParameters" xml:space="preserve">
+    <value>request object, private_key_jwt and client_secret_jwt</value>
+  </data>
+  <data name="SignOut" xml:space="preserve">
+    <value>Sign out</value>
+  </data>
+  <data name="SourceClaimName" xml:space="preserve">
+    <value>Source Claim Name</value>
+  </data>
+  <data name="SourceClaimNameRequired" xml:space="preserve">
+    <value>Source Claim name is required</value>
+  </data>
+  <data name="SourceContainsMoreThanOneValue" xml:space="preserve">
+    <value>Does the source contain more than one value ?</value>
+  </data>
+  <data name="Standard" xml:space="preserve">
+    <value>Standard</value>
+  </data>
+  <data name="Summary" xml:space="preserve">
+    <value>Summary</value>
+  </data>
+  <data name="TokenClaimNameRequired" xml:space="preserve">
+    <value>Token claim name is required</value>
+  </data>
+  <data name="TotpDescription" xml:space="preserve">
+    <value>Time-based One-Time Password (TOTP) is a time-based OTP. The seed for TOTP is static, just like in HOTP, but the moving factor in TOTP is time-based rather than counter-based.</value>
+  </data>
+  <data name="UserAttributeRequired" xml:space="preserve">
+    <value>User attribute is required</value>
+  </data>
+  <data name="UserBasedApp" xml:space="preserve">
+    <value>User Agent Based application</value>
+  </data>
+  <data name="UserBasedAppDescription" xml:space="preserve">
+    <value>A client-side application running in a browser (Angular, EmberJS, VueJS etc...). &lt;br/&gt; Client secret and/or refresh tokens cannot be stored by these applications because there is a security risk.</value>
+  </data>
+  <data name="UserBasedAppShortDescription" xml:space="preserve">
+    <value>Authorization code + PKCE</value>
+  </data>
+  <data name="UserMgt" xml:space="preserve">
+    <value>User management</value>
+  </data>
+  <data name="UserPropertyRequired" xml:space="preserve">
+    <value>User property is required</value>
+  </data>
+  <data name="WebApp" xml:space="preserve">
+    <value>Web application</value>
+  </data>
+  <data name="WebAppDescription" xml:space="preserve">
+    <value>Web application executed on server (ASP.NET CORE, SPRING etc...)</value>
+  </data>
+  <data name="WebAppShortDescription" xml:space="preserve">
+    <value>Authorization code</value>
+  </data>
+  <data name="WsRelyingParty" xml:space="preserve">
+    <value>WS-Fed Relying Party</value>
+  </data>
+  <data name="WsRelyingPartyDescription" xml:space="preserve">
+    <value>A WS-Federation relying party commonly used by older Microsoft applications</value>
+  </data>
+  <data name="WsRelyingPartyShortDescription" xml:space="preserve">
+    <value>WS-Federation application</value>
   </data>
 </root>

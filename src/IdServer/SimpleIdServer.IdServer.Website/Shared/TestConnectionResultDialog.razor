@@ -11,7 +11,7 @@
 @inject IDispatcher dispatcher
 
 <!-- Users -->
-<RadzenText class="mt-3 mb-3" Text="Users" TextStyle="TextStyle.DisplayH3" />
+<RadzenText class="mt-3 mb-3" Text="@Global.Users" TextStyle="TextStyle.DisplayH3" />
 
 <RadzenDataGrid 
                 AllowFiltering="false"
@@ -40,7 +40,7 @@
 
 
 <!-- Assigned groups -->
-<RadzenText class="mt-3 mb-3" Text="Assigned groups" TextStyle="TextStyle.DisplayH3" />
+<RadzenText class="mt-3 mb-3" Text="@Global.AssignedGroups" TextStyle="TextStyle.DisplayH3" />
 
 <RadzenDataGrid AllowFiltering="false"
                 AllowColumnResize="true"
@@ -54,13 +54,13 @@
                 TItem="AssignedGroupResult"
                 ColumnWidth="300px">
     <Columns>
-        <RadzenDataGridColumn Title="User Identifier" Property="UserId" TItem="AssignedGroupResult"></RadzenDataGridColumn>
-        <RadzenDataGridColumn Title="Group Identifier" Property="GroupId" TItem="AssignedGroupResult"></RadzenDataGridColumn>
+        <RadzenDataGridColumn Title="@Global.UserIdentifier" Property="UserId" TItem="AssignedGroupResult"></RadzenDataGridColumn>
+        <RadzenDataGridColumn Title="@Global.GroupIdentifier" Property="GroupId" TItem="AssignedGroupResult"></RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
 
 <!-- Groups -->
-<RadzenText class="mt-3 mb-3" Text="Groups" TextStyle="TextStyle.DisplayH3" />
+<RadzenText class="mt-3 mb-3" Text="@Global.Groups" TextStyle="TextStyle.DisplayH3" />
 
 <RadzenDataGrid AllowFiltering="false"
                 AllowColumnResize="true"

@@ -1,4 +1,6 @@
-﻿@using Microsoft.Extensions.Options;
+﻿@using Microsoft.AspNetCore.Html;
+@using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.ClientStore;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @inject IOptions<IdServerWebsiteOptions> Options;
@@ -10,7 +12,7 @@
 
 <!-- Client Identifier -->
 <div>
-    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Client Identifier</RadzenText>
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.ClientIdentifier</RadzenText>
     <RadzenTextBox @bind-Value="@Client.ClientId" Class="w-100"></RadzenTextBox>
 </div>
 
@@ -18,11 +20,10 @@
 @if(!string.IsNullOrWhiteSpace(Client.JsonWebKeyStr))
 {
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Json Web Key</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Jwk</RadzenText>
         <RadzenTextArea Rows=10 Name="Description" @bind-Value="@Client.JsonWebKeyStr" Class="w-100"></RadzenTextArea>
         <p class="text-muted">
-            Check the JWT request object at <a href='https://openid.net/specs/openid-connect-core-1_0.html#JWTRequests' target='_blank'>OpenID Connect Core 1.0 - JWT Requests</a>. 
-            This key is used in the <i>private_key_jwt</i> and <i>client_secret_jwt</i> authentication flows, as described in <a href='https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication' target='_blank'>OpenID Connect Core 1.0 - Client Authentication.</a>
+            @((MarkupString)(Global.JwkClientUsageDescription))
         </p>
     </div>
 }
@@ -32,12 +33,12 @@
 {
     <!-- Public Key -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Public Key</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.PublicKey</RadzenText>
         <RadzenTextArea Rows=10 Name="Description" Value="@Client.Pem.PublicKey" Class="w-100"></RadzenTextArea>
     </div>
     <!-- Private Key -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Private Key</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.PrivateKey</RadzenText>
         <RadzenTextArea Rows=10 Name="Description" Value="@Client.Pem.PrivateKey" Class="w-100"></RadzenTextArea>
     </div>
 }
@@ -47,21 +48,21 @@
     case SimpleIdServer.IdServer.WsFederation.WsFederationConstants.CLIENT_TYPE:
         <!-- WSFederation -->
         <div>
-            <RadzenLabel Text="WS-Federation" Style="padding: 0px;"></RadzenLabel>
+            <RadzenLabel Text="@Global.WsFederation" Style="padding: 0px;"></RadzenLabel>
             <RadzenTextBox Value=@GetFederationMetadataUrl() Class="w-100"></RadzenTextBox>
         </div>
         break;
     case SimpleIdServer.IdServer.Saml.Idp.Constants.CLIENT_TYPE:
         <!-- SAML -->
         <div>
-            <RadzenLabel Text="SAML" Style="padding: 0px;"></RadzenLabel>
+            <RadzenLabel Text="@Global.Saml" Style="padding: 0px;"></RadzenLabel>
             <RadzenTextBox Value=@GetSamlMetadataUrl() Class="w-100"></RadzenTextBox>
         </div>
         break;
     default:
         <!-- OpenID Connect -->
         <div>
-            <RadzenLabel Text="OpenID Connect" Style="padding: 0px;" />
+            <RadzenLabel Text="@Global.OpenIdConnect" Style="padding: 0px;" />
             <RadzenTextBox Value=@GetOpenIdConnectUrl() Class="w-100"></RadzenTextBox>
         </div>
         break;

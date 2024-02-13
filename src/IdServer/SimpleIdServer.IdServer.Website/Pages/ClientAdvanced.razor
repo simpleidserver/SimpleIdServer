@@ -64,7 +64,7 @@
                     </div>
                     <div class="col">
                         <RadzenTextBox Name="AuthorizationDataTypes" Class="w-100" @bind-Value=@updateAdvancedClient.AuthorizationDataTypes></RadzenTextBox>
-                        <p class="text-muted">@(new HtmlString(Global.AuthorizationDataTypesDescription))</p>
+                        <p class="text-muted">@((MarkupString)(Global.AuthorizationDataTypesDescription))</p>
                     </div>
                 </div>
                 <!-- Response types -->

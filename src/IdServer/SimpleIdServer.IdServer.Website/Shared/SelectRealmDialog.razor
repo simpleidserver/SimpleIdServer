@@ -1,4 +1,5 @@
-﻿@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
+﻿@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @inject IState<RealmsState> realmsState
 @inject IDispatcher dispatcher
 @inject NavigationManager navigationManager
@@ -6,13 +7,13 @@
 
 <RadzenTemplateForm Submit=@SubmitSelectRealm TItem="RealmForm" Data=@realmForm>
     <!-- Realm -->
-    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Realm</RadzenText>
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Realm</RadzenText>
     <RadzenDropDown Name="Realm" Class="w-100"
                     Data=@realmsState.Value.Realms
                     TValue="string"
                     @bind-Value=@realmForm.Name
                     TextProperty="Name" ValueProperty="Name"></RadzenDropDown>
-    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Select"  />
+    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@Global.Select"  />
 </RadzenTemplateForm>
 
 @code {
