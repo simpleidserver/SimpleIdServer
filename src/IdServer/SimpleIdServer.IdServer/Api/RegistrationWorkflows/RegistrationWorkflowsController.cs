@@ -8,6 +8,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
@@ -47,7 +48,7 @@ public class RegistrationWorkflowsController : BaseController
     {
         prefix = prefix ?? Constants.DefaultRealm;
 		var registrationWorkflow = await _registrationWorkflowRepository.Query().AsNoTracking().FirstOrDefaultAsync(r => r.RealmName == prefix && r.Id == id);
-		if (registrationWorkflow == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, ErrorMessages.UNKNOWN_REGISTRATION_WORKFLOW);
+		if (registrationWorkflow == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, Global.UnknownRegistrationWorkflow);
 		return new OkObjectResult(Build(registrationWorkflow));
     }
 
@@ -59,7 +60,7 @@ public class RegistrationWorkflowsController : BaseController
         {
             await CheckAccessToken(prefix, Constants.StandardScopes.RegistrationWorkflows.Name);
             var registrationWorkflow = await _registrationWorkflowRepository.Query().FirstOrDefaultAsync(r => r.RealmName == prefix && r.Id == id);
-            if (registrationWorkflow == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, ErrorMessages.UNKNOWN_REGISTRATION_WORKFLOW);
+            if (registrationWorkflow == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, Global.UnknownRegistrationWorkflow);
             _registrationWorkflowRepository.Delete(registrationWorkflow);
             await _registrationWorkflowRepository.SaveChanges(CancellationToken.None);
             return new NoContentResult();
@@ -81,7 +82,7 @@ public class RegistrationWorkflowsController : BaseController
             if (request.Steps == null || !request.Steps.Any()) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, RegistrationWorkflowNames.Steps));
             var existingAmrs = _authenticationMethodServices.Select(a => a.Amr);
             var unknownAmrs = request.Steps.Where(s => !existingAmrs.Contains(s));
-            if (unknownAmrs.Any()) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_AUTHENTICATION_METHODS, string.Join(",", unknownAmrs)));
+            if (unknownAmrs.Any()) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownAuthMethods, string.Join(",", unknownAmrs)));
             var existingRegistrationWorkflow = await _registrationWorkflowRepository.Query().AsNoTracking().FirstOrDefaultAsync(r => r.RealmName == prefix && r.Name == request.Name);
             if (existingRegistrationWorkflow != null) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.REGISTRATION_WORFKLOW_EXISTS);
             if(request.IsDefault)
@@ -128,9 +129,9 @@ public class RegistrationWorkflowsController : BaseController
             if (request.Steps == null || !request.Steps.Any()) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, RegistrationWorkflowNames.Steps));
             var existingAmrs = _authenticationMethodServices.Select(a => a.Amr);
             var unknownAmrs = request.Steps.Where(s => !existingAmrs.Contains(s));
-            if (unknownAmrs.Any()) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_AUTHENTICATION_METHODS, string.Join(",", unknownAmrs)));
+            if (unknownAmrs.Any()) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownAuthMethods, string.Join(",", unknownAmrs)));
             var existingRegistrationWorkflow = await _registrationWorkflowRepository.Query().FirstOrDefaultAsync(r => r.RealmName == prefix && r.Id == id);
-            if (existingRegistrationWorkflow == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_REGISTRATION_WORKFLOW, id));
+            if (existingRegistrationWorkflow == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownRegistrationWorkflow, id));
             existingRegistrationWorkflow.UpdateDateTime = DateTime.UtcNow;
             existingRegistrationWorkflow.IsDefault = request.IsDefault;
             existingRegistrationWorkflow.Steps = request.Steps;

@@ -19,6 +19,7 @@ using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System;
@@ -164,13 +165,13 @@ namespace SimpleIdServer.IdServer.UI
                 var kvp = Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName());
                 if(string.IsNullOrWhiteSpace(kvp.Value))
                 {
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.NO_SESSION_ID);
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.NoSessionId);
                 }
 
                 var activeSession = await _userSessionRepository.GetById(kvp.Value, prefix, cancellationToken);
                 if(activeSession == null)
                 {
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_USER_SESSION, kvp.Value));
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserSession, kvp.Value));
                 }
 
                 if(!activeSession.IsClientsNotified)
@@ -225,28 +226,28 @@ namespace SimpleIdServer.IdServer.UI
             var extractionResult = ExtractIdTokenHint(realm, idTokenHint);
             var claimName = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
             if (claimName != extractionResult.Jwt.Subject)
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_SUBJECT_IDTOKENHINT);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.InvalidSubjectIdTokenHint);
 
             if (!extractionResult.Jwt.Audiences.Contains(GetIssuer()))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_AUDIENCE_IDTOKENHINT);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.InvalidAudienceIdTokenHint);
 
             var clients = await _clientRepository.Query().Include(c => c.Realms).Where(c => extractionResult.Jwt.Audiences.Contains(c.ClientId) && c.Realms.Any(r => r.Name == realm)).ToListAsync(cancellationToken);
             if (clients == null || !clients.Any())
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_CLIENT_IDTOKENHINT);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.InvalidClientIdTokenHint);
 
             var openidClient = clients.FirstOrDefault(c => c.PostLogoutRedirectUris.Contains(postLogoutRedirectUri));
             if (openidClient == null)
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_POST_LOGOUT_REDIRECT_URI);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.InvalidPostLogoutRedirectUrl);
 
             if (extractionResult.EncryptedJwt != null)
             {
                 if (openidClient.IdTokenEncryptedResponseAlg != extractionResult.EncryptedJwt.Alg || openidClient.IdTokenEncryptedResponseEnc != extractionResult.EncryptedJwt.Enc)
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_ENC_OR_ALG_USED_TO_ENCRYPT_IDTOKENHINT);
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.InvalidEncOrAlgUsedToEncryptIdTokenHint);
             }
 
             if ((openidClient.IdTokenSignedResponseAlg ?? _options.DefaultTokenSignedResponseAlg) != extractionResult.Jwt.Alg)
             {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_ALG_USED_TO_SIGN_IDTOKENHINT);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.InvalidAlgUsedToSignIdTokenHint);
             }
 
             return new ValidationResult(extractionResult.Jwt, openidClient);
@@ -262,11 +263,11 @@ namespace SimpleIdServer.IdServer.UI
         {
             var handler = new JsonWebTokenHandler();
             if (!handler.CanReadToken(idTokenHint))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_IDTOKENHINT);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.InvalidIdTokenHint);
 
             var validationResult = JwtBuilder.ReadSelfIssuedJsonWebToken(realm, idTokenHint);
             if(validationResult.Error != null)
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_IDTOKENHINT);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.InvalidIdTokenHint);
             return validationResult;
         }
 

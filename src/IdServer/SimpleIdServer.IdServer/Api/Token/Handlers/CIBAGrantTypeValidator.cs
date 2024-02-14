@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Text.Json.Nodes;
@@ -41,7 +42,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
 
             var authRequest = await _bcAuthorizeRepository.Query().Include(a => a.Histories).FirstOrDefaultAsync(bc => bc.Id == authRequestId, cancellationToken);
             if (authRequest == null)
-                throw new OAuthException(ErrorCodes.INVALID_GRANT, ErrorMessages.INVALID_AUTH_REQUEST_ID);
+                throw new OAuthException(ErrorCodes.INVALID_GRANT, Global.InvalidAuthRequestId);
 
             if (authRequest.ClientId != openidClient.ClientId)
                 throw new OAuthException(ErrorCodes.INVALID_GRANT, ErrorMessages.AUTH_REQUEST_CLIENT_NOT_AUTHORIZED);

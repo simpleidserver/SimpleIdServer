@@ -8,6 +8,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
@@ -53,12 +54,12 @@ namespace SimpleIdServer.IdServer.Authenticate
                 .Include(c=> c.Realms)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == authenticateInstruction.Realm), cancellationToken);
-            if (client == null) throw new OAuthException(errorCode, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));
+            if (client == null) throw new OAuthException(errorCode, string.Format(Global.UnknownClient, clientId));
             if (isAuthorizationCodeGrantType) return client;
 
             var tokenEndPointAuthMethod = client.TokenEndPointAuthMethod ?? _options.DefaultTokenEndPointAuthMethod;
             var handler = _handlers.FirstOrDefault(h => h.AuthMethod == tokenEndPointAuthMethod);
-            if (handler == null) throw new OAuthException(errorCode, string.Format(ErrorMessages.UNKNOWN_AUTH_METHOD, tokenEndPointAuthMethod));
+            if (handler == null) throw new OAuthException(errorCode, string.Format(Global.UnknownAuthMethod, tokenEndPointAuthMethod));
 
             if (!await handler.Handle(authenticateInstruction, client, issuerName, cancellationToken, errorCode))
             {
@@ -68,7 +69,7 @@ namespace SimpleIdServer.IdServer.Authenticate
                     AuthMethod = tokenEndPointAuthMethod,
                     Realm = authenticateInstruction.Realm
                 });
-                throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_CREDENTIAL);
+                throw new OAuthException(errorCode, Global.BadClientCredential);
             }
 
             await _busControl.Publish(new ClientAuthenticationSuccessEvent

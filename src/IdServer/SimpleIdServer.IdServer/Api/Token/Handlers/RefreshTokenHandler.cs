@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
-using MassTransit.Configuration;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -16,6 +15,7 @@ using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
@@ -87,7 +87,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     if (tokenResult == null)
                     {
                         _logger.LogError($"refresh token '{refreshToken}' is invalid");
-                        return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.BAD_REFRESH_TOKEN);
+                        return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.BadRefreshToken);
                     }
 
                     if (tokenResult.ExpirationTime != null && DateTime.UtcNow > tokenResult.ExpirationTime.Value)
@@ -100,7 +100,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     if(context.DPOPProof != null)
                     {
                         var receivedJkt = context.DPOPProof.PublicKey().CreateThumbprint();
-                        if (tokenResult.Jkt != receivedJkt) throw new OAuthException(ErrorCodes.INVALID_DPOP_PROOF, ErrorMessages.INVALID_DPOP_BOUND_TO_ACCESS_TOKEN);
+                        if (tokenResult.Jkt != receivedJkt) throw new OAuthException(ErrorCodes.INVALID_DPOP_PROOF, Global.InvalidDpopBoundToAccessToken);
                     }
 
                     var jwsPayload = JsonObject.Parse(tokenResult.Data).AsObject();
@@ -125,14 +125,14 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                         if (!isJwsToken)
                         {
                             _logger.LogError("client_assertion doesn't have a correct JWS format");
-                            throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.BAD_CLIENT_ASSERTION_FORMAT);
+                            throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.BadClientAssertionFormat);
                         }
 
                         var extractedJws = jwsHandler.ReadJwtToken(clientAssertion);
                         if (extractedJws == null)
                         {
                             _logger.LogError("payload cannot be extracted from client_assertion");
-                            throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.BAD_CLIENT_ASSERTION_FORMAT);
+                            throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.BadClientAssertionFormat);
                         }
 
                         clientId = extractedJws.Issuer;

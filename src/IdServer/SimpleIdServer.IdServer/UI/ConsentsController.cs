@@ -15,6 +15,7 @@ using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System.Collections.Generic;
@@ -153,7 +154,7 @@ namespace SimpleIdServer.IdServer.UI
             var jObj = new JsonObject
             {
                 { ErrorResponseParameters.Error, ErrorCodes.ACCESS_DENIED },
-                { ErrorResponseParameters.ErrorDescription, ErrorMessages.ACCESS_REVOKED_BY_RESOURCE_OWNER }
+                { ErrorResponseParameters.ErrorDescription, Global.AccessRevokedByResourceOwner }
             };
             if (!string.IsNullOrWhiteSpace(state))
             {

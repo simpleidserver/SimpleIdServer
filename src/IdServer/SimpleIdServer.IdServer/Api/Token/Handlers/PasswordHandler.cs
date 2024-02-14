@@ -12,6 +12,7 @@ using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System.Collections.Generic;
@@ -85,7 +86,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                         Login = userName,
                         Password = password
                     }, cancellationToken);
-                    if (userAuthenticationResult.Status != ValidationStatus.AUTHENTICATE) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.BAD_USER_CREDENTIAL);
+                    if (userAuthenticationResult.Status != ValidationStatus.AUTHENTICATE) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, Global.BadUserCredential);
                     var user = userAuthenticationResult.AuthenticatedUser;
                     context.SetUser(user, null);
                     var result = BuildResult(context, extractionResult.Scopes);

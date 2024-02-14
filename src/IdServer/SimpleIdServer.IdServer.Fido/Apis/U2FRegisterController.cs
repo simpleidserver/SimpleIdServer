@@ -17,6 +17,7 @@ using SimpleIdServer.IdServer.Fido.DTOs;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI;
 using System.Security.Claims;
@@ -120,7 +121,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
         {
             var fidoOptions = GetOptions();
             prefix = prefix ?? IdServer.Constants.DefaultRealm;
-            if (request == null) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, IdServer.ErrorMessages.INVALID_INCOMING_REQUEST);
+            if (request == null) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
             if (string.IsNullOrWhiteSpace(request.SessionId)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.MISSING_PARAMETER, EndU2FRegisterRequestNames.SessionId));
             if (request.AuthenticatorAttestationRawResponse == null) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.MISSING_PARAMETER, EndU2FRegisterRequestNames.AuthenticatorAttestationRawResponse));
             var session = await _distributedCache.GetStringAsync(request.SessionId, cancellationToken);
@@ -238,7 +239,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             var isAuthenticated = User.Identity.IsAuthenticated;
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
             prefix = prefix ?? IdServer.Constants.DefaultRealm;
-            if (request == null) return (null, BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, IdServer.ErrorMessages.INVALID_INCOMING_REQUEST));
+            if (request == null) return (null, BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest));
             var login = request.Login;
             if (isAuthenticated) login = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
             if (string.IsNullOrWhiteSpace(login)) return (null, BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.MISSING_PARAMETER, BeginU2FRegisterRequestNames.Login)));

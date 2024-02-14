@@ -17,6 +17,7 @@ using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.AuthProviders;
 using SimpleIdServer.IdServer.UI.Services;
@@ -173,7 +174,7 @@ namespace SimpleIdServer.IdServer.UI
                 if (result.Failure != null)
                     _logger.LogError(result.Failure.ToString());
 
-                return RedirectToAction("Index", "Errors", new { code = ErrorCodes.INVALID_REQUEST, message = ErrorMessages.BAD_EXTERNAL_AUTHENTICATION });
+                return RedirectToAction("Index", "Errors", new { code = ErrorCodes.INVALID_REQUEST, message = Global.BadExternalAuthentication });
             }
 
             return await LinkProfile(result, cancellationToken);
@@ -187,7 +188,7 @@ namespace SimpleIdServer.IdServer.UI
                 {
                     _logger.LogError("no subject can be extracted from the external authentication provider {authProviderScheme}", scheme);
                     await HttpContext.SignOutAsync(Constants.DefaultExternalCookieAuthenticationScheme);
-                    return RedirectToAction("Index", "Errors", new { code = ErrorCodes.INVALID_REQUEST, message = ErrorMessages.BAD_EXTERNAL_AUTHENTICATION_USER });
+                    return RedirectToAction("Index", "Errors", new { code = ErrorCodes.INVALID_REQUEST, message = Global.BadExternalAuthenticationUser });
                 }
 
                 var isExternalAccountExists = await _userRepository.IsExternalAuthProviderExists(scheme, sub, prefix, cancellationToken);

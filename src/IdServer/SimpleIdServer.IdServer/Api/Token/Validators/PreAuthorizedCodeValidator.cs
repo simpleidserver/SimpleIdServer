@@ -5,6 +5,7 @@ using SimpleIdServer.IdServer.Api.Token.Helpers;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System.Text.Json.Nodes;
 using System.Threading;
@@ -43,8 +44,8 @@ namespace SimpleIdServer.IdServer.Api.Token.Validators
             if (string.IsNullOrWhiteSpace(preAuthorizedCode)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, TokenRequestParameters.PreAuthorizedCode));
             if (context.Client.IsTransactionCodeRequired && string.IsNullOrWhiteSpace(transactionCode)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, TokenRequestParameters.TransactionCode));
             var preAuthCode = await _grantedTokenHelper.GetPreAuthCode(preAuthorizedCode, cancellationToken);
-            if (preAuthCode == null) throw new OAuthException(ErrorCodes.INVALID_GRANT, ErrorMessages.INVALID_PREAUTHORIZEDCODE);
-            if (context.Client.IsTransactionCodeRequired && preAuthCode.TransactionCode != transactionCode) throw new OAuthException(ErrorCodes.INVALID_GRANT, ErrorMessages.INVALID_TRANSACTION_CODE);
+            if (preAuthCode == null) throw new OAuthException(ErrorCodes.INVALID_GRANT, Global.InvalidPreAuthorizedCode);
+            if (context.Client.IsTransactionCodeRequired && preAuthCode.TransactionCode != transactionCode) throw new OAuthException(ErrorCodes.INVALID_GRANT, Global.InvalidTransactionCode);
             return preAuthCode;
         }
     }

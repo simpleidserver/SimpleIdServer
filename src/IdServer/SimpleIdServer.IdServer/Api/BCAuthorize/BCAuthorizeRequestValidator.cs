@@ -10,6 +10,7 @@ using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Linq;
@@ -119,7 +120,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             {
                 var user = await _userRepository.GetBySubject(loginHint, context.Realm, cancellationToken);
                 if (user == null)
-                    throw new OAuthException(ErrorCodes.UNKNOWN_USER_ID, string.Format(ErrorMessages.UNKNOWN_USER, loginHint));
+                    throw new OAuthException(ErrorCodes.UNKNOWN_USER_ID, string.Format(Global.UnknownUser, loginHint));
 
                 return user;
             }
@@ -137,7 +138,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             var subject = jwsPayload.Subject;
             var user = await _userRepository.GetBySubject(subject, realm, cancellationToken);
             if (user == null)
-                throw new OAuthException(ErrorCodes.UNKNOWN_USER_ID, string.Format(ErrorMessages.UNKNOWN_USER, subject));
+                throw new OAuthException(ErrorCodes.UNKNOWN_USER_ID, string.Format(Global.UnknownUser, subject));
 
             return user;
         }
@@ -148,7 +149,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             var credential = user.Credentials.FirstOrDefault(c => c.CredentialType == Constants.Areas.Password && c.IsActive);
             var hash = PasswordHelper.ComputeHash(userCode);
             if (credential == null || credential.Value != PasswordHelper.ComputeHash(userCode))
-                throw new OAuthException(ErrorCodes.INVALID_CREDENTIALS, ErrorMessages.INVALID_USER_CODE);
+                throw new OAuthException(ErrorCodes.INVALID_CREDENTIALS, Global.InvalidUserCode);
         }
 
         private async Task CheckRequestObject(HandlerContext context, CancellationToken cancellationToken)
@@ -256,7 +257,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, extractionResult.Error);
                 var payload = extractionResult.Jwt;
                 if (!payload.Audiences.Contains(context.GetIssuer()))
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_AUDIENCE_IDTOKENHINT);
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.InvalidAudienceIdTokenHint);
 
                 return await CheckHint(context.Realm, payload, cancellationToken);
             }
@@ -268,7 +269,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
         {
             var bindingMessage = context.Request.RequestData.GetBindingMessage();
             if (!string.IsNullOrWhiteSpace(bindingMessage) && bindingMessage.Count() > _options.MaxBindingMessageSize)
-                throw new OAuthException(ErrorCodes.INVALID_BINDING_MESSAGE, string.Format(ErrorMessages.BINDING_MESSAGE_MUST_NOT_EXCEED, _options.MaxBindingMessageSize));
+                throw new OAuthException(ErrorCodes.INVALID_BINDING_MESSAGE, string.Format(Global.BindingMessageMustNotExceed, _options.MaxBindingMessageSize));
         }
 
         private void CheckRequestedExpiry(HandlerContext context)

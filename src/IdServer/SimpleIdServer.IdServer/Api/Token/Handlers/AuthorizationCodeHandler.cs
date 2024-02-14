@@ -16,6 +16,7 @@ using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
@@ -97,7 +98,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                             return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.AUTHORIZATION_CODE_ALREADY_USED);
                         }
 
-                        return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.BAD_AUTHORIZATION_CODE);
+                        return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, Global.BadAuthorizationCode);
                     }
 
                     CheckDPOPJkt(context, authCode);

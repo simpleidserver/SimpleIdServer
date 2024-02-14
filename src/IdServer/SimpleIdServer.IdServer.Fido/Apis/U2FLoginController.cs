@@ -14,6 +14,7 @@ using SimpleIdServer.IdServer.Fido.DTOs;
 using SimpleIdServer.IdServer.Fido.Extensions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System.Text.Json;
 
@@ -107,7 +108,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
         {
             var fidoOptions = GetOptions();
             prefix = prefix ?? IdServer.Constants.DefaultRealm;
-            if (request == null) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, IdServer.ErrorMessages.INVALID_INCOMING_REQUEST);
+            if (request == null) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
             var session = await _distributedCache.GetStringAsync(request.SessionId, cancellationToken);
             if (string.IsNullOrWhiteSpace(session)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.SESSION_CANNOT_BE_EXTRACTED);
             JsonWebToken jsonWebToken = null;
@@ -116,7 +117,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             var login = jsonWebToken?.Subject ?? request.Login;
             var authenticatedUser = await _authenticationHelper.GetUserByLogin(login, prefix, cancellationToken);
             if (authenticatedUser == null)
-                return BuildError(System.Net.HttpStatusCode.Unauthorized, ErrorCodes.ACCESS_DENIED, string.Format(IdServer.ErrorMessages.UNKNOWN_USER, login));
+                return BuildError(System.Net.HttpStatusCode.Unauthorized, ErrorCodes.ACCESS_DENIED, string.Format(SimpleIdServer.IdServer.Resources.Global.UnknownUser, login));
 
             var sessionRecord = JsonSerializer.Deserialize<AuthenticationSessionRecord>(session);
             var options = sessionRecord.Options;
@@ -149,7 +150,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             var fidoOptions = GetOptions();
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
             prefix = prefix ?? IdServer.Constants.DefaultRealm;
-            if (request == null) return (null, BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, IdServer.ErrorMessages.INVALID_INCOMING_REQUEST));
+            if (request == null) return (null, BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest));
             JsonWebToken jsonWebToken = null;
             if (!TryGetIdentityToken(prefix, out jsonWebToken))
                 if (string.IsNullOrWhiteSpace(request.Login)) return (null, BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.ErrorMessages.MISSING_PARAMETER, BeginU2FLoginRequestNames.Login)));
@@ -157,7 +158,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             var login = jsonWebToken?.Subject ?? request.Login;
             var authenticatedUser = await _authenticationHelper.GetUserByLogin(login, prefix, cancellationToken);
             if (authenticatedUser == null)
-                return (null, BuildError(System.Net.HttpStatusCode.Unauthorized, ErrorCodes.ACCESS_DENIED, string.Format(IdServer.ErrorMessages.UNKNOWN_USER, login)));
+                return (null, BuildError(System.Net.HttpStatusCode.Unauthorized, ErrorCodes.ACCESS_DENIED, string.Format(Resources.Global.UnknownUser, login)));
 
             var exts = new AuthenticationExtensionsClientInputs()
             {

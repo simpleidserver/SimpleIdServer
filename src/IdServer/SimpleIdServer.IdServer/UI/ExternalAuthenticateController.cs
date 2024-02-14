@@ -13,6 +13,7 @@ using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.Services;
 using System;
@@ -101,7 +102,7 @@ namespace SimpleIdServer.IdServer.UI
                     _logger.LogError(result.Failure.ToString());
                 }
 
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.BAD_EXTERNAL_AUTHENTICATION);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.BadExternalAuthentication);
             }
 
             var scheme = result.Properties.Items[SCHEME_NAME];
@@ -131,7 +132,7 @@ namespace SimpleIdServer.IdServer.UI
             if (string.IsNullOrWhiteSpace(sub))
             {
                 _logger.LogError("There is not valid subject");
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.BAD_EXTERNAL_AUTHENTICATION_USER);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.BadExternalAuthenticationUser);
             }
 
             var user = await UserRepository.GetByExternalAuthProvider(scheme, sub, realm, cancellationToken);

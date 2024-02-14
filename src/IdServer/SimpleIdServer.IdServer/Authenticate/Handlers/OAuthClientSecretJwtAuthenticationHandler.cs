@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Resources;
 using System;
 using System.Linq;
 using System.Text;
@@ -78,13 +79,13 @@ namespace SimpleIdServer.IdServer.Authenticate.Handlers
             var jwsAudiences = jsonWebToken.Audiences;
             var expirationDateTime = jsonWebToken.ValidTo;
             // 1. Check the client is correct.
-            if (jwsSubject != jwsIssuer) throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_ISSUER);
+            if (jwsSubject != jwsIssuer) throw new OAuthException(errorCode, Global.BadClientAssertionIssuer);
             // 2. Check if the audience is correct
             if (jwsAudiences == null || !jwsAudiences.Any() || !jwsAudiences.Any(j => j.Contains(expectedIssuer)))
-                throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_AUDIENCES);
+                throw new OAuthException(errorCode, Global.BadClientAssertionAudiences);
             // 3. Check the expiration time
             if (DateTime.UtcNow > expirationDateTime)
-                throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_EXPIRED);
+                throw new OAuthException(errorCode, Global.BadClientAssertionExpired);
         }
     }
 }

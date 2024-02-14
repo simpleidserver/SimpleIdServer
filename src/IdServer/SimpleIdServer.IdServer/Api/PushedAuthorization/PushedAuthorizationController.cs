@@ -12,6 +12,7 @@ using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -74,7 +75,7 @@ namespace SimpleIdServer.IdServer.Api.PushedAuthorization
                     {
                         var authHandler = _authenticationHandlers.Single(a => a.AuthMethod == OAuthClientPrivateKeyJwtAuthenticationHandler.AUTH_METHOD);
                         if (!(await authHandler.Handle(authenticateInstruction, context.Client, context.GetIssuer(), token)))
-                            throw new OAuthException(ErrorCodes.INVALID_CLIENT, ErrorMessages.BAD_CLIENT_CREDENTIAL);
+                            throw new OAuthException(ErrorCodes.INVALID_CLIENT, Global.BadClientCredential);
                     }
 
                     activity?.SetStatus(ActivityStatusCode.Ok, "Pushed Authorization Request is granted");

@@ -3,6 +3,7 @@
 using SimpleIdServer.IdServer.Authenticate;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Resources;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json.Nodes;
 using System.Threading;
@@ -29,7 +30,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Helpers
         {
             var authenticateInstruction = BuildAuthenticateInstruction(realm, jObjHeader, jObjBody, certificate);
             var oauthClient = await _authenticateClient.Authenticate(authenticateInstruction, issuerName, cancellationToken, errorCode: errorCode);
-            if (oauthClient == null) throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_CREDENTIAL);
+            if (oauthClient == null) throw new OAuthException(errorCode, Global.BadClientCredential);
             return oauthClient;
         }
 

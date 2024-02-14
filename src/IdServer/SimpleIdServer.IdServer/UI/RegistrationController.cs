@@ -9,6 +9,7 @@ using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Linq;
@@ -41,7 +42,7 @@ public class RegistrationController : BaseController
 		RegistrationWorkflow registrationWorkflow = null;
 		if (string.IsNullOrWhiteSpace(workflowName)) registrationWorkflow = await _registrationWorkflowRepository.Query().SingleOrDefaultAsync(w => w.IsDefault);
 		else registrationWorkflow = await _registrationWorkflowRepository.Query().SingleOrDefaultAsync(w => w.Name == workflowName);
-		if(registrationWorkflow == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, ErrorMessages.UNKNOWN_REGISTRATION_WORKFLOW);
+		if(registrationWorkflow == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, Global.UnknownRegistrationWorkflow);
 		var amr = registrationWorkflow.Steps.First();
 		var cookieName = _options.GetRegistrationCookieName();
 		var registrationProgressId = Guid.NewGuid().ToString();

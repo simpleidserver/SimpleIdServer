@@ -7,6 +7,7 @@ using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Nodes;
@@ -49,7 +50,7 @@ namespace SimpleIdServer.IdServer.Authenticate.Handlers
 
             var codeChallengeMethodHandler = _codeChallengeMethodHandlers.First(c => c.Name == codeChallengeMethod);
             var newCodeChallenge = codeChallengeMethodHandler.Calculate(codeVerifier);
-            if (newCodeChallenge != codeChallenge) throw new OAuthException(errorCode, ErrorMessages.BAD_CODE_VERIFIER);
+            if (newCodeChallenge != codeChallenge) throw new OAuthException(errorCode, Global.BadCodeVerifier);
 
             return true;
         }

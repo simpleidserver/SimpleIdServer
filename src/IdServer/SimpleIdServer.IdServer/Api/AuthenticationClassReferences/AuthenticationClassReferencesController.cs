@@ -7,6 +7,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Domains.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
@@ -98,7 +99,7 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationClassReferences
 
             async Task Validate()
             {
-                if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
+                if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
                 if (string.IsNullOrWhiteSpace(request.Name)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthenticationContextClassReferenceNames.Name));
                 if (request.AuthenticationMethodReferences == null || !request.AuthenticationMethodReferences.Any()) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthenticationContextClassReferenceNames.AuthenticationMethodReferences));
                 var supportedAmrs = _authMethodServices.Select(a => a.Amr);
@@ -120,7 +121,7 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationClassReferences
                 if (acr == null)
                 {
                     activity?.SetStatus(ActivityStatusCode.Error, "Authentication Class Reference doesn't exit");
-                    return BuildError(HttpStatusCode.NotFound, ErrorCodes.UNKNOWN_ACR, string.Format(ErrorMessages.UNKNOWN_ACR, id));
+                    return BuildError(HttpStatusCode.NotFound, ErrorCodes.UNKNOWN_ACR, string.Format(Global.UnknownAcr, id));
                 }
 
                 _authenticationContextClassReferenceRepository.Delete(acr);

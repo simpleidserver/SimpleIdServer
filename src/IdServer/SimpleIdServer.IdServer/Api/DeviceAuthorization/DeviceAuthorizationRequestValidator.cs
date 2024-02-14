@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System.Linq;
 using System.Net;
@@ -47,7 +48,7 @@ namespace SimpleIdServer.IdServer.Api.DeviceAuthorization
                     .AsNoTracking()
                     .FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == realm), cancellationToken);
                 if (client == null)
-                    throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CLIENT, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));
+                    throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CLIENT, string.Format(Global.UnknownClient, clientId));
 
                 return client;
             }

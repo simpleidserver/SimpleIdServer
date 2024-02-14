@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Linq;
@@ -69,14 +70,14 @@ namespace SimpleIdServer.IdServer.Api
                     throw new OAuthException(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_REQUEST, extractionResult.Error);
                 if(!string.IsNullOrWhiteSpace(scope) && !extractionResult.Jwt.Claims.Any(c => c.Type == "scope" && c.Value == scope))
                 {
-                    throw new OAuthException(HttpStatusCode.Unauthorized, ErrorCodes.REQUEST_DENIED, ErrorMessages.UNAUTHORIZED_ACCESS_PERMISSION_API);
+                    throw new OAuthException(HttpStatusCode.Unauthorized, ErrorCodes.REQUEST_DENIED, Global.UnauthorizedAccessPermissionApi);
                 }
 
                 jwt = extractionResult.Jwt;
             }
 
             var token = await _tokenRepository.Query().FirstOrDefaultAsync(t => t.Id == accessToken);
-            if (token == null || token.IsExpired()) throw new OAuthException(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, ErrorMessages.UNKNOWN_ACCESS_TOKEN);
+            if (token == null || token.IsExpired()) throw new OAuthException(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, Global.UnknownAccessToken);
             return (jwt ?? handler.ReadJsonWebToken(token.Data), token);
         }
 

@@ -9,6 +9,7 @@ using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
@@ -88,11 +89,11 @@ namespace SimpleIdServer.IdServer.Api.UMAPermissions
             var umaResources = await _umaResourceRepository.Query().Where(r => resourceIds.Contains(r.Id)).ToListAsync(cancellationToken);
             var unknownResources = resourceIds.Where(rid => !umaResources.Any(r => r.Id == rid));
             if(unknownResources.Any())
-                throw new OAuthException(ErrorCodes.INVALID_RESOURCE_ID, ErrorMessages.INVALID_RESOURCE_ID);
+                throw new OAuthException(ErrorCodes.INVALID_RESOURCE_ID, Global.InvalidResourceId);
 
             var unknownScopes = permissionTicket.Records.Where(rec => !rec.Scopes.All(sc => umaResources.First(r => r.Id == rec.ResourceId).Scopes.Contains(sc)));
             if(unknownScopes.Any())
-                throw new OAuthException(ErrorCodes.INVALID_SCOPE, ErrorMessages.INVALID_UMA_PERMISSION_SCOPE);
+                throw new OAuthException(ErrorCodes.INVALID_SCOPE, Global.InvalidUmaPermissionScope);
         }
     }
 }

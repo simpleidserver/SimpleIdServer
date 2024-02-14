@@ -8,6 +8,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -38,7 +39,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         protected async Task<Client> AuthenticateClient(HandlerContext context, CancellationToken cancellationToken)
         {
             var oauthClient = await _clientAuthenticationHelper.AuthenticateClient(context.Realm, context.Request.HttpHeader, context.Request.RequestData, context.Request.Certificate, context.GetIssuer(), cancellationToken);
-            if (oauthClient.GrantTypes == null || !oauthClient.GrantTypes.Contains(GrantType)) throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(ErrorMessages.BAD_CLIENT_GRANT_TYPE, GrantType));
+            if (oauthClient.GrantTypes == null || !oauthClient.GrantTypes.Contains(GrantType)) throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(Global.BadClientGrantType, GrantType));
             return oauthClient;
         }
 

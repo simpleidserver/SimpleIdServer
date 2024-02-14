@@ -19,6 +19,7 @@ using SimpleIdServer.IdServer.Extractors;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
@@ -143,11 +144,11 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
                     activity?.SetTag("user", user.Name);
                     var oauthClient = await _clientRepository.Query().Include(c => c.Realms).Include(c => c.SerializedJsonWebKeys).AsNoTracking().FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == prefix), cancellationToken);
                     if (oauthClient == null)
-                        throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));
+                        throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(Global.UnknownClient, clientId));
 
                     activity?.SetTag("client_id", oauthClient.ClientId);
                     if (!oauthClient.IsConsentDisabled && _userHelper.GetConsent(user, prefix, oauthClient.ClientId, scopes, claims, null, AuthorizationClaimTypes.UserInfo) == null)
-                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.NO_CONSENT);
+                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.NoConsent);
 
                     var oauthScopes = await _scopeRepository.Query().Include(s => s.Realms).Include(s => s.ClaimMappers).AsNoTracking().Where(s => scopes.Contains(s.Name) && s.Realms.Any(r => r.Name == prefix)).ToListAsync(cancellationToken);
                     var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, null, null, null, (X509Certificate2)null, HttpContext.Request.Method), prefix ?? Constants.DefaultRealm, _options);

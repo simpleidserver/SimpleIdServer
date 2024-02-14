@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,7 +52,7 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationMethods
             {
                 await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationMethods.Name);
                 var authMethod = _authMethods.SingleOrDefault(m => m.Amr == amr);
-                if (authMethod == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.UNKNOWN_ACR, string.Format(string.Format(ErrorMessages.AUTHENTICATION_METHOD_NOT_FOUND, amr)));
+                if (authMethod == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.UNKNOWN_ACR, string.Format(string.Format(Global.AuthenticationMethodNotFound, amr)));
                 if (authMethod.OptionsType == null) return NoContent();
                 foreach (var kvp in request.Values)
                     _configuration[$"{authMethod.OptionsType.Name}:{kvp.Key}"] = kvp.Value;
@@ -71,7 +72,7 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationMethods
             {
                 await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationMethods.Name);
                 var authMethod = _authMethods.SingleOrDefault(m => m.Amr == amr);
-                if (authMethod == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.UNKNOWN_ACR, string.Format(string.Format(ErrorMessages.AUTHENTICATION_METHOD_NOT_FOUND, amr)));
+                if (authMethod == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.UNKNOWN_ACR, string.Format(string.Format(Global.AuthenticationMethodNotFound, amr)));
                 if (authMethod.OptionsType == null) return NoContent();
                 var section = _configuration.GetSection(authMethod.OptionsType.Name);
                 var configuration = section.Get(authMethod.OptionsType);

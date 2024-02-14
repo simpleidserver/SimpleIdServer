@@ -3,6 +3,7 @@
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System.Collections.Generic;
 using System.Linq;
@@ -73,10 +74,10 @@ namespace SimpleIdServer.IdServer.Helpers
                 var apiResources = await _apiResourceRepository.Query().Include(r => r.Realms).Include(r => r.Scopes).Where(r => (resources.Contains(r.Name) || audiences.Contains(r.Audience)) && r.Realms.Any(r => r.Name == realm)).ToListAsync(cancellationToken);
                 var unsupportedResources = resources.Where(r => !apiResources.Any(a => a.Name == r));
                 if (unsupportedResources.Any())
-                    throw new OAuthException(ErrorCodes.INVALID_TARGET, string.Format(ErrorMessages.UNKNOWN_RESOURCE, string.Join(",", unsupportedResources)));
+                    throw new OAuthException(ErrorCodes.INVALID_TARGET, string.Format(Global.UnknownResource, string.Join(",", unsupportedResources)));
                 var unsupportedAudiences = audiences.Where(r => !apiResources.Any(a => a.Audience == r));
                 if (unsupportedAudiences.Any())
-                    throw new OAuthException(ErrorCodes.INVALID_TARGET, string.Format(ErrorMessages.UNKNOWN_AUDIENCE, string.Join(",", unsupportedAudiences)));
+                    throw new OAuthException(ErrorCodes.INVALID_TARGET, string.Format(Global.UnknownAudience, string.Join(",", unsupportedAudiences)));
                 var allApiResourceScopes = apiResources.SelectMany(c => c.Scopes).GroupBy(s => s.Name).Select(k => k.Key);
                 var supportedScopes = scopes.Where(s => apiResources.Any(r => r.Scopes.Any(sc => sc.Name == s)));
                 if (!supportedScopes.Any())

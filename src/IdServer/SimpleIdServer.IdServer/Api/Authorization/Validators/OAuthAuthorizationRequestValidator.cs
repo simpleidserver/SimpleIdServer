@@ -10,6 +10,7 @@ using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
@@ -117,9 +118,9 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                     return regex.Match(redirectUri).Success;
                 })) throw new OAuthExceptionBadRequestURIException(redirectUri);
 
-                if (!string.IsNullOrWhiteSpace(responseMode) && !_oauthResponseModes.Any(o => o.ResponseMode == responseMode)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.BAD_RESPONSE_MODE, responseMode));
+                if (!string.IsNullOrWhiteSpace(responseMode) && !_oauthResponseModes.Any(o => o.ResponseMode == responseMode)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.BadResponseMode, responseMode));
 
-                if (unsupportedResponseTypes.Any()) throw new OAuthException(ErrorCodes.UNSUPPORTED_RESPONSE_TYPE, string.Format(ErrorMessages.BAD_RESPONSE_TYPES_CLIENT, string.Join(",", unsupportedResponseTypes)));
+                if (unsupportedResponseTypes.Any()) throw new OAuthException(ErrorCodes.UNSUPPORTED_RESPONSE_TYPE, string.Format(Global.BadResponseTypesClient, string.Join(",", unsupportedResponseTypes)));
             }
 
             async Task<Client> AuthenticateClient(string realm, string clientId, CancellationToken cancellationToken)
@@ -133,7 +134,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                     .AsNoTracking()
                     .FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == realm), cancellationToken);
                 if (client == null)
-                    throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));
+                    throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(Global.UnknownClient, clientId));
 
                 return client;
             }
@@ -146,7 +147,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.GrantManagementAction));
 
                 if (!string.IsNullOrWhiteSpace(grantManagementAction) && !Constants.AllStandardGrantManagementActions.Contains(grantManagementAction))
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.INVALID_GRANT_MANAGEMENT_ACTION, grantManagementAction));
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.InvalidGrantManagementAction, grantManagementAction));
 
                 if (!context.IsComingFromConsentScreen() && !string.IsNullOrWhiteSpace(grantId) && grantManagementAction == Constants.StandardGrantManagementActions.Create)
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.GRANT_ID_CANNOT_BE_SPECIFIED);
@@ -191,10 +192,10 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
             {
                 var payload = ExtractIdTokenHint(context.Realm, idTokenHint);
                 if (context.User.Name != payload.Subject)
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_SUBJECT_IDTOKENHINT);
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.InvalidSubjectIdTokenHint);
 
                 if (!payload.Audiences.Contains(context.GetIssuer()))
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_AUDIENCE_IDTOKENHINT);
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.InvalidAudienceIdTokenHint);
             }
 
             switch (prompt)
@@ -219,7 +220,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                 var idtokenClaims = claims.Where(cl => cl.Type == AuthorizationClaimTypes.IdToken && cl.IsEssential && Constants.AllUserClaims.Contains(cl.Name));
                 var invalidClaims = idtokenClaims.Where(icl => !context.User.Claims.Any(cl => cl.Type == icl.Name && (icl.Values == null || !icl.Values.Any() || icl.Values.Contains(cl.Value))));
                 if (invalidClaims.Any())
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.INVALID_CLAIMS, string.Join(",", invalidClaims.Select(i => i.Name))));
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.InvalidClaims, string.Join(",", invalidClaims.Select(i => i.Name))));
             }
         }
 

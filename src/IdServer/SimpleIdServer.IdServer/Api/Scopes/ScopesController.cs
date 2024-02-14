@@ -10,6 +10,7 @@ using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
@@ -101,7 +102,7 @@ public class ScopesController : BaseController
                 .Include(p => p.ClaimMappers)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.Realms.Any(r => r.Name == prefix) && p.Id == id);
-            if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_SCOPE, id));
+            if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownScope, id));
             return new OkObjectResult(scope);
         }
         catch (OAuthException ex)
@@ -127,7 +128,7 @@ public class ScopesController : BaseController
                 var scope = await _scopeRepository.Query()
                     .Include(u => u.Realms)
                     .FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.Name == prefix));
-                if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_SCOPE, id));
+                if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownScope, id));
                 _scopeRepository.DeleteRange(new List<Scope> { scope });
                 await _scopeRepository.SaveChanges(CancellationToken.None);
                 activity?.SetStatus(ActivityStatusCode.Ok, "Scope is removed");
@@ -190,7 +191,7 @@ public class ScopesController : BaseController
                 var scope = await _scopeRepository.Query()
                     .Include(u => u.Realms)
                     .FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.Name == prefix));
-                if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_SCOPE, id));
+                if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownScope, id));
                 scope.Description = request.Description;
                 scope.IsExposedInConfigurationEdp = request.IsExposedInConfigurationEdp;
                 scope.UpdateDateTime = DateTime.UtcNow;
@@ -223,7 +224,7 @@ public class ScopesController : BaseController
                     .Include(u => u.ClaimMappers)
                     .Include(u => u.Realms)
                     .FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.Name == prefix));
-                if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_SCOPE, id));
+                if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownScope, id));
                 if(scope.ClaimMappers.Any(m => m.Name == request.Name)) 
                     throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.SCOPE_CLAIM_MAPPER_NAME_MUSTBEUNIQUE);
                 if (!string.IsNullOrWhiteSpace(request.TargetClaimPath) && scope.ClaimMappers.Any(m => m.TargetClaimPath == request.TargetClaimPath))
@@ -266,10 +267,10 @@ public class ScopesController : BaseController
                     .Include(u => u.Realms)
                     .Include(u => u.ClaimMappers)
                     .FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.Name == prefix));
-                if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_SCOPE, id));
+                if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownScope, id));
                 var scopeClaimMapper = scope.ClaimMappers.FirstOrDefault(m => m.Id == mapperId);
                 if(scopeClaimMapper == null)
-                    throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_SCOPE_CLAIM_MAPPER, mapperId));
+                    throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownScopeClaimMapper, mapperId));
                 scope.ClaimMappers.Remove(scopeClaimMapper);
                 await _scopeRepository.SaveChanges(CancellationToken.None);
                 activity?.SetStatus(ActivityStatusCode.Ok, "Claim mapper is removed");
@@ -296,10 +297,10 @@ public class ScopesController : BaseController
                     .Include(u => u.ClaimMappers)
                     .Include(u => u.Realms)
                     .FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.Name == prefix));
-                if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_SCOPE, id));
+                if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownScope, id));
                 var scopeClaimMapper = scope.ClaimMappers.FirstOrDefault(m => m.Id == mapperId);
                 if (scopeClaimMapper == null)
-                    throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_SCOPE_CLAIM_MAPPER, mapperId));
+                    throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownScopeClaimMapper, mapperId));
                 if (!string.IsNullOrWhiteSpace(request.TargetClaimPath) && scope.ClaimMappers.Any(m => m.TargetClaimPath == request.TargetClaimPath && m.Id != mapperId))
                     throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.SCOPE_CLAIM_MAPPER_TOKENCLAIMNAME_MUSTBEUNIQUE);
                 if (!string.IsNullOrWhiteSpace(request.SAMLAttributeName) && scope.ClaimMappers.Any(m => m.SAMLAttributeName == request.SAMLAttributeName && m.Id != mapperId))
@@ -344,16 +345,16 @@ public class ScopesController : BaseController
                 activity?.SetTag("realm", prefix);
                 activity?.SetTag("scope", id);
                 await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
-                if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
+                if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
                 if (request.Resources == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, ScopeNames.Resources));
                 var existingScope = await _scopeRepository.Query()
                     .Include(s => s.Realms)
                     .Include(s => s.ApiResources)
                     .FirstOrDefaultAsync(s => s.Id == id && s.Realms.Any(r => r.Name == prefix));
-                if (existingScope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_SCOPE, id));
+                if (existingScope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownScope, id));
                 var existingApiResources = await _apiResourceRepository.Query().Include(r => r.Realms).Where(r => request.Resources.Contains(r.Name) && r.Realms.Any(re => re.Name == prefix)).ToListAsync();
                 var unknownApiResources = request.Resources.Where(r => !existingApiResources.Any(er => er.Name == r));
-                if (unknownApiResources.Any()) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_RESOURCE, string.Join(",", unknownApiResources)));
+                if (unknownApiResources.Any()) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownResource, string.Join(",", unknownApiResources)));
                 existingScope.ApiResources.Clear();
                 foreach (var apiResource in existingApiResources) existingScope.ApiResources.Add(apiResource);
                 await _scopeRepository.SaveChanges(CancellationToken.None);

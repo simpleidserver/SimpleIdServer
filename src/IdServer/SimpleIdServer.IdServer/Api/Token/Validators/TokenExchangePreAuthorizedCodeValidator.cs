@@ -4,6 +4,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.TokenTypes;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,7 +47,7 @@ public class TokenExchangePreAuthorizedCodeValidator : ITokenExchangePreAuthoriz
         var existingScopes = context.Client.Scopes;
         var unknownScopes = scopes.Where(s => !existingScopes.Any(sc => sc.Name == s));
         if (unknownScopes.Any())
-            throw new OAuthException(ErrorCodes.INVALID_SCOPE, string.Format(ErrorMessages.UNKNOWN_SCOPE, string.Join(",", unknownScopes)));
+            throw new OAuthException(ErrorCodes.INVALID_SCOPE, string.Format(Global.UnknownScope, string.Join(",", unknownScopes)));
         var sub = tokenResult.Claims["sub"].ToString();
         var user = await _authenticationHelper.GetUserByLogin(sub, context.Realm, cancellationToken);
         if (context.Client.IsTransactionCodeRequired)

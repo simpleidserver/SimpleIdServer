@@ -10,6 +10,7 @@ using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
@@ -88,7 +89,7 @@ public class ApiResourcesController : BaseController
             {
                 activity?.SetTag("realm", prefix);
                 await CheckAccessToken(prefix, Constants.StandardScopes.ApiResources.Name);
-                if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
+                if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
                 if (string.IsNullOrWhiteSpace(request.Name)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, ApiResourceNames.Name));
                 if (await _apiResourceRepository.Query().Include(r => r.Realms).AsNoTracking().AnyAsync(r => r.Name == request.Name && r.Realms.Any(r => r.Name == prefix))) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.APIRESOURCE_ALREADY_EXISTS, request.Name));
                 var realm = await _realmRepository.Query().SingleAsync(r => r.Name == prefix);
@@ -146,7 +147,7 @@ public class ApiResourcesController : BaseController
                 var apiResource = await _apiResourceRepository.Query()
                     .Include(s => s.Realms)
                     .SingleOrDefaultAsync(s => s.Id == id && s.Realms.Any(r => r.Name == prefix), cancellationToken);
-                if (apiResource == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_API_RESOURCE, id));
+                if (apiResource == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownApiResource, id));
                 activity?.SetStatus(ActivityStatusCode.Ok, $"API resource {id} is removed");
                 _apiResourceRepository.Delete(apiResource);
                 await _apiResourceRepository.SaveChanges(cancellationToken);

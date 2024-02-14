@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Resources;
 using System;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -58,7 +59,7 @@ namespace SimpleIdServer.IdServer.Authenticate.Handlers
                 if (clientCertificate.Thumbprint == certificate.Thumbprint) return;
             }
 
-            throw new OAuthUnauthorizedException(ErrorCodes.INVALID_CLIENT, ErrorMessages.BAD_SELF_SIGNED_CERTIFICATE);
+            throw new OAuthUnauthorizedException(ErrorCodes.INVALID_CLIENT, Global.BadSelfSignedCertificate);
         }
     }
 }

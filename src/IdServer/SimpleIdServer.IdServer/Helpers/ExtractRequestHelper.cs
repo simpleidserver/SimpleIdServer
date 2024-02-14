@@ -9,6 +9,7 @@ using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using System;
 using System.Linq;
 using System.Security.Claims;
@@ -87,7 +88,7 @@ namespace SimpleIdServer.IdServer.Helpers
 
             Uri uri;
             if (!Uri.TryCreate(requestUri, UriKind.Absolute, out uri))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_REQUEST_URI_PARAMETER);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.InvalidRequestUriParameter);
 
             var cleanedUrl = uri.AbsoluteUri.Replace(uri.Fragment, "");
             using (var httpClient = _httpClientFactory.GetHttpClient())
@@ -110,10 +111,10 @@ namespace SimpleIdServer.IdServer.Helpers
         protected virtual void CheckRequestObject(JsonWebToken jwt, Client client, HandlerContext context)
         {
             if (jwt == null)
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_JWS_REQUEST_PARAMETER);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.InvalidJwsRequestParameter);
 
             if (!string.IsNullOrWhiteSpace(client.RequestObjectSigningAlg) && jwt.Alg != client.RequestObjectSigningAlg)
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, ErrorMessages.INVALID_SIGNATURE_ALG);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, Global.InvalidSignatureAlg);
 
             if (!jwt.TryGetClaim(AuthorizationRequestParameters.ResponseType, out Claim c))
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, ErrorMessages.MISSING_RESPONSE_TYPE_CLAIM);
@@ -123,10 +124,10 @@ namespace SimpleIdServer.IdServer.Helpers
 
             var responseTypes = context.Request.RequestData.GetResponseTypesFromAuthorizationRequest();
             if (responseTypes.Any() && !jwt.GetClaim(AuthorizationRequestParameters.ResponseType).Value.Split(' ').OrderBy(s => s).SequenceEqual(responseTypes.OrderBy(s => s)))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, ErrorMessages.INVALID_RESPONSE_TYPE_CLAIM);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, Global.InvalidResponseTypeClaim);
 
             if (jwt.GetClaim(AuthorizationRequestParameters.ClientId).Value != context.Client.ClientId)
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, ErrorMessages.INVALID_CLIENT_ID_CLAIM);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, Global.InvalidClientIdClaim);
         }
     }
 }

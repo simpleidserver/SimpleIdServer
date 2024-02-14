@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.DPoP;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using System;
 using System.Linq;
 using System.Text;
@@ -45,7 +46,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             }
             else
             {
-                if (!(value is JsonValue)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_DPOP_HEADER);
+                if (!(value is JsonValue)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.InvalidDpopHeader);
                 dpopProof = (context.Request.HttpHeader[Constants.DPOPHeaderName] as JsonValue).GetValue<string>();
             }
 

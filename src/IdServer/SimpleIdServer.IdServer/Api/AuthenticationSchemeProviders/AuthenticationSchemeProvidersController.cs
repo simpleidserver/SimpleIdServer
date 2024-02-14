@@ -8,6 +8,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
@@ -102,7 +103,7 @@ public class AuthenticationSchemeProvidersController : BaseController
 				.Include(p => p.Realms)
 				.Where(p => p.Realms.Any(r => r.Name == prefix))
 				.SingleOrDefaultAsync(p => p.Name == id);
-			if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_AUTH_SCHEME_PROVIDER, id));
+			if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownAuthSchemeProvider, id));
 			_authenticationSchemeProviderRepository.Remove(result);
 			await _authenticationSchemeProviderRepository.SaveChanges(CancellationToken.None);
 			return NoContent();
@@ -127,7 +128,7 @@ public class AuthenticationSchemeProvidersController : BaseController
                 .Where(p => p.Realms.Any(r => r.Name == prefix))
                 .AsNoTracking()
                 .SingleOrDefaultAsync(p => p.Name == id);
-            if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_AUTH_SCHEME_PROVIDER, id));
+            if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownAuthSchemeProvider, id));
 			var optionKey = $"{result.Name}:{result.AuthSchemeProviderDefinition.OptionsName}";
             var optionType = Assembly.GetEntryAssembly().GetType(result.AuthSchemeProviderDefinition.OptionsFullQualifiedName);
             var section = _configuration.GetSection(optionKey);
@@ -180,7 +181,7 @@ public class AuthenticationSchemeProvidersController : BaseController
 
         void Validate()
         {
-            if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_REQUEST_PARAMETER);
+            if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidRequestParameter);
             if (string.IsNullOrWhiteSpace(request.Name)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, nameof(AuthenticationSchemeProviderNames.Name)));
         }
     }
@@ -196,7 +197,7 @@ public class AuthenticationSchemeProvidersController : BaseController
                 .Query()
                 .Include(r => r.Realms)
                 .SingleAsync(a => a.Name == id && a.Realms.Any(r => r.Name == prefix));
-            if (instance == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_AUTH_SCHEME_PROVIDER, id));
+            if (instance == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownAuthSchemeProvider, id));
 			instance.UpdateDateTime = DateTime.UtcNow;
 			instance.Description = request.Description;
 			instance.DisplayName = request.DisplayName;
@@ -221,7 +222,7 @@ public class AuthenticationSchemeProvidersController : BaseController
                 .Include(r => r.AuthSchemeProviderDefinition)
                 .Include(r => r.Realms)
                 .SingleAsync(a => a.Name == id && a.Realms.Any(r => r.Name == prefix));
-            if (instance == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_AUTH_SCHEME_PROVIDER, id));
+            if (instance == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownAuthSchemeProvider, id));
 			instance.UpdateDateTime = DateTime.UtcNow;
             SyncConfiguration(instance, request.Values);
             await _authenticationSchemeProviderRepository.SaveChanges(CancellationToken.None);
@@ -245,7 +246,7 @@ public class AuthenticationSchemeProvidersController : BaseController
                 .Include(r => r.Realms)
                 .Include(r => r.Mappers)
                 .SingleOrDefaultAsync(a => a.Name == id && a.Realms.Any(r => r.Name == prefix));
-            if (instance == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_AUTH_SCHEME_PROVIDER, id));
+            if (instance == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownAuthSchemeProvider, id));
             instance.UpdateDateTime = DateTime.UtcNow;
             var record = new AuthenticationSchemeProviderMapper
             {
@@ -283,7 +284,7 @@ public class AuthenticationSchemeProvidersController : BaseController
                 .Include(p => p.Mappers)
                 .Where(p => p.Realms.Any(r => r.Name == prefix))
                 .SingleOrDefaultAsync(p => p.Name == id);
-            if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_AUTH_SCHEME_PROVIDER, id));
+            if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownAuthSchemeProvider, id));
             result.Mappers = result.Mappers.Where(m => m.Id != mapperId).ToList();
             await _authenticationSchemeProviderRepository.SaveChanges(CancellationToken.None);
             return NoContent();
@@ -306,7 +307,7 @@ public class AuthenticationSchemeProvidersController : BaseController
                 .Include(r => r.Realms)
                 .Include(r => r.Mappers)
                 .SingleOrDefaultAsync(a => a.Name == id && a.Realms.Any(r => r.Name == prefix));
-            if (instance == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_AUTH_SCHEME_PROVIDER, id));
+            if (instance == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownAuthSchemeProvider, id));
             instance.UpdateDateTime = DateTime.UtcNow;
             var mapper = instance.Mappers.Single(m => m.Id == mapperId);
             mapper.Name = request.Name;

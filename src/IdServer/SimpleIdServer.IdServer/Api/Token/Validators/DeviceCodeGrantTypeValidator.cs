@@ -6,6 +6,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Net;
@@ -37,15 +38,15 @@ namespace SimpleIdServer.IdServer.Api.Token.Validators
             var deviceCode = context.Request.RequestData.GetDeviceCode();
             if (string.IsNullOrWhiteSpace(deviceCode)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, TokenRequestParameters.DeviceCode));
             var authDeviceCode = await _deviceAuthCodeRepository.Query().SingleOrDefaultAsync(d => d.DeviceCode == deviceCode, cancellationToken);
-            if (authDeviceCode == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.UNKNOWN_DEVICE_CODE);
-            if (authDeviceCode.Status == DeviceAuthCodeStatus.ISSUED) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_ISSUED_DEVICE_CODE);
-            if (authDeviceCode.ExpirationDateTime <= currentDateTime) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.EXPIRED_TOKEN, ErrorMessages.INVALID_EXPIRED_DEVICE_CODE);
-            if (authDeviceCode.ClientId != context.Client.Id) throw new OAuthException(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_CLIENT_ID_DEVICE_CODE);
+            if (authDeviceCode == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.UnknownDeviceCode);
+            if (authDeviceCode.Status == DeviceAuthCodeStatus.ISSUED) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIssuedDeviceCode);
+            if (authDeviceCode.ExpirationDateTime <= currentDateTime) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.EXPIRED_TOKEN, Global.InvalidExpiredDeviceCode);
+            if (authDeviceCode.ClientId != context.Client.Id) throw new OAuthException(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_REQUEST, Global.InvalidClientIdDeviceCode);
             if (authDeviceCode.NextAccessDateTime != null && authDeviceCode.NextAccessDateTime >= currentDateTime) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.SLOW_DOWN, ErrorMessages.TOO_MANY_AUTH_REQUEST);
             if (authDeviceCode.Status == DeviceAuthCodeStatus.PENDING)
             {
                 authDeviceCode.Next(_options.DeviceCodeInterval);
-                throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.AUTHORIZATION_PENDING, ErrorMessages.INVALID_PENDING_DEVICE_CODE);
+                throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.AUTHORIZATION_PENDING, Global.InvalidPendingDeviceCode);
             }
 
             return authDeviceCode;

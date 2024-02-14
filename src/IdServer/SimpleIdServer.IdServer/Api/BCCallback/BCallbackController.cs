@@ -8,6 +8,7 @@ using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System.Net;
 using System.Threading;
@@ -42,7 +43,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
                 var bcAuthorize = await _bcAuthorizeRepository.Query()
                     .Include(a => a.Histories)
                     .FirstOrDefaultAsync(b => b.Id == parameter.AuthReqId, cancellationToken);
-                if (bcAuthorize == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_BC_AUTHORIZE, parameter.AuthReqId));
+                if (bcAuthorize == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownBcAuthorize, parameter.AuthReqId));
                 if (!bcAuthorize.IsActive) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.EXPIRED_BC_AUTHORIZE);
                 if (bcAuthorize.LastStatus != Domains.BCAuthorizeStatus.Pending) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.BC_AUTHORIZE_NOT_PENDING);
                 var user = await _authenticationHelper.GetUserByLogin(kvp.Item1.Subject, prefix, cancellationToken);

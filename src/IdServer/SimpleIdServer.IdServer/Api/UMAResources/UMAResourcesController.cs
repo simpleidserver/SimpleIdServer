@@ -8,6 +8,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Domains.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Linq;
@@ -59,7 +60,7 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
                 prefix = prefix ?? Constants.DefaultRealm;
                 await CheckHasPAT(prefix);
                 var result = await _umaResourceRepository.Query().Include(r => r.Translations).AsNoTracking().SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
-                if (result == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, ErrorMessages.UNKNOWN_UMA_RESOURCE);
+                if (result == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, Global.UnknownUmaResource);
                 return new OkObjectResult(result);
             }
             catch (OAuthException ex)
@@ -117,7 +118,7 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
                 Validate(request);
                 var currentUmaResource = await _umaResourceRepository.Query().SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
                 if (currentUmaResource == null)
-                    return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, ErrorMessages.UNKNOWN_UMA_RESOURCE);
+                    return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, Global.UnknownUmaResource);
 
                 currentUmaResource.IconUri = request.IconUri;
                 currentUmaResource.Scopes = request.Scopes;
@@ -152,7 +153,7 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
                 await CheckHasPAT(prefix ?? Constants.DefaultRealm);
                 var currentUmaResource = await _umaResourceRepository.Query().SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
                 if (currentUmaResource == null)
-                    return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, ErrorMessages.UNKNOWN_UMA_RESOURCE);
+                    return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, Global.UnknownUmaResource);
 
                 _umaResourceRepository.Delete(currentUmaResource);
                 await _umaResourceRepository.SaveChanges(cancellationToken);
@@ -173,7 +174,7 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
                 await CheckHasPAT(prefix ?? Constants.DefaultRealm);
                 var currentUmaResource = await _umaResourceRepository.Query().Include(r => r.Permissions).ThenInclude(p => p.Claims).SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
                 if (currentUmaResource == null)
-                    return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, ErrorMessages.UNKNOWN_UMA_RESOURCE);
+                    return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, Global.UnknownUmaResource);
                 Validate(request);
                 var permissions = request.Permissions.Select(p =>
                 {
@@ -218,7 +219,7 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
                 await CheckHasPAT(prefix ?? Constants.DefaultRealm);
                 var currentUmaResource = await _umaResourceRepository.Query().Include(r => r.Permissions).ThenInclude(p => p.Claims).AsNoTracking().SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
                 if (currentUmaResource == null)
-                    return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, ErrorMessages.UNKNOWN_UMA_RESOURCE);
+                    return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, Global.UnknownUmaResource);
                 return new OkObjectResult(currentUmaResource.Permissions);
             }
             catch (OAuthException ex)
@@ -236,7 +237,7 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
                 await CheckHasPAT(prefix ?? Constants.DefaultRealm);
                 var currentUmaResource = await _umaResourceRepository.Query().Include(r => r.Permissions).ThenInclude(p => p.Claims).SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
                 if (currentUmaResource == null)
-                    return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, ErrorMessages.UNKNOWN_UMA_RESOURCE);
+                    return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, Global.UnknownUmaResource);
                 currentUmaResource.Permissions.Clear();
                 await _umaResourceRepository.SaveChanges(cancellationToken);
                 return new NoContentResult();

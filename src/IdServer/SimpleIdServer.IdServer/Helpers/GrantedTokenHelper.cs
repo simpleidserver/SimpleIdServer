@@ -10,6 +10,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
@@ -173,7 +174,7 @@ namespace SimpleIdServer.IdServer.Helpers
         {
             var result = await _tokenRepository.Query().FirstOrDefaultAsync(t => t.Id == accessToken, cancellationToken);
             if (result == null) return false;
-            if (result.ClientId != clientId) throw new OAuthException(ErrorCodes.INVALID_CLIENT, ErrorMessages.UNAUTHORIZED_CLIENT);
+            if (result.ClientId != clientId) throw new OAuthException(ErrorCodes.INVALID_CLIENT, Global.UnauthorizedClient);
             _tokenRepository.Remove(result);
             await _tokenRepository.SaveChanges(cancellationToken);
             return true;
@@ -226,7 +227,7 @@ namespace SimpleIdServer.IdServer.Helpers
 
             if (result.ClientId != clientId)
             {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT, ErrorMessages.UNAUTHORIZED_CLIENT);
+                throw new OAuthException(ErrorCodes.INVALID_CLIENT, Global.UnauthorizedClient);
             }
 
             _tokenRepository.Remove(result);

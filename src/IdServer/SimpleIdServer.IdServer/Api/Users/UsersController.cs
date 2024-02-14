@@ -15,6 +15,7 @@ using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
@@ -219,9 +220,9 @@ namespace SimpleIdServer.IdServer.Api.Users
                 try
                 {
                     await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
-                    if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
+                    if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
                     var user = await _userRepository.GetById(id, prefix, cancellationToken);
-                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_USER, id));
+                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
                     user.UpdateEmail(request.Email);
                     user.UpdateName(request.Name);
                     user.UpdateLastname(request.Lastname);
@@ -294,9 +295,9 @@ namespace SimpleIdServer.IdServer.Api.Users
                 try
                 {
                     await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
-                    if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
+                    if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
                     var user = await _userRepository.GetById(id, prefix, cancellationToken);
-                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_USER, id));
+                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
                     if (request.Active)
                     {
                         foreach (var act in user.Credentials.Where(c => c.CredentialType == request.Credential.CredentialType))
@@ -338,7 +339,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                     var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) return new NotFoundResult();
                     var existingCredential = user.Credentials.SingleOrDefault(c => c.Id == credentialId);
-                    if (existingCredential == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_USER_CREDENTIAL, credentialId));
+                    if (existingCredential == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserCredential, credentialId));
                     existingCredential.Value = request.Value;
                     existingCredential.OTPAlg = request.OTPAlg;
                     user.UpdateDateTime = DateTime.UtcNow;
@@ -376,7 +377,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                     var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) return new NotFoundResult();
                     var existingCredential = user.Credentials.SingleOrDefault(c => c.Id == credentialId);
-                    if (existingCredential == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_USER_CREDENTIAL, credentialId));
+                    if (existingCredential == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserCredential, credentialId));
                     user.Credentials.Remove(existingCredential);
                     user.UpdateDateTime = DateTime.UtcNow;
                     await _userRepository.SaveChanges(cancellationToken);
@@ -403,7 +404,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                     var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) return new NotFoundResult();
                     var existingCredential = user.Credentials.SingleOrDefault(c => c.Id == credentialId);
-                    if (existingCredential == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_USER_CREDENTIAL, credentialId));
+                    if (existingCredential == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserCredential, credentialId));
                     foreach (var cred in user.Credentials.Where(c => c.CredentialType == existingCredential.CredentialType))
                         existingCredential.IsActive = false;
                     existingCredential.IsActive = true;
@@ -435,7 +436,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                     await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
                     Validate();
                     var user = await _userRepository.GetById(id, prefix, cancellationToken);
-                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_USER, id));
+                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
                     Update(user, request);
                     await _userRepository.SaveChanges(cancellationToken);
                     activity?.SetStatus(ActivityStatusCode.Ok, "Claims are updated");
@@ -459,7 +460,7 @@ namespace SimpleIdServer.IdServer.Api.Users
 
                 void Validate()
                 {
-                    if (request == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
+                    if (request == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
                 }
 
                 void Update(User user, UpdateUserClaimsRequest request)
@@ -485,11 +486,11 @@ namespace SimpleIdServer.IdServer.Api.Users
                 {
                     await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
                     var user = await _userRepository.GetById(id, prefix, cancellationToken);
-                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_USER, id));
+                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
                     var newGroup = await _groupRepository.Query()
                         .Include(g => g.Realms)
                         .SingleOrDefaultAsync(a => a.Id == groupId && a.Realms.Any(r => r.RealmsName == prefix)); ;
-                    if (newGroup == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_USER_GROUP, groupId));
+                    if (newGroup == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserGroup, groupId));
                     user.Groups.Add(new GroupUser
                     {
                         GroupsId = newGroup.Id
@@ -533,9 +534,9 @@ namespace SimpleIdServer.IdServer.Api.Users
                 {
                     await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
                     var user = await _userRepository.GetById(id, prefix, cancellationToken);
-                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_USER, id));
+                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
                     var assignedGroup = user.Groups.SingleOrDefault(g => g.GroupsId == groupId);
-                    if (assignedGroup == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_USER_GROUP, groupId));
+                    if (assignedGroup == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserGroup, groupId));
                     user.Groups.Remove(assignedGroup);
                     user.UpdateDateTime = DateTime.UtcNow;
                     await _userRepository.SaveChanges(cancellationToken);
@@ -575,9 +576,9 @@ namespace SimpleIdServer.IdServer.Api.Users
                 {
                     await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
                     var user = await _userRepository.GetById(id, prefix, cancellationToken);
-                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_USER, id));
+                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
                     var consent = user.Consents.SingleOrDefault(c => c.Id == consentId);
-                    if (consent == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_USER_CONSENT, consentId));
+                    if (consent == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserConsent, consentId));
                     user.Consents.Remove(consent);
                     user.UpdateDateTime = DateTime.UtcNow;
                     await _userRepository.SaveChanges(cancellationToken);
@@ -618,7 +619,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                     await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
                     var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
                     var user = await _userRepository.GetById(id, prefix, cancellationToken);
-                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_USER, id));
+                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
                     var sessions = await _userSessionRepository.GetActive(id, prefix, cancellationToken);
                     foreach (var session in sessions)
                         session.State = UserSessionStates.Rejected;
@@ -657,9 +658,9 @@ namespace SimpleIdServer.IdServer.Api.Users
                     await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
                     var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
                     var user = await _userRepository.GetById(id, prefix, cancellationToken);
-                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_USER, id));
+                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
                     var session = await _userSessionRepository.GetById(sessionId, prefix, cancellationToken);
-                    if (session == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_USER_SESSION, sessionId));
+                    if (session == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserSession, sessionId));
                     session.State = UserSessionStates.Rejected;
                     await _userSessionRepository.SaveChanges(cancellationToken);
                     _recurringJobManager.Trigger(nameof(UserSessionJob));
@@ -698,13 +699,13 @@ namespace SimpleIdServer.IdServer.Api.Users
                 try
                 {
                     await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
-                    if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST);
+                    if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
                     if (string.IsNullOrWhiteSpace(request.Scheme)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, UserExternalAuthProviderNames.Scheme));
                     if (string.IsNullOrWhiteSpace(request.Subject)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, UserExternalAuthProviderNames.Subject));
                     var user = await _userRepository.GetById(id, prefix, cancellationToken);
-                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_USER, id));
+                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
                     var externalAuthProvider = user.ExternalAuthProviders.SingleOrDefault(c => c.Subject == request.Subject && c.Scheme == request.Scheme);
-                    if (externalAuthProvider == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.UNKNOWN_USER_EXTERNALAUTHPROVIDER);
+                    if (externalAuthProvider == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.UnknownUserExternalAuthProvider);
                     user.ExternalAuthProviders.Remove(externalAuthProvider);
                     user.UpdateDateTime = DateTime.UtcNow;
                     await _userRepository.SaveChanges(cancellationToken);

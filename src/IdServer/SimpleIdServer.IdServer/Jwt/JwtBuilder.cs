@@ -7,6 +7,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using System.Collections.Generic;
 using System.Linq;
@@ -80,7 +81,7 @@ namespace SimpleIdServer.IdServer.Jwt
             var handler = new JsonWebTokenHandler();
             if (jwsAlg == SecurityAlgorithms.None) return handler.CreateToken(securityTokenDescriptor);
             var signingKey = sigCredentials.FirstOrDefault(s => s.Algorithm == jwsAlg);
-            if (signingKey == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.NO_JWK_WITH_ALG_SIG, jwsAlg));
+            if (signingKey == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.NoJwkWithAlgSig, jwsAlg));
             securityTokenDescriptor.SigningCredentials = signingKey;
             return handler.CreateToken(securityTokenDescriptor);
         }
@@ -114,14 +115,14 @@ namespace SimpleIdServer.IdServer.Jwt
         public ReadJsonWebTokenResult ReadSelfIssuedJsonWebToken(string realm, string jwt)
         {
             var handler = new JsonWebTokenHandler();
-            if (!handler.CanReadToken(jwt)) return ReadJsonWebTokenResult.BuildError(ErrorMessages.INVALID_JWT);
+            if (!handler.CanReadToken(jwt)) return ReadJsonWebTokenResult.BuildError(Global.InvalidJwt);
             var jsonWebToken = handler.ReadJsonWebToken(jwt);
             JsonWebToken encJwt = null;
             if(jsonWebToken.IsEncrypted)
             {
                 var encryptionKeys = _keyStore.GetAllEncryptingKeys(realm);
                 var encryptionKey = encryptionKeys.FirstOrDefault(e => jsonWebToken.Kid == e.Key.KeyId);
-                if (encryptionKey == null) return ReadJsonWebTokenResult.BuildError(string.Format(ErrorMessages.NO_JWK_FOUND_TO_DECRYPT, jsonWebToken.Kid));
+                if (encryptionKey == null) return ReadJsonWebTokenResult.BuildError(string.Format(Global.NoJwkFoundToDecrypt, jsonWebToken.Kid));
                 jwt = handler.DecryptToken(jsonWebToken, new TokenValidationParameters
                 {
                     ValidateAudience = false,
@@ -135,7 +136,7 @@ namespace SimpleIdServer.IdServer.Jwt
 
             var signKeys = _keyStore.GetAllSigningKeys(realm);
             var sigKey = signKeys.FirstOrDefault(k => k.Kid == jsonWebToken.Kid);
-            if (sigKey == null) return ReadJsonWebTokenResult.BuildError(string.Format(ErrorMessages.NO_JWK_FOUND_TO_CHECK_SIG, jsonWebToken.Kid));
+            if (sigKey == null) return ReadJsonWebTokenResult.BuildError(string.Format(Global.NoJwkFoundToCheckSig, jsonWebToken.Kid));
             var validationResult = handler.ValidateToken(jwt, new TokenValidationParameters
             {
                 ValidateAudience = false,
@@ -150,7 +151,7 @@ namespace SimpleIdServer.IdServer.Jwt
         public async Task<ReadJsonWebTokenResult> ReadJsonWebToken(string realm, string jwt, Client client, string sigAlg, string encAlg, CancellationToken cancellationToken)
         {
             var handler = new JsonWebTokenHandler();
-            if (!handler.CanReadToken(jwt)) return ReadJsonWebTokenResult.BuildError(ErrorMessages.INVALID_JWT);
+            if (!handler.CanReadToken(jwt)) return ReadJsonWebTokenResult.BuildError(Global.InvalidJwt);
             var jsonWebToken = handler.ReadJsonWebToken(jwt);
             JsonWebToken encJwt = null;
             if(
@@ -187,7 +188,7 @@ namespace SimpleIdServer.IdServer.Jwt
                 {
                     var encryptedKeys = _keyStore.GetAllEncryptingKeys(realm);
                     var encryptedKey = encryptedKeys.FirstOrDefault(k => k.Key.KeyId == jsonWebToken.Kid);
-                    if (encryptedKey == null) return ReadJsonWebTokenResult.BuildError(string.Format(ErrorMessages.NO_JWK_FOUND_TO_DECRYPT, jsonWebToken.Kid));
+                    if (encryptedKey == null) return ReadJsonWebTokenResult.BuildError(string.Format(Global.NoJwkFoundToDecrypt, jsonWebToken.Kid));
                     try
                     {
                         jwt = handler.DecryptToken(jsonWebToken, new TokenValidationParameters
@@ -211,7 +212,7 @@ namespace SimpleIdServer.IdServer.Jwt
             if(sigAlg != jsonWebToken.Alg) return ReadJsonWebTokenResult.BuildError(string.Format(ErrorMessages.JWT_MUST_BE_SIGNED, sigAlg));
 
             var jsonWebKey = await _clientHelper.ResolveJsonWebKey(client, jsonWebToken.Kid, cancellationToken);
-            if (jsonWebToken == null) return ReadJsonWebTokenResult.BuildError(string.Format(ErrorMessages.NO_JWK_FOUND_TO_CHECK_SIG, jsonWebToken.Kid));
+            if (jsonWebToken == null) return ReadJsonWebTokenResult.BuildError(string.Format(Global.NoJwkFoundToCheckSig, jsonWebToken.Kid));
             var validationResult = handler.ValidateToken(jwt, new TokenValidationParameters
             {
                 ValidateAudience = false,

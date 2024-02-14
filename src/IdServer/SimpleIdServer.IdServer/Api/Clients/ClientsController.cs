@@ -11,6 +11,7 @@ using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
@@ -183,7 +184,7 @@ public class ClientsController : BaseController
                 .Include(c => c.SerializedJsonWebKeys)
                 .AsNoTracking()
                 .SingleOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == prefix));
-            if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CLIENT, id));
+            if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
             return new OkObjectResult(result);
         }
         catch(OAuthException ex)
@@ -201,7 +202,7 @@ public class ClientsController : BaseController
         var result = await _clientRepository.Query()
             .Include(c => c.Realms)
             .SingleOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == prefix));
-        if (result == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CLIENT, id));
+        if (result == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
         _clientRepository.Delete(result);
         await _clientRepository.SaveChanges(CancellationToken.None);
         return new NoContentResult();
@@ -221,7 +222,7 @@ public class ClientsController : BaseController
                     .Include(c => c.Realms)
                     .Include(c => c.Translations)
                     .SingleOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == prefix));
-                if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CLIENT, id));
+                if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
                 Update(result, request);
                 result.UpdateDateTime = DateTime.UtcNow;
                 await _registerClientRequestValidator.Validate(prefix, result, CancellationToken.None);
@@ -293,7 +294,7 @@ public class ClientsController : BaseController
                     .Include(c => c.Realms)
                     .Include(c => c.Translations)
                     .SingleOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == prefix));
-                if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CLIENT, id));
+                if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
                 Update(result, request);
                 await _registerClientRequestValidator.Validate(prefix, result, CancellationToken.None);
                 result.UpdateDateTime = DateTime.UtcNow;
@@ -348,9 +349,9 @@ public class ClientsController : BaseController
                     .Include(c => c.Realms)
                     .Include(c => c.Scopes)
                     .SingleOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == prefix));
-                if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CLIENT, id));
+                if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
                 var scope = result.Scopes.SingleOrDefault(s => s.Name == name);
-                if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_SCOPE, name));
+                if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownScope, name));
                 result.Scopes.Remove(scope);
                 result.UpdateDateTime = DateTime.UtcNow;
                 await _clientRepository.SaveChanges(CancellationToken.None);
@@ -386,19 +387,19 @@ public class ClientsController : BaseController
             try
             {
                 activity?.SetTag("realm", prefix);
-                if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_REQUEST_PARAMETER);
+                if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidRequestParameter);
                 if (string.IsNullOrWhiteSpace(request.Name)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, nameof(ScopeNames.Name)));
                 await CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name);
                 var result = await _clientRepository.Query()
                     .Include(c => c.Realms)
                     .Include(c => c.Scopes)
                     .SingleOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == prefix));
-                if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CLIENT, id));
+                if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
                 if (result.Scopes.Any(s => s.Name == request.Name)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.SCOPE_ALREADY_EXISTS, request.Name));
                 var scope = await _scopeRepository.Query()
                     .Include(s => s.Realms)
                     .SingleOrDefaultAsync(c => c.Name == request.Name && c.Realms.Any(r => r.Name == prefix));
-                if (scope == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_SCOPE, request.Name));
+                if (scope == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownScope, request.Name));
                 result.Scopes.Add(scope);
                 result.UpdateDateTime = DateTime.UtcNow;
                 await _clientRepository.SaveChanges(CancellationToken.None);
@@ -437,7 +438,7 @@ public class ClientsController : BaseController
                 .Include(c => c.SerializedJsonWebKeys)
                 .AsNoTracking()
                 .SingleOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == prefix));
-            if (client == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CLIENT, id));
+            if (client == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
             if (client.JsonWebKeys.Any(j => j.KeyId == request.KeyId)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.SIGKEY_ALREADY_EXISTS, request.KeyId));
             SigningCredentials sigCredentials = null;
             switch (request.KeyType)
@@ -475,7 +476,7 @@ public class ClientsController : BaseController
                 .Include(c => c.SerializedJsonWebKeys)
                 .AsNoTracking()
                 .SingleOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == prefix));
-            if (client == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CLIENT, id));
+            if (client == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
             if (client.JsonWebKeys.Any(j => j.KeyId == request.KeyId)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.SIGKEY_ALREADY_EXISTS, request.KeyId));
 
             EncryptingCredentials encCredentials = null;
@@ -513,7 +514,7 @@ public class ClientsController : BaseController
                     .Include(c => c.Realms)
                     .Include(c => c.SerializedJsonWebKeys)
                     .SingleOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == prefix));
-                if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CLIENT, id));
+                if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
                 result.SerializedJsonWebKeys.Add(new ClientJsonWebKey
                 {
                     Kid = request.KeyId,
@@ -567,7 +568,7 @@ public class ClientsController : BaseController
                     .Include(c => c.Realms)
                     .Include(c => c.SerializedJsonWebKeys)
                     .SingleOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == prefix));
-                if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CLIENT, id));
+                if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
                 result.SerializedJsonWebKeys.Add(new ClientJsonWebKey
                 {
                     Kid = request.KeyId,
@@ -621,7 +622,7 @@ public class ClientsController : BaseController
                     .Include(c => c.Realms)
                     .Include(c => c.SerializedJsonWebKeys)
                     .SingleOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == prefix));
-                if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CLIENT, id));
+                if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
                 var serializedJsonWebKey = result.SerializedJsonWebKeys.SingleOrDefault(k => k.Kid == keyId);
                 if (serializedJsonWebKey == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_JSON_WEB_KEY, keyId));
                 result.SerializedJsonWebKeys.Remove(serializedJsonWebKey);
@@ -663,7 +664,7 @@ public class ClientsController : BaseController
                 var result = await _clientRepository.Query()
                     .Include(c => c.Realms)
                     .SingleOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == prefix));
-                if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CLIENT, id));
+                if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
                 result.TokenEndPointAuthMethod = request.TokenEndpointAuthMethod;
                 result.ClientSecret = request.ClientSecret;
                 result.TlsClientAuthSubjectDN = request.TlsClientAuthSubjectDN;
@@ -718,7 +719,7 @@ public class ClientsController : BaseController
                 var result = await _clientRepository.Query()
                     .Include(c => c.Scopes)
                     .SingleOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == prefix));
-                if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CLIENT, id));
+                if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
                 var newScope = new Scope
                 {
                     Id = Guid.NewGuid().ToString(),

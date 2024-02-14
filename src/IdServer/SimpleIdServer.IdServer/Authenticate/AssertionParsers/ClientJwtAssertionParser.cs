@@ -3,6 +3,7 @@
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Resources;
 using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.IdServer.Authenticate.AssertionParsers
@@ -52,7 +53,7 @@ namespace SimpleIdServer.IdServer.Authenticate.AssertionParsers
         {
             var handler = new JsonWebTokenHandler();
             var canRead = handler.CanReadToken(value);
-            if (!canRead) return ClientAssertionResult.Invalid(ErrorMessages.BAD_CLIENT_ASSERTION_JWT);
+            if (!canRead) return ClientAssertionResult.Invalid(Global.BadClientAssertionJwt);
             var token = handler.ReadJsonWebToken(value);
             return ClientAssertionResult.Ok(token);
         }

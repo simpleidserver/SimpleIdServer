@@ -10,6 +10,7 @@ using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Provisioning;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
@@ -92,7 +93,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
                     .Where(p => p.Realms.Any(r => r.Name == prefix))
                     .AsNoTracking()
                     .SingleOrDefaultAsync(p => p.Id == id);
-                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_IDPROVISIONING, id));
+                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
                 var optionKey = $"{result.Name}:{result.Definition.OptionsName}";
                 var optionType = Type.GetType(result.Definition.OptionsFullQualifiedName);
                 var section = _configuration.GetSection(optionKey);
@@ -117,7 +118,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
                     .Include(p => p.Realms)
                     .Where(p => p.Realms.Any(r => r.Name == prefix))
                     .SingleOrDefaultAsync(p => p.Id == id);
-                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_IDPROVISIONING, id));
+                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
                 result.Description = request.Description;
                 await _identityProvisioningStore.SaveChanges(CancellationToken.None);
                 return NoContent();
@@ -140,8 +141,8 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
                     .Include(p => p.Definition)
                     .Where(p => p.Realms.Any(r => r.Name == prefix))
                     .SingleOrDefaultAsync(p => p.Id == id);
-                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_IDPROVISIONING, id));
-                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_IDPROVISIONING, id));
+                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
+                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
                 result.UpdateDateTime = DateTime.UtcNow;
                 SyncConfiguration(result, request.Values);
                 await _identityProvisioningStore.SaveChanges(CancellationToken.None);
@@ -165,9 +166,9 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
                     .Include(p => p.Definition).ThenInclude(d => d.MappingRules)
                     .Where(p => p.Realms.Any(r => r.Name == prefix))
                     .SingleOrDefaultAsync(p => p.Id == id);
-                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_IDPROVISIONING, id));
+                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
                 var mapper = result.Definition.MappingRules.SingleOrDefault(r => r.Id == mapperId);
-                if (mapper == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_IDPROVISIONING_MAPPINGRULE, mapperId));
+                if (mapper == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioningMappingRule, mapperId));
                 result.UpdateDateTime = DateTime.UtcNow;
                 result.Definition.MappingRules = result.Definition.MappingRules.Where(r => r.Id != mapperId).ToList();
                 await _identityProvisioningStore.SaveChanges(CancellationToken.None);
@@ -191,7 +192,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
                     .Include(p => p.Definition).ThenInclude(d => d.MappingRules)
                     .Where(p => p.Realms.Any(r => r.Name == prefix))
                     .SingleOrDefaultAsync(p => p.Id == id);
-                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_IDPROVISIONING, id));
+                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
                 if (IProvisioningMappingRule.IsUnique(request.MappingRule) && result.Definition.MappingRules.Any(r => r.MapperType == request.MappingRule))
                     return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.IDPROVISIONING_TYPE_UNIQUE);
 
@@ -236,9 +237,9 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
                     .Include(p => p.Definition).ThenInclude(d => d.MappingRules)
                     .Where(p => p.Realms.Any(r => r.Name == prefix))
                     .SingleOrDefaultAsync(p => p.Id == id, cancellationToken);
-                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_IDPROVISIONING, id));
+                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
                 var mapperRule = result.Definition.MappingRules.SingleOrDefault(r => r.Id == mapperId);
-                if (mapperRule == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_IDPROVISIONING_MAPPINGRULE, id));
+                if (mapperRule == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioningMappingRule, id));
                 result.UpdateDateTime = DateTime.UtcNow;
                 mapperRule.From = request.From;
                 mapperRule.TargetUserAttribute = request.TargetUserAttribute;
@@ -265,9 +266,9 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
                     .Include(p => p.Definition).ThenInclude(d => d.MappingRules)
                     .Where(p => p.Realms.Any(r => r.Name == prefix))
                     .SingleOrDefaultAsync(p => p.Id == id, cancellationToken);
-                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_IDPROVISIONING, id));
+                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
                 var mapperRule = result.Definition.MappingRules.SingleOrDefault(r => r.Id == mapperId);
-                if (mapperRule == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_IDPROVISIONING_MAPPINGRULE, id));
+                if (mapperRule == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioningMappingRule, id));
                 return new OkObjectResult(Build(mapperRule));
             }
             catch (OAuthException ex)
@@ -288,7 +289,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
                     .Include(p => p.Definition).ThenInclude(p => p.MappingRules)
                     .Where(p => p.Realms.Any(r => r.Name == prefix))
                     .SingleOrDefaultAsync(p => p.Id == id);
-                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_IDPROVISIONING, id));
+                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
                 var provisioningService = _provisioningServices.Single(s => s.Name == result.Definition.Name);
                 var extractionResult = await provisioningService.ExtractTestData(result.Definition, cancellationToken);
                 var users = new List<IdentityProvisioningExtractionResult>();
@@ -364,7 +365,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
                     .Include(p => p.Definition).ThenInclude(p => p.MappingRules)
                     .SingleOrDefaultAsync(p => p.Id == id && p.Realms.Any(r => r.Name == prefix), cancellationToken);
                 if (result == null) 
-                    return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_IDPROVISIONING, id));
+                    return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
                 var provisioningService = _provisioningServices.Single(s => s.Name == result.Definition.Name);
                 await provisioningService.ExtractTestData(result.Definition, cancellationToken);
 
@@ -407,10 +408,10 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
                     .Include(p => p.Definition).ThenInclude(p => p.MappingRules)
                     .SingleOrDefaultAsync(p => p.Id == id && p.Realms.Any(r => r.Name == prefix), cancellationToken);
                 if (result == null) 
-                    return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_IDPROVISIONING, id));
+                    return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
                 var process = result.GetProcess(processId);
                 if (process == null) 
-                    return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_IDPROVISIONING_PROCESS, processId));
+                    return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioningProcess, processId));
                 if (!process.IsExported)
                     return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.IDPROVISIONING_PROCESS_ISNOTEXTRACTED);
                 if(process.StartImportDateTime != null)

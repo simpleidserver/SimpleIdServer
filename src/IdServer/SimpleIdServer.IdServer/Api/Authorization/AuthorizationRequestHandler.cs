@@ -9,6 +9,7 @@ using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
@@ -148,9 +149,9 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                 case Constants.StandardGrantManagementActions.Replace:
                     {
                         if (grant == null)
-                            throw new OAuthException(ErrorCodes.INVALID_GRANT, string.Format(ErrorMessages.UNKNOWN_GRANT, grantId));
+                            throw new OAuthException(ErrorCodes.INVALID_GRANT, string.Format(Global.UnknownGrant, grantId));
                         if (grant.ClientId != context.Client.ClientId)
-                            throw new OAuthException(ErrorCodes.ACCESS_DENIED, string.Format(ErrorMessages.UNAUTHORIZED_CLIENT_ACCESS_GRANT, context.Client.ClientId));
+                            throw new OAuthException(ErrorCodes.ACCESS_DENIED, string.Format(Global.UnauthorizedClientAccessGrant, context.Client.ClientId));
 
                         grant.Claims = allClaims;
                         grant.Scopes = extractionResult.Authorizations;
@@ -162,9 +163,9 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                 case Constants.StandardGrantManagementActions.Merge:
                     {
                         if (grant == null)
-                            throw new OAuthException(ErrorCodes.INVALID_GRANT, string.Format(ErrorMessages.UNKNOWN_GRANT, grantId));
+                            throw new OAuthException(ErrorCodes.INVALID_GRANT, string.Format(Global.UnknownGrant, grantId));
                         if (grant.ClientId != context.Client.ClientId)
-                            throw new OAuthException(ErrorCodes.ACCESS_DENIED, string.Format(ErrorMessages.UNAUTHORIZED_CLIENT_ACCESS_GRANT, context.Client.ClientId));
+                            throw new OAuthException(ErrorCodes.ACCESS_DENIED, string.Format(Global.UnauthorizedClientAccessGrant, context.Client.ClientId));
 
                         grant.Merge(allClaims, extractionResult.Authorizations, authDetails.ToList());
                         grant.Update();

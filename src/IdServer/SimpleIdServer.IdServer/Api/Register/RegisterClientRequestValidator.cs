@@ -7,6 +7,7 @@ using SimpleIdServer.IdServer.Authenticate;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Domains.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
 using System;
@@ -50,32 +51,32 @@ namespace SimpleIdServer.IdServer.Api.Register
                 throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(ErrorMessages.UNSUPPORTED_GRANT_TYPES, string.Join(",", notSupportedGrantTypes)));
 
             if (!string.IsNullOrWhiteSpace(client.TokenEndPointAuthMethod) && !_oauthClientAuthenticationHandlers.Any(o => o.AuthMethod == client.TokenEndPointAuthMethod))
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(ErrorMessages.UNKNOWN_AUTH_METHOD, client.TokenEndPointAuthMethod));
+                throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(Global.UnknownAuthMethod, client.TokenEndPointAuthMethod));
 
             if (!string.IsNullOrWhiteSpace(client.ApplicationType) && client.ApplicationType != "web" && client.ApplicationType != "native")
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, ErrorMessages.INVALID_APPLICATION_TYPE);
+                throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, Global.InvalidApplicationType);
 
             if (!string.IsNullOrWhiteSpace(client.SectorIdentifierUri))
             {
                 if (!Uri.IsWellFormedUriString(client.SectorIdentifierUri, UriKind.Absolute))
-                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, ErrorMessages.INVALID_SECTOR_IDENTIFIER_URI);
+                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, Global.InvalidSectorIdentifierUri);
 
                 var uri = new Uri(client.SectorIdentifierUri);
                 if (uri.Scheme != "https")
-                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, ErrorMessages.INVALID_HTTPS_SECTOR_IDENTIFIER_URI);
+                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, Global.InvalidHttpsSectorIdentifierUri);
             }
 
             if (!string.IsNullOrWhiteSpace(client.SubjectType) && !_subjectTypeBuilders.Any(s => s.SubjectType == client.SubjectType))
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, ErrorMessages.INVALID_SUBJECT_TYPE);
+                throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, Global.InvalidSubjectType);
 
             if (!string.IsNullOrWhiteSpace(client.InitiateLoginUri))
             {
                 if (!Uri.IsWellFormedUriString(client.InitiateLoginUri, UriKind.Absolute))
-                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, ErrorMessages.INVALID_INITIATE_LOGIN_URI);
+                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, Global.InvalidInitiateLoginUri);
 
                 var uri = new Uri(client.InitiateLoginUri);
                 if (uri.Scheme != "https")
-                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, ErrorMessages.INVALID_HTTPS_INITIATE_LOGIN_URI);
+                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, Global.InvalidHttpsInitiateLoginUri);
             }
 
             var supportedResponseTypeHandlers = _responseTypeHandlers.Where(r => client.GrantTypes.Contains(r.GrantType));
@@ -84,7 +85,7 @@ namespace SimpleIdServer.IdServer.Api.Register
                 var supportedResponseTypes = supportedResponseTypeHandlers.Select(s => s.ResponseType);
                 var unSupportedResponseTypes = client.ResponseTypes.Where(r => !supportedResponseTypes.Contains(r));
                 if (unSupportedResponseTypes.Any())
-                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(ErrorMessages.BAD_RESPONSE_TYPES, string.Join(",", unSupportedResponseTypes)));
+                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(Global.BadResponseTypes, string.Join(",", unSupportedResponseTypes)));
             }
 
             foreach (var kvp in supportedResponseTypeHandlers.GroupBy(k => k.GrantType))
@@ -103,11 +104,11 @@ namespace SimpleIdServer.IdServer.Api.Register
                     throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(ErrorMessages.UNSUPPORTED_SCOPES, string.Join(",", unsupportedScopes)));
             }
 
-            CheckUri(client.JwksUri, ErrorMessages.BAD_JWKS_URI);
-            CheckUris(client.Translations, OAuthClientParameters.ClientUri, ErrorMessages.BAD_CLIENT_URI);
-            CheckUris(client.Translations, OAuthClientParameters.LogoUri, ErrorMessages.BAD_LOGO_URI);
-            CheckUris(client.Translations, OAuthClientParameters.TosUri, ErrorMessages.BAD_TOS_URI);
-            CheckUris(client.Translations, OAuthClientParameters.PolicyUri, ErrorMessages.BAD_POLICY_URI);
+            CheckUri(client.JwksUri, Global.BadJwksUri);
+            CheckUris(client.Translations, OAuthClientParameters.ClientUri, Global.BadClientUri);
+            CheckUris(client.Translations, OAuthClientParameters.LogoUri, Global.BadLogoUri);
+            CheckUris(client.Translations, OAuthClientParameters.TosUri, Global.BadTosUri);
+            CheckUris(client.Translations, OAuthClientParameters.PolicyUri, Global.BadPolicyUri);
             CheckSignature(client.TokenSignedResponseAlg, ErrorMessages.UNSUPPORTED_TOKEN_SIGNED_RESPONSE_ALG);
             CheckEncryption(client.TokenEncryptedResponseAlg, client.TokenEncryptedResponseEnc, ErrorMessages.UNSUPPORTED_TOKEN_ENCRYPTED_RESPONSE_ALG, ErrorMessages.UNSUPPORTED_TOKEN_ENCRYPTED_RESPONSE_ENC, OAuthClientParameters.TokenEncryptedResponseAlg);  
             
@@ -154,7 +155,7 @@ namespace SimpleIdServer.IdServer.Api.Register
         protected virtual void CheckRedirectUrl(Client client, string redirectUrl)
         {
             if (!Uri.IsWellFormedUriString(redirectUrl, UriKind.Absolute))
-                throw new OAuthException(ErrorCodes.INVALID_REDIRECT_URI, string.Format(ErrorMessages.BAD_REDIRECT_URI, redirectUrl));
+                throw new OAuthException(ErrorCodes.INVALID_REDIRECT_URI, string.Format(Global.BadRedirectUri, redirectUrl));
 
             Uri.TryCreate(redirectUrl, UriKind.Absolute, out Uri uri);
             if (!string.IsNullOrWhiteSpace(uri.Fragment))
@@ -163,11 +164,11 @@ namespace SimpleIdServer.IdServer.Api.Register
             if (client.ApplicationType == "web")
             {
                 if (uri.Scheme.ToLowerInvariant() != "https")
-                    throw new OAuthException(ErrorCodes.INVALID_REDIRECT_URI, ErrorMessages.INVALID_HTTPS_REDIRECT_URI);
+                    throw new OAuthException(ErrorCodes.INVALID_REDIRECT_URI, Global.InvalidHttpsRedirectUri);
 
                 if (uri.Host.ToLowerInvariant() == "localhost")
                 {
-                    throw new OAuthException(ErrorCodes.INVALID_REDIRECT_URI, ErrorMessages.INVALID_LOCALHOST_REDIRECT_URI);
+                    throw new OAuthException(ErrorCodes.INVALID_REDIRECT_URI, Global.InvalidLocahostRedirectUri);
                 }
             }
         }
@@ -195,7 +196,7 @@ namespace SimpleIdServer.IdServer.Api.Register
             if (!string.IsNullOrWhiteSpace(request.BCTokenDeliveryMode))
             {
                 if (!Constants.AllStandardNotificationModes.Contains(request.BCTokenDeliveryMode))
-                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, ErrorMessages.INVALID_BC_DELIVERY_MODE);
+                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, Global.InvalidBcDeliveryMode);
 
                 if (request.BCTokenDeliveryMode == Constants.StandardNotificationModes.Ping ||
                     request.BCTokenDeliveryMode == Constants.StandardNotificationModes.Push)
@@ -208,10 +209,10 @@ namespace SimpleIdServer.IdServer.Api.Register
             if (!string.IsNullOrWhiteSpace(request.BCClientNotificationEndpoint))
             {
                 if (!Uri.TryCreate(request.BCClientNotificationEndpoint, UriKind.Absolute, out Uri uri))
-                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, ErrorMessages.INVALID_BC_CLIENT_NOTIFICATION_EDP);
+                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, Global.InvalidBcClientNotificationEdp);
 
                 if (uri.Scheme != "https")
-                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, ErrorMessages.INVALID_HTTPS_BC_CLIENT_NOTIFICATION_EDP);
+                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, Global.InvalidHttpsBcClientNotificationEdp);
             }
 
             if (!string.IsNullOrWhiteSpace(request.BCAuthenticationRequestSigningAlg))

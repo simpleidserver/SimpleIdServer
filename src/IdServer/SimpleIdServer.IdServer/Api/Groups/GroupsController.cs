@@ -7,6 +7,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Diagnostics;
@@ -89,7 +90,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
                     .Include(c => c.Roles)
                     .AsNoTracking()
                     .SingleAsync(g => g.Realms.Any(r => r.RealmsName == prefix) && g.Id == id);
-                if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_GROUP, id));
+                if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownGroup, id));
                 var splittedFullPath = result.FullPath.Split('.');
                var rootGroup = result;
                 if (splittedFullPath.Count() > 1)
@@ -218,11 +219,11 @@ namespace SimpleIdServer.IdServer.Api.Groups
                         .Include(c => c.Realms)
                         .Include(c => c.Roles)
                         .SingleOrDefaultAsync(g => g.Realms.Any(r => r.RealmsName == prefix) && g.Id == id);
-                    if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_GROUP, id));
+                    if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownGroup, id));
                     var scope = await _scopeRepository.Query()
                         .Include(s => s.Realms)
                         .SingleOrDefaultAsync(s => s.Name == request.Scope && s.Realms.Any(r => r.Name == prefix));
-                    if(scope == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_SCOPE, request.Scope));
+                    if(scope == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownScope, request.Scope));
                     result.Roles.Add(scope);
                     result.UpdateDateTime = DateTime.UtcNow;
                     await _groupRepository.SaveChanges(CancellationToken.None);
@@ -257,9 +258,9 @@ namespace SimpleIdServer.IdServer.Api.Groups
                         .Include(c => c.Realms)
                         .Include(c => c.Roles)
                         .SingleOrDefaultAsync(g => g.Realms.Any(r => r.RealmsName == prefix) && g.Id == id);
-                    if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_GROUP, id));
+                    if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownGroup, id));
                     var role = result.Roles.SingleOrDefault(r => r.Id == roleId);
-                    if (role == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_GROUP_ROLE, roleId));
+                    if (role == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownGroupRole, roleId));
                     result.Roles.Remove(role);
                     result.UpdateDateTime = DateTime.UtcNow;
                     await _groupRepository.SaveChanges(CancellationToken.None);

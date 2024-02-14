@@ -11,6 +11,7 @@ using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -75,7 +76,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseTypes
                 codeChallengeMethod = _options.DefaultCodeChallengeMethod;
 
             if (!_codeChallengeMethodHandlers.Any(c => c.Name == codeChallengeMethod))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.BAD_CODE_CHALLENGE_METHOD, codeChallengeMethod));
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.BadCodeChallengeMethod, codeChallengeMethod));
         }
     }
 }

@@ -18,6 +18,7 @@ using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
@@ -86,7 +87,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     activity?.SetTag("scopes", string.Join(",", scopes));
                     var permissionTicket = await _umaPermissionTicketHelper.GetTicket(ticket);
                     if (permissionTicket == null)
-                        throw new OAuthException(ErrorCodes.INVALID_GRANT, ErrorMessages.INVALID_TICKET);
+                        throw new OAuthException(ErrorCodes.INVALID_GRANT, Global.InvalidTicket);
 
                     ClaimTokenFormatFetcherResult claimTokenFormatFetcherResult = null;
                     if (!string.IsNullOrWhiteSpace(claimTokenFormat))
@@ -94,7 +95,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                         var claimTokenFormatFetcher = _claimTokenFormats.SingleOrDefault(c => c.Name == claimTokenFormat);
                         if (claimTokenFormatFetcher == null)
                         {
-                            throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.BAD_TOKEN_FORMAT, claimTokenFormat));
+                            throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.BadTokenFormat, claimTokenFormat));
                         }
 
                         claimTokenFormatFetcherResult = await claimTokenFormatFetcher.Fetch(context.Realm, context.Request.RequestData.GetClaimToken(), cancellationToken);
@@ -105,7 +106,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
 
                     var invalidScopes = permissionTicket.Records.Any(rec => !scopes.All(sc => rec.Scopes.Contains(sc)));
                     if (invalidScopes)
-                        throw new OAuthException(ErrorCodes.INVALID_SCOPE, ErrorMessages.INVALID_SCOPE);
+                        throw new OAuthException(ErrorCodes.INVALID_SCOPE, Global.InvalidScope);
 
                     var resourceIds = permissionTicket.Records.Select(r => r.ResourceId);
                     var umaResources = await _umaResourceRepository.Query().Include(r => r.Permissions).ThenInclude(p => p.Claims).Where(r => resourceIds.Contains(r.Id)).ToListAsync(cancellationToken);
