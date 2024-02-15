@@ -6,6 +6,7 @@ using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Resources;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -77,7 +78,7 @@ public abstract class BaseOTPResetPasswordService : IResetPasswordService
     {
         var destination = GetDestination(parameter.User);
         var login = _authenticationHelper.GetLogin(parameter.User);
-        if (string.IsNullOrWhiteSpace(destination)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_DESTINATION);
+        if (string.IsNullOrWhiteSpace(destination)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.MissingDestination);
         var otpOptions = GetOTPOptions();
         var otpAuthenticator = _otpAuthenticators.First(o => o.Alg == otpOptions.OTPAlg);
         var userCredential = new Domains.UserCredential

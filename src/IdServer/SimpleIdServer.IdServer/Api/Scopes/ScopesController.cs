@@ -346,7 +346,7 @@ public class ScopesController : BaseController
                 activity?.SetTag("scope", id);
                 await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
                 if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
-                if (request.Resources == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, ScopeNames.Resources));
+                if (request.Resources == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, ScopeNames.Resources));
                 var existingScope = await _scopeRepository.Query()
                     .Include(s => s.Realms)
                     .Include(s => s.ApiResources)

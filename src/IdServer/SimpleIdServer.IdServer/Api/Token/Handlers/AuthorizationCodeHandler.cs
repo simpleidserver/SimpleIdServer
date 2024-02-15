@@ -95,7 +95,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                         {
                             await _grantedTokenHelper.RemoveTokens(searchResult, cancellationToken);
                             _logger.LogError($"authorization code '{code}' has already been used, all tokens previously issued have been revoked");
-                            return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.AUTHORIZATION_CODE_ALREADY_USED);
+                            return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, Global.AuthorizationCodeAlreadyUsed);
                         }
 
                         return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, Global.BadAuthorizationCode);
@@ -105,7 +105,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     var previousClientId = previousRequest.GetClientId();
                     var previousRedirectUrl = previousRequest.GetRedirectUri();
                     var claims = previousRequest.GetClaimsFromAuthorizationRequest();
-                    if (!previousClientId.Equals(oauthClient.ClientId, StringComparison.InvariantCultureIgnoreCase)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.AUTHORIZATION_CODE_NOT_ISSUED_BY_CLIENT);
+                    if (!previousClientId.Equals(oauthClient.ClientId, StringComparison.InvariantCultureIgnoreCase)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, Global.AuthorizationCodeNotIssuedByClient);
                     if (!previousRedirectUrl.Equals(redirectUri, StringComparison.InvariantCultureIgnoreCase)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.NOT_SAME_REDIRECT_URI);
                     await _grantedTokenHelper.RemoveAuthorizationCode(code, cancellationToken);
 

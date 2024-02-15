@@ -8,6 +8,7 @@ using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Resources;
 using System;
 using System.Linq;
 using System.Security.Claims;
@@ -46,7 +47,7 @@ namespace SimpleIdServer.IdServer.Api.TokenIntrospection
                     activity?.SetTag("realm", context.Realm);
                     token = context.Request.RequestData.GetToken();
                     if (string.IsNullOrWhiteSpace(token))
-                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, IntrospectionRequestParameters.Token));
+                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, IntrospectionRequestParameters.Token));
 
                     activity?.SetTag("token", token);
                     var client = await _clientAuthenticationHelper.AuthenticateClient(context.Realm, context.Request.HttpHeader, context.Request.RequestData, context.Request.Certificate, context.GetIssuer(), cancellationToken);

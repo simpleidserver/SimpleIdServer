@@ -38,7 +38,7 @@ namespace SimpleIdServer.IdServer.Authenticate.Handlers
             var clientAssertion = authenticateInstruction.ClientAssertion;
             var handler = new JsonWebTokenHandler();
             var token = handler.ReadJsonWebToken(clientAssertion);
-            if (!token.IsEncrypted) throw new OAuthException(errorCode, ErrorMessages.CLIENT_ASSERTION_IS_NOT_ENCRYPTED);
+            if (!token.IsEncrypted) throw new OAuthException(errorCode, Global.ClientAssertionIsNotEncrypted);
             var encryptionSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(client.ClientSecret));
             string jws = null;
             try
@@ -54,12 +54,12 @@ namespace SimpleIdServer.IdServer.Authenticate.Handlers
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
-                throw new OAuthException(errorCode, ErrorMessages.CLIENT_ASSERTION_CANNOT_BE_DECRYPTED);
+                throw new OAuthException(errorCode, Global.ClientAssertionCannotBeDecrypted);
             }
 
             token = handler.ReadJsonWebToken(jws);
             var jsonWebKey = await _clientHelper.ResolveJsonWebKey(client, token.Kid, cancellationToken);
-            if (jsonWebKey == null) throw new OAuthException(errorCode, ErrorMessages.CLIENT_ASSERTION_NOT_SIGNED_BY_KNOWN_JWK);
+            if (jsonWebKey == null) throw new OAuthException(errorCode, Global.ClientAssertionNotSignedByKnownJwk);
             var validationResult = handler.ValidateToken(jws, new TokenValidationParameters
             {
                 ValidateAudience = false,

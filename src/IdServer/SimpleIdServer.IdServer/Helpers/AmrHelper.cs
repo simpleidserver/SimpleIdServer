@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,7 +43,7 @@ namespace SimpleIdServer.IdServer.Helpers
                 {
                     defaultAcr = await GetSupportedAcr(realm, acrClaim.Values, cancellationToken);
                     if (defaultAcr == null && acrClaim.IsEssential)
-                        throw new OAuthException(ErrorCodes.ACCESS_DENIED, ErrorMessages.NO_ESSENTIAL_ACR_IS_SUPPORTED);
+                        throw new OAuthException(ErrorCodes.ACCESS_DENIED, Global.NoEssentialAcrIsSupported);
                 }
 
                 if (defaultAcr == null)

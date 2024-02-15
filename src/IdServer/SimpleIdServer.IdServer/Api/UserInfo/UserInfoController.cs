@@ -124,7 +124,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
                             if (at != null && !string.IsNullOrWhiteSpace(at.ToString())) accessToken = at.ToString();
                         }
 
-                        if (string.IsNullOrWhiteSpace(accessToken)) throw new OAuthException(HttpStatusCode.Unauthorized, ErrorCodes.ACCESS_DENIED, ErrorMessages.MISSING_TOKEN);
+                        if (string.IsNullOrWhiteSpace(accessToken)) throw new OAuthException(HttpStatusCode.Unauthorized, ErrorCodes.ACCESS_DENIED, Global.MissingToken);
                     }
 
                     var kvp = await CheckAccessToken(prefix, accessToken: accessToken);

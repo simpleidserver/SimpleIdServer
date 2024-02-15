@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Resources;
 using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.IdServer.Api.Token.Validators
@@ -15,7 +16,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Validators
     {
         public void Validate(HandlerContext context)
         {
-            if (string.IsNullOrWhiteSpace(context.Request.RequestData.GetStr(TokenRequestParameters.RefreshToken))) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, TokenRequestParameters.RefreshToken));
+            if (string.IsNullOrWhiteSpace(context.Request.RequestData.GetStr(TokenRequestParameters.RefreshToken))) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, TokenRequestParameters.RefreshToken));
         }
     }
 }

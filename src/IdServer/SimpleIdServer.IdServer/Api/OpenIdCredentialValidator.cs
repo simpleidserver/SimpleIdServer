@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Resources;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -15,6 +16,6 @@ public class OpenIdCredentialValidator
         var openidCredentials = authDetails.Where(t => t.Type == Constants.StandardAuthorizationDetails.OpenIdCredential);
         if (!openidCredentials.Any()) return;
         foreach (var openidCredential in openidCredentials)
-            if (!openidCredential.AdditionalData.ContainsKey(Constants.StandardAuthorizationDetails.CredentialConfigurationId)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, Constants.StandardAuthorizationDetails.CredentialConfigurationId));
+            if (!openidCredential.AdditionalData.ContainsKey(Constants.StandardAuthorizationDetails.CredentialConfigurationId)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, Constants.StandardAuthorizationDetails.CredentialConfigurationId));
     }
 }

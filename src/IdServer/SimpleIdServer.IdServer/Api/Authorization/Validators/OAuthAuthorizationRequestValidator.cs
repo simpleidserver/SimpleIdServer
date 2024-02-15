@@ -61,12 +61,12 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
             await _extractRequestHelper.Extract(context);
             var requestedResponseTypes = context.Request.RequestData.GetResponseTypesFromAuthorizationRequest();
             if (!requestedResponseTypes.Any())
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.ResponseType));
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, AuthorizationRequestParameters.ResponseType));
 
             var responseTypeHandlers = _responseTypeHandlers.Where(r => requestedResponseTypes.Contains(r.ResponseType));
             var unsupportedResponseType = requestedResponseTypes.Where(r => !_responseTypeHandlers.Any(rh => rh.ResponseType == r));
             if (unsupportedResponseType.Any())
-                throw new OAuthException(ErrorCodes.UNSUPPORTED_RESPONSE_TYPE, string.Format(ErrorMessages.MISSING_RESPONSE_TYPES, string.Join(" ", unsupportedResponseType)));
+                throw new OAuthException(ErrorCodes.UNSUPPORTED_RESPONSE_TYPE, string.Format(Global.MissingResponseTypes, string.Join(" ", unsupportedResponseType)));
 
             var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
             var authDetails = context.Request.RequestData.GetAuthorizationDetailsFromAuthorizationRequest();
@@ -74,18 +74,18 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
             var grantRequest = await _grantHelper.Extract(context.Realm ?? Constants.DefaultRealm, scopes, resources, new List<string>(), authDetails, cancellationToken);
 
             if (!grantRequest.Scopes.Any() && !grantRequest.Audiences.Any() && !authDetails.Any())
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETERS, $"{AuthorizationRequestParameters.Scope},{AuthorizationRequestParameters.Resource},{AuthorizationRequestParameters.AuthorizationDetails}"));
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameters, $"{AuthorizationRequestParameters.Scope},{AuthorizationRequestParameters.Resource},{AuthorizationRequestParameters.AuthorizationDetails}"));
 
             var unsupportedScopes = grantRequest.Scopes.Where(s => s != Constants.StandardScopes.OpenIdScope.Name && !context.Client.Scopes.Any(sc => sc.Name == s));
             if (unsupportedScopes.Any())
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_SCOPES, string.Join(",", unsupportedScopes)));
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UnsupportedScopes, string.Join(",", unsupportedScopes)));
 
             if(authDetails != null && authDetails.Any(d => string.IsNullOrWhiteSpace(d.Type)))
                 throw new OAuthException(ErrorCodes.INVALID_AUTHORIZATION_DETAILS, ErrorMessages.AUTHORIZATION_DETAILS_TYPE_REQUIRED);
 
             var unsupportedAuthorizationDetailsTypes = authDetails.Where(d => !context.Client.AuthorizationDataTypes.Contains(d.Type));
             if (unsupportedAuthorizationDetailsTypes.Any())
-                throw new OAuthException(ErrorCodes.INVALID_AUTHORIZATION_DETAILS, string.Format(ErrorMessages.UNSUPPORTED_AUTHORIZATION_DETAILS_TYPES, string.Join(",", unsupportedAuthorizationDetailsTypes.Select(t => t.Type))));
+                throw new OAuthException(ErrorCodes.INVALID_AUTHORIZATION_DETAILS, string.Format(Global.UnsupportedAuthorizationDetailTypes, string.Join(",", unsupportedAuthorizationDetailsTypes.Select(t => t.Type))));
 
             OpenIdCredentialValidator.ValidateOpenIdCredential(authDetails);
             await CommonValidate(context, cancellationToken);
@@ -93,13 +93,13 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
             var redirectUri = context.Request.RequestData.GetRedirectUriFromAuthorizationRequest();
             var responseTypes = context.Request.RequestData.GetResponseTypesFromAuthorizationRequest();
             if (string.IsNullOrWhiteSpace(redirectUri))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.RedirectUri));
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, AuthorizationRequestParameters.RedirectUri));
 
             if (responseTypes.Contains(TokenResponseParameters.IdToken) && string.IsNullOrWhiteSpace(nonce))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.Nonce));
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, AuthorizationRequestParameters.Nonce));
 
             if (context.Client.IsResourceParameterRequired && !resources.Any())
-                throw new OAuthException(ErrorCodes.INVALID_TARGET, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.Resource));
+                throw new OAuthException(ErrorCodes.INVALID_TARGET, string.Format(Global.MissingParameter, AuthorizationRequestParameters.Resource));
 
             CheckGrantIdAndAction(context);
             return new AuthorizationRequestValidationResult(grantRequest, responseTypeHandlers);
@@ -126,7 +126,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
             async Task<Client> AuthenticateClient(string realm, string clientId, CancellationToken cancellationToken)
             {
                 if (string.IsNullOrWhiteSpace(clientId))
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.ClientId));
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, AuthorizationRequestParameters.ClientId));
 
                 var client = await _clientRepository.Query().Include(c => c.Scopes).ThenInclude(s => s.ClaimMappers)
                     .Include(c => c.SerializedJsonWebKeys)
@@ -144,7 +144,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                 var grantId = context.Request.RequestData.GetGrantIdFromAuthorizationRequest();
                 var grantManagementAction = context.Request.RequestData.GetGrantManagementActionFromAuthorizationRequest();
                 if (_options.GrantManagementActionRequired && string.IsNullOrWhiteSpace(grantManagementAction))
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.GrantManagementAction));
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, AuthorizationRequestParameters.GrantManagementAction));
 
                 if (!string.IsNullOrWhiteSpace(grantManagementAction) && !Constants.AllStandardGrantManagementActions.Contains(grantManagementAction))
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.InvalidGrantManagementAction, grantManagementAction));
@@ -153,7 +153,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.GRANT_ID_CANNOT_BE_SPECIFIED);
 
                 if (!string.IsNullOrWhiteSpace(grantId) && string.IsNullOrWhiteSpace(grantManagementAction))
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.GrantManagementAction));
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, AuthorizationRequestParameters.GrantManagementAction));
             }
         }
 
@@ -169,7 +169,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
             if (context.User == null)
             {
                 if (prompt == PromptParameters.None)
-                    throw new OAuthException(ErrorCodes.LOGIN_REQUIRED, ErrorMessages.LOGIN_IS_REQUIRED);
+                    throw new OAuthException(ErrorCodes.LOGIN_REQUIRED, Global.LoginIsRequired);
 
                 throw new OAuthLoginRequiredException(await GetFirstAmr(context.Realm, acrValues, claims, openidClient, cancellationToken));
             }

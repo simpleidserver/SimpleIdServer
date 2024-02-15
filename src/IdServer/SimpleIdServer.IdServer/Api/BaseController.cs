@@ -32,7 +32,7 @@ namespace SimpleIdServer.IdServer.Api
         protected string ExtractBearerToken()
         {
             if (TryExtractBearerToken(out string result)) return result;
-            throw new OAuthException(HttpStatusCode.Unauthorized, ErrorCodes.ACCESS_DENIED, ErrorMessages.MISSING_TOKEN);
+            throw new OAuthException(HttpStatusCode.Unauthorized, ErrorCodes.ACCESS_DENIED, Global.MissingToken);
         }
 
         protected bool TryExtractBearerToken(out string bearerToken)

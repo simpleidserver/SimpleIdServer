@@ -46,7 +46,7 @@ namespace SimpleIdServer.IdServer.Authenticate
             if (authenticateInstruction == null) throw new ArgumentNullException(nameof(authenticateInstruction));
 
             string clientId;
-            if (!TryGetClientId(authenticateInstruction, out clientId)) throw new OAuthException(errorCode, ErrorMessages.MISSING_CLIENT_ID);
+            if (!TryGetClientId(authenticateInstruction, out clientId)) throw new OAuthException(errorCode, Global.MissingClientId);
 
             var client = await _clientRepository.Query()
                 .Include(c => c.SerializedJsonWebKeys)
@@ -87,11 +87,11 @@ namespace SimpleIdServer.IdServer.Authenticate
             if (string.IsNullOrWhiteSpace(instruction.ClientAssertionType)) return false;
             var type = instruction.ClientAssertionType;
             var parser = _clientAssertionParsers.FirstOrDefault(c => c.Type == type);
-            if (parser == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.CLIENT_ASSERTION_TYPE_NOT_SUPPORTED, type));
+            if (parser == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.ClientAssertionTypeNotSupported, type));
             var clientAssertion = instruction.ClientAssertion;
-            if (string.IsNullOrWhiteSpace(clientAssertion)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.CLIENT_ASSERTION_IS_MISSING);
+            if (string.IsNullOrWhiteSpace(clientAssertion)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.ClientAssertionIsMissing);
             if (!parser.TryExtractClientId(clientAssertion, out clientId)) return false;
-            if (string.IsNullOrWhiteSpace(clientId)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.CLIENT_ID_CANNOT_BE_EXTRACTED_FROM_CLIENT_ASSERTION);
+            if (string.IsNullOrWhiteSpace(clientId)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.ClientIdCannotBeExtractedFromClientAssertion);
             return true;
         }
 

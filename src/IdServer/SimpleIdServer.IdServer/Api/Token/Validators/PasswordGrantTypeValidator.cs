@@ -3,6 +3,7 @@
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using System.Text.Json.Nodes;
+using SimpleIdServer.IdServer.Resources;
 
 namespace SimpleIdServer.IdServer.Api.Token.Validators
 {
@@ -16,10 +17,10 @@ namespace SimpleIdServer.IdServer.Api.Token.Validators
         public void Validate(HandlerContext context)
         {
             if (string.IsNullOrWhiteSpace(context.Request.RequestData.GetStr(TokenRequestParameters.Username)))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, TokenRequestParameters.Username));
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, TokenRequestParameters.Username));
             
             if (string.IsNullOrWhiteSpace(context.Request.RequestData.GetStr(TokenRequestParameters.Password)))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, TokenRequestParameters.Password));
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, TokenRequestParameters.Password));
         }
     }
 }

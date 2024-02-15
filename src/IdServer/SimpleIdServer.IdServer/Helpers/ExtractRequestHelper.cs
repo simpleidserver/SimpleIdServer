@@ -117,10 +117,10 @@ namespace SimpleIdServer.IdServer.Helpers
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, Global.InvalidSignatureAlg);
 
             if (!jwt.TryGetClaim(AuthorizationRequestParameters.ResponseType, out Claim c))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, ErrorMessages.MISSING_RESPONSE_TYPE_CLAIM);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, Global.MissingResponseTypeClaim);
 
             if (!jwt.TryGetClaim(AuthorizationRequestParameters.ClientId, out Claim cl))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, ErrorMessages.MISSING_CLIENT_ID_CLAIM);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, Global.MissingClientIdClaim);
 
             var responseTypes = context.Request.RequestData.GetResponseTypesFromAuthorizationRequest();
             if (responseTypes.Any() && !jwt.GetClaim(AuthorizationRequestParameters.ResponseType).Value.Split(' ').OrderBy(s => s).SequenceEqual(responseTypes.OrderBy(s => s)))

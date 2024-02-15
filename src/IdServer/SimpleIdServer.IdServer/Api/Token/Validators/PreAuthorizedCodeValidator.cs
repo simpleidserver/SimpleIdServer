@@ -41,8 +41,8 @@ namespace SimpleIdServer.IdServer.Api.Token.Validators
         {
             var preAuthorizedCode = context.Request.RequestData.GetPreAuthorizedCode();
             var transactionCode = context.Request.RequestData.GetTransactionCode();
-            if (string.IsNullOrWhiteSpace(preAuthorizedCode)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, TokenRequestParameters.PreAuthorizedCode));
-            if (context.Client.IsTransactionCodeRequired && string.IsNullOrWhiteSpace(transactionCode)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, TokenRequestParameters.TransactionCode));
+            if (string.IsNullOrWhiteSpace(preAuthorizedCode)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, TokenRequestParameters.PreAuthorizedCode));
+            if (context.Client.IsTransactionCodeRequired && string.IsNullOrWhiteSpace(transactionCode)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, TokenRequestParameters.TransactionCode));
             var preAuthCode = await _grantedTokenHelper.GetPreAuthCode(preAuthorizedCode, cancellationToken);
             if (preAuthCode == null) throw new OAuthException(ErrorCodes.INVALID_GRANT, Global.InvalidPreAuthorizedCode);
             if (context.Client.IsTransactionCodeRequired && preAuthCode.TransactionCode != transactionCode) throw new OAuthException(ErrorCodes.INVALID_GRANT, Global.InvalidTransactionCode);

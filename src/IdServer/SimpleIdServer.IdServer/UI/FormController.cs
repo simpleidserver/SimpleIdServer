@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
 using SimpleIdServer.IdServer.DTOs;
+using SimpleIdServer.IdServer.Resources;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -20,7 +21,7 @@ namespace SimpleIdServer.IdServer.UI
                 var jObj = new JsonObject
                 {
                     { ErrorResponseParameters.Error, ErrorCodes.INVALID_REQUEST },
-                    { ErrorResponseParameters.ErrorDescription, string.Format(ErrorMessages.MISSING_PARAMETER, "redirect_url") }
+                    { ErrorResponseParameters.ErrorDescription, string.Format(Global.MissingParameter, "redirect_url") }
                 };
                 var payload = Encoding.UTF8.GetBytes(jObj.ToString());
                 return new ContentResult

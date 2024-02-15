@@ -81,7 +81,7 @@ namespace SimpleIdServer.IdServer.UI
             prefix = prefix ?? Constants.DefaultRealm;
             if (!User.Identity.IsAuthenticated) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.ACCESS_DENIED, ErrorMessages.USER_NOT_AUTHENTICATED);
             var kvp = Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName());
-            if (string.IsNullOrWhiteSpace(kvp.Value)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_SESSIONID);
+            if (string.IsNullOrWhiteSpace(kvp.Value)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.MissingSessionId);
             var userId = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
             var user = await _userRepository.GetBySubject(userId, prefix, cancellationToken);
             if (user == null) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.UNKNOWN_USER, ErrorMessages.USER_NOT_AUTHENTICATED);
@@ -218,10 +218,10 @@ namespace SimpleIdServer.IdServer.UI
         protected virtual async Task<ValidationResult> Validate(string realm, string postLogoutRedirectUri, string idTokenHint, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(postLogoutRedirectUri))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_POST_LOGOUT_REDIRECT_URI);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.MissingPostLogoutRedirectUri);
 
             if (string.IsNullOrWhiteSpace(idTokenHint))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_ID_TOKEN_HINT);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.MissingIdTokenHint);
 
             var extractionResult = ExtractIdTokenHint(realm, idTokenHint);
             var claimName = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;

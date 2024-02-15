@@ -36,7 +36,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Validators
         {
             var currentDateTime = DateTime.UtcNow;
             var deviceCode = context.Request.RequestData.GetDeviceCode();
-            if (string.IsNullOrWhiteSpace(deviceCode)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, TokenRequestParameters.DeviceCode));
+            if (string.IsNullOrWhiteSpace(deviceCode)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, TokenRequestParameters.DeviceCode));
             var authDeviceCode = await _deviceAuthCodeRepository.Query().SingleOrDefaultAsync(d => d.DeviceCode == deviceCode, cancellationToken);
             if (authDeviceCode == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.UnknownDeviceCode);
             if (authDeviceCode.Status == DeviceAuthCodeStatus.ISSUED) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIssuedDeviceCode);

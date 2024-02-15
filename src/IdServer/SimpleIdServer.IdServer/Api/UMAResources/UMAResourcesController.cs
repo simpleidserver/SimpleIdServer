@@ -79,7 +79,7 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
                 await CheckHasPAT(prefix);
                 Validate(request);
                 if(string.IsNullOrWhiteSpace(request.Subject))
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, UMAResourceNames.Subject));
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, UMAResourceNames.Subject));
                 var umaResource = new UMAResource(Guid.NewGuid().ToString(), DateTime.UtcNow, prefix)
                 {
                     IconUri = request.IconUri,
@@ -252,29 +252,29 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
         private void Validate(UMAResourceRequest request)
         {
             if (request.Scopes == null || !request.Scopes.Any())
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, UMAResourceNames.ResourceScopes));
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, UMAResourceNames.ResourceScopes));
         }
 
         private void Validate(UMAResourcePermissionsRequest request)
         {
             if(request.Permissions == null || !request.Permissions.Any())
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, UMAResourcePermissionNames.Permissions));
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, UMAResourcePermissionNames.Permissions));
 
             foreach(var permission in request.Permissions)
             {
                 if(permission.Claims == null || !permission.Claims.Any())
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, $"{UMAResourcePermissionNames.Permissions}.{UMAResourcePermissionNames.Claims}"));
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, $"{UMAResourcePermissionNames.Permissions}.{UMAResourcePermissionNames.Claims}"));
 
                 if(permission.Scopes == null || !permission.Scopes.Any())
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, $"{UMAResourcePermissionNames.Permissions}.{UMAResourcePermissionNames.Scopes}"));
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, $"{UMAResourcePermissionNames.Permissions}.{UMAResourcePermissionNames.Scopes}"));
 
                 foreach(var claim in permission.Claims)
                 {
                     if(string.IsNullOrWhiteSpace(claim.ClaimName))
-                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, $"{UMAResourcePermissionNames.Permissions}.{UMAResourcePermissionNames.Claims}.{UMAResourcePermissionNames.ClaimName}"));
+                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, $"{UMAResourcePermissionNames.Permissions}.{UMAResourcePermissionNames.Claims}.{UMAResourcePermissionNames.ClaimName}"));
 
                     if (string.IsNullOrWhiteSpace(claim.ClaimValue))
-                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, $"{UMAResourcePermissionNames.Permissions}.{UMAResourcePermissionNames.Claims}.{UMAResourcePermissionNames.ClaimValue}"));
+                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, $"{UMAResourcePermissionNames.Permissions}.{UMAResourcePermissionNames.Claims}.{UMAResourcePermissionNames.ClaimValue}"));
                 }
             }
         }

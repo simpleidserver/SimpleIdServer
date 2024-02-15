@@ -32,7 +32,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Validators
         {
             var token = jObjBody.GetStr(RevokeTokenRequestParameters.Token);
             if (string.IsNullOrWhiteSpace(token))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, RevokeTokenRequestParameters.Token));
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, RevokeTokenRequestParameters.Token));
 
             var tokenTypeHint = jObjBody.GetStr(RevokeTokenRequestParameters.TokenTypeHint);
             var supportedTokens = GetSupportedTokens();

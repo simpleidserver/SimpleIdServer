@@ -37,13 +37,13 @@ public class TokenExchangePreAuthorizedCodeValidator : ITokenExchangePreAuthoriz
         var subjectToken = context.Request.RequestData.GetSubjectToken();
         var subjectTokenType = context.Request.RequestData.GetSubjectTokenType();
         var scopes = context.Request.RequestData.GetScopes();
-        if (string.IsNullOrWhiteSpace(subjectToken)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, TokenRequestParameters.SubjectToken));
-        if (string.IsNullOrWhiteSpace(subjectTokenType)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, TokenRequestParameters.SubjectTokenType));
-        if (scopes == null || !scopes.Any()) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, TokenRequestParameters.Scope));
+        if (string.IsNullOrWhiteSpace(subjectToken)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, TokenRequestParameters.SubjectToken));
+        if (string.IsNullOrWhiteSpace(subjectTokenType)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, TokenRequestParameters.SubjectTokenType));
+        if (scopes == null || !scopes.Any()) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, TokenRequestParameters.Scope));
         var tokenTypeParser = _tokenTypeParsers.SingleOrDefault(t => t.Name == subjectTokenType);
-        if (tokenTypeParser == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_TOKENTYPE, subjectTokenType));
+        if (tokenTypeParser == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UnsupportedTokenType, subjectTokenType));
         var tokenResult = tokenTypeParser.Parse(context.Realm, subjectToken);
-        if (!tokenResult.Claims.ContainsKey("sub")) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_SUBJECT_SUBJECTTOKEN);
+        if (!tokenResult.Claims.ContainsKey("sub")) throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.MissingSubSubjectToken);
         var existingScopes = context.Client.Scopes;
         var unknownScopes = scopes.Where(s => !existingScopes.Any(sc => sc.Name == s));
         if (unknownScopes.Any())

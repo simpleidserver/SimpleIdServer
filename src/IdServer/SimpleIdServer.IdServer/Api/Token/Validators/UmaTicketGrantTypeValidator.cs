@@ -3,6 +3,7 @@
 
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Resources;
 using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.IdServer.Api.Token.Validators
@@ -17,15 +18,15 @@ namespace SimpleIdServer.IdServer.Api.Token.Validators
         public void Validate(HandlerContext context)
         {
             if (string.IsNullOrWhiteSpace(context.Request.RequestData.GetTicket()))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, TokenRequestParameters.Ticket));
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, TokenRequestParameters.Ticket));
 
             var claimToken = context.Request.RequestData.GetClaimToken();
             var claimTokenFormat = context.Request.RequestData.GetClaimTokenFormat();
             if (!string.IsNullOrWhiteSpace(claimToken) && string.IsNullOrWhiteSpace(claimTokenFormat))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, TokenRequestParameters.ClaimTokenFormat));
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, TokenRequestParameters.ClaimTokenFormat));
 
             if (!string.IsNullOrWhiteSpace(claimTokenFormat) && string.IsNullOrWhiteSpace(claimToken))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, TokenRequestParameters.ClaimToken));
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, TokenRequestParameters.ClaimToken));
         }
     }
 }

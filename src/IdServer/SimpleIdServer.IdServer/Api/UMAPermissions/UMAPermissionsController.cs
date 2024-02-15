@@ -72,10 +72,10 @@ namespace SimpleIdServer.IdServer.Api.UMAPermissions
             foreach(var request in requestLst)
             {
                 if (string.IsNullOrWhiteSpace(request.ResourceId))
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, UMAPermissionNames.ResourceId));
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, UMAPermissionNames.ResourceId));
 
                 if (request.Scopes == null || !request.Scopes.Any())
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, UMAPermissionNames.ResourceScopes));
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, UMAPermissionNames.ResourceScopes));
 
                 records.Add(new UMAPermissionTicketRecord(request.ResourceId, request.Scopes.ToList()));
             }

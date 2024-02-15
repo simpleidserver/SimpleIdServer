@@ -38,7 +38,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
 
             var authRequestId = context.Request.RequestData.GetAuthRequestId();
             if (string.IsNullOrWhiteSpace(authRequestId))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.AuthReqId));
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, AuthorizationRequestParameters.AuthReqId));
 
             var authRequest = await _bcAuthorizeRepository.Query().Include(a => a.Histories).FirstOrDefaultAsync(bc => bc.Id == authRequestId, cancellationToken);
             if (authRequest == null)

@@ -48,7 +48,7 @@ namespace SimpleIdServer.IdServer.Api.Register
             var supportedGrantTypes = _grantTypeHandlers.Select(g => g.GrantType).Union(authGrantTypes).Distinct();
             var notSupportedGrantTypes = client.GrantTypes.Where(gt => !supportedGrantTypes.Any(sgt => sgt == gt));
             if (notSupportedGrantTypes.Any())
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(ErrorMessages.UNSUPPORTED_GRANT_TYPES, string.Join(",", notSupportedGrantTypes)));
+                throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(Global.UnsupportedGrantTypes, string.Join(",", notSupportedGrantTypes)));
 
             if (!string.IsNullOrWhiteSpace(client.TokenEndPointAuthMethod) && !_oauthClientAuthenticationHandlers.Any(o => o.AuthMethod == client.TokenEndPointAuthMethod))
                 throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(Global.UnknownAuthMethod, client.TokenEndPointAuthMethod));
@@ -91,7 +91,7 @@ namespace SimpleIdServer.IdServer.Api.Register
             foreach (var kvp in supportedResponseTypeHandlers.GroupBy(k => k.GrantType))
             {
                 if (!kvp.Any(k => client.ResponseTypes.Contains(k.ResponseType)))
-                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(ErrorMessages.MISSING_RESPONSE_TYPE, kvp.Key));
+                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(Global.MissingResponseType, kvp.Key));
             }
 
             if (!string.IsNullOrWhiteSpace(client.Scope))
@@ -101,7 +101,7 @@ namespace SimpleIdServer.IdServer.Api.Register
                 var existingScopeNames = existingScopes.Select(s => s.Name);
                 var unsupportedScopes = scopes.Except(existingScopeNames);
                 if (unsupportedScopes.Any())
-                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(ErrorMessages.UNSUPPORTED_SCOPES, string.Join(",", unsupportedScopes)));
+                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(Global.UnsupportedScopes, string.Join(",", unsupportedScopes)));
             }
 
             CheckUri(client.JwksUri, Global.BadJwksUri);
@@ -109,22 +109,22 @@ namespace SimpleIdServer.IdServer.Api.Register
             CheckUris(client.Translations, OAuthClientParameters.LogoUri, Global.BadLogoUri);
             CheckUris(client.Translations, OAuthClientParameters.TosUri, Global.BadTosUri);
             CheckUris(client.Translations, OAuthClientParameters.PolicyUri, Global.BadPolicyUri);
-            CheckSignature(client.TokenSignedResponseAlg, ErrorMessages.UNSUPPORTED_TOKEN_SIGNED_RESPONSE_ALG);
-            CheckEncryption(client.TokenEncryptedResponseAlg, client.TokenEncryptedResponseEnc, ErrorMessages.UNSUPPORTED_TOKEN_ENCRYPTED_RESPONSE_ALG, ErrorMessages.UNSUPPORTED_TOKEN_ENCRYPTED_RESPONSE_ENC, OAuthClientParameters.TokenEncryptedResponseAlg);  
+            CheckSignature(client.TokenSignedResponseAlg, Global.UnsupportedTokenSignedResponseAlg);
+            CheckEncryption(client.TokenEncryptedResponseAlg, client.TokenEncryptedResponseEnc, Global.UnsupportedTokenEncryptedResponseAlg, Global.UnsupportedTokenEncryptedResponseEnc, OAuthClientParameters.TokenEncryptedResponseAlg);  
             
-            CheckSignature(client.IdTokenSignedResponseAlg, ErrorMessages.UNSUPPORTED_IDTOKEN_SIGNED_RESPONSE_ALG); 
-            CheckEncryption(client.IdTokenEncryptedResponseAlg, client.IdTokenEncryptedResponseEnc, ErrorMessages.UNSUPPORTED_IDTOKEN_ENCRYPTED_RESPONSE_ALG, ErrorMessages.UNSUPPORTED_IDTOKEN_ENCRYPTED_RESPONSE_ENC, OAuthClientParameters.IdTokenEncryptedResponseAlg);
-            CheckSignature(client.AuthorizationSignedResponseAlg, ErrorMessages.UNSUPPORTED_AUTHORIZATION_SIGNED_RESPONSE_ALG);
-            CheckEncryption(client.AuthorizationEncryptedResponseAlg, client.AuthorizationEncryptedResponseEnc, ErrorMessages.UNSUPPORTED_AUTHORIZATION_ENCRYPTED_RESPONSE_ALG, ErrorMessages.UNSUPPORTED_AUTHORIZATION_ENCRYPTED_RESPONSE_ENC, client.AuthorizationEncryptedResponseAlg);
-            CheckSignature(client.UserInfoSignedResponseAlg, ErrorMessages.UNSUPPORTED_USERINFO_SIGNED_RESPONSE_ALG);
-            CheckEncryption(client.UserInfoEncryptedResponseAlg, client.UserInfoEncryptedResponseEnc, ErrorMessages.UNSUPPORTED_USERINFO_ENCRYPTED_RESPONSE_ALG, ErrorMessages.UNSUPPORTED_USERINFO_ENCRYPTED_RESPONSE_ENC, OAuthClientParameters.UserInfoEncryptedResponseAlg);
-            CheckSignature(client.RequestObjectSigningAlg, ErrorMessages.UNSUPPORTED_REQUEST_OBJECT_SIGNING_ALG);
-            CheckEncryption(client.RequestObjectEncryptionAlg, client.RequestObjectEncryptionEnc, ErrorMessages.UNSUPPORTED_REQUEST_OBJECT_ENCRYPTION_ALG, ErrorMessages.UNSUPPORTED_REQUEST_OBJECT_ENCRYPTION_ENC, OAuthClientParameters.RequestObjectEncryptionAlg);
+            CheckSignature(client.IdTokenSignedResponseAlg, Global.UnsupportedIdTokenSignedResponseAlg); 
+            CheckEncryption(client.IdTokenEncryptedResponseAlg, client.IdTokenEncryptedResponseEnc, Global.UnsupportedIdTokenEncryptedResponseAlg, Global.UnsupportedIdTokenEncryptedResponseEnc, OAuthClientParameters.IdTokenEncryptedResponseAlg);
+            CheckSignature(client.AuthorizationSignedResponseAlg, Global.UnsupportedAuthorizationSignedResponseAlg);
+            CheckEncryption(client.AuthorizationEncryptedResponseAlg, client.AuthorizationEncryptedResponseEnc, Global.UnsupportedAuthorizationEncryptedResponseAlg, Global.UnsupportedAuthorizationEncryptedResponseEnc, client.AuthorizationEncryptedResponseAlg);
+            CheckSignature(client.UserInfoSignedResponseAlg, Global.UnsupportedUserInfoSignResponseAlg);
+            CheckEncryption(client.UserInfoEncryptedResponseAlg, client.UserInfoEncryptedResponseEnc, Global.UnsupportedUserInfoEncryptedResponseAlg, Global.UnsupportedUserInfoEncryptedResponseEnc, OAuthClientParameters.UserInfoEncryptedResponseAlg);
+            CheckSignature(client.RequestObjectSigningAlg, Global.UnsupportedRequestObjectSigningAlg);
+            CheckEncryption(client.RequestObjectEncryptionAlg, client.RequestObjectEncryptionEnc, Global.UnsupportedRequestObjectEncryptionAlg, Global.UnsupportedRequestObjectEncryptionEnc, OAuthClientParameters.RequestObjectEncryptionAlg);
 
             if (supportedResponseTypeHandlers.Any())
             {
                 if (client.RedirectionUrls == null || !client.RedirectionUrls.Any())
-                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(ErrorMessages.MISSING_PARAMETER, OAuthClientParameters.RedirectUris));
+                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(Global.MissingParameter, OAuthClientParameters.RedirectUris));
 
                 foreach (var redirectUrl in client.RedirectionUrls)
                 {
@@ -188,7 +188,7 @@ namespace SimpleIdServer.IdServer.Api.Register
                 throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, unsupportedEncMsg);
 
             if (!string.IsNullOrWhiteSpace(enc) && string.IsNullOrWhiteSpace(alg))
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(ErrorMessages.MISSING_PARAMETER, parameterName));
+                throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(Global.MissingParameter, parameterName));
         }
 
         protected virtual void CheckBC(RegisterClientRequest request)
@@ -202,7 +202,7 @@ namespace SimpleIdServer.IdServer.Api.Register
                     request.BCTokenDeliveryMode == Constants.StandardNotificationModes.Push)
                 {
                     if (string.IsNullOrWhiteSpace(request.BCClientNotificationEndpoint))
-                        throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(ErrorMessages.MISSING_PARAMETER, OAuthClientParameters.BCClientNotificationEndpoint));
+                        throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(Global.MissingParameter, OAuthClientParameters.BCClientNotificationEndpoint));
                 }
             }
 
@@ -216,7 +216,7 @@ namespace SimpleIdServer.IdServer.Api.Register
             }
 
             if (!string.IsNullOrWhiteSpace(request.BCAuthenticationRequestSigningAlg))
-                CheckSignature(request.BCAuthenticationRequestSigningAlg, ErrorMessages.UNSUPPORTED_BC_AUTHENTICATION_REQUEST_SIGNING_ALG);
+                CheckSignature(request.BCAuthenticationRequestSigningAlg, Global.UnsupportedBcAuthenticationRequestSigningAlg);
         }
     }
 }

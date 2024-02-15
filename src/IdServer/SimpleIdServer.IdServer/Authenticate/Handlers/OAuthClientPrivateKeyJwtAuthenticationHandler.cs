@@ -42,10 +42,10 @@ namespace SimpleIdServer.IdServer.Authenticate.Handlers
             var parseResult = parser.Parse(clientAssertion);
             if (parseResult.Status == ClientAssertionStatus.ERROR) throw new OAuthException(errorCode, parseResult.ErrorMessage);
             var token = parseResult.JsonWebToken;
-            if (!token.IsSigned) throw new OAuthException(errorCode, ErrorMessages.CLIENT_ASSERTION_IS_NOT_SIGNED);
+            if (!token.IsSigned) throw new OAuthException(errorCode, Global.ClientAssertionIsNotSigned);
 
             var jsonWebKey = await _clientHelper.ResolveJsonWebKey(client, token.Kid, cancellationToken);
-            if (jsonWebKey == null) throw new OAuthException(errorCode, ErrorMessages.CLIENT_ASSERTION_NOT_SIGNED_BY_KNOWN_JWK);
+            if (jsonWebKey == null) throw new OAuthException(errorCode, Global.ClientAssertionNotSignedByKnownJwk);
             var validationResult = new JsonWebTokenHandler().ValidateToken(clientAssertion, new Microsoft.IdentityModel.Tokens.TokenValidationParameters
             {
                 ValidateAudience = false,
@@ -59,8 +59,8 @@ namespace SimpleIdServer.IdServer.Authenticate.Handlers
 
         private void ValidateAuthenticateInstruction(AuthenticateInstruction authenticateInstruction, string errorCode)
         {
-            if (authenticateInstruction.ClientAssertionType != ClientJwtAssertionParser.TYPE) throw new OAuthException(errorCode, string.Format(ErrorMessages.CLIENT_ASSERTION_TYPE_IS_UNEXPECTED, ClientJwtAssertionParser.TYPE));
-            if (string.IsNullOrWhiteSpace(authenticateInstruction.ClientAssertion)) throw new OAuthException(errorCode, ErrorMessages.CLIENT_ASSERTION_IS_MISSING);
+            if (authenticateInstruction.ClientAssertionType != ClientJwtAssertionParser.TYPE) throw new OAuthException(errorCode, string.Format(Global.ClientAssertionTypeIsUnexpected, ClientJwtAssertionParser.TYPE));
+            if (string.IsNullOrWhiteSpace(authenticateInstruction.ClientAssertion)) throw new OAuthException(errorCode, Global.ClientAssertionIsMissing);
         }
 
         private bool ValidateJwsPayLoad(JsonWebToken jsonWebToken, string expectedIssuer, string errorCode)

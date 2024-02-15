@@ -1,83 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
-using Microsoft.Identity.Client;
-using NetTopologySuite.Triangulate.Polygon;
 
 namespace SimpleIdServer.IdServer
 {
     public class ErrorMessages
     {
-        public const string CLIENT_ASSERTION_TYPE_NOT_SUPPORTED = "client assertion type {0} is not supported";
-        public const string CLIENT_ASSERTION_IS_MISSING = "client assertion is missing";
-        public const string CLIENT_ASSERTION_TYPE_IS_UNEXPECTED = "unexpected client_assertion_type, must be equals to {0}";
-        public const string CLIENT_ASSERTION_IS_NOT_SIGNED = "client assertion must be a signed JWT (JWS)";
-        public const string CLIENT_ASSERTION_IS_NOT_ENCRYPTED = "client assertion must be encrypted JWT (JWE)";
-        public const string CLIENT_ASSERTION_CANNOT_BE_DECRYPTED = "client assertion cannot be decryted by the client secret";
-        public const string CLIENT_ASSERTION_NOT_SIGNED_BY_KNOWN_JWK = "client assertion is not signed by a known Json Web Key";
-        public const string CLIENT_ID_CANNOT_BE_EXTRACTED_FROM_CLIENT_ASSERTION = "client_id cannot be extracted from client_assertion";
-        public const string CLIENT_NOTIFICATION_TOKEN_MUST_NOT_EXCEED_1024 = "client_notification_token must not exceed 1024 characters";
-        public const string CLIENT_NOTIFICATION_TOKEN_MUST_CONTAIN_AT_LEAST_128_BYTES = "client_notification_token must contains at least 128 bytes";
-        public const string CLIENT_TOKENEXCHANGE_NOT_ENABLED = "Token exchange is not enabled";
-        public const string MISSING_PARAMETER = "missing parameter {0}";
-        public const string MISSING_DESTINATION = "the destination is empty";
-        public const string MISSING_REGISTERED_USER_DEVICE = "the user doesn't have a registered mobile device";
-        public const string MISSING_PARAMETERS = "missing parameters {0}";
-        public const string MISSING_SUBJECT_SUBJECTTOKEN = "the subject cannot be extracted from the subject_token";
-        public const string MISSING_TOKEN = "missing token";
-        public const string MISSING_RESPONSE_TYPES = "missing response types {0}";
-        public const string MISSING_RESPONSE_TYPE = "valid response type must be passed for the grant type {0}";
-        public const string MISSING_ACCESS_TOKEN = "access token is missing";
-        public const string MISSING_USER_CODE = "the parameter user_code is missing";
-        public const string MISSING_CLIENT_ID = "missing client_id";
-        public const string MISSING_POST_LOGOUT_REDIRECT_URI = "the parameter post_logout_redirect_uri is missing";
-        public const string MISSING_ID_TOKEN_HINT = "id_token_hint parameter is missing";
-        public const string MISSING_RESPONSE_TYPE_CLAIM = "the response_type claim is missing";
-        public const string MISSING_CLIENT_ID_CLAIM = "the client_id claim is missing";
-        public const string MISSING_DPOP_PROOF = "the DPOP Proof is missing";
-        public const string MISSING_SESSIONID = "the session identifier is missing";
-        public const string UNSUPPORTED_USERINFO_SIGNED_RESPONSE_ALG = "userinfo_signed_response_alg is not supported";
-        public const string UNSUPPORTED_TOKEN_ENCRYPTED_RESPONSE_ALG = "token_encrypted_response_alg is not supported";
-        public const string UNSUPPORTED_IDTOKEN_ENCRYPTED_RESPONSE_ALG = "id_token_encrypted_response_alg is not supported";
-        public const string UNSUPPORTED_IDTOKEN_ENCRYPTED_RESPONSE_ENC = "id_token_encrypted_response_enc is not supported";
-        public const string UNSUPPORTED_USERINFO_ENCRYPTED_RESPONSE_ALG = "userinfo_encrypted_response_alg is not supported";
-        public const string UNSUPPORTED_USERINFO_ENCRYPTED_RESPONSE_ENC = "userinfo_encrypted_response_enc is not supported";
-        public const string UNSUPPORTED_REQUEST_OBJECT_SIGNING_ALG = "request_object_signing_alg is not supported";
-        public const string UNSUPPORTED_REQUEST_OBJECT_ENCRYPTION_ALG = "request_object_encryption_alg is not supported";
-        public const string UNSUPPORTED_REQUEST_OBJECT_ENCRYPTION_ENC = "request_object_encryption_enc is not supported";
-        public const string UNSUPPORTED_TOKEN_ENCRYPTED_RESPONSE_ENC = "token_encrypted_response_enc is not supported";
-        public const string UNSUPPORTED_TOKEN_SIGNED_RESPONSE_ALG = "token_signed_response_alg is not supported";
-        public const string UNSUPPORTED_BC_AUTHENTICATION_REQUEST_SIGNING_ALG = "bc_authentication_request_signing_alg is not supported";
-        public const string UNSUPPORTED_CREDENTIALS_FORMAT = "credential formats {0} are not supported";
-        public const string UNSUPPORTED_SCOPES = "scopes {0} are not supported";
-        public const string UNSUPPORTED_GRANT_TYPE = "grant type {0} is not supported";
-        public const string UNSUPPORTED_GRANT_TYPES = "grant types {0} are not supported";
-        public const string UNSUPPORTED_AUTHORIZATION_DETAILS_TYPES = "authorization details types {0} are not supported";
-        public const string UNSUPPORTED_IDTOKEN_SIGNED_RESPONSE_ALG = "id_token_signed_response_alg is not supported";
-        public const string UNSUPPORTED_CREDENTIAL_TYPES = "the credential offer doesn't support those credential types {0}";
-        public const string UNSUPPORTED_AUTHORIZATION_SIGNED_RESPONSE_ALG = "authorization_signed_response_alg is not supported";
-        public const string UNSUPPORTED_AUTHORIZATION_ENCRYPTED_RESPONSE_ALG = "authorization_encrypted_response_alg is not supported";
-        public const string UNSUPPORTED_AUTHORIZATION_ENCRYPTED_RESPONSE_ENC = "authorization_encrypted_response_enc is not supported";
-        public const string UNSUPPORTED_SCHEME_PROVIDER = "the scheme provider {0} is not supported";
-        public const string UNSUPPORTED_CREDENTIAL_TYPE = "the credential type {0} is not supported";
-        public const string UNSUPPORTED_AMRS = "the authentication method references {0} are not supported";
-        public const string UNSUPPORTED_TOKENTYPE = "the token type {0} is not supported";
-        public const string UNSUPPORTED_ACTORTYPE = "the actor type {0} is not supported";
-        public const string UNSUPPORTED_REQUESTED_TOKEN_TYPE = "the requested token type {0} is not supported";
-        public const string REFRESH_TOKEN_NOT_ISSUED_BY_CLIENT = "refresh token has not been issued by the client";
-        public const string NO_REGISTERED_REDIRECTURI = "no redirect uri has been registered";
-        public const string NO_ESSENTIAL_ACR_IS_SUPPORTED = "no essential acr is supported";
-        public const string DUPLICATE_JWKS = "jwks and jwks_uri parameters cannot be passed at the same time";
-        public const string LOGIN_IS_REQUIRED = "login is required";
-        public const string LOGIN_HINT_TOKEN_IS_EXPIRED = "login_hint_token has expired";
-        public const string AUTHORIZATION_CODE_ALREADY_USED = "authorization code has already been used, all tokens previously issued have been revoked";
-        public const string AUTHORIZATION_CODE_NOT_ISSUED_BY_CLIENT = "authorization code has not been issued by the client";
-        public const string ACCESS_TOKEN_REJECTED = "access token has been rejected";
-        public const string REFRESH_TOKEN_IS_EXPIRED = "refresh token is expired";
-        public const string ACCESS_TOKEN_VALID_CLIENT = "access token can be used for the client '{0}' and not for '{1}'";
-        public const string CLIENT_IDENTIFIER_MUST_BE_IDENTICAL = "client identifier must be identical";
-        public const string CLIENT_IDENTIFIER_ALREADY_EXISTS = "client identifier {0} already exists";
-        public const string CLIENT_SECRET_MUST_BE_IDENTICAL = "client secret must be identical";
         public const string NO_CLIENT_CERTIFICATE = "no client certificate";
         public const string CERTIFICATE_SUBJECT_INVALID = "certificate subject is invalid";
         public const string CERTIFICATE_SAN_DNS_INVALID = "certificate san DNS is invalid";

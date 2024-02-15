@@ -123,9 +123,9 @@ public class ClientsController : BaseController
                 activity?.SetTag("realm", prefix);
                 await CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name);
                 if(string.IsNullOrWhiteSpace(request.ClientId)) 
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, "id"));
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, "id"));
                 if (await _clientRepository.Query().Include(c => c.Realms).AsNoTracking().AnyAsync(c => c.ClientId == request.ClientId && c.Realms.Any(r => r.Name == prefix)))
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.CLIENT_IDENTIFIER_ALREADY_EXISTS, request.ClientId));
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.ClientIdentifierAlreadyExists, request.ClientId));
                 request.Scopes = await GetScopes(prefix, request.Scope, CancellationToken.None);
                 var realm = await _realmRepository.Query().SingleAsync(r => r.Name == prefix);
                 request.Realms.Add(realm);
@@ -388,7 +388,7 @@ public class ClientsController : BaseController
             {
                 activity?.SetTag("realm", prefix);
                 if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidRequestParameter);
-                if (string.IsNullOrWhiteSpace(request.Name)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, nameof(ScopeNames.Name)));
+                if (string.IsNullOrWhiteSpace(request.Name)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, nameof(ScopeNames.Name)));
                 await CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name);
                 var result = await _clientRepository.Query()
                     .Include(c => c.Realms)

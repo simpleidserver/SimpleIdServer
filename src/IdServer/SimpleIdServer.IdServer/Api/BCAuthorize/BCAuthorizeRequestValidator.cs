@@ -67,7 +67,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
 
             var userCode = context.Request.RequestData.GetUserCode();
             if (context.Client.BCUserCodeParameter && string.IsNullOrWhiteSpace(userCode))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_USER_CODE);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.MissingUserCode);
 
             CheckScopes(context);
             CheckClientNotificationToken(context);
@@ -133,7 +133,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             var exp = jwsPayload.ValidTo;
             var currentDateTime = DateTime.UtcNow;
             if (currentDateTime > exp)
-                throw new OAuthException(ErrorCodes.EXPIRED_LOGIN_HINT_TOKEN, ErrorMessages.LOGIN_HINT_TOKEN_IS_EXPIRED);
+                throw new OAuthException(ErrorCodes.EXPIRED_LOGIN_HINT_TOKEN, Global.LoginHintTokenIsExpired);
 
             var subject = jwsPayload.Subject;
             var user = await _userRepository.GetBySubject(subject, realm, cancellationToken);
@@ -207,7 +207,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             var requestedScopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
             var authDetails = context.Request.RequestData.GetAuthorizationDetailsFromAuthorizationRequest();
             if (!requestedScopes.Any() && !authDetails.Any())
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETERS, $"{AuthorizationRequestParameters.Scope},{AuthorizationRequestParameters.AuthorizationDetails}"));
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameters, $"{AuthorizationRequestParameters.Scope},{AuthorizationRequestParameters.AuthorizationDetails}"));
 
             if(requestedScopes.Any()) ScopeHelper.Validate(requestedScopes, context.Client.Scopes.Select(s => s.Name));
             if(authDetails.Any())
@@ -216,7 +216,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
                     throw new OAuthException(ErrorCodes.INVALID_AUTHORIZATION_DETAILS, ErrorMessages.AUTHORIZATION_DETAILS_TYPE_REQUIRED);
                 var unsupportedAuthorizationDetailsTypes = authDetails.Where(d => !context.Client.AuthorizationDataTypes.Contains(d.Type));
                 if (unsupportedAuthorizationDetailsTypes.Any())
-                    throw new OAuthException(ErrorCodes.INVALID_AUTHORIZATION_DETAILS, string.Format(ErrorMessages.UNSUPPORTED_AUTHORIZATION_DETAILS_TYPES, string.Join(",", unsupportedAuthorizationDetailsTypes.Select(t => t.Type))));
+                    throw new OAuthException(ErrorCodes.INVALID_AUTHORIZATION_DETAILS, string.Format(Global.UnsupportedAuthorizationDetailTypes, string.Join(",", unsupportedAuthorizationDetailsTypes.Select(t => t.Type))));
             }
         }
 
@@ -231,13 +231,13 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             }
 
             if (string.IsNullOrWhiteSpace(clientNotificationToken))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, DTOs.BCAuthenticationRequestParameters.ClientNotificationToken));
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, DTOs.BCAuthenticationRequestParameters.ClientNotificationToken));
 
             if (clientNotificationToken.Length > 1024)
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.CLIENT_NOTIFICATION_TOKEN_MUST_NOT_EXCEED_1024);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.ClientNotificationTokenCannotExceed1024);
 
             if (System.Text.Encoding.ASCII.GetByteCount(clientNotificationToken) * 8 < 128)
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.CLIENT_NOTIFICATION_TOKEN_MUST_CONTAIN_AT_LEAST_128_BYTES);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.ClientNotificationTokenMustContainsAtLeast128Bytes);
         }
 
         /// <summary>

@@ -35,7 +35,7 @@ namespace SimpleIdServer.IdServer.Authenticate.Handlers
         public async Task<bool> Handle(AuthenticateInstruction authenticateInstruction, Client client, string expectedIssuer, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
         {
             var codeVerifier = authenticateInstruction.RequestData.GetCodeVerifier();
-            if (string.IsNullOrWhiteSpace(codeVerifier)) throw new OAuthException(errorCode, string.Format(ErrorMessages.MISSING_PARAMETER, TokenRequestParameters.CodeVerifier));
+            if (string.IsNullOrWhiteSpace(codeVerifier)) throw new OAuthException(errorCode, string.Format(Global.MissingParameter, TokenRequestParameters.CodeVerifier));
 
             var code = authenticateInstruction.RequestData.GetAuthorizationCode();
             if (code == null) return false;

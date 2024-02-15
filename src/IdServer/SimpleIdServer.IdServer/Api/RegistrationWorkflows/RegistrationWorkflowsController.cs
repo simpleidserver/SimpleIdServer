@@ -78,8 +78,8 @@ public class RegistrationWorkflowsController : BaseController
         try
         {
             await CheckAccessToken(prefix, Constants.StandardScopes.RegistrationWorkflows.Name);
-            if (string.IsNullOrWhiteSpace(request.Name)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, RegistrationWorkflowNames.Name));
-            if (request.Steps == null || !request.Steps.Any()) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, RegistrationWorkflowNames.Steps));
+            if (string.IsNullOrWhiteSpace(request.Name)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, RegistrationWorkflowNames.Name));
+            if (request.Steps == null || !request.Steps.Any()) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, RegistrationWorkflowNames.Steps));
             var existingAmrs = _authenticationMethodServices.Select(a => a.Amr);
             var unknownAmrs = request.Steps.Where(s => !existingAmrs.Contains(s));
             if (unknownAmrs.Any()) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownAuthMethods, string.Join(",", unknownAmrs)));
@@ -125,8 +125,8 @@ public class RegistrationWorkflowsController : BaseController
         try
         {
             await CheckAccessToken(prefix, Constants.StandardScopes.RegistrationWorkflows.Name);
-            if (string.IsNullOrWhiteSpace(request.Name)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, RegistrationWorkflowNames.Name));
-            if (request.Steps == null || !request.Steps.Any()) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, RegistrationWorkflowNames.Steps));
+            if (string.IsNullOrWhiteSpace(request.Name)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, RegistrationWorkflowNames.Name));
+            if (request.Steps == null || !request.Steps.Any()) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, RegistrationWorkflowNames.Steps));
             var existingAmrs = _authenticationMethodServices.Select(a => a.Amr);
             var unknownAmrs = request.Steps.Where(s => !existingAmrs.Contains(s));
             if (unknownAmrs.Any()) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownAuthMethods, string.Join(",", unknownAmrs)));

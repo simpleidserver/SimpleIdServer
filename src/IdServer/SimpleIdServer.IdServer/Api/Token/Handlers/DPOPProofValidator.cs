@@ -35,7 +35,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         public async Task Validate(HandlerContext context)
         {
             if (!context.Client.DPOPBoundAccessTokens) return;
-            if (!context.Request.HttpHeader.ContainsKey(Constants.DPOPHeaderName)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_DPOP_PROOF);
+            if (!context.Request.HttpHeader.ContainsKey(Constants.DPOPHeaderName)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.MissingDpopProof);
             var value = context.Request.HttpHeader[Constants.DPOPHeaderName];
             string dpopProof = null;
             if (value is JsonArray)

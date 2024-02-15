@@ -94,7 +94,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     {
                         _logger.LogError($"refresh token '{refreshToken}' is expired");
                         await _grantedTokenHelper.RemoveRefreshToken(refreshToken, cancellationToken);
-                        return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.REFRESH_TOKEN_IS_EXPIRED);
+                        return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.RefreshTokenIsExpired);
                     }
 
                     if(context.DPOPProof != null)
@@ -141,7 +141,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     if (!clientId.Equals(oauthClient.ClientId, StringComparison.InvariantCultureIgnoreCase))
                     {
                         _logger.LogError("refresh token is not issued by the client");
-                        return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.REFRESH_TOKEN_NOT_ISSUED_BY_CLIENT);
+                        return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, Global.RefreshTokenNotIssuedByClient);
                     }
 
                     await _grantedTokenHelper.RemoveRefreshToken(refreshToken, cancellationToken);

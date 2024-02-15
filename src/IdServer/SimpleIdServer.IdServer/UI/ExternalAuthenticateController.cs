@@ -64,7 +64,7 @@ namespace SimpleIdServer.IdServer.UI
         {
             prefix = prefix ?? Constants.DefaultRealm;
             if (string.IsNullOrWhiteSpace(scheme))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, nameof(scheme)));
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, nameof(scheme)));
 
             var result = await HttpContext.AuthenticateAsync(scheme);
             if(result is {  Succeeded : true})
@@ -124,7 +124,7 @@ namespace SimpleIdServer.IdServer.UI
                 .SingleOrDefaultAsync(p => p.Name == scheme, cancellationToken);
             if(idProvider == null)
             {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_SCHEME_PROVIDER, scheme));
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UnsupportedSchemeProvider, scheme));
             }
 
 

@@ -4,6 +4,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.TokenTypes;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,24 +48,24 @@ public class TokenExchangeValidator : ITokenExchangeValidator
 
     public async Task<TokenExchangeValidationResult> Validate(string realm, HandlerContext context, CancellationToken cancellationToken)
     {
-        if (!context.Client.IsTokenExchangeEnabled) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.CLIENT_TOKENEXCHANGE_NOT_ENABLED);
+        if (!context.Client.IsTokenExchangeEnabled) throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.ClientTokenExchangedNotEnabled);
         var subjectToken = context.Request.RequestData.GetSubjectToken();
-        if (string.IsNullOrWhiteSpace(subjectToken)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, TokenRequestParameters.SubjectToken));
+        if (string.IsNullOrWhiteSpace(subjectToken)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, TokenRequestParameters.SubjectToken));
         var subjectTokenType = context.Request.RequestData.GetSubjectTokenType();
-        if (string.IsNullOrWhiteSpace(subjectTokenType)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, TokenRequestParameters.SubjectTokenType));
+        if (string.IsNullOrWhiteSpace(subjectTokenType)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, TokenRequestParameters.SubjectTokenType));
         var tokenTypeParser = _tokenTypeParsers.SingleOrDefault(t => t.Name == subjectTokenType);
-        if (tokenTypeParser == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_TOKENTYPE, subjectTokenType));
+        if (tokenTypeParser == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UnsupportedTokenType, subjectTokenType));
         var requestedTokenType = context.Request.RequestData.GetRequestedTokenType();
-        if (!string.IsNullOrWhiteSpace(requestedTokenType) && !_tokenTypeParsers.Any(p => p.Name == requestedTokenType)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_REQUESTED_TOKEN_TYPE, requestedTokenType));
+        if (!string.IsNullOrWhiteSpace(requestedTokenType) && !_tokenTypeParsers.Any(p => p.Name == requestedTokenType)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UnsupportedRequestedTokenType, requestedTokenType));
         var tokenResult = tokenTypeParser.Parse(context.Realm, subjectToken);
-        if (string.IsNullOrWhiteSpace(tokenResult.Subject)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_SUBJECT_SUBJECTTOKEN);
+        if (string.IsNullOrWhiteSpace(tokenResult.Subject)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.MissingSubSubjectToken);
         var actorToken = context.Request.RequestData.GetActorToken();
         var actorTokenType = context.Request.RequestData.GetActorTokenType();
         TokenResult actor = null;
         if(!string.IsNullOrWhiteSpace(actorTokenType))
         {
             tokenTypeParser = _tokenTypeParsers.SingleOrDefault(t => t.Name == actorTokenType);
-            if (tokenTypeParser == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_ACTORTYPE, actorTokenType));
+            if (tokenTypeParser == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UnsupportedActorType, actorTokenType));
             if (!string.IsNullOrWhiteSpace(actorToken)) tokenTypeParser.Parse(context.Realm, actorToken);
         }
 
