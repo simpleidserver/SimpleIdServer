@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Diagnostics;
@@ -76,7 +77,7 @@ public class RealmsController : BaseController
                 var realmExists = await _realmRepository.Query()
                     .AsNoTracking()
                     .AnyAsync(r => r.Name == request.Name);
-                if (realmExists) throw new OAuthException(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.REALM_EXISTS, request.Name));
+                if (realmExists) throw new OAuthException(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.RealmExists, request.Name));
                 var realm = new Realm { Name = request.Name, Description = request.Description, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow };
                 var users = await _userRepository.GetUsersBySubjects(Constants.RealmStandardUsers, Constants.DefaultRealm, cancellationToken);
                 var clients = await _clientRepository.Query().Include(c => c.Realms).Where(c => Constants.RealmStandardClients.Contains(c.ClientId)).ToListAsync();

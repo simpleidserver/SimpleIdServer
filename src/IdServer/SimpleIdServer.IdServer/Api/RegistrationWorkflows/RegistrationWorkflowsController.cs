@@ -84,7 +84,7 @@ public class RegistrationWorkflowsController : BaseController
             var unknownAmrs = request.Steps.Where(s => !existingAmrs.Contains(s));
             if (unknownAmrs.Any()) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownAuthMethods, string.Join(",", unknownAmrs)));
             var existingRegistrationWorkflow = await _registrationWorkflowRepository.Query().AsNoTracking().FirstOrDefaultAsync(r => r.RealmName == prefix && r.Name == request.Name);
-            if (existingRegistrationWorkflow != null) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.REGISTRATION_WORFKLOW_EXISTS);
+            if (existingRegistrationWorkflow != null) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.RegistrationWorkflowExists);
             if(request.IsDefault)
             {
                 var defaultRegistrationWorkflow = await _registrationWorkflowRepository.Query().FirstOrDefaultAsync(r => r.RealmName == prefix && r.IsDefault);

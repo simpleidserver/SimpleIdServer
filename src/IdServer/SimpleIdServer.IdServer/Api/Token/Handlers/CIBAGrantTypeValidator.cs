@@ -33,7 +33,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             if (openidClient.BCTokenDeliveryMode != Constants.StandardNotificationModes.Ping
                 && openidClient.BCTokenDeliveryMode != Constants.StandardNotificationModes.Poll)
             {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.ONLY_PINGORPOLL_MODE_CAN_BE_USED);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.OnlyPingOrPollModeCanBeUsed);
             }
 
             var authRequestId = context.Request.RequestData.GetAuthRequestId();
@@ -45,27 +45,27 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                 throw new OAuthException(ErrorCodes.INVALID_GRANT, Global.InvalidAuthRequestId);
 
             if (authRequest.ClientId != openidClient.ClientId)
-                throw new OAuthException(ErrorCodes.INVALID_GRANT, ErrorMessages.AUTH_REQUEST_CLIENT_NOT_AUTHORIZED);
+                throw new OAuthException(ErrorCodes.INVALID_GRANT, Global.AuthRequestClientNotAuthorized);
 
             var currentDateTime = DateTime.UtcNow;
             var isSlowDown = currentDateTime <= authRequest.NextFetchTime;
             if (authRequest.LastStatus == BCAuthorizeStatus.Pending || isSlowDown)
             {
                 if (isSlowDown)
-                    throw new OAuthException(ErrorCodes.SLOW_DOWN, ErrorMessages.TOO_MANY_AUTH_REQUEST);
+                    throw new OAuthException(ErrorCodes.SLOW_DOWN, Global.TooManyAuthRequest);
 
                 authRequest.IncrementNextFetchTime();
-                throw new OAuthException(ErrorCodes.AUTHORIZATION_PENDING, ErrorMessages.AUTH_REQUEST_NOT_CONFIRMED);
+                throw new OAuthException(ErrorCodes.AUTHORIZATION_PENDING, Global.AuthRequestNotConfirmed);
             }
 
             if (authRequest.LastStatus == BCAuthorizeStatus.Rejected)
-                throw new OAuthException(ErrorCodes.ACCESS_DENIED, ErrorMessages.AUTH_REQUEST_REJECTED);
+                throw new OAuthException(ErrorCodes.ACCESS_DENIED, Global.AuthRequestRejected);
 
             if (authRequest.LastStatus == BCAuthorizeStatus.Sent)
-                throw new OAuthException(ErrorCodes.INVALID_GRANT, ErrorMessages.AUTH_REQUEST_SENT);
+                throw new OAuthException(ErrorCodes.INVALID_GRANT, Global.AuthRequestSent);
 
             if (currentDateTime > authRequest.ExpirationDateTime)
-                throw new OAuthException(ErrorCodes.EXPIRED_TOKEN, ErrorMessages.AUTH_REQUEST_EXPIRED);
+                throw new OAuthException(ErrorCodes.EXPIRED_TOKEN, Global.AuthRequestExpired);
 
             return authRequest;
         }

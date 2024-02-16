@@ -63,7 +63,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
                 string.IsNullOrWhiteSpace(context.Request.RequestData.GetLoginHintFromAuthorizationRequest())
             };
             if (tokens.All(_ => _) || (tokens.Where(_ => !_).Count() > 1))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.ONE_HINT_MUST_BE_PASSED);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.OnleHintMustBePassed);
 
             var userCode = context.Request.RequestData.GetUserCode();
             if (context.Client.BCUserCodeParameter && string.IsNullOrWhiteSpace(userCode))
@@ -168,36 +168,36 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             var nbf = jsonWebTokenResult.Jwt.ValidFrom;
             var jti = jsonWebTokenResult.Jwt.Id;
             if (audiences == null || !audiences.Any())
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_NO_AUDIENCE);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.AuthRequestNoAudience);
 
             if (!audiences.Contains(context.GetIssuer()))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_BAD_AUDIENCE);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.AuthRequestBadAudience);
 
             if (string.IsNullOrWhiteSpace(issuer))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_NO_ISSUER);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.AuthRequestNoIssuer);
 
             if (issuer != context.Client.ClientId)
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_BAD_ISSUER);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.AuthRequestBadIssuer);
 
             var currentDateTime = DateTime.UtcNow;
             if (currentDateTime >= exp)
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_IS_EXPIRED);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.AuthRequestIsExpired);
 
             var diffSeconds = (exp - nbf).TotalSeconds;
             if (diffSeconds > _options.MaxRequestLifetime)
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.AUTH_REQUEST_MAXIMUM_LIFETIME, _options.MaxRequestLifetime));
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.AuthRequestMaximumLifetime, _options.MaxRequestLifetime));
 
             if (currentDateTime < nbf)
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.AUTH_REQUEST_BAD_NBF, nbf));
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.AuthRequestBadNbf, nbf));
 
             if (string.IsNullOrWhiteSpace(jti))
             {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_NO_JTI);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.AuthRequestNoJti);
             }
 
             Client openidClient = context.Client;
             if (openidClient.BCAuthenticationRequestSigningAlg != jsonWebTokenResult.Jwt.Alg)
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.AUTH_REQUEST_ALG_NOT_VALID, openidClient.BCAuthenticationRequestSigningAlg));
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.AuthRequestAlgNotValid, openidClient.BCAuthenticationRequestSigningAlg));
 
             context.Request.SetRequestData(jsonWebTokenResult.Jwt.GetClaimJson());
         }
@@ -213,7 +213,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             if(authDetails.Any())
             {
                 if (authDetails != null && authDetails.Any(d => string.IsNullOrWhiteSpace(d.Type)))
-                    throw new OAuthException(ErrorCodes.INVALID_AUTHORIZATION_DETAILS, ErrorMessages.AUTHORIZATION_DETAILS_TYPE_REQUIRED);
+                    throw new OAuthException(ErrorCodes.INVALID_AUTHORIZATION_DETAILS, Global.AuthorizationDetailsTypeRequired);
                 var unsupportedAuthorizationDetailsTypes = authDetails.Where(d => !context.Client.AuthorizationDataTypes.Contains(d.Type));
                 if (unsupportedAuthorizationDetailsTypes.Any())
                     throw new OAuthException(ErrorCodes.INVALID_AUTHORIZATION_DETAILS, string.Format(Global.UnsupportedAuthorizationDetailTypes, string.Join(",", unsupportedAuthorizationDetailsTypes.Select(t => t.Type))));
@@ -276,7 +276,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
         {
             var requestedExpiry = context.Request.RequestData.GetRequestedExpiry();
             if (requestedExpiry.HasValue && requestedExpiry.Value < 0)
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.REQUESTED_EXPIRY_MUST_BE_POSITIVE);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.RequestedExpiryMustBePositive);
         }
     }
 }

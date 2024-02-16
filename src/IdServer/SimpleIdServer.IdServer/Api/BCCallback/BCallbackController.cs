@@ -44,10 +44,10 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
                     .Include(a => a.Histories)
                     .FirstOrDefaultAsync(b => b.Id == parameter.AuthReqId, cancellationToken);
                 if (bcAuthorize == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownBcAuthorize, parameter.AuthReqId));
-                if (!bcAuthorize.IsActive) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.EXPIRED_BC_AUTHORIZE);
-                if (bcAuthorize.LastStatus != Domains.BCAuthorizeStatus.Pending) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.BC_AUTHORIZE_NOT_PENDING);
+                if (!bcAuthorize.IsActive) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.ExpiredBcAuthorize);
+                if (bcAuthorize.LastStatus != Domains.BCAuthorizeStatus.Pending) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.BcAuthorizeNotPending);
                 var user = await _authenticationHelper.GetUserByLogin(kvp.Item1.Subject, prefix, cancellationToken);
-                if (user.Id != bcAuthorize.UserId) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.UNAUTHORIZED_TO_VALIDATE_BC_AUTHORIZATION);
+                if (user.Id != bcAuthorize.UserId) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.UnauthorizedToValidateBcAuthorization);
                 switch (parameter.ActionEnum)
                 {
                     case BCCallbackActions.CONFIRM:

@@ -106,7 +106,7 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationClassReferences
                 var unsupportedAmrs = request.AuthenticationMethodReferences.Where(a => !supportedAmrs.Contains(a));
                 if (unsupportedAmrs.Any()) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnsupportedAmrs, string.Join(",", unsupportedAmrs)));
                 var existingAcr = await _authenticationContextClassReferenceRepository.Query().Include(a => a.Realms).AsNoTracking().SingleOrDefaultAsync(a => a.Realms.Any(r => r.Name == prefix) && a.Name == request.Name, cancellationToken);
-                if (existingAcr != null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.ACR_WITH_SAME_NAME_EXISTS);
+                if (existingAcr != null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.AcrWithSameNameExists);
             }
         }
 

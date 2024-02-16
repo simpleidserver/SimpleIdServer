@@ -154,7 +154,7 @@ public class AuthenticationSchemeProvidersController : BaseController
 				.Include(r => r.Realms)
 				.AsNoTracking()
                 .SingleOrDefaultAsync(a => a.Name == request.Name && a.Realms.Any(r => r.Name == prefix));
-			if (instance != null) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTHSCHEMEPROVIDER_WITH_SAME_NAME_EXISTS);
+			if (instance != null) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.AuthSchemeProviderWithSameNameExists);
 			var idProviderDef = await _authenticationSchemeProviderDefinitionRepository.Query().SingleAsync(d => d.Name == request.DefinitionName);
 			var realm = await _realmRepository.Query().SingleAsync(r => r.Name == prefix);
 			var result = new AuthenticationSchemeProvider

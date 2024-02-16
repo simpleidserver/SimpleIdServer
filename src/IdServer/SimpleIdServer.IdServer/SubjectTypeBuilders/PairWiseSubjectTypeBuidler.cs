@@ -3,6 +3,7 @@
 
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Resources;
 using System;
 using System.Linq;
 using System.Security.Cryptography;
@@ -24,10 +25,10 @@ namespace SimpleIdServer.IdServer.SubjectTypeBuilders
         {
             var client = context.Client;
             if (!client.RedirectionUrls.Any() && string.IsNullOrWhiteSpace(client.SectorIdentifierUri))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.CANNOT_GENERATE_PAIRWISE_SUBJECT_BECAUSE_NO_SECTOR_IDENTIFIER);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.CannotGeneratePairwiseSubjectBecauseNoSectorIdentifier);
 
             if (string.IsNullOrWhiteSpace(client.SectorIdentifierUri) && client.RedirectionUrls.Count() > 1)
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.CANNOT_GENERATE_PAIRWISE_SUBJECT_MORE_THAN_ONE_REDIRECT_URLS);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.CannotGeneratePairwiseSubjectMoreThanOneRedirectUrls);
            
             var url = client.RedirectionUrls.FirstOrDefault();
             if (!string.IsNullOrWhiteSpace(client.SectorIdentifierUri))

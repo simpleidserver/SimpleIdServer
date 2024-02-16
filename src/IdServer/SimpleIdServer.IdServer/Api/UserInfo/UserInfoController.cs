@@ -93,7 +93,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
                 var jObj = new JsonObject
                 {
                     [ErrorResponseParameters.Error] = ErrorCodes.INVALID_REQUEST,
-                    [ErrorResponseParameters.ErrorDescription] = ErrorMessages.CONTENT_TYPE_NOT_SUPPORTED
+                    [ErrorResponseParameters.ErrorDescription] = Global.ContentTypeNotSupported
                 };
                 return new ContentResult
                 {

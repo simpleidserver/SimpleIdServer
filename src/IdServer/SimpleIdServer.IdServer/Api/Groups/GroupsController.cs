@@ -166,7 +166,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
                         .Query()
                         .Include(g => g.Realms)
                         .AnyAsync(g => g.Realms.Any(r => r.RealmsName == prefix) && g.FullPath == fullPath);
-                    if (groupAlreadyExists) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.GROUP_EXISTS, fullPath));
+                    if (groupAlreadyExists) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.GroupExists, fullPath));
                     var grp = new Group
                     {
                         Id = Guid.NewGuid().ToString(),

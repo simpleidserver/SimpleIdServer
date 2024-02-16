@@ -40,7 +40,7 @@ namespace SimpleIdServer.IdServer.Api.Grants
                 var bearerToken = ExtractBearerToken();
                 var grant = await _grantRepository.Query().Include(g => g.Scopes).ThenInclude(s => s.AuthorizedResources).Include(g => g.User).FirstOrDefaultAsync(q => q.Id == id, cancellationToken);
                 if (grant == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_TARGET, string.Format(Global.UnknownGrant, id));
-                if (grant.Status == Domains.ConsentStatus.PENDING) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_TARGET, ErrorMessages.GRANT_IS_NOT_ACCEPTED);
+                if (grant.Status == Domains.ConsentStatus.PENDING) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_TARGET, Global.GrantIsNotAccepted);
                 var token = await _grantedTokenHelper.GetAccessToken(bearerToken, cancellationToken);
                 if (token == null) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, Global.UnknownAccessToken);
                 var scopes = token.Claims.Where(c => c.Type == "scope").Select(c => c.Value).ToList();

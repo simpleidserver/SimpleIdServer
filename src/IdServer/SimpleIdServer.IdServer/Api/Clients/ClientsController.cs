@@ -395,7 +395,7 @@ public class ClientsController : BaseController
                     .Include(c => c.Scopes)
                     .SingleOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == prefix));
                 if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
-                if (result.Scopes.Any(s => s.Name == request.Name)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.SCOPE_ALREADY_EXISTS, request.Name));
+                if (result.Scopes.Any(s => s.Name == request.Name)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.ScopeAlreadyExists, request.Name));
                 var scope = await _scopeRepository.Query()
                     .Include(s => s.Realms)
                     .SingleOrDefaultAsync(c => c.Name == request.Name && c.Realms.Any(r => r.Name == prefix));
@@ -439,7 +439,7 @@ public class ClientsController : BaseController
                 .AsNoTracking()
                 .SingleOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == prefix));
             if (client == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
-            if (client.JsonWebKeys.Any(j => j.KeyId == request.KeyId)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.SIGKEY_ALREADY_EXISTS, request.KeyId));
+            if (client.JsonWebKeys.Any(j => j.KeyId == request.KeyId)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.SigKeyAlreadyExists, request.KeyId));
             SigningCredentials sigCredentials = null;
             switch (request.KeyType)
             {
@@ -477,7 +477,7 @@ public class ClientsController : BaseController
                 .AsNoTracking()
                 .SingleOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == prefix));
             if (client == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
-            if (client.JsonWebKeys.Any(j => j.KeyId == request.KeyId)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.SIGKEY_ALREADY_EXISTS, request.KeyId));
+            if (client.JsonWebKeys.Any(j => j.KeyId == request.KeyId)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.SigKeyAlreadyExists, request.KeyId));
 
             EncryptingCredentials encCredentials = null;
             switch (request.KeyType)
@@ -624,7 +624,7 @@ public class ClientsController : BaseController
                     .SingleOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == prefix));
                 if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
                 var serializedJsonWebKey = result.SerializedJsonWebKeys.SingleOrDefault(k => k.Kid == keyId);
-                if (serializedJsonWebKey == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_JSON_WEB_KEY, keyId));
+                if (serializedJsonWebKey == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownJwk, keyId));
                 result.SerializedJsonWebKeys.Remove(serializedJsonWebKey);
                 result.UpdateDateTime = DateTime.UtcNow;
                 await _clientRepository.SaveChanges(CancellationToken.None);

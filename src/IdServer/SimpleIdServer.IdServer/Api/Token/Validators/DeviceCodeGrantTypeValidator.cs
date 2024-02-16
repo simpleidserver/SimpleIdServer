@@ -42,7 +42,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Validators
             if (authDeviceCode.Status == DeviceAuthCodeStatus.ISSUED) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIssuedDeviceCode);
             if (authDeviceCode.ExpirationDateTime <= currentDateTime) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.EXPIRED_TOKEN, Global.InvalidExpiredDeviceCode);
             if (authDeviceCode.ClientId != context.Client.Id) throw new OAuthException(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_REQUEST, Global.InvalidClientIdDeviceCode);
-            if (authDeviceCode.NextAccessDateTime != null && authDeviceCode.NextAccessDateTime >= currentDateTime) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.SLOW_DOWN, ErrorMessages.TOO_MANY_AUTH_REQUEST);
+            if (authDeviceCode.NextAccessDateTime != null && authDeviceCode.NextAccessDateTime >= currentDateTime) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.SLOW_DOWN, Global.TooManyAuthRequest);
             if (authDeviceCode.Status == DeviceAuthCodeStatus.PENDING)
             {
                 authDeviceCode.Next(_options.DeviceCodeInterval);

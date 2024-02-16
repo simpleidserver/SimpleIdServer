@@ -81,7 +81,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UnsupportedScopes, string.Join(",", unsupportedScopes)));
 
             if(authDetails != null && authDetails.Any(d => string.IsNullOrWhiteSpace(d.Type)))
-                throw new OAuthException(ErrorCodes.INVALID_AUTHORIZATION_DETAILS, ErrorMessages.AUTHORIZATION_DETAILS_TYPE_REQUIRED);
+                throw new OAuthException(ErrorCodes.INVALID_AUTHORIZATION_DETAILS, Global.AuthorizationDetailsTypeRequired);
 
             var unsupportedAuthorizationDetailsTypes = authDetails.Where(d => !context.Client.AuthorizationDataTypes.Contains(d.Type));
             if (unsupportedAuthorizationDetailsTypes.Any())
@@ -150,7 +150,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.InvalidGrantManagementAction, grantManagementAction));
 
                 if (!context.IsComingFromConsentScreen() && !string.IsNullOrWhiteSpace(grantId) && grantManagementAction == Constants.StandardGrantManagementActions.Create)
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.GRANT_ID_CANNOT_BE_SPECIFIED);
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.GrantIdCannotBeSpecified);
 
                 if (!string.IsNullOrWhiteSpace(grantId) && string.IsNullOrWhiteSpace(grantManagementAction))
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, AuthorizationRequestParameters.GrantManagementAction));

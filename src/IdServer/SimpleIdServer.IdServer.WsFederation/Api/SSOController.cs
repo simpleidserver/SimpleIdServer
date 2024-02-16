@@ -85,14 +85,14 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
                 var str = realm ?? Constants.DefaultRealm;
                 var client = await _clientRepository.Query().Include(c => c.Realms).Include(c => c.Scopes).ThenInclude(s => s.ClaimMappers).AsNoTracking().FirstOrDefaultAsync(c => c.ClientId == message.Wtrealm && c.Realms.Any(r => r.Name == str), cancellationToken);
                 if (client == null)
-                    throw new OAuthException(ErrorCodes.INVALID_RP, ErrorMessages.UNKNOWN_RP);
+                    throw new OAuthException(ErrorCodes.INVALID_RP, Resources.Global.UnknownRp);
 
                 if (!client.IsWsFederationEnabled())
-                    throw new OAuthException(ErrorCodes.INVALID_RP, ErrorMessages.WSFEDERATION_NOT_ENABLED);
+                    throw new OAuthException(ErrorCodes.INVALID_RP, Resources.Global.WsFederationNotEnabled);
 
                 var tokenType = GetTokenType(client);
                 if (tokenType != WsFederationConstants.TokenTypes.Saml2TokenProfile11 && tokenType != WsFederationConstants.TokenTypes.Saml11TokenProfile11)
-                    throw new OAuthException(ErrorCodes.INVALID_RP, ErrorMessages.UNSUPPORTED_TOKENTYPE);
+                    throw new OAuthException(ErrorCodes.INVALID_RP, Resources.Global.UnsupportedTokenType);
 
                 return client;
             }
@@ -118,7 +118,7 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
                 context.SetUser(user, null);
                 var claims = (await _claimsExtractor.ExtractClaims(context, client.Scopes, ScopeProtocols.SAML)).Select(c => new Claim(c.Key, c.Value.ToString())).ToList();
                 if (claims.Count(t => t.Type == ClaimTypes.NameIdentifier) == 0)
-                    throw new OAuthException(ErrorCodes.INVALID_RP, ErrorMessages.NO_CLAIM);
+                    throw new OAuthException(ErrorCodes.INVALID_RP, Resources.Global.NoClaim);
 
                 if (!claims.Any(c => c.Type == ClaimTypes.NameIdentifier))
                     claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Name));

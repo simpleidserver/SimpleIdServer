@@ -81,7 +81,7 @@ namespace SimpleIdServer.IdServer.Helpers
             {
                 var payload = await _distributedCache.GetAsync(requestUri);
                 if (payload == null)
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.REQUEST_URI_IS_INVALID);
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.RequestUriIsInvalid);
                 context.Request.SetRequestData(JsonObject.Parse(Encoding.UTF8.GetString(payload)).AsObject());
                 return true;
             }

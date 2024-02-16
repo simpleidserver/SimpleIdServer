@@ -117,7 +117,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                         if (string.IsNullOrWhiteSpace(clientAssertion))
                         {
                             _logger.LogError("client identifier cannot be extracted from the initial request");
-                            return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.CLIENT_ID_CANNOT_BE_EXTRACTED);
+                            return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.ClientIdCannotBeExtracted);
                         }
 
                         var jwsHandler = new JwtSecurityTokenHandler();

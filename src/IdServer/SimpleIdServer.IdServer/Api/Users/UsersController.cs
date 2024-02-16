@@ -207,7 +207,7 @@ namespace SimpleIdServer.IdServer.Api.Users
             async Task Validate()
             {
                 if (string.IsNullOrWhiteSpace(request.Name)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, UserNames.Name));
-                if(await _userRepository.IsSubjectExists(request.Name, prefix, cancellationToken)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.USER_EXISTS, request.Name));
+                if(await _userRepository.IsSubjectExists(request.Name, prefix, cancellationToken)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UserExists, request.Name));
             }
         }
 

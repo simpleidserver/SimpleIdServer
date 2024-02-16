@@ -95,7 +95,7 @@ public class CertificateAuthoritiesController : BaseController
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
-                throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.CERTIFICATE_CANNOT_BE_GENERATED);
+                throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.CertificateCannotBeGenerated);
             }
             return new ContentResult
             {
@@ -127,19 +127,19 @@ public class CertificateAuthoritiesController : BaseController
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
-                throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.CANNOT_READ_CERTIFICATE_STORE);
+                throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.CannotReadCertificateStore);
             }
 
             var certificate = store.Certificates.Find(request.FindType, request.FindValue, true).FirstOrDefault();
-            if (certificate == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.CERTIFICATE_DOESNT_EXIST);
+            if (certificate == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.CertificateDoesntExist);
             try
             {
-                if (!certificate.HasPrivateKey || certificate.PrivateKey == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.CERTIFICATE_DOESNT_HAVE_PRIVATE_KEY);
+                if (!certificate.HasPrivateKey || certificate.PrivateKey == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.CertificateDoesntHavePrivateKey);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
-                throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.CERTIFICATE_DOESNT_HAVE_PRIVATE_KEY);
+                throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.CertificateDoesntHavePrivateKey);
             }
 
             var certificateAuthority = CertificateAuthorityBuilder.Import(certificate, request.StoreLocation, request.StoreName, request.FindType, request.FindValue).Build();
@@ -334,7 +334,7 @@ public class CertificateAuthoritiesController : BaseController
                 catch(Exception ex)
                 {
                     _logger.LogError(ex.ToString());
-                    throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.CERTIFICATE_CLIENT_CANNOT_BE_GENERATED);
+                    throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.CertificateClientCannotBeGenerated);
                 }
 
                 var record = new ClientCertificate

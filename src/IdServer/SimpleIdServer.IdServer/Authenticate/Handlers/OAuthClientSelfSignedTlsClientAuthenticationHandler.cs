@@ -36,7 +36,7 @@ namespace SimpleIdServer.IdServer.Authenticate.Handlers
         public async Task<bool> Handle(AuthenticateInstruction authenticateInstruction, Client client, string expectedIssuer, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
         {
             var certificate = authenticateInstruction.Certificate;
-            if (certificate == null) throw new OAuthException(errorCode, ErrorMessages.NO_CLIENT_CERTIFICATE);
+            if (certificate == null) throw new OAuthException(errorCode, Global.NoClientCertificate);
             await CheckCertificate(certificate, client, errorCode, cancellationToken);
             return true;
         }
@@ -46,7 +46,7 @@ namespace SimpleIdServer.IdServer.Authenticate.Handlers
             if (!certificate.IsSelfSigned())
             {
                 _logger.LogError("the certificate is not self signed");
-                throw new OAuthException(errorCode, ErrorMessages.CERTIFICATE_IS_NOT_SELF_SIGNED);
+                throw new OAuthException(errorCode, Global.CertificateIsNotSelfSigned);
             }
 
             var jsonWebKeys = await _clientHelper.ResolveJsonWebKeys(client, cancellationToken);

@@ -41,7 +41,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             if (value is JsonArray)
             {
                 var values = value as JsonArray;
-                if(values.Count > 1) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.TOO_MANY_DPOP_HEADER);
+                if(values.Count > 1) throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.TooManyDpopHeader);
                 dpopProof = values.First().AsValue().GetValue<string>();
             }
             else
@@ -72,7 +72,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             }
 
             var newNonce = await CreateDPoPNonce(context.Client.DPOPNonceLifetimeInSeconds);
-            throw new OAuthDPoPRequiredException(newNonce, ErrorCodes.USE_DPOP_NONCE, ErrorMessages.USE_DPOP_NONCE);
+            throw new OAuthDPoPRequiredException(newNonce, ErrorCodes.USE_DPOP_NONCE, Global.UseDpopNonce);
         }
 
         private async Task<string> CreateDPoPNonce(double validityPeriodsInSeconds)

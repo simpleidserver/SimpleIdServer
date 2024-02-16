@@ -194,7 +194,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
                     .SingleOrDefaultAsync(p => p.Id == id);
                 if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
                 if (IProvisioningMappingRule.IsUnique(request.MappingRule) && result.Definition.MappingRules.Any(r => r.MapperType == request.MappingRule))
-                    return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.IDPROVISIONING_TYPE_UNIQUE);
+                    return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.IdProvisioningTypeUnique);
 
                 // TODO : Check GROUPNAME can be added when usage is GROUP.
                 // TODO : Check SUBJECT or USERATTRIBUTE can be added when usage is USER.
@@ -413,9 +413,9 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
                 if (process == null) 
                     return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioningProcess, processId));
                 if (!process.IsExported)
-                    return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.IDPROVISIONING_PROCESS_ISNOTEXTRACTED);
+                    return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.IdProvisioningProcessIsNotExtracted);
                 if(process.StartImportDateTime != null)
-                    return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.IDPROVISIONING_PROCESS_STARTED);
+                    return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.IdProvisioningProcessStarted);
 
                 var sendEndpoint = await _busControl.GetSendEndpoint(new Uri($"queue:{ImportUsersConsumer.Queuename}"));
                 await sendEndpoint.Send(new StartImportUsersCommand

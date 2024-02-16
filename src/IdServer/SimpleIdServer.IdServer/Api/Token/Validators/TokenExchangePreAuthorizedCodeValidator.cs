@@ -53,7 +53,7 @@ public class TokenExchangePreAuthorizedCodeValidator : ITokenExchangePreAuthoriz
         if (context.Client.IsTransactionCodeRequired)
         {
             var otp = user.ActiveOTP;
-            if (otp == null) throw new OAuthException(ErrorCodes.NO_ACTIVE_OTP, ErrorMessages.NO_ACTIVE_OTP);
+            if (otp == null) throw new OAuthException(ErrorCodes.NO_ACTIVE_OTP, Global.NoActiveOtp);
         }
 
         return user;

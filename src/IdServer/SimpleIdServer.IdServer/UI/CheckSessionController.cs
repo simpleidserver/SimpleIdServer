@@ -79,14 +79,14 @@ namespace SimpleIdServer.IdServer.UI
         public async Task<IActionResult> IsActive([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            if (!User.Identity.IsAuthenticated) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.ACCESS_DENIED, ErrorMessages.USER_NOT_AUTHENTICATED);
+            if (!User.Identity.IsAuthenticated) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.ACCESS_DENIED, Global.UserNotAuthenticated);
             var kvp = Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName());
             if (string.IsNullOrWhiteSpace(kvp.Value)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.MissingSessionId);
             var userId = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
             var user = await _userRepository.GetBySubject(userId, prefix, cancellationToken);
-            if (user == null) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.UNKNOWN_USER, ErrorMessages.USER_NOT_AUTHENTICATED);
+            if (user == null) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.UNKNOWN_USER, Global.UserNotAuthenticated);
             var session = await _userSessionRepository.GetById(kvp.Value, prefix, cancellationToken);
-            if (session == null || !session.IsActive()) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INACTIVE_SESSION, ErrorMessages.INACTIVE_SESSION);
+            if (session == null || !session.IsActive()) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INACTIVE_SESSION, Global.InactiveSession);
             return NoContent();
         }
 

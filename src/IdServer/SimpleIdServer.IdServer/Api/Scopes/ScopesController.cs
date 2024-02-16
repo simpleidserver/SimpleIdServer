@@ -156,7 +156,7 @@ public class ScopesController : BaseController
                     .Include(s => s.Realms)
                     .AsNoTracking()
                     .AnyAsync(s => s.Name == scope.Name && s.Realms.Any(r => r.Name == prefix), CancellationToken.None);
-                if (existingScope) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.SCOPE_ALREADY_EXISTS, scope.Name));
+                if (existingScope) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.ScopeAlreadyExists, scope.Name));
                 var realm = await _realmRepository.Query().SingleAsync(r => r.Name == prefix);
                 scope.Id = Guid.NewGuid().ToString();
                 scope.Realms.Add(realm);
@@ -226,13 +226,13 @@ public class ScopesController : BaseController
                     .FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.Name == prefix));
                 if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownScope, id));
                 if(scope.ClaimMappers.Any(m => m.Name == request.Name)) 
-                    throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.SCOPE_CLAIM_MAPPER_NAME_MUSTBEUNIQUE);
+                    throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.ScopeClaimMapperNameMustBeUnique);
                 if (!string.IsNullOrWhiteSpace(request.TargetClaimPath) && scope.ClaimMappers.Any(m => m.TargetClaimPath == request.TargetClaimPath))
-                    throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.SCOPE_CLAIM_MAPPER_TOKENCLAIMNAME_MUSTBEUNIQUE);
+                    throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.ScopeClaimMapperTokenClaimNameMustBeUnique);
                 if (!string.IsNullOrWhiteSpace(request.SAMLAttributeName) && scope.ClaimMappers.Any(m => m.SAMLAttributeName == request.SAMLAttributeName))
-                    throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.SCOPE_CLAIM_MAPPER_SAML_ATTRIBUTE_NAME);
+                    throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.ScopeClaimMapperSamlAttributeName);
                 if (IProvisioningMappingRule.IsUnique(request.MapperType) && scope.ClaimMappers.Any(r => r.MapperType == request.MapperType))
-                    return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.IDPROVISIONING_TYPE_UNIQUE);
+                    return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.IdProvisioningTypeUnique);
 
                 request.Id = Guid.NewGuid().ToString();
                 scope.ClaimMappers.Add(request);
@@ -302,9 +302,9 @@ public class ScopesController : BaseController
                 if (scopeClaimMapper == null)
                     throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownScopeClaimMapper, mapperId));
                 if (!string.IsNullOrWhiteSpace(request.TargetClaimPath) && scope.ClaimMappers.Any(m => m.TargetClaimPath == request.TargetClaimPath && m.Id != mapperId))
-                    throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.SCOPE_CLAIM_MAPPER_TOKENCLAIMNAME_MUSTBEUNIQUE);
+                    throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.ScopeClaimMapperTokenClaimNameMustBeUnique);
                 if (!string.IsNullOrWhiteSpace(request.SAMLAttributeName) && scope.ClaimMappers.Any(m => m.SAMLAttributeName == request.SAMLAttributeName && m.Id != mapperId))
-                    throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.SCOPE_CLAIM_MAPPER_SAML_ATTRIBUTE_NAME);
+                    throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.ScopeClaimMapperSamlAttributeName);
                 scopeClaimMapper.SourceUserAttribute = request.SourceUserAttribute;
                 scopeClaimMapper.SourceUserProperty = request.SourceUserProperty;
                 scopeClaimMapper.TargetClaimPath = request.TargetClaimPath;

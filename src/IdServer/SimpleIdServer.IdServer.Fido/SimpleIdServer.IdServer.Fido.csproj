@@ -15,4 +15,17 @@
 	<ItemGroup>
 		<PackageReference Include="Fido2.AspNet" Version="4.0.0-beta3" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Compile Update="Resources\Global.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>Global.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+	<ItemGroup>
+	  <EmbeddedResource Update="Resources\Global.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>Global.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	</ItemGroup>
 </Project>

@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using System.Net;
 using System.Text;
 using System.Text.Json.Nodes;
@@ -53,7 +54,7 @@ namespace SimpleIdServer.IdServer.Middlewares
                 var error = new JsonObject
                 {
                     { ErrorResponseParameters.Error, ErrorCodes.INVALID_REQUEST },
-                    { ErrorResponseParameters.ErrorDescription, ErrorMessages.CERTIFICATE_IS_REQUIRED }
+                    { ErrorResponseParameters.ErrorDescription, Global.CertificateIsRequired }
                 };
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 context.Response.Headers.Add("Content-Types", "application/json");

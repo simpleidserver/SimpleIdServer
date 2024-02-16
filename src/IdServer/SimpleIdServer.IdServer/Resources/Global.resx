@@ -126,6 +126,12 @@
   <data name="AccessTokenValidClient" xml:space="preserve">
     <value>access token can be used for the client '{0}' and not for '{1}'</value>
   </data>
+  <data name="AcrWithSameNameExists" xml:space="preserve">
+    <value>an acr with the same name already exists</value>
+  </data>
+  <data name="ApiResourceAlreadyExists" xml:space="preserve">
+    <value>API resource {0} already exists</value>
+  </data>
   <data name="AuthenticationMethodNotFound" xml:space="preserve">
     <value>the authentication method {0} doesn't exist</value>
   </data>
@@ -134,6 +140,66 @@
   </data>
   <data name="AuthorizationCodeNotIssuedByClient" xml:space="preserve">
     <value>authorization code has not been issued by the client</value>
+  </data>
+  <data name="AuthorizationDetailsTypeRequired" xml:space="preserve">
+    <value>the authorization_details type is required</value>
+  </data>
+  <data name="AuthRequestAlgNotValid" xml:space="preserve">
+    <value>the request must be signed with '{0}' algorithm</value>
+  </data>
+  <data name="AuthRequestBadAudience" xml:space="preserve">
+    <value>the request doesn't contain correct audience</value>
+  </data>
+  <data name="AuthRequestBadIssuer" xml:space="preserve">
+    <value>the request doesn't contain correct issuer</value>
+  </data>
+  <data name="AuthRequestBadNbf" xml:space="preserve">
+    <value>the request cannot be received before '{0}'</value>
+  </data>
+  <data name="AuthRequestClientNotAuthorized" xml:space="preserve">
+    <value>the client is not authorized to use the auth_req_id</value>
+  </data>
+  <data name="AuthRequestExpired" xml:space="preserve">
+    <value>the authorization request is expired</value>
+  </data>
+  <data name="AuthRequestIsExpired" xml:space="preserve">
+    <value>the request is expired</value>
+  </data>
+  <data name="AuthRequestMaximumLifetime" xml:space="preserve">
+    <value>the maximum lifetime of the request is '{0}' seconds</value>
+  </data>
+  <data name="AuthRequestNoAudience" xml:space="preserve">
+    <value>the request doesn't contain audience</value>
+  </data>
+  <data name="AuthRequestNoExpiration" xml:space="preserve">
+    <value>the request doesn't contain expiration time</value>
+  </data>
+  <data name="AuthRequestNoIat" xml:space="preserve">
+    <value>the request doesn't contain iat</value>
+  </data>
+  <data name="AuthRequestNoIssuer" xml:space="preserve">
+    <value>the request doesn't contain issuer</value>
+  </data>
+  <data name="AuthRequestNoJti" xml:space="preserve">
+    <value>the request doesn't contain jti</value>
+  </data>
+  <data name="AuthRequestNoNbf" xml:space="preserve">
+    <value>the request doesn't contain nbf</value>
+  </data>
+  <data name="AuthRequestNotAuthorizedToReject" xml:space="preserve">
+    <value>you're not authorized to reject the authorization request</value>
+  </data>
+  <data name="AuthRequestNotConfirmed" xml:space="preserve">
+    <value>the authorization request has not been confirmed</value>
+  </data>
+  <data name="AuthRequestRejected" xml:space="preserve">
+    <value>the authorization request has been rejected</value>
+  </data>
+  <data name="AuthRequestSent" xml:space="preserve">
+    <value>the authorization request is finished</value>
+  </data>
+  <data name="AuthSchemeProviderWithSameNameExists" xml:space="preserve">
+    <value>an authentication scheme provider with the same name already exists</value>
   </data>
   <data name="BadAccessToken" xml:space="preserve">
     <value>access token is not correct</value>
@@ -249,8 +315,53 @@
   <data name="BadUserCredential" xml:space="preserve">
     <value>bad user credential</value>
   </data>
+  <data name="BcAuthorizeNotPending" xml:space="preserve">
+    <value>the authorization request is not in pending</value>
+  </data>
   <data name="BindingMessageMustNotExceed" xml:space="preserve">
     <value>binding_message must not exceed {0} characters</value>
+  </data>
+  <data name="CannotGeneratePairwiseSubjectBecauseNoSectorIdentifier" xml:space="preserve">
+    <value>pairwise subject cannot be generated because the sector_identifier_uri is empty and there is no redirect_uri</value>
+  </data>
+  <data name="CannotGeneratePairwiseSubjectMoreThanOneRedirectUrls" xml:space="preserve">
+    <value>pairwise subject cannot be generated because the sectore_identifier_uri is empty and the client contains more than one redirect_uri</value>
+  </data>
+  <data name="CannotReadCertificateStore" xml:space="preserve">
+    <value>You don't have the permission to read the certificate store</value>
+  </data>
+  <data name="CertificateCannotBeGenerated" xml:space="preserve">
+    <value>the certificate cannot be generated</value>
+  </data>
+  <data name="CertificateClientCannotBeGenerated" xml:space="preserve">
+    <value>the client certificate cannot be generated</value>
+  </data>
+  <data name="CertificateDoesntExist" xml:space="preserve">
+    <value>The certificate doesn't exist</value>
+  </data>
+  <data name="CertificateDoesntHavePrivateKey" xml:space="preserve">
+    <value>The certificate doesn't contain private key</value>
+  </data>
+  <data name="CertificateIsNotSelfSigned" xml:space="preserve">
+    <value>the certificate is not self signed</value>
+  </data>
+  <data name="CertificateIsNotTrusted" xml:space="preserve">
+    <value>certificate is not trusted</value>
+  </data>
+  <data name="CertificateIsRequired" xml:space="preserve">
+    <value>certificate is required</value>
+  </data>
+  <data name="CertificateSanDnsInvalid" xml:space="preserve">
+    <value>certificate san DNS is invalid</value>
+  </data>
+  <data name="CertificateSanEmailInvalid" xml:space="preserve">
+    <value>certificate san EMAIL is invalid</value>
+  </data>
+  <data name="CertificateSanIpInvalid" xml:space="preserve">
+    <value>certificate san IP is invalid</value>
+  </data>
+  <data name="CertificateSubjectInvalid" xml:space="preserve">
+    <value>certificate subject is invalid</value>
   </data>
   <data name="ClientAssertionCannotBeDecrypted" xml:space="preserve">
     <value>client assertion cannot be decryted by the client secret</value>
@@ -276,6 +387,9 @@
   <data name="ClientAssertionTypeNotSupported" xml:space="preserve">
     <value>client assertion type {0} is not supported</value>
   </data>
+  <data name="ClientIdCannotBeExtracted" xml:space="preserve">
+    <value>client identifier cannot be extracted from the initial request</value>
+  </data>
   <data name="ClientIdCannotBeExtractedFromClientAssertion" xml:space="preserve">
     <value>client_id cannot be extracted from client_assertion</value>
   </data>
@@ -297,11 +411,41 @@
   <data name="ClientTokenExchangedNotEnabled" xml:space="preserve">
     <value>Token exchange is not enabled</value>
   </data>
+  <data name="ContentTypeNotSupported" xml:space="preserve">
+    <value>the content-type is not correct</value>
+  </data>
+  <data name="DpopJktMismatch" xml:space="preserve">
+    <value>there is a mismatch between the dpop_jkt and the DPoP proof</value>
+  </data>
   <data name="DuplicateJwks" xml:space="preserve">
     <value>jwks and jwks_uri parameters cannot be passed at the same time</value>
   </data>
   <data name="DuplicateScopes" xml:space="preserve">
     <value>duplicate scopes : {0}</value>
+  </data>
+  <data name="ExpiredBcAuthorize" xml:space="preserve">
+    <value>the authorization request is expired</value>
+  </data>
+  <data name="GrantIdCannotBeSpecified" xml:space="preserve">
+    <value>grant_id cannot be specified because the grant_management_action is equals to create</value>
+  </data>
+  <data name="GrantIsNotAccepted" xml:space="preserve">
+    <value>grant is not accepted</value>
+  </data>
+  <data name="GroupExists" xml:space="preserve">
+    <value>group {0} already exists</value>
+  </data>
+  <data name="IdProvisioningProcessIsNotExtracted" xml:space="preserve">
+    <value>users are not extracted</value>
+  </data>
+  <data name="IdProvisioningProcessStarted" xml:space="preserve">
+    <value>process cannot be started twice</value>
+  </data>
+  <data name="IdProvisioningTypeUnique" xml:space="preserve">
+    <value>The same mapping type cannot be added twice.</value>
+  </data>
+  <data name="InactiveSession" xml:space="preserve">
+    <value>the session is not active</value>
   </data>
   <data name="InvalidAccessTokenScope" xml:space="preserve">
     <value>access token has an invalid scope</value>
@@ -433,7 +577,7 @@
     <value>subject contained in id_token_hint is invalid</value>
   </data>
   <data name="InvalidSubjectType" xml:space="preserve">
-    <value />
+    <value>subject_type is invalid</value>
   </data>
   <data name="InvalidTicket" xml:space="preserve">
     <value>permission ticket is not correct</value>
@@ -449,6 +593,21 @@
   </data>
   <data name="InvalidUserCode" xml:space="preserve">
     <value>the user_code is not valid</value>
+  </data>
+  <data name="JwtBadSignature" xml:space="preserve">
+    <value>JWT doesn't have a correct signature</value>
+  </data>
+  <data name="JwtCannotBeDecrypted" xml:space="preserve">
+    <value>An unexcepted error occured while trying to decrypt the JWT</value>
+  </data>
+  <data name="JwtCannotBeEncrypted" xml:space="preserve">
+    <value>JWT cannnot be encrypted</value>
+  </data>
+  <data name="JwtMustBeEncrypted" xml:space="preserve">
+    <value>JWT must be encrypted with the algorithm {0}</value>
+  </data>
+  <data name="JwtMustBeSigned" xml:space="preserve">
+    <value>JWT must be signed with the algorithm {0}</value>
   </data>
   <data name="LoginHintTokenIsExpired" xml:space="preserve">
     <value>login_hint_token has expired</value>
@@ -507,6 +666,12 @@
   <data name="MissingUserCode" xml:space="preserve">
     <value>the parameter user_code is missing</value>
   </data>
+  <data name="NoActiveOtp" xml:space="preserve">
+    <value>the user doesn't have an active OTP</value>
+  </data>
+  <data name="NoClientCertificate" xml:space="preserve">
+    <value>no client certificate</value>
+  </data>
   <data name="NoClientSecret" xml:space="preserve">
     <value>no client secret</value>
   </data>
@@ -531,11 +696,83 @@
   <data name="NoSessionId" xml:space="preserve">
     <value>the incoming request doesn't contain a session_id</value>
   </data>
+  <data name="NotSameRedirectUri" xml:space="preserve">
+    <value>not the same redirect_uri</value>
+  </data>
+  <data name="NotWellFormedDpopToken" xml:space="preserve">
+    <value>the DPoP proof must be a Json Web Token</value>
+  </data>
+  <data name="OnleHintMustBePassed" xml:space="preserve">
+    <value>only one hint can be passed in the request</value>
+  </data>
+  <data name="OnlyHybridWorkflowsAreSupported" xml:space="preserve">
+    <value>only hybrid workflow are supported</value>
+  </data>
+  <data name="OnlyPingOrPollModeCanBeUsed" xml:space="preserve">
+    <value>only ping or poll mode can be used to get tokens</value>
+  </data>
+  <data name="PollingDeviceAlreadyRegistered" xml:space="preserve">
+    <value>only one polling device can be registrered</value>
+  </data>
+  <data name="PollingDeviceNotRegistered" xml:space="preserve">
+    <value>polling device is not registered</value>
+  </data>
+  <data name="RealmExists" xml:space="preserve">
+    <value>realm {0} already exists</value>
+  </data>
+  <data name="RedirectUriContainsFragment" xml:space="preserve">
+    <value>the redirect_uri cannot contains fragment</value>
+  </data>
   <data name="RefreshTokenIsExpired" xml:space="preserve">
     <value>refresh token is expired</value>
   </data>
   <data name="RefreshTokenNotIssuedByClient" xml:space="preserve">
     <value>refresh token has not been issued by the client</value>
+  </data>
+  <data name="RegistrationWorkflowExists" xml:space="preserve">
+    <value>a registration worklow with the same name already exists</value>
+  </data>
+  <data name="RequestDenied" xml:space="preserve">
+    <value>The client is not authorized to have these permissions.</value>
+  </data>
+  <data name="RequestedExpiryMustBePositive" xml:space="preserve">
+    <value>requested_expiry must be positive</value>
+  </data>
+  <data name="RequestObjectBadAudience" xml:space="preserve">
+    <value>request object has bad audience</value>
+  </data>
+  <data name="RequestObjectIsExpired" xml:space="preserve">
+    <value>request object is expired</value>
+  </data>
+  <data name="RequestUriIsInvalid" xml:space="preserve">
+    <value>the request_uri is invalid</value>
+  </data>
+  <data name="RequestUriIsRequired" xml:space="preserve">
+    <value>the request_uri is required</value>
+  </data>
+  <data name="ScopeAlreadyExists" xml:space="preserve">
+    <value>scope '{0}' already exists</value>
+  </data>
+  <data name="ScopeClaimMapperNameMustBeUnique" xml:space="preserve">
+    <value>Name must be unique</value>
+  </data>
+  <data name="ScopeClaimMapperSamlAttributeName" xml:space="preserve">
+    <value>SAML Attribute name must be unique</value>
+  </data>
+  <data name="ScopeClaimMapperTokenClaimNameMustBeUnique" xml:space="preserve">
+    <value>Token claim name must be unique</value>
+  </data>
+  <data name="ScopeMapperTypeUnique" xml:space="preserve">
+    <value>The same mapping type cannot be added twice.</value>
+  </data>
+  <data name="SigKeyAlreadyExists" xml:space="preserve">
+    <value>signature key {0} already exists</value>
+  </data>
+  <data name="TooManyAuthRequest" xml:space="preserve">
+    <value>you tried too many times to get a token</value>
+  </data>
+  <data name="TooManyDpopHeader" xml:space="preserve">
+    <value>too many DPoP parameters are passed in the header</value>
   </data>
   <data name="UnauthorizedAccessPermissionApi" xml:space="preserve">
     <value>you're not authorized to access to the permissions endpoint</value>
@@ -552,8 +789,14 @@
   <data name="UnauthorizedScopes" xml:space="preserve">
     <value>unauthorized to scopes : {0}</value>
   </data>
+  <data name="UnauthorizedToValidateBcAuthorization" xml:space="preserve">
+    <value>you are not authorized to validate the authorization request</value>
+  </data>
   <data name="UnauthorizedUserAccessGrant" xml:space="preserve">
     <value>the user {0} is not authorized to access to performance operations on the grant</value>
+  </data>
+  <data name="UnexpectedRequestUriParameter" xml:space="preserve">
+    <value>the request cannot contains request_uri</value>
   </data>
   <data name="UnknownAccessToken" xml:space="preserve">
     <value>either the access token has been revoked or is invalid</value>
@@ -623,6 +866,9 @@
   </data>
   <data name="UnknownJsonWebKey" xml:space="preserve">
     <value>Json Web Key doesn't exist</value>
+  </data>
+  <data name="UnknownJwk" xml:space="preserve">
+    <value>unknown json web key '{0}'</value>
   </data>
   <data name="UnknownPermissions" xml:space="preserve">
     <value>the permissions {0} don't exist</value>
@@ -746,5 +992,17 @@
   </data>
   <data name="UnsupportedUserInfoSignResponseAlg" xml:space="preserve">
     <value>userinfo_signed_response_alg is not supported</value>
+  </data>
+  <data name="UseDpopNonce" xml:space="preserve">
+    <value>Authorization Server required nonce in DPoP proof</value>
+  </data>
+  <data name="UserAlreadyExists" xml:space="preserve">
+    <value>user '{0}' already exists</value>
+  </data>
+  <data name="UserExists" xml:space="preserve">
+    <value>the user {0} already exists</value>
+  </data>
+  <data name="UserNotAuthenticated" xml:space="preserve">
+    <value>you're not authenticated</value>
   </data>
 </root>

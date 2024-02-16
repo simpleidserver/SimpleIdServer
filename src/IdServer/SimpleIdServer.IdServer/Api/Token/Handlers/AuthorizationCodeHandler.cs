@@ -106,7 +106,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     var previousRedirectUrl = previousRequest.GetRedirectUri();
                     var claims = previousRequest.GetClaimsFromAuthorizationRequest();
                     if (!previousClientId.Equals(oauthClient.ClientId, StringComparison.InvariantCultureIgnoreCase)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, Global.AuthorizationCodeNotIssuedByClient);
-                    if (!previousRedirectUrl.Equals(redirectUri, StringComparison.InvariantCultureIgnoreCase)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.NOT_SAME_REDIRECT_URI);
+                    if (!previousRedirectUrl.Equals(redirectUri, StringComparison.InvariantCultureIgnoreCase)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, Global.NotSameRedirectUri);
                     await _grantedTokenHelper.RemoveAuthorizationCode(code, cancellationToken);
 
                     var scopes = GetScopes(previousRequest, context);
@@ -201,7 +201,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         void CheckDPOPJkt(HandlerContext context, AuthCode authCode)
         {
             if (context.DPOPProof == null || string.IsNullOrWhiteSpace(authCode.DPOPJkt)) return;
-            if (context.DPOPProof.PublicKey().CreateThumbprint() != authCode.DPOPJkt) throw new OAuthException(ErrorCodes.INVALID_DPOP_PROOF, ErrorMessages.DPOP_JKT_MISMATCH);
+            if (context.DPOPProof.PublicKey().CreateThumbprint() != authCode.DPOPJkt) throw new OAuthException(ErrorCodes.INVALID_DPOP_PROOF, Global.DpopJktMismatch);
         }
     }
 }

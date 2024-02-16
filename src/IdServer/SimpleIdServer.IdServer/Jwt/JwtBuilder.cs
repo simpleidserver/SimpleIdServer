@@ -144,7 +144,7 @@ namespace SimpleIdServer.IdServer.Jwt
                 ValidateLifetime = false,
                 IssuerSigningKey = sigKey.Key
             });
-            if (!validationResult.IsValid) return ReadJsonWebTokenResult.BuildError(ErrorMessages.JWT_BAD_SIGNATURE);
+            if (!validationResult.IsValid) return ReadJsonWebTokenResult.BuildError(Global.JwtBadSignature);
             return ReadJsonWebTokenResult.Ok(jsonWebToken, encJwt);
         }
 
@@ -157,9 +157,9 @@ namespace SimpleIdServer.IdServer.Jwt
             if(
                 (!string.IsNullOrWhiteSpace(encAlg) && !jsonWebToken.IsEncrypted) ||
                 (!string.IsNullOrWhiteSpace(encAlg) && jsonWebToken.IsEncrypted && jsonWebToken.Alg != encAlg)
-            ) return ReadJsonWebTokenResult.BuildError(string.Format(ErrorMessages.JWT_MUST_BE_ENCRYPTED, encAlg));
+            ) return ReadJsonWebTokenResult.BuildError(string.Format(Global.JwtMustBeEncrypted, encAlg));
 
-            if(string.IsNullOrWhiteSpace(encAlg) && jsonWebToken.IsEncrypted) return ReadJsonWebTokenResult.BuildError(ErrorMessages.JWT_CANNOT_BE_ENCRYPTED);
+            if(string.IsNullOrWhiteSpace(encAlg) && jsonWebToken.IsEncrypted) return ReadJsonWebTokenResult.BuildError(Global.JwtCannotBeEncrypted);
 
             if (jsonWebToken.IsEncrypted)
             {
@@ -180,7 +180,7 @@ namespace SimpleIdServer.IdServer.Jwt
                     }
                     catch
                     {
-                        return ReadJsonWebTokenResult.BuildError(ErrorMessages.JWT_CANNOT_BE_DECRYPTED);
+                        return ReadJsonWebTokenResult.BuildError(Global.JwtCannotBeDecrypted);
                     }
                 }
                 // asymmetric key.
@@ -202,14 +202,14 @@ namespace SimpleIdServer.IdServer.Jwt
                     }
                     catch
                     {
-                        return ReadJsonWebTokenResult.BuildError(ErrorMessages.JWT_CANNOT_BE_DECRYPTED);
+                        return ReadJsonWebTokenResult.BuildError(Global.JwtCannotBeDecrypted);
                     }
                 }
 
                 jsonWebToken = encJwt;
             }
 
-            if(sigAlg != jsonWebToken.Alg) return ReadJsonWebTokenResult.BuildError(string.Format(ErrorMessages.JWT_MUST_BE_SIGNED, sigAlg));
+            if(sigAlg != jsonWebToken.Alg) return ReadJsonWebTokenResult.BuildError(string.Format(Global.JwtMustBeSigned, sigAlg));
 
             var jsonWebKey = await _clientHelper.ResolveJsonWebKey(client, jsonWebToken.Kid, cancellationToken);
             if (jsonWebToken == null) return ReadJsonWebTokenResult.BuildError(string.Format(Global.NoJwkFoundToCheckSig, jsonWebToken.Kid));
@@ -220,7 +220,7 @@ namespace SimpleIdServer.IdServer.Jwt
                 ValidateLifetime = false,
                 IssuerSigningKey = jsonWebKey
             });
-            if (!validationResult.IsValid) return ReadJsonWebTokenResult.BuildError(ErrorMessages.JWT_BAD_SIGNATURE);
+            if (!validationResult.IsValid) return ReadJsonWebTokenResult.BuildError(Global.JwtBadSignature);
             return ReadJsonWebTokenResult.Ok(jsonWebToken, encJwt);
         }
     }

@@ -120,7 +120,7 @@ namespace SimpleIdServer.IdServer.Api.PushedAuthorization
             {
                 var requestUri = context.Request.RequestData.GetRequestUriFromAuthorizationRequest();
                 if (!string.IsNullOrWhiteSpace(requestUri))
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.UNEXPECTED_REQUEST_URI_PARAMETER);
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.UnexpectedRequestUriParameter);
             }
         }
 

@@ -74,10 +74,11 @@ const sidebars = {
     },
     {
       type:'category',
-      label: 'Developer (Nuget Packages)',
+      label: 'Developer',
       items: [
         'developer/idserver',
-        'developer/adminwebsite'
+        'developer/adminwebsite',
+        'developer/addlanguage'
       ]
     }
   ],

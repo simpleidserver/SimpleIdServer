@@ -102,7 +102,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     }
 
                     if (claimTokenFormatFetcherResult == null)
-                        return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.REQUEST_DENIED, ErrorMessages.REQUEST_DENIED);
+                        return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.REQUEST_DENIED, Global.RequestDenied);
 
                     var invalidScopes = permissionTicket.Records.Any(rec => !scopes.All(sc => rec.Scopes.Contains(sc)));
                     if (invalidScopes)
@@ -157,7 +157,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     {
                         var pendingRequests = await _umaPendingRequestRepository.Query().Where(r => r.TicketId == permissionTicket.Id).ToListAsync(cancellationToken);
                         if (pendingRequests.Any())
-                            return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.REQUEST_DENIED, ErrorMessages.REQUEST_DENIED);
+                            return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.REQUEST_DENIED, Global.RequestDenied);
 
                         foreach (var umaResource in umaResources)
                         {

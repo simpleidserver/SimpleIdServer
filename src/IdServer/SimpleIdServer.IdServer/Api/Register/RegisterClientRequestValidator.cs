@@ -159,7 +159,7 @@ namespace SimpleIdServer.IdServer.Api.Register
 
             Uri.TryCreate(redirectUrl, UriKind.Absolute, out Uri uri);
             if (!string.IsNullOrWhiteSpace(uri.Fragment))
-                throw new OAuthException(ErrorCodes.INVALID_REDIRECT_URI, ErrorMessages.REDIRECT_URI_CONTAINS_FRAGMENT);
+                throw new OAuthException(ErrorCodes.INVALID_REDIRECT_URI, Global.RedirectUriContainsFragment);
 
             if (client.ApplicationType == "web")
             {

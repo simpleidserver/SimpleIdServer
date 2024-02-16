@@ -91,7 +91,7 @@ public class ApiResourcesController : BaseController
                 await CheckAccessToken(prefix, Constants.StandardScopes.ApiResources.Name);
                 if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
                 if (string.IsNullOrWhiteSpace(request.Name)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, ApiResourceNames.Name));
-                if (await _apiResourceRepository.Query().Include(r => r.Realms).AsNoTracking().AnyAsync(r => r.Name == request.Name && r.Realms.Any(r => r.Name == prefix))) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.APIRESOURCE_ALREADY_EXISTS, request.Name));
+                if (await _apiResourceRepository.Query().Include(r => r.Realms).AsNoTracking().AnyAsync(r => r.Name == request.Name && r.Realms.Any(r => r.Name == prefix))) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.ApiResourceAlreadyExists, request.Name));
                 var realm = await _realmRepository.Query().SingleAsync(r => r.Name == prefix);
                 var apiResource = new ApiResource
                 {
