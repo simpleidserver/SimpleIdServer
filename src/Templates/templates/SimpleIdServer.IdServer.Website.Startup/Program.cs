@@ -35,8 +35,8 @@ app.UseStaticFiles();
 app.UseRequestLocalization(e =>
 {
     e.SetDefaultCulture("en");
-    e.AddSupportedCultures("en");
-    e.AddSupportedUICultures("en");
+    e.AddSupportedCultures("en", "fr", "es");
+    e.AddSupportedUICultures("en", "fr", "es");
 });
 app.UseRouting();
 app.UseCookiePolicy();

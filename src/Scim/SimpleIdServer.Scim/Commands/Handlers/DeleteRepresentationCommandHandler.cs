@@ -51,7 +51,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 foreach (var reference in references)
                 {
                     await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes, representation.Id, true).ConfigureAwait(false);
-                    await _scimRepresentationCommandRepository.BulkDelete(reference.RemovedRepresentationAttributes, representation.Id, true).ConfigureAwait(false);
+                    // await _scimRepresentationCommandRepository.BulkDelete(reference.RemovedRepresentationAttributes, representation.Id, true).ConfigureAwait(false);
                 }
 
                 await _scimRepresentationCommandRepository.Delete(representation).ConfigureAwait(false);

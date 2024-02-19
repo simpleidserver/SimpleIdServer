@@ -13,8 +13,8 @@ In the remainder of this article, we will explain the manual steps to enable sup
 ```
 public static ICollection<Language> Languages => new List<Language>
 {
-    LanguageBuilder.Build(Language.Default).AddDescription("English", "en").AddDescription("French", "fr").Build(),
-    LanguageBuilder.Build("fr").AddDescription("Français", "fr").AddDescription("Anglais", "en").Build()
+    LanguageBuilder.Build(Language.Default).AddDescription("English", "en").AddDescription("Anglais", "fr").Build(),
+    LanguageBuilder.Build("fr").AddDescription("Français", "fr").AddDescription("French", "en").Build()
 };
 ```
 

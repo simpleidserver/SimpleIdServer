@@ -337,11 +337,8 @@ void SeedData(WebApplication application, string scimBaseUrl)
             if (!dbContext.UmaResources.Any())
                 dbContext.UmaResources.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Resources);
 
-            if(!dbContext.Languages.Any())
-            {
-                dbContext.Languages.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Languages);
-                dbContext.Translations.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Languages.SelectMany(l => l.Descriptions));
-            }
+            foreach (var language in SimpleIdServer.IdServer.Startup.IdServerConfiguration.Languages)
+                AddMissingLanguage(dbContext, language);
 
             foreach(var providerDefinition in SimpleIdServer.IdServer.Startup.IdServerConfiguration.ProviderDefinitions)
             {
@@ -467,6 +464,21 @@ void SeedData(WebApplication application, string scimBaseUrl)
             if(!dbContext.Definitions.Any(d => d.Id == name))
             {
                 dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<T>());
+            }
+        }
+
+        void AddMissingLanguage(StoreDbContext dbContext, Language language)
+        {
+            if (!dbContext.Languages.Any(l => l.Code == language.Code)) 
+                dbContext.Languages.Add(language);
+            var keys = language.Descriptions.Select(d => d.Key);
+            var existingTranslations = dbContext.Translations.Where(t => keys.Contains(t.Key)).ToList();
+            var unknownTranslations = language.Descriptions.Where(d => !existingTranslations.Any(t => t.Key == d.Key && t.Language == d.Language));
+            dbContext.Translations.AddRange(unknownTranslations);
+            foreach(var existingTranslation in existingTranslations)
+            {
+                var tr = language.Descriptions.Single(d => d.Key == existingTranslation.Key && d.Language == existingTranslation.Language);
+                existingTranslation.Value = tr.Value;
             }
         }
     }

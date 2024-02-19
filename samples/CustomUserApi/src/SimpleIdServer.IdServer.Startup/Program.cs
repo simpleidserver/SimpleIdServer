@@ -13,22 +13,15 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.Configuration;
 using SimpleIdServer.Configuration.Redis;
 using SimpleIdServer.IdServer;
-using SimpleIdServer.IdServer.CredentialIssuer;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Email;
-using SimpleIdServer.IdServer.Fido;
-using SimpleIdServer.IdServer.Provisioning.LDAP;
-using SimpleIdServer.IdServer.Provisioning.LDAP.Jobs;
-using SimpleIdServer.IdServer.Provisioning.SCIM;
-using SimpleIdServer.IdServer.Provisioning.SCIM.Jobs;
-using SimpleIdServer.IdServer.Sms;
+using SimpleIdServer.IdServer.Pwd;
+using SimpleIdServer.IdServer.Pwd.Services;
 using SimpleIdServer.IdServer.Startup;
 using SimpleIdServer.IdServer.Startup.Configurations;
 using SimpleIdServer.IdServer.Startup.Converters;
 using SimpleIdServer.IdServer.Startup.Services;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.Services;
-using SimpleIdServer.IdServer.WsFederation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -70,69 +63,26 @@ var app = builder.Build();
 SeedData(app, builder.Configuration["SCIMBaseUrl"]);
 app.UseCors("AllowAll");
 app.UseSID()
-.UseWsFederation()
-.UseFIDO()
-.UseCredentialIssuer()
-.UseSamlIdp()
-.UseAutomaticConfiguration();
+    .UseAutomaticConfiguration();
 app.Run();
 
 void ConfigureIdServer(IServiceCollection services)
 {
     services.AddSIDIdentityServer(dataProtectionBuilderCallback: ConfigureDataProtection)
         .UseEFStore(o => ConfigureStorage(o))
-        .AddCredentialIssuer()
         .UseInMemoryMassTransit()
         .AddBackChannelAuthentication()
-        .AddEmailAuthentication()
-        .AddSmsAuthentication()
-        .AddSamlIdp()
-        .AddFidoAuthentication(f =>
-        {
-            var authority = builder.Configuration["Authority"];
-            var url = new Uri(authority);
-            f.ServerName = "SimpleIdServer";
-            f.ServerDomain = url.Host;
-            f.Origins = new HashSet<string> { authority };
-        })
+        .AddPwdAuthentication()
         .EnableConfigurableAuthentication()
-        .AddSCIMProvisioning()
-        .AddLDAPProvisioning()
         .UseRealm()
         .AddAuthentication(callback: (a) =>
         {
-            /*
-            a.AddWsAuthentication(o =>
-            {
-                o.MetadataAddress = "http://localhost:5001";
-                o.Wtrealm = "urn:website";
-                o.RequireHttpsMetadata = false;
-            });
-            */
             a.AddMutualAuthentication(m =>
             {
                 m.AllowedCertificateTypes = CertificateTypes.All;
                 m.RevocationMode = System.Security.Cryptography.X509Certificates.X509RevocationMode.NoCheck;
             });
-            a.AddOIDCAuthentication(opts =>
-            {
-                opts.Authority = builder.Configuration["Authority"];
-                opts.ClientId = "website";
-                opts.ClientSecret = "password";
-                opts.ResponseType = "code";
-                opts.ResponseMode = "query";
-                opts.SaveTokens = true;
-                opts.GetClaimsFromUserInfoEndpoint = true;
-                opts.RequireHttpsMetadata = false;
-                opts.TokenValidationParameters = new TokenValidationParameters
-                {
-                    NameClaimType = "name"
-                };
-                opts.Scope.Add("profile");
-            });
         });
-    services.AddDIDKey();
-    services.AddDIDEthr();
     ConfigureDistributedCache();
     ConfigureApiAuthentication(services);
 }
@@ -143,6 +93,9 @@ void ConfigureApiAuthentication(IServiceCollection services)
     var userRepository = services.First(s => s.ServiceType == typeof(IUserRepository));
     services.Remove(pwdAuthService);
     services.Remove(userRepository);
+    var t = typeof(SimpleIdServer.IdServer.UI.HomeController);
+    services.AddTransient<IAuthenticationMethodService, PwdAuthenticationMethodService>();
+    services.AddTransient<IUserAuthenticationService, CustomPasswordAuthenticationService>();
     services.AddTransient<IPasswordAuthenticationService, CustomPasswordAuthenticationService>();
     services.AddTransient<IUserRepository, CustomUserRepository>();
     services.Configure<UserApiOptions>(o =>
@@ -158,11 +111,6 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
     builder.AddAutomaticConfiguration(o =>
     {
         o.Add<FacebookOptionsLite>();
-        o.Add<LDAPRepresentationsExtractionJobOptions>();
-        o.Add<SCIMRepresentationsExtractionJobOptions>();
-        o.Add<IdServerEmailOptions>();
-        o.Add<IdServerSmsOptions>();
-        o.Add<FidoOptions>();
         if(conf.Type == DistributedCacheTypes.REDIS)
         {
             o.UseRedisConnector(conf.ConnectionString);
@@ -229,9 +177,11 @@ void ConfigureStorage(DbContextOptionsBuilder b)
                 o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
             });
             break;
+        case StorageTypes.INMEMORY:
+            b.UseInMemoryDatabase(conf.ConnectionString);
+            break;
     }
 }
-
 
 void ConfigureDataProtection(IDataProtectionBuilder dataProtectionBuilder)
 {
@@ -244,7 +194,8 @@ void SeedData(WebApplication application, string scimBaseUrl)
     {
         using (var dbContext = scope.ServiceProvider.GetService<StoreDbContext>())
         {
-            dbContext.Database.Migrate();
+            var isInMemory = dbContext.Database.IsInMemory();
+            if (!isInMemory) dbContext.Database.Migrate();
             if (!dbContext.Realms.Any())
                 dbContext.Realms.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Realms);
 
@@ -269,12 +220,6 @@ void SeedData(WebApplication application, string scimBaseUrl)
             if (!dbContext.AuthenticationSchemeProviders.Any())
                 dbContext.AuthenticationSchemeProviders.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Providers);
 
-            if (!dbContext.IdentityProvisioningDefinitions.Any())
-                dbContext.IdentityProvisioningDefinitions.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.IdentityProvisioningDefLst);
-
-            if (!dbContext.IdentityProvisioningLst.Any())
-                dbContext.IdentityProvisioningLst.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.GetIdentityProvisiongLst(scimBaseUrl));
-
             if (!dbContext.RegistrationWorkflows.Any())
                 dbContext.RegistrationWorkflows.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.RegistrationWorkflows);
 
@@ -282,7 +227,6 @@ void SeedData(WebApplication application, string scimBaseUrl)
             {
                 dbContext.SerializedFileKeys.Add(KeyGenerator.GenerateRSASigningCredentials(SimpleIdServer.IdServer.Constants.StandardRealms.Master, "rsa-1"));
                 dbContext.SerializedFileKeys.Add(KeyGenerator.GenerateECDSASigningCredentials(SimpleIdServer.IdServer.Constants.StandardRealms.Master, "ecdsa-1"));
-                dbContext.SerializedFileKeys.Add(WsFederationKeyGenerator.GenerateWsFederationSigningCredentials(SimpleIdServer.IdServer.Constants.StandardRealms.Master));
             }
 
             if(!dbContext.CertificateAuthorities.Any())
@@ -330,37 +274,24 @@ void SeedData(WebApplication application, string scimBaseUrl)
                 });
             }
 
-            if (!dbContext.Networks.Any())
-                dbContext.Networks.Add(new SimpleIdServer.IdServer.Domains.NetworkConfiguration
-                {
-                    Name = "sepolia",
-                    RpcUrl = "https://rpc.sepolia.org",
-                    ContractAdr = SimpleIdServer.Did.Ethr.Constants.DefaultContractAdr,
-                    PrivateAccountKey = "0fda34d0029c91481b1f54b0b68efea94c4572c80b2902cb3a2ab722b41fc1e1",
-                    UpdateDateTime = DateTime.UtcNow,
-                    CreateDateTime = DateTime.UtcNow
-                });
-
             if(!dbContext.Definitions.Any())
             {
                 dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<FacebookOptionsLite>());
-                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<LDAPRepresentationsExtractionJobOptions>());
-                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<SCIMRepresentationsExtractionJobOptions>());
-                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<IdServerEmailOptions>());
-                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<IdServerSmsOptions>());
-                dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<FidoOptions>());
             }
 
-            var dbConnection = dbContext.Database.GetDbConnection() as SqlConnection;
-            if(dbConnection != null)
+            if(!isInMemory)
             {
-                if (dbConnection.State != System.Data.ConnectionState.Open) dbConnection.Open();
-                var cmd = dbConnection.CreateCommand();
-                cmd.CommandText = "ALTER DATABASE IdServer SET ALLOW_SNAPSHOT_ISOLATION ON";
-                cmd.ExecuteNonQuery();
-                cmd = dbConnection.CreateCommand();
-                cmd.CommandText = CreateTableFormat;
-                cmd.ExecuteNonQuery();
+                var dbConnection = dbContext.Database.GetDbConnection() as SqlConnection;
+                if (dbConnection != null)
+                {
+                    if (dbConnection.State != System.Data.ConnectionState.Open) dbConnection.Open();
+                    var cmd = dbConnection.CreateCommand();
+                    cmd.CommandText = "ALTER DATABASE IdServer SET ALLOW_SNAPSHOT_ISOLATION ON";
+                    cmd.ExecuteNonQuery();
+                    cmd = dbConnection.CreateCommand();
+                    cmd.CommandText = CreateTableFormat;
+                    cmd.ExecuteNonQuery();
+                }
             }
 
             dbContext.SaveChanges();

@@ -113,6 +113,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 {
                     if (cookie != null) cookie(opts);
                     opts.LoginPath = $"/{Constants.Areas.Password}/Authenticate";
+                    
                     opts.Events.OnSigningIn += (CookieSigningInContext ctx) =>
                     {
                         if (ctx.Principal != null && ctx.Principal.Identity != null && ctx.Principal.Identity.IsAuthenticated)

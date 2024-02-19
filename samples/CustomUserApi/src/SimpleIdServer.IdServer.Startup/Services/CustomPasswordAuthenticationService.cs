@@ -3,10 +3,10 @@
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Pwd.Services;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -18,13 +18,17 @@ namespace SimpleIdServer.IdServer.Startup.Services;
 
 public class CustomPasswordAuthenticationService : GenericAuthenticationService<AuthenticatePasswordViewModel>, IPasswordAuthenticationService
 {
-    private List<User> _users = new List<User>();
     private readonly UserApiOptions _options;
 
-    public CustomPasswordAuthenticationService(IAuthenticationHelper authenticationHelper, IUserRepository userRepository, IOptions<UserApiOptions> options) : base(authenticationHelper, userRepository)
+    public CustomPasswordAuthenticationService(
+        IAuthenticationHelper authenticationHelper, 
+        IUserRepository userRepository, 
+        IOptions<UserApiOptions> options) : base(authenticationHelper, userRepository)
     {
         _options = options.Value;
     }
+
+    public override string Amr => "pwd";
 
     protected override async Task<User> GetUser(string authenticatedUserId, AuthenticatePasswordViewModel viewModel, string realm, CancellationToken cancellationToken)
     {
@@ -72,7 +76,8 @@ public class CustomPasswordAuthenticationService : GenericAuthenticationService<
                 {
                     RealmsName = realm
                 });
-                await Provision(authenticatedUser, cancellationToken);
+                UserRepository.Add(authenticatedUser);
+                await UserRepository.SaveChanges(cancellationToken);
             }
         }
 
