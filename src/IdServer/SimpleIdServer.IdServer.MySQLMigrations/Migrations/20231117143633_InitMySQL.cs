@@ -644,7 +644,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 {
                     table.PrimaryKey("PK_AuthenticationSchemeProviders", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AuthenticationSchemeProviders_AuthenticationSchemeProviderDe~",
+                        name: "FK_AuthenticationSchemeProviders_AuthenticationSchemeProviderD~",
                         column: x => x.AuthSchemeProviderDefinitionName,
                         principalTable: "AuthenticationSchemeProviderDefinitions",
                         principalColumn: "Name",
@@ -792,7 +792,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 {
                     table.PrimaryKey("PK_ClientCertificate", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ClientCertificate_CertificateAuthorities_CertificateAuthorit~",
+                        name: "FK_ClientCertificate_CertificateAuthorities_CertificateAuthori~",
                         column: x => x.CertificateAuthorityId,
                         principalTable: "CertificateAuthorities",
                         principalColumn: "Id",
@@ -878,7 +878,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 {
                     table.PrimaryKey("PK_ConfigurationDefinitionRecord", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ConfigurationDefinitionRecord_Definitions_ConfigurationDefin~",
+                        name: "FK_ConfigurationDefinitionRecord_Definitions_ConfigurationDefi~",
                         column: x => x.ConfigurationDefinitionId,
                         principalTable: "Definitions",
                         principalColumn: "Id",
@@ -906,7 +906,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 {
                     table.PrimaryKey("PK_IdentityProvisioningLst", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_IdentityProvisioningLst_IdentityProvisioningDefinitions_Defi~",
+                        name: "FK_IdentityProvisioningLst_IdentityProvisioningDefinitions_Def~",
                         column: x => x.DefinitionName,
                         principalTable: "IdentityProvisioningDefinitions",
                         principalColumn: "Name",
@@ -935,7 +935,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 {
                     table.PrimaryKey("PK_IdentityProvisioningMappingRule", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_IdentityProvisioningMappingRule_IdentityProvisioningDefiniti~",
+                        name: "FK_IdentityProvisioningMappingRule_IdentityProvisioningDefinit~",
                         column: x => x.IdentityProvisioningDefinitionName,
                         principalTable: "IdentityProvisioningDefinitions",
                         principalColumn: "Name",
@@ -983,7 +983,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 {
                     table.PrimaryKey("PK_AuthenticationContextClassReferenceRealm", x => new { x.AuthenticationContextClassReferencesId, x.RealmsName });
                     table.ForeignKey(
-                        name: "FK_AuthenticationContextClassReferenceRealm_Acrs_Authentication~",
+                        name: "FK_AuthenticationContextClassReferenceRealm_Acrs_Authenticatio~",
                         column: x => x.AuthenticationContextClassReferencesId,
                         principalTable: "Acrs",
                         principalColumn: "Id",
@@ -1010,7 +1010,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 {
                     table.PrimaryKey("PK_CertificateAuthorityRealm", x => new { x.CertificateAuthoritiesId, x.RealmsName });
                     table.ForeignKey(
-                        name: "FK_CertificateAuthorityRealm_CertificateAuthorities_Certificate~",
+                        name: "FK_CertificateAuthorityRealm_CertificateAuthorities_Certificat~",
                         column: x => x.CertificateAuthoritiesId,
                         principalTable: "CertificateAuthorities",
                         principalColumn: "Id",
@@ -1321,7 +1321,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         principalColumn: "Name",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_RealmSerializedFileKey_SerializedFileKeys_SerializedFileKeys~",
+                        name: "FK_RealmSerializedFileKey_SerializedFileKeys_SerializedFileKey~",
                         column: x => x.SerializedFileKeysId,
                         principalTable: "SerializedFileKeys",
                         principalColumn: "Id",
@@ -1346,7 +1346,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 {
                     table.PrimaryKey("PK_UMAPermissionTicketRecord", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UMAPermissionTicketRecord_UMAPermissionTicket_UMAPermissionT~",
+                        name: "FK_UMAPermissionTicketRecord_UMAPermissionTicket_UMAPermission~",
                         column: x => x.UMAPermissionTicketId,
                         principalTable: "UMAPermissionTicket",
                         principalColumn: "Id",
@@ -1433,7 +1433,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 {
                     table.PrimaryKey("PK_AuthenticationSchemeProviderMapper", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AuthenticationSchemeProviderMapper_AuthenticationSchemeProvi~",
+                        name: "FK_AuthenticationSchemeProviderMapper_AuthenticationSchemeProv~",
                         column: x => x.IdProviderId,
                         principalTable: "AuthenticationSchemeProviders",
                         principalColumn: "Id",
@@ -1454,7 +1454,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 {
                     table.PrimaryKey("PK_AuthenticationSchemeProviderRealm", x => new { x.AuthenticationSchemeProvidersId, x.RealmsName });
                     table.ForeignKey(
-                        name: "FK_AuthenticationSchemeProviderRealm_AuthenticationSchemeProvid~",
+                        name: "FK_AuthenticationSchemeProviderRealm_AuthenticationSchemeProvi~",
                         column: x => x.AuthenticationSchemeProvidersId,
                         principalTable: "AuthenticationSchemeProviders",
                         principalColumn: "Id",
@@ -1506,13 +1506,13 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 {
                     table.PrimaryKey("PK_ConfigurationDefinitionRecordTranslation", x => new { x.ConfigurationDefinitionRecordId, x.TranslationsId });
                     table.ForeignKey(
-                        name: "FK_ConfigurationDefinitionRecordTranslation_ConfigurationDefini~",
+                        name: "FK_ConfigurationDefinitionRecordTranslation_ConfigurationDefin~",
                         column: x => x.ConfigurationDefinitionRecordId,
                         principalTable: "ConfigurationDefinitionRecord",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ConfigurationDefinitionRecordTranslation_Translations_Transl~",
+                        name: "FK_ConfigurationDefinitionRecordTranslation_Translations_Trans~",
                         column: x => x.TranslationsId,
                         principalTable: "Translations",
                         principalColumn: "Id",
@@ -1535,7 +1535,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 {
                     table.PrimaryKey("PK_ConfigurationDefinitionRecordValue", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ConfigurationDefinitionRecordValue_ConfigurationDefinitionRe~",
+                        name: "FK_ConfigurationDefinitionRecordValue_ConfigurationDefinitionR~",
                         column: x => x.ConfigurationDefinitionRecordId,
                         principalTable: "ConfigurationDefinitionRecord",
                         principalColumn: "Id");
@@ -1563,7 +1563,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 {
                     table.PrimaryKey("PK_IdentityProvisioningHistory", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_IdentityProvisioningHistory_IdentityProvisioningLst_Identity~",
+                        name: "FK_IdentityProvisioningHistory_IdentityProvisioningLst_Identit~",
                         column: x => x.IdentityProvisioningId,
                         principalTable: "IdentityProvisioningLst",
                         principalColumn: "Id",
@@ -1584,7 +1584,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 {
                     table.PrimaryKey("PK_IdentityProvisioningRealm", x => new { x.IdentityProvisioningLstId, x.RealmsName });
                     table.ForeignKey(
-                        name: "FK_IdentityProvisioningRealm_IdentityProvisioningLst_IdentityPr~",
+                        name: "FK_IdentityProvisioningRealm_IdentityProvisioningLst_IdentityP~",
                         column: x => x.IdentityProvisioningLstId,
                         principalTable: "IdentityProvisioningLst",
                         principalColumn: "Id",
@@ -1661,7 +1661,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 {
                     table.PrimaryKey("PK_UMAResourcePermissionClaim", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UMAResourcePermissionClaim_UMAResourcePermission_UMAResource~",
+                        name: "FK_UMAResourcePermissionClaim_UMAResourcePermission_UMAResourc~",
                         column: x => x.UMAResourcePermissionId,
                         principalTable: "UMAResourcePermission",
                         principalColumn: "Id",
@@ -1681,13 +1681,13 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 {
                     table.PrimaryKey("PK_ConfigurationDefinitionRecordValueTranslation", x => new { x.ConfigurationDefinitionRecordValueId, x.TranslationsId });
                     table.ForeignKey(
-                        name: "FK_ConfigurationDefinitionRecordValueTranslation_ConfigurationD~",
+                        name: "FK_ConfigurationDefinitionRecordValueTranslation_Configuration~",
                         column: x => x.ConfigurationDefinitionRecordValueId,
                         principalTable: "ConfigurationDefinitionRecordValue",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ConfigurationDefinitionRecordValueTranslation_Translations_T~",
+                        name: "FK_ConfigurationDefinitionRecordValueTranslation_Translations_~",
                         column: x => x.TranslationsId,
                         principalTable: "Translations",
                         principalColumn: "Id",
@@ -2087,7 +2087,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 column: "RealmsName");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AuthenticationSchemeProviders_AuthSchemeProviderDefinitionNa~",
+                name: "IX_AuthenticationSchemeProviders_AuthSchemeProviderDefinitionN~",
                 table: "AuthenticationSchemeProviders",
                 column: "AuthSchemeProviderDefinitionName");
 
@@ -2142,7 +2142,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 column: "TranslationsId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ConfigurationDefinitionRecordValue_ConfigurationDefinitionRe~",
+                name: "IX_ConfigurationDefinitionRecordValue_ConfigurationDefinitionR~",
                 table: "ConfigurationDefinitionRecordValue",
                 column: "ConfigurationDefinitionRecordId");
 
@@ -2232,7 +2232,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 column: "DefinitionName");
 
             migrationBuilder.CreateIndex(
-                name: "IX_IdentityProvisioningMappingRule_IdentityProvisioningDefiniti~",
+                name: "IX_IdentityProvisioningMappingRule_IdentityProvisioningDefinit~",
                 table: "IdentityProvisioningMappingRule",
                 column: "IdentityProvisioningDefinitionName");
 
