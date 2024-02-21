@@ -242,7 +242,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
         {
             if (string.IsNullOrWhiteSpace(action.ParentGroupId)) return state;
             var members = state.Members.ToList();
-            members.Add(new SelectableGroupMember(new Group { Id = action.Id, Name = action.Name, ParentGroupId = action.ParentGroupId, Description = action.Description, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow })
+            members.Add(new SelectableGroupMember(new Group { Id = action.Id, Name = action.Name, ParentGroupId = action.ParentGroupId, Description = action.Description, FullPath = action.FullPath, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow })
             {
                 IsNew = true
             });

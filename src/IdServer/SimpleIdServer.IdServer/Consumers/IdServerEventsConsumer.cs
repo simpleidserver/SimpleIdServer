@@ -22,7 +22,7 @@ namespace SimpleIdServer.IdServer.Consumers
         IConsumer<TokenIssuedFailureEvent>, IConsumer<TokenIssuedSuccessEvent>,
         IConsumer<TokenRevokedFailureEvent>, IConsumer<TokenRevokedSuccessEvent>,
         IConsumer<UserInfoFailureEvent>, IConsumer<UserInfoSuccessEvent>,
-        IConsumer<UserLoginSuccessEvent>, IConsumer<UserLogoutSuccessEvent>,
+        IConsumer<UserLoginSuccessEvent>, IConsumer<UserLoginFailureEvent>, IConsumer<UserLogoutSuccessEvent>,
         IConsumer<PushedAuthorizationRequestSuccessEvent>, IConsumer<PushedAuthorizationRequestFailureEvent>,
         IConsumer<ImportUsersSuccessEvent>, IConsumer<ExtractRepresentationsFailureEvent>,
         IConsumer<ExtractRepresentationsSuccessEvent>, IConsumer<AddUserSuccessEvent>, IConsumer<RemoveUserSuccessEvent>,
@@ -155,6 +155,26 @@ namespace SimpleIdServer.IdServer.Consumers
                     Description = "User Login Success",
                     CreateDateTime = DateTime.UtcNow,
                     UserName = context.Message.UserName,
+                    Realm = context.Message.Realm,
+                    IsError = false
+                };
+                auditEventRepository.Add(auditEvt);
+                await auditEventRepository.SaveChanges(CancellationToken.None);
+            }
+        }
+
+        public async Task Consume(ConsumeContext<UserLoginFailureEvent> context)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var auditEventRepository = scope.ServiceProvider.GetRequiredService<IAuditEventRepository>();
+                var auditEvt = new AuditEvent
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    EventName = context.Message.EventName,
+                    Description = "User Login Failed",
+                    CreateDateTime = DateTime.UtcNow,
+                    UserName = context.Message.Login,
                     Realm = context.Message.Realm,
                     IsError = false
                 };

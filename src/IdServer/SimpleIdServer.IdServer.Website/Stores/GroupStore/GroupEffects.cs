@@ -122,7 +122,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
                     Description = action.Description,
                     Id = newGroup.Id,
                     Name = action.Name,
-                    ParentGroupId = action.ParentId
+                    ParentGroupId = action.ParentId,
+                    FullPath = newGroup.FullPath
                 });
             }
             catch
@@ -250,6 +251,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
         public string Name { get; set; }
         public string Description { get; set; }
         public string ParentGroupId { get; set; }
+        public string FullPath { get; set; }
     }
 
     public class GetGroupAction

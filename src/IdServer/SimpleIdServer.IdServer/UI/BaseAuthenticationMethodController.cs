@@ -141,6 +141,12 @@ namespace SimpleIdServer.IdServer.UI
                 {
                     case ValidationStatus.UNKNOWN_USER:
                         ModelState.AddModelError("unknown_user", "unknown_user");
+                        await Bus.Publish(new UserLoginFailureEvent
+                        {
+                            Realm = prefix,
+                            Amr = Amr,
+                            Login = viewModel.Login
+                        });
                         return View(viewModel);
                     case ValidationStatus.NOCONTENT:
                         if(!string.IsNullOrWhiteSpace(authenticationResult.ErrorCode) && !string.IsNullOrWhiteSpace(authenticationResult.ErrorMessage)) ModelState.AddModelError(authenticationResult.ErrorCode, authenticationResult.ErrorMessage);

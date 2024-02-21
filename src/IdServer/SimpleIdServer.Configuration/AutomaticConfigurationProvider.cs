@@ -18,8 +18,7 @@ public class AutomaticConfigurationProvider : IConfigurationProvider, IDisposabl
     private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
     private readonly AutomaticConfigurationOptions _options;
     private readonly IKeyValueConnector _connector;
-    private readonly double _refreshIntervalInSeconds = 10;
-    private DateTime? _lastRefreshDateTime;
+    private readonly int _refreshIntervalInSeconds = 10;
     private Task? _pollTask;
     private ConfigurationReloadToken _reloadToken = new ConfigurationReloadToken();
 
@@ -59,7 +58,6 @@ public class AutomaticConfigurationProvider : IConfigurationProvider, IDisposabl
         if (_pollTask != null) return;
         var cancellationToken = _cancellationTokenSource.Token;
         LoadConfigurations(cancellationToken).Wait();
-        _lastRefreshDateTime = DateTime.UtcNow;
         _pollTask = Task.Run(async () =>
         {
             await PoolConfigurations(cancellationToken);
@@ -119,9 +117,8 @@ public class AutomaticConfigurationProvider : IConfigurationProvider, IDisposabl
     {
         while(!cancellationToken.IsCancellationRequested)
         {
-            if (_lastRefreshDateTime != null && _lastRefreshDateTime.Value.AddSeconds(_refreshIntervalInSeconds) > DateTime.UtcNow) continue;
             await LoadConfigurations(cancellationToken);
-            _lastRefreshDateTime = DateTime.UtcNow;
+            await Task.Delay(_refreshIntervalInSeconds * 1000);
         }
     }
 

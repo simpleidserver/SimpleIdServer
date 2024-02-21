@@ -100,7 +100,6 @@ Scenario: request parameter must not be expired (request)
 	And extract JSON from body
 
 	Then JSON 'error'='invalid_request'
-	And JSON 'error_description'='the request is expired'
 
 Scenario: lifetime of the request must not exceed 300 seconds (request)
 	Given authenticate a user
