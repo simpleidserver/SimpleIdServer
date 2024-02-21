@@ -82,6 +82,7 @@ public class CertificateAuthoritiesController : BaseController
     [HttpPost]
     public async Task<IActionResult> Generate([FromRoute] string prefix, [FromBody] GenerateCertificateAuthorityRequest request)
     {
+        prefix = prefix ?? Constants.DefaultRealm;
         try
         {
             await CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name);
@@ -114,6 +115,7 @@ public class CertificateAuthoritiesController : BaseController
     [HttpPost]
     public async Task<IActionResult> Import([FromRoute] string prefix, [FromBody] ImportCertificateAuthorityRequest request)
     {
+        prefix = prefix ?? Constants.DefaultRealm;
         try
         {
             await CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name);
@@ -255,6 +257,7 @@ public class CertificateAuthoritiesController : BaseController
     [HttpGet]
     public async Task<IActionResult> Get([FromRoute] string prefix, string id)
     {
+        prefix = prefix ?? Constants.DefaultRealm;
         try
         {
             await CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name);

@@ -93,6 +93,7 @@ namespace SimpleIdServer.IdServer.UI
         [HttpGet]
         public async Task<IActionResult> EndSession([FromRoute] string prefix, CancellationToken cancellationToken)
         {
+            prefix = prefix ?? Constants.DefaultRealm;
             var url = Constants.EndPoints.EndSessionCallback;
             var jObjBody = Request.Query.ToJObject();
             var idTokenHint = jObjBody.GetIdTokenHintFromRpInitiatedLogoutRequest();

@@ -477,7 +477,8 @@ void SeedData(WebApplication application, string scimBaseUrl)
             dbContext.Translations.AddRange(unknownTranslations);
             foreach(var existingTranslation in existingTranslations)
             {
-                var tr = language.Descriptions.Single(d => d.Key == existingTranslation.Key && d.Language == existingTranslation.Language);
+                var tr = language.Descriptions.SingleOrDefault(d => d.Key == existingTranslation.Key && d.Language == existingTranslation.Language);
+                if (tr == null) continue;
                 existingTranslation.Value = tr.Value;
             }
         }
