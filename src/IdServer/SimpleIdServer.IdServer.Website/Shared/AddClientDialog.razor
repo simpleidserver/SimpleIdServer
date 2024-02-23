@@ -284,7 +284,7 @@
                                     @((MarkupString)(@Global.SelectProofOfPossessionHelper))
                                 </p>
                             </div>
-                            @if (highlySecuredWebsiteApplication.ProofOfPossession == MTLs.Name)
+                            @if (highlySecuredWebsiteApplication.ProofOfPossession == MtlsName)
                             {
                                 <RadzenAlert AlertStyle="AlertStyle.Info" ShowIcon="false" Variant="Variant.Flat" AllowClose="false" Shade="Shade.Lighter">
                                     @((MarkupString)(@Global.SelectMtlsProofOfPossessionHelper))
@@ -297,7 +297,7 @@
                                     </p>
                                 </div>
                             }
-                            else if (highlySecuredWebsiteApplication.ProofOfPossession == DPoP.Name)
+                            else if (highlySecuredWebsiteApplication.ProofOfPossession == DpopName)
                             {
                                 <RadzenAlert AlertStyle="AlertStyle.Info" ShowIcon="false" Variant="Variant.Flat" AllowClose="false" Shade="Shade.Lighter">
                                     @((MarkupString)(@Global.SelectDpopProofOfPossessionHelper))
@@ -352,7 +352,7 @@
                                     @((MarkupString)(@Global.SelectProofOfPossessionHelper))
                                     </p>
                             </div>
-                            @if (highlySecuredWebApplicationWithGrantMgtSupport.ProofOfPossession == MTLs.Name)
+                            @if (highlySecuredWebApplicationWithGrantMgtSupport.ProofOfPossession == MtlsName)
                             {
                                 <RadzenAlert AlertStyle="AlertStyle.Info" ShowIcon="false" Variant="Variant.Flat" AllowClose="false" Shade="Shade.Lighter">
                                     @((MarkupString)(@Global.SelectMtlsProofOfPossessionHelper))
@@ -365,7 +365,7 @@
                                     </p>
                                 </div>
                             }
-                            else if (highlySecuredWebApplicationWithGrantMgtSupport.ProofOfPossession == DPoP.Name)
+                            else if (highlySecuredWebApplicationWithGrantMgtSupport.ProofOfPossession == DpopName)
                             {
                                 <RadzenAlert AlertStyle="AlertStyle.Info" ShowIcon="false" Variant="Variant.Flat" AllowClose="false" Shade="Shade.Lighter">
                                     @((MarkupString)(@Global.SelectDpopProofOfPossessionHelper))
@@ -441,8 +441,8 @@
 </RadzenSteps>
 
 @code {
-    static ProofOfPossession DPoP = new ProofOfPossession { Name = "DPoP", Description = "DPoP" };
-    static ProofOfPossession MTLs = new ProofOfPossession { Name = "MTLS", Description = Global.Mtls };
+    static string DpopName = "DPoP";
+    static string MtlsName = "MTLS";
 
     record ApplicationType
     {
@@ -476,7 +476,7 @@
         public string ClientSecret { get; set; } = null!;
         public string RedirectionUris { get; set; } = null!;
         public string SubjectName { get; set; } = null!;
-        public string ProofOfPossession { get; set; } = MTLs.Name;
+        public string ProofOfPossession { get; set; } = MtlsName;
     }
 
     record HighlySecuredWebApplicationWithGrantMgtSupport
@@ -486,7 +486,7 @@
         public string ClientSecret { get; set; } = null!;
         public string RedirectionUris { get; set; } = null!;
         public string SubjectName { get; set; } = null!;
-        public string ProofOfPossession { get; set; } = MTLs.Name;
+        public string ProofOfPossession { get; set; } = MtlsName;
         public string? AuthDataTypes { get; set; } = null;
     }
 
@@ -565,8 +565,8 @@
     CredentialIssuerApplication credentialIssuerApplication = new CredentialIssuerApplication();
     ICollection<ProofOfPossession> ProofOfPossessions { get; set; } = new List<ProofOfPossession>
     {
-        DPoP,
-        MTLs
+        new ProofOfPossession { Name = DpopName, Description = "DPoP" },
+        new ProofOfPossession { Name = MtlsName, Description = Global.Mtls }
     };
     enum ClientTemplateTypes
     {
@@ -657,12 +657,12 @@
 
     void AddHighlySecuredWebsiteApplication(HighlySecuredWebApplication websiteApplication)
     {
-        dispatcher.Dispatch(new AddHighlySecuredWebsiteApplicationAction { ClientId = websiteApplication.ClientIdentifier, ClientName = websiteApplication.ClientName, ClientSecret = websiteApplication.ClientSecret, IsDPoP = websiteApplication.ProofOfPossession == DPoP.Name, RedirectionUrls = websiteApplication.RedirectionUris.Split(';'), SubjectName = websiteApplication.SubjectName });
+        dispatcher.Dispatch(new AddHighlySecuredWebsiteApplicationAction { ClientId = websiteApplication.ClientIdentifier, ClientName = websiteApplication.ClientName, ClientSecret = websiteApplication.ClientSecret, IsDPoP = websiteApplication.ProofOfPossession == DpopName, RedirectionUrls = websiteApplication.RedirectionUris.Split(';'), SubjectName = websiteApplication.SubjectName });
     }
 
     void AddHighlySecuredWebsiteApplicationWithGrantMgtSupport(HighlySecuredWebApplicationWithGrantMgtSupport websiteApplication)
     {        
-        dispatcher.Dispatch(new AddHighlySecuredWebsiteApplicationWithGrantMgtSupportAction { ClientId = websiteApplication.ClientIdentifier, ClientName = websiteApplication.ClientName, ClientSecret = websiteApplication.ClientSecret, IsDPoP = websiteApplication.ProofOfPossession == DPoP.Name, RedirectionUrls = websiteApplication.RedirectionUris.Split(';'), SubjectName = websiteApplication.SubjectName, AuthDataTypes = websiteApplication.AuthDataTypes });
+        dispatcher.Dispatch(new AddHighlySecuredWebsiteApplicationWithGrantMgtSupportAction { ClientId = websiteApplication.ClientIdentifier, ClientName = websiteApplication.ClientName, ClientSecret = websiteApplication.ClientSecret, IsDPoP = websiteApplication.ProofOfPossession == DpopName, RedirectionUrls = websiteApplication.RedirectionUris.Split(';'), SubjectName = websiteApplication.SubjectName, AuthDataTypes = websiteApplication.AuthDataTypes });
     }
 
     void AddMobileApplication(MobileApplication mobileApplication)

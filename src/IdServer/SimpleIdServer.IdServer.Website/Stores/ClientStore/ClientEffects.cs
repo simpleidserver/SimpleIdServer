@@ -12,6 +12,7 @@ using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Saml.Idp.Extensions;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.WsFederation;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq.Dynamic.Core;
 using System.Text;
@@ -80,7 +81,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             var newClientBuilder = ClientBuilder.BuildUserAgentClient(action.ClientId, Guid.NewGuid().ToString(), null, action.RedirectionUrls.ToArray())
                                 .AddScope(new Domains.Scope { Name = Constants.StandardScopes.OpenIdScope.Name }, new Domains.Scope { Name = Constants.StandardScopes.Profile.Name });
             if (!string.IsNullOrWhiteSpace(action.ClientName))
-                newClientBuilder.SetClientName(action.ClientName);
+                newClientBuilder.SetClientName(action.ClientName, CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
             var newClient = newClientBuilder.Build();
             await CreateClient(newClient, dispatcher, ClientTypes.SPA);
         }
@@ -90,7 +91,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         {
             var newClientBuilder = ClientBuilder.BuildApiClient(action.ClientId, action.ClientSecret, null);
             if (!string.IsNullOrWhiteSpace(action.ClientName))
-                newClientBuilder.SetClientName(action.ClientName);
+                newClientBuilder.SetClientName(action.ClientName, CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
             var newClient = newClientBuilder.Build();
             await CreateClient(newClient, dispatcher, ClientTypes.MACHINE);
         }
@@ -101,7 +102,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             var newClientBuilder = ClientBuilder.BuildTraditionalWebsiteClient(action.ClientId, action.ClientSecret, null, action.RedirectionUrls.ToArray())
                     .AddScope(new Domains.Scope { Name = Constants.StandardScopes.OpenIdScope.Name }, new Domains.Scope { Name = Constants.StandardScopes.Profile.Name });
             if (!string.IsNullOrWhiteSpace(action.ClientName))
-                newClientBuilder.SetClientName(action.ClientName);
+                newClientBuilder.SetClientName(action.ClientName, CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
             var newClient = newClientBuilder.Build();
             await CreateClient(newClient, dispatcher, ClientTypes.WEBSITE);
         }
@@ -112,7 +113,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             var newClientBuilder = ClientBuilder.BuildTraditionalWebsiteClient(action.ClientId, action.ClientSecret, null, action.RedirectionUrls.ToArray())
                     .AddScope(new Domains.Scope { Name = Constants.StandardScopes.OpenIdScope.Name }, new Domains.Scope { Name = Constants.StandardScopes.Profile.Name });
             if (!string.IsNullOrWhiteSpace(action.ClientName))
-                newClientBuilder.SetClientName(action.ClientName);
+                newClientBuilder.SetClientName(action.ClientName, CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
 
             // FAPI2.0
             newClientBuilder.SetSigAuthorizationResponse(SecurityAlgorithms.EcdsaSha256);
@@ -141,7 +142,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             var newClientBuilder = ClientBuilder.BuildTraditionalWebsiteClient(action.ClientId, action.ClientSecret, null, action.RedirectionUrls.ToArray())
                     .AddScope(new Domains.Scope { Name = Constants.StandardScopes.OpenIdScope.Name }, new Domains.Scope { Name = Constants.StandardScopes.Profile.Name });
             if (!string.IsNullOrWhiteSpace(action.ClientName))
-                newClientBuilder.SetClientName(action.ClientName);
+                newClientBuilder.SetClientName(action.ClientName, CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
 
             // FAPI2.0
             newClientBuilder.SetSigAuthorizationResponse(SecurityAlgorithms.EcdsaSha256);
@@ -176,7 +177,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             var newClientBuilder = ClientBuilder.BuildMobileApplication(action.ClientId, Guid.NewGuid().ToString(), null, action.RedirectionUrls.ToArray())
                     .AddScope(new Domains.Scope { Name = Constants.StandardScopes.OpenIdScope.Name }, new Domains.Scope { Name = Constants.StandardScopes.Profile.Name });
             if (!string.IsNullOrWhiteSpace(action.ClientName))
-                newClientBuilder.SetClientName(action.ClientName);
+                newClientBuilder.SetClientName(action.ClientName, CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
             var newClient = newClientBuilder.Build();
             await CreateClient(newClient, dispatcher, ClientTypes.MOBILE);
         }
@@ -187,7 +188,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             var newClientBuilder = ClientBuilder.BuildExternalAuthDeviceClient(action.ClientId, action.SubjectName, null)
                     .AddScope(new Domains.Scope { Name = Constants.StandardScopes.OpenIdScope.Name }, new Domains.Scope { Name = Constants.StandardScopes.Profile.Name });
             if (!string.IsNullOrWhiteSpace(action.ClientName))
-                newClientBuilder.SetClientName(action.ClientName);
+                newClientBuilder.SetClientName(action.ClientName, CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
             var newClient = newClientBuilder.Build();
             await CreateClient(newClient, dispatcher, ClientTypes.EXTERNAL);
         }
@@ -198,7 +199,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             var newClientBuilder = ClientBuilder.BuildDeviceClient(action.ClientId, action.ClientSecret, null)
                     .AddScope(new Domains.Scope { Name = Constants.StandardScopes.OpenIdScope.Name }, new Domains.Scope { Name = Constants.StandardScopes.Profile.Name });
             if (!string.IsNullOrWhiteSpace(action.ClientName))
-                newClientBuilder.SetClientName(action.ClientName);
+                newClientBuilder.SetClientName(action.ClientName, CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
             var newClient = newClientBuilder.Build();
             await CreateClient(newClient, dispatcher, ClientTypes.DEVICE);
         }
@@ -209,7 +210,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             var newClientBuilder = ClientBuilder.BuildCredentialIssuer(action.ClientId, action.ClientSecret, null, action.RedirectionUrls.ToArray())
                     .AddScope(new Domains.Scope { Name = Constants.StandardScopes.OpenIdScope.Name }, new Domains.Scope { Name = Constants.StandardScopes.Profile.Name });
             if (!string.IsNullOrWhiteSpace(action.ClientName))
-                newClientBuilder.SetClientName(action.ClientName);
+                newClientBuilder.SetClientName(action.ClientName, CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
             var newClient = newClientBuilder.Build();
             await CreateClient(newClient, dispatcher, ClientTypes.CREDENTIAL_ISSUER);
         }
@@ -219,7 +220,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         {
             var newClientBuilder = WsClientBuilder.BuildWsFederationClient(action.ClientId, null);
             if (!string.IsNullOrWhiteSpace(action.ClientName))
-                newClientBuilder.SetClientName(action.ClientName);
+                newClientBuilder.SetClientName(action.ClientName, CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
             var newClient = newClientBuilder.Build();
             await CreateClient(newClient, dispatcher, WsFederationConstants.CLIENT_TYPE);
         }
@@ -231,7 +232,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             var securityKey = new X509SecurityKey(certificate, Guid.NewGuid().ToString());
             var newClientBuilder = SamlSpClientBuilder.BuildSamlSpClient(action.ClientIdentifier, action.MetadataUrl, certificate, null);
             if (!string.IsNullOrWhiteSpace(action.ClientName))
-                newClientBuilder.SetClientName(action.ClientName);
+                newClientBuilder.SetClientName(action.ClientName, CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
             newClientBuilder.SetUseAcsArtifact(action.UseAcs);
             var newClient = newClientBuilder.Build();
             var pemResult = PemConverter.ConvertFromSecurityKey(securityKey);
