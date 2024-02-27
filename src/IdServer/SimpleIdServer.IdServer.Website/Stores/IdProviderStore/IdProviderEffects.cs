@@ -45,7 +45,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<DTOs.SearchResult<AuthenticationSchemeProviderResult>>(json);
+            var result = SidJsonSerializer.Deserialize<DTOs.SearchResult<AuthenticationSchemeProviderResult>>(json);
             dispatcher.Dispatch(new SearchIdProvidersSuccessAction { IdProviders = result.Content, Count = result.Count });
 
             string SanitizeExpression(string expression) => expression?.Replace("Value.", "");
@@ -81,7 +81,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<AuthenticationSchemeProviderResult>(json);
+            var result = SidJsonSerializer.Deserialize<AuthenticationSchemeProviderResult>(json);
             dispatcher.Dispatch(new GetIdProviderSuccessAction { IdProvider = result });
         }
 
@@ -179,7 +179,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var newMapper = JsonSerializer.Deserialize<AuthenticationSchemeProviderMapperResult>(json);
+            var newMapper = SidJsonSerializer.Deserialize<AuthenticationSchemeProviderMapperResult>(json);
             dispatcher.Dispatch(new AddAuthenticationSchemeProviderMapperSuccessAction
             {
                 Id = newMapper.Id,
@@ -256,7 +256,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var idProviderDefs = JsonSerializer.Deserialize<IEnumerable<AuthenticationSchemeProviderDefinition>>(json);
+            var idProviderDefs = SidJsonSerializer.Deserialize<IEnumerable<AuthenticationSchemeProviderDefinition>>(json);
             dispatcher.Dispatch(new GetIdProviderDefsSuccessAction { AuthProviderDefinitions = idProviderDefs });
         }
 

@@ -46,7 +46,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<DTOs.SearchResult<IdentityProvisioningResult>>(json);
+            var result = SidJsonSerializer.Deserialize<DTOs.SearchResult<IdentityProvisioningResult>>(json);
             dispatcher.Dispatch(new SearchIdentityProvisioningSuccessAction { IdentityProvisioningLst = result.Content, Count = result.Count });
 
             string SanitizeExpression(string expression) => expression?.Replace("Value.", "");
@@ -64,7 +64,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<IdentityProvisioningResult>(json);
+            var result = SidJsonSerializer.Deserialize<IdentityProvisioningResult>(json);
             dispatcher.Dispatch(new GetIdentityProvisioningSuccessAction { IdentityProvisioning = result });
         }
 
@@ -82,7 +82,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             try
             {
                 httpResult.EnsureSuccessStatusCode();
-                var launchedProcess = JsonSerializer.Deserialize<IdentityProvisioningLaunchedResult>(json);
+                var launchedProcess = SidJsonSerializer.Deserialize<IdentityProvisioningLaunchedResult>(json);
                 dispatcher.Dispatch(new LaunchIdentityProvisioningSuccessAction { Id = action.Id, Name = action.Name, ProcessId = launchedProcess.Id });
             }
             catch
@@ -174,7 +174,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             try
             {
                 httpResult.EnsureSuccessStatusCode();
-                var newMapper = JsonSerializer.Deserialize<IdentityProvisioningMappingRuleResult>(json);
+                var newMapper = SidJsonSerializer.Deserialize<IdentityProvisioningMappingRuleResult>(json);
                 dispatcher.Dispatch(new AddIdentityProvisioningMappingRuleSuccessAction { Usage = action.Usage, NewId = newMapper.Id, Id = action.Id, MappingRule = action.MappingRule, From = action.From, TargetUserAttribute = action.TargetUserAttribute, TargetUserProperty = action.TargetUserProperty });
             }
             catch
@@ -200,7 +200,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             try
             {
                 httpResult.EnsureSuccessStatusCode();
-                var mappingRule = JsonSerializer.Deserialize<IdentityProvisioningMappingRuleResult>(json);
+                var mappingRule = SidJsonSerializer.Deserialize<IdentityProvisioningMappingRuleResult>(json);
                 dispatcher.Dispatch(new GetIdentityPriovisioningMappingRuleSuccessAction { MappingRule = mappingRule });
             }
             catch
@@ -257,7 +257,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             try
             {
                 httpResult.EnsureSuccessStatusCode();
-                var extractionResult = JsonSerializer.Deserialize<TestConnectionResult>(json);
+                var extractionResult = SidJsonSerializer.Deserialize<TestConnectionResult>(json);
                 dispatcher.Dispatch(new TestIdentityProvisioningSuccessAction { ConnectionResult = extractionResult });
             }
             catch

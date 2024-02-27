@@ -47,7 +47,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
         {
             if (!string.IsNullOrWhiteSpace(act.ParentGroupId)) return state;
             var groups = state.Groups.ToList();
-            groups.Add(new SelectableGroup(new Group { CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow, Id = act.Id, Name = act.Name, Description = act.Description })
+            groups.Add(new SelectableGroup(new Group { CreateDateTime = DateTime.Now, UpdateDateTime = DateTime.Now, Id = act.Id, Name = act.Name, Description = act.Description })
             {
                 IsNew = true
             });
@@ -242,7 +242,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
         {
             if (string.IsNullOrWhiteSpace(action.ParentGroupId)) return state;
             var members = state.Members.ToList();
-            members.Add(new SelectableGroupMember(new Group { Id = action.Id, Name = action.Name, ParentGroupId = action.ParentGroupId, Description = action.Description, FullPath = action.FullPath, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow })
+            members.Add(new SelectableGroupMember(new Group { Id = action.Id, Name = action.Name, ParentGroupId = action.ParentGroupId, Description = action.Description, FullPath = action.FullPath, CreateDateTime = DateTime.Now, UpdateDateTime = DateTime.Now })
             {
                 IsNew = true
             });

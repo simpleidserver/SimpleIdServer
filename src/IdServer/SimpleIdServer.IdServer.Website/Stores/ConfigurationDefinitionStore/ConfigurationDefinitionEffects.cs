@@ -32,7 +32,7 @@ public class ConfigurationDefinitionEffects
         };
         var httpResult = await httpClient.SendAsync(requestMessage);
         var json = await httpResult.Content.ReadAsStringAsync();
-        var content = JsonSerializer.Deserialize<IEnumerable<ConfigurationDefResult>>(json);
+        var content = SidJsonSerializer.Deserialize<IEnumerable<ConfigurationDefResult>>(json);
         dispatcher.Dispatch(new GetAllConfigurationDefinitionsSuccessAction { Content = content });
     }
 

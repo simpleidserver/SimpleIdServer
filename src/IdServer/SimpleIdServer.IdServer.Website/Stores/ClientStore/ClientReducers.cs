@@ -34,7 +34,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         {
             var clients = state.Clients?.ToList();
             if (clients == null) return state;
-            var newClient = new Domains.Client { ClientId = act.ClientId, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow, ClientType = act.ClientType };
+            var newClient = new Domains.Client { ClientId = act.ClientId, CreateDateTime = DateTime.Now, UpdateDateTime = DateTime.Now, ClientType = act.ClientType };
             if(!string.IsNullOrWhiteSpace(act.ClientName))
                 newClient.Translations.Add(new Translation
                 {
@@ -279,7 +279,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 client.TlsClientAuthSanIP = act.TlsClientAuthSanIP;
             }
 
-            client.UpdateDateTime = DateTime.UtcNow;
+            client.UpdateDateTime = DateTime.Now;
             return state with
             {
                 Client = client

@@ -8,7 +8,6 @@ using SimpleIdServer.IdServer.Api.Clients;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Saml.Idp.Extensions;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.WsFederation;
@@ -52,10 +51,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 }), Encoding.UTF8, "application/json")
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
-            var json = await httpResult.Content.ReadAsStringAsync();
-            var searchResult = JsonSerializer.Deserialize<SearchResult<Domains.Client>>(json);
+            var json = await httpResult.Content.ReadAsStringAsync(); 
+            var searchResult = SidJsonSerializer.DeserializeSearchClients(json);
             dispatcher.Dispatch(new SearchClientsSuccessAction { Clients = searchResult.Content, Count = searchResult.Count });
-
             string SanitizeExpression(string expression) => expression.Replace("Value.", "");
         }
 
@@ -71,7 +69,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var clients = JsonSerializer.Deserialize<IEnumerable<Domains.Client>>(json);
+            var clients = SidJsonSerializer.DeserializeClients(json);
             dispatcher.Dispatch(new SearchClientsSuccessAction { Clients = clients, Count = clients.Count() });
         }
 

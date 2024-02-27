@@ -43,7 +43,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.Auditing
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var searchResult = JsonSerializer.Deserialize<SearchResult<AuditEvent>>(json);
+            var searchResult = SidJsonSerializer.Deserialize<SearchResult<AuditEvent>>(json);
             dispatcher.Dispatch(new SearchAuditingRecordsSuccessAction { AuditEvents = searchResult.Content, Count = searchResult.Count });
 
             string SanitizeExpression(string expression) => expression.Replace("Value.", "");

@@ -35,7 +35,7 @@ public class AuthMethodEffects
         };
         var httpResult = await httpClient.SendAsync(requestMessage);
         var json = await httpResult.Content.ReadAsStringAsync();
-        var result = JsonSerializer.Deserialize<IEnumerable<AuthenticationMethodResult>>(json);
+        var result = SidJsonSerializer.Deserialize<IEnumerable<AuthenticationMethodResult>>(json);
         dispatcher.Dispatch(new GetAllAuthMethodSuccessAction { AuthMethods = result });
     }
 
@@ -54,7 +54,7 @@ public class AuthMethodEffects
         try
         {
             httpResult.EnsureSuccessStatusCode();
-            var result = JsonSerializer.Deserialize<AuthenticationMethodResult>(json);
+            var result = SidJsonSerializer.Deserialize<AuthenticationMethodResult>(json);
             dispatcher.Dispatch(new GetAuthMethodSuccessAction { AuthMethod = result });
         }
         catch

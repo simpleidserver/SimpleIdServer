@@ -33,7 +33,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.StatisticStore
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var statisticResult = JsonSerializer.Deserialize<StatisticResult>(json);
+            var statisticResult = SidJsonSerializer.Deserialize<StatisticResult>(json);
             dispatcher.Dispatch(new GetStatisticsSuccessAction { NbClients = statisticResult.NbClients, NbUsers = statisticResult.NbUsers, NbInvalidAuthentications = statisticResult.InvalidAuthentications, NbValidAuthentications = statisticResult.ValidAuthentications });
         }
 

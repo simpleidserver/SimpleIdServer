@@ -33,7 +33,7 @@ public class LanguageEffects
         };
         var httpResult = await httpClient.SendAsync(requestMessage);
         var json = await httpResult.Content.ReadAsStringAsync();
-        var languages = JsonSerializer.Deserialize<List<Language>>(json);
+        var languages = SidJsonSerializer.Deserialize<List<Language>>(json);
         dispatcher.Dispatch(new GetLanguagesSuccessAction { Languages = languages });
     }
 

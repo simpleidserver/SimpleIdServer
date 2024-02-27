@@ -54,8 +54,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.RealmStore
             {
                 Name= act.Name,
                 Description = act.Description,
-                CreateDateTime = DateTime.UtcNow,
-                UpdateDateTime = DateTime.UtcNow
+                CreateDateTime = DateTime.Now,
+                UpdateDateTime = DateTime.Now
             });
             return state with
             {

@@ -39,7 +39,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.RealmStore
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var realms = JsonSerializer.Deserialize<IEnumerable<Realm>>(json);
+            var realms = SidJsonSerializer.Deserialize<IEnumerable<Realm>>(json);
             dispatcher.Dispatch(new GetAllRealmSuccessAction { Realms = realms });
         }
 

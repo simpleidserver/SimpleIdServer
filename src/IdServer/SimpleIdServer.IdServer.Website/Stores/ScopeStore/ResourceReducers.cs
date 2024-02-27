@@ -84,8 +84,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
                 Protocol = act.Protocol,
                 Type = act.Type,
                 IsExposedInConfigurationEdp = act.IsExposedInConfigurationEdp,
-                CreateDateTime = DateTime.UtcNow,
-                UpdateDateTime = DateTime.UtcNow
+                CreateDateTime = DateTime.Now,
+                UpdateDateTime = DateTime.Now
             })
             {
                 IsNew = true
@@ -146,7 +146,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
         public static ScopeState ReduceUpdateScopeSuccessAction(ScopeState state, UpdateScopeSuccessAction act)
         {
             var resource = state.Scope;
-            resource.UpdateDateTime = DateTime.UtcNow;
+            resource.UpdateDateTime = DateTime.Now;
             resource.Description = act.Description;
             resource.IsExposedInConfigurationEdp = act.IsExposedInConfigurationEdp;
             return state with

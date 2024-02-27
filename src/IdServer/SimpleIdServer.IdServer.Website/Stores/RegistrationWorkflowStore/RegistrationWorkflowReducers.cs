@@ -107,7 +107,7 @@ public class RegistrationWorkflowReducers
     public static RegistrationWorkflowsState ReduceAddRegistrationWorkflowSuccessAction(RegistrationWorkflowsState state, AddRegistrationWorkflowSuccessAction action)
     {
         var registrationWorkflows = state.RegistrationWorkflows.ToList();
-        registrationWorkflows.Add(new SelectableRegistrationWorkflow(new RegistrationWorkflowResult { CreateDateTime = DateTime.UtcNow, Id = action.Id, IsDefault = action.IsDefault, Name = action.Name, Steps = action.Steps, UpdateDateTime = DateTime.UtcNow }, false)
+        registrationWorkflows.Add(new SelectableRegistrationWorkflow(new RegistrationWorkflowResult { CreateDateTime = DateTime.Now, Id = action.Id, IsDefault = action.IsDefault, Name = action.Name, Steps = action.Steps, UpdateDateTime = DateTime.Now }, false)
         {
             IsNew = true
         });
@@ -151,7 +151,7 @@ public class RegistrationWorkflowReducers
     public static RegistrationWorkflowState ReduceUpdateRegistrationWorkflowSuccessAction(RegistrationWorkflowState state, UpdateRegistrationWorkflowSuccessAction act)
     {
         var registrationWorkflow = state.Value;
-        registrationWorkflow.UpdateDateTime = DateTime.UtcNow;
+        registrationWorkflow.UpdateDateTime = DateTime.Now;
         registrationWorkflow.IsDefault = act.IsDefault;
         registrationWorkflow.Steps = act.Steps;
         return state with

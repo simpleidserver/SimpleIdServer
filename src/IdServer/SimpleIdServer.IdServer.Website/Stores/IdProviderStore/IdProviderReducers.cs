@@ -58,7 +58,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         public static SearchIdProvidersState ReduceAddIdProviderSuccessAction(SearchIdProvidersState state, AddIdProviderSuccessAction act)
         {
             var idProviders = state.IdProviders.ToList();
-            idProviders.Add(new SelectableIdProvider(new AuthenticationSchemeProviderResult { CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow, Description = act.Description, DisplayName = act.DisplayName, Name = act.Name })
+            idProviders.Add(new SelectableIdProvider(new AuthenticationSchemeProviderResult { CreateDateTime = DateTime.Now, UpdateDateTime = DateTime.Now, Description = act.Description, DisplayName = act.DisplayName, Name = act.Name })
             {
                 IsNew = true
             });
@@ -75,7 +75,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
             var idProvider = idProviders.First(i => i.Value.Name == act.Name);
             idProvider.Value.Description = act.Description;
             idProvider.Value.DisplayName = act.DisplayName;
-            idProvider.Value.UpdateDateTime = DateTime.UtcNow;
+            idProvider.Value.UpdateDateTime = DateTime.Now;
             return state with
             {
                 IdProviders = idProviders
@@ -101,7 +101,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
             var provider = state.Provider;
             provider.DisplayName = act.DisplayName;
             provider.Description = act.Description;
-            provider.UpdateDateTime = DateTime.UtcNow;
+            provider.UpdateDateTime = DateTime.Now;
             return state with
             {
                 Provider = provider
@@ -112,7 +112,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         public static IdProviderState ReduceUpdateAuthenticationSchemeProviderPropertiesAction(IdProviderState state, UpdateAuthenticationSchemeProviderPropertiesAction act)
         {
             var provider = state.Provider;
-            provider.UpdateDateTime = DateTime.UtcNow;
+            provider.UpdateDateTime = DateTime.Now;
             return state with
             {
                 Provider = provider

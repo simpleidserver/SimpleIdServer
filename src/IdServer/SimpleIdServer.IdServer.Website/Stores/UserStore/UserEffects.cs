@@ -48,7 +48,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var searchResult = JsonSerializer.Deserialize<SearchResult<Domains.User>>(json);
+            var searchResult = SidJsonSerializer.Deserialize<SearchResult<Domains.User>>(json);
             dispatcher.Dispatch(new SearchUsersSuccessAction { Users = searchResult.Content, Count = searchResult.Count });
 
             string SanitizeExpression(string expression) => expression.Replace("Value.", "");
@@ -73,7 +73,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var searchResult = JsonSerializer.Deserialize<SearchResult<Domains.UserSession>>(json);
+            var searchResult = SidJsonSerializer.Deserialize<SearchResult<Domains.UserSession>>(json);
             dispatcher.Dispatch(new SearchUserSessionsSuccessAction { UserSessions = searchResult.Content, Count = searchResult.Count });
 
             string SanitizeExpression(string expression) => expression.Replace("Value.", "");
@@ -91,7 +91,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var user = JsonSerializer.Deserialize<Domains.User>(json);
+            var user = SidJsonSerializer.Deserialize<Domains.User>(json);
             dispatcher.Dispatch(new GetUserSuccessAction { User = user });
         }
 
@@ -217,7 +217,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var newCredential = JsonSerializer.Deserialize<UserCredential>(json);
+            var newCredential = SidJsonSerializer.Deserialize<UserCredential>(json);
             dispatcher.Dispatch(new AddUserCredentialSuccessAction { Credential = newCredential, IsDefault = action.IsDefault });
         }
 
@@ -239,7 +239,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var newCredential = JsonSerializer.Deserialize<UserCredential>(json);
+            var newCredential = SidJsonSerializer.Deserialize<UserCredential>(json);
             dispatcher.Dispatch(new UpdateUserCredentialSuccessAction { Credential = action.Credential });
         }
 
@@ -304,7 +304,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
                 };
                 var httpResult = await httpClient.SendAsync(requestMessage);
                 var json = await httpResult.Content.ReadAsStringAsync();
-                groups.Add(JsonSerializer.Deserialize<Domains.Group>(json));
+                groups.Add(SidJsonSerializer.Deserialize<Domains.Group>(json));
             }
 
             dispatcher.Dispatch(new AssignUserGroupsSuccessAction { Groups = groups, UserId = action.UserId });
@@ -323,7 +323,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var roles = JsonSerializer.Deserialize<IEnumerable<string>>(json);
+            var roles = SidJsonSerializer.Deserialize<IEnumerable<string>>(json);
             dispatcher.Dispatch(new ResolveUserRolesSuccessAction { Roles = roles, UserId = action.UserId });
         }
 
@@ -369,7 +369,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             try
             {
                 httpResult.EnsureSuccessStatusCode();
-                var newUser = JsonSerializer.Deserialize<Domains.User>(json);
+                var newUser = SidJsonSerializer.Deserialize<Domains.User>(json);
                 dispatcher.Dispatch(new AddUserSuccessAction()
                 {
                     Id = newUser.Id,

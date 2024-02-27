@@ -47,7 +47,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var searchResult = JsonSerializer.Deserialize<SearchResult<ApiResource>>(json);
+            var searchResult = SidJsonSerializer.Deserialize<SearchResult<ApiResource>>(json);
             var selectedResources = new List<string>();
             if(!string.IsNullOrWhiteSpace(action.ScopeName))
                 selectedResources = searchResult.Content.Where(c => c.Scopes.Any(s => s.Name == action.ScopeName)).Select(r => r.Name).ToList();
@@ -79,7 +79,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
             try
             {
                 httpResult.EnsureSuccessStatusCode();
-                var newApiResource = JsonSerializer.Deserialize<Domains.ApiResource>(json);
+                var newApiResource = SidJsonSerializer.Deserialize<Domains.ApiResource>(json);
                 dispatcher.Dispatch(new AddApiResourceSuccessAction { Id = newApiResource.Id, Name = action.Name, Description = action.Description, Audience = action.Audience });
             }
             catch

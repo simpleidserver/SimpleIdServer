@@ -47,7 +47,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             if(idProvisioning != null)
             {
                 idProvisioning.Value.Description = act.Description;
-                idProvisioning.Value.UpdateDateTime = DateTime.UtcNow;
+                idProvisioning.Value.UpdateDateTime = DateTime.Now;
             }
 
             return state with
@@ -107,7 +107,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             identityProvisioning.Processes.Add(new IdentityProvisioningProcessResult
             {
                 Id = act.ProcessId,
-                CreateDateTime = DateTime.UtcNow
+                CreateDateTime = DateTime.Now
             });
             return state with
             {
@@ -130,7 +130,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         {
             var identityProvisioning = state.IdentityProvisioning;
             var process = identityProvisioning.Processes.Single(p => p.Id == act.ProcessId);
-            process.StartImportDateTime = DateTime.UtcNow;
+            process.StartImportDateTime = DateTime.Now;
             return state with
             {
                 IdentityProvisioning = identityProvisioning,
@@ -170,7 +170,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         {
             var idProvisioning = state.IdentityProvisioning;
             idProvisioning.Description = act.Description;
-            idProvisioning.UpdateDateTime = DateTime.UtcNow;
+            idProvisioning.UpdateDateTime = DateTime.Now;
             return state with
             {
                 IsLoading = false,

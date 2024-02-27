@@ -46,7 +46,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var searchResult = JsonSerializer.Deserialize<SearchResult<CertificateAuthority>>(json);
+            var searchResult = SidJsonSerializer.Deserialize<SearchResult<CertificateAuthority>>(json);
             dispatcher.Dispatch(new SearchCertificateAuthoritiesSuccessAction { CertificateAuthorities = searchResult.Content, Count = searchResult.Count });
 
             string SanitizeExpression(string expression) => expression.Replace("Value.", "");
@@ -72,7 +72,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
             try
             {
                 httpResult.EnsureSuccessStatusCode();
-                var certificateAuthority = JsonSerializer.Deserialize<CertificateAuthority>(json);
+                var certificateAuthority = SidJsonSerializer.Deserialize<CertificateAuthority>(json);
                 dispatcher.Dispatch(new GenerateCertificateAuthoritySuccessAction { CertificateAuthority = certificateAuthority });
             }
             catch
@@ -104,7 +104,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
             try
             {
                 httpResult.EnsureSuccessStatusCode();
-                var certificateAuthority = JsonSerializer.Deserialize<CertificateAuthority>(json);
+                var certificateAuthority = SidJsonSerializer.Deserialize<CertificateAuthority>(json);
                 dispatcher.Dispatch(new GenerateCertificateAuthoritySuccessAction { CertificateAuthority = certificateAuthority });
             }
             catch
@@ -130,7 +130,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
             try
             {
                 httpResult.EnsureSuccessStatusCode();
-                var certificateAuthority = JsonSerializer.Deserialize<CertificateAuthority>(json);
+                var certificateAuthority = SidJsonSerializer.Deserialize<CertificateAuthority>(json);
                 dispatcher.Dispatch(new SaveCertificateAuthoritySuccessAction { CertificateAuthority = certificateAuthority });
             }
             catch
@@ -170,7 +170,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var certificateAuthority = JsonSerializer.Deserialize<CertificateAuthority>(json);
+            var certificateAuthority = SidJsonSerializer.Deserialize<CertificateAuthority>(json);
             var store = new IdServer.Stores.CertificateAuthorityStore(null);
             var certificate = store.Get(certificateAuthority);
             dispatcher.Dispatch(new GetCertificateAuthoritySuccessAction { CertificateAuthority = certificateAuthority, Certificate = certificate });
@@ -214,7 +214,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
             try
             {
                 httpResult.EnsureSuccessStatusCode();
-                var clientCertificate = JsonSerializer.Deserialize<ClientCertificate>(json);
+                var clientCertificate = SidJsonSerializer.Deserialize<ClientCertificate>(json);
                 dispatcher.Dispatch(new AddClientCertificateSuccessAction { CertificateAuthorityId = action.CertificateAuthorityId, ClientCertificate = clientCertificate });
             }
             catch

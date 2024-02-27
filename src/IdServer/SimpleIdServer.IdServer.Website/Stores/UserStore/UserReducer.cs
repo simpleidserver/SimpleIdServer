@@ -69,7 +69,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
                 Firstname = act.Firstname,
                 Lastname = act.Lastname,
                 Email = act.Email,
-                UpdateDateTime = DateTime.UtcNow
+                UpdateDateTime = DateTime.Now
             };
             users.Add(new SelectableUser(newUser) { IsNew = true });
             return state with
@@ -115,7 +115,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             selectedUser.Value.UpdateLastname(act.Lastname);
             selectedUser.Value.UpdateEmail(act.Email);
             selectedUser.Value.NotificationMode = act.NotificationMode;
-            selectedUser.Value.UpdateDateTime = DateTime.UtcNow;
+            selectedUser.Value.UpdateDateTime = DateTime.Now;
             return state with
             {
                 Users = users
@@ -193,7 +193,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             state.User.UpdateName(act.Firstname);
             state.User.UpdateLastname(act.Lastname);
             state.User.NotificationMode = act.NotificationMode;
-            state.User.UpdateDateTime = DateTime.UtcNow;
+            state.User.UpdateDateTime = DateTime.Now;
             return state;
         }
 

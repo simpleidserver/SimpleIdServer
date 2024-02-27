@@ -57,7 +57,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var searchResult = JsonSerializer.Deserialize<SearchResult<Domains.Scope>>(json);
+            var searchResult = SidJsonSerializer.Deserialize<SearchResult<Domains.Scope>>(json);
             dispatcher.Dispatch(new SearchScopesSuccessAction { Scopes = searchResult.Content, Count = searchResult.Count});
 
             string SanitizeExpression(string expression) => expression.Replace("Value.", "");
@@ -107,7 +107,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
             try
             {
                 httpResult.EnsureSuccessStatusCode();
-                var newScope = JsonSerializer.Deserialize<Domains.Scope>(json);
+                var newScope = SidJsonSerializer.Deserialize<Domains.Scope>(json);
                 dispatcher.Dispatch(new AddScopeSuccessAction { Id = newScope.Id, Name = action.Name, Description = action.Description, IsExposedInConfigurationEdp = action.IsExposedInConfigurationEdp, Protocol = action.Protocol, Type = ScopeTypes.IDENTITY });
             }
             catch
@@ -143,7 +143,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
             try
             {
                 httpResult.EnsureSuccessStatusCode();
-                var newScope = JsonSerializer.Deserialize<Domains.Scope>(json);
+                var newScope = SidJsonSerializer.Deserialize<Domains.Scope>(json);
                 dispatcher.Dispatch(new AddScopeSuccessAction { Id = newScope.Id, Name = action.Name, Description = action.Description, IsExposedInConfigurationEdp = action.IsExposedInConfigurationEdp, Protocol = ScopeProtocols.OAUTH, Type = ScopeTypes.APIRESOURCE });
             }
             catch
@@ -168,7 +168,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
             try
             {
                 httpResult.EnsureSuccessStatusCode();
-                var result = JsonSerializer.Deserialize<Domains.Scope>(json);
+                var result = SidJsonSerializer.Deserialize<Domains.Scope>(json);
                 dispatcher.Dispatch(new GetScopeSuccessAction { Scope = result });
             }
             catch
@@ -232,7 +232,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
             try
             {
                 httpResult.EnsureSuccessStatusCode();
-                var newScopeClaimMapper = JsonSerializer.Deserialize<Domains.ScopeClaimMapper>(json);
+                var newScopeClaimMapper = SidJsonSerializer.Deserialize<Domains.ScopeClaimMapper>(json);
                 dispatcher.Dispatch(new AddScopeClaimMapperSuccessAction { ClaimMapper = newScopeClaimMapper, ScopeId = action.ScopeId });
             }
             catch

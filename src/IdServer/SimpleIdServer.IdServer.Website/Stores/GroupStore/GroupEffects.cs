@@ -43,7 +43,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var getResult = JsonSerializer.Deserialize<GetGroupResult>(json);
+            var getResult = SidJsonSerializer.Deserialize<GetGroupResult>(json);
             return getResult;
         }
 
@@ -67,7 +67,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var searchResult = JsonSerializer.Deserialize<SearchResult<Domains.Group>>(json);
+            var searchResult = SidJsonSerializer.Deserialize<SearchResult<Domains.Group>>(json);
             dispatcher.Dispatch(new SearchGroupsSuccessAction { Groups = searchResult.Content, Count = searchResult.Count });
 
             string SanitizeExpression(string expression) => expression.Replace("Group.", "").Replace("Value", "");
@@ -159,7 +159,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
                 };
                 var httpResult = await httpClient.SendAsync(requestMessage);
                 var json = await httpResult.Content.ReadAsStringAsync();
-                roles.Add(JsonSerializer.Deserialize<Domains.Scope>(json));
+                roles.Add(SidJsonSerializer.Deserialize<Domains.Scope>(json));
             }
 
             dispatcher.Dispatch(new AddGroupRolesSuccessAction { Roles = roles });

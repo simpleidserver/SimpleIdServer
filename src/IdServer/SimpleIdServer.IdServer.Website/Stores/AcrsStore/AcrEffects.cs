@@ -17,7 +17,10 @@ namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
         private readonly IdServerWebsiteOptions _options;
         private readonly ProtectedSessionStorage _sessionStorage;
 
-        public AcrEffects(IWebsiteHttpClientFactory websiteHttpClientFactory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
+        public AcrEffects(
+            IWebsiteHttpClientFactory websiteHttpClientFactory, 
+            IOptions<IdServerWebsiteOptions> options, 
+            ProtectedSessionStorage sessionStorage)
         {
             _websiteHttpClientFactory = websiteHttpClientFactory;
             _options = options.Value;
@@ -36,7 +39,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var acrs = JsonSerializer.Deserialize<IEnumerable<AuthenticationContextClassReference>>(json);
+            var acrs = SidJsonSerializer.Deserialize<IEnumerable<AuthenticationContextClassReference>>(json);
             dispatcher.Dispatch(new GetAllAcrsSuccessAction { Acrs = acrs });
         }
 
@@ -64,7 +67,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
             try
             {
                 httpResult.EnsureSuccessStatusCode();
-                var newAcr = JsonSerializer.Deserialize<AuthenticationContextClassReference>(json);
+                var newAcr = SidJsonSerializer.Deserialize<AuthenticationContextClassReference>(json);
                 dispatcher.Dispatch(new AddAcrSuccessAction { Acr = newAcr });
             }
             catch

@@ -36,7 +36,7 @@ public class RegistrationWorkflowEffects
         };
         var httpResult = await httpClient.SendAsync(requestMessage);
         var json = await httpResult.Content.ReadAsStringAsync();
-        var result = JsonSerializer.Deserialize<List<RegistrationWorkflowResult>>(json);
+        var result = SidJsonSerializer.Deserialize<List<RegistrationWorkflowResult>>(json);
         dispatcher.Dispatch(new GetAllRegistrationWorkflowsSuccessAction { RegistrationWorkflows = result });
     }
 
@@ -55,7 +55,7 @@ public class RegistrationWorkflowEffects
         try
         {
             httpResult.EnsureSuccessStatusCode();
-            var result = JsonSerializer.Deserialize<RegistrationWorkflowResult>(json);
+            var result = SidJsonSerializer.Deserialize<RegistrationWorkflowResult>(json);
             dispatcher.Dispatch(new GetRegistrationWorkflowSuccessAction { RegistrationWorkflow = result });
         }
         catch
@@ -136,7 +136,7 @@ public class RegistrationWorkflowEffects
         try
         {
             httpResult.EnsureSuccessStatusCode();
-            var result = JsonSerializer.Deserialize<RegistrationWorkflowResult>(json);
+            var result = SidJsonSerializer.Deserialize<RegistrationWorkflowResult>(json);
             dispatcher.Dispatch(new AddRegistrationWorkflowSuccessAction { Id = result.Id, IsDefault = action.IsDefault, Name = action.Name, Steps = action.Steps });
         }
         catch
