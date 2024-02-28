@@ -83,6 +83,9 @@ namespace SimpleIdServer.Scim.Helpers
 
                         hierarchicalNewAttributes = lst;
                     }
+
+                    foreach (var h in hierarchicalNewAttributes)
+                        h.ComputeValueIndex();
                 }
 
                 if (patch.Operation == SCIMPatchOperations.ADD && !(scimFilter is SCIMComplexAttributeExpression) && attrSelectors.Contains(fullPath))

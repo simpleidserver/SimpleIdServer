@@ -203,6 +203,8 @@ namespace SimpleIdServer.Scim.Persistence.EF
         public Task BulkInsert(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes, string currentRepresentationId, bool isReference = false)
         {
             scimRepresentationAttributes = scimRepresentationAttributes.Where(r => !string.IsNullOrWhiteSpace(r.RepresentationId));
+            foreach (var attr in scimRepresentationAttributes)
+                attr.SchemaAttributeId = attr.SchemaAttribute?.Id;
             var bulkConfig = GetBulkConfig(BulkOperations.INSERT);
             return _scimDbContext.BulkInsertAsync(scimRepresentationAttributes.ToList(), bulkConfig);
         }
@@ -217,6 +219,8 @@ namespace SimpleIdServer.Scim.Persistence.EF
         public async Task BulkUpdate(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes, bool isReference = false)
         {
             scimRepresentationAttributes = scimRepresentationAttributes.Where(r => !string.IsNullOrWhiteSpace(r.RepresentationId));
+            foreach (var attr in scimRepresentationAttributes)
+                attr.SchemaAttributeId = attr.SchemaAttribute?.Id;
             var bulkConfig = new BulkConfig
             {
                 PropertiesToInclude = new List<string> { nameof(SCIMRepresentationAttribute.ValueString), nameof(SCIMRepresentationAttribute.ComputedValueIndex) }
