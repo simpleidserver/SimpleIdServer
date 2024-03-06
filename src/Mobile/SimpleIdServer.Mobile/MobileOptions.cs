@@ -2,8 +2,9 @@
 {
     public class MobileOptions
     {
-        public string PushType { get; set; } = "firebase";
-        public bool IsDev { get; set; } = true;
         public bool IgnoreHttps { get; set; } = true;
+        public string IdServerUrl { get; set; } = "https://192.168.50.250:5001/master";
+        public string WsServer { get; set; }
+        public bool IsDev { get; set; } = false;
     }
 }

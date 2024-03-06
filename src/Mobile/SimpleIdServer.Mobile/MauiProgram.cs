@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
+using Microsoft.Maui.LifecycleEvents;
 using SimpleIdServer.Mobile.Services;
 using SimpleIdServer.Mobile.Stores;
 using SimpleIdServer.Mobile.ViewModels;
@@ -14,6 +15,18 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
 		builder
 			.UseMauiApp<App>()
+			.ConfigureLifecycleEvents(e =>
+			{
+#if ANDROID
+				e.AddAndroid(ad =>
+				{
+					ad.OnStop(a =>
+					{
+
+					});
+				});
+#endif
+			})
             .UseBarcodeReader()
             .UseMauiCommunityToolkit()
 			.RegisterFirebaseServices()
@@ -26,6 +39,7 @@ public static class MauiProgram
         builder.Services.AddTransient<IOTPService, OTPService>();
 		builder.Services.AddTransient<INavigationService, NavigationService>();
 		builder.Services.AddTransient<IUrlService, UrlService>();
+		builder.Services.AddTransient<Factories.IHttpClientFactory, Factories.HttpClientFactory>();
 		builder.Services.AddSingleton(new OtpListState());
 		builder.Services.AddSingleton(new CredentialListState());
         builder.Services.AddTransient<EnrollPage>();
@@ -40,10 +54,9 @@ public static class MauiProgram
 		builder.Services.AddTransient<ViewOtpListViewModel>();
 		builder.Services.AddTransient<ViewCredentialListViewModel>();
 		builder.Services.AddTransient<NotificationViewModel>();
-        builder.Services.Configure<MobileOptions>(o =>
+		builder.Services.Configure<MobileOptions>(o =>
 		{
-			o.PushType = "firebase";
-			o.IsDev = true;
+			o.WsServer = "wss://gotify.simpleidserver.com";
         });
 #if DEBUG
         builder.Logging.AddDebug();

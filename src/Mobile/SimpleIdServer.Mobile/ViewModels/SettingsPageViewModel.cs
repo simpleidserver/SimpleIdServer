@@ -7,7 +7,6 @@ namespace SimpleIdServer.Mobile.ViewModels;
 
 public class SettingsPageViewModel : INotifyPropertyChanged
 {
-    private bool _isDeveloperModeEnabled = false;
     private bool _isLoading = false;
     private MobileSettings _mobileSettings;
 
@@ -17,38 +16,41 @@ public class SettingsPageViewModel : INotifyPropertyChanged
         {
             _mobileSettings = await App.Database.GetMobileSettings();
         }).Wait();
-        IsDeveloperModeEnabled = _mobileSettings.IsDeveloperModeEnabled;
-        ToggleDeveloperModeComand = new Command<ToggledEventArgs>(async (c) =>
+        var notificationMode = _mobileSettings.NotificationMode ?? "firebase";
+        SelectedNotificationMode = NotificationModes.Single(m => m.Name == notificationMode);
+        SelectNotificationModeCommand = new Command<EventArgs>(async (c) =>
         {
-            await ToggleDeveloperMode(c);
+            await UpdateNotification(c);
         });
     }
 
+    public List<NotificationMode> NotificationModes { get; set; } = new List<NotificationMode>
+    {
+        new NotificationMode { DisplayName = "Gotify", Name = "gotify" },
+        new NotificationMode { DisplayName = "Firebase", Name = "firebase" }
+    };
+
+    public NotificationMode SelectedNotificationMode { get; set; }
+
     public event PropertyChangedEventHandler PropertyChanged;
 
-    public bool IsDeveloperModeEnabled
-    {
-        get => _isDeveloperModeEnabled;
-        set
-        {
-            if(_isDeveloperModeEnabled != value)
-            {
-                _isDeveloperModeEnabled = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    public ICommand ToggleDeveloperModeComand { get; private set; }
+    public ICommand SelectNotificationModeCommand { get; private set; }
 
     public void OnPropertyChanged([CallerMemberName] string name = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
-    private async Task ToggleDeveloperMode(ToggledEventArgs args)
+    private async Task UpdateNotification(EventArgs args)
     {
-        if (_isLoading || args.Value == _mobileSettings.IsDeveloperModeEnabled) return;
+        if (_isLoading) return;
         _isLoading = true;
-        _mobileSettings.IsDeveloperModeEnabled = args.Value;
+        _mobileSettings.NotificationMode = SelectedNotificationMode.Name;
         await App.Database.UpdateMobileSettings(_mobileSettings);
         _isLoading = false;
     }
+}
+
+
+public class NotificationMode
+{
+    public string Name { get; set; }
+    public string DisplayName { get; set; }
 }

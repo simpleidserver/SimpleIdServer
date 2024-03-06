@@ -6,5 +6,6 @@ public class MobileSettings
 {
     [PrimaryKey]
     public string Id { get; set; }
-    public bool IsDeveloperModeEnabled { get; set; }
+    public string NotificationMode { get; set; }
+    public string GotifyPushToken { get; set; }
 }

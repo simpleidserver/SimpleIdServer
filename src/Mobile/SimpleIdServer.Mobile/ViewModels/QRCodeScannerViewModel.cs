@@ -26,16 +26,26 @@ public class QRCodeScannerViewModel
     private readonly IOTPService _otpService;
     private readonly INavigationService _navigationService;
     private readonly IUrlService _urlService;
+    private readonly Factories.IHttpClientFactory _httpClientFactory;
     private readonly OtpListState _otpListState;
     private readonly CredentialListState _credentialListState;
     private readonly MobileOptions _options;
     private SemaphoreSlim _lck = new SemaphoreSlim(1, 1);
 
-    public QRCodeScannerViewModel(IPromptService promptService, IOTPService otpService, INavigationService navigationService, IUrlService urlService, OtpListState otpListState, CredentialListState credentialListState, IOptions<MobileOptions> options)
+    public QRCodeScannerViewModel(
+        IPromptService promptService, 
+        IOTPService otpService, 
+        INavigationService navigationService, 
+        IUrlService urlService,
+        Factories.IHttpClientFactory httpClientFactory,
+        OtpListState otpListState, 
+        CredentialListState credentialListState, 
+        IOptions<MobileOptions> options)
     {
         _promptService = promptService;
         _otpService = otpService;
         _urlService = urlService;
+        _httpClientFactory = httpClientFactory;
         _options = options.Value;
         _otpListState = otpListState;
         _credentialListState = credentialListState;
@@ -79,10 +89,11 @@ public class QRCodeScannerViewModel
         try
         {
             if (string.IsNullOrWhiteSpace(qrCodeValue)) return;
+            var mobileSettings = await App.Database.GetMobileSettings();
             if (!await RegisterOTPCode())
             {
                 var qrCodeResult = JsonSerializer.Deserialize<QRCodeResult>(qrCodeValue);
-                if (qrCodeResult.Action == "register") await Register(qrCodeResult);
+                if (qrCodeResult.Action == "register") await Register(qrCodeResult, mobileSettings);
                 else await Authenticate(qrCodeResult);
             }
         }
@@ -99,7 +110,7 @@ public class QRCodeScannerViewModel
 
         #region Register
 
-        async Task Register(QRCodeResult qrCodeResult)
+        async Task Register(QRCodeResult qrCodeResult, MobileSettings mobileSettings)
         {
             var beginResult = await ReadRegisterQRCode(qrCodeResult);
             var attestationBuilder = new FIDOU2FAttestationBuilder();
@@ -117,11 +128,15 @@ public class QRCodeScannerViewModel
                 Rp = rp,
                 Origin = qrCodeResult.GetOrigin()
             });
+
 #if IOS && HOTRESTART == true
-            await _promptService.ShowAlert("Error", "Host restart cannot be enabled");
-            return;
+            if(mobileSettings.NotificationMode == "firebase")
+            {
+                await _promptService.ShowAlert("Error", "Host restart cannot be enabled");
+                return;
+            }
 #endif
-            var endRegisterResult = await EndRegister(beginResult, enrollResponse);
+            var endRegisterResult = await EndRegister(beginResult, enrollResponse, mobileSettings);
 
             var credentialRecord = new CredentialRecord(enrollResponse.CredentialId, enrollResponse.AttestationCertificate.AttestationCertificate, enrollResponse.AttestationCertificate.PrivateKey, endRegisterResult.SignCount, rp, beginResult.Login);
             await _credentialListState.AddCredentialRecord(credentialRecord);
@@ -131,12 +146,7 @@ public class QRCodeScannerViewModel
 
         async Task<BeginU2FRegisterResult> ReadRegisterQRCode(QRCodeResult qrCodeResult)
         {
-            var handler = new HttpClientHandler();
-            if (_options.IgnoreHttps) handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) =>
-            {
-                return true;
-            };
-            using (var httpClient = new HttpClient(handler))
+            using (var httpClient = _httpClientFactory.Build())
             {
                 var requestMessage = new HttpRequestMessage
                 {
@@ -159,15 +169,15 @@ public class QRCodeScannerViewModel
             }
         }
 
-        async Task<EndU2FRegisterResult> EndRegister(BeginU2FRegisterResult beginResult, EnrollResult enrollResponse)
+        async Task<EndU2FRegisterResult> EndRegister(BeginU2FRegisterResult beginResult, EnrollResult enrollResponse, MobileSettings mobileSettings)
         {
-            var fcmToken = await CrossFirebaseCloudMessaging.Current.GetTokenAsync();
-            var handler = new HttpClientHandler();
-            if (_options.IgnoreHttps) handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) =>
+            var pushToken = mobileSettings.GotifyPushToken;
+            if (mobileSettings.NotificationMode == "firebase")
             {
-                return true;
-            };
-            using (var httpClient = new HttpClient(handler))
+                pushToken = await CrossFirebaseCloudMessaging.Current.GetTokenAsync();
+            }
+
+            using (var httpClient = _httpClientFactory.Build())
             {
                 var deviceInfo = DeviceInfo.Current;
                 var deviceData = new Dictionary<string, string>
@@ -177,8 +187,8 @@ public class QRCodeScannerViewModel
                     { "manufacturer", deviceInfo.Manufacturer },
                     { "name", deviceInfo.Name },
                     { "version", deviceInfo.VersionString },
-                    { "push_token", fcmToken },
-                    { "push_type", _options.PushType }
+                    { "push_token", pushToken },
+                    { "push_type", mobileSettings.NotificationMode }
                 };
                 var dic = new Dictionary<string, object>
                 {
@@ -235,12 +245,7 @@ public class QRCodeScannerViewModel
 
         async Task<BeginU2FAuthenticateResult> ReadAuthenticateQRCode(QRCodeResult qrCodeResult)
         {
-            var handler = new HttpClientHandler();
-            if (_options.IgnoreHttps) handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) =>
-            {
-                return true;
-            };
-            using (var httpClient = new HttpClient(handler))
+            using (var httpClient = _httpClientFactory.Build())
             {
                 var requestMessage = new HttpRequestMessage
                 {
@@ -265,12 +270,7 @@ public class QRCodeScannerViewModel
 
         async Task EndAuthenticate(BeginU2FAuthenticateResult beginAuthenticate, AuthenticatorAssertionRawResponse assertion)
         {
-            var handler = new HttpClientHandler();
-            if (_options.IgnoreHttps) handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) =>
-            {
-                return true;
-            };
-            using (var httpClient = new HttpClient(handler))
+            using (var httpClient = _httpClientFactory.Build())
             {
                 var deviceInfo = DeviceInfo.Current;
                 var endLoginRequest = new JsonObject

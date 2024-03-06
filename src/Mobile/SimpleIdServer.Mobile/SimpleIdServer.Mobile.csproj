@@ -11,11 +11,12 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<!-- Display name -->
 		<ApplicationTitle>SimpleIdServer.Mobile</ApplicationTitle>
+		<UseNativeHttpHandler>false</UseNativeHttpHandler>
 
 		<!-- App Identifier -->
 		<ApplicationId>com.simpleidserver.mobile</ApplicationId>
 		<ApplicationIdGuid>0836bc02-cb16-4a23-9911-8d74c04e41e9</ApplicationIdGuid>
-
+		
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">11.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">13.1</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>

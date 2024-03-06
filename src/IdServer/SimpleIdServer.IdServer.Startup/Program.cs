@@ -20,6 +20,7 @@ using SimpleIdServer.IdServer.Console;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Email;
 using SimpleIdServer.IdServer.Fido;
+using SimpleIdServer.IdServer.Notification.Gotify;
 using SimpleIdServer.IdServer.Provisioning.LDAP;
 using SimpleIdServer.IdServer.Provisioning.SCIM;
 using SimpleIdServer.IdServer.Pwd;
@@ -115,6 +116,7 @@ app
     .UseWsFederation()
     .UseFIDO()
     .UseSamlIdp()
+    .UseGotifyNotification()
     .UseAutomaticConfiguration();
 
 app.Run();
@@ -145,6 +147,7 @@ void ConfigureIdServer(IServiceCollection services)
         .AddOtpAuthentication()
         .AddSmsAuthentication()
         .AddFcmNotification()
+        .AddGotifyNotification()
         .AddSamlIdp()
         .AddFidoAuthentication(f =>
         {
@@ -185,6 +188,7 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
         o.Add<IdServerPasswordOptions>();
         o.Add<FidoOptions>();
         o.Add<IdServerConsoleOptions>();
+        o.Add<GotifyOptions>();
         o.Add<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>();
         if (conf.Type == DistributedCacheTypes.REDIS)
         {
@@ -423,6 +427,7 @@ void SeedData(WebApplication application, string scimBaseUrl)
             AddMissingConfigurationDefinition<IdServerPasswordOptions>(dbContext);
             AddMissingConfigurationDefinition<FidoOptions>(dbContext);
             AddMissingConfigurationDefinition<IdServerConsoleOptions>(dbContext);
+            AddMissingConfigurationDefinition<GotifyOptions>(dbContext);
             AddMissingConfigurationDefinition<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>(dbContext);
             AddMissingConfigurationDefinition<GoogleOptionsLite>(dbContext);
             AddMissingConfigurationDefinition<NegotiateOptionsLite>(dbContext);

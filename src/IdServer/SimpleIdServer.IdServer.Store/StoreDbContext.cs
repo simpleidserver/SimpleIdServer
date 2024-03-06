@@ -46,6 +46,7 @@ namespace SimpleIdServer.IdServer.Store
         public DbSet<Language> Languages { get; set; }
         public DbSet<GroupRealm> GroupRealm { get; set; }
         public DbSet<GroupUser> GroupUser { get; set; }
+        public DbSet<GotifySession> GotifySessions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -101,6 +102,7 @@ namespace SimpleIdServer.IdServer.Store
             builder.ApplyConfiguration(new ExtractedRepresentationStagingConfiguration());
             builder.ApplyConfiguration(new GroupRealmConfiguration());
             builder.ApplyConfiguration(new GroupUserConfiguration());
+            builder.ApplyConfiguration(new GotifySessionConfiguration());
         }
     }
 }
