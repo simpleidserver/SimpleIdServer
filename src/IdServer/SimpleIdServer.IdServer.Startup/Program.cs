@@ -341,6 +341,9 @@ void SeedData(WebApplication application, string scimBaseUrl)
             if (!dbContext.UmaResources.Any())
                 dbContext.UmaResources.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Resources);
 
+            if (!dbContext.GotifySessions.Any())
+                dbContext.GotifySessions.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Sessions);
+
             foreach (var language in SimpleIdServer.IdServer.Startup.IdServerConfiguration.Languages)
                 AddMissingLanguage(dbContext, language);
 

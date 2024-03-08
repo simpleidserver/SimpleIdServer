@@ -17,7 +17,7 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.15")
+                .HasAnnotation("ProductVersion", "7.0.16")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -1313,6 +1313,20 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ExtractedRepresentationsStaging");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.GotifySession", b =>
+                {
+                    b.Property<string>("ApplicationToken")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ClientToken")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("ApplicationToken");
+
+                    b.ToTable("GotifySessions");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Group", b =>

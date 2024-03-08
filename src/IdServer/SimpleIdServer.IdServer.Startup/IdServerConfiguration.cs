@@ -235,5 +235,11 @@ namespace SimpleIdServer.IdServer.Startup
             IdentityProvisioningBuilder.Create(Scim, "SCIM", "SCIM").Build(),
             IdentityProvisioningBuilder.Create(Ldap, "LDAP", "LDAP", "LDAP").Build()
         };
+
+        public static List<GotifySession> Sessions = new List<GotifySession>
+        {
+            new GotifySession { ApplicationToken = "AvSdAw5ILVOdc7g", ClientToken = "CY2St_LANPO5L7P" },
+            new GotifySession { ApplicationToken = "ADIeCkMigAnGLmq", ClientToken = "C9M4RGtX.OlYD1q" }
+        };
     }
 }

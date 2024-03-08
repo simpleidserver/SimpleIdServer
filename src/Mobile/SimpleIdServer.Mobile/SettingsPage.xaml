@@ -14,16 +14,31 @@
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="3*" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
+        <!-- Choose notification mode -->
         <Label Text="Choose notification mode" VerticalOptions="Center" Grid.Column="0"></Label>
         <Picker Grid.Column="1" ItemsSource="{Binding Path=NotificationModes}" ItemDisplayBinding="{Binding Path=DisplayName}" SelectedItem="{Binding Path=SelectedNotificationMode}">
             <Picker.Behaviors>
                 <toolkit:EventToCommandBehavior EventName="SelectedIndexChanged" Command="{Binding SelectNotificationModeCommand}" />
             </Picker.Behaviors>
         </Picker>
+        <!-- Is gotify server available -->
+        <Label Grid.Row="2" Grid.ColumnSpan="2">
+            <Label.Triggers>
+                <DataTrigger TargetType="Label" Binding="{Binding IsGotifyServerRunning}" Value="true">
+                    <Setter Property="Text">Gotify server is up and running</Setter>
+                    <Setter Property="TextColor">Green</Setter>
+                </DataTrigger>
+                <DataTrigger TargetType="Label" Binding="{Binding IsGotifyServerRunning}" Value="false">
+                    <Setter Property="Text">Gotify server is not running</Setter>
+                    <Setter Property="TextColor">Red</Setter>
+                </DataTrigger>
+            </Label.Triggers>
+        </Label>
     </Grid>
 </ContentPage>

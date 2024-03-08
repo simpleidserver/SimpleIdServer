@@ -15,7 +15,7 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "7.0.15");
+            modelBuilder.HasAnnotation("ProductVersion", "7.0.16");
 
             modelBuilder.Entity("ApiResourceRealm", b =>
                 {
@@ -1298,6 +1298,20 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ExtractedRepresentationsStaging");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.GotifySession", b =>
+                {
+                    b.Property<string>("ApplicationToken")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ClientToken")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ApplicationToken");
+
+                    b.ToTable("GotifySessions");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Group", b =>

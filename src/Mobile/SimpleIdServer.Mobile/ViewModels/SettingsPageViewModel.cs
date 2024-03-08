@@ -1,4 +1,5 @@
 ﻿using SimpleIdServer.Mobile.Models;
+using SimpleIdServer.Mobile.Services;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
@@ -8,7 +9,10 @@ namespace SimpleIdServer.Mobile.ViewModels;
 public class SettingsPageViewModel : INotifyPropertyChanged
 {
     private bool _isLoading = false;
+    private bool _isGotifyServerRunning;
     private MobileSettings _mobileSettings;
+    private CancellationTokenSource _cancellationTokenSource;
+    private int _refreshIntervalMs = 2000;
 
     public SettingsPageViewModel()
     {
@@ -22,6 +26,17 @@ public class SettingsPageViewModel : INotifyPropertyChanged
         {
             await UpdateNotification(c);
         });
+        _cancellationTokenSource = new CancellationTokenSource();
+        var listener = GotifyNotificationListener.New();
+        Task.Run(async () =>
+        {
+            while(true)
+            {
+                if (_cancellationTokenSource.IsCancellationRequested) break;
+                IsGotifyServerRunning = listener.IsStarted;
+                await Task.Delay(_refreshIntervalMs);
+            }
+        });
     }
 
     public List<NotificationMode> NotificationModes { get; set; } = new List<NotificationMode>
@@ -32,11 +47,32 @@ public class SettingsPageViewModel : INotifyPropertyChanged
 
     public NotificationMode SelectedNotificationMode { get; set; }
 
+    public bool IsGotifyServerRunning
+    {
+        get
+        {
+            return _isGotifyServerRunning;
+        }
+        set
+        {
+            if(_isGotifyServerRunning != value)
+            {
+                _isGotifyServerRunning = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public event PropertyChangedEventHandler PropertyChanged;
 
     public ICommand SelectNotificationModeCommand { get; private set; }
 
     public void OnPropertyChanged([CallerMemberName] string name = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+    public void Stop()
+    {
+        _cancellationTokenSource.Cancel();
+    }
 
     private async Task UpdateNotification(EventArgs args)
     {
@@ -47,7 +83,6 @@ public class SettingsPageViewModel : INotifyPropertyChanged
         _isLoading = false;
     }
 }
-
 
 public class NotificationMode
 {

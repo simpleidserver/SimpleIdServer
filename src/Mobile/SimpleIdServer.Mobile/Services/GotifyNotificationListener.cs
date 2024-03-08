@@ -24,6 +24,14 @@ namespace SimpleIdServer.Mobile.Services
 
         public event EventHandler<NotificationEventArgs> NotificationReceived;
 
+        public bool IsStarted
+        {
+            get
+            {
+                return _isStarted;
+            }
+        }
+
         public async Task Start(string wsServer, string token, CancellationToken cancellationToken)
         {
             if (_isStarted) return;
