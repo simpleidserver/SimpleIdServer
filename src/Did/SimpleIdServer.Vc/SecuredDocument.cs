@@ -22,14 +22,14 @@ using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.Vc;
 
-public class SecuredVerifiableCredential
+public class SecuredDocument
 {
     private readonly IEnumerable<ISignatureProof> _proofs;
     private readonly IEnumerable<ICanonize> _canonizeMethods;
     private readonly IEnumerable<IHashing> _hashingMethods;
     private readonly IVerificationMethodEncoding _verificationMethodEncoding;
 
-    private SecuredVerifiableCredential(
+    private SecuredDocument(
         IEnumerable<ISignatureProof> proofs,
         IEnumerable<ICanonize> canonizeMethods,
         IEnumerable<IHashing> hashingMethods,
@@ -41,9 +41,9 @@ public class SecuredVerifiableCredential
         _verificationMethodEncoding = verificationMethodEncoding;
     }
 
-    public static SecuredVerifiableCredential New()
+    public static SecuredDocument New()
     {
-        return new SecuredVerifiableCredential(new ISignatureProof[]
+        return new SecuredDocument(new ISignatureProof[]
         {
             new Ed25519Signature2020Proof(),
             new JsonWebSignature2020Proof()
@@ -56,18 +56,16 @@ public class SecuredVerifiableCredential
         }, new VerificationMethodEncoding(VerificationMethodStandardFactory.GetAll(), MulticodecSerializerFactory.Build(), MulticodecSerializerFactory.AllVerificationMethods));
     }
 
-    public string Secure(
-        string json, 
+    public void Secure<T>(
+        T document, 
         DidDocument didDocument, 
         string verificationMethodId, 
         ProofPurposeTypes purpose = ProofPurposeTypes.assertionMethod, 
         IAsymmetricKey asymKey = null,
-        DateTime? creationDateTime = null)
+        DateTime? creationDateTime = null) where T : BaseVerifiableDocument
     {
-        if (string.IsNullOrWhiteSpace(json)) throw new ArgumentNullException(nameof(json));
+        if (document == null) throw new ArgumentException(nameof(document));
         if (didDocument == null) throw new ArgumentNullException(nameof(didDocument));
-        var jObj = JsonObject.Parse(json).AsObject();
-        if (jObj == null) throw new ArgumentException("not a valid JSON");
         if (string.IsNullOrWhiteSpace(verificationMethodId)) throw new ArgumentNullException(verificationMethodId);
         var verificationMethod = didDocument.VerificationMethod.SingleOrDefault(m => m.Id == verificationMethodId);
         if (verificationMethod == null) throw new ArgumentException($"The verification method {verificationMethodId} doesn't exist");
@@ -81,6 +79,7 @@ public class SecuredVerifiableCredential
             ProofPurpose = purpose,
             VerificationMethod = verificationMethod.Id
         };
+        var jObj = JsonObject.Parse(JsonSerializer.Serialize(document)).AsObject();
         var hashPayload = HashDocument(jObj, proof);
         var hashProof = HashProof(dataIntegrityProof, proof, jObj);
         var result = new List<byte>();
@@ -90,18 +89,17 @@ public class SecuredVerifiableCredential
         if(asymKey == null)
             asymKey = _verificationMethodEncoding.Decode(verificationMethod);
         proof.ComputeProof(dataIntegrityProof, result.ToArray(), asymKey, proof.HashingMethod);
-        jObj.Add("proof", JsonObject.Parse(JsonSerializer.Serialize(dataIntegrityProof, typeof(DataIntegrityProof), GetJsonOptions())));
-        return jObj.ToString();
+        document.Proof = JsonObject.Parse(JsonSerializer.Serialize(dataIntegrityProof, typeof(DataIntegrityProof), GetJsonOptions()));
     }
 
-    public bool Check(string json, DidDocument didDocument)
+    public bool Check<T>(T verifiableDocument, DidDocument didDocument)
+        where T : BaseVerifiableDocument
     {
-        if (string.IsNullOrWhiteSpace(json)) throw new ArgumentNullException(nameof(json));
+        if (verifiableDocument == null) throw new ArgumentException(nameof(verifiableDocument));
         if (didDocument == null) throw new ArgumentNullException(nameof(didDocument));
-        var jObj = JsonObject.Parse(json).AsObject();
-        if (jObj == null) throw new ArgumentException("not a valid JSON");
-        if (!jObj.ContainsKey("proof")) throw new InvalidOperationException("The JSON doesn't contain a proof");
-        var proofJson = jObj["proof"].AsObject().ToString();
+        if(verifiableDocument.Proof == null) throw new InvalidOperationException("The JSON doesn't contain a proof");
+        var jObj = JsonObject.Parse(JsonSerializer.Serialize(verifiableDocument)).AsObject();
+        var proofJson = verifiableDocument.Proof.AsObject().ToString();
         var dataIntegrityProof = JsonSerializer.Deserialize<DataIntegrityProof>(proofJson);
         var emptyDataIntegrityProof = JsonSerializer.Deserialize<DataIntegrityProof>(proofJson);
         emptyDataIntegrityProof.ProofValue = null;

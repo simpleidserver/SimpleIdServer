@@ -13,12 +13,11 @@ public class CredentialSubjectBuilder
         _jsonObj = jsonObj;
     }
 
-    public static CredentialSubjectBuilder New(string id)
+    public static CredentialSubjectBuilder New(string id = null)
     {
-        return new CredentialSubjectBuilder(new JsonObject
-        {
-            { "id" , id }
-        });
+        var jsonObj = new JsonObject();
+        if(!string.IsNullOrWhiteSpace(id)) jsonObj.Add("id", id);
+        return new CredentialSubjectBuilder(jsonObj);
     }
 
     public CredentialSubjectBuilder AddClaim(string name, string value)

@@ -37,6 +37,9 @@ public class VcBuilder
         return new VcBuilder(credential);
     }
 
+    public VcBuilder AddCredentialSubject(Action<CredentialSubjectBuilder> action)
+        => AddCredentialSubject(null, action);
+
     public VcBuilder AddCredentialSubject(string id, Action<CredentialSubjectBuilder> action)
     {
         var builder = CredentialSubjectBuilder.New(id);

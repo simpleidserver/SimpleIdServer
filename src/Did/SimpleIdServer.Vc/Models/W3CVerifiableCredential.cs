@@ -10,7 +10,7 @@ namespace SimpleIdServer.Vc.Models;
 /// <summary>
 /// https://www.w3.org/2018/credentials/#sotd
 /// </summary>
-public class W3CVerifiableCredential
+public class W3CVerifiableCredential : BaseVerifiableDocument
 {
     [JsonPropertyName("id")]
     public string Id { get; set; }
@@ -18,6 +18,12 @@ public class W3CVerifiableCredential
     public List<string> Context { get; set; } = new List<string>();
     [JsonPropertyName("type")]
     public List<string> Type { get; set; } = new List<string>();
+    [JsonPropertyName("name")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Name { get; set; } = null;
+    [JsonPropertyName("description")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Description { get; set; } = null;
     [JsonPropertyName("issuer")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string Issuer { get; set; }
