@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using System;
 using System.Collections.Generic;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
@@ -18,10 +17,7 @@ public class W3CVerifiableCredential
     [JsonPropertyName("@context")]
     public List<string> Context { get; set; } = new List<string>();
     [JsonPropertyName("type")]
-    public List<string> Type { get; set; } = new List<string>
-    {
-        "VerifiableCredential"
-    };
+    public List<string> Type { get; set; } = new List<string>();
     [JsonPropertyName("issuer")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string Issuer { get; set; }
@@ -32,5 +28,5 @@ public class W3CVerifiableCredential
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public DateTime? ValidUntil { get; set; }
     [JsonPropertyName("credentialSubject")]
-    public JsonObject CredentialSubject { get; set; }
+    public JsonNode CredentialSubject { get; set; }
 }

@@ -93,6 +93,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.Otp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.Notification.Gotify", "src\IdServer\SimpleIdServer.IdServer.Notification.Gotify\SimpleIdServer.IdServer.Notification.Gotify.csproj", "{A69586FF-DD28-48C0-B227-64157D840053}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.VerifiablePresentation", "src\IdServer\SimpleIdServer.IdServer.VerifiablePresentation\SimpleIdServer.IdServer.VerifiablePresentation.csproj", "{DF8ABFF6-6F35-4E70-BE74-9096E937643E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -247,6 +249,10 @@ Global
 		{A69586FF-DD28-48C0-B227-64157D840053}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A69586FF-DD28-48C0-B227-64157D840053}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A69586FF-DD28-48C0-B227-64157D840053}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF8ABFF6-6F35-4E70-BE74-9096E937643E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF8ABFF6-6F35-4E70-BE74-9096E937643E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF8ABFF6-6F35-4E70-BE74-9096E937643E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF8ABFF6-6F35-4E70-BE74-9096E937643E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -293,6 +299,7 @@ Global
 		{5B787625-82D6-4A2E-8D5D-ED20B87ACBB7} = {DA65BA14-7FA4-4D99-A11D-C67F75F03771}
 		{3655F8EA-FACF-44FD-A403-4263387F2CCB} = {E5886E09-671E-4B3E-AA8F-824C39DF94E4}
 		{A69586FF-DD28-48C0-B227-64157D840053} = {E5886E09-671E-4B3E-AA8F-824C39DF94E4}
+		{DF8ABFF6-6F35-4E70-BE74-9096E937643E} = {E5886E09-671E-4B3E-AA8F-824C39DF94E4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FE1E2C8-475E-4592-8609-D331B1D01730}
