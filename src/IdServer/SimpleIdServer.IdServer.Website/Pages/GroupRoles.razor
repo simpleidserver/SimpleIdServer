@@ -58,7 +58,6 @@
             if (a.Value.Equals(1))
             {
                 var roleIds = groupRolesState.Value.GroupRoles.Where(s => s.IsSelected).Select(s => s.Value.Id).ToList();
-                if (!roleIds.Contains(role.Value.Name)) roleIds.Add(role.Value.Id);
                 var act = new RemoveSelectedGroupRolesAction { RoleIds = roleIds, Id = Group.Id };
                 dispatcher.Dispatch(act);
                 contextMenuService.Close();

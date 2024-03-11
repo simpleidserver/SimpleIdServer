@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
+using SimpleIdServer.IdServer.Website.Stores.AuthMethodsStore;
 
 namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
 {
@@ -139,6 +140,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
 
         [ReducerMethod]
         public static UpdateAcrState ReduceDeleteSelectedAcrsSuccessAction(UpdateAcrState state, DeleteSelectedAcrsSuccessAction action) => new(null)
+        {
+            IsUpdating = false
+        };
+
+        [ReducerMethod]
+        public static UpdateAcrState ReduceStartAddAcrMethodAction(UpdateAcrState state, StartAddAcrMethodAction action) => new(null)
         {
             IsUpdating = false
         };

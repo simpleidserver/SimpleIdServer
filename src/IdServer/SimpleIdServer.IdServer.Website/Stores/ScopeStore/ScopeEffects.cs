@@ -448,4 +448,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
         public string? Description { get; set; } = null;
         public bool IsExposedInConfigurationEdp { get; set; }
     }
+
+    public class StartAddScopeAction { }
+
+    public class StartUpdateScopeMapperAction { }
 }

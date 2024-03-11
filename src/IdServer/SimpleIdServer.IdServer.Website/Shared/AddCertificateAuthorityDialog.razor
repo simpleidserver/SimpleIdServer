@@ -200,6 +200,7 @@
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
                 StateHasChanged();
             });
+            dispatcher.Dispatch(new StartAddCertificateAuthorityAction());
         }
     }
 

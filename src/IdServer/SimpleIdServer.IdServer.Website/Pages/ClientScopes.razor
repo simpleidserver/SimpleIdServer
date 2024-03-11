@@ -128,7 +128,6 @@
         if (a.Value.Equals(1))
         {
             var scopeNames = clientScopesState.Value.Scopes.Where(s => s.IsSelected).Select(s => s.Value.Name).ToList();
-            if (!scopeNames.Contains(scope.Value.Name)) scopeNames.Add(scope.Value.Name);
             var act = new RemoveSelectedClientScopesAction { ScopeNames = scopeNames, ClientId = Client.ClientId };
             dispatcher.Dispatch(act);
             contextMenuService.Close();

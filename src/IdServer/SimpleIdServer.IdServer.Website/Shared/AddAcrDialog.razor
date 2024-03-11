@@ -1,8 +1,10 @@
 ﻿@using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.AcrsStore;
+@using SimpleIdServer.IdServer.Website.Stores.AuthMethodsStore;
 @using SimpleIdServer.IdServer.Website.Stores.IdServerConfigurationStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject IState<UpdateAcrState> updateAcrState
+@inject IState<AuthMethodsState> authMethodsStates
 @inject NotificationService notificationService
 @inject Radzen.DialogService dialogService
 @inject IDispatcher dispatcher
@@ -30,7 +32,13 @@
         <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">
             @Global.SelectAmrsHelper
         </RadzenText>
-        <RadzenDropDown @bind-Value=@selectedAmrs Chips=true Data=@amrs Multiple=true AllowClear=true Placeholder="Select Authentication Methods" class="w-100"></RadzenDropDown>
+        <RadzenDropDown @bind-Value=@selectedAmrs 
+            Chips=true 
+            Data=@amrs
+            Multiple=true 
+            AllowClear=true 
+            Placeholder="Select Authentication Methods" 
+            class="w-100"></RadzenDropDown>
     </div>
     <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateAcrState.Value.IsUpdating ? Global.Adding : Global.Add)" Disabled="@(updateAcrState.Value.IsUpdating)" />
 </RadzenTemplateForm>
@@ -44,18 +52,17 @@
     }
 
     AddAcrForm addAcr = new AddAcrForm();
+    List<string> amrs { get; set; } = new List<string>();
     IEnumerable<string> selectedAmrs { get; set; } = new List<string>();
-    IEnumerable<string> amrs { get; set; } = new List<string>();
 
     protected override void OnAfterRender(bool firstRender)
     {
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
-            SubscribeToAction<GetIdServerConfigurationSuccessAction>((act) =>
+            SubscribeToAction< GetAllAuthMethodSuccessAction>((act) =>
             {
-                amrs = act.Configuration.Amrs.OrderBy(a => a).ToList();
-                StateHasChanged();
+                amrs = act.AuthMethods.Where(a => a.Capabilities.HasFlag(AuthenticationMethodCapabilities.USERAUTHENTICATION)).OrderBy(a => a.Id).Select(m => m.Id).ToList();
             });
             SubscribeToAction<AddAcrSuccessAction>((act) =>
             {
@@ -63,7 +70,8 @@
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.AcrAdded });
                 StateHasChanged();
             });
-            dispatcher.Dispatch(new GetIdServerConfigurationAction());
+            dispatcher.Dispatch(new GetAllAuthMethodAction());
+            dispatcher.Dispatch(new StartAddAcrMethodAction());
         }
     }
 

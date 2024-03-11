@@ -44,6 +44,12 @@
         public string? Email { get; set; } = null;
     }
 
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        dispatcher.Dispatch(new StartAddUserAction());
+    }
+
     AddUserForm addUser = new AddUserForm();
 
     void AddUser(AddUserForm user)

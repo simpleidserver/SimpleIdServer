@@ -367,4 +367,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
     {
         public string ErrorMessage { get; set; }
     }
+
+    public class StartAddCertificateAuthorityAction
+    {
+
+    }
 }

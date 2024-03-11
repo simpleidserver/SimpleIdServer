@@ -100,7 +100,6 @@
     if(a.Value.Equals(1))
     {                
         var mappingRuleIds = searchIdentityProvisioningMappingRulesState.Value.MappingRules?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
-        if (!mappingRuleIds.Contains(idProvisioning.Value.Id)) mappingRuleIds.Add(idProvisioning.Value.Id);
         var act = new RemoveSelectedIdentityProvisioningMappingRulesAction { MappingRuleIds = mappingRuleIds, Id = IdProvisioning.Id };
         dispatcher.Dispatch(act);
         contextMenuService.Close();

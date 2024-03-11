@@ -121,7 +121,6 @@
             if(a.Value.Equals(1)) 
             {
                 var userIds = userState.Value.Users?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
-                if (!userIds.Contains(user.Value.Id)) userIds.Add(user.Value.Id);
                 var act = new RemoveSelectedUsersAction { UserIds = userIds };
                 dispatcher.Dispatch(act);
                 contextMenuService.Close();

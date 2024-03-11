@@ -147,3 +147,8 @@ public class UpdateAuthMethodFailureAction
 {
     public string ErrorMessage { get; set; }
 }
+
+public class StartAddAcrMethodAction
+{
+
+}

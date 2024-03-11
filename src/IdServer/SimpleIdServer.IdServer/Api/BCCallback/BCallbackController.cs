@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Api.BCCallback;
 using SimpleIdServer.IdServer.Exceptions;
-using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
@@ -20,17 +19,14 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
     {
         private readonly IBCAuthorizeRepository _bcAuthorizeRepository;
         private readonly IRecurringJobManager _recurringJobManager;
-        private readonly IAuthenticationHelper _authenticationHelper;
 
         public BCCallbackController(ITokenRepository tokenRepository,
             IJwtBuilder jwtBuilder, 
             IBCAuthorizeRepository bCAuthorizeRepository, 
-            IRecurringJobManager recurringJobManager,
-            IAuthenticationHelper authenticationHelper) : base(tokenRepository, jwtBuilder)
+            IRecurringJobManager recurringJobManager) : base(tokenRepository, jwtBuilder)
         {
             _bcAuthorizeRepository = bCAuthorizeRepository;
             _recurringJobManager = recurringJobManager;
-            _authenticationHelper = authenticationHelper;
         }
 
         [HttpPost]

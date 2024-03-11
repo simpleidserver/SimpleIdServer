@@ -28,7 +28,7 @@
     </div>
     <!-- Description -->
     <div>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Value</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Description</RadzenText>
         <RadzenTextArea Name="Description" @bind-Value="@addApiResource.Description" Class="w-100"></RadzenTextArea>
     </div>
     <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Add"  />
@@ -46,6 +46,7 @@
             notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.ScopeResourceAdded });
             StateHasChanged();
         });
+        dispatcher.Dispatch(new StartAddApiResourceAction());
     }
 
     record AddApiResource

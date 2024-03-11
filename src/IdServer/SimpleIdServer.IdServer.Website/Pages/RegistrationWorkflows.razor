@@ -141,7 +141,6 @@
     if (a.Value.Equals(1))
     {
         var registrationWorkflowIds = registrationWorkflowsState.Value.RegistrationWorkflows.Where(r => r.IsSelected).Select(r => r.RegistrationWorkflow.Id).ToList();
-        if (!registrationWorkflowIds.Contains(registrationWorkflow.RegistrationWorkflow.Id)) registrationWorkflowIds.Add(registrationWorkflow.RegistrationWorkflow.Id);
         var act = new RemoveSelectedRegistrationWorkflowsAction { Ids = registrationWorkflowIds };
         dispatcher.Dispatch(act);
         contextMenuService.Close();

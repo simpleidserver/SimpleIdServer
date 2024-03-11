@@ -90,6 +90,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
         [ReducerMethod]
         public static AddApiResourceState ReduceAddApiResourceSuccessAction(AddApiResourceState state, AddApiResourceFailureAction act) => new(isAdding: false, errorMessage: act.ErrorMessage);
 
+        [ReducerMethod]
+        public static AddApiResourceState ReduceStartAddApiResourceAction(AddApiResourceState state, StartAddApiResourceAction act) => new(isAdding: false, errorMessage: null);
+
         #endregion
     }
 }

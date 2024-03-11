@@ -314,4 +314,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
     {
         public IEnumerable<Scope> Roles { get; set; }
     }
+
+    public class StartAddGroupAction
+    {
+
+    }
 }

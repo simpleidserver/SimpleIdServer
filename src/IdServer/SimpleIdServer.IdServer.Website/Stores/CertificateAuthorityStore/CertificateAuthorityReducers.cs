@@ -184,6 +184,15 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
             };
         }
 
+        public static UpdateCertificateAuthorityState ReduceStartAddCertificateAuthorityAction(UpdateCertificateAuthorityState state, StartAddCertificateAuthorityAction action)
+        {
+            return state with
+            {
+                IsUpdating = false,
+                ErrorMessage = null
+            };
+        }
+
         #endregion
 
         #region CertificateAuthorityState

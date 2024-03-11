@@ -118,7 +118,6 @@
             if (a.Value.Equals(1))
             {
                 var caIds = searchCertificateAuthoritiesState.Value.CertificateAuthorities?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
-                if (!caIds.Contains(certificateAuthority.Value.Id)) caIds.Add(certificateAuthority.Value.Id);
                 var act = new RemoveSelectedCertificateAuthoritiesAction { Ids = caIds };
                 dispatcher.Dispatch(act);
                 contextMenuService.Close();

@@ -34,6 +34,13 @@
         public string Description { get; set; }
     }
 
+
+    protected override Task OnInitializedAsync()
+    {
+        dispatcher.Dispatch(new StartAddGroupAction());
+        return Task.CompletedTask;
+    }
+
     AddGroupForm addGroup = new AddGroupForm();
 
     void AddGroup(AddGroupForm grp)

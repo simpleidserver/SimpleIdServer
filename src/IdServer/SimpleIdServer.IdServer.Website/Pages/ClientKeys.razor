@@ -119,7 +119,6 @@
     if (a.Value.Equals(1))
     {
         var keyIds = clientKeysState.Value.Keys.Where(s => s.IsSelected).Select(s => s.Value.Kid).ToList();
-        if (!keyIds.Contains(scope.Value.Kid)) keyIds.Add(scope.Value.Kid);
         var act = new RemoveSelectedClientKeysAction { KeyIds = keyIds, ClientId = Client.ClientId };
         dispatcher.Dispatch(act);
         contextMenuService.Close();

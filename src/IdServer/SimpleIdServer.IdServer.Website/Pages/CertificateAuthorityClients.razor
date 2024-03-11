@@ -114,7 +114,6 @@
     if (a.Value.Equals(1))
     {
         var caIds = searchCertificateClientsState.Value?.ClientCertificates.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
-        if (!caIds.Contains(certificateAuthority.Value.Id)) caIds.Add(certificateAuthority.Value.Id);
         var act = new RemoveSelectedClientCertificatesAction { CertificateClientIds = caIds, CertificateAuthorityId = CertificateAuthority.Id };
         dispatcher.Dispatch(act);
         contextMenuService.Close();

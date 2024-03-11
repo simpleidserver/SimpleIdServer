@@ -725,4 +725,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
     {
         public string UserId { get; set; }
     }
+
+    public class StartAddUserAction
+    {
+
+    }
 }

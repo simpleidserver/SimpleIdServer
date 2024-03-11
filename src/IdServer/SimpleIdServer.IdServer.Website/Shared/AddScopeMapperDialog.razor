@@ -77,7 +77,8 @@
                 dialogService.Close();
                 StateHasChanged();
             });
-        }
+            dispatcher.Dispatch(new StartUpdateScopeMapperAction());
+    }
     }
 
     ICollection<MapperType> MapperTypes { get; set; } = new List<MapperType>

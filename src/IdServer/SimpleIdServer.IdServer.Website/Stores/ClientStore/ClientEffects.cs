@@ -1212,4 +1212,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
     {
 
     }
+
+    public class StartAddClientAction
+    {
+
+    }
 }

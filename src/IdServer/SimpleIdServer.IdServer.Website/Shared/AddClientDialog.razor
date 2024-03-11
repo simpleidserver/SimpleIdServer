@@ -202,7 +202,6 @@
                             <div>
                                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Name</RadzenText>
                                 <RadzenTextBox Name="ClientName" @bind-Value="@deviceApplication.ClientName" Class="w-100"></RadzenTextBox>
-                                <RadzenRequiredValidator Component="ClientName" Text="@Global.NameIsRequired"></RadzenRequiredValidator>
                             </div>
                             <!-- Client Secret -->
                             <div>
@@ -231,7 +230,6 @@
                             <div>
                                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Name</RadzenText>
                                 <RadzenTextBox Name="ClientName" @bind-Value="@samlSpApplication.ClientName" Class="w-100"></RadzenTextBox>
-                                <RadzenRequiredValidator Component="ClientName" Text="@Global.NameIsRequired"></RadzenRequiredValidator>
                             </div>
                             <!-- Metadata Url -->
                             <div>
@@ -597,6 +595,7 @@
             });
             StateHasChanged();
         });
+        dispatcher.Dispatch(new StartAddClientAction());
     }
 
     ICollection<ApplicationType> AllApplicationTypes { get; set; } = new List<ApplicationType>

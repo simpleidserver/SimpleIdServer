@@ -119,6 +119,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
             IsAdding = false
         };
 
+        [ReducerMethod]
+        public static AddScopeState ReduceStartAddScopeAction(AddScopeState state, StartAddScopeAction act) => state with
+        {
+            ErrorMessage = null
+        };
+
         #endregion
 
         #region ScopeState
@@ -220,6 +226,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
         {
             IsUpdating = false,
             ErrorMessage = act.ErrorMessage
+        };
+
+        [ReducerMethod]
+        public static UpdateScopeMapperState ReduceStartUpdateScopeMapperAction(UpdateScopeMapperState state, StartUpdateScopeMapperAction act) => state with
+        {
+            ErrorMessage = null
         };
 
         [ReducerMethod]

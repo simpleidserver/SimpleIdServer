@@ -69,7 +69,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     var authRequest = await _cibaGrantTypeValidator.Validate(context, cancellationToken);
                     scopeLst = authRequest.Scopes;
                     activity?.SetTag("scopes", string.Join(",", authRequest.Scopes));
-                    var user = await _userRepository.GetById(authRequest.Id, context.Realm, cancellationToken);
+                    var user = await _userRepository.GetById(authRequest.UserId, context.Realm, cancellationToken);
                     context.SetUser(user, null);
                     foreach (var tokenBuilder in _tokenBuilders)
                         await tokenBuilder.Build(new BuildTokenParameter { Scopes = authRequest.Scopes, AuthorizationDetails = authRequest.AuthorizationDetails }, context, cancellationToken);

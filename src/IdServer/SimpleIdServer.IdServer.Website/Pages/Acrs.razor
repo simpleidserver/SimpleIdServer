@@ -115,7 +115,6 @@
         if (a.Value.Equals(1))
         {
             var acrIds = acrsState.Value.Acrs?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
-            if (!acrIds.Contains(acr.Value.Id)) acrIds.Add(acr.Value.Id);
             var act = new DeleteSelectedAcrsAction { Ids = acrIds };
             dispatcher.Dispatch(act);
             contextMenuService.Close();

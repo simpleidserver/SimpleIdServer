@@ -82,7 +82,6 @@
             if (a.Value.Equals(1))
             {
                 var mapperIds = idProviderMappersState.Value.Mappers?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
-                if (!mapperIds.Contains(mapper.Value.Id)) mapperIds.Add(mapper.Value.Id);
                 var act = new RemoveSelectedAuthenticationSchemeProviderMappersAction { Name = IdProvider.Name, MapperIds = mapperIds };
                 dispatcher.Dispatch(act);
                 contextMenuService.Close();

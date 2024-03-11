@@ -125,6 +125,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
         [ReducerMethod]
         public static UpdateGroupState ReduceAddGroupRolesSuccessAction(UpdateGroupState state, AddGroupRolesSuccessAction act) => new UpdateGroupState { ErrorMessage = null, IsUpdating = false };
 
+        [ReducerMethod]
+        public static UpdateGroupState ReduceStartAddGroupAction(UpdateGroupState state, StartAddGroupAction act) => new UpdateGroupState { ErrorMessage = null, IsUpdating = false  };
+
         #endregion
 
         #region GroupState

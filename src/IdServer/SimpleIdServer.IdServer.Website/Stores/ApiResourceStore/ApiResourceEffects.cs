@@ -212,4 +212,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
     {
         public IEnumerable<string> ResourceIds { get; set; }
     }
+
+    public class StartAddApiResourceAction
+    {
+
+    }
 }

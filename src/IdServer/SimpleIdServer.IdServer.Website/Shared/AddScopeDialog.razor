@@ -82,6 +82,7 @@
                             <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addScopeState.Value.IsAdding ? @Global.Adding : Global.Save)" Disabled="@(addScopeState.Value.IsAdding)" />
                         </RadzenTemplateForm>
                         break;
+                    // API RESOURCE 
                     case Domains.ScopeTypes.APIRESOURCE:
                         <RadzenTemplateForm Submit=@AddApiResource TItem="ApiScope" Data=@apiScope>
                             @if (!addScopeState.Value.IsAdding && !string.IsNullOrWhiteSpace(addScopeState.Value.ErrorMessage))
@@ -158,10 +159,11 @@
         await base.OnInitializedAsync();
         SubscribeToAction<AddScopeSuccessAction>((act) =>
         {
-        dialogService.Close();
-        notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = string.Format(Global.ScopeAdded, act.Name) });
-        StateHasChanged();
+            dialogService.Close();
+            notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = string.Format(Global.ScopeAdded, act.Name) });
+            StateHasChanged();
         });
+        dispatcher.Dispatch(new StartAddScopeAction());
     }
 
     ICollection<ScopeType> ScopeTypes { get; set; } = new List<ScopeType>

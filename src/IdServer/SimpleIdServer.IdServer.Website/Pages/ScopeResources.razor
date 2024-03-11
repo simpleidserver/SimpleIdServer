@@ -46,6 +46,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableApiResource" Property="Value.Name" Title="@Global.Resource" Filterable="false" Sortable="false" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableApiResource" Property="Value.Audience" Title="@Global.Audience" Filterable="false" Sortable="false" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableApiResource" Property="Value.Description" Title="@Global.Description" Filterable="false" Sortable="false" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableApiResource" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableApiResource" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
@@ -114,7 +115,6 @@
         if (a.Value.Equals(1))
         {
             var resourceIds = searchApiResourcesState.Value.ApiResources.Where(s => s.IsSelected).Select(s => s.Value.Id).ToList();
-            if (!resourceIds.Contains(resource.Value.Id)) resourceIds.Add(resource.Value.Id);
             var act = new RemoveSelectedApiResourcesAction { ResourceIds = resourceIds };
             dispatcher.Dispatch(act);
             contextMenuService.Close();

@@ -254,6 +254,15 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         #region UpdateUserState
 
         [ReducerMethod]
+        public static UpdateUserState ReduceStartAddUserAction(UpdateUserState state, StartAddUserAction act)
+        {
+            return new UpdateUserState(false)
+            {
+                ErrorMessage = null
+            };
+        }
+
+        [ReducerMethod]
         public static UpdateUserState ReduceUpdateUserDetailsAction(UpdateUserState state, UpdateUserDetailsAction act) => new(true);
 
         [ReducerMethod]

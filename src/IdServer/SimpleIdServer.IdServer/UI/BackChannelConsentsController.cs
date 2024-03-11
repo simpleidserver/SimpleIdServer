@@ -5,16 +5,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.JsonWebTokens;
-using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Api.BCCallback;
-using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.DTOs;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
@@ -31,23 +27,23 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IDataProtector _dataProtector;
         private readonly IClientRepository _clientRepository;
         private readonly IdServer.Infrastructures.IHttpClientFactory _httpClientFactory;
-        private readonly IJwtBuilder _jwtBuilder;
-        private readonly ITokenRepository _tokenRepository;
+        private readonly IAuthenticationHelper _authenticationHelper;
+        private readonly IBCAuthorizeRepository _bcAuthorizeRepository;
         private readonly ILogger<BackChannelConsentsController> _logger;
 
         public BackChannelConsentsController(
             IDataProtectionProvider dataProtectionProvider,
             IClientRepository clientRepository,
             IdServer.Infrastructures.IHttpClientFactory httpClientFactory,
-            IJwtBuilder jwtBuilder,
-            ITokenRepository tokenRepository,
+            IAuthenticationHelper authenticationHelper,
+            IBCAuthorizeRepository bcAuthorizeRepository,
             ILogger<BackChannelConsentsController> logger)
         {
             _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
             _clientRepository = clientRepository;
             _httpClientFactory = httpClientFactory;
-            _jwtBuilder = jwtBuilder;
-            _tokenRepository = tokenRepository;
+            _authenticationHelper = authenticationHelper;
+            _bcAuthorizeRepository = bcAuthorizeRepository;
             _logger = logger;
         }
 
@@ -80,6 +76,7 @@ namespace SimpleIdServer.IdServer.UI
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index([FromRoute] string prefix, ConfirmBCConsentsViewModel confirmConsentsViewModel, CancellationToken cancellationToken)
         {
+            prefix = prefix ?? Constants.DefaultRealm;
             if (!User.Identity.IsAuthenticated)
                 return RedirectToAction("Index", "Errors", new { code = "unauthorized", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
             if (confirmConsentsViewModel == null) 
@@ -102,24 +99,23 @@ namespace SimpleIdServer.IdServer.UI
                     ActionEnum = confirmConsentsViewModel.IsRejected ? BCCallbackActions.REJECT : BCCallbackActions.CONFIRM,
                     AuthReqId = viewModel.AuthReqId
                 };
+                var bcAuthorize = await _bcAuthorizeRepository.Query()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(b => b.Id == parameter.AuthReqId, cancellationToken);
+                if(bcAuthorize == null)
+                {
+                    ModelState.AddModelError("invalid_request", "unknown_bc_authorize");
+                    return View(viewModel);
+                }
+
                 var sub = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-                var tokenDescriptor = new SecurityTokenDescriptor
+                var user = await _authenticationHelper.GetUserByLogin(sub, prefix, cancellationToken);
+                if(bcAuthorize.UserId != user.Id)
                 {
-                    Claims = new Dictionary<string, object>
-                    {
-                        { JwtRegisteredClaimNames.Sub, sub },
-                    }
-                };
-                var accessToken = _jwtBuilder.Sign(prefix ?? Constants.DefaultRealm, tokenDescriptor, SecurityAlgorithms.RsaSha256);
-                _tokenRepository.Add(new Domains.Token
-                {
-                    Id = accessToken,
-                    ClientId = viewModel.ClientId,
-                    CreateDateTime = DateTime.UtcNow,
-                    TokenType = DTOs.TokenResponseParameters.AccessToken,
-                    AccessTokenType = AccessTokenTypes.Jwt
-                });
-                await _tokenRepository.SaveChanges(cancellationToken);
+                    ModelState.AddModelError("invalid_request", "unauthorized_bc_auth");
+                    return View(viewModel);
+                }
+
                 using (var httpClient = _httpClientFactory.GetHttpClient())
                 {
                     var json = JsonSerializer.Serialize(parameter);
@@ -129,7 +125,6 @@ namespace SimpleIdServer.IdServer.UI
                         RequestUri = new Uri(issuer),
                         Content = new StringContent(JsonSerializer.Serialize(parameter), System.Text.Encoding.UTF8, "application/json")
                     };
-                    request.Headers.Add(Constants.AuthorizationHeaderName, $"{AutenticationSchemes.Bearer} {accessToken}");
                     var responseMessage = await httpClient.SendAsync(request, cancellationToken);
                     try
                     {

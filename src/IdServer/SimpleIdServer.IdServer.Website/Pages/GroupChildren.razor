@@ -62,7 +62,6 @@
             if (a.Value.Equals(1))
             {
                 var fullPathLst = groupsMembersState.Value.Members?.Where(c => c.IsSelected).Select(c => c.Value.FullPath)?.ToList();
-                if (!fullPathLst.Contains(group.Value.FullPath)) fullPathLst.Add(group.Value.FullPath);
                 var act = new RemoveSelectedGroupsAction { FullPathLst = fullPathLst };
                 dispatcher.Dispatch(act);
                 contextMenuService.Close();

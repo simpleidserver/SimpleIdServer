@@ -79,7 +79,6 @@
             if (a.Value.Equals(1))
             {
                 var scopeIds = clientRolesState.Value.Roles.Where(s => s.IsSelected).Select(s => s.Value.Id).ToList();
-                if (!scopeIds.Contains(role.Value.Id)) scopeIds.Add(role.Value.Id);
                 var act = new RemoveSelectedScopesAction { ScopeIds = scopeIds, IsRole = true };
                 dispatcher.Dispatch(act);
                 contextMenuService.Close();

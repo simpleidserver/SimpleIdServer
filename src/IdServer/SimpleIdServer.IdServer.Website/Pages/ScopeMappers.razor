@@ -106,7 +106,6 @@
         if (a.Value.Equals(1))
         {
             var mapperIds = scopeMappersState.Value.Mappers?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
-            if (!mapperIds.Contains(mapper.Value.Id)) mapperIds.Add(mapper.Value.Id);
             if (scopeMappersState.Value.Mappers.Any(r => mapperIds.Contains(r.Value.Id) && r.Value.MapperType == MappingRuleTypes.SUBJECT))
             {
                 var isConfirmed = await dialogService.Confirm(Global.AreYouSure, Global.RemoveSubjectClaimMapper, new ConfirmOptions { OkButtonText = Global.Yes, CancelButtonText = Global.No });

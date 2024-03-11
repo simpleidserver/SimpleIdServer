@@ -105,7 +105,6 @@
             if (a.Value.Equals(1))
             {
                 var idProviderIds = searchIdProvidersState.Value.IdProviders?.Where(c => c.IsSelected).Select(c => c.Value.Name)?.ToList();
-                if (!idProviderIds.Contains(idProvider.Value.Name)) idProviderIds.Add(idProvider.Value.Name);
                 var act = new RemoveSelectedIdProvidersAction { Ids = idProviderIds };
                 dispatcher.Dispatch(act);
                 contextMenuService.Close();
