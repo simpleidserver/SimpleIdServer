@@ -439,6 +439,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Assign.
+        /// </summary>
+        public static string AssignResources {
+            get {
+                return ResourceManager.GetString("AssignResources", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à At least one redirection URL must be specified.
         /// </summary>
         public static string AtLeastOneRedirectionUrl {
@@ -4302,6 +4311,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string Unassign {
             get {
                 return ResourceManager.GetString("Unassign", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Unassign.
+        /// </summary>
+        public static string UnassignResources {
+            get {
+                return ResourceManager.GetString("UnassignResources", resourceCulture);
             }
         }
         

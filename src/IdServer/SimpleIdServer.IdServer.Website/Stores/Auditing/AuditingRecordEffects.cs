@@ -3,6 +3,7 @@
 using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Api.Auditing;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Store;
@@ -33,12 +34,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.Auditing
             {
                 RequestUri = new Uri($"{baseUrl}/.search"),
                 Method = HttpMethod.Post,
-                Content = new StringContent(JsonSerializer.Serialize(new SearchRequest
+                Content = new StringContent(JsonSerializer.Serialize(new SearchAuditingRequest
                 {
                     Filter = SanitizeExpression(action.Filter),
                     OrderBy = SanitizeExpression(action.OrderBy),
                     Skip = action.Skip,
-                    Take = action.Take
+                    Take = action.Take,
+                    DisplayOnlyErrors = action.DisplayOnlyErrors
                 }), Encoding.UTF8, "application/json")
             };
             var httpResult = await httpClient.SendAsync(requestMessage);

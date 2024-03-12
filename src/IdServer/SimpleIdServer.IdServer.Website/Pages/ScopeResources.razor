@@ -7,57 +7,100 @@
 @inject ContextMenuService contextMenuService
 @inject DialogService dialogService
 @inject IDispatcher dispatcher
-@inject IState<SearchApiResourcesState> searchApiResourcesState
+@inject IState<ApiResourcesState> searchApiResourcesState
 @inject NotificationService notificationService
 
 <div class="mb-1">
     <RadzenButton Click="@(args => AddResource())" Icon="add" Text="@Global.AddApiResource" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
-    <RadzenButton Click="@(args => UpdateResource())" Icon="save" Text="@Global.Update" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
 </div>
 
 <p class="text-muted">
     @((MarkupString)(Global.ScopeResourcesDescription))
 </p>
 
-<RadzenDataGrid @ref="grid" 
-                AllowFiltering="true"
-                AllowColumnResize="true"
-                AllowAlternatingRows="false"
-                AllowSorting="true"
-                PageSize="30"
-                AllowPaging="true"
-                PagerHorizontalAlign="HorizontalAlign.Left"
-                ShowPagingSummary="true"
-                IsLoading="false"
-                LoadData="@LoadData"
-                RowRender="@RowRender"
-                Count="@searchApiResourcesState.Value.Count"
-                Data="@searchApiResourcesState.Value.ApiResources"
-                TItem="SelectableApiResource"
-                ColumnWidth="300px">
-    <Columns>
-        <RadzenDataGridColumn TItem="SelectableApiResource" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
-            <HeaderTemplate>
-                <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
-            </HeaderTemplate>
-            <Template Context="data">
-                <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableApiResource" Property="Value.Name" Title="@Global.Resource" Filterable="false" Sortable="false" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableApiResource" Property="Value.Audience" Title="@Global.Audience" Filterable="false" Sortable="false" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableApiResource" Property="Value.Description" Title="@Global.Description" Filterable="false" Sortable="false" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableApiResource" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableApiResource" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
-            <Template Context="data">
-                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
-            </Template>
-        </RadzenDataGridColumn>
-    </Columns>
-</RadzenDataGrid>
+<div class="mt-1">
+    <RadzenRow Gap="1rem">
+        <RadzenColumn Size="5">
+            <RadzenDataGrid @ref="grid"
+                            AllowFiltering="true"
+                            AllowColumnResize="true"
+                            AllowAlternatingRows="false"
+                            AllowSorting="true"
+                            PageSize="30"
+                            AllowPaging="true"
+                            PagerHorizontalAlign="HorizontalAlign.Left"
+                            ShowPagingSummary="true"
+                            IsLoading="false"
+                            LoadData="@LoadData"
+                            RowRender="@RowRender"
+                            Count="@searchApiResourcesState.Value.AvailableCount"
+                            Data="@searchApiResourcesState.Value.AvailableApiResources"
+                            TItem="SelectableApiResource"
+                            ColumnWidth="300px">
+                <Columns>
+                    <RadzenDataGridColumn TItem="SelectableApiResource" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+                        <HeaderTemplate>
+                            <RadzenCheckBox @bind-Value=@selectAllAvailable Change="@(args => ToggleAvailableAll(args))" TValue="bool" />
+                        </HeaderTemplate>
+                        <Template Context="data">
+                            <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleAvailableChanged(args, data))" TValue="bool" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="SelectableApiResource" Property="Value.Name" Title="@Global.Resource" Filterable="false" Sortable="false" Width="80px" />
+                    <RadzenDataGridColumn TItem="SelectableApiResource" Property="Value.Audience" Title="@Global.Audience" Filterable="false" Sortable="false" Width="80px" />
+                    <RadzenDataGridColumn TItem="SelectableApiResource" Property="Value.Description" Title="@Global.Description" Filterable="false" Sortable="false" Width="80px" />
+                    <RadzenDataGridColumn TItem="SelectableApiResource" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+                        <Template Context="data">
+                            <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenColumn>
+        <RadzenColumn>
+            <RadzenStack>
+                <RadzenButton Text="@Global.AssignResources" Icon="add" Click="@(() => Assign())" ButtonStyle="ButtonStyle.Primary" />
+                <RadzenButton Text="@Global.UnassignResources" Icon="remove" Click=@(() => Unassign()) ButtonStyle="ButtonStyle.Primary" />
+            </RadzenStack>
+        </RadzenColumn>
+        <RadzenColumn Size="5">
+            <RadzenDataGrid @ref="grid"
+                            AllowFiltering="true"
+                            AllowColumnResize="true"
+                            AllowAlternatingRows="false"
+                            AllowSorting="true"
+                            PageSize="30"
+                            AllowPaging="true"
+                            PagerHorizontalAlign="HorizontalAlign.Left"
+                            ShowPagingSummary="true"
+                            IsLoading="false"
+                            LoadData="@LoadData"
+                            RowRender="@RowRender"
+                            Count="@searchApiResourcesState.Value.ActiveCount"
+                            Data="@searchApiResourcesState.Value.ActiveApiResources"
+                            TItem="SelectableApiResource"
+                            ColumnWidth="300px">
+                <Columns>
+                    <RadzenDataGridColumn TItem="SelectableApiResource" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+                        <HeaderTemplate>
+                            <RadzenCheckBox @bind-Value=@selectAllActive Change="@(args => ToggleActiveAll(args))" TValue="bool" />
+                        </HeaderTemplate>
+                        <Template Context="data">
+                            <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleActiveChanged(args, data))" TValue="bool" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="SelectableApiResource" Property="Value.Name" Title="@Global.Resource" Filterable="false" Sortable="false" Width="80px" />
+                    <RadzenDataGridColumn TItem="SelectableApiResource" Property="Value.Audience" Title="@Global.Audience" Filterable="false" Sortable="false" Width="80px" />
+                    <RadzenDataGridColumn TItem="SelectableApiResource" Property="Value.Description" Title="@Global.Description" Filterable="false" Sortable="false" Width="80px" />
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenColumn>
+    </RadzenRow>
+</div>
 
 @code {
-    bool selectAll = false;
+    bool selectAllAvailable = false;
+    bool selectAllActive = false;
     RadzenDataGrid<SelectableApiResource> grid;
 
     [Parameter]
@@ -73,6 +116,11 @@
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.ScopeResourcesUpdated });
                 StateHasChanged();
             });
+            SubscribeToAction<UnassignApiResourcesSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.ScopeResourcesUpdated });
+                StateHasChanged();
+            });
             SubscribeToAction<RemoveSelectedApiResourcesSuccessAction>((act) =>
             {
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.ScopeResourcesRemoved });
@@ -82,15 +130,27 @@
         }
     }
 
-    void ToggleChanged(bool isSelected, SelectableApiResource apiResource)
+    void ToggleAvailableChanged(bool isSelected, SelectableApiResource apiResource)
     {
-        var act = new ToggleApiResourceSelectionAction { IsSelected = isSelected, ResourceName = apiResource.Value.Name };
+        var act = new ToggleAvailableApiResourceSelectionAction { IsSelected = isSelected, ResourceName = apiResource.Value.Name };
         dispatcher.Dispatch(act);
     }
 
-    void ToggleAll(bool isSelected)
+    void ToggleActiveChanged(bool isSelected, SelectableApiResource apiResource)
     {
-        var act = new ToggleAllApiResourceSelectionAction { IsSelected = isSelected };
+        var act = new ToggleActiveApiResourceSelectionAction { IsSelected = isSelected, ResourceName = apiResource.Value.Name };
+        dispatcher.Dispatch(act);
+    }
+
+    void ToggleAvailableAll(bool isSelected)
+    {
+        var act = new ToggleAllAvailableApiResourceSelectionAction { IsSelected = isSelected };
+        dispatcher.Dispatch(act);
+    }
+
+    void ToggleActiveAll(bool isSelected)
+    {
+        var act = new ToggleAllActiveApiResourceSelectionAction { IsSelected = isSelected };
         dispatcher.Dispatch(act);
     }
 
@@ -105,27 +165,42 @@
             row.Attributes.Remove(className);
     }
 
-    void ShowMoreContextMenu(SelectableApiResource resource, MouseEventArgs args)
+    void Unassign()
     {
-        contextMenuService.Open(args, new List<ContextMenuItem>
-        {
-            new ContextMenuItem { Text = Global.Delete, Value = 1 }
-        }, (a) =>
+        var apiResources = searchApiResourcesState.Value.ActiveApiResources.Where(r => !r.IsSelected).Select(r => r.Value.Name).ToList();
+        var act = new UnassignApiResourcesAction { Id = Scope.Id, Resources = apiResources };
+        dispatcher.Dispatch(act);
+    }
+
+    void Assign()
     {
-        if (a.Value.Equals(1))
-        {
-            var resourceIds = searchApiResourcesState.Value.ApiResources.Where(s => s.IsSelected).Select(s => s.Value.Id).ToList();
-            var act = new RemoveSelectedApiResourcesAction { ResourceIds = resourceIds };
-            dispatcher.Dispatch(act);
-            contextMenuService.Close();
-        }
-    });
+        var selectedApiResources = searchApiResourcesState.Value.AvailableApiResources.Where(r => r.IsSelected).Select(r => r.Value.Name);
+        var apiResources = searchApiResourcesState.Value.ActiveApiResources.Select(r => r.Value.Name).ToList();
+        apiResources.AddRange(selectedApiResources);
+        dispatcher.Dispatch(new UpdateApiScopeResourcesAction { Id = Scope.Id, Resources = apiResources  });
     }
 
     void LoadData(LoadDataArgs args)
     {
         var act = new SearchApiResourcesAction { Filter = args.Filter, OrderBy = args.OrderBy, Skip = args.Skip, Take = args.Top, ScopeName = Scope.Name };
         dispatcher.Dispatch(act);
+    }
+
+    void ShowMoreContextMenu(SelectableApiResource resource, MouseEventArgs args)
+    {
+        contextMenuService.Open(args, new List<ContextMenuItem>
+        {
+            new ContextMenuItem { Text = Global.Delete, Value = 1 }
+        }, (a) =>
+        {
+            if (a.Value.Equals(1))
+            {
+                var resourceIds = searchApiResourcesState.Value.AvailableApiResources.Where(s => s.IsSelected).Select(s => s.Value.Id).ToList();
+                var act = new RemoveSelectedApiResourcesAction { ResourceIds = resourceIds };
+                dispatcher.Dispatch(act);
+                contextMenuService.Close();
+            }
+        });
     }
 
     async void AddResource() 
@@ -137,11 +212,5 @@
             Resizable = true,
             Draggable = true
         });
-    }
-
-    void UpdateResource()
-    {
-        var selectedApiResources = searchApiResourcesState.Value.ApiResources.Where(r => r.IsSelected).Select(r => r.Value.Name);
-        dispatcher.Dispatch(new UpdateApiScopeResourcesAction { Id = Scope.Id, Resources = selectedApiResources });
     }
 }

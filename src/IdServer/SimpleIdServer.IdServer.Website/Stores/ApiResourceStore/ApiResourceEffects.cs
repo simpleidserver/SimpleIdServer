@@ -126,6 +126,25 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
             dispatcher.Dispatch(new UpdateApiScopeResourcesSuccessAction { Id = action.Id, Resources = action.Resources });
         }
 
+        [EffectMethod]
+        public async Task Handle(UnassignApiResourcesAction action, IDispatcher dispatcher)
+        {
+            var baseUrl = await GetScopesBaseUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var addRequest = new UpdateScopeResourcesRequest
+            {
+                Resources = action.Resources
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Put,
+                RequestUri = new Uri($"{baseUrl}/{action.Id}/resources"),
+                Content = new StringContent(JsonSerializer.Serialize(addRequest), Encoding.UTF8, "application/json")
+            };
+            await httpClient.SendAsync(requestMessage);
+            dispatcher.Dispatch(new UnassignApiResourcesSuccessAction { Id = action.Id, Resources = action.Resources });
+        }
+
         private Task<string> GetApiResourcesBaseUrl() => GetBaseUrl("apiresources");
 
         private Task<string> GetScopesBaseUrl() => GetBaseUrl("scopes");
@@ -180,13 +199,24 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
         public string ErrorMessage { get; set; } = null!;
     }
 
-    public class ToggleApiResourceSelectionAction
+    public class ToggleAvailableApiResourceSelectionAction
     {
         public bool IsSelected { get; set; } = false;
         public string ResourceName { get; set; } = null!;
     }
 
-    public class ToggleAllApiResourceSelectionAction
+    public class ToggleActiveApiResourceSelectionAction
+    {
+        public bool IsSelected { get; set; } = false;
+        public string ResourceName { get; set; } = null!;
+    }
+
+    public class ToggleAllAvailableApiResourceSelectionAction
+    {
+        public bool IsSelected { get; set; } = false;
+    }
+
+    public class ToggleAllActiveApiResourceSelectionAction
     {
         public bool IsSelected { get; set; } = false;
     }
@@ -198,6 +228,18 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
     }
 
     public class UpdateApiScopeResourcesSuccessAction
+    {
+        public string Id { get; set; } = null!;
+        public IEnumerable<string> Resources { get; set; } = new List<string>();
+    }
+
+    public class UnassignApiResourcesAction
+    {
+        public string Id { get; set; } = null!;
+        public IEnumerable<string> Resources { get; set; } = new List<string>();
+    }
+
+    public class UnassignApiResourcesSuccessAction
     {
         public string Id { get; set; } = null!;
         public IEnumerable<string> Resources { get; set; } = new List<string>();

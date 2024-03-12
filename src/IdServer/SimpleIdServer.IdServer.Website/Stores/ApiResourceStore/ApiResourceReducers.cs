@@ -10,70 +10,154 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
         #region SearchApiResourcesState
 
         [ReducerMethod]
-        public static SearchApiResourcesState ReduceSearchApiResourcesAction(SearchApiResourcesState state, SearchApiResourcesAction act) => new(isLoading: true, apiResources: new List<ApiResource>());
+        public static ApiResourcesState ReduceSearchApiResourcesAction(ApiResourcesState state, SearchApiResourcesAction act) => new(
+            isLoading: true, 
+            availableApiResources: new List<ApiResource>(), 
+            activeApiResources: new List<ApiResource>());
 
         [ReducerMethod]
-        public static SearchApiResourcesState ReduceSearchApiResourcesSuccessAction(SearchApiResourcesState state, SearchApiResourcesSuccessAction act)
+        public static ApiResourcesState ReduceSearchApiResourcesSuccessAction(ApiResourcesState state, SearchApiResourcesSuccessAction act)
         {
-            var apiResources = act.ApiResources.Select(c => new SelectableApiResource(c)).ToList();
-            foreach (var apiResource in apiResources)
-                apiResource.IsSelected = act.SelectedApiResources.Contains(apiResource.Value.Name);
-
+            var allApiResources = act.ApiResources.Select(c => new SelectableApiResource(c)).ToList();
+            var availableApiResources = allApiResources.Where(a => !act.SelectedApiResources.Contains(a.Value.Name));
+            var activeApiResources = allApiResources.Where(a => act.SelectedApiResources.Contains(a.Value.Name));
             return state with
             {
                 IsLoading = false,
-                ApiResources = apiResources,
-                Count = act.Count
+                AvailableApiResources = availableApiResources,
+                AvailableCount = availableApiResources.Count(),
+                ActiveApiResources = activeApiResources,
+                ActiveCount = activeApiResources.Count(),
             };
         }
 
         [ReducerMethod]
-        public static SearchApiResourcesState ReduceAddApiResourceSuccessAction(SearchApiResourcesState state, AddApiResourceSuccessAction act)
+        public static ApiResourcesState ReduceAddApiResourceSuccessAction(ApiResourcesState state, AddApiResourceSuccessAction act)
         {
-            var apiResources = state.ApiResources.ToList();
+            var availableApiResources = state.AvailableApiResources.ToList();
             var newApiResource = new ApiResource { Id = act.Id, CreateDateTime = DateTime.Now, UpdateDateTime = DateTime.Now, Name = act.Name, Description = act.Description, Audience = act.Audience };
-            apiResources.Add(new SelectableApiResource(newApiResource) { IsNew = true });
+            availableApiResources.Add(new SelectableApiResource(newApiResource) { IsNew = true });
             return state with
             {
-                ApiResources = apiResources,
-                Count = apiResources.Count()
+                AvailableApiResources = availableApiResources,
+                AvailableCount = availableApiResources.Count(),
+                IsLoading = false
             };
         }
 
         [ReducerMethod]
-        public static SearchApiResourcesState ReduceRemoveSelectedApiResourcesSuccessAction(SearchApiResourcesState state, RemoveSelectedApiResourcesSuccessAction act)
+        public static ApiResourcesState ReduceRemoveSelectedApiResourcesSuccessAction(ApiResourcesState state, RemoveSelectedApiResourcesSuccessAction act)
         {
-            var apiResources = state.ApiResources.ToList();
-            apiResources = apiResources.Where(r => !act.ResourceIds.Contains(r.Value.Id)).ToList();
+            var availableApiResources = state.AvailableApiResources.ToList();
+            availableApiResources = availableApiResources.Where(r => !act.ResourceIds.Contains(r.Value.Id)).ToList();
+            foreach (var resource in availableApiResources) resource.IsSelected = false;
             return state with
             {
-                ApiResources = apiResources,
-                Count = apiResources.Count()
+                AvailableApiResources = availableApiResources,
+                AvailableCount = availableApiResources.Count,
+                IsLoading = false
             };
         }
 
         [ReducerMethod]
-        public static SearchApiResourcesState ReduceToggleApiResourceSelectionAction(SearchApiResourcesState state, ToggleApiResourceSelectionAction act)
+        public static ApiResourcesState ReduceUpdateApiScopeResourcesSuccessAction(ApiResourcesState state, UpdateApiScopeResourcesSuccessAction act)
         {
-            var resources = state.ApiResources?.ToList();
+            var activeApiResources = state.ActiveApiResources.ToList();
+            var availableApiResources = state.AvailableApiResources.ToList();
+            var removedApiResources = availableApiResources.Where(r => act.Resources.Contains(r.Value.Name)).ToList();
+            activeApiResources.AddRange(removedApiResources);
+            availableApiResources = activeApiResources.Where(r => !act.Resources.Contains(r.Value.Name)).ToList();
+            foreach (var resource in activeApiResources) resource.IsSelected = false;
+            foreach (var resource in availableApiResources) resource.IsSelected = false;
+            return state with
+            {
+                ActiveApiResources = activeApiResources,
+                ActiveCount = activeApiResources.Count,
+                AvailableApiResources = availableApiResources,
+                AvailableCount = availableApiResources.Count,
+                IsLoading = false
+            };
+        }
+
+        [ReducerMethod]
+        public static ApiResourcesState ReduceUnassignApiResourcesSuccessAction(ApiResourcesState state, UnassignApiResourcesSuccessAction act)
+        {
+            var activeApiResources = state.ActiveApiResources.ToList();
+            var availableApiResources = state.AvailableApiResources.ToList();
+            var removedApiResources = activeApiResources.Where(r => !act.Resources.Contains(r.Value.Name)).ToList();
+            availableApiResources.AddRange(removedApiResources);
+            activeApiResources = activeApiResources.Where(r => act.Resources.Contains(r.Value.Name)).ToList();
+            foreach (var resource in activeApiResources) resource.IsSelected = false;
+            foreach (var resource in availableApiResources) resource.IsSelected = false;
+            return state with
+            {
+                ActiveApiResources = activeApiResources,
+                ActiveCount = activeApiResources.Count,
+                AvailableApiResources = availableApiResources,
+                AvailableCount = availableApiResources.Count,
+                IsLoading = false
+            };
+        }
+
+        [ReducerMethod]
+        public static ApiResourcesState ReduceToggleActiveApiResourceSelectionAction(ApiResourcesState state, ToggleActiveApiResourceSelectionAction act)
+        {
+            var resources = state.ActiveApiResources?.ToList();
             if (resources == null) return state;
             var selectedResource = resources.Single(c => c.Value.Name == act.ResourceName);
             selectedResource.IsSelected = act.IsSelected;
             return state with
             {
-                ApiResources = resources
+                ActiveApiResources = resources
             };
         }
 
         [ReducerMethod]
-        public static SearchApiResourcesState ReduceToggleAllApiResourceSelectionAction(SearchApiResourcesState state, ToggleAllApiResourceSelectionAction act)
+        public static ApiResourcesState ReduceToggleActiveAllAvailableApiResourceSelectionAction(ApiResourcesState state, ToggleAllAvailableApiResourceSelectionAction act)
         {
-            var resources = state.ApiResources?.ToList();
+            var resources = state.AvailableApiResources?.ToList();
             if (resources == null) return state;
             foreach (var resource in resources) resource.IsSelected = act.IsSelected;
             return state with
             {
-                ApiResources = resources
+                AvailableApiResources = resources
+            };
+        }
+
+        [ReducerMethod]
+        public static ApiResourcesState ReduceToggleActiveAllActiveApiResourceSelectionAction(ApiResourcesState state, ToggleAllActiveApiResourceSelectionAction act)
+        {
+            var resources = state.ActiveApiResources?.ToList();
+            if (resources == null) return state;
+            foreach (var resource in resources) resource.IsSelected = act.IsSelected;
+            return state with
+            {
+                ActiveApiResources = resources
+            };
+        }
+
+        [ReducerMethod]
+        public static ApiResourcesState ReduceToggleAvailableApiResourceSelectionAction(ApiResourcesState state, ToggleAvailableApiResourceSelectionAction act)
+        {
+            var resources = state.AvailableApiResources?.ToList();
+            if (resources == null) return state;
+            var selectedResource = resources.Single(c => c.Value.Name == act.ResourceName);
+            selectedResource.IsSelected = act.IsSelected;
+            return state with
+            {
+                AvailableApiResources = resources
+            };
+        }
+
+        [ReducerMethod]
+        public static ApiResourcesState ReduceToggleAvailableAllApiResourceSelectionAction(ApiResourcesState state, ToggleAllAvailableApiResourceSelectionAction act)
+        {
+            var resources = state.AvailableApiResources?.ToList();
+            if (resources == null) return state;
+            foreach (var resource in resources) resource.IsSelected = act.IsSelected;
+            return state with
+            {
+                AvailableApiResources = resources
             };
         }
 

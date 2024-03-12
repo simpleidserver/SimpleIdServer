@@ -335,7 +335,7 @@ namespace SimpleIdServer.IdServer.UI
                     var oauthClient = oauthClients.Single(c => c.ClientId == consent.ClientId);
                     consents.Add(new ConsentViewModel(
                         consent.Id,
-                        oauthClient.ClientName,
+                        string.IsNullOrWhiteSpace(oauthClient.ClientName) ? oauthClient.ClientId : oauthClient.ClientName,
                         oauthClient.ClientUri,
                         consent.Scopes.Select(s => s.Scope),
                         consent.Claims,

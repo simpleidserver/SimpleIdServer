@@ -127,6 +127,7 @@ namespace SimpleIdServer.IdServer.UI
             if (viewModel == null) 
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
             var amrInfo = GetAmrInfo();
+            EnrichViewModel(viewModel);
             await UpdateViewModel(viewModel);
             viewModel.CheckRequiredFields(ModelState);
             if (!ModelState.IsValid) return View(viewModel);
