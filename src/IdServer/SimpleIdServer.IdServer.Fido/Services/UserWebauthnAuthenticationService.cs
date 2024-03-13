@@ -47,7 +47,7 @@ namespace SimpleIdServer.IdServer.Fido.Services
 
         protected override async Task<CredentialsValidationResult> Validate(string realm, User authenticatedUser, AuthenticateWebauthnViewModel viewModel, CancellationToken cancellationToken)
         {
-            if (!authenticatedUser.GetStoredFidoCredentials().Any()) return CredentialsValidationResult.Error("missing_credential", "missing_credential");
+            if (!authenticatedUser.GetStoredFidoCredentials(Constants.AMR).Any()) return CredentialsValidationResult.Error("missing_credential", "missing_credential");
             var session = await _distributedCache.GetStringAsync(viewModel.SessionId, cancellationToken);
             if (string.IsNullOrWhiteSpace(session))
             {

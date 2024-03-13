@@ -69,15 +69,15 @@
         {
             new ContextMenuItem { Text = Global.Unassign, Value = 1 }
         }, (a) =>
-    {
-        if (a.Value.Equals(1))
         {
-            var groupIds = userGroupsState.Value.Groups?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
-            var act = new RemoveSelectedUserGroupAction { GroupIds = groupIds, UserId = User.Id };
-            dispatcher.Dispatch(act);
-            contextMenuService.Close();
-        }
-    });
+            if (a.Value.Equals(1))
+            {
+                var groupIds = userGroupsState.Value.Groups?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
+                var act = new RemoveSelectedUserGroupAction { GroupIds = groupIds, UserId = User.Id };
+                dispatcher.Dispatch(act);
+                contextMenuService.Close();
+            }
+        });
     }
 
     void ToggleChanged(bool isSelected, SelectableUserGroup group)

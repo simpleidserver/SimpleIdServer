@@ -614,7 +614,10 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             {
                 IsEditableGroupsLoading = false,
                 EditableGroups = result,
-                EditableGroupsCount = act.Count
+                EditableGroupsCount = act.Count,
+                Count = state.Groups.Count(),
+                Groups = state.Groups,
+                IsLoading = false
             };
         }
 

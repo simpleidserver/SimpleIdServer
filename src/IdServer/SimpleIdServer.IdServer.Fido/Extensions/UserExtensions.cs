@@ -9,7 +9,7 @@ namespace SimpleIdServer.IdServer.Domains
 {
     public static class UserExtensions
     {
-        public static User AddFidoCredential(this User user, AttestationVerificationSuccess attestation)
+        public static User AddFidoCredential(this User user, string credentialType, AttestationVerificationSuccess attestation)
         {
             var base64Str = Convert.ToBase64String(attestation.Id);
             var existingCredential = user.Credentials.SingleOrDefault(c => c.Id == base64Str);
@@ -17,7 +17,7 @@ namespace SimpleIdServer.IdServer.Domains
             user.Credentials.Add(new UserCredential
             {
                 Id = Convert.ToBase64String(attestation.Id),
-                CredentialType = Fido.Constants.CredentialType,
+                CredentialType = credentialType,
                 Value = JsonSerializer.Serialize(new StoredFidoCredential
                 {
                     Type = attestation.Type,
@@ -41,8 +41,8 @@ namespace SimpleIdServer.IdServer.Domains
             return user;
         }
 
-        public static IEnumerable<UserCredential> GetFidoCredentials(this User user) => user.Credentials.Where(c => c.CredentialType == Fido.Constants.CredentialType);
+        public static IEnumerable<UserCredential> GetFidoCredentials(this User user, string credentialType) => user.Credentials.Where(c => c.CredentialType == credentialType);
 
-        public static IEnumerable<StoredFidoCredential> GetStoredFidoCredentials(this User user) => user.GetFidoCredentials().Select(c => c.GetFidoCredential());
+        public static IEnumerable<StoredFidoCredential> GetStoredFidoCredentials(this User user, string credentialType) => user.GetFidoCredentials(credentialType).Select(c => c.GetFidoCredential(credentialType));
     }
 }

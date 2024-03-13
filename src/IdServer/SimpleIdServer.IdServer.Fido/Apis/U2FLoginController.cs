@@ -121,15 +121,15 @@ namespace SimpleIdServer.IdServer.Fido.Apis
 
             var sessionRecord = JsonSerializer.Deserialize<AuthenticationSessionRecord>(session);
             var options = sessionRecord.Options;
-            var storedCredentials = authenticatedUser.GetStoredFidoCredentials();
+            var storedCredentials = authenticatedUser.GetStoredFidoCredentials(sessionRecord.CredentialType);
             IsUserHandleOwnerOfCredentialIdAsync callback = (args, cancellationToken) =>
             {
                 return Task.FromResult(storedCredentials.Any(c => c.Descriptor.Id.SequenceEqual(args.CredentialId)));
             };
 
-            var fidoCredentials = authenticatedUser.GetFidoCredentials();
-            var credential = fidoCredentials.First(c => c.GetFidoCredential().Descriptor.Id.SequenceEqual(request.Assertion.Id));
-            var creds = credential.GetFidoCredential();
+            var fidoCredentials = authenticatedUser.GetFidoCredentials(sessionRecord.CredentialType);
+            var credential = fidoCredentials.First(c => c.GetFidoCredential(sessionRecord.CredentialType).Descriptor.Id.SequenceEqual(request.Assertion.Id));
+            var creds = credential.GetFidoCredential(sessionRecord.CredentialType);
             var storedCounter = creds.SignatureCounter;
             var res = await _fido2.MakeAssertionAsync(request.Assertion, options, creds.PublicKey, creds.DevicePublicKeys, storedCounter, callback, cancellationToken: cancellationToken);
             creds.SignCount = res.Counter;
@@ -166,14 +166,14 @@ namespace SimpleIdServer.IdServer.Fido.Apis
                 UserVerificationMethod = true,
                 DevicePubKey = new AuthenticationExtensionsDevicePublicKeyInputs()
             };
-            var existingCredentials = authenticatedUser.GetStoredFidoCredentials().Select(c => c.Descriptor);
+            var existingCredentials = authenticatedUser.GetStoredFidoCredentials(request.CredentialType).Select(c => c.Descriptor);
             var options = _fido2.GetAssertionOptions(
                 existingCredentials,
                 UserVerificationRequirement.Discouraged,
                 exts
             );
             var sessionId = Guid.NewGuid().ToString();
-            var sessionRecord = new AuthenticationSessionRecord(options, request.Login);
+            var sessionRecord = new AuthenticationSessionRecord(options, request.Login, request.CredentialType);
             await _distributedCache.SetStringAsync(sessionId, JsonSerializer.Serialize(sessionRecord), new DistributedCacheEntryOptions
             {
                 SlidingExpiration = fidoOptions.U2FExpirationTimeInSeconds
@@ -201,15 +201,17 @@ namespace SimpleIdServer.IdServer.Fido.Apis
 
         }
 
-        public AuthenticationSessionRecord(AssertionOptions assertionOptions, string login)
+        public AuthenticationSessionRecord(AssertionOptions assertionOptions, string login, string credentialType)
         {
             SerializedOptions = assertionOptions.ToJson();
             Login = login;
+            CredentialType = credentialType;
         }
 
         public string SerializedOptions { get; private set; }
         public bool IsValidated { get; set; } = false;
         public string Login { get; set; } = null!;
+        public string CredentialType { get; set; }
 
         public AssertionOptions Options
         {

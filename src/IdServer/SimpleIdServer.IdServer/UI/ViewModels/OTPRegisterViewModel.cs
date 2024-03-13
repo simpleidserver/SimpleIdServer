@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace SimpleIdServer.IdServer.UI.ViewModels;
 
-public class OTPRegisterViewModel : IRegisterViewModel
+public abstract class OTPRegisterViewModel : IRegisterViewModel
 {
     public string NameIdentifier {  get; set; }
     public string Value { get; set; }
@@ -24,10 +24,14 @@ public class OTPRegisterViewModel : IRegisterViewModel
         if (string.IsNullOrWhiteSpace(Value)) modelState.AddModelError("value_missing", "value_missing");
         if (string.IsNullOrWhiteSpace(Action)) modelState.AddModelError("action_missing", "action_missing");
         else if (Action != "SENDCONFIRMATIONCODE" && Action != "REGISTER") modelState.AddModelError("invalid_action", "invalid_action");
-        if(Action == "REGISTER")
+        if (Action == "REGISTER")
         {
             if (string.IsNullOrWhiteSpace(OTPCode)) modelState.AddModelError("otpcode_missing", "otpcode_missing");
             else if (!long.TryParse(OTPCode, out long l)) modelState.AddModelError("otpcode_not_number", "otpcode_not_number");
+            else SpecificValidate(modelState);
         }
+        else SpecificValidate(modelState);
     }
+
+    public abstract void SpecificValidate(ModelStateDictionary modelState);
 }

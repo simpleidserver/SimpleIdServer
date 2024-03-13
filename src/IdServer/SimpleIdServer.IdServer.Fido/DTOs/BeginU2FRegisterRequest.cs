@@ -11,5 +11,7 @@ namespace SimpleIdServer.IdServer.Fido.DTOs
         public string? Login { get; set; } = null;
         [JsonPropertyName(BeginU2FRegisterRequestNames.DisplayName)]
         public string DisplayName { get; set; } = null!;
+        [JsonPropertyName(BeginU2FRegisterRequestNames.CredentialType)]
+        public string CredentialType { get; set; } = null!;
     }
 }

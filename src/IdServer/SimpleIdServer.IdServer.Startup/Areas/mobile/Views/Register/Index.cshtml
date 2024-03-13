@@ -128,7 +128,7 @@
 
                 let response = await fetch(beginRegisterUrl, {
                     method: 'POST',
-                    body: JSON.stringify({ login: login, display_name: displayName }),
+                    body: JSON.stringify({ login: login, display_name: displayName, credential_type: 'mobile' }),
                     headers: {
                         "Accept": "application/json",
                         "Content-Type": "application/json"

@@ -153,6 +153,9 @@
   <data name="selected_language" xml:space="preserve">
     <value>Language is {0}</value>
   </data>
+  <data name="UnexpectedError" xml:space="preserve">
+    <value>Unexpected error</value>
+  </data>
   <data name="user_is_created" xml:space="preserve">
     <value>User is created</value>
   </data>

@@ -129,7 +129,7 @@ namespace SimpleIdServer.IdServer.UI
             var amrInfo = GetAmrInfo();
             EnrichViewModel(viewModel);
             await UpdateViewModel(viewModel);
-            viewModel.CheckRequiredFields(ModelState);
+            viewModel.Validate(ModelState);
             if (!ModelState.IsValid) return View(viewModel);
             var result = await CustomAuthenticate(prefix, amrInfo?.UserId, viewModel, token);
             if (result.ActionResult != null) return result.ActionResult;

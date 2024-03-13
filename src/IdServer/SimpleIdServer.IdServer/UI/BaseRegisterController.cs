@@ -46,7 +46,7 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
         return registrationProgress;
     }
 
-    protected async Task<IActionResult> CreateUser(UserRegistrationProgress registrationProgress, TViewModel viewModel, string prefix, string amr)
+    protected async Task<IActionResult> CreateUser(UserRegistrationProgress registrationProgress, TViewModel viewModel, string prefix, string amr, string redirectUrl)
     {
         var user = registrationProgress.User ?? new Domains.User
         {
@@ -66,7 +66,7 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
             UserRepository.Add(user);
             await UserRepository.SaveChanges(CancellationToken.None);
             viewModel.IsUpdated = true;
-            viewModel.RedirectUrl = registrationProgress.RedirectUrl;
+            viewModel.RedirectUrl = registrationProgress.RedirectUrl ?? redirectUrl;
             return View(viewModel);
         }
 
@@ -77,13 +77,13 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
         return RedirectToAction("Index", "Register", new { area = registrationProgress.Amr });
     }
 
-    protected async Task<IActionResult> UpdateUser(UserRegistrationProgress registrationProgress, TViewModel viewModel, string amr)
+    protected async Task<IActionResult> UpdateUser(UserRegistrationProgress registrationProgress, TViewModel viewModel, string amr, string redirectUrl)
     {
         var lastStep = registrationProgress?.Steps?.Last();
         if (lastStep == amr || registrationProgress == null)
         {
             viewModel.IsUpdated = true;
-            viewModel.RedirectUrl = registrationProgress?.RedirectUrl;
+            viewModel.RedirectUrl = registrationProgress?.RedirectUrl ?? redirectUrl;
             return View(viewModel);
         }
 

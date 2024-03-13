@@ -34,6 +34,7 @@ else
         <!-- Registration form -->
         <form id="registerMobile" method="post">
             @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="RedirectUrl" />
             <div class="form-floating mb-3">
                 @if (User.Identity.IsAuthenticated)
                 {

@@ -11,6 +11,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Sms.UI.ViewModels;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.UI.ViewModels;
@@ -19,7 +20,7 @@ using System.Security.Claims;
 namespace SimpleIdServer.IdServer.Sms.UI;
 
 [Area(Constants.AMR)]
-public class RegisterController : BaseOTPRegisterController<IdServerSmsOptions>
+public class RegisterController : BaseOTPRegisterController<IdServerSmsOptions, RegisterSmsViewModel>
 {
     private readonly IAuthenticationHelper _authenticationHelper;
 
@@ -39,7 +40,7 @@ public class RegisterController : BaseOTPRegisterController<IdServerSmsOptions>
 
     protected override string Amr => Constants.AMR;
 
-    protected override void Enrich(OTPRegisterViewModel viewModel, User user)
+    protected override void Enrich(RegisterSmsViewModel viewModel, User user)
     {
         var phoneNumber = user.OAuthUserClaims.FirstOrDefault(c => c.Name == JwtRegisteredClaimNames.PhoneNumber)?.Value;
         var phoneNumberVerified = user.OAuthUserClaims.FirstOrDefault(c => c.Name == JwtRegisteredClaimNames.PhoneNumberVerified)?.Value;
@@ -48,7 +49,7 @@ public class RegisterController : BaseOTPRegisterController<IdServerSmsOptions>
             viewModel.IsVerified = b;
     }
 
-    protected override void BuildUser(User user, OTPRegisterViewModel viewModel)
+    protected override void BuildUser(User user, RegisterSmsViewModel viewModel)
     {
         var phoneNumberCl = user.OAuthUserClaims.FirstOrDefault(c => c.Name == JwtRegisteredClaimNames.PhoneNumber);
         var phoneNumberIsVerifiedCl = user.OAuthUserClaims.FirstOrDefault(c => c.Name == JwtRegisteredClaimNames.PhoneNumberVerified);

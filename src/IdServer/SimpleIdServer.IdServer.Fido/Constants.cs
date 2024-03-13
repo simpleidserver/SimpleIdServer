@@ -6,7 +6,6 @@ namespace SimpleIdServer.IdServer.Fido
     {
         public const string AMR = "webauthn";
         public const string MobileAMR = "mobile";
-        public const string CredentialType = "fido";
 
         public static class EndPoints
         {

@@ -5,18 +5,18 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Email.UI.ViewModels;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI;
-using SimpleIdServer.IdServer.UI.ViewModels;
 using System.Security.Claims;
 
 namespace SimpleIdServer.IdServer.Email.UI;
 
 [Area(Constants.AMR)]
-public class RegisterController : BaseOTPRegisterController<IdServerEmailOptions>
+public class RegisterController : BaseOTPRegisterController<IdServerEmailOptions, RegisterEmailViewModel>
 {
     private readonly IAuthenticationHelper _authenticationHelper;
 
@@ -36,13 +36,13 @@ public class RegisterController : BaseOTPRegisterController<IdServerEmailOptions
 
     protected override string Amr => Constants.AMR;
 
-    protected override void Enrich(OTPRegisterViewModel viewModel, User user)
+    protected override void Enrich(RegisterEmailViewModel viewModel, User user)
     {
         viewModel.Value = user.Email;
         viewModel.IsVerified = user.EmailVerified;
     }
 
-    protected override void BuildUser(User user, OTPRegisterViewModel viewModel)
+    protected override void BuildUser(User user, RegisterEmailViewModel viewModel)
     {
         user.Email = viewModel.Value;
         user.EmailVerified = true;

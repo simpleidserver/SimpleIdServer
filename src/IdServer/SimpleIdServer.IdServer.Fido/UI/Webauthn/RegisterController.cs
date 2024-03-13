@@ -28,7 +28,7 @@ namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index([FromRoute] string prefix)
+        public async Task<IActionResult> Index([FromRoute] string prefix, string? redirectUrl = null)
         {
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
             if (!string.IsNullOrWhiteSpace(prefix))
@@ -55,7 +55,7 @@ namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
                 EndRegisterUrl = $"{issuer}/{prefix}{Constants.EndPoints.EndRegister}",
                 Amr = userRegistrationProgress?.Amr,
                 Steps = userRegistrationProgress?.Steps,
-                RedirectUrl = userRegistrationProgress?.RedirectUrl,
+                RedirectUrl = userRegistrationProgress?.RedirectUrl ?? redirectUrl
             });
         }
 

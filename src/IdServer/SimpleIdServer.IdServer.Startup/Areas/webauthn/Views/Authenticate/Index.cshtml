@@ -124,7 +124,7 @@ else
                 toggleBtn(true);
                 let response = await fetch(beginLoginUrl, {
                     method: 'POST',
-                    body: JSON.stringify({ login : form.Login }),
+                    body: JSON.stringify({ login : form.Login, credential_type: 'webauthn' }),
                     headers: {
                         "Accept": "application/json",
                         "Content-Type": "application/json"

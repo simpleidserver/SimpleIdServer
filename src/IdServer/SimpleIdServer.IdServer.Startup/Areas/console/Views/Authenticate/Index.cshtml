@@ -23,44 +23,13 @@
     </ul>
 }
 
-<!-- Login form -->
-@using (Html.BeginForm("Index", "Authenticate", new { area = SimpleIdServer.IdServer.Console.Constants.AMR, returnUrl = Model.ReturnUrl }, FormMethod.Post))
-{
-    @Html.AntiForgeryToken()
-    <input type="hidden" asp-for="ReturnUrl" />
-    <input type="hidden" name="Action" value="AUTHENTICATE" />
-    <!-- Login -->
-    <div class="input-group mb-3">
-        @if(Model.IsAuthInProgress)
-        {
-            <input asp-for="Login" placeholder="@AuthenticateConsoleResource.login" type="text" class="form-control" disabled="disabled" />
-            <input asp-for="Login" placeholder="@AuthenticateConsoleResource.login" type="hidden" class="form-control" />
-        }
-        else
-        {
-            <input asp-for="Login" placeholder="@AuthenticateConsoleResource.login" type="text" class="form-control" />
-        }
-    </div>
-    <!-- Confirmation code -->
-    <div class="input-group mb-3">
-        <input asp-for="OTPCode" placeholder="@AuthenticateConsoleResource.confirmationcode" type="password" class="form-control" />
-    </div>
-    <div>
-        <input type="checkbox" asp-for="RememberLogin " />
-        <label>@AuthenticateConsoleResource.remember_login</label>
-    </div>
-    <input asp-for="IsLoginMissing" type="hidden" class="form-control" />
-    <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
-    <button type="submit" class="btn btn-primary">@AuthenticateConsoleResource.authenticate</button>
-}
-
 <!-- Send confirmation code -->
 <div class="mt-3">
     @if (!string.IsNullOrWhiteSpace(ViewBag.SuccessMessage))
     {
         <div class="alert alert-success">
             @AuthenticateConsoleResource.ResourceManager.GetString(ViewBag.SuccessMessage)
-            @if(Model.TOTPStep != null)
+            @if (Model.TOTPStep != null)
             {
                 @string.Format(AuthenticateConsoleResource.code_validity, Model.TOTPStep)
             }
@@ -73,7 +42,7 @@
         <input type="hidden" asp-for="ReturnUrl" />
         <input type="hidden" name="Action" value="SENDCONFIRMATIONCODE" />
         <div class="input-group mb-3">
-            @if(Model.IsAuthInProgress)
+            @if (Model.IsAuthInProgress)
             {
                 <input asp-for="Login" placeholder="@AuthenticateConsoleResource.login" type="text" class="form-control" disabled="disabled" />
                 <input asp-for="Login" placeholder="@AuthenticateConsoleResource.login" type="hidden" class="form-control" />
@@ -88,6 +57,26 @@
         <button type="submit" class="btn btn-primary">@AuthenticateConsoleResource.sendconfirmationcode</button>
     }
 </div>
+
+<!-- Login form -->
+@using (Html.BeginForm("Index", "Authenticate", new { area = SimpleIdServer.IdServer.Console.Constants.AMR, returnUrl = Model.ReturnUrl }, FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="ReturnUrl" />
+    <input type="hidden" name="Action" value="AUTHENTICATE" />
+    <input asp-for="Login" placeholder="@AuthenticateConsoleResource.login" type="hidden" class="form-control" />
+    <!-- Confirmation code -->
+    <div class="input-group mb-3">
+        <input asp-for="OTPCode" placeholder="@AuthenticateConsoleResource.confirmationcode" type="password" class="form-control" />
+    </div>
+    <div>
+        <input type="checkbox" asp-for="RememberLogin " />
+        <label>@AuthenticateConsoleResource.remember_login</label>
+    </div>
+    <input asp-for="IsLoginMissing" type="hidden" class="form-control" />
+    <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
+    <button type="submit" class="btn btn-primary">@AuthenticateConsoleResource.authenticate</button>
+}
 
 @section SubScripts {
     <script type="text/javascript">

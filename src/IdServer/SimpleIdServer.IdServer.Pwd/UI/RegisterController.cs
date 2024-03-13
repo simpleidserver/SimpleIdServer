@@ -27,11 +27,12 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
     }
 
     [HttpGet]
-    public async Task<IActionResult> Index([FromRoute] string prefix)
+    public async Task<IActionResult> Index([FromRoute] string prefix, string redirectUrl)
     {
         prefix = prefix ?? Constants.Prefix;
         var viewModel = new PwdRegisterViewModel();
         var isAuthenticated = User.Identity.IsAuthenticated;
+        viewModel.RedirectUrl = redirectUrl;
         var userRegistrationProgress = await GetRegistrationProgress();
         if (userRegistrationProgress == null && !isAuthenticated)
         {
@@ -85,7 +86,7 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
                 return View(viewModel);
             }
 
-            return await base.CreateUser(userRegistrationProgress, viewModel, prefix, Constants.Areas.Password);
+            return await base.CreateUser(userRegistrationProgress, viewModel, prefix, Constants.Areas.Password, viewModel.RedirectUrl);
         }
 
         async Task<IActionResult> UpdateUser()
@@ -101,7 +102,7 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
                 IsActive = true
             });
             await UserRepository.SaveChanges(cancellationToken);
-            return await base.UpdateUser(userRegistrationProgress, viewModel, Constants.Areas.Password);
+            return await base.UpdateUser(userRegistrationProgress, viewModel, Constants.Areas.Password, viewModel.RedirectUrl);
         }
     }
 

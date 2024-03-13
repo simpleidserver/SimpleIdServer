@@ -20,7 +20,8 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.UI;
 
-public abstract class BaseOTPRegisterController<TOptions> : BaseRegisterController<OTPRegisterViewModel> where TOptions : IOTPRegisterOptions
+public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegisterController<TViewModel> where TOptions : IOTPRegisterOptions
+    where TViewModel : OTPRegisterViewModel
 {
     private readonly IUserRepository _userRepository;
     private readonly IEnumerable<IOTPAuthenticator> _otpAuthenticators;
@@ -47,10 +48,10 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseRegisterControll
 
 
     [HttpGet]
-    public async Task<IActionResult> Index([FromRoute] string prefix)
+    public async Task<IActionResult> Index([FromRoute] string prefix, string redirectUrl)
     {
         prefix = prefix ?? SimpleIdServer.IdServer.Constants.Prefix;
-        var viewModel = new OTPRegisterViewModel();
+        var viewModel = Activator.CreateInstance<TViewModel>();
         var isAuthenticated = User.Identity.IsAuthenticated;
         var registrationProgress = await GetRegistrationProgress();
         if (registrationProgress == null && !isAuthenticated)
@@ -69,12 +70,13 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseRegisterControll
 
         viewModel.Amr = registrationProgress?.Amr;
         viewModel.Steps = registrationProgress?.Steps;
+        viewModel.RedirectUrl = redirectUrl;
         return View(viewModel);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Index([FromRoute] string prefix, OTPRegisterViewModel viewModel)
+    public async Task<IActionResult> Index([FromRoute] string prefix, TViewModel viewModel)
     {
         prefix = prefix ?? Constants.Prefix;
         var isAuthenticated = User.Identity.IsAuthenticated;
@@ -159,7 +161,7 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseRegisterControll
                 authenticatedUser.GenerateTOTP();
 
             await _userRepository.SaveChanges(CancellationToken.None);
-            return await base.UpdateUser(userRegistrationProgress, viewModel, Amr);
+            return await base.UpdateUser(userRegistrationProgress, viewModel, Amr, viewModel.RedirectUrl);
         }
 
         async Task<IActionResult> RegisterUser()
@@ -172,17 +174,17 @@ public abstract class BaseOTPRegisterController<TOptions> : BaseRegisterControll
             }
 
 
-            return await base.CreateUser(userRegistrationProgress, viewModel, prefix, Amr);
+            return await base.CreateUser(userRegistrationProgress, viewModel, prefix, Amr, viewModel.RedirectUrl);
         }
     }
 
-    protected abstract void Enrich(OTPRegisterViewModel viewModel, User user);
+    protected abstract void Enrich(TViewModel viewModel, User user);
 
     protected abstract Task<bool> IsUserExists(string value, string prefix);
 
-    protected abstract void BuildUser(User user, OTPRegisterViewModel viewModel);
+    protected abstract void BuildUser(User user, TViewModel viewModel);
 
-    protected override void EnrichUser(User user, OTPRegisterViewModel viewModel)
+    protected override void EnrichUser(User user, TViewModel viewModel)
     {
         BuildUser(user, viewModel);
         if (user.ActiveOTP == null) user.GenerateTOTP();

@@ -1,4 +1,5 @@
-﻿@using SimpleIdServer.IdServer.Domains;
+﻿@using Microsoft.AspNetCore.Http;
+@using SimpleIdServer.IdServer.Domains;
 @using SimpleIdServer.IdServer.Startup.Resources
 @using System.Security.Claims;
 @model SimpleIdServer.IdServer.UI.ViewModels.ProfileViewModel
@@ -12,6 +13,8 @@
         if (cl == null) return "-";
         return cl.Value;
     };
+    var basePath = Context.Request.GetAbsoluteUriWithVirtualPath();
+    var returnUrl = $"{basePath}{Url.Action("Profile", "Home")}";
 }
 
 <div class="row profile gy-4">
@@ -193,7 +196,7 @@
                         <div class="mt-2">
                             @foreach(var extProvider in Model.ExternalIdProviders)
                             {
-                                <a class="btn btn-secondary me-1" href="@Url.Action("Link", "Home", new { scheme = extProvider.AuthenticationScheme })">
+                                <a class="btn btn-secondary me-1" href="@Url.Action("Link", "Home", new { scheme = extProvider.AuthenticationScheme, returnUrl = returnUrl })">
                                     @extProvider.DisplayName
                                 </a>
                             }
@@ -212,7 +215,7 @@
                                 <p>@ProfileResource.update_your_credentials</p>
                                 foreach(var authenticationMethod in Model.AuthenticationMethods.Where(m => m.IsCredentialExists))
                                 {
-                                    <a class="btn btn-secondary me-1" href="@Url.Action("RegisterCredential", "Home", new { name = authenticationMethod.Amr })">
+                                    <a class="btn btn-secondary me-1" href="@Url.Action("RegisterCredential", "Home", new { name = authenticationMethod.Amr, redirectUrl = returnUrl })">
                                         @authenticationMethod.Name
                                     </a>
                                 }
@@ -228,7 +231,7 @@
                                 <p>@ProfileResource.enroll_credentials</p>
                                 foreach (var authenticationMethod in Model.AuthenticationMethods.Where(m => !m.IsCredentialExists))
                                 {
-                                    <a class="btn btn-secondary me-1" href="@Url.Action("RegisterCredential", "Home", new { name = authenticationMethod.Amr })">
+                                    <a class="btn btn-secondary me-1" href="@Url.Action("RegisterCredential", "Home", new { name = authenticationMethod.Amr, redirectUrl = returnUrl })">
                                         @authenticationMethod.Name
                                     </a>
                                 }

@@ -7,5 +7,6 @@ namespace SimpleIdServer.IdServer.Fido.DTOs
     {
         public const string Login = "login";
         public const string DisplayName = "display_name";
+        public const string CredentialType = "credential_type";
     }
 }

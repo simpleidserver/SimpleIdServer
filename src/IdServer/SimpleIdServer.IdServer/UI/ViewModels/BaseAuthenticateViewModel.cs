@@ -19,7 +19,7 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
         public bool IsAuthInProgress { get; set; } = false;
         public ICollection<ExternalIdProvider> ExternalIdsProviders { get; set; } = new List<ExternalIdProvider>();
         public AmrAuthInfo AmrAuthInfo { get; set; } = null;
-        public abstract void CheckRequiredFields(ModelStateDictionary modelStateDictionary);
+        public abstract void Validate(ModelStateDictionary modelStateDictionary);
     }
 
     public record AmrAuthInfo

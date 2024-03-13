@@ -4,11 +4,12 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using SimpleIdServer.IdServer.UI.ViewModels;
 
-namespace SimpleIdServer.IdServer.Console.UI.ViewModels;
+namespace SimpleIdServer.IdServer.Sms.UI.ViewModels;
 
-public class AuthenticateConsoleViewModel : BaseOTPAuthenticateViewModel
+public class RegisterSmsViewModel : OTPRegisterViewModel
 {
-    public override void SpecificValidate(ModelStateDictionary modelStateDictionary)
+    public override void SpecificValidate(ModelStateDictionary modelState)
     {
+
     }
 }

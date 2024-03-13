@@ -9,5 +9,7 @@ namespace SimpleIdServer.IdServer.Fido.DTOs
     {
         [JsonPropertyName(BeginU2FLoginRequestNames.Login)]
         public string Login { get; set; } = null!;
+        [JsonPropertyName(BeginU2FLoginRequestNames.CredentialType)]
+        public string CredentialType { get; set; } = null;
     }
 }

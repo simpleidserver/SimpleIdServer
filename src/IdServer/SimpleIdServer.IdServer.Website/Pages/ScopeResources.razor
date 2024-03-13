@@ -18,9 +18,10 @@
     @((MarkupString)(Global.ScopeResourcesDescription))
 </p>
 
-<div class="mt-1">
+<div class="mt-3">
     <RadzenRow Gap="1rem">
         <RadzenColumn Size="5">
+            <h4>@Global.AvailableResources</h4>
             <RadzenDataGrid @ref="grid"
                             AllowFiltering="true"
                             AllowColumnResize="true"
@@ -64,6 +65,7 @@
             </RadzenStack>
         </RadzenColumn>
         <RadzenColumn Size="5">
+            <h4>@Global.AssignedResources</h4>
             <RadzenDataGrid @ref="grid"
                             AllowFiltering="true"
                             AllowColumnResize="true"

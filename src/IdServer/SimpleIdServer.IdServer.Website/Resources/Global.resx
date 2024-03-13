@@ -1764,4 +1764,10 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="UnassignResources" xml:space="preserve">
     <value>Unassign</value>
   </data>
+  <data name="AssignedResources" xml:space="preserve">
+    <value>Assigned resources</value>
+  </data>
+  <data name="AvailableResources" xml:space="preserve">
+    <value>Available resources</value>
+  </data>
 </root>

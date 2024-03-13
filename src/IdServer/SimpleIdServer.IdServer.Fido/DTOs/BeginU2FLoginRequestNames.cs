@@ -5,5 +5,6 @@ namespace SimpleIdServer.IdServer.Fido.DTOs
     public static class BeginU2FLoginRequestNames
     {
         public const string Login = "login";
+        public const string CredentialType = "credential_type";
     }
 }

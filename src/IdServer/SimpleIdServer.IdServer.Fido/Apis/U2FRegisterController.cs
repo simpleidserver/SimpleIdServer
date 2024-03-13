@@ -142,11 +142,11 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             var success = await _fido2.MakeNewCredentialAsync(request.AuthenticatorAttestationRawResponse, sessionRecord.Options, async (arg, c) =>
             {
                 var credentialId = Convert.ToBase64String(arg.CredentialId);
-                var result = !(await _userCredentialRepository.Query().AnyAsync(c => c.CredentialType == Constants.CredentialType && credentialId == c.Id, cancellationToken));
+                var result = !(await _userCredentialRepository.Query().AnyAsync(c => c.CredentialType ==  sessionRecord.CredentialType && credentialId == c.Id, cancellationToken));
                 return result;
             }, cancellationToken: cancellationToken);
 
-            user.AddFidoCredential(success.Result);
+            user.AddFidoCredential(sessionRecord.CredentialType, success.Result);
             sessionRecord.IsValidated = true;
             await _distributedCache.SetStringAsync(request.SessionId, System.Text.Json.JsonSerializer.Serialize(sessionRecord), new DistributedCacheEntryOptions
             {
@@ -155,10 +155,13 @@ namespace SimpleIdServer.IdServer.Fido.Apis
 
             if(!isAuthenticated) return await HandleWorkflowRegistration();
             await _userRepository.SaveChanges(CancellationToken.None);
-            if(!registrationProgress.IsLastStep)
+            if(registrationProgress != null)
             {
-                registrationProgress.NextAmr();
-                await _distributedCache.SetStringAsync(registrationProgress.RegistrationProgressId, Newtonsoft.Json.JsonConvert.SerializeObject(registrationProgress));
+                if (!registrationProgress.IsLastStep)
+                {
+                    registrationProgress.NextAmr();
+                    await _distributedCache.SetStringAsync(registrationProgress.RegistrationProgressId, Newtonsoft.Json.JsonConvert.SerializeObject(registrationProgress));
+                }
             }
 
             return new OkObjectResult(new EndU2FRegisterResult
@@ -266,7 +269,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             };
             var options = _fido2.RequestNewCredential(fidoUser, existingKeys, authenticatorSelection, AttestationConveyancePreference.None, exts);
             var sessionId = Guid.NewGuid().ToString();
-            var sessionRecord = new RegistrationSessionRecord(options, request.Login, cookieValue);
+            var sessionRecord = new RegistrationSessionRecord(options, request.Login, request.CredentialType, cookieValue);
             await _distributedCache.SetStringAsync(sessionId, System.Text.Json.JsonSerializer.Serialize(sessionRecord), new DistributedCacheEntryOptions
             {
                 SlidingExpiration = fidoOptions.U2FExpirationTimeInSeconds
@@ -297,16 +300,18 @@ namespace SimpleIdServer.IdServer.Fido.Apis
 
         private record RegistrationSessionRecord
         {
-            public RegistrationSessionRecord(CredentialCreateOptions options, string login, string registrationCookieKey)
+            public RegistrationSessionRecord(CredentialCreateOptions options, string login, string credentialType, string registrationCookieKey)
             {
                 Options = options;
                 Login = login;
+                CredentialType = credentialType;
                 RegistrationCookieKey = registrationCookieKey;
             }
 
             public string SerializedOptions { get; private set; }
             public bool IsValidated { get; set; } = false;
             public string Login { get; set; } = null!;
+            public string CredentialType { get; set; }
             public string RegistrationCookieKey { get; set; }
 
             public CredentialCreateOptions Options

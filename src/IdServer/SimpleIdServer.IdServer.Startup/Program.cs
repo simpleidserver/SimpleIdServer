@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using NeoSmart.Caching.Sqlite.AspNetCore;
 using SimpleIdServer.Configuration;
 using SimpleIdServer.Configuration.Redis;
@@ -107,6 +108,12 @@ app.UseRequestLocalization(e =>
     e.AddSupportedCultures("en");
     e.AddSupportedUICultures("en");
 });
+
+if (!app.Environment.IsDevelopment())
+{
+    var errorPath = identityServerConfiguration.IsRealmEnabled ? "/master/Error" : "/Error";
+    app.UseExceptionHandler(errorPath);
+}
 
 app
     .UseSID()

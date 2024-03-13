@@ -430,6 +430,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Assigned resources.
+        /// </summary>
+        public static string AssignedResources {
+            get {
+                return ResourceManager.GetString("AssignedResources", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Assign groups.
         /// </summary>
         public static string AssignGroups {
@@ -633,6 +642,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string AutomaticIdentityProvisioning {
             get {
                 return ResourceManager.GetString("AutomaticIdentityProvisioning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Available resources.
+        /// </summary>
+        public static string AvailableResources {
+            get {
+                return ResourceManager.GetString("AvailableResources", resourceCulture);
             }
         }
         

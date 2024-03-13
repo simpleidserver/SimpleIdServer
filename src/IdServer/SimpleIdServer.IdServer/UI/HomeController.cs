@@ -146,7 +146,7 @@ namespace SimpleIdServer.IdServer.UI
 
         [HttpGet]
         [Authorize(Constants.Policies.Authenticated)]
-        public virtual IActionResult Link(string scheme)
+        public virtual IActionResult Link(string scheme, string returnUrl)
         {
             if(string.IsNullOrWhiteSpace(scheme))
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request", message = "Authentication Scheme is missing" });
@@ -155,6 +155,11 @@ namespace SimpleIdServer.IdServer.UI
             {
                 { ExternalAuthenticateController.SCHEME_NAME, scheme }
             };
+            if (!string.IsNullOrWhiteSpace(returnUrl))
+            {
+                items.Add(ExternalAuthenticateController.RETURN_URL_NAME, returnUrl);
+            }
+
             var props = new AuthenticationProperties(items)
             {
                 RedirectUri = Url.Action(nameof(LinkCallback)),
@@ -249,12 +254,12 @@ namespace SimpleIdServer.IdServer.UI
 
         [HttpGet]
         [Authorize(Constants.Policies.Authenticated)]
-        public virtual IActionResult RegisterCredential([FromRoute] string prefix, string name)
+        public virtual IActionResult RegisterCredential([FromRoute] string prefix, string name, string redirectUrl)
         {
             prefix = prefix ?? Constants.DefaultRealm;
             var cookieName = _options.GetRegistrationCookieName();
             if (Request.Cookies.ContainsKey(cookieName)) Response.Cookies.Delete(cookieName);
-            return Redirect(Url.Action("Index", "Register", new { area = name }));
+            return Redirect(Url.Action("Index", "Register", new { area = name, redirectUrl = redirectUrl }));
         }
 
         [HttpPost]
