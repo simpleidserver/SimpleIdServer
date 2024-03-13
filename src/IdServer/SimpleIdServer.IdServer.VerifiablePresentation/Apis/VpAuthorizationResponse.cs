@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace SimpleIdServer.IdServer.VerifiablePresentation.Apis;
 
-public class VerifiablePresentationsController : Controller
+public class VpAuthorizationResponse
 {
-    public VerifiablePresentationsController()
-    {
-        
-    }
+    [FromQuery(Name = "vp_token")]
+    public string VpToken { get; set; }
+    [FromQuery(Name = "state")]
+    public string State { get; set; }
 }

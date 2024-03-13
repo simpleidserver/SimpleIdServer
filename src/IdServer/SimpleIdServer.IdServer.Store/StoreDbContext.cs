@@ -47,6 +47,7 @@ namespace SimpleIdServer.IdServer.Store
         public DbSet<GroupRealm> GroupRealm { get; set; }
         public DbSet<GroupUser> GroupUser { get; set; }
         public DbSet<GotifySession> GotifySessions { get; set; }
+        public DbSet<PresentationDefinition> PresentationDefinitions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
