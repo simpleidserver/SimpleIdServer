@@ -86,7 +86,7 @@ public class AuthorizationController : BaseController
         {
             Nonce = Guid.NewGuid().ToString(),
             ResponseMode = "direct_post",
-            ResponseUri = $"{issuer}/{prefix}{Constants.Endpoints.VpAuthorize}",
+            ResponseUri = $"{issuer}/{prefix}{Constants.Endpoints.VpAuthorizeCallback}",
             ResponseType = "vp_token",
             State = Guid.NewGuid().ToString(),
             PresentationDefinitionUri = $"{issuer}/{prefix}/{Constants.Endpoints.PresentationDefinitions}/{presentationDefinitionId}"

@@ -12,5 +12,6 @@ public static class Constants
     {
         public const string PresentationDefinitions = "presentationdefs";
         public const string VpAuthorize = "vpauthorize";
+        public const string VpAuthorizeCallback = $"{VpAuthorize}/cb";
     }
 }
