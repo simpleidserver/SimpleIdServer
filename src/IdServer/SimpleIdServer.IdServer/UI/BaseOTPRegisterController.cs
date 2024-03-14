@@ -91,6 +91,13 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
         viewModel.Steps = userRegistrationProgress?.Steps;
         viewModel.Validate(ModelState);
         if (!ModelState.IsValid) return View(viewModel);
+        var emailIsTaken = await IsUserExists(viewModel.Value, prefix);
+        if (emailIsTaken)
+        {
+            ModelState.AddModelError("value_exists", "value_exists");
+            return View(viewModel);
+        }
+
         var options = GetOptions();
         var optAlg = options.OTPAlg;
         var otpAuthenticator = _otpAuthenticators.First(o => o.Alg == optAlg);
@@ -147,13 +154,6 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
         async Task<IActionResult> UpdateAuthenticatedUser()
         {
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var userExists = await IsUserExists(viewModel.Value, prefix);
-            if (userExists)
-            {
-                ModelState.AddModelError("value_exists", "value_exists");
-                return View(viewModel);
-            }
-
             var authenticatedUser = await _userRepository.GetBySubject(nameIdentifier, prefix, CancellationToken.None);
             BuildUser(authenticatedUser, viewModel);
             authenticatedUser.UpdateDateTime = DateTime.UtcNow;
@@ -166,14 +166,6 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
 
         async Task<IActionResult> RegisterUser()
         {
-            var emailIsTaken = await IsUserExists(viewModel.Value, prefix);
-            if (emailIsTaken)
-            {
-                ModelState.AddModelError("value_exists", "value_exists");
-                return View(viewModel);
-            }
-
-
             return await base.CreateUser(userRegistrationProgress, viewModel, prefix, Amr, viewModel.RedirectUrl);
         }
     }

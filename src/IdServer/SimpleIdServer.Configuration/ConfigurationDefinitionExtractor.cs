@@ -32,6 +32,7 @@ public class ConfigurationDefinitionExtractor
         result.SetDisplayName(configurationRecordAttr.DisplayName, language);
         result.DisplayCondition = configurationRecordAttr.DisplayCondition;
         result.Order = configurationRecordAttr.Order;
+        result.IsRequired = configurationRecordAttr.IsRequired;
         if(configurationRecordAttr.CustomType != null)
         {
             switch (configurationRecordAttr.CustomType)

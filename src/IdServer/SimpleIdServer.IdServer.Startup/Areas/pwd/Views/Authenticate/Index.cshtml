@@ -4,6 +4,7 @@
 @{
     ViewBag.Title = AuthenticatePasswordResource.title;
     Layout = "~/Views/Shared/_AuthenticateLayout.cshtml";
+    var returnUrl = Microsoft.AspNetCore.Http.Extensions.UriHelper.GetDisplayUrl(Context.Request);
 }
 
 @if (!ViewData.ModelState.IsValid)
@@ -54,10 +55,13 @@ else
         <div class="input-group mb-3">
             <input type="password" value="@Model.Password" name="Password" class="form-control" placeholder="@AuthenticatePasswordResource.password">
         </div>
-        <div>
-            <input type="checkbox" value="@Model.RememberLogin" name="RememberLogin" />
-            <label>@AuthenticatePasswordResource.remember_login</label>
-        </div>
+        @if (Model.IsRememberMeDisplayed)
+        {
+            <div>
+                <input type="checkbox" value="@Model.RememberLogin" name="RememberLogin" />
+                <label>@AuthenticatePasswordResource.remember_login</label>
+            </div>
+        }
 
         <input asp-for="IsLoginMissing" type="hidden" class="form-control" />
         <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
@@ -68,7 +72,7 @@ else
         <div class="divider">
             <p class="fw-bold text">OR</p>
         </div>
-        <a href="@Url.Action("Index", "Reset", new { area = SimpleIdServer.IdServer.Constants.Areas.Password })">@AuthenticatePasswordResource.reset_pwd</a>
+        <a href="@Url.Action("Index", "Reset", new { area = SimpleIdServer.IdServer.Constants.Areas.Password, returnUrl = returnUrl })">@AuthenticatePasswordResource.reset_pwd</a>
     }
 }
 

@@ -493,6 +493,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Audience is equired.
+        /// </summary>
+        public static string AudienceIsRequired {
+            get {
+                return ResourceManager.GetString("AudienceIsRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Auditing.
         /// </summary>
         public static string Auditing {
@@ -3240,6 +3249,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Value is required.
+        /// </summary>
+        public static string Required {
+            get {
+                return ResourceManager.GetString("Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Reset.
         /// </summary>
         public static string Reset {
@@ -4878,6 +4896,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string Value {
             get {
                 return ResourceManager.GetString("Value", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The value must be greater than 1.
+        /// </summary>
+        public static string ValueMustBePositive {
+            get {
+                return ResourceManager.GetString("ValueMustBePositive", resourceCulture);
             }
         }
         

@@ -51,6 +51,7 @@ public class ConfigurationDefsController : BaseController
                 DisplayName = r.DisplayName,
                 Order = r.Order,
                 Name = r.Name,
+                IsRequired = r.IsRequired,
                 Type = r.Type,
                 DisplayCondition = r.DisplayCondition,
                 PossibleValues = r.Values.Select(v => new ConfigurationDefRecordValueResult

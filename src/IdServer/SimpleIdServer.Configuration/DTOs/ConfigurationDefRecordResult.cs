@@ -23,6 +23,8 @@ public class ConfigurationDefRecordResult
     public string Description { get; set; }
     [JsonPropertyName("display_condition")]
     public string DisplayCondition { get; set; }
+    [JsonPropertyName("is_required")]
+    public bool IsRequired { get; set; }
     [JsonPropertyName("possible_values")]
     public ICollection<ConfigurationDefRecordValueResult> PossibleValues { get; set; } = new List<ConfigurationDefRecordValueResult>();
 }

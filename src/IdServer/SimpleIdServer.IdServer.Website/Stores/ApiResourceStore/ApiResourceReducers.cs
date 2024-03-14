@@ -66,7 +66,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
             var availableApiResources = state.AvailableApiResources.ToList();
             var removedApiResources = availableApiResources.Where(r => act.Resources.Contains(r.Value.Name)).ToList();
             activeApiResources.AddRange(removedApiResources);
-            availableApiResources = activeApiResources.Where(r => !act.Resources.Contains(r.Value.Name)).ToList();
+            availableApiResources = availableApiResources.Where(r => !act.Resources.Contains(r.Value.Name)).ToList();
             foreach (var resource in activeApiResources) resource.IsSelected = false;
             foreach (var resource in availableApiResources) resource.IsSelected = false;
             return state with

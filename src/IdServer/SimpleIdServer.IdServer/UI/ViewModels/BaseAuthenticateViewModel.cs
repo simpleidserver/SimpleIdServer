@@ -13,10 +13,11 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
         public string LogoUri { get; set; }
         public string TosUri { get; set; }
         public string PolicyUri { get; set; }
-        public bool RememberLogin { get; set; }
+        public bool? RememberLogin { get; set; }
         public string Realm { get; set; }
         public bool IsLoginMissing { get; set; }
         public bool IsAuthInProgress { get; set; } = false;
+        public bool IsRememberMeDisplayed { get; set; } = false;
         public ICollection<ExternalIdProvider> ExternalIdsProviders { get; set; } = new List<ExternalIdProvider>();
         public AmrAuthInfo AmrAuthInfo { get; set; } = null;
         public abstract void Validate(ModelStateDictionary modelStateDictionary);

@@ -11,6 +11,7 @@ public class ResetPasswordViewModel
     public string? Login { get; set; } = null;
     public string? Value { get; set; } = null;
     public bool IsResetLinkedSent { get; set; } = false;
+    public string ReturnUrl { get; set; } = null!;
 
     public void Validate(ModelStateDictionary modelState)
     {

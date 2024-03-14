@@ -48,10 +48,13 @@ else
                 <input asp-for="Login" placeholder="@AuthenticateWebauthnResource.login" type="text" class="form-control" />
             }
         </div>
-        <div>
-            <input type="checkbox" asp-for="RememberLogin " />
-            <label>@AuthenticateWebauthnResource.remember_login</label>
-        </div>
+        @if(Model.IsRememberMeDisplayed)
+        {
+            <div>
+                <input type="checkbox" asp-for="RememberLogin " />
+                <label>@AuthenticateWebauthnResource.remember_login</label>
+            </div>
+        }
         <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
         <input asp-for="BeginLoginUrl" type="hidden" class="form-control" />
         <input asp-for="EndLoginUrl" type="hidden" class="form-control" />

@@ -20,6 +20,7 @@
         {
             @foreach (var property in Properties.OrderBy(p => p.Order))
             {
+                var componentName = Guid.NewGuid().ToString();
                 @if (property.Type != ConfigurationDefinitionRecordTypes.CHECKBOX && property.Type != ConfigurationDefinitionRecordTypes.OTPVALUE && property.Type != ConfigurationDefinitionRecordTypes.NOTIFICATIONMODE)
                 {
                     <RadzenFormField Text="@property.DisplayName" Variant=Variant.Outlined>
@@ -27,17 +28,21 @@
                             @switch (property.Type)
                             {
                                 case ConfigurationDefinitionRecordTypes.INPUT:
-                                    <RadzenTextBox @bind-Value="@property.Value"></RadzenTextBox>
+                                    <RadzenTextBox Name="@componentName" @bind-Value="@property.Value"></RadzenTextBox>
                                     break;
                                 case ConfigurationDefinitionRecordTypes.PASSWORD:
-                                    <RadzenPassword @bind-Value="@property.Value"></RadzenPassword>
+                                    <RadzenPassword Name="@componentName" @bind-Value="@property.Value"></RadzenPassword>
                                     break;
                                 case ConfigurationDefinitionRecordTypes.NUMBER:
-                                    <RadzenNumeric @bind-Value="@property.Value"></RadzenNumeric>
+                                    <RadzenNumeric Name="@componentName" @bind-Value="@property.Value"></RadzenNumeric>
                                     break;
                                 case ConfigurationDefinitionRecordTypes.SELECT:
-                                    <RadzenDropDown @bind-Value="@property.Value" Data="@property.PossibleValues" Change="@((o) => Select(property, o))" TextProperty="Name" ValueProperty="Value" />
+                                    <RadzenDropDown Name="@componentName" @bind-Value="@property.Value" Data="@property.PossibleValues" Change="@((o) => Select(property, o))" TextProperty="Name" ValueProperty="Value" />
                                     break;
+                            }
+                            @if(property.IsRequired)
+                            {
+                                <RadzenRequiredValidator Component="@componentName" Text="@Global.Required"></RadzenRequiredValidator>
                             }
                         </ChildContent>
                         <Helper>
@@ -51,7 +56,11 @@
                         <RadzenColumn Size="10">
                             <RadzenFormField Class="w-100" Text="@property.DisplayName" Variant=Variant.Outlined>
                                 <ChildContent>
-                                    <RadzenTextBox @bind-Value="@property.Value"></RadzenTextBox>
+                                    <RadzenTextBox Name="@componentName" @bind-Value="@property.Value"></RadzenTextBox>
+                                    @if (property.IsRequired)
+                                    {
+                                        <RadzenRequiredValidator Component="@componentName" Text="@Global.Required"></RadzenRequiredValidator>
+                                    }
                                 </ChildContent>
                                 <Helper>
                                     <RadzenText TextStyle="TextStyle.Caption">@property.Description</RadzenText>
@@ -66,9 +75,14 @@
                     <RadzenFormField Text="@property.DisplayName" Variant=Variant.Outlined>
                         <ChildContent>
                             <RadzenDropDown @bind-Value="@property.Value"
+                                            Name="@componentName"
                                             Data="@authMethodsState.Value.AuthenticationMethods.Where(m => m.Capabilities.HasFlag(AuthenticationMethodCapabilities.PUSHNOTIFICATION))"
                                             TextProperty="Name"
                                             ValueProperty="Id" />
+                            @if (property.IsRequired)
+                            {
+                                <RadzenRequiredValidator Component="@componentName" Text="@Global.Required"></RadzenRequiredValidator>
+                            }
                         </ChildContent>
                         <Helper>
                             <RadzenText TextStyle="TextStyle.Caption">@property.Description</RadzenText>
@@ -116,6 +130,7 @@
         public bool ValueBoolean { get; set; }
         public int Order { get; set; }
         public string DisplayCondition { get; set; }
+        public bool IsRequired { get; set; }
         public string GetValue()
         {
             if(Type == ConfigurationDefinitionRecordTypes.CHECKBOX) return ValueBoolean.ToString();
@@ -156,7 +171,10 @@
 
     async void UpdateConfiguration()
     {
-        await PropertiesSaved.InvokeAsync(GetValues());
+        var values = GetValues();
+        var anyRequiredValues = Properties.Any(p => p.IsRequired && values.Any(kvp => kvp.Key == p.Name && string.IsNullOrWhiteSpace(kvp.Value)));
+        if (anyRequiredValues) return;
+        await PropertiesSaved.InvokeAsync(values);
     }
 
     private void Select(EditableProperty p, object o)

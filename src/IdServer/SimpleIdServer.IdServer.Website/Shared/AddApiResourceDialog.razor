@@ -25,6 +25,7 @@
     <div>
         <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Audience</RadzenText>
         <RadzenTextBox Name="Audience" @bind-Value="@addApiResource.Audience" Class="w-100"></RadzenTextBox>
+        <RadzenRequiredValidator Component="Audience" Text="@Global.AudienceIsRequired"></RadzenRequiredValidator>
     </div>
     <!-- Description -->
     <div>
@@ -58,6 +59,8 @@
 
     void SubmitAddApiResource(AddApiResource addApiResource)
     {
+        if (string.IsNullOrEmpty(addApiResource.Name) || string.IsNullOrWhiteSpace(addApiResource.Audience))
+            return;
         dispatcher.Dispatch(new AddApiResourceAction { Name = addApiResource.Name, Description = addApiResource.Description, Audience = addApiResource.Audience });
     }
 }

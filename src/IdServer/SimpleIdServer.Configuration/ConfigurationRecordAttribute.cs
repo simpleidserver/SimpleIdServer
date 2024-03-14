@@ -30,6 +30,7 @@ public class ConfigurationRecordAttribute : Attribute
 	public string? Description { get; set; } = null;
 	public int Order { get; set; } = 0;
 	public string DisplayCondition { get; set; }
+	public bool IsRequired {  get; set; }
 	public CustomConfigurationRecordType? CustomType { get; set; } = null;
 
     public Dictionary<string, string>? Values { get; set; } = null;

@@ -45,7 +45,7 @@ public class ResetController : BaseController
     }
 
     [HttpGet]
-    public async Task<IActionResult> Index([FromRoute] string prefix, CancellationToken cancellationToken)
+    public async Task<IActionResult> Index([FromRoute] string prefix, string returnUrl, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         string login = null;
@@ -62,7 +62,8 @@ public class ResetController : BaseController
         {
             Login = login,
             NotificationMode = notificationMode,
-            Value = null
+            Value = null,
+            ReturnUrl = returnUrl
         };
         return View(viewModel);
     }
@@ -103,7 +104,8 @@ public class ResetController : BaseController
 
         var url = Url.Action("Confirm", "Reset", new
         {
-            area = Constants.Areas.Password
+            area = Constants.Areas.Password,
+            returnUrl = viewModel.ReturnUrl
         });
         var issuer = Request.GetAbsoluteUriWithVirtualPath();
         var parameter = new ResetPasswordParameter(
@@ -141,7 +143,7 @@ public class ResetController : BaseController
     }
 
     [HttpGet]
-    public async Task<IActionResult> Confirm([FromRoute] string prefix, long code, CancellationToken cancellationToken)
+    public async Task<IActionResult> Confirm([FromRoute] string prefix, long code, string returnUrl, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         var viewModel = new ConfirmResetPasswordViewModel();
@@ -158,6 +160,7 @@ public class ResetController : BaseController
         var destination = service.GetDestination(user);
         viewModel.Destination = destination;
         viewModel.Code = code;
+        viewModel.ReturnUrl = returnUrl;
         return View(viewModel);
     }
 

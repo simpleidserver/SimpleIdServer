@@ -12,6 +12,7 @@ namespace SimpleIdServer.IdServer.Pwd.UI.ViewModels
         public string? Password { get; set; } = null;
         public string? ConfirmationPassword { get; set; } = null;
         public bool IsPasswordUpdated { get; set; }
+        public string? ReturnUrl { get; set; } = null;
 
         public void Validate(ModelStateDictionary modelState)
         {

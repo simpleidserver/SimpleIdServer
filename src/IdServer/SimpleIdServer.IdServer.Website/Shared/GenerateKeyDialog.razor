@@ -55,11 +55,6 @@
             {
                 case SimpleIdServer.IdServer.Constants.JWKUsages.Sig:
                     <RadzenTemplateForm Submit=@GenerateSigKey TItem="SigKeyGenerationForm" Data=@sigKeyGeneration>
-                        @if (!updateClientState.Value.IsUpdating && !string.IsNullOrWhiteSpace(updateClientState.Value.ErrorMessage))
-                        {
-                            <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@updateClientState.Value.ErrorMessage</RadzenAlert>
-                        }
-
                         <!-- Key Identifier -->
                         <div>
                             <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Identifier</RadzenText>
@@ -338,6 +333,7 @@
             dialogService.Close();
             StateHasChanged();
         });
+        dispatcher.Dispatch(new StartGenerateClientKeyAction());
     }
 
     void SelectKey(KeyType keyType)

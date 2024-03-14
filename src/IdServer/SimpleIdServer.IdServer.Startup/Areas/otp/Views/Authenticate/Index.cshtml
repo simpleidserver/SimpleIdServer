@@ -53,10 +53,14 @@ else
         <div class="input-group mb-3">
             <input asp-for="OTPCode" placeholder="@AuthenticateOtpResource.confirmationcode" type="password" class="form-control" />
         </div>
-        <div>
-            <input type="checkbox" asp-for="RememberLogin " />
-            <label>@AuthenticateOtpResource.remember_login</label>
-        </div>
+        @if (Model.IsRememberMeDisplayed)
+        {
+            <div>
+                <input type="checkbox" asp-for="RememberLogin " />
+                <label>@AuthenticateOtpResource.remember_login</label>
+            </div>
+        }
+
         <input asp-for="IsLoginMissing" type="hidden" class="form-control" />
         <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
         <button type="submit" class="btn btn-primary">@AuthenticateOtpResource.authenticate</button>

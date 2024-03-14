@@ -13,6 +13,7 @@ public class ConfigurationDefinitionRecord : ITranslatable
 
     public string Id { get; set; } = null!;
     public string Name { get; set; } = null!;
+    public bool IsRequired { get; set; }
     public ConfigurationDefinitionRecordTypes Type { get; set; } = ConfigurationDefinitionRecordTypes.INPUT;
     public DateTime CreateDateTime { get; set; }
     public DateTime UpdateDateTime { get; set; }

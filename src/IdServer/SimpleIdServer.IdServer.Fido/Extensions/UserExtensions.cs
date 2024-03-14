@@ -11,8 +11,7 @@ namespace SimpleIdServer.IdServer.Domains
     {
         public static User AddFidoCredential(this User user, string credentialType, AttestationVerificationSuccess attestation)
         {
-            var base64Str = Convert.ToBase64String(attestation.Id);
-            var existingCredential = user.Credentials.SingleOrDefault(c => c.Id == base64Str);
+            var existingCredential = user.Credentials.SingleOrDefault(c => c.CredentialType == credentialType);
             if(existingCredential != null) user.Credentials.Remove(existingCredential);
             user.Credentials.Add(new UserCredential
             {

@@ -806,6 +806,7 @@ namespace SimpleIdServer.IdServer
         public const string DefaultRealm = "master";
         public const string DefaultRealmCookieName = "CurrentRealm";
         public const string DefaultCurrentAmrCookieName = "currentAmr";
+        public const string DefaultRememberMeCookieName = "RememberMe";
         public const string Prefix = "prefix";
         public const string DefaultLanguage = "en";
     }

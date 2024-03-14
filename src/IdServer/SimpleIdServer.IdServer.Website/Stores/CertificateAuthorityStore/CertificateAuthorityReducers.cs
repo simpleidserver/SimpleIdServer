@@ -189,7 +189,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
             return state with
             {
                 IsUpdating = false,
-                ErrorMessage = null
+                ErrorMessage = null,
+                CertificateAuthority = null
             };
         }
 

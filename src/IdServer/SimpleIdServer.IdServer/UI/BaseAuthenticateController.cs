@@ -100,11 +100,11 @@ namespace SimpleIdServer.IdServer.UI
             }
         }
 
-        protected async Task<IActionResult> Authenticate(string realm, string returnUrl, string currentAmr, User user, CancellationToken token, bool rememberLogin = false)
+        protected async Task<IActionResult> Authenticate(string realm, string returnUrl, string currentAmr, User user, CancellationToken token, bool? rememberLogin = null)
         {
             if (!IsProtected(returnUrl))
             {
-                return await Sign(realm, returnUrl, currentAmr, user, null, token, rememberLogin);
+                return await Sign(realm, returnUrl, currentAmr, user, null, token, rememberLogin.Value);
             }
 
             var unprotectedUrl = Unprotect(returnUrl);
@@ -119,8 +119,19 @@ namespace SimpleIdServer.IdServer.UI
             string amr;
             if (acr == null || string.IsNullOrWhiteSpace(amr = _amrHelper.FetchNextAmr(acr, currentAmr)))
             {
-                return await Sign(realm, unprotectedUrl, currentAmr, user, client, token, rememberLogin);
+                if(rememberLogin == null)
+                {
+                    if (HttpContext.Request.Cookies.ContainsKey(Constants.DefaultRememberMeCookieName))
+                        rememberLogin = bool.Parse(HttpContext.Request.Cookies[Constants.DefaultRememberMeCookieName]);
+                    else
+                        rememberLogin = false;
+                }
+
+                return await Sign(realm, unprotectedUrl, currentAmr, user, client, token, rememberLogin.Value);
             }
+
+            if(rememberLogin != null)
+                HttpContext.Response.Cookies.Append(Constants.DefaultRememberMeCookieName, rememberLogin.Value.ToString());
 
             var allAmr = acr.AuthenticationMethodReferences;
             var login = _authenticationHelper.GetLogin(user);

@@ -61,7 +61,7 @@
                 <RadzenTextArea @bind-Value="@info.Description" Class="w-100"></RadzenTextArea>
             </div>
         </RadzenStepsItem>
-        <RadzenStepsItem Text="Properties" Disabled="@(SelectedIdProvider == null)">
+        <RadzenStepsItem Text="Properties" Disabled="@(SelectedIdProvider == null || string.IsNullOrWhiteSpace(info?.Name) || string.IsNullOrWhiteSpace(info?.DisplayName))">
             <EditConfiguration IsUpdating="@IsAdding" IsAddForm="true" PropertiesSaved=@SaveIdProvider Name=@SelectedIdProvider.OptionsName></EditConfiguration>
         </RadzenStepsItem>
     </Steps>

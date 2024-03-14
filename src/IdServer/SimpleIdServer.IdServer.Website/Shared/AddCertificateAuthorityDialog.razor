@@ -63,6 +63,7 @@
                                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.NumberOfDays</RadzenText>
                                 <RadzenNumeric Name="NumberOfDays" @bind-Value="@addCertificateAuthorityDB.NumberOfDays" Class="w-100"></RadzenNumeric>
                                 <p class="text-muted">@Global.NumberOfDaysDescription</p>
+                                <RadzenNumericRangeValidator Min="1" Component="NumberOfDays" Text="@Global.ValueMustBePositive"></RadzenNumericRangeValidator>
                             </div>
                             @if(updateCertificateAuthorityState.Value.CertificateAuthority != null)
                             {
@@ -200,7 +201,6 @@
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
                 StateHasChanged();
             });
-            dispatcher.Dispatch(new StartAddCertificateAuthorityAction());
         }
     }
 
@@ -213,6 +213,7 @@
     void SelectCertificateAuthorityType(CertificateAuthorityType type)
     {
         SelectedCertificateAuthorityType = type;
+        dispatcher.Dispatch(new StartAddCertificateAuthorityAction());
     }
 
     void GenerateCertificateAuthority(AddCertificateAuthorityDB certificateAuthority)

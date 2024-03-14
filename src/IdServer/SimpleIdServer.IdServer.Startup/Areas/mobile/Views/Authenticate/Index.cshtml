@@ -46,10 +46,13 @@ else
                 <input asp-for="Login" placeholder="@AuthenticateMobileResource.login" type="text" class="form-control" />
             }
         </div>
-        <div>
-            <input type="checkbox" asp-for="RememberLogin " />
-            <label>@AuthenticateMobileResource.remember_login</label>
-        </div>
+        @if(Model.IsRememberMeDisplayed)
+        {
+            <div>
+                <input type="checkbox" asp-for="RememberLogin " />
+                <label>@AuthenticateMobileResource.remember_login</label>
+            </div>
+        }
         <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
         <input asp-for="BeginLoginUrl" type="hidden" class="form-control" />
         <input asp-for="LoginStatusUrl" type="hidden" class="form-control" />

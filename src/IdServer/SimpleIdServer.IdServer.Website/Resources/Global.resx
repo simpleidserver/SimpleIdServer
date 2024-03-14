@@ -1770,4 +1770,13 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="AvailableResources" xml:space="preserve">
     <value>Available resources</value>
   </data>
+  <data name="AudienceIsRequired" xml:space="preserve">
+    <value>Audience is equired</value>
+  </data>
+  <data name="Required" xml:space="preserve">
+    <value>Value is required</value>
+  </data>
+  <data name="ValueMustBePositive" xml:space="preserve">
+    <value>The value must be greater than 1</value>
+  </data>
 </root>

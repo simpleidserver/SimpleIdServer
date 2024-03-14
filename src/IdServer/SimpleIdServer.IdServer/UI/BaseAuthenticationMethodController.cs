@@ -74,6 +74,7 @@ namespace SimpleIdServer.IdServer.UI
                 var viewModel = Activator.CreateInstance<T>();
                 viewModel.ReturnUrl = returnUrl;
                 viewModel.Realm = prefix;
+                viewModel.IsRememberMeDisplayed = true;
                 viewModel.ExternalIdsProviders = externalIdProviders.Select(e => new ExternalIdProvider
                 {
                     AuthenticationScheme = e.Name,
@@ -85,7 +86,10 @@ namespace SimpleIdServer.IdServer.UI
                     var query = ExtractQuery(returnUrl);
                     var clientId = query.GetClientIdFromAuthorizationRequest();
                     var str = prefix ?? Constants.DefaultRealm; 
-                    var client = await ClientRepository.Query().Include(c => c.Realms).Include(c => c.Translations).FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == str), cancellationToken);
+                    var client = await ClientRepository.Query()
+                        .Include(c => c.Realms)
+                        .Include(c => c.Translations)
+                        .FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == str), cancellationToken);
                     var loginHint = query.GetLoginHintFromAuthorizationRequest();
                     var amrInfo = await ResolveAmrInfo(query, str, client, cancellationToken);
                     bool isLoginMissing = amrInfo != null && !string.IsNullOrWhiteSpace(amrInfo.Login);
@@ -94,6 +98,9 @@ namespace SimpleIdServer.IdServer.UI
                         loginHint = login;
                         isLoginMissing = false;
                     }
+
+                    if (amrInfo.CurrentAmr == amrInfo.AllAmr.First()) 
+                        viewModel.IsRememberMeDisplayed = true;
 
                     viewModel.ClientName = client.ClientName;
                     viewModel.Login = loginHint;
