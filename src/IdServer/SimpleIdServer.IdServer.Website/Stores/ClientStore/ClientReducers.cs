@@ -7,6 +7,7 @@ using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Saml.Idp.Extensions;
 using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
+using SimpleIdServer.IdServer.Website.Stores.UserStore;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
@@ -140,6 +141,15 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         #endregion
 
         #region UpdateClientState
+
+        [ReducerMethod]
+        public static UpdateClientState ReduceStartGenerateClientKeyAction(UpdateClientState state, StartGenerateClientKeyAction act)
+        {
+            return new UpdateClientState(false)
+            {
+                ErrorMessage = null
+            };
+        }
 
         [ReducerMethod]
         public static UpdateClientState ReduceUpdateClientDetailsAction(UpdateClientState state, UpdateClientDetailsAction act) => new(isUpdating: true);

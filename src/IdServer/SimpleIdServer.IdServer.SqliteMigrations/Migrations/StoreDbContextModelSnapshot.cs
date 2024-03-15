@@ -15,7 +15,7 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "7.0.16");
+            modelBuilder.HasAnnotation("ProductVersion", "7.0.17");
 
             modelBuilder.Entity("ApiResourceRealm", b =>
                 {
@@ -1097,6 +1097,9 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
 
                     b.Property<string>("DisplayCondition")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsRequired")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .IsRequired()

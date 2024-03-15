@@ -30,7 +30,8 @@ public class ResetPasswordParameter
         string realm,
         string body,
         string title,
-        double defaultExpirationTime)
+        double defaultExpirationTime,
+        string returnUrl)
     {
         Link = link;
         User = user;
@@ -38,7 +39,7 @@ public class ResetPasswordParameter
         Body = body;
         Title = title;
         DefaultExpirationTime = defaultExpirationTime;
-
+        ReturnUrl = returnUrl;
     }
 
     public string Link { get; private set; }
@@ -47,6 +48,7 @@ public class ResetPasswordParameter
     public string Body { get; private set; }
     public string Title { get; private set; }
     public double DefaultExpirationTime { get; private set; }
+    public string ReturnUrl { get; private set; }
 }
 
 public abstract class BaseOTPResetPasswordService : IResetPasswordService
@@ -94,6 +96,8 @@ public abstract class BaseOTPResetPasswordService : IResetPasswordService
         var otp = otpAuthenticator.GenerateOtp(userCredential);
         var link = parameter.Link;
         link = $"{link}?code={otp}";
+        if (!string.IsNullOrWhiteSpace(parameter.ReturnUrl))
+            link = $"{link}&returnUrl={parameter.ReturnUrl}";
         var message = string.Format(parameter.Body, link);
         await _notificationService.Send(parameter.Title,
             message,

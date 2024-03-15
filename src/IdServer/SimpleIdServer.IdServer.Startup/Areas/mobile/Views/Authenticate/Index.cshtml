@@ -35,6 +35,11 @@ else
     {
         @Html.AntiForgeryToken()
         <input type="hidden" asp-for="ReturnUrl" />
+        <input asp-for="IsFirstAmr" type="hidden" class="form-control" />
+        <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
+        <input asp-for="BeginLoginUrl" type="hidden" class="form-control" />
+        <input asp-for="LoginStatusUrl" type="hidden" class="form-control" />
+        <input asp-for="SessionId" type="hidden" class="form-control" />
         <div class="input-group mb-3">
             @if (Model.IsAuthInProgress)
             {
@@ -46,17 +51,13 @@ else
                 <input asp-for="Login" placeholder="@AuthenticateMobileResource.login" type="text" class="form-control" />
             }
         </div>
-        @if(Model.IsRememberMeDisplayed)
+        @if(Model.IsFirstAmr)
         {
             <div>
                 <input type="checkbox" asp-for="RememberLogin " />
                 <label>@AuthenticateMobileResource.remember_login</label>
             </div>
         }
-        <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
-        <input asp-for="BeginLoginUrl" type="hidden" class="form-control" />
-        <input asp-for="LoginStatusUrl" type="hidden" class="form-control" />
-        <input asp-for="SessionId" type="hidden" class="form-control" />
         <button type="submit" class="btn btn-primary card-link">@AuthenticateMobileResource.generate_qrcode</button>
     }
 

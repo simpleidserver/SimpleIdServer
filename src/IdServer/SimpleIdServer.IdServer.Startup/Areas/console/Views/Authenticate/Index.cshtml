@@ -41,6 +41,9 @@
         @Html.AntiForgeryToken()
         <input type="hidden" asp-for="ReturnUrl" />
         <input type="hidden" name="Action" value="SENDCONFIRMATIONCODE" />
+        <input asp-for="IsFirstAmr" type="hidden" class="form-control" />
+        <input asp-for="IsLoginMissing" type="hidden" class="form-control" />
+        <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
         <div class="input-group mb-3">
             @if (Model.IsAuthInProgress)
             {
@@ -52,8 +55,6 @@
                 <input asp-for="Login" placeholder="@AuthenticateConsoleResource.login" type="text" class="form-control" />
             }
         </div>
-        <input asp-for="IsLoginMissing" type="hidden" class="form-control" />
-        <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
         <button type="submit" class="btn btn-primary">@AuthenticateConsoleResource.sendconfirmationcode</button>
     }
 </div>
@@ -64,20 +65,21 @@
     @Html.AntiForgeryToken()
     <input type="hidden" asp-for="ReturnUrl" />
     <input type="hidden" name="Action" value="AUTHENTICATE" />
+    <input asp-for="IsFirstAmr" type="hidden" class="form-control" />
+    <input asp-for="IsLoginMissing" type="hidden" class="form-control" />
+    <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
     <input asp-for="Login" placeholder="@AuthenticateConsoleResource.login" type="hidden" class="form-control" />
     <!-- Confirmation code -->
     <div class="input-group mb-3">
         <input asp-for="OTPCode" placeholder="@AuthenticateConsoleResource.confirmationcode" type="password" class="form-control" />
     </div>
-    @if(Model.IsRememberMeDisplayed)
+    @if(Model.IsFirstAmr)
     {
         <div>
             <input type="checkbox" asp-for="RememberLogin " />
             <label>@AuthenticateConsoleResource.remember_login</label>
         </div>
     }
-    <input asp-for="IsLoginMissing" type="hidden" class="form-control" />
-    <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
     <button type="submit" class="btn btn-primary">@AuthenticateConsoleResource.authenticate</button>
 }
 

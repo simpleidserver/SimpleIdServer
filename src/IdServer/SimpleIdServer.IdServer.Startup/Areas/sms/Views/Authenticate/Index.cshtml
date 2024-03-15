@@ -48,6 +48,9 @@ else
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="ReturnUrl" />
             <input type="hidden" name="Action" value="SENDCONFIRMATIONCODE" />
+            <input asp-for="IsFirstAmr" type="hidden" class="form-control" />
+            <input asp-for="IsLoginMissing" type="hidden" class="form-control" />
+            <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
             <div class="input-group mb-3">
                 @if (Model.IsAuthInProgress)
                 {
@@ -59,8 +62,6 @@ else
                     <input asp-for="Login" placeholder="@AuthenticateSmsResource.phonenumber" type="text" class="form-control" />
                 }
             </div>
-            <input asp-for="IsLoginMissing" type="hidden" class="form-control" />
-            <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
             <button type="submit" class="btn btn-primary card-link">@AuthenticateSmsResource.sendconfirmationcode</button>
         }
     </div>
@@ -72,19 +73,22 @@ else
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="ReturnUrl" />
             <input type="hidden" name="Action" value="AUTHENTICATE" />
-            <input asp-for="Login" placeholder="@AuthenticateSmsResource.phonenumber" type="hidden" class="form-control" />
+            <input asp-for="IsFirstAmr" type="hidden" class="form-control" />
+            <input asp-for="IsLoginMissing" type="hidden" class="form-control" />
+            <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
+            <div class="input-group mb-3">
+                <input asp-for="Login" placeholder="@AuthenticateSmsResource.phonenumber" type="hidden" class="form-control" />
+            </div>
             <div class="input-group mb-3">
                 <input asp-for="OTPCode" type="password" class="form-control" placeholder="@AuthenticateSmsResource.confirmationcode" />
             </div>
-            @if(Model.IsRememberMeDisplayed)
+            @if(Model.IsFirstAmr)
             {
                 <div>
                     <input type="checkbox" asp-for="RememberLogin " />
                     <label>@AuthenticateSmsResource.remember_login</label>
                 </div>
             }
-            <input asp-for="IsLoginMissing" type="hidden" class="form-control" />
-            <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
             <button type="submit" class="btn btn-primary card-link">@AuthenticateSmsResource.authenticate</button>
         }
     </div>

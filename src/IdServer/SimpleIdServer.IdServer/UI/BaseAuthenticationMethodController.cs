@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -74,7 +75,7 @@ namespace SimpleIdServer.IdServer.UI
                 var viewModel = Activator.CreateInstance<T>();
                 viewModel.ReturnUrl = returnUrl;
                 viewModel.Realm = prefix;
-                viewModel.IsRememberMeDisplayed = true;
+                viewModel.IsFirstAmr = false;
                 viewModel.ExternalIdsProviders = externalIdProviders.Select(e => new ExternalIdProvider
                 {
                     AuthenticationScheme = e.Name,
@@ -99,8 +100,11 @@ namespace SimpleIdServer.IdServer.UI
                         isLoginMissing = false;
                     }
 
-                    if (amrInfo.CurrentAmr == amrInfo.AllAmr.First()) 
-                        viewModel.IsRememberMeDisplayed = true;
+                    if (amrInfo.CurrentAmr == amrInfo.AllAmr.First())
+                    {
+                        viewModel.IsFirstAmr = true;
+                        viewModel.RememberLogin = false;
+                    }
 
                     viewModel.ClientName = client.ClientName;
                     viewModel.Login = loginHint;
@@ -111,6 +115,11 @@ namespace SimpleIdServer.IdServer.UI
                     viewModel.IsAuthInProgress = amrInfo != null && !string.IsNullOrWhiteSpace(amrInfo.Login);
                     viewModel.AmrAuthInfo = amrInfo;
                     return View(viewModel);
+                }
+                else
+                {
+                    viewModel.IsFirstAmr = true;
+                    viewModel.RememberLogin = false;
                 }
 
                 return View(viewModel);
@@ -171,7 +180,12 @@ namespace SimpleIdServer.IdServer.UI
                 }
             }
 
-            return await Authenticate(prefix, viewModel.ReturnUrl, Amr, authenticationResult.AuthenticatedUser, token, viewModel.RememberLogin);
+            return await Authenticate(prefix, 
+                viewModel.ReturnUrl, 
+                Amr, 
+                authenticationResult.AuthenticatedUser, 
+                token, 
+                !viewModel.IsFirstAmr ? null : viewModel.RememberLogin);
         }
 
         protected abstract Task<UserAuthenticationResult> CustomAuthenticate(string prefix, string authenticatedUserId, T viewModel, CancellationToken cancellationToken);

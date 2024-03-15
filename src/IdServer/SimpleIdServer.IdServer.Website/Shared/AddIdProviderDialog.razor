@@ -10,7 +10,7 @@
 @inject IState<IdProviderDefsState> idProviderDefsState
 @inject IDispatcher dispatcher
 
-<RadzenSteps>
+<RadzenSteps @bind-SelectedIndex="@selectedIndex">
     <Steps>
         <RadzenStepsItem Text="@Global.IdentityProviderType">
             <div class="row gy-4">
@@ -43,31 +43,35 @@
             </div>
         </RadzenStepsItem>
         <RadzenStepsItem Text="Details" Disabled="@(SelectedIdProvider == null)">
-            <!-- Name -->
-            <div>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Name</RadzenText>
-                <RadzenTextBox Name="Name" @bind-Value="@info.Name" Class="w-100"></RadzenTextBox>
-                <RadzenRequiredValidator Component="Name" Text="@Global.NameIsRequired"></RadzenRequiredValidator>
-            </div>
-            <!-- Display name -->
-            <div>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.DisplayName</RadzenText>
-                <RadzenTextBox Name="DisplayName" @bind-Value="@info.DisplayName" Class="w-100"></RadzenTextBox>
-                <RadzenRequiredValidator Component="DisplayName" Text="@Global.DisplayNameRequired"></RadzenRequiredValidator>
-            </div>
-            <!-- Description -->
-            <div>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Description</RadzenText>
-                <RadzenTextArea @bind-Value="@info.Description" Class="w-100"></RadzenTextArea>
-            </div>
+            <RadzenTemplateForm @ref="infoForm" TItem="IdProviderInfo" Data=@info>
+                <!-- Name -->
+                <div>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Name</RadzenText>
+                    <RadzenTextBox Name="Name" @bind-Value="@info.Name" Class="w-100"></RadzenTextBox>
+                    <RadzenRequiredValidator Component="Name" Text="@Global.NameIsRequired"></RadzenRequiredValidator>
+                </div>
+                <!-- Display name -->
+                <div>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.DisplayName</RadzenText>
+                    <RadzenTextBox Name="DisplayName" @bind-Value="@info.DisplayName" Class="w-100"></RadzenTextBox>
+                    <RadzenRequiredValidator Component="DisplayName" Text="@Global.DisplayNameRequired"></RadzenRequiredValidator>
+                </div>
+                <!-- Description -->
+                <div>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Description</RadzenText>
+                    <RadzenTextArea @bind-Value="@info.Description" Class="w-100"></RadzenTextArea>
+                </div>
+            </RadzenTemplateForm>
         </RadzenStepsItem>
-        <RadzenStepsItem Text="Properties" Disabled="@(SelectedIdProvider == null || string.IsNullOrWhiteSpace(info?.Name) || string.IsNullOrWhiteSpace(info?.DisplayName))">
+        <RadzenStepsItem Text="Properties" Disabled="@(SelectedIdProvider == null)">
             <EditConfiguration IsUpdating="@IsAdding" IsAddForm="true" PropertiesSaved=@SaveIdProvider Name=@SelectedIdProvider.OptionsName></EditConfiguration>
         </RadzenStepsItem>
     </Steps>
 </RadzenSteps>
 
 @code {
+    int _selectedIndex;
+    RadzenTemplateForm<IdProviderInfo> infoForm;
     record IdProviderInfo
     {
         public string Name { get; set; } = null!;
@@ -75,14 +79,31 @@
         public string? Description { get; set; } = null;
         public string Source { get; set; }
     }
-
     bool IsAdding { get; set; } = false;
     IdProviderInfo info = new IdProviderInfo();
+    EditContext editContext;
     AuthenticationSchemeProviderDefinition? SelectedIdProvider { get; set; } = null;
+    int selectedIndex
+    {
+        get
+        {
+            return _selectedIndex;
+        }
+        set
+        {
+            if(value == 2)
+            {
+                if (!this.infoForm.EditContext.Validate()) return;
+            }
+
+            _selectedIndex = value;
+        }
+    }
 
     protected override void OnAfterRender(bool firstRender)
     {
         base.OnAfterRender(firstRender);
+        editContext = new EditContext(info);
         if(firstRender)
         {
             var act = new GetIdProviderDefsAction();

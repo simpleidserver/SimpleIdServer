@@ -184,6 +184,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
             };
         }
 
+        [ReducerMethod]
         public static UpdateCertificateAuthorityState ReduceStartAddCertificateAuthorityAction(UpdateCertificateAuthorityState state, StartAddCertificateAuthorityAction action)
         {
             return state with

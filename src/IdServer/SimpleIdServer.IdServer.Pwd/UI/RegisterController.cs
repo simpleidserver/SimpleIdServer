@@ -27,7 +27,7 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
     }
 
     [HttpGet]
-    public async Task<IActionResult> Index([FromRoute] string prefix, string redirectUrl)
+    public async Task<IActionResult> Index([FromRoute] string prefix, string? redirectUrl = null)
     {
         prefix = prefix ?? Constants.Prefix;
         var viewModel = new PwdRegisterViewModel();

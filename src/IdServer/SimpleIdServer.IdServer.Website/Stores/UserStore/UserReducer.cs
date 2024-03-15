@@ -3,7 +3,6 @@
 using Fluxor;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Website.Stores.ClientStore;
 using SimpleIdServer.IdServer.Website.Stores.GroupStore;
 using System.Data;
 using User = SimpleIdServer.IdServer.Domains.User;
@@ -253,15 +252,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         #endregion
 
         #region UpdateUserState
-
-        [ReducerMethod]
-        public static UpdateUserState ReduceStartGenerateClientKeyAction(UpdateUserState state, StartGenerateClientKeyAction act)
-        {
-            return new UpdateUserState(false)
-            {
-                ErrorMessage = null
-            };
-        }
 
         [ReducerMethod]
         public static UpdateUserState ReduceStartAddUserAction(UpdateUserState state, StartAddUserAction act)

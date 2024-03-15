@@ -1,4 +1,5 @@
 ﻿@page "/acrs"
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 @using Microsoft.AspNetCore.Http;
 @using Microsoft.Extensions.Options;
 @using SimpleIdServer.IdServer.Website.Resources;
@@ -6,6 +7,7 @@
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject DialogService dialogService
+@inject ProtectedSessionStorage sessionStorage
 @inject ContextMenuService contextMenuService
 @inject NotificationService notificationService
 @inject IOptions<IdServerWebsiteOptions> Options;
@@ -53,7 +55,14 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableAcr" Filterable="false" Sortable="false" Title="@Global.Name" Width="80px">
             <Template Context="data">
-                <RadzenLink Path="@GetDemoUrl(data)" Target="_blank">@data.Value.Name</RadzenLink>
+                @if(activeRealm == SimpleIdServer.IdServer.Constants.DefaultRealm)
+                {
+                    <RadzenLink Path="@GetDemoUrl(data)" Target="_blank">@data.Value.Name</RadzenLink>
+                }
+                else
+                {
+                    <RadzenText>@data.Value.Name</RadzenText>
+                }
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableAcr" Property="Value.DisplayName" Filterable="false" Sortable="false" Title="@Global.DisplayName" Width="80px" />
@@ -77,6 +86,7 @@
 @code {
     RadzenDataGrid<SelectableAcr> acrsGrid;
     bool selectAll = false;
+    string activeRealm;
 
     protected override void OnAfterRender(bool firstRender)
     {
@@ -91,6 +101,12 @@
             if (!acrsState.Value.IsLoading)
                 acrsGrid.Reload();
         }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        base.OnInitializedAsync();
+        activeRealm = await GetRealm();
     }
 
     void ToggleChanged(bool isSelected, SelectableAcr acr)
@@ -112,13 +128,13 @@
             new ContextMenuItem { Text = Global.Delete, Value = 1 }
         }, (a) =>
     {
-        if (a.Value.Equals(1))
-        {
-            var acrIds = acrsState.Value.Acrs?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
-            var act = new DeleteSelectedAcrsAction { Ids = acrIds };
-            dispatcher.Dispatch(act);
-            contextMenuService.Close();
-        }
+    if (a.Value.Equals(1))
+    {
+        var acrIds = acrsState.Value.Acrs?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
+        var act = new DeleteSelectedAcrsAction { Ids = acrIds };
+        dispatcher.Dispatch(act);
+        contextMenuService.Close();
+    }
     });
     }
 
@@ -152,5 +168,12 @@
     string GetDemoUrl(SelectableAcr selectableAcr)
     {
         return $"/login?acrValues={selectableAcr.Value.Name}";
+    }
+
+    async Task<string> GetRealm()
+    {
+        var realm = await sessionStorage.GetAsync<string>("realm");
+        var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+        return realmStr;
     }
 }

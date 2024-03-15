@@ -17,7 +17,7 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.16")
+                .HasAnnotation("ProductVersion", "7.0.17")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -1112,6 +1112,9 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
 
                     b.Property<string>("DisplayCondition")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsRequired")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()

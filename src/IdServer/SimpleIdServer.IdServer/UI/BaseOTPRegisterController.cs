@@ -48,7 +48,7 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
 
 
     [HttpGet]
-    public async Task<IActionResult> Index([FromRoute] string prefix, string redirectUrl)
+    public async Task<IActionResult> Index([FromRoute] string prefix, string? redirectUrl = null)
     {
         prefix = prefix ?? SimpleIdServer.IdServer.Constants.Prefix;
         var viewModel = Activator.CreateInstance<TViewModel>();

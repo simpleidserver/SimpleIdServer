@@ -32,6 +32,9 @@ else
     {
         @Html.AntiForgeryToken()
         <input type="hidden" value="@Model.ReturnUrl" name="ReturnUrl" />
+        <input asp-for="IsFirstAmr" type="hidden" class="form-control" />
+        <input asp-for="IsLoginMissing" type="hidden" class="form-control" />
+        <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
         <div class="alert alert-info">
             Default credentials :
             <p style="margin: 0px;">
@@ -55,16 +58,13 @@ else
         <div class="input-group mb-3">
             <input type="password" value="@Model.Password" name="Password" class="form-control" placeholder="@AuthenticatePasswordResource.password">
         </div>
-        @if (Model.IsRememberMeDisplayed)
+        @if (Model.IsFirstAmr)
         {
             <div>
-                <input type="checkbox" value="@Model.RememberLogin" name="RememberLogin" />
+                <input type="checkbox" name="RememberLogin" />
                 <label>@AuthenticatePasswordResource.remember_login</label>
             </div>
         }
-
-        <input asp-for="IsLoginMissing" type="hidden" class="form-control" />
-        <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
         <button type="submit" class="btn btn-primary">@AuthenticatePasswordResource.submit</button>
     }
     @if(Model.CanResetPassword)

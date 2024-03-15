@@ -17,7 +17,7 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.16")
+                .HasAnnotation("ProductVersion", "7.0.17")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -1112,6 +1112,9 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
 
                     b.Property<string>("DisplayCondition")
                         .HasColumnType("text");
+
+                    b.Property<bool>("IsRequired")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()

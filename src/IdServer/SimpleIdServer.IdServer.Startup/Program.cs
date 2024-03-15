@@ -15,7 +15,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NeoSmart.Caching.Sqlite.AspNetCore;
 using SimpleIdServer.Configuration;
-using SimpleIdServer.Configuration.Redis;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Console;
 using SimpleIdServer.IdServer.Domains;
@@ -81,7 +80,6 @@ if (identityServerConfiguration.IsForwardedEnabled)
         options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
     });
 }
-
 
 builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
     .AllowAnyMethod()
@@ -182,8 +180,8 @@ void ConfigureIdServer(IServiceCollection services)
 
 void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
 {
-    var section = builder.Configuration.GetSection(nameof(DistributedCacheConfiguration));
-    var conf = section.Get<DistributedCacheConfiguration>();
+    var section = builder.Configuration.GetSection(nameof(StorageConfiguration));
+    var conf = section.Get<StorageConfiguration>();
     builder.AddAutomaticConfiguration(o =>
     {
         o.Add<FacebookOptionsLite>();
@@ -197,34 +195,27 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
         o.Add<IdServerConsoleOptions>();
         o.Add<GotifyOptions>();
         o.Add<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>();
-        if (conf.Type == DistributedCacheTypes.REDIS)
+        o.UseEFConnector(b =>
         {
-            o.UseRedisConnector(conf.ConnectionString);
-        }
-        else
-        {
-            o.UseEFConnector(b =>
+            switch (conf.Type)
             {
-                switch (conf.Type)
-                {
-                    case DistributedCacheTypes.INMEMORY:
-                        b.UseInMemoryDatabase(conf.ConnectionString);
-                        break;
-                    case DistributedCacheTypes.SQLSERVER:
-                        b.UseSqlServer(conf.ConnectionString);
-                        break;
-                    case DistributedCacheTypes.POSTGRE:
-                        b.UseNpgsql(conf.ConnectionString);
-                        break;
-                    case DistributedCacheTypes.MYSQL:
-                        b.UseMySql(conf.ConnectionString, ServerVersion.AutoDetect(conf.ConnectionString));
-                        break;
-                    case DistributedCacheTypes.SQLITE:
-                        b.UseSqlite(conf.ConnectionString);
-                        break;
-                }
-            });
-        }
+                case StorageTypes.INMEMORY:
+                    b.UseInMemoryDatabase(conf.ConnectionString);
+                    break;
+                case StorageTypes.SQLSERVER:
+                    b.UseSqlServer(conf.ConnectionString);
+                    break;
+                case StorageTypes.POSTGRE:
+                    b.UseNpgsql(conf.ConnectionString);
+                    break;
+                case StorageTypes.MYSQL:
+                    b.UseMySql(conf.ConnectionString, ServerVersion.AutoDetect(conf.ConnectionString));
+                    break;
+                case StorageTypes.SQLITE:
+                    b.UseSqlite(conf.ConnectionString);
+                    break;
+            }
+        });
     });
 }
 
@@ -269,7 +260,7 @@ void ConfigureDistributedCache()
             // Note : we cannot use the same database, because the library Neosmart, checks if the database contains only two tables and one index.
             builder.Services.AddSqliteCache(options =>
             {
-                options.CachePath = "SidCache.db";
+                options.CachePath = conf.ConnectionString;
             });
             break;
     }

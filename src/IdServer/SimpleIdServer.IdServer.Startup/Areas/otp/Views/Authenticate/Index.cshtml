@@ -37,6 +37,9 @@ else
         @Html.AntiForgeryToken()
         <input type="hidden" asp-for="ReturnUrl" />
         <input type="hidden" name="Action" value="AUTHENTICATE" />
+        <input asp-for="IsFirstAmr" type="hidden" class="form-control" />
+        <input asp-for="IsLoginMissing" type="hidden" class="form-control" />
+        <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
         <!-- Login -->
         <div class="input-group mb-3">
             @if (Model.IsAuthInProgress)
@@ -53,7 +56,7 @@ else
         <div class="input-group mb-3">
             <input asp-for="OTPCode" placeholder="@AuthenticateOtpResource.confirmationcode" type="password" class="form-control" />
         </div>
-        @if (Model.IsRememberMeDisplayed)
+        @if (Model.IsFirstAmr)
         {
             <div>
                 <input type="checkbox" asp-for="RememberLogin " />
@@ -61,8 +64,6 @@ else
             </div>
         }
 
-        <input asp-for="IsLoginMissing" type="hidden" class="form-control" />
-        <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
         <button type="submit" class="btn btn-primary">@AuthenticateOtpResource.authenticate</button>
     }
 }

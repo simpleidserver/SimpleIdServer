@@ -104,8 +104,7 @@ public class ResetController : BaseController
 
         var url = Url.Action("Confirm", "Reset", new
         {
-            area = Constants.Areas.Password,
-            returnUrl = viewModel.ReturnUrl
+            area = Constants.Areas.Password
         });
         var issuer = Request.GetAbsoluteUriWithVirtualPath();
         var parameter = new ResetPasswordParameter(
@@ -114,7 +113,8 @@ public class ResetController : BaseController
             prefix, 
             options.ResetPasswordBody, 
             options.ResetPasswordTitle, 
-            options.ResetPasswordLinkExpirationInSeconds);
+            options.ResetPasswordLinkExpirationInSeconds,
+            viewModel.ReturnUrl);
         try
         {
             await service.SendResetLink(parameter, cancellationToken);
