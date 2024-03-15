@@ -561,7 +561,8 @@ namespace SimpleIdServer.Scim.Api
                 var location = GetLocation(representation);
                 var content = representation.ToResponse(location, true, mergeExtensionAttributes: _options.MergeExtensionAttributes);
                 if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
-                return BuildHTTPResult(HttpStatusCode.OK, location, representation.Version, content);
+                if(!_options.IsFullRepresentationReturned) return BuildHTTPResult(HttpStatusCode.OK, location, representation.Version, content);
+                return await InternalGet(id, new GetSCIMResourceRequest(), CancellationToken.None);
             }
             catch (SCIMUniquenessAttributeException ex)
             {
@@ -618,7 +619,8 @@ namespace SimpleIdServer.Scim.Api
                 var location = GetLocation(representation);
                 var content = representation.ToResponse(location, true, mergeExtensionAttributes: _options.MergeExtensionAttributes);
                 if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
-                return BuildHTTPResult(HttpStatusCode.OK, location, representation.Version, content);
+                if(!_options.IsFullRepresentationReturned) return BuildHTTPResult(HttpStatusCode.OK, location, representation.Version, content);
+                return await InternalGet(id, new GetSCIMResourceRequest(), CancellationToken.None);
             }
             catch (SCIMDuplicateAttributeException ex)
             {

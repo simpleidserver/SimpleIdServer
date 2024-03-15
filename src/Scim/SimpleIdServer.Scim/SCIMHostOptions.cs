@@ -81,5 +81,6 @@ namespace SimpleIdServer.Scim
         /// Register to the events.
         /// </summary>
         public SCIMHostEvents SCIMEvents { get; set; } = new SCIMHostEvents();
+        public bool IsFullRepresentationReturned { get; set; }
     }
 }
