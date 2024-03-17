@@ -6,6 +6,7 @@
 		<Description>Add verifiable presentation authentication.</Description>
 	</PropertyGroup>
 	<ItemGroup>
+	  <ProjectReference Include="..\..\Did\SimpleIdServer.Vp\SimpleIdServer.Vp.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
 	</ItemGroup>
 	<ItemGroup>

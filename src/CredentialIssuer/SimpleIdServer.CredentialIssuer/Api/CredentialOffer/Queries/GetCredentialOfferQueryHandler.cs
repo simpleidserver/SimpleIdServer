@@ -13,9 +13,9 @@ namespace SimpleIdServer.CredentialIssuer.Api.CredentialOffer.Queries;
 
 public interface IGetCredentialOfferQueryHandler
 {
-    CredentialOfferResult Get(GetCredentialOfferQuery query);
-    byte[] GetQrCode(GetCredentialOfferQuery query);
-    CredentialOfferRecordResult ToDto(CredentialOfferRecord credentialOffer, string issuer);
+    CredentialOfferResult Get(GetCredentialOfferQuery query, string authorizationServer);
+    byte[] GetQrCode(GetCredentialOfferQuery query, string authorizationServer);
+    CredentialOfferRecordResult ToDto(CredentialOfferRecord credentialOffer, string issuer, string authorizationServer);
 }
 
 public class GetCredentialOfferQuery
@@ -33,21 +33,21 @@ public class GetCredentialOfferQueryHandler : IGetCredentialOfferQueryHandler
         _options = options.Value;
     }
 
-    public CredentialOfferResult Get(GetCredentialOfferQuery query)
+    public CredentialOfferResult Get(GetCredentialOfferQuery query, string authorizationServer)
     {
-        return ToOfferDtoResult(query.CredentialOffer, query.Issuer);
+        return ToOfferDtoResult(query.CredentialOffer, query.Issuer, authorizationServer);
     }
 
-    public byte[] GetQrCode(GetCredentialOfferQuery query)
+    public byte[] GetQrCode(GetCredentialOfferQuery query, string authorizationServer)
     {
-        var dto = ToDto(query.CredentialOffer, query.Issuer);
+        var dto = ToDto(query.CredentialOffer, query.Issuer, authorizationServer);
         var qrGenerator = new QRCodeGenerator();
         var qrCodeData = qrGenerator.CreateQrCode(dto.OfferUri, QRCodeGenerator.ECCLevel.Q);
         var qrCode = new PngByteQRCode(qrCodeData);
         return qrCode.GetGraphic(20);
     }
 
-    public CredentialOfferRecordResult ToDto(CredentialOfferRecord credentialOffer, string issuer)
+    public CredentialOfferRecordResult ToDto(CredentialOfferRecord credentialOffer, string issuer, string authorizationServer)
     {
         var result = new CredentialOfferRecordResult
         {
@@ -56,7 +56,7 @@ public class GetCredentialOfferQueryHandler : IGetCredentialOfferQueryHandler
             Subject = credentialOffer.Subject,
             CredentialConfigurationIds = credentialOffer.CredentialConfigurationIds,
             CreateDateTime = credentialOffer.CreateDateTime,
-            Offer = ToOfferDtoResult(credentialOffer, issuer)
+            Offer = ToOfferDtoResult(credentialOffer, issuer, authorizationServer)
         };
         if (_options.IsCredentialOfferReturnedByReference)
             result.OfferUri = SerializeByReference(result, issuer);
@@ -66,7 +66,7 @@ public class GetCredentialOfferQueryHandler : IGetCredentialOfferQueryHandler
         return result;
     }
 
-    private CredentialOfferResult ToOfferDtoResult(CredentialOfferRecord credentialOffer, string issuer)
+    private CredentialOfferResult ToOfferDtoResult(CredentialOfferRecord credentialOffer, string issuer, string authorizationServer)
     {
         AuthorizedCodeGrant authorizedCodeGrant = null;
         PreAuthorizedCodeGrant preAuthorizedCodeGrant = null;
@@ -82,7 +82,8 @@ public class GetCredentialOfferQueryHandler : IGetCredentialOfferQueryHandler
         {
             preAuthorizedCodeGrant = new PreAuthorizedCodeGrant
             {
-                PreAuthorizedCode = credentialOffer.PreAuthorizedCode
+                PreAuthorizedCode = credentialOffer.PreAuthorizedCode,
+                AuthorizationServer = authorizationServer
             };
         }
 

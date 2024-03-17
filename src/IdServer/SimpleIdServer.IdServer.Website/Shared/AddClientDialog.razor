@@ -433,7 +433,32 @@
                             </div>
                             <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? Global.Adding : Global.Save)" Disabled="@(addClientState.Value.IsAdding)" />
                         </RadzenTemplateForm>
-                        break;                       
+                        break;  
+                    // Wallet
+                    case ClientTypes.WALLET:
+                        <RadzenTemplateForm Submit=@AddWallet TItem="Wallet" Data=@wallet>
+                            @if (!addClientState.Value.IsAdding && !string.IsNullOrWhiteSpace(addClientState.Value.ErrorMessage))
+                            {
+                                <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@addClientState.Value.ErrorMessage</RadzenAlert>
+                            }
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Identifier</RadzenText>
+                                <RadzenTextBox Name="ClientIdentifier" @bind-Value="@wallet.ClientId" Class="w-100"></RadzenTextBox>
+                                <RadzenRequiredValidator Component="ClientIdentifier" Text="@Global.IdentifierIsRequired"></RadzenRequiredValidator>
+                            </div>
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Secret</RadzenText>
+                                <RadzenPassword Name="ClientSecret" @bind-Value="@wallet.ClientSecret" Class="w-100"></RadzenPassword>
+                                <RadzenRequiredValidator Component="ClientSecret" Text="@Global.SecretIsRequired"></RadzenRequiredValidator>
+                            </div>
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Name</RadzenText>
+                                <RadzenTextBox Name="ClientName" @bind-Value="@wallet.ClientName" Class="w-100"></RadzenTextBox>
+                            </div>
+                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? Global.Adding : Global.Save)" Disabled="@(addClientState.Value.IsAdding)" />
+                        </RadzenTemplateForm>
+
+                        break;
                 }
             }
         </RadzenStepsItem>
@@ -540,6 +565,13 @@
         public string RedirectionUris { get; set; }
     }
 
+    record Wallet
+    {
+        public string ClientId { get; set; }
+        public string ClientSecret { get; set; }
+        public string ClientName { get; set; }
+    }
+
     record ProofOfPossession
     {
         public string Name { get; set; }
@@ -563,6 +595,7 @@
     DeviceApplication deviceApplication = new DeviceApplication();
     SamlSpApplication samlSpApplication = new SamlSpApplication();
     CredentialIssuerApplication credentialIssuerApplication = new CredentialIssuerApplication();
+    Wallet wallet = new Wallet();
     ICollection<ProofOfPossession> ProofOfPossessions { get; set; } = new List<ProofOfPossession>
     {
         new ProofOfPossession { Name = DpopName, Description = "DPoP" },
@@ -611,7 +644,8 @@
         new ApplicationType { Name = Global.HighlySecuredWebApp, ClientTemplate = ClientTemplateTypes.FAPI, ShortDescription = Global.HighlySecuredWebAppShortDescription, Description = Global.HighlySecuredWebAppDescription, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/WebsiteClient.png", Type = ClientTypes.HIGHLYSECUREDWEBSITE },
         new ApplicationType { Name = Global.GrantMgt, ClientTemplate = ClientTemplateTypes.FAPI, ShortDescription = Global.GrantMgtShortDescription, Description = Global.GrantMgtDescription, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/WebsiteClient.png", Type = ClientTypes.GRANTMANAGEMENT },
         new ApplicationType { Name = Global.ExternalDeviceAuth, ClientTemplate = ClientTemplateTypes.FAPI,  ShortDescription = Global.ExternalDeviceAuthShortDescription, Description = Global.ExternalDeviceDescription, Type = ClientTypes.EXTERNAL, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/ExternalDeviceClient.png" },
-        new ApplicationType { Name = Global.CredentialIssuer, ClientTemplate = ClientTemplateTypes.CREDENTIALISSUER, ShortDescription = Global.CredentialIssuerShortDescription, Description = Global.CredentialIssuerDescription, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/CredentialIssuer.png", Type = ClientTypes.CREDENTIAL_ISSUER }
+        new ApplicationType { Name = Global.CredentialIssuer, ClientTemplate = ClientTemplateTypes.CREDENTIALISSUER, ShortDescription = Global.CredentialIssuerShortDescription, Description = Global.CredentialIssuerDescription, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/CredentialIssuer.png", Type = ClientTypes.CREDENTIAL_ISSUER },
+        new ApplicationType { Name = Global.Wallet, ClientTemplate = ClientTemplateTypes.CREDENTIALISSUER, ShortDescription = Global.WalletShortDescription, Description = Global.WalletDescription, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/Wallet.png", Type = ClientTypes.WALLET }
     };
 
     ICollection<ClientTemplate> ClientTemplates { get; set; } = new List<ClientTemplate>
@@ -688,5 +722,10 @@
     void AddCredentialIssuerApplication(CredentialIssuerApplication credentialIssuerApplication)
     {
         dispatcher.Dispatch(new AddCredentialIssuerApplicationAction { ClientId = credentialIssuerApplication.ClientIdentifier, ClientName = credentialIssuerApplication.ClientName, ClientSecret = credentialIssuerApplication.ClientSecret, RedirectionUrls = credentialIssuerApplication.RedirectionUris.Split(';') });
+    }
+
+    void AddWallet(Wallet wallet)
+    {
+        dispatcher.Dispatch(new AddWalletAction { ClientId = wallet.ClientId, ClientName = wallet.ClientName, ClientSecret = wallet.ClientSecret });
     }
 }

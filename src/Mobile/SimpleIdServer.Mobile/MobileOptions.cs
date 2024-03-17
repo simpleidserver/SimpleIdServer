@@ -7,5 +7,7 @@
         public string IdServerUrl { get; set; } = $"https://{LocalhostIp}:5001/master";
         public string WsServer { get; set; }
         public bool IsDev { get; set; } = true;
+        public string ClientId { get; set; } = "walletClient";
+        public string ClientSecret = "password";
     }
 }

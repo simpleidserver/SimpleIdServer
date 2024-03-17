@@ -94,6 +94,9 @@
 	  <Compile Update="NotificationPage.xaml.cs">
 	    <DependentUpon>NotificationPage.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="WalletPage.xaml.cs">
+	    <DependentUpon>WalletPage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="ViewCredentialListPage.xaml.cs">
 	    <DependentUpon>ViewCredentialListPage.xaml</DependentUpon>
 	  </Compile>
@@ -119,6 +122,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="NotificationPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="WalletPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="ViewCredentialListPage.xaml">

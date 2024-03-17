@@ -24,6 +24,7 @@ namespace SimpleIdServer.Mobile
             _database = new SQLiteAsyncConnection(options);
             await _database.CreateTableAsync<CredentialRecord>();
             await _database.CreateTableAsync<OTPCode>();
+            await _database.CreateTableAsync<VerifiableCredentialRecord>();
             var result = await _database.CreateTableAsync<MobileSettings>();
             if(result == CreateTableResult.Created) await _database.InsertAsync(new MobileSettings { Id = Guid.NewGuid().ToString() });
         }
@@ -31,6 +32,18 @@ namespace SimpleIdServer.Mobile
         public MobileDatabase(string dbPath)
         {
             _dbPath = dbPath;
+        }
+
+        public async Task<List<VerifiableCredentialRecord>> GetVerifiableCredentials()
+        {
+            await Init();
+            return await _database.Table<VerifiableCredentialRecord>().ToListAsync();
+        }
+
+        public async Task AddVerifiableCredential(VerifiableCredentialRecord verifiableCredential)
+        {
+            await Init();
+            await _database.InsertAsync(verifiableCredential);
         }
 
         public async Task<List<OTPCode>> GetOTPCodes()

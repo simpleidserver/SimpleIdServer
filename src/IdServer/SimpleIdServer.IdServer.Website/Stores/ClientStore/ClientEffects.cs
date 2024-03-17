@@ -214,6 +214,16 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         }
 
         [EffectMethod]
+        public async Task Handle(AddWalletAction action, IDispatcher dispatcher)
+        {
+            var newClientBuilder = ClientBuilder.BuildWalletClient(action.ClientId, action.ClientSecret, null);
+            if (!string.IsNullOrWhiteSpace(action.ClientName))
+                newClientBuilder.SetClientName(action.ClientName, CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
+            var newClient = newClientBuilder.Build();
+            await CreateClient(newClient, dispatcher, ClientTypes.WALLET);
+        }
+
+        [EffectMethod]
         public async Task Handle(AddWsFederationApplicationAction action, IDispatcher dispatcher)
         {
             var newClientBuilder = WsClientBuilder.BuildWsFederationClient(action.ClientId, null);
@@ -839,6 +849,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public string ClientName { get; set; } = null!;
         public string ClientSecret { get; set; } = null!;
         public IEnumerable<string> RedirectionUrls { get; set; } = new List<string>();
+    }
+
+    public class AddWalletAction
+    {
+        public string ClientId { get; set; }
+        public string ClientSecret { get; set; }
+        public string ClientName { get; set; }
     }
 
     public class AddWsFederationApplicationAction

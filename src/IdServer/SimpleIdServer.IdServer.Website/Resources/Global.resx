@@ -1758,4 +1758,13 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="WsRelyingPartyShortDescription" xml:space="preserve">
     <value>WS-Federation application</value>
   </data>
+  <data name="Wallet" xml:space="preserve">
+    <value>Wallet</value>
+  </data>
+  <data name="WalletDescription" xml:space="preserve">
+    <value>Utilize the mobile application as an electronic wallet</value>
+  </data>
+  <data name="WalletShortDescription" xml:space="preserve">
+    <value>Mobile application</value>
+  </data>
 </root>

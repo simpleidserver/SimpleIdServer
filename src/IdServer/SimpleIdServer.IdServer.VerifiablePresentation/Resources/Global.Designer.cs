@@ -61,6 +61,51 @@ namespace SimpleIdServer.IdServer.VerifiablePresentation.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à the incoming request is not valid.
+        /// </summary>
+        public static string InvalidIncomingRequest {
+            get {
+                return ResourceManager.GetString("InvalidIncomingRequest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the presentation submission is not valid.
+        /// </summary>
+        public static string InvalidPresentationSubmission {
+            get {
+                return ResourceManager.GetString("InvalidPresentationSubmission", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the vp_token is an invalid verifiable presentation.
+        /// </summary>
+        public static string InvalidVerifiablePresentation {
+            get {
+                return ResourceManager.GetString("InvalidVerifiablePresentation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the parameter {0} is missing.
+        /// </summary>
+        public static string MissingParameter {
+            get {
+                return ResourceManager.GetString("MissingParameter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à either the state is invalid or the vp offer is expired.
+        /// </summary>
+        public static string StateIsNotValid {
+            get {
+                return ResourceManager.GetString("StateIsNotValid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à the presentation definition {0} doesn&apos;t exist.
         /// </summary>
         public static string UnknownPresentationDefinition {

@@ -4864,6 +4864,33 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Wallet.
+        /// </summary>
+        public static string Wallet {
+            get {
+                return ResourceManager.GetString("Wallet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Utilize the mobile application as an electronic wallet.
+        /// </summary>
+        public static string WalletDescription {
+            get {
+                return ResourceManager.GetString("WalletDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Mobile application.
+        /// </summary>
+        public static string WalletShortDescription {
+            get {
+                return ResourceManager.GetString("WalletShortDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Web application.
         /// </summary>
         public static string WebApp {
