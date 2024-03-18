@@ -14,7 +14,6 @@ using System.Text.Json.Nodes;
 using System.Web;
 using System.Windows.Input;
 using ZXing.Net.Maui;
-using SimpleIdServer.Vc.Models;
 #if IOS
 using Firebase.CloudMessaging;
 #endif
@@ -339,10 +338,28 @@ public class QRCodeScannerViewModel
             var serializedQueryParams = qrCodeValue.Replace(openidCredentialOfferScheme, string.Empty);
             var encodedJson = HttpUtility.UrlDecode(serializedQueryParams);
             var credentialOffer = JsonSerializer.Deserialize<CredentialOffer>(encodedJson);
+            if (credentialOffer.CredentialConfigurationIds.Count() != 1)
+            {
+                await _promptService.ShowAlert("Error", "only one credential can be enrolled");
+                return;
+            }
+
             using (var httpClient = _httpClientFactory.Build())
             {
+                var credentialDefinition = await GetCredentialDefinition(httpClient, credentialOffer);
+                var serializedCredentialDef = credentialDefinition.CredentialsSupported
+                    .Single(kvp => kvp.Key == credentialOffer.CredentialConfigurationIds.Single())
+                    .Value.ToJsonString();
+                var offeredCredential = JsonSerializer.Deserialize<CredentialDefinitionResult>(serializedCredentialDef);
+                if (!offeredCredential.Display.Any())
+                {
+                    await _promptService.ShowAlert("Error", "credential cannot be enrolled because its definition doesn't contain display information");
+                    return;
+                }
+
+                var display = offeredCredential.Display.First();
                 var accessToken = await GetAccessTokenWithPreauthCode(credentialOffer, httpClient);
-                var credentialResult = await GetCredential(httpClient, accessToken);
+                var credentialResult = await GetCredential(httpClient, accessToken, credentialOffer);
                 var serializedVc = credentialResult.Credential.ToJsonString();
                 var w3cVc = JsonSerializer.Deserialize<W3CVerifiableCredential>(serializedVc);
                 await _verifiableCredentialListState.AddVerifiableCredentialRecord(new VerifiableCredentialRecord
@@ -353,10 +370,25 @@ public class QRCodeScannerViewModel
                     Description = w3cVc.Description,
                     ValidFrom = w3cVc.ValidFrom,
                     ValidUntil = w3cVc.ValidUntil,
-                    SerializedVc = serializedVc
+                    SerializedVc = serializedVc,
+                    BackgroundColor = display.BackgroundColor,
+                    TextColor = display.TextColor,
+                    Logo = display.Logo?.Uri
                 });
                 await _promptService.ShowAlert("Success", "The verifiable credential has been enrolled");
             }
+        }
+
+        async Task<CredentialIssuerResult> GetCredentialDefinition(HttpClient httpClient, CredentialOffer credentialOffer)
+        {
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(_urlService.GetUrl($"{credentialOffer.CredentialIssuer}/.well-known/openid-credential-issuer"))
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<CredentialIssuerResult>(json);
         }
 
         async Task<string> GetAccessTokenWithPreauthCode(CredentialOffer credentialOffer, HttpClient httpClient)
@@ -372,7 +404,7 @@ public class QRCodeScannerViewModel
             {
                 Method = HttpMethod.Post,
                 Content = new FormUrlEncodedContent(dic),
-                RequestUri = new Uri($"{credentialOffer.Grants.PreAuthorizedCodeGrant.AuthorizationServer}/token")
+                RequestUri = new Uri(_urlService.GetUrl($"{credentialOffer.Grants.PreAuthorizedCodeGrant.AuthorizationServer}/token"))
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
@@ -380,7 +412,7 @@ public class QRCodeScannerViewModel
             return accessToken.ToString();
         }
 
-        async Task<CredentialResult> GetCredential(HttpClient httpClient, string accessToken)
+        async Task<CredentialResult> GetCredential(HttpClient httpClient, string accessToken, CredentialOffer credentialOffer)
         {
             var credentialRequest = new CredentialRequest
             {
@@ -389,6 +421,7 @@ public class QRCodeScannerViewModel
             var requestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
+                RequestUri = new Uri(_urlService.GetUrl($"{credentialOffer.CredentialIssuer}/credential")),
                 Content = new StringContent(JsonSerializer.Serialize(credentialRequest), Encoding.UTF8, "application/json")
             };
             requestMessage.Headers.Add("Authorization", $"Bearer {accessToken}");

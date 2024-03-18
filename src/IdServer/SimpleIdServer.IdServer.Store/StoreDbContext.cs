@@ -104,6 +104,10 @@ namespace SimpleIdServer.IdServer.Store
             builder.ApplyConfiguration(new GroupRealmConfiguration());
             builder.ApplyConfiguration(new GroupUserConfiguration());
             builder.ApplyConfiguration(new GotifySessionConfiguration());
+            builder.ApplyConfiguration(new PresentationDefinitionConfiguration());
+            builder.ApplyConfiguration(new PresentationDefinitionFormatConfiguration());
+            builder.ApplyConfiguration(new PresentationDefinitionInputDescriptorConfiguration());
+            builder.ApplyConfiguration(new PresentationDefinitionInputDescriptorConstraintConfiguration());
         }
     }
 }

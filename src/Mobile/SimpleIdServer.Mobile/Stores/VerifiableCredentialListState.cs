@@ -12,22 +12,17 @@ public class VerifiableCredentialListState
         _database = App.Database;
     }
 
-    public ObservableCollection<SelectableVerifiableCredentialRecord> VerifiableCredentialRecords { get; set; } = new ObservableCollection<SelectableVerifiableCredentialRecord>();
+    public ObservableCollection<VerifiableCredentialRecord> VerifiableCredentialRecords { get; set; } = new ObservableCollection<VerifiableCredentialRecord>();
+
+    public async Task Load()
+    {
+        var vcLst = await _database.GetVerifiableCredentials();
+        foreach (var vc in vcLst) VerifiableCredentialRecords.Add(vc);
+    }
 
     public async Task AddVerifiableCredentialRecord(VerifiableCredentialRecord verifiableCredential)
     {
         await _database.AddVerifiableCredential(verifiableCredential);
-        VerifiableCredentialRecords.Add(new SelectableVerifiableCredentialRecord(verifiableCredential));
+        VerifiableCredentialRecords.Add(verifiableCredential);
     }
-}
-
-public class SelectableVerifiableCredentialRecord
-{
-    public SelectableVerifiableCredentialRecord(VerifiableCredentialRecord verifiableCredential)
-    {
-        VerifiableCredential = verifiableCredential;
-    }
-
-    public VerifiableCredentialRecord VerifiableCredential { get; set; }
-    public bool IsSelected { get; set; }
 }

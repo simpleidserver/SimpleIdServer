@@ -1,12 +1,40 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:local="clr-namespace:SimpleIdServer.Mobile.ViewModels"
-             x:DataType="local:SettingsPageViewModel"
+             x:DataType="local:WalletViewModel"
              xmlns:converters="clr-namespace:SimpleIdServer.Mobile.Converters"
+             xmlns:models="clr-namespace:SimpleIdServer.Mobile.Models"
+             xmlns:common="clr-namespace:SimpleIdServer.Mobile.Common"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="SimpleIdServer.Mobile.WalletPage">
     <Grid Margin="20">
-        
+        <common:Loader IsVisible="{Binding Path=IsLoading}" ZIndex="2" />
+        <ListView ItemsSource="{Binding Path=VerifiableCredentials}" SelectionMode="None">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="models:VerifiableCredentialRecord">
+                    <ViewCell>
+                        <Grid BackgroundColor="{Binding Path=BackgroundColor}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="40" />
+                                <RowDefinition Height="60" />
+                                <RowDefinition Height="40" />
+                            </Grid.RowDefinitions>
+                            <StackLayout Grid.Row="0" Orientation="Vertical">
+                                <Label TextColor="{Binding Path=TextColor}" Text="{Binding Path=Name}" Style="{StaticResource vcTitle}"></Label>
+                                <Label TextColor="{Binding Path=TextColor}" Text="{Binding Path=Description}" Style="{StaticResource vcDescription}"></Label>
+                            </StackLayout>
+                            <StackLayout Grid.Row="1">
+                                
+                            </StackLayout>
+                            <StackLayout Grid.Row="2" Orientation="Vertical">
+                                <Label TextColor="{Binding Path=TextColor}" Text="{Binding Path=ValidFrom, StringFormat='From {0}'}"></Label>
+                                <Label TextColor="{Binding Path=TextColor}" Text="{Binding Path=ValidUntil, StringFormat='Until {0}'}"></Label>
+                            </StackLayout>
+                        </Grid>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
     </Grid>
 </ContentPage>

@@ -6,6 +6,7 @@ namespace SimpleIdServer.IdServer.Domains;
 
 public class PresentationDefinitionInputDescriptorConstraint
 {
+    public string Id { get; set; }
     /// <summary>
     /// . The value of this property MUST be an array of one or more JSONPath string expressions (as defined in the JSONPath Syntax Definition section) that select a target value from the input.
     /// </summary>

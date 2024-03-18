@@ -42,11 +42,13 @@ public static class MauiProgram
 		builder.Services.AddTransient<Factories.IHttpClientFactory, Factories.HttpClientFactory>();
 		builder.Services.AddSingleton(new OtpListState());
 		builder.Services.AddSingleton(new CredentialListState());
+		builder.Services.AddSingleton(new VerifiableCredentialListState());
         builder.Services.AddTransient<EnrollPage>();
 		builder.Services.AddTransient<NotificationPage>();
 		builder.Services.AddTransient<SettingsPage>();
 		builder.Services.AddTransient<ViewOtpListPage>();
 		builder.Services.AddTransient<QRCodeScannerPage>();
+		builder.Services.AddTransient<WalletPage>();
 		builder.Services.AddTransient<ViewCredentialListPage>();
 		builder.Services.AddTransient<QRCodeScannerViewModel>();
         builder.Services.AddTransient<EnrollViewModel>();
@@ -54,6 +56,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<ViewOtpListViewModel>();
 		builder.Services.AddTransient<ViewCredentialListViewModel>();
 		builder.Services.AddTransient<NotificationViewModel>();
+		builder.Services.AddTransient<WalletViewModel>();
 		builder.Services.Configure<MobileOptions>(o =>
 		{
 			o.WsServer = "wss://gotify.simpleidserver.com";

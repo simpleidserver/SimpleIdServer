@@ -3,11 +3,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.CredentialIssuer.Api;
 using SimpleIdServer.CredentialIssuer.Api.CredentialOffer.Commands;
 using SimpleIdServer.CredentialIssuer.Api.CredentialOffer.Queries;
 using SimpleIdServer.CredentialIssuer.Store;
 using SimpleIdServer.CredentialIssuer.UI.ViewModels;
+using SimpleIdServer.IdServer.CredentialIssuer;
 using SimpleIdServer.IdServer.CredentialIssuer.DTOs;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -22,15 +24,18 @@ public class CredentialsController : BaseController
     private readonly ICredentialConfigurationStore _credentialConfigurationStore;
     private readonly ICreateCredentialOfferCommandHandler _createCredentialOfferCommandHandler;
     private readonly IGetCredentialOfferQueryHandler _getCredentialOfferQueryHandler;
+    private readonly CredentialIssuerOptions _options;
 
     public CredentialsController(
         ICredentialConfigurationStore credentialConfigurationStore,
         ICreateCredentialOfferCommandHandler createCredentialOfferCommandHandler,
-        IGetCredentialOfferQueryHandler getCredentialOfferQueryHandler)
+        IGetCredentialOfferQueryHandler getCredentialOfferQueryHandler,
+        IOptions<CredentialIssuerOptions> options)
     {
         _credentialConfigurationStore = credentialConfigurationStore;
         _createCredentialOfferCommandHandler = createCredentialOfferCommandHandler;
         _getCredentialOfferQueryHandler = getCredentialOfferQueryHandler;
+        _options = options.Value;
     }
 
     [HttpGet]
@@ -64,7 +69,7 @@ public class CredentialsController : BaseController
         { 
             CredentialOffer = result.CredentialOffer, 
             Issuer = issuer 
-        }), "image/png");
+        }, _options.AuthorizationServer), "image/png");
     }
 }
 

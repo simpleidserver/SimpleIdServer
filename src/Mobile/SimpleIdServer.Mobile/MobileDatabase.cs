@@ -66,8 +66,8 @@ namespace SimpleIdServer.Mobile
         public async Task<MobileSettings> GetMobileSettings()
         {
             await Init();
-            var result =  await _database.Table<MobileSettings>().FirstAsync();
-            return result;
+            var result =  await _database.Table<MobileSettings>().FirstOrDefaultAsync();
+            return result ?? new MobileSettings();
         }
 
         public async Task AddCredentialRecord(CredentialRecord credentialRecord)
