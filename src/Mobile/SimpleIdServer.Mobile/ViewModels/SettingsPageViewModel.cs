@@ -1,4 +1,6 @@
-﻿using SimpleIdServer.Mobile.Models;
+﻿using SimpleIdServer.Did.Crypto;
+using SimpleIdServer.Did.Key;
+using SimpleIdServer.Mobile.Models;
 using SimpleIdServer.Mobile.Services;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -8,9 +10,11 @@ namespace SimpleIdServer.Mobile.ViewModels;
 
 public class SettingsPageViewModel : INotifyPropertyChanged
 {
+    private string _did;
     private bool _isLoading = false;
     private bool _isGotifyServerRunning;
     private MobileSettings _mobileSettings;
+    private DidRecord _didRecord;
     private CancellationTokenSource _cancellationTokenSource;
     private int _refreshIntervalMs = 2000;
 
@@ -19,12 +23,21 @@ public class SettingsPageViewModel : INotifyPropertyChanged
         Task.Run(async () =>
         {
             _mobileSettings = await App.Database.GetMobileSettings();
+            _didRecord = await App.Database.GetDidRecord();
         }).Wait();
+        Did = _didRecord?.Did;
         var notificationMode = _mobileSettings.NotificationMode ?? "firebase";
         SelectedNotificationMode = NotificationModes.Single(m => m.Name == notificationMode);
         SelectNotificationModeCommand = new Command<EventArgs>(async (c) =>
         {
             await UpdateNotification(c);
+        });
+        GenerateDidKeyCommand = new Command<EventArgs>(async (c) =>
+        {
+            await GenerateDid();
+        }, (a) =>
+        {
+            return _didRecord == null;
         });
         _cancellationTokenSource = new CancellationTokenSource();
         var listener = GotifyNotificationListener.New();
@@ -63,9 +76,27 @@ public class SettingsPageViewModel : INotifyPropertyChanged
         }
     }
 
+    public string Did
+    {
+        get
+        {
+            return _did;
+        }
+        set
+        {
+            if(_did != value)
+            {
+                _did = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public event PropertyChangedEventHandler PropertyChanged;
 
     public ICommand SelectNotificationModeCommand { get; private set; }
+
+    public ICommand GenerateDidKeyCommand { get; private set; }
 
     public void OnPropertyChanged([CallerMemberName] string name = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
@@ -80,6 +111,18 @@ public class SettingsPageViewModel : INotifyPropertyChanged
         _isLoading = true;
         _mobileSettings.NotificationMode = SelectedNotificationMode.Name;
         await App.Database.UpdateMobileSettings(_mobileSettings);
+        _isLoading = false;
+    }
+
+    private async Task GenerateDid()
+    {
+        if (_isLoading) return;
+        _isLoading = true;
+        var ed25519 = Ed25519SignatureKey.Generate();
+        var generator = DidKeyGenerator.New();
+        var did = generator.Generate(ed25519);
+        await App.Database.AddDidRecord(new DidRecord { Did = did, PrivaterKey = ed25519.GetPrivateKey() });
+        Did = did;
         _isLoading = false;
     }
 }

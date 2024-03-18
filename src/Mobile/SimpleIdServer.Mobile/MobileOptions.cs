@@ -2,7 +2,7 @@
 {
     public class MobileOptions
     {
-        public const string LocalhostIp = "192.168.50.250";
+        public const string LocalhostIp = "192.168.50.125";
         public bool IgnoreHttps { get; set; } = true;
         public string IdServerUrl { get; set; } = $"https://{LocalhostIp}:5001/master";
         public string WsServer { get; set; }

@@ -25,6 +25,7 @@ namespace SimpleIdServer.Mobile
             await _database.CreateTableAsync<CredentialRecord>();
             await _database.CreateTableAsync<OTPCode>();
             await _database.CreateTableAsync<VerifiableCredentialRecord>();
+            await _database.CreateTableAsync<DidRecord>();
             var result = await _database.CreateTableAsync<MobileSettings>();
             if(result == CreateTableResult.Created) await _database.InsertAsync(new MobileSettings { Id = Guid.NewGuid().ToString() });
         }
@@ -32,6 +33,19 @@ namespace SimpleIdServer.Mobile
         public MobileDatabase(string dbPath)
         {
             _dbPath = dbPath;
+        }
+
+        public async Task<DidRecord> GetDidRecord()
+        {
+            await Init();
+            var result = await _database.Table<DidRecord>().FirstOrDefaultAsync();
+            return result;
+        }
+
+        public async Task AddDidRecord(DidRecord didRecord)
+        {
+            await Init();
+            await _database.InsertAsync(didRecord);
         }
 
         public async Task<List<VerifiableCredentialRecord>> GetVerifiableCredentials()

@@ -8,33 +8,37 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="SimpleIdServer.Mobile.WalletPage">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:StringToColorConverter x:Key="StringToColor" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
     <Grid Margin="20">
         <common:Loader IsVisible="{Binding Path=IsLoading}" ZIndex="2" />
-        <ListView ItemsSource="{Binding Path=VerifiableCredentials}" SelectionMode="None">
-            <ListView.ItemTemplate>
-                <DataTemplate x:DataType="models:VerifiableCredentialRecord">
-                    <ViewCell>
-                        <Grid BackgroundColor="{Binding Path=BackgroundColor}">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="40" />
-                                <RowDefinition Height="60" />
-                                <RowDefinition Height="40" />
-                            </Grid.RowDefinitions>
-                            <StackLayout Grid.Row="0" Orientation="Vertical">
-                                <Label TextColor="{Binding Path=TextColor}" Text="{Binding Path=Name}" Style="{StaticResource vcTitle}"></Label>
-                                <Label TextColor="{Binding Path=TextColor}" Text="{Binding Path=Description}" Style="{StaticResource vcDescription}"></Label>
+        <CollectionView ItemsSource="{Binding Path=VerifiableCredentials}" SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Margin="5"
+                           CornerRadius="10"
+                           BorderColor="{Binding Path=BackgroundColor, Converter={StaticResource StringToColor}}"
+                           x:DataType="models:VerifiableCredentialRecord">
+                        <StackLayout>
+                            <StackLayout Orientation="Horizontal" HeightRequest="50">
+                                <StackLayout VerticalOptions="CenterAndExpand">
+                                    <Label Text="{Binding Path=Name}" Style="{StaticResource vcTitle}"></Label>
+                                    <Label Text="{Binding Path=Description}" Style="{StaticResource vcDescription}"></Label>
+                                </StackLayout>
+                                <Image HorizontalOptions="EndAndExpand" HeightRequest="50" WidthRequest="50" Source="https://img.freepik.com/premium-vector/logo-university-name-logo-company-called-university_516670-732.jpg" />
                             </StackLayout>
-                            <StackLayout Grid.Row="1">
-                                
+                            <StackLayout Orientation="Horizontal">
+                                <Button HorizontalOptions="EndAndExpand" Text="View" />
                             </StackLayout>
-                            <StackLayout Grid.Row="2" Orientation="Vertical">
-                                <Label TextColor="{Binding Path=TextColor}" Text="{Binding Path=ValidFrom, StringFormat='From {0}'}"></Label>
-                                <Label TextColor="{Binding Path=TextColor}" Text="{Binding Path=ValidUntil, StringFormat='Until {0}'}"></Label>
-                            </StackLayout>
-                        </Grid>
-                    </ViewCell>
+                            <Label Text="{Binding Path=ValidFrom, StringFormat='From {0}'}"></Label>
+                            <Label Text="{Binding Path=ValidUntil, StringFormat='Until {0}'}"></Label>
+                        </StackLayout>
+                    </Frame>
                 </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
     </Grid>
 </ContentPage>

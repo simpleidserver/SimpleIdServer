@@ -13,6 +13,7 @@ using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -34,6 +35,7 @@ public class PreAuthorizedCodeHandler : BaseCredentialsHandler
     private readonly IGrantHelper _audienceHelper;
     private readonly IGrantedTokenHelper _grantedTokenHelper;
     private readonly IDPOPProofValidator _dpopProofValidator;
+    private readonly IUserRepository _userRepository;
 
     public PreAuthorizedCodeHandler(
         IPreAuthorizedCodeValidator validator,
@@ -44,6 +46,7 @@ public class PreAuthorizedCodeHandler : BaseCredentialsHandler
         IGrantHelper audienceHelper,
         IGrantedTokenHelper grantedTokenHelper,
         IDPOPProofValidator dpopProofValidator,
+        IUserRepository userRepository,
         IOptions<IdServerHostOptions> options) : base(clientAuthenticationHelper, tokenProfiles, options)
     {
         _validator = validator;
@@ -52,6 +55,7 @@ public class PreAuthorizedCodeHandler : BaseCredentialsHandler
         _audienceHelper = audienceHelper;
         _grantedTokenHelper = grantedTokenHelper;
         _dpopProofValidator = dpopProofValidator;
+        _userRepository = userRepository;
     }
 
     public override string GrantType => GRANT_TYPE;
@@ -80,6 +84,8 @@ public class PreAuthorizedCodeHandler : BaseCredentialsHandler
                 var credentialNonce = Guid.NewGuid().ToString();
                 var parameter = new BuildTokenParameter { AuthorizationDetails = extractionResult.AuthorizationDetails, Audiences = extractionResult.Audiences, Scopes = extractionResult.Scopes };
                 var accessTokenBuilder = _tokenBuilders.Single(t => t.Name == TokenResponseParameters.AccessToken);
+                var user = await _userRepository.GetById(preAuthCode.UserId, context.Realm, cancellationToken);
+                context.SetUser(user, null);
                 await accessTokenBuilder.Build(parameter, context, cancellationToken);
                 AddTokenProfile(context);
                 foreach (var kvp in context.Response.Parameters)

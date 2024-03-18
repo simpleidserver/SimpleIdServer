@@ -51,7 +51,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
         [HttpPost]
         public async Task<IActionResult> Get([FromBody] CredentialRequest request, CancellationToken cancellationToken)
         {
-            var subject = User.FindFirst(ClaimTypes.Name).Value;
+            var subject = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var scope = User.Claims.SingleOrDefault(c => c.Type == "scope")?.Value;
             var authorizedScopes = new List<string>();
             if (!string.IsNullOrWhiteSpace(scope))
