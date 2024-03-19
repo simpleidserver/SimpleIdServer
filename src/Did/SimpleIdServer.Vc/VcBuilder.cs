@@ -28,7 +28,7 @@ public class VcBuilder
             Id = id,
             Issuer = issuer,
             ValidFrom = validFrom,
-            ValidUntil = validUntil
+            ValidUntil = validUntil,
         };
         credential.Context.Add(VcConstants.VerifiableCredentialJsonLdContext);
         credential.Context.Add(jsonLdContext);

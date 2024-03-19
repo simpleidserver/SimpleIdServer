@@ -261,4 +261,7 @@
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Areas\vp\" />
+	</ItemGroup>
 </Project>

@@ -117,46 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="CannotExtractVcFromPath" xml:space="preserve">
-    <value>the verifiable credential cannot be extracted from the path {0}</value>
+  <data name="register" xml:space="preserve">
+    <value>Register</value>
   </data>
-  <data name="InvalidIncomingRequest" xml:space="preserve">
-    <value>the incoming request is not valid</value>
-  </data>
-  <data name="InvalidPresentationSubmission" xml:space="preserve">
-    <value>the presentation submission is not valid</value>
-  </data>
-  <data name="InvalidVerifiableCredential" xml:space="preserve">
-    <value>the verifiable credential is not valid</value>
-  </data>
-  <data name="InvalidVerifiablePresentation" xml:space="preserve">
-    <value>the vp_token is an invalid verifiable presentation</value>
-  </data>
-  <data name="MissingParameter" xml:space="preserve">
-    <value>the parameter {0} is missing</value>
-  </data>
-  <data name="PresentationSubmissinMissingPathNested" xml:space="preserve">
-    <value>the path_nested parameter is missing</value>
-  </data>
-  <data name="PresentationSubmissionBadFormat" xml:space="preserve">
-    <value>the format {0} present in the presentation submission is not correct</value>
-  </data>
-  <data name="PresentationSubmissionMissingVerifiableCredential" xml:space="preserve">
-    <value>the verifiable credential {0} is missing from the presentation submission</value>
-  </data>
-  <data name="StateIsNotValid" xml:space="preserve">
-    <value>either the state is invalid or the vp offer is expired</value>
-  </data>
-  <data name="UnknownPresentationDefinition" xml:space="preserve">
-    <value>the presentation definition {0} doesn't exist</value>
-  </data>
-  <data name="VcIssuerNotDid" xml:space="preserve">
-    <value>the issuer of the verifiable credential must be a Did</value>
-  </data>
-  <data name="VerifiableCredentialProofInvalid" xml:space="preserve">
-    <value>the proof of the verifiable credential {0} is invalid</value>
-  </data>
-  <data name="VerifiablePresentationProofInvalid" xml:space="preserve">
-    <value>the verifiable presentation proof is incorrect</value>
+  <data name="title" xml:space="preserve">
+    <value>Register</value>
   </data>
 </root>

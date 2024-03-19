@@ -14,6 +14,10 @@ public class WalletViewModel : INotifyPropertyChanged
     public WalletViewModel(VerifiableCredentialListState vcListState)
     {
         _vcListState = vcListState;
+        DeleteVerifiableCredentialCommand = new Command<VerifiableCredentialRecord>(async (record) =>
+        {
+            await RemoveVerifiableCredential(record);
+        });
     }
 
     public ObservableCollection<VerifiableCredentialRecord> VerifiableCredentials
@@ -24,6 +28,7 @@ public class WalletViewModel : INotifyPropertyChanged
         }
     }
 
+    public Command<VerifiableCredentialRecord> DeleteVerifiableCredentialCommand { get; private set; }
 
     public event PropertyChangedEventHandler PropertyChanged;
 
@@ -38,6 +43,14 @@ public class WalletViewModel : INotifyPropertyChanged
                 OnPropertyChanged();
             }
         }
+    }
+
+    private async Task RemoveVerifiableCredential(VerifiableCredentialRecord record)
+    {
+        if (IsLoading) return;
+        IsLoading = true;
+        await _vcListState.RemoveVerifiableCredentialRecord(record);
+        IsLoading = false;
     }
 
     public void OnPropertyChanged([CallerMemberName] string name = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));

@@ -25,4 +25,10 @@ public class VerifiableCredentialListState
         await _database.AddVerifiableCredential(verifiableCredential);
         VerifiableCredentialRecords.Add(verifiableCredential);
     }
+
+    public async Task RemoveVerifiableCredentialRecord(VerifiableCredentialRecord verifiableCredential)
+    {
+        await _database.RemoveVerifiableCredential(verifiableCredential);
+        VerifiableCredentialRecords.Remove(verifiableCredential);
+    }
 }

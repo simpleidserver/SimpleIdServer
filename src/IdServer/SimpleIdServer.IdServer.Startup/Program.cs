@@ -31,6 +31,7 @@ using SimpleIdServer.IdServer.Startup.Converters;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Swagger;
 using SimpleIdServer.IdServer.TokenTypes;
+using SimpleIdServer.IdServer.VerifiablePresentation;
 using SimpleIdServer.IdServer.WsFederation;
 using System;
 using System.Collections.Generic;
@@ -189,6 +190,7 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
         o.Add<FidoOptions>();
         o.Add<IdServerConsoleOptions>();
         o.Add<GotifyOptions>();
+        o.Add<IdServerVpOptions>();
         o.Add<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>();
         if (conf.Type == DistributedCacheTypes.REDIS)
         {
@@ -428,6 +430,7 @@ void SeedData(WebApplication application, string scimBaseUrl)
             AddMissingConfigurationDefinition<IdServerEmailOptions>(dbContext);
             AddMissingConfigurationDefinition<IdServerSmsOptions>(dbContext);
             AddMissingConfigurationDefinition<IdServerPasswordOptions>(dbContext);
+            AddMissingConfigurationDefinition<IdServerVpOptions>(dbContext);
             AddMissingConfigurationDefinition<FidoOptions>(dbContext);
             AddMissingConfigurationDefinition<IdServerConsoleOptions>(dbContext);
             AddMissingConfigurationDefinition<GotifyOptions>(dbContext);

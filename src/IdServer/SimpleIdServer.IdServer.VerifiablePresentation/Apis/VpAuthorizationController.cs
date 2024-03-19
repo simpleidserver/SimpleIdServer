@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using BlushingPenguin.JsonPath;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -7,35 +8,44 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using QRCoder;
+using SimpleIdServer.Did;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.VerifiablePresentation.DTOs;
 using SimpleIdServer.IdServer.VerifiablePresentation.Resources;
+using SimpleIdServer.Vc;
+using SimpleIdServer.Vc.Models;
+using SimpleIdServer.Vp;
 using System.Net;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Web;
 
 namespace SimpleIdServer.IdServer.VerifiablePresentation.Apis;
 
-public class AuthorizationController : BaseController
+public class VpAuthorizationController : BaseController
 {
     private readonly IPresentationDefinitionStore _presentationDefinitionStore;
     private readonly IDistributedCache _distributedCache;
     private readonly VerifiablePresentationOptions _options;
-    private readonly ILogger<AuthorizationController> _logger;
+    private readonly IDidFactoryResolver _didFactoryResolver;
+    private readonly ILogger<VpAuthorizationController> _logger;
 
-    public AuthorizationController(
+    public VpAuthorizationController(
         IPresentationDefinitionStore presentationDefinitionStore,
         IDistributedCache distributedCache,
         IOptions<VerifiablePresentationOptions> options,
-        ILogger<AuthorizationController> logger,
+        ILogger<VpAuthorizationController> logger,
         ITokenRepository tokenRepository, 
-        IJwtBuilder jwtBuilder) : base(tokenRepository, jwtBuilder)
+        IJwtBuilder jwtBuilder,
+        IDidFactoryResolver didFactoryResolver) : base(tokenRepository, jwtBuilder)
     {
         _presentationDefinitionStore = presentationDefinitionStore;
         _distributedCache = distributedCache;
         _options = options.Value;
+        _didFactoryResolver = didFactoryResolver;
         _logger = logger;
     }
 
@@ -45,9 +55,8 @@ public class AuthorizationController : BaseController
         prefix = prefix ?? IdServer.Constants.Prefix;
         try
         {
-            // CONTINUE : https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#name-response-mode-direct_post
-            await Validate(request, cancellationToken);
-            return null;
+            var validationResult = Validate(request, prefix, cancellationToken);
+            return new NoContentResult();
         }
         catch (OAuthException ex)
         {
@@ -110,7 +119,7 @@ public class AuthorizationController : BaseController
         return result;
     }        
 
-    private async Task Validate(VpAuthorizationResponse request, CancellationToken cancellationToken)
+    private async Task<Dictionary<string, JsonNode>> Validate(VpAuthorizationResponse request, string prefix, CancellationToken cancellationToken)
     {
         if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
         if (string.IsNullOrWhiteSpace(request.VpToken)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, "vp_token"));
@@ -121,23 +130,46 @@ public class AuthorizationController : BaseController
         if (verifiablePresentation == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidVerifiablePresentation);
         var presentationSubmission = JsonSerializer.Deserialize<PresentationSubmission>(request.PresentationSubmission);
         if (presentationSubmission == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidPresentationSubmission);
+        var verifiablePresentationJsonObject = JsonDocument.Parse(request.VpToken);
 
         var cachedValue = await _distributedCache.GetStringAsync(request.State, cancellationToken);
         if (cachedValue == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.StateIsNotValid);
         var vpPendingAuthorization = JsonSerializer.Deserialize<VpPendingAuthorization>(cachedValue);
-    }
+        var presentationDefinition = await _presentationDefinitionStore.Query()
+            .AsNoTracking()
+            .SingleOrDefaultAsync(p => p.PublicId == vpPendingAuthorization.PresentationDefinitionId && p.RealmName == prefix, cancellationToken);
 
-    private class VpPendingAuthorization
-    {
-        public VpPendingAuthorization(string presentationDefinitionId, string state, string nonce)
+        var vpVerifier = new VpVerifier(_didFactoryResolver);
+        try
         {
-            PresentationDefinitionId = presentationDefinitionId;
-            State = state;
-            Nonce = nonce;
+            await vpVerifier.Verify(verifiablePresentation, cancellationToken);
+        }
+        catch(Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+            throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.VerifiablePresentationProofInvalid);
         }
 
-        public string PresentationDefinitionId { get; set; }
-        public string State { get; set; }
-        public string Nonce { get; set; }
+        var result = new Dictionary<string, JsonNode>();
+        var securedDocument = SecuredDocument.New();
+        var inputDescriptors = presentationDefinition.InputDescriptors;
+        foreach(var inputDescriptor in inputDescriptors)
+        {
+            var descriptorMap = presentationSubmission.DescriptorMaps.SingleOrDefault(m => m.Id == inputDescriptor.PublicId);
+            if (descriptorMap == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.PresentationSubmissionMissingVerifiableCredential, inputDescriptor.PublicId));
+            if (descriptorMap.PathNested == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.PresentationSubmissinMissingPathNested);
+            if (!inputDescriptor.Format.Any(f => f.Format == descriptorMap.PathNested.Format)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.PresentationSubmissionBadFormat, descriptorMap.PathNested.Format));
+            var token = verifiablePresentationJsonObject.SelectToken(descriptorMap.PathNested.Path);
+            if (token == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.CannotExtractVcFromPath, descriptorMap.PathNested.Path));
+            var vcJson = token.ToString();
+            var vc = JsonSerializer.Deserialize<W3CVerifiableCredential>(vcJson);
+            if (vc == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidVerifiableCredential);
+            var did = await _didFactoryResolver.Resolve(vc.Issuer, cancellationToken);
+            if (did == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.VcIssuerNotDid);
+            if (!securedDocument.Check(vc, did)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.VerifiableCredentialProofInvalid, vc.Id));
+            result.Add(vc.Id, vc.CredentialSubject);
+        }
+
+        return result;
     }
 }

@@ -13,5 +13,7 @@ public static class Constants
         public const string PresentationDefinitions = "presentationdefs";
         public const string VpAuthorize = "vpauthorize";
         public const string VpAuthorizeCallback = $"{VpAuthorize}/cb";
+        public const string VpAuthorizeQrCode = $"{VpAuthorize}/qr";
+        public const string VpAuthorizeStatus = $"{VpAuthorize}/status";
     }
 }

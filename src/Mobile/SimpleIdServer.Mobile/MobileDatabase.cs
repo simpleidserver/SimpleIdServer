@@ -60,6 +60,12 @@ namespace SimpleIdServer.Mobile
             await _database.InsertAsync(verifiableCredential);
         }
 
+        public async Task RemoveVerifiableCredential(VerifiableCredentialRecord verifiableCredential)
+        {
+            await Init();
+            await _database.DeleteAsync(verifiableCredential);
+        }
+
         public async Task<List<OTPCode>> GetOTPCodes()
         {
             await Init();

@@ -15,7 +15,7 @@
     </ContentPage.Resources>
     <Grid Margin="20">
         <common:Loader IsVisible="{Binding Path=IsLoading}" ZIndex="2" />
-        <CollectionView ItemsSource="{Binding Path=VerifiableCredentials}" SelectionMode="None">
+        <CollectionView x:Name="collectionView" ItemsSource="{Binding Path=VerifiableCredentials}" SelectionMode="None">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Frame Margin="5"
@@ -28,10 +28,12 @@
                                     <Label Text="{Binding Path=Name}" Style="{StaticResource vcTitle}"></Label>
                                     <Label Text="{Binding Path=Description}" Style="{StaticResource vcDescription}"></Label>
                                 </StackLayout>
-                                <Image HorizontalOptions="EndAndExpand" HeightRequest="50" WidthRequest="50" Source="https://img.freepik.com/premium-vector/logo-university-name-logo-company-called-university_516670-732.jpg" />
+                                <Image HorizontalOptions="EndAndExpand" HeightRequest="50" WidthRequest="50" Source="{Binding Path=Logo}" />
                             </StackLayout>
-                            <StackLayout Orientation="Horizontal">
-                                <Button HorizontalOptions="EndAndExpand" Text="View" />
+                            <StackLayout Orientation="Horizontal" HorizontalOptions="EndAndExpand">
+                                <Button Text="Delete"
+                                        Command="{Binding Source={x:Reference collectionView}, Path=BindingContext.DeleteVerifiableCredentialCommand}" 
+                                        CommandParameter="{Binding}"></Button>
                             </StackLayout>
                             <Label Text="{Binding Path=ValidFrom, StringFormat='From {0}'}"></Label>
                             <Label Text="{Binding Path=ValidUntil, StringFormat='Until {0}'}"></Label>

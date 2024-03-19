@@ -10,6 +10,9 @@
 	  <ProjectReference Include="..\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
 	</ItemGroup>
 	<ItemGroup>
+		<PackageReference Include="BlushingPenguin.JsonPath" Version="1.0.6" />
+	</ItemGroup>
+	<ItemGroup>
 	  <Compile Update="Resources\Global.Designer.cs">
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>

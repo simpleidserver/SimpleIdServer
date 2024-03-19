@@ -360,6 +360,12 @@ public class QRCodeScannerViewModel
 
                 var display = offeredCredential.Display.First();
                 var accessToken = await GetAccessTokenWithPreauthCode(credentialOffer, credentialDefinition, httpClient);
+                if(string.IsNullOrWhiteSpace(accessToken))
+                {
+                    await _promptService.ShowAlert("Error", "the credential offer is expired or has been processed");
+                    return;
+                }
+
                 var credentialResult = await GetCredential(httpClient, accessToken, credentialOffer, offeredCredential);
                 var serializedVc = credentialResult.Credential.ToJsonString();
                 var w3cVc = JsonSerializer.Deserialize<W3CVerifiableCredential>(serializedVc);
@@ -394,23 +400,31 @@ public class QRCodeScannerViewModel
 
         async Task<string> GetAccessTokenWithPreauthCode(CredentialOffer credentialOffer, CredentialIssuerResult credentialIssuer, HttpClient httpClient)
         {
-            var dic = new Dictionary<string, string>
+            try
             {
-                { "grant_type", "urn:ietf:params:oauth:grant-type:pre-authorized_code" },
-                { "client_id", _options.ClientId },
-                { "client_secret", _options.ClientSecret },
-                { "pre-authorized_code", credentialOffer.Grants.PreAuthorizedCodeGrant.PreAuthorizedCode }
-            };
-            var requestMessage = new HttpRequestMessage
+                var dic = new Dictionary<string, string>
+                {
+                    { "grant_type", "urn:ietf:params:oauth:grant-type:pre-authorized_code" },
+                    { "client_id", _options.ClientId },
+                    { "client_secret", _options.ClientSecret },
+                    { "pre-authorized_code", credentialOffer.Grants.PreAuthorizedCodeGrant.PreAuthorizedCode }
+                };
+                var requestMessage = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Post,
+                    Content = new FormUrlEncodedContent(dic),
+                    RequestUri = new Uri(_urlService.GetUrl($"{credentialIssuer.AuthorizationServers.First()}/token"))
+                };
+                var httpResult = await httpClient.SendAsync(requestMessage);
+                httpResult.EnsureSuccessStatusCode();
+                var json = await httpResult.Content.ReadAsStringAsync();
+                var accessToken = JsonObject.Parse(json).AsObject()["access_token"];
+                return accessToken.ToString();
+            }
+            catch
             {
-                Method = HttpMethod.Post,
-                Content = new FormUrlEncodedContent(dic),
-                RequestUri = new Uri(_urlService.GetUrl($"{credentialIssuer.AuthorizationServers.First()}/token"))
-            };
-            var httpResult = await httpClient.SendAsync(requestMessage);
-            var json = await httpResult.Content.ReadAsStringAsync();
-            var accessToken = JsonObject.Parse(json).AsObject()["access_token"];
-            return accessToken.ToString();
+                return null;
+            }
         }
 
         async Task<CredentialResult> GetCredential(HttpClient httpClient, string accessToken, CredentialOffer credentialOffer, CredentialDefinitionResult credentialDefinition)

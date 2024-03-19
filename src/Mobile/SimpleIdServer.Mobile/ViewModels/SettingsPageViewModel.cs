@@ -123,6 +123,8 @@ public class SettingsPageViewModel : INotifyPropertyChanged
         var did = generator.Generate(ed25519);
         await App.Database.AddDidRecord(new DidRecord { Did = did, PrivaterKey = ed25519.GetPrivateKey() });
         Did = did;
+        var cmd = (Command)GenerateDidKeyCommand;
+        cmd.ChangeCanExecute();
         _isLoading = false;
     }
 }

@@ -61,6 +61,15 @@ namespace SimpleIdServer.IdServer.VerifiablePresentation.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à the verifiable credential cannot be extracted from the path {0}.
+        /// </summary>
+        public static string CannotExtractVcFromPath {
+            get {
+                return ResourceManager.GetString("CannotExtractVcFromPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à the incoming request is not valid.
         /// </summary>
         public static string InvalidIncomingRequest {
@@ -75,6 +84,15 @@ namespace SimpleIdServer.IdServer.VerifiablePresentation.Resources {
         public static string InvalidPresentationSubmission {
             get {
                 return ResourceManager.GetString("InvalidPresentationSubmission", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the verifiable credential is not valid.
+        /// </summary>
+        public static string InvalidVerifiableCredential {
+            get {
+                return ResourceManager.GetString("InvalidVerifiableCredential", resourceCulture);
             }
         }
         
@@ -97,6 +115,33 @@ namespace SimpleIdServer.IdServer.VerifiablePresentation.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à the path_nested parameter is missing.
+        /// </summary>
+        public static string PresentationSubmissinMissingPathNested {
+            get {
+                return ResourceManager.GetString("PresentationSubmissinMissingPathNested", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the format {0} present in the presentation submission is not correct.
+        /// </summary>
+        public static string PresentationSubmissionBadFormat {
+            get {
+                return ResourceManager.GetString("PresentationSubmissionBadFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the verifiable credential {0} is missing from the presentation submission.
+        /// </summary>
+        public static string PresentationSubmissionMissingVerifiableCredential {
+            get {
+                return ResourceManager.GetString("PresentationSubmissionMissingVerifiableCredential", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à either the state is invalid or the vp offer is expired.
         /// </summary>
         public static string StateIsNotValid {
@@ -111,6 +156,33 @@ namespace SimpleIdServer.IdServer.VerifiablePresentation.Resources {
         public static string UnknownPresentationDefinition {
             get {
                 return ResourceManager.GetString("UnknownPresentationDefinition", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the issuer of the verifiable credential must be a Did.
+        /// </summary>
+        public static string VcIssuerNotDid {
+            get {
+                return ResourceManager.GetString("VcIssuerNotDid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the proof of the verifiable credential {0} is invalid.
+        /// </summary>
+        public static string VerifiableCredentialProofInvalid {
+            get {
+                return ResourceManager.GetString("VerifiableCredentialProofInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the verifiable presentation proof is incorrect.
+        /// </summary>
+        public static string VerifiablePresentationProofInvalid {
+            get {
+                return ResourceManager.GetString("VerifiablePresentationProofInvalid", resourceCulture);
             }
         }
     }
