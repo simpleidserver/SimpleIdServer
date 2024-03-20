@@ -185,5 +185,14 @@ namespace SimpleIdServer.IdServer.VerifiablePresentation.Resources {
                 return ResourceManager.GetString("VerifiablePresentationProofInvalid", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the verifiable presentation is not received.
+        /// </summary>
+        public static string VpNotReceived {
+            get {
+                return ResourceManager.GetString("VpNotReceived", resourceCulture);
+            }
+        }
     }
 }

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using System.Text.Json.Nodes;
+
 namespace SimpleIdServer.IdServer.VerifiablePresentation.Apis;
 
 public class VpPendingAuthorization
@@ -16,4 +18,5 @@ public class VpPendingAuthorization
     public string State { get; set; }
     public string Nonce { get; set; }
     public bool IsAuthorized { get; set; }
+    public Dictionary<string, JsonNode> VcSubjects { get; set; }
 }

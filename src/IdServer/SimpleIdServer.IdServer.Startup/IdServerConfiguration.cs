@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Fido.UI.ViewModels;
 using SimpleIdServer.IdServer.Provisioning.LDAP;
 using SimpleIdServer.IdServer.Provisioning.SCIM;
 using SimpleIdServer.IdServer.Startup.Converters;
@@ -40,6 +41,7 @@ namespace SimpleIdServer.IdServer.Startup
         {
             RegistrationWorkflowBuilder.New("pwd", true).AddStep("pwd").Build(),
             RegistrationWorkflowBuilder.New("pwd-email").AddStep("pwd").AddStep("email").Build(),
+            RegistrationWorkflowBuilder.New("vp").AddStep("vp").Build(),
             RegistrationWorkflowBuilder.New("mobile").AddStep("mobile").Build()
         };
 
@@ -98,7 +100,7 @@ namespace SimpleIdServer.IdServer.Startup
             ClientBuilder.BuildWalletClient("walletClient", "password")
                 .SetClientName("Wallet")
                 .Build(),
-            ClientBuilder.BuildCredentialIssuer("CredentialIssuer", "password", null, "https://localhost:5005/*", "https://credentialissuer.simpleidserver.com/*", "https://credentialissuer.localhost.com/*", "https://credentialissuer.sid.svc.cluster.local/*")
+            ClientBuilder.BuildCredentialIssuer("CredentialIssuer", "password", null, "http://localhost:5005/*", "https://credentialissuer.simpleidserver.com/*", "https://credentialissuer.localhost.com/*", "https://credentialissuer.sid.svc.cluster.local/*")
                 .SetClientName("Credential issuer")
                 .AddScope(
                     SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope,
@@ -243,6 +245,11 @@ namespace SimpleIdServer.IdServer.Startup
         {
             new GotifySession { ApplicationToken = "AvSdAw5ILVOdc7g", ClientToken = "CY2St_LANPO5L7P" },
             new GotifySession { ApplicationToken = "ADIeCkMigAnGLmq", ClientToken = "C9M4RGtX.OlYD1q" }
+        };
+
+        public static List<PresentationDefinition> PresentationDefinitions = new List<PresentationDefinition>
+        {
+            PresentationDefinitionBuilder.New("universitydegree_vp", "University Degree").AddLdpVcInputDescriptor("UniversityDegree", "UniversityDegree", "UniversityDegree").Build()
         };
     }
 }

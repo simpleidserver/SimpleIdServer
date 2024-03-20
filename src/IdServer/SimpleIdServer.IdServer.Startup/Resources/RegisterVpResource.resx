@@ -117,8 +117,17 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="credential_added" xml:space="preserve">
+    <value>Verifiable credentials are enrolled</value>
+  </data>
+  <data name="enroll_vp" xml:space="preserve">
+    <value>Enroll your verifiable credentials</value>
+  </data>
   <data name="register" xml:space="preserve">
     <value>Register</value>
+  </data>
+  <data name="scan_mobileapp" xml:space="preserve">
+    <value>QR code</value>
   </data>
   <data name="title" xml:space="preserve">
     <value>Register</value>

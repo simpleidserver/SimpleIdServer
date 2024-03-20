@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
@@ -34,6 +35,8 @@ public class RegisterController : BaseRegisterController<VerifiablePresentationR
     public async Task<IActionResult> Index([FromRoute] string prefix, CancellationToken cancellationToken)
     {
         prefix = prefix ?? IdServer.Constants.DefaultRealm;
+        var issuer = Request.GetAbsoluteUriWithVirtualPath();
+        var userRegistrationProgress = await GetRegistrationProgress();
         var presentationDefinitions = await _presentationDefinitionStore.Query()
             .Include(p => p.InputDescriptors)
             .AsNoTracking()
@@ -41,15 +44,22 @@ public class RegisterController : BaseRegisterController<VerifiablePresentationR
             .ToListAsync(cancellationToken);
         var verifiablePresentations = presentationDefinitions.Select(d => new VerifiablePresentationViewModel
         {
-            Id = d.Id,
+            Id = d.PublicId,
             Name = d.Name,
             VcNames = d.InputDescriptors.Select(id => id.Name).ToList()
         });
-        return View(verifiablePresentations);
+        var viewModel = new VerifiablePresentationRegisterViewModel
+        {
+            VerifiablePresentations = verifiablePresentations,
+            QrCodeUrl = $"{issuer}/{GetRealm(prefix)}{Constants.Endpoints.VpAuthorizeQrCode}",
+            StatusUrl = $"{issuer}/{GetRealm(prefix)}{Constants.Endpoints.VpRegisterStatus}",
+            EndRegisterUrl = $"{issuer}/{GetRealm(prefix)}{Constants.Endpoints.VpEndRegister}",
+            RedirectUrl = userRegistrationProgress?.RedirectUrl
+        };
+        return View(viewModel);
     }
 
-    protected override void EnrichUser(User user, VerifiablePresentationRegisterViewModel viewModel)
-    {
-        throw new NotImplementedException();
-    }
+    protected override void EnrichUser(User user, VerifiablePresentationRegisterViewModel viewModel) { }
+
+    private string GetRealm(string realm) => Options.UseRealm ? $"{realm}/" : string.Empty;
 }

@@ -55,6 +55,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<ILanguageRepository, LanguageRepository>();
             services.AddTransient<IProvisioningStagingStore, ProvisioningStagingStore>();
             services.AddTransient<IGotiySessionStore, GotiySessionStore>();
+            services.AddTransient<IPresentationDefinitionStore, PresentationDefinitionStore>();
         }
     }
 }

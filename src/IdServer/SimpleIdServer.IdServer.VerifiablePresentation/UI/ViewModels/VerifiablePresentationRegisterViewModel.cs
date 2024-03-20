@@ -12,6 +12,9 @@ public class VerifiablePresentationRegisterViewModel : IRegisterViewModel
     public List<string> Steps { get; set; }
     public string? RedirectUrl { get; set; }
     public IEnumerable<VerifiablePresentationViewModel> VerifiablePresentations { get; set; }
+    public string QrCodeUrl { get; set; }
+    public string StatusUrl { get; set; }
+    public string EndRegisterUrl { get; set; }
 }
 
 public class VerifiablePresentationViewModel

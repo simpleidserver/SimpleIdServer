@@ -19,6 +19,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IdServerBuilder AddVpAuthentication(this IdServerBuilder idServerBuilder)
         {
             idServerBuilder.Services.AddTransient<IAuthenticationMethodService, VpAuthenticationMethodService>();
+            idServerBuilder.Services.AddDid();
             return idServerBuilder;
         }
     }

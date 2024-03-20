@@ -20,13 +20,18 @@ namespace Microsoft.AspNetCore.Builder
 
             webApplication.SidMapControllerRoute("vpAuthorizeCallback",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + SimpleIdServer.IdServer.VerifiablePresentation.Constants.Endpoints.VpAuthorizeCallback,
-                defaults: new { controller = "VpAuthorizationController", action = "Callback" });
+                defaults: new { controller = "VpAuthorization", action = "Callback" });
             webApplication.SidMapControllerRoute("vpQrCode",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + SimpleIdServer.IdServer.VerifiablePresentation.Constants.Endpoints.VpAuthorizeQrCode + "/{id}",
-                defaults: new { controller = "VpAuthorizationController", action = "GetQRCode" });
-            webApplication.SidMapControllerRoute("vpAuthorizeStatus",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + SimpleIdServer.IdServer.VerifiablePresentation.Constants.Endpoints.VpAuthorizeStatus + "/{id}",
-                defaults: new { controller = "VpAuthorizationController", action = "Status" });
+                defaults: new { controller = "VpAuthorization", action = "GetQRCode" });
+
+            webApplication.SidMapControllerRoute("vpRegisterStatus",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + SimpleIdServer.IdServer.VerifiablePresentation.Constants.Endpoints.VpRegisterStatus + "/{id}",
+                defaults: new { controller = "VpRegister", action = "Status" });
+            webApplication.SidMapControllerRoute("vpEndRegister",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + SimpleIdServer.IdServer.VerifiablePresentation.Constants.Endpoints.VpEndRegister,
+                defaults: new { controller = "VpRegister", action = "EndRegister" });
+
 
             return webApplication;
         }

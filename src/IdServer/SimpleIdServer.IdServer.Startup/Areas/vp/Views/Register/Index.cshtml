@@ -8,30 +8,30 @@
 @{
     ViewBag.Title = RegisterVpResource.title;
     Layout = "~/Views/Shared/_RegisterLayout.cshtml";
-    var getQrCodeUrl = Url.Action("GetQRCode", "VpAuthorization", new { area = SimpleIdServer.IdServer.VerifiablePresentation.Constants.AMR });
 }
 
-<ul class="list-group mb-3" id="errors">
+<div id="registrationContainer">
 
-</ul>
+    <h5>@RegisterVpResource.enroll_vp</h5>
 
-@if(!Model.IsUpdated)
-{
-    <div class="row">
+    <ul class="list-group mb-3" id="errors">
+    </ul>
+
+    <div class="row g-2">
         @foreach (var verifiablePresentation in Model.VerifiablePresentations)
         {
-            <div class="col col-md-6">
+            <div class="col">
                 <div class="card">
                     <div class="card-header">@verifiablePresentation.Name</div>
                     <div class="card-body">
                         <ul class="list-group">
-                            @foreach(var vcName in verifiablePresentation.VcNames)
+                            @foreach (var vcName in verifiablePresentation.VcNames)
                             {
                                 <li class="list-group-item">@vcName</li>
                             }
                         </ul>
                     </div>
-                    <div>
+                    <div class="card-footer">
                         <form class="vpRegister" action="#" method="post">
                             <input type="hidden" name="id" value="@verifiablePresentation.Id" />
                             <button type="submit" class="btn btn-primary card-link">@RegisterVpResource.register</button>
@@ -44,19 +44,27 @@
 
     <!-- Qr code -->
     <div id="qrCode" style="display: none; text-align: center;">
-        <h3>@AuthenticateMobileResource.scan_mobileapp</h3>
+        <h5>@RegisterVpResource.scan_mobileapp</h5>
         <img src="#" style="max-width:280px;" />
     </div>
-}
-else
-{
-    
-}
+</div>
+
+<div style="display: none;" id="registerSuccessMessage">
+    <div class="alert alert-success">
+        @RegisterVpResource.credential_added
+    </div>
+    @if (!string.IsNullOrWhiteSpace(Model.RedirectUrl))
+    {
+        <a href="@Model.RedirectUrl" class="btn btn-primary mt-1">@LayoutResource.back</a>
+    }
+</div>
                             
 @section SubScripts {
     <script type="text/javascript">
         $(document).ready(function () {
-            var getQrCodeUrl = "@getQrCodeUrl";
+            var getQrCodeUrl = "@Model.QrCodeUrl";
+            var statusUrl = "@Model.StatusUrl";
+            var endRegisterURL = "@Model.EndRegisterUrl";
 
             var displayError = function (errorJson) {
                 $("#errors").empty();
@@ -66,6 +74,47 @@ else
             var displayQRCode = function (img) {
                 $("#qrCode").css("display", "");
                 $("#qrCode img").attr("src", img);
+            }
+
+            var displaySuccessMessage = function () {
+                $("#registerSuccessMessage").css('display', '');
+                $("#registrationContainer").css('display', 'none');
+            }
+
+            async function register(state) {
+                let response = await fetch(endRegisterURL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        state: state
+                    }),
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                let responseJson = await response.json();
+                if (!responseJson.next_registration_url) {
+                    displaySuccessMessage();
+                } else {
+                    window.location.href = responseJson.next_registration_url;
+                }
+            }
+
+            async function checkStatus(state) {
+                setTimeout(async function () {
+                    let response = await fetch(statusUrl + "/" + state, {
+                        method: 'GET'
+                    });
+                    if (!response.ok) {
+                        let responseJson = await response.json();
+                        displayError(responseJson);
+                        await checkStatus(state);
+                        return;
+                    }
+
+                    register(state);
+                }, 1000);
             }
 
             async function displayQrCode(id) {
@@ -78,16 +127,17 @@ else
                     return;
                 }
 
+                const state = response.headers.get('state');
                 const blob = await response.blob();
                 const img = URL.createObjectURL(blob);
                 displayQRCode(img, qrCode);
-                // check status of the qr code.
+                await checkStatus(state);
             }
 
             $(".vpRegister").submit(function (evt) {
                 evt.preventDefault();
                 var id = $(evt.target)
-                    .serializeArray()["id"];
+                    .serializeArray()[0].value;
                 displayQrCode(id);
             });
         });

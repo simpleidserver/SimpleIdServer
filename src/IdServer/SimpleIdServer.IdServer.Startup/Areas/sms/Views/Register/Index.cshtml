@@ -12,7 +12,6 @@
 
 @if(!Model.IsUpdated)
 {
-
     <h5>@(User.Identity.IsAuthenticated ? RegisterSmsResource.update_sms : RegisterSmsResource.register_sms)</h5>
 
     @if (Model.IsOTPCodeSent)

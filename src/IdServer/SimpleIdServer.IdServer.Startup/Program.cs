@@ -37,6 +37,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using SimpleIdServer.Did.Key;
 
 const string SQLServerCreateTableFormat = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DistributedCache' and xtype='U') " +
     "CREATE TABLE [dbo].[DistributedCache] (" +
@@ -111,6 +112,7 @@ app.UseRequestLocalization(e =>
 
 app
     .UseSID()
+    .UseVerifiablePresentation()
     .UseSIDSwagger()
     .UseSIDSwaggerUI()
     // .UseSIDReDoc()
@@ -141,6 +143,7 @@ void ConfigureIdServer(IServiceCollection services)
             o.AddOAuthSecurity();
         })
         .AddConsoleNotification()
+        .AddVpAuthentication()
         .UseInMemoryMassTransit()
         .AddBackChannelAuthentication()
         .AddPwdAuthentication()
@@ -171,6 +174,7 @@ void ConfigureIdServer(IServiceCollection services)
         });
     var isRealmEnabled = identityServerConfiguration.IsRealmEnabled;
     if (isRealmEnabled) idServerBuilder.UseRealm();
+    services.AddDidKey();
     ConfigureDistributedCache();
 }
 
@@ -381,6 +385,9 @@ void SeedData(WebApplication application, string scimBaseUrl)
 
             if (!dbContext.CertificateAuthorities.Any())
                 dbContext.CertificateAuthorities.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.CertificateAuthorities);
+
+            if (!dbContext.PresentationDefinitions.Any())
+                dbContext.PresentationDefinitions.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.PresentationDefinitions);
 
             if (!dbContext.Acrs.Any())
             {

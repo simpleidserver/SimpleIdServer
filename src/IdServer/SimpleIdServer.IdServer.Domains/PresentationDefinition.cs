@@ -26,7 +26,7 @@ public class PresentationDefinition
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Purpose { get; set; } = null;
     [JsonPropertyName("input_descriptors")]
-    public List<PresentationDefinitionInputDescriptor> InputDescriptors { get; set; }
+    public List<PresentationDefinitionInputDescriptor> InputDescriptors { get; set; } = new List<PresentationDefinitionInputDescriptor>();
     [JsonIgnore]
     public string RealmName { get; set; } = null!;
     [JsonIgnore]

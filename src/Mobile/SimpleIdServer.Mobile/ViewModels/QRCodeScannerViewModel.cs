@@ -25,6 +25,7 @@ public class QRCodeScannerViewModel
 {
     private const string _vcFormat = "ldp_vc";
     private const string openidCredentialOfferScheme = "openid-credential-offer://?credential_offer=";
+    private const string openidVpScheme = "openid4vp://authorize?";
     private bool _isLoading = false;
     private readonly IPromptService _promptService;
     private readonly IOTPService _otpService;
@@ -102,6 +103,10 @@ public class QRCodeScannerViewModel
                 if(qrCodeValue.StartsWith(openidCredentialOfferScheme))
                 {
                     await RegisterVerifiableCredential();
+                }
+                else if (qrCodeValue.StartsWith(openidVpScheme))
+                {
+
                 }
                 else
                 {
@@ -448,6 +453,33 @@ public class QRCodeScannerViewModel
             var json = await httpResult.Content.ReadAsStringAsync();
             var credentialResult = JsonSerializer.Deserialize<CredentialResult>(json);
             return credentialResult;
+        }
+
+        #endregion
+
+        #region Verifiable presentation
+
+        Task SendVerifiablePresentation()
+        {
+            var serializedQueryParams = qrCodeValue.Replace(openidVpScheme, string.Empty);
+            var encodedJson = HttpUtility.UrlDecode(serializedQueryParams);
+            var vpAuthorizationRequest = JsonSerializer.Deserialize<VpAuthorizationRequest>(encodedJson);
+            using (var httpClient = _httpClientFactory.Build())
+            {
+
+            }
+        }
+
+        async Task GetPresentationDefinition(VpAuthorizationRequest request, HttpClient httpClient)
+        {
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(request.PresentationDefinitionUri)
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = httpResult.Content.ReadAsStringAsync();
+
         }
 
         #endregion

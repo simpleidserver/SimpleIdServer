@@ -12,6 +12,7 @@ using SimpleIdServer.Did;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.VerifiablePresentation.DTOs;
 using SimpleIdServer.IdServer.VerifiablePresentation.Resources;
@@ -27,6 +28,7 @@ namespace SimpleIdServer.IdServer.VerifiablePresentation.Apis;
 
 public class VpAuthorizationController : BaseController
 {
+    private readonly IdServerHostOptions _idServerOptions;
     private readonly IPresentationDefinitionStore _presentationDefinitionStore;
     private readonly IDistributedCache _distributedCache;
     private readonly VerifiablePresentationOptions _options;
@@ -34,6 +36,7 @@ public class VpAuthorizationController : BaseController
     private readonly ILogger<VpAuthorizationController> _logger;
 
     public VpAuthorizationController(
+        IOptions<IdServerHostOptions> idServerOptions,
         IPresentationDefinitionStore presentationDefinitionStore,
         IDistributedCache distributedCache,
         IOptions<VerifiablePresentationOptions> options,
@@ -42,6 +45,7 @@ public class VpAuthorizationController : BaseController
         IJwtBuilder jwtBuilder,
         IDidFactoryResolver didFactoryResolver) : base(tokenRepository, jwtBuilder)
     {
+        _idServerOptions = idServerOptions.Value;
         _presentationDefinitionStore = presentationDefinitionStore;
         _distributedCache = distributedCache;
         _options = options.Value;
@@ -52,10 +56,17 @@ public class VpAuthorizationController : BaseController
     [HttpPost]
     public async Task<IActionResult> Callback([FromRoute] string prefix, [FromForm] VpAuthorizationResponse request, CancellationToken cancellationToken)
     {
-        prefix = prefix ?? IdServer.Constants.Prefix;
+        prefix = prefix ?? IdServer.Constants.DefaultRealm;
         try
         {
-            var validationResult = Validate(request, prefix, cancellationToken);
+            var validationResult = await Validate(request, prefix, cancellationToken);
+            var pendingAuthorization = validationResult.PendingAuthorization;
+            pendingAuthorization.IsAuthorized = true;
+            pendingAuthorization.VcSubjects = validationResult.VcSubjects;
+            await _distributedCache.SetStringAsync(request.State, JsonSerializer.Serialize(pendingAuthorization), new DistributedCacheEntryOptions
+            {
+                SlidingExpiration = TimeSpan.FromMilliseconds(_options.SlidingExpirationTimeVpOfferMs)
+            }, cancellationToken);
             return new NoContentResult();
         }
         catch (OAuthException ex)
@@ -68,7 +79,7 @@ public class VpAuthorizationController : BaseController
     [HttpGet]
     public async Task<IActionResult> GetQRCode([FromRoute] string prefix, string id, CancellationToken cancellationToken)
     {
-        prefix = prefix ?? IdServer.Constants.Prefix;
+        prefix = prefix ?? IdServer.Constants.DefaultRealm;
         try
         {
             var presentationDefinition = await _presentationDefinitionStore.Query()
@@ -78,7 +89,7 @@ public class VpAuthorizationController : BaseController
                 throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownPresentationDefinition, id));
             var state = Guid.NewGuid().ToString();
             var nonce = Guid.NewGuid().ToString();
-            var qrCodeUrl = GetQRCodeUrl(id, prefix);
+            var qrCodeUrl = GetQRCodeUrl(id, prefix, nonce, state);
             await _distributedCache.SetStringAsync(state, JsonSerializer.Serialize(new VpPendingAuthorization(id, state, nonce)), new DistributedCacheEntryOptions
             {
                 SlidingExpiration = TimeSpan.FromMilliseconds(_options.SlidingExpirationTimeVpOfferMs)
@@ -87,6 +98,7 @@ public class VpAuthorizationController : BaseController
             var qrCodeData = qrGenerator.CreateQrCode(qrCodeUrl, QRCodeGenerator.ECCLevel.Q);
             var qrCode = new PngByteQRCode(qrCodeData);
             var payload = qrCode.GetGraphic(20);
+            Response.Headers.Add("State", state);
             return File(payload, "image/png");
         }
         catch(OAuthException ex)
@@ -96,30 +108,32 @@ public class VpAuthorizationController : BaseController
         }
     }
 
-    private string GetQRCodeUrl(string presentationDefinitionId, string prefix)
+    private string GetQRCodeUrl(string presentationDefinitionId, string prefix, string nonce, string state)
     {
-        var authorizationRequest = BuildAuthorizationRequestDirectPost(presentationDefinitionId, prefix);
+        var authorizationRequest = BuildAuthorizationRequestDirectPost(presentationDefinitionId, prefix, nonce, state);
         var json = JsonSerializer.Serialize(authorizationRequest);
         var encodedJson = HttpUtility.UrlEncode(json);
         return $"openid4vp://authorize?{encodedJson}";
     }
 
-    private VpAuthorizationRequest BuildAuthorizationRequestDirectPost(string presentationDefinitionId, string prefix)
+    private VpAuthorizationRequest BuildAuthorizationRequestDirectPost(string presentationDefinitionId, string prefix, string nonce, string state)
     {
         var issuer = Request.GetAbsoluteUriWithVirtualPath();
         var result = new VpAuthorizationRequest
         {
-            Nonce = Guid.NewGuid().ToString(),
+            Nonce = nonce,
             ResponseMode = "direct_post",
-            ResponseUri = $"{issuer}/{prefix}{Constants.Endpoints.VpAuthorizeCallback}",
+            ResponseUri = $"{issuer}/{GetRealm(prefix)}{Constants.Endpoints.VpAuthorizeCallback}",
             ResponseType = "vp_token",
-            State = Guid.NewGuid().ToString(),
-            PresentationDefinitionUri = $"{issuer}/{prefix}/{Constants.Endpoints.PresentationDefinitions}/{presentationDefinitionId}"
+            State = state,
+            PresentationDefinitionUri = $"{issuer}/{GetRealm(prefix)}/{Constants.Endpoints.PresentationDefinitions}/{presentationDefinitionId}"
         };
         return result;
-    }        
+    }
 
-    private async Task<Dictionary<string, JsonNode>> Validate(VpAuthorizationResponse request, string prefix, CancellationToken cancellationToken)
+    private string GetRealm(string realm) => _idServerOptions.UseRealm ? $"{realm}/" : string.Empty;
+
+    private async Task<VpAuthorizationValidationResult> Validate(VpAuthorizationResponse request, string prefix, CancellationToken cancellationToken)
     {
         if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
         if (string.IsNullOrWhiteSpace(request.VpToken)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, "vp_token"));
@@ -136,6 +150,8 @@ public class VpAuthorizationController : BaseController
         if (cachedValue == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.StateIsNotValid);
         var vpPendingAuthorization = JsonSerializer.Deserialize<VpPendingAuthorization>(cachedValue);
         var presentationDefinition = await _presentationDefinitionStore.Query()
+            .Include(p => p.InputDescriptors).ThenInclude(p => p.Format)
+            .Include(p => p.InputDescriptors).ThenInclude(p => p.Constraints)
             .AsNoTracking()
             .SingleOrDefaultAsync(p => p.PublicId == vpPendingAuthorization.PresentationDefinitionId && p.RealmName == prefix, cancellationToken);
 
@@ -170,6 +186,16 @@ public class VpAuthorizationController : BaseController
             result.Add(vc.Id, vc.CredentialSubject);
         }
 
-        return result;
+        return new VpAuthorizationValidationResult
+        {
+            PendingAuthorization = vpPendingAuthorization,
+            VcSubjects = result
+        };
+    }
+    
+    private class VpAuthorizationValidationResult
+    {
+        public VpPendingAuthorization PendingAuthorization { get; set; }
+        public Dictionary<string, JsonNode> VcSubjects { get; set; }
     }
 }

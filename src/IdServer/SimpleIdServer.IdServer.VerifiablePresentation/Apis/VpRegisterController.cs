@@ -1,9 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
@@ -39,12 +39,14 @@ public class VpRegisterController : BaseController
     }
 
     [HttpGet]
-    public async Task<IActionResult> Status([FromRoute] string prefix, string state, CancellationToken cancellationToken)
+    public async Task<IActionResult> Status([FromRoute] string prefix, string id, CancellationToken cancellationToken)
     {
         try
         {
-            var cachedValue = await _distributedCache.GetStringAsync(state, cancellationToken);
+            var cachedValue = await _distributedCache.GetStringAsync(id, cancellationToken);
             if (cachedValue == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.StateIsNotValid);
+            var vpPendingAuthorization = JsonSerializer.Deserialize<VpPendingAuthorization>(cachedValue);
+            if (!vpPendingAuthorization.IsAuthorized) throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.VpNotReceived);
             return new NoContentResult();
         }
         catch (OAuthException ex)
@@ -57,23 +59,32 @@ public class VpRegisterController : BaseController
     [HttpPost]
     public async Task<IActionResult> EndRegister([FromRoute] string prefix, [FromBody] VpEndRegisterRequest request, CancellationToken cancellationToken)
     {
-        if (request == null) throw new OAuthException();
-        var cachedValue = await _distributedCache.GetStringAsync(request.State, cancellationToken);
-        if (cachedValue == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.StateIsNotValid);
-        var vpPendingAuthorization = JsonSerializer.Deserialize<VpPendingAuthorization>(cachedValue);
-        if (!vpPendingAuthorization.IsAuthorized) throw new OAuthException();
-        var userRegistrationProgress = await GetRegistrationProgress();
-        var lastStep = userRegistrationProgress.Steps.Last();
-        if(lastStep == Constants.AMR)
+        prefix = prefix ?? SimpleIdServer.IdServer.Constants.DefaultRealm;
+        try
         {
-            // REGISTER THE USER.
+            var issuer = Request.GetAbsoluteUriWithVirtualPath();
+            if (request == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
+            var cachedValue = await _distributedCache.GetStringAsync(request.State, cancellationToken);
+            if (cachedValue == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.StateIsNotValid);
+            var vpPendingAuthorization = JsonSerializer.Deserialize<VpPendingAuthorization>(cachedValue);
+            if (!vpPendingAuthorization.IsAuthorized) throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.VpNotReceived);
+            var userRegistrationProgress = await GetRegistrationProgress();
+            var registrationResult = await CreateUser(issuer, userRegistrationProgress, prefix, Constants.AMR, cancellationToken);
+            await _distributedCache.RemoveAsync(request.State, cancellationToken);
+            return new OkObjectResult(registrationResult);
         }
-
-
-        if (userRegistrationProgress.)
+        catch(OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            return BuildError(ex);
+        }
     }
 
-    protected async Task CreateUser(UserRegistrationProgress registrationProgress, string prefix, string amr, CancellationToken cancellationToken)
+    protected async Task<VpEndRegisterResult> CreateUser(string issuer,
+        UserRegistrationProgress registrationProgress, 
+        string prefix, 
+        string amr, 
+        CancellationToken cancellationToken)
     {
         var user = registrationProgress.User ?? new Domains.User
         {
@@ -82,7 +93,6 @@ public class VpRegisterController : BaseController
             CreateDateTime = DateTime.UtcNow,
             UpdateDateTime = DateTime.UtcNow
         };
-        // ADD VERIFIABLE CREDENTIAL.
         var lastStep = registrationProgress.Steps.Last();
         if (lastStep == amr)
         {
@@ -91,16 +101,19 @@ public class VpRegisterController : BaseController
                 RealmsName = prefix
             });
             _userRepository.Add(user);
-            await _userRepository.SaveChanges(CancellationToken.None);
-            return;
+            await _userRepository.SaveChanges(cancellationToken);
+            return new VpEndRegisterResult();
         }
 
         registrationProgress.NextAmr();
         registrationProgress.User = user;
-        var json = JsonConvert.SerializeObject(registrationProgress);
+        var json = Newtonsoft.Json.JsonConvert.SerializeObject(registrationProgress);
         await _distributedCache.SetStringAsync(registrationProgress.RegistrationProgressId, json);
-        // NEXT AMR.
-        return;
+        var nextRegistrationRedirectUrl = $"{issuer}/{prefix}/{registrationProgress.Amr}/register";
+        return new VpEndRegisterResult
+        {
+            NextRegistrationRedirectUrl = nextRegistrationRedirectUrl
+        };
     }
 
     private async Task<UserRegistrationProgress> GetRegistrationProgress()
@@ -110,7 +123,7 @@ public class VpRegisterController : BaseController
         var cookieValue = Request.Cookies[cookieName];
         var json = await _distributedCache.GetStringAsync(cookieValue);
         if (string.IsNullOrWhiteSpace(json)) return null;
-        var registrationProgress = JsonConvert.DeserializeObject<UserRegistrationProgress>(json);
+        var registrationProgress = Newtonsoft.Json.JsonConvert.DeserializeObject<UserRegistrationProgress>(json);
         return registrationProgress;
     }
 }

@@ -159,4 +159,7 @@
   <data name="VerifiablePresentationProofInvalid" xml:space="preserve">
     <value>the verifiable presentation proof is incorrect</value>
   </data>
+  <data name="VpNotReceived" xml:space="preserve">
+    <value>the verifiable presentation is not received</value>
+  </data>
 </root>

@@ -61,11 +61,38 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Verifiable credentials are enrolled.
+        /// </summary>
+        public static string credential_added {
+            get {
+                return ResourceManager.GetString("credential_added", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Enroll your verifiable credentials.
+        /// </summary>
+        public static string enroll_vp {
+            get {
+                return ResourceManager.GetString("enroll_vp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Register.
         /// </summary>
         public static string register {
             get {
                 return ResourceManager.GetString("register", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à QR code.
+        /// </summary>
+        public static string scan_mobileapp {
+            get {
+                return ResourceManager.GetString("scan_mobileapp", resourceCulture);
             }
         }
         
