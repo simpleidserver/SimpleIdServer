@@ -353,12 +353,7 @@ void SeedData(WebApplication application, string scimBaseUrl)
                 }
             }
 
-            if (!dbContext.AuthenticationSchemeProviderDefinitions.Any())
-                dbContext.AuthenticationSchemeProviderDefinitions.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.ProviderDefinitions);
-
-            if (!dbContext.AuthenticationSchemeProviders.Any())
-                dbContext.AuthenticationSchemeProviders.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Providers);
-
+            AddMissingAuthenticationSchemeProviders(dbContext);
             if (!dbContext.IdentityProvisioningDefinitions.Any())
                 dbContext.IdentityProvisioningDefinitions.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.IdentityProvisioningDefLst);
 
@@ -486,6 +481,27 @@ void SeedData(WebApplication application, string scimBaseUrl)
                 var tr = language.Descriptions.SingleOrDefault(d => d.Key == existingTranslation.Key && d.Language == existingTranslation.Language);
                 if (tr == null) continue;
                 existingTranslation.Value = tr.Value;
+            }
+        }
+
+        void AddMissingAuthenticationSchemeProviders(StoreDbContext dbContext)
+        {
+            if (!dbContext.AuthenticationSchemeProviders.Any())
+            {
+                foreach (var provider in SimpleIdServer.IdServer.Startup.IdServerConfiguration.Providers)
+                {
+                    var def = dbContext.AuthenticationSchemeProviderDefinitions.FirstOrDefault(d => d.Name == provider.AuthSchemeProviderDefinition.Name);
+                    if (def != null) provider.AuthSchemeProviderDefinition = def;
+                    var realmName = provider.Realms.First().Name;
+                    var realm = dbContext.Realms.FirstOrDefault(r => r.Name == realmName);
+                    if (realm != null)
+                    {
+                        provider.Realms.Clear();
+                        provider.Realms.Add(realm);
+                    }
+
+                    dbContext.AuthenticationSchemeProviders.Add(provider);
+                }
             }
         }
     }
