@@ -15,6 +15,11 @@ using System.Web;
 using System.Windows.Input;
 using ZXing.Net.Maui;
 using SimpleIdServer.Vc.Models;
+using SimpleIdServer.Vp;
+using SimpleIdServer.Vc;
+using SimpleIdServer.Did.Key;
+using SimpleIdServer.Did.Crypto;
+using SimpleIdServer.Did.Models;
 #if IOS
 using Firebase.CloudMessaging;
 #endif
@@ -23,6 +28,7 @@ namespace SimpleIdServer.Mobile.ViewModels;
 
 public class QRCodeScannerViewModel
 {
+    private const string _vpFormat = "ldp_vp";
     private const string _vcFormat = "ldp_vc";
     private const string openidCredentialOfferScheme = "openid-credential-offer://?credential_offer=";
     private const string openidVpScheme = "openid4vp://authorize?";
@@ -374,6 +380,8 @@ public class QRCodeScannerViewModel
                 var credentialResult = await GetCredential(httpClient, accessToken, credentialOffer, offeredCredential);
                 var serializedVc = credentialResult.Credential.ToJsonString();
                 var w3cVc = JsonSerializer.Deserialize<W3CVerifiableCredential>(serializedVc);
+                var types = w3cVc.Type;
+                types.Remove("VerifiableCredential");
                 await _verifiableCredentialListState.AddVerifiableCredentialRecord(new VerifiableCredentialRecord
                 {
                     Id = w3cVc.Id,
@@ -382,6 +390,7 @@ public class QRCodeScannerViewModel
                     Description = display.Description,
                     ValidFrom = w3cVc.ValidFrom,
                     ValidUntil = w3cVc.ValidUntil,
+                    Type = types.First(),
                     SerializedVc = serializedVc,
                     BackgroundColor = display.BackgroundColor,
                     TextColor = display.TextColor,
@@ -459,18 +468,35 @@ public class QRCodeScannerViewModel
 
         #region Verifiable presentation
 
-        Task SendVerifiablePresentation()
+        async Task SendVerifiablePresentation()
         {
+            var didRecord = await App.Database.GetDidRecord();
+            if(didRecord == null)
+            {
+                return;
+            }
+
+            var didDocument = await DidKeyResolver.New().Resolve(didRecord.Did, CancellationToken.None);
+            var privateKey = Ed25519SignatureKey.From(null, didRecord.PrivaterKey);
+            var vcLst = _verifiableCredentialListState.VerifiableCredentialRecords;
             var serializedQueryParams = qrCodeValue.Replace(openidVpScheme, string.Empty);
             var encodedJson = HttpUtility.UrlDecode(serializedQueryParams);
             var vpAuthorizationRequest = JsonSerializer.Deserialize<VpAuthorizationRequest>(encodedJson);
             using (var httpClient = _httpClientFactory.Build())
             {
+                var presentationDefinition = await GetPresentationDefinition(vpAuthorizationRequest, httpClient);
+                var types = presentationDefinition.InputDescriptors.Select(d => d.Type);
+                var filteredVc = vcLst.Where(v => types.Contains(v.Type)).Select(v => JsonSerializer.Deserialize<W3CVerifiableCredential>(v.SerializedVc));
+                var vpToken = await BuildVpToken(filteredVc, didDocument, privateKey);
+                var presentationSubmission = BuildPresentationSubmission(presentationDefinition);
 
+                // build presentation definition.
+                // build vp_token
+                // call the authorization edp.
             }
         }
 
-        async Task GetPresentationDefinition(VpAuthorizationRequest request, HttpClient httpClient)
+        async Task<PresentationDefinitionResult> GetPresentationDefinition(VpAuthorizationRequest request, HttpClient httpClient)
         {
             var requestMessage = new HttpRequestMessage
             {
@@ -479,7 +505,45 @@ public class QRCodeScannerViewModel
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = httpResult.Content.ReadAsStringAsync();
+            return null;
+        }
 
+        async Task<string> BuildVpToken(IEnumerable<W3CVerifiableCredential> filteredVc, DidDocument didDocument, Ed25519SignatureKey privateKey)
+        {
+            var builder = VpBuilder.New(Guid.NewGuid().ToString(), didDocument.Id);
+            foreach (var vc in filteredVc)
+                builder.AddVerifiableCredential(vc);
+
+            var presentation = builder.Build();
+            var securedDocument = SecuredDocument.New();
+            securedDocument.Secure(
+                presentation,
+                didDocument,
+                didDocument.VerificationMethod.First().Id,
+                asymKey: privateKey);
+            var vpToken = JsonSerializer.Serialize(presentation);
+            return vpToken;
+        }
+
+        PresentationSubmissionRequest BuildPresentationSubmission(PresentationDefinitionResult presentationDefinition)
+        {
+            var result = new PresentationSubmissionRequest
+            {
+                Id = Guid.NewGuid().ToString(),
+                DefinitionId = presentationDefinition.Id,
+                DescriptorMap = presentationDefinition.InputDescriptors.Select(d => new PresentationSubmissionDescriptorMapRequest
+                {
+                    Id = d.Id,
+                    Format = _vpFormat,
+                    Path = "$",
+                    PathNested = new PresentationSubmissionDescriptorMapPathNestedRequest
+                    {
+                        Format = _vcFormat,
+                        Path = ""
+                    }
+                }).ToList()
+            };
+            return result;
         }
 
         #endregion

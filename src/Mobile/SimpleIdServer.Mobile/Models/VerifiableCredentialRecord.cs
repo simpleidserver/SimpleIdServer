@@ -7,6 +7,7 @@ public class VerifiableCredentialRecord
     [PrimaryKey]
     public string Id { get; set; }
     public string Name { get; set; }
+    public string Type { get; set; }
     public string Format { get; set; }
     public string BackgroundColor { get; set; }
     public string TextColor { get; set; }
