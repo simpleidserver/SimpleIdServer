@@ -120,6 +120,9 @@
   <data name="AuthenticationNotConfirmed" xml:space="preserve">
     <value>authentication is not yet confirmed</value>
   </data>
+  <data name="NoCredential" xml:space="preserve">
+    <value>there is no credential enrolled</value>
+  </data>
   <data name="NotAllowedToRegister" xml:space="preserve">
     <value>you are not allowed to register an account</value>
   </data>

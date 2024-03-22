@@ -70,6 +70,15 @@ namespace SimpleIdServer.IdServer.Fido.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à there is no credential enrolled.
+        /// </summary>
+        internal static string NoCredential {
+            get {
+                return ResourceManager.GetString("NoCredential", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à you are not allowed to register an account.
         /// </summary>
         internal static string NotAllowedToRegister {

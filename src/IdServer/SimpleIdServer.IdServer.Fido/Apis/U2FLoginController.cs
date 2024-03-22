@@ -160,13 +160,17 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             if (authenticatedUser == null)
                 return (null, BuildError(System.Net.HttpStatusCode.Unauthorized, ErrorCodes.ACCESS_DENIED, string.Format(IdServer.Resources.Global.UnknownUser, login)));
 
+            var fidoCredentials = authenticatedUser.GetStoredFidoCredentials(request.CredentialType);
+            if (!fidoCredentials.Any())
+                return (null, BuildError(System.Net.HttpStatusCode.Unauthorized, ErrorCodes.ACCESS_DENIED, string.Format(Fido.Resources.Global.NoCredential, login)));
+
             var exts = new AuthenticationExtensionsClientInputs()
             {
                 Extensions = true,
                 UserVerificationMethod = true,
                 DevicePubKey = new AuthenticationExtensionsDevicePublicKeyInputs()
             };
-            var existingCredentials = authenticatedUser.GetStoredFidoCredentials(request.CredentialType).Select(c => c.Descriptor);
+            var existingCredentials = fidoCredentials.Select(c => c.Descriptor);
             var options = _fido2.GetAssertionOptions(
                 existingCredentials,
                 UserVerificationRequirement.Discouraged,

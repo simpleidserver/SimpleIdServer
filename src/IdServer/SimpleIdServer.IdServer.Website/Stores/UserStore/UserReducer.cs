@@ -338,7 +338,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
 
         [ReducerMethod]
         public static UpdateUserState ReduceAddUserFailureAction(UpdateUserState state, AddUserFailureAction act)
-            => new(false) { ErrorMessage = act.ErrorMessage };
+            => new(false) { ErrorMessage = act.ErrorMessage, IsUpdating = false };
 
         #endregion
 

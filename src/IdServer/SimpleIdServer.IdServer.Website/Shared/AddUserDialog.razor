@@ -44,9 +44,9 @@
         public string? Email { get; set; } = null;
     }
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        base.OnAfterRender(firstRender);
+        await base.OnInitializedAsync();
         dispatcher.Dispatch(new StartAddUserAction());
     }
 

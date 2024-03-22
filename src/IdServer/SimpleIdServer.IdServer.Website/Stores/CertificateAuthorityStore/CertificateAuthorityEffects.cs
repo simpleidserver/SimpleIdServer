@@ -119,6 +119,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore
         {
             var baseUrl = await GetBaseUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
+            action.CertificateAuthority.StartDateTime = action.CertificateAuthority.StartDateTime.ToUniversalTime();
+            action.CertificateAuthority.EndDateTime = action.CertificateAuthority.EndDateTime.ToUniversalTime();
             var requestMessage = new HttpRequestMessage
             {
                 RequestUri = new Uri(baseUrl),
