@@ -15,7 +15,7 @@ namespace SimpleIdServer.IdServer.Domains
             if(existingCredential != null) user.Credentials.Remove(existingCredential);
             user.Credentials.Add(new UserCredential
             {
-                Id = Convert.ToBase64String(attestation.Id),
+                Id = Guid.NewGuid().ToString(),
                 CredentialType = credentialType,
                 Value = JsonSerializer.Serialize(new StoredFidoCredential
                 {

@@ -22,6 +22,7 @@ using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI;
 using System.Security.Claims;
 using System.Text;
+using System.Web;
 
 namespace SimpleIdServer.IdServer.Fido.Apis
 {
@@ -141,9 +142,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             if (!isAuthenticated) user = BuildUser();
             var success = await _fido2.MakeNewCredentialAsync(request.AuthenticatorAttestationRawResponse, sessionRecord.Options, async (arg, c) =>
             {
-                var credentialId = Convert.ToBase64String(arg.CredentialId);
-                var result = !(await _userCredentialRepository.Query().AnyAsync(c => c.CredentialType ==  sessionRecord.CredentialType && credentialId == c.Id, cancellationToken));
-                return result;
+                return true;
             }, cancellationToken: cancellationToken);
 
             user.AddFidoCredential(sessionRecord.CredentialType, success.Result);
