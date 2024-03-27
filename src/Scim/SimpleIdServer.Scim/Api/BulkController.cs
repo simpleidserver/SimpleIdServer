@@ -152,6 +152,7 @@ namespace SimpleIdServer.Scim.Api
                 RouteData = RouteData
             });
             features.Set<IHttpResponseFeature>(new HttpResponseFeature());
+            features.Set<IHttpResponseBodyFeature>(new StreamResponseBodyFeature(new MemoryStream()));
             features.Set<IResponseCookiesFeature>(new ResponseCookiesFeature(features));
             var newHttpContext = new DefaultHttpContext(features);
             newHttpContext.Request.Path = scimBulkOperationRequest.Path;
