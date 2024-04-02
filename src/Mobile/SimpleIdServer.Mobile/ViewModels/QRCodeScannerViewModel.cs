@@ -20,6 +20,7 @@ using SimpleIdServer.Vc;
 using SimpleIdServer.Did.Key;
 using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Models;
+using Comet.Reflection;
 #if IOS
 using Firebase.CloudMessaging;
 #endif
@@ -112,7 +113,7 @@ public class QRCodeScannerViewModel
                 }
                 else if (qrCodeValue.StartsWith(openidVpScheme))
                 {
-
+                    await SendVerifiablePresentation();
                 }
                 else
                 {
@@ -485,14 +486,25 @@ public class QRCodeScannerViewModel
             using (var httpClient = _httpClientFactory.Build())
             {
                 var presentationDefinition = await GetPresentationDefinition(vpAuthorizationRequest, httpClient);
-                var types = presentationDefinition.InputDescriptors.Select(d => d.Type);
+                var types = presentationDefinition.InputDescriptors.Select(d => d.Constraints).SelectMany(c => c.Fields).SelectMany(c => c.Path);
                 var filteredVc = vcLst.Where(v => types.Contains(v.Type)).Select(v => JsonSerializer.Deserialize<W3CVerifiableCredential>(v.SerializedVc));
                 var vpToken = await BuildVpToken(filteredVc, didDocument, privateKey);
                 var presentationSubmission = BuildPresentationSubmission(presentationDefinition);
-
-                // build presentation definition.
-                // build vp_token
-                // call the authorization edp.
+                var vpAuthorizationResponse = new VpAuthorizationResponse
+                {
+                    PresentationSubmission = JsonSerializer.Serialize(presentationSubmission),
+                    State = vpAuthorizationRequest.State,
+                    VpToken = vpToken
+                };                
+                var requestMessage = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Post,
+                    RequestUri = new Uri(_urlService.GetUrl(vpAuthorizationRequest.ResponseUri)),
+                    Content = new FormUrlEncodedContent(vpAuthorizationResponse.ToQueries())
+                };
+                var httpResponse = await httpClient.SendAsync(requestMessage);
+                httpResponse.EnsureSuccessStatusCode();
+                await _promptService.ShowAlert("Success", "The verifiable presentation has been presented to the verifier");
             }
         }
 
@@ -501,11 +513,11 @@ public class QRCodeScannerViewModel
             var requestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(request.PresentationDefinitionUri)
+                RequestUri = new Uri(_urlService.GetUrl(request.PresentationDefinitionUri))
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
-            var json = httpResult.Content.ReadAsStringAsync();
-            return null;
+            var json = await httpResult.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<PresentationDefinitionResult>(json);
         }
 
         async Task<string> BuildVpToken(IEnumerable<W3CVerifiableCredential> filteredVc, DidDocument didDocument, Ed25519SignatureKey privateKey)
@@ -531,7 +543,12 @@ public class QRCodeScannerViewModel
             {
                 Id = Guid.NewGuid().ToString(),
                 DefinitionId = presentationDefinition.Id,
-                DescriptorMap = presentationDefinition.InputDescriptors.Select(d => new PresentationSubmissionDescriptorMapRequest
+                DescriptorMap = new List<PresentationSubmissionDescriptorMapRequest>()
+            };
+            int i = 0;
+            foreach(var d in presentationDefinition.InputDescriptors)
+            {
+                result.DescriptorMap.Add(new PresentationSubmissionDescriptorMapRequest
                 {
                     Id = d.Id,
                     Format = _vpFormat,
@@ -539,10 +556,11 @@ public class QRCodeScannerViewModel
                     PathNested = new PresentationSubmissionDescriptorMapPathNestedRequest
                     {
                         Format = _vcFormat,
-                        Path = ""
+                        Path = $"$.verifiableCredential[{i}]"
                     }
-                }).ToList()
-            };
+                });
+            }
+
             return result;
         }
 

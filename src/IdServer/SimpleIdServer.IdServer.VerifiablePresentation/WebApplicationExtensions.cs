@@ -15,7 +15,7 @@ namespace Microsoft.AspNetCore.Builder
             var usePrefix = opts.UseRealm;
 
             webApplication.SidMapControllerRoute("getPresentationDefinition",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + SimpleIdServer.IdServer.VerifiablePresentation.Constants.Endpoints.PresentationDefinitions,
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + SimpleIdServer.IdServer.VerifiablePresentation.Constants.Endpoints.PresentationDefinitions + "/{id}",
                 defaults: new { controller = "PresentationDefinitions", action = "Get" });
 
             webApplication.SidMapControllerRoute("vpAuthorizeCallback",

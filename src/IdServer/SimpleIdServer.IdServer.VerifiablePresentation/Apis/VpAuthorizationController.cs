@@ -126,7 +126,7 @@ public class VpAuthorizationController : BaseController
             ResponseUri = $"{issuer}/{GetRealm(prefix)}{Constants.Endpoints.VpAuthorizeCallback}",
             ResponseType = "vp_token",
             State = state,
-            PresentationDefinitionUri = $"{issuer}/{GetRealm(prefix)}/{Constants.Endpoints.PresentationDefinitions}/{presentationDefinitionId}"
+            PresentationDefinitionUri = $"{issuer}/{GetRealm(prefix)}{Constants.Endpoints.PresentationDefinitions}/{presentationDefinitionId}"
         };
         return result;
     }

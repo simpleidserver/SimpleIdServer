@@ -33,7 +33,7 @@ public class PresentationDefinitionInputDescriptorConstraint
             }
 
             if (!string.IsNullOrWhiteSpace(constraint.Filter))
-                record.Add("filter", JsonObject.Parse(constraint.Filter));
+                record.Add("filter", constraint.Filter);
 
             fields.Add(record);
         }
