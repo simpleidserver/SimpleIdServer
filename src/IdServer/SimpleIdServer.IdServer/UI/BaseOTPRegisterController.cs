@@ -106,7 +106,7 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
             return await SendConfirmationCode();
         }
 
-        var enteredOtpCode = long.Parse(viewModel.OTPCode);
+        var enteredOtpCode = viewModel.OTPCode;
         var isOtpCodeCorrect = otpAuthenticator.Verify(enteredOtpCode, new UserCredential
         {
             OTPAlg = optAlg,
@@ -143,7 +143,7 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
                 IsActive = true
             });
             await _userNotificationService.Send("One Time Password", string.Format(options.HttpBody, otpCode), new Dictionary<string, string>(), viewModel.Value);
-            await DistributedCache.SetStringAsync(otpCode.ToString(), viewModel.Value, new DistributedCacheEntryOptions
+            await DistributedCache.SetStringAsync(otpCode, viewModel.Value, new DistributedCacheEntryOptions
             {
                 SlidingExpiration = TimeSpan.FromHours(2)
             });

@@ -7,7 +7,7 @@ namespace SimpleIdServer.IdServer.UI
     public interface IOTPAuthenticator
     {
         OTPAlgs Alg { get; }
-        long GenerateOtp(UserCredential credential);
-        bool Verify(long otp, UserCredential credential);
+        string GenerateOtp(UserCredential credential);
+        bool Verify(string otp, UserCredential credential);
     }
 }

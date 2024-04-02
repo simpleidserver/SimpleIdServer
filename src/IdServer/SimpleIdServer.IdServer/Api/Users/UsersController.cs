@@ -406,7 +406,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                     var existingCredential = user.Credentials.SingleOrDefault(c => c.Id == credentialId);
                     if (existingCredential == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserCredential, credentialId));
                     foreach (var cred in user.Credentials.Where(c => c.CredentialType == existingCredential.CredentialType))
-                        existingCredential.IsActive = false;
+                        cred.IsActive = false;
                     existingCredential.IsActive = true;
                     user.UpdateDateTime = DateTime.UtcNow;
                     await _userRepository.SaveChanges(cancellationToken);

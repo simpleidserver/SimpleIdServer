@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
@@ -23,20 +24,21 @@ public class AuthenticateController : BaseAuthenticationMethodController<Authent
     private readonly IConfiguration _configuration;
 
     public AuthenticateController(
-        IPasswordAuthenticationService userAuthenticationService, 
+        IPasswordAuthenticationService userAuthenticationService,
         IAuthenticationSchemeProvider authenticationSchemeProvider,
         IOptions<IdServerHostOptions> options,
         IDataProtectionProvider dataProtectionProvider,
         ITokenRepository tokenRepository,
         IJwtBuilder jwtBuilder,
-        IAuthenticationHelper authenticationHelper, 
-        IClientRepository clientRepository, 
-        IAmrHelper amrHelper, 
+        IAuthenticationHelper authenticationHelper,
+        IClientRepository clientRepository,
+        IAmrHelper amrHelper,
         IUserRepository userRepository,
         IUserSessionResitory userSessionRepository,
         IUserTransformer userTransformer,
         IBusControl busControl,
-        IConfiguration configuration) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl)
+        IConfiguration configuration,
+        IAntiforgery antiforgery) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery)
     {
         _configuration = configuration;
     }

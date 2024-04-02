@@ -9,17 +9,17 @@ namespace SimpleIdServer.IdServer.UI
     {
         public OTPAlgs Alg => OTPAlgs.TOTP;
 
-        public long GenerateOtp(UserCredential credential)
+        public string GenerateOtp(UserCredential credential)
         {
             return GenerateOtp(credential.OTPKey, CalculateTimeStep(DateTime.UtcNow, credential));
         }
 
-        public long GenerateOtp(UserCredential credential, DateTime date)
+        public string GenerateOtp(UserCredential credential, DateTime date)
         {
             return GenerateOtp(credential.OTPKey, CalculateTimeStep(date, credential));
         }
 
-        public bool Verify(long otp, UserCredential credential)
+        public bool Verify(string otp, UserCredential credential)
         {
             var currentDateTime = DateTime.UtcNow;
             var key = credential.OTPKey;

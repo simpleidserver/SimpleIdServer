@@ -11,5 +11,7 @@ namespace SimpleIdServer.IdServer.UI
         {
             return View(new ErrorViewModel(code, message));
         }
+
+        public IActionResult Unexpected() => View();
     }
 }

@@ -143,7 +143,7 @@ public class ResetController : BaseController
     }
 
     [HttpGet]
-    public async Task<IActionResult> Confirm([FromRoute] string prefix, long code, string returnUrl, CancellationToken cancellationToken)
+    public async Task<IActionResult> Confirm([FromRoute] string prefix, string code, string returnUrl, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         var viewModel = new ConfirmResetPasswordViewModel();
@@ -177,7 +177,7 @@ public class ResetController : BaseController
 
         var notificationMode = GetOptions().NotificationMode;
         var service = _resetPasswordServices.Single(p => p.NotificationMode == notificationMode);
-        var resetPasswordLink = await service.Verify(viewModel.Code.Value, cancellationToken);
+        var resetPasswordLink = await service.Verify(viewModel.Code, cancellationToken);
         if(resetPasswordLink == null)
         {
             ModelState.AddModelError("invalid_otpcode", "invalid_otpcode");

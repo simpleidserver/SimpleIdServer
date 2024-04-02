@@ -18,7 +18,7 @@ public interface IResetPasswordService
 {
     string NotificationMode { get; }
     Task SendResetLink(ResetPasswordParameter parameter, CancellationToken cancellationToken);
-    Task<ResetPasswordLink> Verify(long code, CancellationToken cancellationToken);
+    Task<ResetPasswordLink> Verify(string code, CancellationToken cancellationToken);
     string GetDestination(User user);
 }
 
@@ -104,10 +104,10 @@ public abstract class BaseOTPResetPasswordService : IResetPasswordService
             new Dictionary<string, string>(),
             destination);
         var expirationTimeInSeconds = GetExpirationTimeInSeconds(userCredential, otpOptions, parameter);
-        await _grantedTokenHelper.AddResetPasswordLink(otp.ToString(), login, parameter.Realm, expirationTimeInSeconds, cancellationToken);
+        await _grantedTokenHelper.AddResetPasswordLink(otp, login, parameter.Realm, expirationTimeInSeconds, cancellationToken);
     }
 
-    public async Task<ResetPasswordLink> Verify(long code, CancellationToken cancellationToken)
+    public async Task<ResetPasswordLink> Verify(string code, CancellationToken cancellationToken)
     {
         var otpOptions = GetOTPOptions();
         var otpAuthenticator = _otpAuthenticators.First(o => o.Alg == otpOptions.OTPAlg);

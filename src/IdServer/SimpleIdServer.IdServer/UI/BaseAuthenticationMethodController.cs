@@ -1,8 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +13,7 @@ using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.AuthProviders;
 using SimpleIdServer.IdServer.UI.Services;
@@ -32,6 +33,7 @@ namespace SimpleIdServer.IdServer.UI
     {
         private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
         private readonly IUserAuthenticationService _authenticationService;
+        private readonly IAntiforgery _antiforgery;
 
         public BaseAuthenticationMethodController(
             IOptions<IdServerHostOptions> options,
@@ -46,10 +48,12 @@ namespace SimpleIdServer.IdServer.UI
             IUserRepository userRepository,
             IUserSessionResitory userSessionRepository,
             IUserTransformer userTransformer,
-            IBusControl busControl) : base(clientRepository, userRepository, userSessionRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, tokenRepository, jwtBuilder, options)
+            IBusControl busControl,
+            IAntiforgery antiforgery) : base(clientRepository, userRepository, userSessionRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, tokenRepository, jwtBuilder, options)
         {
             _authenticationSchemeProvider = authenticationSchemeProvider;
             _authenticationService = userAuthenticationService;
+            _antiforgery = antiforgery;
         }
 
         protected abstract string Amr { get; }
@@ -135,9 +139,30 @@ namespace SimpleIdServer.IdServer.UI
         #region Submit Credentials
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        // [ValidateAntiForgeryToken]
         public async virtual Task<IActionResult> Index([FromRoute] string prefix, T viewModel, CancellationToken token)
         {
+            try
+            {
+                await _antiforgery.ValidateRequestAsync(this.HttpContext);
+            }
+            catch (AntiforgeryValidationException)
+            {
+                if (!User.Identity.IsAuthenticated)
+                {
+                    return RedirectToAction("Index", "Errors", new { code = "invalid_request", message = Global.InvalidAntiForgeryToken });
+                }
+
+                var returnUrl = viewModel.ReturnUrl;
+                if(!IsProtected(returnUrl))
+                {
+                    return Redirect(returnUrl);
+                }
+
+                var unprotectedUrl = Unprotect(returnUrl);
+                return Redirect(unprotectedUrl);
+            }
+
             viewModel.Realm = prefix;
             prefix = prefix ?? Constants.DefaultRealm;
             if (viewModel == null) 

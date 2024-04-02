@@ -7,7 +7,7 @@ namespace SimpleIdServer.IdServer.UI
 {
     public class OTPAuthenticator
     {
-        protected long GenerateOtp(byte[] key, long counter)
+        protected string GenerateOtp(byte[] key, long counter)
         {
             var data = BitConverter.GetBytes(counter);
             Array.Reverse(data);
@@ -24,7 +24,7 @@ namespace SimpleIdServer.IdServer.UI
                 | (hashed[offset + 2] & 0xff) << 8
                 | (hashed[offset + 3] & 0xff) % 1000000;
             var truncatedValue = ((int)otp % (int)Math.Pow(10, 6));
-            return long.Parse(truncatedValue.ToString().PadLeft(6, '0'));
+            return truncatedValue.ToString().PadLeft(6, '0');
         }
     }
 }

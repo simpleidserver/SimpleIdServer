@@ -7,7 +7,7 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
     public abstract class BaseOTPAuthenticateViewModel : BaseAuthenticateViewModel
     {
         public string Action { get; set; }
-        public long? OTPCode { get; set; }
+        public string? OTPCode { get; set; }
         public int? TOTPStep { get; set; }
 
         public override void Validate(ModelStateDictionary modelStateDictionary)

@@ -109,7 +109,7 @@ app.UseRequestLocalization(e =>
 
 if (!app.Environment.IsDevelopment())
 {
-    var errorPath = identityServerConfiguration.IsRealmEnabled ? "/master/Error" : "/Error";
+    var errorPath = identityServerConfiguration.IsRealmEnabled ? "/master/Error/Unexpected" : "/Error/Unexpected";
     app.UseExceptionHandler(errorPath);
 }
 

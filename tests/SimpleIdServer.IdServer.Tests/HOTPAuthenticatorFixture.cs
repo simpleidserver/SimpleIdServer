@@ -17,12 +17,12 @@ namespace SimpleIdServer.IdServer.Tests
             };
 
         [Test]
-        [TestCase(0, 755224)]
-        [TestCase(1, 287082)]
-        [TestCase(2, 359152)]
-        [TestCase(3, 969429)]
-        [TestCase(4, 338314)]
-        public void CheckHOTP(int counter, long expectedOtp)
+        [TestCase(0, "755224")]
+        [TestCase(1, "287082")]
+        [TestCase(2, "359152")]
+        [TestCase(3, "969429")]
+        [TestCase(4, "338314")]
+        public void CheckHOTP(int counter, string expectedOtp)
         {
             // ACT
             var user = UserBuilder.Create("login", "pwd").Build();

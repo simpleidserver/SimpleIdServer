@@ -71,7 +71,7 @@ public class TokenExchangePreAuthorizedCodeHandler : BaseCredentialsHandler
                     var otpAuthenticator = _otpAuthenticators.Single(o => o.Alg == user.ActiveOTP.OTPAlg);
                     var notificationService = _userNotificationServices.Single(s => s.Name == user.NotificationMode);
                     var otpCode = otpAuthenticator.GenerateOtp(user.ActiveOTP);
-                    var transactionCode = otpCode.ToString();
+                    var transactionCode = otpCode;
                     await notificationService.Send("Transaction code", transactionCode, new Dictionary<string, string>(), user);
                     preAuthCode.TransactionCode = transactionCode;
                 }

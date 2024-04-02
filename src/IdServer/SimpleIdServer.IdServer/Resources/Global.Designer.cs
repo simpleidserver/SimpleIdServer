@@ -1069,6 +1069,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Impossible to validate the anti forgery token, close all the window and retry again.
+        /// </summary>
+        public static string InvalidAntiForgeryToken {
+            get {
+                return ResourceManager.GetString("InvalidAntiForgeryToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à application type is invalid.
         /// </summary>
         public static string InvalidApplicationType {
