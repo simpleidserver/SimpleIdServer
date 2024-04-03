@@ -8,6 +8,7 @@ public class ProfileViewModel
 {
     public string Name { get; set; }
     public bool HasOtpKey { get; set; }
+    public string Picture { get; set; }
     public IEnumerable<ConsentViewModel> Consents { get; set; }
     public IEnumerable<PendingRequestViewModel> PendingRequests { get; set; }
     public IEnumerable<ExternalAuthProviderViewModel> Profiles { get; set; }

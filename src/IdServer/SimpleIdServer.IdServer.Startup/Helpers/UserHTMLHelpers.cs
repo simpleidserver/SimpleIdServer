@@ -8,13 +8,20 @@ namespace Microsoft.AspNetCore.Mvc.Rendering
 {
     public static class UserHTMLHelpers
     {
-        public static IHtmlContent UserPicture(this IHtmlHelper htmlHelper, ClaimsPrincipal claimsPrincipal)
+        public static IHtmlContent UserPicture(this IHtmlHelper htmlHelper, ClaimsPrincipal claimsPrincipal, string picture = null)
         {
             var src = "/images/DefaultUser.png";
-            var cl = claimsPrincipal.Claims.FirstOrDefault(c => c.Type == SimpleIdServer.IdServer.Constants.UserClaims.Profile);
-            if (cl != null)
-                src = cl.Value;
-            return new HtmlString($"<img class='img-thumbnail' src='{src}' />");
+            if (!string.IsNullOrWhiteSpace(picture))
+                src = picture;
+            else
+            {
+                var cl = claimsPrincipal.Claims.FirstOrDefault(c => c.Type == SimpleIdServer.IdServer.Constants.UserClaims.Picture);
+                if (cl != null)
+                    src = cl.Value;
+            }
+
+            // fas fa-edit
+            return new HtmlString($"<div class='profile-content'><button class='btn edit' id='edit-profile'><i class='fa-solid fa-pen-to-square'></i></button><img id='user-picture' class='img-thumbnail' src='{src}' /></div>");
         }
     }
 }

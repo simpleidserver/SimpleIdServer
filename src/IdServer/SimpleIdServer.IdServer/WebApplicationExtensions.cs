@@ -238,6 +238,13 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("generateDecentralizedIdentity",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/did",
                 defaults: new { controller = "Users", action = "GenerateDecentralizedIdentity" });
+            webApplication.SidMapControllerRoute("getPicture",
+                pattern: Constants.EndPoints.Users + "/{id}/picture",
+                defaults: new { controller = "Users", action = "GetPicture" });
+            webApplication.SidMapControllerRoute("updatePicture",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/picture",
+                defaults: new { controller = "Users", action = "UpdatePicture" });
+
 
             webApplication.SidMapControllerRoute("searchIdProvisioning",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.IdentityProvisioning + "/.search",

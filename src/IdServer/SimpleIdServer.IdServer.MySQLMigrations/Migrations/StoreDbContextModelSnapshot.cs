@@ -1546,6 +1546,111 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                     b.ToTable("Languages");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.PresentationDefinition", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("longtext")
+                        .HasAnnotation("Relational:JsonPropertyName", "name");
+
+                    b.Property<string>("PublicId")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasAnnotation("Relational:JsonPropertyName", "id");
+
+                    b.Property<string>("Purpose")
+                        .HasColumnType("longtext")
+                        .HasAnnotation("Relational:JsonPropertyName", "purpose");
+
+                    b.Property<string>("RealmName")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RealmName");
+
+                    b.ToTable("PresentationDefinitions");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.PresentationDefinitionFormat", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("Format")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PresentationDefinitionInputDescriptorId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("ProofType")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PresentationDefinitionInputDescriptorId");
+
+                    b.ToTable("PresentationDefinitionFormat");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.PresentationDefinitionInputDescriptor", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("longtext")
+                        .HasAnnotation("Relational:JsonPropertyName", "name");
+
+                    b.Property<string>("PresentationDefinitionId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("PublicId")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasAnnotation("Relational:JsonPropertyName", "id");
+
+                    b.Property<string>("Purpose")
+                        .HasColumnType("longtext")
+                        .HasAnnotation("Relational:JsonPropertyName", "purpose");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PresentationDefinitionId");
+
+                    b.ToTable("PresentationDefinitionInputDescriptor");
+
+                    b.HasAnnotation("Relational:JsonPropertyName", "input_descriptors");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.PresentationDefinitionInputDescriptorConstraint", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("Filter")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PresentationDefinitionInputDescriptorId")
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PresentationDefinitionInputDescriptorId");
+
+                    b.ToTable("PresentationDefinitionInputDescriptorConstraint");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Realm", b =>
                 {
                     b.Property<string>("Name")
@@ -2024,6 +2129,9 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                     b.Property<bool>("EmailVerified")
                         .HasColumnType("tinyint(1)")
                         .HasAnnotation("Relational:JsonPropertyName", "emailVerified");
+
+                    b.Property<string>("EncodedPicture")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Firstname")
                         .HasColumnType("longtext")
@@ -2671,6 +2779,41 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                     b.Navigation("IdentityProvisioningDefinition");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.PresentationDefinition", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Realm", "Realm")
+                        .WithMany("PresentationDefinitions")
+                        .HasForeignKey("RealmName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Realm");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.PresentationDefinitionFormat", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.PresentationDefinitionInputDescriptor", null)
+                        .WithMany("Format")
+                        .HasForeignKey("PresentationDefinitionInputDescriptorId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.PresentationDefinitionInputDescriptor", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.PresentationDefinition", null)
+                        .WithMany("InputDescriptors")
+                        .HasForeignKey("PresentationDefinitionId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.PresentationDefinitionInputDescriptorConstraint", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.PresentationDefinitionInputDescriptor", null)
+                        .WithMany("Constraints")
+                        .HasForeignKey("PresentationDefinitionInputDescriptorId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.RealmUser", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.Realm", "Realm")
@@ -2906,9 +3049,23 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                     b.Navigation("MappingRules");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.PresentationDefinition", b =>
+                {
+                    b.Navigation("InputDescriptors");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.PresentationDefinitionInputDescriptor", b =>
+                {
+                    b.Navigation("Constraints");
+
+                    b.Navigation("Format");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Realm", b =>
                 {
                     b.Navigation("Groups");
+
+                    b.Navigation("PresentationDefinitions");
 
                     b.Navigation("RegistrationWorkflows");
 

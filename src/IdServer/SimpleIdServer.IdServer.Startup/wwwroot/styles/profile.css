@@ -12,8 +12,17 @@
     padding-bottom: 5px;
 }
 
-.profile .info .picture > img {
+.profile .info .picture .profile-content {
     max-width: 150px;
+    margin: auto;
+    text-align: center;
+    position: relative;
+}
+
+.profile .info .picture .profile-content .edit {
+    position: absolute;
+    top: 0px;
+    right: 0px;
 }
 
 .profile .info ul {

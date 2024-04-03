@@ -23,7 +23,10 @@
         <div class="card shadow-sm">
             <div class="card-body info">
                 <div class="picture">
-                    @Html.UserPicture(User)
+                    @Html.UserPicture(User, Model.Picture)
+                    <form id="pictureForm" action="@Url.Action("UpdatePicture", "Home")" method="post">
+                        <input type="file" id="pictureFile" name="File" style="display: none" accept="image/*" />
+                    </form>
                 </div>
                 <ul>
                     <!-- Name identifier -->
@@ -247,3 +250,38 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#pictureFile").on("change", function (e) {
+                const files = e.target.files;
+                if (files.length != 1) return;
+                const action = $("#pictureForm").attr("action");
+                const formData = new FormData();
+                formData.append('file', files[0]);
+                $.ajax({
+                    url: action,
+                    type: 'POST',
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success: function() {
+                        var reader = new FileReader();
+                        reader.onload = function (e) {
+                            $('#user-picture').attr('src', e.target.result);
+                        }
+
+                        reader.readAsDataURL(files[0]);
+                    }
+                });
+                return false;
+            });
+            $("#edit-profile").on('click', function () {
+                $("#pictureFile").trigger('click');
+                return false;
+            });
+        });  
+    </script>
+}

@@ -11,6 +11,7 @@ namespace SimpleIdServer.IdServer.Store
     public interface IUserRepository
     {
         Task<User> GetBySubject(string subject, string realm, CancellationToken cancellationToken);
+        Task<User> GetById(string id, CancellationToken cancellationToken);
         Task<User> GetById(string id, string realm, CancellationToken cancellationToken);
         Task<User> GetByEmail(string email, string realm, CancellationToken cancellationToken);
         Task<User> GetByExternalAuthProvider(string scheme, string sub, string realm, CancellationToken cancellationToken);
@@ -46,6 +47,13 @@ namespace SimpleIdServer.IdServer.Store
         {
             var result = await GetUsers()
                         .FirstOrDefaultAsync(u => u.Name == subject && u.Realms.Any(r => r.RealmsName == realm), cancellationToken);
+            return result;
+        }
+
+        public async Task<User> GetById(string id, CancellationToken cancellationToken)
+        {
+            var result = await GetUsers()
+                        .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
             return result;
         }
 

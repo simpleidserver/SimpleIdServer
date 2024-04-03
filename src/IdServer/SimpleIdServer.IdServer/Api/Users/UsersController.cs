@@ -37,6 +37,7 @@ namespace SimpleIdServer.IdServer.Api.Users
         private readonly IGroupRepository _groupRepository;
         private readonly IBusControl _busControl;
         private readonly IRecurringJobManager _recurringJobManager;
+        private readonly IUserHelper _userHelper;
         private readonly ILogger<UsersController> _logger;
         private readonly IdServerHostOptions _options;
 
@@ -50,6 +51,7 @@ namespace SimpleIdServer.IdServer.Api.Users
             ITokenRepository tokenRepository,
             IJwtBuilder jwtBuilder,
             IRecurringJobManager recurringJobManager,
+            IUserHelper userHelper,
             ILogger<UsersController> logger,
             IOptions<IdServerHostOptions> options) : base(tokenRepository, jwtBuilder)
         {
@@ -60,6 +62,7 @@ namespace SimpleIdServer.IdServer.Api.Users
             _groupRepository = groupRepository;
             _busControl = busControl;
             _recurringJobManager = recurringJobManager;
+            _userHelper = userHelper;
             _logger = logger;
             _options = options.Value;
         }
@@ -272,6 +275,31 @@ namespace SimpleIdServer.IdServer.Api.Users
                         Id = id,
                         Name = user.Name
                     });
+                    return new NoContentResult();
+                }
+                catch (OAuthException ex)
+                {
+                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+                    return BuildError(ex);
+                }
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdatePicture([FromRoute] string prefix, string id, IFormFile file, CancellationToken cancellationToken)
+        {
+            using (var activity = Tracing.IdServerActivitySource.StartActivity("Update user picture"))
+            {
+                try
+                {
+                    var issuer = Request.GetAbsoluteUriWithVirtualPath();
+                    prefix = prefix ?? Constants.DefaultRealm;
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
+                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
+                    if (user == null) return new NotFoundResult();
+                    _userHelper.UpdatePicture(user, file, issuer);
+                    await _userRepository.SaveChanges(cancellationToken);
+                    activity?.SetStatus(ActivityStatusCode.Ok, "User picture is updated");
                     return new NoContentResult();
                 }
                 catch (OAuthException ex)
@@ -729,6 +757,19 @@ namespace SimpleIdServer.IdServer.Api.Users
                     return BuildError(ex);
                 }
             }
+        }
+
+        #endregion
+
+        #region Public operations
+
+        [HttpGet]
+        public async Task<IActionResult> GetPicture(string id, CancellationToken cancellationToken)
+        {
+            var user = await _userRepository.GetById(id, cancellationToken);
+            if (user == null || string.IsNullOrWhiteSpace(user.EncodedPicture)) return NotFound();
+            var payload = Convert.FromBase64String(user.EncodedPicture);
+            return File(payload, "image/jpeg");
         }
 
         #endregion

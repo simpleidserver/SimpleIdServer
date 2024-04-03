@@ -24,6 +24,7 @@ using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
@@ -85,6 +86,19 @@ namespace SimpleIdServer.IdServer.UI
             var viewModel = new ProfileViewModel();
             await Build(prefix, viewModel, cancellationToken);
             return View(viewModel);
+        }
+
+        [HttpPost]
+        [Authorize(Constants.Policies.Authenticated)]
+        public async Task<IActionResult> UpdatePicture([FromResult] string prefix, IFormFile file, CancellationToken cancellationToken)
+        {
+            var issuer = Request.GetAbsoluteUriWithVirtualPath();
+            var realm = prefix ?? Constants.DefaultRealm;
+            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            var user = await _userRepository.GetBySubject(nameIdentifier, realm, cancellationToken);
+            _userHelper.UpdatePicture(user, file, issuer);
+            await _userRepository.SaveChanges(cancellationToken);
+            return new NoContentResult();
         }
 
         [HttpGet]
@@ -318,6 +332,9 @@ namespace SimpleIdServer.IdServer.UI
             });
             var externalIdProviders = ExternalProviderHelper.GetExternalAuthenticationSchemes(schemes);
             viewModel.Name = user.Name;
+            var claimPicture = user.OAuthUserClaims.FirstOrDefault(c => c.Name == Constants.StandardClaims.Picture.Name);
+            if (claimPicture != null)
+                viewModel.Picture = claimPicture.Value;
             viewModel.HasOtpKey = user.ActiveOTP != null;
             viewModel.Consents = consents;
             viewModel.PendingRequests = pendingRequests;

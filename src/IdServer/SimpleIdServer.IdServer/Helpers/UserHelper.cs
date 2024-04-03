@@ -1,7 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Http;
 using SimpleIdServer.IdServer.Domains;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace SimpleIdServer.IdServer.Helpers
@@ -12,6 +15,7 @@ namespace SimpleIdServer.IdServer.Helpers
         bool HasOpenIDConsent(User user, string consentId);
         Consent GetConsent(User user, string prefix, string clientId, GrantRequest request, IEnumerable<AuthorizedClaim> claims, ICollection<AuthorizationData> authDetails, AuthorizationClaimTypes claimType = AuthorizationClaimTypes.IdToken);
         Consent GetConsent(User user, string prefix, string clientId, IEnumerable<string> scopes, IEnumerable<AuthorizedClaim> claims, ICollection<AuthorizationData> authDetails, AuthorizationClaimTypes claimType = AuthorizationClaimTypes.IdToken);
+        void UpdatePicture(User user, IFormFile file, string issuer);
     }
 
     public class UserHelper : IUserHelper
@@ -39,6 +43,21 @@ namespace SimpleIdServer.IdServer.Helpers
                     return c.AuthorizationDetails.Any(ad => ad.Type == d.Type && d.Actions != null && d.Actions.All(a => ad.Actions.Contains(a)) && d.Identifier == ad.Identifier);
                 })))
             );
+        }
+
+        public void UpdatePicture(User user, IFormFile file, string issuer)
+        {
+            var pictureBase64 = string.Empty;
+            using (var ms = new MemoryStream())
+            {
+                file.CopyTo(ms);
+                var payload = ms.ToArray();
+                pictureBase64 = Convert.ToBase64String(payload);
+            }
+
+            var pictureUrl = $"{issuer}/{Constants.EndPoints.Users}/{user.Id}/picture";
+            user.EncodedPicture = pictureBase64;
+            user.UpdateClaim(Constants.UserClaims.Picture, pictureUrl);
         }
     }
 }

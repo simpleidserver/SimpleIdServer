@@ -60,6 +60,8 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonIgnore]
         public string? IdentityProvisioningId { get; set; } = null;
         [JsonIgnore]
+        public string? EncodedPicture { get; set; } = null;
+        [JsonIgnore]
         [Newtonsoft.Json.JsonIgnore]
         public ICollection<Claim> Claims
         {
