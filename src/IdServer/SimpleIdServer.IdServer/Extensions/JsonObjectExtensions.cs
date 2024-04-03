@@ -89,17 +89,6 @@ namespace System.Text.Json.Nodes
         public static string GetIssuerState(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.IssuerState);
 
         /// <summary>
-        /// CONDITIONAL : String containing a presentation definition JSON object.
-        /// </summary>
-        /// <param name="jObj"></param>
-        /// <returns></returns>
-        public static PresentationDefinition GetPresentationDefinition(this JsonObject jObj)
-        {
-            var result = jObj.GetToken(AuthorizationRequestParameters.PresentationDefinition);
-            return null;
-        }
-
-        /// <summary>
         /// Indicates the target service or resource to which access is being requested. 
         /// </summary>
         /// <param name="jObj"></param>

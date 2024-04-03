@@ -9,10 +9,13 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <converters:ToggledEventArgsConverter x:Key="toggledEventArgsConverter" />
+            <toolkit:IsStringNullOrEmptyConverter x:Key="IsStringNullOrEmptyConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
     <Grid Margin="20">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -27,8 +30,9 @@
                 <toolkit:EventToCommandBehavior EventName="SelectedIndexChanged" Command="{Binding SelectNotificationModeCommand}" />
             </Picker.Behaviors>
         </Picker>
+
         <!-- Is gotify server available -->
-        <Label Grid.Row="2" Grid.ColumnSpan="2">
+        <Label Grid.Row="1" Grid.ColumnSpan="2">
             <Label.Triggers>
                 <DataTrigger TargetType="Label" Binding="{Binding IsGotifyServerRunning}" Value="true">
                     <Setter Property="Text">Gotify server is up and running</Setter>
@@ -36,6 +40,17 @@
                 </DataTrigger>
                 <DataTrigger TargetType="Label" Binding="{Binding IsGotifyServerRunning}" Value="false">
                     <Setter Property="Text">Gotify server is not running</Setter>
+                    <Setter Property="TextColor">Red</Setter>
+                </DataTrigger>
+            </Label.Triggers>
+        </Label>
+
+        <!-- DID -->
+        <Button Text="Generate Did key" HorizontalOptions="Fill" Command="{Binding Path=GenerateDidKeyCommand}" Grid.Row="2" Grid.ColumnSpan="2" />
+        <Label Grid.Row="3" Grid.ColumnSpan="2" Text="{Binding Path=Did, StringFormat='Did : &quot;{0}&quot;'}" TextColor="Green">
+            <Label.Triggers>
+                <DataTrigger TargetType="Label" Binding="{Binding Did, Converter={StaticResource IsStringNullOrEmptyConverter}}" Value="true">
+                    <Setter Property="Text">There is no Did</Setter>
                     <Setter Property="TextColor">Red</Setter>
                 </DataTrigger>
             </Label.Triggers>

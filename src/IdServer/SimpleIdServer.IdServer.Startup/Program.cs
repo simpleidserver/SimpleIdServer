@@ -31,11 +31,13 @@ using SimpleIdServer.IdServer.Startup.Converters;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Swagger;
 using SimpleIdServer.IdServer.TokenTypes;
+using SimpleIdServer.IdServer.VerifiablePresentation;
 using SimpleIdServer.IdServer.WsFederation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using SimpleIdServer.Did.Key;
 
 const string SQLServerCreateTableFormat = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DistributedCache' and xtype='U') " +
     "CREATE TABLE [dbo].[DistributedCache] (" +
@@ -115,6 +117,7 @@ if (!app.Environment.IsDevelopment())
 
 app
     .UseSID()
+    .UseVerifiablePresentation()
     .UseSIDSwagger()
     .UseSIDSwaggerUI()
     // .UseSIDReDoc()
@@ -145,6 +148,7 @@ void ConfigureIdServer(IServiceCollection services)
             o.AddOAuthSecurity();
         })
         .AddConsoleNotification()
+        .AddVpAuthentication()
         .UseInMemoryMassTransit()
         .AddBackChannelAuthentication()
         .AddPwdAuthentication()
@@ -175,6 +179,7 @@ void ConfigureIdServer(IServiceCollection services)
         });
     var isRealmEnabled = identityServerConfiguration.IsRealmEnabled;
     if (isRealmEnabled) idServerBuilder.UseRealm();
+    services.AddDidKey();
     ConfigureDistributedCache();
 }
 
@@ -194,6 +199,7 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
         o.Add<FidoOptions>();
         o.Add<IdServerConsoleOptions>();
         o.Add<GotifyOptions>();
+        o.Add<IdServerVpOptions>();
         o.Add<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>();
         o.UseEFConnector(b =>
         {
@@ -373,6 +379,9 @@ void SeedData(WebApplication application, string scimBaseUrl)
             if (!dbContext.CertificateAuthorities.Any())
                 dbContext.CertificateAuthorities.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.CertificateAuthorities);
 
+            if (!dbContext.PresentationDefinitions.Any())
+                dbContext.PresentationDefinitions.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.PresentationDefinitions);
+
             if (!dbContext.Acrs.Any())
             {
                 dbContext.Acrs.Add(SimpleIdServer.IdServer.Constants.StandardAcrs.FirstLevelAssurance);
@@ -421,6 +430,7 @@ void SeedData(WebApplication application, string scimBaseUrl)
             AddMissingConfigurationDefinition<IdServerEmailOptions>(dbContext);
             AddMissingConfigurationDefinition<IdServerSmsOptions>(dbContext);
             AddMissingConfigurationDefinition<IdServerPasswordOptions>(dbContext);
+            AddMissingConfigurationDefinition<IdServerVpOptions>(dbContext);
             AddMissingConfigurationDefinition<FidoOptions>(dbContext);
             AddMissingConfigurationDefinition<IdServerConsoleOptions>(dbContext);
             AddMissingConfigurationDefinition<GotifyOptions>(dbContext);

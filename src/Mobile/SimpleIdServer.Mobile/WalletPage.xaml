@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:local="clr-namespace:SimpleIdServer.Mobile.ViewModels"
+             x:DataType="local:WalletViewModel"
+             xmlns:converters="clr-namespace:SimpleIdServer.Mobile.Converters"
+             xmlns:models="clr-namespace:SimpleIdServer.Mobile.Models"
+             xmlns:common="clr-namespace:SimpleIdServer.Mobile.Common"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SimpleIdServer.Mobile.WalletPage">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:StringToColorConverter x:Key="StringToColor" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <Grid Margin="20">
+        <common:Loader IsVisible="{Binding Path=IsLoading}" ZIndex="2" />
+        <CollectionView x:Name="collectionView" ItemsSource="{Binding Path=VerifiableCredentials}" SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Margin="5"
+                           CornerRadius="10"
+                           BorderColor="{Binding Path=BackgroundColor, Converter={StaticResource StringToColor}}"
+                           x:DataType="models:VerifiableCredentialRecord">
+                        <StackLayout>
+                            <StackLayout Orientation="Horizontal" HeightRequest="50">
+                                <StackLayout VerticalOptions="CenterAndExpand">
+                                    <Label Text="{Binding Path=Name}" Style="{StaticResource vcTitle}"></Label>
+                                    <Label Text="{Binding Path=Description}" Style="{StaticResource vcDescription}"></Label>
+                                </StackLayout>
+                                <Image HorizontalOptions="EndAndExpand" HeightRequest="50" WidthRequest="50" Source="{Binding Path=Logo}" />
+                            </StackLayout>
+                            <StackLayout Orientation="Horizontal" HorizontalOptions="EndAndExpand">
+                                <Button Text="Delete"
+                                        Command="{Binding Source={x:Reference collectionView}, Path=BindingContext.DeleteVerifiableCredentialCommand}" 
+                                        CommandParameter="{Binding}"></Button>
+                            </StackLayout>
+                            <Label Text="{Binding Path=ValidFrom, StringFormat='From {0}'}"></Label>
+                            <Label Text="{Binding Path=ValidUntil, StringFormat='Until {0}'}"></Label>
+                        </StackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

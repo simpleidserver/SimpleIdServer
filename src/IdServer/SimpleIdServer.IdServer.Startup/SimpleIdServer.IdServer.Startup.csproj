@@ -5,6 +5,7 @@
 		<ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
 	</PropertyGroup>
 	<ItemGroup>
+	  <ProjectReference Include="..\..\Did\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.Configuration.Redis\SimpleIdServer.Configuration.Redis.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.Configuration\SimpleIdServer.Configuration.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Console\SimpleIdServer.IdServer.Console.csproj" />
@@ -23,6 +24,7 @@
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.SqliteMigrations\SimpleIdServer.IdServer.SqliteMigrations.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.SqlServerMigrations\SimpleIdServer.IdServer.SqlServerMigrations.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Swagger\SimpleIdServer.IdServer.Swagger.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.IdServer.VerifiablePresentation\SimpleIdServer.IdServer.VerifiablePresentation.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.WsFederation\SimpleIdServer.IdServer.WsFederation.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
 	</ItemGroup>
@@ -120,6 +122,11 @@
 			<DependentUpon>CredentialsResource.resx</DependentUpon>
 			<DesignTime>True</DesignTime>
 			<AutoGen>True</AutoGen>
+		</Compile>
+		<Compile Update="Resources\RegisterVpResource.Designer.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>RegisterVpResource.resx</DependentUpon>
 		</Compile>
 		<Compile Update="Resources\ResetPasswordResource.Designer.cs">
 		  <DesignTime>True</DesignTime>
@@ -223,6 +230,10 @@
 			<LastGenOutput>CredentialsResource.Designer.cs</LastGenOutput>
 			<Generator>PublicResXFileCodeGenerator</Generator>
 		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\RegisterVpResource.resx">
+		  <Generator>PublicResXFileCodeGenerator</Generator>
+		  <LastGenOutput>RegisterVpResource.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
 		<EmbeddedResource Update="Resources\ResetPasswordResource.resx">
 		  <Generator>PublicResXFileCodeGenerator</Generator>
 		  <LastGenOutput>ResetPasswordResource.Designer.cs</LastGenOutput>
@@ -260,5 +271,8 @@
 	  <None Update="SimpleIdServer.IdServer.xml">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Areas\vp\" />
 	</ItemGroup>
 </Project>

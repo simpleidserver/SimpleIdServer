@@ -24,6 +24,29 @@ namespace SimpleIdServer.IdServer.Builders
             return this;
         }
 
+        #region Other parameters
+
+        /// <summary>
+        /// Set client name.
+        /// </summary>
+        /// <param name="clientName"></param>
+        /// <returns></returns>
+        public WalletClientBuilder SetClientName(string clientName, string language = null)
+        {
+            if (string.IsNullOrWhiteSpace(language))
+                language = Domains.Language.Default;
+
+            _client.Translations.Add(new Translation
+            {
+                Key = "client_name",
+                Value = clientName,
+                Language = language
+            });
+            return this;
+        }
+
+        #endregion
+
         public Client Build() => _client;
     }
 }

@@ -7,13 +7,14 @@ using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Crypto.Multicodec;
 using SimpleIdServer.Did.Encoders;
 using SimpleIdServer.Did.Models;
-using System.Text.Json.Nodes;
+using SimpleIdServer.Vc.Models;
+using System.Text.Json;
 
 namespace SimpleIdServer.Vc.Tests;
 
 public class SecuredVerifiableCredentialFixture
 {
-    private const string _json = "{\r\n    \"@context\": [\r\n      \"https://www.w3.org/2018/credentials/v1\",\r\n      \"https://www.w3.org/2018/credentials/examples/v1\",\r\n      \"https://w3id.org/security/suites/jws-2020/v1\"\r\n    ],\r\n    \"id\": \"http://example.gov/credentials/3732\",\r\n    \"type\": [\"VerifiableCredential\", \"UniversityDegreeCredential\"],\r\n    \"issuer\": {\r\n      \"id\": \"https://example.com/issuer/123\"\r\n    },\r\n    \"issuanceDate\": \"2020-03-10T04:24:12.164Z\",\r\n    \"credentialSubject\": {\r\n      \"id\": \"did:example:456\",\r\n      \"degree\": {\r\n        \"type\": \"BachelorDegree\",\r\n        \"name\": \"Bachelor of Science and Arts\"\r\n      }\r\n    }\r\n}";
+    private const string _json = "{\r\n    \"@context\": [\r\n      \"https://www.w3.org/2018/credentials/v1\",\r\n      \"https://www.w3.org/2018/credentials/examples/v1\",\r\n      \"https://w3id.org/security/suites/jws-2020/v1\"\r\n    ],\r\n    \"id\": \"http://example.gov/credentials/3732\",\r\n    \"type\": [\"VerifiableCredential\", \"UniversityDegreeCredential\"],\r\n    \"issuer\": \"https://example.com/issuer/123\", \r\n    \"issuanceDate\": \"2020-03-10T04:24:12.164Z\",\r\n    \"credentialSubject\": {\r\n      \"id\": \"did:example:456\",\r\n      \"degree\": {\r\n        \"type\": \"BachelorDegree\",\r\n        \"name\": \"Bachelor of Science and Arts\"\r\n      }\r\n    }\r\n}";
 
     #region Ed25519VerificationKey2020
 
@@ -27,16 +28,16 @@ public class SecuredVerifiableCredentialFixture
             .AddController("didController")
             .AddVerificationMethod(Ed25519VerificationKey2020Standard.TYPE, ed25119Sig, "controller", VerificationMethodUsages.AUTHENTICATION, includePrivateKey: true)
             .Build();
-        var vc = SecuredVerifiableCredential.New();
+        var vc = SecuredDocument.New();
 
         // ACT
-        var securedJson = vc.Secure(_json, identityDocument, identityDocument.VerificationMethod.First().Id);
-        var isSignatureValid = vc.Check(securedJson, identityDocument);
+        var credential = JsonSerializer.Deserialize<W3CVerifiableCredential>(_json);
+        vc.Secure(credential, identityDocument, identityDocument.VerificationMethod.First().Id);
+        var isSignatureValid = vc.Check(credential, identityDocument);
 
         // ASSERT
-        Assert.IsNotNull(securedJson);
-        var jObj = JsonObject.Parse(securedJson).AsObject();
-        Assert.True(jObj.ContainsKey("proof"));
+        Assert.IsNotNull(credential);
+        Assert.True(credential.Proof != null);
         Assert.True(isSignatureValid);
     }
 
@@ -58,18 +59,18 @@ public class SecuredVerifiableCredentialFixture
                 c.Id = "https://vc.example/issuers/5678#z6MkrJVnaZkeFzdQyMZu1cgjg7k1pZZ6pvBQ7XJPt4swbTQ2";
             }, includePrivateKey: true)
             .Build();
-        var vc = SecuredVerifiableCredential.New();
+        var vc = SecuredDocument.New();
 
         // ACT
-        var securedJson = vc.Secure(json, identityDocument, identityDocument.VerificationMethod.First().Id, creationDateTime: DateTime.Parse("2023-02-24T23:36:38Z", null, System.Globalization.DateTimeStyles.RoundtripKind));
-        var isSignatureValid = vc.Check(securedJson, identityDocument);
+        var credential = JsonSerializer.Deserialize<W3CVerifiableCredential>(json);
+        vc.Secure(credential, identityDocument, identityDocument.VerificationMethod.First().Id, creationDateTime: DateTime.Parse("2023-02-24T23:36:38Z", null, System.Globalization.DateTimeStyles.RoundtripKind));
+        var isSignatureValid = vc.Check(credential, identityDocument);
 
         // ASSERT
-        Assert.IsNotNull(securedJson);
+        Assert.IsNotNull(vc);
         Assert.IsTrue(isSignatureValid);
-        var jObj = JsonObject.Parse(securedJson).AsObject();
-        Assert.True(jObj.ContainsKey("proof"));
-        var proofValue = jObj["proof"]["proofValue"].ToString();
+        Assert.True(credential.Proof != null);
+        var proofValue = credential.Proof["proofValue"].ToString();
         Assert.AreEqual("z2PC6JBDG1otY3PfnxGnvHCuh8tEqPPNpDggvsnzjr2yKxszQg5bJXsQhV1ZUTG6KBNGdvWVzVqFxtLagbdoRUjf6", proofValue);
     }
 
@@ -87,16 +88,16 @@ public class SecuredVerifiableCredentialFixture
             .AddController("didController")
             .AddVerificationMethod(JsonWebKey2020Standard.TYPE, ed25119Sig, "controller", VerificationMethodUsages.AUTHENTICATION, includePrivateKey: true)
             .Build();
-        var vc = SecuredVerifiableCredential.New();
+        var vc = SecuredDocument.New();
 
         // ACT
-        var securedJson = vc.Secure(_json, identityDocument, identityDocument.VerificationMethod.First().Id);
-        var isSignatureValid = vc.Check(securedJson, identityDocument);
+        var credential = JsonSerializer.Deserialize<W3CVerifiableCredential>(_json);
+        vc.Secure(credential, identityDocument, identityDocument.VerificationMethod.First().Id);
+        var isSignatureValid = vc.Check(credential, identityDocument);
 
         // ASSERT
-        Assert.IsNotNull(securedJson);
-        var jObj = JsonObject.Parse(securedJson).AsObject();
-        Assert.True(jObj.ContainsKey("proof"));
+        Assert.IsNotNull(credential);
+        Assert.True(credential.Proof != null);
         Assert.True(isSignatureValid);
     }
 
@@ -104,7 +105,7 @@ public class SecuredVerifiableCredentialFixture
     public void When_Secure_VerifiableCredentials_With_Static_ED25519_JsonWebKey2020_VerificationKey_Then_Proof_Is_Valid()
     {
         // ARRANGE
-        var json = "{\r\n    \"@context\": [\r\n      \"https://www.w3.org/2018/credentials/v1\",\r\n      \"https://www.w3.org/2018/credentials/examples/v1\",\r\n      \"https://w3id.org/security/suites/jws-2020/v1\"\r\n    ],\r\n    \"id\": \"http://example.gov/credentials/3732\",\r\n    \"type\": [\"VerifiableCredential\", \"UniversityDegreeCredential\"],\r\n    \"issuer\": { \"id\": \"did:example:123\" },\r\n    \"issuanceDate\": \"2020-03-10T04:24:12.164Z\",\r\n    \"credentialSubject\": {\r\n      \"id\": \"did:example:456\",\r\n      \"degree\": {\r\n        \"type\": \"BachelorDegree\",\r\n        \"name\": \"Bachelor of Science and Arts\"\r\n      }\r\n    }\r\n  }";
+        var json = "{\r\n    \"@context\": [\r\n      \"https://www.w3.org/2018/credentials/v1\",\r\n      \"https://www.w3.org/2018/credentials/examples/v1\",\r\n      \"https://w3id.org/security/suites/jws-2020/v1\"\r\n    ],\r\n    \"id\": \"http://example.gov/credentials/3732\",\r\n    \"type\": [\"VerifiableCredential\", \"UniversityDegreeCredential\"],\r\n    \"issuer\": \"did:example:123\" ,\r\n    \"issuanceDate\": \"2020-03-10T04:24:12.164Z\",\r\n    \"credentialSubject\": {\r\n      \"id\": \"did:example:456\",\r\n      \"degree\": {\r\n        \"type\": \"BachelorDegree\",\r\n        \"name\": \"Bachelor of Science and Arts\"\r\n      }\r\n    }\r\n  }";
         var x = "CV-aGlld3nVdgnhoZK0D36Wk-9aIMlZjZOK2XhPMnkQ";
         var d = "m5N7gTItgWz6udWjuqzJsqX-vksUnxJrNjD5OilScBc";
         var xPayload = Base64UrlEncoder.DecodeBytes(x);
@@ -114,12 +115,13 @@ public class SecuredVerifiableCredentialFixture
             .AddController("didController")
             .AddVerificationMethod(JsonWebKey2020Standard.TYPE, ed25119Sig, "controller", VerificationMethodUsages.AUTHENTICATION, includePrivateKey: true)
             .Build();
-        var vc = SecuredVerifiableCredential.New();
+        var vc = SecuredDocument.New();
 
         // ACT
-        var securedJson = vc.Secure(_json, identityDocument, identityDocument.VerificationMethod.First().Id);
+        var credential = JsonSerializer.Deserialize<W3CVerifiableCredential>(json);
+        vc.Secure(credential, identityDocument, identityDocument.VerificationMethod.First().Id);
 
-        Assert.IsNotNull(securedJson);
+        Assert.IsNotNull(credential);
     }
 
     #endregion

@@ -33,6 +33,14 @@
         <Setter Property="VerticalOptions" Value="Center"></Setter>
         <Setter Property="TextColor" Value="{StaticResource White}"></Setter>
     </Style>
+
+    <Style x:Key="vcTitle" TargetType="Label">
+        <Setter Property="FontAttributes" Value="Bold"></Setter>
+    </Style>
+
+    <Style x:Key="vcDescription" TargetType="Label">
+        <Setter Property="FontAttributes" Value="Italic"></Setter>
+    </Style>
     
     <Style TargetType="ActivityIndicator">
         <Setter Property="Color" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />

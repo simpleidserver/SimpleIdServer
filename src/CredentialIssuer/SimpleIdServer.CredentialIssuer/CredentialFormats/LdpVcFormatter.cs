@@ -3,8 +3,8 @@
 using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Models;
 using SimpleIdServer.Vc;
-using SimpleIdServer.Vc.CredentialFormats.Serializers;
 using System;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.CredentialIssuer.CredentialFormats
@@ -22,9 +22,9 @@ namespace SimpleIdServer.CredentialIssuer.CredentialFormats
             if (verificationMethodId == null) throw new ArgumentNullException(nameof(verificationMethodId));
             if (asymmetricKey == null) throw new ArgumentNullException(nameof(asymmetricKey));
             var credential = BuildCredential(request);
-            var json = new W3CVerifiableCredentialJsonSerializer().Serialize(credential);
-            return JsonObject.Parse(SecuredVerifiableCredential.New()
-                .Secure(json, didDocument, verificationMethodId, asymKey: asymmetricKey));
+            SecuredDocument.New()
+                .Secure(credential, didDocument, verificationMethodId, asymKey: asymmetricKey);
+            return JsonObject.Parse(JsonSerializer.Serialize(credential));
         }
     }
 }

@@ -81,6 +81,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\..\..\json-ld.net\src\json-ld.net\json-ld.net.csproj" />
+	  <ProjectReference Include="..\..\Did\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj" />
+	  <ProjectReference Include="..\..\Did\SimpleIdServer.Vp\SimpleIdServer.Vp.csproj" />
 	  <ProjectReference Include="..\..\IdServer\SimpleIdServer.IdServer.U2FClient\SimpleIdServer.IdServer.U2FClient.csproj" />
 	</ItemGroup>
 
@@ -93,6 +96,9 @@
 	  </Compile>
 	  <Compile Update="NotificationPage.xaml.cs">
 	    <DependentUpon>NotificationPage.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="WalletPage.xaml.cs">
+	    <DependentUpon>WalletPage.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="ViewCredentialListPage.xaml.cs">
 	    <DependentUpon>ViewCredentialListPage.xaml</DependentUpon>
@@ -119,6 +125,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="NotificationPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="WalletPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="ViewCredentialListPage.xaml">

@@ -10,7 +10,8 @@ public partial class App : Application
 {
     private readonly CredentialListState _credentialListState;
 	private readonly OtpListState _otpListState;
-	private readonly IServiceProvider _serviceProvider;
+    private readonly VerifiableCredentialListState _verifiableCredentialListState;
+    private readonly IServiceProvider _serviceProvider;
     public static MobileDatabase _database;
 
     public static GotifyNotificationListener Listener = GotifyNotificationListener.New();
@@ -27,12 +28,13 @@ public partial class App : Application
 
 	public static INavigationService NavigationService { get; private set; }
 
-	public App(CredentialListState credentialListState, OtpListState otpListState, IServiceProvider serviceProvider)
+	public App(CredentialListState credentialListState, OtpListState otpListState, VerifiableCredentialListState verifiableCredentialListState, IServiceProvider serviceProvider)
 	{
 		InitializeComponent();
 		_credentialListState = credentialListState;
         _otpListState = otpListState;
-		_serviceProvider = serviceProvider;
+        _verifiableCredentialListState = verifiableCredentialListState;
+        _serviceProvider = serviceProvider;
         MainPage = new AppShell();
     }
 
@@ -41,6 +43,7 @@ public partial class App : Application
         base.OnStart();
 		await _otpListState.Load();
 		await _credentialListState.Load();
+        await _verifiableCredentialListState.Load();
         NavigationService = _serviceProvider.GetRequiredService<INavigationService>();
         await InitGotify();
         Listener.NotificationReceived += async (sender, e) =>
@@ -60,29 +63,36 @@ public partial class App : Application
 	{
 		var mobileSettings = await Database.GetMobileSettings();
         var opts = _serviceProvider.GetRequiredService<IOptions<MobileOptions>>();
-        if (string.IsNullOrWhiteSpace(mobileSettings.GotifyPushToken))
+        try
         {
-            using (var httpClient = _serviceProvider.GetRequiredService<Factories.IHttpClientFactory>().Build())
+            if (string.IsNullOrWhiteSpace(mobileSettings.GotifyPushToken))
             {
-                var msg = new HttpRequestMessage
+                using (var httpClient = _serviceProvider.GetRequiredService<Factories.IHttpClientFactory>().Build())
                 {
-                    RequestUri = new Uri($"{opts.Value.IdServerUrl}/gotifyconnections"),
-                    Content = new StringContent("{}", Encoding.UTF8, "application/json"),
-                    Method = HttpMethod.Post
-                };
-                var httpResult = await httpClient.SendAsync(msg);
-                var content = await httpResult.Content.ReadAsStringAsync();
-                var jObj = JsonObject.Parse(content);
-                var pushToken = jObj["token"].ToString();
-                mobileSettings.GotifyPushToken = pushToken;
-                await Database.UpdateMobileSettings(mobileSettings);
+                    var msg = new HttpRequestMessage
+                    {
+                        RequestUri = new Uri($"{opts.Value.IdServerUrl}/gotifyconnections"),
+                        Content = new StringContent("{}", Encoding.UTF8, "application/json"),
+                        Method = HttpMethod.Post
+                    };
+                    var httpResult = await httpClient.SendAsync(msg);
+                    var content = await httpResult.Content.ReadAsStringAsync();
+                    var jObj = JsonObject.Parse(content);
+                    var pushToken = jObj["token"].ToString();
+                    mobileSettings.GotifyPushToken = pushToken;
+                    await Database.UpdateMobileSettings(mobileSettings);
+                }
             }
-        }
 
-        var instance = GotifyNotificationListener.New();
-        await instance.Start(
-            opts.Value.WsServer,
-            mobileSettings.GotifyPushToken, 
-            CancellationToken.None);
-	}
+            var instance = GotifyNotificationListener.New();
+            await instance.Start(
+                opts.Value.WsServer,
+                mobileSettings.GotifyPushToken, 
+                CancellationToken.None);
+        }
+        catch
+        {
+
+        }
+    }
 }

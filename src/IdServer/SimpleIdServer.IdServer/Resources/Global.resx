@@ -876,6 +876,9 @@
   <data name="UnknownPermissions" xml:space="preserve">
     <value>the permissions {0} don't exist</value>
   </data>
+  <data name="UnknownPresentationDefinition" xml:space="preserve">
+    <value>the presentation definition {0} doesn't exist</value>
+  </data>
   <data name="UnknownRegistrationWorkflow" xml:space="preserve">
     <value>no registration workflow has been resolved</value>
   </data>

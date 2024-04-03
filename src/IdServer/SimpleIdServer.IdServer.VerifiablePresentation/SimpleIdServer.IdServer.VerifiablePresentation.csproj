@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Description>Add verifiable presentation authentication.</Description>
+	</PropertyGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\..\Did\SimpleIdServer.Vp\SimpleIdServer.Vp.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="BlushingPenguin.JsonPath" Version="1.0.6" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Compile Update="Resources\Global.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>Global.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+	<ItemGroup>
+	  <EmbeddedResource Update="Resources\Global.resx">
+	    <Generator>PublicResXFileCodeGenerator</Generator>
+	    <LastGenOutput>Global.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	</ItemGroup>
+</Project>

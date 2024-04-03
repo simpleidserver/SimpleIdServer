@@ -2338,6 +2338,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à the presentation definition {0} doesn&apos;t exist.
+        /// </summary>
+        public static string UnknownPresentationDefinition {
+            get {
+                return ResourceManager.GetString("UnknownPresentationDefinition", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à no registration workflow has been resolved.
         /// </summary>
         public static string UnknownRegistrationWorkflow {

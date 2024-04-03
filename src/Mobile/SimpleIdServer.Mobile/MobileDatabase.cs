@@ -24,6 +24,8 @@ namespace SimpleIdServer.Mobile
             _database = new SQLiteAsyncConnection(options);
             await _database.CreateTableAsync<CredentialRecord>();
             await _database.CreateTableAsync<OTPCode>();
+            await _database.CreateTableAsync<VerifiableCredentialRecord>();
+            await _database.CreateTableAsync<DidRecord>();
             var result = await _database.CreateTableAsync<MobileSettings>();
             if(result == CreateTableResult.Created) await _database.InsertAsync(new MobileSettings { Id = Guid.NewGuid().ToString() });
         }
@@ -31,6 +33,37 @@ namespace SimpleIdServer.Mobile
         public MobileDatabase(string dbPath)
         {
             _dbPath = dbPath;
+        }
+
+        public async Task<DidRecord> GetDidRecord()
+        {
+            await Init();
+            var result = await _database.Table<DidRecord>().FirstOrDefaultAsync();
+            return result;
+        }
+
+        public async Task AddDidRecord(DidRecord didRecord)
+        {
+            await Init();
+            await _database.InsertAsync(didRecord);
+        }
+
+        public async Task<List<VerifiableCredentialRecord>> GetVerifiableCredentials()
+        {
+            await Init();
+            return await _database.Table<VerifiableCredentialRecord>().ToListAsync();
+        }
+
+        public async Task AddVerifiableCredential(VerifiableCredentialRecord verifiableCredential)
+        {
+            await Init();
+            await _database.InsertAsync(verifiableCredential);
+        }
+
+        public async Task RemoveVerifiableCredential(VerifiableCredentialRecord verifiableCredential)
+        {
+            await Init();
+            await _database.DeleteAsync(verifiableCredential);
         }
 
         public async Task<List<OTPCode>> GetOTPCodes()
@@ -53,8 +86,8 @@ namespace SimpleIdServer.Mobile
         public async Task<MobileSettings> GetMobileSettings()
         {
             await Init();
-            var result =  await _database.Table<MobileSettings>().FirstAsync();
-            return result;
+            var result =  await _database.Table<MobileSettings>().FirstOrDefaultAsync();
+            return result ?? new MobileSettings();
         }
 
         public async Task AddCredentialRecord(CredentialRecord credentialRecord)

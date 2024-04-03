@@ -26,7 +26,7 @@ public class JwtVerifiableCredentialFixture
             .AddController("didController")
             .AddVerificationMethod(Ed25519VerificationKey2020Standard.TYPE, ed25119Sig, "controller", VerificationMethodUsages.ASSERTION_METHOD, includePrivateKey: true)
             .Build();
-        var vc = SecuredVerifiableCredential.New();
+        var vc = SecuredDocument.New();
         var handler = DidJsonWebTokenHandler.New();
 
         // ACT
@@ -55,7 +55,7 @@ public class JwtVerifiableCredentialFixture
             .AddController("didController")
             .AddVerificationMethod(JsonWebKey2020Standard.TYPE, es256Sig, "controller", VerificationMethodUsages.ASSERTION_METHOD, includePrivateKey: true)
             .Build();
-        var vc = SecuredVerifiableCredential.New();
+        var vc = SecuredDocument.New();
         var handler = DidJsonWebTokenHandler.New();
 
         // ACT

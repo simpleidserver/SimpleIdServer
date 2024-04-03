@@ -1,0 +1,9 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<Description>Library used to manipulate Verifiable Presentation.</Description>
+	</PropertyGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\SimpleIdServer.Vc\SimpleIdServer.Vc.csproj" />
+	</ItemGroup>
+</Project>

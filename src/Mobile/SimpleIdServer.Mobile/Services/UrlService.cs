@@ -16,6 +16,6 @@ namespace SimpleIdServer.Mobile.Services
             _options = options.Value;
         }
 
-        public string GetUrl(string url) => _options.IsDev ? url.Replace("loc alhost", MobileOptions.LocalhostIp) : url;
+        public string GetUrl(string url) => _options.IsDev ? url.Replace("localhost", MobileOptions.LocalhostIp) : url;
     }
 }

@@ -1,6 +1,7 @@
 ﻿using SimpleIdServer.CredentialIssuer.Domains;
 using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Models;
+using SimpleIdServer.Vc;
 using SimpleIdServer.Vc.Models;
 using System;
 using System.Collections.Generic;
@@ -11,21 +12,18 @@ namespace SimpleIdServer.CredentialIssuer.CredentialFormats;
 
 public abstract class BaseW3CVerifiableCredentialFormatter : ICredentialFormatter
 {
-    private const string VerifiableCredentialJsonLdContext = "https://www.w3.org/2018/credentials/v1";
-    private const string VerifiableCredentialType = "VerifiableCredential";
-
     public abstract string Format { get; }
 
     public JsonObject ExtractCredentialIssuerMetadata(CredentialConfiguration configuration)
     {
         var ctx = new JsonArray
         {
-            VerifiableCredentialJsonLdContext,
+            VcConstants.VerifiableCredentialJsonLdContext,
             configuration.JsonLdContext
         };
         var type = new JsonArray
         {
-            VerifiableCredentialType,
+            VcConstants.VerifiableCredentialType,
             configuration.Type
         };
         var credentialSubject = new JsonObject();
@@ -55,7 +53,7 @@ public abstract class BaseW3CVerifiableCredentialFormatter : ICredentialFormatte
         if (credentialDefinition == null || !credentialDefinition.ContainsKey("type")) return null;
         var jArrTypes = credentialDefinition["type"].AsArray();
         if (jArrTypes == null) return null;
-        var filteredTypes = jArrTypes.Select(t => t.ToString()).Where(c => c != VerifiableCredentialType);
+        var filteredTypes = jArrTypes.Select(t => t.ToString()).Where(c => c != VcConstants.VerifiableCredentialType);
         if (filteredTypes.Count() != 1) return null;
         return new CredentialHeader
         {
@@ -68,22 +66,17 @@ public abstract class BaseW3CVerifiableCredentialFormatter : ICredentialFormatte
     protected W3CVerifiableCredential BuildCredential(BuildCredentialRequest request)
     {
         if (request == null) throw new ArgumentNullException(nameof(request));
-        var verifiableCredential = new W3CVerifiableCredential
+        var builder = VcBuilder.New(request.Id,
+            request.JsonLdContext,
+            request.Issuer,
+            request.Type,
+            request.ValidFrom,
+            request.ValidUntil);
+        builder.AddCredentialSubject(request.Subject, (b) =>
         {
-            Id = request.Id,
-            Issuer = request.Issuer,
-            ValidFrom = request.ValidFrom,
-            ValidUntil = request.ValidUntil,
-            CredentialSubject = new JsonObject
-            {
-                { "id", request.Subject }
-            }
-        };
-        verifiableCredential.Context.Add(VerifiableCredentialJsonLdContext);
-        verifiableCredential.Context.Add(request.JsonLdContext);
-        Build(request.UserClaims, verifiableCredential.CredentialSubject, 1);
-        verifiableCredential.Type.Add(request.Type);
-        return verifiableCredential;
+            Build(request.UserClaims, b.Build(), 1);
+        });
+        return builder.Build();
     }
 
     private static void Build(IEnumerable<CredentialConfigurationClaimNode> claims, JsonObject jsonObj, int level)

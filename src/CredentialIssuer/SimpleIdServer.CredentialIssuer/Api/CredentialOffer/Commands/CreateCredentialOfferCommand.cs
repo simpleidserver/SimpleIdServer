@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.Options;
 using SimpleIdServer.CredentialIssuer.Services;
 using SimpleIdServer.CredentialIssuer.Store;
 using SimpleIdServer.IdServer.CredentialIssuer;
@@ -61,7 +62,10 @@ public class CreateCredentialOfferCommandHandler : ICreateCredentialOfferCommand
 
         if (credentialOffer.GrantTypes.Contains(CredentialOfferResultNames.PreAuthorizedCodeGrant))
         {
-            credentialOffer.PreAuthorizedCode = await _preAuthorizedCodeService.Get(command.AccessToken, validationResult.CredentialConfigurations.Select(c => c.Scope).Distinct().ToList(), cancellationToken);
+            credentialOffer.PreAuthorizedCode = await _preAuthorizedCodeService.Get(
+                command.AccessToken, 
+                validationResult.CredentialConfigurations.Select(c => c.Scope).Distinct().ToList(), 
+                cancellationToken);
         }
 
         _credentialOfferStore.Add(credentialOffer);

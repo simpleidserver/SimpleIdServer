@@ -1,0 +1,65 @@
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.UI;
+using SimpleIdServer.IdServer.VerifiablePresentation.UI.ViewModels;
+
+namespace SimpleIdServer.IdServer.VerifiablePresentation.UI;
+
+[Area(Constants.AMR)]
+public class RegisterController : BaseRegisterController<VerifiablePresentationRegisterViewModel>
+{
+    private readonly IPresentationDefinitionStore _presentationDefinitionStore;
+
+    public RegisterController(
+        IPresentationDefinitionStore presentationDefinitionStore,
+        IOptions<IdServerHostOptions> options, 
+        IDistributedCache distributedCache, 
+        IUserRepository userRepository, 
+        ITokenRepository tokenRepository, 
+        IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, tokenRepository, jwtBuilder)
+    {
+        _presentationDefinitionStore = presentationDefinitionStore;
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Index([FromRoute] string prefix, CancellationToken cancellationToken)
+    {
+        prefix = prefix ?? IdServer.Constants.DefaultRealm;
+        var issuer = Request.GetAbsoluteUriWithVirtualPath();
+        var userRegistrationProgress = await GetRegistrationProgress();
+        var presentationDefinitions = await _presentationDefinitionStore.Query()
+            .Include(p => p.InputDescriptors)
+            .AsNoTracking()
+            .Where(p => p.RealmName == prefix)
+            .ToListAsync(cancellationToken);
+        var verifiablePresentations = presentationDefinitions.Select(d => new VerifiablePresentationViewModel
+        {
+            Id = d.PublicId,
+            Name = d.Name,
+            VcNames = d.InputDescriptors.Select(id => id.Name).ToList()
+        });
+        var viewModel = new VerifiablePresentationRegisterViewModel
+        {
+            VerifiablePresentations = verifiablePresentations,
+            QrCodeUrl = $"{issuer}/{GetRealm(prefix)}{Constants.Endpoints.VpAuthorizeQrCode}",
+            StatusUrl = $"{issuer}/{GetRealm(prefix)}{Constants.Endpoints.VpRegisterStatus}",
+            EndRegisterUrl = $"{issuer}/{GetRealm(prefix)}{Constants.Endpoints.VpEndRegister}",
+            RedirectUrl = userRegistrationProgress?.RedirectUrl
+        };
+        return View(viewModel);
+    }
+
+    protected override void EnrichUser(User user, VerifiablePresentationRegisterViewModel viewModel) { }
+
+    private string GetRealm(string realm) => Options.UseRealm ? $"{realm}/" : string.Empty;
+}
