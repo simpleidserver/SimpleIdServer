@@ -5,6 +5,7 @@ using SimpleIdServer.Persistence.Filters;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Parser.Expressions;
 using SimpleIdServer.Scim.Persistence.EF.Extensions;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -73,6 +74,9 @@ namespace SimpleIdServer.Scim.Persistence.EF
             }
 
             int total = queryableRepresentations.Count();
+            if(parameter.Count == 0)
+                return new SearchSCIMRepresentationsResponse(total, new List<SCIMRepresentation>());
+
             queryableRepresentations = queryableRepresentations.Skip(parameter.StartIndex <= 1 ? 0 : parameter.StartIndex - 1).Take(parameter.Count);
             return await queryableRepresentations.BuildResult(_scimDbContext, parameter.IncludedAttributes, parameter.ExcludedAttributes, total, cancellationToken);
         }

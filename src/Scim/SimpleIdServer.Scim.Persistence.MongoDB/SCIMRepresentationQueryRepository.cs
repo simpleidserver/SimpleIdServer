@@ -92,6 +92,9 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                     .CountAsync();
             }
 
+            if (parameter.Count == 0)
+                return new SearchSCIMRepresentationsResponse(total, new List<SCIMRepresentation>());
+
             var filteredRepresentations = _scimDbContext.SCIMRepresentationLst.AsQueryable()
                 .Where(r => r.ResourceType == parameter.ResourceType);
             if(parameter.Filter != null)

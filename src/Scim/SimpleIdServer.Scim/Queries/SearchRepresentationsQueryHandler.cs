@@ -49,6 +49,7 @@ namespace SimpleIdServer.Scim.Queries
                 throw new SCIMBadSyntaxException(Global.StartIndexMustBeSuperiorOrEqualTo1);
             }
 
+            if (searchRequest.Count < 0) searchRequest.Count = 0;
             var standardSchemas = new List<SCIMSchema>
             {
                 StandardSchemas.StandardResponseSchemas

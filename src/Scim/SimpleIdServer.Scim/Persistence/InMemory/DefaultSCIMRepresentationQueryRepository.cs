@@ -74,6 +74,8 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             }
 
             int totalResults = queryableRepresentations.Count();
+            if (parameter.Count == 0)
+                return Task.FromResult(new SearchSCIMRepresentationsResponse(totalResults, new List<SCIMRepresentation>()));
             IEnumerable<SCIMRepresentation> result = new List<SCIMRepresentation>();
             result = queryableRepresentations.Skip(parameter.StartIndex <= 1 ? 0 : parameter.StartIndex - 1).Take(parameter.Count).Select(r => (SCIMRepresentation)r.Clone()).ToList();
             result.FilterAttributes(parameter.IncludedAttributes, parameter.ExcludedAttributes);

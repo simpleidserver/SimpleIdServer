@@ -71,7 +71,7 @@ namespace SimpleIdServer.Scim.Domain
             var fullPathProperty = Expression.Property(representationParameter, "FullPath");
             var namespaceProperty = Expression.Property(representationParameter, "Namespace");
             Expression expression = null;
-            foreach (var attribute in attributes)
+            foreach (var attribute in attributes.Where(a => a != null))
             {
                 Expression record = null;
                 if (attribute.TryContainsGroupingExpression(out SCIMComplexAttributeExpression complexAttributeExpression))
