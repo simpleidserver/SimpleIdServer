@@ -81,6 +81,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\..\..\json-ld.net\src\json-ld.net\json-ld.net.csproj" />
 	  <ProjectReference Include="..\..\Did\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj" />
 	  <ProjectReference Include="..\..\Did\SimpleIdServer.Vp\SimpleIdServer.Vp.csproj" />
 	  <ProjectReference Include="..\..\IdServer\SimpleIdServer.IdServer.U2FClient\SimpleIdServer.IdServer.U2FClient.csproj" />
