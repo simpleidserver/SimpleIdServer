@@ -313,6 +313,9 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("deleteAmr",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationClassReferences + "/{id}",
                 defaults: new { controller = "AuthenticationClassReferences", action = "Delete" });
+            webApplication.SidMapControllerRoute("assignRegistrationWorkflow",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationClassReferences + "/{id}/assign",
+                defaults: new { controller = "AuthenticationClassReferences", action = "AssignRegistrationWorkflow" });
 
 
             webApplication.SidMapControllerRoute("searchIdProviders",

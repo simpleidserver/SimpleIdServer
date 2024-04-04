@@ -24,12 +24,14 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationClassReferences
     {
         private readonly IAuthenticationContextClassReferenceRepository _authenticationContextClassReferenceRepository;
         private readonly IRealmRepository _realmRepository;
+        private readonly IRegistrationWorkflowRepository _registrationWorkflowRepository;
         private readonly IEnumerable<IAuthenticationMethodService> _authMethodServices;
         private readonly ILogger<AuthenticationClassReferencesController> _logger;
 
         public AuthenticationClassReferencesController(
             IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository, 
-            IRealmRepository realmRepository, 
+            IRealmRepository realmRepository,
+            IRegistrationWorkflowRepository registrationWorkflowRepository,
             ITokenRepository tokenRepository,
             IJwtBuilder jwtBuilder, 
             IEnumerable<IAuthenticationMethodService> authMethodServices, 
@@ -37,6 +39,7 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationClassReferences
         {
             _authenticationContextClassReferenceRepository = authenticationContextClassReferenceRepository;
             _realmRepository = realmRepository;
+            _registrationWorkflowRepository = registrationWorkflowRepository;
             _authMethodServices = authMethodServices;
             _logger = logger;
         }
@@ -48,7 +51,11 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationClassReferences
             {
                 prefix = prefix ?? Constants.DefaultRealm;
                 await CheckAccessToken(prefix, Constants.StandardScopes.Acrs.Name);
-                var result = await _authenticationContextClassReferenceRepository.Query().Include(a => a.Realms).Where(a => a.Realms.Any(r => r.Name == prefix)).AsNoTracking().OrderBy(a => a.Name).ToListAsync(cancellationToken);
+                var result = await _authenticationContextClassReferenceRepository
+                    .Query()
+                    .Include(a => a.Realms)
+                    .Include(a => a.RegistrationWorkflow)
+                    .Where(a => a.Realms.Any(r => r.Name == prefix)).AsNoTracking().OrderBy(a => a.Name).ToListAsync(cancellationToken);
                 return new OkObjectResult(result);
             }
             catch (OAuthException ex)
@@ -128,6 +135,49 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationClassReferences
                 await _authenticationContextClassReferenceRepository.SaveChanges(cancellationToken);
                 activity?.SetStatus(ActivityStatusCode.Ok, "Authentication Class Reference has been removed");
                 return new NoContentResult();
+            }
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> AssignRegistrationWorkflow([FromRoute] string prefix, string id, [FromBody] AssignRegistrationWorkflowRequest request,  CancellationToken cancellationToken)
+        {
+            using (var activity = Tracing.IdServerActivitySource.StartActivity("Assign registration workflow to the ACR"))
+            {
+                prefix = prefix ?? Constants.DefaultRealm;
+                try
+                {
+                    await Validate();
+                    var acr = await _authenticationContextClassReferenceRepository.Query()
+                        .Include(a => a.Realms)
+                        .SingleOrDefaultAsync(a => a.Realms.Any(r => r.Name == prefix) && a.Id == id, cancellationToken);
+                    if (acr == null)
+                    {
+                        activity?.SetStatus(ActivityStatusCode.Error, "Authentication Class Reference doesn't exit");
+                        return BuildError(HttpStatusCode.NotFound, ErrorCodes.UNKNOWN_ACR, string.Format(Global.UnknownAcr, id));
+                    }
+
+                    acr.RegistrationWorkflowId = request.WorkflowId;
+                    acr.UpdateDateTime = DateTime.UtcNow;
+                    await _authenticationContextClassReferenceRepository.SaveChanges(cancellationToken);
+                    activity?.SetStatus(ActivityStatusCode.Ok, "Registration worklow is assigned to the ACR");
+                    return new NoContentResult();
+                }
+                catch(OAuthException ex)
+                {
+                    _logger.LogError(ex.ToString());
+                    activity?.SetStatus(ActivityStatusCode.Error, ex.ToString());
+                    return BuildError(ex);
+                }
+            }
+
+            async Task Validate()
+            {
+                if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
+                if (string.IsNullOrWhiteSpace(request.WorkflowId)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, AuthenticationContextClassReferenceNames.WorkflowId));
+                var registrationWorkflow = await _registrationWorkflowRepository.Query()
+                    .AsNoTracking()
+                    .SingleOrDefaultAsync(r => r.RealmName == prefix && r.Id == request.WorkflowId, cancellationToken);
+                if (registrationWorkflow == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, Global.UnknownRegistrationWorkflow);
             }
         }
     }

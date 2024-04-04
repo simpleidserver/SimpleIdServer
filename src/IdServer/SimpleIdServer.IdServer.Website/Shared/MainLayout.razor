@@ -1,9 +1,11 @@
-﻿@using SimpleIdServer.IdServer.Website.Stores.AuthMethodsStore;
+﻿@using SimpleIdServer.IdServer.Website.Stores.AcrsStore;
+@using SimpleIdServer.IdServer.Website.Stores.AuthMethodsStore;
 @using SimpleIdServer.IdServer.Website.Stores.ConfigurationDefinitionStore;
 @using SimpleIdServer.IdServer.Website.Stores.LanguageStore;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @using System.Globalization;
 @using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.RegistrationWorkflowStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorLayout
 @inject IState<RealmsState> state
 @inject IState<LanguagesState> languagesState
@@ -140,5 +142,7 @@
         dispatcher.Dispatch(new GetAllRealmAction());
         dispatcher.Dispatch(new GetAllAuthMethodAction());
         dispatcher.Dispatch(new GetLanguagesAction());
+        dispatcher.Dispatch(new GetAllRegistrationWorkflowsAction());
+        dispatcher.Dispatch(new GetAllAcrsAction());
     }
 }

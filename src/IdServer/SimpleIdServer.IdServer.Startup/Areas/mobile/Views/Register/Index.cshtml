@@ -13,9 +13,9 @@
 <h5>@(User.Identity.IsAuthenticated ? AuthenticateMobileResource.enroll_mobile : AuthenticateMobileResource.register_mobile)</h5>
 
 <div id="registrationContainer">
-    <ul class="list-group mb-3" id="errors">
-        @if (!ViewData.ModelState.IsValid)
-        {
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <ul class="list-group mb-3" id="errors">
             @foreach (var modelState in ViewData.ModelState.Values)
             {
                 foreach (var error in modelState.Errors)
@@ -23,8 +23,8 @@
                     <li class="list-group-item list-group-item-danger">@AuthenticateWebauthnResource.ResourceManager.GetString(error.ErrorMessage)</li>
                 }
             }
-        }
-    </ul>
+        </ul>
+    }
 
     <!-- Registration form -->
     <form id="registerMobile">

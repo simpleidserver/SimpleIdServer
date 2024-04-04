@@ -242,6 +242,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             client.BackChannelLogoutSessionRequired = act.BackChannelLogoutSessionRequired;
             client.IsRedirectUrlCaseSensitive = act.IsRedirectUrlCaseSensitive;
             client.RedirectToRevokeSessionUI = act.RedirectToRevokeSessionUI;
+            client.DefaultAcrValues = act.DefaultAcrValues;
             var grantTypes = new List<string>();
             if (act.IsClientCredentialsGrantTypeEnabled)
                 grantTypes.Add(ClientCredentialsHandler.GRANT_TYPE);

@@ -361,11 +361,17 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "name");
 
+                    b.Property<string>("RegistrationWorkflowId")
+                        .HasColumnType("nvarchar(450)")
+                        .HasAnnotation("Relational:JsonPropertyName", "workflow_id");
+
                     b.Property<DateTime>("UpdateDateTime")
                         .HasColumnType("datetime2")
                         .HasAnnotation("Relational:JsonPropertyName", "update_datetime");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("RegistrationWorkflowId");
 
                     b.ToTable("Acrs");
                 });
@@ -695,6 +701,9 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("Relational:JsonPropertyName", "auth_reqid_expirationtime");
 
+                    b.Property<string>("AuthenticationContextClassReferenceId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("AuthorizationDataTypes")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
@@ -985,6 +994,8 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .HasAnnotation("Relational:JsonPropertyName", "userinfo_signed_response_alg");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AuthenticationContextClassReferenceId");
 
                     b.ToTable("Clients");
                 });
@@ -1707,7 +1718,8 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.RegistrationWorkflow", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(450)")
+                        .HasAnnotation("Relational:JsonPropertyName", "id");
 
                     b.Property<DateTime>("CreateDateTime")
                         .HasColumnType("datetime2");
@@ -1717,7 +1729,8 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "name");
 
                     b.Property<string>("RealmName")
                         .IsRequired()
@@ -1735,6 +1748,8 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.HasIndex("RealmName");
 
                     b.ToTable("RegistrationWorkflows");
+
+                    b.HasAnnotation("Relational:JsonPropertyName", "registration_workflow");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Scope", b =>
@@ -2611,6 +2626,15 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.RegistrationWorkflow", "RegistrationWorkflow")
+                        .WithMany("Acrs")
+                        .HasForeignKey("RegistrationWorkflowId");
+
+                    b.Navigation("RegistrationWorkflow");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProvider", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderDefinition", "AuthSchemeProviderDefinition")
@@ -2658,6 +2682,13 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .WithMany("Histories")
                         .HasForeignKey("BCAuthorizeId")
                         .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Client", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference", null)
+                        .WithMany("Clients")
+                        .HasForeignKey("AuthenticationContextClassReferenceId");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ClientCertificate", b =>
@@ -3004,6 +3035,11 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference", b =>
+                {
+                    b.Navigation("Clients");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProvider", b =>
                 {
                     b.Navigation("Mappers");
@@ -3097,6 +3133,11 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.Navigation("RegistrationWorkflows");
 
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.RegistrationWorkflow", b =>
+                {
+                    b.Navigation("Acrs");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Scope", b =>

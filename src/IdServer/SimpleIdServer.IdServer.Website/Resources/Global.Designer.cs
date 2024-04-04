@@ -457,6 +457,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Assign.
+        /// </summary>
+        public static string AssignWorkflow {
+            get {
+                return ResourceManager.GetString("AssignWorkflow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à At least one redirection URL must be specified.
         /// </summary>
         public static string AtLeastOneRedirectionUrl {
@@ -970,6 +979,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à ACR must be sorted by priority.
+        /// </summary>
+        public static string ClientDefaultAcrValuesHelper {
+            get {
+                return ResourceManager.GetString("ClientDefaultAcrValuesHelper", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Client details.
         /// </summary>
         public static string ClientDetailsTitle {
@@ -1308,6 +1326,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string Data {
             get {
                 return ResourceManager.GetString("Data", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Default acr methods.
+        /// </summary>
+        public static string DefaultClientAcr {
+            get {
+                return ResourceManager.GetString("DefaultClientAcr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Default authentication method used by the client to authenticate the user.
+        /// </summary>
+        public static string DefaultClientAcrTooltip {
+            get {
+                return ResourceManager.GetString("DefaultClientAcrTooltip", resourceCulture);
             }
         }
         
@@ -3173,6 +3209,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string RegistrationMethods {
             get {
                 return ResourceManager.GetString("RegistrationMethods", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Registration.
+        /// </summary>
+        public static string RegistrationWorkflow {
+            get {
+                return ResourceManager.GetString("RegistrationWorkflow", resourceCulture);
             }
         }
         

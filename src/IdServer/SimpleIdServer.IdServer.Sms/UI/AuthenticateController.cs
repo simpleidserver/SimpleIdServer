@@ -43,7 +43,8 @@ namespace SimpleIdServer.IdServer.Sms.UI
             IUserSessionResitory userSessionRepository,
             IUserTransformer userTransformer,
             IBusControl busControl,
-            IAntiforgery antiforgery) : base(notificationServices, otpAuthenticators, userAuthenticationService, authenticationSchemeProvider, options, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, tokenRepository, jwtBuilder, busControl, antiforgery)
+            IAntiforgery antiforgery,
+            IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(notificationServices, otpAuthenticators, userAuthenticationService, authenticationSchemeProvider, options, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, tokenRepository, jwtBuilder, busControl, antiforgery, authenticationContextClassReferenceRepository)
         {
             _configuration = configuration;
         }

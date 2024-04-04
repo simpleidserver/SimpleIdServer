@@ -266,6 +266,7 @@ public class ClientsController : BaseController
             existingClient.IsConsentDisabled = newClient.IsConsentDisabled;
             existingClient.JwksUri = newClient.JwksUrl;
             existingClient.IsRedirectUrlCaseSensitive = newClient.IsRedirectUrlCaseSensitive;
+            existingClient.DefaultAcrValues = newClient.DefaultAcrValues;
             if (newClient.Parameters != null)
             {
                 var existingClientParameters = existingClient.Parameters;

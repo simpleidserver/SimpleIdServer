@@ -38,7 +38,8 @@ public class AuthenticateController : BaseAuthenticationMethodController<Authent
         IUserTransformer userTransformer,
         IBusControl busControl,
         IConfiguration configuration,
-        IAntiforgery antiforgery) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery)
+        IAntiforgery antiforgery,
+        IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository)
     {
         _configuration = configuration;
     }

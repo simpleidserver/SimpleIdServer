@@ -8,7 +8,7 @@ namespace Microsoft.AspNetCore.Mvc.Rendering
 {
     public static class UserHTMLHelpers
     {
-        public static IHtmlContent UserPicture(this IHtmlHelper htmlHelper, ClaimsPrincipal claimsPrincipal, string picture = null)
+        public static IHtmlContent UserPicture(this IHtmlHelper htmlHelper, ClaimsPrincipal claimsPrincipal, string picture = null, bool isEditModeEnabled = false)
         {
             var src = "/images/DefaultUser.png";
             if (!string.IsNullOrWhiteSpace(picture))
@@ -20,7 +20,9 @@ namespace Microsoft.AspNetCore.Mvc.Rendering
                     src = cl.Value;
             }
 
-            // fas fa-edit
+            if(!isEditModeEnabled)
+                return new HtmlString($"<div class='profile-content'><img id='user-picture' class='img-thumbnail' src='{src}' /></div>");
+
             return new HtmlString($"<div class='profile-content'><button class='btn edit' id='edit-profile'><i class='fa-solid fa-pen-to-square'></i></button><img id='user-picture' class='img-thumbnail' src='{src}' /></div>");
         }
     }

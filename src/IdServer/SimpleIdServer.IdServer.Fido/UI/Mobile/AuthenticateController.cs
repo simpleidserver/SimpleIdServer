@@ -48,7 +48,8 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
             IUserSessionResitory userSessionRepository,
             IUserTransformer userTransformer, 
             IBusControl busControl,
-            IAntiforgery antiforgery) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery)
+            IAntiforgery antiforgery,
+            IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository)
         {
             _configuration = configuration;
             _authenticationHelper = authenticationHelper;
@@ -76,8 +77,11 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
         {
             var options = GetFidoOptions();
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
-            viewModel.BeginLoginUrl = $"{issuer}/{viewModel.Realm}/{Constants.EndPoints.BeginQRCodeLogin}";
-            viewModel.LoginStatusUrl = $"{issuer}/{viewModel.Realm}/{Constants.EndPoints.LoginStatus}";
+            var realm = "/";
+            if (!string.IsNullOrWhiteSpace(viewModel.Realm))
+                realm = $"/{viewModel.Realm}/";
+            viewModel.BeginLoginUrl = $"{issuer}{realm}{Constants.EndPoints.BeginQRCodeLogin}";
+            viewModel.LoginStatusUrl = $"{issuer}{realm}{Constants.EndPoints.LoginStatus}";
             viewModel.IsDeveloperModeEnabled = options.IsDeveloperModeEnabled;
         }
 

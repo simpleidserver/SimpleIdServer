@@ -34,6 +34,7 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
         private readonly IUserAuthenticationService _authenticationService;
         private readonly IAntiforgery _antiforgery;
+        private readonly IAuthenticationContextClassReferenceRepository _authenticationContextClassReferenceRepository;
 
         public BaseAuthenticationMethodController(
             IOptions<IdServerHostOptions> options,
@@ -49,11 +50,13 @@ namespace SimpleIdServer.IdServer.UI
             IUserSessionResitory userSessionRepository,
             IUserTransformer userTransformer,
             IBusControl busControl,
-            IAntiforgery antiforgery) : base(clientRepository, userRepository, userSessionRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, tokenRepository, jwtBuilder, options)
+            IAntiforgery antiforgery,
+            IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(clientRepository, userRepository, userSessionRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, tokenRepository, jwtBuilder, options)
         {
             _authenticationSchemeProvider = authenticationSchemeProvider;
             _authenticationService = userAuthenticationService;
             _antiforgery = antiforgery;
+            _authenticationContextClassReferenceRepository = authenticationContextClassReferenceRepository;
         }
 
         protected abstract string Amr { get; }
@@ -97,17 +100,18 @@ namespace SimpleIdServer.IdServer.UI
                         .FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == str), cancellationToken);
                     var loginHint = query.GetLoginHintFromAuthorizationRequest();
                     var amrInfo = await ResolveAmrInfo(query, str, client, cancellationToken);
-                    bool isLoginMissing = amrInfo != null && !string.IsNullOrWhiteSpace(amrInfo.Login);
-                    if (amrInfo != null && !string.IsNullOrWhiteSpace(amrInfo.Login) && TryGetLogin(amrInfo, out string login))
+                    bool isLoginMissing = amrInfo != null && !string.IsNullOrWhiteSpace(amrInfo.Value.Item1.Login);
+                    if (amrInfo != null && !string.IsNullOrWhiteSpace(amrInfo.Value.Item1.Login) && TryGetLogin(amrInfo.Value.Item1, out string login))
                     {
                         loginHint = login;
                         isLoginMissing = false;
                     }
 
-                    if (amrInfo.CurrentAmr == amrInfo.AllAmr.First())
+                    if (amrInfo != null && amrInfo.Value.Item1.CurrentAmr == amrInfo.Value.Item1.AllAmr.First())
                     {
                         viewModel.IsFirstAmr = true;
                         viewModel.RememberLogin = false;
+                        viewModel.RegistrationWorkflow = amrInfo.Value.Item2.RegistrationWorkflow;
                     }
 
                     viewModel.ClientName = client.ClientName;
@@ -116,8 +120,8 @@ namespace SimpleIdServer.IdServer.UI
                     viewModel.TosUri = client.TosUri;
                     viewModel.PolicyUri = client.PolicyUri;
                     viewModel.IsLoginMissing = isLoginMissing;
-                    viewModel.IsAuthInProgress = amrInfo != null && !string.IsNullOrWhiteSpace(amrInfo.Login);
-                    viewModel.AmrAuthInfo = amrInfo;
+                    viewModel.IsAuthInProgress = amrInfo != null && !string.IsNullOrWhiteSpace(amrInfo.Value.Item1.Login);
+                    viewModel.AmrAuthInfo = amrInfo.Value.Item1;
                     return View(viewModel);
                 }
                 else
@@ -139,7 +143,6 @@ namespace SimpleIdServer.IdServer.UI
         #region Submit Credentials
 
         [HttpPost]
-        // [ValidateAntiForgeryToken]
         public async virtual Task<IActionResult> Index([FromRoute] string prefix, T viewModel, CancellationToken token)
         {
             try
@@ -241,15 +244,24 @@ namespace SimpleIdServer.IdServer.UI
 
         protected abstract bool TryGetLogin(AmrAuthInfo amrInfo, out string login);
 
-        protected async Task<AmrAuthInfo> ResolveAmrInfo(JsonObject query, string realm, Client client, CancellationToken cancellationToken)
+        protected async Task<(AmrAuthInfo, AuthenticationContextClassReference)?> ResolveAmrInfo(JsonObject query, string realm, Client client, CancellationToken cancellationToken)
         {
             var amrInfo = GetAmrInfo();
-            if (amrInfo != null) return amrInfo;
+            if (amrInfo != null)
+            {
+                var resolvedAcr = await _authenticationContextClassReferenceRepository.Query()
+                    .AsNoTracking()
+                    .Include(a => a.Realms)
+                    .Include(a => a.RegistrationWorkflow)
+                    .SingleAsync(a => a.Realms.Any(r => r.Name == realm) && a.Name == amrInfo.CurrentAmr, cancellationToken);
+                return (amrInfo, resolvedAcr);
+            }
+
             var acrValues = query.GetAcrValuesFromAuthorizationRequest();
             var requestedClaims = query.GetClaimsFromAuthorizationRequest();
             var acr = await AmrHelper.FetchDefaultAcr(realm, acrValues, requestedClaims, client, cancellationToken);
             if (acr == null) return null;
-            return new AmrAuthInfo(null, null, null, null, acr.AuthenticationMethodReferences, acr.AuthenticationMethodReferences.First());
+            return (new AmrAuthInfo(null, null, null, null, acr.AuthenticationMethodReferences, acr.AuthenticationMethodReferences.First()), acr);
         }
 
         protected AmrAuthInfo GetAmrInfo()

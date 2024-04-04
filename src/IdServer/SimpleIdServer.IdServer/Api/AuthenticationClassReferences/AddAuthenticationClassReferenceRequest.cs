@@ -5,15 +5,14 @@ using SimpleIdServer.IdServer.Domains.DTOs;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace SimpleIdServer.IdServer.Api.AuthenticationClassReferences
+namespace SimpleIdServer.IdServer.Api.AuthenticationClassReferences;
+
+public class AddAuthenticationClassReferenceRequest
 {
-    public class AddAuthenticationClassReferenceRequest
-    {
-        [JsonPropertyName(AuthenticationContextClassReferenceNames.Name)]
-        public string Name { get; set; }
-        [JsonPropertyName(AuthenticationContextClassReferenceNames.DisplayName)]
-        public string DisplayName { get; set; }
-        [JsonPropertyName(AuthenticationContextClassReferenceNames.AuthenticationMethodReferences)]
-        public IEnumerable<string> AuthenticationMethodReferences { get; set; }
-    }
+    [JsonPropertyName(AuthenticationContextClassReferenceNames.Name)]
+    public string Name { get; set; }
+    [JsonPropertyName(AuthenticationContextClassReferenceNames.DisplayName)]
+    public string DisplayName { get; set; }
+    [JsonPropertyName(AuthenticationContextClassReferenceNames.AuthenticationMethodReferences)]
+    public IEnumerable<string> AuthenticationMethodReferences { get; set; }
 }

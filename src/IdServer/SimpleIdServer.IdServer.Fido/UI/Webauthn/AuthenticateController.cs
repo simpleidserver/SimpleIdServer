@@ -42,7 +42,8 @@ namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
             IUserSessionResitory userSessionRepository,
             IUserTransformer userTransformer,
             IBusControl busControl,
-            IAntiforgery antiforgery) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery)
+            IAntiforgery antiforgery,
+            IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository)
         {
             _distributedCache = distributedCache;
         }
@@ -68,8 +69,11 @@ namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
         protected override void EnrichViewModel(AuthenticateWebauthnViewModel viewModel)
         {
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
-            viewModel.BeginLoginUrl = $"{issuer}/{viewModel.Realm}/{Constants.EndPoints.BeginLogin}";
-            viewModel.EndLoginUrl = $"{issuer}/{viewModel.Realm}/{Constants.EndPoints.EndLogin}";
+            var realm = "/";
+            if (!string.IsNullOrWhiteSpace(viewModel.Realm))
+                realm = $"/{viewModel.Realm}/";
+            viewModel.BeginLoginUrl = $"{issuer}{realm}{Constants.EndPoints.BeginLogin}";
+            viewModel.EndLoginUrl = $"{issuer}{realm}{Constants.EndPoints.EndLogin}";
         }
 
         protected async Task<ValidationStatus> ValidateCredentials(AuthenticateWebauthnViewModel viewModel, User user, CancellationToken cancellationToken)

@@ -40,7 +40,8 @@ namespace SimpleIdServer.IdServer.UI
             ITokenRepository tokenRepository,
             IJwtBuilder jwtBuilder,
             IBusControl busControl,
-            IAntiforgery antiforgery) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery)
+            IAntiforgery antiforgery,
+            IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository)
         {
             _notificationServices = notificationServices;
             _otpAuthenticators = otpAuthenticators;

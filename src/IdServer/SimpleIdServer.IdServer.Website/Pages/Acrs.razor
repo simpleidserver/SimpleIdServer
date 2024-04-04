@@ -5,6 +5,7 @@
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.AcrsStore;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
+@using SimpleIdServer.IdServer.Website.Stores.RegistrationWorkflowStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject DialogService dialogService
 @inject ProtectedSessionStorage sessionStorage
@@ -14,6 +15,7 @@
 @inject IState<RealmsState> realmsState
 @inject IDispatcher dispatcher
 @inject IState<AcrsState> acrsState
+@inject IState<RegistrationWorkflowsState> registrationWorkflowsState
 @inject DefaultSecurityOptions securityOptions
 
 <div class="row">
@@ -66,6 +68,16 @@
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableAcr" Property="Value.DisplayName" Filterable="false" Sortable="false" Title="@Global.DisplayName" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableAcr" Filterable="false" Sortable="false" Title="@Global.RegistrationWorkflow" Width="80px">
+            <Template Context="data">                
+                <RadzenDropDown Data=@registrationWorkflowsState.Value.RegistrationWorkflows.Select(r => r.RegistrationWorkflow)
+                    TextProperty="Name"
+                    ValueProperty="Id"
+                    TValue="string"
+                    @bind-Value=@data.Value.RegistrationWorkflowId
+                    Change=@((obj) => UpdateRegistrationWorkflow(obj,  data))/>
+            </Template>
+        </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableAcr" Filterable="false" Sortable="false" Title="@Global.Name" Width="80px">
             <Template Context="data">
                 @foreach(var amr in data.Value.AuthenticationMethodReferences)
@@ -175,5 +187,11 @@
         var realm = await sessionStorage.GetAsync<string>("realm");
         var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
         return realmStr;
+    }
+
+    void UpdateRegistrationWorkflow(object data, SelectableAcr acr) 
+    {
+        var act = new AssignWorkflowRegistrationAction { AcrId = acr.Value.Id, RegistrationWorkflowId = data.ToString() };
+        this.dispatcher.Dispatch(act);
     }
 }

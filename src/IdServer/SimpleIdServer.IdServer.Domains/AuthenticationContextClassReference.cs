@@ -29,8 +29,14 @@ namespace SimpleIdServer.IdServer.Domains
         public DateTime CreateDateTime { get; set; }
         [JsonPropertyName(AuthenticationContextClassReferenceNames.UpdateDateTime)]
         public DateTime UpdateDateTime { get; set; }
+        [JsonPropertyName(AuthenticationContextClassReferenceNames.WorkflowId)]
+        public string? RegistrationWorkflowId { get; set; }
+        [JsonPropertyName(AuthenticationContextClassReferenceNames.RegistrationWorkflow)]
+        public RegistrationWorkflow? RegistrationWorkflow { get; set; }
         [JsonIgnore]
         public ICollection<Realm> Realms { get; set; } = new List<Realm>();
+        [JsonIgnore]
+        public ICollection<Client> Clients { get; set; } = new List<Client>();
 
         public bool Equals(AuthenticationContextClassReference other)
         {

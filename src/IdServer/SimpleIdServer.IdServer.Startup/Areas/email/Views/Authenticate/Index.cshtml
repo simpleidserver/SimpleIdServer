@@ -8,6 +8,9 @@
 @{
     ViewBag.Title = AuthenticateEmailResource.title;
     Layout = "~/Views/Shared/_AuthenticateLayout.cshtml";
+    var returnUrl = Microsoft.AspNetCore.Http.Extensions.UriHelper.GetDisplayUrl(Context.Request);
+    var realm = SimpleIdServer.IdServer.Middlewares.RealmContext.Instance()?.Realm;
+    var registationUrl = $"{(string.IsNullOrWhiteSpace(realm) ? "/" : $"/{realm}/")}Registration?redirectUrl={returnUrl}&workflowName={Model.RegistrationWorkflow?.Name}";
 }
 
 @if (!ViewData.ModelState.IsValid)
@@ -92,6 +95,16 @@ else
             <button type="submit" class="btn btn-primary">@AuthenticateEmailResource.authenticate</button>
         }
     </div>
+
+    @if (Model.IsFirstAmr && Model.RegistrationWorkflow != null)
+    {
+        <div>
+            <div class="divider">
+                <p class="fw-bold text">OR</p>
+            </div>
+            <a href="@registationUrl">@AuthenticatePasswordResource.register</a>
+        </div>
+    }
 }
 
 @section SubScripts {

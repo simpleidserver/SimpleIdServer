@@ -23,7 +23,7 @@
         <div class="card shadow-sm">
             <div class="card-body info">
                 <div class="picture">
-                    @Html.UserPicture(User, Model.Picture)
+                    @Html.UserPicture(User, Model.Picture, true)
                     <form id="pictureForm" action="@Url.Action("UpdatePicture", "Home")" method="post">
                         <input type="file" id="pictureFile" name="File" style="display: none" accept="image/*" />
                     </form>

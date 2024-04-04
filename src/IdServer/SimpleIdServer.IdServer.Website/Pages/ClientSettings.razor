@@ -1,6 +1,7 @@
 ﻿@using SimpleIdServer.IdServer.Api.Token.Handlers;
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.ClientStore;
+@using SimpleIdServer.IdServer.Website.Stores.AcrsStore;
 @using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
 @using SimpleIdServer.IdServer.Website.Stores.UserStore;
 @using SimpleIdServer.IdServer.WsFederation
@@ -9,6 +10,7 @@
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject IDispatcher dispatcher
 @inject IState<UpdateClientState> updateClientState
+@inject IState<AcrsState> acrsState
 @inject TooltipService tooltipService
 @inject NotificationService notificationService
 
@@ -42,7 +44,8 @@
                             <RadzenLabel Text="@Global.AccessTokenType" Style="padding: 0px;" />
                         </div>
                         <div class="col">
-                            <RadzenDropDown Name="AccessTokenType" Class="w-100"
+                            <RadzenDropDown Name="AccessTokenType" 
+                                            class="w-100"
                                             Data=@AllAccessTokenTypes
                                             TextProperty="Description"
                                             ValueProperty="Value"
@@ -260,6 +263,34 @@
                             <RadzenCheckBox @bind-Value=updateClient.IsConsentEnabled></RadzenCheckBox>
                         </div>
                     </div>
+                    <!-- default acr methods -->
+                    @if (Client.ClientType == ClientTypes.CREDENTIAL_ISSUER ||
+                       Client.ClientType == ClientTypes.SPA ||
+                       Client.ClientType == ClientTypes.WEBSITE ||
+                       Client.ClientType == ClientTypes.HIGHLYSECUREDWEBSITE)
+                    {
+                        <div class="row mt-2">
+                            <div class="col-md-2">
+                                <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, Global.DefaultClientAcrTooltip))" />
+                                <RadzenLabel Text="@Global.DefaultClientAcr" Style="padding: 0px;" />
+                            </div>
+                            <div class="col">
+                                <RadzenFormField Variant="Variant.Outlined">
+                                    <ChildContent>
+                                        <RadzenDropDown @bind-Value=@updateClient.DefaultAcrValues
+                                                        Chips=true
+                                                        Data=@AcrNames
+                                                        Multiple=true
+                                                        AllowClear=true
+                                                        class="w-100"></RadzenDropDown>
+                                    </ChildContent>
+                                    <Helper>
+                                        @Global.ClientDefaultAcrValuesHelper
+                                    </Helper>
+                                </RadzenFormField>
+                            </div>
+                        </div>
+                    }
                 </RadzenAccordionItem>                
             }
 
@@ -323,6 +354,14 @@
 
 
 @code {
+    List<string> AcrNames
+    {
+        get 
+        {
+            return acrsState.Value.Acrs == null ? new List<string>() : acrsState.Value.Acrs.Select(a => a.Value.Name).ToList();
+        }
+    }
+
     [Parameter]
     public SimpleIdServer.IdServer.Domains.Client Client { get; set; }
 
@@ -374,6 +413,7 @@
         public bool IsRedirectUrlCaseSensitive { get; set; }
         public bool RedirectToRevokeSessionUI { get; set; }
         public string MetadataUrl { get; set; }
+        public ICollection<string> DefaultAcrValues { get; set; }
         public TokenExchangeTypes? TokenExchangeType { get; set;  }
         public AccessTokenTypes AccessTokenType { get; set;  }
     }
@@ -418,7 +458,8 @@
             IsRedirectUrlCaseSensitive = this.Client.IsRedirectUrlCaseSensitive,
             RedirectToRevokeSessionUI = this.Client.RedirectToRevokeSessionUI,
             TokenExchangeType = this.Client.TokenExchangeType,
-            AccessTokenType = this.Client.AccessTokenType
+            AccessTokenType = this.Client.AccessTokenType,
+            DefaultAcrValues = this.Client.DefaultAcrValues.Where(a => !string.IsNullOrWhiteSpace(a)).ToList()
         };
         if (this.Client.GrantTypes.Contains(ClientCredentialsHandler.GRANT_TYPE))
             updateClient.IsClientCredentialsGrantTypeEnabled = true;
@@ -468,7 +509,8 @@
             JwksUrl = this.Client.JwksUri,
             AccessTokenType = client.AccessTokenType,
             RedirectToRevokeSessionUI = client.RedirectToRevokeSessionUI,
-            IsTokenExchangePreAuthorizedCodeEnabled = client.IsTokenExchangePreAuthorizedCodeEnabled
+            IsTokenExchangePreAuthorizedCodeEnabled = client.IsTokenExchangePreAuthorizedCodeEnabled,
+            DefaultAcrValues = client.DefaultAcrValues
         });
     }
 

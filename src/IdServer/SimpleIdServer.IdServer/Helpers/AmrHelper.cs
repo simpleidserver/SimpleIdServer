@@ -33,7 +33,12 @@ namespace SimpleIdServer.IdServer.Helpers
             _options = options.Value;
         }
 
-        public async Task<AuthenticationContextClassReference> FetchDefaultAcr(string realm, IEnumerable<string> requestedAcrValues, IEnumerable<AuthorizedClaim> requestedClaims, Client client, CancellationToken cancellationToken)
+        public async Task<AuthenticationContextClassReference> FetchDefaultAcr(
+            string realm, 
+            IEnumerable<string> requestedAcrValues, 
+            IEnumerable<AuthorizedClaim> requestedClaims, 
+            Client client, 
+            CancellationToken cancellationToken)
         {
             var defaultAcr = await GetSupportedAcr(realm, requestedAcrValues, cancellationToken);
             if (defaultAcr == null)
@@ -60,7 +65,11 @@ namespace SimpleIdServer.IdServer.Helpers
 
         public async Task<AuthenticationContextClassReference> GetSupportedAcr(string realm, IEnumerable<string> requestedAcrValues, CancellationToken cancellationToken)
         {
-            var acrs = await _authenticationContextClassReferenceRepository.Query().Include(a => a.Realms).AsNoTracking().Where(a => requestedAcrValues.Contains(a.Name) && a.Realms.Any(r => r.Name == realm)).ToListAsync(cancellationToken);
+            var acrs = await _authenticationContextClassReferenceRepository.Query()
+                .Include(a => a.Realms)
+                .Include(a => a.RegistrationWorkflow)
+                .AsNoTracking()
+                .Where(a => requestedAcrValues.Contains(a.Name) && a.Realms.Any(r => r.Name == realm)).ToListAsync(cancellationToken);
             foreach (var acrValue in requestedAcrValues)
             {
                 var acr = acrs.FirstOrDefault(a => a.Name == acrValue);

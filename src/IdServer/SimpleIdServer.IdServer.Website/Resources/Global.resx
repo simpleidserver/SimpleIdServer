@@ -1788,4 +1788,19 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="WalletShortDescription" xml:space="preserve">
     <value>Mobile application</value>
   </data>
+  <data name="AssignWorkflow" xml:space="preserve">
+    <value>Assign</value>
+  </data>
+  <data name="RegistrationWorkflow" xml:space="preserve">
+    <value>Registration</value>
+  </data>
+  <data name="DefaultClientAcr" xml:space="preserve">
+    <value>Default acr methods</value>
+  </data>
+  <data name="DefaultClientAcrTooltip" xml:space="preserve">
+    <value>Default authentication method used by the client to authenticate the user</value>
+  </data>
+  <data name="ClientDefaultAcrValuesHelper" xml:space="preserve">
+    <value>ACR must be sorted by priority</value>
+  </data>
 </root>

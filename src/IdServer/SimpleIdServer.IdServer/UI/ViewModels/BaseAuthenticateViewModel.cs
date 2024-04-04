@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using SimpleIdServer.IdServer.Domains;
 using System.Collections.Generic;
 
 namespace SimpleIdServer.IdServer.UI.ViewModels
@@ -20,6 +21,7 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
         public bool IsFirstAmr { get; set; } = false;
         public ICollection<ExternalIdProvider> ExternalIdsProviders { get; set; } = new List<ExternalIdProvider>();
         public AmrAuthInfo AmrAuthInfo { get; set; } = null;
+        public RegistrationWorkflow RegistrationWorkflow { get; set; }
         public abstract void Validate(ModelStateDictionary modelStateDictionary);
     }
 

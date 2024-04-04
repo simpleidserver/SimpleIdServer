@@ -41,4 +41,6 @@ public class UpdateClientRequest
     public AccessTokenTypes AccessTokenType { get; set; }
     [JsonPropertyName(OAuthClientParameters.RedirectToRevokeSessionUI)]
     public bool RedirectToRevokeSessionUI { get; set; }
+    [JsonPropertyName(OAuthClientParameters.DefaultAcrValues)]
+    public ICollection<string> DefaultAcrValues { get; set; }
 }

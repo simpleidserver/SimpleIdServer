@@ -3,6 +3,7 @@
 using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Api.AuthenticationClassReferences;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Domains.DTOs;
 using System.Text;
@@ -95,6 +96,24 @@ namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
             dispatcher.Dispatch(new DeleteSelectedAcrsSuccessAction { Ids = action.Ids });
         }
 
+        [EffectMethod]
+        public async Task Handle(AssignWorkflowRegistrationAction action, IDispatcher dispatcher)
+        {
+            var baseUrl = await GetBaseUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var request = new AssignRegistrationWorkflowRequest
+            {
+                WorkflowId = action.RegistrationWorkflowId
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{baseUrl}/{action.AcrId}/assign"),
+                Method = HttpMethod.Put,
+                Content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json")
+            };
+            await httpClient.SendAsync(requestMessage);
+        }
+
         private async Task<string> GetBaseUrl()
         {
             if(_options.IsReamEnabled)
@@ -154,5 +173,11 @@ namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
     {
         public string Name { get; set; }
         public bool IsSelected { get; set; }
+    }
+
+    public class AssignWorkflowRegistrationAction
+    {
+        public string AcrId { get; set; }
+        public string RegistrationWorkflowId { get; set; }
     }
 }
