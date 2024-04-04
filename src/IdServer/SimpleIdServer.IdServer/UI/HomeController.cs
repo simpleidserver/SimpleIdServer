@@ -324,7 +324,7 @@ namespace SimpleIdServer.IdServer.UI
             var user = await _userRepository.GetBySubject(nameIdentifier, prefix, cancellationToken);
             var consents = await GetConsents();
             var pendingRequests = await GetPendingRequest();
-            var methodServices = _authenticationMethodServices.Where(a => a.IsRegistrationSupported).Select(a => new AuthenticationMethodViewModel
+            var methodServices = _authenticationMethodServices.Where(a => a.Capabilities.HasFlag(AuthenticationMethodCapabilities.USERREGISTRATION)).Select(a => new AuthenticationMethodViewModel
             {
                 Name = a.Name,
                 Amr = a.Amr,

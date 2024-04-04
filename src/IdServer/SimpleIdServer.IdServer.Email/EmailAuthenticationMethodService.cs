@@ -9,8 +9,7 @@ namespace SimpleIdServer.IdServer.Email
         public string Amr => Constants.AMR;
         public string Name => "Email";
         public Type? OptionsType => typeof(IdServerEmailOptions);
-        public AuthenticationMethodCapabilities Capabilities => AuthenticationMethodCapabilities.USERAUTHENTICATION | AuthenticationMethodCapabilities.PUSHNOTIFICATION;
-        public bool IsRegistrationSupported => true;
+        public AuthenticationMethodCapabilities Capabilities => AuthenticationMethodCapabilities.USERAUTHENTICATION | AuthenticationMethodCapabilities.PUSHNOTIFICATION | AuthenticationMethodCapabilities.USERREGISTRATION;
         public bool IsCredentialExists(User user) => !string.IsNullOrEmpty(user.Email);
     }
 }

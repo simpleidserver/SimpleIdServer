@@ -8,7 +8,48 @@
 @if (authMethodsState.Value != null && !authMethodsState.Value.IsLoading)
 {
     <RadzenRow>
-        @foreach(var authMethod in authMethodsState.Value.AuthenticationMethods.Where(a => a.Name != "otp"))
+        <!-- Filter the authentication methods by their capabilities -->
+        <RadzenColumn>
+            <RadzenFormField Text="@Global.AuthMethodCapabilities" Variant=Variant.Outlined>
+                <ChildContent>
+                    <RadzenDropDown Data=@AllAuthenticationMethods
+                                    TextProperty="Name"
+                                    ValueProperty="Capability"
+                                    Multiple=true
+                                    AllowClear=true
+                                    Chips=true
+                    @bind-Value=@SelectedAuthenticationMethods
+                                    Change=@((obj) => UpdateAuthenticationMethod(obj)) />
+                </ChildContent>
+                <Helper>
+                    <RadzenText TextStyle="TextStyle.Caption">@Global.FilterAuthMethodByCapabilities</RadzenText>
+                </Helper>
+            </RadzenFormField>
+        </RadzenColumn>
+        <!-- Legend -->
+        <RadzenColumn>
+            <RadzenText class="no-margin" Text="@Global.Legend" TextStyle="TextStyle.DisplayH6" />
+            <table>
+                <tbody>
+                    <tr>
+                        <td><RadzenBadge BadgeStyle="BadgeStyle.Info" Variant="Variant.Outlined">@Global.Authentication</RadzenBadge></td>
+                        <td>@Global.SupportUserAuthentication</td>
+                    </tr>
+                    <tr>
+                        <td><RadzenBadge BadgeStyle="BadgeStyle.Info" Variant="Variant.Outlined">@Global.Registration</RadzenBadge></td>
+                        <td>@Global.SupportUserRegistration</td>
+                    </tr>
+                    <tr>
+                        <td><RadzenBadge BadgeStyle="BadgeStyle.Info" Variant="Variant.Outlined">@Global.PushNotification</RadzenBadge></td>
+                        <td>@Global.SupportPushNotification</td>
+                    </tr>
+                </tbody>
+            </table>
+        </RadzenColumn>
+    </RadzenRow>
+
+    <RadzenRow class="rz-pt-12">
+        @foreach (var authMethod in authMethods.Where(a => a.Name != "otp"))
         {
             var link = GetAuthMethodUrl(authMethod);
             if (!string.IsNullOrWhiteSpace(link))
@@ -22,12 +63,17 @@
                                 <div>
                                     @if (authMethod.Capabilities.HasFlag(AuthenticationMethodCapabilities.USERAUTHENTICATION))
                                     {
-                                        <RadzenBadge BadgeStyle="BadgeStyle.Info" Variant="Variant.Outlined">@Global.Authentication</RadzenBadge>
+                                        <RadzenBadge BadgeStyle="@(SelectedAuthenticationMethods.Any(a => a.HasFlag(AuthenticationMethodCapabilities.USERAUTHENTICATION)) ? BadgeStyle.Primary : BadgeStyle.Info)" Variant="Variant.Outlined">@Global.Authentication</RadzenBadge>
                                     }
 
                                     @if (authMethod.Capabilities.HasFlag(AuthenticationMethodCapabilities.PUSHNOTIFICATION))
                                     {
-                                        <RadzenBadge BadgeStyle="BadgeStyle.Info" Variant="Variant.Outlined">@Global.PushNotification</RadzenBadge>
+                                        <RadzenBadge BadgeStyle="@(SelectedAuthenticationMethods.Any(a => a.HasFlag(AuthenticationMethodCapabilities.PUSHNOTIFICATION)) ? BadgeStyle.Primary : BadgeStyle.Info)" Variant="Variant.Outlined">@Global.PushNotification</RadzenBadge>
+                                    }
+
+                                    @if (authMethod.Capabilities.HasFlag(AuthenticationMethodCapabilities.USERREGISTRATION))
+                                    {
+                                        <RadzenBadge BadgeStyle="@(SelectedAuthenticationMethods.Any(a => a.HasFlag(AuthenticationMethodCapabilities.USERREGISTRATION)) ? BadgeStyle.Primary : BadgeStyle.Info)" Variant="Variant.Outlined">@Global.Registration</RadzenBadge>
                                     }
                                 </div>
                             </RadzenStack>
@@ -45,12 +91,17 @@
                             <div>
                                 @if (authMethod.Capabilities.HasFlag(AuthenticationMethodCapabilities.USERAUTHENTICATION))
                                 {
-                                    <RadzenBadge BadgeStyle="BadgeStyle.Info" Variant="Variant.Outlined">@Global.Authentication</RadzenBadge>
+                                    <RadzenBadge BadgeStyle="@(SelectedAuthenticationMethods.Any(a => a.HasFlag(AuthenticationMethodCapabilities.USERAUTHENTICATION)) ? BadgeStyle.Primary : BadgeStyle.Info)" Variant="Variant.Outlined">@Global.Authentication</RadzenBadge>
                                 }
 
                                 @if (authMethod.Capabilities.HasFlag(AuthenticationMethodCapabilities.PUSHNOTIFICATION))
                                 {
-                                    <RadzenBadge BadgeStyle="BadgeStyle.Info" Variant="Variant.Outlined">>@Global.PushNotification</RadzenBadge>
+                                    <RadzenBadge BadgeStyle="@(SelectedAuthenticationMethods.Any(a => a.HasFlag(AuthenticationMethodCapabilities.PUSHNOTIFICATION)) ? BadgeStyle.Primary : BadgeStyle.Info)" Variant="Variant.Outlined">>@Global.PushNotification</RadzenBadge>
+                                }
+
+                                @if(authMethod.Capabilities.HasFlag(AuthenticationMethodCapabilities.USERREGISTRATION))
+                                {
+                                    <RadzenBadge BadgeStyle="@(SelectedAuthenticationMethods.Any(a => a.HasFlag(AuthenticationMethodCapabilities.USERREGISTRATION)) ? BadgeStyle.Primary : BadgeStyle.Info)" Variant="Variant.Outlined">>@Global.Registration</RadzenBadge>
                                 }
                             </div>
                         </RadzenStack>
@@ -62,11 +113,39 @@
 }
 
 @code {
+    IEnumerable<AuthenticationMethodResult> fullAuthMethods;
+    IEnumerable<AuthenticationMethodResult> authMethods = new List<AuthenticationMethodResult>();
+
+    record AuthenticationMethodCapability
+    {
+        public string Name { get; set; }
+        public AuthenticationMethodCapabilities Capability { get; set; }
+    }
+
+    List<AuthenticationMethodCapability> AllAuthenticationMethods { get; set; } = new List<AuthenticationMethodCapability>
+    {
+        new AuthenticationMethodCapability { Name = Global.Authentication, Capability = AuthenticationMethodCapabilities.USERAUTHENTICATION },
+        new AuthenticationMethodCapability { Name = Global.Registration, Capability = AuthenticationMethodCapabilities.USERREGISTRATION },
+        new AuthenticationMethodCapability { Name = Global.PushNotification, Capability = AuthenticationMethodCapabilities.PUSHNOTIFICATION }
+    };
+
+    List<AuthenticationMethodCapabilities> SelectedAuthenticationMethods { get; set; } = new List<AuthenticationMethodCapabilities>
+    {
+        AuthenticationMethodCapabilities.USERAUTHENTICATION,
+        AuthenticationMethodCapabilities.USERREGISTRATION,
+        AuthenticationMethodCapabilities.PUSHNOTIFICATION
+    };
+
     protected override void OnAfterRender(bool firstRender)
     {
         base.OnAfterRender(firstRender);
         if(firstRender)
         {
+            SubscribeToAction<GetAllAuthMethodSuccessAction>((act) =>
+            {
+                fullAuthMethods = act.AuthMethods;
+                authMethods = act.AuthMethods;
+            });
             var act = new GetAllAuthMethodAction();
             dispatcher.Dispatch(act);
         }
@@ -99,8 +178,16 @@
                 return result + "/OTP.png";
             case "gotify":
                 return result + "/gotify.png";
+            case "vp":
+                return result + "/Wallet.png";
             default:
                 return result + "/pwd.png";
         }
+    }
+
+    void UpdateAuthenticationMethod(object obj)
+    {
+        var selectedCapabilities = (IEnumerable<AuthenticationMethodCapabilities>)obj;
+        authMethods = fullAuthMethods.Where(a => selectedCapabilities.Any(c => a.Capabilities.HasFlag(c)));
     }
 }

@@ -13,9 +13,7 @@ public class VpAuthenticationMethodService : IAuthenticationMethodService
 
     public Type? OptionsType => typeof(IdServerVpOptions);
 
-    public AuthenticationMethodCapabilities Capabilities => AuthenticationMethodCapabilities.USERAUTHENTICATION;
-
-    public bool IsRegistrationSupported => true;
+    public AuthenticationMethodCapabilities Capabilities => AuthenticationMethodCapabilities.USERREGISTRATION;
 
     public bool IsCredentialExists(User user)
     {

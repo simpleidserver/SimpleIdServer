@@ -38,7 +38,6 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationMethods
                 Name = a.Name,
                 OptionsName = a.OptionsType?.Name,
                 Capabilities = a.Capabilities,
-                IsRegistrationSupported = a.IsRegistrationSupported,
                 Values = null
             });
             return new OkObjectResult(result);

@@ -583,6 +583,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Capabilities.
+        /// </summary>
+        public static string AuthMethodCapabilities {
+            get {
+                return ResourceManager.GetString("AuthMethodCapabilities", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Authentication Method has been updated.
         /// </summary>
         public static string AuthMethodUpdated {
@@ -1717,6 +1726,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Filter the authentication methods by their capabilities.
+        /// </summary>
+        public static string FilterAuthMethodByCapabilities {
+            get {
+                return ResourceManager.GetString("FilterAuthMethodByCapabilities", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Find type.
         /// </summary>
         public static string FindType {
@@ -2545,6 +2563,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Legend.
+        /// </summary>
+        public static string Legend {
+            get {
+                return ResourceManager.GetString("Legend", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Loading....
         /// </summary>
         public static string Loading {
@@ -3200,6 +3227,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string RefreshToken {
             get {
                 return ResourceManager.GetString("RefreshToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Registration.
+        /// </summary>
+        public static string Registration {
+            get {
+                return ResourceManager.GetString("Registration", resourceCulture);
             }
         }
         
@@ -4248,6 +4284,33 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string Summary {
             get {
                 return ResourceManager.GetString("Summary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Able to receive notifications from the identity server.
+        /// </summary>
+        public static string SupportPushNotification {
+            get {
+                return ResourceManager.GetString("SupportPushNotification", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Support user authentication.
+        /// </summary>
+        public static string SupportUserAuthentication {
+            get {
+                return ResourceManager.GetString("SupportUserAuthentication", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Support user registration.
+        /// </summary>
+        public static string SupportUserRegistration {
+            get {
+                return ResourceManager.GetString("SupportUserRegistration", resourceCulture);
             }
         }
         

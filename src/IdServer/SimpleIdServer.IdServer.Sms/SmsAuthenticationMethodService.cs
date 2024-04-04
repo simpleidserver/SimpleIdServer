@@ -10,8 +10,7 @@ namespace SimpleIdServer.IdServer.Sms
         public string Amr => Constants.AMR;
         public string Name => "Sms";
         public Type? OptionsType => typeof(IdServerSmsOptions);
-        public AuthenticationMethodCapabilities Capabilities => AuthenticationMethodCapabilities.USERAUTHENTICATION | AuthenticationMethodCapabilities.PUSHNOTIFICATION;
-        public bool IsRegistrationSupported => true;
+        public AuthenticationMethodCapabilities Capabilities => AuthenticationMethodCapabilities.USERAUTHENTICATION | AuthenticationMethodCapabilities.PUSHNOTIFICATION | AuthenticationMethodCapabilities.USERREGISTRATION;
         public bool IsCredentialExists(User user) => user.OAuthUserClaims.Any(c => c.Name == JwtRegisteredClaimNames.PhoneNumber);
     }
 }

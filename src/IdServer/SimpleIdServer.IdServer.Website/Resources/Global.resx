@@ -1803,4 +1803,25 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="ClientDefaultAcrValuesHelper" xml:space="preserve">
     <value>ACR must be sorted by priority</value>
   </data>
+  <data name="Registration" xml:space="preserve">
+    <value>Registration</value>
+  </data>
+  <data name="AuthMethodCapabilities" xml:space="preserve">
+    <value>Capabilities</value>
+  </data>
+  <data name="FilterAuthMethodByCapabilities" xml:space="preserve">
+    <value>Filter the authentication methods by their capabilities</value>
+  </data>
+  <data name="Legend" xml:space="preserve">
+    <value>Legend</value>
+  </data>
+  <data name="SupportPushNotification" xml:space="preserve">
+    <value>Able to receive notifications from the identity server</value>
+  </data>
+  <data name="SupportUserAuthentication" xml:space="preserve">
+    <value>Support user authentication</value>
+  </data>
+  <data name="SupportUserRegistration" xml:space="preserve">
+    <value>Support user registration</value>
+  </data>
 </root>

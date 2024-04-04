@@ -9,6 +9,5 @@ namespace SimpleIdServer.IdServer.DTOs
         public const string OptionsName = "options_name";
         public const string Values = "values";
         public const string Capabilities = "capabilities";
-        public const string IsRegistrationSupported = "is_registration_supported";
     }
 }

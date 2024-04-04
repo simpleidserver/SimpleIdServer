@@ -9,8 +9,7 @@ namespace SimpleIdServer.IdServer.Pwd
         public string Amr => Constants.Areas.Password;
         public string Name => "Password";
         public Type? OptionsType => typeof(IdServerPasswordOptions);
-        public AuthenticationMethodCapabilities Capabilities => AuthenticationMethodCapabilities.USERAUTHENTICATION;
-        public bool IsRegistrationSupported => true;
+        public AuthenticationMethodCapabilities Capabilities => AuthenticationMethodCapabilities.USERAUTHENTICATION | AuthenticationMethodCapabilities.USERREGISTRATION;
         public bool IsCredentialExists(User user) => user.Credentials.Any(c => c.CredentialType == Constants.Areas.Password);
     }
 }

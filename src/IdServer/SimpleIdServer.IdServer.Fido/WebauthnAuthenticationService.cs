@@ -10,8 +10,7 @@ namespace SimpleIdServer.IdServer.Fido
         public string Amr => Constants.AMR;
         public string Name => "Web Authentication (Webauthn)";
         public Type? OptionsType => typeof(FidoOptions);
-        public AuthenticationMethodCapabilities Capabilities => AuthenticationMethodCapabilities.USERAUTHENTICATION;
-        public bool IsRegistrationSupported => true;
+        public AuthenticationMethodCapabilities Capabilities => AuthenticationMethodCapabilities.USERAUTHENTICATION | AuthenticationMethodCapabilities.USERREGISTRATION;
         public bool IsCredentialExists(User user) => user.Credentials.Any(c => c.CredentialType == Amr);
     }
 }

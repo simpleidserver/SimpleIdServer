@@ -15,8 +15,6 @@ public class GotifyAuthenticationService : IAuthenticationMethodService
 
     public AuthenticationMethodCapabilities Capabilities => AuthenticationMethodCapabilities.PUSHNOTIFICATION;
 
-    public bool IsRegistrationSupported => false;
-
     public bool IsCredentialExists(User user)
     {
         return true;

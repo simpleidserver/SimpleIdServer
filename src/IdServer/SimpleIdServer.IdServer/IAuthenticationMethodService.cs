@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.IdServer.Domains;
 using System;
-using System.Linq;
 
 namespace SimpleIdServer.IdServer
 {
@@ -12,7 +11,6 @@ namespace SimpleIdServer.IdServer
         string Name { get; }
         Type? OptionsType { get; }
         AuthenticationMethodCapabilities Capabilities { get; }
-        bool IsRegistrationSupported { get; }
         bool IsCredentialExists(User user);
     }
 
@@ -20,6 +18,7 @@ namespace SimpleIdServer.IdServer
     public enum AuthenticationMethodCapabilities
     {
         USERAUTHENTICATION = 1,
-        PUSHNOTIFICATION = 2
+        PUSHNOTIFICATION = 2,
+        USERREGISTRATION = 4
     }
 }

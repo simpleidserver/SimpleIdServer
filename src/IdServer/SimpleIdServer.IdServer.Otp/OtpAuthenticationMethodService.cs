@@ -10,7 +10,6 @@ namespace SimpleIdServer.IdServer.Otp
         public string Name => "OTP";
         public Type? OptionsType => null;
         public AuthenticationMethodCapabilities Capabilities => AuthenticationMethodCapabilities.USERAUTHENTICATION;
-        public bool IsRegistrationSupported => false;
         public bool IsCredentialExists(User user) => user.ActiveOTP != null;
     }
 }
