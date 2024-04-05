@@ -40,6 +40,14 @@ According to the [specification](https://openid.bitbucket.io/fapi/fapi-2_0-secur
     </DocsCard>
 </DocsCards>
 
+# Credential issuer
+
+<DocsCards>
+    <DocsCard header="Credential issuer" href="credentialissuer">
+        <p>Issue Verifiable Credentials</p>
+    </DocsCard>
+</DocsCards>
+
 # Other applications
 
 <DocsCards>

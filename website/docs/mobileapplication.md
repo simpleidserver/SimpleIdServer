@@ -24,3 +24,14 @@ If you are using the [mobile application](https://install.appcenter.ms/users/age
 3. Click on the `Scan QR Code` button and scan the QR code displayed on the website.
 
 Your mobile application is now successfully enrolled and ready to be used for user authentication.
+
+## Push notification methods
+
+The mobile application can be configured to use one of the following notification methods:
+
+* **Firebase** : [Firebase Cloud Message (FCM)](https://firebase.google.com/docs/cloud-messaging) is a cross-platform messaging solution from Google.
+* **Gotify** : [Gotify](https://gotify.net/) is a simple server for sending and receiving messages. Our Gotify server is hosted [here](https://gotify.simpleidserver.com/#/).
+
+The default notification method can be selected in the `Settings` tab.
+
+![Settings](./images/mobile-settings.png)

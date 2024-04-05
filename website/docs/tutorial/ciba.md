@@ -129,7 +129,13 @@ while(cont)
 
 5. Replace the `CN=client.pfx` certificate with the one you have previously downloaded.
 
-When you run the application, a `green message` will be displayed in the Identity Server instance.
+Once the consumption device is configured, you can choose one of the following push notification methods to receive the back channel authentication.
+
+## 3.1 Console notification method
+
+By default, the console notification method is configured in the settings of all users.
+
+When you run the consumption device, a `green message` will be displayed in the Identity Server instance.
 Copy the URL from the browser and authenticate using the following credentials:
 
 | Credential | Value    |
@@ -139,3 +145,40 @@ Copy the URL from the browser and authenticate using the following credentials:
 
 
 Once the consent is granted, the access token will be displayed by the console application.
+
+## 3.2 Gotify notification method
+
+Before being able to use the Gotify Server as a notification method, you must check its configuration:
+
+1. Navigate to the details view of the `user`.
+2. Under the notification mode, select `Gotify` and click on the `Save` button.
+3. Open the `Authentications` screen and navigate to the `Gotify` authentication method.
+4. Check the following parameters :
+
+| Parameter | Description                            |
+| --------- | -------------------------------------- |
+| BaseUrl   | Url of the gotify service              |
+| Login     | Login of the administration account    |
+| Password  | Password of the administration account |
+
+Once the configuration of the Gotify Server is finished, the mobile application can be enrolled:
+
+1. Open the [Mobile application](../mobileapplication).
+2. Click on the `Settings` tab. Next to the `Choose notification mode` option, select `Gotify`.
+3. Browse the [Identity Server URL](https://openid.simpleidserver.com/master/Home/Profile), and authenticate with the `user` account.
+4. Under the `Credentials` section, click on the `Mobile` to enroll the mobile application.
+5. Set the Display name to `mobile` and click on the `Generate QR Code` button.
+
+![Generate QR Code](./images/generate-qr-code.png)
+
+6. Scan the QR code with your mobile application. If the mobile application is successfully enrolled, a success message should be displayed.
+
+![QR Code](./images/qr-code.png)
+
+The mobile application is ready to receive back-channel notifications.
+
+When you run the consumption device, a popup will be displayed in the mobile application. You can click on the `Accept` button.
+
+![Modal](./images/mobile-modal.png)
+
+Once consent is granted, the access token will be displayed by the console application.
