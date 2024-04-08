@@ -163,10 +163,3 @@ steps:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)\credentialissuerwebsite'
     ArtifactName: 'credentialissuerwebsite'
     publishLocation: 'Container'
-
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Mobile application'
-  inputs:
-    PathtoPublish: '$(Build.Repository.LocalPath)\src\Mobile\SimpleIdServer.Mobile\bin\Release\net7.0-android\publish'
-    ArtifactName: 'mobileApp'
-    publishLocation: 'Container'
