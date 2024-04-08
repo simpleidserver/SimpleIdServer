@@ -179,6 +179,4 @@ The mobile application is ready to receive back-channel notifications.
 
 When you run the consumption device, a popup will be displayed in the mobile application. You can click on the `Accept` button.
 
-![Modal](./images/mobile-modal.png)
-
 Once consent is granted, the access token will be displayed by the console application.
