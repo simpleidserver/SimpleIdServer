@@ -1,5 +1,8 @@
 # Credential issuer
 
+import VcQrCode from './images/vc-qr.png';
+import WalletCredential from './images/wallet-credential.png';
+
 A credential issuer is a protected REST API capable of issuing Verifiable Credentials.
 
 The Digital Credentials Protocols (DPC) working group of the OPENID standard has authored a technical specification for developing Credential Issuers. For more information, please refer to the [official documentation](https://openid.net/specs/openid-4-verifiable-credential-issuance-1_0.html).
@@ -94,7 +97,9 @@ The User-Agent will be automatically redirected to the OpenID server. Submit the
 Finally, click on the `Share` button next to the University Credential.
 A QR will be displayed in a popup window :
 
-![VC QRCode](./images/vc-qr.png)
+<div style={{textAlign:"center"}}>
+    <img src={VcQrCode} style={{width: 300}} />
+</div>
 
 ## 3. Enroll verifiable credentials
 
@@ -102,4 +107,6 @@ If the mobile application is not yet installed, follow this [tutorial](../mobile
 
 Scan the QR code displayed by the credential issuer. If the enrollment is successful, a success message will be displayed. The verifiable credential is now visible in the `Wallet` tab.
 
-![Credential](./images/wallet-credential.png)
+<div style={{textAlign:"center"}}>
+    <img src={WalletCredential} style={{width: 300}} />
+</div>

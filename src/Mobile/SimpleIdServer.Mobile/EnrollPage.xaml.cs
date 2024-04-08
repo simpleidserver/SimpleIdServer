@@ -11,10 +11,4 @@ public partial class EnrollPage : ContentPage
         BindingContext = _viewModel;
 		InitializeComponent();
 	}
-
-    protected override void OnAppearing()
-    {
-        base.OnAppearing();
-        _viewModel.Init();
-    }
 }

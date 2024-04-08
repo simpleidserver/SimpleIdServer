@@ -331,6 +331,15 @@ namespace SimpleIdServer.CredentialIssuer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Credential issuer.
+        /// </summary>
+        internal static string CredentialIssuer {
+            get {
+                return ResourceManager.GetString("CredentialIssuer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Credential has been removed.
         /// </summary>
         internal static string CredentialRemoved {
@@ -601,6 +610,15 @@ namespace SimpleIdServer.CredentialIssuer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Overview.
+        /// </summary>
+        internal static string Overview {
+            get {
+                return ResourceManager.GetString("Overview", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Preview.
         /// </summary>
         internal static string Preview {
@@ -624,6 +642,15 @@ namespace SimpleIdServer.CredentialIssuer.Website.Resources {
         internal static string Scope {
             get {
                 return ResourceManager.GetString("Scope", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Servers.
+        /// </summary>
+        internal static string Servers {
+            get {
+                return ResourceManager.GetString("Servers", resourceCulture);
             }
         }
         

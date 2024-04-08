@@ -5,7 +5,6 @@ using Fido2NetLib;
 using Fido2NetLib.Objects;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -22,7 +21,6 @@ using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI;
 using System.Security.Claims;
 using System.Text;
-using System.Web;
 
 namespace SimpleIdServer.IdServer.Fido.Apis
 {
@@ -33,7 +31,6 @@ namespace SimpleIdServer.IdServer.Fido.Apis
         private readonly IUserRepository _userRepository;
         private readonly IFido2 _fido2;
         private readonly IDistributedCache _distributedCache;
-        private readonly IUserCredentialRepository _userCredentialRepository;
         private readonly IdServerHostOptions _idServerHostOptions;
 
         public U2FRegisterController(
@@ -52,7 +49,6 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             _userRepository = userRepository;
             _fido2 = fido2;
             _distributedCache = distributedCache;
-            _userCredentialRepository=  userCredentialRepository;
             _idServerHostOptions = idServerHostOptions.Value;
         }
 
@@ -129,17 +125,16 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             var sessionRecord = System.Text.Json.JsonSerializer.Deserialize<RegistrationSessionRecord>(session);
             var login = request.Login;
             var registrationProgress = await GetRegistrationProgress(sessionRecord);
-            bool isAuthenticated = User.Identity.IsAuthenticated;
-            if (!isAuthenticated)
-            {
-                if (registrationProgress == null) return BuildError(System.Net.HttpStatusCode.Unauthorized, ErrorCodes.INVALID_REQUEST, Resources.Global.NotAllowedToRegister);
-            }
-            else login = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            if (registrationProgress == null) return BuildError(System.Net.HttpStatusCode.Unauthorized, ErrorCodes.INVALID_REQUEST, Resources.Global.NotAllowedToRegister);
             if (string.IsNullOrWhiteSpace(request.Login)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.Resources.Global.MissingParameter, EndU2FRegisterRequestNames.Login));
             var user = await _authenticationHelper.GetUserByLogin(login, prefix, cancellationToken);
-            if (user != null && !isAuthenticated)
-                return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UserAlreadyExists, login));
-            if (!isAuthenticated) user = BuildUser();
+            bool isNewUser = false;
+            if (user == null)
+            {
+                user = BuildUser();
+                isNewUser = true;
+            }
+
             var success = await _fido2.MakeNewCredentialAsync(request.AuthenticatorAttestationRawResponse, sessionRecord.Options, async (arg, c) =>
             {
                 return true;
@@ -152,21 +147,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
                 SlidingExpiration = fidoOptions.U2FExpirationTimeInSeconds
             }, cancellationToken);
 
-            if(!isAuthenticated) return await HandleWorkflowRegistration();
-            await _userRepository.SaveChanges(CancellationToken.None);
-            if(registrationProgress != null)
-            {
-                if (!registrationProgress.IsLastStep)
-                {
-                    registrationProgress.NextAmr();
-                    await _distributedCache.SetStringAsync(registrationProgress.RegistrationProgressId, Newtonsoft.Json.JsonConvert.SerializeObject(registrationProgress));
-                }
-            }
-
-            return new OkObjectResult(new EndU2FRegisterResult
-            {
-                Sig = success.Result.SignCount
-            });
+            return await HandleWorkflowRegistration();
 
             User BuildUser()
             {
@@ -197,7 +178,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
                         PushType = request.DeviceData.PushType,
                         Version = request.DeviceData.Version
                     });
-                    result.NotificationMode = request.DeviceData.PushType;
+                    result.NotificationMode = request.DeviceData.PushType ?? "console";
                 }
 
                 return result;
@@ -209,11 +190,15 @@ namespace SimpleIdServer.IdServer.Fido.Apis
                 var currentAmr = registrationProgress.Amr;
                 if (currentAmr == lastStep)
                 {
-                    user.Realms.Add(new RealmUser
+                    if(isNewUser)
                     {
-                        RealmsName = prefix
-                    });
-                    _userRepository.Add(user);
+                        user.Realms.Add(new RealmUser
+                        {
+                            RealmsName = prefix
+                        });
+                        _userRepository.Add(user);
+                    }
+
                     await _userRepository.SaveChanges(CancellationToken.None);
                     return new OkObjectResult(new EndU2FRegisterResult
                     {

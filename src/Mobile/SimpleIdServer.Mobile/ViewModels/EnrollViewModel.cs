@@ -36,13 +36,4 @@ public class EnrollViewModel : INotifyPropertyChanged
     public ICommand ViewCredentialListCommand {  get; private set; }
 
     public void OnPropertyChanged([CallerMemberName] string name = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-
-    public void Init()
-    {
-        MobileSettings mobileSettings = null;
-        Task.Run(async () =>
-        {
-            mobileSettings = await App.Database.GetMobileSettings();
-        }).Wait();
-    }
 }

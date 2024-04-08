@@ -11,6 +11,8 @@ public partial class App : Application
     private readonly CredentialListState _credentialListState;
 	private readonly OtpListState _otpListState;
     private readonly VerifiableCredentialListState _verifiableCredentialListState;
+    private readonly MobileSettingsState _mobileSettingsState;
+    private readonly DidRecordState _didRecordState;
     private readonly IServiceProvider _serviceProvider;
     public static MobileDatabase _database;
 
@@ -28,12 +30,20 @@ public partial class App : Application
 
 	public static INavigationService NavigationService { get; private set; }
 
-	public App(CredentialListState credentialListState, OtpListState otpListState, VerifiableCredentialListState verifiableCredentialListState, IServiceProvider serviceProvider)
+	public App(
+        CredentialListState credentialListState, 
+        OtpListState otpListState, 
+        VerifiableCredentialListState verifiableCredentialListState, 
+        MobileSettingsState mobileSettingsState,
+        DidRecordState didRecordState,
+        IServiceProvider serviceProvider)
 	{
 		InitializeComponent();
 		_credentialListState = credentialListState;
         _otpListState = otpListState;
         _verifiableCredentialListState = verifiableCredentialListState;
+        _mobileSettingsState = mobileSettingsState;
+        _didRecordState = didRecordState;
         _serviceProvider = serviceProvider;
         MainPage = new AppShell();
     }
@@ -41,9 +51,12 @@ public partial class App : Application
     protected override async void OnStart()
     {
         base.OnStart();
+        await Database.Init();
 		await _otpListState.Load();
 		await _credentialListState.Load();
         await _verifiableCredentialListState.Load();
+        await _mobileSettingsState.Load();
+        await _didRecordState.Load();
         NavigationService = _serviceProvider.GetRequiredService<INavigationService>();
         await InitGotify();
         Listener.NotificationReceived += async (sender, e) =>
@@ -61,7 +74,7 @@ public partial class App : Application
 
     private async Task InitGotify()
 	{
-		var mobileSettings = await Database.GetMobileSettings();
+        var mobileSettings = _mobileSettingsState.Settings;
         var opts = _serviceProvider.GetRequiredService<IOptions<MobileOptions>>();
         try
         {
@@ -80,7 +93,7 @@ public partial class App : Application
                     var jObj = JsonObject.Parse(content);
                     var pushToken = jObj["token"].ToString();
                     mobileSettings.GotifyPushToken = pushToken;
-                    await Database.UpdateMobileSettings(mobileSettings);
+                    await _mobileSettingsState.Update(mobileSettings);
                 }
             }
 

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -24,7 +25,6 @@ using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
@@ -46,6 +46,7 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IEnumerable<IAuthenticationMethodService> _authenticationMethodServices;
         private readonly IUserSessionResitory _userSessionRepository;
         private readonly IRecurringJobManager _recurringJobManager;
+        private readonly IDistributedCache _distributedCache;
         private readonly ILogger<HomeController> _logger;
 
         public HomeController(IOptions<IdServerHostOptions> options,
@@ -59,6 +60,7 @@ namespace SimpleIdServer.IdServer.UI
             IEnumerable<IAuthenticationMethodService> authenticationMethodServices,
             IUserSessionResitory userSessionRepository,
             IRecurringJobManager recurringJobManager,
+            IDistributedCache distributedCache,
             ILogger<HomeController> logger)
         {
             _options = options.Value;
@@ -72,6 +74,7 @@ namespace SimpleIdServer.IdServer.UI
             _authenticationMethodServices = authenticationMethodServices;
             _userSessionRepository = userSessionRepository;
             _recurringJobManager = recurringJobManager;
+            _distributedCache = distributedCache;
             _logger = logger;
         }
 
@@ -268,11 +271,25 @@ namespace SimpleIdServer.IdServer.UI
 
         [HttpGet]
         [Authorize(Constants.Policies.Authenticated)]
-        public virtual IActionResult RegisterCredential([FromRoute] string prefix, string name, string redirectUrl)
+        public async virtual Task<IActionResult> RegisterCredential([FromRoute] string prefix, string name, string redirectUrl)
         {
             prefix = prefix ?? Constants.DefaultRealm;
             var cookieName = _options.GetRegistrationCookieName();
             if (Request.Cookies.ContainsKey(cookieName)) Response.Cookies.Delete(cookieName);
+            var registrationProgress = new UserRegistrationProgress
+            {
+                RegistrationProgressId = Guid.NewGuid().ToString(),
+                Amr = name,
+                WorkflowName = name,
+                Realm = prefix,
+                Steps = new List<string> { name },
+                RedirectUrl = redirectUrl
+            };
+            Response.Cookies.Append(cookieName, registrationProgress.RegistrationProgressId, new CookieOptions
+            {
+                Secure = true
+            });
+            await _distributedCache.SetStringAsync(registrationProgress.RegistrationProgressId, Newtonsoft.Json.JsonConvert.SerializeObject(registrationProgress));
             return Redirect(Url.Action("Index", "Register", new { area = name, redirectUrl = redirectUrl }));
         }
 

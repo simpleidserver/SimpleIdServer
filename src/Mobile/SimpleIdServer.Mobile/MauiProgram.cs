@@ -43,6 +43,8 @@ public static class MauiProgram
 		builder.Services.AddSingleton(new OtpListState());
 		builder.Services.AddSingleton(new CredentialListState());
 		builder.Services.AddSingleton(new VerifiableCredentialListState());
+		builder.Services.AddSingleton(new MobileSettingsState());
+		builder.Services.AddSingleton(new DidRecordState());
         builder.Services.AddTransient<EnrollPage>();
 		builder.Services.AddTransient<NotificationPage>();
 		builder.Services.AddTransient<SettingsPage>();

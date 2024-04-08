@@ -1,0 +1,19 @@
+﻿@page "/overview"
+@using Microsoft.Extensions.Options;
+@inject IOptions<CredentialIssuerWebsiteOptions> Options
+
+<RadzenCard>
+    <RadzenText TextStyle="TextStyle.DisplayH6">@Global.Servers</RadzenText>
+    <div class="row">
+        <div class="col-2">
+            <RadzenLabel Text="@Global.CredentialIssuer" Style="padding: 0px;" />
+        </div>
+        <div class="col">
+            <RadzenTextBox Value=@GetCredentialIssuerUrl() Class="w-100"></RadzenTextBox>
+        </div>
+    </div>
+</RadzenCard>
+
+@code {
+    string GetCredentialIssuerUrl() => $"{Options.Value.CredentialIssuerUrl}/credential_configurations";
+}

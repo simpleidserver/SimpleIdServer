@@ -42,18 +42,22 @@ public class QRCodeScannerViewModel
     private readonly OtpListState _otpListState;
     private readonly CredentialListState _credentialListState;
     private readonly VerifiableCredentialListState _verifiableCredentialListState;
+    private readonly MobileSettingsState _mobileSettingsState;
+    private readonly DidRecordState _didState;
     private readonly MobileOptions _options;
     private SemaphoreSlim _lck = new SemaphoreSlim(1, 1);
 
     public QRCodeScannerViewModel(
-        IPromptService promptService, 
-        IOTPService otpService, 
-        INavigationService navigationService, 
+        IPromptService promptService,
+        IOTPService otpService,
+        INavigationService navigationService,
         IUrlService urlService,
         Factories.IHttpClientFactory httpClientFactory,
-        OtpListState otpListState, 
-        CredentialListState credentialListState, 
+        OtpListState otpListState,
+        CredentialListState credentialListState,
         VerifiableCredentialListState verifiableCredentialListState,
+        MobileSettingsState mobileSettingsState,
+        DidRecordState didState,
         IOptions<MobileOptions> options)
     {
         _promptService = promptService;
@@ -64,6 +68,8 @@ public class QRCodeScannerViewModel
         _otpListState = otpListState;
         _credentialListState = credentialListState;
         _verifiableCredentialListState = verifiableCredentialListState;
+        _didState = didState;
+        _mobileSettingsState = mobileSettingsState;
         _navigationService = navigationService;
         CloseCommand = new Command(async () =>
         {
@@ -104,7 +110,7 @@ public class QRCodeScannerViewModel
         try
         {
             if (string.IsNullOrWhiteSpace(qrCodeValue)) return;
-            var mobileSettings = await App.Database.GetMobileSettings();
+            var mobileSettings = _mobileSettingsState.Settings;
             if (!await RegisterOTPCode())
             {
                 if(qrCodeValue.StartsWith(openidCredentialOfferScheme))
@@ -230,8 +236,8 @@ public class QRCodeScannerViewModel
                     Content = new StringContent(JsonSerializer.Serialize(dic), Encoding.UTF8, "application/json")
                 };
                 var httpResponse = await httpClient.SendAsync(requestMessage);
-                httpResponse.EnsureSuccessStatusCode();
                 var json = await httpResponse.Content.ReadAsStringAsync();
+                httpResponse.EnsureSuccessStatusCode();
                 return JsonSerializer.Deserialize<EndU2FRegisterResult>(json);
             }
         }
@@ -471,7 +477,7 @@ public class QRCodeScannerViewModel
 
         async Task SendVerifiablePresentation()
         {
-            var didRecord = await App.Database.GetDidRecord();
+            var didRecord = _didState.Did;
             if(didRecord == null)
             {
                 return;

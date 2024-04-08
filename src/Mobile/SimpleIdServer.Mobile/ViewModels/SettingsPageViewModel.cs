@@ -2,6 +2,7 @@
 using SimpleIdServer.Did.Key;
 using SimpleIdServer.Mobile.Models;
 using SimpleIdServer.Mobile.Services;
+using SimpleIdServer.Mobile.Stores;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
@@ -13,21 +14,18 @@ public class SettingsPageViewModel : INotifyPropertyChanged
     private string _did;
     private bool _isLoading = false;
     private bool _isGotifyServerRunning;
-    private MobileSettings _mobileSettings;
-    private DidRecord _didRecord;
+    private readonly MobileSettingsState _mobileSettingsState;
+    private readonly DidRecordState _didRecordState;
+    private NotificationMode _selectedNotificationMode;
     private CancellationTokenSource _cancellationTokenSource;
     private int _refreshIntervalMs = 2000;
 
-    public SettingsPageViewModel()
+    public SettingsPageViewModel(
+        MobileSettingsState mobileSettingsState,
+        DidRecordState didRecordState)
     {
-        Task.Run(async () =>
-        {
-            _mobileSettings = await App.Database.GetMobileSettings();
-            _didRecord = await App.Database.GetDidRecord();
-        }).Wait();
-        Did = _didRecord?.Did;
-        var notificationMode = _mobileSettings.NotificationMode ?? "firebase";
-        SelectedNotificationMode = NotificationModes.Single(m => m.Name == notificationMode);
+        _mobileSettingsState = mobileSettingsState;
+        _didRecordState = didRecordState;
         SelectNotificationModeCommand = new Command<EventArgs>(async (c) =>
         {
             await UpdateNotification(c);
@@ -37,13 +35,13 @@ public class SettingsPageViewModel : INotifyPropertyChanged
             await GenerateDid();
         }, (a) =>
         {
-            return _didRecord == null;
+            return _didRecordState.Did == null;
         });
         _cancellationTokenSource = new CancellationTokenSource();
         var listener = GotifyNotificationListener.New();
         Task.Run(async () =>
         {
-            while(true)
+            while (true)
             {
                 if (_cancellationTokenSource.IsCancellationRequested) break;
                 IsGotifyServerRunning = listener.IsStarted;
@@ -52,13 +50,34 @@ public class SettingsPageViewModel : INotifyPropertyChanged
         });
     }
 
+    public void Start()
+    {
+        Did = _didRecordState.Did?.Did;
+        var notificationMode = _mobileSettingsState.Settings.NotificationMode;
+        SelectedNotificationMode = NotificationModes.Single(m => m.Name == notificationMode);
+    }
+
     public List<NotificationMode> NotificationModes { get; set; } = new List<NotificationMode>
     {
         new NotificationMode { DisplayName = "Gotify", Name = "gotify" },
         new NotificationMode { DisplayName = "Firebase", Name = "firebase" }
     };
 
-    public NotificationMode SelectedNotificationMode { get; set; }
+    public NotificationMode SelectedNotificationMode
+    {
+        get
+        {
+            return _selectedNotificationMode;
+        }
+        set
+        {
+            if (_selectedNotificationMode != value)
+            {
+                _selectedNotificationMode = value;
+                OnPropertyChanged();
+            }
+        }
+    }
 
     public bool IsGotifyServerRunning
     {
@@ -109,8 +128,9 @@ public class SettingsPageViewModel : INotifyPropertyChanged
     {
         if (_isLoading) return;
         _isLoading = true;
-        _mobileSettings.NotificationMode = SelectedNotificationMode.Name;
-        await App.Database.UpdateMobileSettings(_mobileSettings);
+        var mobileSettings = _mobileSettingsState.Settings;
+        mobileSettings.NotificationMode = SelectedNotificationMode.Name;
+        await _mobileSettingsState.Update(mobileSettings);
         _isLoading = false;
     }
 
@@ -121,7 +141,7 @@ public class SettingsPageViewModel : INotifyPropertyChanged
         var ed25519 = Ed25519SignatureKey.Generate();
         var generator = DidKeyGenerator.New();
         var did = generator.Generate(ed25519);
-        await App.Database.AddDidRecord(new DidRecord { Did = did, PrivaterKey = ed25519.GetPrivateKey() });
+        await _didRecordState.Update(new DidRecord { Did = did, PrivaterKey = ed25519.GetPrivateKey() });
         Did = did;
         var cmd = (Command)GenerateDidKeyCommand;
         cmd.ChangeCanExecute();

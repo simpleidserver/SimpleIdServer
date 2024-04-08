@@ -207,6 +207,9 @@
   <data name="CredentialIssued" xml:space="preserve">
     <value>Credential has been issued</value>
   </data>
+  <data name="CredentialIssuer" xml:space="preserve">
+    <value>Credential issuer</value>
+  </data>
   <data name="CredentialRemoved" xml:space="preserve">
     <value>Credential has been removed</value>
   </data>
@@ -297,6 +300,9 @@
   <data name="NameHelper" xml:space="preserve">
     <value>NameHelper</value>
   </data>
+  <data name="Overview" xml:space="preserve">
+    <value>Overview</value>
+  </data>
   <data name="Preview" xml:space="preserve">
     <value>Preview</value>
   </data>
@@ -305,6 +311,9 @@
   </data>
   <data name="Scope" xml:space="preserve">
     <value>Scope</value>
+  </data>
+  <data name="Servers" xml:space="preserve">
+    <value>Servers</value>
   </data>
   <data name="SignOut" xml:space="preserve">
     <value>Sign out</value>

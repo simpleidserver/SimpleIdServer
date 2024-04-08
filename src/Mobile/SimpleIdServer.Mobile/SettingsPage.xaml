@@ -47,7 +47,7 @@
 
         <!-- DID -->
         <Button Text="Generate Did key" HorizontalOptions="Fill" Command="{Binding Path=GenerateDidKeyCommand}" Grid.Row="2" Grid.ColumnSpan="2" />
-        <Label Grid.Row="3" Grid.ColumnSpan="2" Text="{Binding Path=Did, StringFormat='Did : &quot;{0}&quot;'}" TextColor="Green">
+        <Label Grid.Row="3" Grid.ColumnSpan="2" Text="{Binding Path=Did}" TextColor="Green">
             <Label.Triggers>
                 <DataTrigger TargetType="Label" Binding="{Binding Did, Converter={StaticResource IsStringNullOrEmptyConverter}}" Value="true">
                     <Setter Property="Text">There is no Did</Setter>
