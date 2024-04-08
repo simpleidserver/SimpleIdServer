@@ -33,5 +33,3 @@ The mobile application can be configured to use one of the following notificatio
 * **Gotify** : [Gotify](https://gotify.net/) is a simple server for sending and receiving messages. Our Gotify server is hosted [here](https://gotify.simpleidserver.com/#/).
 
 The default notification method can be selected in the `Settings` tab.
-
-![Settings](./images/mobile-settings.png)
