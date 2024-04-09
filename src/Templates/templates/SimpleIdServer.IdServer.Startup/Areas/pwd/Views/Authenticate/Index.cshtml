@@ -4,6 +4,9 @@
 @{
     ViewBag.Title = AuthenticatePasswordResource.title;
     Layout = "~/Views/Shared/_AuthenticateLayout.cshtml";
+    var returnUrl = Microsoft.AspNetCore.Http.Extensions.UriHelper.GetDisplayUrl(Context.Request);
+    var realm = SimpleIdServer.IdServer.Middlewares.RealmContext.Instance()?.Realm;
+    var registationUrl = $"{(string.IsNullOrWhiteSpace(realm) ? "/" : $"/{realm}/")}Registration?redirectUrl={returnUrl}&workflowName={Model.RegistrationWorkflow?.Name}";
 }
 
 @if (!ViewData.ModelState.IsValid)
@@ -31,6 +34,9 @@ else
     {
         @Html.AntiForgeryToken()
         <input type="hidden" value="@Model.ReturnUrl" name="ReturnUrl" />
+        <input asp-for="IsFirstAmr" type="hidden" class="form-control" />
+        <input asp-for="IsLoginMissing" type="hidden" class="form-control" />
+        <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
         <div class="alert alert-info">
             Default credentials :
             <p style="margin: 0px;">
@@ -54,21 +60,34 @@ else
         <div class="input-group mb-3">
             <input type="password" value="@Model.Password" name="Password" class="form-control" placeholder="@AuthenticatePasswordResource.password">
         </div>
-        <div>
-            <input type="checkbox" value="@Model.RememberLogin" name="RememberLogin" />
-            <label>@AuthenticatePasswordResource.remember_login</label>
-        </div>
-
-        <input asp-for="IsLoginMissing" type="hidden" class="form-control" />
-        <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
+        @if (Model.IsFirstAmr)
+        {
+            <div>
+                <input type="checkbox" name="RememberLogin" />
+                <label>@AuthenticatePasswordResource.remember_login</label>
+            </div>
+        }
         <button type="submit" class="btn btn-primary">@AuthenticatePasswordResource.submit</button>
     }
+
     @if(Model.CanResetPassword)
     {
-        <div class="divider">
-            <p class="fw-bold text">OR</p>
+        <div class="mb-3">            
+            <div class="divider">
+                <p class="fw-bold text">OR</p>
+            </div>
+            <a href="@Url.Action("Index", "Reset", new { area = SimpleIdServer.IdServer.Constants.Areas.Password, returnUrl = returnUrl })">@AuthenticatePasswordResource.reset_pwd</a>
         </div>
-        <a href="@Url.Action("Index", "Reset", new { area = SimpleIdServer.IdServer.Constants.Areas.Password })">@AuthenticatePasswordResource.reset_pwd</a>
+    }
+
+    @if(Model.IsFirstAmr && Model.RegistrationWorkflow != null)
+    {
+        <div>
+            <div class="divider">
+                <p class="fw-bold text">OR</p>
+            </div>
+            <a href="@registationUrl">@AuthenticatePasswordResource.register</a>
+        </div>
     }
 }
 

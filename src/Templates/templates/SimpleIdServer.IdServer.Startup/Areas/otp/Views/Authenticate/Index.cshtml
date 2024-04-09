@@ -8,6 +8,9 @@
 @{
     ViewBag.Title = AuthenticateOtpResource.title;
     Layout = "~/Views/Shared/_AuthenticateLayout.cshtml";
+    var returnUrl = Microsoft.AspNetCore.Http.Extensions.UriHelper.GetDisplayUrl(Context.Request);
+    var realm = SimpleIdServer.IdServer.Middlewares.RealmContext.Instance()?.Realm;
+    var registationUrl = $"{(string.IsNullOrWhiteSpace(realm) ? "/" : $"/{realm}/")}Registration?redirectUrl={returnUrl}&workflowName={Model.RegistrationWorkflow?.Name}";
 }
 
 @if (!ViewData.ModelState.IsValid)
@@ -37,6 +40,9 @@ else
         @Html.AntiForgeryToken()
         <input type="hidden" asp-for="ReturnUrl" />
         <input type="hidden" name="Action" value="AUTHENTICATE" />
+        <input asp-for="IsFirstAmr" type="hidden" class="form-control" />
+        <input asp-for="IsLoginMissing" type="hidden" class="form-control" />
+        <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
         <!-- Login -->
         <div class="input-group mb-3">
             @if (Model.IsAuthInProgress)
@@ -53,13 +59,25 @@ else
         <div class="input-group mb-3">
             <input asp-for="OTPCode" placeholder="@AuthenticateOtpResource.confirmationcode" type="password" class="form-control" />
         </div>
-        <div>
-            <input type="checkbox" asp-for="RememberLogin " />
-            <label>@AuthenticateOtpResource.remember_login</label>
-        </div>
-        <input asp-for="IsLoginMissing" type="hidden" class="form-control" />
-        <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
+        @if (Model.IsFirstAmr)
+        {
+            <div>
+                <input type="checkbox" asp-for="RememberLogin " />
+                <label>@AuthenticateOtpResource.remember_login</label>
+            </div>
+        }
+
         <button type="submit" class="btn btn-primary">@AuthenticateOtpResource.authenticate</button>
+    }
+
+    @if (Model.IsFirstAmr && Model.RegistrationWorkflow != null)
+    {
+        <div>
+            <div class="divider">
+                <p class="fw-bold text">OR</p>
+            </div>
+            <a href="@registationUrl">@AuthenticatePasswordResource.register</a>
+        </div>
     }
 }
 

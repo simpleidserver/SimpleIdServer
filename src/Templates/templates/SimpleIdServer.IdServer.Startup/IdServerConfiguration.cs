@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Fido.UI.ViewModels;
 using SimpleIdServer.IdServer.Provisioning.LDAP;
 using SimpleIdServer.IdServer.Provisioning.SCIM;
 using SimpleIdServer.IdServer.Startup.Converters;
@@ -40,6 +41,7 @@ namespace SimpleIdServer.IdServer.Startup
         {
             RegistrationWorkflowBuilder.New("pwd", true).AddStep("pwd").Build(),
             RegistrationWorkflowBuilder.New("pwd-email").AddStep("pwd").AddStep("email").Build(),
+            RegistrationWorkflowBuilder.New("vp").AddStep("vp").Build(),
             RegistrationWorkflowBuilder.New("mobile").AddStep("mobile").Build()
         };
 
@@ -95,7 +97,10 @@ namespace SimpleIdServer.IdServer.Startup
 
         public static ICollection<Client> Clients => new List<Client>
         {
-            ClientBuilder.BuildCredentialIssuer("CredentialIssuer", "password", null, "https://localhost:5005/*", "https://credentialissuer.simpleidserver.com/*", "https://credentialissuer.localhost.com/*", "https://credentialissuer.sid.svc.cluster.local/*")
+            ClientBuilder.BuildWalletClient("walletClient", "password")
+                .SetClientName("Wallet")
+                .Build(),
+            ClientBuilder.BuildCredentialIssuer("CredentialIssuer", "password", null, "https://localhost:5005/*", "http://localhost:5005/*", "https://credentialissuer.simpleidserver.com/*", "https://credentialissuer.localhost.com/*", "https://credentialissuer.sid.svc.cluster.local/*")
                 .SetClientName("Credential issuer")
                 .AddScope(
                     SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope,
@@ -178,7 +183,6 @@ namespace SimpleIdServer.IdServer.Startup
                 .AddSigningKey(new SigningCredentials(SimpleIdServer.IdServer.PemImporter.Import(new SimpleIdServer.IdServer.PemResult("-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEK21CoKCA2Vk5zPM+7+vqtnrq4pIe\nsCLiWObLDFKKf3gJl0hll/ZTI5ww/oRrKIXO/uRe9AkckkKwqrqqXGnvsQ==\n-----END PUBLIC KEY-----", "-----BEGIN EC PRIVATE KEY-----\nMHcCAQEEIDHtu+N0u38ZN7DF/TpycDfaUs8WfPGUB3UusR0uv3TVoAoGCCqGSM49\nAwEHoUQDQgAEK21CoKCA2Vk5zPM+7+vqtnrq4pIesCLiWObLDFKKf3gJl0hll/ZT\nI5ww/oRrKIXO/uRe9AkckkKwqrqqXGnvsQ==\n-----END EC PRIVATE KEY-----"), "keyId"), SecurityAlgorithms.EcdsaSha256), SecurityAlgorithms.EcdsaSha256, SecurityKeyTypes.ECDSA)
                 .Build(),
             ClientBuilder.BuildApiClient("managementClient", "password").AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.Users).AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.Register).Build(),
-            ClientBuilder.BuildTraditionalWebsiteClient("walletClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().EnableTokenInResponseType().Build(),
             ClientBuilder.BuildDeviceClient("deviceClient", "password").AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope, SimpleIdServer.IdServer.Constants.StandardScopes.Profile).Build(),
             SamlSpClientBuilder.BuildSamlSpClient("samlSp", "http://localhost:5125/Metadata").Build()
         };
@@ -202,8 +206,7 @@ namespace SimpleIdServer.IdServer.Startup
 
         public static ICollection<Language> Languages => new List<Language>
         {
-            LanguageBuilder.Build(Language.Default).AddDescription("English", "en").AddDescription("French", "fr").Build(),
-            LanguageBuilder.Build("fr").AddDescription("Français", "fr").AddDescription("Anglais", "en").Build()
+            LanguageBuilder.Build(Language.Default).AddDescription("English", "en").Build()
         };
 
         public static ICollection<AuthenticationSchemeProvider> Providers => new List<AuthenticationSchemeProvider>
@@ -234,6 +237,17 @@ namespace SimpleIdServer.IdServer.Startup
         {
             IdentityProvisioningBuilder.Create(Scim, "SCIM", "SCIM").Build(),
             IdentityProvisioningBuilder.Create(Ldap, "LDAP", "LDAP", "LDAP").Build()
+        };
+
+        public static List<GotifySession> Sessions = new List<GotifySession>
+        {
+            new GotifySession { ApplicationToken = "AvSdAw5ILVOdc7g", ClientToken = "CY2St_LANPO5L7P" },
+            new GotifySession { ApplicationToken = "ADIeCkMigAnGLmq", ClientToken = "C9M4RGtX.OlYD1q" }
+        };
+
+        public static List<PresentationDefinition> PresentationDefinitions = new List<PresentationDefinition>
+        {
+            PresentationDefinitionBuilder.New("universitydegree_vp", "University Degree").AddLdpVcInputDescriptor("UniversityDegree", "UniversityDegree", "UniversityDegree").Build()
         };
     }
 }

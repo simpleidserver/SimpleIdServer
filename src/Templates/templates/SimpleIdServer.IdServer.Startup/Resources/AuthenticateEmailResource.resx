@@ -141,6 +141,9 @@
   <data name="invalid_confirmationcode" xml:space="preserve">
     <value>Confirmation code is invalid</value>
   </data>
+  <data name="invalid_email" xml:space="preserve">
+    <value>Email is invalid</value>
+  </data>
   <data name="missing_confirmationcode" xml:space="preserve">
     <value>Confirmation code is missing</value>
   </data>

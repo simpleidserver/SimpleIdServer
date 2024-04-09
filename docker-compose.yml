@@ -28,7 +28,7 @@ services:
     networks:
       proxy_net: null
   scim:
-    image: simpleidserver/scim:4.0.7
+    image: simpleidserver/scim:4.0.8
     environment:
       VIRTUAL_HOST: "scim.localhost.com"
       ASPNETCORE_URLS : "http://*:80"
@@ -40,7 +40,7 @@ services:
     networks:
       proxy_net: null
   idserver:
-    image: simpleidserver/idserver:4.0.7
+    image: simpleidserver/idserver:4.0.8
     environment:
       VIRTUAL_HOST: "idserver.localhost.com"
       ASPNETCORE_URLS : "http://*:80"
@@ -58,7 +58,7 @@ services:
     networks:
       proxy_net: null
   website:
-    image: simpleidserver/website:4.0.7
+    image: simpleidserver/website:4.0.8
     environment:
       VIRTUAL_HOST: "website.localhost.com"
       ASPNETCORE_URLS : "http://*:80"
@@ -73,7 +73,7 @@ services:
     networks:
       proxy_net: null
   credentialissuer:
-    image: simpleidserver/credentialissuer:4.0.7
+    image: simpleidserver/credentialissuer:4.0.8
     environment:
       VIRTUAL_HOST: "credentialissuer.localhost.com"
       ASPNETCORE_URLS : "http://*:80"
@@ -85,7 +85,7 @@ services:
     networks:
       proxy_net: null
   credentialissuerwebsite:
-    image: simpleidserver/credentialissuerwebsite:4.0.7
+    image: simpleidserver/credentialissuerwebsite:4.0.8
     environment:
       VIRTUAL_HOST: "credentialissuerwebsite.localhost.com"
       ASPNETCORE_URLS : "http://*:80"

@@ -13,9 +13,9 @@
 <h5>@(User.Identity.IsAuthenticated ? AuthenticateWebauthnResource.update_webauthn : AuthenticateWebauthnResource.register_webauthn)</h5>
 
 <div id="registrationContainer">
-    <ul class="list-group mb-3" id="errors">
-        @if (!ViewData.ModelState.IsValid)
-        {
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <ul class="list-group mb-3" id="errors">
             @foreach (var modelState in ViewData.ModelState.Values)
             {
                 foreach (var error in modelState.Errors)
@@ -23,8 +23,8 @@
                     <li class="list-group-item list-group-item-danger">@AuthenticateWebauthnResource.ResourceManager.GetString(error.ErrorMessage)</li>
                 }
             }
-        }
-    </ul>
+        </ul>
+    }
 
     <!-- Registration form -->
     <form id="registerWebauthn">
@@ -53,7 +53,7 @@
     </div>
     @if(!string.IsNullOrWhiteSpace(Model.RedirectUrl))
     {
-    <a href="@Model.RedirectUrl" class="btn btn-primary mt-1">@LayoutResource.back</a>
+        <a href="@Model.RedirectUrl" class="btn btn-primary mt-1">@LayoutResource.back</a>
     }
 </div>
 
@@ -127,7 +127,7 @@
 
                 let response = await fetch(beginRegisterUrl, {
                     method: 'POST',
-                    body: JSON.stringify({ login: login, display_name: displayName }),
+                    body: JSON.stringify({ login: login, display_name: displayName, credential_type: 'webauthn' }),
                     headers: {
                         "Accept": "application/json",
                         "Content-Type": "application/json"

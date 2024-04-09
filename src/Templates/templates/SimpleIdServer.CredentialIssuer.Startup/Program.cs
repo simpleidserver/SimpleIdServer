@@ -100,6 +100,7 @@ builder.Services.AddCredentialIssuer(o =>
 .UseInMemoryStore(c =>
 {
     c.AddCredentialConfigurations(CredentialIssuerConfiguration.CredentialConfigurations);
+    c.AddUserCredentialClaims(CredentialIssuerConfiguration.CredentialClaims);
 });
 
 var app = builder.Build();

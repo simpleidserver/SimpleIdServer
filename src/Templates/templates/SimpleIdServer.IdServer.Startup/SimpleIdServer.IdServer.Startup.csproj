@@ -4,6 +4,8 @@
 		<OutputType>Exe</OutputType>
 	</PropertyGroup>
 	<ItemGroup>
+	  <PackageReference Include="SimpleIdServer.Did.Key" Version="4.0.*-*" />
+	  <PackageReference Include="SimpleIdServer.IdServer.VerifiablePresentation" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Swagger" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Pwd" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Otp" Version="4.0.*-*" />
@@ -11,6 +13,7 @@
 	  <PackageReference Include="SimpleIdServer.IdServer.Email" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Fido" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Notification.Fcm" Version="4.0.*-*" />
+	  <PackageReference Include="SimpleIdServer.IdServer.Notification.Gotify" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.PostgreMigrations" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Saml.Idp" Version="4.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Sms" Version="4.0.*-*" />
@@ -26,14 +29,14 @@
       <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="7.0.1" />
 	  <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="7.0.1" />
 	  <PackageReference Include="Microsoft.AspNetCore.Authentication.Negotiate" Version="7.0.1" />
+	  <PackageReference Include="Pomelo.Extensions.Caching.MySql" Version="2.1.4" />
 	  <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="7.0.*" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.*" />
 	  <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.*" />
-	  <PackageReference Include="NeoSmart.Caching.Sqlite.AspNetCore" Version="7.0.2" />
 	  <PackageReference Include="Microsoft.Extensions.Caching.SqlServer" Version="7.0.*" />
-	  <PackageReference Include="Pomelo.Extensions.Caching.MySql" Version="2.1.4" />
 	  <PackageReference Include="Community.Microsoft.Extensions.Caching.PostgreSql" Version="4.0.4" />
+	  <PackageReference Include="NeoSmart.Caching.Sqlite.AspNetCore" Version="7.0.2" />
 	  <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="7.0.*" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.*">
 		<PrivateAssets>all</PrivateAssets>
@@ -41,183 +44,231 @@
 	  </PackageReference>
 	</ItemGroup>
 	<ItemGroup>
-	  <Compile Update="Resources\AccountsResource.Designer.cs">
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	    <DependentUpon>AccountsResource.resx</DependentUpon>
-	  </Compile>
-	  <Compile Update="Resources\RegisterPwdResource.Designer.cs">
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	    <DependentUpon>RegisterPwdResource.resx</DependentUpon>
-	  </Compile>
-	  <Compile Update="Resources\RegisterSmsResource.Designer.cs">
-	    <DependentUpon>RegisterSmsResource.resx</DependentUpon>
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	  </Compile>
-	  <Compile Update="Resources\RegisterEmailResource.Designer.cs">
-	    <DependentUpon>RegisterEmailResource.resx</DependentUpon>
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	  </Compile>
-	  <Compile Update="Resources\AuthenticateMobileResource.Designer.cs">
-	    <DependentUpon>AuthenticateMobileResource.resx</DependentUpon>
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	  </Compile>
-	  <Compile Update="Resources\AuthenticateWebauthnResource.Designer.cs">
-	    <DependentUpon>AuthenticateWebauthnResource.resx</DependentUpon>
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	  </Compile>
-	  <Compile Update="Resources\DeviceCodeResource.Designer.cs">
-	    <DependentUpon>DeviceCodeResource.resx</DependentUpon>
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	  </Compile>
-	  <Compile Update="Resources\ProfileResource.Designer.cs">
-	    <DependentUpon>ProfileResource.resx</DependentUpon>
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	  </Compile>
-	  <Compile Update="Resources\AuthenticateSmsResource.Designer.cs">
-	    <DependentUpon>AuthenticateSmsResource.resx</DependentUpon>
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	  </Compile>
-	  <Compile Update="Resources\AuthenticateEmailResource.Designer.cs">
-	    <DependentUpon>AuthenticateEmailResource.resx</DependentUpon>
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	  </Compile>
-	  <Compile Update="Resources\AuthenticatePasswordResource.Designer.cs">
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	    <DependentUpon>AuthenticatePasswordResource.resx</DependentUpon>
-	  </Compile>
-	  <Compile Update="Resources\CredentialsResource.Designer.cs">
-	    <DependentUpon>CredentialsResource.resx</DependentUpon>
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	  </Compile>
-	  <Compile Update="Resources\ScopesResource.Designer.cs">
-	    <DependentUpon>ScopesResource.resx</DependentUpon>
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	  </Compile>
-	  <Compile Update="Resources\CheckSessionResource.Designer.cs">
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	    <DependentUpon>CheckSessionResource.resx</DependentUpon>
-	  </Compile>
-	  <Compile Update="Resources\BCConsentsResource.Designer.cs">
-	    <DependentUpon>BCConsentsResource.resx</DependentUpon>
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	  </Compile>
-	  <Compile Update="Resources\ConsentsResource.Designer.cs">
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	    <DependentUpon>ConsentsResource.resx</DependentUpon>
-	  </Compile>
-	  <Compile Update="Resources\ErrorsResource.Designer.cs">
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	    <DependentUpon>ErrorsResource.resx</DependentUpon>
-	  </Compile>
-	  <Compile Update="Resources\HomeResource.Designer.cs">
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	    <DependentUpon>HomeResource.resx</DependentUpon>
-	  </Compile>
-	  <Compile Update="Resources\LayoutResource.Designer.cs">
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	    <DependentUpon>LayoutResource.resx</DependentUpon>
-	  </Compile>
+		<Compile Update="Resources\AccountsResource.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>AccountsResource.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Resources\AuthenticateConsoleResource.Designer.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>AuthenticateConsoleResource.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Resources\AuthenticateOtpResource.Designer.cs">
+		  <DependentUpon>AuthenticateOtpResource.resx</DependentUpon>
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		</Compile>
+		<Compile Update="Resources\ConfirmResetPasswordResource.Designer.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>ConfirmResetPasswordResource.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Resources\RegisterPwdResource.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>RegisterPwdResource.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Resources\RegisterSmsResource.Designer.cs">
+			<DependentUpon>RegisterSmsResource.resx</DependentUpon>
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+		</Compile>
+		<Compile Update="Resources\RegisterEmailResource.Designer.cs">
+			<DependentUpon>RegisterEmailResource.resx</DependentUpon>
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+		</Compile>
+		<Compile Update="Resources\AuthenticateMobileResource.Designer.cs">
+			<DependentUpon>AuthenticateMobileResource.resx</DependentUpon>
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+		</Compile>
+		<Compile Update="Resources\AuthenticateWebauthnResource.Designer.cs">
+			<DependentUpon>AuthenticateWebauthnResource.resx</DependentUpon>
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+		</Compile>
+		<Compile Update="Resources\DeviceCodeResource.Designer.cs">
+			<DependentUpon>DeviceCodeResource.resx</DependentUpon>
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+		</Compile>
+		<Compile Update="Resources\ProfileResource.Designer.cs">
+			<DependentUpon>ProfileResource.resx</DependentUpon>
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+		</Compile>
+		<Compile Update="Resources\AuthenticateSmsResource.Designer.cs">
+			<DependentUpon>AuthenticateSmsResource.resx</DependentUpon>
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+		</Compile>
+		<Compile Update="Resources\AuthenticateEmailResource.Designer.cs">
+			<DependentUpon>AuthenticateEmailResource.resx</DependentUpon>
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+		</Compile>
+		<Compile Update="Resources\AuthenticatePasswordResource.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>AuthenticatePasswordResource.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Resources\CredentialsResource.Designer.cs">
+			<DependentUpon>CredentialsResource.resx</DependentUpon>
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+		</Compile>
+		<Compile Update="Resources\RegisterVpResource.Designer.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>RegisterVpResource.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Resources\ResetPasswordResource.Designer.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>ResetPasswordResource.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Resources\ScopesResource.Designer.cs">
+			<DependentUpon>ScopesResource.resx</DependentUpon>
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+		</Compile>
+		<Compile Update="Resources\CheckSessionResource.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>CheckSessionResource.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Resources\BCConsentsResource.Designer.cs">
+			<DependentUpon>BCConsentsResource.resx</DependentUpon>
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+		</Compile>
+		<Compile Update="Resources\ConsentsResource.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>ConsentsResource.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Resources\ErrorsResource.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>ErrorsResource.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Resources\HomeResource.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>HomeResource.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Resources\LayoutResource.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>LayoutResource.resx</DependentUpon>
+		</Compile>
 	</ItemGroup>
 	<ItemGroup>
-	  <EmbeddedResource Update="Resources\AccountsResource.resx">
-	    <Generator>PublicResXFileCodeGenerator</Generator>
-	    <LastGenOutput>AccountsResource.Designer.cs</LastGenOutput>
-	  </EmbeddedResource>
-	  <EmbeddedResource Update="Resources\RegisterPwdResource.resx">
-	    <Generator>PublicResXFileCodeGenerator</Generator>
-	    <LastGenOutput>RegisterPwdResource.Designer.cs</LastGenOutput>
-	  </EmbeddedResource>
-	  <EmbeddedResource Update="Resources\RegisterSmsResource.resx">
-	    <LastGenOutput>RegisterSmsResource.Designer.cs</LastGenOutput>
-	    <Generator>PublicResXFileCodeGenerator</Generator>
-	  </EmbeddedResource>
-	  <EmbeddedResource Update="Resources\RegisterEmailResource.resx">
-	    <LastGenOutput>RegisterEmailResource.Designer.cs</LastGenOutput>
-	    <Generator>PublicResXFileCodeGenerator</Generator>
-	  </EmbeddedResource>
-	  <EmbeddedResource Update="Resources\AuthenticateMobileResource.resx">
-	    <LastGenOutput>AuthenticateMobileResource.Designer.cs</LastGenOutput>
-	    <Generator>PublicResXFileCodeGenerator</Generator>
-	  </EmbeddedResource>
-	  <EmbeddedResource Update="Resources\AuthenticateWebauthnResource.resx">
-	    <LastGenOutput>AuthenticateWebauthnResource.Designer.cs</LastGenOutput>
-	    <Generator>PublicResXFileCodeGenerator</Generator>
-	  </EmbeddedResource>
-	  <EmbeddedResource Update="Resources\DeviceCodeResource.resx">
-	    <LastGenOutput>DeviceCodeResource.Designer.cs</LastGenOutput>
-	    <Generator>PublicResXFileCodeGenerator</Generator>
-	  </EmbeddedResource>
-	  <EmbeddedResource Update="Resources\ProfileResource.resx">
-	    <LastGenOutput>ProfileResource.Designer.cs</LastGenOutput>
-	    <Generator>PublicResXFileCodeGenerator</Generator>
-	  </EmbeddedResource>
-	  <EmbeddedResource Update="Resources\AuthenticateSmsResource.resx">
-	    <LastGenOutput>AuthenticateSmsResource.Designer.cs</LastGenOutput>
-	    <Generator>PublicResXFileCodeGenerator</Generator>
-	  </EmbeddedResource>
-	  <EmbeddedResource Update="Resources\AuthenticateEmailResource.resx">
-	    <LastGenOutput>AuthenticateEmailResource.Designer.cs</LastGenOutput>
-	    <Generator>PublicResXFileCodeGenerator</Generator>
-	  </EmbeddedResource>
-	  <EmbeddedResource Update="Resources\AuthenticatePasswordResource.resx">
-	    <Generator>PublicResXFileCodeGenerator</Generator>
-	    <LastGenOutput>AuthenticatePasswordResource.Designer.cs</LastGenOutput>
-	  </EmbeddedResource>
-	  <EmbeddedResource Update="Resources\CredentialsResource.resx">
-	    <LastGenOutput>CredentialsResource.Designer.cs</LastGenOutput>
-	    <Generator>PublicResXFileCodeGenerator</Generator>
-	  </EmbeddedResource>
-	  <EmbeddedResource Update="Resources\ScopesResource.resx">
-	    <LastGenOutput>ScopesResource.Designer.cs</LastGenOutput>
-	    <Generator>PublicResXFileCodeGenerator</Generator>
-	  </EmbeddedResource>
-	  <EmbeddedResource Update="Resources\CheckSessionResource.resx">
-	    <Generator>PublicResXFileCodeGenerator</Generator>
-	    <LastGenOutput>CheckSessionResource.Designer.cs</LastGenOutput>
-	  </EmbeddedResource>
-	  <EmbeddedResource Update="Resources\BCConsentsResource.resx">
-	    <LastGenOutput>BCConsentsResource.Designer.cs</LastGenOutput>
-	    <Generator>PublicResXFileCodeGenerator</Generator>
-	  </EmbeddedResource>
-	  <EmbeddedResource Update="Resources\ConsentsResource.resx">
-	    <Generator>PublicResXFileCodeGenerator</Generator>
-	    <LastGenOutput>ConsentsResource.Designer.cs</LastGenOutput>
-	  </EmbeddedResource>
-	  <EmbeddedResource Update="Resources\ErrorsResource.resx">
-	    <Generator>PublicResXFileCodeGenerator</Generator>
-	    <LastGenOutput>ErrorsResource.Designer.cs</LastGenOutput>
-	  </EmbeddedResource>
-	  <EmbeddedResource Update="Resources\HomeResource.resx">
-	    <Generator>PublicResXFileCodeGenerator</Generator>
-	    <LastGenOutput>HomeResource.Designer.cs</LastGenOutput>
-	  </EmbeddedResource>
-	  <EmbeddedResource Update="Resources\LayoutResource.resx">
-	    <Generator>PublicResXFileCodeGenerator</Generator>
-	    <LastGenOutput>LayoutResource.Designer.cs</LastGenOutput>
-	  </EmbeddedResource>
+		<EmbeddedResource Update="Resources\AccountsResource.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>AccountsResource.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\AuthenticateConsoleResource.resx">
+		  <Generator>PublicResXFileCodeGenerator</Generator>
+		  <LastGenOutput>AuthenticateConsoleResource.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\AuthenticateOtpResource.resx">
+		  <LastGenOutput>AuthenticateOtpResource.Designer.cs</LastGenOutput>
+		  <Generator>PublicResXFileCodeGenerator</Generator>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\ConfirmResetPasswordResource.resx">
+		  <Generator>PublicResXFileCodeGenerator</Generator>
+		  <LastGenOutput>ConfirmResetPasswordResource.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\RegisterPwdResource.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>RegisterPwdResource.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\RegisterSmsResource.resx">
+			<LastGenOutput>RegisterSmsResource.Designer.cs</LastGenOutput>
+			<Generator>PublicResXFileCodeGenerator</Generator>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\RegisterEmailResource.resx">
+			<LastGenOutput>RegisterEmailResource.Designer.cs</LastGenOutput>
+			<Generator>PublicResXFileCodeGenerator</Generator>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\AuthenticateMobileResource.resx">
+			<LastGenOutput>AuthenticateMobileResource.Designer.cs</LastGenOutput>
+			<Generator>PublicResXFileCodeGenerator</Generator>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\AuthenticateWebauthnResource.resx">
+			<LastGenOutput>AuthenticateWebauthnResource.Designer.cs</LastGenOutput>
+			<Generator>PublicResXFileCodeGenerator</Generator>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\DeviceCodeResource.resx">
+			<LastGenOutput>DeviceCodeResource.Designer.cs</LastGenOutput>
+			<Generator>PublicResXFileCodeGenerator</Generator>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\ProfileResource.resx">
+			<LastGenOutput>ProfileResource.Designer.cs</LastGenOutput>
+			<Generator>PublicResXFileCodeGenerator</Generator>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\AuthenticateSmsResource.resx">
+			<LastGenOutput>AuthenticateSmsResource.Designer.cs</LastGenOutput>
+			<Generator>PublicResXFileCodeGenerator</Generator>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\AuthenticateEmailResource.resx">
+			<LastGenOutput>AuthenticateEmailResource.Designer.cs</LastGenOutput>
+			<Generator>PublicResXFileCodeGenerator</Generator>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\AuthenticatePasswordResource.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>AuthenticatePasswordResource.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\CredentialsResource.resx">
+			<LastGenOutput>CredentialsResource.Designer.cs</LastGenOutput>
+			<Generator>PublicResXFileCodeGenerator</Generator>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\RegisterVpResource.resx">
+		  <Generator>PublicResXFileCodeGenerator</Generator>
+		  <LastGenOutput>RegisterVpResource.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\ResetPasswordResource.resx">
+		  <Generator>PublicResXFileCodeGenerator</Generator>
+		  <LastGenOutput>ResetPasswordResource.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\ScopesResource.resx">
+			<LastGenOutput>ScopesResource.Designer.cs</LastGenOutput>
+			<Generator>PublicResXFileCodeGenerator</Generator>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\CheckSessionResource.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>CheckSessionResource.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\BCConsentsResource.resx">
+			<LastGenOutput>BCConsentsResource.Designer.cs</LastGenOutput>
+			<Generator>PublicResXFileCodeGenerator</Generator>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\ConsentsResource.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>ConsentsResource.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\ErrorsResource.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>ErrorsResource.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\HomeResource.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>HomeResource.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\LayoutResource.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>LayoutResource.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
 	</ItemGroup>
 	<ItemGroup>
 	  <None Update="SimpleIdServer.IdServer.xml">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Areas\vp\" />
 	</ItemGroup>
 </Project>

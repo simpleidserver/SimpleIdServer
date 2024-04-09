@@ -133,6 +133,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Email is invalid.
+        /// </summary>
+        public static string invalid_email {
+            get {
+                return ResourceManager.GetString("invalid_email", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Confirmation code is missing.
         /// </summary>
         public static string missing_confirmationcode {

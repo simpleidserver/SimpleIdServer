@@ -15,6 +15,10 @@
             @if(Model.IsResetLinkedSent)
             {
                 <div class="alert alert-success">@string.Format(ResetPasswordResource.reset_link_sent, Model.NotificationMode)</div>
+                if (!string.IsNullOrWhiteSpace(Model.ReturnUrl))
+                {
+                    <a href="@Model.ReturnUrl" class="btn btn-primary mt-1">@LayoutResource.back</a>
+                }
             }
             else
             {
@@ -42,6 +46,7 @@
                 @using (Html.BeginForm("Index", "Reset", new { area = SimpleIdServer.IdServer.Constants.Areas.Password }, FormMethod.Post))
                 {
                     @Html.AntiForgeryToken()
+                    <input asp-for="ReturnUrl" type="hidden" />
                     <input asp-for="NotificationMode" type="hidden" />
                     <!-- Login -->
                     <div class="form-floating mb-3">

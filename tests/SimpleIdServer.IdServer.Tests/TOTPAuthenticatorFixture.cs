@@ -32,7 +32,7 @@ namespace SimpleIdServer.IdServer.Tests
             var otp = authenticator.GenerateOtp(user.Credentials.Last(), date);
 
             // ASSERT
-            Assert.That(102892 == otp);
+            Assert.That("102892" == otp);
         }
     }
 }

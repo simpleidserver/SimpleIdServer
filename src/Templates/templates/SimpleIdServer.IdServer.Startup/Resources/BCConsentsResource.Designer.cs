@@ -140,5 +140,23 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
                 return ResourceManager.GetString("scopes", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à You are not authorized to perform any action on this back channel authentication.
+        /// </summary>
+        public static string unauthorized_bc_auth {
+            get {
+                return ResourceManager.GetString("unauthorized_bc_auth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Back channel authentication is unknown.
+        /// </summary>
+        public static string unknown_bc_authorize {
+            get {
+                return ResourceManager.GetString("unknown_bc_authorize", resourceCulture);
+            }
+        }
     }
 }

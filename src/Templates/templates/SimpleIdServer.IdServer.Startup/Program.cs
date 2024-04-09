@@ -12,14 +12,15 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using NeoSmart.Caching.Sqlite.AspNetCore;
 using SimpleIdServer.Configuration;
-using SimpleIdServer.Configuration.Redis;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Console;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Email;
 using SimpleIdServer.IdServer.Fido;
+using SimpleIdServer.IdServer.Notification.Gotify;
 using SimpleIdServer.IdServer.Provisioning.LDAP;
 using SimpleIdServer.IdServer.Provisioning.SCIM;
 using SimpleIdServer.IdServer.Pwd;
@@ -30,11 +31,13 @@ using SimpleIdServer.IdServer.Startup.Converters;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Swagger;
 using SimpleIdServer.IdServer.TokenTypes;
+using SimpleIdServer.IdServer.VerifiablePresentation;
 using SimpleIdServer.IdServer.WsFederation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using SimpleIdServer.Did.Key;
 
 const string SQLServerCreateTableFormat = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DistributedCache' and xtype='U') " +
     "CREATE TABLE [dbo].[DistributedCache] (" +
@@ -80,7 +83,6 @@ if (identityServerConfiguration.IsForwardedEnabled)
     });
 }
 
-
 builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
     .AllowAnyMethod()
     .AllowAnyHeader()));
@@ -107,14 +109,22 @@ app.UseRequestLocalization(e =>
     e.AddSupportedUICultures("en");
 });
 
+if (!app.Environment.IsDevelopment())
+{
+    var errorPath = identityServerConfiguration.IsRealmEnabled ? "/master/Error/Unexpected" : "/Error/Unexpected";
+    app.UseExceptionHandler(errorPath);
+}
+
 app
     .UseSID()
+    .UseVerifiablePresentation()
     .UseSIDSwagger()
     .UseSIDSwaggerUI()
     // .UseSIDReDoc()
     .UseWsFederation()
     .UseFIDO()
     .UseSamlIdp()
+    .UseGotifyNotification()
     .UseAutomaticConfiguration();
 
 app.Run();
@@ -138,6 +148,7 @@ void ConfigureIdServer(IServiceCollection services)
             o.AddOAuthSecurity();
         })
         .AddConsoleNotification()
+        .AddVpAuthentication()
         .UseInMemoryMassTransit()
         .AddBackChannelAuthentication()
         .AddPwdAuthentication()
@@ -145,6 +156,7 @@ void ConfigureIdServer(IServiceCollection services)
         .AddOtpAuthentication()
         .AddSmsAuthentication()
         .AddFcmNotification()
+        .AddGotifyNotification()
         .AddSamlIdp()
         .AddFidoAuthentication(f =>
         {
@@ -167,13 +179,14 @@ void ConfigureIdServer(IServiceCollection services)
         });
     var isRealmEnabled = identityServerConfiguration.IsRealmEnabled;
     if (isRealmEnabled) idServerBuilder.UseRealm();
+    services.AddDidKey();
     ConfigureDistributedCache();
 }
 
 void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
 {
-    var section = builder.Configuration.GetSection(nameof(DistributedCacheConfiguration));
-    var conf = section.Get<DistributedCacheConfiguration>();
+    var section = builder.Configuration.GetSection(nameof(StorageConfiguration));
+    var conf = section.Get<StorageConfiguration>();
     builder.AddAutomaticConfiguration(o =>
     {
         o.Add<FacebookOptionsLite>();
@@ -185,35 +198,30 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
         o.Add<IdServerPasswordOptions>();
         o.Add<FidoOptions>();
         o.Add<IdServerConsoleOptions>();
+        o.Add<GotifyOptions>();
+        o.Add<IdServerVpOptions>();
         o.Add<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>();
-        if (conf.Type == DistributedCacheTypes.REDIS)
+        o.UseEFConnector(b =>
         {
-            o.UseRedisConnector(conf.ConnectionString);
-        }
-        else
-        {
-            o.UseEFConnector(b =>
+            switch (conf.Type)
             {
-                switch (conf.Type)
-                {
-                    case DistributedCacheTypes.INMEMORY:
-                        b.UseInMemoryDatabase(conf.ConnectionString);
-                        break;
-                    case DistributedCacheTypes.SQLSERVER:
-                        b.UseSqlServer(conf.ConnectionString);
-                        break;
-                    case DistributedCacheTypes.POSTGRE:
-                        b.UseNpgsql(conf.ConnectionString);
-                        break;
-                    case DistributedCacheTypes.MYSQL:
-                        b.UseMySql(conf.ConnectionString, ServerVersion.AutoDetect(conf.ConnectionString));
-                        break;
-                    case DistributedCacheTypes.SQLITE:
-                        b.UseSqlite(conf.ConnectionString);
-                        break;
-                }
-            });
-        }
+                case StorageTypes.INMEMORY:
+                    b.UseInMemoryDatabase(conf.ConnectionString);
+                    break;
+                case StorageTypes.SQLSERVER:
+                    b.UseSqlServer(conf.ConnectionString);
+                    break;
+                case StorageTypes.POSTGRE:
+                    b.UseNpgsql(conf.ConnectionString);
+                    break;
+                case StorageTypes.MYSQL:
+                    b.UseMySql(conf.ConnectionString, ServerVersion.AutoDetect(conf.ConnectionString));
+                    break;
+                case StorageTypes.SQLITE:
+                    b.UseSqlite(conf.ConnectionString);
+                    break;
+            }
+        });
     });
 }
 
@@ -258,7 +266,7 @@ void ConfigureDistributedCache()
             // Note : we cannot use the same database, because the library Neosmart, checks if the database contains only two tables and one index.
             builder.Services.AddSqliteCache(options =>
             {
-                options.CachePath = "SidCache.db";
+                options.CachePath = conf.ConnectionString;
             });
             break;
     }
@@ -337,6 +345,9 @@ void SeedData(WebApplication application, string scimBaseUrl)
             if (!dbContext.UmaResources.Any())
                 dbContext.UmaResources.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Resources);
 
+            if (!dbContext.GotifySessions.Any())
+                dbContext.GotifySessions.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Sessions);
+
             foreach (var language in SimpleIdServer.IdServer.Startup.IdServerConfiguration.Languages)
                 AddMissingLanguage(dbContext, language);
 
@@ -348,12 +359,7 @@ void SeedData(WebApplication application, string scimBaseUrl)
                 }
             }
 
-            if (!dbContext.AuthenticationSchemeProviderDefinitions.Any())
-                dbContext.AuthenticationSchemeProviderDefinitions.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.ProviderDefinitions);
-
-            if (!dbContext.AuthenticationSchemeProviders.Any())
-                dbContext.AuthenticationSchemeProviders.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Providers);
-
+            AddMissingAuthenticationSchemeProviders(dbContext);
             if (!dbContext.IdentityProvisioningDefinitions.Any())
                 dbContext.IdentityProvisioningDefinitions.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.IdentityProvisioningDefLst);
 
@@ -372,6 +378,16 @@ void SeedData(WebApplication application, string scimBaseUrl)
 
             if (!dbContext.CertificateAuthorities.Any())
                 dbContext.CertificateAuthorities.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.CertificateAuthorities);
+
+            if (!dbContext.PresentationDefinitions.Any())
+            {
+                foreach(var processDefinition in SimpleIdServer.IdServer.Startup.IdServerConfiguration.PresentationDefinitions)
+                {
+                    var realm = dbContext.Realms.Single(r => r.Name == processDefinition.Realm.Name);
+                    processDefinition.Realm = realm;
+                    dbContext.PresentationDefinitions.Add(processDefinition);
+                }
+            }
 
             if (!dbContext.Acrs.Any())
             {
@@ -421,8 +437,10 @@ void SeedData(WebApplication application, string scimBaseUrl)
             AddMissingConfigurationDefinition<IdServerEmailOptions>(dbContext);
             AddMissingConfigurationDefinition<IdServerSmsOptions>(dbContext);
             AddMissingConfigurationDefinition<IdServerPasswordOptions>(dbContext);
+            AddMissingConfigurationDefinition<IdServerVpOptions>(dbContext);
             AddMissingConfigurationDefinition<FidoOptions>(dbContext);
             AddMissingConfigurationDefinition<IdServerConsoleOptions>(dbContext);
+            AddMissingConfigurationDefinition<GotifyOptions>(dbContext);
             AddMissingConfigurationDefinition<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>(dbContext);
             AddMissingConfigurationDefinition<GoogleOptionsLite>(dbContext);
             AddMissingConfigurationDefinition<NegotiateOptionsLite>(dbContext);
@@ -477,8 +495,30 @@ void SeedData(WebApplication application, string scimBaseUrl)
             dbContext.Translations.AddRange(unknownTranslations);
             foreach(var existingTranslation in existingTranslations)
             {
-                var tr = language.Descriptions.Single(d => d.Key == existingTranslation.Key && d.Language == existingTranslation.Language);
+                var tr = language.Descriptions.SingleOrDefault(d => d.Key == existingTranslation.Key && d.Language == existingTranslation.Language);
+                if (tr == null) continue;
                 existingTranslation.Value = tr.Value;
+            }
+        }
+
+        void AddMissingAuthenticationSchemeProviders(StoreDbContext dbContext)
+        {
+            if (!dbContext.AuthenticationSchemeProviders.Any())
+            {
+                foreach (var provider in SimpleIdServer.IdServer.Startup.IdServerConfiguration.Providers)
+                {
+                    var def = dbContext.AuthenticationSchemeProviderDefinitions.FirstOrDefault(d => d.Name == provider.AuthSchemeProviderDefinition.Name);
+                    if (def != null) provider.AuthSchemeProviderDefinition = def;
+                    var realmName = provider.Realms.First().Name;
+                    var realm = dbContext.Realms.FirstOrDefault(r => r.Name == realmName);
+                    if (realm != null)
+                    {
+                        provider.Realms.Clear();
+                        provider.Realms.Add(realm);
+                    }
+
+                    dbContext.AuthenticationSchemeProviders.Add(provider);
+                }
             }
         }
     }

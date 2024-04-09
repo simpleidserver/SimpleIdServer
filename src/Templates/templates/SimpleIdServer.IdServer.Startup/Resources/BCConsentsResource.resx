@@ -144,4 +144,10 @@
   <data name="scopes" xml:space="preserve">
     <value>Scopes</value>
   </data>
+  <data name="unauthorized_bc_auth" xml:space="preserve">
+    <value>You are not authorized to perform any action on this back channel authentication</value>
+  </data>
+  <data name="unknown_bc_authorize" xml:space="preserve">
+    <value>Back channel authentication is unknown</value>
+  </data>
 </root>

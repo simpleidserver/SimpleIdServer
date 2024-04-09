@@ -1,4 +1,5 @@
-﻿@using SimpleIdServer.IdServer.Domains;
+﻿@using Microsoft.AspNetCore.Http;
+@using SimpleIdServer.IdServer.Domains;
 @using SimpleIdServer.IdServer.Startup.Resources
 @using System.Security.Claims;
 @model SimpleIdServer.IdServer.UI.ViewModels.ProfileViewModel
@@ -12,6 +13,8 @@
         if (cl == null) return "-";
         return cl.Value;
     };
+    var basePath = Context.Request.GetAbsoluteUriWithVirtualPath();
+    var returnUrl = $"{basePath}{Url.Action("Profile", "Home")}";
 }
 
 <div class="row profile gy-4">
@@ -20,7 +23,10 @@
         <div class="card shadow-sm">
             <div class="card-body info">
                 <div class="picture">
-                    @Html.UserPicture(User)
+                    @Html.UserPicture(User, Model.Picture, true)
+                    <form id="pictureForm" action="@Url.Action("UpdatePicture", "Home")" method="post">
+                        <input type="file" id="pictureFile" name="File" style="display: none" accept="image/*" />
+                    </form>
                 </div>
                 <ul>
                     <!-- Name identifier -->
@@ -193,7 +199,7 @@
                         <div class="mt-2">
                             @foreach(var extProvider in Model.ExternalIdProviders)
                             {
-                                <a class="btn btn-secondary me-1" href="@Url.Action("Link", "Home", new { scheme = extProvider.AuthenticationScheme })">
+                                <a class="btn btn-secondary me-1" href="@Url.Action("Link", "Home", new { scheme = extProvider.AuthenticationScheme, returnUrl = returnUrl })">
                                     @extProvider.DisplayName
                                 </a>
                             }
@@ -212,7 +218,7 @@
                                 <p>@ProfileResource.update_your_credentials</p>
                                 foreach(var authenticationMethod in Model.AuthenticationMethods.Where(m => m.IsCredentialExists))
                                 {
-                                    <a class="btn btn-secondary me-1" href="@Url.Action("RegisterCredential", "Home", new { name = authenticationMethod.Amr })">
+                                    <a class="btn btn-secondary me-1" href="@Url.Action("RegisterCredential", "Home", new { name = authenticationMethod.Amr, redirectUrl = returnUrl })">
                                         @authenticationMethod.Name
                                     </a>
                                 }
@@ -228,7 +234,7 @@
                                 <p>@ProfileResource.enroll_credentials</p>
                                 foreach (var authenticationMethod in Model.AuthenticationMethods.Where(m => !m.IsCredentialExists))
                                 {
-                                    <a class="btn btn-secondary me-1" href="@Url.Action("RegisterCredential", "Home", new { name = authenticationMethod.Amr })">
+                                    <a class="btn btn-secondary me-1" href="@Url.Action("RegisterCredential", "Home", new { name = authenticationMethod.Amr, redirectUrl = returnUrl })">
                                         @authenticationMethod.Name
                                     </a>
                                 }
@@ -244,3 +250,38 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#pictureFile").on("change", function (e) {
+                const files = e.target.files;
+                if (files.length != 1) return;
+                const action = $("#pictureForm").attr("action");
+                const formData = new FormData();
+                formData.append('file', files[0]);
+                $.ajax({
+                    url: action,
+                    type: 'POST',
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success: function() {
+                        var reader = new FileReader();
+                        reader.onload = function (e) {
+                            $('#user-picture').attr('src', e.target.result);
+                        }
+
+                        reader.readAsDataURL(files[0]);
+                    }
+                });
+                return false;
+            });
+            $("#edit-profile").on('click', function () {
+                $("#pictureFile").trigger('click');
+                return false;
+            });
+        });  
+    </script>
+}

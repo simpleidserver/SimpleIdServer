@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Org.BouncyCastle.Crypto.Agreement;
 using SimpleIdServer.CredentialIssuer.Builders;
 using SimpleIdServer.CredentialIssuer.CredentialFormats;
 using SimpleIdServer.CredentialIssuer.Domains;
@@ -29,7 +30,13 @@ public class CredentialIssuerConfiguration
             {
                 cb.AddTranslation("Name of degree", "en-US");
             })
-            .AddDisplay("University Credential", "en-US", "https://university.example.edu/public/logo.png", "A square logo of a university", null,"#12107c", "#acd2b1")
+            .AddDisplay("University Credential", "en-US", "https://img.freepik.com/premium-vector/logo-university-name-logo-company-called-university_516670-732.jpg", "A square logo of a university", null,"#12107c", "#acd2b1")
             .Build()
+    };
+
+    public static List<UserCredentialClaim> CredentialClaims => new List<UserCredentialClaim>
+    {
+        UserCredentialClaimBuilder.Build("administrator", "DegreeName", "Master degree"),
+        UserCredentialClaimBuilder.Build("administrator", "GivenName", "SimpleIdServer")
     };
 }

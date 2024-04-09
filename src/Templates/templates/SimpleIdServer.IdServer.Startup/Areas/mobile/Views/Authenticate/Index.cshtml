@@ -7,11 +7,14 @@
 @{
     ViewBag.Title = AuthenticateMobileResource.auth_title;
     Layout = "~/Views/Shared/_AuthenticateLayout.cshtml";
+    var returnUrl = Microsoft.AspNetCore.Http.Extensions.UriHelper.GetDisplayUrl(Context.Request);
+    var realm = SimpleIdServer.IdServer.Middlewares.RealmContext.Instance()?.Realm;
+    var registationUrl = $"{(string.IsNullOrWhiteSpace(realm) ? "/" : $"/{realm}/")}Registration?redirectUrl={returnUrl}&workflowName={Model.RegistrationWorkflow?.Name}";
 }
 
-<ul class="list-group mb-3" id="errors">
-    @if (!ViewData.ModelState.IsValid)
-    {
+@if (!ViewData.ModelState.IsValid)
+{
+    <ul class="list-group mb-3" id="errors">
         @foreach (var modelState in ViewData.ModelState.Values)
         {
             foreach (var error in modelState.Errors)
@@ -19,8 +22,8 @@
                 <li class="list-group-item list-group-item-danger">@AuthenticateMobileResource.ResourceManager.GetString(error.ErrorMessage)</li>
             }
         }
-    }
-</ul>
+    </ul>
+}
 
 @if (Model.IsLoginMissing)
 {
@@ -35,6 +38,11 @@ else
     {
         @Html.AntiForgeryToken()
         <input type="hidden" asp-for="ReturnUrl" />
+        <input asp-for="IsFirstAmr" type="hidden" class="form-control" />
+        <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
+        <input asp-for="BeginLoginUrl" type="hidden" class="form-control" />
+        <input asp-for="LoginStatusUrl" type="hidden" class="form-control" />
+        <input asp-for="SessionId" type="hidden" class="form-control" />
         <div class="input-group mb-3">
             @if (Model.IsAuthInProgress)
             {
@@ -46,15 +54,24 @@ else
                 <input asp-for="Login" placeholder="@AuthenticateMobileResource.login" type="text" class="form-control" />
             }
         </div>
-        <div>
-            <input type="checkbox" asp-for="RememberLogin " />
-            <label>@AuthenticateMobileResource.remember_login</label>
-        </div>
-        <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
-        <input asp-for="BeginLoginUrl" type="hidden" class="form-control" />
-        <input asp-for="LoginStatusUrl" type="hidden" class="form-control" />
-        <input asp-for="SessionId" type="hidden" class="form-control" />
+        @if(Model.IsFirstAmr)
+        {
+            <div>
+                <input type="checkbox" asp-for="RememberLogin " />
+                <label>@AuthenticateMobileResource.remember_login</label>
+            </div>
+        }
         <button type="submit" class="btn btn-primary card-link">@AuthenticateMobileResource.generate_qrcode</button>
+    }
+
+    @if (Model.IsFirstAmr && Model.RegistrationWorkflow != null)
+    {
+        <div>
+            <div class="divider">
+                <p class="fw-bold text">OR</p>
+            </div>
+            <a href="@registationUrl">@AuthenticatePasswordResource.register</a>
+        </div>
     }
 
     <!-- QR Code-->
@@ -123,7 +140,7 @@ else
                 toggleBtn(true);
                 let response = await fetch(beginLoginUrl, {
                     method: 'POST',
-                    body: JSON.stringify({ login : form.Login }),
+                    body: JSON.stringify({ login : form.Login, credential_type: 'mobile' }),
                     headers: {
                         "Accept": "application/json",
                         "Content-Type": "application/json"

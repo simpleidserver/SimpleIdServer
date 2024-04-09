@@ -138,6 +138,9 @@
   <data name="invalid_confirmation_code" xml:space="preserve">
     <value>Confirmation code is not correct</value>
   </data>
+  <data name="invalid_email" xml:space="preserve">
+    <value>The email is invalid</value>
+  </data>
   <data name="otpcode_missing" xml:space="preserve">
     <value>Confirmation code is missing</value>
   </data>
