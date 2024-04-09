@@ -21,6 +21,7 @@ using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI;
 using System.Security.Claims;
 using System.Text;
+using static MassTransit.ValidationResultExtensions;
 
 namespace SimpleIdServer.IdServer.Fido.Apis
 {
@@ -141,6 +142,23 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             }, cancellationToken: cancellationToken);
 
             user.AddFidoCredential(sessionRecord.CredentialType, success.Result);
+            if (request.DeviceData != null)
+            {
+                user.Devices.Add(new UserDevice
+                {
+                    CreateDateTime = DateTime.UtcNow,
+                    DeviceType = request.DeviceData.DeviceType,
+                    Id = Guid.NewGuid().ToString(),
+                    Manufacturer = request.DeviceData.Manufacturer,
+                    Model = request.DeviceData.Model,
+                    Name = request.DeviceData.Name,
+                    PushToken = request.DeviceData.PushToken,
+                    PushType = request.DeviceData.PushType,
+                    Version = request.DeviceData.Version
+                });
+                user.NotificationMode = request.DeviceData.PushType ?? "console";
+            }
+
             sessionRecord.IsValidated = true;
             await _distributedCache.SetStringAsync(request.SessionId, System.Text.Json.JsonSerializer.Serialize(sessionRecord), new DistributedCacheEntryOptions
             {
@@ -162,23 +180,6 @@ namespace SimpleIdServer.IdServer.Fido.Apis
                         CreateDateTime = DateTime.UtcNow
                     };
                     if (_idServerHostOptions.IsEmailUsedDuringAuthentication) user.Email = login;
-                }
-
-                if (request.DeviceData != null)
-                {
-                    result.Devices.Add(new UserDevice
-                    {
-                        CreateDateTime = DateTime.UtcNow,
-                        DeviceType = request.DeviceData.DeviceType,
-                        Id = Guid.NewGuid().ToString(),
-                        Manufacturer = request.DeviceData.Manufacturer,
-                        Model = request.DeviceData.Model,
-                        Name = request.DeviceData.Name,
-                        PushToken = request.DeviceData.PushToken,
-                        PushType = request.DeviceData.PushType,
-                        Version = request.DeviceData.Version
-                    });
-                    result.NotificationMode = request.DeviceData.PushType ?? "console";
                 }
 
                 return result;

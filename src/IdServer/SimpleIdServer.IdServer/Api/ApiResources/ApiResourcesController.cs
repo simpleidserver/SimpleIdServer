@@ -64,6 +64,8 @@ public class ApiResourcesController : BaseController
 
             if (!string.IsNullOrWhiteSpace(request.OrderBy))
                 query = query.OrderBy(request.OrderBy);
+            else
+                query = query.OrderBy(r => r.Name);
             var nb = query.Count();
             var apiResources = await query.Skip(request.Skip.Value).Take(request.Take.Value).ToListAsync();
             return new OkObjectResult(new SearchResult<ApiResource>
