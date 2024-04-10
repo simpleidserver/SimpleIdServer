@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<Description>Library used to create and verify W3C Verifiable Credentials and Presentations in JWT format. </Description>
 	</PropertyGroup>
 	<ItemGroup>

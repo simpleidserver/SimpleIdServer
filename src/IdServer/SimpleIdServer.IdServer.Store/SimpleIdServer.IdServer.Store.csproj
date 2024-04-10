@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<Description>Storage used by the Identity Server project. By default EF is used.</Description>
@@ -9,9 +9,9 @@
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Domains\SimpleIdServer.IdServer.Domains.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.*" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.*" />
-		<PackageReference Include="EFCore.BulkExtensions" Version="7.0.*" />
-		<PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="7.0.*" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.*" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.*" />
+		<PackageReference Include="EFCore.BulkExtensions" Version="8.0.*" />
+		<PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="8.0.*" />
 	</ItemGroup>
 </Project>

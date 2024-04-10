@@ -1,18 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<Description>Identity server project with OPENID, OAUTH2.0, UMA2.0, CIBA and FAPI support.</Description>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="QRCoder" Version="1.4.1" />
-		<PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="6.25.1" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="7.0.1" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.Certificate" Version="7.0.1" />
+		<PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="7.5.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.4" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Certificate" Version="8.0.4" />
 		<PackageReference Include="Hangfire.AspNetCore" Version="1.7.32" />
 		<PackageReference Include="Hangfire.InMemory" Version="0.3.5" />
 		<PackageReference Include="MassTransit" Version="8.0.*" />
-		<PackageReference Include="System.DirectoryServices" Version="7.0.*" />
-		<PackageReference Include="System.DirectoryServices.Protocols" Version="7.0.0" />
+		<PackageReference Include="System.DirectoryServices" Version="8.0.*" />
+		<PackageReference Include="System.DirectoryServices.Protocols" Version="8.0.0" />
 	</ItemGroup>
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />

@@ -29,6 +29,7 @@ namespace Microsoft.IdentityModel.Tokens
         public static string SerializeJWKStr(this SigningCredentials credentials, string use = "sig")
         {
             var jsonWebKey = SerializeJWK(credentials, use);
+            
             return JsonNode.Parse(JsonExtensions.SerializeToJson(jsonWebKey)).AsObject().ToJsonString();
         }
 
