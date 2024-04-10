@@ -131,17 +131,26 @@ namespace SimpleIdServer.IdServer.UI
 
                 var subject = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
                 var kvp = Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName());
-                var authenticatedUser = await _authenticationHelper.GetUserByLogin(subject, prefix, cancellationToken);
-                var frontChannelLogout = BuildFrontChannelLogoutUrl(validationResult.Client, kvp.Value);
-                if (!string.IsNullOrWhiteSpace(frontChannelLogout))
+                var userSession = await _userSessionRepository.GetById(kvp.Value, prefix, cancellationToken);
+                IEnumerable<string> frontChannelLogouts = new List<string>();
+                if (userSession != null && userSession.State == UserSessionStates.Active)
                 {
-                    Response.SetNoCache();
+                    var targetedClients = await _clientRepository.Query()
+                        .AsNoTracking()
+                        .Where(c => userSession.ClientIds.Contains(c.ClientId) && c.Realms.Any(r => r.Name == prefix) && !string.IsNullOrWhiteSpace(c.FrontChannelLogoutUri))
+                        .ToListAsync();
+                    frontChannelLogouts = targetedClients.Select(c => BuildFrontChannelLogoutUrl(c, kvp.Value));
+                    if (frontChannelLogouts.Any())
+                    {
+                        Response.SetNoCache();
+                    }
                 }
 
+                var authenticatedUser = await _authenticationHelper.GetUserByLogin(subject, prefix, cancellationToken);
                 return View(new RevokeSessionViewModel(
                     url,
                     validationResult.Payload,
-                    frontChannelLogout,
+                    frontChannelLogouts,
                     validationResult.Client.RedirectToRevokeSessionUI));
             }
             catch (OAuthException ex)

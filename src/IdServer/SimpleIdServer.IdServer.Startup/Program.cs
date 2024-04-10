@@ -380,14 +380,7 @@ void SeedData(WebApplication application, string scimBaseUrl)
                 dbContext.CertificateAuthorities.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.CertificateAuthorities);
 
             if (!dbContext.PresentationDefinitions.Any())
-            {
-                foreach(var processDefinition in SimpleIdServer.IdServer.Startup.IdServerConfiguration.PresentationDefinitions)
-                {
-                    var realm = dbContext.Realms.Single(r => r.Name == processDefinition.Realm.Name);
-                    processDefinition.Realm = realm;
-                    dbContext.PresentationDefinitions.Add(processDefinition);
-                }
-            }
+                dbContext.PresentationDefinitions.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.PresentationDefinitions);
 
             if (!dbContext.Acrs.Any())
             {

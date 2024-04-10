@@ -7,11 +7,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
+using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.ExternalEvents;
@@ -47,6 +49,7 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IUserSessionResitory _userSessionRepository;
         private readonly IRecurringJobManager _recurringJobManager;
         private readonly IDistributedCache _distributedCache;
+        private readonly ISessionHelper _sessionHelper;
         private readonly ILogger<HomeController> _logger;
 
         public HomeController(IOptions<IdServerHostOptions> options,
@@ -61,6 +64,7 @@ namespace SimpleIdServer.IdServer.UI
             IUserSessionResitory userSessionRepository,
             IRecurringJobManager recurringJobManager,
             IDistributedCache distributedCache,
+            ISessionHelper sessionHelper,
             ILogger<HomeController> logger)
         {
             _options = options.Value;
@@ -75,6 +79,7 @@ namespace SimpleIdServer.IdServer.UI
             _userSessionRepository = userSessionRepository;
             _recurringJobManager = recurringJobManager;
             _distributedCache = distributedCache;
+            _sessionHelper = sessionHelper;
             _logger = logger;
         }
 
@@ -307,16 +312,21 @@ namespace SimpleIdServer.IdServer.UI
         [HttpGet]
         public virtual async Task<IActionResult> Disconnect([FromRoute] string prefix, CancellationToken cancellationToken)
         {
-            prefix = prefix ?? Constants.DefaultRealm;
-            var sessionCookieName = _options.GetSessionCookieName();
             if (User.Identity == null || !User.Identity.IsAuthenticated) return RedirectToAction("Index");
+            var sessionCookieName = _options.GetSessionCookieName();
             var subject = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
             var kvp = Request.Cookies.SingleOrDefault(c => c.Key == sessionCookieName);
-            if(!string.IsNullOrWhiteSpace(kvp.Key))
+            IEnumerable<string> frontChannelLogouts = new List<string>();
+            if (!string.IsNullOrWhiteSpace(kvp.Key))
             {
                 var activeSession = await _userSessionRepository.GetById(kvp.Value, prefix, cancellationToken);
-                if(activeSession != null && !activeSession.IsClientsNotified)
+                var targetedClients = await _clientRepository.Query()
+                    .AsNoTracking()
+                    .Where(c => activeSession.ClientIds.Contains(c.ClientId) && c.Realms.Any(r => r.Name == prefix) && !string.IsNullOrWhiteSpace(c.FrontChannelLogoutUri))
+                    .ToListAsync();
+                frontChannelLogouts = targetedClients.Select(c => BuildFrontChannelLogoutUrl(c, kvp.Value));
+                if (activeSession != null && !activeSession.IsClientsNotified)
                 {
                     activeSession.State = UserSessionStates.Rejected;
                     await _userSessionRepository.SaveChanges(cancellationToken);
@@ -331,7 +341,10 @@ namespace SimpleIdServer.IdServer.UI
                 UserName = nameIdentifier,
                 Realm = prefix
             });
-            return RedirectToAction("Index");
+            return View(new DisconnectViewModel
+            {
+                FrontChannelLogoutUrls = frontChannelLogouts
+            });
         }
 
         protected async Task Build(string prefix, ProfileViewModel viewModel, CancellationToken cancellationToken)
@@ -437,6 +450,24 @@ namespace SimpleIdServer.IdServer.UI
             }
 
             return returnUrl;
+        }
+        protected string BuildFrontChannelLogoutUrl(Client client, string sessionId)
+        {
+            if (string.IsNullOrWhiteSpace(client.FrontChannelLogoutUri))
+                return null;
+
+            var url = client.FrontChannelLogoutUri;
+            if (client.FrontChannelLogoutSessionRequired)
+            {
+                var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
+                url = QueryHelpers.AddQueryString(url, new Dictionary<string, string>
+                {
+                    { JwtRegisteredClaimNames.Iss, issuer },
+                    { JwtRegisteredClaimNames.Sid, sessionId }
+                });
+            }
+
+            return url;
         }
     }
 }

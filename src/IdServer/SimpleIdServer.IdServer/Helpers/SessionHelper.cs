@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -20,7 +21,7 @@ namespace SimpleIdServer.IdServer.Helpers;
 
 public interface ISessionHelper
 {
-    Task Revoke(string subject, IEnumerable<SigningCredentials> signingCredentials, UserSession session, IEnumerable<Client> clients, string issuer, CancellationToken cancellationToken);
+    Task RevokeBackChannels(string subject, IEnumerable<SigningCredentials> signingCredentials, UserSession session, IEnumerable<Client> clients, string issuer, CancellationToken cancellationToken);
 }
 
 public class SessionHelper : ISessionHelper
@@ -42,7 +43,7 @@ public class SessionHelper : ISessionHelper
         _logger = logger;
     }
 
-    public async Task Revoke(string subject, IEnumerable<SigningCredentials> signingCredentials, UserSession session, IEnumerable<Client> clients, string issuer, CancellationToken cancellationToken)
+    public async Task RevokeBackChannels(string subject, IEnumerable<SigningCredentials> signingCredentials, UserSession session, IEnumerable<Client> clients, string issuer, CancellationToken cancellationToken)
     {
         if (!clients.Any()) return;
         var currentDateTime = DateTime.UtcNow;

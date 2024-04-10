@@ -14,7 +14,6 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Extractors;
-using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Stores;
@@ -37,7 +36,6 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
             IUserRepository userRepository,
             IDataProtectionProvider dataProtectionProvider,
             IScopeClaimsExtractor claimsExtractor,
-            ISessionHelper sessionHelper,
             IOptions<IdServerHostOptions> opts, 
             IOptions<IdServerWsFederationOptions> options, 
             IKeyStore keyStore) : base(options, keyStore)

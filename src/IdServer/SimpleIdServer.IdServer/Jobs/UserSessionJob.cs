@@ -63,7 +63,7 @@ namespace SimpleIdServer.IdServer.Jobs
                         var sub = _authenticationHelper.GetLogin(inactiveSession.User);
                         var sessionClientIds = inactiveSession.ClientIds;
                         var sessionClients = targetedClients.Where(c => sessionClientIds.Contains(c.ClientId));
-                        await _sessionHelper.Revoke(sub, sigCredentials, inactiveSession, sessionClients, $"{_options.Authority}/{inactiveSession.Realm}", CancellationToken.None);
+                        await _sessionHelper.RevokeBackChannels(sub, sigCredentials, inactiveSession, sessionClients, $"{_options.Authority}/{inactiveSession.Realm}", CancellationToken.None);
                         inactiveSession.IsClientsNotified = true;
                     });
                 }
