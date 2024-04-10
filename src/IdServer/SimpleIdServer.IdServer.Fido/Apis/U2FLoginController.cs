@@ -127,7 +127,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             var creds = credential.GetFidoCredential();
             var storedCounter = creds.SignatureCounter;
             var res = await _fido2.MakeAssertionAsync(request.Assertion, options, creds.PublicKey, creds.DevicePublicKeys, storedCounter, callback, cancellationToken: cancellationToken);
-            creds.SignCount = res.Counter;
+            // creds.SignCount = res.Counter;
             if (res.DevicePublicKey is not null)
                 creds.DevicePublicKeys.Add(res.DevicePublicKey);
             credential.Value = JsonSerializer.Serialize(creds);
@@ -160,7 +160,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
                 UserVerificationMethod = true,
                 DevicePubKey = new AuthenticationExtensionsDevicePublicKeyInputs()
             };
-            var existingCredentials = authenticatedUser.GetStoredFidoCredentials().Select(c => c.Descriptor);
+            var existingCredentials = authenticatedUser.GetStoredFidoCredentials().Select(c => c.Descriptor).ToList().AsReadOnly();
             var options = _fido2.GetAssertionOptions(
                 existingCredentials,
                 UserVerificationRequirement.Discouraged,

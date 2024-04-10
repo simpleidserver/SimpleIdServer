@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.DPoP;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.Domains;
@@ -457,7 +458,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 Kid = act.KeyId,
                 KeyType = act.KeyType,
                 Usage = Constants.JWKUsages.Sig,
-                SerializedJsonWebKey = JsonExtensions.SerializeToJson(jsonWebKey)
+                SerializedJsonWebKey = JsonWebKeySerializer.Write(jsonWebKey)
             };
             keys.Add(new SelectableClientKey(newKey) { IsNew = true, Value = newKey });
             return state with
@@ -478,7 +479,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 Kid = act.KeyId,
                 KeyType = act.KeyType,
                 Usage = Constants.JWKUsages.Enc,
-                SerializedJsonWebKey = JsonExtensions.SerializeToJson(jsonWebKey)
+                SerializedJsonWebKey = JsonWebKeySerializer.Write(jsonWebKey)
             };
             keys.Add(new SelectableClientKey(newKey) { IsNew = true, Value = newKey });
             return state with

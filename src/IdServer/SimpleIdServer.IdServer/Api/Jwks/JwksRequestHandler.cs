@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.DPoP;
 using SimpleIdServer.IdServer.Stores;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text.Json.Nodes;
@@ -40,13 +41,13 @@ namespace SimpleIdServer.IdServer.Api.Jwks
             JsonObject ConvertSigningKey(SigningCredentials signingCredentials)
             {
                 var publicJwk = signingCredentials.SerializePublicJWK();
-                return JsonNode.Parse(JsonExtensions.SerializeToJson(publicJwk)).AsObject();
+                return JsonNode.Parse(JsonWebKeySerializer.Write(publicJwk)).AsObject();
             }
 
             JsonObject ConvertEncryptionKey(EncryptingCredentials encryptingCredentials)
             {
                 var publicJwk = encryptingCredentials.SerializePublicJWK();
-                return JsonNode.Parse(JsonExtensions.SerializeToJson(publicJwk)).AsObject();
+                return JsonNode.Parse(JsonWebKeySerializer.Write(publicJwk)).AsObject();
             }
         }
     }

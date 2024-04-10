@@ -9,7 +9,7 @@ namespace SimpleIdServer.IdServer.Domains
 {
     public static class UserExtensions
     {
-        public static User AddFidoCredential(this User user, AttestationVerificationSuccess attestation)
+        public static User AddFidoCredential(this User user, RegisteredPublicKeyCredential attestation)
         {
             user.Credentials.Add(new UserCredential
             {
@@ -22,15 +22,10 @@ namespace SimpleIdServer.IdServer.Domains
                     Descriptor = new PublicKeyCredentialDescriptor(attestation.Id),
                     PublicKey = attestation.PublicKey,
                     UserHandle = attestation.User.Id,
-                    SignCount = attestation.Counter,
-                    CredType = attestation.CredType,
                     RegDate = DateTime.Now,
                     AaGuid = attestation.AaGuid,
                     Transports = attestation.Transports,
-                    BE = attestation.BE,
-                    BS = attestation.BS,
                     AttestationObject = attestation.AttestationObject,
-                    AttestationClientDataJSON = attestation.AttestationClientDataJSON,
                     DevicePublicKeys = new List<byte[]>() { attestation.DevicePublicKey }
                 }),
                 IsActive = true

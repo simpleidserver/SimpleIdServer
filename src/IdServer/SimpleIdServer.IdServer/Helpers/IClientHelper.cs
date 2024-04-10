@@ -83,7 +83,7 @@ namespace SimpleIdServer.IdServer.Helpers
                 request.EnsureSuccessStatusCode();
                 var json = await request.Content.ReadAsStringAsync().ConfigureAwait(false);
                 var keysJson = JsonObject.Parse(json)["keys"].AsArray();
-                var jsonWebKeys = keysJson.Select(k => JsonExtensions.DeserializeFromJson<JsonWebKey>(k.ToString()));
+                var jsonWebKeys = keysJson.Select(k => new JsonWebKey(k.ToString()));
                 return jsonWebKeys;
             }
         }

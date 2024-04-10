@@ -300,7 +300,7 @@ namespace SimpleIdServer.IdServer.Helpers
         public object BuildScopeClaim(IEnumerable<string> scopes)
         {
             if (_oauthHostOptions.IsScopeClaimConcatenationEnabled) return string.Join(" ", scopes);
-            return scopes;
+            return scopes.ToArray();
         }
 
         private static void AddExpirationAndIssueTime(SecurityTokenDescriptor descriptor, double validityPeriodsInSeconds)

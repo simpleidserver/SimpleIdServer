@@ -223,7 +223,7 @@ namespace SimpleIdServer.IdServer.Domains
         {
             get
             {
-                return SerializedJsonWebKeys.Select(j=> JsonExtensions.DeserializeFromJson<JsonWebKey>(j.SerializedJsonWebKey));
+                return SerializedJsonWebKeys.Select(j=> new JsonWebKey(j.SerializedJsonWebKey));
             }
         }
         /// <summary>
@@ -520,7 +520,7 @@ namespace SimpleIdServer.IdServer.Domains
             SerializedJsonWebKeys.Add(new ClientJsonWebKey
             {
                 Kid = keyId,
-                SerializedJsonWebKey = JsonExtensions.SerializeToJson(jsonWebKey),
+                SerializedJsonWebKey = JsonSerializer.Serialize(jsonWebKey),
                 Alg = jsonWebKey.Alg,
                 KeyType = keyType,
                 Usage = usage

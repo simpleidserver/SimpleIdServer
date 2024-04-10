@@ -4,7 +4,6 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -60,7 +59,7 @@ namespace SimpleIdServer.DPoP
             {
                 var encodedPayload = Encoding.UTF8.GetBytes(jwt.EncodedHeader + "." + jwt.EncodedPayload);
                 var sig = Base64UrlEncoder.DecodeBytes(jwt.EncodedSignature);
-                var jwk = JsonExtensions.DeserializeFromJson<JsonWebKey>(jwkJson);
+                var jwk = new JsonWebKey(jwkJson);
                 var verifier = jwk.CryptoProviderFactory.CreateForVerifying(jwk, jwt.Alg);
                 var isValid = verifier.Verify(encodedPayload, sig);
                 return isValid;
@@ -121,7 +120,8 @@ namespace SimpleIdServer.DPoP
             {
                 var signingCredentials = new SigningCredentials(securityKey, alg);
                 var publicKey = signingCredentials.SerializePublicJWK(null);
-                var publicKeyJson = JsonNode.Parse(JsonExtensions.SerializeToJson(publicKey)).AsObject();
+
+                var publicKeyJson = JsonNode.Parse(JsonWebKeySerializer.Write(publicKey)).AsObject();
                 var jwk = new JsonObject();
                 foreach (var record in publicKeyJson) jwk.Add(record.Key, record.Value.AsValue().GetValue<string>());
                 var header = new JsonObject

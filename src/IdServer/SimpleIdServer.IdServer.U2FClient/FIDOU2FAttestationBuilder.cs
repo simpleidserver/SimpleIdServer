@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
+using static Fido2NetLib.AuthenticatorAttestationRawResponse;
 
 namespace SimpleIdServer.IdServer.U2FClient
 {
@@ -42,11 +43,11 @@ namespace SimpleIdServer.IdServer.U2FClient
                     { "sig",  signature }
                 } },
                 // The authenticator data object.
-                { "authData", new CborByteString(authData.ToByteArray()) }
+                { "authData", authData.ToByteArray() }
             }.Encode();
             var rawResponse = new AuthenticatorAttestationRawResponse
             {
-                Response = new AuthenticatorAttestationRawResponse.ResponseData
+                Response = new AttestationResponse
                 {
                     AttestationObject = attestationObject,
                     ClientDataJson = clientDataJson
