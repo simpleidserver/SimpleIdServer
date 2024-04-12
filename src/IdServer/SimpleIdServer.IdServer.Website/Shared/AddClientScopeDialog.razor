@@ -36,7 +36,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="EditableClientScope" Filterable="false" Sortable="false" Title="@Global.Name" Width="80px">
             <Template Context="data">
-                <RadzenLink Text="@data.Value.Name" Path="@($"/scopes/{data.Value.Name}/settings")" />
+                <RadzenLink Text="@data.Value.Name" Path="@($"/scopes/{data.Value.Id}/settings")" />
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="EditableClientScope" Filterable="false" Sortable="false" Title="@Global.Type" Width="80px">
