@@ -393,12 +393,21 @@ namespace SimpleIdServer.Scim.Helpers
             var value = values.FirstOrDefault(s => s.Name == SCIMConstants.StandardSCIMReferenceProperties.Value);
             var display = values.FirstOrDefault(s => IsDisplayName(s.Name));
             var type = values.FirstOrDefault(s => s.Name == SCIMConstants.StandardSCIMReferenceProperties.Type);
+
+            var parentAttr = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), targetSchemaAttribute, targetSchemaAttribute.SchemaId)
+            {
+                SchemaAttribute = targetSchemaAttribute,
+                RepresentationId = representationId
+            };
+            attributes.Add(parentAttr);
+
             if (value != null)
             {
                 attributes.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), value, value.SchemaId)
                 {
                     ValueString = sourceRepresentation.Id,
-                    RepresentationId = representationId
+                    RepresentationId = representationId,
+                    ParentAttributeId = parentAttr.Id
                 });
             }
 
@@ -408,7 +417,8 @@ namespace SimpleIdServer.Scim.Helpers
                 {
                     ValueString = sourceRepresentation.DisplayName,
                     RepresentationId = representationId,
-                    IsComputed = true
+                    IsComputed = true,
+                    ParentAttributeId = parentAttr.Id
                 });
             }
 
@@ -421,7 +431,8 @@ namespace SimpleIdServer.Scim.Helpers
                         {
                             ValueString = sourceResourceType,
                             RepresentationId = representationId,
-                            IsComputed = true
+                            IsComputed = true,
+                            ParentAttributeId = parentAttr.Id
                         });
                         break;
                     case Mode.PROPAGATE_INHERITANCE:
@@ -429,20 +440,13 @@ namespace SimpleIdServer.Scim.Helpers
                         {
                             ValueString = isDirect ? "direct" : "indirect",
                             RepresentationId = representationId,
-                            IsComputed = true
+                            IsComputed = true,
+                            ParentAttributeId = parentAttr.Id
                         });
                         break;
                 }
             }
 
-            var attrId = Guid.NewGuid().ToString();
-            var parentAttr = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attrId, targetSchemaAttribute, targetSchemaAttribute.SchemaId)
-            {
-                SchemaAttribute = targetSchemaAttribute
-            };
-            parentAttr.RepresentationId = representationId;
-            foreach (var attr in attributes) attr.ParentAttributeId = parentAttr.Id;
-            attributes.Add(parentAttr);
             return attributes;
         }
 
