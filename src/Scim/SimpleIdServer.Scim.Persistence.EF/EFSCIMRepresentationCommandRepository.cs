@@ -223,7 +223,16 @@ namespace SimpleIdServer.Scim.Persistence.EF
                 attr.SchemaAttributeId = attr.SchemaAttribute?.Id;
             var bulkConfig = new BulkConfig
             {
-                PropertiesToInclude = new List<string> { nameof(SCIMRepresentationAttribute.ValueString), nameof(SCIMRepresentationAttribute.ComputedValueIndex) }
+                PropertiesToInclude = new List<string> 
+                { 
+                    nameof(SCIMRepresentationAttribute.ValueString),
+                    nameof(SCIMRepresentationAttribute.ValueDecimal), 
+                    nameof(SCIMRepresentationAttribute.ValueBoolean),
+                    nameof(SCIMRepresentationAttribute.ValueBinary),
+                    nameof(SCIMRepresentationAttribute.ValueReference),
+                    nameof(SCIMRepresentationAttribute.ValueInteger),
+                    nameof(SCIMRepresentationAttribute.ValueDateTime),
+                    nameof(SCIMRepresentationAttribute.ComputedValueIndex) }
             };
             bulkConfig = GetBulkConfig(BulkOperations.UPDATE, bulkConfig);
             await _scimDbContext.BulkUpdateAsync(scimRepresentationAttributes.ToList(), bulkConfig);
