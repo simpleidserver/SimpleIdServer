@@ -43,7 +43,10 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        public static SimpleIdServerSCIMBuilder AddSIDScim(this IServiceCollection services, Action<SCIMHostOptions> options, Action<IBusRegistrationConfigurator> massTransitOptions = null)
+        public static SimpleIdServerSCIMBuilder AddSIDScim(
+            this IServiceCollection services, 
+            Action<SCIMHostOptions> options, 
+            Action<IBusRegistrationConfigurator> massTransitOptions = null)
         {
             services.Configure(options);
             return services.AddSIDScim(massTransitOptions);

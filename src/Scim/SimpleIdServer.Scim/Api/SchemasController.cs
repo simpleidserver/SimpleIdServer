@@ -14,7 +14,6 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Api
 {
-    [Route(SCIMEndpoints.Schemas)]
     public class SchemasController : Controller
     {
         private readonly ISCIMSchemaQueryRepository _scimSchemaQueryRepository;
@@ -35,7 +34,7 @@ namespace SimpleIdServer.Scim.Api
         /// <returns></returns>
         [ProducesResponseType(200)]
         [HttpGet]
-        public async virtual Task<IActionResult> Get()
+        public async virtual Task<IActionResult> GetAll()
         {
             _logger.LogInformation(Global.StartGetSchemas);
             var schemas = await _scimSchemaQueryRepository.GetAll();
@@ -66,7 +65,7 @@ namespace SimpleIdServer.Scim.Api
         /// <returns>Unique ID of the schema</returns>
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        [HttpGet("{id}")]
+        [HttpGet]
         public async virtual Task<IActionResult> Get(string id)
         {
             var schema = await _scimSchemaQueryRepository.FindSCIMSchemaById(id);

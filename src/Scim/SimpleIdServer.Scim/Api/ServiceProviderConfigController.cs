@@ -8,13 +8,11 @@ using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Domains.Builders;
 using SimpleIdServer.Scim.Helpers;
 using SimpleIdServer.Scim.Resources;
-using System;
 using System.Collections.Generic;
 using System.Net;
 
 namespace SimpleIdServer.Scim.Api
 {
-    [Route(SCIMEndpoints.ServiceProviderConfig)]
     public class ServiceProviderConfigController : Controller
     {
         private readonly SCIMHostOptions _options;

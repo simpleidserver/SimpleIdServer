@@ -15,7 +15,6 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Api
 {
-    [Route(SCIMEndpoints.ResourceType)]
     public class ResourceTypesController : Controller
     {
         private readonly ISCIMSchemaQueryRepository _scimSchemaQueryRepository;
@@ -42,7 +41,7 @@ namespace SimpleIdServer.Scim.Api
         /// <returns></returns>
         [ProducesResponseType(200)]
         [HttpGet]
-        public async virtual Task<IActionResult> Get()
+        public async virtual Task<IActionResult> GetAll()
         {
             _logger.LogInformation(Global.StartGetResourceTypes);
             var result = await _scimSchemaQueryRepository.GetAllRoot();
@@ -67,7 +66,7 @@ namespace SimpleIdServer.Scim.Api
         /// <returns></returns>
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        [HttpGet("{id}")]
+        [HttpGet]
         public async virtual Task<IActionResult> Get(string id)
         {
             _logger.LogInformation(string.Format(Global.StartGetResourceType, id));

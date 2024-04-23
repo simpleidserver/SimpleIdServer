@@ -3,7 +3,6 @@
 using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
@@ -83,7 +82,7 @@ namespace SimpleIdServer.Scim.Api
         [ProducesResponseType(404)]
         [HttpGet]
         [Authorize("QueryScimResource")]
-        public virtual Task<IActionResult> Get([FromQuery] SearchSCIMResourceParameter searchRequest, CancellationToken cancellationToken)
+        public virtual Task<IActionResult> Get([FromRoute] string prefix, [FromQuery] SearchSCIMResourceParameter searchRequest, CancellationToken cancellationToken)
         {
             if (Request.Query != null && Request.Query.TryGetValue(SCIMConstants.StandardSCIMSearchAttributes.Filter, out StringValues str) && string.IsNullOrWhiteSpace(searchRequest.Filter)) searchRequest.Filter = string.Empty;
             return InternalSearch(searchRequest, cancellationToken);
@@ -104,7 +103,7 @@ namespace SimpleIdServer.Scim.Api
         [ProducesResponseType(404)]
         [HttpPost(".search")]
         [Authorize("QueryScimResource")]
-        public virtual Task<IActionResult> Search([FromBody] SearchSCIMResourceParameter searchRequest, CancellationToken cancellationToken)
+        public virtual Task<IActionResult> Search([FromRoute] string prefix, [FromBody] SearchSCIMResourceParameter searchRequest, CancellationToken cancellationToken)
         {
             return InternalSearch(searchRequest, cancellationToken);
         }
@@ -124,7 +123,7 @@ namespace SimpleIdServer.Scim.Api
         [ProducesResponseType(404)]
         [HttpGet("{id}")]
         [Authorize("QueryScimResource")]
-        public virtual Task<IActionResult> Get(string id, [FromQuery] GetSCIMResourceRequest parameter, CancellationToken cancellationToken)
+        public virtual Task<IActionResult> Get([FromRoute] string prefix, string id, [FromQuery] GetSCIMResourceRequest parameter, CancellationToken cancellationToken)
         {
             return InternalGet(id, parameter, cancellationToken);
         }
@@ -145,7 +144,7 @@ namespace SimpleIdServer.Scim.Api
         [ProducesResponseType(404)]
         [HttpGet("Me")]
         [Authorize("UserAuthenticated")]
-        public virtual Task<IActionResult> GetMe(string id, [FromQuery] GetSCIMResourceRequest parameter, CancellationToken cancellationToken)
+        public virtual Task<IActionResult> GetMe([FromRoute] string prefix, string id, [FromQuery] GetSCIMResourceRequest parameter, CancellationToken cancellationToken)
         {
             return ExecuteActionIfAuthenticated(() =>
             {
@@ -170,7 +169,7 @@ namespace SimpleIdServer.Scim.Api
         [ProducesResponseType(401)]
         [ProducesResponseType(409)]
         [ProducesResponseType(500)]
-        public virtual Task<IActionResult> Add([FromBody] RepresentationParameter param)
+        public virtual Task<IActionResult> Add([FromRoute] string prefix, [FromBody] RepresentationParameter param)
         {
             return InternalAdd(param);
         }
@@ -193,7 +192,7 @@ namespace SimpleIdServer.Scim.Api
         [ProducesResponseType(401)]
         [ProducesResponseType(409)]
         [ProducesResponseType(500)]
-        public virtual Task<IActionResult> AddMe([FromBody] RepresentationParameter param)
+        public virtual Task<IActionResult> AddMe([FromRoute] string prefix, [FromBody] RepresentationParameter param)
         {
             return ExecuteActionIfAuthenticated(() =>
             {
@@ -218,7 +217,7 @@ namespace SimpleIdServer.Scim.Api
         [ProducesResponseType(500)]
         [HttpDelete("{id}")]
         [Authorize("DeleteScimResource")]
-        public virtual Task<IActionResult> Delete(string id)
+        public virtual Task<IActionResult> Delete([FromRoute] string prefix, string id)
         {
             return InternalDelete(id);
         }
@@ -241,7 +240,7 @@ namespace SimpleIdServer.Scim.Api
         [ProducesResponseType(500)]
         [HttpDelete("Me/{id}")]
         [Authorize("UserAuthenticated")]
-        public virtual Task<IActionResult> DeleteMe(string id)
+        public virtual Task<IActionResult> DeleteMe([FromRoute] string prefix, string id)
         {
             return ExecuteActionIfAuthenticated(() =>
             {
@@ -269,7 +268,7 @@ namespace SimpleIdServer.Scim.Api
         [ProducesResponseType(500)]
         [HttpPut("{id}")]
         [Authorize("UpdateScimResource")]
-        public virtual Task<IActionResult> Update(string id, [FromBody] RepresentationParameter param)
+        public virtual Task<IActionResult> Update([FromRoute] string prefix, string id, [FromBody] RepresentationParameter param)
         {
             return InternalUpdate(id, param);
         }
@@ -295,7 +294,7 @@ namespace SimpleIdServer.Scim.Api
         [ProducesResponseType(500)]
         [HttpPut("Me/{id}")]
         [Authorize("UserAuthenticated")]
-        public virtual Task<IActionResult> UpdateMe(string id, [FromBody] RepresentationParameter param)
+        public virtual Task<IActionResult> UpdateMe([FromRoute] string prefix, string id, [FromBody] RepresentationParameter param)
         {
             return ExecuteActionIfAuthenticated(() =>
             {
@@ -326,7 +325,7 @@ namespace SimpleIdServer.Scim.Api
         [ProducesResponseType(500)]
         [HttpPatch("{id}")]
         [Authorize("UpdateScimResource")]
-        public virtual Task<IActionResult> Patch(string id, [FromBody] PatchRepresentationParameter patchRepresentation)
+        public virtual Task<IActionResult> Patch([FromRoute] string prefix, string id, [FromBody] PatchRepresentationParameter patchRepresentation)
         {
             return InternalPatch(id, patchRepresentation);
         }
@@ -354,7 +353,7 @@ namespace SimpleIdServer.Scim.Api
         [ProducesResponseType(500)]
         [HttpPatch("Me/{id}")]
         [Authorize("UserAuthenticated")]
-        public virtual Task<IActionResult> PatchMe(string id, [FromBody] PatchRepresentationParameter patchRepresentation)
+        public virtual Task<IActionResult> PatchMe([FromRoute] string prefix, string id, [FromBody] PatchRepresentationParameter patchRepresentation)
         {
             return ExecuteActionIfAuthenticated(() =>
             {
