@@ -196,9 +196,13 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
         public void Configure(IApplicationBuilder app)
         {
             app.UseAuthentication();
-            app.UseRouting();
             app.UseAuthorization();
-            app.UseMvc();
+            app.UseMvc(r =>
+            {
+                r.UseStandardScimEdp("CustomUsers", false);
+                r.UseStandardScimEdp("Entitlements", false);
+                r.UseScim();
+            });
         }
     }
 

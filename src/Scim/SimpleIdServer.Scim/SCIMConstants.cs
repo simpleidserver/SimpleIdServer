@@ -94,6 +94,12 @@ namespace SimpleIdServer.Scim
             }
         };
 
+        public static List<Realm> StandardRealms = new List<Realm>
+        {
+            new Realm { Name = "idserver", Owner = "IdServer" },
+            new Realm { Name = "azuread", Owner = "AzureAd" }
+        };
+
         public static List<string> AllStandardPath = new List<string>
         {
              StandardSCIMRepresentationAttributes.Id,

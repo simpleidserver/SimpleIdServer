@@ -86,6 +86,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddSingleton<ISCIMSchemaQueryRepository>(new DefaultSchemaQueryRepository(schemas));
             services.TryAddSingleton<ISCIMAttributeMappingQueryRepository>(new DefaultAttributeMappingQueryRepository(SCIMConstants.StandardAttributeMapping));
             services.TryAddSingleton<IProvisioningConfigurationRepository>(new DefaultProvisioningConfigurationRepository(provisioningConfigurations));
+            services.TryAddSingleton<IRealmRepository>(new DefaultRealmRepository(SCIMConstants.StandardRealms));
             return services;
         }
 

@@ -28,7 +28,6 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Api
 {
-    [Route(SCIMEndpoints.Bulk)]
     [TypeFilter(typeof(ActivatorActionFilter), Arguments = new object[] { "IsBulkEnabled" })]
     public class BulkController : Controller
     {
@@ -172,10 +171,7 @@ namespace SimpleIdServer.Scim.Api
             {
                 newHttpContext.RequestServices = scope.ServiceProvider;
                 newHttpContext.Response.Body = new MemoryStream();
-                var routeContext = new RouteContext(newHttpContext)
-                {
-                    RouteData = RouteData
-                };
+                var routeContext = new RouteContext(newHttpContext);
                 await router.RouteAsync(routeContext);
                 var ctx = routeContext.HttpContext;
                 await routeContext.Handler.Invoke(newHttpContext);

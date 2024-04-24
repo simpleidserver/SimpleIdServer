@@ -9,18 +9,19 @@ using SimpleIdServer.Scim.Persistence.EF;
 
 #nullable disable
 
-namespace SimpleIdServer.Scim.Postgre.Startup.Migrations
+namespace SimpleIdServer.Scim.PostgreMigrations.Migrations
 {
     [DbContext(typeof(SCIMDbContext))]
-    [Migration("20230302151513_Init")]
-    partial class Init
+    [Migration("20240424184031_AddRealm")]
+    partial class AddRealm
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.3")
+                .HasDefaultSchema("scim")
+                .HasAnnotation("ProductVersion", "7.0.18")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -37,7 +38,7 @@ namespace SimpleIdServer.Scim.Postgre.Startup.Migrations
 
                     b.HasIndex("SchemasId");
 
-                    b.ToTable("SCIMRepresentationSCIMSchema");
+                    b.ToTable("SCIMRepresentationSCIMSchema", "scim");
                 });
 
             modelBuilder.Entity("SimpleIdServer.Scim.Domains.ProvisioningConfiguration", b =>
@@ -56,7 +57,7 @@ namespace SimpleIdServer.Scim.Postgre.Startup.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ProvisioningConfigurations");
+                    b.ToTable("ProvisioningConfigurations", "scim");
                 });
 
             modelBuilder.Entity("SimpleIdServer.Scim.Domains.ProvisioningConfigurationHistory", b =>
@@ -98,7 +99,7 @@ namespace SimpleIdServer.Scim.Postgre.Startup.Migrations
 
                     b.HasIndex("ProvisioningConfigurationId");
 
-                    b.ToTable("ProvisioningConfigurationHistory");
+                    b.ToTable("ProvisioningConfigurationHistory", "scim");
                 });
 
             modelBuilder.Entity("SimpleIdServer.Scim.Domains.ProvisioningConfigurationRecord", b =>
@@ -133,7 +134,20 @@ namespace SimpleIdServer.Scim.Postgre.Startup.Migrations
 
                     b.HasIndex("ProvisioningConfigurationRecordId");
 
-                    b.ToTable("ProvisioningConfigurationRecord");
+                    b.ToTable("ProvisioningConfigurationRecord", "scim");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.Scim.Domains.Realm", b =>
+                {
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Owner")
+                        .HasColumnType("text");
+
+                    b.HasKey("Name");
+
+                    b.ToTable("Realms", "scim");
                 });
 
             modelBuilder.Entity("SimpleIdServer.Scim.Domains.SCIMAttributeMapping", b =>
@@ -161,7 +175,7 @@ namespace SimpleIdServer.Scim.Postgre.Startup.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SCIMAttributeMappingLst");
+                    b.ToTable("SCIMAttributeMappingLst", "scim");
                 });
 
             modelBuilder.Entity("SimpleIdServer.Scim.Domains.SCIMRepresentation", b =>
@@ -181,6 +195,9 @@ namespace SimpleIdServer.Scim.Postgre.Startup.Migrations
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("RealmName")
+                        .HasColumnType("text");
+
                     b.Property<string>("ResourceType")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
@@ -190,7 +207,7 @@ namespace SimpleIdServer.Scim.Postgre.Startup.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SCIMRepresentationLst");
+                    b.ToTable("SCIMRepresentationLst", "scim");
                 });
 
             modelBuilder.Entity("SimpleIdServer.Scim.Domains.SCIMRepresentationAttribute", b =>
@@ -201,8 +218,14 @@ namespace SimpleIdServer.Scim.Postgre.Startup.Migrations
                     b.Property<string>("AttributeId")
                         .HasColumnType("text");
 
+                    b.Property<string>("ComputedValueIndex")
+                        .HasColumnType("text");
+
                     b.Property<string>("FullPath")
                         .HasColumnType("text");
+
+                    b.Property<bool>("IsComputed")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Namespace")
                         .HasColumnType("text");
@@ -249,7 +272,7 @@ namespace SimpleIdServer.Scim.Postgre.Startup.Migrations
 
                     b.HasIndex("SchemaAttributeId");
 
-                    b.ToTable("SCIMRepresentationAttributeLst");
+                    b.ToTable("SCIMRepresentationAttributeLst", "scim");
                 });
 
             modelBuilder.Entity("SimpleIdServer.Scim.Domains.SCIMSchema", b =>
@@ -271,7 +294,7 @@ namespace SimpleIdServer.Scim.Postgre.Startup.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SCIMSchemaLst");
+                    b.ToTable("SCIMSchemaLst", "scim");
                 });
 
             modelBuilder.Entity("SimpleIdServer.Scim.Domains.SCIMSchemaAttribute", b =>
@@ -331,7 +354,7 @@ namespace SimpleIdServer.Scim.Postgre.Startup.Migrations
 
                     b.HasIndex("SchemaId");
 
-                    b.ToTable("SCIMSchemaAttribute");
+                    b.ToTable("SCIMSchemaAttribute", "scim");
                 });
 
             modelBuilder.Entity("SimpleIdServer.Scim.Domains.SCIMSchemaExtension", b =>
@@ -352,7 +375,7 @@ namespace SimpleIdServer.Scim.Postgre.Startup.Migrations
 
                     b.HasIndex("SCIMSchemaId");
 
-                    b.ToTable("SCIMSchemaExtension");
+                    b.ToTable("SCIMSchemaExtension", "scim");
                 });
 
             modelBuilder.Entity("SCIMRepresentationSCIMSchema", b =>

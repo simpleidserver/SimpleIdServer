@@ -18,7 +18,7 @@ namespace SimpleIdServer.Scim.SqlServerMigrations.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("scim")
-                .HasAnnotation("ProductVersion", "7.0.10")
+                .HasAnnotation("ProductVersion", "7.0.18")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -134,6 +134,19 @@ namespace SimpleIdServer.Scim.SqlServerMigrations.Migrations
                     b.ToTable("ProvisioningConfigurationRecord", "scim");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.Scim.Domains.Realm", b =>
+                {
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Owner")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Name");
+
+                    b.ToTable("Realms", "scim");
+                });
+
             modelBuilder.Entity("SimpleIdServer.Scim.Domains.SCIMAttributeMapping", b =>
                 {
                     b.Property<string>("Id")
@@ -178,6 +191,9 @@ namespace SimpleIdServer.Scim.SqlServerMigrations.Migrations
 
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("RealmName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ResourceType")
                         .HasMaxLength(255)

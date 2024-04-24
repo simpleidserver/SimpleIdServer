@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Infrastructure;
@@ -45,10 +46,9 @@ public class Program
 
     private static void ConfigureServices(WebApplicationBuilder builder)
     {
-        builder.Services.AddControllers(o =>
+        builder.Services.AddMvc(o =>
         {
             o.EnableEndpointRouting = true;
-            // o.AddSCIMValueProviders();
         }).AddNewtonsoftJson();
         builder.Services.AddLogging(o =>
         {
@@ -229,6 +229,7 @@ public class Program
 
     private static void ConfigureApp(WebApplicationBuilder builder, WebApplication app)
     {
+        var opts = app.Services.GetRequiredService<IOptions<SCIMHostOptions>>().Value;
         app.UseSwagger();
         app.UseSwaggerUI(c =>
         {
@@ -236,7 +237,10 @@ public class Program
         });
         InitializeDatabase(builder, app);
         app.UseAuthentication();
-        app.UseScim();
+        app.UseMvc(e =>
+        {
+            e.UseScim(opts.EnableRealm);
+        });
     }
 
     #region Database migration
@@ -313,6 +317,9 @@ public class Program
                     context.SCIMAttributeMappingLst.Add(secondAttributeMapping);
                     context.SCIMAttributeMappingLst.Add(thirdAttributeMapping);
                 }
+
+                if (!context.Realms.Any())
+                    context.Realms.AddRange(Scim.SCIMConstants.StandardRealms);
 
                 context.SaveChanges();
             }
