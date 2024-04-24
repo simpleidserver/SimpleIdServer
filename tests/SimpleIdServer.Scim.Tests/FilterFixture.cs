@@ -143,7 +143,8 @@ namespace SimpleIdServer.Scim.Tests
             var thirtyResult = ParseAndExecuteFilter(representations.AsQueryable(), "urn:ietf:params:scim:schemas:core:2.0:User:name.familyName co \"O'Malley\"", customSchema);
             var twentyTwoResult = ParseAndExecuteFilter(representations.AsQueryable(), "(userName eq \"bjensen\")", customSchema);
             var twentyThreeResult = ParseAndExecuteFilter(representations.AsQueryable(), "(userName eq \"bjensen\" or userName eq \"Jule\")", customSchema);
-
+            var twentyFourResult = ParseAndExecuteFilter(representations.AsQueryable(), "(userName eq \"bjensen\") and emails[type eq \"work\" and value co \"example.org\"] and phoneNumbers[primary eq \"true\"]", customSchema);
+            
             Assert.Equal(1, firstResult.Count());
             Assert.Equal(1, secondResult.Count());
             Assert.Equal(2, thirdResult.Count());
@@ -168,6 +169,7 @@ namespace SimpleIdServer.Scim.Tests
             Assert.Equal(1, thirtyResult.Count());
             Assert.Equal(1, twentyTwoResult.Count());
             Assert.Equal(2, twentyThreeResult.Count());
+            Assert.Equal(1, twentyFourResult.Count());
         }
 
         private IQueryable<SCIMRepresentation> ParseAndExecuteFilter(IQueryable<SCIMRepresentation> representations, string filter, SCIMSchema customSchema)
