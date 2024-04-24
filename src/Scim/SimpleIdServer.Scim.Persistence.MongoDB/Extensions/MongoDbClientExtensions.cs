@@ -11,18 +11,18 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
 {
     public static class MongoDbClientExtensions
 	{
-		public static void EnsureMongoDbSCIMDatabaseIsCreated(MongoDbOptions options, List<SCIMSchema> initialSchemas, List<SCIMAttributeMapping> initialAttributeMapping)
+		public static void EnsureMongoDbSCIMDatabaseIsCreated(MongoDbOptions options, List<SCIMSchema> initialSchemas, List<SCIMAttributeMapping> initialAttributeMapping, List<Realm> realms)
 		{
 			var mongoClient = new MongoClient(options.ConnectionString);
 			var db = mongoClient.GetDatabase(options.Database);
 			EnsureCollectionIsCreated<SCIMRepresentationModel>(db, options.CollectionRepresentations);
             EnsureCollectionIsCreated<SCIMRepresentationAttribute>(db, options.CollectionRepresentationAttributes);
             EnsureCollectionIsCreated<ProvisioningConfiguration>(db, options.CollectionProvisioningLst);
-            EnsureCollectionIsCreated<Realm>(db, options.CollectionRealms);
             EnsureSCIMRepresentationAttributeIndexesAreCreated(db, options.CollectionRepresentationAttributes);
             var schemasCollection = EnsureCollectionIsCreated<SCIMSchema>(db, options.CollectionSchemas);
 			var mappingsCollection = EnsureCollectionIsCreated<SCIMAttributeMapping>(db, options.CollectionMappings);
-			var query = schemasCollection.AsQueryable();
+            var realmsCollection = EnsureCollectionIsCreated<Realm>(db, options.CollectionRealms);
+            var query = schemasCollection.AsQueryable();
 			if (query.Count() == 0)
 			{
 				if (initialSchemas != null)
@@ -51,7 +51,19 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
 					mappingsCollection.InsertMany(SCIMConstants.StandardAttributeMapping);
 				}
             }
-		}
+
+            if (realmsCollection.AsQueryable().Count() == 0)
+            {
+                if (realms != null)
+                {
+                    realmsCollection.InsertMany(realms);
+                }
+                else
+                {
+                    realmsCollection.InsertMany(SCIMConstants.StandardRealms);
+                }
+            }
+        }
 
 		private static void EnsureSCIMRepresentationAttributeIndexesAreCreated(IMongoDatabase db, string name)
         {

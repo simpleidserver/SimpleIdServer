@@ -19,6 +19,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Models
         public SCIMRepresentationModel(SCIMRepresentation representation, string schemaCollectionName, string attributesCollectionName) : this()
         {
             Id = representation.Id;
+            RealmName = representation.RealmName;
             ExternalId = representation.ExternalId;
             ResourceType = representation.ResourceType;
             Version = representation.Version;

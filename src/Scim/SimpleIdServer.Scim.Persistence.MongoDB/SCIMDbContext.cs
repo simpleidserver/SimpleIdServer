@@ -46,6 +46,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             BsonClassMap.RegisterClassMap<Realm>(cm =>
             {
                 cm.AutoMap();
+				cm.MapIdMember(c => c.Name);
             });
             BsonClassMap.RegisterClassMap<ProvisioningConfiguration>(cm =>
 			{

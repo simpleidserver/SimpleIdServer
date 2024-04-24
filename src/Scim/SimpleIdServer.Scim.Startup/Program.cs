@@ -3,6 +3,7 @@
 using AspNetCore.Authentication.ApiKey;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -48,7 +49,8 @@ public class Program
     {
         builder.Services.AddMvc(o =>
         {
-            o.EnableEndpointRouting = true;
+            o.EnableEndpointRouting = false;
+            o.AddSCIMValueProviders();
         }).AddNewtonsoftJson();
         builder.Services.AddLogging(o =>
         {
@@ -75,7 +77,8 @@ public class Program
                 options.Realm = "Sample Web API";
                 options.KeyName = "Authorization";
             });
-        // services.AddAuthorization(opts => opts.AddDefaultSCIMAuthorizationPolicy());
+        builder.Services.AddAuthorization(opts => opts.AddDefaultSCIMAuthorizationPolicy());
+        /*
         builder.Services.AddAuthorization(opts =>
         {
             opts.AddPolicy("QueryScimResource", p => p.RequireAssertion(_ => true));
@@ -84,6 +87,7 @@ public class Program
             opts.AddPolicy("UpdateScimResource", p => p.RequireAssertion(_ => true));
             opts.AddPolicy("BulkScimResource", p => p.RequireAssertion(_ => true));
         });
+        */
     }
 
     private static void ConfigureSwagger(WebApplicationBuilder builder)
@@ -109,7 +113,7 @@ public class Program
         builder.Services.AddSIDScim(_ =>
         {
             _.IgnoreUnsupportedCanonicalValues = false;
-            _.EnableRealm = true;
+            _.EnableRealm = bool.Parse(builder.Configuration["IsRealmEnabled"]);
         }, massTransitOptions: _ =>
         {
             _.AddConsumer<IntegrationEventConsumer>();

@@ -17,6 +17,7 @@ namespace Microsoft.Extensions.DependencyInjection
 			Action<MongoDbOptions> mongoDbSetup,
 			List<SCIMSchema> initialSchemas = null,
 			List<SCIMAttributeMapping> initialAttributeMapping = null,
+			List<Realm> realms = null,
 			bool useVersion403 = false)
 		{
 			if (!useVersion403) SCIMDbContext.RegisterMappings();
@@ -31,7 +32,7 @@ namespace Microsoft.Extensions.DependencyInjection
 				services.AddTransient<IMongoClient>(_ => new MongoClient(options.ConnectionString));
 				services.AddTransient(provider => provider.GetService<IMongoClient>().GetDatabase(options.Database));
 				services.AddTransient<SCIMDbContext>();
-				MongoDbClientExtensions.EnsureMongoDbSCIMDatabaseIsCreated(options, initialSchemas, initialAttributeMapping);
+				MongoDbClientExtensions.EnsureMongoDbSCIMDatabaseIsCreated(options, initialSchemas, initialAttributeMapping, realms);
 			}
 
 			services.AddTransient<ISCIMRepresentationCommandRepository, SCIMRepresentationCommandRepository>();

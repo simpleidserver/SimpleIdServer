@@ -603,7 +603,7 @@ namespace SimpleIdServer.Scim.Api
             if (nameIdentifier == null) return RealmStatus.UNKNOWN;
             var existingRealm = await _realmRepository.Get(realm, cancellationToken);
             if (existingRealm == null) return RealmStatus.UNKNOWN;
-            return existingRealm.Name == realm ? RealmStatus.AUTHORIZED : RealmStatus.UNAUTHORIZED;
+            return existingRealm.Owner == nameIdentifier.Value ? RealmStatus.AUTHORIZED : RealmStatus.UNAUTHORIZED;
         }
 
         private IActionResult Build(string realm, RealmStatus status)

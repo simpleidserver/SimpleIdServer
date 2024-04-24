@@ -20,6 +20,7 @@ namespace SimpleIdServer.Scim.Persistence
             IEnumerable<SCIMAttributeExpression> includedAttributes = null, 
             IEnumerable<SCIMAttributeExpression> excludedAttributes = null)
         {
+            Realm = realm;
             SchemaNames = schemaNames;
             ResourceType = resourceType;
             StartIndex = startIndex;
