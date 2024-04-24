@@ -13,13 +13,17 @@ namespace SimpleIdServer.Scim.Parser.Expressions
             GroupingFilter = groupingFilter;
         }
 
-        public SCIMComplexAttributeExpression(string name, SCIMExpression groupingFilter, SCIMAttributeExpression child) : this(name, child) { }
+        public SCIMComplexAttributeExpression(string name, SCIMExpression groupingFilter, SCIMAttributeExpression child)
+            : this(name, groupingFilter)
+        {
+            Child = child;
+        }
 
         public SCIMExpression GroupingFilter { get; set; }
 
         public override object Clone()
         {
-            return new SCIMComplexAttributeExpression(Name, (SCIMExpression)GroupingFilter.Clone(), (SCIMAttributeExpression)Child.Clone());
+            return new SCIMComplexAttributeExpression(Name, (SCIMExpression)GroupingFilter.Clone(), (SCIMAttributeExpression)Child?.Clone());
         }
 
         protected override ICollection<SCIMRepresentationAttribute> InternalBuildEmptyAttributes()
