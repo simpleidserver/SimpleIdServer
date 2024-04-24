@@ -98,7 +98,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             if (unsupportedSchemas.Any())
                 throw new SCIMBadSyntaxException(string.Format(Global.SchemasAreUnknown, string.Join(",", unsupportedSchemas)));
 
-            var existingRepresentation = await _scimRepresentationCommandRepository.Get(replaceRepresentationCommand.Id);
+            var existingRepresentation = await _scimRepresentationCommandRepository.Get(replaceRepresentationCommand.Realm, replaceRepresentationCommand.Id);
             if (existingRepresentation == null)
                 throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, replaceRepresentationCommand.Id));
 

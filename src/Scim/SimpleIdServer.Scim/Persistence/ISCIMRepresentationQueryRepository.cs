@@ -9,8 +9,6 @@ namespace SimpleIdServer.Scim.Persistence
     public interface ISCIMRepresentationQueryRepository
     {
         Task<SearchSCIMRepresentationsResponse> FindSCIMRepresentations(SearchSCIMRepresentationsParameter parameter, CancellationToken cancellationToken);
-        Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, CancellationToken cancellationToken);
-        Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType, CancellationToken cancellationToken);
-        Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType, GetSCIMResourceParameter parameter, CancellationToken cancellationToken);
+        Task<SCIMRepresentation> FindSCIMRepresentationById(string realm, string representationId, string resourceType, GetSCIMResourceParameter parameter, CancellationToken cancellationToken);
     }
 }

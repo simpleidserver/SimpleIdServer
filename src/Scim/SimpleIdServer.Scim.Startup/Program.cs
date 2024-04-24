@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using SimpleIdServer.Scim.Domains;
-using SimpleIdServer.Scim.Infrastructures;
+using SimpleIdServer.Scim.Infrastructure;
 using SimpleIdServer.Scim.Persistence.MongoDB.Extensions;
 using SimpleIdServer.Scim.Persistence.MongoDB.Infrastructures;
 using SimpleIdServer.Scim.Persistence.MongoDB.Models;
@@ -83,8 +83,6 @@ public class Program
             opts.AddPolicy("DeleteScimResource", p => p.RequireAssertion(_ => true));
             opts.AddPolicy("UpdateScimResource", p => p.RequireAssertion(_ => true));
             opts.AddPolicy("BulkScimResource", p => p.RequireAssertion(_ => true));
-            opts.AddPolicy("Provison", p => p.RequireAssertion(_ => true));
-            opts.AddPolicy("UserAuthenticated", p => p.RequireAssertion(_ => true));
         });
     }
 

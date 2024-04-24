@@ -23,6 +23,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
         public DbSet<SCIMRepresentationAttribute> SCIMRepresentationAttributeLst { get; set; }
         public DbSet<ProvisioningConfiguration> ProvisioningConfigurations { get; set; }
         public DbSet<ProvisioningConfigurationHistory> ProvisioningConfigurationHistory { get; set; }
+        public DbSet<Realm> Realms { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -37,6 +38,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
             modelBuilder.ApplyConfiguration(new SCIMSchemaAttributeConfiguration());
             modelBuilder.ApplyConfiguration(new SCIMSchemaConfiguration());
             modelBuilder.ApplyConfiguration(new SCIMSchemaExtensionConfiguration());
+            modelBuilder.ApplyConfiguration(new RealmConfiguration());
         }
     }
 }

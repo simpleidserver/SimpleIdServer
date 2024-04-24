@@ -49,7 +49,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var schema = await _scimSchemaCommandRepository.FindRootSCIMSchemaByResourceType(patchRepresentationCommand.ResourceType);
             if (schema == null) throw new SCIMSchemaNotFoundException();
             CheckParameter(patchRepresentationCommand.PatchRepresentation);
-            var existingRepresentation = await _scimRepresentationCommandRepository.Get(patchRepresentationCommand.Id);
+            var existingRepresentation = await _scimRepresentationCommandRepository.Get(patchRepresentationCommand.Realm, patchRepresentationCommand.Id);
             if (existingRepresentation == null) throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, patchRepresentationCommand.Id));
             return await UpdateRepresentation(existingRepresentation, patchRepresentationCommand, schema);
         }

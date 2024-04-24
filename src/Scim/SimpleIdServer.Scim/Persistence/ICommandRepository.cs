@@ -7,7 +7,7 @@ namespace SimpleIdServer.Scim.Persistence
 {
     public interface ICommandRepository<T>
     {
-        Task<T> Get(string id, CancellationToken token = default(CancellationToken));
+        Task<T> Get(string realm, string id, CancellationToken token = default(CancellationToken));
         Task<ITransaction> StartTransaction(CancellationToken token = default(CancellationToken));
         Task<bool> Add(T data, CancellationToken token = default(CancellationToken));
         Task<bool> Update(T data, CancellationToken token = default(CancellationToken));

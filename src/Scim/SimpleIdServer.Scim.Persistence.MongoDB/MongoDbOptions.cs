@@ -14,7 +14,8 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             CollectionSchemas = "schemas";
 			CollectionMappings = "mappings";
 			CollectionProvisioningLst = "provisioningLst";
-			SupportTransaction = true;
+			CollectionRealms = "realms";
+            SupportTransaction = true;
 		}
 
 		public string ConnectionString { get; set; }
@@ -24,6 +25,8 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 		public string CollectionSchemas { get; set; }
 		public string CollectionMappings { get; set; }
 		public string CollectionProvisioningLst { get; set; }
-		public bool SupportTransaction { get; set; }
+		public string CollectionRealms { get; set; }
+
+        public bool SupportTransaction { get; set; }
 	}
 }

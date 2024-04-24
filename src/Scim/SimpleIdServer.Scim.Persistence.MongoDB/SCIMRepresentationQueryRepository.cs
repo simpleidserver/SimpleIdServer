@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using SimpleIdServer.Persistence.Filters;
@@ -10,7 +9,6 @@ using SimpleIdServer.Scim.Parser.Expressions;
 using SimpleIdServer.Scim.Persistence.MongoDB.Extensions;
 using SimpleIdServer.Scim.Persistence.MongoDB.Models;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,43 +18,10 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
     public class SCIMRepresentationQueryRepository : ISCIMRepresentationQueryRepository
     {
         private readonly SCIMDbContext _scimDbContext;
-        private readonly MongoDbOptions _options;
 
-        public SCIMRepresentationQueryRepository(SCIMDbContext scimDbContext, IOptions<MongoDbOptions> options)
+        public SCIMRepresentationQueryRepository(SCIMDbContext scimDbContext)
         {
             _scimDbContext = scimDbContext;
-            _options = options.Value;
-        }
-
-        public async Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, CancellationToken cancellationToken)
-        {
-            var collection = _scimDbContext.SCIMRepresentationLst;
-            var result = await collection.AsQueryable().Where(a => a.Id == representationId).ToMongoFirstAsync();
-            if (result == null)
-            {
-                return null;
-            }
-
-            result.IncludeAll(_scimDbContext.Database);
-            return result;
-        }
-
-        public async Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType, CancellationToken cancellationToken)
-        {
-            var collection = _scimDbContext.SCIMRepresentationLst;
-            var result = await collection.AsQueryable().Where(a => a.Id == representationId && a.ResourceType == resourceType).ToMongoFirstAsync();
-            if (result == null)
-            {
-                return null;
-            }
-
-            result.IncludeAll(_scimDbContext.Database);
-            return result;
-        }
-
-        public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType, GetSCIMResourceParameter parameter, CancellationToken cancellationToken)
-        {
-            return FindSCIMRepresentationById(representationId, resourceType, cancellationToken);
         }
 
         public async Task<SearchSCIMRepresentationsResponse> FindSCIMRepresentations(SearchSCIMRepresentationsParameter parameter, CancellationToken cancellationToken)
@@ -66,15 +31,15 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             if (parameter.Filter != null)
             {
                 var filteredRepresentationAttributes = from a in _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
-                    join b in _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable() on a.ParentAttributeId equals b.Id into Parents
-                    select new EnrichedAttribute
-                    {
-                        Attribute = a,
-                        Parent = Parents.First(),
-                        Children = new List<SCIMRepresentationAttribute>()
-                    };
+                                                       join b in _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable() on a.ParentAttributeId equals b.Id into Parents
+                                                       select new EnrichedAttribute
+                                                       {
+                                                           Attribute = a,
+                                                           Parent = Parents.First(),
+                                                           Children = new List<SCIMRepresentationAttribute>()
+                                                       };
                 filteredRepresentationAttributes = parameter.Filter.EvaluateMongoDbAttributes(filteredRepresentationAttributes);
-                if(filteredRepresentationAttributes != null)
+                if (filteredRepresentationAttributes != null)
                 {
                     filteredRepresentationIds = (await
                         filteredRepresentationAttributes
@@ -97,7 +62,9 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 
             var filteredRepresentations = _scimDbContext.SCIMRepresentationLst.AsQueryable()
                 .Where(r => r.ResourceType == parameter.ResourceType);
-            if(parameter.Filter != null)
+            if (!string.IsNullOrWhiteSpace(parameter.Realm))
+                filteredRepresentations = filteredRepresentations.Where(r => r.RealmName == parameter.Realm);
+            if (parameter.Filter != null)
             {
                 var tmp = parameter.Filter.EvaluateMongoDbRepresentations(filteredRepresentations);
                 if (tmp != null)
@@ -120,7 +87,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                 }
             }
 
-            if(filteredRepresentationIds != null)
+            if (filteredRepresentationIds != null)
             {
                 filteredRepresentations = filteredRepresentations.Where(r => filteredRepresentationIds.Contains(r.Id));
             }
@@ -128,15 +95,15 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             var paginationResult = await OrderByAndPaginate(filteredRepresentations, parameter, filteredRepresentationIds);
             filteredRepresentations = paginationResult.Query;
             var filteredRepresentationsWithAttributes = from a in filteredRepresentations
-                  join b in _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable() on a.Id equals b.RepresentationId into Attributes
-                  select new
-                  {
-                      Representation = a,
-                      Attributes = Attributes
-                  };
+                                                        join b in _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable() on a.Id equals b.RepresentationId into Attributes
+                                                        select new
+                                                        {
+                                                            Representation = a,
+                                                            Attributes = Attributes
+                                                        };
             var representationWithAttributes = await filteredRepresentationsWithAttributes
                 .ToListAsync();
-            if(paginationResult.OrderedRepresentationIds != null)
+            if (paginationResult.OrderedRepresentationIds != null)
             {
                 representationWithAttributes = representationWithAttributes.Select(r => new
                 {
@@ -149,7 +116,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             }
 
             var representations = new List<SCIMRepresentation>();
-            foreach(var record in representationWithAttributes)
+            foreach (var record in representationWithAttributes)
             {
                 var representation = record.Representation;
                 representation.FlatAttributes = record.Attributes.ToList();
@@ -158,6 +125,23 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 
             representations.FilterAttributes(parameter.IncludedAttributes, parameter.ExcludedAttributes);
             return new SearchSCIMRepresentationsResponse(total, representations);
+        }
+
+        public async Task<SCIMRepresentation> FindSCIMRepresentationById(string realm, string representationId, string resourceType, GetSCIMResourceParameter parameter, CancellationToken cancellationToken)
+        {
+            var collection = _scimDbContext.SCIMRepresentationLst;
+            SCIMRepresentationModel result = null;
+            if(!string.IsNullOrWhiteSpace(realm))
+                result = await collection.AsQueryable().Where(a => a.Id == representationId && a.ResourceType == resourceType && a.RealmName == realm).ToMongoFirstAsync();
+            else
+                result = await collection.AsQueryable().Where(a => a.Id == representationId && a.ResourceType == resourceType).ToMongoFirstAsync();
+            if (result == null)
+            {
+                return null;
+            }
+
+            result.IncludeAll(_scimDbContext.Database);
+            return result;
         }
 
         private async Task<PaginationResult> OrderByAndPaginate(

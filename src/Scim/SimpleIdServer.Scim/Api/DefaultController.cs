@@ -7,7 +7,7 @@ using static SimpleIdServer.Scim.SCIMConstants;
 
 namespace SimpleIdServer.Scim.Api
 {
-    [Route("{*url}", Order = 999)]
+    // [Route("{*url}", Order = 999)]
     [ApiExplorerSettings(IgnoreApi = true)]
     public class DefaultController : Controller
     {

@@ -421,6 +421,24 @@ namespace SimpleIdServer.Scim.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à you are not authorized to access the realm {0}.
+        /// </summary>
+        public static string RealmUnauthorized {
+            get {
+                return ResourceManager.GetString("RealmUnauthorized", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the realm {0} doesn&apos;t exist.
+        /// </summary>
+        public static string RealmUnknown {
+            get {
+                return ResourceManager.GetString("RealmUnknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à references {0} don&apos;t exist.
         /// </summary>
         public static string ReferencesDontExist {

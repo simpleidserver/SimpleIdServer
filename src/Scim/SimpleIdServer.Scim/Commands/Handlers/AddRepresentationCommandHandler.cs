@@ -62,6 +62,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             scimRepresentation.SetCreated(DateTime.UtcNow);
             scimRepresentation.SetUpdated(DateTime.UtcNow);
             scimRepresentation.SetVersion(0);
+            scimRepresentation.RealmName = addRepresentationCommand.Realm;
             scimRepresentation.SetResourceType(addRepresentationCommand.ResourceType);
             foreach (var attr in scimRepresentation.FlatAttributes) attr.RepresentationId = scimRepresentation.Id;
             await _representationHelper.CheckUniqueness(scimRepresentation.FlatAttributes);

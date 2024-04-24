@@ -10,6 +10,6 @@ namespace SimpleIdServer.Scim.Queries
 {
     public interface ISearchRepresentationsQueryHandler
     {
-        Task<GenericResult<SearchSCIMRepresentationsResponse>> Handle(SearchSCIMResourceParameter searchRequest, string resourceType, CancellationToken cancellationToken);
+        Task<GenericResult<SearchSCIMRepresentationsResponse>> Handle(string realm, SearchSCIMResourceParameter searchRequest, string resourceType, CancellationToken cancellationToken);
     }
 }

@@ -18,7 +18,8 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
 			EnsureCollectionIsCreated<SCIMRepresentationModel>(db, options.CollectionRepresentations);
             EnsureCollectionIsCreated<SCIMRepresentationAttribute>(db, options.CollectionRepresentationAttributes);
             EnsureCollectionIsCreated<ProvisioningConfiguration>(db, options.CollectionProvisioningLst);
-			EnsureSCIMRepresentationAttributeIndexesAreCreated(db, options.CollectionRepresentationAttributes);
+            EnsureCollectionIsCreated<Realm>(db, options.CollectionRealms);
+            EnsureSCIMRepresentationAttributeIndexesAreCreated(db, options.CollectionRepresentationAttributes);
             var schemasCollection = EnsureCollectionIsCreated<SCIMSchema>(db, options.CollectionSchemas);
 			var mappingsCollection = EnsureCollectionIsCreated<SCIMAttributeMapping>(db, options.CollectionMappings);
 			var query = schemasCollection.AsQueryable();

@@ -17,6 +17,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<ISCIMSchemaCommandRepository, EFSCIMSchemaCommandRepository>();
             services.AddTransient<ISCIMAttributeMappingQueryRepository, EFSCIMAttributeMappingQueryRepository>();
             services.AddTransient<IProvisioningConfigurationRepository, EFProvisioningConfigurationRepository>();
+            services.AddTransient<IRealmRepository, EFRealmRepository>();
             services.AddDbContext<SCIMDbContext>(dbContextOptsCallback);
             if (optionsCallback == null) services.Configure<SCIMEFOptions>(o => { });
             else services.Configure(optionsCallback);

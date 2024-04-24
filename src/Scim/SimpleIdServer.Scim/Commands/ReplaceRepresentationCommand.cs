@@ -8,18 +8,20 @@ namespace SimpleIdServer.Scim.Commands
 {
     public class ReplaceRepresentationCommand : ISCIMCommand<ReplaceRepresentationResult>
     {
-        public ReplaceRepresentationCommand(string id, string resourceType, RepresentationParameter representation, string location)
+        public ReplaceRepresentationCommand(string id, string resourceType, RepresentationParameter representation, string location, string realm)
         {
             Id = id;
             ResourceType = resourceType;
             Representation = representation;
             Location = location;
+            Realm = realm;
         }
 
         public string Id { get; private set; }
         public string ResourceType{ get; private set; }
         public RepresentationParameter Representation { get; private set; }
         public string Location { get; }
+        public string Realm { get; set; }
     }
 
     public class ReplaceRepresentationResult

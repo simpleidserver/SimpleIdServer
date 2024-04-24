@@ -10,7 +10,7 @@ using System.Collections.Generic;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-	public static class ServiceCollectionExtensions
+    public static class ServiceCollectionExtensions
 	{
 		public static IServiceCollection AddScimStoreMongoDB(
 			this IServiceCollection services,
@@ -40,6 +40,7 @@ namespace Microsoft.Extensions.DependencyInjection
 			services.AddTransient<ISCIMSchemaCommandRepository, SCIMSchemaCommandRepository>();
 			services.AddTransient<ISCIMAttributeMappingQueryRepository, SCIMAttributeMappingQueryRepository>();
 			services.AddTransient<IProvisioningConfigurationRepository, ProvisioningConfigurationRepository>();
+			services.AddTransient<IRealmRepository, RealmRepository>();
 			return services;
 		}
 	}

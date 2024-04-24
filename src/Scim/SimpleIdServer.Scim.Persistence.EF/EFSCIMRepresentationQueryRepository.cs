@@ -21,34 +21,16 @@ namespace SimpleIdServer.Scim.Persistence.EF
             _scimDbContext = scimDbContext;
         }
 
-        public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, CancellationToken cancellationToken)
-        {
-            return _scimDbContext.SCIMRepresentationLst.AsNoTracking()
-                .Include(r => r.FlatAttributes)
-                .Include(r => r.Schemas).ThenInclude(s => s.Attributes).FirstOrDefaultAsync(r => r.Id == representationId, cancellationToken);
-        }
-
-        public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType, CancellationToken cancellationToken)
-        {
-            return _scimDbContext.SCIMRepresentationLst
-                .Include(r => r.FlatAttributes).ThenInclude(s => s.SchemaAttribute)
-                .Include(r => r.Schemas).ThenInclude(s => s.Attributes)
-                .FirstOrDefaultAsync(r => r.Id == representationId && r.ResourceType == resourceType, cancellationToken);
-        }
-
-        public async Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType, GetSCIMResourceParameter parameter, CancellationToken cancellationToken)
-        {
-            var query = _scimDbContext.SCIMRepresentationLst
-                .Include(r => r.FlatAttributes).ThenInclude(s => s.SchemaAttribute)
-                .Include(r => r.Schemas).ThenInclude(s => s.Attributes);
-            return await query.BuildResult(_scimDbContext, parameter.IncludedAttributes, parameter.ExcludedAttributes, representationId, resourceType, cancellationToken);
-        }
-
         public async Task<SearchSCIMRepresentationsResponse> FindSCIMRepresentations(SearchSCIMRepresentationsParameter parameter, CancellationToken cancellationToken)
         {
             IQueryable<SCIMRepresentation> queryableRepresentations = _scimDbContext.SCIMRepresentationLst
                 .Include(r => r.FlatAttributes)
                 .Where(s => s.ResourceType == parameter.ResourceType);
+            if(!string.IsNullOrWhiteSpace(parameter.Realm))
+            {
+                queryableRepresentations = queryableRepresentations.Where(r => r.RealmName == parameter.Realm);
+            }
+
             if (parameter.SortBy == null)
             {
                 queryableRepresentations = queryableRepresentations.OrderBy(s => s.Id);
@@ -79,6 +61,14 @@ namespace SimpleIdServer.Scim.Persistence.EF
 
             queryableRepresentations = queryableRepresentations.Skip(parameter.StartIndex <= 1 ? 0 : parameter.StartIndex - 1).Take(parameter.Count);
             return await queryableRepresentations.BuildResult(_scimDbContext, parameter.IncludedAttributes, parameter.ExcludedAttributes, total, cancellationToken);
+        }
+
+        public async Task<SCIMRepresentation> FindSCIMRepresentationById(string realm, string representationId, string resourceType, GetSCIMResourceParameter parameter, CancellationToken cancellationToken)
+        {
+            var query = _scimDbContext.SCIMRepresentationLst
+                .Include(r => r.FlatAttributes).ThenInclude(s => s.SchemaAttribute)
+                .Include(r => r.Schemas).ThenInclude(s => s.Attributes);
+            return await query.BuildResult(_scimDbContext, parameter.IncludedAttributes, parameter.ExcludedAttributes, representationId, realm, resourceType, cancellationToken);
         }
     }
 }

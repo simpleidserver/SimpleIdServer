@@ -32,10 +32,14 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             _options = options.Value;
         }
 
-        public async Task<SCIMRepresentation> Get(string id, CancellationToken token = default)
+        public async Task<SCIMRepresentation> Get(string realm, string id, CancellationToken token = default)
         {
             var collection = _scimDbContext.SCIMRepresentationLst;
-            var result = await collection.AsQueryable().Where(a => a.Id == id).ToMongoFirstAsync();
+            SCIMRepresentationModel result = null;
+            if(!string.IsNullOrWhiteSpace(realm))
+                result = await collection.AsQueryable().Where(a => a.Id == id && a.RealmName == realm).ToMongoFirstAsync();
+            else
+                result = await collection.AsQueryable().Where(a => a.Id == id).ToMongoFirstAsync();
             if (result == null)
                 return null;
 

@@ -34,7 +34,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
         {
             var schema = await _scimSchemaCommandRepository.FindRootSCIMSchemaByResourceType(request.ResourceType);
             if (schema == null) throw new SCIMSchemaNotFoundException();
-            var representation = await _scimRepresentationCommandRepository.Get(request.Id);
+            var representation = await _scimRepresentationCommandRepository.Get(request.Realm, request.Id);
             if (representation == null) throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, request.Id));
             var result = representation.Clone() as SCIMRepresentation;
             var attributes = await _scimRepresentationCommandRepository.FindAttributes(representation.Id, CancellationToken.None);

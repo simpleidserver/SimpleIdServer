@@ -9,6 +9,7 @@ namespace SimpleIdServer.Scim.Persistence
     public class SearchSCIMRepresentationsParameter
     {
         public SearchSCIMRepresentationsParameter(
+            string realm,
             List<string> schemaNames,
             string resourceType, 
             int startIndex, 
@@ -39,5 +40,6 @@ namespace SimpleIdServer.Scim.Persistence
         public SearchSCIMRepresentationOrders? SortOrder { get; set; }
         public SCIMExpression Filter { get; set; }
         public List<string> SchemaNames { get; set; } = new List<string>();
+        public string Realm { get; set; }
     }
 }

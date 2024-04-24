@@ -18,12 +18,14 @@ using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.ExternalEvents;
 using SimpleIdServer.Scim.Helpers;
 using SimpleIdServer.Scim.Parser.Exceptions;
+using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Queries;
 using SimpleIdServer.Scim.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -44,9 +46,22 @@ namespace SimpleIdServer.Scim.Api
         private readonly IBusControl _busControl;
         private readonly IResourceTypeResolver _resourceTypeResolver;
         private readonly IUriProvider _uriProvider;
+        private readonly IRealmRepository _realmRepository;
 
-        public BaseApiController(string resourceType, IAddRepresentationCommandHandler addRepresentationCommandHandler, IDeleteRepresentationCommandHandler deleteRepresentationCommandHandler, IReplaceRepresentationCommandHandler replaceRepresentationCommandHandler, IPatchRepresentationCommandHandler patchRepresentationCommandHandler,
-            ISearchRepresentationsQueryHandler searchRepresentationsQueryHandler, IGetRepresentationQueryHandler getRepresentationQueryHandler, IAttributeReferenceEnricher attributeReferenceEnricher, IOptionsMonitor<SCIMHostOptions> options, ILogger logger, IBusControl busControl, IResourceTypeResolver resourceTypeResolver, IUriProvider uriProvider)
+        public BaseApiController(string resourceType, 
+            IAddRepresentationCommandHandler addRepresentationCommandHandler, 
+            IDeleteRepresentationCommandHandler deleteRepresentationCommandHandler, 
+            IReplaceRepresentationCommandHandler replaceRepresentationCommandHandler, 
+            IPatchRepresentationCommandHandler patchRepresentationCommandHandler,
+            ISearchRepresentationsQueryHandler searchRepresentationsQueryHandler,
+            IGetRepresentationQueryHandler getRepresentationQueryHandler, 
+            IAttributeReferenceEnricher attributeReferenceEnricher, 
+            IOptionsMonitor<SCIMHostOptions> options, 
+            ILogger logger, 
+            IBusControl busControl, 
+            IResourceTypeResolver resourceTypeResolver, 
+            IUriProvider uriProvider,
+            IRealmRepository realmRepository)
         {
             _resourceType = resourceType;
             _addRepresentationCommandHandler = addRepresentationCommandHandler;
@@ -61,6 +76,7 @@ namespace SimpleIdServer.Scim.Api
             _busControl = busControl;
             _resourceTypeResolver = resourceTypeResolver;
             _uriProvider = uriProvider;
+            _realmRepository = realmRepository;
         }
 
         public string ResourceType => _resourceType;
@@ -82,10 +98,10 @@ namespace SimpleIdServer.Scim.Api
         [ProducesResponseType(404)]
         [HttpGet]
         [Authorize("QueryScimResource")]
-        public virtual Task<IActionResult> Get([FromRoute] string prefix, [FromQuery] SearchSCIMResourceParameter searchRequest, CancellationToken cancellationToken)
+        public virtual Task<IActionResult> GetAll([FromRoute] string prefix, [FromQuery] SearchSCIMResourceParameter searchRequest, CancellationToken cancellationToken)
         {
             if (Request.Query != null && Request.Query.TryGetValue(SCIMConstants.StandardSCIMSearchAttributes.Filter, out StringValues str) && string.IsNullOrWhiteSpace(searchRequest.Filter)) searchRequest.Filter = string.Empty;
-            return InternalSearch(searchRequest, cancellationToken);
+            return InternalSearch(prefix, searchRequest, cancellationToken);
         }
 
         /// <summary>
@@ -101,12 +117,10 @@ namespace SimpleIdServer.Scim.Api
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
-        [HttpPost(".search")]
+        [HttpPost]
         [Authorize("QueryScimResource")]
         public virtual Task<IActionResult> Search([FromRoute] string prefix, [FromBody] SearchSCIMResourceParameter searchRequest, CancellationToken cancellationToken)
-        {
-            return InternalSearch(searchRequest, cancellationToken);
-        }
+            => InternalSearch(prefix, searchRequest, cancellationToken);
 
         /// <summary>
         /// Returns the representation details of a particular representation using its unique ID.
@@ -121,35 +135,14 @@ namespace SimpleIdServer.Scim.Api
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
-        [HttpGet("{id}")]
+        [HttpGet]
         [Authorize("QueryScimResource")]
-        public virtual Task<IActionResult> Get([FromRoute] string prefix, string id, [FromQuery] GetSCIMResourceRequest parameter, CancellationToken cancellationToken)
+        public virtual async Task<IActionResult> Get([FromRoute] string prefix, string id, [FromQuery] GetSCIMResourceRequest parameter, CancellationToken cancellationToken)
         {
-            return InternalGet(id, parameter, cancellationToken);
-        }
-
-        /// <summary>
-        /// The operation can be executed only by authenticated user.
-        /// Returns the representation details of a particular representation using its unique ID.
-        /// </summary>
-        /// <param name="id">Unique identifier of the resource type.</param>
-        /// <response code="200">Valid representation is found</response>
-        /// <response code="400">Request is unparsable, syntactically incorrect, or violates schema.</response>
-        /// <response code="401">Unauthorized</response>
-        /// <response code="404">Valid representation is not found</response>
-        /// <returns></returns>
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(401)]
-        [ProducesResponseType(404)]
-        [HttpGet("Me")]
-        [Authorize("UserAuthenticated")]
-        public virtual Task<IActionResult> GetMe([FromRoute] string prefix, string id, [FromQuery] GetSCIMResourceRequest parameter, CancellationToken cancellationToken)
-        {
-            return ExecuteActionIfAuthenticated(() =>
-            {
-                return InternalGet(id, parameter, cancellationToken);
-            });
+            var realm = _options.EnableRealm ? prefix : string.Empty;
+            var status = await CheckRealm(realm, cancellationToken);
+            if (status != RealmStatus.AUTHORIZED) return Build(realm, status);
+            return await InternalGet(realm, id, parameter, cancellationToken);
         }
 
         /// <summary>
@@ -169,36 +162,8 @@ namespace SimpleIdServer.Scim.Api
         [ProducesResponseType(401)]
         [ProducesResponseType(409)]
         [ProducesResponseType(500)]
-        public virtual Task<IActionResult> Add([FromRoute] string prefix, [FromBody] RepresentationParameter param)
-        {
-            return InternalAdd(param);
-        }
-
-        /// <summary>
-        /// The operation can be executed only by authenticated user.
-        /// Create representation and returns the details of the created representation including its unique ID.
-        /// </summary>
-        /// <response code="201">Valid representation is created</response>
-        /// <response code="400">Request is not valid</response>
-        /// <response code="401">Unauthorized</response>
-        /// <response code="409">At least one representation exists with the same unique attribute</response>
-        /// <response code="500">Something goes wrong in the server</response>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        [HttpPost("Me")]
-        [Authorize("UserAuthenticated")]
-        [ProducesResponseType(201)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(401)]
-        [ProducesResponseType(409)]
-        [ProducesResponseType(500)]
-        public virtual Task<IActionResult> AddMe([FromRoute] string prefix, [FromBody] RepresentationParameter param)
-        {
-            return ExecuteActionIfAuthenticated(() =>
-            {
-                return InternalAdd(param);
-            });
-        }
+        public virtual Task<IActionResult> Add([FromRoute] string prefix, [FromBody] RepresentationParameter param, CancellationToken cancellationToken)
+            => InternalAdd(prefix, param, cancellationToken);
 
         /// <summary>
         /// Delete a particular representation using its unique ID.
@@ -215,38 +180,10 @@ namespace SimpleIdServer.Scim.Api
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        [HttpDelete("{id}")]
+        [HttpDelete]
         [Authorize("DeleteScimResource")]
-        public virtual Task<IActionResult> Delete([FromRoute] string prefix, string id)
-        {
-            return InternalDelete(id);
-        }
-
-        /// <summary>
-        /// The operation can be executed only by authenticated user.
-        /// Delete a particular representation using its unique ID.
-        /// </summary>
-        /// <response code="204">Representation is deleted</response>
-        /// <response code="400">Request is unparsable, syntactically incorrect, or violates schema.</response>
-        /// <response code="401">Unauthorized</response>
-        /// <response code="404">Representation is not found</response>
-        /// <response code="500">Something goes wrong in the server</response>
-        /// <param name="id">Unique ID of the resource type</param>
-        /// <returns></returns>
-        [ProducesResponseType(204)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(401)]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(500)]
-        [HttpDelete("Me/{id}")]
-        [Authorize("UserAuthenticated")]
-        public virtual Task<IActionResult> DeleteMe([FromRoute] string prefix, string id)
-        {
-            return ExecuteActionIfAuthenticated(() =>
-            {
-                return InternalDelete(id);
-            });
-        }
+        public virtual Task<IActionResult> Delete([FromRoute] string prefix, string id, CancellationToken cancellationToken)
+            => InternalDelete(prefix, id, cancellationToken);
 
         /// <summary>
         /// Update the representation details and returns the updated representation details using a PUT operation.
@@ -266,42 +203,10 @@ namespace SimpleIdServer.Scim.Api
         [ProducesResponseType(404)]
         [ProducesResponseType(409)]
         [ProducesResponseType(500)]
-        [HttpPut("{id}")]
+        [HttpPut]
         [Authorize("UpdateScimResource")]
-        public virtual Task<IActionResult> Update([FromRoute] string prefix, string id, [FromBody] RepresentationParameter param)
-        {
-            return InternalUpdate(id, param);
-        }
-
-        /// <summary>
-        /// The operation can be executed only by authenticated user.
-        /// Update the representation details and returns the updated representation details using a PUT operation.
-        /// </summary>
-        /// <response code="200">Representation is updated</response>
-        /// <response code="400">Request is not valid</response>
-        /// <response code="401">Unauthorized</response>
-        /// <response code="404">Representation is not found</response>
-        /// <response code="409">At least one representation exists with the same unique attribute</response>
-        /// <response code="500">Something goes wrong in the server</response>
-        /// <param name="id">Unique ID of the resource type</param>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(401)]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(409)]
-        [ProducesResponseType(500)]
-        [HttpPut("Me/{id}")]
-        [Authorize("UserAuthenticated")]
-        public virtual Task<IActionResult> UpdateMe([FromRoute] string prefix, string id, [FromBody] RepresentationParameter param)
-        {
-            return ExecuteActionIfAuthenticated(() =>
-            {
-                return InternalUpdate(id, param);
-            });
-        }
-
+        public virtual Task<IActionResult> Update([FromRoute] string prefix, string id, [FromBody] RepresentationParameter param, CancellationToken cancellationToken)
+            => InternalUpdate(prefix, id, param, cancellationToken);
 
         /// <summary>
         /// Update the representation details and returns the updated representation details using a PATCH operation.
@@ -323,50 +228,20 @@ namespace SimpleIdServer.Scim.Api
         [ProducesResponseType(404)]
         [ProducesResponseType(409)]
         [ProducesResponseType(500)]
-        [HttpPatch("{id}")]
+        [HttpPatch]
         [Authorize("UpdateScimResource")]
-        public virtual Task<IActionResult> Patch([FromRoute] string prefix, string id, [FromBody] PatchRepresentationParameter patchRepresentation)
-        {
-            return InternalPatch(id, patchRepresentation);
-        }
+        public virtual Task<IActionResult> Patch([FromRoute] string prefix, string id, [FromBody] PatchRepresentationParameter patchRepresentation, CancellationToken cancellationToken)
+            => InternalPatch(prefix, id, patchRepresentation, cancellationToken);
 
-        /// <summary>
-        /// The operation can be executed only by authenticated user.
-        /// Update the representation details and returns the updated representation details using a PATCH operation.
-        /// </summary>
-        /// <response code="200">Representation is updated</response>
-        /// <response code="204">No changes have been made.</response>
-        /// <response code="400">Request is not valid</response>
-        /// <response code="401">Unauthorized</response>
-        /// <response code="404">Representation is not found</response>
-        /// <response code="409">At least one representation exists with the same unique attribute</response>
-        /// <response code="500">Something goes wrong in the server</response>
-        /// <param name="id">Unique ID of the resource type</param>
-        /// <param name="patchRepresentation"></param>
-        /// <returns></returns>
-        [ProducesResponseType(200)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(401)]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(409)]
-        [ProducesResponseType(500)]
-        [HttpPatch("Me/{id}")]
-        [Authorize("UserAuthenticated")]
-        public virtual Task<IActionResult> PatchMe([FromRoute] string prefix, string id, [FromBody] PatchRepresentationParameter patchRepresentation)
+        protected async Task<IActionResult> InternalSearch(string prefix, SearchSCIMResourceParameter searchRequest, CancellationToken cancellationToken)
         {
-            return ExecuteActionIfAuthenticated(() =>
-            {
-                return InternalPatch(id, patchRepresentation);
-            });
-        }
-
-        protected async Task<IActionResult> InternalSearch(SearchSCIMResourceParameter searchRequest, CancellationToken cancellationToken)
-        {
+            var realm = _options.EnableRealm ? prefix : string.Empty;
+            var status = await CheckRealm(realm, cancellationToken);
+            if (status != RealmStatus.AUTHORIZED) return Build(realm, status);
             _logger.LogInformation(Global.StartGetResources);
             try
             {
-                var searchResult = await _searchRepresentationsQueryHandler.Handle(searchRequest, _resourceType, cancellationToken);
+                var searchResult = await _searchRepresentationsQueryHandler.Handle(realm, searchRequest, _resourceType, cancellationToken);
                 if (searchResult.HasError) return this.BuildError(searchResult);
                 var result = searchResult.Result;
                 var jObj = new JObject
@@ -438,12 +313,12 @@ namespace SimpleIdServer.Scim.Api
             }
         }
 
-        protected async Task<IActionResult> InternalGet(string id, GetSCIMResourceRequest parameter, CancellationToken cancellationToken)
+        protected async Task<IActionResult> InternalGet(string realm, string id, GetSCIMResourceRequest parameter, CancellationToken cancellationToken)
         {
             _logger.LogInformation(string.Format(Global.StartGetResource, id));
             try
             {
-                var getRepresentationResult = await _getRepresentationQueryHandler.Handle(id, parameter, _resourceType, cancellationToken);
+                var getRepresentationResult = await _getRepresentationQueryHandler.Handle(realm, id, parameter, _resourceType, cancellationToken);
                 if (getRepresentationResult.HasError) return this.BuildError(getRepresentationResult);
                 var representation = getRepresentationResult.Result;
                 await _attributeReferenceEnricher.Enrich(_resourceType, new List<SCIMRepresentation> { representation }, _uriProvider.GetAbsoluteUriWithVirtualPath());
@@ -465,13 +340,16 @@ namespace SimpleIdServer.Scim.Api
             }
         }
 
-        protected async Task<IActionResult> InternalAdd(RepresentationParameter jobj)
+        protected async Task<IActionResult> InternalAdd(string prefix, RepresentationParameter jobj, CancellationToken cancellationToken)
         {
+            var realm = _options.EnableRealm ? prefix : string.Empty;
+            var status = await CheckRealm(realm, cancellationToken);
+            if (status != RealmStatus.AUTHORIZED) return Build(realm, status);
             if (jobj == null) return this.BuildError(HttpStatusCode.BadRequest, Global.HttpPostNotWellFormatted, SCIMConstants.ErrorSCIMTypes.InvalidSyntax);
             _logger.LogInformation(Global.AddResource);
             try
             {
-                var command = new AddRepresentationCommand(_resourceType, jobj, _uriProvider.GetAbsoluteUriWithVirtualPath());
+                var command = new AddRepresentationCommand(_resourceType, jobj, _uriProvider.GetAbsoluteUriWithVirtualPath(), realm);
                 var addRepresentationResult = await _addRepresentationCommandHandler.Handle(command);
                 if (addRepresentationResult.HasError) return this.BuildError(addRepresentationResult);
                 var representation = addRepresentationResult.Result;
@@ -507,12 +385,15 @@ namespace SimpleIdServer.Scim.Api
             }
         }
 
-        protected async Task<IActionResult> InternalDelete(string id)
+        protected async Task<IActionResult> InternalDelete(string prefix, string id, CancellationToken cancellationToken)
         {
+            var realm = _options.EnableRealm ? prefix : string.Empty;
+            var status = await CheckRealm(realm, cancellationToken);
+            if (status != RealmStatus.AUTHORIZED) return Build(realm, status);
             _logger.LogInformation(string.Format(Global.DeleteResource, id));
             try
             {
-                var getRepresentationResult = await _deleteRepresentationCommandHandler.Handle(new DeleteRepresentationCommand(id, _resourceType, _uriProvider.GetAbsoluteUriWithVirtualPath()));
+                var getRepresentationResult = await _deleteRepresentationCommandHandler.Handle(new DeleteRepresentationCommand(id, _resourceType, _uriProvider.GetAbsoluteUriWithVirtualPath(), realm));
                 if (getRepresentationResult.HasError) return this.BuildError(getRepresentationResult);
                 var representation = getRepresentationResult.Result;
                 representation.ApplyEmptyArray();
@@ -542,17 +423,20 @@ namespace SimpleIdServer.Scim.Api
             }
         }
 
-        protected async Task<IActionResult> InternalUpdate(string id, RepresentationParameter representationParameter)
+        protected async Task<IActionResult> InternalUpdate(string prefix, string id, RepresentationParameter representationParameter, CancellationToken cancellationToken)
         {
             if (representationParameter == null)
             {
                 return this.BuildError(HttpStatusCode.BadRequest, Global.HttpPutNotWellFormatted, SCIMConstants.ErrorSCIMTypes.InvalidSyntax);
             }
 
+            var realm = _options.EnableRealm ? prefix : string.Empty;
+            var status = await CheckRealm(realm, cancellationToken);
+            if (status != RealmStatus.AUTHORIZED) return Build(realm, status);
             _logger.LogInformation(Global.UpdateResource, id);
             try
             {
-                var updateResult = await _replaceRepresentationCommandHandler.Handle(new ReplaceRepresentationCommand(id, _resourceType, representationParameter, _uriProvider.GetAbsoluteUriWithVirtualPath()));
+                var updateResult = await _replaceRepresentationCommandHandler.Handle(new ReplaceRepresentationCommand(id, _resourceType, representationParameter, _uriProvider.GetAbsoluteUriWithVirtualPath(), realm));
                 if (updateResult.HasError) return this.BuildError(updateResult);
                 if (!updateResult.Result.IsReplaced) return NoContent();
                 var representation = updateResult.Result.Representation;
@@ -561,7 +445,7 @@ namespace SimpleIdServer.Scim.Api
                 var content = representation.ToResponse(location, true, mergeExtensionAttributes: _options.MergeExtensionAttributes);
                 if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
                 if(!_options.IsFullRepresentationReturned) return BuildHTTPResult(HttpStatusCode.OK, location, representation.Version, content);
-                return await InternalGet(id, new GetSCIMResourceRequest(), CancellationToken.None);
+                return await InternalGet(realm, id, new GetSCIMResourceRequest(), cancellationToken);
             }
             catch (SCIMUniquenessAttributeException ex)
             {
@@ -599,17 +483,21 @@ namespace SimpleIdServer.Scim.Api
             }
         }
 
-        protected async Task<IActionResult> InternalPatch(string id, PatchRepresentationParameter patchRepresentation)
+        protected async Task<IActionResult> InternalPatch(string prefix, string id, PatchRepresentationParameter patchRepresentation, CancellationToken cancellationToken)
         {
             if (patchRepresentation == null)
             {
                 return this.BuildError(HttpStatusCode.BadRequest, Global.HttpPatchNotWellFormatted, SCIMConstants.ErrorSCIMTypes.InvalidSyntax);
             }
 
+
+            var realm = _options.EnableRealm ? prefix : string.Empty;
+            var status = await CheckRealm(realm, cancellationToken);
+            if (status != RealmStatus.AUTHORIZED) return Build(realm, status);
             _logger.LogInformation(string.Format(Global.PatchResource, id, patchRepresentation == null ? string.Empty : JsonConvert.SerializeObject(patchRepresentation)));
             try
             {
-                var patchRes = await _patchRepresentationCommandHandler.Handle(new PatchRepresentationCommand(id, ResourceType, patchRepresentation, _uriProvider.GetAbsoluteUriWithVirtualPath()));
+                var patchRes = await _patchRepresentationCommandHandler.Handle(new PatchRepresentationCommand(id, ResourceType, patchRepresentation, _uriProvider.GetAbsoluteUriWithVirtualPath(), realm));
                 if (patchRes.HasError) return this.BuildError(patchRes);
                 var patchResult = patchRes.Result;
                 if (!patchResult.IsPatched) return NoContent();
@@ -619,7 +507,7 @@ namespace SimpleIdServer.Scim.Api
                 var content = representation.ToResponse(location, true, mergeExtensionAttributes: _options.MergeExtensionAttributes);
                 if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
                 if(!_options.IsFullRepresentationReturned) return BuildHTTPResult(HttpStatusCode.OK, location, representation.Version, content);
-                return await InternalGet(id, new GetSCIMResourceRequest(), CancellationToken.None);
+                return await InternalGet(realm, id, new GetSCIMResourceRequest(), CancellationToken.None);
             }
             catch (SCIMDuplicateAttributeException ex)
             {
@@ -679,17 +567,6 @@ namespace SimpleIdServer.Scim.Api
             return customActionResult;
         }
 
-        protected async Task<IActionResult> ExecuteActionIfAuthenticated(Func<Task<IActionResult>> callback)
-        {
-            var user = User.Claims.FirstOrDefault(c => c.Type == _options.SCIMIdClaimName);
-            if (user == null)
-            {
-                return this.BuildError(HttpStatusCode.BadRequest, $"{_options.SCIMIdClaimName} claim cannot be retrieved", SCIMConstants.ErrorSCIMTypes.InvalidSyntax);
-            }
-
-            return await callback();
-        }
-
         protected IActionResult BuildHTTPResult(SCIMRepresentation representation, HttpStatusCode status, bool isGetRequest)
         {
             var location = GetLocation(representation);
@@ -717,6 +594,30 @@ namespace SimpleIdServer.Scim.Api
         protected virtual string GetResourceType(string resourceType)
         {
             return !SCIMConstants.MappingScimResourceTypeToCommonType.ContainsKey(resourceType) ? resourceType : SCIMConstants.MappingScimResourceTypeToCommonType[resourceType];
+        }
+
+        private async Task<RealmStatus> CheckRealm(string realm, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrWhiteSpace(realm)) return RealmStatus.AUTHORIZED;
+            var nameIdentifier = User.Claims.SingleOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (nameIdentifier == null) return RealmStatus.UNKNOWN;
+            var existingRealm = await _realmRepository.Get(realm, cancellationToken);
+            if (existingRealm == null) return RealmStatus.UNKNOWN;
+            return existingRealm.Name == realm ? RealmStatus.AUTHORIZED : RealmStatus.UNAUTHORIZED;
+        }
+
+        private IActionResult Build(string realm, RealmStatus status)
+        {
+            if(status == RealmStatus.UNAUTHORIZED)
+                return this.BuildError(HttpStatusCode.Unauthorized, string.Format(Global.RealmUnauthorized, realm));
+            return this.BuildError(HttpStatusCode.NotFound, string.Format(Global.RealmUnknown, realm));
+        }
+
+        private enum RealmStatus
+        {
+            UNKNOWN = 0,
+            UNAUTHORIZED = 1,
+            AUTHORIZED = 2
         }
     }
 }

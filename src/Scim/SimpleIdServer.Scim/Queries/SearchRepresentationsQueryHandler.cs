@@ -32,7 +32,7 @@ namespace SimpleIdServer.Scim.Queries
             _scimRepresentationQueryRepository = scimRepresentationQueryRepository;
         }
 
-        public virtual async Task<GenericResult<SearchSCIMRepresentationsResponse>> Handle(SearchSCIMResourceParameter searchRequest, string resourceType, CancellationToken cancellationToken)
+        public virtual async Task<GenericResult<SearchSCIMRepresentationsResponse>> Handle(string realm, SearchSCIMResourceParameter searchRequest, string resourceType, CancellationToken cancellationToken)
         {
             if (searchRequest == null) throw new SCIMBadSyntaxException(Global.HttpPostNotWellFormatted);
             if (string.Empty == searchRequest.Filter) throw new SCIMBadSyntaxException(Global.FilterIsNotEmpty);
@@ -58,6 +58,7 @@ namespace SimpleIdServer.Scim.Queries
             var includedAttributes = searchRequest.Attributes == null ? new List<SCIMAttributeExpression>() : searchRequest.Attributes.Select(a => SCIMFilterParser.Parse(a, standardSchemas)).Cast<SCIMAttributeExpression>().ToList();
             var excludedAttributes = searchRequest.ExcludedAttributes == null ? new List<SCIMAttributeExpression>() : searchRequest.ExcludedAttributes.Select(a => SCIMFilterParser.Parse(a, standardSchemas)).Cast<SCIMAttributeExpression>().ToList();
             var result = await _scimRepresentationQueryRepository.FindSCIMRepresentations(new SearchSCIMRepresentationsParameter(
+                realm,
                 schemas.Select(s => s.Id).ToList(),
                 resourceType, 
                 searchRequest.StartIndex, 

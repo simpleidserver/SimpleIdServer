@@ -237,6 +237,12 @@
   <data name="ReadOnlyAttributesCannotBeRemoved" xml:space="preserve">
     <value>Readonly Attributes {0} cannot be removed</value>
   </data>
+  <data name="RealmUnauthorized" xml:space="preserve">
+    <value>you are not authorized to access the realm {0}</value>
+  </data>
+  <data name="RealmUnknown" xml:space="preserve">
+    <value>the realm {0} doesn't exist</value>
+  </data>
   <data name="ReferencesDontExist" xml:space="preserve">
     <value>references {0} don't exist</value>
   </data>

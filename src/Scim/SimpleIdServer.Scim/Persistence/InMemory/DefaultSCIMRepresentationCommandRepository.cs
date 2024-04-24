@@ -1,5 +1,6 @@
 // Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using MassTransit.SagaStateMachine;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Parser.Expressions;
 using System;
@@ -19,9 +20,13 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             _attributes = attributes;
         }
 
-        public override Task<SCIMRepresentation> Get(string id, CancellationToken token)
+        public override Task<SCIMRepresentation> Get(string realm,string id, CancellationToken token)
         {
-            var result = LstData.FirstOrDefault(r => r.Id == id);
+            SCIMRepresentation result = null;
+            if (!string.IsNullOrWhiteSpace(realm))
+                result = LstData.FirstOrDefault(r => r.Id == id && r.RealmName == realm);
+            else
+                result = LstData.FirstOrDefault(r => r.Id == id);
             if (result == null) return Task.FromResult((SCIMRepresentation)null);
             return Task.FromResult(Enrich(result));
         }

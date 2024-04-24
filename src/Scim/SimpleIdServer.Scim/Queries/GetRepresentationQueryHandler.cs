@@ -30,7 +30,7 @@ namespace SimpleIdServer.Scim.Queries
             _logger = logger;
         }
 
-        public async virtual Task<GenericResult<SCIMRepresentation>> Handle(string id, GetSCIMResourceRequest parameter, string resourceType, CancellationToken cancellationToken)
+        public async virtual Task<GenericResult<SCIMRepresentation>> Handle(string realm, string id, GetSCIMResourceRequest parameter, string resourceType, CancellationToken cancellationToken)
         {
             var schema = await _scimSchemaQueryRepository.FindRootSCIMSchemaByResourceType(resourceType);
             if (schema == null) throw new SCIMNotFoundException();
@@ -44,7 +44,7 @@ namespace SimpleIdServer.Scim.Queries
             standardSchemas.AddRange(schemas);
             var includedAttributes = parameter.Attributes == null ? new List<SCIMAttributeExpression>() : parameter.Attributes.Select(a => SCIMFilterParser.Parse(a, standardSchemas)).Cast<SCIMAttributeExpression>().ToList();
             var excludedAttributes = parameter.ExcludedAttributes == null ? new List<SCIMAttributeExpression>() : parameter.ExcludedAttributes.Select(a => SCIMFilterParser.Parse(a, standardSchemas)).Cast<SCIMAttributeExpression>().ToList();
-            var representation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(id, resourceType, new GetSCIMResourceParameter { ExcludedAttributes = excludedAttributes, IncludedAttributes = includedAttributes }, cancellationToken);
+            var representation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(realm, id, resourceType, new GetSCIMResourceParameter { ExcludedAttributes = excludedAttributes, IncludedAttributes = includedAttributes }, cancellationToken);
             if (representation == null)
             {
                 _logger.LogError(string.Format(Global.ResourceNotFound, id));

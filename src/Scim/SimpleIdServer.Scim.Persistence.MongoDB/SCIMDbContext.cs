@@ -9,7 +9,7 @@ using System;
 
 namespace SimpleIdServer.Scim.Persistence.MongoDB
 {
-	public class SCIMDbContext : IDisposable
+    public class SCIMDbContext : IDisposable
 	{
 		private readonly MongoDbOptions _options;
 
@@ -36,11 +36,18 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 		public IMongoCollection<ProvisioningConfiguration> ProvisioningConfigurationLst =>
 			Database.GetCollection<ProvisioningConfiguration>(_options.CollectionProvisioningLst);
 
+		public IMongoCollection<Realm> Realms =>
+			Database.GetCollection<Realm>(_options.CollectionRealms);
+
 		public void Dispose() { }
 
 		internal static void RegisterMappings()
-		{
-			BsonClassMap.RegisterClassMap<ProvisioningConfiguration>(cm =>
+        {
+            BsonClassMap.RegisterClassMap<Realm>(cm =>
+            {
+                cm.AutoMap();
+            });
+            BsonClassMap.RegisterClassMap<ProvisioningConfiguration>(cm =>
 			{
 				cm.AutoMap();
 			});

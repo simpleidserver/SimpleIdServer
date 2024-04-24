@@ -27,6 +27,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
             IEnumerable<SCIMAttributeExpression> includedAttributes,
             IEnumerable<SCIMAttributeExpression> excludedAttributes,
             string id,
+            string realm,
             string resourceType, 
             CancellationToken cancellationToken)
         {
@@ -44,7 +45,11 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
             if (filteredAttrs != null)
             {
                 filteredAttrs = filteredAttrs.Where(a => a.RepresentationId == id);
-                var result = await representations.FirstOrDefaultAsync(r => r.Id == id && r.ResourceType == resourceType, cancellationToken);
+                SCIMRepresentation result = null;
+                if(!string.IsNullOrWhiteSpace(realm))
+                    result = await representations.FirstOrDefaultAsync(r => r.Id == id && r.ResourceType == resourceType && r.RealmName == realm, cancellationToken);
+                else
+                    result = await representations.FirstOrDefaultAsync(r => r.Id == id && r.ResourceType == resourceType, cancellationToken);
                 if (result == null) return null;
                 result.FlatAttributes = filteredAttrs.ToList();
                 return result;

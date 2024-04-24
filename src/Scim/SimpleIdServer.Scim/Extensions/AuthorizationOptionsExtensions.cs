@@ -13,8 +13,6 @@ namespace Microsoft.Extensions.DependencyInjection
             opts.AddPolicy("DeleteScimResource", p => p.RequireClaim("scope", "delete_scim_resource"));
             opts.AddPolicy("UpdateScimResource", p => p.RequireClaim("scope", "update_scim_resource"));
             opts.AddPolicy("BulkScimResource", p => p.RequireClaim("scope", "bulk_scim_resource"));
-            opts.AddPolicy("Provison", p => p.RequireClaim("scope", "scim_provision"));
-            opts.AddPolicy("UserAuthenticated", p => p.RequireAuthenticatedUser());
         }
     }
 }

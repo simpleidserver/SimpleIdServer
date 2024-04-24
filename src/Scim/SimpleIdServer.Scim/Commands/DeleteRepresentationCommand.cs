@@ -7,15 +7,17 @@ namespace SimpleIdServer.Scim.Commands
 {
     public class DeleteRepresentationCommand : ISCIMCommand<SCIMRepresentation>
     {
-        public DeleteRepresentationCommand(string id, string resourceType, string location)
+        public DeleteRepresentationCommand(string id, string resourceType, string location, string realm)
         {
             Id = id;
             ResourceType = resourceType;
             Location = location;
+            Realm = realm;
         }
 
         public string Id { get; set; }
         public string ResourceType { get; set; }
         public string Location { get; }
+        public string Realm { get; set; }
     }
 }

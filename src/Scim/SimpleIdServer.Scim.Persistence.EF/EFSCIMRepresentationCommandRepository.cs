@@ -23,10 +23,12 @@ namespace SimpleIdServer.Scim.Persistence.EF
             _options = options.Value;
         }
 
-        public async Task<SCIMRepresentation> Get(string id, CancellationToken token = default)
+        public async Task<SCIMRepresentation> Get(string realm, string id, CancellationToken token = default)
         {
             var query = _scimDbContext.SCIMRepresentationLst
                 .Include(r => r.Schemas).ThenInclude(s => s.Attributes);
+            if(!string.IsNullOrWhiteSpace(realm))
+                return await query.FirstOrDefaultAsync(r => r.RealmName == realm && r.Id == id, token);
             return await query.FirstOrDefaultAsync(r => r.Id == id, token);
         }
 
