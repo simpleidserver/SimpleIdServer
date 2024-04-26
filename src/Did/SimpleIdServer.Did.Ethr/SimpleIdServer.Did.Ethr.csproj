@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<Description>Library used to manipulate DID Document of type ethr.</Description>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Nethereum.Web3" Version="4.18.0" />
+		<PackageReference Include="Nethereum.Web3" Version="4.20.0" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\SimpleIdServer.Did\SimpleIdServer.Did.csproj" />

@@ -77,6 +77,12 @@ public class Ed25519SignatureProvider : SignatureProvider
         _securityKey = securityKey;
     }
 
+    public override bool Sign(ReadOnlySpan<byte> data, Span<byte> destination, out int bytesWritten)
+    {
+        var result = Sign(data.ToArray());
+        return Helpers.TryCopyToDestination(result, destination, out bytesWritten);
+    }
+
     public override byte[] Sign(byte[] input)
     {
         var signer = new Ed25519Signer();

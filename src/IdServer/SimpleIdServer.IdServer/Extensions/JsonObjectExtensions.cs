@@ -477,8 +477,7 @@ namespace System.Text.Json.Nodes
 
             var keys = JsonObject.Parse(str)?["keys"]?.AsArray();
             if (keys == null) return null;
-
-            return keys.Select(k => JsonExtensions.DeserializeFromJson<JsonWebKey>(k.ToJsonString()));
+            return keys.Select(k => new JsonWebKey(k.ToJsonString()));
         }
 
         public static IEnumerable<string> GetScopes(this JsonObject jObj)

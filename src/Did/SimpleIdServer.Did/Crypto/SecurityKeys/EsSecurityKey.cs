@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto.Parameters;
@@ -10,6 +11,7 @@ using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Crypto.SecurityKeys;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SimpleIdServer.Did.Crypto.SecurityKeys
 {
@@ -90,6 +92,12 @@ public class EsSignatureProvider : SignatureProvider
     public EsSignatureProvider(EsSecurityKey securityKey, string algorithm) : base(securityKey, algorithm)
     {
         _securityKey = securityKey;
+    }
+
+    public override bool Sign(ReadOnlySpan<byte> data, Span<byte> destination, out int bytesWritten)
+    {
+        var result = Sign(data.ToArray());
+        return Helpers.TryCopyToDestination(result, destination, out bytesWritten);
     }
 
     public override byte[] Sign(byte[] input)

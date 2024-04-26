@@ -146,6 +146,8 @@ public class SecuredDocument
             Claims = claims
         };
         var handler = new JsonWebTokenHandler();
+        CryptoProviderFactory cryptoProviderFactory = signingCredentials.CryptoProviderFactory ?? signingCredentials.Key.CryptoProviderFactory;
+        var signatureProvider = cryptoProviderFactory.CreateForSigning(signingCredentials.Key, signingCredentials.Algorithm);
         var result = handler.CreateToken(securityTokenDescriptor);
         return result;
     }

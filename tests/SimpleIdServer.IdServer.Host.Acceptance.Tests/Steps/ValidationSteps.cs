@@ -143,7 +143,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
         {
             value = WebApiSteps.ParseValue(_scenarioContext, value).ToString();
             var jwt = GetAccessToken();
-            var str = JsonArray.Parse(jwt.GetClaim("permissions").Value)[0];
+            var str = JsonObject.Parse(jwt.GetClaim("permissions").Value);
             Assert.Equal(value, str["resource_id"].GetValue<string>());
         }
 
@@ -152,7 +152,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
         {
             value = WebApiSteps.ParseValue(_scenarioContext, value).ToString();
             var jwt = GetAccessToken();
-            var str = JsonArray.Parse(jwt.GetClaim("permissions").Value)[0];
+            var str = JsonObject.Parse(jwt.GetClaim("permissions").Value);
             var scopes = (str["resource_scopes"] as JsonArray).Select(s => s.GetValue<string>());
             Assert.True(scopes.Contains(value) == true);
         }

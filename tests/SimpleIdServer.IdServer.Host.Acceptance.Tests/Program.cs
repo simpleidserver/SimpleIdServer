@@ -12,6 +12,12 @@ using System.Linq;
 using System.Security.Cryptography;
 
 var builder = WebApplication.CreateBuilder(args);
+var p = GetKey(512);
+var s = new SymmetricSecurityKey(p)
+{
+    KeyId = Guid.NewGuid().ToString()
+};
+
 builder.Services.AddSIDIdentityServer(o =>
 {
     o.WalletAuthorizationServer = "http://localhost";
@@ -36,9 +42,9 @@ builder.Services.AddSIDIdentityServer(o =>
             new SigningCredentials(BuildECDSaSecurityKey(ECCurve.NamedCurves.nistP256), SecurityAlgorithms.EcdsaSha256),
             new SigningCredentials(BuildECDSaSecurityKey(ECCurve.NamedCurves.nistP384), SecurityAlgorithms.EcdsaSha384),
             new SigningCredentials(BuildECDSaSecurityKey(ECCurve.NamedCurves.nistP521), SecurityAlgorithms.EcdsaSha512),
-            new SigningCredentials(BuildSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256),
-            new SigningCredentials(BuildSymmetricSecurityKey(), SecurityAlgorithms.HmacSha384),
-            new SigningCredentials(BuildSymmetricSecurityKey(), SecurityAlgorithms.HmacSha512)
+            new SigningCredentials(BuildSymmetricSecurityKey(256), SecurityAlgorithms.HmacSha256),
+            new SigningCredentials(BuildSymmetricSecurityKey(384), SecurityAlgorithms.HmacSha384),
+            new SigningCredentials(BuildSymmetricSecurityKey(512), SecurityAlgorithms.HmacSha512)
         }, new List<EncryptingCredentials>
         {
             new EncryptingCredentials(BuildRsaSecurityKey("keyid4"), SecurityAlgorithms.RsaPKCS1, SecurityAlgorithms.Aes128CbcHmacSha256)
@@ -76,9 +82,17 @@ static ECDsaSecurityKey BuildECDSaSecurityKey(ECCurve curve) => new ECDsaSecurit
     KeyId = Guid.NewGuid().ToString()
 };
 
-static SecurityKey BuildSymmetricSecurityKey() => new SymmetricSecurityKey(System.Text.Encoding.ASCII.GetBytes(Guid.NewGuid().ToString()))
+static SecurityKey BuildSymmetricSecurityKey(int keySize) => new SymmetricSecurityKey(GetKey(keySize))
 {
     KeyId = Guid.NewGuid().ToString()
 };
+
+static byte[] GetKey(int keySize)
+{
+    var length = keySize / 8;
+    var str = "abcdefghijklmnopqrstuvwxyz";
+    var rnd = new Random();
+    return Enumerable.Repeat(0, length).Select(_ => rnd.Next(0, str.Length)).Select(_ => Convert.ToByte(str[_])).ToArray();
+}
 
 public partial class Program { }

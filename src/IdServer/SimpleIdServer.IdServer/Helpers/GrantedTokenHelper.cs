@@ -107,12 +107,12 @@ namespace SimpleIdServer.IdServer.Helpers
             if (audiences == null || !audiences.Any()) audiences = new List<string> { clientId };
             var claims = new Dictionary<string, object>
             {
-                { System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Aud, audiences },
+                { System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Aud, audiences.ToArray() },
                 { OpenIdConnectParameterNames.ClientId, clientId },
                 { OpenIdConnectParameterNames.Scope, BuildScopeClaim(scopes) }
             };
             if(authorizationDetails != null && authorizationDetails.Any())
-                claims.Add(AuthorizationRequestParameters.AuthorizationDetails, authorizationDetails.Select(d => d.Serialize()));
+                claims.Add(AuthorizationRequestParameters.AuthorizationDetails, authorizationDetails.Select(d => d.Serialize()).ToList());
 
             return new SecurityTokenDescriptor
             {
@@ -325,7 +325,7 @@ namespace SimpleIdServer.IdServer.Helpers
         public object BuildScopeClaim(IEnumerable<string> scopes)
         {
             if (_oauthHostOptions.IsScopeClaimConcatenationEnabled) return string.Join(" ", scopes);
-            return scopes;
+            return scopes.ToList();
         }
 
         private static void AddExpirationAndIssueTime(SecurityTokenDescriptor descriptor, double validityPeriodsInSeconds)

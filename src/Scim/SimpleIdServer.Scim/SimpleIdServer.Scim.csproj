@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Description>SCIM2.0 implementation.</Description>
 	<LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-	<PackageReference Include="MassTransit" Version="8.2.0" />
-	<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="6.0.0" />
+	<PackageReference Include="MassTransit" Version="8.2.1" />
+	<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
   </ItemGroup>
   <ItemGroup>
   	<FrameworkReference Include="Microsoft.AspNetCore.App" />

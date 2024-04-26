@@ -4,6 +4,7 @@ using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.DPoP;
 using SimpleIdServer.IdServer.Api.Clients;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Builders;
@@ -531,7 +532,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                     Alg = act.Alg,
                     KeyId = act.KeyId,
                     KeyType = act.KeyType,
-                    SerializedJsonWebKey = JsonExtensions.SerializeToJson(jsonWebKey),
+                    SerializedJsonWebKey = JsonWebKeySerializer.Write(jsonWebKey),
                 }), Encoding.UTF8, "application/json")
             };
             await httpClient.SendAsync(requestMessage);
@@ -553,7 +554,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                     Alg = act.Alg,
                     KeyId = act.KeyId,
                     KeyType = act.KeyType,
-                    SerializedJsonWebKey = JsonExtensions.SerializeToJson(jsonWebKey),
+                    SerializedJsonWebKey = JsonWebKeySerializer.Write(jsonWebKey),
                 }), Encoding.UTF8, "application/json")
             };
             await httpClient.SendAsync(requestMessage);

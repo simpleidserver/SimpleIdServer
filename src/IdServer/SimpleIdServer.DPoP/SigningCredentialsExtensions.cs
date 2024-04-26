@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.DPoP;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Cryptography;
 using System.Text.Json.Nodes;
@@ -29,7 +30,7 @@ namespace Microsoft.IdentityModel.Tokens
         public static string SerializeJWKStr(this SigningCredentials credentials, string use = "sig")
         {
             var jsonWebKey = SerializeJWK(credentials, use);
-            return JsonNode.Parse(JsonExtensions.SerializeToJson(jsonWebKey)).AsObject().ToJsonString();
+            return JsonNode.Parse(JsonWebKeySerializer.Write(jsonWebKey)).AsObject().ToJsonString();
         }
 
         public static JsonWebKey SerializeJWK(this SigningCredentials credentials, string use = "sig")

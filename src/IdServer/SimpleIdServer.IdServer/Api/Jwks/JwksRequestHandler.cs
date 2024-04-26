@@ -3,6 +3,7 @@
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Stores;
 using System.IdentityModel.Tokens.Jwt;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.IdServer.Api.Jwks
@@ -40,13 +41,13 @@ namespace SimpleIdServer.IdServer.Api.Jwks
             JsonObject ConvertSigningKey(SigningCredentials signingCredentials)
             {
                 var publicJwk = signingCredentials.SerializePublicJWK();
-                return JsonNode.Parse(JsonExtensions.SerializeToJson(publicJwk)).AsObject();
+                return JsonNode.Parse(JsonSerializer.Serialize(publicJwk)).AsObject();
             }
 
             JsonObject ConvertEncryptionKey(EncryptingCredentials encryptingCredentials)
             {
                 var publicJwk = encryptingCredentials.SerializePublicJWK();
-                return JsonNode.Parse(JsonExtensions.SerializeToJson(publicJwk)).AsObject();
+                return JsonNode.Parse(JsonSerializer.Serialize(publicJwk)).AsObject();
             }
         }
     }

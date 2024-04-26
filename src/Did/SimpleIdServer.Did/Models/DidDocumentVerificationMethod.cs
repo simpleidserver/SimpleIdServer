@@ -3,6 +3,7 @@
 using Microsoft.IdentityModel.Tokens;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
@@ -39,7 +40,7 @@ namespace SimpleIdServer.Did.Models
             get
             {
                 if (PublicKeyJwk == null) return null;
-                var json = JsonExtensions.SerializeToJson(PublicKeyJwk);
+                var json = JsonSerializer.Serialize(PublicKeyJwk);
                 return JsonObject.Parse(json).AsObject();
             }
         }
@@ -57,7 +58,7 @@ namespace SimpleIdServer.Did.Models
             get
             {
                 if (PrivateKeyJwk == null) return null;
-                var json = JsonExtensions.SerializeToJson(PrivateKeyJwk);
+                var json = JsonSerializer.Serialize(PrivateKeyJwk);
                 return JsonObject.Parse(json).AsObject();
             }
         }

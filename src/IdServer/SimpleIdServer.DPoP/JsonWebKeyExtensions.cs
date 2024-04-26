@@ -51,7 +51,7 @@ namespace SimpleIdServer.DPoP
         {
             string jwkJson;
             if (!jsonWebToken.TryGetHeaderValue(DPoPConstants.Jwk, out jwkJson)) return null;
-            return JsonExtensions.DeserializeFromJson<JsonWebKey>(jwkJson);
+            return new JsonWebKey(jwkJson);
         }
 
         public static string CreateThumbprint(this JsonWebKey jwk)
