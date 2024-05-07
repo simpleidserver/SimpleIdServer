@@ -4,6 +4,7 @@ using Fluxor;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
+using NetTopologySuite.Index;
 using SimpleIdServer.IdServer.Api.Groups;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
@@ -170,7 +171,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
         {
             var baseUrl = await GetGroupsUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
-            var roles = new List<Domains.Scope>();
             foreach (var roleId in action.RoleIds)
             {
                 var requestMessage = new HttpRequestMessage
@@ -182,6 +182,22 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
             }
 
             dispatcher.Dispatch(new RemoveSelectedGroupRolesSuccessAction { Id = action.Id, RoleIds = action.RoleIds });
+        }
+
+        [EffectMethod]
+        public async Task Handle(GetHierarchicalGroupAction action, IDispatcher dispatcher)
+        {
+            var baseUrl = await GetGroupsUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{baseUrl}/{action.GroupId}/hierarchy"),
+                Method = HttpMethod.Get
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<List<GetHierarchicalGroupResult>>(json);
+            dispatcher.Dispatch(new GetHierarchicalGroupSuccessAction { GroupId = action.GroupId, Result = result });
         }
 
         private async Task<string> GetGroupsUrl()
@@ -318,5 +334,16 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
     public class StartAddGroupAction
     {
 
+    }
+
+    public class GetHierarchicalGroupAction
+    {
+        public string GroupId { get; set; }
+    }
+
+    public class GetHierarchicalGroupSuccessAction
+    {
+        public string GroupId { get; set; }
+        public List<GetHierarchicalGroupResult> Result { get; set; }
     }
 }

@@ -15,7 +15,7 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "7.0.17");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.4");
 
             modelBuilder.Entity("ApiResourceRealm", b =>
                 {
@@ -2202,7 +2202,6 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                         .HasAnnotation("Relational:JsonPropertyName", "type");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Value")
@@ -2941,8 +2940,7 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                     b.HasOne("SimpleIdServer.IdServer.Domains.User", "User")
                         .WithMany("OAuthUserClaims")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("User");
                 });

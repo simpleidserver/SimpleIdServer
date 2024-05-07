@@ -45,9 +45,18 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
         [ReducerMethod]
         public static SearchGroupsState ReduceAddGroupSuccessAction(SearchGroupsState state, AddGroupSuccessAction act)
         {
-            if (!string.IsNullOrWhiteSpace(act.ParentGroupId)) return state;
+            if (!string.IsNullOrWhiteSpace(act.ParentGroupId)) return state with
+            {
+                IsLoading = false
+            };
             var groups = state.Groups.ToList();
-            groups.Add(new SelectableGroup(new Group { CreateDateTime = DateTime.Now, UpdateDateTime = DateTime.Now, Id = act.Id, Name = act.Name, Description = act.Description })
+            groups.Add(new SelectableGroup(new Group { 
+                CreateDateTime = DateTime.Now, 
+                UpdateDateTime = DateTime.Now, 
+                Id = act.Id, 
+                Name = act.Name, 
+                Description = act.Description, 
+                FullPath = act.FullPath })
             {
                 IsNew = true
             });
@@ -71,7 +80,10 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
         [ReducerMethod]
         public static SearchGroupsState ReduceRemoveSelectedGroupsSuccessAction(SearchGroupsState state, RemoveSelectedGroupsSuccessAction act)
         {
-            if (state.Groups == null) return state;
+            if (state.Groups == null) return state with
+            {
+                IsLoading = false
+            };
             var groups = state.Groups.ToList();
             groups = groups.Where(g => !act.FullPathLst.Contains(g.Group.FullPath)).ToList();
             return state with
@@ -224,7 +236,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
         [ReducerMethod]
         public static GroupMembersState ReduceAddGroupAction(GroupMembersState state, AddGroupAction action)
         {
-            if (string.IsNullOrWhiteSpace(action.ParentId)) return state;
             return state with
             {
                 IsLoading = true
@@ -243,7 +254,10 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
         [ReducerMethod]
         public static GroupMembersState ReduceAddGroupSuccessAction(GroupMembersState state, AddGroupSuccessAction action)
         {
-            if (string.IsNullOrWhiteSpace(action.ParentGroupId)) return state;
+            if (string.IsNullOrWhiteSpace(action.ParentGroupId)) return state with
+            {
+                IsLoading = false
+            };
             var members = state.Members.ToList();
             members.Add(new SelectableGroupMember(new Group { Id = action.Id, Name = action.Name, ParentGroupId = action.ParentGroupId, Description = action.Description, FullPath = action.FullPath, CreateDateTime = DateTime.Now, UpdateDateTime = DateTime.Now })
             {
@@ -382,6 +396,23 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
                 IsLoading = false
             };
         }
+
+        #endregion
+
+        #region GroupHierarchyState
+
+        [ReducerMethod]
+        public static GroupHierarchyState ReduceGetHierarchicalGroupAction(GroupHierarchyState state, GetHierarchicalGroupAction act) => new GroupHierarchyState
+        {
+            IsLoading = true
+        };
+
+        [ReducerMethod]
+        public static GroupHierarchyState ReduceGetHierarchicalGroupSuccessAction(GroupHierarchyState state, GetHierarchicalGroupSuccessAction act) => new GroupHierarchyState
+        {
+            IsLoading = false,
+            Result = act.Result
+        };
 
         #endregion
     }

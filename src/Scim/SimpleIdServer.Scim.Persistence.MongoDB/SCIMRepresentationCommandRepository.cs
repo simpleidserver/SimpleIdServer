@@ -6,7 +6,6 @@ using MongoDB.Driver.Linq;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Parser.Expressions;
 using SimpleIdServer.Scim.Persistence.MongoDB.Extensions;
-using SimpleIdServer.Scim.Persistence.MongoDB.Infrastructures;
 using SimpleIdServer.Scim.Persistence.MongoDB.Models;
 using System;
 using System.Collections.Generic;
@@ -43,13 +42,13 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             if (result == null)
                 return null;
 
-            result.IncludeAll(_scimDbContext.Database);
+            await result.IncludeAll(_scimDbContext);
             return result;
         }
 
         public async Task<bool> Add(SCIMRepresentation representation, CancellationToken token)
         {
-            var record = new SCIMRepresentationModel(representation, _options.CollectionSchemas, _options.CollectionRepresentationAttributes);
+            var record = new SCIMRepresentationModel(representation, _options.CollectionSchemas);
             foreach (var flatAttr in representation.FlatAttributes) flatAttr.RepresentationId = representation.Id;
             if (_session != null)
             {
@@ -67,10 +66,8 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 
         public async Task<bool> Update(SCIMRepresentation data, CancellationToken token)
         {
-            var record = new SCIMRepresentationModel(data, _options.CollectionSchemas, _options.CollectionRepresentationAttributes);
+            var record = new SCIMRepresentationModel(data, _options.CollectionSchemas);
             data.FlatAttributes.Clear();
-            foreach (var newId in _addedAttributeIds) record.AttributeRefs.Add(new CustomMongoDBRef(_options.CollectionRepresentationAttributes, newId));
-            record.AttributeRefs = record.AttributeRefs.Where(r => !_removedAttributeIds.Contains(r.Id.AsString)).ToList();
             if (_session != null)
             {
                 await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(_session, s => s.Id == data.Id, record);
@@ -286,31 +283,9 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 
             _addedAttributeIds.AddRange(scimRepresentationAttributes.Where(a => a.RepresentationId == currentRepresentationId).Select(a => a.Id));
             if (_session != null)
-            {
                 await _scimDbContext.SCIMRepresentationAttributeLst.InsertManyAsync(_session, scimRepresentationAttributes);
-                if (isReference)
-                {
-                    foreach (var attrs in scimRepresentationAttributes.GroupBy(a => a.RepresentationId))
-                    {
-                        var currentRepresentation = result.Single(r => r.Id == attrs.Key);
-                        foreach (var id in attrs.Select(a => a.Id)) currentRepresentation.AttributeRefs.Add(new CustomMongoDBRef(_options.CollectionRepresentationAttributes, id));
-                        await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(_session, s => s.Id == currentRepresentation.Id, currentRepresentation);
-                    }
-                }
-            }
             else
-            {
                 await _scimDbContext.SCIMRepresentationAttributeLst.InsertManyAsync(scimRepresentationAttributes);
-                if(isReference)
-                {
-                    foreach (var attrs in scimRepresentationAttributes.GroupBy(a => a.RepresentationId))
-                    {
-                        var currentRepresentation = result.Single(r => r.Id == attrs.Key);
-                        foreach (var id in attrs.Select(a => a.Id)) currentRepresentation.AttributeRefs.Add(new CustomMongoDBRef(_options.CollectionRepresentationAttributes, id));
-                        await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(s => s.Id == currentRepresentation.Id, currentRepresentation);
-                    }
-                }
-            }
         }
 
         public async Task BulkUpdate(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes, bool isReference = false)
@@ -343,33 +318,9 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             var filter = Builders<SCIMRepresentationAttribute>.Filter.In(a => a.Id, attributeIds);
             _removedAttributeIds.AddRange(scimRepresentationAttributes.Where(r => r.RepresentationId == currentRepresentationId).Select(r => r.Id));
             if (_session != null)
-            {
                 await _scimDbContext.SCIMRepresentationAttributeLst.DeleteManyAsync(_session, filter);
-                if (isReference)
-                {
-                    foreach (var attrs in scimRepresentationAttributes.GroupBy(a => a.RepresentationId))
-                    {
-                        var currentRepresentation = result.Single(r => r.Id == attrs.Key);
-                        var attrIds = attrs.Select(a => a.Id);
-                        currentRepresentation.AttributeRefs = currentRepresentation.AttributeRefs.Where(a => !attrIds.Contains(a.Id.AsString)).ToList();
-                        await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(_session, s => s.Id == currentRepresentation.Id, currentRepresentation);
-                    }
-                }
-            }
             else
-            {
                 await _scimDbContext.SCIMRepresentationAttributeLst.DeleteManyAsync(filter);
-                if (isReference)
-                {
-                    foreach (var attrs in scimRepresentationAttributes.GroupBy(a => a.RepresentationId))
-                    {
-                        var currentRepresentation = result.Single(r => r.Id == attrs.Key);
-                        var attrIds = attrs.Select(a => a.Id);
-                        currentRepresentation.AttributeRefs = currentRepresentation.AttributeRefs.Where(a => !attrIds.Contains(a.Id.AsString)).ToList();
-                        await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(s => s.Id == currentRepresentation.Id, currentRepresentation);
-                    }
-                }
-            }
         }
 
 

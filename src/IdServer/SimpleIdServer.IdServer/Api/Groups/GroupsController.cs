@@ -10,6 +10,7 @@ using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Store;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -112,6 +113,34 @@ namespace SimpleIdServer.IdServer.Api.Groups
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetHierarchicalGroup([FromRoute] string prefix, string id)
+        {
+            prefix = prefix ?? Constants.DefaultRealm;
+            try
+            {
+                await CheckAccessToken(prefix, Constants.StandardScopes.Groups.Name);
+                var result = await _groupRepository.Query()
+                    .Include(c => c.Realms)
+                    .AsNoTracking()
+                    .SingleAsync(g => g.Realms.Any(r => r.RealmsName == prefix) && g.Id == id);
+                if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownGroup, id));
+                var children = await _groupRepository.Query()
+                    .Include(c => c.Realms)
+                    .AsNoTracking()
+                    .Where(g => g.Realms.Any(r => r.RealmsName == prefix) && g.FullPath.StartsWith(result.FullPath) && g.Id != id)
+                    .ToListAsync();
+                return new OkObjectResult(new List<GetHierarchicalGroupResult>
+                {
+                    GetHierarchicalGroupResult.BuildRoot(children, result)
+                });
+            }
+            catch (OAuthException ex)
+            {
+                _logger.LogError(ex.ToString());
+                return BuildError(ex);
+            }
+        }
 
         #endregion
 

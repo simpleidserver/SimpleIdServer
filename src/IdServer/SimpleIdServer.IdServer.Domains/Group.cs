@@ -35,15 +35,19 @@ namespace SimpleIdServer.IdServer.Domains
         public List<string> ResolveAllPath()
         {
             var result = new List<string> { FullPath };
-            var splitted = FullPath.Split('.');
-            if (splitted.Length == 1) return result;
-            for (var i = 1; i < splitted.Length; i++) result.Add(string.Join('.', splitted.Take(i)));
+            var splitted = Split(FullPath);
+            if (splitted.Count() == 1) return result;
+            for (var i = 1; i < splitted.Count(); i++) result.Add(string.Join('.', splitted.Take(i)));
             return result;
         }
 
-        public object Split(char v)
-        {
-            throw new NotImplementedException();
-        }
+        public int GetLevel()
+            => GetLevel(FullPath);
+
+        public static int GetLevel(string fullPath)
+            => Split(fullPath).Count();
+
+        public static IEnumerable<string> Split(string fullPath)
+            => fullPath.Split('.');
     }
 }

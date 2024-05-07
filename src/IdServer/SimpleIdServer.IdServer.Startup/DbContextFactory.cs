@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore.Design;
 using SimpleIdServer.IdServer.Store;
 
 namespace SimpleIdServer.IdServer.PostgreMigrations;
-
 /*
 public class DbContextFactory : IDesignTimeDbContextFactory<StoreDbContext>
 {

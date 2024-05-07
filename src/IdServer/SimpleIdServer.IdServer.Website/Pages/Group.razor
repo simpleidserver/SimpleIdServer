@@ -1,6 +1,7 @@
 ﻿@page "/groups/{id}/{action}"
 @inherits Fluxor.Blazor.Web.Components.FluxorLayout
 @using Microsoft.EntityFrameworkCore;
+@using SimpleIdServer.IdServer.Api.Groups
 @using SimpleIdServer.IdServer.Store;
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.GroupStore;
@@ -12,27 +13,35 @@
 @inject IDispatcher dispatcher
 @inject IGroupService groupService
 @inject IState<GroupState> groupState
+@inject IState<GroupHierarchyState> groupHierarchyState
 
-    <RadzenBreadCrumb>
-        <RadzenBreadCrumbItem Path="/groups" Text="@Global.Groups" />
-        <RadzenBreadCrumbItem Text="@Global.GroupDetails" />
-    </RadzenBreadCrumb>
+<RadzenBreadCrumb>
+    <RadzenBreadCrumbItem Path="/groups" Text="@Global.Groups" />
+    <RadzenBreadCrumbItem Text="@Global.GroupDetails" />
+</RadzenBreadCrumb>
 
-    <RadzenText class="mt-3 mb-3 no-margin" Text="@groupState.Value.Group?.Name" TextStyle="TextStyle.DisplayH3" />
+<RadzenText class="mt-3 mb-3 no-margin" Text="@groupState.Value.Group?.Name" TextStyle="TextStyle.DisplayH3" />
 
-    <RadzenBreadCrumb>
-        @foreach (var groupName in groupNames)
-        {
-            <RadzenBreadCrumbItem Text="@groupName" />
-        }
-    </RadzenBreadCrumb>
+<RadzenBreadCrumb>
+    @foreach (var groupName in groupNames)
+    {
+        <RadzenBreadCrumbItem Text="@groupName" />
+    }
+</RadzenBreadCrumb>
 
 <RadzenCardLoader Variant="Variant.Filled" IsLoading=@groupState.Value.IsLoading>
     <RadzenSplitter>
         <RadzenSplitterPane Size="10%">
-            <RadzenTree Expand="@OnExpand" Data=@groups>
-                <RadzenTreeLevel TextProperty="Name" Template="@treeTemplate" />
-            </RadzenTree>
+            @if (!isLoading)
+            {
+                <RadzenTree Data=@groups>
+                    <RadzenTreeLevel Selected="@(o => IsSelected(o))" Expanded="@(o => IsExpanded(o))" HasChildren="@(o => HasChildren(o))" TextProperty="Name" ChildrenProperty="Children">
+                        <Template>
+                            <RadzenLink Text="@GetGroupName(context)" Path="@GetGroupLink(context)" />
+                        </Template>
+                    </RadzenTreeLevel>
+                </RadzenTree>
+            }
         </RadzenSplitterPane>
         <RadzenSplitterPane>
             <div class="ml-3">
@@ -52,16 +61,9 @@
 </RadzenCardLoader>
 
 @code {
-    ICollection<SimpleIdServer.IdServer.Domains.Group> groups;
-    RenderFragment<RadzenTreeItem> treeTemplate = (context) => builder =>
-    {
-        var grp = context.Value as SimpleIdServer.IdServer.Domains.Group;
-        builder.OpenComponent<RadzenLink>(0);
-        builder.AddAttribute(1, "Text", grp.Name);
-        builder.AddAttribute(2, "Path", $"/groups/{grp.Id}/children");
-        builder.CloseComponent();
-    };
-
+    bool isLoading = true;
+    Domains.Group currentGroup;
+    List<GetHierarchicalGroupResult> groups;
     Dictionary<string, int> mappingActionNameToIndex = new Dictionary<string, int>
     {
         { "children", 0 },
@@ -89,18 +91,40 @@
             });
             SubscribeToAction<GetGroupSuccessAction>((act) =>
             {
-                groups.Add(act.RootGroup);
-                groupNames = act.Group.FullPath.Split('.').ToList();
+                currentGroup = act.Group;
+                groupNames = currentGroup.FullPath.Split('.').ToList();
+                dispatcher.Dispatch(new GetHierarchicalGroupAction { GroupId = act.RootGroup.Id });
+            });
+            SubscribeToAction<GetHierarchicalGroupAction>((act) =>
+            {
+                isLoading = true;
+            });
+            SubscribeToAction<GetHierarchicalGroupSuccessAction>((act) =>
+            {
+                isLoading = false;
+                groups = act.Result;
             });
             SubscribeToAction<AddGroupSuccessAction>((act) =>
             {
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.GroupMemberAdded });
                 dialogService.Close();
+                groups.First().Resolve(currentGroup.FullPath).Children.Add(new GetHierarchicalGroupResult
+                {
+                    Root = new Domains.Group
+                    {
+                        Id = act.Id,
+                        Name = act.Name,
+                        FullPath = act.FullPath,
+                        Description = act.Description
+                    }
+                });
                 StateHasChanged();
             });
             SubscribeToAction<RemoveSelectedGroupsSuccessAction>((act) =>
             {
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.GroupMembersRemoved });
+                var rootGroup = groups.First().Resolve(currentGroup.FullPath);
+                rootGroup.Children = rootGroup.Children.Where(c => !act.FullPathLst.Contains(c.Root.FullPath)).ToList();
                 StateHasChanged();
             });
             SubscribeToAction<RemoveSelectedGroupRolesSuccessAction>((act) =>
@@ -122,28 +146,41 @@
             StateHasChanged();
         });
         dispatcher.Dispatch(new GetGroupAction { Id = id });
-        groups = new List<SimpleIdServer.IdServer.Domains.Group>();
-    }
-
-    async Task OnExpand(TreeExpandEventArgs args)
-    {
-        var group = args.Value as SimpleIdServer.IdServer.Domains.Group;
-        var children = group.Children;
-        if (group.Children == null || !group.Children.Any())
-        {
-            var getResult = await groupService.Get(group.Id);
-            children = getResult.Target.Children.ToList();
-        }
-
-        args.Children.Data = children;
-        args.Children.Template = treeTemplate;
-        args.Children.TextProperty = "Name";
-        args.Children.HasChildren = (g) => true;
     }
 
     void OnChange(int index)
     {
         var rec = mappingActionNameToIndex.Single(kvp => kvp.Value == index);
         navigationManager.NavigateTo($"/groups/{id}/{rec.Key}");
+    }
+
+    string GetGroupName(RadzenTreeItem data)
+    {
+        return (data.Value as GetHierarchicalGroupResult).Name;
+    }
+
+    string GetGroupLink(RadzenTreeItem data)
+    {
+        return $"/groups/{(data.Value as GetHierarchicalGroupResult).Root.Id}/children";
+    }
+
+    bool HasChildren(object data)
+    {
+        var record = data as GetHierarchicalGroupResult;
+        return record.Children == null ? false : record.Children.Any();
+    }
+
+    bool IsExpanded(object data)
+    {
+        var record = data as GetHierarchicalGroupResult;
+        var fp = record.Root.FullPath;
+        return record.Root.GetLevel() < currentGroup.GetLevel() &&
+            currentGroup.FullPath.StartsWith(record.Root.FullPath);
+    }
+
+    bool IsSelected(object data)
+    {        
+        var record = data as GetHierarchicalGroupResult;
+        return record.Root.FullPath == currentGroup.FullPath;
     }
 }

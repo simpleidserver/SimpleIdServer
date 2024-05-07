@@ -2,9 +2,11 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MongoDB.Driver;
 using SimpleIdServer.Scim.Domains;
+using SimpleIdServer.Scim.Persistence.MongoDB.Extensions;
 using SimpleIdServer.Scim.Persistence.MongoDB.Infrastructures;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Persistence.MongoDB.Models
 {
@@ -13,10 +15,9 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Models
         public SCIMRepresentationModel() : base()
         {
             SchemaRefs = new List<CustomMongoDBRef>();
-            AttributeRefs = new List<CustomMongoDBRef>();
         }
 
-        public SCIMRepresentationModel(SCIMRepresentation representation, string schemaCollectionName, string attributesCollectionName) : this()
+        public SCIMRepresentationModel(SCIMRepresentation representation, string schemaCollectionName) : this()
         {
             Id = representation.Id;
             RealmName = representation.RealmName;
@@ -26,17 +27,15 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Models
             Created = representation.Created;
             LastModified = representation.LastModified;
             DisplayName = representation.DisplayName;
-            AttributeRefs = representation.FlatAttributes.Select(s => new CustomMongoDBRef(attributesCollectionName, s.Id)).ToList();
             SchemaRefs = representation.Schemas.Select(s => new CustomMongoDBRef(schemaCollectionName, s.Id)).ToList();
         }
 
         public ICollection<CustomMongoDBRef> SchemaRefs { get; set; }
-        public ICollection<CustomMongoDBRef> AttributeRefs { get; set; }
 
-        public void IncludeAll(IMongoDatabase database)
+        public async Task IncludeAll(SCIMDbContext dbContext)
         {
-            IncludeSchemas(database);
-            IncludeAttributes(database);
+            IncludeSchemas(dbContext.Database);
+            await IncludeAttributes(dbContext);
         }
 
         public void IncludeSchemas(IMongoDatabase database)
@@ -44,9 +43,11 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Models
             Schemas = MongoDBEntity.GetReferences<SCIMSchema>(SchemaRefs, database);
         }
 
-        public void IncludeAttributes(IMongoDatabase database)
+        public async Task IncludeAttributes(SCIMDbContext dbContext)
         {
-            FlatAttributes = MongoDBEntity.GetReferences<SCIMRepresentationAttribute>(AttributeRefs, database);
+            FlatAttributes = await dbContext.SCIMRepresentationAttributeLst.AsQueryable()
+                .Where(a => a.RepresentationId == Id)
+                .ToMongoListAsync();
         }
     }
 }

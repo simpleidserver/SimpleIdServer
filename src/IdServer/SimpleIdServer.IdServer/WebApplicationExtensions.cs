@@ -504,6 +504,9 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("getGroup",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Groups + "/{id}",
                 defaults: new { controller = "Groups", action = "Get" });
+            webApplication.SidMapControllerRoute("getGroupHierarchy",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Groups + "/{id}/hierarchy",
+                defaults: new { controller = "Groups", action = "GetHierarchicalGroup" });
             webApplication.SidMapControllerRoute("addGroup",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Groups,
                 defaults: new { controller = "Groups", action = "Add" });

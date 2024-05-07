@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SimpleIdServer.IdServer.Store;
 
@@ -16,8 +17,10 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.17")
+                .HasAnnotation("ProductVersion", "8.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
             modelBuilder.Entity("ApiResourceRealm", b =>
                 {
@@ -189,6 +192,8 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("FriendlyName")
                         .HasColumnType("longtext");
@@ -472,6 +477,8 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<string>("Audience")
                         .HasColumnType("longtext");
 
@@ -494,6 +501,8 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ConsentId")
                         .IsRequired()
@@ -572,6 +581,8 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("BCAuthorizeId")
                         .HasColumnType("varchar(255)");
@@ -1041,6 +1052,8 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<string>("Alg")
                         .IsRequired()
                         .HasColumnType("longtext")
@@ -1467,6 +1480,8 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<int>("CurrentPage")
                         .HasColumnType("int");
 
@@ -1882,6 +1897,8 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("PkID"));
+
                     b.Property<int?>("AccessTokenType")
                         .HasColumnType("int");
 
@@ -1931,6 +1948,8 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<string>("ClientId")
                         .HasColumnType("varchar(255)");
 
@@ -1956,6 +1975,8 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreateDateTime")
                         .HasColumnType("datetime(6)");
@@ -2007,6 +2028,8 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ResourceId")
                         .IsRequired()
@@ -2092,6 +2115,8 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("longtext")
@@ -2204,7 +2229,6 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         .HasAnnotation("Relational:JsonPropertyName", "type");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("Value")
@@ -2317,6 +2341,8 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreateDateTime")
                         .HasColumnType("datetime(6)")
@@ -2943,8 +2969,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                     b.HasOne("SimpleIdServer.IdServer.Domains.User", "User")
                         .WithMany("OAuthUserClaims")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("User");
                 });
