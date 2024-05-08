@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Api.Authorization;
@@ -39,6 +40,7 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IExtractRequestHelper _extractRequestHelper;
         private readonly ITokenRepository _tokenRepository;
         private readonly IBusControl _busControl;
+        private readonly ILogger<ConsentsController> _logger;
         private readonly IdServerHostOptions _options;
 
         public ConsentsController(
@@ -50,6 +52,7 @@ namespace SimpleIdServer.IdServer.UI
             IExtractRequestHelper extractRequestHelper,
             ITokenRepository tokenRepository,
             IBusControl busControl,
+            ILogger<ConsentsController> logger,
             IOptions<IdServerHostOptions> options)
         {
             _userRepository = userRepository;
@@ -60,6 +63,7 @@ namespace SimpleIdServer.IdServer.UI
             _extractRequestHelper = extractRequestHelper;
             _tokenRepository = tokenRepository;
             _busControl = busControl;
+            _logger = logger;
             _options = options.Value;
         }
 
@@ -177,12 +181,12 @@ namespace SimpleIdServer.IdServer.UI
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Index([FromRoute] string prefix, ConfirmConsentsViewModel confirmConsentsViewModel, CancellationToken cancellationToken)
+        public async Task<IActionResult> Index([FromRoute] string prefix, ConfirmConsentsViewModel viewModel, CancellationToken cancellationToken)
         {
             try
             {
                 prefix = prefix ?? Constants.DefaultRealm;
-                var unprotectedUrl = _dataProtector.Unprotect(confirmConsentsViewModel.ReturnUrl);
+                var unprotectedUrl = _dataProtector.Unprotect(viewModel.ReturnUrl);
                 var query = unprotectedUrl.GetQueries().ToJsonObject();
                 var grantId = query.GetGrantIdFromAuthorizationRequest();
                 var clientId = query.GetClientIdFromAuthorizationRequest();
@@ -225,10 +229,11 @@ namespace SimpleIdServer.IdServer.UI
                 await _userRepository.SaveChanges(cancellationToken);
                 return Redirect(unprotectedUrl);
             }
-            catch (CryptographicException)
+            catch (CryptographicException ex)
             {
+                _logger.LogError(ex.ToString());
                 ModelState.AddModelError("invalid_request", "invalid_request");
-                return View(confirmConsentsViewModel);
+                return await Index(prefix, viewModel.ReturnUrl, true, cancellationToken);
             }
 
             async Task RevokeTokens(string grantId, CancellationToken cancellationToken)
