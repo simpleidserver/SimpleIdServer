@@ -47,9 +47,9 @@ public class SessionHelper : ISessionHelper
     {
         if (!clients.Any()) return;
         var currentDateTime = DateTime.UtcNow;
-        var events = new JsonObject
+        var events = new Dictionary<string, string>
         {
-            { "http://schemas.openid.net/event/backchannel-logout", new JsonObject() }
+            { "http://schemas.openid.net/event/backchannel-logout", "{}" }
         };
         using (var httpClient = _httpClientFactory.GetHttpClient())
         {
