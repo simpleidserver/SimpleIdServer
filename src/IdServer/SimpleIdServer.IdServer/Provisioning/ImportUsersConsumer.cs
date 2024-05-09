@@ -249,9 +249,11 @@ public class ImportUsersConsumer :
                 }
             }
         }
+
         if(extractedUser.GroupIds != null)
         {
-            foreach(var groupId in extractedUser.GroupIds)
+            var filteredGroupIds = extractedUser.GroupIds.Where(i => !string.IsNullOrWhiteSpace(i));
+            foreach(var groupId in filteredGroupIds)
             {
                 groupUsers.Add(new GroupUser
                 {

@@ -31,6 +31,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Models
         }
 
         public ICollection<CustomMongoDBRef> SchemaRefs { get; set; }
+        public ICollection<CustomMongoDBRef> AttributeRefs { get; set; }
 
         public async Task IncludeAll(SCIMDbContext dbContext)
         {

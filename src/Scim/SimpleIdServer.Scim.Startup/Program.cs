@@ -390,6 +390,7 @@ public class Program
                     var filter = Builders<SCIMRepresentationModel>.Filter.Eq("_id", representation.Id);
                     var updateDefinitionBuilder = Builders<SCIMRepresentationModel>.Update;
                     var updateDefinition = updateDefinitionBuilder.Unset("FlatAttributes");
+                    representation.AttributeRefs = representation.FlatAttributes.Select(a => new CustomMongoDBRef("representationAttributes", a.Id)).ToList();
                     representation.FlatAttributes = null;
                     context.SCIMRepresentationLst.ReplaceOneAsync(s => s.Id == representation.Id, representation, new ReplaceOptions { IsUpsert = true }).Wait();
                     context.SCIMRepresentationLst.UpdateOneAsync(filter, updateDefinition).Wait();
