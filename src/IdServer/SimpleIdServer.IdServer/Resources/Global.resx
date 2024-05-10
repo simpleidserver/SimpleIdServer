@@ -336,8 +336,8 @@
   <data name="CertificateClientCannotBeGenerated" xml:space="preserve">
     <value>the client certificate cannot be generated</value>
   </data>
-  <data name="CertificateDoesntExist" xml:space="preserve">
-    <value>The certificate doesn't exist</value>
+  <data name="CertificateDoesntExistInvalid" xml:space="preserve">
+    <value>The certificate doesn't exist or is invalid</value>
   </data>
   <data name="CertificateDoesntHavePrivateKey" xml:space="preserve">
     <value>The certificate doesn't contain private key</value>

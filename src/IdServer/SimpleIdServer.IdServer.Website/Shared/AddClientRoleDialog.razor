@@ -8,6 +8,11 @@
 @inject IState<UpdateClientState> updateClientState
 @inject IDispatcher dispatcher
 
+@if (!string.IsNullOrWhiteSpace(ErrorMessage))
+{
+    <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@ErrorMessage</RadzenAlert>
+}
+
 <RadzenTemplateForm Submit=@SubmitAddClientRole TItem="AddClientRole" Data=@addClientRole>
     <!-- Name -->
     <div>
@@ -29,15 +34,30 @@
 
     AddClientRole addClientRole = new AddClientRole();
 
+    string ErrorMessage { get; set; }
+
     record AddClientRole
     {
         public string Name { get; set; } = null!;
         public string Description { get; set; } = null!;
     }
 
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        ErrorMessage = null;
+        SubscribeToAction<AddClientRoleFailureAction>((e) =>
+        {
+            ErrorMessage = e.ErrorMessage;
+        });
+        SubscribeToAction<AddClientRoleSuccessAction>((e) =>
+        {
+            dialogService.Close();
+        });
+    }
+
     void SubmitAddClientRole(AddClientRole addClientRole)
     {
         dispatcher.Dispatch(new AddClientRoleAction { Name = addClientRole.Name, Description = addClientRole.Description, ClientId = ClientId });
-        dialogService.Close();
     }
 }

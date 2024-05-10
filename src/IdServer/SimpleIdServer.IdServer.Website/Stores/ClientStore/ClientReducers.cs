@@ -569,6 +569,15 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         }
 
         [ReducerMethod]
+        public static ClientRolesState ReduceClientRoleFailureAction(ClientRolesState state, AddClientRoleFailureAction act)
+        {
+            return state with
+            {
+                IsLoading = false
+            };
+        }
+
+        [ReducerMethod]
         public static ClientRolesState ReduceAddClientRoleSuccessAction(ClientRolesState state, AddClientRoleSuccessAction act)
         {
             var roles = state.Roles.ToList();

@@ -661,11 +661,20 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var newScope = JsonSerializer.Deserialize<Domains.Scope>(json);
-            dispatcher.Dispatch(new AddClientRoleSuccessAction
+            try
             {
-                Scope = newScope
-            });
+                httpResult.EnsureSuccessStatusCode();
+                var newScope = JsonSerializer.Deserialize<Domains.Scope>(json);
+                dispatcher.Dispatch(new AddClientRoleSuccessAction
+                {
+                    Scope = newScope
+                });
+            }
+            catch
+            {
+                var jsonObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new AddClientRoleFailureAction { ErrorMessage = jsonObj["error_description"].GetValue<string>() });
+            }
         }
 
         [EffectMethod]
@@ -1185,6 +1194,11 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
     public class AddClientRoleSuccessAction
     {
         public Domains.Scope Scope { get; set; }
+    }
+
+    public class AddClientRoleFailureAction
+    {
+        public string ErrorMessage { get; set; }
     }
 
     public class ToggleClientRoleAction

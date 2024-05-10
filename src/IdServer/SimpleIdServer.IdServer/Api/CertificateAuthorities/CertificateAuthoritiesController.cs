@@ -18,6 +18,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Net;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using System.Threading;
@@ -133,7 +134,7 @@ public class CertificateAuthoritiesController : BaseController
             }
 
             var certificate = store.Certificates.Find(request.FindType, request.FindValue, true).FirstOrDefault();
-            if (certificate == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.CertificateDoesntExist);
+            if (certificate == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.CertificateDoesntExistInvalid);
             try
             {
                 if (!certificate.HasPrivateKey || certificate.PrivateKey == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.CertificateDoesntHavePrivateKey);
@@ -151,6 +152,11 @@ public class CertificateAuthoritiesController : BaseController
                 Content = JsonSerializer.Serialize(certificateAuthority).ToString(),
                 ContentType = "application/json"
             };
+        }
+        catch(CryptographicException ex)
+        {
+            _logger.LogError(ex.ToString());
+            return BuildError(ex);
         }
         catch (OAuthException ex)
         {

@@ -22,6 +22,7 @@ using System.Net;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using static System.Formats.Asn1.AsnWriter;
 using ScopeNames = SimpleIdServer.IdServer.Domains.DTOs.ScopeNames;
 
 namespace SimpleIdServer.IdServer.Api.Clients;
@@ -721,10 +722,16 @@ public class ClientsController : BaseController
                     .Include(c => c.Scopes)
                     .SingleOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == prefix));
                 if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
-                var newScope = new Scope
+                var scopeName = $"{result.ClientId}/{request.Name}";
+                var existingScope = await _scopeRepository.Query()
+                    .Include(s => s.Realms)
+                    .AsNoTracking()
+                    .AnyAsync(s => s.Name == scopeName && s.Realms.Any(r => r.Name == prefix), CancellationToken.None);
+                if (existingScope) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.ScopeAlreadyExists, scopeName));
+                var newScope = new Domains.Scope
                 {
                     Id = Guid.NewGuid().ToString(),
-                    Name = $"{result.ClientId}/{request.Name}",
+                    Name = scopeName,
                     Type = ScopeTypes.ROLE,
                     Protocol = ScopeProtocols.OAUTH,
                     Description = request.Description,

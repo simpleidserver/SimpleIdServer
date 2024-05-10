@@ -718,11 +718,11 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à The certificate doesn&apos;t exist.
+        ///   Recherche une chaîne localisée semblable à The certificate doesn&apos;t exist or is invalid.
         /// </summary>
-        public static string CertificateDoesntExist {
+        public static string CertificateDoesntExistInvalid {
             get {
-                return ResourceManager.GetString("CertificateDoesntExist", resourceCulture);
+                return ResourceManager.GetString("CertificateDoesntExistInvalid", resourceCulture);
             }
         }
         
