@@ -126,13 +126,6 @@ public class AuthorizationController : Controller
                     ui_locales = string.Join(" ", uiLocales)
                 });
                 activity?.SetStatus(ActivityStatusCode.Ok, $"User agent will be redirect to '{url}'");
-                await _busControl.Publish(new AuthorizationFailureEvent
-                {
-                    ClientId = context.Client.ClientId,
-                    Realm = context.Realm,
-                    RequestJSON = jObjBody.ToString(),
-                    ErrorMessage = $"User agent will be redirect to '{url}'"
-                });
                 HttpContext.Response.Redirect(url);
             }
             catch (OAuthExceptionBadRequestURIException ex)

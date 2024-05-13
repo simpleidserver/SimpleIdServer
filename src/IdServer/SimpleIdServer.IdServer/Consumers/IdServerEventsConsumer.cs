@@ -44,7 +44,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 {
                     Id = Guid.NewGuid().ToString(),
                     EventName = context.Message.EventName,
-                    Description = "Authorization Failed",
+                    Description = "Fail to process the authorization request",
                     CreateDateTime = DateTime.UtcNow,
                     Realm = context.Message.Realm,
                     IsError = true,
@@ -66,7 +66,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 {
                     Id = Guid.NewGuid().ToString(),
                     EventName = context.Message.EventName,
-                    Description = "Authorization Success",
+                    Description = "The authorization request is processed",
                     CreateDateTime = DateTime.UtcNow,
                     ClientId = context.Message.ClientId,
                     RequestJSON = context.Message.RequestJSON,
@@ -88,7 +88,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 {
                     Id = Guid.NewGuid().ToString(),
                     EventName = context.Message.EventName,
-                    Description = "Client Authentication Success",
+                    Description = "The client is authenticated",
                     CreateDateTime = DateTime.UtcNow,
                     ClientId = context.Message.ClientId,
                     AuthMethod = context.Message.AuthMethod,
@@ -109,7 +109,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 {
                     Id = Guid.NewGuid().ToString(),
                     EventName = context.Message.EventName,
-                    Description = "Client Registration Success",
+                    Description = "The client is registered",
                     CreateDateTime = DateTime.UtcNow,
                     RequestJSON = context.Message.RequestJSON,
                     Realm = context.Message.Realm,
@@ -129,7 +129,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 {
                     Id = Guid.NewGuid().ToString(),
                     EventName = context.Message.EventName,
-                    Description = "Consent Revoked",
+                    Description = "The consent is revoked",
                     ClientId = context.Message.ClientId,
                     Scopes = context.Message.Scopes == null ? new string[0] : context.Message.Scopes.ToArray(),
                     Claims = context.Message.Claims?.ToArray(),
@@ -152,7 +152,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 {
                     Id = Guid.NewGuid().ToString(),
                     EventName = context.Message.EventName,
-                    Description = "User Login Success",
+                    Description = "User is logged-in",
                     CreateDateTime = DateTime.UtcNow,
                     UserName = context.Message.UserName,
                     Realm = context.Message.Realm,
@@ -172,7 +172,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 {
                     Id = Guid.NewGuid().ToString(),
                     EventName = context.Message.EventName,
-                    Description = "User Login Failed",
+                    Description = "Fail to login the user",
                     CreateDateTime = DateTime.UtcNow,
                     UserName = context.Message.Login,
                     Realm = context.Message.Realm,
@@ -192,7 +192,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 {
                     Id = Guid.NewGuid().ToString(),
                     EventName = context.Message.EventName,
-                    Description = "Client Registration Failed",
+                    Description = "Fail to register the client",
                     CreateDateTime = DateTime.UtcNow,
                     RequestJSON = context.Message.RequestJSON,
                     Realm = context.Message.Realm,
@@ -213,7 +213,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 {
                     Id = Guid.NewGuid().ToString(),
                     EventName = context.Message.EventName,
-                    Description = "Client Authentication Failed",
+                    Description = "Fail to authenticate the client",
                     ClientId = context.Message.ClientId,
                     AuthMethod = context.Message.AuthMethod,
                     CreateDateTime = DateTime.UtcNow,
@@ -234,7 +234,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 {
                     Id = Guid.NewGuid().ToString(),
                     EventName = context.Message.EventName,
-                    Description = "Token Introspection Failed",
+                    Description = "Token cannot be introspected",
                     CreateDateTime = DateTime.UtcNow,
                     ClientId = context.Message.ClientId,
                     Realm = context.Message.Realm,
@@ -255,7 +255,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 {
                     Id = Guid.NewGuid().ToString(),
                     EventName = context.Message.EventName,
-                    Description = "Consent Granted",
+                    Description = "The consent is accepted",
                     UserName = context.Message.UserName,
                     ClientId = context.Message.ClientId,
                     Scopes = context.Message.Scopes == null ? new string[0] : context.Message.Scopes.ToArray(),
@@ -278,7 +278,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 {
                     Id = Guid.NewGuid().ToString(),
                     EventName = context.Message.EventName,
-                    Description = "Token Issued Failed",
+                    Description = "The token cannot be issued",
                     Scopes = context.Message.Scopes == null ? new string[0] : context.Message.Scopes.ToArray(),
                     ClientId = context.Message.ClientId,
                     CreateDateTime = DateTime.UtcNow,
@@ -300,7 +300,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 {
                     Id = Guid.NewGuid().ToString(),
                     EventName = context.Message.EventName,
-                    Description = "Token Introspection Success",
+                    Description = "The token can be introspected",
                     ClientId = context.Message.ClientId,
                     CreateDateTime = DateTime.UtcNow,
                     Realm = context.Message.Realm,
@@ -320,7 +320,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 {
                     Id = Guid.NewGuid().ToString(),
                     EventName = context.Message.EventName,
-                    Description = "Token Issued Success",
+                    Description = $"Token is issued with the grant type {context.Message.GrantType}",
                     ClientId = context.Message.ClientId,
                     Scopes = context.Message.Scopes == null ? new string[0] : context.Message.Scopes.ToArray(),
                     CreateDateTime = DateTime.UtcNow,
@@ -341,7 +341,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 {
                     Id = Guid.NewGuid().ToString(),
                     EventName = context.Message.EventName,
-                    Description = "Token Revoked Success",
+                    Description = "Token is revoked",
                     CreateDateTime = DateTime.UtcNow,
                     Realm = context.Message.Realm,
                     IsError = false
@@ -360,7 +360,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 {
                     Id = Guid.NewGuid().ToString(),
                     EventName = context.Message.EventName,
-                    Description = "Token Revoked Failure",
+                    Description = "Fail to revoke the token",
                     CreateDateTime = DateTime.UtcNow,
                     Realm = context.Message.Realm,
                     IsError = true,
@@ -383,7 +383,7 @@ namespace SimpleIdServer.IdServer.Consumers
                     ClientId = context.Message.ClientId,
                     UserName = context.Message.UserName,
                     Scopes = context.Message.Scopes == null ? new string[0] : context.Message.Scopes.ToArray(),
-                    Description = "UserInfo Failure",
+                    Description = "Fail to get the user information",
                     CreateDateTime = DateTime.UtcNow,
                     Realm = context.Message.Realm,
                     IsError = true,
@@ -406,7 +406,7 @@ namespace SimpleIdServer.IdServer.Consumers
                     ClientId = context.Message.ClientId,
                     UserName = context.Message.UserName,
                     Scopes = context.Message.Scopes == null ? new string[0] : context.Message.Scopes.ToArray(),
-                    Description = "UserInfo Success",
+                    Description = "The user information is returned",
                     CreateDateTime = DateTime.UtcNow,
                     Realm = context.Message.Realm,
                     IsError = false
@@ -425,7 +425,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 {
                     Id = Guid.NewGuid().ToString(),
                     EventName = context.Message.EventName,
-                    Description = "UserInfo Logout",
+                    Description = "The user is logged out",
                     UserName = context.Message.UserName,
                     CreateDateTime = DateTime.UtcNow,
                     Realm = context.Message.Realm,
@@ -445,7 +445,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 {
                     Id = Guid.NewGuid().ToString(),
                     EventName = context.Message.EventName,
-                    Description = "Pushed Authorization Failed",
+                    Description = "Fail to push the authorization request",
                     CreateDateTime = DateTime.UtcNow,
                     Realm = context.Message.Realm,
                     IsError = true,
@@ -467,7 +467,7 @@ namespace SimpleIdServer.IdServer.Consumers
                 {
                     Id = Guid.NewGuid().ToString(),
                     EventName = context.Message.EventName,
-                    Description = "Pushed Authorization Success",
+                    Description = "The authorization request is pushed",
                     CreateDateTime = DateTime.UtcNow,
                     ClientId = context.Message.ClientId,
                     RequestJSON = context.Message.RequestJSON,
