@@ -11,6 +11,7 @@ public interface IAuthenticationContextClassReferenceRepository
 {
     Task<AuthenticationContextClassReference> Get(string realm, string id, CancellationToken cancellationToken);
     Task<AuthenticationContextClassReference> GetByName(string realm, string name, CancellationToken cancellationToken);
+    Task<List<AuthenticationContextClassReference>> GetByNames(string realm, List<string> names, CancellationToken cancellationToken);
     Task<List<AuthenticationContextClassReference>> GetAll(CancellationToken cancellationToken);
     Task<List<AuthenticationContextClassReference>> GetAll(string realm, CancellationToken cancellationToken);
     void Add(AuthenticationContextClassReference record);

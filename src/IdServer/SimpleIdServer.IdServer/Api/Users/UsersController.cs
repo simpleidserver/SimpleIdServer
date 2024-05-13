@@ -4,7 +4,6 @@ using Hangfire;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
@@ -16,7 +15,7 @@ using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -128,12 +127,8 @@ namespace SimpleIdServer.IdServer.Api.Users
                 await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
                 var user = await _userRepository.GetById(id, prefix, cancellationToken);
                 if (user == null) return new NotFoundResult();
-                var grpPathLst = user.Groups.SelectMany(g => g.Group.ResolveAllPath()).Distinct();
-                var allGroups = await _groupRepository.Query()
-                    .Include(g => g.Roles)
-                    .AsNoTracking()
-                    .Where(g => grpPathLst.Contains(g.FullPath))
-                    .ToListAsync();
+                var grpPathLst = user.Groups.SelectMany(g => g.Group.ResolveAllPath()).Distinct().ToList();
+                var allGroups = await _groupRepository.GetAllByStrictFullPath(prefix, grpPathLst, cancellationToken);
                 var roles = allGroups.SelectMany(g => g.Roles).Select(r => r.Name).Distinct();
                 return new OkObjectResult(roles);
             }
@@ -157,7 +152,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                 {
                     prefix = prefix ?? Constants.DefaultRealm;
                     await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
-                    var realm = await _realmRepository.Query().FirstAsync(r => r.Name == prefix, cancellationToken);
+                    var realm = await _realmRepository.Get(prefix, cancellationToken);
                     await Validate();
                     var newUser = new User
                     {
@@ -515,9 +510,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                     await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
                     var user = await _userRepository.GetById(id, prefix, cancellationToken);
                     if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
-                    var newGroup = await _groupRepository.Query()
-                        .Include(g => g.Realms)
-                        .SingleOrDefaultAsync(a => a.Id == groupId && a.Realms.Any(r => r.RealmsName == prefix)); ;
+                    var newGroup = await _groupRepository.Get(prefix, groupId, cancellationToken);
                     if (newGroup == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserGroup, groupId));
                     user.Groups.Add(new GroupUser
                     {

@@ -6,7 +6,6 @@ using SimpleIdServer.IdServer.Api.Groups;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Stores;
 using System.Linq.Dynamic.Core;
-using static MassTransit.ValidationResultExtensions;
 
 namespace SimpleIdServer.IdServer.Store.EF;
 
@@ -49,7 +48,7 @@ public class GroupRepository : IGroupRepository
                     .Include(c => c.Roles)
                     .SingleOrDefaultAsync(g => g.Realms.Any(r => r.RealmsName == realm) && g.Id == id, cancellationToken);
 
-    public Task<Group> GetByFullPath(string realm, string fullPath, CancellationToken cancellationToken)
+    public Task<Group> GetByStrictFullPath(string realm, string fullPath, CancellationToken cancellationToken)
         => _dbContext.Groups
             .Include(c => c.Realms)
             .Include(c => c.Children)
@@ -60,6 +59,14 @@ public class GroupRepository : IGroupRepository
                 .Include(c => c.Realms)
                 .Where(g => g.Realms.Any(r => r.RealmsName == realm) && g.FullPath.StartsWith(fullPath))
                 .ToListAsync(cancellationToken);
+
+    public Task<List<Group>> GetAllByStrictFullPath(string realm, List<string> fullPathLst, CancellationToken cancellationToken)
+        => _dbContext.Groups
+            .Include(g => g.Roles)
+            .Include(c => c.Realms)
+            .Where(g => fullPathLst.Contains(g.FullPath) && g.Realms.Any(r => r.RealmsName == realm))
+            .ToListAsync(cancellationToken);
+
 
     public Task<List<Group>> GetAllByFullPath(string realm, string id, string fullPath, CancellationToken cancellationToken)
         => _dbContext.Groups

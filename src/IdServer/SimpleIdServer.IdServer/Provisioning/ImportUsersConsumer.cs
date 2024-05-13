@@ -1,9 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
-using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,11 +42,7 @@ public class ImportUsersConsumer :
     public async Task Consume(ConsumeContext<StartImportUsersCommand> context)
     {
         var message = context.Message;
-        var idProvisioning = await _identityProvisioningStore.Query()
-            .Include(i => i.Definition).ThenInclude(i => i.MappingRules)
-            .Include(i => i.Realms)
-            .Include(i => i.Histories)
-            .SingleAsync(i => i.Id == message.InstanceId && i.Realms.Any(r => r.Name == message.Realm), context.CancellationToken);
+        var idProvisioning = await _identityProvisioningStore.Get(message.Realm, message.InstanceId, context.CancellationToken);
         var nbRecords = await _provisioningStagingStore.NbStagingExtractedRepresentations(context.Message.ProcessId, context.CancellationToken);
         var nbPages = ((int)Math.Ceiling((double)nbRecords / _pageSize));
         if(nbPages == 0)
@@ -85,11 +80,7 @@ public class ImportUsersConsumer :
     public async Task Consume(ConsumeContext<ImportUsersCommand> context)
     {
         var message = context.Message;
-        var idProvisioning = await _identityProvisioningStore.Query()
-            .Include(i => i.Definition).ThenInclude(i => i.MappingRules)
-            .Include(i => i.Realms)
-            .Include(i => i.Histories)
-            .SingleAsync(i => i.Id == message.InstanceId && i.Realms.Any(r => r.Name == message.Realm), context.CancellationToken);
+        var idProvisioning = await _identityProvisioningStore.Get(message.Realm, message.InstanceId, context.CancellationToken);
         var representations = await _provisioningStagingStore.GetStagingExtractedRepresentations(
             message.ProcessId,
             message.Page - 1, 
@@ -109,11 +100,7 @@ public class ImportUsersConsumer :
     public async Task Consume(ConsumeContext<CheckUsersImportedCommand> context)
     {
         var message = context.Message;
-        var instance = await _identityProvisioningStore.Query()
-            .Include(d => d.Realms)
-            .Include(d => d.Histories)
-            .Include(d => d.Definition).ThenInclude(d => d.MappingRules)
-            .SingleAsync(i => i.Id == message.InstanceId && i.Realms.Any(r => r.Name == message.Realm));
+        var instance = await _identityProvisioningStore.Get(message.Realm, message.InstanceId, context.CancellationToken);
         var process = instance.GetProcess(message.ProcessId);
         if (process.TotalPageToImport == process.NbImportedPages)
         {

@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
@@ -13,7 +12,7 @@ using SimpleIdServer.IdServer.Events;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System;
@@ -112,9 +111,7 @@ namespace SimpleIdServer.IdServer.UI
             var acrValues = query.GetAcrValuesFromAuthorizationRequest();
             var clientId = query.GetClientIdFromAuthorizationRequest();
             var requestedClaims = query.GetClaimsFromAuthorizationRequest();
-            var client = await _clientRepository.Query()
-                .Include(c => c.Realms)
-                .FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == realm), token);
+            var client = await _clientRepository.GetByClientId(realm, clientId, token);
             var acr = await _amrHelper.FetchDefaultAcr(realm, acrValues, requestedClaims, client, token);
             string amr;
             if (acr == null || string.IsNullOrWhiteSpace(amr = _amrHelper.FetchNextAmr(acr, currentAmr)))

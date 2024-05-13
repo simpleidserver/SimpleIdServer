@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -21,7 +20,7 @@ using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.AuthProviders;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
@@ -129,10 +128,11 @@ namespace SimpleIdServer.IdServer.UI
         public async virtual Task<IActionResult> RejectUmaPendingRequest(string ticketId, CancellationToken cancellationToken)
         {
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var pendingRequest = await _pendingRequestRepository.Query().FirstOrDefaultAsync(p => p.TicketId == ticketId, cancellationToken);
-            if (pendingRequest == null)
+            var pendingRequests = await _pendingRequestRepository.GetByPermissionTicketId(ticketId, cancellationToken);
+            if (!pendingRequests.Any())
                 return NotFound();
 
+            var pendingRequest = pendingRequests.First();
             if (pendingRequest.Owner != nameIdentifier)
                 return Unauthorized();
 
@@ -149,10 +149,11 @@ namespace SimpleIdServer.IdServer.UI
         public async virtual Task<IActionResult> ConfirmUmaPendingRequest(string ticketId, CancellationToken cancellationToken)
         {
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var pendingRequest = await _pendingRequestRepository.Query().FirstOrDefaultAsync(p => p.TicketId == ticketId, cancellationToken);
-            if (pendingRequest == null)
+            var pendingRequests = await _pendingRequestRepository.GetByPermissionTicketId(ticketId, cancellationToken);
+            if (!pendingRequests.Any())
                 return NotFound();
 
+            var pendingRequest = pendingRequests.First();
             if (pendingRequest.Owner != nameIdentifier)
                 return Unauthorized();
 
@@ -321,10 +322,7 @@ namespace SimpleIdServer.IdServer.UI
             if (!string.IsNullOrWhiteSpace(kvp.Key))
             {
                 var activeSession = await _userSessionRepository.GetById(kvp.Value, prefix, cancellationToken);
-                var targetedClients = await _clientRepository.Query()
-                    .AsNoTracking()
-                    .Where(c => activeSession.ClientIds.Contains(c.ClientId) && c.Realms.Any(r => r.Name == prefix) && !string.IsNullOrWhiteSpace(c.FrontChannelLogoutUri))
-                    .ToListAsync();
+                var targetedClients = await _clientRepository.GetByClientIdsAndExistingFrontchannelLogoutUri(prefix, activeSession.ClientIds, cancellationToken);
                 frontChannelLogouts = targetedClients.Select(c => BuildFrontChannelLogoutUrl(c, kvp.Value));
                 if (activeSession != null && !activeSession.IsClientsNotified)
                 {
@@ -380,8 +378,8 @@ namespace SimpleIdServer.IdServer.UI
             {
                 var consents = new List<ConsentViewModel>();
                 var filteredConsents = user.Consents.Where(c => c.Realm == prefix);
-                var clientIds = filteredConsents.Select(c => c.ClientId);
-                var oauthClients = await _clientRepository.Query().Include(c => c.Translations).Include(r => r.Realms).AsNoTracking().Where(c => clientIds.Contains(c.ClientId) && c.Realms.Any(r => r.Name == prefix)).ToListAsync(cancellationToken);
+                var clientIds = filteredConsents.Select(c => c.ClientId).ToList();
+                var oauthClients = await _clientRepository.GetByClientIds(prefix, clientIds, cancellationToken);
                 foreach (var consent in filteredConsents)
                 {
                     var oauthClient = oauthClients.Single(c => c.ClientId == consent.ClientId);
@@ -399,7 +397,7 @@ namespace SimpleIdServer.IdServer.UI
 
             async Task<List<PendingRequestViewModel>> GetPendingRequest()
             {
-                var pendingRequestLst = await _pendingRequestRepository.Query().Include(p => p.Resource).ThenInclude(p => p.Translations).Where(r => (r.Owner == nameIdentifier || r.Requester == nameIdentifier) && r.Realm == prefix).ToListAsync(cancellationToken);
+                var pendingRequestLst = await _pendingRequestRepository.GetByUsername(prefix, nameIdentifier, cancellationToken);
                 var result = new List<PendingRequestViewModel>();
                 foreach (var pendingRequest in pendingRequestLst)
                 {

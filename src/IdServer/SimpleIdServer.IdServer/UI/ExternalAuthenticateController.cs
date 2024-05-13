@@ -5,7 +5,6 @@ using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
@@ -14,9 +13,8 @@ using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.Services;
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -117,11 +115,7 @@ namespace SimpleIdServer.IdServer.UI
         private async Task<User> JustInTimeProvision(string realm, string scheme, AuthenticateResult authResult, CancellationToken cancellationToken)
         {
             var principal = authResult.Principal;
-            var idProvider = await _authenticationSchemeProviderRepository
-                .Query()
-                .AsNoTracking()
-                .Include(p => p.Mappers)
-                .SingleOrDefaultAsync(p => p.Name == scheme, cancellationToken);
+            var idProvider = await _authenticationSchemeProviderRepository.Get(realm, scheme, cancellationToken);
             if(idProvider == null)
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UnsupportedSchemeProvider, scheme));
@@ -149,7 +143,7 @@ namespace SimpleIdServer.IdServer.UI
                 else
                 {
                     
-                    var r = await _realmRepository.Query().FirstAsync(r => r.Name == realm);
+                    var r = await _realmRepository.Get(realm, cancellationToken);
                     user = _userTransformer.Transform(r, principal, idProvider);
                     user.AddExternalAuthProvider(scheme, sub);
                     UserRepository.Add(user);

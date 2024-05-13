@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
@@ -17,7 +16,7 @@ using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System.Collections.Generic;
 using System.Linq;
@@ -78,7 +77,7 @@ namespace SimpleIdServer.IdServer.UI
                 var unprotectedUrl = _dataProtector.Unprotect(returnUrl);
                 var query = unprotectedUrl.GetQueries().ToJsonObject();
                 var clientId = query.GetClientIdFromAuthorizationRequest();
-                var oauthClient = await _clientRepository.Query().Include(c => c.Translations).Include(c => c.Realms).Include(c => c.Scopes).Include(c => c.SerializedJsonWebKeys).AsNoTracking().FirstAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == prefix), cancellationToken);
+                var oauthClient = await _clientRepository.GetByClientId(prefix, clientId, cancellationToken);
                 var grantId = query.GetGrantIdFromAuthorizationRequest();
                 if(!string.IsNullOrWhiteSpace(grantId))
                     return View(await BuildConsentsFromGrant(query, oauthClient, grantId));
@@ -138,7 +137,7 @@ namespace SimpleIdServer.IdServer.UI
             var unprotectedUrl = _dataProtector.Unprotect(viewModel.ReturnUrl);
             var query = unprotectedUrl.GetQueries().ToJsonObject();
             var clientId = query.GetClientIdFromAuthorizationRequest();
-            var oauthClient = await _clientRepository.Query().Include(c => c.Realms).AsNoTracking().FirstAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == prefix), cancellationToken);
+            var oauthClient = await _clientRepository.GetByClientId(prefix, clientId, cancellationToken);
             query = await _extractRequestHelper.Extract(prefix, Request.GetAbsoluteUriWithVirtualPath(), query, oauthClient);
             var redirectUri = query.GetRedirectUriFromAuthorizationRequest();
             var grantId = query.GetGrantIdFromAuthorizationRequest();
@@ -190,7 +189,7 @@ namespace SimpleIdServer.IdServer.UI
                 var query = unprotectedUrl.GetQueries().ToJsonObject();
                 var grantId = query.GetGrantIdFromAuthorizationRequest();
                 var clientId = query.GetClientIdFromAuthorizationRequest();
-                var oauthClient = await _clientRepository.Query().Include(c => c.Translations).Include(c => c.Realms).Include(c => c.Scopes).Include(c => c.SerializedJsonWebKeys).AsNoTracking().FirstAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == prefix), cancellationToken);
+                var oauthClient = await _clientRepository.GetByClientId(prefix, clientId, cancellationToken);
                 query = await _extractRequestHelper.Extract(prefix, Request.GetAbsoluteUriWithVirtualPath(), query, oauthClient);
                 var nameIdentifier = GetNameIdentifier();
                 var user = await _userRepository.GetBySubject(nameIdentifier, prefix, cancellationToken);
@@ -238,7 +237,7 @@ namespace SimpleIdServer.IdServer.UI
 
             async Task RevokeTokens(string grantId, CancellationToken cancellationToken)
             {
-                var tokens = await _tokenRepository.Query().Where(t => t.GrantId == grantId).ToListAsync(cancellationToken);
+                var tokens = await _tokenRepository.GetByGrantId(grantId, cancellationToken);
                 foreach (var t in tokens)
                     _tokenRepository.Remove(t);
                 await _tokenRepository.SaveChanges(cancellationToken);

@@ -56,6 +56,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IProvisioningStagingStore, ProvisioningStagingStore>();
             services.AddTransient<IGotiySessionStore, GotiySessionStore>();
             services.AddTransient<IPresentationDefinitionStore, PresentationDefinitionStore>();
+            services.AddTransient<IKeyValueRepository, KeyValueRepository>();
         }
     }
 }

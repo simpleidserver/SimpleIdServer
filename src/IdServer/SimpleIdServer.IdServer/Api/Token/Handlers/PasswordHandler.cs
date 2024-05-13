@@ -33,17 +33,16 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IBusControl _busControl;
         private readonly IDPOPProofValidator _dpopProofValidator;
         private readonly IEnumerable<IUserAuthenticationService> _userAuthenticationServices;
-        private readonly IdServerHostOptions _options;
 
         public PasswordHandler(
             IPasswordGrantTypeValidator passwordGrantTypeValidator,
             IEnumerable<ITokenProfile> tokenProfiles,
+            IOptions<IdServerHostOptions> options,
             IEnumerable<ITokenBuilder> tokenBuilders, 
             IClientAuthenticationHelper clientAuthenticationHelper,
             IGrantHelper audienceHelper,
             IBusControl busControl,
             IDPOPProofValidator dpopProofValidator,
-            IOptions<IdServerHostOptions> options,
             IEnumerable<IUserAuthenticationService> userAuthenticationServices) : base(clientAuthenticationHelper, tokenProfiles, options)
         {
             _passwordGrantTypeValidator = passwordGrantTypeValidator;
@@ -51,7 +50,6 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             _audienceHelper = audienceHelper;
             _busControl = busControl;
             _dpopProofValidator = dpopProofValidator;
-            _options = options.Value;
             _userAuthenticationServices = userAuthenticationServices;
         }
 

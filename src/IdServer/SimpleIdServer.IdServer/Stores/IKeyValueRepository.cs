@@ -3,17 +3,15 @@
 
 using SimpleIdServer.IdServer.Domains;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.Stores;
 
-public interface IUmaPendingRequestRepository
+public interface IKeyValueRepository
 {
-    Task<List<UMAPendingRequest>> GetByPermissionTicketId(string permissionTicketId, CancellationToken cancellationToken);
-    Task<List<UMAPendingRequest>> GetByUsername(string realm, string userName, CancellationToken cancellationToken);
-    IQueryable<UMAPendingRequest> Query();
-    void Add(UMAPendingRequest request);
+    Task<ConfigurationKeyPairValueRecord> Get(string key, CancellationToken cancellationToken);
+    Task<List<ConfigurationKeyPairValueRecord>> GetAll(CancellationToken cancellationToken);
+    void Add(ConfigurationKeyPairValueRecord keyValue);
     Task<int> SaveChanges(CancellationToken cancellationToken);
 }

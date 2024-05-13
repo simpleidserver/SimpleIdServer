@@ -3,7 +3,6 @@
 
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.IdServer.Api.Token.Helpers;
@@ -19,7 +18,7 @@ using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -108,8 +107,8 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     if (invalidScopes)
                         throw new OAuthException(ErrorCodes.INVALID_SCOPE, Global.InvalidScope);
 
-                    var resourceIds = permissionTicket.Records.Select(r => r.ResourceId);
-                    var umaResources = await _umaResourceRepository.Query().Include(r => r.Permissions).ThenInclude(p => p.Claims).Where(r => resourceIds.Contains(r.Id)).ToListAsync(cancellationToken);
+                    var resourceIds = permissionTicket.Records.Select(r => r.ResourceId).ToList();
+                    var umaResources = await _umaResourceRepository.GetByIds(resourceIds, cancellationToken);
                     var requiredClaims = new List<UMAResourcePermissionClaim>();
                     foreach (var umaResource in umaResources)
                     {
@@ -155,7 +154,8 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                         .All(pr => pr.Claims.All(cl => claimTokenFormatFetcherResult.Claims.Any(c => c.Type == cl.Name && !c.Value.ToString().Equals(cl.Value, StringComparison.InvariantCultureIgnoreCase)))));
                     if (isNotAuthorized)
                     {
-                        var pendingRequests = await _umaPendingRequestRepository.Query().Where(r => r.TicketId == permissionTicket.Id).ToListAsync(cancellationToken);
+
+                        var pendingRequests = await _umaPendingRequestRepository.GetByPermissionTicketId(permissionTicket.Id, cancellationToken);
                         if (pendingRequests.Any())
                             return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.REQUEST_DENIED, Global.RequestDenied);
 

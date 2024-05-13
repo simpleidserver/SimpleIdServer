@@ -11,11 +11,13 @@ public static class WebApplicationBuilderExtensions
 {
     public static WebApplicationBuilder AddAutomaticConfiguration(this WebApplicationBuilder builder, Action<AutomaticConfigurationOptions> callback)
     {
-        var options = new AutomaticConfigurationOptions();
+        var options = new AutomaticConfigurationOptions(builder.Services);
         callback(options);
         builder.Services.AddSingleton(options);
         var configurationBuilder = (IConfigurationBuilder)builder.Configuration;
-        configurationBuilder.Add(new AutomaticConfigurationSource(options, options.KeyValueConnector));
+        var provider = builder.Services.BuildServiceProvider();
+        var keyValueConnector = provider.GetRequiredService(options.KeyValueConnectorType) as IKeyValueConnector;
+        configurationBuilder.Add(new AutomaticConfigurationSource(options, keyValueConnector));
         return builder;
     }
 }

@@ -25,7 +25,7 @@ public class RegistrationWorkflowRepository : IRegistrationWorkflowRepository
     public Task<RegistrationWorkflow> GetByName(string realm, string name, CancellationToken cancellationToken)
     {
         return _dbContext.RegistrationWorkflows
-            .SingleOrDefaultAsync(r => r.RealmName == realm && r.Id == name, cancellationToken);
+            .SingleOrDefaultAsync(r => r.RealmName == realm && r.Name == name, cancellationToken);
     }
 
     public Task<RegistrationWorkflow> GetDefault(string realm, CancellationToken cancellationToken)

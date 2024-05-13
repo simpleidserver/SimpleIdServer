@@ -11,6 +11,7 @@ namespace SimpleIdServer.IdServer.Stores;
 public interface ITokenRepository
 {
     Task<Token> Get(string id, CancellationToken cancellationToken);
+    Task<List<Token>> GetAllByAuthorizationCode(string authorizationCode, CancellationToken cancellationToken);
     Task<List<Token>> GetByGrantId(string grantId, CancellationToken cancellationToken);
     IQueryable<Token> Query();
     void Add(Token token);

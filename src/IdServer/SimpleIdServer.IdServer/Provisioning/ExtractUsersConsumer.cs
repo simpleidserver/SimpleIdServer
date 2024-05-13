@@ -3,13 +3,13 @@
 
 using MassTransit;
 using MassTransit.Initializers;
-using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Nodes;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
 
@@ -40,11 +40,7 @@ public class ExtractUsersConsumer :
     public async Task Consume(ConsumeContext<StartExtractUsersCommand> context)
     {
         var message = context.Message;
-        var instance = await _identityProvisioningStore.Query()
-            .Include(d => d.Realms)
-            .Include(d => d.Histories)
-            .Include(d => d.Definition).ThenInclude(d => d.MappingRules)
-            .SingleAsync(i => i.Id == message.InstanceId && i.Realms.Any(r => r.Name == message.Realm));
+        var instance = await _identityProvisioningStore.Get(message.Realm, message.InstanceId, context.CancellationToken);
         if (!instance.IsEnabled)
         {
             return;
@@ -78,11 +74,7 @@ public class ExtractUsersConsumer :
     public async Task Consume(ConsumeContext<ExtractUsersCommand> context)
     {
         var message = context.Message;
-        var instance = await _identityProvisioningStore.Query()
-            .Include(d => d.Realms)
-            .Include(d => d.Histories)
-            .Include(d => d.Definition).ThenInclude(d => d.MappingRules)
-            .SingleAsync(i => i.Id == message.InstanceId && i.Realms.Any(r => r.Name == message.Realm));
+        var instance = await _identityProvisioningStore.Get(message.Realm, message.InstanceId, CancellationToken.None);
         var provisioningService = _provisioningServices.Single(p => p.Name == instance.Definition.Name);
         var extractionResult = await provisioningService.Extract(new ExtractionPage
         {
@@ -127,11 +119,7 @@ public class ExtractUsersConsumer :
     public async Task Consume(ConsumeContext<CheckUsersExtractedCommand> context)
     {
         var message = context.Message;
-        var instance = await _identityProvisioningStore.Query()
-            .Include(d => d.Realms)
-            .Include(d => d.Histories)
-            .Include(d => d.Definition).ThenInclude(d => d.MappingRules)
-            .SingleAsync(i => i.Id == message.InstanceId && i.Realms.Any(r => r.Name == message.Realm));
+        var instance = await _identityProvisioningStore.Get(message.Realm, message.InstanceId, CancellationToken.None);
         var process = instance.GetProcess(message.ProcessId);
         if(process.TotalPageToExtract == process.NbExtractedPages)
         {

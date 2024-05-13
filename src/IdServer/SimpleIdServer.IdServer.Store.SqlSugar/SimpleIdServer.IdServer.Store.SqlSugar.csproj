@@ -6,9 +6,9 @@
 		<Description>Use sqlsugar.</Description>
 	</PropertyGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\SimpleIdServer.IdServer.Domains\SimpleIdServer.IdServer.Domains.csproj" />
+		<PackageReference Include="SqlSugarCore" Version="5.1.4.154" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="SqlSugarCore" Version="5.1.4.154" />
+	  <ProjectReference Include="..\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
 	</ItemGroup>
 </Project>

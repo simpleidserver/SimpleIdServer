@@ -1,11 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System.Linq;
 using System.Net;
 using System.Text.Json.Nodes;
@@ -41,12 +40,7 @@ namespace SimpleIdServer.IdServer.Api.DeviceAuthorization
             {
                 if (string.IsNullOrWhiteSpace(clientId))
                     throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, AuthorizationRequestParameters.ClientId));
-
-                var client = await _clientRepository.Query().Include(c => c.Scopes).ThenInclude(s => s.ClaimMappers)
-                    .Include(c => c.SerializedJsonWebKeys)
-                    .Include(c => c.Realms)
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == realm), cancellationToken);
+                var client = await _clientRepository.GetByClientId(realm, clientId, cancellationToken);
                 if (client == null)
                     throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CLIENT, string.Format(Global.UnknownClient, clientId));
 

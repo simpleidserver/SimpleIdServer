@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Events;
 using SimpleIdServer.IdServer.ExternalEvents;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Linq;
 using System.Text.Json;

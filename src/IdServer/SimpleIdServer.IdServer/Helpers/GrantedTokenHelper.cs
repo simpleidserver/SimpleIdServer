@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -11,7 +10,7 @@ using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -73,13 +72,13 @@ namespace SimpleIdServer.IdServer.Helpers
 
         public async Task<IEnumerable<Token>> GetTokensByAuthorizationCode(string code, CancellationToken cancellationToken)
         {
-            var result = await _tokenRepository.Query().Where(t => t.AuthorizationCode == code).ToListAsync(cancellationToken);
+            var result = await _tokenRepository.GetAllByAuthorizationCode(code, cancellationToken);
             return result;
         }
 
         public async Task<bool> RemoveToken(string token, CancellationToken cancellationToken)
         {
-            var result = await _tokenRepository.Query().FirstOrDefaultAsync(t => t.Id == token, cancellationToken);
+            var result = await _tokenRepository.Get(token, cancellationToken);
             if (result == null)
             {
                 return false;
@@ -163,7 +162,7 @@ namespace SimpleIdServer.IdServer.Helpers
 
         public async Task<JsonWebToken> GetAccessToken(string accessToken, CancellationToken cancellationToken)
         {
-            var result = await _tokenRepository.Query().FirstOrDefaultAsync(t => t.Id == accessToken, cancellationToken);
+            var result = await _tokenRepository.Get(accessToken, cancellationToken);
             if (result == null) return null;
             var handler = new JsonWebTokenHandler();
             if(result.AccessTokenType == AccessTokenTypes.Jwt) return handler.ReadJsonWebToken(result.Id);
@@ -172,7 +171,7 @@ namespace SimpleIdServer.IdServer.Helpers
 
         public async Task<bool> TryRemoveAccessToken(string accessToken, string clientId, CancellationToken cancellationToken)
         {
-            var result = await _tokenRepository.Query().FirstOrDefaultAsync(t => t.Id == accessToken, cancellationToken);
+            var result = await _tokenRepository.Get(accessToken, cancellationToken);
             if (result == null) return false;
             if (result.ClientId != clientId) throw new OAuthException(ErrorCodes.INVALID_CLIENT, Global.UnauthorizedClient);
             _tokenRepository.Remove(result);
@@ -186,7 +185,7 @@ namespace SimpleIdServer.IdServer.Helpers
 
         public async Task<Token> GetRefreshToken(string refreshToken, CancellationToken token)
         {
-            var cache = await _tokenRepository.Query().FirstOrDefaultAsync(t => t.Id == refreshToken, token);
+            var cache = await _tokenRepository.Get(refreshToken, token);
             if (cache == null) return null;
             return cache;
         }
@@ -219,7 +218,7 @@ namespace SimpleIdServer.IdServer.Helpers
 
         public async Task<bool> TryRemoveRefreshToken(string refreshToken, string clientId, CancellationToken cancellationToken)
         {
-            var result = await _tokenRepository.Query().FirstOrDefaultAsync(r => r.Id == refreshToken, cancellationToken);
+            var result = await _tokenRepository.Get(refreshToken, cancellationToken);
             if (result == null)
             {
                 return false;

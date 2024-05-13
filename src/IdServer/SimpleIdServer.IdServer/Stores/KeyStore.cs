@@ -1,9 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +29,7 @@ namespace SimpleIdServer.IdServer.Stores
         public IEnumerable<SigningCredentials> GetAllSigningKeys(string realm)
         {
             var result = new List<SigningCredentials>();
-            var serializedKeys = _fileSerializedKeyStore.Query().Include(s => s.Realms).Where(s => s.Usage == Constants.JWKUsages.Sig && s.Realms.Any(r => r.Name == realm)).ToList();
+            var serializedKeys = _fileSerializedKeyStore.GetAllSig(realm, CancellationToken.None).Result;
             foreach(var serializedKey in serializedKeys)
             {
                 SecurityKey securityKey;
@@ -53,7 +51,7 @@ namespace SimpleIdServer.IdServer.Stores
         public IEnumerable<EncryptingCredentials> GetAllEncryptingKeys(string realm)
         {
             var result = new List<EncryptingCredentials>();
-            var serializedKeys = _fileSerializedKeyStore.Query().Include(s => s.Realms).Where(s => s.Usage == Constants.JWKUsages.Enc && s.Realms.Any(r => r.Name == realm)).ToList();
+            var serializedKeys = _fileSerializedKeyStore.GetAllEnc(realm, CancellationToken.None).Result;
             foreach(var serializedKey in serializedKeys)
             {
                 SecurityKey securityKey;

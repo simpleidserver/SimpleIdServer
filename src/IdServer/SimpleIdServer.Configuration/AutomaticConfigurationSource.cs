@@ -9,6 +9,11 @@ namespace SimpleIdServer.Configuration
         private readonly AutomaticConfigurationOptions _options;
         private readonly IKeyValueConnector _keyValueConnector;
 
+        public AutomaticConfigurationSource()
+        {
+            
+        }
+
         public AutomaticConfigurationSource(AutomaticConfigurationOptions options, IKeyValueConnector keyValueConnector)
         {
             _options = options;

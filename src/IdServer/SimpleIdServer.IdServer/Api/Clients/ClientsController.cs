@@ -650,7 +650,7 @@ public class ClientsController : BaseController
                 if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
                 var scopeName = $"{result.ClientId}/{request.Name}";
                 var existingScope = await _scopeRepository.GetByName(prefix, scopeName, cancellationToken);
-                if (existingScope) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.ScopeAlreadyExists, scopeName));
+                if (existingScope != null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.ScopeAlreadyExists, scopeName));
                 var newScope = new Domains.Scope
                 {
                     Id = Guid.NewGuid().ToString(),
@@ -661,7 +661,7 @@ public class ClientsController : BaseController
                     CreateDateTime = DateTime.UtcNow,
                     UpdateDateTime = DateTime.UtcNow,
                 };
-                var realm = await _realmRepository.Get(r => r.Name == prefix, cancellationToken);
+                var realm = await _realmRepository.Get(prefix, cancellationToken);
                 newScope.Realms.Add(realm);
                 result.Scopes.Add(newScope);
                 result.UpdateDateTime = DateTime.UtcNow;

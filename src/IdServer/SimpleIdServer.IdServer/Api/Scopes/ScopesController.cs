@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SimpleIdServer.IdServer.Api.ApiResources;
 using SimpleIdServer.IdServer.Domains;
@@ -11,17 +10,15 @@ using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Net;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using static MassTransit.ValidationResultExtensions;
 
 namespace SimpleIdServer.IdServer.Api.Scopes;
 
@@ -54,34 +51,14 @@ public class ScopesController : BaseController
     #region Querying
 
     [HttpPost]
-    public async Task<IActionResult> Search([FromRoute] string prefix, [FromBody] SearchScopeRequest request)
+    public async Task<IActionResult> Search([FromRoute] string prefix, [FromBody] SearchScopeRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
             await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
-            IQueryable<Scope> query = _scopeRepository.Query()
-                .Include(p => p.Realms)
-                .Where(p => p.Realms.Any(r => r.Name == prefix) && ((request.IsRole && p.Type == ScopeTypes.ROLE) || (!request.IsRole && (p.Type == ScopeTypes.IDENTITY || p.Type == ScopeTypes.APIRESOURCE))))
-                .AsNoTracking();
-            if (!string.IsNullOrWhiteSpace(request.Filter))
-                query = query.Where(request.Filter);
-
-            if (!string.IsNullOrWhiteSpace(request.OrderBy))
-                query = query.OrderBy(request.OrderBy);
-            else
-                query = query.OrderByDescending(s => s.UpdateDateTime);
-
-            if (request.Protocols != null && request.Protocols.Any())
-                query = query.Where(q => request.Protocols.Contains(q.Protocol));
-
-            var nb = query.Count();
-            var clients = await query.Skip(request.Skip.Value).Take(request.Take.Value).ToListAsync();
-            return new OkObjectResult(new SearchResult<Scope>
-            {
-                Count = nb,
-                Content = clients
-            });
+            var result = await _scopeRepository.Search(prefix, request, cancellationToken);
+            return new OkObjectResult(result);
         }
         catch (OAuthException ex)
         {
@@ -91,17 +68,13 @@ public class ScopesController : BaseController
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get([FromRoute] string prefix, string id)
+    public async Task<IActionResult> Get([FromRoute] string prefix, string id, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
             await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
-            var scope = await _scopeRepository.Query()
-                .Include(p => p.Realms)
-                .Include(p => p.ClaimMappers)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(p => p.Realms.Any(r => r.Name == prefix) && p.Id == id);
+            var scope = await _scopeRepository.Get(prefix, id, cancellationToken);
             if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownScope, id));
             return new OkObjectResult(scope);
         }
@@ -117,7 +90,7 @@ public class ScopesController : BaseController
     #region CRUD
 
     [HttpDelete]
-    public async Task<IActionResult> Delete([FromRoute] string prefix, string id)
+    public async Task<IActionResult> Delete([FromRoute] string prefix, string id, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         using (var activity = Tracing.IdServerActivitySource.StartActivity("Remove scope"))
@@ -125,9 +98,7 @@ public class ScopesController : BaseController
             try
             {
                 await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
-                var scope = await _scopeRepository.Query()
-                    .Include(u => u.Realms)
-                    .FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.Name == prefix));
+                var scope = await _scopeRepository.Get(prefix, id, cancellationToken);
                 if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownScope, id));
                 _scopeRepository.DeleteRange(new List<Scope> { scope });
                 await _scopeRepository.SaveChanges(CancellationToken.None);
@@ -143,7 +114,7 @@ public class ScopesController : BaseController
     }
 
     [HttpPost]
-    public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] Scope scope)
+    public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] Scope scope, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         using (var activity = Tracing.IdServerActivitySource.StartActivity("Add scope"))
@@ -152,12 +123,9 @@ public class ScopesController : BaseController
             {
                 prefix = prefix ?? Constants.DefaultRealm;
                 await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
-                var existingScope = await _scopeRepository.Query()
-                    .Include(s => s.Realms)
-                    .AsNoTracking()
-                    .AnyAsync(s => s.Name == scope.Name && s.Realms.Any(r => r.Name == prefix), CancellationToken.None);
-                if (existingScope) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.ScopeAlreadyExists, scope.Name));
-                var realm = await _realmRepository.Query().SingleAsync(r => r.Name == prefix);
+                var existingScope = await _scopeRepository.GetByName(prefix, scope.Name, cancellationToken);
+                if (existingScope != null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.ScopeAlreadyExists, scope.Name));
+                var realm = await _realmRepository.Get(prefix, cancellationToken);
                 scope.Id = Guid.NewGuid().ToString();
                 scope.Realms.Add(realm);
                 _scopeRepository.Add(scope);
@@ -180,7 +148,7 @@ public class ScopesController : BaseController
     }
 
     [HttpPut]
-    public async Task<IActionResult> Update([FromRoute] string prefix, string id, [FromBody] UpdateScopeRequest request)
+    public async Task<IActionResult> Update([FromRoute] string prefix, string id, [FromBody] UpdateScopeRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         using (var activity = Tracing.IdServerActivitySource.StartActivity("Update scope"))
@@ -188,9 +156,7 @@ public class ScopesController : BaseController
             try
             {
                 await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
-                var scope = await _scopeRepository.Query()
-                    .Include(u => u.Realms)
-                    .FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.Name == prefix));
+                var scope = await _scopeRepository.Get(prefix, id, cancellationToken);
                 if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownScope, id));
                 scope.Description = request.Description;
                 scope.IsExposedInConfigurationEdp = request.IsExposedInConfigurationEdp;
@@ -212,7 +178,7 @@ public class ScopesController : BaseController
     #region Mappers
 
     [HttpPost]
-    public async Task<IActionResult> AddClaimMapper([FromRoute] string prefix, string id, [FromBody] ScopeClaimMapper request)
+    public async Task<IActionResult> AddClaimMapper([FromRoute] string prefix, string id, [FromBody] ScopeClaimMapper request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         using (var activity = Tracing.IdServerActivitySource.StartActivity("Add claim mapping rule"))
@@ -220,10 +186,7 @@ public class ScopesController : BaseController
             try
             {
                 await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
-                var scope = await _scopeRepository.Query()
-                    .Include(u => u.ClaimMappers)
-                    .Include(u => u.Realms)
-                    .FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.Name == prefix));
+                var scope = await _scopeRepository.Get(prefix, id, cancellationToken);
                 if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownScope, id));
                 if(scope.ClaimMappers.Any(m => m.Name == request.Name)) 
                     throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.ScopeClaimMapperNameMustBeUnique);
@@ -255,7 +218,7 @@ public class ScopesController : BaseController
     }
 
     [HttpDelete]
-    public async Task<IActionResult> RemoveClaimMapper([FromRoute] string prefix, string id, string mapperId)
+    public async Task<IActionResult> RemoveClaimMapper([FromRoute] string prefix, string id, string mapperId, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         using (var activity = Tracing.IdServerActivitySource.StartActivity("Remove scope claim mapper"))
@@ -263,10 +226,7 @@ public class ScopesController : BaseController
             try
             {
                 await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
-                var scope = await _scopeRepository.Query()
-                    .Include(u => u.Realms)
-                    .Include(u => u.ClaimMappers)
-                    .FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.Name == prefix));
+                var scope = await _scopeRepository.Get(prefix, id, cancellationToken);
                 if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownScope, id));
                 var scopeClaimMapper = scope.ClaimMappers.FirstOrDefault(m => m.Id == mapperId);
                 if(scopeClaimMapper == null)
@@ -285,7 +245,7 @@ public class ScopesController : BaseController
     }
 
     [HttpPut]
-    public async Task<IActionResult> UpdateClaimMapper([FromRoute] string prefix, string id, string mapperId, [FromBody] UpdateScopeClaimRequest request)
+    public async Task<IActionResult> UpdateClaimMapper([FromRoute] string prefix, string id, string mapperId, [FromBody] UpdateScopeClaimRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         using (var activity = Tracing.IdServerActivitySource.StartActivity("Add claim mapping rule"))
@@ -293,10 +253,7 @@ public class ScopesController : BaseController
             try
             {
                 await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
-                var scope = await _scopeRepository.Query()
-                    .Include(u => u.ClaimMappers)
-                    .Include(u => u.Realms)
-                    .FirstOrDefaultAsync(u => u.Id == id && u.Realms.Any(r => r.Name == prefix));
+                var scope = await _scopeRepository.Get(prefix, id, cancellationToken);
                 if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownScope, id));
                 var scopeClaimMapper = scope.ClaimMappers.FirstOrDefault(m => m.Id == mapperId);
                 if (scopeClaimMapper == null)
@@ -335,7 +292,7 @@ public class ScopesController : BaseController
     #region Resources
 
     [HttpPut]
-    public async Task<IActionResult> UpdateResources([FromRoute] string prefix, string id, [FromBody] UpdateScopeResourcesRequest request)
+    public async Task<IActionResult> UpdateResources([FromRoute] string prefix, string id, [FromBody] UpdateScopeResourcesRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         using (var activity = Tracing.IdServerActivitySource.StartActivity($"Update API resources of the scope {id}"))
@@ -347,12 +304,9 @@ public class ScopesController : BaseController
                 await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
                 if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
                 if (request.Resources == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, ScopeNames.Resources));
-                var existingScope = await _scopeRepository.Query()
-                    .Include(s => s.Realms)
-                    .Include(s => s.ApiResources)
-                    .FirstOrDefaultAsync(s => s.Id == id && s.Realms.Any(r => r.Name == prefix));
+                var existingScope = await _scopeRepository.Get(prefix, id, cancellationToken);
                 if (existingScope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownScope, id));
-                var existingApiResources = await _apiResourceRepository.Query().Include(r => r.Realms).Where(r => request.Resources.Contains(r.Name) && r.Realms.Any(re => re.Name == prefix)).ToListAsync();
+                var existingApiResources = await _apiResourceRepository.GetByNames(prefix, request.Resources.ToList(), cancellationToken);
                 var unknownApiResources = request.Resources.Where(r => !existingApiResources.Any(er => er.Name == r));
                 if (unknownApiResources.Any()) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownResource, string.Join(",", unknownApiResources)));
                 existingScope.ApiResources.Clear();

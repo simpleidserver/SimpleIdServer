@@ -3,6 +3,8 @@
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Api.Auditing;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Events;
+using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Stores;
 using System.Linq.Dynamic.Core;
 
@@ -36,5 +38,25 @@ public class AuditEventRepository : IAuditEventRepository
             Content = result,
             Count = nb,
         };
+    }
+
+    public Task<int> NbInvalidAuthentications(string realm, DateTime startDateTime, CancellationToken cancellationToken)
+    {
+        return _dbContext.AuditEvents.AsNoTracking().CountAsync(e => e.CreateDateTime >= startDateTime && e.EventName == nameof(UserLoginFailureEvent) && e.Realm == realm);
+    }
+
+    public Task<int> NbValidAuthentications(string realm, DateTime startDateTime, CancellationToken cancellationToken)
+    {
+        return _dbContext.AuditEvents.AsNoTracking().CountAsync(e => e.CreateDateTime >= startDateTime && e.EventName == nameof(UserLoginSuccessEvent) && e.Realm == realm);
+    }
+
+    public void Add(AuditEvent auditEvt)
+    {
+        _dbContext.AuditEvents.Add(auditEvt);
+    }
+
+    public Task<int> SaveChanges(CancellationToken cancellationToken)
+    {
+        return _dbContext.SaveChangesAsync(cancellationToken);
     }
 }

@@ -1,13 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -65,11 +64,7 @@ namespace SimpleIdServer.IdServer.Helpers
 
         public async Task<AuthenticationContextClassReference> GetSupportedAcr(string realm, IEnumerable<string> requestedAcrValues, CancellationToken cancellationToken)
         {
-            var acrs = await _authenticationContextClassReferenceRepository.Query()
-                .Include(a => a.Realms)
-                .Include(a => a.RegistrationWorkflow)
-                .AsNoTracking()
-                .Where(a => requestedAcrValues.Contains(a.Name) && a.Realms.Any(r => r.Name == realm)).ToListAsync(cancellationToken);
+            var acrs = await _authenticationContextClassReferenceRepository.GetByNames(realm, requestedAcrValues.ToList(), cancellationToken);
             foreach (var acrValue in requestedAcrValues)
             {
                 var acr = acrs.FirstOrDefault(a => a.Name == acrValue);

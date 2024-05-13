@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Stores;
@@ -26,10 +27,28 @@ public class ClientRepository : IClientRepository
                 .SingleOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == realm), cancellationToken);
     }
 
+    public Task<List<Client>> GetByClientIds(string realm, List<string> clientIds, CancellationToken cancellationToken)
+    {
+        return _dbContext.Clients
+                .Include(c => c.SerializedJsonWebKeys)
+                .Include(c => c.Realms)
+                .Include(c => c.Scopes)
+                .Include(c => c.Translations)
+                .Where(c => clientIds.Contains(c.ClientId) && c.Realms.Any(r => r.Name == realm))
+                .ToListAsync(cancellationToken);
+    }
+
     public Task<List<Client>> GetByClientIdsAndExistingBackchannelLogoutUri(string realm, List<string> clientIds, CancellationToken cancellationToken)
     {
         return _dbContext.Clients
             .Where(c => clientIds.Contains(c.ClientId) && c.Realms.Any(r => r.Name == realm) && !string.IsNullOrWhiteSpace(c.BackChannelLogoutUri))
+            .ToListAsync();
+    }
+
+    public Task<List<Client>> GetByClientIdsAndExistingFrontchannelLogoutUri(string realm, List<string> clientIds, CancellationToken cancellationToken)
+    {
+        return _dbContext.Clients
+            .Where(c => clientIds.Contains(c.ClientId) && c.Realms.Any(r => r.Name == realm) && !string.IsNullOrWhiteSpace(c.FrontChannelLogoutUri))
             .ToListAsync();
     }
 
@@ -76,6 +95,11 @@ public class ClientRepository : IClientRepository
             Count = nb,
             Content = clients
         };
+    }
+
+    public Task<int> NbClients(string realm, CancellationToken cancellationToken)
+    {
+        return _dbContext.Clients.Include(c => c.Realms).CountAsync(c => c.Realms.Any(r => r.Name == realm), cancellationToken);
     }
 
     public void Delete(Client client) => _dbContext.Clients.Remove(client);

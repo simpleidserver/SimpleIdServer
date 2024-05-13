@@ -30,7 +30,10 @@ namespace SimpleIdServer.IdServer.Api.TokenIntrospection
         private readonly IGrantedTokenHelper _grantedTokenHelper;
         private readonly IBusControl _busControl;
 
-        public TokenIntrospectionRequestHandler(IClientAuthenticationHelper clientAuthenticationHelper, IGrantedTokenHelper grantedTokenHelper, IBusControl busControl)
+        public TokenIntrospectionRequestHandler(
+            IClientAuthenticationHelper clientAuthenticationHelper, 
+            IGrantedTokenHelper grantedTokenHelper, 
+            IBusControl busControl)
         {
             _clientAuthenticationHelper = clientAuthenticationHelper;
             _grantedTokenHelper = grantedTokenHelper;

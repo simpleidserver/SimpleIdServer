@@ -19,7 +19,15 @@ public class BCAuthorizeRepository : IBCAuthorizeRepository
     {
         return _dbContext.BCAuthorizeLst
             .Include(a => a.Histories)
-            .FirstOrDefaultAsync(b => b.Id == id, cancellationToken);
+            .SingleOrDefaultAsync(b => b.Id == id, cancellationToken);
+    }
+
+    public Task<List<BCAuthorize>> GetAllConfirmed(List<string> notificationModes, CancellationToken cancellationToken)
+    {
+        return _dbContext.BCAuthorizeLst
+            .Include(a => a.Histories)
+            .Where(a => a.LastStatus == Domains.BCAuthorizeStatus.Confirmed && notificationModes.Contains(a.NotificationMode) && DateTime.UtcNow < a.ExpirationDateTime)
+            .ToListAsync(cancellationToken);
     }
 
     public void Add(BCAuthorize bcAuthorize) => _dbContext.BCAuthorizeLst.Add(bcAuthorize);

@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.ExternalEvents;
@@ -14,7 +13,7 @@ using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.AuthProviders;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
@@ -93,11 +92,8 @@ namespace SimpleIdServer.IdServer.UI
                 {
                     var query = ExtractQuery(returnUrl);
                     var clientId = query.GetClientIdFromAuthorizationRequest();
-                    var str = prefix ?? Constants.DefaultRealm; 
-                    var client = await ClientRepository.Query()
-                        .Include(c => c.Realms)
-                        .Include(c => c.Translations)
-                        .FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == str), cancellationToken);
+                    var str = prefix ?? Constants.DefaultRealm;
+                    var client = await ClientRepository.GetByClientId(str, clientId, cancellationToken);
                     var loginHint = query.GetLoginHintFromAuthorizationRequest();
                     var amrInfo = await ResolveAmrInfo(query, str, client, cancellationToken);
                     bool isLoginMissing = amrInfo != null && !string.IsNullOrWhiteSpace(amrInfo.Value.Item1.Login);
@@ -249,11 +245,7 @@ namespace SimpleIdServer.IdServer.UI
             var amrInfo = GetAmrInfo();
             if (amrInfo != null)
             {
-                var resolvedAcr = await _authenticationContextClassReferenceRepository.Query()
-                    .AsNoTracking()
-                    .Include(a => a.Realms)
-                    .Include(a => a.RegistrationWorkflow)
-                    .SingleAsync(a => a.Realms.Any(r => r.Name == realm) && a.Name == amrInfo.CurrentAmr, cancellationToken);
+                var resolvedAcr = await _authenticationContextClassReferenceRepository.GetByName(realm, amrInfo.CurrentAmr, cancellationToken);
                 return (amrInfo, resolvedAcr);
             }
 

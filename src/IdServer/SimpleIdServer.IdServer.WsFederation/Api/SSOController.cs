@@ -3,7 +3,6 @@
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.WsFederation;
 using Microsoft.IdentityModel.Tokens;
@@ -15,7 +14,6 @@ using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Extractors;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.WsFederation.Extensions;
 using System.Net;

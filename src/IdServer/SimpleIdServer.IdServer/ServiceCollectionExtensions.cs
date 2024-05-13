@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer;
-using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Api.Authorization;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseModes;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
@@ -42,7 +41,6 @@ using SimpleIdServer.IdServer.Infrastructures;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
 using SimpleIdServer.IdServer.TokenTypes;
@@ -52,7 +50,6 @@ using SimpleIdServer.IdServer.UI.Services;
 using System;
 using System.Linq;
 using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Microsoft.Extensions.DependencyInjection

@@ -3,9 +3,8 @@
 using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System;
 using System.Linq;
@@ -34,7 +33,7 @@ namespace SimpleIdServer.IdServer.UI
         {
             if (!string.IsNullOrWhiteSpace(userCode))
             {
-                var deviceAuthCode = await _deviceAuthCodeRepository.Query().Include(c => c.Client).ThenInclude(c => c.Scopes).SingleAsync(a => a.UserCode == userCode, cancellationToken);
+                var deviceAuthCode = await _deviceAuthCodeRepository.GetByUserCode(userCode, cancellationToken);
                 return View(BuildViewModel(userCode, deviceAuthCode));
             }
 
@@ -45,7 +44,7 @@ namespace SimpleIdServer.IdServer.UI
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index([FromRoute] string prefix, ConfirmDeviceCodeViewModel viewModel, CancellationToken cancellationToken)
         {
-            var deviceAuthCode = await _deviceAuthCodeRepository.Query().Include(c => c.Client).ThenInclude(c => c.Scopes).SingleOrDefaultAsync(v => v.UserCode == viewModel.UserCode, cancellationToken);
+            var deviceAuthCode = await _deviceAuthCodeRepository.GetByUserCode(viewModel.UserCode, cancellationToken);
             if (deviceAuthCode == null)
             {
                 ModelState.AddModelError("unknown_user_code", "unknown_user_code");

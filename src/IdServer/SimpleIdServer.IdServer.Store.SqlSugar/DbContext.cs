@@ -10,7 +10,6 @@ public class DbContext
     {
         var db = new SqlSugarClient(new ConnectionConfig
         {
-            DbType = 
         });
     }
 }

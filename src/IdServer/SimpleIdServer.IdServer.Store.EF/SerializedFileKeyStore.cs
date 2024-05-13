@@ -25,6 +25,22 @@ public class SerializedFileKeyStore : IFileSerializedKeyStore
             .ToListAsync(cancellationToken);
     }
 
+    public Task<List<SerializedFileKey>> GetAllSig(string realm, CancellationToken cancellationToken)
+    {
+        return _dbContext.SerializedFileKeys
+            .Include(s => s.Realms)
+            .Where(s => s.Usage == Constants.JWKUsages.Sig && s.Realms.Any(r => r.Name == realm))
+            .ToListAsync(cancellationToken);
+    }
+
+    public Task<List<SerializedFileKey>> GetAllEnc(string realm, CancellationToken cancellationToken)
+    {
+        return _dbContext.SerializedFileKeys
+            .Include(s => s.Realms)
+            .Where(s => s.Usage == Constants.JWKUsages.Enc && s.Realms.Any(r => r.Name == realm))
+            .ToListAsync(cancellationToken);
+    }
+
     public void Add(SerializedFileKey key) => _dbContext.SerializedFileKeys.Add(key);
 
     public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);

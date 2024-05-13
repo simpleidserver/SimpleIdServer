@@ -1,8 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Nodes;
@@ -31,7 +30,7 @@ namespace SimpleIdServer.IdServer.ClaimsEnricher
 
         public async Task Enrich(User user, Dictionary<string, object> claims, Client client, CancellationToken cancellationToken)
         {
-            var claimProviders = await _repository.Query().AsNoTracking().ToListAsync(cancellationToken);
+            var claimProviders = await _repository.GetAll(cancellationToken);
             int i = 1;
             foreach(var claimProvider in claimProviders) 
             {

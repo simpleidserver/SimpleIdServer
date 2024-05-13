@@ -201,27 +201,7 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
         o.Add<GotifyOptions>();
         o.Add<IdServerVpOptions>();
         o.Add<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>();
-        o.UseEFConnector(b =>
-        {
-            switch (conf.Type)
-            {
-                case StorageTypes.INMEMORY:
-                    b.UseInMemoryDatabase(conf.ConnectionString);
-                    break;
-                case StorageTypes.SQLSERVER:
-                    b.UseSqlServer(conf.ConnectionString);
-                    break;
-                case StorageTypes.POSTGRE:
-                    b.UseNpgsql(conf.ConnectionString);
-                    break;
-                case StorageTypes.MYSQL:
-                    b.UseMySql(conf.ConnectionString, ServerVersion.AutoDetect(conf.ConnectionString));
-                    break;
-                case StorageTypes.SQLITE:
-                    b.UseSqlite(conf.ConnectionString);
-                    break;
-            }
-        });
+        o.UseEFConnector();
     });
 }
 

@@ -1,8 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
 
@@ -11,15 +10,19 @@ namespace SimpleIdServer.Configuration;
 public class AutomaticConfigurationOptions
 {
     internal List<AutomaticConfigurationRecord> ConfigurationDefinitions = new List<AutomaticConfigurationRecord>();
-    public IKeyValueConnector? KeyValueConnector = null;
 
-    public AutomaticConfigurationOptions UseEFConnector(Action<DbContextOptionsBuilder>? action = null)
+    public AutomaticConfigurationOptions(IServiceCollection services)
     {
-        var builder = new DbContextOptionsBuilder<StoreDbContext>();
-        if (action == null) builder.UseInMemoryDatabase("Configuration");
-        else action(builder);
-        var dbContext = new StoreDbContext(builder.Options);
-        KeyValueConnector = new EFKeyValueConnector(dbContext);
+        Services = services;
+    }
+
+    public IServiceCollection Services { get; set; }
+    public Type KeyValueConnectorType = null;
+
+    public AutomaticConfigurationOptions UseEFConnector()
+    {
+        Services.AddSingleton<IKeyValueConnector, EFKeyValueConnector>();
+        KeyValueConnectorType = typeof(EFKeyValueConnector);
         return this;
     }
 

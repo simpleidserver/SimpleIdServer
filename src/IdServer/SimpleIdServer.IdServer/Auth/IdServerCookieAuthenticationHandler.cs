@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Middlewares;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -56,7 +56,11 @@ namespace SimpleIdServer.IdServer.Auth
         /// <param name="logger">The <see cref="ILoggerFactory"/>.</param>
         /// <param name="encoder">The <see cref="UrlEncoder"/>.</param>
         /// <param name="clock">The <see cref="ISystemClock"/>.</param>
-        public IdServerCookieAuthenticationHandler(IUserSessionResitory userSessionResitory, IOptions<IdServerHostOptions> idServerHostOptions,IOptionsMonitor<CookieAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock)
+        public IdServerCookieAuthenticationHandler(
+            IUserSessionResitory userSessionResitory, 
+            IOptions<IdServerHostOptions> idServerHostOptions,
+            IOptionsMonitor<CookieAuthenticationOptions> options, 
+            ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock)
             : base(options, logger, encoder, clock)
         {
             _userSessionResitory = userSessionResitory;

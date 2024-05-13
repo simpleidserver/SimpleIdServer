@@ -3,12 +3,10 @@
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SimpleIdServer.IdServer.Api.BCCallback;
 using SimpleIdServer.IdServer.Helpers;
-using SimpleIdServer.IdServer.Jwt;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System;
 using System.Linq;
@@ -99,9 +97,7 @@ namespace SimpleIdServer.IdServer.UI
                     ActionEnum = confirmConsentsViewModel.IsRejected ? BCCallbackActions.REJECT : BCCallbackActions.CONFIRM,
                     AuthReqId = viewModel.AuthReqId
                 };
-                var bcAuthorize = await _bcAuthorizeRepository.Query()
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(b => b.Id == parameter.AuthReqId, cancellationToken);
+                var bcAuthorize = await _bcAuthorizeRepository.GetById(parameter.AuthReqId, cancellationToken);
                 if(bcAuthorize == null)
                 {
                     ModelState.AddModelError("invalid_request", "unknown_bc_authorize");
@@ -161,11 +157,7 @@ namespace SimpleIdServer.IdServer.UI
                 ReturnUrl = returnUrl
             };
             var str = realm ?? Constants.DefaultRealm;
-            var client = await _clientRepository.Query()
-                .Include(c => c.Translations)
-                .Include(c => c.Realms)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.ClientId == viewModel.ClientId && c.Realms.Any(r => r.Name == str), cancellationToken);
+            var client = await _clientRepository.GetByClientId(str, viewModel.ClientId, cancellationToken);
             viewModel.ClientName = client.ClientName;
             return viewModel;
         }

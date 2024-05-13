@@ -18,6 +18,14 @@ public class AuthenticationSchemeProviderRepository : IAuthenticationSchemeProvi
 
     public void Add(AuthenticationSchemeProvider idProvider) => _dbContext.AuthenticationSchemeProviders.Add(idProvider);
 
+    public Task<List<AuthenticationSchemeProvider>> GetAll(string realm, CancellationToken cancellationToken)
+    {
+        return _dbContext.AuthenticationSchemeProviders
+            .Include(c => c.Realms)
+            .Include(c => c.AuthSchemeProviderDefinition)
+            .Where(c => c.Realms.Any(r => r.Name == realm)).ToListAsync(cancellationToken);
+    }
+
     public Task<AuthenticationSchemeProvider> Get(string realm, string name, CancellationToken cancellationToken)
     {
         return _dbContext.AuthenticationSchemeProviders

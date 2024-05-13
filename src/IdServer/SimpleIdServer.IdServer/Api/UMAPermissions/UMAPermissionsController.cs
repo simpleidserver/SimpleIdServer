@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
@@ -10,7 +9,7 @@ using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -85,8 +84,8 @@ namespace SimpleIdServer.IdServer.Api.UMAPermissions
 
         private async Task Validate(UMAPermissionTicket permissionTicket, CancellationToken cancellationToken)
         {
-            var resourceIds = permissionTicket.Records.Select(r => r.ResourceId);
-            var umaResources = await _umaResourceRepository.Query().Where(r => resourceIds.Contains(r.Id)).ToListAsync(cancellationToken);
+            var resourceIds = permissionTicket.Records.Select(r => r.ResourceId).ToList();
+            var umaResources = await _umaResourceRepository.GetByIds(resourceIds, cancellationToken);
             var unknownResources = resourceIds.Where(rid => !umaResources.Any(r => r.Id == rid));
             if(unknownResources.Any())
                 throw new OAuthException(ErrorCodes.INVALID_RESOURCE_ID, Global.InvalidResourceId);

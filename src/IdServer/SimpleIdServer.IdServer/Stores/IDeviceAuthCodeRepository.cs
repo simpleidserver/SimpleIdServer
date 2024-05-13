@@ -10,6 +10,8 @@ namespace SimpleIdServer.IdServer.Stores;
 public interface IDeviceAuthCodeRepository
 {
     IQueryable<DeviceAuthCode> Query();
+    Task<DeviceAuthCode> GetByDeviceCode(string deviceCode, CancellationToken cancellationToken);
+    Task<DeviceAuthCode> GetByUserCode(string userCode, CancellationToken cancellationToken);
     void Delete(DeviceAuthCode deviceAuthCode);
     void Add(DeviceAuthCode deviceAuthCode);
     Task<int> SaveChanges(CancellationToken cancellationToken);

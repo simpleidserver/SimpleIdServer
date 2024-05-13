@@ -13,6 +13,8 @@ public interface IFileSerializedKeyStore
 {
     IQueryable<SerializedFileKey> Query();
     Task<List<SerializedFileKey>> GetAll(string realm, CancellationToken cancellationToken);
+    Task<List<SerializedFileKey>> GetAllSig(string realm, CancellationToken cancellationToken);
+    Task<List<SerializedFileKey>> GetAllEnc(string realm, CancellationToken cancellationToken);
     void Add(SerializedFileKey key);
     Task<int> SaveChanges(CancellationToken cancellationToken);
 }

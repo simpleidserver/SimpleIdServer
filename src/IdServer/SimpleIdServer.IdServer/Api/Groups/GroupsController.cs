@@ -70,7 +70,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
                 var splittedFullPath = result.FullPath.Split('.');
                var rootGroup = result;
                 if (splittedFullPath.Count() > 1)
-                    rootGroup = await _groupRepository.GetByFullPath(prefix, splittedFullPath[0], cancellationToken);
+                    rootGroup = await _groupRepository.GetByStrictFullPath(prefix, splittedFullPath[0], cancellationToken);
                 return new OkObjectResult(new GetGroupResult
                 {
                     Target = result,
@@ -152,7 +152,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
                         fullPath = $"{parent.FullPath}.{request.Name}";
                     }
 
-                    var existingGroup = await _groupRepository.GetByFullPath(prefix, fullPath, cancellationToken);
+                    var existingGroup = await _groupRepository.GetByStrictFullPath(prefix, fullPath, cancellationToken);
                     if (existingGroup != null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.GroupExists, fullPath));
                     var grp = new Group
                     {

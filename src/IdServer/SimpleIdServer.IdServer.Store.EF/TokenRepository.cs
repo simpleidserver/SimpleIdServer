@@ -18,6 +18,9 @@ namespace SimpleIdServer.IdServer.Store.EF
         public Task<Token> Get(string id, CancellationToken cancellationToken)
             => _dbContext.Tokens.FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
 
+        public Task<List<Token>> GetAllByAuthorizationCode(string authorizationCode, CancellationToken cancellationToken)
+            => _dbContext.Tokens.Where(t => t.AuthorizationCode == authorizationCode).ToListAsync(cancellationToken);
+
         public Task<List<Token>> GetByGrantId(string grantId, CancellationToken cancellationToken)
             => _dbContext.Tokens.Where(t => t.GrantId == grantId).ToListAsync(cancellationToken);
 

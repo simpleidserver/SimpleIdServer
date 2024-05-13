@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Stores;
 using System.Linq.Dynamic.Core;
+using static Azure.Core.HttpHeader;
 
 namespace SimpleIdServer.IdServer.Store.EF;
 
@@ -34,6 +35,28 @@ public class ApiResourceRepository : IApiResourceRepository
                 .Include(p => p.Scopes)
                 .SingleOrDefaultAsync(p => p.Realms.Any(r => r.Name == realm) && p.Name == name, cancellationToken);
         return result;
+    }
+
+    public Task<List<ApiResource>> GetByNames(string realm, List<string> names, CancellationToken cancellationToken)
+    {
+        var result = _dbContext.ApiResources
+            .Include(r => r.Realms)
+            .Where(r => names.Contains(r.Name) && r.Realms.Any(re => re.Name == realm)).ToListAsync(cancellationToken);
+        return result;
+    }
+
+    public Task<List<ApiResource>> GetByNamesOrAudiences(string realm, List<string> names, List<string> audiences, CancellationToken cancellationToken)
+    {
+        return _dbContext.ApiResources.Include(r => r.Realms)
+            .Include(r => r.Scopes)
+            .Where(r => (names.Contains(r.Name) || audiences.Contains(r.Audience)) && r.Realms.Any(r => r.Name == realm)).ToListAsync(cancellationToken);
+    }
+
+    public Task<List<ApiResource>> GetByScopes(List<string> scopes, CancellationToken cancellationToken)
+    {
+        return _dbContext.ApiResources.Include(r => r.Realms)
+            .Include(r => r.Scopes)
+            .Where(r => r.Scopes.Any(s => scopes.Contains(s.Name))).ToListAsync(cancellationToken);
     }
 
     public async Task<SearchResult<ApiResource>> Search(string realm, SearchRequest request, CancellationToken cancellationToken)

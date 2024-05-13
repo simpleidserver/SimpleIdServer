@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Stores;
 
@@ -14,6 +15,9 @@ public class ClaimProviderRepository : IClaimProviderRepository
     {
         _dbContext = dbContext;
     }
+
+    public Task<List<ClaimProvider>> GetAll(CancellationToken cancellationToken)
+        => _dbContext.ClaimProviders.ToListAsync(cancellationToken);
 
     public IQueryable<ClaimProvider> Query() => _dbContext.ClaimProviders;
 }

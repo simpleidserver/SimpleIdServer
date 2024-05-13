@@ -1,12 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.Extractors
@@ -35,8 +35,8 @@ namespace SimpleIdServer.IdServer.Extractors
             newContext.SetUser((User)context.User?.Clone(), (UserSession)context.Session?.Clone());
             if(newContext.User != null)
             {
-                var grpPathLst = newContext.User.Groups.SelectMany(g => g.Group.ResolveAllPath()).Distinct();
-                var allGroups = await _groupRepository.Query().Include(g => g.Roles).AsNoTracking().Where(g => grpPathLst.Contains(g.FullPath)).ToListAsync();
+                var grpPathLst = newContext.User.Groups.SelectMany(g => g.Group.ResolveAllPath()).Distinct().ToList();
+                var allGroups = await _groupRepository.GetAllByStrictFullPath(context.Realm, grpPathLst, CancellationToken.None);
                 var roles = allGroups.SelectMany(g => g.Roles).Select(r => r.Name).Distinct();
                 foreach (var role in roles)
                     newContext.User.AddClaim(Constants.UserClaims.Role, role);

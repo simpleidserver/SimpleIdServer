@@ -251,6 +251,7 @@ namespace SimpleIdServer.IdServer.Api.Register
         {
             var scopeNames = string.IsNullOrWhiteSpace(scope) ? _options.DefaultScopes : scope.ToScopes();
             var scopes = await _scopeRepository.GetByNames(realm, scopeNames.ToList(), cancellationToken);
+            return scopes;
         }
 
         private class GetClientResult
