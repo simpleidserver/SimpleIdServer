@@ -18,6 +18,9 @@ public class RealmRepository : IRealmRepository
 
     public IQueryable<Realm> Query() => _dbContext.Realms;
 
+    public Task<List<Realm>> GetAll(CancellationToken cancellationToken)
+        => _dbContext.Realms.ToListAsync(cancellationToken);
+
     public Task<Realm> Get(string name, CancellationToken cancellationToken)
         => _dbContext.Realms.SingleOrDefaultAsync(r => r.Name == name, cancellationToken);
 

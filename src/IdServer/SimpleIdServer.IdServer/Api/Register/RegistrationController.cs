@@ -3,7 +3,6 @@
 using MassTransit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using SimpleIdServer.IdServer.Domains;
@@ -12,7 +11,7 @@ using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -113,7 +112,7 @@ namespace SimpleIdServer.IdServer.Api.Register
                 if (_options.ClientSecretExpirationInSeconds != null)
                     expirationDateTime = DateTime.UtcNow.AddSeconds(_options.ClientSecretExpirationInSeconds.Value);
 
-                var realm = await _realmRepository.Query().FirstAsync(r => r.Name == prefix, cancellationToken);
+                var realm = await _realmRepository.Get(prefix, cancellationToken);
                 var client = new Client
                 {
                     Id = Guid.NewGuid().ToString(),
@@ -231,7 +230,7 @@ namespace SimpleIdServer.IdServer.Api.Register
         {
             string accessToken;
             if (!TryExtractAccessToken(out accessToken)) return GetClientResult.Error(Unauthorized());
-            var client = await _clientRepository.Query().Include(c => c.Translations).Include(c => c.Realms).AsNoTracking().FirstOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == realm), cancellationToken);
+            var client = await _clientRepository.GetByClientId(realm, id, cancellationToken);
             if (client == null) return GetClientResult.Error(NotFound());
             if (client.RegistrationAccessToken != accessToken) return GetClientResult.Error(Unauthorized());
             return GetClientResult.Ok(client);
@@ -251,7 +250,7 @@ namespace SimpleIdServer.IdServer.Api.Register
         private async Task<ICollection<Domains.Scope>> GetScopes(string realm, string scope, CancellationToken cancellationToken)
         {
             var scopeNames = string.IsNullOrWhiteSpace(scope) ? _options.DefaultScopes : scope.ToScopes();
-            return await _scopeRepository.Query().Include(s => s.Realms).Where(s => scopeNames.Contains(s.Name) && s.Realms.Any(r => r.Name == realm)).ToListAsync(cancellationToken);
+            var scopes = await _scopeRepository.GetByNames(realm, scopeNames.ToList(), cancellationToken);
         }
 
         private class GetClientResult

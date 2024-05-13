@@ -22,6 +22,26 @@ public class RegistrationWorkflowRepository : IRegistrationWorkflowRepository
             .SingleOrDefaultAsync(r => r.RealmName == realm && r.Id == id, cancellationToken);
     }
 
+    public Task<RegistrationWorkflow> GetByName(string realm, string name, CancellationToken cancellationToken)
+    {
+        return _dbContext.RegistrationWorkflows
+            .SingleOrDefaultAsync(r => r.RealmName == realm && r.Id == name, cancellationToken);
+    }
+
+    public Task<RegistrationWorkflow> GetDefault(string realm, CancellationToken cancellationToken)
+    {
+        return _dbContext.RegistrationWorkflows
+            .SingleOrDefaultAsync(r => r.RealmName == realm && r.IsDefault, cancellationToken);
+    }
+
+    public Task<List<RegistrationWorkflow>> GetAll(string realm, CancellationToken cancellationToken)
+    {
+        return _dbContext.RegistrationWorkflows
+            .Where(r => r.RealmName == realm)
+            .OrderByDescending(r => r.UpdateDateTime)
+            .ToListAsync(cancellationToken);
+    }
+
     public IQueryable<RegistrationWorkflow> Query() => _dbContext.RegistrationWorkflows;
 
     public void Delete(RegistrationWorkflow record) => _dbContext.RegistrationWorkflows.Remove(record);

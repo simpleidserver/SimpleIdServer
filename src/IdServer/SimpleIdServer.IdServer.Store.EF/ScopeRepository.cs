@@ -41,6 +41,14 @@ public class ScopeRepository : IScopeRepository
                 .ToListAsync(cancellationToken);
     }
 
+    public Task<List<Scope>> GetAll(string realm, List<string> scopeNames, CancellationToken cancellationToken)
+    {
+        return _dbContext.Scopes
+                .Include(s => s.Realms)
+                .Where(s => scopeNames.Contains(s.Name) && s.Realms.Any(r => r.Name == realm))
+                .ToListAsync(cancellationToken);
+    }
+
     public void DeleteRange(IEnumerable<Scope> scopes) => _dbContext.Scopes.RemoveRange(scopes);
 
     public void Add(Scope scope) => _dbContext.Scopes.Add(scope);

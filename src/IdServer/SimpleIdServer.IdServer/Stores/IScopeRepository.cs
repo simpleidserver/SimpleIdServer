@@ -14,6 +14,7 @@ public interface IScopeRepository
     Task<Scope> GetByName(string realm, string scopeName, CancellationToken cancellationToken);
     Task<List<Scope>> GetByNames(string realm, List<string> scopeNames, CancellationToken cancellationToken);
     Task<List<Scope>> GetAllExposedScopes(string realm, CancellationToken cancellationToken);
+    Task<List<Scope>> GetAll(string realm, List<string> scopeNames, CancellationToken cancellationToken);
     void Add(Scope scope);
     void DeleteRange(IEnumerable<Scope> scopes);
     Task<int> SaveChanges(CancellationToken cancellationToken);

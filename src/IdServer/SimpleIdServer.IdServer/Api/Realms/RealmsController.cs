@@ -3,16 +3,14 @@
 
 
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
 using System.Text.Json;
 using System.Threading;
@@ -51,12 +49,12 @@ public class RealmsController : BaseController
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         try
         {
             await CheckAccessToken(Constants.DefaultRealm, Constants.StandardScopes.Realms.Name);
-            var realms = await _realmRepository.Query().AsNoTracking().ToListAsync();
+            var realms = await _realmRepository.GetAll(cancellationToken);
             return new OkObjectResult(realms);
         }
         catch (OAuthException ex)
@@ -74,16 +72,14 @@ public class RealmsController : BaseController
             try
             {
                 await CheckAccessToken(Constants.DefaultRealm, Constants.StandardScopes.Realms.Name);
-                var realmExists = await _realmRepository.Query()
-                    .AsNoTracking()
-                    .AnyAsync(r => r.Name == request.Name);
-                if (realmExists) throw new OAuthException(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.RealmExists, request.Name));
+                var existingRealm = await _realmRepository.Get(request.Name, cancellationToken);
+                if (existingRealm != null) throw new OAuthException(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.RealmExists, request.Name));
                 var realm = new Realm { Name = request.Name, Description = request.Description, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow };
                 var users = await _userRepository.GetUsersBySubjects(Constants.RealmStandardUsers, Constants.DefaultRealm, cancellationToken);
-                var clients = await _clientRepository.Query().Include(c => c.Realms).Where(c => Constants.RealmStandardClients.Contains(c.ClientId)).ToListAsync();
-                var scopes = await _scopeRepository.Query().Include(s => s.Realms).Where(s => Constants.RealmStandardScopes.Contains(s.Name)).ToListAsync();
-                var keys = await _fileSerializedKeyStore.Query().Include(s => s.Realms).Where(s => s.Realms.Any(r => r.Name == Constants.DefaultRealm)).ToListAsync();
-                var acrs = await _authenticationContextClassReferenceRepository.Query().Include(a => a.Realms).ToListAsync();
+                var clients = await _clientRepository.GetAll(Constants.DefaultRealm, Constants.RealmStandardClients, cancellationToken);
+                var scopes = await _scopeRepository.GetAll(Constants.DefaultRealm, Constants.RealmStandardScopes, cancellationToken);
+                var keys = await _fileSerializedKeyStore.GetAll(Constants.DefaultRealm, cancellationToken);
+                var acrs = await _authenticationContextClassReferenceRepository.GetAll(cancellationToken);
                 foreach (var user in users)
                     user.Realms.Add(new RealmUser { RealmsName = request.Name });
 

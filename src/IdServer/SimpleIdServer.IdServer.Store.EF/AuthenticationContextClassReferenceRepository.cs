@@ -31,6 +31,13 @@ public class AuthenticationContextClassReferenceRepository : IAuthenticationCont
             .SingleOrDefaultAsync(a => a.Realms.Any(r => r.Name == realm) && a.Name == name, cancellationToken);
     }
 
+    public Task<List<AuthenticationContextClassReference>> GetAll(CancellationToken cancellationToken)
+    {
+        return _dbContext.Acrs
+            .Include(a => a.Realms)
+            .ToListAsync(cancellationToken);
+    }
+
     public Task<List<AuthenticationContextClassReference>> GetAll(string realm, CancellationToken cancellationToken)
     {
         return _dbContext.Acrs

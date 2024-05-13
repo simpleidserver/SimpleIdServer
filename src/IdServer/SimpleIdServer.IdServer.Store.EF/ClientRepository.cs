@@ -29,7 +29,6 @@ public class ClientRepository : IClientRepository
     public Task<List<Client>> GetByClientIdsAndExistingBackchannelLogoutUri(string realm, List<string> clientIds, CancellationToken cancellationToken)
     {
         return _dbContext.Clients
-            .AsNoTracking()
             .Where(c => clientIds.Contains(c.ClientId) && c.Realms.Any(r => r.Name == realm) && !string.IsNullOrWhiteSpace(c.BackChannelLogoutUri))
             .ToListAsync();
     }
@@ -41,7 +40,15 @@ public class ClientRepository : IClientRepository
                 .Include(p => p.Realms)
                 .Include(p => p.Scopes)
                 .Where(p => p.Realms.Any(r => r.Name == realm))
-                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+        return result;
+    }
+
+    public Task<List<Client>> GetAll(string realm, List<string> clientIds, CancellationToken cancellationToken)
+    {
+        var result = _dbContext.Clients
+                .Include(p => p.Realms)
+                .Where(p => clientIds.Contains(p.ClientId) && p.Realms.Any(r => r.Name == realm))
                 .ToListAsync(cancellationToken);
         return result;
     }
