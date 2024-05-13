@@ -5,7 +5,4 @@
 	<ItemGroup>
 		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.2" />
 	</ItemGroup>
-	<ItemGroup>
-	  <ProjectReference Include="..\SimpleIdServer.IdServer.Store\SimpleIdServer.IdServer.Store.csproj" />
-	</ItemGroup>
 </Project>

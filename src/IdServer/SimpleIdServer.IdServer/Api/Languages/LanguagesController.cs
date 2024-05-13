@@ -1,10 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Jwt;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,7 +31,7 @@ public class LanguagesController : BaseController
         var languages = await _languageRepository.GetAll(cancellationToken);
         foreach (var language in languages)
         {
-            var descriptions = await _translationRepository.Query().Where(t => t.Key == language.TranslationKey).ToListAsync(cancellationToken);
+            var descriptions = await _translationRepository.GetAllByKey(language.TranslationKey, cancellationToken);
             language.Descriptions = descriptions;
             language.Description = GetDescription(language);
         }

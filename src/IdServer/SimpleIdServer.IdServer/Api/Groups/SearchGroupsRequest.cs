@@ -1,7 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Newtonsoft.Json;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 
 namespace SimpleIdServer.IdServer.Api.Groups;
 

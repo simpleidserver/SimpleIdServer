@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NeoSmart.Caching.Sqlite.AspNetCore;
 using SimpleIdServer.Configuration;
+using SimpleIdServer.Did.Key;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Console;
 using SimpleIdServer.IdServer.Domains;
@@ -28,7 +29,7 @@ using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Startup;
 using SimpleIdServer.IdServer.Startup.Configurations;
 using SimpleIdServer.IdServer.Startup.Converters;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Store.EF;
 using SimpleIdServer.IdServer.Swagger;
 using SimpleIdServer.IdServer.TokenTypes;
 using SimpleIdServer.IdServer.VerifiablePresentation;
@@ -37,7 +38,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using SimpleIdServer.Did.Key;
 
 const string SQLServerCreateTableFormat = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DistributedCache' and xtype='U') " +
     "CREATE TABLE [dbo].[DistributedCache] (" +

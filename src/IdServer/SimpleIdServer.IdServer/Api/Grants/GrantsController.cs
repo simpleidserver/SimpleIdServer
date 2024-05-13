@@ -1,13 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -38,7 +37,7 @@ namespace SimpleIdServer.IdServer.Api.Grants
             try
             {
                 var bearerToken = ExtractBearerToken();
-                var grant = await _grantRepository.Query().Include(g => g.Scopes).ThenInclude(s => s.AuthorizedResources).Include(g => g.User).FirstOrDefaultAsync(q => q.Id == id, cancellationToken);
+                var grant = await _grantRepository.Get(id, cancellationToken);
                 if (grant == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_TARGET, string.Format(Global.UnknownGrant, id));
                 if (grant.Status == Domains.ConsentStatus.PENDING) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_TARGET, Global.GrantIsNotAccepted);
                 var token = await _grantedTokenHelper.GetAccessToken(bearerToken, cancellationToken);
@@ -61,7 +60,7 @@ namespace SimpleIdServer.IdServer.Api.Grants
             try
             {
                 var bearerToken = ExtractBearerToken();
-                var grant = await _grantRepository.Query().FirstOrDefaultAsync(q => q.Id == id, cancellationToken);
+                var grant = await _grantRepository.Get(id, cancellationToken);
                 if (grant == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_TARGET, string.Format(Global.UnknownAuthMethods, id));
                 var token = await _grantedTokenHelper.GetAccessToken(bearerToken, cancellationToken);
                 if (token == null) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, Global.UnknownAccessToken);
@@ -70,7 +69,7 @@ namespace SimpleIdServer.IdServer.Api.Grants
                 var clientId = token.Claims.FirstOrDefault(c => c.Type == OpenIdConnectParameterNames.ClientId)?.Value;
                 if (grant.ClientId != clientId) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, string.Format(Global.UnauthorizedClientAccessGrant, clientId));
                 _grantRepository.Remove(grant);
-                var tokens = await _tokenRepository.Query().Where(t => t.GrantId == id).ToListAsync(cancellationToken);
+                var tokens = await _tokenRepository.GetByGrantId(id, cancellationToken);
                 foreach (var t in tokens)
                     _tokenRepository.Remove(t);
                 await _tokenRepository.SaveChanges(cancellationToken);

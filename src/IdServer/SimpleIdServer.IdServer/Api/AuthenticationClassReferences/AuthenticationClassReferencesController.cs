@@ -1,14 +1,13 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Domains.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -51,11 +50,7 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationClassReferences
             {
                 prefix = prefix ?? Constants.DefaultRealm;
                 await CheckAccessToken(prefix, Constants.StandardScopes.Acrs.Name);
-                var result = await _authenticationContextClassReferenceRepository
-                    .Query()
-                    .Include(a => a.Realms)
-                    .Include(a => a.RegistrationWorkflow)
-                    .Where(a => a.Realms.Any(r => r.Name == prefix)).AsNoTracking().OrderBy(a => a.Name).ToListAsync(cancellationToken);
+                var result = await _authenticationContextClassReferenceRepository.GetAll(prefix, cancellationToken);
                 return new OkObjectResult(result);
             }
             catch (OAuthException ex)
@@ -75,7 +70,7 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationClassReferences
                     prefix = prefix ?? Constants.DefaultRealm;
                     await CheckAccessToken(prefix, Constants.StandardScopes.Acrs.Name);
                     await Validate();
-                    var realm = await _realmRepository.Query().SingleAsync(r => r.Name == prefix, cancellationToken);
+                    var realm = await _realmRepository.Get(prefix, cancellationToken);
                     var record = new AuthenticationContextClassReference
                     {
                         Id = Guid.NewGuid().ToString(),
@@ -112,7 +107,8 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationClassReferences
                 var supportedAmrs = _authMethodServices.Select(a => a.Amr);
                 var unsupportedAmrs = request.AuthenticationMethodReferences.Where(a => !supportedAmrs.Contains(a));
                 if (unsupportedAmrs.Any()) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnsupportedAmrs, string.Join(",", unsupportedAmrs)));
-                var existingAcr = await _authenticationContextClassReferenceRepository.Query().Include(a => a.Realms).AsNoTracking().SingleOrDefaultAsync(a => a.Realms.Any(r => r.Name == prefix) && a.Name == request.Name, cancellationToken);
+                var existingAcr = await _authenticationContextClassReferenceRepository
+                    .GetByName(prefix, request.Name, cancellationToken);
                 if (existingAcr != null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.AcrWithSameNameExists);
             }
         }
@@ -124,7 +120,7 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationClassReferences
             {
                 prefix = prefix ?? Constants.DefaultRealm;
                 await CheckAccessToken(prefix, Constants.StandardScopes.Acrs.Name);
-                var acr = await _authenticationContextClassReferenceRepository.Query().Include(a => a.Realms).SingleOrDefaultAsync(a => a.Realms.Any(r => r.Name == prefix) && a.Id == id, cancellationToken);
+                var acr = await _authenticationContextClassReferenceRepository.Get(prefix, id, cancellationToken);
                 if (acr == null)
                 {
                     activity?.SetStatus(ActivityStatusCode.Error, "Authentication Class Reference doesn't exit");
@@ -147,9 +143,7 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationClassReferences
                 try
                 {
                     await Validate();
-                    var acr = await _authenticationContextClassReferenceRepository.Query()
-                        .Include(a => a.Realms)
-                        .SingleOrDefaultAsync(a => a.Realms.Any(r => r.Name == prefix) && a.Id == id, cancellationToken);
+                    var acr = await _authenticationContextClassReferenceRepository.Get(prefix, id, cancellationToken);
                     if (acr == null)
                     {
                         activity?.SetStatus(ActivityStatusCode.Error, "Authentication Class Reference doesn't exit");
@@ -174,9 +168,7 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationClassReferences
             {
                 if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
                 if (string.IsNullOrWhiteSpace(request.WorkflowId)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, AuthenticationContextClassReferenceNames.WorkflowId));
-                var registrationWorkflow = await _registrationWorkflowRepository.Query()
-                    .AsNoTracking()
-                    .SingleOrDefaultAsync(r => r.RealmName == prefix && r.Id == request.WorkflowId, cancellationToken);
+                var registrationWorkflow = await _registrationWorkflowRepository.Get(prefix, request.WorkflowId, cancellationToken);
                 if (registrationWorkflow == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, Global.UnknownRegistrationWorkflow);
             }
         }

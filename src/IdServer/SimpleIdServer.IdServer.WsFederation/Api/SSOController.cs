@@ -81,7 +81,7 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
             async Task<Domains.Client> Validate()
             {
                 var str = realm ?? Constants.DefaultRealm;
-                var client = await _clientRepository.Query().Include(c => c.Realms).Include(c => c.Scopes).ThenInclude(s => s.ClaimMappers).AsNoTracking().FirstOrDefaultAsync(c => c.ClientId == message.Wtrealm && c.Realms.Any(r => r.Name == str), cancellationToken);
+                var client = await _clientRepository.GetByClientId(str, message.Wtrealm, cancellationToken);
                 if (client == null)
                     throw new OAuthException(ErrorCodes.INVALID_RP, Resources.Global.UnknownRp);
 

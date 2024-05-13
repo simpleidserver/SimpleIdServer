@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Description>Use sqlsugar.</Description>
+	</PropertyGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\SimpleIdServer.IdServer.Domains\SimpleIdServer.IdServer.Domains.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="SqlSugarCore" Version="5.1.4.154" />
+	</ItemGroup>
+</Project>

@@ -8,7 +8,7 @@ using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;

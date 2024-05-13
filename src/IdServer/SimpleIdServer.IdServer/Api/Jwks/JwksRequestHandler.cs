@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Stores;
-using System.IdentityModel.Tokens.Jwt;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 

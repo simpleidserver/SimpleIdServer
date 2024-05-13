@@ -2,11 +2,9 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using Hangfire;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Stores;
 using System.Linq;
 using System.Threading;
@@ -53,10 +51,7 @@ namespace SimpleIdServer.IdServer.Jobs
                         .Where(s => !string.IsNullOrWhiteSpace(s))
                         .Distinct();
 
-                    var targetedClients = await _clientRepository.Query()
-                        .AsNoTracking()
-                        .Where(c => clientIds.Contains(c.ClientId) && c.Realms.Any(r => r.Name == group.Key) && !string.IsNullOrWhiteSpace(c.BackChannelLogoutUri))
-                        .ToListAsync();
+                    var targetedClients = await _clientRepository.GetByClientIdsAndExistingBackchannelLogoutUri(group.Key, clientIds.ToList(), CancellationToken.None);
                     var sigCredentials = _keyStore.GetAllSigningKeys(group.Key);
                     await Parallel.ForEachAsync(group.Select(_ => _), async (inactiveSession, c) =>
                     {

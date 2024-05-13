@@ -2,21 +2,18 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Domains.DTOs;
-using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Net;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -47,31 +44,14 @@ public class CertificateAuthoritiesController : BaseController
     }
 
     [HttpPost]
-    public async Task<IActionResult> Search([FromRoute] string prefix, [FromBody] SearchRequest request)
+    public async Task<IActionResult> Search([FromRoute] string prefix, [FromBody] SearchRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
             await CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name);
-            IQueryable<CertificateAuthority> query = _certificateAuthorityRepository.Query()
-                .Include(p => p.Realms)
-                .Where(p => p.Realms.Any(r => r.Name == prefix))
-                .AsNoTracking();
-            if (!string.IsNullOrWhiteSpace(request.Filter))
-                query = query.Where(request.Filter);
-
-            if (!string.IsNullOrWhiteSpace(request.OrderBy))
-                query = query.OrderBy(request.OrderBy);
-            else
-                query = query.OrderByDescending(c => c.UpdateDateTime);
-
-            var nb = query.Count();
-            var cas = await query.Skip(request.Skip.Value).Take(request.Take.Value).ToListAsync();
-            return new OkObjectResult(new SearchResult<CertificateAuthority>
-            {
-                Count = nb,
-                Content = cas
-            });
+            var result = await _certificateAuthorityRepository.Search(prefix, request, cancellationToken);
+            return new OkObjectResult(result);
         }
         catch (OAuthException ex)
         {
@@ -166,7 +146,7 @@ public class CertificateAuthoritiesController : BaseController
     }
 
     [HttpPost]
-    public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] CertificateAuthority request)
+    public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] CertificateAuthority request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         using (var activity = Tracing.IdServerActivitySource.StartActivity("Add certificate authority"))
@@ -193,7 +173,7 @@ public class CertificateAuthoritiesController : BaseController
                     StoreName = request.StoreName,
                     UpdateDateTime = DateTime.UtcNow
                 };
-                var realm = await _realmRepository.Query().SingleAsync(r => r.Name == prefix);
+                var realm = await _realmRepository.Get(prefix, cancellationToken);
                 record.Realms.Add(realm);
                 _certificateAuthorityRepository.Add(record);
                 await _certificateAuthorityRepository.SaveChanges(CancellationToken.None);
@@ -225,7 +205,7 @@ public class CertificateAuthoritiesController : BaseController
     }
 
     [HttpDelete]
-    public async Task<IActionResult> Remove([FromRoute] string prefix, string id)
+    public async Task<IActionResult> Remove([FromRoute] string prefix, string id, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         using (var activity = Tracing.IdServerActivitySource.StartActivity("Remove certificate authority"))
@@ -234,7 +214,7 @@ public class CertificateAuthoritiesController : BaseController
             {
                 activity?.SetTag("realm", prefix);
                 await CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name);
-                var ca = await _certificateAuthorityRepository.Query().Include(c => c.Realms).SingleOrDefaultAsync(c => c.Id == id && c.Realms.Any(r => r.Name == prefix));
+                var ca = await _certificateAuthorityRepository.Get(prefix, id, cancellationToken);
                 if (ca == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownCa, id));
                 _certificateAuthorityRepository.Delete(ca);
                 await _certificateAuthorityRepository.SaveChanges(CancellationToken.None);
@@ -261,13 +241,13 @@ public class CertificateAuthoritiesController : BaseController
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get([FromRoute] string prefix, string id)
+    public async Task<IActionResult> Get([FromRoute] string prefix, string id, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
             await CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name);
-            var ca = await _certificateAuthorityRepository.Query().Include(c => c.Realms).Include(c => c.ClientCertificates).AsNoTracking().SingleOrDefaultAsync(c => c.Id == id && c.Realms.Any(r => r.Name == prefix));
+            var ca = await _certificateAuthorityRepository.Get(prefix, id, cancellationToken);
             if (ca == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownCa, id));
             return new OkObjectResult(ca);
         }
@@ -279,7 +259,7 @@ public class CertificateAuthoritiesController : BaseController
     }
 
     [HttpDelete]
-    public async Task<IActionResult> RemoveClientCertificate([FromRoute] string prefix, string id, string clientCertificateId)
+    public async Task<IActionResult> RemoveClientCertificate([FromRoute] string prefix, string id, string clientCertificateId, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         using (var activity = Tracing.IdServerActivitySource.StartActivity("Remove client certificate"))
@@ -288,7 +268,7 @@ public class CertificateAuthoritiesController : BaseController
             {
                 activity?.SetTag("realm", prefix);
                 await CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name);
-                var ca = await _certificateAuthorityRepository.Query().Include(c => c.Realms).Include(c => c.ClientCertificates).SingleOrDefaultAsync(c => c.Id == id && c.Realms.Any(r => r.Name == prefix));
+                var ca = await _certificateAuthorityRepository.Get(prefix, id, cancellationToken);
                 if (ca == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownCa, id));
                 var clientCertificate = ca.ClientCertificates.SingleOrDefault(c => c.Id == clientCertificateId);
                 if (clientCertificate == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClientCa, id));
@@ -319,7 +299,7 @@ public class CertificateAuthoritiesController : BaseController
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddClientCertificate([FromRoute] string prefix, string id, [FromBody] AddClientCertificateRequest request)
+    public async Task<IActionResult> AddClientCertificate([FromRoute] string prefix, string id, [FromBody] AddClientCertificateRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         using (var activity = Tracing.IdServerActivitySource.StartActivity("Add client certificate authority"))
@@ -331,7 +311,7 @@ public class CertificateAuthoritiesController : BaseController
                 if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
                 if (string.IsNullOrWhiteSpace(request.SubjectName)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, ClientCertificateNames.SubjectName));
                 activity?.SetTag("subjectName", request.SubjectName);
-                var ca = await _certificateAuthorityRepository.Query().Include(c => c.Realms).Include(c => c.ClientCertificates).SingleAsync(c => c.Id == id && c.Realms.Any(r => r.Name == prefix));
+                var ca = await _certificateAuthorityRepository.Get(prefix, id, cancellationToken);
                 if (ca == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownCa, id));
                 var store = new Stores.CertificateAuthorityStore(null);
                 var certificate = store.Get(ca);

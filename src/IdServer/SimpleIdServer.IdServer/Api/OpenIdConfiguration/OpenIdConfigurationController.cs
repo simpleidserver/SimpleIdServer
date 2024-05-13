@@ -2,12 +2,11 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.Configuration;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,15 +47,9 @@ namespace SimpleIdServer.IdServer.Api.OpenIdConfiguration
         public override async Task<IActionResult> Get([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
-            var acrLst = await _authenticationContextClassReferenceRepository.Query().Include(a => a.Realms).AsNoTracking().Where(a => a.Realms.Any(r => r.Name == prefix)).ToListAsync(cancellationToken);
+            var acrLst = await _authenticationContextClassReferenceRepository.GetAll(prefix, cancellationToken);
             var result = await Build(prefix, cancellationToken);
-            var claims = await _scopeRepository.Query()
-                .Include(s => s.ClaimMappers)
-                .Include(s => s.Realms)
-                .AsNoTracking()
-                .Where(s => s.IsExposedInConfigurationEdp && s.Realms.Any(r => r.Name == prefix))
-                .SelectMany(s => s.ClaimMappers)
-                .ToListAsync(cancellationToken);
+            var claims = (await _scopeRepository.GetAllExposedScopes(prefix, cancellationToken)).SelectMany(s => s.ClaimMappers);
             
             if (!string.IsNullOrWhiteSpace(prefix))
                 prefix = $"{prefix}/";

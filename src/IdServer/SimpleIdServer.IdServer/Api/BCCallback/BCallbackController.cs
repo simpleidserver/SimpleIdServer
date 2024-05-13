@@ -2,13 +2,12 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Hangfire;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Api.BCCallback;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,9 +34,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             try
             {
                 prefix = prefix ?? Constants.DefaultRealm;
-                var bcAuthorize = await _bcAuthorizeRepository.Query()
-                    .Include(a => a.Histories)
-                    .FirstOrDefaultAsync(b => b.Id == parameter.AuthReqId, cancellationToken);
+                var bcAuthorize = await _bcAuthorizeRepository.GetById(parameter.AuthReqId, cancellationToken);
                 if (bcAuthorize == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownBcAuthorize, parameter.AuthReqId));
                 if (!bcAuthorize.IsActive) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.ExpiredBcAuthorize);
                 if (bcAuthorize.LastStatus != Domains.BCAuthorizeStatus.Pending) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.BcAuthorizeNotPending);

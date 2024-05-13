@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;

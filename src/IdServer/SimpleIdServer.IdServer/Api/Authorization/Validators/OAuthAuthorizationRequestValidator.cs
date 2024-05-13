@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
@@ -11,7 +10,7 @@ using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,7 +34,17 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
         private readonly IJwtBuilder _jwtBuilder;
         private readonly IdServerHostOptions _options;
 
-        public OAuthAuthorizationRequestValidator(IEnumerable<IResponseTypeHandler> responseTypeHandlers, IUserHelper userHelper, IClientRepository clientRepository, IGrantHelper grantHelper, IAmrHelper amrHelper, IExtractRequestHelper extractRequestHelper, IEnumerable<IOAuthResponseMode> oauthResponseModes, IClientHelper clientHelper, IJwtBuilder jwtBuilder, IOptions<IdServerHostOptions> options)
+        public OAuthAuthorizationRequestValidator(
+            IEnumerable<IResponseTypeHandler> responseTypeHandlers, 
+            IUserHelper userHelper, 
+            IClientRepository clientRepository, 
+            IGrantHelper grantHelper, 
+            IAmrHelper amrHelper, 
+            IExtractRequestHelper extractRequestHelper, 
+            IEnumerable<IOAuthResponseMode> oauthResponseModes, 
+            IClientHelper clientHelper, 
+            IJwtBuilder jwtBuilder, 
+            IOptions<IdServerHostOptions> options)
         {
             _responseTypeHandlers = responseTypeHandlers;
             _userHelper = userHelper;
@@ -128,11 +137,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                 if (string.IsNullOrWhiteSpace(clientId))
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, AuthorizationRequestParameters.ClientId));
 
-                var client = await _clientRepository.Query().Include(c => c.Scopes).ThenInclude(s => s.ClaimMappers)
-                    .Include(c => c.SerializedJsonWebKeys)
-                    .Include(c => c.Realms)
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == realm), cancellationToken);
+                var client = await _clientRepository.GetByClientId(realm, clientId, cancellationToken);
                 if (client == null)
                     throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(Global.UnknownClient, clientId));
 
