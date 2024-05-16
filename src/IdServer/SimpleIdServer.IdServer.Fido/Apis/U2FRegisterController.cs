@@ -17,11 +17,10 @@ using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI;
 using System.Security.Claims;
 using System.Text;
-using static MassTransit.ValidationResultExtensions;
 
 namespace SimpleIdServer.IdServer.Fido.Apis
 {

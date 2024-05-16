@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Stores;
 
@@ -17,4 +18,21 @@ public class PresentationDefinitionStore : IPresentationDefinitionStore
 
     public IQueryable<PresentationDefinition> Query()
         => _dbContext.PresentationDefinitions;
+
+    public Task<List<PresentationDefinition>> GetAll(string realm, CancellationToken cancellationToken)
+    {
+        var result = _dbContext.PresentationDefinitions
+            .Include(p => p.InputDescriptors)
+            .Where(p => p.RealmName == realm).ToListAsync(cancellationToken);
+        return result;
+    }
+
+    public Task<PresentationDefinition> GetByPublicId(string id, string realm, CancellationToken cancellationToken)
+    {
+        var result = _dbContext.PresentationDefinitions
+            .Include(p => p.InputDescriptors).ThenInclude(p => p.Format)
+            .Include(p => p.InputDescriptors).ThenInclude(p => p.Constraints)
+            .SingleOrDefaultAsync(p => p.PublicId == id && p.RealmName == realm, cancellationToken);
+        return result;
+    }
 }

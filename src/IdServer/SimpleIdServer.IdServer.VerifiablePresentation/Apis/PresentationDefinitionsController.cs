@@ -32,11 +32,7 @@ public class PresentationDefinitionsController : BaseController
         prefix = prefix ?? IdServer.Constants.DefaultRealm;
         try
         {
-            var presentationDefinition = await _presentationDefinitionStore.Query()
-                .AsNoTracking()
-                .Include(p => p.InputDescriptors).ThenInclude(p => p.Format)
-                .Include(p => p.InputDescriptors).ThenInclude(p => p.Constraints)
-                .SingleOrDefaultAsync(p => p.PublicId == id && p.RealmName == prefix, cancellationToken);
+            var presentationDefinition = await _presentationDefinitionStore.GetByPublicId(id, prefix, cancellationToken);
             if(presentationDefinition == null)
                 throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownPresentationDefinition, id));
             return new OkObjectResult(presentationDefinition);

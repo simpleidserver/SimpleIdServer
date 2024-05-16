@@ -3,7 +3,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;

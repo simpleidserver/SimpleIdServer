@@ -12,9 +12,8 @@ using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Sms.UI.ViewModels;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI;
-using SimpleIdServer.IdServer.UI.ViewModels;
 using System.Security.Claims;
 
 namespace SimpleIdServer.IdServer.Sms.UI;

@@ -15,7 +15,7 @@ using SimpleIdServer.IdServer.Fido.Extensions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System.Text.Json;
 
 namespace SimpleIdServer.IdServer.Fido.Apis

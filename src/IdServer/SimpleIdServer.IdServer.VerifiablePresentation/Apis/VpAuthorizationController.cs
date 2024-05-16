@@ -3,7 +3,6 @@
 using BlushingPenguin.JsonPath;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -13,7 +12,7 @@ using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.VerifiablePresentation.DTOs;
 using SimpleIdServer.IdServer.VerifiablePresentation.Resources;
 using SimpleIdServer.Vc;
@@ -82,9 +81,7 @@ public class VpAuthorizationController : BaseController
         prefix = prefix ?? IdServer.Constants.DefaultRealm;
         try
         {
-            var presentationDefinition = await _presentationDefinitionStore.Query()
-                .AsNoTracking()
-                .SingleOrDefaultAsync(p => p.PublicId == id && p.RealmName == prefix, cancellationToken);
+            var presentationDefinition = await _presentationDefinitionStore.GetByPublicId(id, prefix, cancellationToken);
             if(presentationDefinition == null)
                 throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownPresentationDefinition, id));
             var state = Guid.NewGuid().ToString();
@@ -149,12 +146,7 @@ public class VpAuthorizationController : BaseController
         var cachedValue = await _distributedCache.GetStringAsync(request.State, cancellationToken);
         if (cachedValue == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.StateIsNotValid);
         var vpPendingAuthorization = JsonSerializer.Deserialize<VpPendingAuthorization>(cachedValue);
-        var presentationDefinition = await _presentationDefinitionStore.Query()
-            .Include(p => p.InputDescriptors).ThenInclude(p => p.Format)
-            .Include(p => p.InputDescriptors).ThenInclude(p => p.Constraints)
-            .AsNoTracking()
-            .SingleOrDefaultAsync(p => p.PublicId == vpPendingAuthorization.PresentationDefinitionId && p.RealmName == prefix, cancellationToken);
-
+        var presentationDefinition = await _presentationDefinitionStore.GetByPublicId(vpPendingAuthorization.PresentationDefinitionId, prefix, cancellationToken);
         var vpVerifier = new VpVerifier(_didFactoryResolver);
         try
         {
