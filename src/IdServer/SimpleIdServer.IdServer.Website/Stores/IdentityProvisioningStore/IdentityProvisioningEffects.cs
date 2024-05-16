@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.Provisioning;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Provisioning;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -46,7 +46,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var result = SidJsonSerializer.Deserialize<DTOs.SearchResult<IdentityProvisioningResult>>(json);
+            var result = SidJsonSerializer.Deserialize<SearchResult<IdentityProvisioningResult>>(json);
             dispatcher.Dispatch(new SearchIdentityProvisioningSuccessAction { IdentityProvisioningLst = result.Content, Count = result.Count });
 
             string SanitizeExpression(string expression) => expression?.Replace("Value.", "");

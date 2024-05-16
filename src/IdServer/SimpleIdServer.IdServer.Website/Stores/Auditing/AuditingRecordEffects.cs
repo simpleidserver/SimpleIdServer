@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.Auditing;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System.Text;
 using System.Text.Json;
 

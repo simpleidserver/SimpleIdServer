@@ -1,14 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
-using NetTopologySuite.Index;
 using SimpleIdServer.IdServer.Api.Groups;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.DTOs;
-using System;
+using SimpleIdServer.IdServer.Stores;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
