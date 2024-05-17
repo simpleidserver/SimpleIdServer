@@ -135,7 +135,7 @@ namespace SimpleIdServer.IdServer.UI
 
             var allAmr = acr.AuthenticationMethodReferences;
             var login = _authenticationHelper.GetLogin(user);
-            HttpContext.Response.Cookies.Append(Constants.DefaultCurrentAmrCookieName, JsonSerializer.Serialize(new AmrAuthInfo(user.Id, login, user.Email, user.OAuthUserClaims.Select(c => new KeyValuePair<string, string>(c.Name, c.Value)).ToList(), allAmr, amr)));
+            HttpContext.Response.Cookies.Append(Constants.DefaultCurrentAmrCookieName, JsonSerializer.Serialize(new AmrAuthInfo(user.Id, login, user.Email, user.OAuthUserClaims.Select(c => new KeyValuePair<string, string>(c.Name, c.Value)).ToList(), allAmr, acr.Name, amr)));
 	        await _userRepository.SaveChanges(token);
             return RedirectToAction("Index", "Authenticate", new { area = amr, ReturnUrl = returnUrl });
         }

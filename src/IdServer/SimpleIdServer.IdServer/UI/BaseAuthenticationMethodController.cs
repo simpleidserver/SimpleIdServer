@@ -170,7 +170,20 @@ namespace SimpleIdServer.IdServer.UI
             prefix = prefix ?? Constants.DefaultRealm;
             if (viewModel == null) 
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
-            var amrInfo = GetAmrInfo();
+            AmrAuthInfo amrInfo = null;
+            if(IsProtected(viewModel.ReturnUrl))
+            {
+                var query = ExtractQuery(viewModel.ReturnUrl);
+                var clientId = query.GetClientIdFromAuthorizationRequest();
+                var client = await ClientRepository.Query()
+                    .Include(c => c.Realms)
+                    .Include(c => c.Translations)
+                    .FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == prefix), token);
+                var res = await ResolveAmrInfo(query, prefix, client, token);
+                amrInfo = res?.Item1;
+                viewModel.AmrAuthInfo = amrInfo;
+            }
+
             EnrichViewModel(viewModel);
             await UpdateViewModel(viewModel);
             viewModel.Validate(ModelState);
@@ -229,8 +242,6 @@ namespace SimpleIdServer.IdServer.UI
                 externalIdProviders = ExternalProviderHelper.GetExternalAuthenticationSchemes(schemes);
             }
 
-            var amrInfo = GetAmrInfo();
-            viewModel.AmrAuthInfo = amrInfo;
             viewModel.ExternalIdsProviders = externalIdProviders.Select(e => new ExternalIdProvider
             {
                 AuthenticationScheme = e.Name,
@@ -253,7 +264,7 @@ namespace SimpleIdServer.IdServer.UI
                     .AsNoTracking()
                     .Include(a => a.Realms)
                     .Include(a => a.RegistrationWorkflow)
-                    .SingleAsync(a => a.Realms.Any(r => r.Name == realm) && a.Name == amrInfo.CurrentAmr, cancellationToken);
+                    .SingleAsync(a => a.Realms.Any(r => r.Name == realm) && a.Name == amrInfo.CurrentAcr, cancellationToken);
                 return (amrInfo, resolvedAcr);
             }
 
@@ -261,7 +272,7 @@ namespace SimpleIdServer.IdServer.UI
             var requestedClaims = query.GetClaimsFromAuthorizationRequest();
             var acr = await AmrHelper.FetchDefaultAcr(realm, acrValues, requestedClaims, client, cancellationToken);
             if (acr == null) return null;
-            return (new AmrAuthInfo(null, null, null, null, acr.AuthenticationMethodReferences, acr.AuthenticationMethodReferences.First()), acr);
+            return (new AmrAuthInfo(null, null, null, null, acr.AuthenticationMethodReferences, acr.Name, acr.AuthenticationMethodReferences.First()), acr);
         }
 
         protected AmrAuthInfo GetAmrInfo()
