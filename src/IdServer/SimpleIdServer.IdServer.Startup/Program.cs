@@ -30,6 +30,7 @@ using SimpleIdServer.IdServer.Startup;
 using SimpleIdServer.IdServer.Startup.Configurations;
 using SimpleIdServer.IdServer.Startup.Converters;
 using SimpleIdServer.IdServer.Store.EF;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.Swagger;
 using SimpleIdServer.IdServer.TokenTypes;
 using SimpleIdServer.IdServer.VerifiablePresentation;
@@ -38,6 +39,23 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading;
+
+void Test()
+{
+    var services = new ServiceCollection();
+    services.AddSqlSugarStore(o =>
+    {
+        o.ConnectionConfig = new SqlSugar.ConnectionConfig { DbType = SqlSugar.DbType.SqlServer, ConnectionString = "Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True" };
+    });
+    var provider = services.BuildServiceProvider();
+    var repository = provider.GetRequiredService<IApiResourceRepository>();
+    var result = repository.Get("master", "60DEC462-2F40-4524-8F97-E7779ED3B6F3", CancellationToken.None).Result;
+    
+    var str = "";
+}
+
+Test();
 
 const string SQLServerCreateTableFormat = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DistributedCache' and xtype='U') " +
     "CREATE TABLE [dbo].[DistributedCache] (" +
