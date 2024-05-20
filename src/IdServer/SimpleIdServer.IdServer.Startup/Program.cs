@@ -30,7 +30,6 @@ using SimpleIdServer.IdServer.Startup;
 using SimpleIdServer.IdServer.Startup.Configurations;
 using SimpleIdServer.IdServer.Startup.Converters;
 using SimpleIdServer.IdServer.Store.EF;
-using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.Swagger;
 using SimpleIdServer.IdServer.TokenTypes;
 using SimpleIdServer.IdServer.VerifiablePresentation;
@@ -39,23 +38,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Threading;
-
-void Test()
-{
-    var services = new ServiceCollection();
-    services.AddSqlSugarStore(o =>
-    {
-        o.ConnectionConfig = new SqlSugar.ConnectionConfig { DbType = SqlSugar.DbType.SqlServer, ConnectionString = "Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True" };
-    });
-    var provider = services.BuildServiceProvider();
-    var repository = provider.GetRequiredService<IApiResourceRepository>();
-    var result = repository.Get("master", "60DEC462-2F40-4524-8F97-E7779ED3B6F3", CancellationToken.None).Result;
-    
-    var str = "";
-}
-
-Test();
 
 const string SQLServerCreateTableFormat = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DistributedCache' and xtype='U') " +
     "CREATE TABLE [dbo].[DistributedCache] (" +
@@ -92,7 +74,6 @@ builder.Services.Configure<KestrelServerOptions>(options =>
         if (identityServerConfiguration.ClientCertificateMode != null) o.ClientCertificateMode = identityServerConfiguration.ClientCertificateMode.Value;
     });
 });
-ConfigureCentralizedConfiguration(builder);
 if (identityServerConfiguration.IsForwardedEnabled)
 {
     builder.Services.Configure<ForwardedHeadersOptions>(options =>
@@ -108,6 +89,7 @@ builder.Services.AddRazorPages()
     .AddRazorRuntimeCompilation();
 builder.Services.AddLocalization();
 ConfigureIdServer(builder.Services);
+ConfigureCentralizedConfiguration(builder);
 
 var app = builder.Build();
 SeedData(app, identityServerConfiguration.SCIMBaseUrl);
@@ -149,7 +131,7 @@ app.Run();
 
 void ConfigureIdServer(IServiceCollection services)
 {
-    var idServerBuilder = services.AddSIDIdentityServer(callback: cb =>
+    var chooser = services.AddSIDIdentityServer(callback: cb =>
         {
             if (!string.IsNullOrWhiteSpace(identityServerConfiguration.SessionCookieNamePrefix)) 
                 cb.SessionCookieName = identityServerConfiguration.SessionCookieNamePrefix;
@@ -158,8 +140,12 @@ void ConfigureIdServer(IServiceCollection services)
         {
             if(!string.IsNullOrWhiteSpace(identityServerConfiguration.AuthCookieNamePrefix)) 
                 c.Cookie.Name = identityServerConfiguration.AuthCookieNamePrefix;
-        }, dataProtectionBuilderCallback: ConfigureDataProtection)
-        .UseEFStore(o => ConfigureStorage(o))
+        }, dataProtectionBuilderCallback: ConfigureDataProtection);
+    chooser.UseEFStore(o => ConfigureStorage(o));
+    var idServerBuilder = chooser.UseSqlSugar(o =>
+    {
+        o.ConnectionConfig = new SqlSugar.ConnectionConfig { DbType = SqlSugar.DbType.SqlServer, ConnectionString = "Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True" };
+    })
         .AddSwagger(o =>
         {
             o.IncludeDocumentation<AccessTokenTypeService>();

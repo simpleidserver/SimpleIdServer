@@ -37,9 +37,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IAuthenticationSchemeProviderRepository, AuthenticationSchemeProviderRepository>();
             services.AddTransient<IClaimProviderRepository, ClaimProviderRepository>();
             services.AddTransient<IBCAuthorizeRepository, BCAuthorizeRepository>();
+            // services.AddTransient<IApiResourceRepository, ApiResourceRepository>();
             services.AddTransient<IUmaResourceRepository, UmaResourceRepository>();
             services.AddTransient<IUmaPendingRequestRepository, UmaPendingRequestRepository>();
-            services.AddTransient<IRealmRepository, RealmRepository>();
+            // services.AddTransient<IRealmRepository, RealmRepository>();
             services.AddTransient<IFileSerializedKeyStore, SerializedFileKeyStore>();
             services.AddTransient<IAuditEventRepository, AuditEventRepository>();
             services.AddTransient<ICertificateAuthorityRepository, CertificateAuthorityRepository>();
@@ -57,6 +58,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IGotiySessionStore, GotiySessionStore>();
             services.AddTransient<IPresentationDefinitionStore, PresentationDefinitionStore>();
             services.AddTransient<IKeyValueRepository, KeyValueRepository>();
+            services.AddTransient<ITransactionBuilder, EFTransactionBuilder>();
         }
     }
 }

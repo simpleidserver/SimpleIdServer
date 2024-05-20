@@ -69,6 +69,7 @@ public class ApiResourcesController : BaseController
                 await CheckAccessToken(prefix, Constants.StandardScopes.ApiResources.Name);
                 if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
                 if (string.IsNullOrWhiteSpace(request.Name)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, ApiResourceNames.Name));
+                await _apiResourceRepository.StartTransaction();
                 var existingApiResource = await _apiResourceRepository.GetByName(prefix, request.Name, cancellationToken);
                 if (existingApiResource != null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.ApiResourceAlreadyExists, request.Name));
                 var realm = await _realmRepository.Get(prefix, cancellationToken);
@@ -83,7 +84,7 @@ public class ApiResourcesController : BaseController
                 };
                 apiResource.Realms.Add(realm);
                 _apiResourceRepository.Add(apiResource);
-                await _apiResourceRepository.SaveChanges(CancellationToken.None);
+                await _apiResourceRepository.CommitTransaction();
                 activity?.SetStatus(ActivityStatusCode.Ok, $"API resource {request.Name} added");
                 await _busControl.Publish(new AddApiResourceSuccessEvent
                 {
@@ -123,11 +124,12 @@ public class ApiResourcesController : BaseController
             {
                 activity?.SetTag("realm", prefix);
                 await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
+                await _apiResourceRepository.StartTransaction();
                 var apiResource = await _apiResourceRepository.Get(prefix, id, cancellationToken);
                 if (apiResource == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownApiResource, id));
                 activity?.SetStatus(ActivityStatusCode.Ok, $"API resource {id} is removed");
                 _apiResourceRepository.Delete(apiResource);
-                await _apiResourceRepository.SaveChanges(cancellationToken);
+                await _apiResourceRepository.CommitTransaction();
                 return new NoContentResult();
             }
             catch (OAuthException ex)

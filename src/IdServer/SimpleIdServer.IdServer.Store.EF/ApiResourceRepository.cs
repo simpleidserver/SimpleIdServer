@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Stores;
 using System.Linq.Dynamic.Core;
-using static Azure.Core.HttpHeader;
 
 namespace SimpleIdServer.IdServer.Store.EF;
 
@@ -18,6 +17,9 @@ public class ApiResourceRepository : IApiResourceRepository
     {
         _dbContext = dbContext;
     }
+
+    public Task StartTransaction()
+        => Task.CompletedTask;
 
     public Task<ApiResource> Get(string realm, string id, CancellationToken cancellationToken)
     {
@@ -49,7 +51,8 @@ public class ApiResourceRepository : IApiResourceRepository
     {
         return _dbContext.ApiResources.Include(r => r.Realms)
             .Include(r => r.Scopes)
-            .Where(r => (names.Contains(r.Name) || audiences.Contains(r.Audience)) && r.Realms.Any(r => r.Name == realm)).ToListAsync(cancellationToken);
+            .Where(r => (names.Contains(r.Name) || audiences.Contains(r.Audience)) && r.Realms.Any(r => r.Name == realm))
+            .ToListAsync(cancellationToken);
     }
 
     public Task<List<ApiResource>> GetByScopes(List<string> scopes, CancellationToken cancellationToken)
@@ -88,11 +91,6 @@ public class ApiResourceRepository : IApiResourceRepository
     public void Delete(ApiResource apiResource)
         => _dbContext.ApiResources.Remove(apiResource);
 
-    public IQueryable<ApiResource> Query()
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<int> SaveChanges(CancellationToken cancellationToken)
-        => _dbContext.SaveChangesAsync(cancellationToken);
+    public Task<int> CommitTransaction()
+        => _dbContext.SaveChangesAsync();
 }

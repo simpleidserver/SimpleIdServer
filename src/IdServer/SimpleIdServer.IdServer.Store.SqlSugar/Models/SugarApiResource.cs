@@ -32,6 +32,7 @@ public class SugarApiResource
             CreateDateTime = CreateDateTime,
             UpdateDateTime = UpdateDateTime,
             Scopes = Scopes == null ? new List<Scope>() : Scopes.Select(s => s.ToDomain()).ToList(),
+            Realms = Realms == null ? new List<Realm>() : Realms.Select(r => r.ToDomain()).ToList()
         };
     }
 }

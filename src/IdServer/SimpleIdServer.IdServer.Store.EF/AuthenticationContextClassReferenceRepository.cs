@@ -61,5 +61,8 @@ public class AuthenticationContextClassReferenceRepository : IAuthenticationCont
 
     public void Delete(AuthenticationContextClassReference record) => _dbContext.Acrs.Remove(record);
 
-    public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
+    public void Update(AuthenticationContextClassReference record)
+    {
+
+    }
 }

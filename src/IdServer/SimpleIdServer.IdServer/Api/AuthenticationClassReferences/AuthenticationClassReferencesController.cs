@@ -25,6 +25,7 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationClassReferences
         private readonly IRealmRepository _realmRepository;
         private readonly IRegistrationWorkflowRepository _registrationWorkflowRepository;
         private readonly IEnumerable<IAuthenticationMethodService> _authMethodServices;
+        private readonly ITransactionBuilder _transactionBuilder;
         private readonly ILogger<AuthenticationClassReferencesController> _logger;
 
         public AuthenticationClassReferencesController(
@@ -34,12 +35,14 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationClassReferences
             ITokenRepository tokenRepository,
             IJwtBuilder jwtBuilder, 
             IEnumerable<IAuthenticationMethodService> authMethodServices, 
+            ITransactionBuilder transactionBuilder,
             ILogger<AuthenticationClassReferencesController> logger) : base(tokenRepository, jwtBuilder)
         {
             _authenticationContextClassReferenceRepository = authenticationContextClassReferenceRepository;
             _realmRepository = realmRepository;
             _registrationWorkflowRepository = registrationWorkflowRepository;
             _authMethodServices = authMethodServices;
+            _transactionBuilder = transactionBuilder;
             _logger = logger;
         }
 
@@ -67,29 +70,32 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationClassReferences
             {
                 try
                 {
-                    prefix = prefix ?? Constants.DefaultRealm;
-                    await CheckAccessToken(prefix, Constants.StandardScopes.Acrs.Name);
-                    await Validate();
-                    var realm = await _realmRepository.Get(prefix, cancellationToken);
-                    var record = new AuthenticationContextClassReference
+                    using (var transaction = _transactionBuilder.Build())
                     {
-                        Id = Guid.NewGuid().ToString(),
-                        Name = request.Name,
-                        AuthenticationMethodReferences = request.AuthenticationMethodReferences,
-                        DisplayName = request.DisplayName,
-                        CreateDateTime = DateTime.UtcNow,
-                        UpdateDateTime = DateTime.UtcNow
-                    };
-                    record.Realms.Add(realm);
-                    _authenticationContextClassReferenceRepository.Add(record);
-                    await _authenticationContextClassReferenceRepository.SaveChanges(cancellationToken);
-                    activity?.SetStatus(ActivityStatusCode.Ok, "Authentication Class Reference has been added");
-                    return new ContentResult
-                    {
-                        Content = JsonSerializer.Serialize(record),
-                        ContentType = "application/json",
-                        StatusCode = (int)HttpStatusCode.Created
-                    };
+                        prefix = prefix ?? Constants.DefaultRealm;
+                        await CheckAccessToken(prefix, Constants.StandardScopes.Acrs.Name);
+                        await Validate();
+                        var realm = await _realmRepository.Get(prefix, cancellationToken);
+                        var record = new AuthenticationContextClassReference
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            Name = request.Name,
+                            AuthenticationMethodReferences = request.AuthenticationMethodReferences,
+                            DisplayName = request.DisplayName,
+                            CreateDateTime = DateTime.UtcNow,
+                            UpdateDateTime = DateTime.UtcNow
+                        };
+                        record.Realms.Add(realm);
+                        _authenticationContextClassReferenceRepository.Add(record);
+                        await transaction.Commit(cancellationToken);
+                        activity?.SetStatus(ActivityStatusCode.Ok, "Authentication Class Reference has been added");
+                        return new ContentResult
+                        {
+                            Content = JsonSerializer.Serialize(record),
+                            ContentType = "application/json",
+                            StatusCode = (int)HttpStatusCode.Created
+                        };
+                    }
                 }
                 catch(OAuthException ex)
                 {
@@ -118,19 +124,22 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationClassReferences
         {
             using (var activity = Tracing.IdServerActivitySource.StartActivity("Remove Authentication Class Reference"))
             {
-                prefix = prefix ?? Constants.DefaultRealm;
-                await CheckAccessToken(prefix, Constants.StandardScopes.Acrs.Name);
-                var acr = await _authenticationContextClassReferenceRepository.Get(prefix, id, cancellationToken);
-                if (acr == null)
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    activity?.SetStatus(ActivityStatusCode.Error, "Authentication Class Reference doesn't exit");
-                    return BuildError(HttpStatusCode.NotFound, ErrorCodes.UNKNOWN_ACR, string.Format(Global.UnknownAcr, id));
-                }
+                    prefix = prefix ?? Constants.DefaultRealm;
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Acrs.Name);
+                    var acr = await _authenticationContextClassReferenceRepository.Get(prefix, id, cancellationToken);
+                    if (acr == null)
+                    {
+                        activity?.SetStatus(ActivityStatusCode.Error, "Authentication Class Reference doesn't exit");
+                        return BuildError(HttpStatusCode.NotFound, ErrorCodes.UNKNOWN_ACR, string.Format(Global.UnknownAcr, id));
+                    }
 
-                _authenticationContextClassReferenceRepository.Delete(acr);
-                await _authenticationContextClassReferenceRepository.SaveChanges(cancellationToken);
-                activity?.SetStatus(ActivityStatusCode.Ok, "Authentication Class Reference has been removed");
-                return new NoContentResult();
+                    _authenticationContextClassReferenceRepository.Delete(acr);
+                    await transaction.Commit(cancellationToken);
+                    activity?.SetStatus(ActivityStatusCode.Ok, "Authentication Class Reference has been removed");
+                    return new NoContentResult();
+                }
             }
         }
 
@@ -142,19 +151,23 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationClassReferences
                 prefix = prefix ?? Constants.DefaultRealm;
                 try
                 {
-                    await Validate();
-                    var acr = await _authenticationContextClassReferenceRepository.Get(prefix, id, cancellationToken);
-                    if (acr == null)
+                    using (var transaction = _transactionBuilder.Build())
                     {
-                        activity?.SetStatus(ActivityStatusCode.Error, "Authentication Class Reference doesn't exit");
-                        return BuildError(HttpStatusCode.NotFound, ErrorCodes.UNKNOWN_ACR, string.Format(Global.UnknownAcr, id));
-                    }
+                        await Validate();
+                        var acr = await _authenticationContextClassReferenceRepository.Get(prefix, id, cancellationToken);
+                        if (acr == null)
+                        {
+                            activity?.SetStatus(ActivityStatusCode.Error, "Authentication Class Reference doesn't exit");
+                            return BuildError(HttpStatusCode.NotFound, ErrorCodes.UNKNOWN_ACR, string.Format(Global.UnknownAcr, id));
+                        }
 
-                    acr.RegistrationWorkflowId = request.WorkflowId;
-                    acr.UpdateDateTime = DateTime.UtcNow;
-                    await _authenticationContextClassReferenceRepository.SaveChanges(cancellationToken);
-                    activity?.SetStatus(ActivityStatusCode.Ok, "Registration worklow is assigned to the ACR");
-                    return new NoContentResult();
+                        acr.RegistrationWorkflowId = request.WorkflowId;
+                        acr.UpdateDateTime = DateTime.UtcNow;
+                        _authenticationContextClassReferenceRepository.Update(acr);
+                        await transaction.Commit(cancellationToken);
+                        activity?.SetStatus(ActivityStatusCode.Ok, "Registration worklow is assigned to the ACR");
+                        return new NoContentResult();
+                    }
                 }
                 catch(OAuthException ex)
                 {

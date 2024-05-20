@@ -9,7 +9,6 @@ public static class AutomaticConfigurationOptionsExtensions
     public static AutomaticConfigurationOptions UseRedisConnector(this AutomaticConfigurationOptions options, string configuration)
     {
         options.Services.AddSingleton<IKeyValueConnector>(new RedisKeyValueConnector(configuration));
-        options.KeyValueConnectorType = typeof(RedisKeyValueConnector);
         return options;
     }
 }

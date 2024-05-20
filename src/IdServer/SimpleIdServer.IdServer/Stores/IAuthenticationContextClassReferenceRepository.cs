@@ -16,5 +16,5 @@ public interface IAuthenticationContextClassReferenceRepository
     Task<List<AuthenticationContextClassReference>> GetAll(string realm, CancellationToken cancellationToken);
     void Add(AuthenticationContextClassReference record);
     void Delete(AuthenticationContextClassReference record);
-    Task<int> SaveChanges(CancellationToken cancellationToken);
+    void Update(AuthenticationContextClassReference record);
 }

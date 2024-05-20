@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Store.SqlSugar.Models;
 using SimpleIdServer.IdServer.Stores;
 using SqlSugar;
 
@@ -15,46 +16,34 @@ public class RealmRepository : IRealmRepository
         _dbContext = dbContext;
     }
 
-    public void Add(Realm realm)
+    public Task StartTransaction()
+        => _dbContext.Client.BeginTranAsync();
+
+    public async Task<List<Realm>> GetAll(CancellationToken cancellationToken)
     {
-        _dbContext.Client.Insertable(realm).IgnoreColumns(
-                nameof(Realm.Clients),
-                nameof(Realm.Users),
-                nameof(Realm.Scopes),
-                nameof(Realm.AuthenticationContextClassReferences),
-                nameof(Realm.AuthenticationSchemeProviders),
-                nameof(Realm.ApiResources),
-                nameof(Realm.SerializedFileKeys),
-                nameof(Realm.CertificateAuthorities),
-                nameof(Realm.IdentityProvisioningLst),
-                nameof(Realm.Groups),
-                nameof(Realm.RegistrationWorkflows),
-                nameof(Realm.PresentationDefinitions)).ExecuteCommand();
+        var result = await _dbContext.Client.Queryable<SugarRealm>().ToListAsync(cancellationToken);
+        return result.Select(r => r.ToDomain()).ToList();
     }
 
-    public Task<Realm> Get(string name, CancellationToken cancellationToken)
-        => GetRealms().FirstAsync(c => c.Name == name, cancellationToken);
+    public async Task<Realm> Get(string name, CancellationToken cancellationToken)
+    {
+        var result = await _dbContext.Client.Queryable<SugarRealm>()
+            .FirstAsync(r => r.RealmsName == name, cancellationToken);
+        return result?.ToDomain();
+    }
 
-    public Task<List<Realm>> GetAll(CancellationToken cancellationToken)
-        => GetRealms().ToListAsync(cancellationToken);
+    public void Add(Realm realm)
+        => _dbContext.Client.Insertable(new SugarRealm
+        {
+            CreateDateTime = realm.CreateDateTime,
+            UpdateDateTime = realm.UpdateDateTime,
+            Description = realm.Description,
+            RealmsName = realm.Name
+        }).ExecuteCommand();
 
-    public Task<int> SaveChanges(CancellationToken cancellationToken)
-        => Task.FromResult(1);
-
-    private ISugarQueryable<Realm> GetRealms()
-        => _dbContext.Client.
-            Queryable<Realm>()
-            .IgnoreColumns(
-                nameof(Realm.Clients),
-                nameof(Realm.Users),
-                nameof(Realm.Scopes),
-                nameof(Realm.AuthenticationContextClassReferences),
-                nameof(Realm.AuthenticationSchemeProviders),
-                nameof(Realm.ApiResources),
-                nameof(Realm.SerializedFileKeys),
-                nameof(Realm.CertificateAuthorities),
-                nameof(Realm.IdentityProvisioningLst),
-                nameof(Realm.Groups),
-                nameof(Realm.RegistrationWorkflows),
-                nameof(Realm.PresentationDefinitions));
+    public Task<int> CommitTransaction()
+    {
+        _dbContext.Client.CommitTran();
+        return Task.FromResult(1);
+    }
 }

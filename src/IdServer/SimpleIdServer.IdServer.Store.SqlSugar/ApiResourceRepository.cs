@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using MassTransit.Initializers;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store.SqlSugar.Models;
 using SimpleIdServer.IdServer.Stores;
@@ -16,15 +17,8 @@ public class ApiResourceRepository : IApiResourceRepository
         _dbContext = dbContext;
     }
 
-    public void Add(ApiResource apiResource)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void Delete(ApiResource apiResource)
-    {
-        throw new NotImplementedException();
-    }
+    public Task StartTransaction()
+        => _dbContext.Client.BeginTranAsync();
 
     public async Task<ApiResource> Get(string realm, string id, CancellationToken cancellationToken)
     {
@@ -53,47 +47,77 @@ public class ApiResourceRepository : IApiResourceRepository
         return result.Select(r => r.ToDomain()).ToList();
     }
 
-    public Task<List<ApiResource>> GetByNamesOrAudiences(string realm, List<string> names, List<string> audiences, CancellationToken cancellationToken)
+    public async Task<List<ApiResource>> GetByNamesOrAudiences(string realm, List<string> names, List<string> audiences, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var result = await _dbContext.Client.Queryable<SugarApiResource>()
+            .Includes(r => r.Realms)
+            .Includes(r => r.Scopes)
+            .Where(r => (names.Contains(r.Name) || audiences.Contains(r.Audience)) && r.Realms.Any(r => r.RealmsName == realm))
+            .ToListAsync(cancellationToken);
+        return result.Select(r => r.ToDomain()).ToList();
     }
 
-    public Task<List<ApiResource>> GetByScopes(List<string> scopes, CancellationToken cancellationToken)
+    public async Task<List<ApiResource>> GetByScopes(List<string> scopes, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var result = await _dbContext.Client.Queryable<SugarApiResource>()
+            .Includes(r => r.Realms)
+            .Includes(r => r.Scopes)
+            .Where(r => r.Scopes.Any(s => scopes.Contains(s.Name)))
+            .ToListAsync(cancellationToken);
+        return result.Select(r => r.ToDomain()).ToList();
     }
 
-    public IQueryable<ApiResource> Query()
+    public async Task<SearchResult<ApiResource>> Search(string realm, SearchRequest request, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var query = _dbContext.Client.Queryable<SugarApiResource>()
+                .Includes(p => p.Realms)
+                .Includes(p => p.Scopes)
+                .Where(p => p.Realms.Any(r => r.RealmsName == realm));
+        if (!string.IsNullOrWhiteSpace(request.Filter))
+            query = query.Where(request.Filter);
+
+        if (!string.IsNullOrWhiteSpace(request.OrderBy))
+            query = query.OrderBy(request.OrderBy);
+        else
+            query = query.OrderBy(r => r.Name);
+        var nb = query.Count();
+
+        var apiResources = await query.Skip(request.Skip.Value).Take(request.Take.Value).ToListAsync(cancellationToken);
+        return new SearchResult<ApiResource>
+        {
+            Count = nb,
+            Content = apiResources.Select(r => r.ToDomain()).ToList()
+        };
     }
 
-    public Task<int> SaveChanges(CancellationToken cancellationToken)
+    public void Add(ApiResource apiResource)
     {
-        throw new NotImplementedException();
+        var res = new SugarApiResource
+        {
+            Audience = apiResource.Audience,
+            CreateDateTime = apiResource.CreateDateTime,
+            Description = apiResource.Description,
+            Id = apiResource.Id,
+            Name = apiResource.Name,
+            UpdateDateTime = apiResource.UpdateDateTime,
+            Realms = apiResource.Realms.Select(r => new SugarRealm
+            {
+                RealmsName = r.Name
+            }).ToList()
+        };
+        _dbContext.Client.InsertNav(res)
+            .Include(r => r.Realms)
+            .ExecuteCommand();
     }
 
-    public Task<SearchResult<ApiResource>> Search(string realm, SearchRequest request, CancellationToken cancellationToken)
+    public void Delete(ApiResource apiResource)
     {
-        throw new NotImplementedException();
+        _dbContext.Client.Deleteable(apiResource).ExecuteCommand();
     }
-}
 
-[SugarTable("tb_a1")]
-public class ClassA
-{
-    [SugarColumn(IsPrimaryKey = true)]
-    public string AId { get; set; }
-    [Navigate(NavigateType.OneToMany, nameof(ClassB.AId))]
-    public List<ClassB> B { get; set; }
-    [SugarColumn(IsNullable = true)]
-    public DateTime? UpdateTime { get; set; }
-}
-
-[SugarTable("tb_b2")]
-public class ClassB
-{
-    [SugarColumn(IsPrimaryKey = true)]
-    public string BId { get; set; }
-    public string AId { get; set; }
+    public async Task<int> CommitTransaction()
+    {
+        await _dbContext.Client.CommitTranAsync();
+        return 1;
+    }
 }

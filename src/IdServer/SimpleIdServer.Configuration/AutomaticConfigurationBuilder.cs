@@ -17,12 +17,10 @@ public class AutomaticConfigurationOptions
     }
 
     public IServiceCollection Services { get; set; }
-    public Type KeyValueConnectorType = null;
 
     public AutomaticConfigurationOptions UseEFConnector()
     {
-        Services.AddSingleton<IKeyValueConnector, EFKeyValueConnector>();
-        KeyValueConnectorType = typeof(EFKeyValueConnector);
+        Services.AddTransient<IKeyValueConnector, EFKeyValueConnector>();
         return this;
     }
 

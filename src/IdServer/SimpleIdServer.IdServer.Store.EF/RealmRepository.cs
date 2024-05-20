@@ -16,7 +16,8 @@ public class RealmRepository : IRealmRepository
         _dbContext= dbContext;
     }
 
-    public IQueryable<Realm> Query() => _dbContext.Realms;
+    public Task StartTransaction()
+        => Task.CompletedTask;
 
     public Task<List<Realm>> GetAll(CancellationToken cancellationToken)
         => _dbContext.Realms.ToListAsync(cancellationToken);
@@ -26,5 +27,6 @@ public class RealmRepository : IRealmRepository
 
     public void Add(Realm realm) =>_dbContext.Realms.Add(realm);
 
-    public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
+    public Task<int> CommitTransaction() 
+        => _dbContext.SaveChangesAsync();
 }

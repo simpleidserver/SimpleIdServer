@@ -16,8 +16,7 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddSingleton(options);
         var configurationBuilder = (IConfigurationBuilder)builder.Configuration;
         var provider = builder.Services.BuildServiceProvider();
-        var keyValueConnector = provider.GetRequiredService(options.KeyValueConnectorType) as IKeyValueConnector;
-        configurationBuilder.Add(new AutomaticConfigurationSource(options, keyValueConnector));
+        configurationBuilder.Add(new AutomaticConfigurationSource(options, provider));
         return builder;
     }
 }

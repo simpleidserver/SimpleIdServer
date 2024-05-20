@@ -74,6 +74,7 @@ public class RealmsController : BaseController
                 await CheckAccessToken(Constants.DefaultRealm, Constants.StandardScopes.Realms.Name);
                 var existingRealm = await _realmRepository.Get(request.Name, cancellationToken);
                 if (existingRealm != null) throw new OAuthException(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.RealmExists, request.Name));
+                await _realmRepository.StartTransaction();
                 var realm = new Realm { Name = request.Name, Description = request.Description, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow };
                 var users = await _userRepository.GetUsersBySubjects(Constants.RealmStandardUsers, Constants.DefaultRealm, cancellationToken);
                 var clients = await _clientRepository.GetAll(Constants.DefaultRealm, Constants.RealmStandardClients, cancellationToken);
@@ -101,7 +102,7 @@ public class RealmsController : BaseController
                 await _scopeRepository.SaveChanges(CancellationToken.None);
                 await _fileSerializedKeyStore.SaveChanges(CancellationToken.None);
                 await _authenticationContextClassReferenceRepository.SaveChanges(CancellationToken.None);
-                await _realmRepository.SaveChanges(CancellationToken.None);
+                await _realmRepository.CommitTransaction();
                 activity?.SetStatus(ActivityStatusCode.Ok, $"Realm {request.Name} is added");
                 return new ContentResult
                 {

@@ -9,8 +9,9 @@ namespace SimpleIdServer.IdServer.Stores;
 
 public interface IRealmRepository
 {
+    Task StartTransaction();
     Task<List<Realm>> GetAll(CancellationToken cancellationToken);
     Task<Realm> Get(string name, CancellationToken cancellationToken);
     void Add(Realm realm);
-    Task<int> SaveChanges(CancellationToken cancellationToken);
+    Task<int> CommitTransaction();
 }

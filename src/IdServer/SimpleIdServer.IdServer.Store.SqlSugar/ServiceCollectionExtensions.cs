@@ -13,6 +13,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<DbContext>();
         services.AddTransient<IRealmRepository, RealmRepository>();
         services.AddTransient<IApiResourceRepository, ApiResourceRepository>();
+        services.AddTransient<IAuditEventRepository, AuditEventRepository>();
+        services.AddTransient<ITransactionBuilder, SqlSugarTransactionBuilder>();
         return services;
     }
 }
