@@ -13,5 +13,5 @@ public interface IBCAuthorizeRepository
     Task<BCAuthorize> GetById(string id, CancellationToken cancellationToken);
     Task<List<BCAuthorize>> GetAllConfirmed(List<string> notificationModes, CancellationToken cancellationToken);
     void Add(BCAuthorize bcAuthorize);
-    Task<int> SaveChanges(CancellationToken cancellationToken);
+    void Update(BCAuthorize bcAuthorize);
 }

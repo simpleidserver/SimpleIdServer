@@ -28,6 +28,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IBCAuthorizeRepository _bcAuthorizeRepository;
         private readonly IBusControl _busControl;
         private readonly IDPOPProofValidator _dpopProofValidator;
+        private readonly ITransactionBuilder _transactionBuilder;
 
         public CIBAHandler(
             ILogger<CIBAHandler> logger,
@@ -39,7 +40,8 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IOptions<IdServerHostOptions> options,
             IBCAuthorizeRepository bcAuthorizeRepository,
             IBusControl busControl,
-            IDPOPProofValidator dpopProofValidator) : base(clientAuthenticationHelper, tokensProfiles, options)
+            IDPOPProofValidator dpopProofValidator,
+            ITransactionBuilder transactionBuilder) : base(clientAuthenticationHelper, tokensProfiles, options)
         {
             _logger = logger;
             _userRepository = userRepository;
@@ -48,6 +50,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             _bcAuthorizeRepository = bcAuthorizeRepository;
             _busControl = busControl;
             _dpopProofValidator = dpopProofValidator;
+            _transactionBuilder = transactionBuilder;
         }
 
         public const string GRANT_TYPE = "urn:openid:params:grant-type:ciba";
@@ -58,68 +61,72 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IEnumerable<string> scopeLst = new string[0];
             using (var activity = Tracing.IdServerActivitySource.StartActivity("Get Token"))
             {
-                try
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    activity?.SetTag("grant_type", GRANT_TYPE);
-                    activity?.SetTag("realm", context.Realm);
-                    var oauthClient = await AuthenticateClient(context, cancellationToken);
-                    context.SetClient(oauthClient);
-                    activity?.SetTag("client_id", oauthClient.ClientId);
-                    await _dpopProofValidator.Validate(context);
-                    var authRequest = await _cibaGrantTypeValidator.Validate(context, cancellationToken);
-                    scopeLst = authRequest.Scopes;
-                    activity?.SetTag("scopes", string.Join(",", authRequest.Scopes));
-                    var user = await _userRepository.GetById(authRequest.UserId, context.Realm, cancellationToken);
-                    context.SetUser(user, null);
-                    foreach (var tokenBuilder in _tokenBuilders)
-                        await tokenBuilder.Build(new BuildTokenParameter { Scopes = authRequest.Scopes, AuthorizationDetails = authRequest.AuthorizationDetails }, context, cancellationToken);
+                    try
+                    {
+                        activity?.SetTag("grant_type", GRANT_TYPE);
+                        activity?.SetTag("realm", context.Realm);
+                        var oauthClient = await AuthenticateClient(context, cancellationToken);
+                        context.SetClient(oauthClient);
+                        activity?.SetTag("client_id", oauthClient.ClientId);
+                        await _dpopProofValidator.Validate(context);
+                        var authRequest = await _cibaGrantTypeValidator.Validate(context, cancellationToken);
+                        scopeLst = authRequest.Scopes;
+                        activity?.SetTag("scopes", string.Join(",", authRequest.Scopes));
+                        var user = await _userRepository.GetById(authRequest.UserId, context.Realm, cancellationToken);
+                        context.SetUser(user, null);
+                        foreach (var tokenBuilder in _tokenBuilders)
+                            await tokenBuilder.Build(new BuildTokenParameter { Scopes = authRequest.Scopes, AuthorizationDetails = authRequest.AuthorizationDetails }, context, cancellationToken);
 
-                    AddTokenProfile(context);
-                    var result = BuildResult(context, authRequest.Scopes);
-                    foreach (var kvp in context.Response.Parameters)
-                        result.Add(kvp.Key, kvp.Value);
+                        AddTokenProfile(context);
+                        var result = BuildResult(context, authRequest.Scopes);
+                        foreach (var kvp in context.Response.Parameters)
+                            result.Add(kvp.Key, kvp.Value);
 
-                    authRequest.Send();
-                    await _busControl.Publish(new TokenIssuedSuccessEvent
+                        authRequest.Send();
+                        _bcAuthorizeRepository.Update(authRequest);
+                        await _busControl.Publish(new TokenIssuedSuccessEvent
+                        {
+                            GrantType = GRANT_TYPE,
+                            ClientId = context.Client.ClientId,
+                            Scopes = authRequest.Scopes,
+                            Realm = context.Realm
+                        });
+                        activity?.SetStatus(ActivityStatusCode.Ok, "Token has been issued");
+                        return new OkObjectResult(result);
+                    }
+                    catch (OAuthUnauthorizedException ex)
                     {
-                        GrantType = GRANT_TYPE,
-                        ClientId = context.Client.ClientId,
-                        Scopes = authRequest.Scopes,
-                        Realm = context.Realm
-                    });
-                    activity?.SetStatus(ActivityStatusCode.Ok, "Token has been issued");
-                    return new OkObjectResult(result);
-                }
-                catch (OAuthUnauthorizedException ex)
-                {
-                    await _busControl.Publish(new TokenIssuedFailureEvent
+                        await _busControl.Publish(new TokenIssuedFailureEvent
+                        {
+                            GrantType = GRANT_TYPE,
+                            ClientId = context.Client?.ClientId,
+                            Scopes = scopeLst,
+                            Realm = context.Realm,
+                            ErrorMessage = ex.Message
+                        });
+                        activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+                        return BuildError(HttpStatusCode.Unauthorized, ex.Code, ex.Message);
+                    }
+                    catch (OAuthException ex)
                     {
-                        GrantType = GRANT_TYPE,
-                        ClientId = context.Client?.ClientId,
-                        Scopes = scopeLst,
-                        Realm = context.Realm,
-                        ErrorMessage = ex.Message
-                    });
-                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                    return BuildError(HttpStatusCode.Unauthorized, ex.Code, ex.Message);
-                }
-                catch (OAuthException ex)
-                {
-                    await _busControl.Publish(new TokenIssuedFailureEvent
+                        await _busControl.Publish(new TokenIssuedFailureEvent
+                        {
+                            GrantType = GRANT_TYPE,
+                            ClientId = context.Client?.ClientId,
+                            Scopes = scopeLst,
+                            Realm = context.Realm,
+                            ErrorMessage = ex.Message
+                        });
+                        activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+                        _logger.LogError(ex.ToString());
+                        return BuildError(HttpStatusCode.BadRequest, ex.Code, ex.Message);
+                    }
+                    finally
                     {
-                        GrantType = GRANT_TYPE,
-                        ClientId = context.Client?.ClientId,
-                        Scopes = scopeLst,
-                        Realm = context.Realm,
-                        ErrorMessage = ex.Message
-                    });
-                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                    _logger.LogError(ex.ToString());
-                    return BuildError(HttpStatusCode.BadRequest, ex.Code, ex.Message);
-                }
-                finally
-                {
-                    await _bcAuthorizeRepository.SaveChanges(cancellationToken);
+                        await transaction.Commit(cancellationToken);
+                    }
                 }
             }
         }

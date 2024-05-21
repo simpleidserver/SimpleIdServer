@@ -9,7 +9,6 @@ namespace SimpleIdServer.IdServer.Stores;
 
 public interface IApiResourceRepository
 {
-    Task StartTransaction();
     Task<ApiResource> Get(string realm, string name, CancellationToken cancellationToken);
     Task<ApiResource> GetByName(string realm, string name, CancellationToken cancellationToken);
     Task<List<ApiResource>> GetByNames(string realm, List<string> names, CancellationToken cancellationToken);
@@ -18,5 +17,4 @@ public interface IApiResourceRepository
     Task<SearchResult<ApiResource>> Search(string realm, SearchRequest request, CancellationToken cancellationToken);
     void Add(ApiResource apiResource);
     void Delete(ApiResource apiResource);
-    Task<int> CommitTransaction();
 }

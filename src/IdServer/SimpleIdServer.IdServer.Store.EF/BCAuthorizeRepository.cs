@@ -32,5 +32,8 @@ public class BCAuthorizeRepository : IBCAuthorizeRepository
 
     public void Add(BCAuthorize bcAuthorize) => _dbContext.BCAuthorizeLst.Add(bcAuthorize);
 
-    public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
+    public void Update(BCAuthorize bcAuthorize)
+    {
+
+    }
 }

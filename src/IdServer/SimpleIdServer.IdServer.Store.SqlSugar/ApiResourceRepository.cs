@@ -17,9 +17,6 @@ public class ApiResourceRepository : IApiResourceRepository
         _dbContext = dbContext;
     }
 
-    public Task StartTransaction()
-        => _dbContext.Client.BeginTranAsync();
-
     public async Task<ApiResource> Get(string realm, string id, CancellationToken cancellationToken)
     {
         var result = await _dbContext.Client.Queryable<SugarApiResource>()
@@ -113,11 +110,5 @@ public class ApiResourceRepository : IApiResourceRepository
     public void Delete(ApiResource apiResource)
     {
         _dbContext.Client.Deleteable(apiResource).ExecuteCommand();
-    }
-
-    public async Task<int> CommitTransaction()
-    {
-        await _dbContext.Client.CommitTranAsync();
-        return 1;
     }
 }

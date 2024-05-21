@@ -18,9 +18,6 @@ public class ApiResourceRepository : IApiResourceRepository
         _dbContext = dbContext;
     }
 
-    public Task StartTransaction()
-        => Task.CompletedTask;
-
     public Task<ApiResource> Get(string realm, string id, CancellationToken cancellationToken)
     {
         var result = _dbContext.ApiResources
@@ -90,7 +87,4 @@ public class ApiResourceRepository : IApiResourceRepository
 
     public void Delete(ApiResource apiResource)
         => _dbContext.ApiResources.Remove(apiResource);
-
-    public Task<int> CommitTransaction()
-        => _dbContext.SaveChangesAsync();
 }

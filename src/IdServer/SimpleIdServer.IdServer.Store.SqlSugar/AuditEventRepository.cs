@@ -52,11 +52,6 @@ internal class AuditEventRepository : IAuditEventRepository
         return result;
     }
 
-    public Task<int> SaveChanges(CancellationToken cancellationToken)
-    {
-        return Task.FromResult(1);
-    }
-
     public  async Task<SearchResult<AuditEvent>> Search(string realm, SearchAuditingRequest request, CancellationToken cancellationToken)
     {
         var query = _dbContext.Client.Queryable<SugarAuditEvent>()

@@ -15,5 +15,4 @@ public interface IAuditEventRepository
     Task<int> NbValidAuthentications(string realm, DateTime startDateTime, CancellationToken cancellationToken);
     Task<int> NbInvalidAuthentications(string realm, DateTime startDateTime, CancellationToken cancellationToken);
     void Add(AuditEvent auditEvt);
-    Task<int> SaveChanges(CancellationToken cancellationToken);
 }

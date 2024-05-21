@@ -54,9 +54,4 @@ public class AuditEventRepository : IAuditEventRepository
     {
         _dbContext.AuditEvents.Add(auditEvt);
     }
-
-    public Task<int> SaveChanges(CancellationToken cancellationToken)
-    {
-        return _dbContext.SaveChangesAsync(cancellationToken);
-    }
 }

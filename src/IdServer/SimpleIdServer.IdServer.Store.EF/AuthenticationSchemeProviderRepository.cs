@@ -58,6 +58,4 @@ public class AuthenticationSchemeProviderRepository : IAuthenticationSchemeProvi
     }
 
     public void Remove(AuthenticationSchemeProvider idProvider) => _dbContext.AuthenticationSchemeProviders.Remove(idProvider);
-
-    public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
 }

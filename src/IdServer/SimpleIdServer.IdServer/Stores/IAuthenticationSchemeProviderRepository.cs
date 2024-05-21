@@ -14,5 +14,5 @@ public interface IAuthenticationSchemeProviderRepository
     Task<AuthenticationSchemeProvider> Get(string realm, string name, CancellationToken cancellationToken);
     Task<SearchResult<AuthenticationSchemeProvider>> Search(string realm, SearchRequest request, CancellationToken cancellationToken);
     void Remove(AuthenticationSchemeProvider idProvider);
-    Task<int> SaveChanges(CancellationToken cancellationToken);
+    void Update(AuthenticationSchemeProvider idProvider);
 }

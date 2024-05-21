@@ -18,14 +18,17 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
     {
         private readonly IBCAuthorizeRepository _bcAuthorizeRepository;
         private readonly IRecurringJobManager _recurringJobManager;
+        private readonly ITransactionBuilder _transactionBuilder;
 
         public BCCallbackController(ITokenRepository tokenRepository,
             IJwtBuilder jwtBuilder, 
             IBCAuthorizeRepository bCAuthorizeRepository, 
-            IRecurringJobManager recurringJobManager) : base(tokenRepository, jwtBuilder)
+            IRecurringJobManager recurringJobManager,
+            ITransactionBuilder transactionBuilder) : base(tokenRepository, jwtBuilder)
         {
             _bcAuthorizeRepository = bCAuthorizeRepository;
             _recurringJobManager = recurringJobManager;
+            _transactionBuilder = transactionBuilder;
         }
 
         [HttpPost]
@@ -33,24 +36,28 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
         {
             try
             {
-                prefix = prefix ?? Constants.DefaultRealm;
-                var bcAuthorize = await _bcAuthorizeRepository.GetById(parameter.AuthReqId, cancellationToken);
-                if (bcAuthorize == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownBcAuthorize, parameter.AuthReqId));
-                if (!bcAuthorize.IsActive) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.ExpiredBcAuthorize);
-                if (bcAuthorize.LastStatus != Domains.BCAuthorizeStatus.Pending) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.BcAuthorizeNotPending);
-                switch (parameter.ActionEnum)
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    case BCCallbackActions.CONFIRM:
-                        bcAuthorize.Confirm();
-                        break;
-                    case BCCallbackActions.REJECT:
-                        bcAuthorize.Reject();
-                        break;
-                }
+                    prefix = prefix ?? Constants.DefaultRealm;
+                    var bcAuthorize = await _bcAuthorizeRepository.GetById(parameter.AuthReqId, cancellationToken);
+                    if (bcAuthorize == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownBcAuthorize, parameter.AuthReqId));
+                    if (!bcAuthorize.IsActive) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.ExpiredBcAuthorize);
+                    if (bcAuthorize.LastStatus != Domains.BCAuthorizeStatus.Pending) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.BcAuthorizeNotPending);
+                    switch (parameter.ActionEnum)
+                    {
+                        case BCCallbackActions.CONFIRM:
+                            bcAuthorize.Confirm();
+                            break;
+                        case BCCallbackActions.REJECT:
+                            bcAuthorize.Reject();
+                            break;
+                    }
 
-                await _bcAuthorizeRepository.SaveChanges(cancellationToken);
-                _recurringJobManager.Trigger(nameof(BCNotificationJob));
-                return new NoContentResult();
+                    _bcAuthorizeRepository.Update(bcAuthorize);
+                    await transaction.Commit(cancellationToken);
+                    _recurringJobManager.Trigger(nameof(BCNotificationJob));
+                    return new NoContentResult();
+                }
             }
             catch (OAuthException ex)
             {

@@ -18,6 +18,4 @@ public class ClaimProviderRepository : IClaimProviderRepository
 
     public Task<List<ClaimProvider>> GetAll(CancellationToken cancellationToken)
         => _dbContext.ClaimProviders.ToListAsync(cancellationToken);
-
-    public IQueryable<ClaimProvider> Query() => _dbContext.ClaimProviders;
 }

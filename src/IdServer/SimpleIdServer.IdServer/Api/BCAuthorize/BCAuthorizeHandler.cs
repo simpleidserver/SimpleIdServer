@@ -31,73 +31,79 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
         private readonly IBCNotificationService _bcNotificationService;
         private readonly IBCAuthorizeRepository _bcAuthorizeRepository;
         private readonly IAmrHelper _amrHelper;
+        private readonly ITransactionBuilder _transactionBuilder;
 
         public BCAuthorizeHandler(
             IClientAuthenticationHelper clientAuthenticationHelper,
             IBCAuthorizeRequestValidator bcAuthorizeRequestValidator,
             IBCNotificationService bcNotificationService,
             IBCAuthorizeRepository bcAuthorizeRepository,
-            IAmrHelper amrHelper)
+            IAmrHelper amrHelper,
+            ITransactionBuilder transactionBuilder)
         {
             _clientAuthenticationHelper = clientAuthenticationHelper;
             _bcAuthorizeRequestValidator = bcAuthorizeRequestValidator;
             _bcNotificationService = bcNotificationService;
             _bcAuthorizeRepository = bcAuthorizeRepository;
             _amrHelper = amrHelper;
+            _transactionBuilder = transactionBuilder;
         }
 
         public async Task<IActionResult> Create(HandlerContext context, CancellationToken cancellationToken)
         {
             try
             {
-                Client oauthClient = await _clientAuthenticationHelper.AuthenticateClient(context.Realm, context.Request.HttpHeader, context.Request.RequestData, context.Request.Certificate, context.GetIssuer(), cancellationToken, ErrorCodes.INVALID_REQUEST);
-                context.SetClient(oauthClient);
-                var user = await _bcAuthorizeRequestValidator.ValidateCreate(context, cancellationToken);
-                context.SetUser(user, null);
-                var requestedExpiry = context.Request.RequestData.GetRequestedExpiry() ?? context.Client.AuthReqIdExpirationTimeInSeconds;
-                var currentDateTime = DateTime.UtcNow;
-                var openidClient = oauthClient;
-                var interval = oauthClient.BCIntervalSeconds;
-                var bcAuthorize = Domains.BCAuthorize.Create(
-                    currentDateTime.AddSeconds(requestedExpiry),
-                    oauthClient.ClientId,
-                    interval,
-                    openidClient.BCClientNotificationEndpoint,
-                    openidClient.BCTokenDeliveryMode,
-                    context.Request.RequestData.GetScopesFromAuthorizationRequest(),
-                    context.Request.RequestData.GetAuthorizationDetailsFromAuthorizationRequest(),
-                    context.User.Id,
-                    context.Request.RequestData.GetClientNotificationToken(),
-                    context.Realm);
-                bcAuthorize.IncrementNextFetchTime();
-                _bcAuthorizeRepository.Add(bcAuthorize);
-                await _bcAuthorizeRepository.SaveChanges(cancellationToken);
+                using (var transaction = _transactionBuilder.Build())
+                {
+                    Client oauthClient = await _clientAuthenticationHelper.AuthenticateClient(context.Realm, context.Request.HttpHeader, context.Request.RequestData, context.Request.Certificate, context.GetIssuer(), cancellationToken, ErrorCodes.INVALID_REQUEST);
+                    context.SetClient(oauthClient);
+                    var user = await _bcAuthorizeRequestValidator.ValidateCreate(context, cancellationToken);
+                    context.SetUser(user, null);
+                    var requestedExpiry = context.Request.RequestData.GetRequestedExpiry() ?? context.Client.AuthReqIdExpirationTimeInSeconds;
+                    var currentDateTime = DateTime.UtcNow;
+                    var openidClient = oauthClient;
+                    var interval = oauthClient.BCIntervalSeconds;
+                    var bcAuthorize = Domains.BCAuthorize.Create(
+                        currentDateTime.AddSeconds(requestedExpiry),
+                        oauthClient.ClientId,
+                        interval,
+                        openidClient.BCClientNotificationEndpoint,
+                        openidClient.BCTokenDeliveryMode,
+                        context.Request.RequestData.GetScopesFromAuthorizationRequest(),
+                        context.Request.RequestData.GetAuthorizationDetailsFromAuthorizationRequest(),
+                        context.User.Id,
+                        context.Request.RequestData.GetClientNotificationToken(),
+                        context.Realm);
+                    bcAuthorize.IncrementNextFetchTime();
+                    _bcAuthorizeRepository.Add(bcAuthorize);
+                    await transaction.Commit(cancellationToken);
 
-                var bindingMessage = context.Request.RequestData.GetBindingMessage();
-                var acrLst = context.Request.RequestData.GetAcrValuesFromAuthorizationRequest();
-                var acr = await _amrHelper.FetchDefaultAcr(context.Realm, acrLst, new List<AuthorizedClaim>(), context.Client, cancellationToken);
-                var amr = acr.AuthenticationMethodReferences.First();
-                await _bcNotificationService.Notify(context, new BCNotificationMessage 
-                { 
-                    ClientId = context.Client.ClientId, 
-                    AuthReqId = bcAuthorize.Id, 
-                    BindingMessage = bindingMessage, 
-                    Scopes = bcAuthorize.Scopes,
-                    AcrLst = acrLst,
-                    Amr = amr,
-                    AuthorizationDetails = bcAuthorize.AuthorizationDetails
-                }, cancellationToken);
+                    var bindingMessage = context.Request.RequestData.GetBindingMessage();
+                    var acrLst = context.Request.RequestData.GetAcrValuesFromAuthorizationRequest();
+                    var acr = await _amrHelper.FetchDefaultAcr(context.Realm, acrLst, new List<AuthorizedClaim>(), context.Client, cancellationToken);
+                    var amr = acr.AuthenticationMethodReferences.First();
+                    await _bcNotificationService.Notify(context, new BCNotificationMessage
+                    {
+                        ClientId = context.Client.ClientId,
+                        AuthReqId = bcAuthorize.Id,
+                        BindingMessage = bindingMessage,
+                        Scopes = bcAuthorize.Scopes,
+                        AcrLst = acrLst,
+                        Amr = amr,
+                        AuthorizationDetails = bcAuthorize.AuthorizationDetails
+                    }, cancellationToken);
 
-                var res = new JsonObject
+                    var res = new JsonObject
                 {
                     { BCAuthenticationResponseParameters.AuthReqId, bcAuthorize.Id },
                     { BCAuthenticationResponseParameters.ExpiresIn, requestedExpiry },
                 };
-                if (oauthClient.BCTokenDeliveryMode == StandardNotificationModes.Ping ||
-                    oauthClient.BCTokenDeliveryMode == StandardNotificationModes.Poll)
-                    res.Add(BCAuthenticationResponseParameters.Interval, interval);
+                    if (oauthClient.BCTokenDeliveryMode == StandardNotificationModes.Ping ||
+                        oauthClient.BCTokenDeliveryMode == StandardNotificationModes.Poll)
+                        res.Add(BCAuthenticationResponseParameters.Interval, interval);
 
-                return new OkObjectResult(res);
+                    return new OkObjectResult(res);
+                }
             }
             catch (OAuthUnauthorizedException ex)
             {
