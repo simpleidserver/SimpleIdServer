@@ -33,6 +33,7 @@ namespace SimpleIdServer.IdServer.Api.Register
         private readonly IRegisterClientRequestValidator _validator;
         private readonly IRealmRepository _realmRepository;
         private readonly IBusControl _busControl;
+        private readonly ITransactionBuilder _transactionBuilder;
         private readonly IdServerHostOptions _options;
 
         public RegistrationController(
@@ -40,7 +41,8 @@ namespace SimpleIdServer.IdServer.Api.Register
             IScopeRepository scopeRepository, 
             IRegisterClientRequestValidator validator, 
             IRealmRepository realmRepository, 
-            IBusControl busControl, 
+            IBusControl busControl,
+            ITransactionBuilder transactionBuilder,
             ITokenRepository tokenRepository,
             IJwtBuilder jwtBuilder, 
             IOptions<IdServerHostOptions> options) : base(tokenRepository, jwtBuilder)
@@ -50,6 +52,7 @@ namespace SimpleIdServer.IdServer.Api.Register
             _validator = validator;
             _realmRepository = realmRepository;
             _busControl = busControl;
+            _transactionBuilder = transactionBuilder;
             _options = options.Value;
         }
 
@@ -70,23 +73,26 @@ namespace SimpleIdServer.IdServer.Api.Register
             {
                 try
                 {
-                    await CheckAccessToken(prefix, Constants.StandardScopes.Register.Name);
-                    var client = await Build(request, cancellationToken);
-                    await _validator.Validate(prefix, client, cancellationToken);
-                    _clientRepository.Add(client);
-                    await _clientRepository.SaveChanges(cancellationToken);
-                    activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Ok, "Client is registered");
-                    await _busControl.Publish(new ClientRegisteredSuccessEvent
+                    using (var transaction = _transactionBuilder.Build())
                     {
-                        Realm = prefix,
-                        RequestJSON = JsonSerializer.Serialize(request)
-                    });
-                    return new ContentResult
-                    {
-                        StatusCode = (int)HttpStatusCode.Created,
-                        Content = client.Serialize(Request.GetAbsoluteUriWithVirtualPath()).ToJsonString(),
-                        ContentType = "application/json"
-                    };
+                        await CheckAccessToken(prefix, Constants.StandardScopes.Register.Name);
+                        var client = await Build(request, cancellationToken);
+                        await _validator.Validate(prefix, client, cancellationToken);
+                        _clientRepository.Add(client);
+                        await transaction.Commit(cancellationToken);
+                        activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Ok, "Client is registered");
+                        await _busControl.Publish(new ClientRegisteredSuccessEvent
+                        {
+                            Realm = prefix,
+                            RequestJSON = JsonSerializer.Serialize(request)
+                        });
+                        return new ContentResult
+                        {
+                            StatusCode = (int)HttpStatusCode.Created,
+                            Content = client.Serialize(Request.GetAbsoluteUriWithVirtualPath()).ToJsonString(),
+                            ContentType = "application/json"
+                        };
+                    }
                 }
                 catch (OAuthException ex)
                 {
@@ -181,13 +187,16 @@ namespace SimpleIdServer.IdServer.Api.Register
         [ProducesResponseType(404)]
         public async Task<IActionResult> Delete([FromRoute] string prefix, string id, CancellationToken cancellationToken)
         {
-            prefix = prefix ?? Constants.DefaultRealm;
-            var res = await GetClient(prefix, id, cancellationToken);
-            if (res.HasError) return res.ErrorResult;
-            var client = res.Client;
-            _clientRepository.Delete(client);
-            await _clientRepository.SaveChanges(cancellationToken);
-            return NoContent();
+            using (var transaction = _transactionBuilder.Build())
+            {
+                prefix = prefix ?? Constants.DefaultRealm;
+                var res = await GetClient(prefix, id, cancellationToken);
+                if (res.HasError) return res.ErrorResult;
+                var client = res.Client;
+                _clientRepository.Delete(client);
+                await transaction.Commit(cancellationToken);
+                return NoContent();
+            }
         }
 
         /// <summary>
@@ -209,11 +218,15 @@ namespace SimpleIdServer.IdServer.Api.Register
             if (res.HasError) return res.ErrorResult;
             try
             {
-                res.Client.Scopes = await GetScopes(prefix, request.Scope, cancellationToken);
-                request.Apply(res.Client, _options);
-                await _validator.Validate(prefix, res.Client, cancellationToken);
-                await _clientRepository.SaveChanges(cancellationToken);
-                return new OkObjectResult(res.Client.Serialize(Request.GetAbsoluteUriWithVirtualPath()));
+                using (var transaction = _transactionBuilder.Build())
+                {
+                    res.Client.Scopes = await GetScopes(prefix, request.Scope, cancellationToken);
+                    request.Apply(res.Client, _options);
+                    await _validator.Validate(prefix, res.Client, cancellationToken);
+                    _clientRepository.Update(res.Client);
+                    await transaction.Commit(cancellationToken);
+                    return new OkObjectResult(res.Client.Serialize(Request.GetAbsoluteUriWithVirtualPath()));
+                }
             }
             catch (OAuthException ex)
             {

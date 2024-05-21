@@ -18,7 +18,8 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IAuthenticationSchemeProviderRepository, AuthenticationSchemeProviderRepository>();
         services.AddTransient<IBCAuthorizeRepository, BCAuthorizeRepository>();
         services.AddTransient<IClaimProviderRepository, ClaimProviderRepository>();
-
+        services.AddTransient<ICertificateAuthorityRepository, CertificateAuthorityRepository>();
+        services.AddTransient<IClientRepository, ClientRepository>();
         services.AddTransient<ITransactionBuilder, SqlSugarTransactionBuilder>();
         return services;
     }

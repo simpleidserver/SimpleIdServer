@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Stores;
@@ -108,5 +107,8 @@ public class ClientRepository : IClientRepository
 
     public void Add(Client client) => _dbContext.Clients.Add(client);
 
-    public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
+    public void Update(Client client)
+    {
+
+    }
 }

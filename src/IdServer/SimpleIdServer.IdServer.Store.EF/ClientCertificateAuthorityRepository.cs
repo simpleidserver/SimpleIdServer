@@ -60,6 +60,8 @@ public class CertificateAuthorityRepository : ICertificateAuthorityRepository
     public void Delete(CertificateAuthority certificateAuthority)
         => _dbContext.CertificateAuthorities.Remove(certificateAuthority);
 
-    public Task<int> SaveChanges(CancellationToken cancellationToken)
-        => _dbContext.SaveChangesAsync(cancellationToken);
+    public void Update(CertificateAuthority certificateAuthority)
+    {
+
+    }
 }

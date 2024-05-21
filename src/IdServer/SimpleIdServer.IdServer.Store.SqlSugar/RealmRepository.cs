@@ -16,9 +16,6 @@ public class RealmRepository : IRealmRepository
         _dbContext = dbContext;
     }
 
-    public Task StartTransaction()
-        => _dbContext.Client.BeginTranAsync();
-
     public async Task<List<Realm>> GetAll(CancellationToken cancellationToken)
     {
         var result = await _dbContext.Client.Queryable<SugarRealm>().ToListAsync(cancellationToken);
@@ -40,10 +37,4 @@ public class RealmRepository : IRealmRepository
             Description = realm.Description,
             RealmsName = realm.Name
         }).ExecuteCommand();
-
-    public Task<int> CommitTransaction()
-    {
-        _dbContext.Client.CommitTran();
-        return Task.FromResult(1);
-    }
 }

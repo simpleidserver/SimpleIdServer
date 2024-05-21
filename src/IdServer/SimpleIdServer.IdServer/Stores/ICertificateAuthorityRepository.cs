@@ -13,5 +13,5 @@ public interface ICertificateAuthorityRepository
     Task<SearchResult<CertificateAuthority>> Search(string realm, SearchRequest request, CancellationToken cancellationToken);
     void Add(CertificateAuthority certificateAuthority);
     void Delete(CertificateAuthority certificateAuthority);
-    Task<int> SaveChanges(CancellationToken cancellationToken);
+    void Update(CertificateAuthority certificateAuthority);
 }

@@ -19,7 +19,7 @@ namespace SimpleIdServer.IdServer.Stores
         Task<int> NbClients(string realm, CancellationToken cancellationToken);
         void Delete(Client client);
         void Add(Client client);
+        void Update(Client client);
         void DeleteRange(IEnumerable<Client> clients);
-        Task<int> SaveChanges(CancellationToken cancellationToken);
     }
 }
