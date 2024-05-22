@@ -23,6 +23,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
         private readonly IGroupRepository _groupRepository;
         private readonly IScopeRepository _scopeRepository;
         private readonly IRealmRepository _realmRepository;
+        private readonly ITransactionBuilder _transactionBuilder;
         private readonly ILogger<GroupsController> _logger;
 
         public GroupsController(
@@ -30,12 +31,14 @@ namespace SimpleIdServer.IdServer.Api.Groups
             IScopeRepository scopeRepository,
             IRealmRepository realmRepository,
             ITokenRepository tokenRepository,
+            ITransactionBuilder transactionBuilder,
             IJwtBuilder jwtBuilder, 
             ILogger<GroupsController> logger) : base(tokenRepository, jwtBuilder)
         {
             _groupRepository = groupRepository;
             _scopeRepository = scopeRepository;
             _realmRepository = realmRepository;
+            _transactionBuilder = transactionBuilder;
             _logger = logger;
         }
 
@@ -143,41 +146,44 @@ namespace SimpleIdServer.IdServer.Api.Groups
             {
                 try
                 {
-                    activity?.SetTag("realm", prefix);
-                    await CheckAccessToken(prefix, Constants.StandardScopes.Groups.Name);
-                    var fullPath = request.Name;
-                    if (!string.IsNullOrWhiteSpace(request.ParentGroupId))
+                    using (var transaction = _transactionBuilder.Build())
                     {
-                        var parent = await _groupRepository.Get(prefix, request.ParentGroupId, cancellationToken);
-                        fullPath = $"{parent.FullPath}.{request.Name}";
-                    }
+                        activity?.SetTag("realm", prefix);
+                        await CheckAccessToken(prefix, Constants.StandardScopes.Groups.Name);
+                        var fullPath = request.Name;
+                        if (!string.IsNullOrWhiteSpace(request.ParentGroupId))
+                        {
+                            var parent = await _groupRepository.Get(prefix, request.ParentGroupId, cancellationToken);
+                            fullPath = $"{parent.FullPath}.{request.Name}";
+                        }
 
-                    var existingGroup = await _groupRepository.GetByStrictFullPath(prefix, fullPath, cancellationToken);
-                    if (existingGroup != null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.GroupExists, fullPath));
-                    var grp = new Group
-                    {
-                        Id = Guid.NewGuid().ToString(),
-                        Name = request.Name,
-                        FullPath = fullPath,
-                        ParentGroupId = request.ParentGroupId,
-                        Description = request.Description,
-                        CreateDateTime = DateTime.UtcNow,
-                        UpdateDateTime = DateTime.UtcNow
-                    };
-                    grp.Realms.Add(new GroupRealm
-                    {
-                        RealmsName = prefix,
-                        GroupsId = grp.Id
-                    });
-                    _groupRepository.Add(grp);
-                    await _groupRepository.SaveChanges(CancellationToken.None);
-                    activity?.SetStatus(ActivityStatusCode.Ok, $"Group {fullPath} is added");
-                    return new ContentResult
-                    {
-                        StatusCode = (int)HttpStatusCode.Created,
-                        Content = JsonSerializer.Serialize(grp).ToString(),
-                        ContentType = "application/json"
-                    };
+                        var existingGroup = await _groupRepository.GetByStrictFullPath(prefix, fullPath, cancellationToken);
+                        if (existingGroup != null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.GroupExists, fullPath));
+                        var grp = new Group
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            Name = request.Name,
+                            FullPath = fullPath,
+                            ParentGroupId = request.ParentGroupId,
+                            Description = request.Description,
+                            CreateDateTime = DateTime.UtcNow,
+                            UpdateDateTime = DateTime.UtcNow
+                        };
+                        grp.Realms.Add(new GroupRealm
+                        {
+                            RealmsName = prefix,
+                            GroupsId = grp.Id
+                        });
+                        _groupRepository.Add(grp);
+                        await transaction.Commit(cancellationToken);
+                        activity?.SetStatus(ActivityStatusCode.Ok, $"Group {fullPath} is added");
+                        return new ContentResult
+                        {
+                            StatusCode = (int)HttpStatusCode.Created,
+                            Content = JsonSerializer.Serialize(grp).ToString(),
+                            ContentType = "application/json"
+                        };
+                    }
                 }
                 catch (OAuthException ex)
                 {

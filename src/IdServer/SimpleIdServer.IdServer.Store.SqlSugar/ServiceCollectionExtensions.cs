@@ -20,6 +20,10 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IClaimProviderRepository, ClaimProviderRepository>();
         services.AddTransient<ICertificateAuthorityRepository, CertificateAuthorityRepository>();
         services.AddTransient<IClientRepository, ClientRepository>();
+        services.AddTransient<IConfigurationDefinitionStore, ConfigurationDefinitionStore>();
+        services.AddTransient<IDeviceAuthCodeRepository, DeviceAuthCodeRepository>();
+        services.AddTransient<IGotiySessionStore, GotiySessionStore>();
+        services.AddTransient<IGrantRepository, GrantRepository>();
         services.AddTransient<ITransactionBuilder, SqlSugarTransactionBuilder>();
         return services;
     }

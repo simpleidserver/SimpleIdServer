@@ -15,8 +15,6 @@ public class DeviceAuthCodeRepository : IDeviceAuthCodeRepository
         _dbContext = dbContext;
     }
 
-    public IQueryable<DeviceAuthCode> Query() => _dbContext.DeviceAuthCodes;
-
     public Task<DeviceAuthCode> GetByDeviceCode(string deviceCode, CancellationToken cancellationToken)
     {
         return _dbContext.DeviceAuthCodes.SingleOrDefaultAsync(d => d.DeviceCode == deviceCode, cancellationToken);
@@ -32,4 +30,8 @@ public class DeviceAuthCodeRepository : IDeviceAuthCodeRepository
     public void Add(DeviceAuthCode deviceAuthCode) => _dbContext.DeviceAuthCodes.Add(deviceAuthCode);
 
     public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
+
+    public void Update(DeviceAuthCode deviceAuthCode)
+    {
+    }
 }

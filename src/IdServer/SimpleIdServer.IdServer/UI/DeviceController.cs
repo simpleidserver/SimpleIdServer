@@ -18,12 +18,18 @@ namespace SimpleIdServer.IdServer.UI
     public class DeviceController : Controller
     {
         private readonly IDeviceAuthCodeRepository _deviceAuthCodeRepository;
+        private readonly ITransactionBuilder _transactionBuilder;
         private readonly IClientRepository _clientRepository;
         private readonly IBusControl _busControl;
 
-        public DeviceController(IDeviceAuthCodeRepository deviceAuthCodeRepository, IClientRepository clientRepository, IBusControl busControl)
+        public DeviceController(
+            IDeviceAuthCodeRepository deviceAuthCodeRepository,
+            ITransactionBuilder transactionBuilder,
+            IClientRepository clientRepository, 
+            IBusControl busControl)
         {
             _deviceAuthCodeRepository = deviceAuthCodeRepository;
+            _transactionBuilder = transactionBuilder;
             _clientRepository = clientRepository;
             _busControl = busControl;
         }
@@ -44,34 +50,38 @@ namespace SimpleIdServer.IdServer.UI
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index([FromRoute] string prefix, ConfirmDeviceCodeViewModel viewModel, CancellationToken cancellationToken)
         {
-            var deviceAuthCode = await _deviceAuthCodeRepository.GetByUserCode(viewModel.UserCode, cancellationToken);
-            if (deviceAuthCode == null)
+            using (var transaction = _transactionBuilder.Build())
             {
-                ModelState.AddModelError("unknown_user_code", "unknown_user_code");
-                return View(new DeviceCodeViewModel
+                var deviceAuthCode = await _deviceAuthCodeRepository.GetByUserCode(viewModel.UserCode, cancellationToken);
+                if (deviceAuthCode == null)
                 {
-                    UserCode = viewModel.UserCode
-                });
-            }
+                    ModelState.AddModelError("unknown_user_code", "unknown_user_code");
+                    return View(new DeviceCodeViewModel
+                    {
+                        UserCode = viewModel.UserCode
+                    });
+                }
 
-            if (deviceAuthCode.Status != Domains.DeviceAuthCodeStatus.PENDING)
-            {
-                ModelState.AddModelError("not_pending_auth_device_code", "not_pending_auth_device_code");
-                return View(BuildViewModel(viewModel.UserCode, deviceAuthCode));
-            }
+                if (deviceAuthCode.Status != Domains.DeviceAuthCodeStatus.PENDING)
+                {
+                    ModelState.AddModelError("not_pending_auth_device_code", "not_pending_auth_device_code");
+                    return View(BuildViewModel(viewModel.UserCode, deviceAuthCode));
+                }
 
-            if (deviceAuthCode.ExpirationDateTime <= DateTime.UtcNow)
-            {
-                ModelState.AddModelError("auth_device_code_expired", "auth_device_code_expired");
-                return View(BuildViewModel(viewModel.UserCode, deviceAuthCode));
-            }
+                if (deviceAuthCode.ExpirationDateTime <= DateTime.UtcNow)
+                {
+                    ModelState.AddModelError("auth_device_code_expired", "auth_device_code_expired");
+                    return View(BuildViewModel(viewModel.UserCode, deviceAuthCode));
+                }
 
-            var nameIdentifier = GetNameIdentifier();
-            deviceAuthCode.Accept(nameIdentifier);
-            await _deviceAuthCodeRepository.SaveChanges(cancellationToken);
-            var result = BuildViewModel(viewModel.UserCode, deviceAuthCode);
-            result.IsConfirmed = true;
-            return View(result);
+                var nameIdentifier = GetNameIdentifier();
+                deviceAuthCode.Accept(nameIdentifier);
+                _deviceAuthCodeRepository.Update(deviceAuthCode);
+                await transaction.Commit(cancellationToken);
+                var result = BuildViewModel(viewModel.UserCode, deviceAuthCode);
+                result.IsConfirmed = true;
+                return View(result);
+            }
         }
 
         private static DeviceCodeViewModel BuildViewModel(string userCode, DeviceAuthCode deviceAuthCode)

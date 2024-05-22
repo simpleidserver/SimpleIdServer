@@ -10,5 +10,4 @@ public interface IGotiySessionStore
 {
     void Add(GotifySession session);
     Task<GotifySession> GetByClientToken(string clientToken, CancellationToken cancellationToken);
-    Task<int> SaveChanges(CancellationToken cancellationToken);
 }

@@ -21,9 +21,5 @@ public class GrantRepository : IGrantRepository
             .Include(g => g.User)
             .SingleOrDefaultAsync(g => g.Id == id, cancellation);
 
-    public IQueryable<Consent> Query() => _dbContext.Grants;
-
     public void Remove(Consent consent) => _dbContext.Grants.Remove(consent);
-
-    public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
 }

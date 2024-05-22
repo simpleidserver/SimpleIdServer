@@ -19,16 +19,19 @@ namespace SimpleIdServer.IdServer.Api.Grants
         private readonly ITokenRepository _tokenRepository;
         private readonly IGrantRepository _grantRepository;
         private readonly IGrantedTokenHelper _grantedTokenHelper;
+        private readonly ITransactionBuilder _transactionBuilder;
 
         public GrantsController(
             ITokenRepository tokenRepository,
             IGrantRepository grantRepository, 
             IGrantedTokenHelper grantedTokenHelper,
+            ITransactionBuilder transactionBuilder,
             IJwtBuilder jwtBuilder) : base(tokenRepository, jwtBuilder)
         {
             _tokenRepository = tokenRepository;
             _grantRepository = grantRepository;
             _grantedTokenHelper = grantedTokenHelper;
+            _transactionBuilder = transactionBuilder;
         }
 
         [HttpGet]
@@ -43,9 +46,9 @@ namespace SimpleIdServer.IdServer.Api.Grants
                 var token = await _grantedTokenHelper.GetAccessToken(bearerToken, cancellationToken);
                 if (token == null) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, Global.UnknownAccessToken);
                 var scopes = token.Claims.Where(c => c.Type == "scope").Select(c => c.Value).ToList();
-                if(!scopes.Contains(Constants.StandardScopes.GrantManagementQuery.Name)) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, Global.InvalidAccessTokenScope);
+                if (!scopes.Contains(Constants.StandardScopes.GrantManagementQuery.Name)) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, Global.InvalidAccessTokenScope);
                 var clientId = token.Claims.FirstOrDefault(c => c.Type == OpenIdConnectParameterNames.ClientId)?.Value;
-                if(grant.ClientId != clientId) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, string.Format(Global.UnauthorizedClientAccessGrant, clientId));
+                if (grant.ClientId != clientId) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, string.Format(Global.UnauthorizedClientAccessGrant, clientId));
                 return new OkObjectResult(grant);
             }
             catch (OAuthException ex)
@@ -59,22 +62,25 @@ namespace SimpleIdServer.IdServer.Api.Grants
         {
             try
             {
-                var bearerToken = ExtractBearerToken();
-                var grant = await _grantRepository.Get(id, cancellationToken);
-                if (grant == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_TARGET, string.Format(Global.UnknownAuthMethods, id));
-                var token = await _grantedTokenHelper.GetAccessToken(bearerToken, cancellationToken);
-                if (token == null) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, Global.UnknownAccessToken);
-                var scopes = token.Claims.Where(c => c.Type == "scope").Select(c => c.Value).ToList();
-                if (!scopes.Contains(Constants.StandardScopes.GrantManagementRevoke.Name)) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, Global.InvalidAccessTokenScope);
-                var clientId = token.Claims.FirstOrDefault(c => c.Type == OpenIdConnectParameterNames.ClientId)?.Value;
-                if (grant.ClientId != clientId) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, string.Format(Global.UnauthorizedClientAccessGrant, clientId));
-                _grantRepository.Remove(grant);
-                var tokens = await _tokenRepository.GetByGrantId(id, cancellationToken);
-                foreach (var t in tokens)
-                    _tokenRepository.Remove(t);
-                await _tokenRepository.SaveChanges(cancellationToken);
-                await _grantRepository.SaveChanges(cancellationToken);
-                return new NoContentResult();
+                using (var transaction = _transactionBuilder.Build())
+                {
+                    var bearerToken = ExtractBearerToken();
+                    var grant = await _grantRepository.Get(id, cancellationToken);
+                    if (grant == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_TARGET, string.Format(Global.UnknownAuthMethods, id));
+                    var token = await _grantedTokenHelper.GetAccessToken(bearerToken, cancellationToken);
+                    if (token == null) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, Global.UnknownAccessToken);
+                    var scopes = token.Claims.Where(c => c.Type == "scope").Select(c => c.Value).ToList();
+                    if (!scopes.Contains(Constants.StandardScopes.GrantManagementRevoke.Name)) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, Global.InvalidAccessTokenScope);
+                    var clientId = token.Claims.FirstOrDefault(c => c.Type == OpenIdConnectParameterNames.ClientId)?.Value;
+                    if (grant.ClientId != clientId) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, string.Format(Global.UnauthorizedClientAccessGrant, clientId));
+                    _grantRepository.Remove(grant);
+                    var tokens = await _tokenRepository.GetByGrantId(id, cancellationToken);
+                    foreach (var t in tokens)
+                        _tokenRepository.Remove(t);
+                    await _tokenRepository.SaveChanges(cancellationToken);
+                    await transaction.Commit(cancellationToken);
+                    return new NoContentResult();
+                }
             }
             catch (OAuthException ex)
             {

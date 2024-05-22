@@ -22,34 +22,43 @@ namespace SimpleIdServer.IdServer.Api.DeviceAuthorization
     {
         private readonly IDeviceAuthorizationRequestValidator _validator;
         private readonly IDeviceAuthCodeRepository _deviceAuthCodeRepository;
+        private readonly ITransactionBuilder _transactionBuilder;
         private readonly IdServerHostOptions _options;
 
-        public DeviceAuthorizationRequestHandler(IDeviceAuthorizationRequestValidator validator, IDeviceAuthCodeRepository deviceAuthCodeRepository, IOptions<IdServerHostOptions> options)
+        public DeviceAuthorizationRequestHandler(
+            IDeviceAuthorizationRequestValidator validator, 
+            IDeviceAuthCodeRepository deviceAuthCodeRepository, 
+            ITransactionBuilder transactionBuilder,
+            IOptions<IdServerHostOptions> options)
         {
             _validator = validator;
             _deviceAuthCodeRepository = deviceAuthCodeRepository;
+            _transactionBuilder = transactionBuilder;
             _options = options.Value;
         }
 
         public virtual async Task<JsonObject> Handle(HandlerContext context, CancellationToken cancellationToken)
         {
-            await _validator.Validate(context, cancellationToken);
-            var deviceCode = Guid.NewGuid().ToString();
-            var userCode = GenerateUserCode();
-            var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
-            _deviceAuthCodeRepository.Add(DeviceAuthCode.Create(deviceCode, userCode, context.Client.Id, scopes, _options.DeviceCodeExpirationInSeconds));
-            await _deviceAuthCodeRepository.SaveChanges(cancellationToken);
-            var verificationUri = $"{context.Request.IssuerName}{context.UrlHelper.Action("Index", "Device")}";
-            var verificationUriComplete = $"{context.Request.IssuerName}{context.UrlHelper.Action("Index", "Device", new { userCode = userCode })}";
-            return new JsonObject
+            using (var transaction = _transactionBuilder.Build())
             {
-                { DeviceAuthorizationNames.DeviceCode, deviceCode },
-                { DeviceAuthorizationNames.UserCode, userCode },
-                { DeviceAuthorizationNames.VerificationUri, verificationUri },
-                { DeviceAuthorizationNames.VerificationUriComplete, verificationUriComplete },
-                { DeviceAuthorizationNames.ExpiresIn, _options.DeviceCodeExpirationInSeconds },
-                { DeviceAuthorizationNames.Interval, _options.DeviceCodeInterval }
-            };
+                await _validator.Validate(context, cancellationToken);
+                var deviceCode = Guid.NewGuid().ToString();
+                var userCode = GenerateUserCode();
+                var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
+                _deviceAuthCodeRepository.Add(DeviceAuthCode.Create(deviceCode, userCode, context.Client.Id, scopes, _options.DeviceCodeExpirationInSeconds));
+                await transaction.Commit(cancellationToken);
+                var verificationUri = $"{context.Request.IssuerName}{context.UrlHelper.Action("Index", "Device")}";
+                var verificationUriComplete = $"{context.Request.IssuerName}{context.UrlHelper.Action("Index", "Device", new { userCode = userCode })}";
+                return new JsonObject
+                {
+                    { DeviceAuthorizationNames.DeviceCode, deviceCode },
+                    { DeviceAuthorizationNames.UserCode, userCode },
+                    { DeviceAuthorizationNames.VerificationUri, verificationUri },
+                    { DeviceAuthorizationNames.VerificationUriComplete, verificationUriComplete },
+                    { DeviceAuthorizationNames.ExpiresIn, _options.DeviceCodeExpirationInSeconds },
+                    { DeviceAuthorizationNames.Interval, _options.DeviceCodeInterval }
+                };
+            }
         }
 
         protected virtual string GenerateUserCode()

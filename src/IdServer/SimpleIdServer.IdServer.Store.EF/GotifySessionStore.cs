@@ -20,7 +20,4 @@ public class GotiySessionStore : IGotiySessionStore
 
     public Task<GotifySession> GetByClientToken(string clientToken, CancellationToken cancellationToken)
         => _dbContext.GotifySessions.SingleOrDefaultAsync(c => c.ClientToken == clientToken, cancellationToken);
-
-    public Task<int> SaveChanges(CancellationToken cancellationToken)
-        => _dbContext.SaveChangesAsync(cancellationToken);
 }
